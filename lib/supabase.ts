@@ -235,7 +235,7 @@ export function generateDiscountCode(name: string, percent: number = 10): string
     .substring(0, 6);
 
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-  return \`\${cleanName}\${percent}\${random}\`;
+  return `${cleanName}${percent}${random}`;
 }
 
 // Re-export normalization functions from centralized module
