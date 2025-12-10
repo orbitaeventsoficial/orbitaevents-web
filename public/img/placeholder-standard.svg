@@ -1,0 +1,71 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#000000;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#DAA520;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#DAA520;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Fondo degradado -->
+  <rect width="1920" height="1080" fill="url(#grad1)"/>
+  
+  <!-- Efecto de brillo dorado -->
+  <ellipse cx="960" cy="540" rx="600" ry="400" fill="url(#glow)"/>
+  
+  <!-- Grid de fondo -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#DAA520" stroke-width="0.5" opacity="0.1"/>
+    </pattern>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  
+  <!-- Logo circular en el centro -->
+  <circle cx="960" cy="540" r="150" fill="none" stroke="#DAA520" stroke-width="3" opacity="0.8"/>
+  <circle cx="960" cy="540" r="140" fill="none" stroke="#DAA520" stroke-width="1" opacity="0.4"/>
+  
+  <!-- Texto ÒRBITA -->
+  <text x="960" y="520" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#DAA520" text-anchor="middle" letter-spacing="8">
+    ÒRBITA
+  </text>
+  
+  <!-- Texto EVENTS -->
+  <text x="960" y="580" font-family="Arial, sans-serif" font-size="36" font-weight="300" fill="#FFFFFF" text-anchor="middle" letter-spacing="12">
+    EVENTS
+  </text>
+  
+  <!-- Línea decorativa superior -->
+  <line x1="760" y1="460" x2="1160" y2="460" stroke="#DAA520" stroke-width="2" opacity="0.6"/>
+  
+  <!-- Línea decorativa inferior -->
+  <line x1="760" y1="620" x2="1160" y2="620" stroke="#DAA520" stroke-width="2" opacity="0.6"/>
+  
+  <!-- Subtítulo -->
+  <text x="960" y="660" font-family="Arial, sans-serif" font-size="18" fill="#AAAAAA" text-anchor="middle" letter-spacing="4">
+    EL EVENTO QUE TU GENTE NO OLVIDARÁ
+  </text>
+  
+  <!-- Marca de agua -->
+  <text x="960" y="1040" font-family="monospace" font-size="12" fill="#555555" text-anchor="middle">
+    PLACEHOLDER IMAGE · Replace with real photo
+  </text>
+  
+  <!-- Partículas decorativas -->
+  <circle cx="400" cy="200" r="3" fill="#DAA520" opacity="0.6">
+    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="1520" cy="300" r="2" fill="#DAA520" opacity="0.5">
+    <animate attributeName="opacity" values="0.5;0.2;0.5" dur="4s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="300" cy="800" r="2.5" fill="#DAA520" opacity="0.4">
+    <animate attributeName="opacity" values="0.4;0.1;0.4" dur="5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="1600" cy="850" r="2" fill="#DAA520" opacity="0.5">
+    <animate attributeName="opacity" values="0.5;0.2;0.5" dur="3.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>

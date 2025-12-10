@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1024 1024"
+   width="1024"
+   height="1024"
+   aria-labelledby="title desc"
+   role="img"
+   preserveAspectRatio="xMidYMid meet"
+   version="1.1"
+   id="svg40"
+   sodipodi:docname="Logo Orbita fons BN.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview39"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.75488281"
+     inkscape:cx="561.01423"
+     inkscape:cy="526.5718"
+     inkscape:window-width="1920"
+     inkscape:window-height="991"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg40" />
+  <title
+     id="title">Òrbita Events — símbolo + wordmark</title>
+  <desc
+     id="desc">Planeta naranja con anillo ámbar, satélite magenta metálico y el wordmark “Òrbita / EVENTS” centrado abajo.</desc>
+  <!-- FONDO -->
+  <defs
+     id="defs30">
+    <!-- Gradientes del planeta -->
+    <radialGradient
+       id="g-planet-core"
+       cx="440"
+       cy="300"
+       r="268"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#FFF1C4"
+         id="stop1" />
+      <stop
+         offset="26%"
+         stop-color="#FFC069"
+         id="stop2" />
+      <stop
+         offset="56%"
+         stop-color="#FF7A2E"
+         id="stop3" />
+      <stop
+         offset="100%"
+         stop-color="#5E0022"
+         id="stop4" />
+    </radialGradient>
+    <radialGradient
+       id="g-terminator"
+       cx="612"
+       cy="468"
+       r="300"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.845,0,0,0.845,-5,-18)">
+      <stop
+         offset="52%"
+         stop-color="#000"
+         stop-opacity="0"
+         id="stop5" />
+      <stop
+         offset="100%"
+         stop-color="#200015"
+         stop-opacity=".58"
+         id="stop6" />
+    </radialGradient>
+    <radialGradient
+       id="g-planet-spec"
+       cx="390"
+       cy="252"
+       r="205"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#FFF"
+         stop-opacity=".20"
+         id="stop7" />
+      <stop
+         offset="55%"
+         stop-color="#FFF"
+         stop-opacity=".08"
+         id="stop8" />
+      <stop
+         offset="100%"
+         stop-color="#FFF"
+         stop-opacity="0"
+         id="stop9" />
+    </radialGradient>
+    <!-- Anillo -->
+    <linearGradient
+       id="grad_ring_fill"
+       x1="90.84"
+       y1="261.72"
+       x2="622.2"
+       y2="261.72"
+       gradientTransform="scale(1.4360915,0.69633445)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#FFC24D"
+         id="stop10" />
+      <stop
+         offset="32%"
+         stop-color="#FFA33A"
+         id="stop11" />
+      <stop
+         offset="66%"
+         stop-color="#E27600"
+         id="stop12" />
+      <stop
+         offset="100%"
+         stop-color="#A34700"
+         id="stop13" />
+    </linearGradient>
+    <linearGradient
+       id="g-ring-bevel"
+       x1="0%"
+       y1="0%"
+       x2="0%"
+       y2="100%"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="rotate(-28,512,420)">
+      <stop
+         offset="0%"
+         stop-color="#FFF6CA"
+         stop-opacity=".65"
+         id="stop14" />
+      <stop
+         offset="22%"
+         stop-color="#FFE189"
+         stop-opacity=".42"
+         id="stop15" />
+      <stop
+         offset="55%"
+         stop-color="#F3B350"
+         stop-opacity=".30"
+         id="stop16" />
+      <stop
+         offset="100%"
+         stop-color="#552100"
+         stop-opacity=".25"
+         id="stop17" />
+    </linearGradient>
+    <linearGradient
+       id="g-edge-top"
+       x1="90.21"
+       y1="259.74"
+       x2="90.21"
+       y2="793.44"
+       gradientTransform="scale(1.43,0.697)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#FFE9A6"
+         id="stop18" />
+      <stop
+         offset="60%"
+         stop-color="#FFE9A6"
+         stop-opacity="0"
+         id="stop19" />
+    </linearGradient>
+    <linearGradient
+       id="g-edge-bottom"
+       x1="90.1"
+       y1="259.38"
+       x2="90.1"
+       y2="793.51"
+       gradientTransform="scale(1.43,0.6976)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="42%"
+         stop-color="#000"
+         stop-opacity="0"
+         id="stop20" />
+      <stop
+         offset="100%"
+         stop-color="#421400"
+         stop-opacity=".45"
+         id="stop21" />
+    </linearGradient>
+    <linearGradient
+       id="g-inner-shade"
+       x1="90.84"
+       y1="261.72"
+       x2="90.84"
+       y2="793.08"
+       gradientTransform="scale(1.4360915,0.69633445)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#000"
+         stop-opacity="0"
+         id="stop22" />
+      <stop
+         offset="100%"
+         stop-color="#732700"
+         stop-opacity=".25"
+         id="stop23" />
+    </linearGradient>
+    <path
+       id="ring-shape"
+       d="M694.688 182.251c.448.442.894.885 1.338 1.33 20.426.556 37.188 2.806 61.852 6.313 34.946 4.968 110.162 26.3 73.771 83.732-14.574 23.001-37.28 46.722-60.116 65.534-38.699 31.881-84.617 55.921-115.698 71.618-124.536 61.878-272.372 94.2-374.076 77.256-25.727-4.286-48.502-11.725-67.201-22.635-44.242-21.963-50.403-70.274 2.998-124.578 11.512-12.971 25.751-25.423 42.367-37.262.441-1.746.9-3.487 1.377-5.223-24.946 13.526-46.008 27.091-61.51 39.955-58.158 48.263-109.643 126.543-23.766 177.955 37.326 22.346 91.35 34.074 153.068 35.787 105.292 2.923 232.981-23.301 338.371-75.668 33.856-16.823 67.833-35.895 99.459-57.977 42.191-29.458 80.199-64.273 108.162-106.244 41.191-61.825 11.476-111.074-69.537-121.809-41.519-5.502-74.875-7.934-106.01-8.082-1.622-.008-3.238-.009-4.849-.004z" />
+    <mask
+       id="mask_outside_planet"
+       maskUnits="userSpaceOnUse">
+      <rect
+         width="1024"
+         height="1024"
+         fill="#fff"
+         id="rect23" />
+      <circle
+         cx="512"
+         cy="380"
+         r="260"
+         fill="#000"
+         id="circle23" />
+    </mask>
+    <filter
+       id="f-under-blur"
+       x="-0.0071226183"
+       y="-0.014702413"
+       width="1.0142237"
+       height="1.0294056">
+      <feGaussianBlur
+         stdDeviation="1.6"
+         id="feGaussianBlur23" />
+    </filter>
+    <!-- Satélite -->
+    <radialGradient
+       id="g-sat-metal"
+       cx="-17.2"
+       cy="-17.2"
+       r="77.4"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(795,190)">
+      <stop
+         offset="0%"
+         stop-color="#FFE2F1"
+         stop-opacity=".92"
+         id="stop24" />
+      <stop
+         offset="22%"
+         stop-color="#E83D7A"
+         id="stop25" />
+      <stop
+         offset="68%"
+         stop-color="#8C1047"
+         id="stop26" />
+      <stop
+         offset="100%"
+         stop-color="#2A021B"
+         id="stop27" />
+    </radialGradient>
+    <radialGradient
+       id="g-sat-spec"
+       cx="790"
+       cy="158"
+       r="36"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(2.4050659,0,0,2.4050659,-1148.173,-233.00677)">
+      <stop
+         offset="0%"
+         stop-color="#FFFFFF"
+         stop-opacity=".85"
+         id="stop28" />
+      <stop
+         offset="65%"
+         stop-color="#FFFFFF"
+         stop-opacity=".18"
+         id="stop29" />
+      <stop
+         offset="100%"
+         stop-color="#FFFFFF"
+         stop-opacity="0"
+         id="stop30" />
+    </radialGradient>
+    <filter
+       id="f-soft-shadow"
+       x="-0.065934066"
+       y="-0.33333333"
+       width="1.1318681"
+       height="1.6666667">
+      <feGaussianBlur
+         stdDeviation="10"
+         id="feGaussianBlur30" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Greyscale"
+       id="filter39"
+       x="-0.0015678121"
+       y="-0.0032431795"
+       width="1.0031194"
+       height="1.0064869">
+      <feColorMatrix
+         values="0.3 0.59 0.11 0.05 0 0.3 0.59 0.11 0.05 0 0.3 0.59 0.11 0.05 0 0 0 0 1 0 "
+         id="feColorMatrix39" />
+    </filter>
+  </defs>
+  <!-- Sombra bajo el planeta -->
+  <!-- Planeta -->
+  <!-- Anillo -->
+  <!-- Satélite -->
+  <!-- WORDMARK: centrado bajo el planeta, color #F8F3EE -->
+  <!-- Escala y posición ya ajustadas para aire respecto al anillo -->
+  <ellipse
+     cx="512"
+     cy="705"
+     rx="182"
+     ry="36"
+     fill="#000000"
+     opacity="0.25"
+     filter="url(#f-soft-shadow)"
+     id="ellipse30" />
+  <circle
+     cx="512"
+     cy="380"
+     r="260"
+     fill="url(#g-planet-core)"
+     id="circle30"
+     style="fill:url(#g-planet-core);filter:url(#filter39)" />
+  <circle
+     cx="512"
+     cy="379.09299"
+     r="259.55099"
+     fill="url(#g-terminator)"
+     opacity="0.28"
+     id="circle31"
+     style="fill:url(#g-terminator);filter:url(#filter39)" />
+  <circle
+     cx="512"
+     cy="380"
+     r="260"
+     fill="url(#g-planet-spec)"
+     opacity="0.22"
+     id="circle32"
+     style="fill:url(#g-planet-spec);filter:url(#filter39)" />
+  <use
+     xlink:href="#ring-shape"
+     mask="url(#mask_outside_planet)"
+     fill="url(#grad_ring_fill)"
+     opacity="0.28"
+     id="use32"
+     style="fill:url(#grad_ring_fill);filter:url(#filter39)" />
+  <use
+     xlink:href="#ring-shape"
+     fill="url(#grad_ring_fill)"
+     opacity="0.82"
+     stroke="#000000"
+     stroke-opacity="0.06"
+     stroke-width="0.6"
+     vector-effect="non-scaling-stroke"
+     stroke-linejoin="round"
+     id="use33"
+     style="fill:url(#grad_ring_fill);filter:url(#filter39)" />
+  <use
+     xlink:href="#ring-shape"
+     fill="url(#g-inner-shade)"
+     opacity="0.3"
+     id="use34"
+     style="fill:url(#g-inner-shade);filter:url(#filter39)" />
+  <use
+     xlink:href="#ring-shape"
+     fill="url(#g-ring-bevel)"
+     opacity="0.5"
+     style="mix-blend-mode:overlay;fill:url(#g-ring-bevel);filter:url(#filter39)"
+     id="use35" />
+  <use
+     xlink:href="#ring-shape"
+     fill="none"
+     stroke="url(#g-edge-top)"
+     stroke-width="2.1"
+     opacity="0.55"
+     id="use36"
+     style="stroke:url(#g-edge-top);filter:url(#filter39)" />
+  <use
+     xlink:href="#ring-shape"
+     fill="none"
+     stroke="url(#g-edge-bottom)"
+     stroke-width="2.4"
+     opacity="0.42"
+     id="use37"
+     style="stroke:url(#g-edge-bottom);filter:url(#filter39)" />
+  <use
+     xlink:href="#ring-shape"
+     fill="none"
+     stroke="#000000"
+     stroke-width="3.2"
+     opacity="0.1"
+     filter="url(#f-under-blur)"
+     id="use38" />
+  <circle
+     r="43"
+     cx="795"
+     cy="190"
+     fill="url(#g-sat-metal)"
+     id="circle38"
+     style="fill:url(#g-sat-metal);filter:url(#filter39)" />
+  <circle
+     r="43.291"
+     cx="795.12"
+     cy="190.285"
+     fill="url(#g-sat-spec)"
+     id="circle39"
+     style="fill:url(#g-sat-spec);filter:url(#filter39)" />
+  <g
+     id="wordmark"
+     fill="#F8F3EE"
+     stroke="none"
+     style="fill:#111111;fill-opacity:1;filter:url(#filter39)">
+    <path
+       id="logotype"
+       d="m 692.77325,947.19017 c -3.90474,-0.82851 -6.96237,-2.38408 -11.84335,-6.02532 l -3.89607,-2.90648 4.11218,-2.8806 c 2.26171,-1.58432 4.2423,-2.88059 4.40132,-2.88059 0.15902,0 1.38309,0.99978 2.72014,2.22173 5.38507,4.92146 14.87011,5.63889 19.06682,1.44218 4.66395,-4.66395 1.67144,-11.38652 -6.35889,-14.28501 -13.31738,-4.80681 -18.65242,-8.93562 -20.04682,-15.51435 -1.40009,-6.60557 0.80541,-12.78671 5.87202,-16.45695 4.09761,-2.96829 7.9378,-3.87121 14.91796,-3.50755 6.09354,0.31748 10.28256,1.96725 15.26639,6.0124 l 2.06232,1.67389 -4.01361,3.0303 c -3.52332,2.66013 -4.12793,2.89256 -4.94947,1.90266 -1.93018,-2.32573 -6.40592,-3.95661 -10.85839,-3.95661 -3.63825,0 -4.75863,0.32087 -6.63582,1.90042 -1.8805,1.58233 -2.25852,2.43146 -2.25852,5.0732 0,4.17815 2.1435,5.98363 11.32953,9.54292 11.75448,4.55449 15.46266,7.80081 17.31153,15.15536 1.92808,7.66964 -2.09345,15.69854 -9.44774,18.86228 -4.14258,1.78209 -12.23918,2.55355 -16.75153,1.59612 z m -373.87843,-30.29187 -1.4e-4,-29.91314 h 18.35162 18.35162 v 4.77142 4.77142 h -13.21317 -13.21316 v 8.07472 8.07471 h 11.378 11.37801 v 4.40439 4.40439 h -11.37801 -11.378 v 8.07471 8.07471 h 13.61523 13.61522 l -0.21854,4.46146 -0.21855,4.46145 -18.53499,0.12645 -18.535,0.12645 z m 89.25798,29.54611 -5.06922,-0.36703 -10.88834,-28.99556 c -5.98859,-15.94756 -10.8921,-29.25778 -10.89669,-29.57827 -0.004,-0.32048 2.33793,-0.48565 5.20562,-0.36703 l 5.21398,0.21567 8.49052,23.38413 8.49052,23.38412 8.50096,-23.56628 8.50096,-23.56628 5.32197,-10e-4 c 2.92708,-7.4e-4 5.32197,0.1024 5.32197,0.22922 0,0.80922 -22.16714,58.90481 -22.59349,59.21296 -0.29126,0.2105 -2.8107,0.21757 -5.59876,0.0157 z m 55.10777,0.24518 c -0.0672,-0.067 -0.0323,-13.52792 0.0776,-29.91314 l 0.19971,-29.79129 h 18.27023 18.27022 l 0.24872,4.46792 c 0.13679,2.45736 0.11108,4.6045 -0.0572,4.77142 -0.16821,0.16693 -6.19672,0.3035 -13.39668,0.3035 h -13.09078 v 8.07472 8.07471 h 11.378 11.37801 v 4.40439 4.40439 h -11.37801 -11.378 v 8.07471 8.07471 h 13.5802 13.5802 l -1.1e-4,4.58791 -10e-5,4.5879 h -18.77991 c -10.32894,0 -18.83487,-0.0548 -18.90206,-0.12185 z m 74.2019,-0.0952 -4.95494,-0.21706 v -29.69608 -29.69609 l 4.95494,0.0214 4.95494,0.0214 3.0072,4.19947 c 1.65396,2.30971 7.80612,10.97122 13.67147,19.2478 5.86535,8.27658 11.37621,15.87416 12.24636,16.88349 l 1.58208,1.83517 -0.0995,-2.2022 c -0.0548,-1.2112 -0.0645,-10.70817 -0.0217,-21.10436 l 0.0778,-18.90217 h 4.77143 4.77142 l 6.5e-4,29.91314 6.6e-4,29.91314 -4.95478,-0.36703 -4.95478,-0.36703 -14.68211,-20.41838 -14.68211,-20.41836 -0.36703,20.7854 -0.36703,20.7854 z m 91.51341,-0.0888 c -0.16823,-0.16822 -0.30586,-11.48199 -0.30586,-25.14172 v -24.83586 h -9.17581 -9.17581 v -4.77142 -4.77142 h 23.49007 23.49007 v 4.77142 4.77142 h -9.17581 -9.17581 v 25.14172 25.14172 h -4.83259 c -2.65793,0 -4.97023,-0.13764 -5.13845,-0.30586 z M 510.85262,842.93732 c -9.31823,-1.29353 -16.33044,-4.78534 -23.30656,-11.60579 l -4.22087,-4.12669 v 6.40009 6.40009 h -12.11207 -12.11207 v -69.18561 -69.1856 h 12.86373 12.86373 l -0.20111,26.24312 c -0.11062,14.43371 -0.0801,26.24298 0.0678,26.24282 0.1479,-1.7e-4 2.14808,-1.74008 4.44482,-3.86646 7.81507,-7.23537 18.22584,-11.02964 30.15434,-10.98994 12.34413,0.0411 22.603,3.98915 31.15626,11.99031 10.92509,10.21987 15.79339,24.5749 14.88025,43.87696 -0.71677,15.15128 -5.06187,25.92668 -14.12722,35.03404 -5.59557,5.62153 -12.65539,9.6738 -20.16426,11.57411 -5.47503,1.3856 -14.83572,1.94137 -20.18678,1.19855 z m 9.88926,-23.18097 c 13.60437,-4.04006 21.51857,-18.08125 19.15995,-33.99315 -2.06607,-13.93836 -10.35514,-22.82917 -23.43154,-25.13254 -11.25918,-1.98326 -23.60309,3.97202 -28.62113,13.80819 -4.45884,8.74006 -5.05436,21.54308 -1.38274,29.72779 2.07519,4.62599 6.82773,10.19509 10.89702,12.76928 6.09276,3.85423 15.90931,5.03853 23.37844,2.82043 z m -230.10869,22.70218 c -26.47179,-4.20682 -46.05681,-21.15695 -54.16957,-46.8818 -2.78113,-8.81871 -3.69216,-16.67626 -3.25971,-28.11479 1.04028,-27.51615 14.38285,-48.82187 37.60953,-60.05568 10.95769,-5.29981 16.2812,-6.41127 30.83072,-6.437 13.71441,-0.0242 19.96296,1.12063 29.35232,5.37797 25.81163,11.70354 41.66017,39.47339 39.78938,69.71905 -1.2602,20.37414 -8.50251,36.3375 -22.37347,49.31511 -8.78236,8.21674 -17.58649,12.90381 -29.54588,15.72938 -5.36957,1.26863 -23.33477,2.12623 -28.23332,1.34776 z m 21.58659,-24.13763 c 14.34312,-3.38092 25.51867,-15.2788 29.96577,-31.90261 1.77176,-6.62307 1.76971,-22.75258 -0.004,-29.36259 -5.39461,-20.1066 -20.55832,-32.29885 -40.17069,-32.29885 -11.51924,0 -20.72563,3.76986 -28.62852,11.72289 -8.48803,8.54187 -12.3976,18.37307 -13.01824,32.73627 -0.72236,16.7172 3.50939,29.1687 13.18523,38.79628 8.06628,8.02604 16.06725,11.30975 27.72747,11.37975 3.43175,0.0206 8.35594,-0.46141 10.94265,-1.07114 z m 417.38414,24.18361 c -0.80747,-0.17146 -3.28494,-0.67861 -5.50548,-1.127 -5.09713,-1.02925 -11.6675,-4.3134 -15.42997,-7.71257 -1.59909,-1.44468 -3.97108,-4.78726 -5.27108,-7.42796 -2.02411,-4.11153 -2.40631,-5.77649 -2.66058,-11.59004 -0.34091,-7.79468 0.79788,-12.29986 4.3478,-17.20038 4.43083,-6.11659 15.24212,-11.25268 27.72952,-13.17341 5.33339,-0.82035 28.16557,-2.98246 31.57089,-2.98963 1.71403,-0.004 1.74142,-0.10903 1.40213,-5.39583 -0.57931,-9.02701 -4.27147,-13.80279 -12.57799,-16.26956 -8.27785,-2.45826 -17.22246,-0.69664 -22.31374,4.39464 -1.7697,1.7697 -3.32368,4.12142 -3.58424,5.42424 l -0.46,2.29998 h -11.35077 -11.35077 l 0.51533,-3.11977 c 2.95858,-17.91136 16.64838,-28.45638 38.51915,-29.67067 25.0102,-1.38858 42.51879,9.49989 46.65499,29.01443 0.80158,3.78183 1.03659,12.41916 1.04648,38.46057 l 0.0128,33.58347 h -11.74503 -11.74504 v -5.56242 -5.5624 l -3.85384,3.3908 c -4.55864,4.01091 -10.96377,7.30127 -17.06701,8.76743 -4.71382,1.13239 -14.46671,1.97929 -16.88349,1.46608 z m 22.26873,-21.22326 c 8.71583,-3.91144 14.06748,-11.95895 14.06748,-21.15391 v -3.64202 l -7.52416,0.49885 c -18.73544,1.24214 -26.39748,2.99109 -30.09816,6.87027 -6.70143,7.02466 -3.1729,16.71697 7.04136,19.34153 4.36173,1.12075 11.62655,0.2784 16.51348,-1.91472 z m -90.88599,19.05406 c -8.06343,-2.24495 -13.93372,-7.24066 -17.53612,-14.92349 l -1.93439,-4.12546 -0.22152,-29.91314 -0.22153,-29.91314 h -8.40374 -8.40373 v -10.2769 -10.27691 h 8.47337 8.47337 l -0.10001,-11.78367 -0.1,-11.78367 h 12.24883 12.24883 l -0.10001,11.78367 -0.10001,11.78367 h 11.77667 11.77666 v 10.27691 10.2769 h -11.81786 -11.81785 l 0.28978,24.77469 c 0.30837,26.36379 0.53349,28.08248 4.09362,31.25242 2.21989,1.97659 10.11239,3.13664 15.14019,2.22531 l 4.11212,-0.74535 v 10.4404 c 0,9.23848 -0.14789,10.50548 -1.28461,11.00576 -0.70654,0.31095 -6.07439,0.6724 -11.92856,0.80323 -7.89932,0.17653 -11.68041,-0.0507 -14.6635,-0.88123 z M 387.89677,790.82268 v -49.18234 h 12.17471 12.1747 l -0.24615,4.77296 c -0.13538,2.62512 -0.17038,4.77226 -0.0778,4.77142 0.0926,-7.3e-4 1.53861,-1.48805 3.21332,-3.30489 5.70342,-6.18748 16.2711,-9.70242 26.16439,-8.7026 l 4.58791,0.46365 v 12.45627 c 0,11.57872 -0.0905,12.41835 -1.28462,11.91816 -2.54228,-1.06491 -12.63356,-1.28603 -15.97649,-0.35007 -4.50293,1.26075 -9.49815,5.85085 -12.20695,11.21693 -3.00248,5.94788 -3.52023,12.00164 -3.54496,41.44926 l -0.0199,23.67359 h -12.4791 -12.4791 z m 195.9953,0 v -49.18234 h 12.4791 12.4791 v 49.18234 49.18234 h -12.4791 -12.4791 z m 6.20918,-64.50937 c -10.17997,-4.62412 -11.29436,-18.69259 -1.98589,-25.07086 3.01492,-2.06585 9.71,-2.78085 13.70215,-1.46333 12.59709,4.15742 13.24428,21.65781 0.99028,26.77785 -3.62684,1.51539 -9.06352,1.41114 -12.70654,-0.24366 z m -288.10608,-34.53668 -6.98964,-0.41973 -10.62792,-7.65897 c -9.16536,-6.60498 -15.29885,-11.19135 -17.93186,-13.40868 -0.38355,-0.32299 6.30378,-0.58726 14.86074,-0.58726 h 15.55809 l 7.78098,9.35932 c 4.27953,5.14763 8.43297,10.26773 9.22987,11.37801 l 1.4489,2.01868 -3.16977,-0.13082 c -1.74336,-0.0719 -6.31509,-0.3197 -10.15939,-0.55055 z"
+       style="fill:#111111;fill-opacity:1" />
+  </g>
+  <metadata
+     id="metadata39">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Òrbita Events — símbolo + wordmark</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

@@ -1,0 +1,1184 @@
+// prisma/schema.prisma
+// Òrbita Events - Sistema Centralitzat Complet
+// Versió 2.0 - Desembre 2024
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CONFIGURACIÓ GLOBAL (Settings)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Setting {
+  id          String      @id @default(cuid())
+  key         String      @unique
+  value       String
+  type        SettingType @default(STRING)
+  category    String      // "stats", "contact", "pricing", "config"
+  label       String?
+  description String?
+  updatedAt   DateTime    @updatedAt
+
+  @@index([category])
+  @@map("settings")
+}
+
+enum SettingType {
+  STRING
+  NUMBER
+  BOOLEAN
+  JSON
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INVENTARI
+// ═══════════════════════════════════════════════════════════════════════════
+
+model InventoryItem {
+  id            String            @id @default(cuid())
+  code          String            @unique // "ALT-001", "FUM-001"
+  name          String
+  description   String?
+  category      InventoryCategory
+  watts         Int?
+  value         Float
+  status        ItemStatus        @default(AVAILABLE)
+  condition     ItemCondition     @default(GOOD)
+  isConsumable  Boolean           @default(false)
+  stockQuantity Int?
+  minStock      Int?
+  imageUrl      String?
+  notes         String?
+
+  packItems     PackInventory[]
+  extraItems    ExtraInventory[]
+  bookingItems  BookingInventory[]
+  usageHistory  InventoryUsage[]
+
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([category])
+  @@index([status])
+  @@map("inventory_items")
+}
+
+enum InventoryCategory {
+  SOUND
+  LIGHTING
+  EFFECTS
+  STRUCTURE
+  CABLING
+  TECH
+  DECORATION_HP
+  DECORATION_HW
+  DECORATION_GEN
+  CONSUMABLE
+}
+
+enum ItemStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  BROKEN
+  RETIRED
+}
+
+enum ItemCondition {
+  NEW
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+}
+
+model InventoryUsage {
+  id        String        @id @default(cuid())
+  itemId    String
+  item      InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  bookingId String?
+  usedAt    DateTime      @default(now())
+  hoursUsed Float?
+  notes     String?
+
+  @@map("inventory_usage")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PACKS
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Pack {
+  id             String            @id @default(cuid())
+  slug           String            @unique // "flash", "party-starter", "corporate"
+  isActive       Boolean           @default(true)
+  isFeatured     Boolean           @default(false)
+  order          Int               @default(0)
+  price          Float
+  originalPrice  Float?
+  extraHourPrice Float             @default(75)
+  minGuests      Int?
+  maxGuests      Int?
+  djHours        Int
+  soundWatts     Int               @default(4000)
+  includesFog    Boolean           @default(true)
+  includesMic    Boolean           @default(false)
+
+  translations   PackTranslation[]
+  inventory      PackInventory[]
+  bookings       Booking[]
+
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@map("packs")
+}
+
+model PackTranslation {
+  id          String   @id @default(cuid())
+  packId      String
+  pack        Pack     @relation(fields: [packId], references: [id], onDelete: Cascade)
+  locale      String   // "es", "ca", "en"
+  name        String
+  tagline     String?
+  description String?  @db.Text
+  badge       String?
+  features    String[] // Array de features
+
+  @@unique([packId, locale])
+  @@map("pack_translations")
+}
+
+model PackInventory {
+  id         String        @id @default(cuid())
+  packId     String
+  pack       Pack          @relation(fields: [packId], references: [id], onDelete: Cascade)
+  itemId     String
+  item       InventoryItem @relation(fields: [itemId], references: [id])
+  quantity   Int           @default(1)
+  isRequired Boolean       @default(true)
+
+  @@unique([packId, itemId])
+  @@map("pack_inventory")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// EXTRAS
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Extra {
+  id           String             @id @default(cuid())
+  slug         String             @unique
+  isActive     Boolean            @default(true)
+  price        Float
+  priceType    PriceType          @default(FIXED)
+  order        Int                @default(0)
+
+  translations ExtraTranslation[]
+  inventory    ExtraInventory[]
+  bookingExtras BookingExtra[]
+
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@map("extras")
+}
+
+enum PriceType {
+  FIXED
+  PER_HOUR
+  PER_UNIT
+  ON_REQUEST
+}
+
+model ExtraTranslation {
+  id          String  @id @default(cuid())
+  extraId     String
+  extra       Extra   @relation(fields: [extraId], references: [id], onDelete: Cascade)
+  locale      String
+  name        String
+  description String?
+
+  @@unique([extraId, locale])
+  @@map("extra_translations")
+}
+
+model ExtraInventory {
+  id       String        @id @default(cuid())
+  extraId  String
+  extra    Extra         @relation(fields: [extraId], references: [id], onDelete: Cascade)
+  itemId   String
+  item     InventoryItem @relation(fields: [itemId], references: [id])
+  quantity Int           @default(1)
+
+  @@unique([extraId, itemId])
+  @@map("extra_inventory")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLIENTS UNIFICATS (CRM)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Customer {
+  id                String   @id @default(cuid())
+
+  // Dades normalitzades
+  email             String   @unique
+  emailNormalized   String   @unique // lowercase, trimmed
+  phone             String?
+  phoneNormalized   String?  // només dígits, amb prefix internacional
+  name              String
+  nameNormalized    String   // lowercase, sense accents, per cerques
+
+  // Instagram (opcional)
+  instagram         String?
+  instagramNormalized String? // sense @, lowercase
+
+  // Metadades
+  preferredLocale   String   @default("es")
+  source            LeadSource @default(WEBSITE)
+
+  // GDPR
+  gdprConsent       Boolean  @default(false)
+  gdprConsentDate   DateTime?
+  marketingConsent  Boolean  @default(false)
+  marketingConsentDate DateTime?
+
+  // Estadístiques
+  totalEvents       Int      @default(0)
+  totalSpent        Float    @default(0)
+  lastEventDate     DateTime?
+
+  // Relacions
+  leads             Lead[]
+  testimonials      CustomerTestimonial[]
+  discountCodes     CustomerDiscountCode[]
+  activityLog       CustomerActivity[]
+  consentRecords    ConsentRecord[]
+  dataRequests      DataRequest[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  mergedIntoId      String?  // Si s'ha fusionat amb un altre customer
+
+  @@index([emailNormalized])
+  @@index([phoneNormalized])
+  @@index([nameNormalized])
+  @@map("customers")
+}
+
+model CustomerActivity {
+  id          String   @id @default(cuid())
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  action      String   // "LEAD_CREATED", "BOOKING_CONFIRMED", "TESTIMONIAL_SUBMITTED", etc
+  details     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([customerId])
+  @@index([createdAt])
+  @@map("customer_activities")
+}
+
+// Testimonis dels clients (per generar canvas/imatges)
+model CustomerTestimonial {
+  id              String   @id @default(cuid())
+  customerId      String
+  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  // Contingut
+  text            String   @db.Text
+  rating          Int      @default(5) // 1-5
+  eventType       EventType?
+  eventDate       DateTime?
+
+  // Foto del client (opcional)
+  photoUrl        String?
+
+  // Permisos
+  showName        Boolean  @default(true)
+  showPhoto       Boolean  @default(false)
+  isApproved      Boolean  @default(false) // Admin ha d'aprovar
+
+  // Canvas generat
+  canvasImageUrl  String?  // URL de la imatge generada
+  canvasGeneratedAt DateTime?
+
+  // Codi de descompte associat
+  discountCodeId  String?
+
+  // Token únic per al formulari públic
+  submissionToken String   @unique @default(cuid())
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([isApproved])
+  @@map("customer_testimonials")
+}
+
+// Codis de descompte personalitzats per client
+model CustomerDiscountCode {
+  id              String   @id @default(cuid())
+  customerId      String
+  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  code            String   @unique
+  discountPercent Float    @default(10)
+
+  // Validesa
+  validFrom       DateTime @default(now())
+  validUntil      DateTime
+
+  // Ús
+  maxUses         Int      @default(1)
+  currentUses     Int      @default(0)
+
+  // Origen
+  sourceType      String   // "POST_EVENT", "TESTIMONIAL", "REFERRAL", "MANUAL"
+  sourceId        String?  // ID del testimonial o booking
+
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  usedAt          DateTime?
+
+  @@index([code])
+  @@index([customerId])
+  @@map("customer_discount_codes")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LEADS
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Lead {
+  id               String     @id @default(cuid())
+
+  // Relació amb Customer (opcional, es crea quan es processa)
+  customerId       String?
+  customer         Customer?  @relation(fields: [customerId], references: [id])
+
+  name             String
+  email            String
+  phone            String?
+  eventType        EventType
+  eventDate        DateTime?
+  eventLocation    String?
+  guestCount       Int?
+  budget           String?
+  message          String?    @db.Text
+  interestedPackId String?
+  interestedExtras String[]
+  source           LeadSource @default(WEBSITE)
+  landingPage      String?
+  utmSource        String?
+  utmMedium        String?
+  utmCampaign      String?
+  status           LeadStatus @default(NEW)
+  priority         Priority   @default(MEDIUM)
+  assignedTo       String?
+  preferredLocale  String     @default("es") // Idioma preferit del client (es, ca, en, ar, fr, zh)
+
+  notes            LeadNote[]
+  booking          Booking?
+
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  contactedAt      DateTime?
+  convertedAt      DateTime?
+
+  @@index([status])
+  @@index([eventType])
+  @@index([createdAt])
+  @@index([customerId])
+  @@index([email])
+  @@index([status, createdAt]) // Consultes combinades
+  @@index([priority, status]) // Per ordenar leads urgents
+  @@map("leads")
+}
+
+enum EventType {
+  WEDDING
+  BIRTHDAY
+  CORPORATE
+  COMMUNION
+  BAPTISM
+  GRADUATION
+  ANNIVERSARY
+  PRIVATE_PARTY
+  OTHER
+}
+
+enum LeadSource {
+  WEBSITE
+  CONFIGURATOR
+  PHONE
+  WHATSAPP
+  INSTAGRAM
+  REFERRAL
+  GOOGLE
+  OTHER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUOTE_SENT
+  NEGOTIATING
+  WON
+  LOST
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  createdBy String?
+  createdAt DateTime @default(now())
+
+  @@map("lead_notes")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RESERVES (Bookings)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Booking {
+  id             String        @id @default(cuid())
+  reference      String        @unique // "OE-2024-001"
+  leadId         String?       @unique
+  lead           Lead?         @relation(fields: [leadId], references: [id])
+
+  // Client
+  clientName      String
+  clientEmail     String
+  clientPhone     String
+  preferredLocale String        @default("es") // Idioma preferit (es, ca, en, ar, fr, zh)
+
+  // Event
+  eventType      EventType
+  eventDate      DateTime
+  eventStartTime String?       // "20:00"
+  eventEndTime   String?       // "03:00"
+  eventLocation  String
+  eventVenue     String?
+  guestCount     Int
+
+  // Services
+  packId         String
+  pack           Pack          @relation(fields: [packId], references: [id])
+  extras         BookingExtra[]
+  extraHours     Int           @default(0)
+  inventory      BookingInventory[]
+
+  // Pricing
+  subtotal       Float
+  discount       Float         @default(0)
+  discountCode   String?
+  vatRate        Float         @default(21)
+  vatAmount      Float
+  total          Float
+
+  // Payments
+  depositAmount  Float
+  depositPaid    Boolean       @default(false)
+  depositPaidAt  DateTime?
+  remainingAmount Float
+  remainingPaid  Boolean       @default(false)
+  remainingPaidAt DateTime?
+
+  // Status
+  status         BookingStatus @default(PENDING)
+  notes          String?       @db.Text
+
+  // Post-event
+  postEventReport  PostEventReport?
+  clientSurvey     ClientSurvey?
+  clientFeedback   ClientFeedback?
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([eventDate])
+  @@index([status])
+  @@index([packId])
+  @@index([createdAt])
+  @@index([status, eventDate]) // Consultes combinades
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  COMPLETED
+  CANCELLED
+}
+
+model BookingExtra {
+  id        String  @id @default(cuid())
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  extraId   String
+  extra     Extra   @relation(fields: [extraId], references: [id])
+  quantity  Int     @default(1)
+  price     Float
+
+  @@unique([bookingId, extraId])
+  @@map("booking_extras")
+}
+
+model BookingInventory {
+  id              String         @id @default(cuid())
+  bookingId       String
+  booking         Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  itemId          String
+  item            InventoryItem  @relation(fields: [itemId], references: [id])
+  quantity        Int            @default(1)
+  checkedOut      Boolean        @default(false)
+  checkedIn       Boolean        @default(false)
+  conditionBefore ItemCondition?
+  conditionAfter  ItemCondition?
+  notes           String?
+
+  @@unique([bookingId, itemId])
+  @@map("booking_inventory")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DISPONIBILITAT
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Availability {
+  id        String             @id @default(cuid())
+  date      DateTime           @unique
+  status    AvailabilityStatus @default(AVAILABLE)
+  bookingId String?
+  note      String?
+  updatedAt DateTime           @updatedAt
+
+  @@map("availability")
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  BOOKED
+  BLOCKED
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// POST-EVENT: INFORME INTERN (el que omples tu)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model PostEventReport {
+  id        String  @id @default(cuid())
+  bookingId String  @unique
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  // TIMING
+  actualStartTime  String?
+  actualEndTime    String?
+  actualGuestCount Int?
+  punctuality      String? // EARLY, ON_TIME, SLIGHT_DELAY, DELAYED
+
+  // EQUIP
+  soundQuality     Int?    // 1-5
+  maxVolumeUsed    Int?    // %
+  soundProblems    Boolean @default(false)
+  soundProblemsDetail String?
+  lightingUsed     String[] // ["MOV-001", "MOV-002"]
+  effectsUsed      String[] // ["FUM-001"]
+  effectsReaction  String? // INDIFFERENT, GOOD, WOW, INCREDIBLE
+  backupNeeded     Boolean @default(false)
+
+  // AMBIENT
+  temperature      String? // COLD, COOL, IDEAL, WARM, HOT
+  maxDancefloor    Int?    // %
+  peakTime         String? // "01:30"
+  avgDancing       String? // BELOW_25, 25_50, 50_75, ABOVE_75
+  overallVibe      String? // COLD, CORRECT, GOOD_VIBES, INCREDIBLE
+
+  // MÚSICA
+  mainStyle        String?
+  genresWorked     String[]
+  genresFailed     String[]
+  hitSongs         String? @db.Text
+  memorableMoment  String? @db.Text
+
+  // ANIMACIÓ
+  animationLevel   String? // ZERO, MINIMAL, MODERATE, HIGH, SHOWMAN
+  microphoneUsed   Boolean @default(false)
+  gamesPlayed      String[]
+
+  // CLIENT
+  perceivedSatisfaction String? // UNSATISFIED, CORRECT, HAPPY, DELIGHTED
+  clientComments   String? @db.Text
+
+  // INCIDÈNCIES
+  hadIncidents     Boolean @default(false)
+  incidentType     String? // TECHNICAL, LOGISTICS, CLIENT, PUBLIC, OTHER
+  incidentDescription String? @db.Text
+  incidentResolution String? @db.Text
+  incidentImpact   String? // NONE, MINIMAL, MODERATE, HIGH, CRITICAL
+
+  // VALORACIÓ
+  overallRating    Int?    // 1-5
+  whatWorkedBest   String? @db.Text
+  whatToImprove    String? @db.Text
+  lessonsLearned   String? @db.Text
+  wouldRepeatVenue Boolean?
+  stressLevel      Int?    // 1-10
+
+  // MEDIA
+  photosTaken      Int?
+  videosTaken      Int?
+  iconicPhotoUrl   String?
+  mediaPermission  String? // YES_FULL, YES_ANONYMOUS, NO
+
+  status           String  @default("DRAFT") // DRAFT, COMPLETED
+  completedAt      DateTime?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("post_event_reports")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// POST-EVENT: ENQUESTA CLIENT
+// ═══════════════════════════════════════════════════════════════════════════
+
+model ClientSurvey {
+  id        String  @id @default(cuid())
+  bookingId String  @unique
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  // Valoracions 1-5
+  overallRating          Int
+  djMusicSelection       Int
+  djCrowdReading         Int
+  djEnergyAttitude       Int
+  djProfessionalism      Int
+  soundQuality           Int
+  volumeAdequate         Int
+  lightingQuality        Int
+  effectsQuality         Int?
+  priorCommunication     Int
+  punctuality            Int
+  flexibility            Int
+
+  // Pista
+  dancefloorActivity     DancefloorLevel
+  guestsEnjoyment        GuestsEnjoyment
+
+  // Recomanació
+  npsScore               Int // 0-10
+  wouldHireAgain         WouldHireAgain
+
+  // Comentaris
+  bestMoment             String? @db.Text
+  missedSongs            String? @db.Text
+  improvements           String? @db.Text
+  additionalComments     String? @db.Text
+
+  // Permís testimoni
+  testimonialPermission  TestimonialPermission
+
+  sentAt                 DateTime?
+  reminderSentAt         DateTime?
+  submittedAt            DateTime @default(now())
+
+  // Testimoni creat
+  createdTestimonialId   String?
+
+  @@map("client_surveys")
+}
+
+enum DancefloorLevel {
+  EMPTY_MOSTLY
+  SOMETIMES_FULL
+  MOSTLY_FULL
+  PACKED_ALL_NIGHT
+}
+
+enum GuestsEnjoyment {
+  SOME
+  MOST
+  ALL
+}
+
+enum WouldHireAgain {
+  YES_DEFINITELY
+  PROBABLY_YES
+  NOT_SURE
+  PROBABLY_NO
+}
+
+enum TestimonialPermission {
+  YES_WITH_NAME
+  YES_ANONYMOUS
+  NO
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// POST-EVENT: FEEDBACK CLIENT (el que envies al client)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model ClientFeedback {
+  id               String   @id @default(cuid())
+  bookingId        String   @unique
+  booking          Booking  @relation(fields: [bookingId], references: [id])
+
+  personalMessage  String?  @db.Text
+  highlightMoments String[]
+  iconicPhotoUrl   String?
+
+  discountCode     String   @unique
+  discountPercent  Float    @default(10)
+  discountValidUntil DateTime
+  discountUsed     Boolean  @default(false)
+  discountUsedAt   DateTime?
+
+  sentAt           DateTime?
+  sentVia          String?  // "email", "whatsapp"
+
+  createdAt        DateTime @default(now())
+
+  @@map("client_feedbacks")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CODIS DESCOMPTE
+// ═══════════════════════════════════════════════════════════════════════════
+
+model DiscountCode {
+  id              String       @id @default(cuid())
+  code            String       @unique
+  type            DiscountType @default(PERCENTAGE)
+  value           Float        @default(10)
+  description     String?
+  validFrom       DateTime     @default(now())
+  validUntil      DateTime
+  maxUses         Int?
+  currentUses     Int          @default(0)
+  minOrderValue   Float?
+  applicablePacks String[]
+  isAccumulative  Boolean      @default(true)
+  sourceType      String?      // "POST_EVENT", "PROMOTION", "MANUAL"
+  sourceBookingId String?
+  isActive        Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+
+  @@map("discount_codes")
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TRADUCCIONS (Contingut Web)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Translation {
+  id               String    @id @default(cuid())
+  namespace        String    // "hero", "stats", "packs", "faq"
+  key              String    // "title", "subtitle"
+  locale           String    // "es", "ca", "en"
+  value            String    @db.Text
+  isAutoTranslated Boolean   @default(false)
+  lastManualEdit   DateTime?
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([namespace, key, locale])
+  @@index([namespace, locale])
+  @@map("translations")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FAQ
+// ═══════════════════════════════════════════════════════════════════════════
+
+model FAQ {
+  id           String           @id @default(cuid())
+  slug         String           @unique
+  category     String           @default("general")
+  order        Int              @default(0)
+  isActive     Boolean          @default(true)
+  translations FAQTranslation[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@map("faqs")
+}
+
+model FAQTranslation {
+  id       String @id @default(cuid())
+  faqId    String
+  faq      FAQ    @relation(fields: [faqId], references: [id], onDelete: Cascade)
+  locale   String
+  question String
+  answer   String @db.Text
+
+  @@unique([faqId, locale])
+  @@map("faq_translations")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TESTIMONIS
+// ═══════════════════════════════════════════════════════════════════════════
+
+model Testimonial {
+  id              String                   @id @default(cuid())
+  isActive        Boolean                  @default(true)
+  isFeatured      Boolean                  @default(false)
+  order           Int                      @default(0)
+  authorName      String
+  authorLabel     String?
+  rating          Int                      @default(5)
+  eventType       EventType?
+  eventDate       DateTime?
+  isVerified      Boolean                  @default(true)
+  sourceBookingId String?
+  sourceSurveyId  String?
+  translations    TestimonialTranslation[]
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  @@map("testimonials")
+}
+
+model TestimonialTranslation {
+  id            String      @id @default(cuid())
+  testimonialId String
+  testimonial   Testimonial @relation(fields: [testimonialId], references: [id], onDelete: Cascade)
+  locale        String
+  quote         String      @db.Text
+
+  @@unique([testimonialId, locale])
+  @@map("testimonial_translations")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NOTIFICACIONS EN VIU (Prova Social)
+// ═══════════════════════════════════════════════════════════════════════════
+
+model LiveNotification {
+  id        String    @id @default(cuid())
+  type      EventType
+  location  String
+  isReal    Boolean   @default(true)
+  bookingId String?
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+
+  @@map("live_notifications")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LOGS ADMIN
+// ═══════════════════════════════════════════════════════════════════════════
+
+model AdminLog {
+  id        String   @id @default(cuid())
+  action    String   // "CREATE", "UPDATE", "DELETE"
+  entity    String   // "lead", "booking", "pack"
+  entityId  String?
+  details   Json?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([entity])
+  @@index([createdAt])
+  @@map("admin_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RGPD / LOPDGDD - SISTEMA DE PRIVACITAT
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Registre de Consentiments
+model ConsentRecord {
+  id               String   @id @default(cuid())
+  customerId       String?
+  customer         Customer? @relation(fields: [customerId], references: [id])
+
+  // Identificació (si no hi ha customer)
+  email            String?
+  ipAddress        String?
+  userAgent        String?
+
+  // Tipus de consentiment
+  consentType      ConsentType
+  consentVersion   String   // Versió del document legal (ex: "2.1")
+
+  // Estat
+  granted          Boolean  @default(false)
+  grantedAt        DateTime?
+  revokedAt        DateTime?
+
+  // Context
+  source           String   // "WEBSITE", "FORM", "EMAIL", "ADMIN"
+  sourceUrl        String?  // URL on es va donar el consentiment
+  formId           String?  // ID del formulari
+
+  // Evidència
+  rawConsent       Json?    // Dades originals del formulari
+  checksumHash     String?  // Hash per verificació d'integritat
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([email])
+  @@index([consentType])
+  @@index([createdAt])
+  @@map("consent_records")
+}
+
+enum ConsentType {
+  GDPR_BASIC           // Consentiment bàsic RGPD
+  MARKETING_EMAIL      // Rebre emails comercials
+  MARKETING_SMS        // Rebre SMS comercials
+  MARKETING_WHATSAPP   // Rebre WhatsApp comercials
+  PROFILING            // Perfilat i decisions automatitzades
+  THIRD_PARTY          // Compartir amb tercers
+  COOKIES_ANALYTICS    // Cookies analítiques
+  COOKIES_MARKETING    // Cookies de màrqueting
+  COOKIES_FUNCTIONAL   // Cookies funcionals
+  TESTIMONIAL_PUBLIC   // Publicar testimoni públicament
+  PHOTO_USAGE          // Ús de fotos
+}
+
+// Sol·licituds de Drets ARCO (Accés, Rectificació, Cancel·lació, Oposició)
+model DataRequest {
+  id              String            @id @default(cuid())
+  customerId      String?
+  customer        Customer?         @relation(fields: [customerId], references: [id])
+
+  // Identificació del sol·licitant
+  requesterEmail  String
+  requesterName   String
+  requesterPhone  String?
+
+  // Verificació d'identitat
+  verificationToken    String   @unique @default(cuid())
+  verificationSentAt   DateTime?
+  verifiedAt           DateTime?
+  identityDocument     String?  // DNI/NIE (xifrat o hash)
+  identityVerified     Boolean  @default(false)
+
+  // Tipus de sol·licitud
+  requestType     DataRequestType
+
+  // Detalls
+  description     String?  @db.Text  // Què vol l'usuari exactament
+  specificData    String[] // Camps específics si és parcial
+  reason          String?  @db.Text  // Motiu (obligatori per algunes sol·licituds)
+
+  // Estat
+  status          DataRequestStatus @default(PENDING)
+  priority        Priority          @default(MEDIUM)
+
+  // Processament
+  assignedTo      String?
+  processedAt     DateTime?
+  processedBy     String?
+  responseNotes   String?  @db.Text
+
+  // Resposta
+  responseType    DataResponseType?
+  responseData    Json?             // Dades exportades (si escau)
+  responseFileUrl String?           // URL del fitxer (si escau)
+  responseSentAt  DateTime?
+
+  // Terminis legals
+  legalDeadline   DateTime          // 30 dies màxim per RGPD
+  extensionApplied Boolean @default(false)
+  extensionReason String?
+
+  // Auditoria
+  auditTrail      Json?             // Historial de canvis
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([requesterEmail])
+  @@index([status])
+  @@index([requestType])
+  @@index([legalDeadline])
+  @@map("data_requests")
+}
+
+enum DataRequestType {
+  ACCESS            // Dret d'accés - obtenir còpia de totes les dades
+  RECTIFICATION     // Dret de rectificació - corregir dades incorrectes
+  ERASURE           // Dret de supressió ("dret a l'oblit")
+  RESTRICTION       // Dret de limitació del tractament
+  PORTABILITY       // Dret de portabilitat - exportar dades
+  OBJECTION         // Dret d'oposició al tractament
+  AUTOMATED         // Drets sobre decisions automatitzades
+}
+
+enum DataRequestStatus {
+  PENDING           // Pendent de verificació
+  IDENTITY_REQUIRED // Cal verificar identitat
+  VERIFIED          // Identitat verificada, pendent processament
+  IN_PROGRESS       // En processament
+  COMPLETED         // Completada
+  REJECTED          // Rebutjada (amb motiu legal)
+  CANCELLED         // Cancel·lada pel sol·licitant
+}
+
+enum DataResponseType {
+  DATA_PROVIDED     // Dades entregades
+  DATA_CORRECTED    // Dades corregides
+  DATA_DELETED      // Dades eliminades
+  REQUEST_DENIED    // Sol·licitud denegada (amb motiu)
+  PARTIAL_RESPONSE  // Resposta parcial
+}
+
+// Registre d'Auditoria de Privacitat
+model PrivacyAuditLog {
+  id            String   @id @default(cuid())
+
+  // Entitat afectada
+  entityType    String   // "Customer", "Lead", "Booking", etc.
+  entityId      String
+
+  // Acció realitzada
+  action        PrivacyAction
+
+  // Actor
+  performedBy   String?  // ID d'admin o "SYSTEM" o "USER"
+  performerIp   String?
+  performerUserAgent String?
+
+  // Dades
+  previousData  Json?    // Estat anterior (per rectificacions/supressions)
+  newData       Json?    // Estat nou
+  affectedFields String[] // Camps afectats
+
+  // Context
+  requestId     String?  // ID de DataRequest si aplica
+  reason        String?  // Motiu de l'acció
+  legalBasis    String?  // Base legal (consentiment, contracte, etc.)
+
+  createdAt     DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([action])
+  @@index([performedBy])
+  @@index([createdAt])
+  @@map("privacy_audit_logs")
+}
+
+enum PrivacyAction {
+  DATA_ACCESSED       // Dades consultades
+  DATA_EXPORTED       // Dades exportades
+  DATA_CREATED        // Dades creades
+  DATA_UPDATED        // Dades actualitzades
+  DATA_DELETED        // Dades eliminades
+  DATA_ANONYMIZED     // Dades anonimitzades
+  CONSENT_GRANTED     // Consentiment atorgat
+  CONSENT_REVOKED     // Consentiment revocat
+  ACCOUNT_DELETED     // Compte eliminat
+  RETENTION_APPLIED   // Política de retenció aplicada
+}
+
+// Documents Legals (versions dels textos legals)
+model LegalDocument {
+  id              String   @id @default(cuid())
+
+  type            LegalDocumentType
+  version         String   // "1.0", "1.1", "2.0"
+  locale          String   // "es", "ca", "en"
+
+  title           String
+  content         String   @db.Text
+  summary         String?  @db.Text  // Resum dels canvis
+
+  // Vigència
+  effectiveFrom   DateTime
+  effectiveUntil  DateTime?
+
+  // Metadades
+  isActive        Boolean  @default(true)
+  publishedAt     DateTime?
+  publishedBy     String?
+
+  // Hash per verificació
+  contentHash     String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([type, version, locale])
+  @@index([type, locale, isActive])
+  @@map("legal_documents")
+}
+
+enum LegalDocumentType {
+  PRIVACY_POLICY      // Política de privacitat
+  TERMS_CONDITIONS    // Termes i condicions
+  COOKIE_POLICY       // Política de cookies
+  CONSENT_FORM        // Formulari de consentiment
+  DATA_RETENTION      // Política de retenció
+}
+
+// Polítiques de Retenció de Dades
+model DataRetentionPolicy {
+  id              String   @id @default(cuid())
+
+  name            String
+  description     String?
+
+  // Entitat
+  entityType      String   // "Customer", "Lead", "Booking"
+
+  // Condicions
+  retentionDays   Int      // Dies de retenció
+  condition       String?  // Condició SQL/lògica per aplicar
+
+  // Acció
+  actionType      RetentionAction
+
+  // Execució
+  isActive        Boolean  @default(true)
+  lastRunAt       DateTime?
+  nextRunAt       DateTime?
+
+  // Estadístiques
+  totalProcessed  Int      @default(0)
+  lastProcessedCount Int   @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("data_retention_policies")
+}
+
+enum RetentionAction {
+  DELETE          // Eliminar completament
+  ANONYMIZE       // Anonimitzar (mantenir estadístiques)
+  ARCHIVE         // Arxivar (moure a cold storage)
+  NOTIFY          // Només notificar admin
+}

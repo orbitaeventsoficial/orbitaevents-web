@@ -1,0 +1,716 @@
+// ============================================================
+// FORMULARI DE CONTACTE COMPLET I LEGAL
+// ============================================================
+// - Nom complet (obligatori)
+// - Email (obligatori)
+// - Telefon (obligatori)
+// - Tipus d'event
+// - Data aproximada
+// - Nombre de convidats
+// - Missatge
+// - Checkbox RGPD (obligatori)
+// - Checkbox newsletter (opcional)
+// - Captcha matematic
+// ============================================================
+
+'use client';
+
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { SITE_CONFIG } from '@/config/site-config';
+import { trackLead } from '@/lib/analytics';
+
+// ============================================================
+// TIPUS
+// ============================================================
+
+interface FormData {
+  // Dades personals
+  fullName: string;
+  email: string;
+  phone: string;
+
+  // Dades event
+  eventType: string;
+  eventDate: string;
+  guestCount: string;
+  location: string;
+  budget: string;
+
+  // Missatge
+  message: string;
+  howFound: string;
+
+  // Legals
+  acceptPrivacy: boolean;
+  acceptMarketing: boolean;
+}
+
+interface FormErrors {
+  [key: string]: string;
+}
+
+// ============================================================
+// VALIDACIO
+// ============================================================
+
+function validateForm(data: FormData): FormErrors {
+  const errors: FormErrors = {};
+
+  // Nom complet
+  if (!data.fullName.trim()) {
+    errors.fullName = 'El nom es obligatori';
+  } else if (data.fullName.trim().length < 3) {
+    errors.fullName = 'El nom ha de tenir minim 3 caracters';
+  } else if (!data.fullName.includes(' ')) {
+    errors.fullName = 'Si us plau, introdueix nom i cognoms';
+  }
+
+  // Email
+  if (!data.email.trim()) {
+    errors.email = "L'email es obligatori";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    errors.email = "L'email no es valid";
+  }
+
+  // Telefon
+  if (!data.phone.trim()) {
+    errors.phone = 'El telefon es obligatori';
+  } else if (!/^[0-9+\s()-]{9,}$/.test(data.phone.replace(/\s/g, ''))) {
+    errors.phone = 'El telefon no es valid (minim 9 digits)';
+  }
+
+  // Tipus event
+  if (!data.eventType) {
+    errors.eventType = "Selecciona un tipus d'event";
+  }
+
+  // Data (opcional pero si hi es, ha de ser futura)
+  if (data.eventDate) {
+    const selectedDate = new Date(data.eventDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate < today) {
+      errors.eventDate = 'La data ha de ser futura';
+    }
+  }
+
+  // Privacitat (obligatori)
+  if (!data.acceptPrivacy) {
+    errors.acceptPrivacy = "Has d'acceptar la politica de privacitat";
+  }
+
+  return errors;
+}
+
+// ============================================================
+// SIMPLE CAPTCHA (alternativa a reCAPTCHA)
+// ============================================================
+
+function SimpleCaptcha({
+  onVerify
+}: {
+  onVerify: (verified: boolean) => void
+}) {
+  const [num1] = useState(() => Math.floor(Math.random() * 10) + 1);
+  const [num2] = useState(() => Math.floor(Math.random() * 10) + 1);
+  const [answer, setAnswer] = useState('');
+  const [verified, setVerified] = useState(false);
+  const [error, setError] = useState(false);
+
+  const checkAnswer = (value: string) => {
+    setAnswer(value);
+    setError(false);
+
+    if (value === '') {
+      onVerify(false);
+      setVerified(false);
+      return;
+    }
+
+    const correct = parseInt(value) === num1 + num2;
+    setVerified(correct);
+    onVerify(correct);
+
+    if (value.length >= 2 && !correct) {
+      setError(true);
+    }
+  };
+
+  return (
+    <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+      <p className="text-white/60 text-sm mb-3">
+        Verifica que ets huma
+      </p>
+      <div className="flex items-center gap-3">
+        <span className="text-white font-mono text-lg">
+          {num1} + {num2} =
+        </span>
+        <input
+          type="number"
+          value={answer}
+          onChange={(e) => checkAnswer(e.target.value)}
+          className={`w-20 px-3 py-2 rounded-lg bg-white/10 text-white text-center
+                   font-mono text-lg outline-none transition-all
+                   ${verified ? 'ring-2 ring-green-500 bg-green-500/10' : ''}
+                   ${error ? 'ring-2 ring-red-500 bg-red-500/10' : ''}
+                   focus:ring-2 focus:ring-amber-500`}
+          placeholder="?"
+        />
+        {verified && <span className="text-green-400 text-xl">✓</span>}
+        {error && <span className="text-red-400 text-xl">✗</span>}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// COMPONENT PRINCIPAL
+// ============================================================
+
+export default function ContactFormComplete({
+  preselectedService,
+  preselectedDate,
+}: {
+  preselectedService?: string;
+  preselectedDate?: string;
+}) {
+  const [formData, setFormData] = useState<FormData>({
+    fullName: '',
+    email: '',
+    phone: '',
+    eventType: preselectedService || '',
+    eventDate: preselectedDate || '',
+    guestCount: '',
+    location: '',
+    budget: '',
+    message: '',
+    howFound: '',
+    acceptPrivacy: false,
+    acceptMarketing: false,
+  });
+
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+
+  // Update form
+  const updateField = (field: keyof FormData, value: string | boolean) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear error on change
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  // Mark field as touched
+  const touchField = (field: string) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
+  // Validate on blur
+  const validateField = (field: keyof FormData) => {
+    const fieldErrors = validateForm(formData);
+    if (fieldErrors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: fieldErrors[field] }));
+    }
+  };
+
+  // Submit
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate all
+    const formErrors = validateForm(formData);
+
+    // Check captcha
+    if (!captchaVerified) {
+      formErrors.captcha = 'Completa la verificacio';
+    }
+
+    setErrors(formErrors);
+
+    // Mark all as touched
+    const allTouched: { [key: string]: boolean } = {};
+    Object.keys(formData).forEach((key) => {
+      allTouched[key] = true;
+    });
+    setTouched(allTouched);
+
+    if (Object.keys(formErrors).length > 0) {
+      // Scroll to first error
+      const firstError = document.querySelector('.error-field');
+      firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.fullName,
+          contact: formData.email,
+          phone: formData.phone,
+          event: formData.eventType,
+          eventDate: formData.eventDate,
+          guestCount: formData.guestCount,
+          location: formData.location,
+          budget: formData.budget,
+          message: formData.message,
+          howFound: formData.howFound,
+          acceptMarketing: formData.acceptMarketing,
+          timestamp: new Date().toISOString(),
+          source: 'contact-form-complete',
+        }),
+      });
+
+      if (response.ok) {
+        // Track lead
+        trackLead({
+          eventType: formData.eventType,
+          source: 'contact_form_complete',
+        });
+
+        setSubmitStatus('success');
+        // Reset form
+        setFormData({
+          fullName: '',
+          email: '',
+          phone: '',
+          eventType: '',
+          eventDate: '',
+          guestCount: '',
+          location: '',
+          budget: '',
+          message: '',
+          howFound: '',
+          acceptPrivacy: false,
+          acceptMarketing: false,
+        });
+      } else {
+        throw new Error('Error al enviar');
+      }
+    } catch {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Success message
+  if (submitStatus === 'success') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="p-8 rounded-2xl bg-green-500/10 border border-green-500/30 text-center"
+      >
+        <span className="text-6xl block mb-4">🎉</span>
+        <h3 className="text-2xl font-bold text-white mb-2">Missatge enviat!</h3>
+        <p className="text-white/70 mb-6">
+          Gracies per contactar amb nosaltres. Et respondrem en menys de 2 hores.
+        </p>
+        <button
+          onClick={() => setSubmitStatus('idle')}
+          className="px-6 py-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+        >
+          Enviar un altre missatge
+        </button>
+      </motion.div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Seccio: Dades personals */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+          <span>👤</span> Les teves dades
+        </h3>
+
+        {/* Nom complet */}
+        <div className={errors.fullName && touched.fullName ? 'error-field' : ''}>
+          <label className="block text-white/70 text-sm mb-2">
+            Nom i cognoms <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="text"
+            value={formData.fullName}
+            onChange={(e) => updateField('fullName', e.target.value)}
+            onBlur={() => { touchField('fullName'); validateField('fullName'); }}
+            placeholder="El teu nom complet"
+            className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
+                     placeholder:text-white/30 outline-none transition-all
+                     ${errors.fullName && touched.fullName
+                       ? 'border-red-500 focus:ring-red-500'
+                       : 'border-white/10 focus:border-amber-500 focus:ring-amber-500'
+                     } focus:ring-2`}
+          />
+          {errors.fullName && touched.fullName && (
+            <p className="text-red-400 text-sm mt-1">{errors.fullName}</p>
+          )}
+        </div>
+
+        {/* Email i Telefon */}
+        <div className="grid sm:grid-cols-2 gap-4">
+          {/* Email */}
+          <div className={errors.email && touched.email ? 'error-field' : ''}>
+            <label className="block text-white/70 text-sm mb-2">
+              Email <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => updateField('email', e.target.value)}
+              onBlur={() => { touchField('email'); validateField('email'); }}
+              placeholder="el.teu@email.com"
+              className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
+                       placeholder:text-white/30 outline-none transition-all
+                       ${errors.email && touched.email
+                         ? 'border-red-500'
+                         : 'border-white/10 focus:border-amber-500'
+                       } focus:ring-2 focus:ring-amber-500`}
+            />
+            {errors.email && touched.email && (
+              <p className="text-red-400 text-sm mt-1">{errors.email}</p>
+            )}
+          </div>
+
+          {/* Telefon */}
+          <div className={errors.phone && touched.phone ? 'error-field' : ''}>
+            <label className="block text-white/70 text-sm mb-2">
+              Telefon <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => updateField('phone', e.target.value)}
+              onBlur={() => { touchField('phone'); validateField('phone'); }}
+              placeholder="+34 600 000 000"
+              className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
+                       placeholder:text-white/30 outline-none transition-all
+                       ${errors.phone && touched.phone
+                         ? 'border-red-500'
+                         : 'border-white/10 focus:border-amber-500'
+                       } focus:ring-2 focus:ring-amber-500`}
+            />
+            {errors.phone && touched.phone && (
+              <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Seccio: Dades event */}
+      <div className="space-y-4 pt-4 border-t border-white/10">
+        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+          <span>🎉</span> El teu event
+        </h3>
+
+        {/* Tipus event */}
+        <div className={errors.eventType && touched.eventType ? 'error-field' : ''}>
+          <label className="block text-white/70 text-sm mb-2">
+            Tipus d&apos;event <span className="text-red-400">*</span>
+          </label>
+          <select
+            value={formData.eventType}
+            onChange={(e) => updateField('eventType', e.target.value)}
+            onBlur={() => { touchField('eventType'); validateField('eventType'); }}
+            className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
+                     outline-none transition-all appearance-none cursor-pointer
+                     ${errors.eventType && touched.eventType
+                       ? 'border-red-500'
+                       : 'border-white/10 focus:border-amber-500'
+                     } focus:ring-2 focus:ring-amber-500`}
+          >
+            <option value="" className="bg-black">Selecciona un tipus</option>
+            <option value="boda" className="bg-black">💒 Casament</option>
+            <option value="fiesta" className="bg-black">🎉 Festa privada</option>
+            <option value="cumpleanos" className="bg-black">🎂 Aniversari</option>
+            <option value="corporativo" className="bg-black">💼 Event corporatiu</option>
+            <option value="comunion" className="bg-black">⛪ Comunio / Bateig</option>
+            <option value="graduacion" className="bg-black">🎓 Graduacio</option>
+            <option value="otro" className="bg-black">✨ Altre</option>
+          </select>
+          {errors.eventType && touched.eventType && (
+            <p className="text-red-400 text-sm mt-1">{errors.eventType}</p>
+          )}
+        </div>
+
+        {/* Data i Convidats */}
+        <div className="grid sm:grid-cols-2 gap-4">
+          {/* Data */}
+          <div>
+            <label className="block text-white/70 text-sm mb-2">
+              Data aproximada
+            </label>
+            <input
+              type="date"
+              value={formData.eventDate}
+              onChange={(e) => updateField('eventDate', e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
+                       text-white outline-none focus:border-amber-500 focus:ring-2
+                       focus:ring-amber-500 transition-all"
+            />
+            {errors.eventDate && (
+              <p className="text-red-400 text-sm mt-1">{errors.eventDate}</p>
+            )}
+          </div>
+
+          {/* Convidats */}
+          <div>
+            <label className="block text-white/70 text-sm mb-2">
+              Nombre de convidats
+            </label>
+            <select
+              value={formData.guestCount}
+              onChange={(e) => updateField('guestCount', e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
+                       text-white outline-none focus:border-amber-500 focus:ring-2
+                       focus:ring-amber-500 transition-all appearance-none cursor-pointer"
+            >
+              <option value="" className="bg-black">Selecciona</option>
+              <option value="1-50" className="bg-black">1 - 50 persones</option>
+              <option value="51-100" className="bg-black">51 - 100 persones</option>
+              <option value="101-200" className="bg-black">101 - 200 persones</option>
+              <option value="201-300" className="bg-black">201 - 300 persones</option>
+              <option value="300+" className="bg-black">Mes de 300 persones</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Ubicacio i Pressupost */}
+        <div className="grid sm:grid-cols-2 gap-4">
+          {/* Ubicacio */}
+          <div>
+            <label className="block text-white/70 text-sm mb-2">
+              Ubicacio (ciutat/poble)
+            </label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => updateField('location', e.target.value)}
+              placeholder="Barcelona, Girona..."
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
+                       text-white placeholder:text-white/30 outline-none
+                       focus:border-amber-500 focus:ring-2 focus:ring-amber-500 transition-all"
+            />
+          </div>
+
+          {/* Pressupost */}
+          <div>
+            <label className="block text-white/70 text-sm mb-2">
+              Pressupost aproximat
+            </label>
+            <select
+              value={formData.budget}
+              onChange={(e) => updateField('budget', e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
+                       text-white outline-none focus:border-amber-500 focus:ring-2
+                       focus:ring-amber-500 transition-all appearance-none cursor-pointer"
+            >
+              <option value="" className="bg-black">Selecciona</option>
+              <option value="menys500" className="bg-black">Menys de 500€</option>
+              <option value="500-1000" className="bg-black">500€ - 1.000€</option>
+              <option value="1000-2000" className="bg-black">1.000€ - 2.000€</option>
+              <option value="2000-3000" className="bg-black">2.000€ - 3.000€</option>
+              <option value="3000+" className="bg-black">Mes de 3.000€</option>
+              <option value="nosabe" className="bg-black">No ho se encara</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Seccio: Missatge */}
+      <div className="space-y-4 pt-4 border-t border-white/10">
+        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+          <span>💬</span> Explica&apos;ns mes
+        </h3>
+
+        {/* Missatge */}
+        <div>
+          <label className="block text-white/70 text-sm mb-2">
+            Que tens al cap? Algun detall especial?
+          </label>
+          <textarea
+            value={formData.message}
+            onChange={(e) => updateField('message', e.target.value)}
+            placeholder="Explica'ns la teva visio: tematica, estil de musica, efectes especials que t'agradaria..."
+            rows={4}
+            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
+                     text-white placeholder:text-white/30 outline-none resize-none
+                     focus:border-amber-500 focus:ring-2 focus:ring-amber-500 transition-all"
+          />
+        </div>
+
+        {/* Com ens has trobat */}
+        <div>
+          <label className="block text-white/70 text-sm mb-2">
+            Com ens has trobat?
+          </label>
+          <select
+            value={formData.howFound}
+            onChange={(e) => updateField('howFound', e.target.value)}
+            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
+                     text-white outline-none focus:border-amber-500 focus:ring-2
+                     focus:ring-amber-500 transition-all appearance-none cursor-pointer"
+          >
+            <option value="" className="bg-black">Selecciona</option>
+            <option value="google" className="bg-black">🔍 Google</option>
+            <option value="instagram" className="bg-black">📸 Instagram</option>
+            <option value="facebook" className="bg-black">👥 Facebook</option>
+            <option value="tiktok" className="bg-black">🎵 TikTok</option>
+            <option value="recomendacion" className="bg-black">👋 Recomanacio</option>
+            <option value="evento" className="bg-black">🎉 Vaig veure-us a un event</option>
+            <option value="otro" className="bg-black">✨ Altre</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Seccio: Verificacio i Legal */}
+      <div className="space-y-4 pt-4 border-t border-white/10">
+        {/* Captcha */}
+        <SimpleCaptcha onVerify={setCaptchaVerified} />
+        {errors.captcha && (
+          <p className="text-red-400 text-sm">{errors.captcha}</p>
+        )}
+
+        {/* Checkbox privacitat */}
+        <div className={`${errors.acceptPrivacy && touched.acceptPrivacy ? 'error-field' : ''}`}>
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <div className="relative mt-1">
+              <input
+                type="checkbox"
+                checked={formData.acceptPrivacy}
+                onChange={(e) => updateField('acceptPrivacy', e.target.checked)}
+                onBlur={() => touchField('acceptPrivacy')}
+                className="sr-only peer"
+              />
+              <div className={`w-5 h-5 rounded border-2 transition-all
+                           peer-checked:bg-amber-500 peer-checked:border-amber-500
+                           ${errors.acceptPrivacy && touched.acceptPrivacy
+                             ? 'border-red-500'
+                             : 'border-white/30 group-hover:border-white/50'
+                           }`}>
+                {formData.acceptPrivacy && (
+                  <svg className="w-full h-full text-black p-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+            </div>
+            <span className="text-white/70 text-sm">
+              He llegit i accepto la{' '}
+              <Link href="/legal/privacidad" className="text-amber-400 hover:underline" target="_blank">
+                politica de privacitat
+              </Link>{' '}
+              i els{' '}
+              <Link href="/legal/terminos" className="text-amber-400 hover:underline" target="_blank">
+                termes i condicions
+              </Link>
+              . <span className="text-red-400">*</span>
+            </span>
+          </label>
+          {errors.acceptPrivacy && touched.acceptPrivacy && (
+            <p className="text-red-400 text-sm mt-1 ml-8">{errors.acceptPrivacy}</p>
+          )}
+        </div>
+
+        {/* Checkbox marketing */}
+        <label className="flex items-start gap-3 cursor-pointer group">
+          <div className="relative mt-1">
+            <input
+              type="checkbox"
+              checked={formData.acceptMarketing}
+              onChange={(e) => updateField('acceptMarketing', e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-5 h-5 rounded border-2 border-white/30 transition-all
+                         group-hover:border-white/50
+                         peer-checked:bg-amber-500 peer-checked:border-amber-500">
+              {formData.acceptMarketing && (
+                <svg className="w-full h-full text-black p-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+          </div>
+          <span className="text-white/70 text-sm">
+            Vull rebre ofertes exclusives i novetats d&apos;Orbita Events (opcional)
+          </span>
+        </label>
+      </div>
+
+      {/* Info RGPD */}
+      <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-white/50">
+        <p className="mb-2">
+          <strong className="text-white/70">Informacio sobre proteccio de dades:</strong>
+        </p>
+        <ul className="space-y-1">
+          <li>• <strong>Responsable:</strong> Orbita Events</li>
+          <li>• <strong>Finalitat:</strong> Gestionar la teva sol·licitud i oferir-te pressupost</li>
+          <li>• <strong>Legitimacio:</strong> Consentiment de l&apos;interessat</li>
+          <li>• <strong>Destinataris:</strong> No es cediran dades a tercers</li>
+          <li>• <strong>Drets:</strong> Acces, rectificacio, supressio, oposicio i portabilitat</li>
+          <li>• <strong>Contacte:</strong> {SITE_CONFIG.business.email}</li>
+        </ul>
+      </div>
+
+      {/* Error general */}
+      <AnimatePresence>
+        {submitStatus === 'error' && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm"
+          >
+            Hi ha hagut un error al enviar el formulari. Si us plau, torna-ho a provar o
+            contacta&apos;ns directament a{' '}
+            <a href={`tel:${SITE_CONFIG.business.phone}`} className="underline">{SITE_CONFIG.business.phoneDisplay}</a>.
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Boto submit */}
+      <motion.button
+        type="submit"
+        disabled={isSubmitting}
+        whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+        whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+        className={`w-full py-4 rounded-xl font-bold text-lg transition-all
+                 ${isSubmitting
+                   ? 'bg-white/20 text-white/50 cursor-not-allowed'
+                   : 'bg-gradient-to-r from-amber-400 to-orange-500 text-black hover:shadow-lg hover:shadow-amber-500/30'
+                 }`}
+      >
+        {isSubmitting ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Enviant...
+          </span>
+        ) : (
+          'Enviar sol·licitud 🚀'
+        )}
+      </motion.button>
+
+      {/* Nota final */}
+      <p className="text-center text-white/40 text-sm">
+        Et respondrem en menys de 2 hores · Tambe pots trucar-nos: {' '}
+        <a href={`tel:${SITE_CONFIG.business.phone}`} className="text-amber-400 hover:underline">
+          {SITE_CONFIG.business.phoneDisplay}
+        </a>
+      </p>
+    </form>
+  );
+}
