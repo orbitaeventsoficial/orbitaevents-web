@@ -33,7 +33,7 @@ export type EventStatus = 'lead' | 'quoted' | 'confirmed' | 'completed' | 'cance
 export type TestimonialStatus = 'pending' | 'approved' | 'rejected' | 'featured';
 
 export interface Customer {
-  id: string; // UUID
+  id: string;
   email: string;
   name?: string | null;
   name_normalized?: string | null;
@@ -64,7 +64,7 @@ export interface Customer {
 }
 
 export interface Event {
-  id: string; // UUID
+  id: string;
   customer_id?: string | null;
   event_type: EventType;
   event_date?: string | null;
@@ -90,7 +90,7 @@ export interface Event {
 }
 
 export interface Testimonial {
-  id: string; // UUID
+  id: string;
   customer_id?: string | null;
   event_id?: string | null;
   rating: number;
@@ -191,21 +191,33 @@ export interface AuditLog {
 // CLIENTS
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Placeholder client per quan no hi ha configuració
+const createPlaceholderClient = (): SupabaseClient => {
+  const handler = {
+    get: () => () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
+  };
+  return new Proxy({} as SupabaseClient, handler);
+};
+
 /**
  * Client públic - Per operacions del frontend
  */
-export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase: SupabaseClient = supabaseUrl && supabaseAnonKey
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : createPlaceholderClient();
 
 /**
  * Client admin - Per operacions del servidor
  * Bypassa RLS
  */
-export const supabaseAdmin: SupabaseClient = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-});
+export const supabaseAdmin: SupabaseClient = supabaseUrl && supabaseServiceKey
+  ? createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
+  : createPlaceholderClient();
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HELPERS
@@ -223,7 +235,7 @@ export function generateDiscountCode(name: string, percent: number = 10): string
     .substring(0, 6);
 
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `${cleanName}${percent}${random}`;
+  return \`\${cleanName}\${percent}\${random}\`;
 }
 
 // Re-export normalization functions from centralized module
