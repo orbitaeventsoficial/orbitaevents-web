@@ -79,14 +79,44 @@
       "october": "octubre",
       "november": "novembre",
       "december": "desembre"
-    }
+    },
+    "back": "Tornar",
+    "close": "Tancar",
+    "error": "Error",
+    "learnMore": "Saber més",
+    "loading": "Carregant...",
+    "next": "Següent",
+    "previous": "Anterior",
+    "success": "Èxit"
   },
   "hero": {
     "badge": "🔥 DJ + So + Llums + Efectes Especials",
-    "headline1": "Convertim el teu event en LLEGENDA",
-    "headline2": "DJ + So + Llums + Efectes = MÀGIA",
+    "rotatingHeadlines": [
+      {
+        "line1": "A les 4am la teva sogra",
+        "line2": "BALLAVA DESCALÇA"
+      },
+      {
+        "line1": "L'únic DJ que et garanteix",
+        "line2": "FESTES ÈPIQUES"
+      },
+      {
+        "line1": "Convertim el teu event en",
+        "line2": "LLEGENDA"
+      },
+      {
+        "line1": "No contractes un DJ",
+        "line2": "CONTRACTA UNA EXPERIÈNCIA"
+      },
+      {
+        "line1": "El teu casament mereix",
+        "line2": "SER INOLVIDABLE"
+      }
+    ],
+    "headline1": "A les 4am la teva sogra",
+    "headline2": "BALLAVA DESCALÇA",
     "headline3": "L'únic DJ que et garanteix FESTES ÈPIQUES",
-    "subtitle": "Casaments, festes privades i events corporatius a Barcelona i Girona. Equipament professional de 4000W, llums LED intel·ligents i efectes especials que deixen sense alè.",
+    "subtitle": "DJ + So + Llums + Efectes + Tematització",
     "countdownPrefix": "Proper dissabte disponible en:",
     "days": "Dies",
     "hours": "Hores",
@@ -107,7 +137,7 @@
       "line2": "ballava descalça"
     },
     "punchline": "Això fem.",
-    "services": "Música adaptada • Tematització • Animació • Jocs • Efectes especials",
+    "services": "DJ + So + Llums + Efectes + Tematització",
     "location": "Barcelona + Girona",
     "response": "Resposta en 2h",
     "cta": {
@@ -152,7 +182,6 @@
     "scrollMore": "Descobreix més",
     "titleLine1": "EL TEU EVENT",
     "titleLine2": "SERÀ LLEGENDA",
-    "subtitle": "DJ + So + Llums + Efectes + Tematització",
     "subtitleHighlight": "Tot el que necessites. Un sol equip.",
     "ctaPrimary": "Demana Pressupost",
     "ctaSecondary": "WhatsApp",
@@ -490,7 +519,20 @@
   "contact": {
     "errors": {
       "sendError": "S'ha produït un error en enviar el missatge"
-    }
+    },
+    "form": {
+      "date": "Data",
+      "email": "Email",
+      "error": "Error en enviar el formulari",
+      "eventType": "Tipus d'esdeveniment",
+      "message": "Missatge",
+      "name": "Nom",
+      "phone": "Telèfon",
+      "sending": "Enviant...",
+      "submit": "Enviar",
+      "success": "Formulari enviat correctament!"
+    },
+    "subtitle": "Contacta amb nosaltres"
   },
   "configurator": {
     "step1": {

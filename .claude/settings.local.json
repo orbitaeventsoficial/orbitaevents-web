@@ -19,7 +19,9 @@
       "Bash(curl:*)",
       "Bash(unzip:*)",
       "Bash(dir:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(timeout /t 120 /nobreak)",
+      "Bash(del \"C:\\Users\\Lore\\Desktop\\orbitaevents\\lib\\navigation.ts\")"
     ]
   }
 }

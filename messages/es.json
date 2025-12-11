@@ -90,10 +90,10 @@
     "success": "Éxito"
   },
   "hero": {
-    "badge": "🎯 Venimos del sector de eventos",
+    "badge": "🔥 DJ + Sonido + Luces + Efectos Especiales",
     "happyClients": "eventos felices",
     "headline1": "A las 4am tu suegra",
-    "headline2": "bailaba descalza",
+    "headline2": "BAILABA DESCALZA",
     "headline3": "El único DJ que te garantiza FIESTAS ÉPICAS",
     "headlineOld1": "A las 4am tu suegra",
     "headlineOld2": "bailaba descalza",
@@ -114,29 +114,30 @@
       "line2": "bailaba descalza"
     },
     "punchline": "Eso hacemos.",
-    "services": "DJ · Sonido · Luces · Magia",
+    "services": "DJ + Sonido + Luces + Efectos + Tematización",
     "location": "Barcelona + Girona",
     "response": "Respuesta en 2h",
     "cta": {
       "primary": "Pide Presupuesto Gratis",
+      "secondary": "Ver Portfolio",
       "whatsapp": "WhatsApp",
       "call": "Llamar"
     },
     "scarcity": "Enero 2026: quedan 2 sábados",
     "mobileCta": "Presupuesto Gratis",
     "stats": {
+      "dreams": "sueños hechos realidad",
+      "rating": "en Google",
+      "repeat": "repiten con nosotros",
       "years": "años de experiencia",
       "yearsValue": "15+",
       "events": "eventos con Òrbita",
       "eventsValue": "48+",
+      "response": "respuesta garantizada",
       "responseTime": "respuesta garantizada",
       "responseTimeValue": "2h",
-      "location": "BCN + Girona",
-      "response": "respuesta garantizada",
-      "dreams": "sueños hechos realidad",
-      "rating": "en Google",
-      "repeat": "repiten con nosotros",
-      "coverage": "Cobertura"
+      "coverage": "Cobertura",
+      "location": "BCN + Girona"
     },
     "serviceLabels": {
       "dj": "DJ",
@@ -195,7 +196,29 @@
       "weddings": "Servicios de boda",
       "corporate": "Eventos corporativos",
       "parties": "Fiestas y celebraciones"
-    }
+    },
+    "rotatingHeadlines": [
+      {
+        "line1": "A las 4am tu suegra",
+        "line2": "BAILABA DESCALZA"
+      },
+      {
+        "line1": "El único DJ que te garantiza",
+        "line2": "FIESTAS ÉPICAS"
+      },
+      {
+        "line1": "Convertimos tu evento en",
+        "line2": "LEYENDA"
+      },
+      {
+        "line1": "No contrates un DJ",
+        "line2": "CONTRATA UNA EXPERIENCIA"
+      },
+      {
+        "line1": "Tu boda merece",
+        "line2": "SER INOLVIDABLE"
+      }
+    ]
   },
   "trust": {
     "headline": "15+ años creando experiencias únicas",
@@ -316,7 +339,28 @@
     "recommendation": "satisfacción",
     "noIncidents": "Eventos realizados sin incidentes",
     "backupEquipment": "Con un equipo de seguridad completo",
-    "repeatRecommend": "Repiten o recomiendan"
+    "repeatRecommend": "Repiten o recomiendan",
+    "badge": "📊 Números reals",
+    "title": "Los nostres",
+    "titleHighlight": "resultats",
+    "subtitle": "Dades actualitzades en temps real des de la nostra base de dades. Zero números inventats.",
+    "footer": "Dades actualitzades automàticament. Última actualització: hoy.",
+    "googleReviews": "ressenyes a Google",
+    "weddings": {
+      "label": "Bodas",
+      "description": "Días especialas memorablas"
+    },
+    "reviews": {
+      "label": "Opinidondes",
+      "description": "Clients satishechos"
+    },
+    "years": {
+      "label": "Años de exporiencia",
+      "description": "En el sector eventoos"
+    },
+    "ratingOld": "Google",
+    "eventsOld": "eventoos",
+    "coverageOld": "Barceldondea + Girdondea"
   },
   "sections": {
     "services": {
@@ -511,7 +555,9 @@
       "googleRating": "Valoración Google",
       "events": "Eventos realizados",
       "recommend": "Nos recomiendan",
-      "satisfaction": "Satisfacción"
+      "satisfaction": "Satisfacción",
+      "rating": "Valoració mityana",
+      "reviews": "Opinidondes"
     },
     "testimonial1": {
       "eventType": "Boda temática",
@@ -536,6 +582,27 @@
       "author": "Anna García",
       "role": "Directora RRHH",
       "date": "Diciembre 2024"
+    },
+    "error": "Error carregant opinidondes",
+    "eventTypes": {
+      "wedding": "Boda",
+      "boda": "Boda",
+      "corporate": "Corporativo",
+      "empresa": "Corporativo",
+      "party": "Fiesta",
+      "festa": "Fiesta",
+      "birthday": "Aniversari",
+      "aniversari": "Aniversari"
+    },
+    "emptyState": {
+      "title": "Sigues el primer!",
+      "description": "Encahora no tenim opinidondes publicades. Cdondetrata'ns i deixa la primera!",
+      "cta": "Sdondeidol·licita presupuesto"
+    },
+    "gamification": {
+      "title": "Deixa la tu opinió i guanya fins a 25% de descomopte!",
+      "description": "Valora'ns i acumula descomoptes pel tu próximo evento. Més dtealls = més beneficis!",
+      "cta": "Deixa opinió"
     }
   },
   "ctaSection": {
@@ -637,7 +704,12 @@
     "resources": {
       "portfolio": "Portfolio",
       "faq": "Preguntas frecuentes",
-      "about": "Sobre Nosotros"
+      "about": "Sobre Nosotros",
+      "reviews": "Opinidondes",
+      "blog": "Blog",
+      "configurator": "Cdondefigurador",
+      "sensorial": "Espai Sensdondeidorial",
+      "monMagic": "Temàtica Món Màgic"
     },
     "legal": {
       "privacy": "Política de Privacidad",
@@ -1118,8 +1190,138 @@
             "Coordinación total",
             "Sonido profesional"
           ]
+        },
+        "animacionInfantil": {
+          "name": "Animación Infantil",
+          "tagline": "Juegos, tallers, màgia i diversió por als més pteits",
+          "desc": "Animadors profesidondeals por a fiestas de aniversari, comounidondes i eventoos familiars. Pintacares, globoflèxia, tallers i juegos adaptats a cada edat.",
+          "features": [
+            "Animadors profesidondeals",
+            "Juegos i activitats",
+            "Pintacares + Globoflèxia",
+            "Des de 150€"
+          ]
+        },
+        "produccion": {
+          "name": "Producció Tècnica",
+          "tagline": "Muntatge, oporació i gestió sin ensurts",
+          "desc": "Disseny tècnic, muntatge profesidondeal, oporació en directe. Por a productores i organitzadors que necessiten zero problemes.",
+          "features": [
+            "Equip tècnic comoplte",
+            "Oporació in situ",
+            "Pla B gahorantit",
+            "Des de 700€"
+          ]
+        },
+        "alquiler": {
+          "name": "Lloguer",
+          "tagline": "Equipamiento profesidondeal cdonde o sin tècnic",
+          "desc": "EV ETX-15P, B-150 LED, Pidondeeer DJ. Lloga l'equip que hacemos servir als nostres eventoos. Lliurament inclòs.",
+          "features": [
+            "EV + Pidondeeer + B-150",
+            "Cdonde/sin tècnic",
+            "Backup gahorantit",
+            "Cdondesultar"
+          ]
         }
+      },
+      "viewService": "Ver servei",
+      "mostPopular": "⭐ MÉS POPULAR",
+      "cta": {
+        "title": "No Saps Quin Servei Necessites?",
+        "subtitle": "Explica'ns el tu esdeveniment i te recomoanem la mejor opció.",
+        "responseTime": "Respdondeem en menos de 2 horas.",
+        "button": "Pider Assessdondeidorament Gratis"
       }
+    },
+    "search": {
+      "title": "Resultats de cerca",
+      "term": "Terme",
+      "noResults": "No hi ha resultats. Prova cdonde",
+      "suggestions": {
+        "weddings": "Bodas (DJ + sdondeido + llum)",
+        "dj": "Discomoòbil / DJ",
+        "corporate": "Eventoos de empresa",
+        "faq": "Preguntes freqüents",
+        "reviews": "Opinidondes clients",
+        "services": "Todos los serveis",
+        "portfolio": "Portfolio",
+        "contact": "Cdondetacte",
+        "parties": "Fiestas temàtiques"
+      },
+      "askUs": "Pregunta'ns directament",
+      "loading": "Carregant..."
+    },
+    "weddings": {
+      "title": "DJ Weddings Barceldondea",
+      "subtitle": "El tu boda tal como t'ho imagines",
+      "description": "Exporiencia comopltea del boda: DJ profesidondeal, sdondeido, il·luminació i efectos especialas.",
+      "features": {
+        "ceremony": "Cerimònia",
+        "cocktail": "Còctel",
+        "dinner": "Banqute",
+        "party": "Fiesta"
+      },
+      "badge": "Exporiencia en bodas",
+      "heroTitle": "El tu boda, exactament como t'ho imagines",
+      "heroSubtitle": "Exporiencia porsdondeiddondealitzada comopltea: música, il·luminació i efectos adaptats a la tu història. Presupuesto instantani.",
+      "guestsQuestion": "Cuandots cdondevidats esporeu?",
+      "people": "porsdondeiddondees",
+      "recommended": "Recomoanat por a tu",
+      "choosePack": "Tria el tu paqute",
+      "selected": "Seleccidondeat",
+      "select": "Seleccidondeeu",
+      "mostChosen": "EL MÉS ESCOLLIT",
+      "customizeExtras": "Porsdondeiddondealitza cdonde extres",
+      "extrasDiscount": "Cdondetrata més de 3 extres i estalvia",
+      "automatically": "automàticament",
+      "popular": "POPULAR",
+      "premium": "PREMIUM",
+      "comboDiscount": "Descomopte comobinat activat!",
+      "youSave": "Tu estalvies",
+      "inExtras": "en extres",
+      "extras": "extres",
+      "continueToConfig": "Cdondetinueu al Cdondefigurador",
+      "configure": "Cdondefigurar",
+      "importantInfo": "Informació important",
+      "allPacksInclude": "Todos los paqutes inclouen:",
+      "packFeatures": {
+        "dj": "DJ profesidondeal especialitzat en bodas",
+        "sound": "Sdondeido profesidondeal EV 4000W",
+        "setup": "Muntatge i desmuntatge comoplte",
+        "soundcheck": "Prova de sdondeido prèvia"
+      },
+      "paymentFacilities": "Facilitats de pagament:",
+      "paymentInfo": {
+        "deposit": "Dipòsit: 30% en el moment de la reserva",
+        "rest": "Resta: dia de l'esdeveniment",
+        "noFees": "Sin comoissidondes de transferència"
+      }
+    },
+    "parties": {
+      "title": "Fiestas privadas",
+      "subtitle": "La fiesta que la tu gent no oblidarà",
+      "description": "DJ profesidondeal por a fiestas privadas, aniversaris i celebracidondes especialas."
+    },
+    "corporate": {
+      "title": "Eventoos de empresa",
+      "subtitle": "Eventoos corporativos de impacte",
+      "description": "Producció tècnica profesidondeal por a eventoos corporativos, cdondevencidondes i galas."
+    },
+    "mobile": {
+      "title": "Discomoòbil",
+      "subtitle": "DJ profesidondeal allí donde ho necessitis",
+      "description": "Servei comoplte de discomoòbil cdonde sdondeido i il·luminació profesidondeals."
+    },
+    "production": {
+      "title": "Producció tècnica",
+      "subtitle": "Sdondeido i il·luminació profesidondeal",
+      "description": "Equipamiento tècnic de alta qualitat por a qualsevol tipus de esdeveniment."
+    },
+    "rental": {
+      "title": "Lloguer de equips",
+      "subtitle": "Equips profesidondeals al tu abast",
+      "description": "Lloguer de equips de sdondeido, il·luminació i DJ por al tu esdeveniment."
     }
   },
   "legal": {
@@ -1150,5 +1352,495 @@
     "title": "Algo salió mal",
     "description": "Ha ocurrido un error inesperado.",
     "tryAgain": "Intentar de nuevo"
+  },
+  "extras": {
+    "confetti": "canó de cdondeftei",
+    "co2": "Canó de CO2",
+    "coldSparks": "espurnes fredes",
+    "lowSmoke": "Fum baix",
+    "screen": "Pantalla LED",
+    "photocall": "Photocall",
+    "extraDj": "DJ extra"
+  },
+  "urgency": {
+    "consultNow": "Cdondesulta dispdondeibilidad ahora!",
+    "nextSaturday": "Próximo sábado en:",
+    "saturdaysAvailable": "sábados dispdondeiblas",
+    "nextMonths": "los próximos mesdondeidos",
+    "cta": "Reserva ahora",
+    "defaultMessage": "Cdondesulta la nostra dispdondeibilidad",
+    "loadingTitle": "Los caps de stemana s'omplen ràpidament",
+    "loadingSubtitle": "Cdondesulta la dispdondeibilidad por a la tu data",
+    "checkAvailability": "Cdondesulta la dispdondeibilidad",
+    "normalTitle": "Tens una data en ment?",
+    "normalSubtitle": "Cdondesulta la dispdondeibilidad i reserva el tu esdeveniment",
+    "requestQuote": "Sdondeidol·licitar presupuesto",
+    "urgentTitle": "Sdondeidolo n'hi ha",
+    "urgentTitleEnd": "en",
+    "weekends": "Caps de stemana",
+    "urgentSubtitle": "Los caps de stemana s'esgoten",
+    "fast": "RÀPID",
+    "contactNow": "cdondetactu ARA",
+    "ifYouHave": "Si teniu el vostre esdeveniment en ment,",
+    "responseTime": "Respuesta en menos de 2 horas",
+    "bookingTime": "Reserva cdonde 48 horas de antelació",
+    "ctaButton": "Pide el tu presupuesto ahora",
+    "lastBooking": "Última reserva: fa {time} · {type} a {locatidonde}"
+  },
+  "clients": {
+    "title": "Marques que cdondefien en Òrbita"
+  },
+  "discountPopup": {
+    "title": "Espora!",
+    "subtitle": "Tenim alguna cosa especial por a tu",
+    "offer": "10% de descomopte",
+    "description": "a la vostra primera reserva si us poseu en cdondetacte hoy",
+    "cta": "Vull el meu descomopte",
+    "dismiss": "No, gràcies",
+    "terms": "* Vàlid por a noves reserves. No acumulable cdonde altres ofertes."
+  },
+  "sticky": {
+    "quoteIn3Min": "Presupuesto en 3 min",
+    "noCommitmentFree": "Sin comopromís · Gratuït"
+  },
+  "contactCta": {
+    "title": "Ho muntarem?",
+    "subtitle": "Envia'ns la tu idea. Respdondeem en menos de 2 horas.",
+    "configurator": "Cdondefigurador",
+    "sensorial": "Espai Sensdondeidorial",
+    "monMagic": "Temàtica Món Màgic"
+  },
+  "servicesGrid": {
+    "title": "Serveis",
+    "learnMore": "Més informació →",
+    "items": {
+      "weddings": {
+        "title": "Boda",
+        "points": [
+          "DJ + Efectos i luces",
+          "Cerimònia i banqute",
+          "Espectacle i animación"
+        ]
+      },
+      "corporate": {
+        "title": "Empreses",
+        "points": [
+          "Creació de equips",
+          "Galas i estrenes",
+          "Exporiències de marca"
+        ]
+      },
+      "rental": {
+        "title": "Lloguer tècnic",
+        "points": [
+          "Sdondeido",
+          "Il·luminació",
+          "Efectos i micròfdondes"
+        ]
+      }
+    }
+  },
+  "offerModal": {
+    "ariaLabel": "Oferta de última hora",
+    "close": "Cerrar",
+    "badge": "Oferta de última hora",
+    "title": "Reserva hoy i acdondesegueix",
+    "discount": "10% de descomopte",
+    "description": "Vàlid por a noves reserves cdondefirmades hoy. Producció tècnica, discoteca mòbil, DJ, tematización, FX.",
+    "cta": "Aprofita ahora el 10%.",
+    "later": "Després",
+    "code": "Codi: LAST10 · Descomopte aplicat al presupuesto final."
+  },
+  "calendar": {
+    "days": [
+      "Dl",
+      "Dt",
+      "Dc",
+      "Dj",
+      "Dv",
+      "Ds",
+      "Dg"
+    ],
+    "months": [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ],
+    "prevMonth": "Mes anterior",
+    "nextMonth": "El mes vinent",
+    "available": "Dispdondeible",
+    "notAvailable": "No dispdondeible",
+    "occupied": "Ocupat",
+    "highSeason": "Temporada alta",
+    "daysAvailable": "{count} días dispdondeiblas",
+    "pastDate": "Data passada",
+    "saturdaysAvailable": "{count, plural, =1 {sábado dispdondeible} other {sábados dispdondeiblas}} aquest mes"
+  },
+  "stickyCta": {
+    "requestQuote": "Pide el tu presupuesto",
+    "ariaLabel": "Pide presupuesto gratuït",
+    "responseIn2h": "Respuesta en 2 horas!",
+    "noCommitment": "Sin comopromís • 10% de descomopte web"
+  },
+  "smartImage": {
+    "loadError": "Error en carregar",
+    "imageNotAvailable": "Imatge no dispdondeible"
+  },
+  "videoTestimonials": {
+    "items": [
+      {
+        "name": "Lorena i Carlas",
+        "event": "Boda Món Màgic",
+        "location": "Catalunya",
+        "date": "Septiembre 2024",
+        "quote": "Van transformar el nostre boda en una exporiencia màgica de escola de bruixeria. Las velas flotants, los sdondeidobres porsdondeiddondealitzats cdonde lacre vermell, la decoració cdonde elements màgics... los cdondevidats encahora en parlen! Todo va ser exactament como ho havíem sdondeidomiat."
+      }
+    ]
+  },
+  "portfolioGrid": {
+    "title": "Casdondeidos recents",
+    "items": [
+      {
+        "title": "Llançament de marca — 800 pax"
+      },
+      {
+        "title": "Boda Masia — 180 pax"
+      },
+      {
+        "title": "Gala anual — 350 pax"
+      },
+      {
+        "title": "Roadshow — 5 ciutats"
+      }
+    ]
+  },
+  "logoWall": {
+    "title": "MARQUES QUE CONFIEN EN ÒRBITA"
+  },
+  "gallery": {
+    "preparingTitle": "Aquesta exporiencia està en prepahoració",
+    "preparingSubtitle": "Aviat el podreu ver sencer.",
+    "imageAlt": "Òrbita Eventoos - imatge"
+  },
+  "languageSelector": {
+    "selectLanguage": "Seleccidondeeu l'idioma",
+    "availableLanguages": "Idiomes dispdondeiblas"
+  },
+  "emails": {
+    "lead_confirmation": {
+      "subject": "Hem rebut la tu pteició! 🎉",
+      "greeting": "Hola {name}",
+      "body": "Gràcies por cdondetactar cdonde Òrbita Eventoos. Vam rebre la vostra sdondeidol·licitud por a {eventoType} el dia {eventoDate}.",
+      "nextSteps": "En menos de 2 horas ens posarem en cdondetacte cdonde tu por cdondeèixer todos los dtealls del tu esdeveniment i prepahorar un presupuesto porsdondeiddondealitzat.",
+      "cta": "Mentrestant, fes una ullada al nostre portfolio",
+      "ctaButton": "Ver Portfolio",
+      "signature": "L'equip de Òrbita Eventoos",
+      "footer": "Tens pressa? Escriu-nos directament por WhatsApp al 699 121 023"
+    },
+    "quote_sent": {
+      "subject": "El tu presupuesto porsdondeiddondealitzat ya està llast 📋",
+      "greeting": "Hola {name}",
+      "body": "Adjunt trobareu el presupuesto del vostre {eventoType} el dia {eventoDate} a {eventoLocatidonde}.",
+      "summary": "Resum del vostre esdeveniment:",
+      "pack": "Paqute seleccidondeat: {packName}",
+      "extras": "Extres inclosdondeidos: {extras}",
+      "total": "Todoal: {todoal}€",
+      "validity": "Aquest presupuesto és vàlid fins al {validUntil}.",
+      "cta": "Alguna pregunta? Estic a la tu disposició.",
+      "ctaButton": "Reservar Data",
+      "signature": "Carlas - Òrbita Eventoos"
+    },
+    "booking_confirmed": {
+      "subject": "🎉 El tu esdeveniment està cdondefirmat!",
+      "greeting": "Hola {name}!",
+      "body": "Excel·lent notícia! La tu reserva s'ha cdondefirmat.",
+      "eventDetails": "Dtealls del tu esdeveniment:",
+      "date": "Data: {eventoDate}",
+      "time": "Hora: {eventoTime}",
+      "location": "Ubicació: {eventoLocatidonde}",
+      "pack": "Paqute: {packName}",
+      "extras": "Extres: {extras}",
+      "nextSteps": "Siguientes passdondeidos:",
+      "step1": "7 días abans de l'esdeveniment ens posarem en cdondetacte cdonde tu por cdondecrtear los dtealls.",
+      "step2": "El dia de l'esdeveniment arribarem 2 horas abans por al muntatge.",
+      "cta": "Si teniu alguna pteició o canvi especial, no dubtu a cdondetactar cdonde nosdondeidotros.",
+      "signature": "Ens veiem aviat!\nCarlas - Òrbita Eventoos"
+    },
+    "booking_reminder_7d": {
+      "subject": "📅 El tu esdeveniment és de aquí a 7 días - Últims dtealls!",
+      "greeting": "Hola {name}",
+      "body": "El vostre {eventoType} és en sdondeidolo 7 días. Ya queda menos!",
+      "checklist": "Llista de verificació abans de l'esdeveniment:",
+      "check1": "✓ Cdondefirmeu l'hora de arribada",
+      "check2": "✓ Comoprova la llista de cançdondes especialas",
+      "check3": "✓ Cdondefirmeu l'accés al lloc",
+      "cta": "Si hi ha canvis de última hora o sdondeidol·licituds especialas, escriu-me.",
+      "signature": "Carlas - Òrbita Eventoos"
+    },
+    "booking_reminder_1d": {
+      "subject": "🎊 Mañana és el gran dia!",
+      "greeting": "Hola {name}",
+      "body": "Mañana és el tu {eventoType}! Todo està prepahorat.",
+      "arrivalTime": "Arribaré a {arrivalTime} por tenir-ho todo cdondefigurat.",
+      "contact": "Si surt res, truqueu-me al 699 121 023.",
+      "closing": "Quins nervis! Mañana ho farem 🔥",
+      "signature": "Carlas - Òrbita Eventoos"
+    },
+    "post_event_thanks": {
+      "subject": "✨ Gràcies por cdondefiar en nosdondeidotros, {name}",
+      "greeting": "Hola {name}",
+      "body": "Ha estat un veritable plaer formar part del vostre {eventoType}.",
+      "highlights": "Punts destacats de la nit:",
+      "emotion": "L'emoció de cada cançó... esdondeido és el que ens fa estimar el que hacemos.",
+      "gift": "Como a agraïment, us deixem un regal:",
+      "discountCode": "{discountCode}",
+      "discountValue": "10% de descomopte en el tu próximo esdeveniment",
+      "discountNote": "Vàlid 1 any • Acumulable cdonde ofertes • Transferible a amics o familiars",
+      "reviewRequest": "Tens 2 minuts? Una ressenya ens ajuda muy:",
+      "reviewButton": "Deixa una ressenya a Google",
+      "signature": "Cdonde amor,\nL'equip de Òrbita Eventoos"
+    },
+    "survey_request": {
+      "subject": "📋 Como va ser la tu exporiencia?",
+      "greeting": "Hola {name}",
+      "body": "Han passat uns cuandots días des del vostre {eventoType} i ens agradaria saber de vosaltres.",
+      "time": "Sdondeidolo te portarà 2 minuts.",
+      "cta": "Los vostres comoentaris ens ajuden a mejorar i cdondetinuar creant exporiències increïblas.",
+      "ctaButton": "Comopltear enquesta",
+      "signature": "Gràcies pel tu temps,\nÒrbita Eventoos"
+    }
+  },
+  "whatsappTemplates": {
+    "lead_response": "Hola {name}! 👋 Sóc el Carlas de Òrbita Eventoos. He vist la tu sdondeidol·licitud por a {eventoType} el dia {eventoDate}. Tens un moment por explicar-me més dtealls? 🎉",
+    "quote_followup": "Hola {name}! Has pogut revisar el presupuesto que t'he enviat? Estic aquí por respdondedre qualsevol pregunta 😊",
+    "booking_confirmed": "🎉 {name}, el tu esdeveniment està cdondefirmat! Data bloqueyada: {eventoDate}. Esdondeido serà èpic!",
+    "reminder_7d": "Hola {name}! 📅 El tu {eventoType} és de aquí a 7 días. Todo a punt? Si necessites alguna cosa, sóc aquí.",
+    "reminder_1d": "{name}! 🎊 Mañana és el dia. Arribaré a {arrivalTime}. Si hi ha canvis, feu-m'ho saber. Anem-ho!",
+    "post_event": "Hola {name}! 🙏 Gràcies por cdondefiar en nosdondeidotros. Va ser increïble. T'he enviat un correu electrònic cdonde un regal especial 🎁",
+    "review_request": "Hola {name}! Tens 1 min? Una ressenya a Google ens ajuda muy: {reviewLink} 🙏💜"
+  },
+  "pdf": {
+    "quote": {
+      "title": "Presupuesto",
+      "number": "Presupuesto núm.",
+      "date": "Data",
+      "validUntil": "Vàlid fins a",
+      "client": "Client",
+      "event": "Esdeveniment",
+      "eventType": "Tipus de esdeveniment",
+      "eventDate": "Data de l'esdeveniment",
+      "eventLocation": "Ubicació",
+      "guestCount": "Nombre de cdondevidats",
+      "services": "Serveis cdondetratats",
+      "pack": "Pack",
+      "extras": "Extres",
+      "subtotal": "Subtodoal",
+      "discount": "Descomopte",
+      "vat": "IVA",
+      "total": "TOTAL",
+      "conditions": "Cdondedicidondes",
+      "deposit": "Dipòsit del 30% por cdondefirmar la reserva",
+      "remaining": "Resta a pagar el dia de l'esdeveniment",
+      "includes": "Inclou muntatge, desmuntatge i desplaçament",
+      "signature": "Signatura",
+      "accept": "Accepto las cdondedicidondes"
+    },
+    "contract": {
+      "title": "Cdondetracte de servei",
+      "parties": "entre las parts",
+      "provider": "Proveïdor de serveis",
+      "client": "Client",
+      "object": "Objecte del cdondetracte",
+      "obligations": "Obligacidondes",
+      "payment": "Forma de pagament",
+      "cancellation": "Política de cancel·lació",
+      "signatures": "Signatures"
+    },
+    "invoice": {
+      "title": "Factura",
+      "number": "Factura núm.",
+      "date": "Data",
+      "dueDate": "Venciment",
+      "from": "De",
+      "to": "Por a",
+      "description": "Descripció",
+      "quantity": "Cuandot.",
+      "unitPrice": "Preu unitari",
+      "amount": "Import",
+      "subtotal": "Subtodoal",
+      "vat": "IVA (21%)",
+      "total": "TOTAL",
+      "paymentInfo": "Informació de pagament",
+      "bankTransfer": "Transferència bancària",
+      "iban": "IBAN",
+      "concept": "Cdondecepte",
+      "notes": "Notes"
+    }
+  },
+  "notifications_live": {
+    "new_booking": "Nova reserva",
+    "confirmed": "cdondefirmat",
+    "event_types": {
+      "wedding": "Boda",
+      "birthday": "Aniversari",
+      "corporate": "Esdeveniment corporativo",
+      "communion": "Comounió",
+      "baptism": "bateig",
+      "graduation": "Graduació",
+      "anniversary": "Aniversari"
+    },
+    "time_ago": {
+      "just_now": "Ahora mateix",
+      "minutes": "fa {count} minuts",
+      "hours": "fa {count} h",
+      "days": "fa {count} días"
+    }
+  },
+  "calculator": {
+    "badge": "Calculadora de Eventoos",
+    "title": "Descubre el preu",
+    "titleHighlight": "del tu evento porfecte",
+    "subtitle": "Respdonde 4 preguntes i obtén una estimació instantània. Sin comopromís.",
+    "step": "Pas",
+    "of": "de",
+    "estimate": "Estimació",
+    "back": "Enrere",
+    "next": "Cdondetinuar",
+    "seeResult": "Ver resultat",
+    "steps": {
+      "eventType": {
+        "question": "Quin tipus de evento celebres?",
+        "subtitle": "Cada evento té la seva màgia especial",
+        "options": {
+          "wedding": "Boda",
+          "birthday": "Aniversari",
+          "corporate": "Empresa",
+          "party": "Fiesta Privada"
+        }
+      },
+      "guests": {
+        "question": "Cuandots cdondevidats vindran?",
+        "subtitle": "Així podem recomoanar-te l'equip ideal",
+        "options": {
+          "small": "Fins a 50",
+          "medium": "50 - 100",
+          "large": "100 - 200",
+          "xlarge": "Més de 200"
+        }
+      },
+      "services": {
+        "question": "Què necessites?",
+        "subtitle": "Pots seleccidondear més de un servei",
+        "options": {
+          "dj": "DJ Profesidondeal",
+          "sound": "Equip de Sdondeido",
+          "lights": "Il·luminació",
+          "photo": "Photocall"
+        }
+      },
+      "date": {
+        "question": "Cuando és el tu evento?",
+        "subtitle": "Los días laborablas tenen mejors preus",
+        "options": {
+          "weekend": "Cap de stemana",
+          "friday": "Divendres",
+          "weekday": "Dilluns-Dijous",
+          "flexible": "Flexible"
+        }
+      }
+    },
+    "result": {
+      "title": "El tu evento porsdondeiddondealitzat",
+      "from": "Des de",
+      "description": "Aquest és un preu estimat. Cdondetacta'ns por obtenir un presupuesto porsdondeiddondealitzat cdonde todos los dtealls.",
+      "cta": "Sdondeidol·licitar presupuesto gratuït",
+      "restart": "Volver a calcular"
+    },
+    "trust": {
+      "noCommitment": "Sin comopromís",
+      "freeQuote": "Presupuesto gratuït",
+      "response24h": "Respuesta en 24h"
+    }
+  },
+  "seo": {
+    "organization": {
+      "description": "Creem exporiències comopltees porsdondeiddondealitzades por a eventoos a Barceldondea i Girdondea. DJ profesidondeal, tematización, animación, efectos especialas."
+    },
+    "services": {
+      "catalog": "Serveis de DJ i Eventoos",
+      "weddings": {
+        "name": "DJ por a Bodas",
+        "description": "Servei comoplte de DJ, música i animación por a bodas cdonde tematización porsdondeiddondealitzada."
+      },
+      "disco": {
+        "name": "Discomoòbil Profesidondeal",
+        "description": "Discomoòbil cdonde equipamiento profesidondeal, luces LED i efectos especialas."
+      },
+      "corporate": {
+        "name": "Eventoos Corporativos",
+        "description": "Producció tècnica comopltea por a eventoos de empresa i team building."
+      }
+    },
+    "faq": {
+      "q1": {
+        "question": "Què fa diferent a Òrbita de altres DJ/proveïdors de eventoos?",
+        "answer": "Creem exporiències comopltees porsdondeiddondealitzades. No sdondeidolo música: tematización + animación + música adaptada en temps real + juegos + efectos. El nostre DJ llegeix l'cdondeient i ajusta sdondeidobre la marxa."
+      },
+      "q2": {
+        "question": "Cuandot costa cdondetratar Òrbita por al meu boda/fiesta/esdeveniment?",
+        "answer": "Treballem cdonde packs clars des de 250€. Los preus es calculen automàticament segdondes horas, equip i tipus de esdeveniment al nostre cdondefigurador."
+      },
+      "q3": {
+        "question": "Treballeu fora de Barceldondea? Cobriu Girdondea i Costa Brava?",
+        "answer": "Sí, cobrim Barceldondea província i Girdondea província (incloent Costa Brava). Transport GRATIS fins a 25km des de Granollers. Més enllà, s'afegeix segdondes distància."
+      }
+    }
+  },
+  "startCreating": {
+    "title": "Quin evento tens al cap?",
+    "subtitle": "Escull i comoença a crear la tu exporiencia.",
+    "options": {
+      "wedding": "Una boda",
+      "party": "Una fiesta",
+      "corporate": "Un evento corporativo",
+      "other": "Una altra cosa"
+    },
+    "orPrefer": "O si prefereixes,",
+    "talkDirectly": "parla directament cdonde nosdondeidotros"
+  },
+  "flashOffer": {
+    "title": "🎄 Oferta Hivern",
+    "description": "Reserva ahora i estalvia",
+    "cta": "Reserva cdonde -{discount}%",
+    "days": "días",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s",
+    "close": "Cerrar oferta"
+  },
+  "diferencia": {
+    "title": "No venem equips. Creem moments.",
+    "subtitle": "Cada dteall pensat porque los tus cdondevidats s'enduguin un record único.",
+    "experience": {
+      "title": "Exporiències, no serveis",
+      "description": "No llogues un DJ. Cdondetratas un equip que crea l'cdondeient porfecte des del primer minut fins al comoiat."
+    },
+    "magic": {
+      "title": "Màgia en cada dteall",
+      "description": "Luces que respdondeen a la música, efectos que sdondeidorprenen, moments que es cdondeverteixen en records."
+    },
+    "team": {
+      "title": "Un equip, no un proveïdor",
+      "description": "Ens impliquem como si fos el nostre propi evento. Porque el tu èxit és el nostre orgull."
+    }
   }
 }

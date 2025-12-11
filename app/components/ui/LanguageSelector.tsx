@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 /**
@@ -48,7 +48,6 @@ export default function LanguageSelector({
   className = ''
 }: LanguageSelectorProps) {
   const locale = useLocale();
-  const router = useRouter();
   const pathname = usePathname();
   const [hoveredLang, setHoveredLang] = useState<string | null>(null);
 
@@ -56,37 +55,24 @@ export default function LanguageSelector({
     // Guardar preferència a cookie
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
 
+    // Obtenir path sense locale actual
     const segments = pathname.split('/');
     const hasLocalePrefix = languages.some(l => l.code === segments[1]);
-
-    // Obtenir el path sense locale actual
-    let pathWithoutLocale = hasLocalePrefix
+    const pathWithoutLocale = hasLocalePrefix
       ? '/' + segments.slice(2).join('/')
       : pathname;
 
-    // Normalitzar: assegurar que comença amb /
-    if (!pathWithoutLocale.startsWith('/')) {
-      pathWithoutLocale = '/' + pathWithoutLocale;
-    }
-    // Evitar doble barra
-    if (pathWithoutLocale === '/') {
-      pathWithoutLocale = '';
-    }
-
-    // El defaultLocale és 'ca', amb localePrefix: 'as-needed' no necessita prefix
-    // Altres idiomes necessiten prefix
+    // Construir nova URL
     const DEFAULT_LOCALE = 'ca';
-
     let newPath: string;
     if (newLocale === DEFAULT_LOCALE) {
-      // Català: sense prefix (as-needed)
       newPath = pathWithoutLocale || '/';
     } else {
-      // Altres idiomes: amb prefix
-      newPath = `/${newLocale}${pathWithoutLocale}`;
+      newPath = `/${newLocale}${pathWithoutLocale || ''}`;
     }
 
-    router.push(newPath);
+    // Forçar recàrrega completa per aplicar el canvi d'idioma
+    window.location.href = newPath;
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -223,7 +209,6 @@ export default function LanguageSelector({
 // ═══════════════════════════════════════════════════════════════════════════
 export function LanguageSelectorMobile({ className = '' }: { className?: string }) {
   const locale = useLocale();
-  const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -234,28 +219,19 @@ export function LanguageSelectorMobile({ className = '' }: { className?: string 
 
     const segments = pathname.split('/');
     const hasLocalePrefix = languages.some(l => l.code === segments[1]);
-
-    let pathWithoutLocale = hasLocalePrefix
+    const pathWithoutLocale = hasLocalePrefix
       ? '/' + segments.slice(2).join('/')
       : pathname;
-
-    if (!pathWithoutLocale.startsWith('/')) {
-      pathWithoutLocale = '/' + pathWithoutLocale;
-    }
-    if (pathWithoutLocale === '/') {
-      pathWithoutLocale = '';
-    }
 
     const DEFAULT_LOCALE = 'ca';
     let newPath: string;
     if (newLocale === DEFAULT_LOCALE) {
       newPath = pathWithoutLocale || '/';
     } else {
-      newPath = `/${newLocale}${pathWithoutLocale}`;
+      newPath = `/${newLocale}${pathWithoutLocale || ''}`;
     }
 
-    router.push(newPath);
-    setIsOpen(false);
+    window.location.href = newPath;
   };
 
   return (
@@ -313,7 +289,6 @@ export function LanguageSelectorMobile({ className = '' }: { className?: string 
 // ═══════════════════════════════════════════════════════════════════════════
 export function LanguageBar({ className = '' }: { className?: string }) {
   const locale = useLocale();
-  const router = useRouter();
   const pathname = usePathname();
 
   const switchLocale = (newLocale: string) => {
@@ -321,27 +296,19 @@ export function LanguageBar({ className = '' }: { className?: string }) {
 
     const segments = pathname.split('/');
     const hasLocalePrefix = languages.some(l => l.code === segments[1]);
-
-    let pathWithoutLocale = hasLocalePrefix
+    const pathWithoutLocale = hasLocalePrefix
       ? '/' + segments.slice(2).join('/')
       : pathname;
-
-    if (!pathWithoutLocale.startsWith('/')) {
-      pathWithoutLocale = '/' + pathWithoutLocale;
-    }
-    if (pathWithoutLocale === '/') {
-      pathWithoutLocale = '';
-    }
 
     const DEFAULT_LOCALE = 'ca';
     let newPath: string;
     if (newLocale === DEFAULT_LOCALE) {
       newPath = pathWithoutLocale || '/';
     } else {
-      newPath = `/${newLocale}${pathWithoutLocale}`;
+      newPath = `/${newLocale}${pathWithoutLocale || ''}`;
     }
 
-    router.push(newPath);
+    window.location.href = newPath;
   };
 
   return (
