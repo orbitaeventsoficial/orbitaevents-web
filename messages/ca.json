@@ -91,7 +91,7 @@
   },
   "hero": {
     "badge": "🔥 DJ + So + Llums + Efectes Especials",
-    "rotatingHeadlines": [
+    "headlines": [
       {
         "line1": "A les 4am la teva sogra",
         "line2": "BALLAVA DESCALÇA"

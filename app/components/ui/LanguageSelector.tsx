@@ -16,16 +16,19 @@ const flags: Record<string, JSX.Element> = {
   // Catalunya - SENYERA (4 barres vermelles sobre groc)
   ca: (
     <svg viewBox="0 0 640 480" className="w-full h-full">
-      <path fill="#FCDD09" d="M0 0h640v480H0z"/>
-      <path stroke="#DA121A" strokeWidth="53" d="M0 53h640M0 160h640M0 267h640M0 374h640"/>
+      <rect width="640" height="480" fill="#FCDD09"/>
+      <rect y="53" width="640" height="53" fill="#DA121A"/>
+      <rect y="160" width="640" height="53" fill="#DA121A"/>
+      <rect y="267" width="640" height="53" fill="#DA121A"/>
+      <rect y="374" width="640" height="53" fill="#DA121A"/>
     </svg>
   ),
 
   // Espanya
   es: (
     <svg viewBox="0 0 640 480" className="w-full h-full">
-      <path fill="#AA151B" d="M0 0h640v480H0z"/>
-      <path fill="#F1BF00" d="M0 120h640v240H0z"/>
+      <rect width="640" height="480" fill="#AA151B"/>
+      <rect y="120" width="640" height="240" fill="#F1BF00"/>
     </svg>
   ),
 };
