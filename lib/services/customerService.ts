@@ -44,6 +44,7 @@ export interface UpsertCustomerResult {
  * Buscar client per email
  */
 export async function findCustomerByEmail(email: string): Promise<Customer | null> {
+  if (!supabaseAdmin) return null;
   const normalizedEmail = normalizeEmail(email);
 
   const { data, error } = await supabaseAdmin
@@ -60,6 +61,9 @@ export async function findCustomerByEmail(email: string): Promise<Customer | nul
  * Crear o actualitzar client
  */
 export async function upsertCustomer(input: UpsertCustomerInput): Promise<UpsertCustomerResult> {
+  if (!supabaseAdmin) {
+    throw new Error('Database not configured');
+  }
   const normalizedEmail = normalizeEmail(input.email);
 
   // Buscar si ja existeix
@@ -155,6 +159,7 @@ export async function upsertCustomer(input: UpsertCustomerInput): Promise<Upsert
  * Obtenir client per ID
  */
 export async function getCustomerById(id: string): Promise<Customer | null> {
+  if (!supabaseAdmin) return null;
   const { data, error } = await supabaseAdmin
     .from('customers')
     .select('*')
@@ -169,6 +174,7 @@ export async function getCustomerById(id: string): Promise<Customer | null> {
  * Buscar clients
  */
 export async function searchCustomers(query: string, limit = 20): Promise<Customer[]> {
+  if (!supabaseAdmin) return [];
   const normalizedQuery = query.toLowerCase().trim();
 
   const { data, error } = await supabaseAdmin
@@ -185,6 +191,7 @@ export async function searchCustomers(query: string, limit = 20): Promise<Custom
  * Obtenir tots els clients
  */
 export async function getAllCustomers(limit = 100): Promise<Customer[]> {
+  if (!supabaseAdmin) return [];
   const { data, error } = await supabaseAdmin
     .from('customers')
     .select('*')
@@ -202,6 +209,7 @@ export async function updateCustomer(
   id: string,
   updates: Partial<Customer>
 ): Promise<Customer | null> {
+  if (!supabaseAdmin) return null;
   const { data, error } = await supabaseAdmin
     .from('customers')
     .update({
@@ -226,6 +234,7 @@ export async function logCustomerActivity(
   ipAddress?: string,
   userAgent?: string
 ): Promise<void> {
+  if (!supabaseAdmin) return;
   await supabaseAdmin.from('audit_log').insert({
     actor_type: 'customer',
     actor_id: customerId,
@@ -251,6 +260,7 @@ export async function recordConsent(
   ipAddress?: string,
   userAgent?: string
 ): Promise<void> {
+  if (!supabaseAdmin) return;
   await supabaseAdmin.from('consent_records').insert({
     customer_id: customerId,
     consent_type: consentType,
@@ -267,6 +277,7 @@ export async function recordConsent(
  * Obtenir estadístiques de clients
  */
 export async function getCustomerStats() {
+  if (!supabaseAdmin) return { total: 0, vip: 0, marketing: 0, withEvents: 0 };
   const { data: all } = await supabaseAdmin
     .from('customers')
     .select('id, is_vip, consent_marketing, total_events');

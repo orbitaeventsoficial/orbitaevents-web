@@ -12,6 +12,17 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 
 export const dynamic = 'force-dynamic';
 
+// Check if Supabase is configured
+function checkSupabase() {
+  if (!supabaseAdmin) {
+    return NextResponse.json(
+      { error: 'Database not configured' },
+      { status: 503 }
+    );
+  }
+  return null;
+}
+
 // Verificar autenticació admin
 function verifyAdminAuth(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
@@ -36,6 +47,9 @@ function verifyAdminAuth(request: NextRequest): boolean {
  * POST - Iniciar procés
  */
 export async function POST(request: NextRequest) {
+  const dbError = checkSupabase();
+  if (dbError) return dbError;
+
   if (!verifyAdminAuth(request)) {
     return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
   }
@@ -52,7 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Obtenir client
-    const { data: customer, error: customerError } = await supabaseAdmin
+    const { data: customer, error: customerError } = await supabaseAdmin!
       .from('customers')
       .select('*')
       .eq('id', customerId)
@@ -90,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Actualitzar última data de contacte
-    await supabaseAdmin
+    await supabaseAdmin!
       .from('customers')
       .update({
         last_contact_date: new Date().toISOString(),
@@ -202,7 +216,7 @@ async function sendPostEventSequence(
   const discountCode = `${cleanName}10${random}`;
 
   // 2. Guardar codi a Supabase (si tenim bookingId)
-  if (bookingId) {
+  if (bookingId && supabaseAdmin) {
     await supabaseAdmin.from('discount_codes').insert({
       code: discountCode,
       discount_percent: 10,

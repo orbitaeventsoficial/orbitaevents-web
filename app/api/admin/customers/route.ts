@@ -10,6 +10,17 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
+// Check if Supabase is configured
+function checkSupabase() {
+  if (!supabaseAdmin) {
+    return NextResponse.json(
+      { error: 'Database not configured' },
+      { status: 503 }
+    );
+  }
+  return null;
+}
+
 // Verificar autenticació admin
 function verifyAdminAuth(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
@@ -34,6 +45,9 @@ function verifyAdminAuth(request: NextRequest): boolean {
  * GET - Obtenir clients
  */
 export async function GET(request: NextRequest) {
+  const dbError = checkSupabase();
+  if (dbError) return dbError;
+
   if (!verifyAdminAuth(request)) {
     return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
   }
@@ -42,7 +56,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const includeStats = searchParams.get('stats') === 'true';
 
-    const { data: customers, error } = await supabaseAdmin
+    const { data: customers, error } = await supabaseAdmin!
       .from('customers')
       .select('*')
       .order('created_at', { ascending: false });
@@ -85,6 +99,9 @@ export async function GET(request: NextRequest) {
  * POST - Crear client
  */
 export async function POST(request: NextRequest) {
+  const dbError = checkSupabase();
+  if (dbError) return dbError;
+
   if (!verifyAdminAuth(request)) {
     return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
   }
@@ -101,7 +118,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Comprovar si ja existeix
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await supabaseAdmin!
       .from('customers')
       .select('id')
       .eq('email', email.toLowerCase().trim())
@@ -115,7 +132,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear client
-    const { data: customer, error } = await supabaseAdmin
+    const { data: customer, error } = await supabaseAdmin!
       .from('customers')
       .insert({
         name: name.trim(),

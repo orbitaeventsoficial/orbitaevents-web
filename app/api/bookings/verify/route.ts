@@ -10,7 +10,21 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
+// Check if Supabase is configured
+function checkSupabase() {
+  if (!supabaseAdmin) {
+    return NextResponse.json(
+      { error: 'Database not configured' },
+      { status: 503 }
+    );
+  }
+  return null;
+}
+
 export async function GET(request: NextRequest) {
+  const dbError = checkSupabase();
+  if (dbError) return dbError;
+
   try {
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code')?.toUpperCase().trim();
@@ -23,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar booking per codi de verificació
-    const { data: booking, error } = await supabaseAdmin
+    const { data: booking, error } = await supabaseAdmin!
       .from('bookings')
       .select(`
         id,
@@ -42,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     if (error || !booking) {
       // Intentar buscar per referència (ex: OE-2024-001)
-      const { data: bookingByRef, error: refError } = await supabaseAdmin
+      const { data: bookingByRef, error: refError } = await supabaseAdmin!
         .from('bookings')
         .select(`
           id,

@@ -33,7 +33,7 @@ export type EventStatus = 'lead' | 'quoted' | 'confirmed' | 'completed' | 'cance
 export type TestimonialStatus = 'pending' | 'approved' | 'rejected' | 'featured';
 
 export interface Customer {
-  id: string;
+  id: string; // UUID
   email: string;
   name?: string | null;
   name_normalized?: string | null;
@@ -64,7 +64,7 @@ export interface Customer {
 }
 
 export interface Event {
-  id: string;
+  id: string; // UUID
   customer_id?: string | null;
   event_type: EventType;
   event_date?: string | null;
@@ -90,7 +90,7 @@ export interface Event {
 }
 
 export interface Testimonial {
-  id: string;
+  id: string; // UUID
   customer_id?: string | null;
   event_id?: string | null;
   rating: number;
@@ -191,33 +191,30 @@ export interface AuditLog {
 // CLIENTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Placeholder client per quan no hi ha configuració
-const createPlaceholderClient = (): SupabaseClient => {
-  const handler = {
-    get: () => () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
-  };
-  return new Proxy({} as SupabaseClient, handler);
-};
+// Check if Supabase is configured
+const isSupabaseConfigured = supabaseUrl && supabaseAnonKey;
 
 /**
  * Client públic - Per operacions del frontend
+ * Returns null if Supabase is not configured
  */
-export const supabase: SupabaseClient = supabaseUrl && supabaseAnonKey
+export const supabase: SupabaseClient | null = isSupabaseConfigured
   ? createClient(supabaseUrl, supabaseAnonKey)
-  : createPlaceholderClient();
+  : null;
 
 /**
  * Client admin - Per operacions del servidor
  * Bypassa RLS
+ * Returns null if Supabase is not configured
  */
-export const supabaseAdmin: SupabaseClient = supabaseUrl && supabaseServiceKey
+export const supabaseAdmin: SupabaseClient | null = isSupabaseConfigured && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
       },
     })
-  : createPlaceholderClient();
+  : null;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HELPERS

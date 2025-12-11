@@ -14,6 +14,14 @@ import {
 import { upsertCustomer, logCustomerActivity } from './customerService';
 import { sendTestimonialApprovedEmail } from '@/lib/email';
 
+// Helper to check if Supabase is configured
+function checkSupabase() {
+  if (!supabaseAdmin) {
+    throw new Error('Database not configured');
+  }
+  return supabaseAdmin;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -123,7 +131,8 @@ export async function createTestimonial(
     updated_at: new Date().toISOString(),
   };
 
-  const { data: testimonial, error } = await supabaseAdmin
+  const db = checkSupabase();
+  const { data: testimonial, error } = await db
     .from('testimonials')
     .insert(testimonialData)
     .select()
@@ -134,7 +143,7 @@ export async function createTestimonial(
   }
 
   // 4. Crear codi de descompte a la taula
-  await supabaseAdmin.from('discount_codes').insert({
+  await db.from('discount_codes').insert({
     code: discountCode,
     discount_percent: discountPercent,
     source: 'testimonial',
@@ -170,6 +179,7 @@ export async function createTestimonial(
  * Obtenir tots els testimonis aprovats (per la web)
  */
 export async function getApprovedTestimonials(limit = 20): Promise<TestimonialWithCustomer[]> {
+  if (!supabaseAdmin) return [];
   const { data, error } = await supabaseAdmin
     .from('testimonials')
     .select(
@@ -197,6 +207,7 @@ export async function getApprovedTestimonials(limit = 20): Promise<TestimonialWi
  * Obtenir testimonis destacats (featured, rating >= 4)
  */
 export async function getFeaturedTestimonials(limit = 6): Promise<TestimonialWithCustomer[]> {
+  if (!supabaseAdmin) return [];
   const { data, error } = await supabaseAdmin
     .from('testimonials')
     .select(
@@ -226,6 +237,7 @@ export async function getFeaturedTestimonials(limit = 6): Promise<TestimonialWit
  * Obtenir testimonis pendents d'aprovació (per admin)
  */
 export async function getPendingTestimonials(): Promise<TestimonialWithCustomer[]> {
+  if (!supabaseAdmin) return [];
   const { data, error } = await supabaseAdmin
     .from('testimonials')
     .select(
@@ -252,6 +264,7 @@ export async function getPendingTestimonials(): Promise<TestimonialWithCustomer[
  * Obtenir tots els testimonis (per admin)
  */
 export async function getAllTestimonials(): Promise<TestimonialWithCustomer[]> {
+  if (!supabaseAdmin) return [];
   const { data, error } = await supabaseAdmin
     .from('testimonials')
     .select(
@@ -277,6 +290,7 @@ export async function getAllTestimonials(): Promise<TestimonialWithCustomer[]> {
  * Obtenir un testimoni per ID
  */
 export async function getTestimonialById(id: string): Promise<TestimonialWithCustomer | null> {
+  if (!supabaseAdmin) return null;
   const { data, error } = await supabaseAdmin
     .from('testimonials')
     .select(
@@ -311,6 +325,7 @@ export async function approveTestimonial(
   id: string,
   featured = false
 ): Promise<Testimonial | null> {
+  if (!supabaseAdmin) return null;
   const newStatus: TestimonialStatus = featured ? 'featured' : 'approved';
 
   // Obtenir testimoni amb dades del client
@@ -373,6 +388,7 @@ export async function rejectTestimonial(
   id: string,
   reason?: string
 ): Promise<Testimonial | null> {
+  if (!supabaseAdmin) return null;
   const { data, error } = await supabaseAdmin
     .from('testimonials')
     .update({
@@ -402,6 +418,7 @@ export async function rejectTestimonial(
  * Eliminar un testimoni
  */
 export async function deleteTestimonial(id: string): Promise<boolean> {
+  if (!supabaseAdmin) return false;
   const { error } = await supabaseAdmin.from('testimonials').delete().eq('id', id);
   return !error;
 }
@@ -411,6 +428,7 @@ export async function deleteTestimonial(id: string): Promise<boolean> {
  * Utilitza updates condicionals per evitar race conditions
  */
 export async function toggleFeatured(id: string): Promise<Testimonial | null> {
+  if (!supabaseAdmin) return null;
   // Primer intentar canviar featured -> approved
   const { data: unfeatured, error: err1 } = await supabaseAdmin
     .from('testimonials')
@@ -450,6 +468,7 @@ export async function toggleFeatured(id: string): Promise<Testimonial | null> {
  * Obtenir estadístiques de testimonis
  */
 export async function getTestimonialStats() {
+  if (!supabaseAdmin) return { total: 0, pending: 0, approved: 0, featured: 0, avgRating: 0 };
   const { data: all } = await supabaseAdmin
     .from('testimonials')
     .select('id, status, rating');

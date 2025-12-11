@@ -10,6 +10,17 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
+// Check if Supabase is configured
+function checkSupabase() {
+  if (!supabaseAdmin) {
+    return NextResponse.json(
+      { error: 'Database not configured' },
+      { status: 503 }
+    );
+  }
+  return null;
+}
+
 // Verificar autenticació admin
 function verifyAdminAuth(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
@@ -34,6 +45,9 @@ function verifyAdminAuth(request: NextRequest): boolean {
  * GET - Obtenir events passats/completats
  */
 export async function GET(request: NextRequest) {
+  const dbError = checkSupabase();
+  if (dbError) return dbError;
+
   if (!verifyAdminAuth(request)) {
     return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
   }
@@ -47,7 +61,7 @@ export async function GET(request: NextRequest) {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
 
-    const { data: bookings, error } = await supabaseAdmin
+    const { data: bookings, error } = await supabaseAdmin!
       .from('bookings')
       .select('*')
       .eq('status', status)
@@ -76,6 +90,9 @@ export async function GET(request: NextRequest) {
  * PATCH - Actualitzar booking (marcar post-event enviat)
  */
 export async function PATCH(request: NextRequest) {
+  const dbError = checkSupabase();
+  if (dbError) return dbError;
+
   if (!verifyAdminAuth(request)) {
     return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
   }
@@ -99,7 +116,7 @@ export async function PATCH(request: NextRequest) {
       updateData.review_requested_at = review_requested_at;
     }
 
-    const { data: booking, error } = await supabaseAdmin
+    const { data: booking, error } = await supabaseAdmin!
       .from('bookings')
       .update(updateData)
       .eq('id', bookingId)
