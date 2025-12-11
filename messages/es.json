@@ -2268,5 +2268,196 @@
       "miniTestimonial": "\"Transformaron nuestra boda en una experiencia mágica inolvidable.\"",
       "miniTestimonialAuthor": "— Lorena y Carles"
     }
+  },
+  "sensorial": {
+    "brandName": "Òrbita Events",
+    "title": "Espacio Sensorial",
+    "breathe": "Respira...",
+    "infoTitle": "¿Qué es el Espacio Sensorial?",
+    "infoP1": "Un lugar digital diseñado para personas con sensibilidades sensoriales, niños y niñas con autismo, o cualquiera que quiera un momento de calma o diversión controlada.",
+    "infoP2": "Ajusta la velocidad y densidad de las partículas a tu gusto. ¡Prueba los diferentes temas para encontrar el que más te guste! 💜",
+    "understood": "¡Entendido!",
+    "controls": "Controles",
+    "chooseTheme": "🎨 Elige un tema",
+    "presets": "⚡ Presets",
+    "speed": "Velocidad",
+    "slow": "🐢 Lento",
+    "fast": "🐇 Rápido",
+    "density": "Densidad",
+    "few": "Pocas",
+    "many": "Muchas",
+    "touchInteraction": "Interacción táctil",
+    "touchDescription": "Las partículas seguirán tu dedo o ratón",
+    "pause": "Pausa",
+    "play": "Play",
+    "madeWithLove": "Hecho con amor",
+    "forSpecialPeople": "Para todas las personas especiales 💜",
+    "backHome": "Volver al inicio",
+    "themes": {
+      "calm": { "name": "Calma", "description": "Relajación y paz" },
+      "elegant": { "name": "Elegante", "description": "Sofisticación dorada" },
+      "halloween": { "name": "Halloween", "description": "Misterio y diversión" },
+      "monmagic": { "name": "Mundo Mágico", "description": "Magia de escuela de hechicería" },
+      "disco": { "name": "Disco", "description": "Ritmo y luz" },
+      "tropical": { "name": "Tropical", "description": "Paraíso verde" }
+    },
+    "presetNames": {
+      "relaxed": "🧘 Relajado",
+      "normal": "✨ Normal",
+      "party": "🎉 Fiesta"
+    }
+  },
+  "testimonialForm": {
+    "validation": {
+      "emailInvalid": "Email no válido",
+      "nameMin": "El nombre debe tener mínimo 2 caracteres",
+      "titleMax": "El título debe tener máximo 200 caracteres",
+      "commentMin": "El comentario debe tener mínimo 10 caracteres",
+      "commentMax": "El comentario debe tener máximo 1000 caracteres",
+      "acceptData": "Debes aceptar el tratamiento de datos"
+    },
+    "eventTypes": {
+      "boda": "Boda",
+      "cumpleanos": "Cumpleaños",
+      "corporativo": "Corporativo",
+      "comunion": "Comunión",
+      "bautizo": "Bautizo",
+      "fiesta": "Fiesta Privada",
+      "festival": "Festival",
+      "otro": "Otro"
+    },
+    "errors": {
+      "fileType": "Tipo de archivo no permitido. Usa JPG, PNG, WebP o GIF.",
+      "fileTooLarge": "La imagen es demasiado grande. Máximo 5MB.",
+      "uploadError": "Error subiendo la imagen",
+      "submitError": "Error enviando la opinión",
+      "photoMax": "La foto debe ser máximo 5MB",
+      "videoMax": "El vídeo debe ser máximo 50MB",
+      "uploadPhotoError": "Error subiendo foto",
+      "uploadVideoError": "Error subiendo vídeo",
+      "codeInvalid": "Código no válido. Comprueba tu email de confirmación.",
+      "verifyError": "Error verificando el código. Inténtalo de nuevo."
+    },
+    "success": {
+      "title": "¡Gracias por tu opinión!",
+      "subtitle": "La revisaremos y la publicaremos pronto. Mientras tanto, aquí tienes tu regalo:",
+      "exclusiveCode": "Tu código exclusivo",
+      "discount": "de descuento",
+      "validFor": "Válido durante 6 meses para tu próximo evento",
+      "copyCode": "Copiar código",
+      "backHome": "Volver al inicio",
+      "thanksTitle": "¡Gracias!",
+      "thanksSubtitle": "Tu opinión significa mucho para nosotros",
+      "yourDiscount": "Tu descuento:",
+      "codeByEmail": "¡Recibirás el código por email pronto!",
+      "leaveGoogleReview": "⭐ Dejar opinión en Google"
+    },
+    "form": {
+      "ratingQuestion": "¿Cómo valoras tu experiencia con nosotros?",
+      "ratingLabels": {
+        "5": "¡Excelente!",
+        "4": "¡Muy bien!",
+        "3": "Correcto",
+        "2": "Puede mejorar",
+        "1": "No satisfecho"
+      },
+      "nameOptional": "Nombre (opcional)",
+      "phoneOptional": "Teléfono (opcional)",
+      "cityOptional": "Ciudad (opcional)",
+      "instagramOptional": "Instagram (opcional)",
+      "eventType": "Tipo de evento",
+      "selectType": "Selecciona tipo...",
+      "eventDate": "Fecha del evento",
+      "titleOptional": "Título de la opinión (opcional)",
+      "titlePlaceholder": "Resumen en pocas palabras...",
+      "yourOpinion": "Tu opinión",
+      "opinionPlaceholder": "Cuéntanos cómo fue el evento, qué te gustó más, cómo fue el ambiente...",
+      "photoOptional": "Foto del evento (opcional)",
+      "uploading": "Subiendo...",
+      "clickToUpload": "Haz clic para subir una foto",
+      "photoFormats": "JPG, PNG, WebP o GIF (máx 5MB)",
+      "showName": "Mostrar mi nombre en la web (si no, aparecerá como \"Cliente verificado\")",
+      "acceptData": "Acepto el tratamiento de mis datos según la",
+      "privacyPolicy": "política de privacidad",
+      "receiveOffers": "Quiero recibir ofertas exclusivas y novedades de Òrbita Events",
+      "sending": "Enviando...",
+      "submitButton": "Enviar opinión y obtener 10% descuento",
+      "submitInfo": "Al enviar tu opinión recibirás un código de descuento exclusivo"
+    },
+    "gamified": {
+      "emojiMessages": {
+        "1": "¡Oh no! ¿Qué pasó?",
+        "2": "Entendemos, podemos mejorar",
+        "3": "¡Gracias por el feedback!",
+        "4": "¡Genial! ¡Nos alegramos!",
+        "5": "¡INCREÍBLE! ¡Esto nos hace muy felices! 🎉"
+      },
+      "steps": {
+        "start": "Inicio",
+        "rating": "Valoración",
+        "comment": "Comentario",
+        "media": "Foto/Vídeo",
+        "nps": "Recomendación",
+        "finish": "Final"
+      },
+      "hasCode": {
+        "question": "¿Tienes código de verificación?",
+        "subtitle": "Lo recibiste por email después de tu evento",
+        "yesCode": "Sí, tengo código",
+        "noCode": "No, quiero opinar"
+      },
+      "enterCode": {
+        "title": "Introduce tu código",
+        "subtitle": "Lo encontrarás en el email de confirmación",
+        "placeholder": "ORBITA-2024-XXXX",
+        "verify": "Verificar",
+        "continueWithout": "Continuar sin código →"
+      },
+      "yourData": {
+        "title": "Tus datos",
+        "subtitle": "Para enviarte el código de descuento",
+        "continue": "Continuar"
+      },
+      "rating": {
+        "title": "¿Cómo fue la experiencia?",
+        "subtitle": "Tu opinión nos ayuda a mejorar"
+      },
+      "comment": {
+        "title": "Cuéntanos más",
+        "subtitle": "¿Qué te ha gustado más?",
+        "titlePlaceholder": "Título de tu opinión (opcional)",
+        "commentPlaceholder": "El DJ fue increíble, la música perfecta, los efectos de luz espectaculares..."
+      },
+      "media": {
+        "title": "Añade foto o vídeo",
+        "subtitle": "Opcional, ¡pero te dará más descuento! 🎁",
+        "delete": "Eliminar",
+        "addPhoto": "Añadir foto",
+        "photoDiscount": "+5% descuento",
+        "addVideo": "Añadir vídeo",
+        "videoDiscount": "+10% descuento",
+        "maxSizes": "Máx: 5MB fotos, 50MB vídeos (15-30 segundos ideal)"
+      },
+      "nps": {
+        "title": "¡Última pregunta!",
+        "question": "Del 0 al 10, ¿cuánto recomendarías Òrbita?",
+        "unlikely": "Nada probable",
+        "likely": "Muy probable",
+        "googleShare": "También quiero dejarlo en Google",
+        "googleDiscount": "+5% descuento extra!"
+      },
+      "consent": {
+        "dataProcessing": "Acepto el tratamiento de datos según la",
+        "showName": "Mostrar mi nombre en la web (si no, aparecerá como \"Cliente verificado\")",
+        "receiveOffers": "Quiero recibir ofertas exclusivas de Òrbita Events"
+      },
+      "navigation": {
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "submit": "Enviar opinión",
+        "submitting": "Enviando...",
+        "currentReward": "Recompensa actual:"
+      }
+    }
   }
 }

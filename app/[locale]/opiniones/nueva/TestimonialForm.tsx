@@ -17,6 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 // Esquema de validació actualitzat per nou esquema Supabase
 const testimonialSchema = z.object({
@@ -43,16 +44,7 @@ const testimonialSchema = z.object({
 
 type TestimonialFormData = z.infer<typeof testimonialSchema>;
 
-const EVENT_TYPES = [
-  { value: 'boda', label: 'Boda' },
-  { value: 'cumpleaños', label: 'Cumpleaños' },
-  { value: 'corporativo', label: 'Corporativo' },
-  { value: 'comunion', label: 'Comunión' },
-  { value: 'bautizo', label: 'Bautizo' },
-  { value: 'fiesta', label: 'Fiesta Privada' },
-  { value: 'festival', label: 'Festival' },
-  { value: 'otro', label: 'Otro' },
-];
+const EVENT_TYPE_KEYS = ['boda', 'cumpleanos', 'corporativo', 'comunion', 'bautizo', 'fiesta', 'festival', 'otro'] as const;
 
 interface SubmissionResult {
   discountCode: string;
@@ -60,6 +52,7 @@ interface SubmissionResult {
 }
 
 export default function TestimonialForm() {
+  const t = useTranslations('testimonialForm');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<SubmissionResult | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -105,13 +98,13 @@ export default function TestimonialForm() {
     // Validar tipus
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
-      setSubmitError('Tipus de fitxer no permès. Usa JPG, PNG, WebP o GIF.');
+      setSubmitError(t('errors.fileType'));
       return;
     }
 
     // Validar mida (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setSubmitError('La imatge és massa gran. Màxim 5MB.');
+      setSubmitError(t('errors.fileTooLarge'));
       return;
     }
 
@@ -138,12 +131,12 @@ export default function TestimonialForm() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Error pujant la imatge');
+        throw new Error(result.error || t('errors.uploadError'));
       }
 
       setValue('photoUrl', result.url);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error pujant la imatge';
+      const errorMessage = error instanceof Error ? error.message : t('errors.uploadError');
       setSubmitError(errorMessage);
       setPhotoPreview(null);
     } finally {
@@ -173,7 +166,7 @@ export default function TestimonialForm() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Error enviant la opinió');
+        throw new Error(result.error || t('errors.submitError'));
       }
 
       setSubmitResult({
@@ -181,7 +174,7 @@ export default function TestimonialForm() {
         discountPercent: result.data.discountPercent || 10,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error enviant la opinió';
+      const errorMessage = error instanceof Error ? error.message : t('errors.submitError');
       setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -221,7 +214,7 @@ export default function TestimonialForm() {
               className="text-3xl md:text-4xl font-bold text-center mb-4"
             >
               <span className="bg-gradient-to-r from-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Gràcies per la teva opinió!
+                {t('success.title')}
               </span>
             </motion.h2>
 
@@ -231,7 +224,7 @@ export default function TestimonialForm() {
               transition={{ delay: 0.4 }}
               className="text-gray-400 text-center mb-8 text-lg"
             >
-              La revisarem i la publicarem aviat. Mentrestant, aquí tens el teu regal:
+              {t('success.subtitle')}
             </motion.p>
 
             {/* Codi de descompte */}
@@ -244,16 +237,16 @@ export default function TestimonialForm() {
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10" />
               <div className="relative z-10">
                 <p className="text-purple-400 text-sm font-medium mb-2 uppercase tracking-wider">
-                  El teu codi exclusiu
+                  {t('success.exclusiveCode')}
                 </p>
                 <p className="text-4xl md:text-5xl font-black bg-gradient-to-r from-purple-400 via-fuchsia-400 to-purple-400 bg-clip-text text-transparent tracking-widest mb-3">
                   {submitResult.discountCode}
                 </p>
                 <div className="inline-flex items-center gap-2 bg-purple-500/20 px-4 py-2 rounded-full">
                   <span className="text-2xl font-bold text-white">{submitResult.discountPercent}%</span>
-                  <span className="text-purple-300">de descompte</span>
+                  <span className="text-purple-300">{t('success.discount')}</span>
                 </div>
-                <p className="text-gray-500 text-sm mt-4">Vàlid durant 6 mesos per al teu pròxim event</p>
+                <p className="text-gray-500 text-sm mt-4">{t('success.validFor')}</p>
               </div>
             </motion.div>
 
@@ -275,7 +268,7 @@ export default function TestimonialForm() {
                   d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                 />
               </svg>
-              Copiar codi
+              {t('success.copyCode')}
             </motion.button>
 
             <motion.a
@@ -285,7 +278,7 @@ export default function TestimonialForm() {
               href="/"
               className="block text-center text-gray-500 hover:text-purple-400 mt-6 transition-colors"
             >
-              ← Tornar a l&apos;inici
+              ← {t('success.backHome')}
             </motion.a>
           </div>
         </div>
@@ -331,7 +324,7 @@ export default function TestimonialForm() {
           {/* RATING - Estrelles */}
           <fieldset className="mb-10 text-center">
             <legend className="block text-white font-semibold mb-4 text-lg">
-              Com valores la teva experiència amb nosaltres?
+              {t('form.ratingQuestion')}
             </legend>
             <div className="flex justify-center gap-3">
               {[1, 2, 3, 4, 5].map(star => (
@@ -358,11 +351,7 @@ export default function TestimonialForm() {
               ))}
             </div>
             <p className="text-purple-400 mt-2 text-sm">
-              {rating === 5 && 'Excel·lent!'}
-              {rating === 4 && 'Molt bé!'}
-              {rating === 3 && 'Correcte'}
-              {rating === 2 && 'Pot millorar'}
-              {rating === 1 && 'No satisfet'}
+              {rating >= 1 && rating <= 5 && t(`form.ratingLabels.${rating}`)}
             </p>
           </fieldset>
 
@@ -384,18 +373,17 @@ export default function TestimonialForm() {
           {/* CAMPS OPCIONALS - Grid */}
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="testimonial-name" className="block text-sm text-gray-400 mb-2">Nom (opcional)</label>
+              <label htmlFor="testimonial-name" className="block text-sm text-gray-400 mb-2">{t('form.nameOptional')}</label>
               <input
                 id="testimonial-name"
                 type="text"
                 {...register('name')}
                 className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3.5 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all"
-                placeholder="El teu nom"
               />
             </div>
 
             <div>
-              <label htmlFor="testimonial-phone" className="block text-sm text-gray-400 mb-2">Telèfon (opcional)</label>
+              <label htmlFor="testimonial-phone" className="block text-sm text-gray-400 mb-2">{t('form.phoneOptional')}</label>
               <input
                 id="testimonial-phone"
                 type="tel"
@@ -406,24 +394,23 @@ export default function TestimonialForm() {
             </div>
 
             <div>
-              <label htmlFor="testimonial-city" className="block text-sm text-gray-400 mb-2">Ciutat (opcional)</label>
+              <label htmlFor="testimonial-city" className="block text-sm text-gray-400 mb-2">{t('form.cityOptional')}</label>
               <input
                 id="testimonial-city"
                 type="text"
                 {...register('city')}
                 className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3.5 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all"
-                placeholder="Barcelona, Girona..."
               />
             </div>
 
             <div>
-              <label htmlFor="testimonial-instagram" className="block text-sm text-gray-400 mb-2">Instagram (opcional)</label>
+              <label htmlFor="testimonial-instagram" className="block text-sm text-gray-400 mb-2">{t('form.instagramOptional')}</label>
               <input
                 id="testimonial-instagram"
                 type="text"
                 {...register('instagram')}
                 className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3.5 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all"
-                placeholder="@el_teu_usuari"
+                placeholder="@username"
               />
             </div>
           </div>
@@ -431,7 +418,7 @@ export default function TestimonialForm() {
           {/* TIPUS D'EVENT I DATA */}
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="testimonial-eventType" className="block text-sm text-gray-400 mb-2">Tipus d&apos;event</label>
+              <label htmlFor="testimonial-eventType" className="block text-sm text-gray-400 mb-2">{t('form.eventType')}</label>
               <select
                 id="testimonial-eventType"
                 {...register('eventType')}
@@ -443,17 +430,17 @@ export default function TestimonialForm() {
                   backgroundSize: '1.5rem',
                 }}
               >
-                <option value="">Selecciona tipus...</option>
-                {EVENT_TYPES.map(type => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
+                <option value="">{t('form.selectType')}</option>
+                {EVENT_TYPE_KEYS.map(key => (
+                  <option key={key} value={key}>
+                    {t(`eventTypes.${key}`)}
                   </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label htmlFor="testimonial-eventDate" className="block text-sm text-gray-400 mb-2">Data de l&apos;event</label>
+              <label htmlFor="testimonial-eventDate" className="block text-sm text-gray-400 mb-2">{t('form.eventDate')}</label>
               <input
                 id="testimonial-eventDate"
                 type="date"
@@ -465,27 +452,27 @@ export default function TestimonialForm() {
 
           {/* TÍTOL (opcional) */}
           <div className="mb-6">
-            <label htmlFor="testimonial-title" className="block text-sm text-gray-400 mb-2">Títol de la opinió (opcional)</label>
+            <label htmlFor="testimonial-title" className="block text-sm text-gray-400 mb-2">{t('form.titleOptional')}</label>
             <input
               id="testimonial-title"
               type="text"
               {...register('title')}
               className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3.5 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all"
-              placeholder="Resum en poques paraules..."
+              placeholder={t('form.titlePlaceholder')}
             />
           </div>
 
           {/* COMENTARI */}
           <div className="mb-6">
             <label htmlFor="testimonial-comment" className="block text-sm text-gray-400 mb-2">
-              La teva opinió <span className="text-fuchsia-500">*</span>
+              {t('form.yourOpinion')} <span className="text-fuchsia-500">*</span>
             </label>
             <textarea
               id="testimonial-comment"
               {...register('comment')}
               rows={5}
               className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3.5 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all resize-none"
-              placeholder="Explica'ns com va anar l'event, què et va agradar més, com va ser l'ambient..."
+              placeholder={t('form.opinionPlaceholder')}
             />
             <div className="flex justify-between items-center mt-1.5">
               {errors.comment ? (
@@ -502,7 +489,7 @@ export default function TestimonialForm() {
           {/* UPLOAD FOTO */}
           <div className="mb-6">
             <label htmlFor="photo-upload" className="block text-sm text-gray-400 mb-2">
-              Foto de l&apos;event (opcional)
+              {t('form.photoOptional')}
             </label>
             <input
               ref={fileInputRef}
@@ -528,7 +515,7 @@ export default function TestimonialForm() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
-                      <span>Pujant...</span>
+                      <span>{t('form.uploading')}</span>
                     </div>
                   </div>
                 )}
@@ -552,8 +539,8 @@ export default function TestimonialForm() {
                 <svg className="w-8 h-8 text-zinc-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span className="text-zinc-500 text-sm">Clica per pujar una foto</span>
-                <span className="text-zinc-600 text-xs mt-1">JPG, PNG, WebP o GIF (màx 5MB)</span>
+                <span className="text-zinc-500 text-sm">{t('form.clickToUpload')}</span>
+                <span className="text-zinc-600 text-xs mt-1">{t('form.photoFormats')}</span>
               </label>
             )}
           </div>
@@ -567,7 +554,7 @@ export default function TestimonialForm() {
                 className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-purple-500 focus:ring-purple-500 focus:ring-offset-zinc-900 mt-0.5 cursor-pointer"
               />
               <span className="text-gray-400 group-hover:text-gray-300 transition-colors text-sm">
-                Mostrar el meu nom a la web (si no, apareixerà com &quot;Client verificat&quot;)
+                {t('form.showName')}
               </span>
             </label>
 
@@ -578,9 +565,9 @@ export default function TestimonialForm() {
                 className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-purple-500 focus:ring-purple-500 focus:ring-offset-zinc-900 mt-0.5 cursor-pointer"
               />
               <span className="text-gray-400 group-hover:text-gray-300 transition-colors text-sm">
-                Accepto el tractament de les meves dades segons la{' '}
+                {t('form.acceptData')}{' '}
                 <a href="/legal/privacidad" className="text-purple-400 hover:text-purple-300 underline" target="_blank">
-                  política de privacitat
+                  {t('form.privacyPolicy')}
                 </a>{' '}
                 <span className="text-fuchsia-500">*</span>
               </span>
@@ -596,7 +583,7 @@ export default function TestimonialForm() {
                 className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-purple-500 focus:ring-purple-500 focus:ring-offset-zinc-900 mt-0.5 cursor-pointer"
               />
               <span className="text-gray-400 group-hover:text-gray-300 transition-colors text-sm">
-                Vull rebre ofertes exclusives i novetats d&apos;Òrbita Events
+                {t('form.receiveOffers')}
               </span>
             </label>
           </div>
@@ -626,11 +613,11 @@ export default function TestimonialForm() {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Enviant...
+                {t('form.sending')}
               </>
             ) : (
               <>
-                <span>Enviar opinió i obtenir 10% descompte</span>
+                <span>{t('form.submitButton')}</span>
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -640,7 +627,7 @@ export default function TestimonialForm() {
 
           {/* INFO */}
           <p className="text-center text-gray-600 text-xs mt-4">
-            En enviar la teva opinió rebràs un codi de descompte exclusiu
+            {t('form.submitInfo')}
           </p>
         </div>
       </form>

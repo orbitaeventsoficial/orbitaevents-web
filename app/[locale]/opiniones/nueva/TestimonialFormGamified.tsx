@@ -11,6 +11,7 @@ import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import confetti from 'canvas-confetti';
+import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -61,40 +62,28 @@ interface SubmissionResult {
   totalDiscount: number;
 }
 
-const STEPS = [
-  { id: 'start', title: 'Inici' },
-  { id: 'rating', title: 'Valoració' },
-  { id: 'comment', title: 'Comentari' },
-  { id: 'media', title: 'Foto/Vídeo' },
-  { id: 'nps', title: 'Recomanació' },
-  { id: 'finish', title: 'Final' },
-];
+const STEP_IDS = ['start', 'rating', 'comment', 'media', 'nps', 'finish'] as const;
 
 const EMOJIS = ['😢', '😐', '🙂', '😊', '🤩'];
-const EMOJI_MESSAGES = [
-  'Oh no! Què va passar?',
-  'Entenem, podem millorar',
-  'Gràcies pel feedback!',
-  'Genial! Ens alegrem!',
-  'INCREÏBLE! Això ens fa molt feliços! 🎉'
-];
 
-const EVENT_TYPES = [
-  { value: 'boda', label: '💒 Boda', emoji: '💒' },
-  { value: 'cumpleaños', label: '🎂 Aniversari', emoji: '🎂' },
-  { value: 'corporativo', label: '🏢 Corporatiu', emoji: '🏢' },
-  { value: 'comunion', label: '⛪ Comunió', emoji: '⛪' },
-  { value: 'bautizo', label: '👶 Bateig', emoji: '👶' },
-  { value: 'fiesta', label: '🎉 Festa Privada', emoji: '🎉' },
-  { value: 'festival', label: '🎪 Festival', emoji: '🎪' },
-  { value: 'otro', label: '✨ Altre', emoji: '✨' },
-];
+const EVENT_TYPE_KEYS = ['boda', 'cumpleanos', 'corporativo', 'comunion', 'bautizo', 'fiesta', 'festival', 'otro'] as const;
+const EVENT_EMOJIS: Record<string, string> = {
+  boda: '💒',
+  cumpleanos: '🎂',
+  corporativo: '🏢',
+  comunion: '⛪',
+  bautizo: '👶',
+  fiesta: '🎉',
+  festival: '🎪',
+  otro: '✨',
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function TestimonialFormGamified() {
+  const t = useTranslations('testimonialForm');
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<FormData>({
     verificationCode: '',
@@ -157,10 +146,10 @@ export default function TestimonialFormGamified() {
         }));
         setCurrentStep(1);
       } else {
-        setUploadError('Codi no vàlid. Comprova el teu email de confirmació.');
+        setUploadError(t('errors.codeInvalid'));
       }
     } catch {
-      setUploadError('Error verificant el codi. Torna-ho a provar.');
+      setUploadError(t('errors.verifyError'));
     }
   };
 
@@ -189,7 +178,7 @@ export default function TestimonialFormGamified() {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      setUploadError('La foto ha de ser màxim 5MB');
+      setUploadError(t('errors.photoMax'));
       return;
     }
 
@@ -216,7 +205,7 @@ export default function TestimonialFormGamified() {
 
       setFormData(prev => ({ ...prev, photoUrl: result.url }));
     } catch (error) {
-      setUploadError(error instanceof Error ? error.message : 'Error pujant foto');
+      setUploadError(error instanceof Error ? error.message : t('errors.uploadPhotoError'));
       setPhotoPreview(null);
     } finally {
       setPhotoUploading(false);
@@ -229,7 +218,7 @@ export default function TestimonialFormGamified() {
     if (!file) return;
 
     if (file.size > 50 * 1024 * 1024) {
-      setUploadError('El vídeo ha de ser màxim 50MB');
+      setUploadError(t('errors.videoMax'));
       return;
     }
 
@@ -255,7 +244,7 @@ export default function TestimonialFormGamified() {
 
       setFormData(prev => ({ ...prev, videoUrl: result.url }));
     } catch (error) {
-      setUploadError(error instanceof Error ? error.message : 'Error pujant vídeo');
+      setUploadError(error instanceof Error ? error.message : t('errors.uploadVideoError'));
       setVideoPreview(null);
     } finally {
       setVideoUploading(false);
@@ -265,7 +254,7 @@ export default function TestimonialFormGamified() {
   // Submit
   const handleSubmit = async () => {
     if (!formData.consentDataProcessing) {
-      setUploadError("Has d'acceptar el tractament de dades");
+      setUploadError(t('validation.acceptData'));
       return;
     }
 
@@ -303,7 +292,7 @@ export default function TestimonialFormGamified() {
 
       setCurrentStep(5); // Finish step
     } catch (error) {
-      setUploadError(error instanceof Error ? error.message : 'Error enviant opinió');
+      setUploadError(error instanceof Error ? error.message : t('errors.submitError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -314,7 +303,7 @@ export default function TestimonialFormGamified() {
   // ═══════════════════════════════════════════════════════════════════════════
 
   const renderStep = () => {
-    switch (STEPS[currentStep].id) {
+    switch (STEP_IDS[currentStep]) {
       // STEP 0: START - Verificació o dades
       case 'start':
         return (
@@ -329,10 +318,10 @@ export default function TestimonialFormGamified() {
               <>
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-white mb-2">
-                    Tens codi de verificació?
+                    {t('gamified.hasCode.question')}
                   </h2>
                   <p className="text-white/60">
-                    El vas rebre per email després del teu event
+                    {t('gamified.hasCode.subtitle')}
                   </p>
                 </div>
 
@@ -342,7 +331,7 @@ export default function TestimonialFormGamified() {
                     className="p-6 bg-amber-400/10 border-2 border-amber-400/30 rounded-2xl hover:bg-amber-400/20 hover:border-amber-400/50 transition-all"
                   >
                     <span className="text-4xl block mb-3">🎫</span>
-                    <span className="text-white font-medium">Sí, tinc codi</span>
+                    <span className="text-white font-medium">{t('gamified.hasCode.yesCode')}</span>
                   </button>
 
                   <button
@@ -350,7 +339,7 @@ export default function TestimonialFormGamified() {
                     className="p-6 bg-white/5 border-2 border-white/20 rounded-2xl hover:bg-white/10 hover:border-white/30 transition-all"
                   >
                     <span className="text-4xl block mb-3">✍️</span>
-                    <span className="text-white font-medium">No, vull opinar</span>
+                    <span className="text-white font-medium">{t('gamified.hasCode.noCode')}</span>
                   </button>
                 </div>
               </>
@@ -359,10 +348,10 @@ export default function TestimonialFormGamified() {
               <>
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-white mb-2">
-                    Introdueix el teu codi
+                    {t('gamified.enterCode.title')}
                   </h2>
                   <p className="text-white/60">
-                    El trobaràs a l&apos;email de confirmació
+                    {t('gamified.enterCode.subtitle')}
                   </p>
                 </div>
 
@@ -373,7 +362,7 @@ export default function TestimonialFormGamified() {
                     ...prev,
                     verificationCode: e.target.value.toUpperCase()
                   }))}
-                  placeholder="ORBITA-2024-XXXX"
+                  placeholder={t('gamified.enterCode.placeholder')}
                   className="w-full px-6 py-4 bg-white/5 border border-white/20 rounded-2xl text-white text-center text-xl tracking-wider placeholder-white/30 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all"
                 />
 
@@ -382,14 +371,14 @@ export default function TestimonialFormGamified() {
                   disabled={formData.verificationCode.length < 5}
                   className="w-full py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-amber-500/30 transition-all"
                 >
-                  Verificar
+                  {t('gamified.enterCode.verify')}
                 </button>
 
                 <button
                   onClick={continueWithoutCode}
                   className="w-full py-3 text-white/60 hover:text-white transition-colors"
                 >
-                  Continuar sense codi →
+                  {t('gamified.enterCode.continueWithout')}
                 </button>
               </>
             ) : (
@@ -397,10 +386,10 @@ export default function TestimonialFormGamified() {
               <>
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-white mb-2">
-                    Les teves dades
+                    {t('gamified.yourData.title')}
                   </h2>
                   <p className="text-white/60">
-                    Per enviar-te el codi de descompte
+                    {t('gamified.yourData.subtitle')}
                   </p>
                 </div>
 
@@ -418,14 +407,14 @@ export default function TestimonialFormGamified() {
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Nom (opcional)"
+                      placeholder={t('form.nameOptional')}
                       className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
                     />
                     <input
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                      placeholder="Telèfon (opcional)"
+                      placeholder={t('form.phoneOptional')}
                       className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
                     />
                   </div>
@@ -435,9 +424,9 @@ export default function TestimonialFormGamified() {
                     onChange={(e) => setFormData(prev => ({ ...prev, eventType: e.target.value }))}
                     className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:border-amber-400 transition-all"
                   >
-                    <option value="">Tipus d&apos;event...</option>
-                    {EVENT_TYPES.map(type => (
-                      <option key={type.value} value={type.value}>{type.label}</option>
+                    <option value="">{t('form.selectType')}</option>
+                    {EVENT_TYPE_KEYS.map(key => (
+                      <option key={key} value={key}>{EVENT_EMOJIS[key]} {t(`eventTypes.${key}`)}</option>
                     ))}
                   </select>
                 </div>
@@ -447,7 +436,7 @@ export default function TestimonialFormGamified() {
                   disabled={!formData.email}
                   className="w-full py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-amber-500/30 transition-all"
                 >
-                  Continuar
+                  {t('gamified.yourData.continue')}
                 </button>
               </>
             )}
@@ -465,9 +454,9 @@ export default function TestimonialFormGamified() {
           >
             <div className="text-center">
               <h2 className="text-2xl font-bold text-white mb-2">
-                Com va ser l&apos;experiència?
+                {t('gamified.rating.title')}
               </h2>
-              <p className="text-white/60">La teva opinió ens ajuda a millorar</p>
+              <p className="text-white/60">{t('gamified.rating.subtitle')}</p>
             </div>
 
             <div className="flex justify-center gap-3 sm:gap-4">
@@ -497,7 +486,7 @@ export default function TestimonialFormGamified() {
                   exit={{ opacity: 0, y: -10 }}
                   className="text-center text-xl text-amber-400"
                 >
-                  {EMOJI_MESSAGES[formData.rating - 1]}
+                  {t(`gamified.emojiMessages.${formData.rating}`)}
                 </motion.p>
               )}
             </AnimatePresence>
@@ -515,16 +504,16 @@ export default function TestimonialFormGamified() {
           >
             <div className="text-center">
               <h2 className="text-2xl font-bold text-white mb-2">
-                Explica&apos;ns més
+                {t('gamified.comment.title')}
               </h2>
-              <p className="text-white/60">Què t&apos;ha agradat més?</p>
+              <p className="text-white/60">{t('gamified.comment.subtitle')}</p>
             </div>
 
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="Títol de la teva opinió (opcional)"
+              placeholder={t('gamified.comment.titlePlaceholder')}
               className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
             />
 
@@ -532,7 +521,7 @@ export default function TestimonialFormGamified() {
               <textarea
                 value={formData.comment}
                 onChange={(e) => setFormData(prev => ({ ...prev, comment: e.target.value }))}
-                placeholder="El DJ va ser increïble, la música perfecta, els efectes de llum espectaculars..."
+                placeholder={t('gamified.comment.commentPlaceholder')}
                 rows={5}
                 className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all resize-none"
               />
@@ -556,10 +545,10 @@ export default function TestimonialFormGamified() {
           >
             <div className="text-center">
               <h2 className="text-2xl font-bold text-white mb-2">
-                Afegeix foto o vídeo
+                {t('gamified.media.title')}
               </h2>
               <p className="text-white/60">
-                Opcional, però et donarà més descompte! 🎁
+                {t('gamified.media.subtitle')}
               </p>
             </div>
 
@@ -601,7 +590,7 @@ export default function TestimonialFormGamified() {
                           }}
                           className="absolute bottom-2 right-2 px-3 py-1 bg-red-500/80 text-white text-sm rounded-lg"
                         >
-                          Eliminar
+                          {t('gamified.media.delete')}
                         </button>
                       </>
                     )}
@@ -612,8 +601,8 @@ export default function TestimonialFormGamified() {
                     className="w-full aspect-square flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-2xl hover:border-amber-400/50 hover:bg-amber-400/5 transition-all"
                   >
                     <span className="text-4xl mb-2">📷</span>
-                    <span className="text-white/60 text-sm">Afegir foto</span>
-                    <span className="text-amber-400 text-xs mt-1">+5% descompte</span>
+                    <span className="text-white/60 text-sm">{t('gamified.media.addPhoto')}</span>
+                    <span className="text-amber-400 text-xs mt-1">{t('gamified.media.photoDiscount')}</span>
                   </button>
                 )}
               </div>
@@ -655,7 +644,7 @@ export default function TestimonialFormGamified() {
                           }}
                           className="absolute bottom-2 right-2 px-3 py-1 bg-red-500/80 text-white text-sm rounded-lg"
                         >
-                          Eliminar
+                          {t('gamified.media.delete')}
                         </button>
                       </>
                     )}
@@ -666,15 +655,15 @@ export default function TestimonialFormGamified() {
                     className="w-full aspect-square flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-2xl hover:border-purple-400/50 hover:bg-purple-400/5 transition-all"
                   >
                     <span className="text-4xl mb-2">🎬</span>
-                    <span className="text-white/60 text-sm">Afegir vídeo</span>
-                    <span className="text-purple-400 text-xs mt-1">+10% descompte</span>
+                    <span className="text-white/60 text-sm">{t('gamified.media.addVideo')}</span>
+                    <span className="text-purple-400 text-xs mt-1">{t('gamified.media.videoDiscount')}</span>
                   </button>
                 )}
               </div>
             </div>
 
             <p className="text-center text-white/40 text-sm">
-              Màx: 5MB fotos, 50MB vídeos (15-30 segons ideal)
+              {t('gamified.media.maxSizes')}
             </p>
           </motion.div>
         );
@@ -690,9 +679,9 @@ export default function TestimonialFormGamified() {
           >
             <div className="text-center">
               <h2 className="text-2xl font-bold text-white mb-2">
-                Última pregunta!
+                {t('gamified.nps.title')}
               </h2>
-              <p className="text-white/60">Del 0 al 10, quant recomanaries Òrbita?</p>
+              <p className="text-white/60">{t('gamified.nps.question')}</p>
             </div>
 
             <div className="flex flex-wrap justify-center gap-2">
@@ -716,8 +705,8 @@ export default function TestimonialFormGamified() {
             </div>
 
             <div className="flex justify-between text-xs sm:text-sm text-white/40 px-2">
-              <span>Gens probable</span>
-              <span>Molt probable</span>
+              <span>{t('gamified.nps.unlikely')}</span>
+              <span>{t('gamified.nps.likely')}</span>
             </div>
 
             {/* Google Review CTA */}
@@ -736,8 +725,8 @@ export default function TestimonialFormGamified() {
                 className="w-5 h-5 rounded border-white/20 bg-white/5 text-amber-500 focus:ring-amber-400"
               />
               <div>
-                <p className="text-white font-medium">També vull deixar-ho a Google</p>
-                <p className="text-amber-400 text-sm">+5% descompte extra!</p>
+                <p className="text-white font-medium">{t('gamified.nps.googleShare')}</p>
+                <p className="text-amber-400 text-sm">{t('gamified.nps.googleDiscount')}</p>
               </div>
             </motion.label>
 
@@ -754,9 +743,9 @@ export default function TestimonialFormGamified() {
                   className="w-5 h-5 mt-0.5 rounded border-white/20 bg-white/5 text-amber-500"
                 />
                 <span className="text-white/60 text-sm">
-                  Accepto el tractament de dades segons la{' '}
+                  {t('gamified.consent.dataProcessing')}{' '}
                   <a href="/legal/privacidad" className="text-amber-400 underline" target="_blank">
-                    política de privacitat
+                    {t('form.privacyPolicy')}
                   </a>{' '}
                   <span className="text-red-400">*</span>
                 </span>
@@ -773,7 +762,7 @@ export default function TestimonialFormGamified() {
                   className="w-5 h-5 mt-0.5 rounded border-white/20 bg-white/5 text-amber-500"
                 />
                 <span className="text-white/60 text-sm">
-                  Mostrar el meu nom a la web (si no, apareixerà com &quot;Client verificat&quot;)
+                  {t('gamified.consent.showName')}
                 </span>
               </label>
 
@@ -788,7 +777,7 @@ export default function TestimonialFormGamified() {
                   className="w-5 h-5 mt-0.5 rounded border-white/20 bg-white/5 text-amber-500"
                 />
                 <span className="text-white/60 text-sm">
-                  Vull rebre ofertes exclusives d&apos;Òrbita Events
+                  {t('gamified.consent.receiveOffers')}
                 </span>
               </label>
             </div>
@@ -814,18 +803,18 @@ export default function TestimonialFormGamified() {
             </motion.div>
 
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Gràcies!</h1>
-              <p className="text-white/60">La teva opinió significa molt per nosaltres</p>
+              <h1 className="text-3xl font-bold text-white mb-2">{t('success.thanksTitle')}</h1>
+              <p className="text-white/60">{t('success.thanksSubtitle')}</p>
             </div>
 
             <div className="p-6 bg-gradient-to-r from-amber-400/20 to-yellow-500/20 rounded-2xl border border-amber-400/30">
-              <p className="text-amber-400 text-sm mb-2">El teu descompte:</p>
+              <p className="text-amber-400 text-sm mb-2">{t('success.yourDiscount')}</p>
               <p className="text-5xl font-black text-amber-400">{submitResult.totalDiscount}%</p>
               <p className="text-2xl font-bold text-white mt-2 tracking-widest">
                 {submitResult.discountCode}
               </p>
               <p className="text-white/60 text-sm mt-2">
-                Rebràs el codi per email aviat!
+                {t('success.codeByEmail')}
               </p>
             </div>
 
@@ -836,7 +825,7 @@ export default function TestimonialFormGamified() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-white/90 transition-all"
               >
-                ⭐ Deixar opinió a Google
+                ⭐ {t('success.leaveGoogleReview')}
               </a>
             )}
 
@@ -844,7 +833,7 @@ export default function TestimonialFormGamified() {
               href="/"
               className="block text-white/60 hover:text-amber-400 transition-colors"
             >
-              ← Tornar a l&apos;inici
+              ← {t('success.backHome')}
             </a>
           </motion.div>
         );
@@ -865,19 +854,19 @@ export default function TestimonialFormGamified() {
         {currentStep > 0 && currentStep < 5 && (
           <div className="mb-8">
             <div className="flex justify-between mb-2">
-              {STEPS.slice(1, -1).map((step, i) => (
+              {STEP_IDS.slice(1, -1).map((stepId, i) => (
                 <div
-                  key={step.id}
+                  key={stepId}
                   className={`text-xs ${i < currentStep ? 'text-amber-400' : 'text-white/30'}`}
                 >
-                  {step.title}
+                  {t(`gamified.steps.${stepId}`)}
                 </div>
               ))}
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-amber-400 to-yellow-500"
-                animate={{ width: `${(currentStep / (STEPS.length - 2)) * 100}%` }}
+                animate={{ width: `${(currentStep / (STEP_IDS.length - 2)) * 100}%` }}
                 transition={{ duration: 0.3 }}
               />
             </div>
@@ -915,7 +904,7 @@ export default function TestimonialFormGamified() {
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span className="hidden sm:inline">Anterior</span>
+              <span className="hidden sm:inline">{t('gamified.navigation.previous')}</span>
             </button>
 
             <div className="flex-1" />
@@ -929,7 +918,7 @@ export default function TestimonialFormGamified() {
                 }
                 className="flex items-center gap-2 px-4 sm:px-6 py-3 bg-amber-400 text-black font-bold rounded-full disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-300 transition-all"
               >
-                <span>Següent</span>
+                <span>{t('gamified.navigation.next')}</span>
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -943,11 +932,11 @@ export default function TestimonialFormGamified() {
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin w-5 h-5 border-2 border-black border-t-transparent rounded-full" />
-                    <span>Enviant...</span>
+                    <span>{t('gamified.navigation.submitting')}</span>
                   </>
                 ) : (
                   <>
-                    <span>Enviar opinió</span>
+                    <span>{t('gamified.navigation.submit')}</span>
                     <span>🎁</span>
                   </>
                 )}
@@ -965,7 +954,7 @@ export default function TestimonialFormGamified() {
           >
             <div className="flex items-center gap-3">
               <span className="text-2xl">🎁</span>
-              <span className="text-white/80 text-sm sm:text-base">Recompensa actual:</span>
+              <span className="text-white/80 text-sm sm:text-base">{t('gamified.navigation.currentReward')}</span>
             </div>
             <span className="text-2xl font-bold text-amber-400">{calculateReward()}%</span>
           </motion.div>

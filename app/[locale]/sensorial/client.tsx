@@ -11,6 +11,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import {
   Sparkles,
   Settings2,
@@ -32,9 +33,7 @@ type ThemeType = 'calm' | 'elegant' | 'halloween' | 'monmagic' | 'disco' | 'trop
 
 interface ThemeConfig {
   id: ThemeType;
-  name: string;
   emoji: string;
-  description: string;
   particles: string[];
   colors: {
     primary: string;
@@ -50,9 +49,7 @@ interface ThemeConfig {
 const THEMES: ThemeConfig[] = [
   {
     id: 'calm',
-    name: 'Calma',
     emoji: '🌙',
-    description: 'Relaxació i pau',
     particles: ['✨', '🌙', '💫', '⭐'],
     colors: {
       primary: '#a78bfa',
@@ -61,9 +58,7 @@ const THEMES: ThemeConfig[] = [
   },
   {
     id: 'elegant',
-    name: 'Elegant',
     emoji: '✨',
-    description: 'Sofisticació daurada',
     particles: ['✨', '⭐', '💫', '🌟'],
     colors: {
       primary: '#fbbf24',
@@ -72,9 +67,7 @@ const THEMES: ThemeConfig[] = [
   },
   {
     id: 'halloween',
-    name: 'Halloween',
     emoji: '🎃',
-    description: 'Misteri i diversió',
     particles: ['🎃', '🦇', '👻', '🕷️', '💀', '🕸️', '🌙'],
     colors: {
       primary: '#f97316',
@@ -84,9 +77,7 @@ const THEMES: ThemeConfig[] = [
   },
   {
     id: 'monmagic',
-    name: 'Món Màgic',
     emoji: '🧙‍♂️',
-    description: "Màgia d'escola de bruixeria",
     particles: ['⚡', '🧙‍♂️', '🦉', '🪄', '⭐', '✨', '🏰'],
     colors: {
       primary: '#fbbf24',
@@ -96,9 +87,7 @@ const THEMES: ThemeConfig[] = [
   },
   {
     id: 'disco',
-    name: 'Disco',
     emoji: '🪩',
-    description: 'Ritme i llum',
     particles: ['🪩', '💿', '🎵', '🎶', '✨', '🌟', '💜'],
     colors: {
       primary: '#ec4899',
@@ -108,9 +97,7 @@ const THEMES: ThemeConfig[] = [
   },
   {
     id: 'tropical',
-    name: 'Tropical',
     emoji: '🌴',
-    description: 'Paradís verd',
     particles: ['🌿', '🍃', '🌴', '🌺', '🦜', '🌸', '🌱'],
     colors: {
       primary: '#10b981',
@@ -120,10 +107,11 @@ const THEMES: ThemeConfig[] = [
   },
 ];
 
-const PRESETS = [
-  { name: '🧘 Relaxat', speed: 0.3, density: 25 },
-  { name: '✨ Normal', speed: 0.6, density: 40 },
-  { name: '🎉 Festa', speed: 1.2, density: 70 },
+const PRESET_KEYS = ['relaxed', 'normal', 'party'] as const;
+const PRESET_CONFIGS = [
+  { key: 'relaxed', speed: 0.3, density: 25 },
+  { key: 'normal', speed: 0.6, density: 40 },
+  { key: 'party', speed: 1.2, density: 70 },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -319,6 +307,7 @@ export default function SensorialClient() {
   const animationRef = useRef<number>(0);
   const particlesRef = useRef<any[]>([]);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const t = useTranslations('sensorial');
 
   const [mounted, setMounted] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(THEMES[0]);
@@ -503,7 +492,7 @@ export default function SensorialClient() {
             animate={{ opacity: [0.2, 0.4, 0.2] }}
             transition={{ duration: 4, repeat: Infinity }}
           >
-            Respira...
+            {t('breathe')}
           </motion.p>
         </motion.div>
       )}
@@ -516,7 +505,7 @@ export default function SensorialClient() {
             className="flex items-center gap-3 px-4 py-2 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 hover:bg-black/80 transition-colors"
           >
             <span className="text-xl">🪐</span>
-            <span className="text-white/80 text-sm font-medium hidden sm:inline">Òrbita Events</span>
+            <span className="text-white/80 text-sm font-medium hidden sm:inline">{t('brandName')}</span>
           </Link>
 
           <motion.h1
@@ -525,7 +514,7 @@ export default function SensorialClient() {
             animate={{ opacity: 1, y: 0 }}
           >
             <Sparkles className="w-6 h-6" style={{ color: currentTheme.colors.primary }} />
-            <span className="hidden sm:inline">Espai Sensorial</span>
+            <span className="hidden sm:inline">{t('title')}</span>
           </motion.h1>
 
           <div className="flex gap-2">
@@ -558,22 +547,19 @@ export default function SensorialClient() {
           >
             <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
               <Heart className="w-5 h-5 text-pink-400" />
-              Què és l&apos;Espai Sensorial?
+              {t('infoTitle')}
             </h3>
             <p className="text-white/70 text-sm leading-relaxed">
-              Un lloc digital dissenyat per a persones amb sensibilitats sensorials,
-              nens i nenes amb autisme, o qualsevol que vulgui un moment de calma
-              o diversió controlada.
+              {t('infoP1')}
             </p>
             <p className="text-white/70 text-sm leading-relaxed mt-3">
-              Ajusta la velocitat i densitat de les partícules al teu gust.
-              Prova els diferents temes per trobar el que més t&apos;agradi! 💜
+              {t('infoP2')}
             </p>
             <button
               onClick={() => setShowInfo(false)}
               className="mt-4 w-full py-2 bg-white/10 rounded-lg text-white/80 hover:bg-white/20 transition-colors"
             >
-              Entès!
+              {t('understood')}
             </button>
           </motion.div>
         )}
@@ -595,7 +581,7 @@ export default function SensorialClient() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <Sparkles className="w-5 h-5" style={{ color: currentTheme.colors.primary }} />
-                Controls
+                {t('controls')}
               </h2>
               <button
                 onClick={() => setShowPanel(false)}
@@ -608,7 +594,7 @@ export default function SensorialClient() {
             {/* Selector de tema */}
             <fieldset className="mb-6">
               <legend className="text-white/60 text-sm uppercase tracking-wider mb-3 font-medium">
-                🎨 Tria un tema
+                {t('chooseTheme')}
               </legend>
               <div className="grid grid-cols-2 gap-2">
                 {THEMES.map((theme) => (
@@ -624,8 +610,8 @@ export default function SensorialClient() {
                     }`}
                   >
                     <span className="text-2xl">{theme.emoji}</span>
-                    <p className="text-white text-sm font-medium mt-1">{theme.name}</p>
-                    <p className="text-white/40 text-xs">{theme.description}</p>
+                    <p className="text-white text-sm font-medium mt-1">{t(`themes.${theme.id}.name`)}</p>
+                    <p className="text-white/40 text-xs">{t(`themes.${theme.id}.description`)}</p>
                   </motion.button>
                 ))}
               </div>
@@ -634,19 +620,19 @@ export default function SensorialClient() {
             {/* Presets ràpids */}
             <div className="mb-6">
               <label className="text-white/60 text-sm uppercase tracking-wider mb-3 font-medium block">
-                ⚡ Presets
+                {t('presets')}
               </label>
               <div className="flex gap-2">
-                {PRESETS.map((preset) => (
+                {PRESET_CONFIGS.map((preset) => (
                   <button
-                    key={preset.name}
+                    key={preset.key}
                     onClick={() => {
                       setSpeed(preset.speed);
                       setDensity(preset.density);
                     }}
                     className="flex-1 py-2 px-3 bg-white/5 hover:bg-white/10 rounded-lg text-white text-sm transition-colors"
                   >
-                    {preset.name}
+                    {t(`presetNames.${preset.key}`)}
                   </button>
                 ))}
               </div>
@@ -655,7 +641,7 @@ export default function SensorialClient() {
             {/* Slider velocitat */}
             <div className="mb-6">
               <label className="text-white/60 text-sm mb-2 flex justify-between">
-                <span>Velocitat</span>
+                <span>{t('speed')}</span>
                 <span className="text-white/80 font-mono">{speed.toFixed(1)}x</span>
               </label>
               <input
@@ -668,15 +654,15 @@ export default function SensorialClient() {
                 className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-amber-400"
               />
               <div className="flex justify-between text-xs text-white/40 mt-1">
-                <span>🐢 Lent</span>
-                <span>🐇 Ràpid</span>
+                <span>{t('slow')}</span>
+                <span>{t('fast')}</span>
               </div>
             </div>
 
             {/* Slider densitat */}
             <div className="mb-6">
               <label className="text-white/60 text-sm mb-2 flex justify-between">
-                <span>Densitat</span>
+                <span>{t('density')}</span>
                 <span className="text-white/80 font-mono">{density}</span>
               </label>
               <input
@@ -689,15 +675,15 @@ export default function SensorialClient() {
                 className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-amber-400"
               />
               <div className="flex justify-between text-xs text-white/40 mt-1">
-                <span>Poques</span>
-                <span>Moltes</span>
+                <span>{t('few')}</span>
+                <span>{t('many')}</span>
               </div>
             </div>
 
             {/* Toggle interacció */}
             <div className="mb-6">
               <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-white/60 text-sm">Interacció tàctil</span>
+                <span className="text-white/60 text-sm">{t('touchInteraction')}</span>
                 <div
                   onClick={() => setTouchEnabled(!touchEnabled)}
                   className={`w-12 h-6 rounded-full transition-colors relative ${
@@ -712,7 +698,7 @@ export default function SensorialClient() {
                 </div>
               </label>
               <p className="text-white/40 text-xs mt-1">
-                Les partícules seguiran el teu dit o ratolí
+                {t('touchDescription')}
               </p>
             </div>
 
@@ -723,7 +709,7 @@ export default function SensorialClient() {
                 className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition-all"
               >
                 {isPaused ? <Play className="w-4 h-4 text-white" /> : <Pause className="w-4 h-4 text-white" />}
-                <span className="text-sm text-white">{isPaused ? 'Play' : 'Pausa'}</span>
+                <span className="text-sm text-white">{isPaused ? t('play') : t('pause')}</span>
               </button>
             </div>
 
@@ -732,9 +718,9 @@ export default function SensorialClient() {
               <div className="flex items-start gap-3">
                 <Heart className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-white/80 text-sm font-medium mb-1">Fet amb amor</p>
+                  <p className="text-white/80 text-sm font-medium mb-1">{t('madeWithLove')}</p>
                   <p className="text-white/50 text-xs">
-                    Per a totes les persones especials 💜
+                    {t('forSpecialPeople')}
                   </p>
                 </div>
               </div>
@@ -746,7 +732,7 @@ export default function SensorialClient() {
               className="flex items-center justify-center gap-2 mt-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-white/60 hover:text-white"
             >
               <Home className="w-4 h-4" />
-              <span className="text-sm">Tornar a l&apos;inici</span>
+              <span className="text-sm">{t('backHome')}</span>
             </Link>
           </motion.aside>
         )}

@@ -2245,5 +2245,196 @@
       "miniTestimonial": "\"Van transformar el nostre casament en una experiència màgica inoblidable.\"",
       "miniTestimonialAuthor": "— Lorena i Carles"
     }
+  },
+  "sensorial": {
+    "brandName": "Òrbita Events",
+    "title": "Espai Sensorial",
+    "breathe": "Respira...",
+    "infoTitle": "Què és l'Espai Sensorial?",
+    "infoP1": "Un lloc digital dissenyat per a persones amb sensibilitats sensorials, nens i nenes amb autisme, o qualsevol que vulgui un moment de calma o diversió controlada.",
+    "infoP2": "Ajusta la velocitat i densitat de les partícules al teu gust. Prova els diferents temes per trobar el que més t'agradi! 💜",
+    "understood": "Entès!",
+    "controls": "Controls",
+    "chooseTheme": "🎨 Tria un tema",
+    "presets": "⚡ Presets",
+    "speed": "Velocitat",
+    "slow": "🐢 Lent",
+    "fast": "🐇 Ràpid",
+    "density": "Densitat",
+    "few": "Poques",
+    "many": "Moltes",
+    "touchInteraction": "Interacció tàctil",
+    "touchDescription": "Les partícules seguiran el teu dit o ratolí",
+    "pause": "Pausa",
+    "play": "Play",
+    "madeWithLove": "Fet amb amor",
+    "forSpecialPeople": "Per a totes les persones especials 💜",
+    "backHome": "Tornar a l'inici",
+    "themes": {
+      "calm": { "name": "Calma", "description": "Relaxació i pau" },
+      "elegant": { "name": "Elegant", "description": "Sofisticació daurada" },
+      "halloween": { "name": "Halloween", "description": "Misteri i diversió" },
+      "monmagic": { "name": "Món Màgic", "description": "Màgia d'escola de bruixeria" },
+      "disco": { "name": "Disco", "description": "Ritme i llum" },
+      "tropical": { "name": "Tropical", "description": "Paradís verd" }
+    },
+    "presetNames": {
+      "relaxed": "🧘 Relaxat",
+      "normal": "✨ Normal",
+      "party": "🎉 Festa"
+    }
+  },
+  "testimonialForm": {
+    "validation": {
+      "emailInvalid": "Email no vàlid",
+      "nameMin": "El nom ha de tenir mínim 2 caràcters",
+      "titleMax": "El títol ha de tenir màxim 200 caràcters",
+      "commentMin": "El comentari ha de tenir mínim 10 caràcters",
+      "commentMax": "El comentari ha de tenir màxim 1000 caràcters",
+      "acceptData": "Has d'acceptar el tractament de dades"
+    },
+    "eventTypes": {
+      "boda": "Boda",
+      "cumpleanos": "Aniversari",
+      "corporativo": "Corporatiu",
+      "comunion": "Comunió",
+      "bautizo": "Bateig",
+      "fiesta": "Festa Privada",
+      "festival": "Festival",
+      "otro": "Altre"
+    },
+    "errors": {
+      "fileType": "Tipus de fitxer no permès. Usa JPG, PNG, WebP o GIF.",
+      "fileTooLarge": "La imatge és massa gran. Màxim 5MB.",
+      "uploadError": "Error pujant la imatge",
+      "submitError": "Error enviant la opinió",
+      "photoMax": "La foto ha de ser màxim 5MB",
+      "videoMax": "El vídeo ha de ser màxim 50MB",
+      "uploadPhotoError": "Error pujant foto",
+      "uploadVideoError": "Error pujant vídeo",
+      "codeInvalid": "Codi no vàlid. Comprova el teu email de confirmació.",
+      "verifyError": "Error verificant el codi. Torna-ho a provar."
+    },
+    "success": {
+      "title": "Gràcies per la teva opinió!",
+      "subtitle": "La revisarem i la publicarem aviat. Mentrestant, aquí tens el teu regal:",
+      "exclusiveCode": "El teu codi exclusiu",
+      "discount": "de descompte",
+      "validFor": "Vàlid durant 6 mesos per al teu pròxim event",
+      "copyCode": "Copiar codi",
+      "backHome": "Tornar a l'inici",
+      "thanksTitle": "Gràcies!",
+      "thanksSubtitle": "La teva opinió significa molt per nosaltres",
+      "yourDiscount": "El teu descompte:",
+      "codeByEmail": "Rebràs el codi per email aviat!",
+      "leaveGoogleReview": "⭐ Deixar opinió a Google"
+    },
+    "form": {
+      "ratingQuestion": "Com valores la teva experiència amb nosaltres?",
+      "ratingLabels": {
+        "5": "Excel·lent!",
+        "4": "Molt bé!",
+        "3": "Correcte",
+        "2": "Pot millorar",
+        "1": "No satisfet"
+      },
+      "nameOptional": "Nom (opcional)",
+      "phoneOptional": "Telèfon (opcional)",
+      "cityOptional": "Ciutat (opcional)",
+      "instagramOptional": "Instagram (opcional)",
+      "eventType": "Tipus d'event",
+      "selectType": "Selecciona tipus...",
+      "eventDate": "Data de l'event",
+      "titleOptional": "Títol de la opinió (opcional)",
+      "titlePlaceholder": "Resum en poques paraules...",
+      "yourOpinion": "La teva opinió",
+      "opinionPlaceholder": "Explica'ns com va anar l'event, què et va agradar més, com va ser l'ambient...",
+      "photoOptional": "Foto de l'event (opcional)",
+      "uploading": "Pujant...",
+      "clickToUpload": "Clica per pujar una foto",
+      "photoFormats": "JPG, PNG, WebP o GIF (màx 5MB)",
+      "showName": "Mostrar el meu nom a la web (si no, apareixerà com \"Client verificat\")",
+      "acceptData": "Accepto el tractament de les meves dades segons la",
+      "privacyPolicy": "política de privacitat",
+      "receiveOffers": "Vull rebre ofertes exclusives i novetats d'Òrbita Events",
+      "sending": "Enviant...",
+      "submitButton": "Enviar opinió i obtenir 10% descompte",
+      "submitInfo": "En enviar la teva opinió rebràs un codi de descompte exclusiu"
+    },
+    "gamified": {
+      "emojiMessages": {
+        "1": "Oh no! Què va passar?",
+        "2": "Entenem, podem millorar",
+        "3": "Gràcies pel feedback!",
+        "4": "Genial! Ens alegrem!",
+        "5": "INCREÏBLE! Això ens fa molt feliços! 🎉"
+      },
+      "steps": {
+        "start": "Inici",
+        "rating": "Valoració",
+        "comment": "Comentari",
+        "media": "Foto/Vídeo",
+        "nps": "Recomanació",
+        "finish": "Final"
+      },
+      "hasCode": {
+        "question": "Tens codi de verificació?",
+        "subtitle": "El vas rebre per email després del teu event",
+        "yesCode": "Sí, tinc codi",
+        "noCode": "No, vull opinar"
+      },
+      "enterCode": {
+        "title": "Introdueix el teu codi",
+        "subtitle": "El trobaràs a l'email de confirmació",
+        "placeholder": "ORBITA-2024-XXXX",
+        "verify": "Verificar",
+        "continueWithout": "Continuar sense codi →"
+      },
+      "yourData": {
+        "title": "Les teves dades",
+        "subtitle": "Per enviar-te el codi de descompte",
+        "continue": "Continuar"
+      },
+      "rating": {
+        "title": "Com va ser l'experiència?",
+        "subtitle": "La teva opinió ens ajuda a millorar"
+      },
+      "comment": {
+        "title": "Explica'ns més",
+        "subtitle": "Què t'ha agradat més?",
+        "titlePlaceholder": "Títol de la teva opinió (opcional)",
+        "commentPlaceholder": "El DJ va ser increïble, la música perfecta, els efectes de llum espectaculars..."
+      },
+      "media": {
+        "title": "Afegeix foto o vídeo",
+        "subtitle": "Opcional, però et donarà més descompte! 🎁",
+        "delete": "Eliminar",
+        "addPhoto": "Afegir foto",
+        "photoDiscount": "+5% descompte",
+        "addVideo": "Afegir vídeo",
+        "videoDiscount": "+10% descompte",
+        "maxSizes": "Màx: 5MB fotos, 50MB vídeos (15-30 segons ideal)"
+      },
+      "nps": {
+        "title": "Última pregunta!",
+        "question": "Del 0 al 10, quant recomanaries Òrbita?",
+        "unlikely": "Gens probable",
+        "likely": "Molt probable",
+        "googleShare": "També vull deixar-ho a Google",
+        "googleDiscount": "+5% descompte extra!"
+      },
+      "consent": {
+        "dataProcessing": "Accepto el tractament de dades segons la",
+        "showName": "Mostrar el meu nom a la web (si no, apareixerà com \"Client verificat\")",
+        "receiveOffers": "Vull rebre ofertes exclusives d'Òrbita Events"
+      },
+      "navigation": {
+        "previous": "Anterior",
+        "next": "Següent",
+        "submit": "Enviar opinió",
+        "submitting": "Enviant...",
+        "currentReward": "Recompensa actual:"
+      }
+    }
   }
 }
