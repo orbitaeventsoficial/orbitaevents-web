@@ -95,6 +95,28 @@
     "headline1": "A las 4am tu suegra",
     "headline2": "BAILABA DESCALZA",
     "headline3": "El único DJ que te garantiza FIESTAS ÉPICAS",
+    "headlines": [
+      {
+        "line1": "A las 4am tu suegra",
+        "line2": "BAILABA DESCALZA"
+      },
+      {
+        "line1": "El único DJ que te garantiza",
+        "line2": "FIESTAS ÉPICAS"
+      },
+      {
+        "line1": "Convertimos tu evento en",
+        "line2": "LEYENDA"
+      },
+      {
+        "line1": "No contrates un DJ",
+        "line2": "CONTRATA UNA EXPERIENCIA"
+      },
+      {
+        "line1": "Tu boda merece",
+        "line2": "SER INOLVIDABLE"
+      }
+    ],
     "headlineOld1": "A las 4am tu suegra",
     "headlineOld2": "bailaba descalza",
     "countdownPrefix": "Próximo sábado disponible en:",

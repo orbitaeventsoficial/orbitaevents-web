@@ -220,17 +220,17 @@ export default function HeroBrutalReal() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
 
-  // Headlines que roten - ara cada una pot tenir 2 línies
-  const headlines = [
-    {
-      line1: t('headline1') || 'A les 4am la teva sogra',
-      line2: t('headline2') || 'BALLAVA DESCALÇA'
-    },
-    {
-      line1: t('headline3') || "L'únic DJ que et garanteix",
-      line2: 'FESTES ÈPIQUES'
-    },
-  ];
+  // Headlines que roten - llegeix de l'array 'headlines' del JSON
+  const headlinesRaw = t.raw('headlines') as Array<{line1: string, line2: string}> | undefined;
+  const headlines = headlinesRaw && headlinesRaw.length > 0
+    ? headlinesRaw
+    : [
+        { line1: t('headline1') || 'A les 4am la teva sogra', line2: t('headline2') || 'BALLAVA DESCALÇA' },
+        { line1: "L'únic DJ que et garanteix", line2: 'FESTES ÈPIQUES' },
+        { line1: 'Convertim el teu event en', line2: 'LLEGENDA' },
+        { line1: 'No contractes un DJ', line2: 'CONTRACTA UNA EXPERIÈNCIA' },
+        { line1: 'El teu casament mereix', line2: 'SER INOLVIDABLE' },
+      ];
 
   const [currentHeadline, setCurrentHeadline] = useState(0);
 
