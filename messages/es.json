@@ -2038,5 +2038,190 @@
       "trustResponse": "2h respuesta",
       "guarantee": "Respuesta garantizada en menos de 2h, incluso fines de semana"
     }
+  },
+  "mobileLanding": {
+    "heroSlides": {
+      "halloween": "Halloween",
+      "monMagic": "Mundo Mágico",
+      "bodes": "Bodas"
+    },
+    "hero": {
+      "title1": "Fiestas que",
+      "title2": "no se olvidan.",
+      "cta": "Descubre cómo"
+    },
+    "promesa": {
+      "sectionTitle": "Nuestro secreto",
+      "title1": "No ponemos música.",
+      "title2": "Creamos mundos.",
+      "description": "Tematización completa. Cada luz, cada detalle, cada momento. Tu evento, exactamente como lo imaginas."
+    },
+    "elsMons": {
+      "sectionTitle": "Tematizaciones",
+      "title": "Nuestros",
+      "titleHighlight": "mundos",
+      "halloween": {
+        "nom": "Halloween",
+        "desc": "Terror, humo, luces verdes, calabazas..."
+      },
+      "monmagic": {
+        "nom": "Mundo Mágico",
+        "desc": "Escuela de magia, varitas, hechizos..."
+      },
+      "wantParty": "Quiero una fiesta",
+      "contact": "Contactar →",
+      "swipeHint": "← Desliza para ver más fotos"
+    },
+    "gallery": {
+      "sectionTitle": "2+ años experiencia",
+      "title": "Experiencias",
+      "titleHighlight": "reales",
+      "viewAll": "Ver todo el portfolio"
+    },
+    "testimonis": [
+      {
+        "text": "La mejor decisión que tomamos para nuestra boda. La tematización mágica fue INCREÍBLE.",
+        "nom": "Lorena & Carles",
+        "event": "Boda Mundo Mágico"
+      },
+      {
+        "text": "Mis amigos aún me preguntan dónde encontré al DJ. La fiesta de Halloween fue BRUTAL.",
+        "nom": "Àngela",
+        "event": "18 cumpleaños Halloween"
+      },
+      {
+        "text": "Transformaron nuestra cena de empresa en una experiencia increíble. El equipo aún habla de ello.",
+        "nom": "TechCat",
+        "event": "Evento corporativo"
+      }
+    ],
+    "testimonials": {
+      "sectionTitle": "100% recomendado",
+      "title": "Sus",
+      "titleHighlight": "palabras"
+    },
+    "cta": {
+      "title": "¿Tienes una fecha",
+      "titleHighlight": "en mente?",
+      "description": "Cuéntanos tu idea. Te respondemos en menos de 2 horas.",
+      "whatsapp": "WhatsApp directo",
+      "budget": "Pide presupuesto",
+      "call": "Llámanos",
+      "trustYears": "2+ años",
+      "trustLocation": "BCN + Girona",
+      "trustResponse": "2h respuesta"
+    }
+  },
+  "elViatge": {
+    "portal": {
+      "magicBegins": "La magia comienza...",
+      "skipIntro": "Saltar intro →"
+    },
+    "mons": {
+      "halloween": {
+        "nom": "Halloween",
+        "titol": "La Noche de los Muertos",
+        "subtitol": "Terror, humo, luces verdes... Una noche que no olvidarán."
+      },
+      "monmagic": {
+        "nom": "Mundo Mágico",
+        "titol": "Bienvenido a la Escuela de Magia",
+        "subtitol": "Varitas, casas, magia... El sueño de todo fan de la fantasía."
+      },
+      "bodes": {
+        "nom": "Bodas",
+        "titol": "El Amor Celebrado",
+        "subtitol": "El día más importante de vuestra vida, perfecto."
+      },
+      "festes": {
+        "nom": "Fiestas",
+        "titol": "La Alegría Compartida",
+        "subtitol": "Cumpleaños, celebraciones, momentos únicos."
+      },
+      "empreses": {
+        "nom": "Empresas",
+        "titol": "El Impacto Memorable",
+        "subtitol": "Eventos corporativos que tu equipo recordará."
+      }
+    },
+    "testimonis": [
+      {
+        "text": "Estamos preparando nuestra boda temática con Òrbita Events. La planificación está siendo increíble: velas flotantes, decoración mágica... ¡Estamos muy ilusionados!",
+        "nom": "Lorena & Carles",
+        "event": "Boda Mundo Mágico",
+        "lloc": "Cataluña",
+        "data": "Próximamente"
+      },
+      {
+        "text": "La mejor fiesta de Halloween de mi vida. El humo, las luces verdes, las calabazas... Mis amigos aún alucinan.",
+        "nom": "Àngela",
+        "event": "18º Cumpleaños Halloween",
+        "lloc": "Barcelona",
+        "data": "Octubre 2024"
+      },
+      {
+        "text": "Queríamos algo diferente para la empresa. Superaron todas las expectativas. Profesional, creativo, y el equipo aún habla de ello.",
+        "nom": "Marta - Dir. RRHH",
+        "event": "Cena Empresa",
+        "lloc": "Girona",
+        "data": "Diciembre 2024"
+      }
+    ],
+    "promesa": {
+      "title1": "El día que siempre",
+      "title2": "imaginaste",
+      "subtitle1": "Ese momento en que miras a tu alrededor y ves a todos sonriendo.",
+      "subtitle2": "La música perfecta. Las luces justas. Y sabes que ese instante quedará para siempre.",
+      "cta": "Empieza a crearlo",
+      "stats": {
+        "anys": "años en el sector",
+        "ubicacio": "+ Girona",
+        "resposta": "respuesta"
+      }
+    },
+    "elsMons": {
+      "sectionTitle": "Escoge tu universo",
+      "title1": "Cada evento es un",
+      "title2": "mundo",
+      "wantParty": "Quiero una fiesta",
+      "contact": "Contactar →",
+      "swipeHint": "← swipe para ver más →"
+    },
+    "histories": {
+      "sectionTitle": "Historias reales",
+      "title1": "No te lo decimos nosotros.",
+      "title2": "Te lo dicen ellos."
+    },
+    "diferencia": {
+      "title1": "Evento normal",
+      "title2": "vs Evento Òrbita",
+      "comparisons": [
+        {
+          "altres": "Solo música de fondo",
+          "nosaltres": "Música + tematización + animación"
+        },
+        {
+          "altres": "DJ que no se adapta",
+          "nosaltres": "Leemos la sala en tiempo real"
+        },
+        {
+          "altres": "\"Estuvo bien... nada especial\"",
+          "nosaltres": "\"Aún hablan de ello meses después\""
+        }
+      ]
+    },
+    "primerPas": {
+      "title1": "¿Tienes una fecha",
+      "title2": "en mente?",
+      "subtitle1": "Cuéntanos qué imaginas.",
+      "subtitle2": "Te respondemos en menos de 2 horas. Sin compromiso.",
+      "whatsapp": "WhatsApp directo",
+      "contactForm": "Formulario de contacto",
+      "trustYears": "2+ años en el sector",
+      "trustLocation": "BCN + Girona",
+      "trustResponse": "2h respuesta",
+      "miniTestimonial": "\"Transformaron nuestra boda en una experiencia mágica inolvidable.\"",
+      "miniTestimonialAuthor": "— Lorena y Carles"
+    }
   }
 }

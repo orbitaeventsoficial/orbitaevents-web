@@ -27,6 +27,7 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 📸 DADES REALS - Les fotos d'Òrbita
@@ -42,9 +43,6 @@ const MONS = {
   halloween: {
     id: 'halloween',
     emoji: '🎃',
-    nom: 'Halloween',
-    titol: 'La Nit dels Morts',
-    subtitol: 'Terror, fum, llums verdes... Una nit que no oblidaran.',
     color: '#ff6b00',
     colorSecondary: '#00ff00',
     gradient: 'from-orange-600 via-red-700 to-black',
@@ -66,9 +64,6 @@ const MONS = {
   monmagic: {
     id: 'monmagic',
     emoji: '🧙‍♂️',
-    nom: 'Món Màgic',
-    titol: "Benvingut a l'Escola de Màgia",
-    subtitol: 'Varetes, cases, màgia... El somni de tot fan de la fantasia.',
     color: '#ffd700',
     colorSecondary: '#740001',
     gradient: 'from-amber-600 via-red-800 to-black',
@@ -90,9 +85,6 @@ const MONS = {
   bodes: {
     id: 'bodes',
     emoji: '💒',
-    nom: 'Bodes',
-    titol: "L'Amor Celebrat",
-    subtitol: 'El dia més important de la vostra vida, perfecte.',
     color: '#f0c0c0',
     colorSecondary: '#d4af37',
     gradient: 'from-rose-400 via-pink-600 to-purple-900',
@@ -113,9 +105,6 @@ const MONS = {
   festes: {
     id: 'festes',
     emoji: '🎉',
-    nom: 'Festes',
-    titol: "L'Alegria Compartida",
-    subtitol: 'Aniversaris, celebracions, moments únics.',
     color: '#ff00ff',
     colorSecondary: '#00ffff',
     gradient: 'from-fuchsia-500 via-purple-600 to-blue-900',
@@ -132,9 +121,6 @@ const MONS = {
   empreses: {
     id: 'empreses',
     emoji: '🏢',
-    nom: 'Empreses',
-    titol: "L'Impacte Memorable",
-    subtitol: 'Events corporatius que el teu equip recordarà.',
     color: '#3b82f6',
     colorSecondary: '#1e3a5f',
     gradient: 'from-blue-500 via-indigo-700 to-slate-900',
@@ -149,37 +135,10 @@ const MONS = {
   },
 };
 
-const TESTIMONIS = [
-  {
-    id: 1,
-    text: "Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació està sent increïble: veles flotants, decoració màgica... Estem molt il·lusionats!",
-    nom: 'Lorena & Carles',
-    event: 'Boda Món Màgic',
-    lloc: 'Catalunya',
-    data: 'Pròximament',
-    foto: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-06.webp',
-    rating: 5,
-  },
-  {
-    id: 2,
-    text: 'La millor festa de Halloween de la meva vida. El fum, les llums verdes, les carbasses... Els meus amics encara al·lucinen.',
-    nom: 'Àngela',
-    event: '18è Aniversari Halloween',
-    lloc: 'Barcelona',
-    data: 'Octubre 2024',
-    foto: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-06.webp',
-    rating: 5,
-  },
-  {
-    id: 3,
-    text: "Volíem quelcom diferent per l'empresa. Van superar totes les expectatives. Professional, creatiu, i l'equip encara en parla.",
-    nom: 'Marta - Dir. RRHH',
-    event: 'Sopar Empresa',
-    lloc: 'Girona',
-    data: 'Desembre 2024',
-    foto: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
-    rating: 5,
-  },
+const TESTIMONIS_FOTOS = [
+  '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-06.webp',
+  '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-06.webp',
+  '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -190,6 +149,7 @@ export default function ElViatge() {
   const [mounted, setMounted] = useState(false);
   const [portalComplete, setPortalComplete] = useState(false);
   const [currentMon, setCurrentMon] = useState<keyof typeof MONS>('halloween');
+  const t = useTranslations('elViatge');
 
   useEffect(() => {
     setMounted(true);
@@ -221,7 +181,7 @@ export default function ElViatge() {
       {/* CAPÍTOL 1: EL PORTAL */}
       <AnimatePresence>
         {!portalComplete && (
-          <Portal onComplete={() => setPortalComplete(true)} />
+          <Portal onComplete={() => setPortalComplete(true)} t={t} />
         )}
       </AnimatePresence>
 
@@ -229,19 +189,19 @@ export default function ElViatge() {
       {portalComplete && (
         <>
           {/* CAPÍTOL 2: LA PROMESA */}
-          <LaPromesa />
+          <LaPromesa t={t} />
 
           {/* CAPÍTOL 3: ELS MONS */}
-          <ElsMons currentMon={currentMon} setCurrentMon={setCurrentMon} />
+          <ElsMons currentMon={currentMon} setCurrentMon={setCurrentMon} t={t} />
 
           {/* CAPÍTOL 4: LES HISTÒRIES */}
-          <LesHistories />
+          <LesHistories t={t} />
 
           {/* CAPÍTOL 5: LA DIFERÈNCIA */}
-          <LaDiferencia />
+          <LaDiferencia t={t} />
 
           {/* CAPÍTOL 6: EL PRIMER PAS */}
-          <ElPrimerPas />
+          <ElPrimerPas t={t} />
 
           {/* WhatsApp flotant */}
           <WhatsAppFloat />
@@ -256,7 +216,7 @@ export default function ElViatge() {
 // L'entrada al món Òrbita. 5-7 segons de màgia pura.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function Portal({ onComplete }: { onComplete: () => void }) {
+function Portal({ onComplete, t }: { onComplete: () => void; t: (key: string) => string }) {
   const [phase, setPhase] = useState(0);
   // 0: Negre total
   // 1: Text subliminal apareix
@@ -291,7 +251,7 @@ function Portal({ onComplete }: { onComplete: () => void }) {
             transition={{ duration: 1.5, ease: [0.22, 0.61, 0.36, 1] }}
             className="absolute top-1/3 text-magic text-magic-lg animate-magic-breathe"
           >
-            La màgia comença...
+            {t('portal.magicBegins')}
           </motion.p>
         )}
       </AnimatePresence>
@@ -410,7 +370,7 @@ function Portal({ onComplete }: { onComplete: () => void }) {
                    transition-all duration-200
                    focus-visible:ring-2 focus-visible:ring-amber-400/50"
       >
-        Saltar intro →
+        {t('portal.skipIntro')}
       </motion.button>
     </motion.div>
   );
@@ -446,7 +406,7 @@ function PortalParticles() {
 // No parlem de nosaltres. Parlem de TU.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function LaPromesa() {
+function LaPromesa({ t }: { t: (key: string) => string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -505,10 +465,10 @@ function LaPromesa() {
           transition={{ duration: 1, delay: 0.3 }}
           className="text-4xl sm:text-5xl md:text-7xl font-black text-white leading-tight mb-6"
         >
-          El dia que sempre
+          {t('promesa.title1')}
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300">
-            vas imaginar
+            {t('promesa.title2')}
           </span>
         </motion.h1>
 
@@ -519,9 +479,9 @@ function LaPromesa() {
           transition={{ duration: 1, delay: 0.6 }}
           className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto mb-8 leading-relaxed"
         >
-          Aquell moment en què mires al teu voltant i veus tothom somrient.
+          {t('promesa.subtitle1')}
           <br className="hidden sm:block" />
-          La música perfecta. Les llums justes. I saps que aquest instant quedarà per sempre.
+          {t('promesa.subtitle2')}
         </motion.p>
 
         {/* CTA */}
@@ -534,7 +494,7 @@ function LaPromesa() {
             href="#mons"
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full text-black font-bold text-lg hover:scale-105 transition-transform shadow-lg shadow-amber-500/30"
           >
-            Comença a crear-lo
+            {t('promesa.cta')}
             <motion.span
               animate={{ y: [0, 5, 0] }}
               transition={{ duration: 1.5, repeat: Infinity }}
@@ -552,9 +512,9 @@ function LaPromesa() {
           className="flex flex-wrap justify-center gap-8 mt-12"
         >
           {[
-            { num: '2+', label: 'anys en el sector' },
-            { num: 'BCN', label: '+ Girona' },
-            { num: '2h', label: 'resposta' },
+            { num: '2+', label: t('promesa.stats.anys') },
+            { num: 'BCN', label: t('promesa.stats.ubicacio') },
+            { num: '2h', label: t('promesa.stats.resposta') },
           ].map((stat, i) => (
             <div key={i} className="text-center">
               <p className="text-3xl font-black text-amber-400">{stat.num}</p>
@@ -595,9 +555,11 @@ function LaPromesa() {
 function ElsMons({
   currentMon,
   setCurrentMon,
+  t,
 }: {
   currentMon: keyof typeof MONS;
   setCurrentMon: (_mon: keyof typeof MONS) => void;
+  t: (key: string) => string;
 }) {
   const mon = MONS[currentMon];
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -612,7 +574,7 @@ function ElsMons({
           viewport={{ once: true }}
           className="text-amber-400/80 text-sm tracking-[0.3em] uppercase mb-4"
         >
-          Escull el teu univers
+          {t('elsMons.sectionTitle')}
         </motion.p>
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -620,9 +582,9 @@ function ElsMons({
           viewport={{ once: true }}
           className="text-4xl sm:text-5xl font-black text-white"
         >
-          Cada event és un{' '}
+          {t('elsMons.title1')}{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-orange-500">
-            món
+            {t('elsMons.title2')}
           </span>
         </motion.h2>
       </div>
@@ -641,7 +603,7 @@ function ElsMons({
                 : 'bg-white/5 text-white/60 border border-white/10 hover:border-white/30'
             }`}
           >
-            {MONS[key].emoji} {MONS[key].nom}
+            {MONS[key].emoji} {t(`mons.${key}.nom`)}
           </motion.button>
         ))}
       </div>
@@ -655,8 +617,8 @@ function ElsMons({
           exit={{ opacity: 0, y: -20 }}
           className="text-center px-6 mb-8"
         >
-          <h3 className="text-3xl font-black text-white mb-2">{mon.titol}</h3>
-          <p className="text-white/60 max-w-md mx-auto">{mon.subtitol}</p>
+          <h3 className="text-3xl font-black text-white mb-2">{t(`mons.${currentMon}.titol`)}</h3>
+          <p className="text-white/60 max-w-md mx-auto">{t(`mons.${currentMon}.subtitol`)}</p>
         </motion.div>
       </AnimatePresence>
 
@@ -677,7 +639,7 @@ function ElsMons({
             <div className="relative w-[280px] sm:w-[320px] aspect-[3/4] rounded-3xl overflow-hidden group">
               <Image
                 src={foto}
-                alt={`${mon.nom} - ${idx + 1}`}
+                alt={`${t(`mons.${currentMon}.nom`)} - ${idx + 1}`}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
                 sizes="320px"
@@ -700,12 +662,12 @@ function ElsMons({
           >
             <span className="text-6xl mb-4">{mon.emoji}</span>
             <p className="text-white font-bold text-xl text-center mb-2">
-              Vull una festa
+              {t('elsMons.wantParty')}
               <br />
-              {mon.nom}!
+              {t(`mons.${currentMon}.nom`)}!
             </p>
             <span className="mt-4 px-6 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium">
-              Contactar →
+              {t('elsMons.contact')}
             </span>
           </Link>
         </div>
@@ -713,7 +675,7 @@ function ElsMons({
 
       {/* Indicador swipe */}
       <p className="text-center text-white/40 text-sm mt-4">
-        ← swipe per veure més →
+        {t('elsMons.swipeHint')}
       </p>
     </section>
   );
@@ -724,18 +686,16 @@ function ElsMons({
 // Testimonis REALS amb fotos dels events.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function LesHistories() {
+function LesHistories({ t }: { t: (key: string) => string }) {
   const [current, setCurrent] = useState(0);
 
   // Auto-advance
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % TESTIMONIS.length);
+      setCurrent((prev) => (prev + 1) % TESTIMONIS_FOTOS.length);
     }, 6000);
     return () => clearInterval(interval);
   }, []);
-
-  const testimoni = TESTIMONIS[current];
 
   return (
     <section className="py-20 bg-gradient-to-b from-black via-neutral-950 to-black">
@@ -747,7 +707,7 @@ function LesHistories() {
           viewport={{ once: true }}
           className="text-amber-400/80 text-sm tracking-[0.3em] uppercase mb-4"
         >
-          Històries reals
+          {t('histories.sectionTitle')}
         </motion.p>
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -755,10 +715,10 @@ function LesHistories() {
           viewport={{ once: true }}
           className="text-4xl sm:text-5xl font-black text-white"
         >
-          No t'ho diem nosaltres.
+          {t('histories.title1')}
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-orange-500">
-            T'ho diuen ells.
+            {t('histories.title2')}
           </span>
         </motion.h2>
       </div>
@@ -776,8 +736,8 @@ function LesHistories() {
             {/* Foto */}
             <div className="relative aspect-[4/3] rounded-3xl overflow-hidden">
               <Image
-                src={testimoni.foto}
-                alt={testimoni.nom}
+                src={TESTIMONIS_FOTOS[current]}
+                alt={t(`testimonis.${current}.nom`)}
                 fill
                 className="object-cover"
               />
@@ -785,28 +745,28 @@ function LesHistories() {
               {/* Badge event */}
               <div className="absolute bottom-4 left-4">
                 <div className="bg-amber-500/90 px-4 py-2 rounded-full">
-                  <span className="text-black font-bold text-sm">{testimoni.event}</span>
+                  <span className="text-black font-bold text-sm">{t(`testimonis.${current}.event`)}</span>
                 </div>
               </div>
               {/* Rating */}
               <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                <span className="text-amber-400">{'★'.repeat(testimoni.rating)}</span>
+                <span className="text-amber-400">{'★★★★★'}</span>
               </div>
             </div>
 
             {/* Text */}
             <div>
               <blockquote className="text-xl sm:text-2xl text-white italic leading-relaxed mb-6">
-                "{testimoni.text}"
+                &ldquo;{t(`testimonis.${current}.text`)}&rdquo;
               </blockquote>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center">
                   <span className="text-2xl">😊</span>
                 </div>
                 <div>
-                  <p className="font-bold text-white">{testimoni.nom}</p>
+                  <p className="font-bold text-white">{t(`testimonis.${current}.nom`)}</p>
                   <p className="text-white/60 text-sm">
-                    {testimoni.lloc} · {testimoni.data}
+                    {t(`testimonis.${current}.lloc`)} · {t(`testimonis.${current}.data`)}
                   </p>
                 </div>
               </div>
@@ -816,7 +776,7 @@ function LesHistories() {
 
         {/* Dots navegació */}
         <div className="flex justify-center gap-2 mt-8">
-          {TESTIMONIS.map((_, idx) => (
+          {TESTIMONIS_FOTOS.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrent(idx)}
@@ -836,24 +796,8 @@ function LesHistories() {
 // Per què nosaltres.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function LaDiferencia() {
-  const diferencies = [
-    {
-      altres: 'Només música de fons',
-      nosaltres: 'Música + tematització + animació',
-      emoji: '🎵',
-    },
-    {
-      altres: "DJ que no s'adapta",
-      nosaltres: 'Llegim la sala en temps real',
-      emoji: '👀',
-    },
-    {
-      altres: '"Estuvo bien... nada especial"',
-      nosaltres: '"Encara en parlen després de mesos"',
-      emoji: '✨',
-    },
-  ];
+function LaDiferencia({ t }: { t: (key: string) => string }) {
+  const emojis = ['🎵', '👀', '✨'];
 
   return (
     <section className="py-20 bg-black">
@@ -866,17 +810,17 @@ function LaDiferencia() {
             viewport={{ once: true }}
             className="text-4xl sm:text-5xl font-black text-white"
           >
-            Event normal
+            {t('diferencia.title1')}
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-orange-500">
-              vs Event Òrbita
+              {t('diferencia.title2')}
             </span>
           </motion.h2>
         </div>
 
         {/* Comparativa */}
         <div className="space-y-6">
-          {diferencies.map((dif, idx) => (
+          {[0, 1, 2].map((idx) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, x: -30 }}
@@ -887,15 +831,15 @@ function LaDiferencia() {
             >
               {/* Altres */}
               <div className="bg-red-950/30 border border-red-900/30 rounded-2xl p-4 text-right">
-                <p className="text-white/60 line-through">{dif.altres}</p>
+                <p className="text-white/60 line-through">{t(`diferencia.comparisons.${idx}.altres`)}</p>
               </div>
 
               {/* Emoji */}
-              <div className="text-3xl">{dif.emoji}</div>
+              <div className="text-3xl">{emojis[idx]}</div>
 
               {/* Nosaltres */}
               <div className="bg-amber-950/30 border border-amber-500/30 rounded-2xl p-4">
-                <p className="text-amber-200 font-medium">{dif.nosaltres}</p>
+                <p className="text-amber-200 font-medium">{t(`diferencia.comparisons.${idx}.nosaltres`)}</p>
               </div>
             </motion.div>
           ))}
@@ -910,7 +854,7 @@ function LaDiferencia() {
 // CTA càlid, no agressiu. Una invitació.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ElPrimerPas() {
+function ElPrimerPas({ t }: { t: (key: string) => string }) {
   return (
     <section className="py-20 bg-gradient-to-b from-black via-neutral-950 to-black">
       <div className="max-w-2xl mx-auto px-6 text-center">
@@ -930,10 +874,10 @@ function ElPrimerPas() {
           viewport={{ once: true }}
           className="text-4xl sm:text-5xl font-black text-white mb-4"
         >
-          Tens una data
+          {t('primerPas.title1')}
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-orange-500">
-            al cap?
+            {t('primerPas.title2')}
           </span>
         </motion.h2>
 
@@ -945,9 +889,9 @@ function ElPrimerPas() {
           transition={{ delay: 0.2 }}
           className="text-white/60 text-lg mb-8"
         >
-          Explica'ns què imagines.
+          {t('primerPas.subtitle1')}
           <br />
-          <span className="text-white/80">Et responem en menys de 2 hores. Sense compromís.</span>
+          <span className="text-white/80">{t('primerPas.subtitle2')}</span>
         </motion.p>
 
         {/* Botons */}
@@ -962,7 +906,7 @@ function ElPrimerPas() {
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
             </svg>
-            WhatsApp directe
+            {t('primerPas.whatsapp')}
           </motion.a>
 
           {/* Formulari */}
@@ -971,7 +915,7 @@ function ElPrimerPas() {
               href="/contacto"
               className="flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full text-black font-bold text-lg"
             >
-              ✉️ Formulari de contacte
+              ✉️ {t('primerPas.contactForm')}
             </Link>
           </motion.div>
         </div>
@@ -987,18 +931,18 @@ function ElPrimerPas() {
 
         {/* Trust badge */}
         <div className="flex flex-wrap justify-center gap-4 mt-10 text-white/40 text-sm">
-          <span>2+ anys en el sector</span>
+          <span>{t('primerPas.trustYears')}</span>
           <span>•</span>
-          <span>BCN + Girona</span>
+          <span>{t('primerPas.trustLocation')}</span>
           <span>•</span>
-          <span>2h resposta</span>
+          <span>{t('primerPas.trustResponse')}</span>
         </div>
 
         {/* Mini testimoni REAL */}
         <p className="text-white/30 text-sm mt-6 italic">
-          "Van transformar el nostre casament en una experiència màgica inoblidable."
+          {t('primerPas.miniTestimonial')}
           <br />
-          — Lorena i Carles
+          {t('primerPas.miniTestimonialAuthor')}
         </p>
       </div>
     </section>

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DADES - Les fotos reals d'Òrbita
@@ -12,17 +13,17 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 const HERO_SLIDES = [
   {
     image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
-    tag: 'Halloween',
+    tagKey: 'halloween',
     emoji: '🎃',
   },
   {
     image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
-    tag: 'Món Màgic',
+    tagKey: 'monMagic',
     emoji: '🧙‍♂️',
   },
   {
     image: '/img/portfolio/bodas/bodas-01.webp',
-    tag: 'Bodes',
+    tagKey: 'bodes',
     emoji: '💒',
   },
 ];
@@ -47,25 +48,10 @@ const GALERIA_IMPACTE = [
   { src: '/img/portfolio/fiestas-privadas/fiestas-privadas-02.webp', cat: 'festes' },
 ];
 
-const TESTIMONIS = [
-  {
-    text: "La millor decisió que vam prendre per al nostre casament. La tematització màgica va ser INCREÏBLE.",
-    nom: "Lorena & Carles",
-    event: "Boda Món Màgic",
-    image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-06.webp',
-  },
-  {
-    text: "Els meus amics encara em pregunten on vaig trobar el DJ. La festa de Halloween va ser BRUTAL.",
-    nom: "Àngela",
-    event: "18 aniversari Halloween",
-    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-06.webp',
-  },
-  {
-    text: "Van transformar el nostre sopar d'empresa en una experiència increïble. L'equip encara en parla.",
-    nom: "TechCat",
-    event: "Event corporatiu",
-    image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
-  },
+const TESTIMONIS_IMAGES = [
+  '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-06.webp',
+  '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-06.webp',
+  '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -73,25 +59,27 @@ const TESTIMONIS = [
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function MobileLanding() {
+  const t = useTranslations('mobileLanding');
+
   return (
     <main className="bg-black min-h-screen overflow-x-hidden">
       {/* CAPÍTOL 1: L'IMPACTE */}
-      <HeroImpacte />
+      <HeroImpacte t={t} />
 
       {/* CAPÍTOL 2: LA PROMESA */}
-      <LaPromesa />
+      <LaPromesa t={t} />
 
       {/* CAPÍTOL 3: ELS MONS (Tematitzacions) */}
-      <ElsMons />
+      <ElsMons t={t} />
 
       {/* CAPÍTOL 4: LES PROVES (Galeria) */}
-      <LesProves />
+      <LesProves t={t} />
 
       {/* CAPÍTOL 5: LES VEUS (Testimonis) */}
-      <LesVeus />
+      <LesVeus t={t} />
 
       {/* CAPÍTOL 6: EL MOMENT (CTA) */}
-      <ElMoment />
+      <ElMoment t={t} />
 
       {/* Botó WhatsApp flotant */}
       <WhatsAppFlotant />
@@ -104,7 +92,7 @@ export default function MobileLanding() {
 // Una imatge que para el món. Sense paraules innecessàries.
 // ═══════════════════════════════════════════════════════════════════════════
 
-function HeroImpacte() {
+function HeroImpacte({ t }: { t: (key: string) => string }) {
   const [current, setCurrent] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
 
@@ -150,7 +138,7 @@ function HeroImpacte() {
         >
           <Image
             src={HERO_SLIDES[current].image}
-            alt={HERO_SLIDES[current].tag}
+            alt={t(`heroSlides.${HERO_SLIDES[current].tagKey}`)}
             fill
             priority
             className="object-cover"
@@ -173,7 +161,7 @@ function HeroImpacte() {
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white">
             <span className="text-xl">{HERO_SLIDES[current].emoji}</span>
-            <span className="font-medium">{HERO_SLIDES[current].tag}</span>
+            <span className="font-medium">{t(`heroSlides.${HERO_SLIDES[current].tagKey}`)}</span>
           </span>
         </motion.div>
 
@@ -184,10 +172,10 @@ function HeroImpacte() {
           transition={{ delay: 0.1 }}
           className="text-4xl sm:text-5xl font-black text-white leading-tight mb-4"
         >
-          Festes que
+          {t('hero.title1')}
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-            no s'obliden.
+            {t('hero.title2')}
           </span>
         </motion.h1>
 
@@ -201,7 +189,7 @@ function HeroImpacte() {
             href="#mons"
             className="inline-flex items-center gap-2 text-white/80 font-medium"
           >
-            <span>Descobreix com</span>
+            <span>{t('hero.cta')}</span>
             <motion.span
               animate={{ y: [0, 5, 0] }}
               transition={{ duration: 1.5, repeat: Infinity }}
@@ -237,7 +225,7 @@ function HeroImpacte() {
 // Què fem diferent? En una frase. Sense rotllo.
 // ═══════════════════════════════════════════════════════════════════════════
 
-function LaPromesa() {
+function LaPromesa({ t }: { t: (key: string) => string }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -250,16 +238,15 @@ function LaPromesa() {
     <section ref={ref} className="py-20 px-6 bg-black">
       <motion.div style={{ opacity, y }} className="max-w-lg mx-auto text-center">
         <p className="text-white/40 text-sm uppercase tracking-widest mb-4">
-          El nostre secret
+          {t('promesa.sectionTitle')}
         </p>
         <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-6">
-          No posem música.
+          {t('promesa.title1')}
           <br />
-          <span className="text-amber-400">Creem mons.</span>
+          <span className="text-amber-400">{t('promesa.title2')}</span>
         </h2>
         <p className="text-white/60 text-lg">
-          Tematització completa. Cada llum, cada detall, cada moment.
-          El teu event, exactament com l'imagines.
+          {t('promesa.description')}
         </p>
       </motion.div>
     </section>
@@ -271,14 +258,12 @@ function LaPromesa() {
 // Les tematitzacions - El diferencial visual
 // ═══════════════════════════════════════════════════════════════════════════
 
-function ElsMons() {
+function ElsMons({ t }: { t: (key: string) => string }) {
   const [activeMon, setActiveMon] = useState<'halloween' | 'monmagic'>('halloween');
 
   const mons = {
     halloween: {
       emoji: '🎃',
-      nom: 'Halloween',
-      desc: 'Terror, fum, llums verdes, carbasses...',
       color: 'from-orange-600 to-red-900',
       images: [
         '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
@@ -289,8 +274,6 @@ function ElsMons() {
     },
     monmagic: {
       emoji: '🧙‍♂️',
-      nom: 'Món Màgic',
-      desc: 'Escola de màgia, varetes, encanteris...',
       color: 'from-amber-600 to-red-800',
       images: [
         '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
@@ -307,10 +290,10 @@ function ElsMons() {
     <section id="mons" className="py-16 bg-neutral-950">
       <div className="px-6 mb-8">
         <p className="text-white/40 text-sm uppercase tracking-widest mb-2">
-          Tematitzacions
+          {t('elsMons.sectionTitle')}
         </p>
         <h2 className="text-3xl font-black text-white">
-          Els nostres <span className="text-amber-400">mons</span>
+          {t('elsMons.title')} <span className="text-amber-400">{t('elsMons.titleHighlight')}</span>
         </h2>
       </div>
 
@@ -326,7 +309,7 @@ function ElsMons() {
                 : 'bg-white/10 text-white/60'
             }`}
           >
-            {mons[key].emoji} {mons[key].nom}
+            {mons[key].emoji} {t(`elsMons.${key}.nom`)}
           </button>
         ))}
       </div>
@@ -345,7 +328,7 @@ function ElsMons() {
               <div className="relative w-[280px] sm:w-[320px] aspect-[3/4] rounded-3xl overflow-hidden">
                 <Image
                   src={img}
-                  alt={`${mon.nom} - ${idx + 1}`}
+                  alt={`${t(`elsMons.${activeMon}.nom`)} - ${idx + 1}`}
                   fill
                   className="object-cover"
                   sizes="320px"
@@ -364,12 +347,12 @@ function ElsMons() {
               <div className="text-center p-8">
                 <span className="text-6xl mb-4 block">{mon.emoji}</span>
                 <p className="text-white font-bold text-xl mb-2">
-                  Vull una festa
+                  {t('elsMons.wantParty')}
                   <br />
-                  {mon.nom}!
+                  {t(`elsMons.${activeMon}.nom`)}!
                 </p>
                 <span className="inline-block mt-4 px-6 py-2 bg-white/20 rounded-full text-white font-medium">
-                  Contactar →
+                  {t('elsMons.contact')}
                 </span>
               </div>
             </Link>
@@ -379,9 +362,9 @@ function ElsMons() {
 
       {/* Descripció */}
       <div className="px-6 mt-6">
-        <p className="text-white/60">{mon.desc}</p>
+        <p className="text-white/60">{t(`elsMons.${activeMon}.desc`)}</p>
         <p className="text-amber-400 text-sm mt-2">
-          ← Fes swipe per veure més fotos
+          {t('elsMons.swipeHint')}
         </p>
       </div>
     </section>
@@ -393,15 +376,15 @@ function ElsMons() {
 // Galeria massissa - Que vegin que tenim MOLT material real
 // ═══════════════════════════════════════════════════════════════════════════
 
-function LesProves() {
+function LesProves({ t }: { t: (key: string) => string }) {
   return (
     <section className="py-16 bg-black">
       <div className="px-6 mb-8">
         <p className="text-white/40 text-sm uppercase tracking-widest mb-2">
-          2+ anys experiència
+          {t('gallery.sectionTitle')}
         </p>
         <h2 className="text-3xl font-black text-white">
-          Experiències <span className="text-amber-400">reals</span>
+          {t('gallery.title')} <span className="text-amber-400">{t('gallery.titleHighlight')}</span>
         </h2>
       </div>
 
@@ -435,7 +418,7 @@ function LesProves() {
           href="/portfolio"
           className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 rounded-full text-white font-medium"
         >
-          Veure tot el portfolio
+          {t('gallery.viewAll')}
           <span>→</span>
         </Link>
       </div>
@@ -448,17 +431,17 @@ function LesProves() {
 // Testimonis amb les FOTOS dels events - No text genèric
 // ═══════════════════════════════════════════════════════════════════════════
 
-function LesVeus() {
+function LesVeus({ t }: { t: (key: string) => string }) {
   const [current, setCurrent] = useState(0);
 
   return (
     <section className="py-16 bg-neutral-950">
       <div className="px-6 mb-8">
         <p className="text-white/40 text-sm uppercase tracking-widest mb-2">
-          100% recomanat
+          {t('testimonials.sectionTitle')}
         </p>
         <h2 className="text-3xl font-black text-white">
-          Les seves <span className="text-amber-400">paraules</span>
+          {t('testimonials.title')} <span className="text-amber-400">{t('testimonials.titleHighlight')}</span>
         </h2>
       </div>
 
@@ -475,8 +458,8 @@ function LesVeus() {
             {/* Imatge de l'event */}
             <div className="relative aspect-[4/3] rounded-3xl overflow-hidden mb-6">
               <Image
-                src={TESTIMONIS[current].image}
-                alt={TESTIMONIS[current].event}
+                src={TESTIMONIS_IMAGES[current]}
+                alt={t(`testimonis.${current}.event`)}
                 fill
                 className="object-cover"
                 sizes="100vw"
@@ -486,26 +469,26 @@ function LesVeus() {
               {/* Badge de l'event */}
               <div className="absolute bottom-4 left-4">
                 <span className="px-3 py-1 bg-amber-500 rounded-full text-black text-sm font-bold">
-                  {TESTIMONIS[current].event}
+                  {t(`testimonis.${current}.event`)}
                 </span>
               </div>
             </div>
 
             {/* Text del testimoni */}
             <blockquote className="text-xl text-white italic leading-relaxed mb-4">
-              "{TESTIMONIS[current].text}"
+              &ldquo;{t(`testimonis.${current}.text`)}&rdquo;
             </blockquote>
 
             {/* Autor */}
             <p className="text-amber-400 font-bold">
-              — {TESTIMONIS[current].nom}
+              — {t(`testimonis.${current}.nom`)}
             </p>
           </motion.div>
         </AnimatePresence>
 
         {/* Navegació */}
         <div className="flex items-center justify-center gap-3 mt-8">
-          {TESTIMONIS.map((_, idx) => (
+          {TESTIMONIS_IMAGES.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrent(idx)}
@@ -525,7 +508,7 @@ function LesVeus() {
 // CTA Final - Ara o mai
 // ═══════════════════════════════════════════════════════════════════════════
 
-function ElMoment() {
+function ElMoment({ t }: { t: (key: string) => string }) {
   return (
     <section className="py-20 px-6 bg-gradient-to-b from-neutral-950 to-black">
       <div className="max-w-lg mx-auto text-center">
@@ -536,48 +519,48 @@ function ElMoment() {
         >
           <p className="text-6xl mb-6">✨</p>
           <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
-            Tens una data
+            {t('cta.title')}
             <br />
-            <span className="text-amber-400">al cap?</span>
+            <span className="text-amber-400">{t('cta.titleHighlight')}</span>
           </h2>
           <p className="text-white/60 mb-8">
-            Explica'ns la teva idea. Et responem en menys de 2 hores.
+            {t('cta.description')}
           </p>
 
           {/* Botons d'acció */}
           <div className="flex flex-col gap-4">
             <Link
-              href="https://wa.me/34666666666"
+              href="https://wa.me/34699121023"
               className="flex items-center justify-center gap-3 w-full py-4 bg-[#25D366] rounded-2xl text-white font-bold text-lg"
             >
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
               </svg>
-              WhatsApp directe
+              {t('cta.whatsapp')}
             </Link>
 
             <Link
               href="/contacto"
               className="flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl text-black font-bold text-lg"
             >
-              Demana pressupost
+              {t('cta.budget')}
             </Link>
 
             <a
-              href="tel:+34666666666"
+              href="tel:+34699121023"
               className="flex items-center justify-center gap-3 w-full py-4 bg-white/10 border border-white/20 rounded-2xl text-white font-medium"
             >
-              📞 Truca'ns
+              📞 {t('cta.call')}
             </a>
           </div>
 
           {/* Trust badges */}
           <div className="flex justify-center gap-6 mt-8 text-white/40 text-sm">
-            <span>2+ anys</span>
+            <span>{t('cta.trustYears')}</span>
             <span>•</span>
-            <span>BCN + Girona</span>
+            <span>{t('cta.trustLocation')}</span>
             <span>•</span>
-            <span>2h resposta</span>
+            <span>{t('cta.trustResponse')}</span>
           </div>
         </motion.div>
       </div>
