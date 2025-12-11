@@ -91,8 +91,24 @@
   },
   "hero": {
     "badge": "🎯 Venimos del sector de eventos",
+    "happyClients": "eventos felices",
     "headline1": "A las 4am tu suegra",
     "headline2": "bailaba descalza",
+    "headline3": "El único DJ que te garantiza FIESTAS ÉPICAS",
+    "headlineOld1": "A las 4am tu suegra",
+    "headlineOld2": "bailaba descalza",
+    "countdownPrefix": "Próximo sábado disponible en:",
+    "days": "Días",
+    "hours": "Horas",
+    "mins": "Mins",
+    "secs": "Segs",
+    "urgencyExpired": "¡Consulta disponibilidad ahora!",
+    "scroll": "Descubre más",
+    "trust": {
+      "guarantee": "Garantía 100% satisfacción",
+      "response": "Respuesta en menos de 2h",
+      "equipment": "Equipamiento profesional"
+    },
     "headline": {
       "line1": "A las 4am tu suegra",
       "line2": "bailaba descalza"

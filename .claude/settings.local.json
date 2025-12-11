@@ -16,7 +16,10 @@
       "Bash(git checkout:*)",
       "Bash(git restore:*)",
       "Bash(git commit:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(unzip:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)"
     ]
   }
 }
