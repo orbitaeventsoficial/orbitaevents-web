@@ -1,12 +1,10 @@
 'use client';
 
 /**
- * FlashOffer.tsx - VERSIÓ CONNECTADA A BD
+ * FlashOffer.tsx - VERSIÓ SIMPLIFICADA
  *
- * Canvis respecte l'original:
- * - Carrega configuració des de Settings (BD)
- * - Pot activar/desactivar sense tocar codi
- * - Manté tota la funcionalitat visual original
+ * Desactivat temporalment per evitar errors 401 amb l'API admin/settings
+ * TODO: Crear endpoint públic /api/public/offer-settings quan es necessiti
  */
 
 import { useState, useEffect } from 'react';
@@ -38,7 +36,7 @@ export default function FlashOffer() {
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Carregar configuració des de Settings
+  // Configuració local (no crida API admin)
   useEffect(() => {
     setMounted(true);
 
@@ -52,53 +50,19 @@ export default function FlashOffer() {
       }
     }
 
-    // Carregar configuració des de l'API
-    const loadConfig = async () => {
-      try {
-        const res = await fetch('/api/admin/settings?category=offer');
-
-        if (!res.ok) {
-          // Si l'API falla, desactivar oferta
-          setOfferConfig({ isActive: false, endDate: '', discount: 0, ctaLink: '' });
-          setIsLoading(false);
-          return;
-        }
-
-        const data = await res.json();
-        const settings = data.settings || [];
-
-        // Extreure valors dels settings
-        const getValue = (key: string, defaultValue: string = '') =>
-          settings.find((s: { key: string; value: string }) => s.key === key)?.value || defaultValue;
-
-        const config: OfferConfig = {
-          isActive: getValue('offer_active', 'false') === 'true',
-          endDate: getValue('offer_end_date', ''),
-          discount: parseInt(getValue('offer_discount', '0')) || 0,
-          ctaLink: getValue('offer_cta_link', '/configurador'),
-          title: getValue('offer_title', ''),
-          description: getValue('offer_description', ''),
-        };
-
-        // Validar que la data no hagi passat
-        if (config.endDate) {
-          const endTime = new Date(config.endDate).getTime();
-          const now = Date.now();
-          if (endTime <= now) {
-            config.isActive = false;
-          }
-        }
-
-        setOfferConfig(config);
-      } catch (error) {
-        console.error('Error carregant configuració oferta:', error);
-        setOfferConfig({ isActive: false, endDate: '', discount: 0, ctaLink: '' });
-      } finally {
-        setIsLoading(false);
-      }
+    // Configuració local - desactivat per defecte
+    // Per activar, canviar isActive a true i configurar endDate
+    const config: OfferConfig = {
+      isActive: false, // DESACTIVAT - canviar a true per activar
+      endDate: '', // Format: '2025-12-31T23:59:59'
+      discount: 10,
+      ctaLink: '/configurador',
+      title: '',
+      description: '',
     };
 
-    loadConfig();
+    setOfferConfig(config);
+    setIsLoading(false);
   }, []);
 
   // Countdown timer
