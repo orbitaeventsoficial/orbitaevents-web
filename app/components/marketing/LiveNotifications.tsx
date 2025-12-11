@@ -23,7 +23,8 @@ const iconMap = {
 };
 
 // Configuració
-const NOTIFICATIONS_ENABLED = true;
+// DESACTIVAT: No mostrar notificacions fake fins que tinguem dades reals
+const NOTIFICATIONS_ENABLED = false;
 const SHOW_INTERVAL = 15000; // Mostrar cada 15 segons
 const DISPLAY_DURATION = 6000; // Mostrar durant 6 segons
 

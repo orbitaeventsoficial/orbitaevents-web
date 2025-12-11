@@ -89,12 +89,21 @@ interface UseAvailabilityReturn {
   currentMonthAvailable: number;
 }
 
+// Helper per calcular el proper dissabte
+function getNextSaturday(): string {
+  const now = new Date();
+  const daysUntilSaturday = (6 - now.getDay() + 7) % 7 || 7;
+  const nextSat = new Date(now);
+  nextSat.setDate(now.getDate() + daysUntilSaturday);
+  return nextSat.toISOString().slice(0, 10);
+}
+
 const defaultAvailability: AvailabilityData = {
-  nextAvailableDate: null,
-  nextAvailableSaturday: null,
+  nextAvailableDate: getNextSaturday(),
+  nextAvailableSaturday: getNextSaturday(),
   monthlyAvailability: [],
-  scarcityMessage: 'Cargando...',
-  urgencyLevel: 'low',
+  scarcityMessage: 'Consulta disponibilitat',
+  urgencyLevel: 'medium',
 };
 
 export function useAvailability(): UseAvailabilityReturn {
