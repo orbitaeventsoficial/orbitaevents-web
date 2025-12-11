@@ -517,6 +517,7 @@
     "tagline": "L'esdeveniment que la teva gent no oblidarà"
   },
   "contact": {
+    "title": "Demana Pressupost",
     "errors": {
       "sendError": "S'ha produït un error en enviar el missatge"
     },
@@ -532,7 +533,7 @@
       "submit": "Enviar",
       "success": "Formulari enviat correctament!"
     },
-    "subtitle": "Contacta amb nosaltres"
+    "subtitle": "Explica'ns el teu event i et respondrem en menys de 2 hores"
   },
   "configurator": {
     "step1": {
