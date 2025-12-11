@@ -124,7 +124,9 @@
       "years": "Anys experiència",
       "events": "Events realitzats",
       "response": "Temps resposta",
-      "coverage": "Cobertura"
+      "responseTime": "Temps resposta",
+      "coverage": "Cobertura",
+      "location": "BCN + Girona"
     },
     "serviceLabels": {
       "dj": "DJ",
