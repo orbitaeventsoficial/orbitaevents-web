@@ -1,232 +1,109 @@
-# 🔥 ÒRBITA EVENTS - LA MILLOR WEB DEL PLANETA 🔥
+# 🚀 ÒRBITA EVENTS - REPOSITORI DEFINITIU
 
-## 📦 PAQUET MEGA-MILLORAT v7.0
+## ✅ AQUEST REPOSITORI ESTÀ LLEST PER FUNCIONAR
 
-**Data:** 10 Desembre 2025
-**Arquitecte:** MANOLO - El Teu Arquitecte Digital
+### Què inclou:
+- ✅ Codi complet Next.js 14
+- ✅ Traduccions CA + ES **ARREGLADES** (sense duplicats)
+- ✅ Components BRUTAL (Hero, Testimonials, CTA, WhyUs)
+- ✅ Sistema admin complet
+- ✅ APIs funcionals
+- ✅ Configuració Vercel
 
----
-
-## ✅ MILLORES APLICADES
-
-### 1️⃣ TRADUCCIONS ESPANYOLES COMPLETES
-- **Abans:** 412 línies (INCOMPLET)
-- **Ara:** 1.100+ línies (COMPLET)
-- Totes les seccions traduïdes: hero, services, testimonials, configurator, FAQ, etc.
-- Coherència total entre CA i ES
-
-### 2️⃣ FOOTER ARREGLAT
-- Eliminada redundància "BCN+GI+ Girona"
-- Ara mostra correctament "Barcelona + Girona"
-- metric: '' per evitar duplicitats
-
-### 3️⃣ CONFIGURACIÓ CORRECTA
-- stats-config.ts amb valors reals: 48+ events, 2+ anys, 2h resposta
-- site-config.ts amb dades actualitzades
-- Dates calculades dinàmicament
+### Què necessites afegir:
+- ⚠️ Carpeta `/public/` amb les teves imatges i vídeos
 
 ---
 
-## 🚀 INSTRUCCIONS DE DESPLEGAMENT
+## 📁 ESTRUCTURA /public/ NECESSÀRIA
 
-### Opció 1: Desplegament Ràpid
-
-```bash
-# 1. Descomprimeix el paquet
-unzip orbita-planet-best.zip -d orbita-web
-
-# 2. Instal·la dependències
-cd orbita-web
-npm install
-
-# 3. Verifica que compila
-npm run build
-
-# 4. Desplega a Vercel
-vercel --prod --force
+```
+public/
+├── favicon.ico
+├── icon.svg
+├── apple-touch-icon.png
+├── og-home.jpg                 (imatge OpenGraph 1200x630)
+│
+├── img/
+│   ├── logoplanetatextdreta.svg    ← Logo principal
+│   ├── logosoloplaneta.svg         ← Logo només planeta
+│   ├── hero-home-visual.jpg        ← Imatge hero fallback
+│   └── portfolio/
+│       ├── bodas/
+│       │   └── bodas-01.webp
+│       ├── fiestas-privadas/
+│       │   └── fiestas-privadas-01.webp
+│       ├── eventos-empresa/
+│       │   └── eventos-empresa-01.webp
+│       ├── empresas-cover.webp
+│       └── fiestas-tematicas-halloween/
+│           └── fiestas-tematicas-halloween-01.jpg
+│
+├── images/
+│   ├── tematicas/
+│   │   └── mon-magic/
+│   │       └── hero/
+│   │           └── 01-taula-panoramica-cartell.jpg
+│   └── testimonials/
+│       ├── lorena-carles.jpg
+│       ├── marc.jpg
+│       └── ana.jpg
+│
+└── video/
+    ├── hero.mp4                    ← Vídeo hero principal
+    └── promohalloween.mp4          ← Vídeo promo Halloween
 ```
 
-### Opció 2: Substitució del Repositori Existent
+---
+
+## 🚀 DEPLOYMENT
+
+### Opció 1: GitHub + Vercel (Recomanat)
 
 ```bash
-# 1. Clona el teu repo existent
-git clone https://github.com/orbitaeventsoficial/orbitaevents-web.git
+# 1. Esborra tot el contingut del repo actual a GitHub
+# 2. Descomprimeix aquest ZIP
+# 3. Afegeix la teva carpeta /public/ amb imatges
+
 cd orbitaevents-web
-
-# 2. Elimina els fitxers antics (excepte .git)
-rm -rf app messages lib hooks
-
-# 3. Copia els fitxers nous
-cp -r ../orbita-planet-best/* .
-
-# 4. Commit i push
+git init
 git add -A
-git commit -m "🚀 MEGA UPDATE: Traduccions completes + fixes"
-git push origin main
+git commit -m "🚀 Òrbita Events - Web Definitiva"
+git remote add origin https://github.com/orbitaeventsoficial/orbitaevents-web.git
+git push -f origin main
 ```
 
 ---
 
-## ⚠️ CONFIGURACIÓ CRÍTICA A VERCEL
+## ⚠️ IMPORTANT: CONFIGURACIÓ VERCEL
 
-### DESACTIVA Deployment Protection!
+### Desactivar Deployment Protection:
 
-1. Ves a **Vercel Dashboard** → El teu projecte
+1. **Vercel Dashboard** → Projecte
 2. **Settings** → **Deployment Protection**
-3. Desactiva **"Vercel Authentication"** per al domini de producció
-4. Assegura't que `orbitaevents.com` té **"Public Access"**
+3. **DESACTIVA** "Vercel Authentication"
+4. Guarda
 
-### Força un Redeploy Net
+### Forçar Redeploy sense cache:
 
-```bash
-# Localment
-rm -rf .next node_modules/.cache
-npm ci
-npm run build
-vercel --prod --force
-```
-
-**O des del Dashboard:**
-1. Deployments → Selecciona l'últim
-2. Clica els 3 punts → **"Redeploy"**
-3. Marca **"Build without cache"**
+1. **Deployments** → Últim deployment
+2. Clica **... → Redeploy**
+3. **DESMARCA** "Use existing Build Cache"
+4. Clica **Redeploy**
 
 ---
 
-## 🔍 VERIFICACIÓ POST-DESPLEGAMENT
+## ✅ VERIFICACIÓ POST-DEPLOY
 
-### Checklist:
+Comprova a https://orbitaevents.com:
 
-- [ ] **Hero Stats:** Mostren "2+ anys", "48+ events", "2h resposta"
-- [ ] **Footer:** Mostra "Barcelona + Girona" (no "BCN+GI+ Girona")
-- [ ] **Testimonials:** Text real traduït (no claus i18n com `testimonials.quote`)
-- [ ] **Metadata:** Títols específics per idioma
-- [ ] **NO popup d'autenticació HTTP** a les pàgines públiques
-- [ ] **Idiomes:** CA i ES funcionen perfectament
-
-### URLs de Test:
-
-```
-https://orbitaevents.com/ca          ← Català
-https://orbitaevents.com/es          ← Espanyol
-https://orbitaevents.com/ca/faq      ← FAQ Català
-https://orbitaevents.com/es/contacto ← Contacte Espanyol
-```
+| Element | Ha de mostrar |
+|---------|---------------|
+| Hero stats | "2+ anys", "48+ events", "2h resposta" |
+| Testimonials badge | "Clients Satisfets" |
+| Testimonials text | Text real dels testimonis |
+| Footer coverage | "Barcelona + Girona" |
 
 ---
 
-## 📁 ESTRUCTURA DE FITXERS MODIFICATS
-
-```
-orbita-planet-best/
-├── messages/
-│   ├── ca.json              ← COMPLET (1.665 línies)
-│   └── es.json              ← NOU I COMPLET (1.100+ línies)
-├── app/
-│   ├── config/
-│   │   ├── stats-config.ts  ← Valors correctes
-│   │   └── site-config.ts   ← Dades actualitzades
-│   └── components/
-│       └── ui/
-│           └── footer.tsx   ← Redundància eliminada
-├── vercel.json              ← Headers de seguretat
-└── README.md                ← Aquest fitxer
-```
-
----
-
-## 🎯 SECCIONS TRADUÏDES A ES.JSON
-
-| Secció | Estat |
-|--------|-------|
-| loader | ✅ |
-| meta | ✅ |
-| common | ✅ |
-| hero | ✅ |
-| trust | ✅ |
-| comparison | ✅ |
-| guarantees | ✅ |
-| checkout | ✅ |
-| notifications | ✅ |
-| services | ✅ |
-| stats | ✅ |
-| sections | ✅ |
-| proof | ✅ |
-| transformation | ✅ |
-| guarantee | ✅ |
-| finalCta | ✅ |
-| tematitzacio | ✅ |
-| themes | ✅ |
-| whyUs | ✅ |
-| testimonials | ✅ |
-| ctaSection | ✅ |
-| footer | ✅ |
-| footerLinks | ✅ |
-| nav | ✅ |
-| bottomNav | ✅ |
-| header | ✅ |
-| mobileHeader | ✅ |
-| contact | ✅ |
-| configurator | ✅ |
-| faq | ✅ |
-| reviews | ✅ |
-| packs | ✅ |
-| experiences | ✅ |
-| pages.about | ✅ |
-| pages.portfolio | ✅ |
-| pages.servicios | ✅ |
-| legal | ✅ |
-| sensorial | ✅ |
-| notFound | ✅ |
-| error | ✅ |
-
----
-
-## 🔧 SOLUCIÓ DE PROBLEMES
-
-### Les traduccions no es mostren?
-
-```bash
-# Neteja la cache de Next.js
-rm -rf .next
-npm run build
-```
-
-### El footer encara mostra "BCN+GI+ Girona"?
-
-1. Verifica que `metric: ''` a `footer.tsx` línia 171
-2. Verifica que `coverage: "Barcelona + Girona"` a `messages/ca.json` i `messages/es.json`
-3. Força redeploy sense cache
-
-### Errors d'importació?
-
-```bash
-# Reinstal·la dependències
-rm -rf node_modules package-lock.json
-npm install
-```
-
-### Metadata no canvia amb l'idioma?
-
-Verifica que `app/[locale]/page.tsx` utilitza `generateMetadata()` dinàmic.
-
----
-
-## 📞 SUPORT
-
-Si tens problemes:
-
-1. **Verifica la consola del navegador** (F12 → Console)
-2. **Verifica els logs de Vercel** (Dashboard → Deployments → Logs)
-3. **Neteja la cache del navegador** (Ctrl+Shift+Delete)
-
----
-
-## 🏆 CRÈDITS
-
-**MANOLO** - Arquitecte Digital de Experiències que Venen
-*"No dissenyo webs. Dissenyo trampes emocionals digitals on l'única sortida és contractar Òrbita Events."*
-
----
-
-🔥 **ÒRBITA EVENTS - Fent que les webs facturin des de 2024** 🔥
+**Versió: DEFINITIVA - 10 Desembre 2025**

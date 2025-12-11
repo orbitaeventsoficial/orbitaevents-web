@@ -82,15 +82,32 @@
     }
   },
   "hero": {
-    "badge": "🎯 Venim del sector d'events",
-    "headline1": "A les 4am la teva sogra",
-    "headline2": "ballava descalça",
+    "badge": "🔥 DJ + So + Llums + Efectes Especials",
+    "headline1": "Convertim el teu event en LLEGENDA",
+    "headline2": "DJ + So + Llums + Efectes = MÀGIA",
+    "headline3": "L'únic DJ que et garanteix FESTES ÈPIQUES",
+    "subtitle": "Casaments, festes privades i events corporatius a Barcelona i Girona. Equipament professional de 4000W, llums LED intel·ligents i efectes especials que deixen sense alè.",
+    "countdownPrefix": "Proper dissabte disponible en:",
+    "days": "Dies",
+    "hours": "Hores",
+    "mins": "Mins",
+    "secs": "Segs",
+    "urgencyExpired": "Consulta disponibilitat ara!",
+    "happyClients": "events feliços",
+    "scroll": "Descobreix més",
+    "trust": {
+      "guarantee": "Garantia 100% satisfacció",
+      "response": "Resposta en menys de 2h",
+      "equipment": "Equipament professional"
+    },
+    "headlineOld1": "A les 4am la teva sogra",
+    "headlineOld2": "ballava descalça",
     "headline": {
       "line1": "A les 4am la teva sogra",
       "line2": "ballava descalça"
     },
     "punchline": "Això fem.",
-    "services": "DJ · So · Llums · Màgia",
+    "services": "Música adaptada • Tematització • Animació • Jocs • Efectes especials",
     "location": "Barcelona + Girona",
     "response": "Resposta en 2h",
     "cta": {
@@ -101,11 +118,13 @@
     "scarcity": "Gener 2026: queden 2 dissabtes",
     "mobileCta": "Pressupost Gratis",
     "stats": {
-      "years": "anys experiència",
-      "events": "esdeveniments",
-      "responseTime": "resposta",
-      "location": "BCN + Girona",
-      "response": "Resposta"
+      "dreams": "somnis fets realitat",
+      "rating": "a Google",
+      "repeat": "repeteixen amb nosaltres",
+      "years": "Anys experiència",
+      "events": "Events realitzats",
+      "response": "Temps resposta",
+      "coverage": "Cobertura"
     },
     "serviceLabels": {
       "dj": "DJ",
@@ -141,7 +160,6 @@
     "subtitleEnd": "La música perfecta. Les llums justes. I saps que aquest instant quedarà per sempre.",
     "availableSlots": "{count, plural, =1 {dissabte disponible} other {dissabtes disponibles}} aquest mes",
     "features": "Música adaptada • Tematització • Animació • Jocs • Efectes especials",
-    "services": "Música adaptada • Tematització • Animació • Jocs • Efectes especials",
     "forEvents": "Per a casaments, empreses i festes que mereixen una atenció professional",
     "events": "esdeveniments",
     "yearsLabel": "anys experiència",
@@ -160,11 +178,6 @@
     "closeDemo": "Tancar",
     "bookedRecently": "Reservat fa {time}",
     "scrollDown": "Descobreix les possibilitats",
-    "stats": {
-      "dreams": "somnis fets realitat",
-      "rating": "a Google",
-      "repeat": "repeteixen amb nosaltres"
-    },
     "images": {
       "main": "Espectacular acte a càrrec d'Òrbita Events",
       "weddings": "Serveis de casament",
@@ -278,14 +291,44 @@
     }
   },
   "stats": {
-    "rating": "Google",
-    "events": "esdeveniments",
+    "badge": "📊 Números reals",
+    "title": "Els nostres",
+    "titleHighlight": "resultats",
+    "subtitle": "Dades actualitzades en temps real des de la nostra base de dades. Zero números inventats.",
+    "footer": "Dades actualitzades automàticament. Última actualització: avui.",
+    "googleReviews": "ressenyes a Google",
+    "events": {
+      "label": "Events realitzats",
+      "description": "Casaments, festes i corporatius"
+    },
+    "weddings": {
+      "label": "Casaments",
+      "description": "Dies especials memorables"
+    },
+    "rating": {
+      "label": "Valoració mitjana",
+      "description": "De clients verificats"
+    },
+    "reviews": {
+      "label": "Opinions",
+      "description": "Clients satisfets"
+    },
+    "years": {
+      "label": "Anys d'experiència",
+      "description": "En el sector events"
+    },
+    "coverage": {
+      "label": "Províncies",
+      "description": "Barcelona i Girona"
+    },
+    "ratingOld": "Google",
+    "eventsOld": "esdeveniments",
     "eventsCompleted": "Esdeveniments celebrats",
     "peopleDancing": "gent ballant",
     "recommendRate": "Ens recomanen",
     "yearsExperience": "anys en el sector",
     "satisfaction": "satisfacció",
-    "coverage": "Barcelona + Girona",
+    "coverageOld": "Barcelona + Girona",
     "dedication": "dedicació",
     "response": "Resposta",
     "recommendation": "satisfacció",
@@ -626,10 +669,22 @@
         "description": "<strong>Discomòbil professional</strong> amb DJ itinerant, llums FX espectaculars i tematització total. Casaments amb posades en escena màgiques, festes temàtiques (Món Màgic, Halloween, Nadal, hawaianes) i animacions interactives per a infantils i adults. Tenim ganes, temps i equip PRO per al teu esdeveniment!"
       },
       "stats": {
-        "years": { "value": "2+", "label": "Anys en el sector" },
-        "satisfaction": { "value": "5.0", "label": "Valoració Clients" },
-        "parties": { "value": "BCN", "label": "+ Girona" },
-        "events": { "value": "2h", "label": "Resposta" }
+        "years": {
+          "value": "2+",
+          "label": "Anys en el sector"
+        },
+        "satisfaction": {
+          "value": "5.0",
+          "label": "Valoració Clients"
+        },
+        "parties": {
+          "value": "BCN",
+          "label": "+ Girona"
+        },
+        "events": {
+          "value": "2h",
+          "label": "Resposta"
+        }
       },
       "history": {
         "title": "La Nostra Història: De la Passió a la Independència",
@@ -640,20 +695,50 @@
       "services": {
         "title": "El Que Fem (i Estimem)",
         "items": {
-          "discomovil": { "title": "Discomòbil Itinerant", "desc": "DJ professional + equip complet per a qualsevol localització." },
-          "lights": { "title": "Llums i FX Espectaculars", "desc": "LED, làser, fum, CO2, confeti. Efectes que fan fotos virals." },
-          "theming": { "title": "Tematització Total", "desc": "Món Màgic, Halloween, Nadal, hawaianes, cap d'any. Mons immersius." },
-          "kids": { "title": "Festes Infantils", "desc": "Animacions, jocs, trivial interactiu. Diversió garantida." },
-          "weddings": { "title": "Casaments Memorables", "desc": "Posades en escena màgiques, cerimònia + ball inoblidable." },
-          "animations": { "title": "Animacions Interactives", "desc": "Trivial, jocs, dinàmiques. Ningú es queda quiet." }
+          "discomovil": {
+            "title": "Discomòbil Itinerant",
+            "desc": "DJ professional + equip complet per a qualsevol localització."
+          },
+          "lights": {
+            "title": "Llums i FX Espectaculars",
+            "desc": "LED, làser, fum, CO2, confeti. Efectes que fan fotos virals."
+          },
+          "theming": {
+            "title": "Tematització Total",
+            "desc": "Món Màgic, Halloween, Nadal, hawaianes, cap d'any. Mons immersius."
+          },
+          "kids": {
+            "title": "Festes Infantils",
+            "desc": "Animacions, jocs, trivial interactiu. Diversió garantida."
+          },
+          "weddings": {
+            "title": "Casaments Memorables",
+            "desc": "Posades en escena màgiques, cerimònia + ball inoblidable."
+          },
+          "animations": {
+            "title": "Animacions Interactives",
+            "desc": "Trivial, jocs, dinàmiques. Ningú es queda quiet."
+          }
         }
       },
       "team": {
         "title": "L'Equip Darrere de la Màgia",
         "members": {
-          "dj": { "name": "DJ Estrella", "role": "Fundador & Mestre de Pistes", "desc": "Lectura d'ambient nivell pro. Temazo en el moment exacte." },
-          "tech": { "name": "Tècnic FX", "role": "Rei de Llums i Efectes", "desc": "CO2, làser, fum. Fa que sembli Hollywood." },
-          "animator": { "name": "Animador Temàtic", "role": "Creador de Mons", "desc": "Món Màgic, Halloween... Transforma espais." }
+          "dj": {
+            "name": "DJ Estrella",
+            "role": "Fundador & Mestre de Pistes",
+            "desc": "Lectura d'ambient nivell pro. Temazo en el moment exacte."
+          },
+          "tech": {
+            "name": "Tècnic FX",
+            "role": "Rei de Llums i Efectes",
+            "desc": "CO2, làser, fum. Fa que sembli Hollywood."
+          },
+          "animator": {
+            "name": "Animador Temàtic",
+            "role": "Creador de Mons",
+            "desc": "Món Màgic, Halloween... Transforma espais."
+          }
         }
       },
       "cta": {
@@ -694,43 +779,78 @@
           "name": "Casaments",
           "tagline": "El dia més important mereix el millor ambient",
           "desc": "Cerimònia emotiva, còctel elegant i festa memorable. Tot sincronitzat perquè els teus convidats ballin fins que tanquis la barra.",
-          "features": ["DJ que llegeix la sala", "Llums sincronitzades", "Efectes especials", "Coordinació total"]
+          "features": [
+            "DJ que llegeix la sala",
+            "Llums sincronitzades",
+            "Efectes especials",
+            "Coordinació total"
+          ]
         },
         "discomovil": {
           "name": "Discomòbil",
           "tagline": "La festa que els teus amics NO oblidaran",
           "desc": "No posem playlists. Llegim la pista en temps real. Resultat: pista PLENA des de les 23h fins que marxen.",
-          "features": ["Pista plena garantida", "Equipament professional", "Efectes WOW", "Des de 350€"]
+          "features": [
+            "Pista plena garantida",
+            "Equipament professional",
+            "Efectes WOW",
+            "Des de 350€"
+          ]
         },
         "fiestas": {
           "name": "Festes Privades",
           "tagline": "Aniversaris, comiadaments i temàtiques úniques",
           "desc": "Des d'aniversaris extraordinaris fins a comiadaments memorables. Tematització completa disponible (Halloween, anys 80, Món Màgic...).",
-          "features": ["Tematització personalitzada", "DJ + efectes", "Playlist curada", "Des de 350€"]
+          "features": [
+            "Tematització personalitzada",
+            "DJ + efectes",
+            "Playlist curada",
+            "Des de 350€"
+          ]
         },
         "animacionInfantil": {
           "name": "Animació Infantil",
           "tagline": "Jocs, tallers, màgia i diversió per als més petits",
           "desc": "Animadors professionals per a festes d'aniversari, comunions i esdeveniments familiars. Pintacares, globoflèxia, tallers i jocs adaptats a cada edat.",
-          "features": ["Animadors professionals", "Jocs i activitats", "Pintacares + Globoflèxia", "Des de 150€"]
+          "features": [
+            "Animadors professionals",
+            "Jocs i activitats",
+            "Pintacares + Globoflèxia",
+            "Des de 150€"
+          ]
         },
         "empresas": {
           "name": "Esdeveniments Empreses",
           "tagline": "L'esdeveniment que et fa quedar com un crack",
           "desc": "Team building immersiu, sopars d'empresa impactants, presentacions memorables. Facturació + assegurances + zero estrès.",
-          "features": ["Factura immediata", "Equipament professional", "Coordinador 24h", "Des de 400€"]
+          "features": [
+            "Factura immediata",
+            "Equipament professional",
+            "Coordinador 24h",
+            "Des de 400€"
+          ]
         },
         "produccion": {
           "name": "Producció Tècnica",
           "tagline": "Muntatge, operació i gestió sense ensurts",
           "desc": "Disseny tècnic, muntatge professional, operació en directe. Per a productores i organitzadors que necessiten zero problemes.",
-          "features": ["Equip tècnic complet", "Operació in situ", "Pla B garantit", "Des de 700€"]
+          "features": [
+            "Equip tècnic complet",
+            "Operació in situ",
+            "Pla B garantit",
+            "Des de 700€"
+          ]
         },
         "alquiler": {
           "name": "Lloguer",
           "tagline": "Equipament professional amb o sense tècnic",
           "desc": "EV ETX-15P, B-150 LED, Pioneer DJ. Lloga l'equip que fem servir als nostres esdeveniments. Lliurament inclòs.",
-          "features": ["EV + Pioneer + B-150", "Amb/sense tècnic", "Backup garantit", "Consultar"]
+          "features": [
+            "EV + Pioneer + B-150",
+            "Amb/sense tècnic",
+            "Backup garantit",
+            "Consultar"
+          ]
         }
       },
       "viewService": "Veure servei",
@@ -842,65 +962,57 @@
     "extraDj": "DJ extra"
   },
   "testimonials": {
-    "badge": "Opinions verificades",
-    "title": "El que diuen",
-    "titleHighlight": "els nostres clients",
-    "subtitle": "Històries reals d'esdeveniments que transformem en moments inoblidables",
+    "badge": "⭐ Opinions verificades",
+    "title": "El que diuen els nostres",
+    "titleHighlight": "clients",
+    "subtitle": "Opinions reals de clients reals. Sense trampa ni cartó.",
     "verified": "Verificat",
-    "cta": "Ja has celebrat un event amb nosaltres?",
+    "cta": "Has celebrat un event amb nosaltres?",
     "ctaButton": "Comparteix la teva experiència",
     "viewAll": "Veure totes les opinions",
-    "leaveReview": "Deixa la teva opinió",
-    "satisfiedClient": "Client satisfet",
+    "error": "Error carregant opinions",
     "stats": {
-      "googleRating": "Rating Google",
-      "events": "Esdeveniments",
-      "recommend": "Recomanen",
-      "satisfaction": "Satisfacció"
+      "googleRating": "Valoració Google",
+      "events": "Events realitzats",
+      "rating": "Valoració mitjana",
+      "reviews": "Opinions"
+    },
+    "eventTypes": {
+      "wedding": "Casament",
+      "boda": "Casament",
+      "corporate": "Corporatiu",
+      "empresa": "Corporatiu",
+      "party": "Festa",
+      "festa": "Festa",
+      "birthday": "Aniversari",
+      "aniversari": "Aniversari"
+    },
+    "emptyState": {
+      "title": "Sigues el primer!",
+      "description": "Encara no tenim opinions publicades. Contracta'ns i deixa la primera!",
+      "cta": "Sol·licita pressupost"
+    },
+    "gamification": {
+      "title": "Deixa la teva opinió i guanya fins a 25% de descompte!",
+      "description": "Valora'ns i acumula descomptes pel teu proper event. Més detalls = més beneficis!",
+      "cta": "Deixa opinió"
     },
     "testimonial1": {
-      "quote": "Van transformar el nostre casament en màgia pura. Les espelmes flotants, els sobres amb lacre personalitzat, l'ambient... els convidats encara en parlen! A les 4am la pista seguia plena.",
-      "author": "Lorena & Carles",
-      "role": "Casament temàtic",
-      "date": "Juliol 2025",
-      "eventType": "Casament Món Màgic",
-      "highlight": "200 convidats"
-    },
-    "testimonial2": {
-      "quote": "El millor aniversari de la meva vida. La decoració de Halloween va ser INCREÏBLE, el fum baix, els llums sincronitzats amb la música... Semblava una producció de pel·lícula.",
-      "author": "Marc Rodríguez",
-      "role": "Aniversari",
-      "date": "Octubre 2024",
-      "eventType": "Festa Halloween",
-      "highlight": "80 convidats"
-    },
-    "testimonial3": {
-      "quote": "Vam contractar Òrbita pel nostre event corporatiu i van superar totes les expectatives. Professionalitat màxima, es van coordinar perfectament amb el càtering i el timing va ser impecable.",
-      "author": "Ana García",
-      "role": "Directora RRHH",
-      "date": "Novembre 2024",
-      "eventType": "Event Corporatiu",
-      "highlight": "Empresa tech"
-    },
-    "items": {
-      "wedding": {
-        "quote": "La millor decisió que vam prendre per al nostre casament. La temàtica d'Escola de Màgia era meravellosa. El DJ va fer una feina extraordinària. Espectacular.",
-        "author": "Casament a Granollers",
-        "role": "setembre de 2024"
-      },
-      "birthday": {
-        "quote": "Vaig llogar la discoteca mòbil i els meus amics encara em pregunten on vaig trobar el DJ. Els efectes especials i la posada en escena van ser espectaculars. Repetiria al 100%.",
-        "author": "30è aniversari",
-        "role": "Octubre 2024"
-      },
-      "corporate": {
-        "quote": "Necessitàvem un esdeveniment corporatiu diferent. Exactament això ens ha donat l'Òrbita: equipament professional, coordinació perfecta i una animació de la qual encara parla l'equip.",
-        "author": "Esdeveniment empresarial",
-        "role": "novembre de 2024"
-      }
+      "eventType": "Casament temàtic",
+      "highlight": "Una experiència màgica!",
+      "quote": "Van transformar el nostre casament en una experiència de Món Màgic increïble. Els convidats encara en parlen! La decoració, les llums, la música... tot perfecte. Van superar totes les nostres expectatives.",
+      "author": "Lorena i Carles",
+      "role": "Nuvis - Casament Món Màgic",
+      "date": "Juliol 2025"
     }
   },
   "urgency": {
+    "consultNow": "Consulta disponibilitat ara!",
+    "nextSaturday": "Proper dissabte en:",
+    "saturdaysAvailable": "dissabtes disponibles",
+    "nextMonths": "els propers mesos",
+    "cta": "Reserva ara",
+    "defaultMessage": "Consulta la nostra disponibilitat",
     "loadingTitle": "Els caps de setmana s'omplen ràpidament",
     "loadingSubtitle": "Consulta la disponibilitat per a la teva data",
     "checkAvailability": "Consulta la disponibilitat",
@@ -939,8 +1051,8 @@
     "title": "Ho muntarem?",
     "subtitle": "Envia'ns la teva idea. Responem en menys de 2 hores.",
     "configurator": "Configurador",
-      "sensorial": "Espai Sensorial",
-      "monMagic": "Temàtica Món Màgic"
+    "sensorial": "Espai Sensorial",
+    "monMagic": "Temàtica Món Màgic"
   },
   "servicesGrid": {
     "title": "Serveis",
@@ -1507,56 +1619,27 @@
       "us": "Òrbita Events",
       "them": "DJ típic",
       "items": {
-        "1": { "us": "Arribem 3h abans pel muntatge", "them": "Arriben 30 min abans" },
-        "2": { "us": "Equip de backup sempre", "them": "Sense pla B" },
-        "3": { "us": "Coordinem amb càtering/wedding planner", "them": "Només posen música" },
-        "4": { "us": "Tematització completa disponible", "them": "Només llums bàsiques" },
-        "5": { "us": "Resposta en 2 hores", "them": "Resposta en dies" }
+        "1": {
+          "us": "Arribem 3h abans pel muntatge",
+          "them": "Arriben 30 min abans"
+        },
+        "2": {
+          "us": "Equip de backup sempre",
+          "them": "Sense pla B"
+        },
+        "3": {
+          "us": "Coordinem amb càtering/wedding planner",
+          "them": "Només posen música"
+        },
+        "4": {
+          "us": "Tematització completa disponible",
+          "them": "Només llums bàsiques"
+        },
+        "5": {
+          "us": "Resposta en 2 hores",
+          "them": "Resposta en dies"
+        }
       }
-    }
-  },
-  "testimonials": {
-    "badge": "Clients Satisfets",
-    "title": "Què diuen de nosaltres",
-    "titleHighlight": "els nostres clients",
-    "subtitle": "Opinions reals de persones que han confiat en nosaltres",
-    "quote": "Van transformar el nostre casament en màgia pura. Les veles flotants, els sobres amb lacre personalitzat, l'ambient... els convidats encara en parlen!",
-    "author": "Lorena i Carles",
-    "event": "Casament temàtic Món Màgic",
-    "date": "Juliol 2025",
-    "verified": "Verificat",
-    "cta": "Has celebrat un event amb nosaltres?",
-    "ctaButton": "Comparteix la teva experiència",
-    "viewAll": "Veure totes les opinions",
-    "stats": {
-      "googleRating": "Valoració Google",
-      "events": "Events realitzats",
-      "recommend": "Ens recomanen",
-      "satisfaction": "Satisfacció"
-    },
-    "testimonial1": {
-      "eventType": "Casament temàtic",
-      "highlight": "Una experiència màgica!",
-      "quote": "Van transformar el nostre casament en una experiència de Món Màgic increïble. Els convidats encara en parlen! La decoració, les llums, la música... tot perfecte. Van superar totes les nostres expectatives.",
-      "author": "Lorena i Carles",
-      "role": "Nuvis - Casament Món Màgic",
-      "date": "Juliol 2025"
-    },
-    "testimonial2": {
-      "eventType": "Festa privada",
-      "highlight": "Professionals de veritat",
-      "quote": "Vam contractar-los per l'aniversari dels 50 del meu pare i va ser brutal. El DJ va saber llegir l'ambient perfectament i la gent no va parar de ballar fins les 5am.",
-      "author": "Marc Puig",
-      "role": "Festa 50 aniversari",
-      "date": "Novembre 2024"
-    },
-    "testimonial3": {
-      "eventType": "Event corporatiu",
-      "highlight": "Molt professionals",
-      "quote": "Per la nostra festa d'empresa necessitàvem quelcom diferent. Òrbita va muntar una temàtica Tropical increïble amb so i llums professionals. Els companys encara ho comenten!",
-      "author": "Anna García",
-      "role": "Directora RRHH",
-      "date": "Desembre 2024"
     }
   },
   "ctaSection": {

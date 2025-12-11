@@ -451,11 +451,26 @@
       "us": "Òrbita Events",
       "them": "DJ típico",
       "items": {
-        "1": { "us": "Llegamos 3h antes para montaje", "them": "Llegan 30 min antes" },
-        "2": { "us": "Equipo de backup siempre", "them": "Sin plan B" },
-        "3": { "us": "Coordinamos con catering/wedding planner", "them": "Solo ponen música" },
-        "4": { "us": "Tematización completa disponible", "them": "Solo luces básicas" },
-        "5": { "us": "Respuesta en 2 horas", "them": "Respuesta en días" }
+        "1": {
+          "us": "Llegamos 3h antes para montaje",
+          "them": "Llegan 30 min antes"
+        },
+        "2": {
+          "us": "Equipo de backup siempre",
+          "them": "Sin plan B"
+        },
+        "3": {
+          "us": "Coordinamos con catering/wedding planner",
+          "them": "Solo ponen música"
+        },
+        "4": {
+          "us": "Tematización completa disponible",
+          "them": "Solo luces básicas"
+        },
+        "5": {
+          "us": "Respuesta en 2 horas",
+          "them": "Respuesta en días"
+        }
       }
     }
   },
@@ -937,10 +952,22 @@
         "description": "<strong>Discomóvil profesional</strong> con DJ itinerante, luces FX espectaculares y tematización total. Bodas con puestas en escena mágicas, fiestas temáticas (Mundo Mágico, Halloween, Navidad, hawaianas) y animaciones interactivas para infantiles y adultos. ¡Tenemos ganas, tiempo y equipo PRO para tu evento!"
       },
       "stats": {
-        "years": { "value": "2+", "label": "Años en el sector" },
-        "satisfaction": { "value": "5.0", "label": "Valoración Clientes" },
-        "parties": { "value": "BCN", "label": "+ Girona" },
-        "events": { "value": "2h", "label": "Respuesta" }
+        "years": {
+          "value": "2+",
+          "label": "Años en el sector"
+        },
+        "satisfaction": {
+          "value": "5.0",
+          "label": "Valoración Clientes"
+        },
+        "parties": {
+          "value": "BCN",
+          "label": "+ Girona"
+        },
+        "events": {
+          "value": "2h",
+          "label": "Respuesta"
+        }
       },
       "history": {
         "title": "Nuestra Historia: De la Pasión a la Independencia",
@@ -951,20 +978,50 @@
       "services": {
         "title": "Lo Que Hacemos (y Amamos)",
         "items": {
-          "discomovil": { "title": "Discomóvil Itinerante", "desc": "DJ profesional + equipo completo para cualquier ubicación." },
-          "lights": { "title": "Luces y FX Espectaculares", "desc": "LED, láser, humo, CO2, confeti. Efectos que hacen fotos virales." },
-          "theming": { "title": "Tematización Total", "desc": "Mundo Mágico, Halloween, Navidad, hawaianas, fin de año. Mundos inmersivos." },
-          "kids": { "title": "Fiestas Infantiles", "desc": "Animaciones, juegos, trivial interactivo. Diversión garantizada." },
-          "weddings": { "title": "Bodas Memorables", "desc": "Puestas en escena mágicas, ceremonia + baile inolvidable." },
-          "animations": { "title": "Animaciones Interactivas", "desc": "Trivial, juegos, dinámicas. Nadie se queda quieto." }
+          "discomovil": {
+            "title": "Discomóvil Itinerante",
+            "desc": "DJ profesional + equipo completo para cualquier ubicación."
+          },
+          "lights": {
+            "title": "Luces y FX Espectaculares",
+            "desc": "LED, láser, humo, CO2, confeti. Efectos que hacen fotos virales."
+          },
+          "theming": {
+            "title": "Tematización Total",
+            "desc": "Mundo Mágico, Halloween, Navidad, hawaianas, fin de año. Mundos inmersivos."
+          },
+          "kids": {
+            "title": "Fiestas Infantiles",
+            "desc": "Animaciones, juegos, trivial interactivo. Diversión garantizada."
+          },
+          "weddings": {
+            "title": "Bodas Memorables",
+            "desc": "Puestas en escena mágicas, ceremonia + baile inolvidable."
+          },
+          "animations": {
+            "title": "Animaciones Interactivas",
+            "desc": "Trivial, juegos, dinámicas. Nadie se queda quieto."
+          }
         }
       },
       "team": {
         "title": "El Equipo Detrás de la Magia",
         "members": {
-          "dj": { "name": "DJ Estrella", "role": "Fundador & Maestro de Pistas", "desc": "Lectura de ambiente nivel pro. Temazo en el momento exacto." },
-          "tech": { "name": "Técnico FX", "role": "Rey de Luces y Efectos", "desc": "CO2, láser, humo. Hace que parezca Hollywood." },
-          "animator": { "name": "Animador Temático", "role": "Creador de Mundos", "desc": "Mundo Mágico, Halloween... Transforma espacios." }
+          "dj": {
+            "name": "DJ Estrella",
+            "role": "Fundador & Maestro de Pistas",
+            "desc": "Lectura de ambiente nivel pro. Temazo en el momento exacto."
+          },
+          "tech": {
+            "name": "Técnico FX",
+            "role": "Rey de Luces y Efectos",
+            "desc": "CO2, láser, humo. Hace que parezca Hollywood."
+          },
+          "animator": {
+            "name": "Animador Temático",
+            "role": "Creador de Mundos",
+            "desc": "Mundo Mágico, Halloween... Transforma espacios."
+          }
         }
       },
       "cta": {
@@ -1005,25 +1062,42 @@
           "name": "Bodas",
           "tagline": "El día más importante merece el mejor ambiente",
           "desc": "Ceremonia emotiva, cóctel elegante y fiesta memorable. Todo sincronizado para que tus invitados bailen hasta que cierres la barra.",
-          "features": ["DJ que lee la sala", "Luces sincronizadas", "Efectos especiales", "Coordinación total"]
+          "features": [
+            "DJ que lee la sala",
+            "Luces sincronizadas",
+            "Efectos especiales",
+            "Coordinación total"
+          ]
         },
         "discomovil": {
           "name": "Discomóvil",
           "tagline": "DJ profesional donde lo necesites",
           "desc": "Llevamos la fiesta donde quieras: jardines, masías, playas, locales. Equipo completo autónomo.",
-          "features": ["Equipo portátil completo", "Autonomía total", "Cualquier ubicación"]
+          "features": [
+            "Equipo portátil completo",
+            "Autonomía total",
+            "Cualquier ubicación"
+          ]
         },
         "fiestas": {
           "name": "Fiestas Privadas",
           "tagline": "La fiesta que tu gente no olvidará",
           "desc": "Cumpleaños, aniversarios, comuniones, graduaciones. Adaptamos el ambiente a cada celebración.",
-          "features": ["Música personalizada", "Juegos y animación", "Efectos especiales"]
+          "features": [
+            "Música personalizada",
+            "Juegos y animación",
+            "Efectos especiales"
+          ]
         },
         "empresas": {
           "name": "Empresas",
           "tagline": "Eventos corporativos de impacto",
           "desc": "Team building, cenas de empresa, inauguraciones, presentaciones. Profesionalidad garantizada.",
-          "features": ["Imagen corporativa", "Coordinación total", "Sonido profesional"]
+          "features": [
+            "Imagen corporativa",
+            "Coordinación total",
+            "Sonido profesional"
+          ]
         }
       }
     }

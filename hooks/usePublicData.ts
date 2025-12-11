@@ -166,18 +166,32 @@ interface UseStatsReturn {
   refetch: () => void;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// VALORS MÍNIMS GARANTITS
+// Aquests són els valors mínims que mostrarem. Si la BD té més, es mostrarà el real.
+// ═══════════════════════════════════════════════════════════════════════════
+const MINIMUM_STATS = {
+  totalEvents: 48,      // Mínim 48 events
+  totalWeddings: 15,    // Mínim 15 casaments
+  totalCorporate: 10,   // Mínim 10 corporatius
+  totalParties: 20,     // Mínim 20 festes
+  averageRating: 4.9,   // Mínim 4.9 rating
+  googleRating: 4.9,    // Mínim 4.9 Google
+  googleReviewsCount: 20, // Mínim 20 reviews
+};
+
 const defaultStats: StatsData = {
   yearsExperience: '2+',
   coverage: 'BCN + Girona',
   responseTime: '2h',
-  totalEvents: 150,
-  totalWeddings: 50,
-  totalCorporate: 30,
-  totalParties: 70,
+  totalEvents: MINIMUM_STATS.totalEvents,
+  totalWeddings: MINIMUM_STATS.totalWeddings,
+  totalCorporate: MINIMUM_STATS.totalCorporate,
+  totalParties: MINIMUM_STATS.totalParties,
   totalTestimonials: 0,
-  averageRating: 5,
-  googleRating: 4.9,
-  googleReviewsCount: 50,
+  averageRating: MINIMUM_STATS.averageRating,
+  googleRating: MINIMUM_STATS.googleRating,
+  googleReviewsCount: MINIMUM_STATS.googleReviewsCount,
 };
 
 export function usePublicStats(): UseStatsReturn {
@@ -200,8 +214,19 @@ export function usePublicStats(): UseStatsReturn {
       const json = await response.json();
 
       if (json.ok) {
-        setStats(json.stats);
-        setCachedData('stats', json.stats);
+        // Aplicar mínims: mostrem el valor real si és major que el mínim
+        const statsWithMinimums: StatsData = {
+          ...json.stats,
+          totalEvents: Math.max(json.stats.totalEvents || 0, MINIMUM_STATS.totalEvents),
+          totalWeddings: Math.max(json.stats.totalWeddings || 0, MINIMUM_STATS.totalWeddings),
+          totalCorporate: Math.max(json.stats.totalCorporate || 0, MINIMUM_STATS.totalCorporate),
+          totalParties: Math.max(json.stats.totalParties || 0, MINIMUM_STATS.totalParties),
+          averageRating: Math.max(json.stats.averageRating || 0, MINIMUM_STATS.averageRating),
+          googleRating: json.stats.googleRating ? Math.max(json.stats.googleRating, MINIMUM_STATS.googleRating) : MINIMUM_STATS.googleRating,
+          googleReviewsCount: json.stats.googleReviewsCount ? Math.max(json.stats.googleReviewsCount, MINIMUM_STATS.googleReviewsCount) : MINIMUM_STATS.googleReviewsCount,
+        };
+        setStats(statsWithMinimums);
+        setCachedData('stats', statsWithMinimums);
         setError(null);
       } else {
         setError(json.error || 'Error desconocido');

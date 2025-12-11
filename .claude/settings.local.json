@@ -1,16 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm install)",
+      "Bash(pnpm i)",
       "Bash(pnpm run build:*)",
-      "Bash(git init:*)",
+      "Bash(pnpm run dev)",
       "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git branch:*)",
-      "Bash(git remote add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix: graceful Supabase null handling for build without env vars\n\n- Changed supabase clients to return null when not configured\n- Added null checks to all API routes using supabaseAdmin\n- Added null checks to customerService and testimonialService\n- Allows build to succeed without Supabase environment variables\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git push:*)",
-      "Bash(vercel:*)",
-      "Bash(git checkout:*)"
+      "Bash(npx vercel:*)",
+      "WebFetch(domain:orbitaevents.com)",
+      "Bash(taskkill:*)",
+      "Bash(timeout /t 3 /nobreak)",
+      "Bash(if exist .next rmdir /s /q .next)",
+      "Bash(git reset:*)"
     ]
   }
 }
