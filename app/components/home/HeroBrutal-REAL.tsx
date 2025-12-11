@@ -220,13 +220,18 @@ export default function HeroBrutalReal() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
 
-  // Headlines que roten
+  // Headlines que roten - ara cada una pot tenir 2 línies
   const headlines = [
-    t('headline1') || 'Convertim el teu event en LLEGENDA',
-    t('headline2') || 'DJ + So + Llums + Efectes = MÀGIA',
-    t('headline3') || "L'únic DJ que et garanteix FESTES ÈPIQUES",
+    {
+      line1: t('headline1') || 'A les 4am la teva sogra',
+      line2: t('headline2') || 'BALLAVA DESCALÇA'
+    },
+    {
+      line1: t('headline3') || "L'únic DJ que et garanteix",
+      line2: 'FESTES ÈPIQUES'
+    },
   ];
-  
+
   const [currentHeadline, setCurrentHeadline] = useState(0);
 
   useEffect(() => {
@@ -296,8 +301,8 @@ export default function HeroBrutalReal() {
             </span>
           </motion.div>
 
-          {/* Headline rotativa */}
-          <div className="h-[120px] md:h-[160px] mb-6 overflow-hidden">
+          {/* Headline rotativa - dues línies */}
+          <div className="min-h-[140px] md:min-h-[200px] mb-6 flex flex-col items-center justify-center">
             <AnimatePresence mode="wait">
               <motion.h1
                 key={currentHeadline}
@@ -305,20 +310,16 @@ export default function HeroBrutalReal() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -50 }}
                 transition={{ duration: 0.5 }}
-                className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight"
+                className="text-center"
               >
-                {headlines[currentHeadline].split(' ').map((word, i) => (
-                  <span
-                    key={i}
-                    className={
-                      word.toUpperCase() === word && word.length > 2
-                        ? 'text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500'
-                        : ''
-                    }
-                  >
-                    {word}{' '}
-                  </span>
-                ))}
+                {/* Línia 1 - text blanc */}
+                <span className="block text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-2">
+                  {headlines[currentHeadline].line1}
+                </span>
+                {/* Línia 2 - text destacat en gradient */}
+                <span className="block text-4xl md:text-6xl lg:text-7xl font-black leading-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
+                  {headlines[currentHeadline].line2}
+                </span>
               </motion.h1>
             </AnimatePresence>
           </div>
