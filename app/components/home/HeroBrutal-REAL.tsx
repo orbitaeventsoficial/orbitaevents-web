@@ -213,6 +213,23 @@ function GoogleRatingBadge() {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Headlines per idioma - hardcoded per garantir que sempre funciona
+const HEADLINES_CA = [
+  { line1: 'A les 4am la teva sogra', line2: 'BALLAVA DESCALÇA' },
+  { line1: "L'únic DJ que et garanteix", line2: 'FESTES ÈPIQUES' },
+  { line1: 'Convertim el teu event en', line2: 'LLEGENDA' },
+  { line1: 'No contractes un DJ', line2: "CONTRACTA UNA EXPERIÈNCIA" },
+  { line1: 'El teu casament mereix', line2: 'SER INOLVIDABLE' },
+];
+
+const HEADLINES_ES = [
+  { line1: 'A las 4am tu suegra', line2: 'BAILABA DESCALZA' },
+  { line1: 'El único DJ que te garantiza', line2: 'FIESTAS ÉPICAS' },
+  { line1: 'Convertimos tu evento en', line2: 'LEYENDA' },
+  { line1: 'No contrates un DJ', line2: 'CONTRATA UNA EXPERIENCIA' },
+  { line1: 'Tu boda merece', line2: 'SER INOLVIDABLE' },
+];
+
 export default function HeroBrutalReal() {
   const t = useTranslations('hero');
   const { stats, isLoading: statsLoading } = usePublicStats();
@@ -220,14 +237,9 @@ export default function HeroBrutalReal() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
 
-  // Headlines que roten - llegeix directament de les traduccions
-  const headlines = [
-    { line1: t('headlines.0.line1'), line2: t('headlines.0.line2') },
-    { line1: t('headlines.1.line1'), line2: t('headlines.1.line2') },
-    { line1: t('headlines.2.line1'), line2: t('headlines.2.line2') },
-    { line1: t('headlines.3.line1'), line2: t('headlines.3.line2') },
-    { line1: t('headlines.4.line1'), line2: t('headlines.4.line2') },
-  ];
+  // Detectar idioma pel text del badge
+  const isSpanish = t('badge')?.includes('Sonido') || t('badge')?.includes('Luces');
+  const headlines = isSpanish ? HEADLINES_ES : HEADLINES_CA;
 
   const [currentHeadline, setCurrentHeadline] = useState(0);
 
