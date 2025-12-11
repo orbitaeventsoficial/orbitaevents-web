@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 /**
  * FloatingContactButtons - Botons flotants de contacte
@@ -28,6 +29,7 @@ export default function FloatingContactButtons() {
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const t = useTranslations('floatingButtons');
 
   // Evitar hydration mismatch
   useEffect(() => {
@@ -97,7 +99,7 @@ export default function FloatingContactButtons() {
                     style={{ minHeight: '48px' }}
                   >
                     <span className="text-xl">📞</span>
-                    <span className="whitespace-nowrap">Trucar ara</span>
+                    <span className="whitespace-nowrap">{t('callNow')}</span>
                   </motion.a>
 
                   {/* Email */}
@@ -111,7 +113,7 @@ export default function FloatingContactButtons() {
                     style={{ minHeight: '48px' }}
                   >
                     <span className="text-xl">✉️</span>
-                    <span className="whitespace-nowrap">Email</span>
+                    <span className="whitespace-nowrap">{t('email')}</span>
                   </motion.a>
                 </>
               )}
@@ -154,7 +156,7 @@ export default function FloatingContactButtons() {
               </motion.span>
 
               <span className="whitespace-nowrap">
-                {isExpanded ? 'WhatsApp' : "Contacta'ns!"}
+                {isExpanded ? t('whatsapp') : t('contactUs')}
               </span>
 
               {/* Indicador expandir */}

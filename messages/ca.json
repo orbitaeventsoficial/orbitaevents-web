@@ -467,9 +467,48 @@
     "cta": "Vull aquest tema!",
     "examples": "Veure exemples",
     "testimonial": "\"La tematització d'Escola de Màgia va ser INCREÏBLE. Els convidats no paraven de fer fotos. Semblava que estàvem en un castell encantat de veritat!\"",
+    "testimonialAuthor": "— Lorena i Carles, Casament Món Màgic",
     "custom": "No veus el que busques? Fem",
     "customSuffix": "temàtica que imaginis.",
-    "contact": "Explica'ns la teva idea"
+    "contact": "Explica'ns la teva idea",
+    "themes": {
+      "monmagic": {
+        "name": "Món Màgic",
+        "tagline": "Màgia d'escola de bruixeria al teu event",
+        "description": "Transforma el teu event en una experiència màgica: efectes de varetes, il·luminació de veles flotants, música encantada, i fins i tot humo que sembla màgia real.",
+        "features": ["Efectes de vareta màgica", "Veles flotants", "Efectes de boira màgica", "Playlist temàtica"]
+      },
+      "halloween": {
+        "name": "Halloween",
+        "tagline": "La nit més terrorífica",
+        "description": "Convertim qualsevol espai en una casa encantada: llums vermelles i taronges, humo baixa, efectes de so terrorífics, i una ambientació que farà cridar els teus convidats.",
+        "features": ["Decoració terrorífica", "Efectes de boira", "Llums estroboscòpiques", "So ambient esgarrifós"]
+      },
+      "tropical": {
+        "name": "Tropical",
+        "tagline": "Paradís a Catalunya",
+        "description": "Porta el Carib a casa teva: llums càlides, efectes de palmeres projectades, música reggaeton i salsa, i una atmosfera que et farà sentir a la platja.",
+        "features": ["Projeccions tropicals", "Llums càlides", "Playlist caribenyes", "Efectes de posta de sol"]
+      },
+      "disco": {
+        "name": "Disco 80s",
+        "tagline": "Viatja als anys daurats",
+        "description": "Bola de discoteca gegant, llums de neó, màquina de fum, i els millors hits dels 70s i 80s. Una festa retro que farà ballar a totes les generacions.",
+        "features": ["Bola disco gegant", "Llums de neó", "Vestits d'època opcional", "Greatest hits 70s-80s"]
+      },
+      "elegant": {
+        "name": "Elegant Gold",
+        "tagline": "Sofisticació pura",
+        "description": "Per als que busquen classe i distinció: il·luminació daurada, efectes subtils però impressionants, música lounge i jazz, i una atmosfera de gala.",
+        "features": ["Il·luminació daurada", "Efectes subtils", "Jazz & Lounge", "Ambientació premium"]
+      },
+      "custom": {
+        "name": "La Teva Idea",
+        "tagline": "Tu imagines, nosaltres creem",
+        "description": "Tens una idea diferent? Peaky Blinders, Star Wars, Anime, Medieval... Digue'ns la teva visió i la fem realitat amb efectes, música i ambientació a mida.",
+        "features": ["Disseny personalitzat", "Qualsevol temàtica", "Efectes a mida", "Assessorament creatiu"]
+      }
+    }
   },
   "footer": {
     "trust": {
@@ -1964,6 +2003,63 @@
       "trustResponse": "2h resposta",
       "guarantee": "Resposta garantida en menys de 2h, fins i tot caps de setmana"
     }
+  },
+  "tematitzacio": {
+    "badge": "El Nostre Punt Fort",
+    "title": "Tematització",
+    "titleSuffix": "d'Events",
+    "subtitle": "No fem events normals. Creem experiències immersives que transporten els teus convidats a un altre món.",
+    "cta": "Vull aquest tema!",
+    "examples": "Veure exemples",
+    "testimonial": "\"La tematització màgica va ser INCREÏBLE. Els convidats no paraven de fer fotos. Semblava que estàvem en una escola de bruixeria de veritat!\"",
+    "testimonialAuthor": "— Lorena i Carles, Casament Món Màgic",
+    "custom": "No veus el que busques? Fem",
+    "customSuffix": "temàtica que imaginis.",
+    "contact": "Explica'ns la teva idea",
+    "themes": {
+      "monmagic": {
+        "name": "Món Màgic",
+        "tagline": "Màgia d'escola de bruixeria al teu event",
+        "description": "Transforma el teu event en una experiència màgica: efectes de varetes, il·luminació de veles flotants, música encantada, i fins i tot humo que sembla màgia real.",
+        "features": ["Efectes de vareta màgica", "Veles flotants", "Efectes de boira màgica", "Playlist temàtica"]
+      },
+      "halloween": {
+        "name": "Halloween",
+        "tagline": "La nit més terrorífica",
+        "description": "Convertim qualsevol espai en una casa encantada: llums vermelles i taronges, humo baixa, efectes de so terrorífics, i una ambientació que farà cridar els teus convidats.",
+        "features": ["Decoració terrorífica", "Efectes de boira", "Llums estroboscòpiques", "So ambient esgarrifós"]
+      },
+      "tropical": {
+        "name": "Tropical",
+        "tagline": "Paradís a Catalunya",
+        "description": "Porta el Carib a casa teva: llums càlides, efectes de palmeres projectades, música reggaeton i salsa, i una atmosfera que et farà sentir a la platja.",
+        "features": ["Projeccions tropicals", "Llums càlides", "Playlist caribenyes", "Efectes de posta de sol"]
+      },
+      "disco": {
+        "name": "Disco 80s",
+        "tagline": "Viatja als anys daurats",
+        "description": "Bola de discoteca gegant, llums de neó, màquina de fum, i els millors hits dels 70s i 80s. Una festa retro que farà ballar a totes les generacions.",
+        "features": ["Bola disco gegant", "Llums de neó", "Vestits d'època opcional", "Greatest hits 70s-80s"]
+      },
+      "elegant": {
+        "name": "Elegant Gold",
+        "tagline": "Sofisticació pura",
+        "description": "Per als que busquen classe i distinció: il·luminació daurada, efectes subtils però impressionants, música lounge i jazz, i una atmosfera de gala.",
+        "features": ["Il·luminació daurada", "Efectes subtils", "Jazz & Lounge", "Ambientació premium"]
+      },
+      "custom": {
+        "name": "La Teva Idea",
+        "tagline": "Tu imagines, nosaltres creem",
+        "description": "Tens una idea diferent? Peaky Blinders, Star Wars, Anime, Medieval... Digue'ns la teva visió i la fem realitat amb efectes, música i ambientació a mida.",
+        "features": ["Disseny personalitzat", "Qualsevol temàtica", "Efectes a mida", "Assessorament creatiu"]
+      }
+    }
+  },
+  "floatingButtons": {
+    "callNow": "Trucar ara",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "contactUs": "Contacta'ns!"
   },
   "mobileLanding": {
     "heroSlides": {

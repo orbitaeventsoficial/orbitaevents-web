@@ -480,9 +480,48 @@
     "cta": "¡Quiero este tema!",
     "examples": "Ver ejemplos",
     "testimonial": "\"La tematización de Escuela de Magia fue INCREÍBLE. Los invitados no paraban de hacer fotos. ¡Parecía que estábamos en un castillo encantado de verdad!\"",
+    "testimonialAuthor": "— Lorena y Carles, Boda Mundo Mágico",
     "custom": "¿No ves lo que buscas? Hacemos",
     "customSuffix": "cualquier temática que imagines.",
-    "contact": "Cuéntanos tu idea"
+    "contact": "Cuéntanos tu idea",
+    "themes": {
+      "monmagic": {
+        "name": "Mundo Mágico",
+        "tagline": "Magia de escuela de hechicería en tu evento",
+        "description": "Transforma tu evento en una experiencia mágica: efectos de varitas, iluminación de velas flotantes, música encantada, e incluso humo que parece magia real.",
+        "features": ["Efectos de varita mágica", "Velas flotantes", "Efectos de niebla mágica", "Playlist temática"]
+      },
+      "halloween": {
+        "name": "Halloween",
+        "tagline": "La noche más terrorífica",
+        "description": "Convertimos cualquier espacio en una casa encantada: luces rojas y naranjas, humo bajo, efectos de sonido terroríficos, y una ambientación que hará gritar a tus invitados.",
+        "features": ["Decoración terrorífica", "Efectos de niebla", "Luces estroboscópicas", "Sonido ambiente espeluznante"]
+      },
+      "tropical": {
+        "name": "Tropical",
+        "tagline": "Paraíso en Catalunya",
+        "description": "Trae el Caribe a tu casa: luces cálidas, efectos de palmeras proyectadas, música reggaeton y salsa, y una atmósfera que te hará sentir en la playa.",
+        "features": ["Proyecciones tropicales", "Luces cálidas", "Playlist caribeñas", "Efectos de puesta de sol"]
+      },
+      "disco": {
+        "name": "Disco 80s",
+        "tagline": "Viaja a los años dorados",
+        "description": "Bola de discoteca gigante, luces de neón, máquina de humo, y los mejores hits de los 70s y 80s. Una fiesta retro que hará bailar a todas las generaciones.",
+        "features": ["Bola disco gigante", "Luces de neón", "Disfraces de época opcional", "Greatest hits 70s-80s"]
+      },
+      "elegant": {
+        "name": "Elegant Gold",
+        "tagline": "Sofisticación pura",
+        "description": "Para los que buscan clase y distinción: iluminación dorada, efectos sutiles pero impresionantes, música lounge y jazz, y una atmósfera de gala.",
+        "features": ["Iluminación dorada", "Efectos sutiles", "Jazz & Lounge", "Ambientación premium"]
+      },
+      "custom": {
+        "name": "Tu Idea",
+        "tagline": "Tú imaginas, nosotros creamos",
+        "description": "¿Tienes una idea diferente? Peaky Blinders, Star Wars, Anime, Medieval... Cuéntanos tu visión y la hacemos realidad con efectos, música y ambientación a medida.",
+        "features": ["Diseño personalizado", "Cualquier temática", "Efectos a medida", "Asesoramiento creativo"]
+      }
+    }
   },
   "themes": {
     "badge": "✨ Extra disponible",
@@ -2038,6 +2077,12 @@
       "trustResponse": "2h respuesta",
       "guarantee": "Respuesta garantizada en menos de 2h, incluso fines de semana"
     }
+  },
+  "floatingButtons": {
+    "callNow": "Llamar ahora",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "contactUs": "¡Contáctanos!"
   },
   "mobileLanding": {
     "heroSlides": {
