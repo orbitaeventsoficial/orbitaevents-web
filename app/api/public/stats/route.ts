@@ -46,8 +46,9 @@ interface StatsResponse {
 }
 
 // Fallback stats when DB is not available
+// Fundador amb 15+ anys experiència en sector events, Òrbita Events des de 2023
 const FALLBACK_STATS = {
-  yearsExperience: '2+',
+  yearsExperience: '15+',
   coverage: 'BCN + Girona',
   responseTime: '2h',
   totalEvents: 48,

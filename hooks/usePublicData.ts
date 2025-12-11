@@ -181,7 +181,7 @@ const MINIMUM_STATS = {
 };
 
 const defaultStats: StatsData = {
-  yearsExperience: '2+',
+  yearsExperience: '15+',  // Fundador amb 15+ anys experiència en sector events
   coverage: 'BCN + Girona',
   responseTime: '2h',
   totalEvents: MINIMUM_STATS.totalEvents,

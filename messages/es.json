@@ -109,14 +109,18 @@
     "scarcity": "Enero 2026: quedan 2 sábados",
     "mobileCta": "Presupuesto Gratis",
     "stats": {
-      "years": "años experiencia",
-      "events": "eventos",
-      "responseTime": "respuesta",
+      "years": "años de experiencia",
+      "yearsValue": "15+",
+      "events": "eventos con Òrbita",
+      "eventsValue": "48+",
+      "responseTime": "respuesta garantizada",
+      "responseTimeValue": "2h",
       "location": "BCN + Girona",
-      "response": "Respuesta",
+      "response": "respuesta garantizada",
       "dreams": "sueños hechos realidad",
       "rating": "en Google",
-      "repeat": "repiten con nosotros"
+      "repeat": "repiten con nosotros",
+      "coverage": "Cobertura"
     },
     "serviceLabels": {
       "dj": "DJ",
