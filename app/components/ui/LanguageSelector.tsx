@@ -57,14 +57,35 @@ export default function LanguageSelector({
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
 
     const segments = pathname.split('/');
-    // Si la URL ja té locale, substituir-lo
-    if (languages.some(l => l.code === segments[1])) {
-      segments[1] = newLocale;
-    } else {
-      // Si no té locale, afegir-lo
-      segments.splice(1, 0, newLocale);
+    const hasLocalePrefix = languages.some(l => l.code === segments[1]);
+
+    // Obtenir el path sense locale actual
+    let pathWithoutLocale = hasLocalePrefix
+      ? '/' + segments.slice(2).join('/')
+      : pathname;
+
+    // Normalitzar: assegurar que comença amb /
+    if (!pathWithoutLocale.startsWith('/')) {
+      pathWithoutLocale = '/' + pathWithoutLocale;
     }
-    const newPath = segments.join('/') || '/';
+    // Evitar doble barra
+    if (pathWithoutLocale === '/') {
+      pathWithoutLocale = '';
+    }
+
+    // El defaultLocale és 'ca', amb localePrefix: 'as-needed' no necessita prefix
+    // Altres idiomes necessiten prefix
+    const DEFAULT_LOCALE = 'ca';
+
+    let newPath: string;
+    if (newLocale === DEFAULT_LOCALE) {
+      // Català: sense prefix (as-needed)
+      newPath = pathWithoutLocale || '/';
+    } else {
+      // Altres idiomes: amb prefix
+      newPath = `/${newLocale}${pathWithoutLocale}`;
+    }
+
     router.push(newPath);
   };
 
@@ -210,13 +231,30 @@ export function LanguageSelectorMobile({ className = '' }: { className?: string 
 
   const switchLocale = (newLocale: string) => {
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
+
     const segments = pathname.split('/');
-    if (languages.some(l => l.code === segments[1])) {
-      segments[1] = newLocale;
-    } else {
-      segments.splice(1, 0, newLocale);
+    const hasLocalePrefix = languages.some(l => l.code === segments[1]);
+
+    let pathWithoutLocale = hasLocalePrefix
+      ? '/' + segments.slice(2).join('/')
+      : pathname;
+
+    if (!pathWithoutLocale.startsWith('/')) {
+      pathWithoutLocale = '/' + pathWithoutLocale;
     }
-    router.push(segments.join('/') || '/');
+    if (pathWithoutLocale === '/') {
+      pathWithoutLocale = '';
+    }
+
+    const DEFAULT_LOCALE = 'ca';
+    let newPath: string;
+    if (newLocale === DEFAULT_LOCALE) {
+      newPath = pathWithoutLocale || '/';
+    } else {
+      newPath = `/${newLocale}${pathWithoutLocale}`;
+    }
+
+    router.push(newPath);
     setIsOpen(false);
   };
 
@@ -280,13 +318,30 @@ export function LanguageBar({ className = '' }: { className?: string }) {
 
   const switchLocale = (newLocale: string) => {
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
+
     const segments = pathname.split('/');
-    if (languages.some(l => l.code === segments[1])) {
-      segments[1] = newLocale;
-    } else {
-      segments.splice(1, 0, newLocale);
+    const hasLocalePrefix = languages.some(l => l.code === segments[1]);
+
+    let pathWithoutLocale = hasLocalePrefix
+      ? '/' + segments.slice(2).join('/')
+      : pathname;
+
+    if (!pathWithoutLocale.startsWith('/')) {
+      pathWithoutLocale = '/' + pathWithoutLocale;
     }
-    router.push(segments.join('/') || '/');
+    if (pathWithoutLocale === '/') {
+      pathWithoutLocale = '';
+    }
+
+    const DEFAULT_LOCALE = 'ca';
+    let newPath: string;
+    if (newLocale === DEFAULT_LOCALE) {
+      newPath = pathWithoutLocale || '/';
+    } else {
+      newPath = `/${newLocale}${pathWithoutLocale}`;
+    }
+
+    router.push(newPath);
   };
 
   return (
