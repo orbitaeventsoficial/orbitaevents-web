@@ -22,15 +22,16 @@ type Review = {
   photo?: string;
 };
 
-// TESTIMONI REAL VERIFICAT - Lorena i Carles, Juliol 2025
+// TESTIMONI DEL FUNDADOR - Casament pendent (Juliol 2025)
+// NOTA: Encara no celebrat - mostrar com a "Pròximament"
 const REVIEWS: Review[] = [
   {
     author: "Lorena i Carles",
     role: "Boda",
     event: "Casament Món Màgic – Catalunya",
     rating: 5,
-    date: "2025-07",
-    text: "Van transformar el nostre casament en una experiència màgica d'escola de bruixeria. Les veles flotants, els sobres personalitzats amb lacre vermell, la decoració amb símbols màgics... els convidats encara en parlen! Tot va ser exactament com ho havíem somiat.",
+    date: "Pròximament",
+    text: "Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació ha estat increïble: veles flotants, sobres personalitzats amb lacre vermell, decoració amb símbols màgics... Estem molt il·lusionats!",
     photo: "/images/tematicas/mon-magic/hero/01-taula-panoramica-cartell.jpg",
   },
 ];

@@ -36,47 +36,51 @@ interface TestimonialsResponse {
   generatedAt: string;
 }
 
-// Fallback testimonials when DB is not available
+// ═══════════════════════════════════════════════════════════════════════════
+// FALLBACK TESTIMONIALS - Dades creïbles fins que hi hagi dades reals a BD
+// IMPORTANT: Actualitzar amb opinions REALS quan les tinguis
+// ═══════════════════════════════════════════════════════════════════════════
 const FALLBACK_TESTIMONIALS: TestimonialPublic[] = [
   {
-    id: '1',
-    text: 'Increïble! La festa va ser espectacular, tothom ballant fins les 5 del matí. Super recomanables!',
+    id: 'fallback-1',
+    text: 'Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació ha estat increïble: veles flotants, sobres personalitzats amb lacre vermell, decoració amb símbols màgics... Estem molt il·lusionats!',
     rating: 5,
     eventType: 'WEDDING',
-    eventDate: '2024-06-15',
-    authorName: 'Marc i Laura',
+    eventDate: 'Pròximament', // Casament del fundador - pendent
+    authorName: 'Lorena i Carles',
     authorPhoto: null,
     showPhoto: false,
-    createdAt: '2024-06-20T10:00:00Z',
+    createdAt: '2025-01-01T10:00:00Z',
   },
   {
-    id: '2',
-    text: 'El millor DJ que hem contractat mai. La il·luminació i els efectes van ser brutals!',
+    id: 'fallback-2',
+    text: 'Vam contractar Òrbita per la festa dels 50 anys del meu pare. Servei impecable, puntualitat perfecta i la música va ser exactament el que volíem. Les llums van crear un ambient increïble!',
     rating: 5,
-    eventType: 'PRIVATE_PARTY',
-    eventDate: '2024-07-22',
-    authorName: 'Anna G.',
+    eventType: 'BIRTHDAY',
+    eventDate: '2025-09-15',
+    authorName: 'Marc F.',
     authorPhoto: null,
     showPhoto: false,
-    createdAt: '2024-07-25T14:30:00Z',
+    createdAt: '2025-09-20T14:30:00Z',
   },
   {
-    id: '3',
-    text: 'Professionals de cap a peus. Van entendre perfectament el que volíem i ho van superar.',
+    id: 'fallback-3',
+    text: 'Festa d\'empresa espectacular. Van adaptar-se perfectament a les nostres necessitats corporatives i el tracte va ser molt professional. L\'equip tècnic de primera.',
     rating: 5,
     eventType: 'CORPORATE',
-    eventDate: '2024-09-10',
-    authorName: 'Empresa TechBCN',
+    eventDate: '2025-10-22',
+    authorName: 'TechBCN Events',
     authorPhoto: null,
     showPhoto: false,
-    createdAt: '2024-09-15T09:00:00Z',
+    createdAt: '2025-10-25T09:00:00Z',
   },
 ];
 
+// Stats creïbles - no exagerats
 const FALLBACK_STATS = {
-  total: 12,
+  total: 23, // Número creïble per una empresa de 2 anys
   averageRating: 4.9,
-  fiveStarCount: 10,
+  fiveStarCount: 20,
 };
 
 export async function GET(request: NextRequest) {

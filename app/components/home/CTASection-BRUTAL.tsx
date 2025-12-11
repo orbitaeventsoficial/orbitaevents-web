@@ -28,53 +28,10 @@ import { useTranslations, useLocale } from 'next-intl';
 // ═══════════════════════════════════════════════════════════════════════════
 
 function LiveActivity({ t }: { t: (key: string) => string }) {
-  const [activity, setActivity] = useState({ viewers: 0, recent: '' });
-
-  useEffect(() => {
-    // Simular actividad real - En producción conectar con analytics
-    const names = ['María', 'Carlos', 'Ana', 'David', 'Laura', 'Pablo', 'Lucía', 'Jorge'];
-    const cities = ['Barcelona', 'Girona', 'Sabadell', 'Terrassa', 'Mataró', 'Granollers'];
-
-    setActivity({
-      viewers: Math.floor(Math.random() * 5) + 2,
-      recent: `${names[Math.floor(Math.random() * names.length)]} de ${cities[Math.floor(Math.random() * cities.length)]}`
-    });
-
-    const interval = setInterval(() => {
-      setActivity({
-        viewers: Math.floor(Math.random() * 5) + 2,
-        recent: `${names[Math.floor(Math.random() * names.length)]} de ${cities[Math.floor(Math.random() * cities.length)]}`
-      });
-    }, 15000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm">
-      {/* Live viewers */}
-      <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 rounded-full border border-green-500/20">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-        </span>
-        <span className="text-green-400">{activity.viewers} {t('liveActivity.viewers')}</span>
-      </div>
-
-      {/* Recent inquiry */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activity.recent}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="text-white/50"
-        >
-          📩 {activity.recent} {t('liveActivity.recentRequest')}
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
+  // DESACTIVAT: No mostrar fake viewers fins que tinguem analytics real
+  // Això evita el "0 persones veient ara" que destrossa credibilitat
+  // TODO: ACTIVAR quan tinguem analytics real
+  return null;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

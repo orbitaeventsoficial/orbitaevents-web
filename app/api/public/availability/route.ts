@@ -75,15 +75,23 @@ function getMonthName(month: number): string {
   return months[month];
 }
 
-// Helper to generate fallback availability
+// ═══════════════════════════════════════════════════════════════════════════
+// FALLBACK AVAILABILITY - Dades creïbles quan la BD no està disponible
+// ═══════════════════════════════════════════════════════════════════════════
 function generateFallbackAvailability() {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
 
-  // Generate next available Saturday
+  // Generate next available Saturday (mínim 7 dies endavant per ser creïble)
   const nextSaturday = new Date(now);
-  nextSaturday.setDate(now.getDate() + ((6 - now.getDay() + 7) % 7 || 7));
+  const daysUntilSaturday = (6 - now.getDay() + 7) % 7 || 7;
+  nextSaturday.setDate(now.getDate() + Math.max(daysUntilSaturday, 7));
+
+  // Missatge d'escassetat creïble (no "COMPLETO!" que sembla fake)
+  const monthNames = ['gener', 'febrer', 'març', 'abril', 'maig', 'juny', 
+                      'juliol', 'agost', 'setembre', 'octubre', 'novembre', 'desembre'];
+  const currentMonthName = monthNames[currentMonth];
 
   return {
     ok: true,
@@ -95,13 +103,13 @@ function generateFallbackAvailability() {
         monthName: getMonthName(currentMonth),
         year: currentYear,
         totalSaturdays: 4,
-        availableSaturdays: 2,
+        availableSaturdays: 2, // Creïble: alguns reservats, alguns lliures
         bookedSaturdays: 2,
         blockedSaturdays: 0,
         saturdayDates: [],
       }],
-      scarcityMessage: `${getMonthName(currentMonth)}: quedan 2 sábados`,
-      urgencyLevel: 'medium' as const,
+      scarcityMessage: `${currentMonthName}: queden 2 dissabtes disponibles`,
+      urgencyLevel: 'medium' as const, // No 'critical' que sembla manipulatiu
     },
     generatedAt: new Date().toISOString(),
     source: 'fallback',

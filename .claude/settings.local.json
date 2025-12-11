@@ -12,7 +12,11 @@
       "Bash(taskkill:*)",
       "Bash(timeout /t 3 /nobreak)",
       "Bash(if exist .next rmdir /s /q .next)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)",
+      "Bash(git restore:*)",
+      "Bash(git commit:*)",
+      "Bash(curl:*)"
     ]
   }
 }

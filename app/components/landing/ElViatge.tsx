@@ -152,11 +152,11 @@ const MONS = {
 const TESTIMONIS = [
   {
     id: 1,
-    text: "Van transformar el nostre casament en una experiència màgica d'escola de bruixeria. Els convidats encara en parlen. El DJ va llegir l'ambient perfectament. INCREÏBLE.",
+    text: "Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació està sent increïble: veles flotants, decoració màgica... Estem molt il·lusionats!",
     nom: 'Lorena & Carles',
     event: 'Boda Món Màgic',
     lloc: 'Catalunya',
-    data: 'Juliol 2025',
+    data: 'Pròximament',
     foto: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-06.webp',
     rating: 5,
   },

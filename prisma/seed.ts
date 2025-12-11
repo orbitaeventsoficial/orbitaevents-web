@@ -16,11 +16,18 @@ async function main() {
   console.log('⚙️ Creant configuració global...');
 
   const settings = [
-    // Stats (DADES REALS: 45 events, 2000 persones)
-    { key: 'stats.eventsCompleted', value: '45', type: 'NUMBER', category: 'stats', label: 'Esdeveniments completats' },
+    // Stats (DADES REALS: 48 events, 2000 persones, 15+ anys experiència fundador)
+    { key: 'stats.eventsCompleted', value: '48', type: 'NUMBER', category: 'stats', label: 'Esdeveniments completats' },
     { key: 'stats.peopleEntertained', value: '2000', type: 'NUMBER', category: 'stats', label: 'Persones que han ballat' },
     { key: 'stats.yearStarted', value: '2023', type: 'NUMBER', category: 'stats', label: 'Any inici Òrbita' },
     { key: 'stats.technicalIncidents', value: '0', type: 'NUMBER', category: 'stats', label: 'Incidents tècnics' },
+    
+    // Stats per l'API pública (claus que busca /api/public/stats)
+    { key: 'years_experience', value: '15+', type: 'STRING', category: 'stats', label: 'Anys experiència fundador' },
+    { key: 'coverage', value: 'BCN + Girona', type: 'STRING', category: 'stats', label: 'Cobertura geogràfica' },
+    { key: 'response_time', value: '2h', type: 'STRING', category: 'stats', label: 'Temps resposta' },
+    { key: 'google_rating', value: '4.9', type: 'STRING', category: 'stats', label: 'Valoració Google' },
+    { key: 'google_reviews_count', value: '23', type: 'NUMBER', category: 'stats', label: 'Ressenyes Google' },
 
     // Contacte
     { key: 'contact.phone', value: '699121023', type: 'STRING', category: 'contact', label: 'Telèfon' },

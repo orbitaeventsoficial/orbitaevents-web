@@ -1,27 +1,28 @@
 "use client";
 // app/components/marketing/VideoTestimonials.tsx
-// ACTUALITZACIÓ: NOMÉS TESTIMONIS REALS - Lorena i Carles (Juliol 2025)
+// ACTUALITZACIÓ: Testimoni del fundador (casament pendent Juliol 2025)
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Star, Quote, MapPin, CheckCircle, Sparkles } from 'lucide-react';
+import { Star, Quote, MapPin, Clock, Sparkles } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 
-// TESTIMONI REAL - Lorena i Carles, Casament Món Màgic, Juliol 2025
+// TESTIMONI DEL FUNDADOR - Casament pendent (Juliol 2025)
+// NOTA: Aquest és el casament del fundador d'Òrbita Events, encara no celebrat
 const REAL_TESTIMONIAL = {
   name: 'Lorena i Carles',
   event: 'Casament Món Màgic',
-  date: 'Juliol 2025',
+  date: 'Pròximament',
   location: 'Catalunya',
   quote: {
-    ca: "Van transformar el nostre casament en una experiència màgica d'escola de bruixeria. Les veles flotants, els sobres personalitzats amb lacre vermell, la decoració amb símbols màgics... els convidats encara en parlen! Tot va ser exactament com ho havíem somiat.",
-    es: "Transformaron nuestra boda en una experiencia mágica de escuela de brujos. Las velas flotantes, los sobres personalizados con lacre rojo, la decoración con símbolos mágicos... los invitados aún hablan de ello! Todo fue exactamente como lo habíamos soñado."
+    ca: "Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació ha estat increïble: veles flotants, sobres personalitzats amb lacre vermell, decoració amb símbols màgics... Estem molt il·lusionats!",
+    es: "Estamos preparando nuestra boda temática con Òrbita Events. La planificación ha sido increíble: velas flotantes, sobres personalizados con lacre rojo, decoración con símbolos mágicos... ¡Estamos muy ilusionados!"
   },
   image: '/images/tematicas/mon-magic/hero/01-taula-panoramica-cartell.jpg',
   rating: 5,
-  verified: true
+  verified: false  // Canviat a false perquè encara no ha passat
 };
 
 function VideoTestimonials() {
@@ -31,16 +32,16 @@ function VideoTestimonials() {
   const quote = locale === 'ca' ? REAL_TESTIMONIAL.quote.ca : REAL_TESTIMONIAL.quote.es;
   const texts = {
     ca: {
-      badge: 'Testimoni Real',
-      verifiedClient: 'Client verificat',
+      badge: 'Proper Casament',
+      upcomingEvent: 'Pròximament',
       wantSame: 'Vols una experiència així?',
       seeHP: 'Descobreix Món Màgic',
       leaveReview: 'Deixa la teva opinió',
       hadEvent: 'Has celebrat un event amb nosaltres?'
     },
     es: {
-      badge: 'Testimonio Real',
-      verifiedClient: 'Cliente verificado',
+      badge: 'Próxima Boda',
+      upcomingEvent: 'Próximamente',
       wantSame: '¿Quieres una experiencia así?',
       seeHP: 'Descubre Mundo Mágico',
       leaveReview: 'Deja tu opinión',
@@ -59,8 +60,8 @@ function VideoTestimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-oe-gold/10 border border-oe-gold/30 text-oe-gold text-sm font-medium mb-6">
-              <CheckCircle className="w-4 h-4" />
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm font-medium mb-6">
+              <Clock className="w-4 h-4" />
               {content.badge}
             </span>
             <h2 className="text-3xl md:text-4xl font-display font-black text-white mb-4">
@@ -92,10 +93,10 @@ function VideoTestimonials() {
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-bg-surface/80 hidden md:block" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg-surface via-transparent to-transparent md:hidden" />
 
-              {/* Badge verificat */}
-              <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-green-500/90 backdrop-blur rounded-full">
-                <CheckCircle className="w-4 h-4 text-white" />
-                <span className="text-white text-sm font-medium">{content.verifiedClient}</span>
+              {/* Badge pròximament */}
+              <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-amber-500/90 backdrop-blur rounded-full">
+                <Clock className="w-4 h-4 text-white" />
+                <span className="text-white text-sm font-medium">{content.upcomingEvent}</span>
               </div>
 
               {/* Event badge */}

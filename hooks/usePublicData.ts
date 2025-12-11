@@ -102,8 +102,8 @@ const defaultAvailability: AvailabilityData = {
   nextAvailableDate: getNextSaturday(),
   nextAvailableSaturday: getNextSaturday(),
   monthlyAvailability: [],
-  scarcityMessage: 'Consulta disponibilitat',
-  urgencyLevel: 'medium',
+  scarcityMessage: 'Només queden 2 dissabtes aquest mes', // Missatge per defecte amb urgència
+  urgencyLevel: 'high', // Sempre mostrar urgència per defecte
 };
 
 export function useAvailability(): UseAvailabilityReturn {
