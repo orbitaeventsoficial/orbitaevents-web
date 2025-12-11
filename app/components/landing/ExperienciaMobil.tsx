@@ -51,6 +51,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════════════
 // 📸 DADES - Les fotos REALS d'Òrbita
@@ -156,7 +157,8 @@ const TESTIMONIS = [
 
 export default function ExperienciaMobil() {
   const [isMounted, setIsMounted] = useState(false);
-  
+  const t = useTranslations('mobileExperience');
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -169,25 +171,25 @@ export default function ExperienciaMobil() {
     <main className="bg-black min-h-screen overflow-x-hidden selection:bg-amber-500/30">
       {/* Capa de màgia interactiva */}
       <MagicTouchLayer />
-      
+
       {/* CAPÍTOL 1: L'ENCANTAMENT */}
-      <Capitol1_Encantament />
-      
+      <Capitol1_Encantament t={t} />
+
       {/* CAPÍTOL 2: LA REVELACIÓ */}
-      <Capitol2_Revelacio />
-      
+      <Capitol2_Revelacio t={t} />
+
       {/* CAPÍTOL 3: ELS REGNES */}
-      <Capitol3_Regnes />
-      
+      <Capitol3_Regnes t={t} />
+
       {/* CAPÍTOL 4: LES PROVES (Galeria extra) */}
-      <Capitol4_Proves />
-      
+      <Capitol4_Proves t={t} />
+
       {/* CAPÍTOL 5: ELS TESTIMONIS */}
-      <Capitol5_Testimonis />
-      
+      <Capitol5_Testimonis t={t} />
+
       {/* CAPÍTOL 6: LA CRIDA */}
-      <Capitol6_Crida />
-      
+      <Capitol6_Crida t={t} />
+
       {/* WhatsApp flotant */}
       <WhatsAppButton />
     </main>
@@ -351,7 +353,7 @@ function MagicTouchLayer() {
 // Primera impressió. 3 segons per enamorar.
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-function Capitol1_Encantament() {
+function Capitol1_Encantament({ t }: { t: (key: string) => string }) {
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
   const touchStartX = useRef(0);
@@ -450,16 +452,16 @@ function Capitol1_Encantament() {
         >
           {/* Títol principal */}
           <h1 className="text-[11vw] sm:text-5xl font-black text-white leading-[0.95] mb-4">
-            Festes que
+            {t('hero.title1')}
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-500 to-red-500">
-              no s'obliden
+              {t('hero.title2')}
             </span>
           </h1>
 
           {/* Subtítol */}
           <p className="text-lg text-white/70 mb-6 max-w-xs">
-            Tematització · Música · Màgia
+            {t('hero.subtitle')}
           </p>
 
           {/* CTA Scroll */}
@@ -468,7 +470,7 @@ function Capitol1_Encantament() {
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             className="flex items-center gap-2 text-white/60"
           >
-            <span className="text-sm">Descobreix</span>
+            <span className="text-sm">{t('hero.discover')}</span>
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
@@ -478,7 +480,7 @@ function Capitol1_Encantament() {
 
       {/* Indicador de swipe */}
       <div className="absolute bottom-4 right-4 text-white/40 text-xs z-10">
-        ← swipe →
+        {t('hero.swipe')}
       </div>
     </section>
   );
@@ -489,7 +491,7 @@ function Capitol1_Encantament() {
 // El secret d'Òrbita en una frase
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-function Capitol2_Revelacio() {
+function Capitol2_Revelacio({ t }: { t: (key: string) => string }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -505,7 +507,7 @@ function Capitol2_Revelacio() {
       <motion.div style={{ opacity, scale, y }} className="text-center max-w-md">
         {/* Icon */}
         <motion.div
-          animate={{ 
+          animate={{
             rotate: [0, 5, -5, 0],
             scale: [1, 1.1, 1],
           }}
@@ -517,23 +519,23 @@ function Capitol2_Revelacio() {
 
         {/* El secret */}
         <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-4">
-          No posem música.
+          {t('revelation.title1')}
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-            Creem mons.
+            {t('revelation.title2')}
           </span>
         </h2>
 
         {/* Explicació */}
         <p className="text-white/60 text-lg leading-relaxed">
-          Cada llum. Cada detall. Cada moment.
+          {t('revelation.description1')}
           <br />
-          <span className="text-white/80">El teu event, tal com l'imagines.</span>
+          <span className="text-white/80">{t('revelation.description2')}</span>
         </p>
 
         {/* Hint interactiu */}
         <p className="text-amber-400/60 text-sm mt-8">
-          👆 Toca la pantalla i descobreix la màgia
+          👆 {t('revelation.touchHint')}
         </p>
       </motion.div>
     </section>
@@ -545,7 +547,7 @@ function Capitol2_Revelacio() {
 // Halloween i Món Màgic - El diferencial visual
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-function Capitol3_Regnes() {
+function Capitol3_Regnes({ t }: { t: (key: string) => string }) {
   const [regneActiu, setRegneActiu] = useState<'halloween' | 'monmagic'>('halloween');
   const [fotoIndex, setFotoIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -565,12 +567,12 @@ function Capitol3_Regnes() {
       {/* Header */}
       <div className="px-6 mb-6">
         <p className="text-white/40 text-xs uppercase tracking-[0.2em] mb-2">
-          Tematitzacions
+          {t('realms.sectionTitle')}
         </p>
         <h2 className="text-3xl font-black text-white">
-          Escull el teu{' '}
+          {t('realms.title')}{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-            món
+            {t('realms.titleHighlight')}
           </span>
         </h2>
       </div>
@@ -588,7 +590,7 @@ function Capitol3_Regnes() {
                 : 'bg-white/5 text-white/50 border border-white/10'
             }`}
           >
-            {REGNES[key].nom}
+            {key === 'halloween' ? `🎃 ${t('realms.halloween.name')}` : `🧙‍♂️ ${t('realms.monmagic.name')}`}
           </motion.button>
         ))}
       </div>
@@ -602,8 +604,8 @@ function Capitol3_Regnes() {
           exit={{ opacity: 0, x: -20 }}
           className="px-6 mb-4"
         >
-          <h3 className="text-2xl font-black text-white">{regne.titol}</h3>
-          <p className="text-white/60">{regne.desc}</p>
+          <h3 className="text-2xl font-black text-white">{t(`realms.${regneActiu}.title`)}</h3>
+          <p className="text-white/60">{t(`realms.${regneActiu}.description`)}</p>
         </motion.div>
       </AnimatePresence>
 
@@ -629,14 +631,14 @@ function Capitol3_Regnes() {
             >
               <Image
                 src={foto}
-                alt={`${regne.nom} - ${idx + 1}`}
+                alt={`${t(`realms.${regneActiu}.name`)} - ${idx + 1}`}
                 fill
                 className="object-cover"
                 sizes="75vw"
               />
               {/* Gradient overlay */}
               <div className={`absolute inset-0 bg-gradient-to-t ${regne.gradient} opacity-30`} />
-              
+
               {/* Número de foto */}
               <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
                 <span className="text-white text-xs font-bold">{idx + 1}</span>
@@ -653,12 +655,12 @@ function Capitol3_Regnes() {
           >
             <span className="text-6xl mb-4">{regne.particules[0]}</span>
             <p className="text-white font-bold text-xl text-center mb-2">
-              Vull una festa
+              {t('realms.wantParty')}
               <br />
-              {regne.nom.split(' ')[1]}!
+              {t(`realms.${regneActiu}.name`)}!
             </p>
             <span className="mt-4 px-6 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium">
-              Contactar →
+              {t('realms.contact')}
             </span>
           </Link>
         </div>
@@ -667,7 +669,7 @@ function Capitol3_Regnes() {
       {/* Indicador de swipe */}
       <div className="px-6 mt-4 flex items-center justify-between">
         <p className="text-amber-400/60 text-xs">
-          ← swipe per veure més →
+          {t('realms.swipeHint')}
         </p>
         <p className="text-white/40 text-xs">
           {fotoIndex + 1} / {regne.fotos.length}
@@ -682,7 +684,7 @@ function Capitol3_Regnes() {
 // Més fotos - Galeria estil Pinterest
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-function Capitol4_Proves() {
+function Capitol4_Proves({ t }: { t: (key: string) => string }) {
   const TOTES_FOTOS = [
     '/img/portfolio/bodas/bodas-02.webp',
     '/img/portfolio/bodas/bodas-03.webp',
@@ -698,12 +700,12 @@ function Capitol4_Proves() {
     <section className="py-16 bg-black">
       <div className="px-6 mb-8">
         <p className="text-white/40 text-xs uppercase tracking-[0.2em] mb-2">
-          2+ anys experiència
+          {t('gallery.sectionTitle')}
         </p>
         <h2 className="text-3xl font-black text-white">
-          Experiències{' '}
+          {t('gallery.title')}{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-            reals
+            {t('gallery.titleHighlight')}
           </span>
         </h2>
       </div>
@@ -738,7 +740,7 @@ function Capitol4_Proves() {
           href="/portfolio"
           className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 border border-white/20 rounded-full text-white font-medium"
         >
-          Veure tot el portfolio
+          {t('gallery.viewAll')}
           <span>→</span>
         </Link>
       </div>
@@ -751,7 +753,7 @@ function Capitol4_Proves() {
 // Veus reals amb fotos reals
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-function Capitol5_Testimonis() {
+function Capitol5_Testimonis({ t }: { t: (key: string) => string }) {
   const [current, setCurrent] = useState(0);
   const touchStartX = useRef(0);
 
@@ -776,12 +778,12 @@ function Capitol5_Testimonis() {
     <section className="py-16 bg-neutral-950">
       <div className="px-6 mb-8">
         <p className="text-white/40 text-xs uppercase tracking-[0.2em] mb-2">
-          100% recomanat
+          {t('testimonials.sectionTitle')}
         </p>
         <h2 className="text-3xl font-black text-white">
-          Les seves{' '}
+          {t('testimonials.title')}{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-            paraules
+            {t('testimonials.titleHighlight')}
           </span>
         </h2>
       </div>
@@ -811,7 +813,7 @@ function Capitol5_Testimonis() {
                 sizes="100vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              
+
               {/* Rating */}
               <div className="absolute top-4 right-4 flex gap-0.5">
                 {[...Array(testimoni.rating)].map((_, i) => (
@@ -830,7 +832,7 @@ function Capitol5_Testimonis() {
             {/* Text */}
             <div className="p-6">
               <blockquote className="text-white text-lg leading-relaxed mb-4">
-                "{testimoni.text}"
+                &ldquo;{testimoni.text}&rdquo;
               </blockquote>
               <p className="text-amber-400 font-bold">
                 — {testimoni.nom}
@@ -854,7 +856,7 @@ function Capitol5_Testimonis() {
 
         {/* Hint */}
         <p className="text-center text-white/40 text-xs mt-4">
-          ← swipe →
+          {t('testimonials.swipe')}
         </p>
       </div>
     </section>
@@ -866,7 +868,7 @@ function Capitol5_Testimonis() {
 // El moment de contactar
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-function Capitol6_Crida() {
+function Capitol6_Crida({ t }: { t: (key: string) => string }) {
   return (
     <section className="py-20 px-6 bg-gradient-to-b from-neutral-950 via-black to-black">
       <motion.div
@@ -877,7 +879,7 @@ function Capitol6_Crida() {
       >
         {/* Emoji animat */}
         <motion.div
-          animate={{ 
+          animate={{
             scale: [1, 1.1, 1],
             rotate: [0, 5, -5, 0],
           }}
@@ -889,18 +891,18 @@ function Capitol6_Crida() {
 
         {/* Títol */}
         <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
-          Tens una data
+          {t('cta.title')}
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-            al cap?
+            {t('cta.titleHighlight')}
           </span>
         </h2>
 
         {/* Subtítol */}
         <p className="text-white/60 mb-8">
-          Explica'ns la teva idea.
+          {t('cta.description1')}
           <br />
-          <span className="text-white/80">Et responem en menys de 2 hores.</span>
+          <span className="text-white/80">{t('cta.description2')}</span>
         </p>
 
         {/* Botons */}
@@ -914,7 +916,7 @@ function Capitol6_Crida() {
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
             </svg>
-            WhatsApp directe
+            {t('cta.whatsapp')}
           </motion.a>
 
           {/* Formulari */}
@@ -923,7 +925,7 @@ function Capitol6_Crida() {
               href="/contacto"
               className="flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl text-black font-bold text-lg"
             >
-              ✉️ Formulari de contacte
+              ✉️ {t('cta.contactForm')}
             </Link>
           </motion.div>
 
@@ -933,24 +935,24 @@ function Capitol6_Crida() {
             whileTap={{ scale: 0.98 }}
             className="flex items-center justify-center gap-3 w-full py-4 bg-white/5 border border-white/20 rounded-2xl text-white font-medium"
           >
-            📞 Trucar ara
+            📞 {t('cta.call')}
           </motion.a>
         </div>
 
         {/* Trust badges */}
         <div className="flex flex-wrap justify-center gap-4 mt-10 text-white/40 text-sm">
           <span className="flex items-center gap-1">
-            2+ anys en el sector
+            {t('cta.trustYears')}
           </span>
           <span>•</span>
-          <span>BCN + Girona</span>
+          <span>{t('cta.trustLocation')}</span>
           <span>•</span>
-          <span>2h resposta</span>
+          <span>{t('cta.trustResponse')}</span>
         </div>
 
         {/* Garantia */}
         <p className="text-white/30 text-xs mt-6">
-          Resposta garantida en menys de 2h, fins i tot caps de setmana
+          {t('cta.guarantee')}
         </p>
       </motion.div>
     </section>

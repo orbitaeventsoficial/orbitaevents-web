@@ -18,6 +18,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/config/site-config';
 import { trackLead } from '@/lib/analytics';
 
@@ -55,35 +56,35 @@ interface FormErrors {
 // VALIDACIO
 // ============================================================
 
-function validateForm(data: FormData): FormErrors {
+function validateForm(data: FormData, t: (key: string) => string): FormErrors {
   const errors: FormErrors = {};
 
   // Nom complet
   if (!data.fullName.trim()) {
-    errors.fullName = 'El nom es obligatori';
+    errors.fullName = t('validation.fullNameRequired');
   } else if (data.fullName.trim().length < 3) {
-    errors.fullName = 'El nom ha de tenir minim 3 caracters';
+    errors.fullName = t('validation.fullNameMinLength');
   } else if (!data.fullName.includes(' ')) {
-    errors.fullName = 'Si us plau, introdueix nom i cognoms';
+    errors.fullName = t('validation.fullNameLastName');
   }
 
   // Email
   if (!data.email.trim()) {
-    errors.email = "L'email es obligatori";
+    errors.email = t('validation.emailRequired');
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-    errors.email = "L'email no es valid";
+    errors.email = t('validation.emailInvalid');
   }
 
   // Telefon
   if (!data.phone.trim()) {
-    errors.phone = 'El telefon es obligatori';
+    errors.phone = t('validation.phoneRequired');
   } else if (!/^[0-9+\s()-]{9,}$/.test(data.phone.replace(/\s/g, ''))) {
-    errors.phone = 'El telefon no es valid (minim 9 digits)';
+    errors.phone = t('validation.phoneInvalid');
   }
 
   // Tipus event
   if (!data.eventType) {
-    errors.eventType = "Selecciona un tipus d'event";
+    errors.eventType = t('validation.eventTypeRequired');
   }
 
   // Data (opcional pero si hi es, ha de ser futura)
@@ -92,13 +93,13 @@ function validateForm(data: FormData): FormErrors {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (selectedDate < today) {
-      errors.eventDate = 'La data ha de ser futura';
+      errors.eventDate = t('validation.dateFuture');
     }
   }
 
   // Privacitat (obligatori)
   if (!data.acceptPrivacy) {
-    errors.acceptPrivacy = "Has d'acceptar la politica de privacitat";
+    errors.acceptPrivacy = t('validation.privacyRequired');
   }
 
   return errors;
@@ -109,9 +110,11 @@ function validateForm(data: FormData): FormErrors {
 // ============================================================
 
 function SimpleCaptcha({
-  onVerify
+  onVerify,
+  t
 }: {
-  onVerify: (verified: boolean) => void
+  onVerify: (verified: boolean) => void;
+  t: (key: string) => string;
 }) {
   const [num1] = useState(() => Math.floor(Math.random() * 10) + 1);
   const [num2] = useState(() => Math.floor(Math.random() * 10) + 1);
@@ -141,7 +144,7 @@ function SimpleCaptcha({
   return (
     <div className="p-4 rounded-xl bg-white/5 border border-white/10">
       <p className="text-white/60 text-sm mb-3">
-        Verifica que ets huma
+        {t('captcha.title')}
       </p>
       <div className="flex items-center gap-3">
         <span className="text-white font-mono text-lg">
@@ -156,7 +159,7 @@ function SimpleCaptcha({
                    ${verified ? 'ring-2 ring-green-500 bg-green-500/10' : ''}
                    ${error ? 'ring-2 ring-red-500 bg-red-500/10' : ''}
                    focus:ring-2 focus:ring-amber-500`}
-          placeholder="?"
+          placeholder={t('captcha.placeholder')}
         />
         {verified && <span className="text-green-400 text-xl">✓</span>}
         {error && <span className="text-red-400 text-xl">✗</span>}
@@ -176,6 +179,7 @@ export default function ContactFormComplete({
   preselectedService?: string;
   preselectedDate?: string;
 }) {
+  const t = useTranslations('contactForm');
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
@@ -213,7 +217,7 @@ export default function ContactFormComplete({
 
   // Validate on blur
   const validateField = (field: keyof FormData) => {
-    const fieldErrors = validateForm(formData);
+    const fieldErrors = validateForm(formData, t);
     if (fieldErrors[field]) {
       setErrors((prev) => ({ ...prev, [field]: fieldErrors[field] }));
     }
@@ -224,11 +228,11 @@ export default function ContactFormComplete({
     e.preventDefault();
 
     // Validate all
-    const formErrors = validateForm(formData);
+    const formErrors = validateForm(formData, t);
 
     // Check captcha
     if (!captchaVerified) {
-      formErrors.captcha = 'Completa la verificacio';
+      formErrors.captcha = t('validation.captchaRequired');
     }
 
     setErrors(formErrors);
@@ -312,15 +316,15 @@ export default function ContactFormComplete({
         className="p-8 rounded-2xl bg-green-500/10 border border-green-500/30 text-center"
       >
         <span className="text-6xl block mb-4">🎉</span>
-        <h3 className="text-2xl font-bold text-white mb-2">Missatge enviat!</h3>
+        <h3 className="text-2xl font-bold text-white mb-2">{t('success.title')}</h3>
         <p className="text-white/70 mb-6">
-          Gracies per contactar amb nosaltres. Et respondrem en menys de 2 hores.
+          {t('success.message')}
         </p>
         <button
           onClick={() => setSubmitStatus('idle')}
           className="px-6 py-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
         >
-          Enviar un altre missatge
+          {t('success.sendAnother')}
         </button>
       </motion.div>
     );
@@ -331,20 +335,20 @@ export default function ContactFormComplete({
       {/* Seccio: Dades personals */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <span>👤</span> Les teves dades
+          <span>👤</span> {t('sections.personalData')}
         </h3>
 
         {/* Nom complet */}
         <div className={errors.fullName && touched.fullName ? 'error-field' : ''}>
           <label className="block text-white/70 text-sm mb-2">
-            Nom i cognoms <span className="text-red-400">*</span>
+            {t('labels.fullName')} <span className="text-red-400">*</span>
           </label>
           <input
             type="text"
             value={formData.fullName}
             onChange={(e) => updateField('fullName', e.target.value)}
             onBlur={() => { touchField('fullName'); validateField('fullName'); }}
-            placeholder="El teu nom complet"
+            placeholder={t('placeholders.fullName')}
             className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
                      placeholder:text-white/30 outline-none transition-all
                      ${errors.fullName && touched.fullName
@@ -362,14 +366,14 @@ export default function ContactFormComplete({
           {/* Email */}
           <div className={errors.email && touched.email ? 'error-field' : ''}>
             <label className="block text-white/70 text-sm mb-2">
-              Email <span className="text-red-400">*</span>
+              {t('labels.email')} <span className="text-red-400">*</span>
             </label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => updateField('email', e.target.value)}
               onBlur={() => { touchField('email'); validateField('email'); }}
-              placeholder="el.teu@email.com"
+              placeholder={t('placeholders.email')}
               className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
                        placeholder:text-white/30 outline-none transition-all
                        ${errors.email && touched.email
@@ -385,14 +389,14 @@ export default function ContactFormComplete({
           {/* Telefon */}
           <div className={errors.phone && touched.phone ? 'error-field' : ''}>
             <label className="block text-white/70 text-sm mb-2">
-              Telefon <span className="text-red-400">*</span>
+              {t('labels.phone')} <span className="text-red-400">*</span>
             </label>
             <input
               type="tel"
               value={formData.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               onBlur={() => { touchField('phone'); validateField('phone'); }}
-              placeholder="+34 600 000 000"
+              placeholder={t('placeholders.phone')}
               className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
                        placeholder:text-white/30 outline-none transition-all
                        ${errors.phone && touched.phone
@@ -410,13 +414,13 @@ export default function ContactFormComplete({
       {/* Seccio: Dades event */}
       <div className="space-y-4 pt-4 border-t border-white/10">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <span>🎉</span> El teu event
+          <span>🎉</span> {t('sections.eventData')}
         </h3>
 
         {/* Tipus event */}
         <div className={errors.eventType && touched.eventType ? 'error-field' : ''}>
           <label className="block text-white/70 text-sm mb-2">
-            Tipus d&apos;event <span className="text-red-400">*</span>
+            {t('labels.eventType')} <span className="text-red-400">*</span>
           </label>
           <select
             value={formData.eventType}
@@ -429,14 +433,14 @@ export default function ContactFormComplete({
                        : 'border-white/10 focus:border-amber-500'
                      } focus:ring-2 focus:ring-amber-500`}
           >
-            <option value="" className="bg-black">Selecciona un tipus</option>
-            <option value="boda" className="bg-black">💒 Casament</option>
-            <option value="fiesta" className="bg-black">🎉 Festa privada</option>
-            <option value="cumpleanos" className="bg-black">🎂 Aniversari</option>
-            <option value="corporativo" className="bg-black">💼 Event corporatiu</option>
-            <option value="comunion" className="bg-black">⛪ Comunio / Bateig</option>
-            <option value="graduacion" className="bg-black">🎓 Graduacio</option>
-            <option value="otro" className="bg-black">✨ Altre</option>
+            <option value="" className="bg-black">{t('placeholders.selectEventType')}</option>
+            <option value="boda" className="bg-black">{t('eventTypes.boda')}</option>
+            <option value="fiesta" className="bg-black">{t('eventTypes.fiesta')}</option>
+            <option value="cumpleanos" className="bg-black">{t('eventTypes.cumpleanos')}</option>
+            <option value="corporativo" className="bg-black">{t('eventTypes.corporativo')}</option>
+            <option value="comunion" className="bg-black">{t('eventTypes.comunion')}</option>
+            <option value="graduacion" className="bg-black">{t('eventTypes.graduacion')}</option>
+            <option value="otro" className="bg-black">{t('eventTypes.otro')}</option>
           </select>
           {errors.eventType && touched.eventType && (
             <p className="text-red-400 text-sm mt-1">{errors.eventType}</p>
@@ -448,7 +452,7 @@ export default function ContactFormComplete({
           {/* Data */}
           <div>
             <label className="block text-white/70 text-sm mb-2">
-              Data aproximada
+              {t('labels.eventDate')}
             </label>
             <input
               type="date"
@@ -467,7 +471,7 @@ export default function ContactFormComplete({
           {/* Convidats */}
           <div>
             <label className="block text-white/70 text-sm mb-2">
-              Nombre de convidats
+              {t('labels.guestCount')}
             </label>
             <select
               value={formData.guestCount}
@@ -476,12 +480,12 @@ export default function ContactFormComplete({
                        text-white outline-none focus:border-amber-500 focus:ring-2
                        focus:ring-amber-500 transition-all appearance-none cursor-pointer"
             >
-              <option value="" className="bg-black">Selecciona</option>
-              <option value="1-50" className="bg-black">1 - 50 persones</option>
-              <option value="51-100" className="bg-black">51 - 100 persones</option>
-              <option value="101-200" className="bg-black">101 - 200 persones</option>
-              <option value="201-300" className="bg-black">201 - 300 persones</option>
-              <option value="300+" className="bg-black">Mes de 300 persones</option>
+              <option value="" className="bg-black">{t('placeholders.selectGuests')}</option>
+              <option value="1-50" className="bg-black">{t('guestOptions.1-50')}</option>
+              <option value="51-100" className="bg-black">{t('guestOptions.51-100')}</option>
+              <option value="101-200" className="bg-black">{t('guestOptions.101-200')}</option>
+              <option value="201-300" className="bg-black">{t('guestOptions.201-300')}</option>
+              <option value="300+" className="bg-black">{t('guestOptions.300+')}</option>
             </select>
           </div>
         </div>
@@ -491,13 +495,13 @@ export default function ContactFormComplete({
           {/* Ubicacio */}
           <div>
             <label className="block text-white/70 text-sm mb-2">
-              Ubicacio (ciutat/poble)
+              {t('labels.location')}
             </label>
             <input
               type="text"
               value={formData.location}
               onChange={(e) => updateField('location', e.target.value)}
-              placeholder="Barcelona, Girona..."
+              placeholder={t('placeholders.location')}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
                        text-white placeholder:text-white/30 outline-none
                        focus:border-amber-500 focus:ring-2 focus:ring-amber-500 transition-all"
@@ -507,7 +511,7 @@ export default function ContactFormComplete({
           {/* Pressupost */}
           <div>
             <label className="block text-white/70 text-sm mb-2">
-              Pressupost aproximat
+              {t('labels.budget')}
             </label>
             <select
               value={formData.budget}
@@ -516,13 +520,13 @@ export default function ContactFormComplete({
                        text-white outline-none focus:border-amber-500 focus:ring-2
                        focus:ring-amber-500 transition-all appearance-none cursor-pointer"
             >
-              <option value="" className="bg-black">Selecciona</option>
-              <option value="menys500" className="bg-black">Menys de 500€</option>
-              <option value="500-1000" className="bg-black">500€ - 1.000€</option>
-              <option value="1000-2000" className="bg-black">1.000€ - 2.000€</option>
-              <option value="2000-3000" className="bg-black">2.000€ - 3.000€</option>
-              <option value="3000+" className="bg-black">Mes de 3.000€</option>
-              <option value="nosabe" className="bg-black">No ho se encara</option>
+              <option value="" className="bg-black">{t('placeholders.selectBudget')}</option>
+              <option value="menys500" className="bg-black">{t('budgetOptions.menys500')}</option>
+              <option value="500-1000" className="bg-black">{t('budgetOptions.500-1000')}</option>
+              <option value="1000-2000" className="bg-black">{t('budgetOptions.1000-2000')}</option>
+              <option value="2000-3000" className="bg-black">{t('budgetOptions.2000-3000')}</option>
+              <option value="3000+" className="bg-black">{t('budgetOptions.3000+')}</option>
+              <option value="nosabe" className="bg-black">{t('budgetOptions.nosabe')}</option>
             </select>
           </div>
         </div>
@@ -531,18 +535,18 @@ export default function ContactFormComplete({
       {/* Seccio: Missatge */}
       <div className="space-y-4 pt-4 border-t border-white/10">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <span>💬</span> Explica&apos;ns mes
+          <span>💬</span> {t('sections.tellUsMore')}
         </h3>
 
         {/* Missatge */}
         <div>
           <label className="block text-white/70 text-sm mb-2">
-            Que tens al cap? Algun detall especial?
+            {t('labels.message')}
           </label>
           <textarea
             value={formData.message}
             onChange={(e) => updateField('message', e.target.value)}
-            placeholder="Explica'ns la teva visio: tematica, estil de musica, efectes especials que t'agradaria..."
+            placeholder={t('placeholders.message')}
             rows={4}
             className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
                      text-white placeholder:text-white/30 outline-none resize-none
@@ -553,7 +557,7 @@ export default function ContactFormComplete({
         {/* Com ens has trobat */}
         <div>
           <label className="block text-white/70 text-sm mb-2">
-            Com ens has trobat?
+            {t('labels.howFound')}
           </label>
           <select
             value={formData.howFound}
@@ -562,14 +566,14 @@ export default function ContactFormComplete({
                      text-white outline-none focus:border-amber-500 focus:ring-2
                      focus:ring-amber-500 transition-all appearance-none cursor-pointer"
           >
-            <option value="" className="bg-black">Selecciona</option>
-            <option value="google" className="bg-black">🔍 Google</option>
-            <option value="instagram" className="bg-black">📸 Instagram</option>
-            <option value="facebook" className="bg-black">👥 Facebook</option>
-            <option value="tiktok" className="bg-black">🎵 TikTok</option>
-            <option value="recomendacion" className="bg-black">👋 Recomanacio</option>
-            <option value="evento" className="bg-black">🎉 Vaig veure-us a un event</option>
-            <option value="otro" className="bg-black">✨ Altre</option>
+            <option value="" className="bg-black">{t('placeholders.selectHowFound')}</option>
+            <option value="google" className="bg-black">{t('howFoundOptions.google')}</option>
+            <option value="instagram" className="bg-black">{t('howFoundOptions.instagram')}</option>
+            <option value="facebook" className="bg-black">{t('howFoundOptions.facebook')}</option>
+            <option value="tiktok" className="bg-black">{t('howFoundOptions.tiktok')}</option>
+            <option value="recomendacion" className="bg-black">{t('howFoundOptions.recomendacion')}</option>
+            <option value="evento" className="bg-black">{t('howFoundOptions.evento')}</option>
+            <option value="otro" className="bg-black">{t('howFoundOptions.otro')}</option>
           </select>
         </div>
       </div>
@@ -577,7 +581,7 @@ export default function ContactFormComplete({
       {/* Seccio: Verificacio i Legal */}
       <div className="space-y-4 pt-4 border-t border-white/10">
         {/* Captcha */}
-        <SimpleCaptcha onVerify={setCaptchaVerified} />
+        <SimpleCaptcha onVerify={setCaptchaVerified} t={t} />
         {errors.captcha && (
           <p className="text-red-400 text-sm">{errors.captcha}</p>
         )}
@@ -607,13 +611,13 @@ export default function ContactFormComplete({
               </div>
             </div>
             <span className="text-white/70 text-sm">
-              He llegit i accepto la{' '}
+              {t('privacy.text')}{' '}
               <Link href="/legal/privacidad" className="text-amber-400 hover:underline" target="_blank">
-                politica de privacitat
+                {t('privacy.link')}
               </Link>{' '}
-              i els{' '}
+              {t('privacy.and')}{' '}
               <Link href="/legal/terminos" className="text-amber-400 hover:underline" target="_blank">
-                termes i condicions
+                {t('privacy.termsLink')}
               </Link>
               . <span className="text-red-400">*</span>
             </span>
@@ -643,7 +647,7 @@ export default function ContactFormComplete({
             </div>
           </div>
           <span className="text-white/70 text-sm">
-            Vull rebre ofertes exclusives i novetats d&apos;Orbita Events (opcional)
+            {t('marketing.text')}
           </span>
         </label>
       </div>
@@ -651,15 +655,15 @@ export default function ContactFormComplete({
       {/* Info RGPD */}
       <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-white/50">
         <p className="mb-2">
-          <strong className="text-white/70">Informacio sobre proteccio de dades:</strong>
+          <strong className="text-white/70">{t('gdpr.title')}</strong>
         </p>
         <ul className="space-y-1">
-          <li>• <strong>Responsable:</strong> Orbita Events</li>
-          <li>• <strong>Finalitat:</strong> Gestionar la teva sol·licitud i oferir-te pressupost</li>
-          <li>• <strong>Legitimacio:</strong> Consentiment de l&apos;interessat</li>
-          <li>• <strong>Destinataris:</strong> No es cediran dades a tercers</li>
-          <li>• <strong>Drets:</strong> Acces, rectificacio, supressio, oposicio i portabilitat</li>
-          <li>• <strong>Contacte:</strong> {SITE_CONFIG.business.email}</li>
+          <li>• <strong>{t('gdpr.responsible')}:</strong> {t('gdpr.responsibleValue')}</li>
+          <li>• <strong>{t('gdpr.purpose')}:</strong> {t('gdpr.purposeValue')}</li>
+          <li>• <strong>{t('gdpr.legitimacy')}:</strong> {t('gdpr.legitimacyValue')}</li>
+          <li>• <strong>{t('gdpr.recipients')}:</strong> {t('gdpr.recipientsValue')}</li>
+          <li>• <strong>{t('gdpr.rights')}:</strong> {t('gdpr.rightsValue')}</li>
+          <li>• <strong>{t('gdpr.contact')}:</strong> {SITE_CONFIG.business.email}</li>
         </ul>
       </div>
 
@@ -672,8 +676,7 @@ export default function ContactFormComplete({
             exit={{ opacity: 0, y: -10 }}
             className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm"
           >
-            Hi ha hagut un error al enviar el formulari. Si us plau, torna-ho a provar o
-            contacta&apos;ns directament a{' '}
+            {t('error.message')}{' '}
             <a href={`tel:${SITE_CONFIG.business.phone}`} className="underline">{SITE_CONFIG.business.phoneDisplay}</a>.
           </motion.div>
         )}
@@ -697,16 +700,16 @@ export default function ContactFormComplete({
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            Enviant...
+            {t('sending')}
           </span>
         ) : (
-          'Enviar sol·licitud 🚀'
+          t('submit')
         )}
       </motion.button>
 
       {/* Nota final */}
       <p className="text-center text-white/40 text-sm">
-        Et respondrem en menys de 2 hores · Tambe pots trucar-nos: {' '}
+        {t('responseNote')}{' '}
         <a href={`tel:${SITE_CONFIG.business.phone}`} className="text-amber-400 hover:underline">
           {SITE_CONFIG.business.phoneDisplay}
         </a>

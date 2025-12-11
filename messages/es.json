@@ -823,6 +823,121 @@
       "error": "Error al enviar. Inténtalo de nuevo."
     }
   },
+  "contactForm": {
+    "sections": {
+      "personalData": "Tus datos",
+      "eventData": "Tu evento",
+      "tellUsMore": "Cuéntanos más"
+    },
+    "labels": {
+      "fullName": "Nombre y apellidos",
+      "email": "Email",
+      "phone": "Teléfono",
+      "eventType": "Tipo de evento",
+      "eventDate": "Fecha aproximada",
+      "guestCount": "Número de invitados",
+      "location": "Ubicación (ciudad/pueblo)",
+      "budget": "Presupuesto aproximado",
+      "message": "¿Qué tienes en mente? ¿Algún detalle especial?",
+      "howFound": "¿Cómo nos has encontrado?"
+    },
+    "placeholders": {
+      "fullName": "Tu nombre completo",
+      "email": "tu@email.com",
+      "phone": "+34 600 000 000",
+      "location": "Barcelona, Girona...",
+      "message": "Cuéntanos tu visión: temática, estilo de música, efectos especiales que te gustarían...",
+      "selectEventType": "Selecciona un tipo",
+      "selectGuests": "Selecciona",
+      "selectBudget": "Selecciona",
+      "selectHowFound": "Selecciona"
+    },
+    "eventTypes": {
+      "boda": "💒 Boda",
+      "fiesta": "🎉 Fiesta privada",
+      "cumpleanos": "🎂 Cumpleaños",
+      "corporativo": "💼 Evento corporativo",
+      "comunion": "⛪ Comunión / Bautizo",
+      "graduacion": "🎓 Graduación",
+      "otro": "✨ Otro"
+    },
+    "guestOptions": {
+      "1-50": "1 - 50 personas",
+      "51-100": "51 - 100 personas",
+      "101-200": "101 - 200 personas",
+      "201-300": "201 - 300 personas",
+      "300+": "Más de 300 personas"
+    },
+    "budgetOptions": {
+      "menys500": "Menos de 500€",
+      "500-1000": "500€ - 1.000€",
+      "1000-2000": "1.000€ - 2.000€",
+      "2000-3000": "2.000€ - 3.000€",
+      "3000+": "Más de 3.000€",
+      "nosabe": "No lo sé todavía"
+    },
+    "howFoundOptions": {
+      "google": "🔍 Google",
+      "instagram": "📸 Instagram",
+      "facebook": "👥 Facebook",
+      "tiktok": "🎵 TikTok",
+      "recomendacion": "👋 Recomendación",
+      "evento": "🎉 Os vi en un evento",
+      "otro": "✨ Otro"
+    },
+    "captcha": {
+      "title": "Verifica que eres humano",
+      "placeholder": "?"
+    },
+    "privacy": {
+      "text": "He leído y acepto la",
+      "link": "política de privacidad",
+      "and": "y los",
+      "termsLink": "términos y condiciones"
+    },
+    "marketing": {
+      "text": "Quiero recibir ofertas exclusivas y novedades de Òrbita Events (opcional)"
+    },
+    "gdpr": {
+      "title": "Información sobre protección de datos:",
+      "responsible": "Responsable",
+      "responsibleValue": "Òrbita Events",
+      "purpose": "Finalidad",
+      "purposeValue": "Gestionar tu solicitud y ofrecerte presupuesto",
+      "legitimacy": "Legitimación",
+      "legitimacyValue": "Consentimiento del interesado",
+      "recipients": "Destinatarios",
+      "recipientsValue": "No se cederán datos a terceros",
+      "rights": "Derechos",
+      "rightsValue": "Acceso, rectificación, supresión, oposición y portabilidad",
+      "contact": "Contacto"
+    },
+    "validation": {
+      "fullNameRequired": "El nombre es obligatorio",
+      "fullNameMinLength": "El nombre debe tener mínimo 3 caracteres",
+      "fullNameLastName": "Por favor, introduce nombre y apellidos",
+      "emailRequired": "El email es obligatorio",
+      "emailInvalid": "El email no es válido",
+      "phoneRequired": "El teléfono es obligatorio",
+      "phoneInvalid": "El teléfono no es válido (mínimo 9 dígitos)",
+      "eventTypeRequired": "Selecciona un tipo de evento",
+      "dateFuture": "La fecha debe ser futura",
+      "privacyRequired": "Debes aceptar la política de privacidad",
+      "captchaRequired": "Completa la verificación"
+    },
+    "success": {
+      "title": "¡Mensaje enviado!",
+      "message": "Gracias por contactar con nosotros. Te responderemos en menos de 2 horas.",
+      "sendAnother": "Enviar otro mensaje"
+    },
+    "error": {
+      "title": "Error al enviar",
+      "message": "Ha habido un error al enviar el formulario. Por favor, vuelve a intentarlo o contacta con nosotros directamente al"
+    },
+    "submit": "Enviar solicitud 🚀",
+    "sending": "Enviando...",
+    "responseNote": "Te responderemos en menos de 2 horas · También puedes llamarnos:"
+  },
   "configurator": {
     "step1": {
       "title": "¿Qué tipo de evento es?",
@@ -1863,6 +1978,65 @@
     "team": {
       "title": "Un equipo, no un proveedor",
       "description": "Nos implicamos como si fuera nuestro propio evento. Porque tu éxito es nuestro orgullo."
+    }
+  },
+  "mobileExperience": {
+    "hero": {
+      "title1": "Fiestas que",
+      "title2": "no se olvidan",
+      "subtitle": "Tematización · Música · Magia",
+      "discover": "Descubre",
+      "swipe": "← swipe →"
+    },
+    "revelation": {
+      "title1": "No ponemos música.",
+      "title2": "Creamos mundos.",
+      "description1": "Cada luz. Cada detalle. Cada momento.",
+      "description2": "Tu evento, tal como lo imaginas.",
+      "touchHint": "Toca la pantalla y descubre la magia"
+    },
+    "realms": {
+      "sectionTitle": "Tematizaciones",
+      "title": "Escoge tu",
+      "titleHighlight": "mundo",
+      "swipeHint": "← swipe para ver más →",
+      "wantParty": "Quiero una fiesta",
+      "contact": "Contactar →",
+      "halloween": {
+        "name": "Halloween",
+        "title": "La Noche de los Muertos",
+        "description": "Humo, luces verdes, calabazas, terror... Una noche que no olvidarán."
+      },
+      "monmagic": {
+        "name": "Mundo Mágico",
+        "title": "Bienvenido a la Escuela de Magia",
+        "description": "Varitas, casas, magia... El sueño de todo fan de la fantasía hecho realidad."
+      }
+    },
+    "gallery": {
+      "sectionTitle": "2+ años experiencia",
+      "title": "Experiencias",
+      "titleHighlight": "reales",
+      "viewAll": "Ver todo el portfolio"
+    },
+    "testimonials": {
+      "sectionTitle": "100% recomendado",
+      "title": "Sus",
+      "titleHighlight": "palabras",
+      "swipe": "← swipe →"
+    },
+    "cta": {
+      "title": "¿Tienes una fecha",
+      "titleHighlight": "en mente?",
+      "description1": "Cuéntanos tu idea.",
+      "description2": "Te respondemos en menos de 2 horas.",
+      "whatsapp": "WhatsApp directo",
+      "contactForm": "Formulario de contacto",
+      "call": "Llamar ahora",
+      "trustYears": "2+ años en el sector",
+      "trustLocation": "BCN + Girona",
+      "trustResponse": "2h respuesta",
+      "guarantee": "Respuesta garantizada en menos de 2h, incluso fines de semana"
     }
   }
 }

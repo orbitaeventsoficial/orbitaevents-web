@@ -535,6 +535,117 @@
     },
     "subtitle": "Explica'ns el teu event i et respondrem en menys de 2 hores"
   },
+  "contactForm": {
+    "sections": {
+      "personalData": "Les teves dades",
+      "eventData": "El teu event",
+      "tellUsMore": "Explica'ns més"
+    },
+    "labels": {
+      "fullName": "Nom i cognoms",
+      "email": "Email",
+      "phone": "Telèfon",
+      "eventType": "Tipus d'event",
+      "eventDate": "Data aproximada",
+      "guestCount": "Nombre de convidats",
+      "location": "Ubicació (ciutat/poble)",
+      "budget": "Pressupost aproximat",
+      "message": "Què tens al cap? Algun detall especial?",
+      "howFound": "Com ens has trobat?",
+      "required": "*"
+    },
+    "placeholders": {
+      "fullName": "El teu nom complet",
+      "email": "el.teu@email.com",
+      "phone": "+34 600 000 000",
+      "location": "Barcelona, Girona...",
+      "message": "Explica'ns la teva visió: temàtica, estil de música, efectes especials que t'agradaria..."
+    },
+    "eventTypes": {
+      "select": "Selecciona un tipus",
+      "wedding": "💒 Casament",
+      "party": "🎉 Festa privada",
+      "birthday": "🎂 Aniversari",
+      "corporate": "💼 Event corporatiu",
+      "communion": "⛪ Comunió / Bateig",
+      "graduation": "🎓 Graduació",
+      "other": "✨ Altre"
+    },
+    "guestOptions": {
+      "select": "Selecciona",
+      "1-50": "1 - 50 persones",
+      "51-100": "51 - 100 persones",
+      "101-200": "101 - 200 persones",
+      "201-300": "201 - 300 persones",
+      "300+": "Més de 300 persones"
+    },
+    "budgetOptions": {
+      "select": "Selecciona",
+      "less500": "Menys de 500€",
+      "500-1000": "500€ - 1.000€",
+      "1000-2000": "1.000€ - 2.000€",
+      "2000-3000": "2.000€ - 3.000€",
+      "3000+": "Més de 3.000€",
+      "dontKnow": "No ho sé encara"
+    },
+    "howFoundOptions": {
+      "select": "Selecciona",
+      "google": "🔍 Google",
+      "instagram": "📸 Instagram",
+      "facebook": "👥 Facebook",
+      "tiktok": "🎵 TikTok",
+      "recommendation": "👋 Recomanació",
+      "event": "🎉 Vaig veure-us a un event",
+      "other": "✨ Altre"
+    },
+    "captcha": {
+      "verify": "Verifica que ets humà",
+      "complete": "Completa la verificació"
+    },
+    "privacy": {
+      "accept": "He llegit i accepto la",
+      "policy": "política de privacitat",
+      "and": "i els",
+      "terms": "termes i condicions",
+      "marketing": "Vull rebre ofertes exclusives i novetats d'Òrbita Events (opcional)"
+    },
+    "gdpr": {
+      "title": "Informació sobre protecció de dades:",
+      "responsible": "Responsable:",
+      "purpose": "Finalitat:",
+      "purposeText": "Gestionar la teva sol·licitud i oferir-te pressupost",
+      "legitimation": "Legitimació:",
+      "legitimationText": "Consentiment de l'interessat",
+      "recipients": "Destinataris:",
+      "recipientsText": "No es cediran dades a tercers",
+      "rights": "Drets:",
+      "rightsText": "Accés, rectificació, supressió, oposició i portabilitat",
+      "contact": "Contacte:"
+    },
+    "validation": {
+      "nameRequired": "El nom és obligatori",
+      "nameMin": "El nom ha de tenir mínim 3 caràcters",
+      "nameFullRequired": "Si us plau, introdueix nom i cognoms",
+      "emailRequired": "L'email és obligatori",
+      "emailInvalid": "L'email no és vàlid",
+      "phoneRequired": "El telèfon és obligatori",
+      "phoneInvalid": "El telèfon no és vàlid (mínim 9 dígits)",
+      "eventTypeRequired": "Selecciona un tipus d'event",
+      "dateFuture": "La data ha de ser futura",
+      "privacyRequired": "Has d'acceptar la política de privacitat"
+    },
+    "success": {
+      "title": "Missatge enviat!",
+      "message": "Gràcies per contactar amb nosaltres. Et respondrem en menys de 2 hores.",
+      "sendAnother": "Enviar un altre missatge"
+    },
+    "error": {
+      "message": "Hi ha hagut un error al enviar el formulari. Si us plau, torna-ho a provar o contacta'ns directament a"
+    },
+    "submit": "Enviar sol·licitud 🚀",
+    "sending": "Enviant...",
+    "responseNote": "Et respondrem en menys de 2 hores · També pots trucar-nos:"
+  },
   "configurator": {
     "step1": {
       "title": "Quin tipus d'esdeveniment és?",
@@ -1793,6 +1904,65 @@
       "subtitle": "Creem experiències personalitzades. Explica'ns la teva idea i la fem realitat.",
       "custom": "Crear experiència personalitzada",
       "note": "Resposta en menys de 2 hores · Pressupost sense compromís"
+    }
+  },
+  "mobileExperience": {
+    "hero": {
+      "title1": "Festes que",
+      "title2": "no s'obliden",
+      "subtitle": "Tematització · Música · Màgia",
+      "discover": "Descobreix",
+      "swipe": "← swipe →"
+    },
+    "revelation": {
+      "title1": "No posem música.",
+      "title2": "Creem mons.",
+      "description1": "Cada llum. Cada detall. Cada moment.",
+      "description2": "El teu event, tal com l'imagines.",
+      "touchHint": "Toca la pantalla i descobreix la màgia"
+    },
+    "realms": {
+      "sectionTitle": "Tematitzacions",
+      "title": "Escull el teu",
+      "titleHighlight": "món",
+      "swipeHint": "← swipe per veure més →",
+      "wantParty": "Vull una festa",
+      "contact": "Contactar →",
+      "halloween": {
+        "name": "Halloween",
+        "title": "La Nit dels Morts",
+        "description": "Fum, llums verdes, carbasses, terror... Una nit que no oblidaran."
+      },
+      "monmagic": {
+        "name": "Món Màgic",
+        "title": "Benvingut a l'Escola de Màgia",
+        "description": "Varetes, cases, màgia... El somni de tot fan de la fantasia fet realitat."
+      }
+    },
+    "gallery": {
+      "sectionTitle": "2+ anys experiència",
+      "title": "Experiències",
+      "titleHighlight": "reals",
+      "viewAll": "Veure tot el portfolio"
+    },
+    "testimonials": {
+      "sectionTitle": "100% recomanat",
+      "title": "Les seves",
+      "titleHighlight": "paraules",
+      "swipe": "← swipe →"
+    },
+    "cta": {
+      "title": "Tens una data",
+      "titleHighlight": "al cap?",
+      "description1": "Explica'ns la teva idea.",
+      "description2": "Et responem en menys de 2 hores.",
+      "whatsapp": "WhatsApp directe",
+      "contactForm": "Formulari de contacte",
+      "call": "Trucar ara",
+      "trustYears": "2+ anys en el sector",
+      "trustLocation": "BCN + Girona",
+      "trustResponse": "2h resposta",
+      "guarantee": "Resposta garantida en menys de 2h, fins i tot caps de setmana"
     }
   }
 }
