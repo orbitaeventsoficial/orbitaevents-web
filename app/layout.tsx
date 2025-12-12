@@ -3,19 +3,10 @@
 // Header/Footer están en [locale]/layout.tsx donde hay provider de i18n
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { Sora } from 'next/font/google';
+import { inter, outfit, space } from '@/app/fonts';
 
 // StructuredData mogut a [locale]/layout.tsx per suportar i18n
 import { SpeedInsights } from '@vercel/speed-insights/next';
-
-// Sora - Font moderna, geomètrica i elegant per tota la web
-const sora = Sora({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-sora',
-  weight: ['300', '400', '500', '600', '700', '800'],
-  preload: true,
-});
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -146,7 +137,7 @@ function AnalyticsScripts() {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${sora.variable} scroll-smooth`}>
+    <html lang="es" className={`${inter.variable} ${outfit.variable} ${space.variable} scroll-smooth`}>
       <head>
         <AnalyticsScripts />
 
@@ -188,7 +179,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
 
-      <body className="bg-[var(--bg-main)] text-white antialiased overflow-x-hidden">
+      <body className={`font-sans antialiased bg-neutral-950 text-white overflow-x-hidden`}>
         {children}
         <SpeedInsights />
       </body>
