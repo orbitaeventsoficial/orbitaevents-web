@@ -60,7 +60,7 @@ function CalendarPreview() {
                 : 'bg-white/10 border-white/20 text-white/40'
             }`}
           >
-            <span className="text-xs uppercase">{month}</span>
+            <span className="text-xs uppercase" suppressHydrationWarning>{month}</span>
             <span className="text-lg font-bold">{day}</span>
             {saturday.status === 'booked' && (
               <span className="absolute -top-1 -right-1 text-xs">🔒</span>

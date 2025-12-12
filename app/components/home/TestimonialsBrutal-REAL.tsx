@@ -122,7 +122,7 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialPublic }) {
             {formattedDate && (
               <>
                 <span>•</span>
-                <span>{formattedDate}</span>
+                <span suppressHydrationWarning>{formattedDate}</span>
               </>
             )}
           </div>
