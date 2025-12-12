@@ -369,12 +369,12 @@ export function HeaderPro() {
               {/* Botó CTA principal - DAURAT PROFESSIONAL */}
               <Link
                 href="/contacto"
-                className="relative px-6 py-3 overflow-hidden rounded-full group"
+                className="relative px-6 py-3 overflow-hidden rounded-full group hover:scale-105 transition-transform duration-300 hover:shadow-[0_0_30px_rgba(251,191,36,0.3)]"
               >
                 {/* Gradient daurat */}
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-amber-600 transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-amber-600 transition-all duration-300 pointer-events-none" />
                 {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
                 {/* Text */}
                 <span className="relative z-10 text-black font-bold text-sm tracking-wide">
                   {t('cta')}

@@ -47,7 +47,7 @@ function DifferentiatorCard({ icon, title, description, highlight, index }: Diff
       <div className="relative h-full p-8 bg-gradient-to-br from-white/[0.05] to-white/[0.02] backdrop-blur-sm rounded-2xl border border-white/10 hover:border-amber-500/30 transition-all duration-500 overflow-hidden">
         
         {/* Hover glow effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         
         {/* Number indicator */}
         <div className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/20 text-sm font-bold">

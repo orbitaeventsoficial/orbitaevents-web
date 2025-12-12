@@ -89,7 +89,7 @@ interface UseAvailabilityReturn {
   currentMonthAvailable: number;
 }
 
-// Helper per calcular el proper dissabte
+// Helper per calcular el proper dissabte - NOMÉS cridar dins useEffect!
 function getNextSaturday(): string {
   const now = new Date();
   const daysUntilSaturday = (6 - now.getDay() + 7) % 7 || 7;
@@ -98,10 +98,10 @@ function getNextSaturday(): string {
   return nextSat.toISOString().slice(0, 10);
 }
 
-// SSR-safe defaults - DO NOT call getNextSaturday() here as it uses new Date()
+// DEFAULT SEGUR PER SSR - Sense dates calculades a nivell de mòdul!
 const defaultAvailability: AvailabilityData = {
-  nextAvailableDate: '', // Will be set on client
-  nextAvailableSaturday: '', // Will be set on client
+  nextAvailableDate: null, // Es calcula al client dins useEffect
+  nextAvailableSaturday: null, // Es calcula al client dins useEffect
   monthlyAvailability: [],
   scarcityMessage: 'Només queden 2 dissabtes aquest mes',
   urgencyLevel: 'high',
@@ -111,6 +111,18 @@ export function useAvailability(): UseAvailabilityReturn {
   const [data, setData] = useState<AvailabilityData>(defaultAvailability);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  // Inicialitzar dates només al CLIENT per evitar hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+    const nextSat = getNextSaturday();
+    setData(prev => ({
+      ...prev,
+      nextAvailableDate: prev.nextAvailableDate || nextSat,
+      nextAvailableSaturday: prev.nextAvailableSaturday || nextSat,
+    }));
+  }, []);
 
   const fetchData = useCallback(async () => {
     // Check cache first

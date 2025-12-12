@@ -46,19 +46,25 @@ interface CountdownUnitProps {
 
 function AnimatedStat({ value, suffix = '', label, isLoading }: AnimatedStatProps) {
   return (
-    <div className="text-center px-4">
-      <div className="text-2xl md:text-4xl font-black text-amber-400 mb-1">
-        {isLoading ? (
-          <span className="inline-block w-12 h-8 bg-amber-400/20 rounded animate-pulse" />
-        ) : (
-          <>
-            {value}
-            {suffix && <span className="text-amber-300">{suffix}</span>}
-          </>
-        )}
-      </div>
-      <div className="text-xs md:text-sm text-white/60 uppercase tracking-wider">
-        {label}
+    <div className="group text-center px-6 py-3 relative">
+      {/* Glow subtil en hover */}
+      <div className="absolute inset-0 bg-amber-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      
+      {/* Valor */}
+      <div className="relative">
+        <div className="text-3xl md:text-5xl font-black mb-1">
+          {isLoading ? (
+            <span className="inline-block w-16 h-10 bg-gradient-to-r from-amber-400/20 to-amber-400/40 rounded-lg animate-pulse" />
+          ) : (
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">
+              {value}
+              {suffix && <span className="text-amber-300">{suffix}</span>}
+            </span>
+          )}
+        </div>
+        <div className="text-xs md:text-sm text-white/70 uppercase tracking-widest font-medium">
+          {label}
+        </div>
       </div>
     </div>
   );
@@ -66,13 +72,17 @@ function AnimatedStat({ value, suffix = '', label, isLoading }: AnimatedStatProp
 
 function CountdownUnit({ value, label }: CountdownUnitProps) {
   return (
-    <div className="flex flex-col items-center">
-      <div className="bg-black/60 backdrop-blur-sm border border-amber-500/30 rounded-lg px-3 py-2 md:px-4 md:py-3 min-w-[60px] md:min-w-[80px]">
-        <span className="text-2xl md:text-4xl font-black text-amber-400 tabular-nums">
+    <div className="flex flex-col items-center group">
+      <div className="relative bg-black/70 backdrop-blur-md border border-amber-500/40 rounded-xl px-4 py-3 md:px-5 md:py-4 min-w-[70px] md:min-w-[90px] overflow-hidden group-hover:border-amber-400/60 transition-colors duration-300">
+        {/* Reflex superior - efecte vidre */}
+        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+        
+        {/* Número amb glow */}
+        <span className="relative text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-amber-300 to-amber-500 tabular-nums drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]">
           {String(value).padStart(2, '0')}
         </span>
       </div>
-      <span className="text-[10px] md:text-xs text-white/50 uppercase tracking-wider mt-1">
+      <span className="text-[10px] md:text-xs text-white/60 uppercase tracking-widest font-medium mt-2">
         {label}
       </span>
     </div>
@@ -284,37 +294,44 @@ export default function HeroBrutalReal() {
             <GoogleRatingBadge />
           </motion.div>
 
-          {/* Badge principal */}
+          {/* Badge principal - Premium amb glow */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="mb-6"
+            className="mb-8"
           >
-            <span className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-black px-4 py-2 rounded-full text-sm font-bold">
-              <span className="animate-pulse">🔥</span>
-              {t('badge')}
-              <span className="animate-pulse">🔥</span>
+            <span className="relative inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold overflow-hidden group">
+              {/* Fons gradient animat */}
+              <span className="absolute inset-0 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 bg-[length:200%_auto] animate-shimmer pointer-events-none" />
+              {/* Glow blur */}
+              <span className="absolute inset-0 blur-xl bg-amber-500/50 scale-150 opacity-50 pointer-events-none" />
+              {/* Contingut */}
+              <span className="relative z-10 flex items-center gap-2 text-black">
+                <span className="animate-bounce">🔥</span>
+                {t('badge')}
+                <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>🔥</span>
+              </span>
             </span>
           </motion.div>
 
-          {/* Headline rotativa - dues línies */}
-          <div className="min-h-[140px] md:min-h-[200px] mb-6 flex flex-col items-center justify-center">
+          {/* Headline rotativa - Premium amb efectes */}
+          <div className="min-h-[160px] md:min-h-[220px] mb-8 flex flex-col items-center justify-center">
             <AnimatePresence mode="wait">
               <motion.h1
                 key={currentHeadline}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-                transition={{ duration: 0.5 }}
+                initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -50, scale: 0.95 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 className="text-center"
               >
-                {/* Línia 1 - text blanc */}
-                <span className="block text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-2">
+                {/* Línia 1 - text blanc amb ombra */}
+                <span className="block text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-tight mb-3 drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
                   {headlines[currentHeadline].line1}
                 </span>
-                {/* Línia 2 - text destacat en gradient */}
-                <span className="block text-4xl md:text-6xl lg:text-7xl font-black leading-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
+                {/* Línia 2 - gradient amb glow espectacular */}
+                <span className="block text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-orange-500 drop-shadow-[0_0_30px_rgba(251,191,36,0.5)]">
                   {headlines[currentHeadline].line2}
                 </span>
               </motion.h1>
@@ -326,7 +343,7 @@ export default function HeroBrutalReal() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-lg md:text-xl text-white/70 mb-8 max-w-3xl mx-auto"
+            className="text-lg md:text-xl lg:text-2xl text-white/80 mb-10 max-w-3xl mx-auto font-light"
           >
             {t('subtitle')}
           </motion.p>
@@ -370,21 +387,38 @@ export default function HeroBrutalReal() {
           >
             <Link
               href="/contacto"
-              className="group relative w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-lg rounded-full overflow-hidden transition-all hover:shadow-lg hover:shadow-amber-500/30 hover:scale-105"
+              className="group relative w-full sm:w-auto px-10 py-5 overflow-hidden rounded-full transform hover:scale-105 transition-all duration-500 hover:shadow-[0_0_60px_rgba(251,191,36,0.4)]"
             >
-              <span className="relative z-10 flex items-center justify-center gap-2">
+              {/* Fons base gradient */}
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 pointer-events-none" />
+              
+              {/* Shimmer animat */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
+              
+              {/* Glow pulsant */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-yellow-300 to-orange-400 blur-xl animate-pulse" />
+              </div>
+              
+              {/* Contingut */}
+              <span className="relative z-10 flex items-center justify-center gap-3 text-black font-black text-lg tracking-wide">
                 {t('cta.primary')}
-                <span className="group-hover:translate-x-1 transition-transform">→</span>
+                <span className="group-hover:translate-x-2 transition-transform duration-300 text-xl">→</span>
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             </Link>
             
             <Link
               href="/portfolio"
-              className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold text-lg rounded-full hover:bg-white/20 hover:border-white/40 transition-all flex items-center justify-center gap-2"
+              className="group w-full sm:w-auto px-10 py-5 relative overflow-hidden rounded-full border-2 border-white/20 hover:border-amber-400/50 transition-all duration-500 hover:shadow-[0_0_40px_rgba(251,191,36,0.2)]"
             >
-              <span>▶</span>
-              {t('cta.secondary')}
+              {/* Fons glass */}
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm group-hover:bg-white/10 transition-all duration-500 pointer-events-none" />
+              
+              {/* Contingut */}
+              <span className="relative z-10 flex items-center justify-center gap-3 text-white font-semibold text-lg">
+                <span className="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full group-hover:bg-amber-500/20 transition-colors duration-300">▶</span>
+                {t('cta.secondary')}
+              </span>
             </Link>
           </motion.div>
 
