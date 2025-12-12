@@ -3,7 +3,7 @@
 // La galeria mes BRUTAL de tematiques disponibles!
 
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 

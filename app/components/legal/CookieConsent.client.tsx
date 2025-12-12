@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Cookie, X, Settings } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 
 const COOKIE_CONSENT_KEY = 'orbita_cookie_consent';

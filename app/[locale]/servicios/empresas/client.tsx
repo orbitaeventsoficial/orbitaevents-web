@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import ContactForm from "@/components/forms/ContactForm.client";
 import { Briefcase, Users, Lightbulb, Star, Check, FileText, Shield, TrendingUp, Handshake, Sparkles } from "lucide-react";
 import { useTranslations } from 'next-intl';

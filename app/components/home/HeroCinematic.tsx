@@ -12,7 +12,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 

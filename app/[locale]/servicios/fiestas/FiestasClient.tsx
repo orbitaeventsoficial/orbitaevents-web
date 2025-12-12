@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Zap, FileText, Star, TrendingUp, ArrowRight, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';

@@ -17,7 +17,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/config/site-config';
 import { trackLead } from '@/lib/analytics';

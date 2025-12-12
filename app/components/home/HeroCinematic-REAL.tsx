@@ -15,7 +15,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 

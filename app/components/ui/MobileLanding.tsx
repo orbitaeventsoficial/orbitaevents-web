@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 

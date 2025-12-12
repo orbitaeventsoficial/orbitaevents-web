@@ -12,7 +12,7 @@
 
 import { Metadata } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { PORTFOLIO_IMAGES } from '@/config/portfolio-images';
 import { getTranslations } from 'next-intl/server';
 

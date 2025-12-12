@@ -2,7 +2,7 @@
 // app/error.tsx
 
 import { useEffect } from 'react';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { MessageCircle, Home, RefreshCcw, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';

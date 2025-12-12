@@ -15,7 +15,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAvailability, useCountdown } from '@/hooks/usePublicData';
 

@@ -16,7 +16,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTestimonials, usePublicStats } from '@/hooks/usePublicData';
 

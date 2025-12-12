@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Star, Quote, MapPin, Clock, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 
 // Dades estàtiques (no traduïbles)
 const TESTIMONIAL_IMAGE = '/images/tematicas/mon-magic/hero/01-taula-panoramica-cartell.jpg';

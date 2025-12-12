@@ -1,7 +1,7 @@
 "use client";
 
 import { SITE_CONFIG } from '@/config/site-config';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { useState } from "react";
 import { Search, ChevronDown, MessageCircle, FileText } from "lucide-react";
 import { FAQ_DATA } from '@/config/faq-data';

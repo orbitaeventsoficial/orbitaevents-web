@@ -1,6 +1,6 @@
 import { Star, Users, Calendar, Zap, Music, Lightbulb, Sparkles, PartyPopper, ArrowRight } from 'lucide-react';
 import { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { getTranslations } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { SITE_CONFIG, getWhatsAppUrl } from '@/config/site-config';
 import { Ghost, Skull, Moon, Sparkles, Star, CheckCircle, Calendar, MessageCircle, ArrowRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';

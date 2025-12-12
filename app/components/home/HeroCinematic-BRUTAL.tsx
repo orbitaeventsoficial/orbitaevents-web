@@ -23,7 +23,7 @@
  */
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 

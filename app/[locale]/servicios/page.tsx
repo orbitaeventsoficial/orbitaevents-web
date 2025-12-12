@@ -1,6 +1,6 @@
 // app/servicios/page.tsx
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import {
   Music,
   Heart,

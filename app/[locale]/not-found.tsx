@@ -1,5 +1,5 @@
 // app/[locale]/not-found.tsx
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 
 export default function NotFound() {

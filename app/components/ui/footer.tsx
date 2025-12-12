@@ -5,7 +5,7 @@
 
 "use client";
 
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { SITE_CONFIG } from '@/config/site-config';
 import Image from 'next/image';
 import { motion } from 'framer-motion';

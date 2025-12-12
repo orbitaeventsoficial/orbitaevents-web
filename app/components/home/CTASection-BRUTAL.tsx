@@ -20,7 +20,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════

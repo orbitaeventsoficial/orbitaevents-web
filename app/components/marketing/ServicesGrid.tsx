@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 
 const SERVICE_KEYS = ['weddings', 'corporate', 'rental'] as const;

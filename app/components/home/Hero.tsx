@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { Stats } from './Stats';
 import { useTranslations } from 'next-intl';
 

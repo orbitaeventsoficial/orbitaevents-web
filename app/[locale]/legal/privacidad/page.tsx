@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 export default function PrivacidadPage() {
