@@ -1,14 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, getTranslations } from "next-intl/server";
-import { locales, localeConfig, type Locale } from "@/i18n";
-import { inter, outfit, space } from "@/app/fonts";
+import { getMessages } from "next-intl/server";
+import { locales, type Locale } from "@/i18n";
 import "@/app/globals.css";
 
 // Components
 import LayoutWrapper from "@/app/components/layout/LayoutWrapper";
-import StructuredData from "@/app/components/seo/StructuredData";
 
 // JSON-LD estàtic per SEO (no necessita traduccions - Google entén qualsevol idioma)
 const JSON_LD_DATA = {
@@ -200,30 +198,13 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  // Carregar missatges i traduccions
+  // Carregar missatges per i18n
   const messages = await getMessages();
-  const t = await getTranslations({ locale, namespace: 'common.nav' });
 
   // HYDRATION FIX: No renderizar <html> aquí - ya lo hace app/layout.tsx
   // Solo renderizar el contenido con el provider de i18n
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>
-      {/* Schema.org JSON-LD per SEO - injectat com a script inline */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_DATA) }}
-      />
-
-      {/* Skip link per accessibilitat */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
-                   focus:z-[100] focus:px-4 focus:py-2 focus:bg-amber-400 focus:text-black
-                   focus:rounded-lg focus:font-bold focus:outline-none"
-      >
-        {t('skip')}
-      </a>
-
       <LayoutWrapper>
         {children}
       </LayoutWrapper>
