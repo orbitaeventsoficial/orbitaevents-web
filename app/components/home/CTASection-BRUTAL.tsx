@@ -67,18 +67,29 @@ function GuaranteeBadge({ t }: { t: (key: string) => string }) {
 // AVAILABILITY CALENDAR MINI
 // ═══════════════════════════════════════════════════════════════════════════
 
+type MonthStatus = 'critical' | 'warning' | 'ok';
+type MonthData = { name: string; available: number; status: MonthStatus };
+
 function AvailabilityMini({ t, locale }: { t: (key: string) => string; locale: string }) {
-  const months = useMemo(() => {
+  // SSR-safe: use static defaults, update on client
+  const [months, setMonths] = useState<MonthData[]>([
+    { name: 'DES', available: 2, status: 'warning' },
+    { name: 'GEN', available: 3, status: 'ok' },
+    { name: 'FEB', available: 2, status: 'warning' },
+  ]);
+
+  useEffect(() => {
     const now = new Date();
-    return [0, 1, 2].map(offset => {
+    const newMonths = [0, 1, 2].map(offset => {
       const date = new Date(now.getFullYear(), now.getMonth() + offset, 1);
       const available = Math.floor(Math.random() * 3) + 1;
       return {
         name: date.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { month: 'short' }).toUpperCase(),
         available,
-        status: available <= 1 ? 'critical' : available <= 2 ? 'warning' : 'ok'
+        status: (available <= 1 ? 'critical' : available <= 2 ? 'warning' : 'ok') as MonthStatus
       };
     });
+    setMonths(newMonths);
   }, [locale]);
 
   return (

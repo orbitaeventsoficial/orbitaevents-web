@@ -26,6 +26,12 @@ export default function ContactForm() {
   const [confetti, setConfetti] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [windowSize, setWindowSize] = useState({ width: 300, height: 300 });
+
+  // Set window size on client to avoid hydration mismatch
+  useEffect(() => {
+    setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+  }, []);
 
   /* -------------------------------------------------------------------------- */
   /*  SCHEMA ZOD – Validació robusta per email/telèfon                          */
@@ -110,8 +116,8 @@ export default function ContactForm() {
       >
         {confetti && (
           <Confetti
-            width={typeof window !== "undefined" ? window.innerWidth : 300}
-            height={typeof window !== "undefined" ? window.innerHeight : 300}
+            width={windowSize.width}
+            height={windowSize.height}
             recycle={false}
             numberOfPieces={300}
           />

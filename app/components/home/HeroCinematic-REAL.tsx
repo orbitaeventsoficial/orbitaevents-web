@@ -467,7 +467,7 @@ export default function HeroCinematicBrutalReal() {
             <CountdownTimerReal targetDate={countdownTarget} />
           </div>
 
-          <p className="mt-3 text-xs sm:text-sm text-white/50 text-center">
+          <p className="mt-3 text-xs sm:text-sm text-white/50 text-center" suppressHydrationWarning>
             {t('urgency.remaining')}{' '}
             <span className="text-amber-400 font-bold">
               {isLoading ? '--' : currentMonthAvailable} {t('urgency.saturdays')}

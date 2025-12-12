@@ -98,12 +98,13 @@ function getNextSaturday(): string {
   return nextSat.toISOString().slice(0, 10);
 }
 
+// SSR-safe defaults - DO NOT call getNextSaturday() here as it uses new Date()
 const defaultAvailability: AvailabilityData = {
-  nextAvailableDate: getNextSaturday(),
-  nextAvailableSaturday: getNextSaturday(),
+  nextAvailableDate: '', // Will be set on client
+  nextAvailableSaturday: '', // Will be set on client
   monthlyAvailability: [],
-  scarcityMessage: 'Només queden 2 dissabtes aquest mes', // Missatge per defecte amb urgència
-  urgencyLevel: 'high', // Sempre mostrar urgència per defecte
+  scarcityMessage: 'Només queden 2 dissabtes aquest mes',
+  urgencyLevel: 'high',
 };
 
 export function useAvailability(): UseAvailabilityReturn {

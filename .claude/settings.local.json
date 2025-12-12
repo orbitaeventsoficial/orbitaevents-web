@@ -29,7 +29,17 @@
       "Bash(for url in \"/\" \"/es\" \"/servicios/bodas\" \"/servicios/discomovil\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/contacto\" \"/portfolio\")",
       "Bash(do echo -n \"$url: \")",
       "Bash(done)",
-      "Bash(for url in \"/\" \"/es\" \"/servicios/bodas\" \"/servicios/discomovil\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/contacto\" \"/portfolio\" \"/legal/cookies\" \"/legal/privacidad\" \"/legal/terminos\")"
+      "Bash(for url in \"/\" \"/es\" \"/servicios/bodas\" \"/servicios/discomovil\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/contacto\" \"/portfolio\" \"/legal/cookies\" \"/legal/privacidad\" \"/legal/terminos\")",
+      "Bash(for url in \"/\" \"/es\" \"/servicios/bodas\" \"/contacto\" \"/portfolio\")",
+      "Bash(cat:*)",
+      "Bash(timeout 180 pnpm run build:*)",
+      "Bash(npx next build)",
+      "Bash(npx tsc:*)",
+      "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/portfolio\")",
+      "Bash(while read js)",
+      "Bash(do echo -n \"$js: \")",
+      "Bash(for page in \"/\" \"/contacto\" \"/es\")",
+      "Bash(do echo -n \"$page: \")"
     ]
   }
 }
