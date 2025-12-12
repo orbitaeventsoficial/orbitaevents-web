@@ -455,27 +455,17 @@
     "badge": "Lo que necesitas"
   },
   "stats": {
-    "rating": "Google",
-    "events": "eventos",
-    "eventsCompleted": "Eventos celebrados",
-    "peopleDancing": "gente bailando",
-    "recommendRate": "Nos recomiendan",
-    "yearsExperience": "años en el sector",
-    "satisfaction": "satisfacción",
-    "coverage": "Barcelona + Girona",
-    "dedication": "dedicación",
-    "response": "Respuesta",
-    "recommendation": "satisfacción",
-    "noIncidents": "Eventos realizados sin incidentes",
-    "backupEquipment": "Con un equipo de seguridad completo",
-    "repeatRecommend": "Repiten o recomiendan",
     "badge": "📊 Números reales",
+    "yearsExperience": "años en el sector",
+    "eventsCompleted": "Eventos celebrados",
+    "response": "Respuesta",
+    "coverage": "Barcelona + Girona",
     "title": "Nuestros",
     "titleHighlight": "resultados",
     "subtitle": "Datos actualizados en tiempo real desde nuestra base de datos. Cero números inventados.",
     "footer": "Datos actualizados automáticamente. Última actualización: hoy.",
     "googleReviews": "reseñas en Google",
-    "eventsDetailed": {
+    "events": {
       "label": "Eventos realizados",
       "description": "Bodas, fiestas y corporativos"
     },
@@ -483,7 +473,7 @@
       "label": "Bodas",
       "description": "Días especiales memorables"
     },
-    "ratingDetailed": {
+    "rating": {
       "label": "Valoración media",
       "description": "De clientes verificados"
     },
@@ -498,7 +488,17 @@
     "coverageDetailed": {
       "label": "Provincias",
       "description": "Barcelona y Girona"
-    }
+    },
+    "ratingOld": "Google",
+    "eventsOld": "eventos",
+    "peopleDancing": "gente bailando",
+    "recommendRate": "Nos recomiendan",
+    "satisfaction": "satisfacción",
+    "dedication": "dedicación",
+    "recommendation": "satisfacción",
+    "noIncidents": "Eventos realizados sin incidentes",
+    "backupEquipment": "Con un equipo de seguridad completo",
+    "repeatRecommend": "Repiten o recomiendan"
   },
   "sections": {
     "services": {

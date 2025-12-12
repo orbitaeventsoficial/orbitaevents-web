@@ -183,8 +183,8 @@ export default function StatsSectionReal() {
     {
       icon: '📍',
       value: 2,
-      label: t('coverage.label'),
-      description: t('coverage.description'),
+      label: t('coverageDetailed.label'),
+      description: t('coverageDetailed.description'),
       color: 'green',
     },
   ];
