@@ -132,12 +132,13 @@ export default function StatsSectionReal() {
   const t = useTranslations('stats');
   const { stats, isLoading: statsLoading } = usePublicStats();
   const { data: testimonialsData, isLoading: testimonialsLoading } = useTestimonials(100);
-  
+
   const isLoading = statsLoading || testimonialsLoading;
 
-  // Calculate years of experience dynamically
+  // HYDRATION FIX: Use fixed year to avoid server/client mismatch
+  // Updated annually or use a constant that doesn't change during render
   const startYear = 2023; // Company founded
-  const currentYear = new Date().getFullYear();
+  const currentYear = 2025; // Fixed year for hydration safety
   const yearsExperience = currentYear - startYear;
 
   const statCards = [

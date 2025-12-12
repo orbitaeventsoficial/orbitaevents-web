@@ -389,8 +389,9 @@ export default function Footer() {
         <div className="py-6 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Copyright */}
-            <p className="text-white/40 text-sm text-center md:text-left" suppressHydrationWarning>
-              © {new Date().getFullYear()} Òrbita Events · {t('since')} · {t('copyright')}
+            {/* HYDRATION FIX: Fixed year to avoid server/client mismatch */}
+            <p className="text-white/40 text-sm text-center md:text-left">
+              © 2025 Òrbita Events · {t('since')} · {t('copyright')}
             </p>
 
             {/* Legal Links */}
