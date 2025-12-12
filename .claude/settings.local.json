@@ -39,7 +39,8 @@
       "Bash(while read js)",
       "Bash(do echo -n \"$js: \")",
       "Bash(for page in \"/\" \"/contacto\" \"/es\")",
-      "Bash(do echo -n \"$page: \")"
+      "Bash(do echo -n \"$page: \")",
+      "Bash(ls:*)"
     ]
   }
 }

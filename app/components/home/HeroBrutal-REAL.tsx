@@ -267,7 +267,7 @@ export default function HeroBrutalReal() {
         {/* Fallback image mentre carrega video */}
         {!videoLoaded && (
           <Image
-            src="/img/hero-fallback.webp"
+            src="/img/hero-home-visual.jpg"
             alt="Òrbita Events - DJ Barcelona"
             fill
             className="object-cover opacity-40"
