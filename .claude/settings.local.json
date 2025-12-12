@@ -24,7 +24,8 @@
       "Bash(del \"C:\\Users\\Lore\\Desktop\\orbitaevents\\lib\\navigation.ts\")",
       "Bash(node -e:*)",
       "Bash(grep:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(pkill:*)"
     ]
   }
 }
