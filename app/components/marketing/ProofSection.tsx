@@ -7,21 +7,28 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
-const clientLogos = [
-  { src: '/img/logos/cliente1.webp', alt: 'Moto Offroad Academy' },
-  { src: '/img/logos/cliente2.webp', alt: 'Masia El Massaguer' },
-  { src: '/img/logos/cliente3.webp', alt: 'AECC' },
-  { src: '/img/logos/cliente4.webp', alt: 'Clap' },
-  { src: '/img/logos/cliente5.webp', alt: 'Ajuntament de Granollers' },
-  { src: '/img/logos/cliente6.webp', alt: 'Ajuntament de Terrassa' },
-  { src: '/img/logos/cliente7.webp', alt: 'MG Medicina Estètica' },
-  { src: '/img/logos/cliente8.webp', alt: 'Zona Motor L\'Ametlla Park' },
-
-].filter(Boolean);
+// Els src dels logos són fixes; els alt vindran de traduccions
+const clientLogoSrcs = [
+  '/img/logos/cliente1.webp',
+  '/img/logos/cliente2.webp',
+  '/img/logos/cliente3.webp',
+  '/img/logos/cliente4.webp',
+  '/img/logos/cliente5.webp',
+  '/img/logos/cliente6.webp',
+  '/img/logos/cliente7.webp',
+  '/img/logos/cliente8.webp',
+];
 
 export default function ProofSection() {
   const t = useTranslations('proof');
   const tStats = useTranslations('stats');
+  const tLogos = useTranslations('logoWall');
+
+  // Genera logos amb alt text traduït
+  const clientLogos = clientLogoSrcs.map((src, idx) => ({
+    src,
+    alt: tLogos(`clients.${idx}`),
+  }));
 
   const validLogos = clientLogos.filter(logo => logo.src);
   if (validLogos.length === 0) return null;

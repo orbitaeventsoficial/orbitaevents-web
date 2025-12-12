@@ -521,14 +521,14 @@ export default function SensorialClient() {
             <button
               onClick={() => setShowInfo(!showInfo)}
               className="p-2 rounded-full bg-white/10 text-white/80 hover:bg-white/20 transition-colors"
-              aria-label="Informació"
+              aria-label={t('ariaInfo')}
             >
               <Info className="w-5 h-5" />
             </button>
             <button
               onClick={() => setShowPanel(!showPanel)}
               className="p-2 rounded-full bg-white/10 text-white/80 hover:bg-white/20 transition-colors"
-              aria-label="Configuració"
+              aria-label={t('ariaSettings')}
             >
               <Settings2 className="w-5 h-5" />
             </button>

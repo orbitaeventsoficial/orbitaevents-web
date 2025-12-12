@@ -18,6 +18,7 @@ import { useTranslations } from 'next-intl';
 
 export function HeroCinematic() {
   const t = useTranslations('hero');
+  const tWhatsapp = useTranslations('whatsappMessages');
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -141,7 +142,7 @@ export function HeroCinematic() {
           className="mt-4 flex items-center gap-4 text-sm"
         >
           <Link
-            href="https://wa.me/34699121023?text=Hola!%20Vull%20info%20sobre%20un%20event"
+            href={`https://wa.me/34699121023?text=${encodeURIComponent(tWhatsapp('general'))}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-white/50 hover:text-green-400 transition-colors flex items-center gap-1.5"

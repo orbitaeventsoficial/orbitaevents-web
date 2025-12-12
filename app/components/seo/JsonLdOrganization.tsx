@@ -1,17 +1,23 @@
 // app/components/seo/JsonLdOrganization.tsx
 import { SITE_CONFIG } from '@/config/site-config';
-export default function JsonLdOrganization() {
-  
+import { getTranslations } from 'next-intl/server';
+
+interface Props {
+  locale: string;
+}
+
+export default async function JsonLdOrganization({ locale }: Props) {
+  const t = await getTranslations({ locale, namespace: 'seoJsonLd' });
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Òrbita Events',
     alternateName: 'Orbita Events',
     url: 'https://orbitaevents.com',
-    logo: 'https://orbitaeventcom/logo.png',
+    logo: 'https://orbitaevents.com/logo.png',
     image: 'https://orbitaevents.com/og-default.jpg',
-    description:
-      'Eventos profesionales en Barcelona y Girona: bodas, fiestas privadas, eventos corporativos. DJ profesional, tematización de fiestas y efectos especiales. 2+ años de experiencia.',
+    description: t('organization.description'),
     telephone: SITE_CONFIG.business.phone,
     email: SITE_CONFIG.business.email,
     address: {
@@ -26,27 +32,14 @@ export default function JsonLdOrganization() {
       longitude: 2.1734,
     },
     areaServed: [
-      {
-        '@type': 'City',
-        name: 'Barcelona',
-      },
-      {
-        '@type': 'City',
-        name: 'Girona',
-      },
-      {
-        '@type': 'AdministrativeArea',
-        name: 'Costa Brava',
-      },
-      {
-        '@type': 'AdministrativeArea',
-        name: 'Maresme',
-      },
+      { '@type': 'City', name: 'Barcelona' },
+      { '@type': 'City', name: 'Girona' },
+      { '@type': 'AdministrativeArea', name: 'Costa Brava' },
+      { '@type': 'AdministrativeArea', name: 'Maresme' },
     ],
     sameAs: [
       'https://www.instagram.com/orbitaeventsoficial',
       'https://www.facebook.com/orbitaeventsoficial',
-      // Añade más perfiles sociales si existen
     ],
     contactPoint: {
       '@type': 'ContactPoint',
@@ -56,7 +49,6 @@ export default function JsonLdOrganization() {
       availableLanguage: ['Spanish', 'Catalan'],
       contactOption: 'TollFree',
     },
-    // AggregateRating eliminat - no tenim reviews de Google actives
     priceRange: '€€',
     openingHoursSpecification: [
       {
@@ -80,48 +72,48 @@ export default function JsonLdOrganization() {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'Bodas',
-            description: 'DJ + luces + efectos para bodas épicas',
+            name: t('services.bodas.name'),
+            description: t('services.bodas.description'),
           },
         },
         {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'Discomóvil',
-            description: 'DJ profesional + equipamiento para fiestas',
+            name: t('services.discomovil.name'),
+            description: t('services.discomovil.description'),
           },
         },
         {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'Fiestas Privadas',
-            description: 'Cumpleaños, despedidas y fiestas temáticas',
+            name: t('services.fiestas.name'),
+            description: t('services.fiestas.description'),
           },
         },
         {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'Eventos Corporativos',
-            description: 'Team building, cenas empresa, presentaciones',
+            name: t('services.corporativo.name'),
+            description: t('services.corporativo.description'),
           },
         },
         {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'Producción Técnica',
-            description: 'Montaje y operación técnica profesional',
+            name: t('services.produccion.name'),
+            description: t('services.produccion.description'),
           },
         },
         {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'Alquiler Equipamiento',
-            description: 'Alquiler sonido, luces y equipamiento DJ',
+            name: t('services.alquiler.name'),
+            description: t('services.alquiler.description'),
           },
         },
       ],

@@ -1,4 +1,93 @@
 {
+  "halloweenPage": {
+    "meta": {
+      "title": "Fiesta Halloween Barcelona | Decoración + DJ + Efectos | Òrbita Events",
+      "description": "Transforma tu evento en una noche de terror. Decoración temática, DJ especializado, humo, luces sincronizadas y efectos especiales. Desde 600€."
+    },
+    "badge": "Temporada Halloween 2025",
+    "hero": {
+      "title1": "NOCHES DE",
+      "title2": "TERROR",
+      "subtitle": "Transforma tu evento en una experiencia terroríficamente memorable. Decoración, DJ, efectos especiales y todo lo que necesitas."
+    },
+    "cta": {
+      "reserve": "Reserva tu noche de terror",
+      "whatsapp": "WhatsApp directo",
+      "reserve2025": "Reserva Halloween 2025",
+      "requestInfo": "Solicitar info"
+    },
+    "gallery": {
+      "title": "Eventos Halloween",
+      "titleHighlight": "reales",
+      "subtitle": "No son mockups. Son fiestas que hemos creado."
+    },
+    "includes": {
+      "title": "¿Qué incluye una noche",
+      "titleHighlight": "Halloween?",
+      "dj": {
+        "title": "DJ Temático",
+        "description": "Playlist curada de Halloween: desde clásicos (Thriller, Ghostbusters) hasta remixes actuales. El DJ puede ir caracterizado."
+      },
+      "decoration": {
+        "title": "Decoración Completa",
+        "description": "Telarañas, calabazas LED, esqueletos, calaveras, telas de saco, velas falsas, carteles vintage de terror..."
+      },
+      "effects": {
+        "title": "Efectos Especiales",
+        "description": "Humo bajo que recorre el suelo, luces rojas y verdes sincronizadas, efectos de sonido terroríficos, chispas frías."
+      }
+    },
+    "packs": {
+      "title": "Packs",
+      "titleHighlight": "Halloween",
+      "subtitle": "Elige el nivel de terror que quieres",
+      "mostRequested": "MÁS PEDIDO",
+      "hours": "horas",
+      "basic": {
+        "name": "Terror Básico",
+        "includes": [
+          "DJ temático 4 horas",
+          "Sonido 4000W",
+          "Iluminación roja/verde",
+          "Máquina de humo",
+          "Playlist Halloween curada"
+        ]
+      },
+      "night": {
+        "name": "Noche de Miedo",
+        "includes": [
+          "DJ temático 5 horas",
+          "Sonido 4000W + subwoofer",
+          "4 cabezas móviles sincronizadas",
+          "Humo bajo (suelo)",
+          "Decoración básica (telarañas, calabazas LED)",
+          "Efectos de sonido terroríficos"
+        ]
+      },
+      "zombie": {
+        "name": "Apocalipsis Zombie",
+        "includes": [
+          "DJ + Técnico de luces 6 horas",
+          "Sonido club 4000W",
+          "Show de luces completo",
+          "Humo bajo + máquina de niebla",
+          "Decoración completa (200+ elementos)",
+          "Chispas frías para momentos clave",
+          "CO2 criogénico",
+          "Actor/animador zombie opcional"
+        ]
+      }
+    },
+    "testimonial": {
+      "quote": "La mejor fiesta de Halloween que hemos hecho nunca. Los niños no paraban de gritar de emoción (¡y un poco de miedo!). Repetiremos seguro.",
+      "author": "Familia Martínez, Halloween 2024"
+    },
+    "finalCta": {
+      "title1": "¿Preparado para una noche",
+      "title2": "terroríficamente buena?",
+      "footer": "📍 Barcelona y Girona · ⚡ Respuesta en 2 horas · ✓ Sin compromiso"
+    }
+  },
   "loader": {
     "launching": "Lanzando Òrbita…",
     "wow": "WOW en",
@@ -91,6 +180,37 @@
   },
   "hero": {
     "badge": "🔥 DJ + Sonido + Luces + Efectos Especiales",
+    "themingSpecialists": "Especialistas en Tematización",
+    "location": "Barcelona + Girona",
+    "stats": {
+      "dreams": "sueños hechos realidad",
+      "rating": "en Google",
+      "repeat": "repiten con nosotros",
+      "years": "años de experiencia",
+      "yearsValue": "15+",
+      "events": "eventos con Òrbita",
+      "eventsValue": "48+",
+      "response": "respuesta garantizada",
+      "responseTime": "respuesta garantizada",
+      "responseTimeValue": "2h",
+      "coverage": "Cobertura",
+      "location": "BCN + Girona"
+    },
+    "simpleBadge": "Venimos del sector de eventos",
+    "simpleTitle1": "DJ y Discomóvil para",
+    "simpleTitle2": "Bodas y Eventos Barcelona",
+    "simpleSubtitle": "No somos un DJ cualquiera. Venimos del mundo de los eventos – hemos vivido miles de bodas desde dentro.",
+    "simpleSubtitleHighlight": "Sabemos exactamente qué hace que tu evento funcione.",
+    "simpleServices": {
+      "dj": "DJ Profesional",
+      "lighting": "Iluminación PRO",
+      "effects": "Efectos Especiales",
+      "theming": "Tematización"
+    },
+    "simpleCta": {
+      "budget": "Pide presupuesto",
+      "whatsapp": "WhatsApp directo 💬"
+    },
     "happyClients": "eventos felices",
     "headline1": "A las 4am tu suegra",
     "headline2": "BAILABA DESCALZA",
@@ -137,7 +257,6 @@
     },
     "punchline": "Eso hacemos.",
     "services": "DJ + Sonido + Luces + Efectos + Tematización",
-    "location": "Barcelona + Girona",
     "response": "Respuesta en 2h",
     "cta": {
       "primary": "Pide Presupuesto Gratis",
@@ -147,20 +266,6 @@
     },
     "scarcity": "Enero 2026: quedan 2 sábados",
     "mobileCta": "Presupuesto Gratis",
-    "stats": {
-      "dreams": "sueños hechos realidad",
-      "rating": "en Google",
-      "repeat": "repiten con nosotros",
-      "years": "años de experiencia",
-      "yearsValue": "15+",
-      "events": "eventos con Òrbita",
-      "eventsValue": "48+",
-      "response": "respuesta garantizada",
-      "responseTime": "respuesta garantizada",
-      "responseTimeValue": "2h",
-      "coverage": "Cobertura",
-      "location": "BCN + Girona"
-    },
     "serviceLabels": {
       "dj": "DJ",
       "sound": "Sonido",
@@ -296,6 +401,7 @@
     "timeAgo": "hace {time}"
   },
   "services": {
+    "badge": "Lo que necesitas",
     "title": "¿Qué necesitas?",
     "subtitle": "Elige el tipo de evento y te ayudamos a crearlo",
     "viewMore": "Ver más",
@@ -345,7 +451,8 @@
       "name": "Alquiler de equipos",
       "icon": "🔊",
       "tagline": "Equipos profesionales a tu alcance"
-    }
+    },
+    "badge": "Lo que necesitas"
   },
   "stats": {
     "rating": "Google",
@@ -482,45 +589,96 @@
     "testimonial": "\"La tematización de Escuela de Magia fue INCREÍBLE. Los invitados no paraban de hacer fotos. ¡Parecía que estábamos en un castillo encantado de verdad!\"",
     "testimonialAuthor": "— Lorena y Carles, Boda Mundo Mágico",
     "custom": "¿No ves lo que buscas? Hacemos",
-    "customSuffix": "cualquier temática que imagines.",
+    "customAny": "cualquier",
+    "customSuffix": "temática que imagines.",
     "contact": "Cuéntanos tu idea",
+    "monMagic": {
+      "title": "Mundo Mágico",
+      "subtitle": "Magia de escuela de hechicería en tu evento",
+      "description": "Transforma tu evento en una experiencia mágica: efectos de varitas, iluminación de velas flotantes, música encantada, e incluso humo que parece magia real."
+    },
+    "halloween": {
+      "title": "Halloween",
+      "subtitle": "La noche más terrorífica",
+      "description": "Convertimos cualquier espacio en una casa encantada: luces rojas y naranjas, humo bajo, efectos de sonido terroríficos."
+    },
     "themes": {
       "monmagic": {
         "name": "Mundo Mágico",
         "tagline": "Magia de escuela de hechicería en tu evento",
         "description": "Transforma tu evento en una experiencia mágica: efectos de varitas, iluminación de velas flotantes, música encantada, e incluso humo que parece magia real.",
-        "features": ["Efectos de varita mágica", "Velas flotantes", "Efectos de niebla mágica", "Playlist temática"]
+        "features": [
+          "Efectos de varita mágica",
+          "Velas flotantes",
+          "Efectos de niebla mágica",
+          "Playlist temática"
+        ]
       },
       "halloween": {
         "name": "Halloween",
         "tagline": "La noche más terrorífica",
         "description": "Convertimos cualquier espacio en una casa encantada: luces rojas y naranjas, humo bajo, efectos de sonido terroríficos, y una ambientación que hará gritar a tus invitados.",
-        "features": ["Decoración terrorífica", "Efectos de niebla", "Luces estroboscópicas", "Sonido ambiente espeluznante"]
+        "features": [
+          "Decoración terrorífica",
+          "Efectos de niebla",
+          "Luces estroboscópicas",
+          "Sonido ambiente espeluznante"
+        ]
       },
       "tropical": {
         "name": "Tropical",
         "tagline": "Paraíso en Catalunya",
         "description": "Trae el Caribe a tu casa: luces cálidas, efectos de palmeras proyectadas, música reggaeton y salsa, y una atmósfera que te hará sentir en la playa.",
-        "features": ["Proyecciones tropicales", "Luces cálidas", "Playlist caribeñas", "Efectos de puesta de sol"]
+        "features": [
+          "Proyecciones tropicales",
+          "Luces cálidas",
+          "Playlist caribeñas",
+          "Efectos de puesta de sol"
+        ]
       },
       "disco": {
         "name": "Disco 80s",
         "tagline": "Viaja a los años dorados",
         "description": "Bola de discoteca gigante, luces de neón, máquina de humo, y los mejores hits de los 70s y 80s. Una fiesta retro que hará bailar a todas las generaciones.",
-        "features": ["Bola disco gigante", "Luces de neón", "Disfraces de época opcional", "Greatest hits 70s-80s"]
+        "features": [
+          "Bola disco gigante",
+          "Luces de neón",
+          "Disfraces de época opcional",
+          "Greatest hits 70s-80s"
+        ]
       },
       "elegant": {
         "name": "Elegant Gold",
         "tagline": "Sofisticación pura",
         "description": "Para los que buscan clase y distinción: iluminación dorada, efectos sutiles pero impresionantes, música lounge y jazz, y una atmósfera de gala.",
-        "features": ["Iluminación dorada", "Efectos sutiles", "Jazz & Lounge", "Ambientación premium"]
+        "features": [
+          "Iluminación dorada",
+          "Efectos sutiles",
+          "Jazz & Lounge",
+          "Ambientación premium"
+        ]
       },
       "custom": {
         "name": "Tu Idea",
         "tagline": "Tú imaginas, nosotros creamos",
         "description": "¿Tienes una idea diferente? Peaky Blinders, Star Wars, Anime, Medieval... Cuéntanos tu visión y la hacemos realidad con efectos, música y ambientación a medida.",
-        "features": ["Diseño personalizado", "Cualquier temática", "Efectos a medida", "Asesoramiento creativo"]
+        "features": [
+          "Diseño personalizado",
+          "Cualquier temática",
+          "Efectos a medida",
+          "Asesoramiento creativo"
+        ]
       }
+    },
+    "monMagic": {
+      "title": "Mundo Mágico",
+      "subtitle": "Magia de escuela de hechicería en tu evento",
+      "description": "Transforma tu evento en una experiencia mágica: efectos de varitas, iluminación de velas flotantes, música encantada, e incluso humo que parece magia real."
+    },
+    "halloween": {
+      "title": "Halloween",
+      "subtitle": "La noche más terrorífica",
+      "description": "Convertimos cualquier espacio en una casa encantada: luces rojas y naranjas, humo bajo, efectos de sonido terroríficos, y una ambientación que hará gritar a tus invitados."
     }
   },
   "themes": {
@@ -664,7 +822,10 @@
       "title": "¡Deja tu opinión y gana hasta un 25% de descuento!",
       "description": "Valóranos y acumula descuentos para tu próximo evento. ¡Más detalles = más beneficios!",
       "cta": "Dejar opinión"
-    }
+    },
+    "rewardsSystem": "Sistema de Recompensas",
+    "rewardsDescription": "¡Deja tu opinión y gana hasta un 25% de descuento en tu próximo evento!",
+    "rewardsBreakdown": "Base 5% + Foto +5% + Vídeo +10% + Google +5%"
   },
   "ctaSection": {
     "title": "¿Hablamos de",
@@ -704,6 +865,7 @@
     }
   },
   "footer": {
+    "whatsappButton": "WhatsApp",
     "trust": {
       "experience": "Años de experiencia",
       "events": "Eventos celebrados",
@@ -745,7 +907,7 @@
       }
     },
     "copyright": "Todos los derechos reservados.",
-    "since": "15+ años de experiencia · Desde 2023",
+    "since": "2+ años de experiencia · Desde 2023",
     "tagline": "El evento que tu gente no olvidará"
   },
   "footerLinks": {
@@ -823,7 +985,15 @@
     "bodaHalloween": "Boda Halloween",
     "bodaHalloweenDesc": "El amor en la oscuridad",
     "viewAllExperiences": "Ver todas las experiencias",
-    "cta": "Pide Presupuesto"
+    "cta": "Pide Presupuesto",
+    "badges": {
+      "popular": "Popular",
+      "terrific": "Terrorífico",
+      "exclusive": "Exclusivo",
+      "summer": "Verano",
+      "retro": "Retro",
+      "premium": "Premium"
+    }
   },
   "mobileHeader": {
     "menu": "Menú",
@@ -837,6 +1007,8 @@
     "coverage": "Barcelona · Girona · Costa Brava",
     "experience": "15+ años",
     "locations": "BCN + Girona",
+    "location": "Barcelona + Girona",
+    "response": "Respuesta en 2h",
     "weddingsDesc": "DJ profesional para tu boda",
     "partiesDesc": "Cumpleaños y celebraciones",
     "corporateDesc": "Eventos de empresa",
@@ -1110,11 +1282,45 @@
       }
     }
   },
+  "opinionsPage": {
+    "comingSoon": "Próximamente",
+    "meta": {
+      "title": "Opiniones y Reseñas | Òrbita Events - DJ Bodas Barcelona",
+      "titleWithReviews": "Opiniones Reales DJ Bodas Barcelona | {rating}/5 en {count} Reseñas | Òrbita Events",
+      "description": "Más de {events} eventos realizados. Próximamente reseñas verificadas de Google. DJ profesional para bodas y eventos en Barcelona.",
+      "descriptionWithReviews": "Opiniones reales de bodas, fiestas y eventos. {rating}/5 en {count} reseñas verificadas. Sonido impecable, iluminación cuidada y momentos inolvidables.",
+      "ogTitle": "Opiniones y Reseñas | Òrbita Events",
+      "ogTitleWithReviews": "Opiniones Reales | {rating}/5 | Òrbita Events",
+      "ogDescription": "Más de {events} eventos realizados. DJ profesional en Barcelona.",
+      "ogDescriptionWithReviews": "{rating}/5 en {count} reseñas de bodas y eventos.",
+      "twitterDescription": "Más de {events} eventos realizados.",
+      "twitterDescriptionWithReviews": "{rating}/5 en {count} reseñas verificadas.",
+      "imageAlt": "Reseñas de bodas con DJ en Barcelona"
+    },
+    "jsonLd": {
+      "description": "Más de {events} eventos realizados en Catalunya."
+    },
+    "faq": {
+      "q1": "¿Qué opinan los clientes de Òrbita Events?",
+      "a1": "Hemos realizado más de {events} eventos con clientes satisfechos. Próximamente podrás ver reseñas verificadas de Google.",
+      "a1WithReviews": "Valoración media de {rating}/5 en {count} reseñas. Nuestros clientes destacan el sonido, el montaje y la capacidad del DJ para mantener la pista y divertir a los invitados.",
+      "q2": "¿Son reseñas reales?",
+      "a2": "Estamos en proceso de recopilar reseñas verificadas en Google Business. Mientras tanto, puedes contactarnos para referencias directas.",
+      "a2WithReviews": "Sí, todas verificadas de bodas y eventos en Barcelona y Girona. Enlazamos directamente a Google.",
+      "q3": "¿Cómo puedo dejar una reseña?",
+      "a3": "Puedes enviarnos tu opinión por correo a {email}. Pronto activaremos nuestro perfil de Google Business para reseñas públicas.",
+      "a3WithGoogleUrl": "Puedes hacerlo desde nuestro perfil de Google Business o enviándola por correo a {email}. Cada opinión cuenta y nos ayuda a seguir mejorando."
+    }
+  },
   "reviews": {
     "title": "Opiniones reales",
     "subtitle": "Lo que dicen nuestras parejas y clientes",
     "ratingText": "en {count} reseñas",
     "verifiedReviews": "opiniones verificadas",
+    "comingSoon": "Próximamente",
+    "founderRole": "Boda",
+    "founderEvent": "Boda Mundo Mágico – Cataluña",
+    "founderText": "Estamos preparando nuestra boda temática con Òrbita Events. La planificación ha sido increíble: velas flotantes, sobres personalizados con lacre rojo, decoración con símbolos mágicos... ¡Estamos muy ilusionados!",
     "filters": {
       "all": "Todos",
       "weddings": "Bodas",
@@ -1154,6 +1360,14 @@
       "description": "Descubre nuestras experiencias temáticas únicas: Mundo Mágico (estilo Harry Potter), Halloween, Disco 80s, Tropical y más. Tematización completa para tu evento."
     },
     "badge": "Experiencias Únicas",
+    "badges": {
+      "popular": "Popular",
+      "terrific": "Terrorífico",
+      "exclusive": "Exclusivo",
+      "summer": "Verano",
+      "retro": "Retro",
+      "premium": "Premium"
+    },
     "title": {
       "line1": "Transforma tu evento en una",
       "highlight": "experiencia inolvidable"
@@ -1439,8 +1653,33 @@
         "party": "Fiesta"
       },
       "badge": "Experiencia en bodas",
-      "heroTitle": "Tu boda, exactamente como la imaginas",
+      "badgeYears": "2+ años en el sector",
+      "heroTitle": "DJ para Bodas en Barcelona",
       "heroSubtitle": "Experiencia personalizada completa: música, iluminación y efectos adaptados a tu historia. Presupuesto instantáneo.",
+      "coverage": {
+        "badge": "Cobertura en Catalunya",
+        "title": "¿Dónde es tu boda?",
+        "subtitle": "Especialistas en cada zona",
+        "zones": {
+          "maresme": {
+            "name": "Maresme",
+            "desc": "Mataró, Calella..."
+          },
+          "girona": {
+            "name": "Girona",
+            "desc": "Ciudad y provincia"
+          },
+          "costaBrava": {
+            "name": "Costa Brava",
+            "desc": "Cadaqués, Tossa..."
+          },
+          "valles": {
+            "name": "Vallès",
+            "desc": "Granollers, Sabadell..."
+          }
+        }
+      },
+      "recommendedBadge": "RECOMENDADO",
       "guestsQuestion": "¿Cuántos invitados esperáis?",
       "people": "personas",
       "recommended": "Recomendado para ti",
@@ -1477,27 +1716,456 @@
     "parties": {
       "title": "Fiestas privadas",
       "subtitle": "La fiesta que tu gente no olvidará",
-      "description": "DJ profesional para fiestas privadas, cumpleaños y celebraciones especiales."
+      "description": "DJ profesional para fiestas privadas, cumpleaños y celebraciones especiales.",
+      "heroTitle": "DJ Fiestas Privadas Barcelona",
+      "heroSubtitle": "Desde cumpleaños temáticos hasta celebraciones familiares. Música, animación y efectos adaptados a tu grupo.",
+      "guestsQuestion": "¿Cuántos invitados esperas?",
+      "people": "personas",
+      "flashAccess": "¡Puedes acceder a la",
+      "upToGuests": "Hasta {max} invitados con",
+      "discount": "de descuento",
+      "recommendedFor": "Recomendado para {guests} personas:",
+      "allPacks": "Todos los Packs",
+      "mostSold": "MÁS VENDIDO",
+      "recommended": "RECOMENDADO",
+      "checkAvailability": "Consultar Disponibilidad",
+      "requestInfo": "Solicitar Información",
+      "youSave": "Ahorras",
+      "idealFor": "Ideal para",
+      "importantInfo": "Información Importante",
+      "allPacksInclude": "Todos los packs incluyen:",
+      "packFeatures": {
+        "transport": "Transporte e instalación",
+        "techDj": "Técnico/DJ durante el evento",
+        "setup": "Montaje y desmontaje completo",
+        "insurance": "Seguro de responsabilidad civil"
+      },
+      "customization": "Personalización:",
+      "customFeatures": {
+        "theming": "Tematización disponible (consultar)",
+        "decoration": "Decoración personalizada",
+        "lightShow": "Show especial de luces",
+        "consultation": "¡Consulta sin compromiso!"
+      },
+      "more": "más..."
     },
     "corporate": {
       "title": "Eventos de empresa",
       "subtitle": "Eventos corporativos de impacto",
-      "description": "Producción técnica profesional para eventos corporativos, convenciones y galas."
+      "description": "Producción técnica profesional para eventos corporativos, convenciones y galas.",
+      "heroTitle": "DJ Eventos Corporativos",
+      "heroTitleCity": "Barcelona",
+      "heroSubtitle": "Cenas de empresa, team building, presentaciones y networking elegante.",
+      "heroSubtitle2": "Profesionalismo que refuerza tu marca.",
+      "configureEvent": "Configurar Mi Evento",
+      "requestProposal": "Solicitar Propuesta",
+      "eventsTitle": "Eventos que",
+      "eventsTitleHighlight": "Conectan",
+      "events": {
+        "companyDinners": {
+          "title": "Cenas de Empresa",
+          "text": "Música ambiente elegante, iluminación corporativa y coordinación impecable para que tu equipo disfrute sin preocupaciones."
+        },
+        "teamBuilding": {
+          "title": "Team Building",
+          "text": "Dinámicas musicales, juegos interactivos y ambiente que genera conexión real entre tu equipo."
+        },
+        "networking": {
+          "title": "Networking Empresarial",
+          "text": "Música de fondo sofisticada, iluminación profesional y ambiente que facilita la conversación."
+        },
+        "presentations": {
+          "title": "Presentaciones Corporativas",
+          "text": "Sonido profesional para speakers, pantallas LED, iluminación escénica y coordinación con protocolo."
+        },
+        "productLaunch": {
+          "title": "Lanzamientos de Producto",
+          "text": "Producción técnica completa, branding integrado y efectos especiales para impactar a tus invitados."
+        },
+        "institutional": {
+          "title": "Eventos Institucionales",
+          "text": "Profesionalismo en cada detalle: montaje discreto, técnico onsite y backup total del equipamiento."
+        }
+      },
+      "valueTitle": "Profesionalismo que Refuerza tu Marca",
+      "valueText": "No solo producción técnica: creamos networking elegante, ambiente profesional y momentos de conexión real entre asistentes. Tu equipo recuerda el evento, tu cliente queda impresionado.",
+      "stats": {
+        "experience": {
+          "value": "2+",
+          "label": "Años experiencia"
+        },
+        "location": {
+          "value": "BCN",
+          "label": "+ Girona"
+        },
+        "dedication": {
+          "value": "100%",
+          "label": "Dedicación"
+        }
+      },
+      "includesTitle": "Qué Incluye",
+      "includesTitleHighlight": "Tu Evento",
+      "techProduction": "Producción Técnica",
+      "techFeatures": {
+        "sound": "Sonido profesional Pioneer + EV (cobertura perfecta)",
+        "lighting": "Iluminación LED corporativa sincronizada con branding",
+        "mics": "Micrófonos inalámbricos para speakers/presentadores",
+        "screens": "Pantallas LED opcionales para proyección corporativa",
+        "setup": "Montaje discreto, técnico onsite y backup total"
+      },
+      "ambientTitle": "Ambiente Profesional",
+      "ambientFeatures": {
+        "music": "Música ambiente adaptada al momento del evento",
+        "branding": "Integración de identidad corporativa (logo, colores, mensajes)",
+        "networking": "Dinámicas de networking si se requieren",
+        "coordination": "Coordinación con catering, venue y proveedores",
+        "protocol": "Protocolo y timing impecable durante el evento"
+      },
+      "formTitle": "Cuéntanos Tu Evento",
+      "formSubtitle": "Dinos qué necesitas y te enviaremos una propuesta adaptada a tu empresa."
     },
     "mobile": {
       "title": "Discomóvil",
       "subtitle": "DJ profesional donde lo necesites",
-      "description": "Servicio completo de discomóvil con sonido e iluminación profesionales."
+      "description": "Servicio completo de discomóvil con sonido e iluminación profesionales.",
+      "badgeYears": "2+ años en el sector",
+      "heroTitle": "Discomóvil Barcelona",
+      "heroSubtitle": "Música adaptada en tiempo real, iluminación de ambiente y efectos especiales. Mucho más que poner música. Presupuesto al instante.",
+      "guestsQuestion": "¿Cuántas personas esperáis?",
+      "people": "personas",
+      "recommended": "Recomendado para ti:",
+      "choosePack": "Elige Tu Pack Base",
+      "mostPopular": "MÁS POPULAR",
+      "recommendedBadge": "RECOMENDADO",
+      "selected": "Seleccionado",
+      "select": "Seleccionar",
+      "extendParty": "¿Quieres alargar la fiesta?",
+      "noExtraHours": "Sin horas extra",
+      "perHour": "por hora extra",
+      "maxHours": "Máximo +3 horas",
+      "addEffects": "Añade Efectos Especiales",
+      "extrasDiscount": "Contrata 3+ extras y ahorra",
+      "comboDiscount": "¡Descuento Combo Activado!",
+      "youSave": "Ahorras",
+      "inEffects": "en efectos",
+      "effects": "efecto",
+      "effectsPlural": "efectos",
+      "continueToConfig": "Continuar al Configurador",
+      "configure": "Configurar",
+      "partyIncludes": "Qué Incluye Tu Fiesta",
+      "allPacksInclude": "Todos los packs:",
+      "packFeatures": {
+        "dj": "DJ profesional que lee la pista",
+        "setup": "Montaje y desmontaje incluidos",
+        "backup": "Backup de equipamiento",
+        "playlist": "Playlist personalizada previa"
+      },
+      "flexiblePayment": "Pago flexible:",
+      "paymentFeatures": {
+        "deposit": "30% al reservar tu fecha",
+        "rest": "70% el día del evento",
+        "cancel": "Cancelación gratuita hasta 15 días antes"
+      }
     },
     "production": {
       "title": "Producción técnica",
       "subtitle": "Sonido e iluminación profesional",
-      "description": "Equipamiento técnico de alta calidad para cualquier tipo de evento."
+      "description": "Equipamiento técnico de alta calidad para cualquier tipo de evento.",
+      "badge": "Producción Técnica Profesional",
+      "heroTitle": "Configura Tu Producción Técnica",
+      "heroSubtitle": "Sistema modular adaptado a tus necesidades. Selecciona solo lo que necesitas: audio, visual, escenario, efectos y equipo técnico.",
+      "categories": {
+        "audio": "Audio",
+        "visual": "Visual",
+        "stage": "Escenario",
+        "effects": "Efectos",
+        "crew": "Equipo"
+      },
+      "popular": "POPULAR",
+      "premium": "PREMIUM",
+      "currentConfig": "Tu Configuración Actual",
+      "volumeDiscount": "Descuento por Volumen Activado",
+      "volumeDiscountText": "Producción +2.000€ = Ahorro de {discount}€ (10%)",
+      "volumeTag": "-10% volumen",
+      "service": "servicio",
+      "servicePlural": "servicios",
+      "selected": "seleccionado",
+      "selectedPlural": "seleccionados",
+      "requestProposal": "Solicitar Propuesta",
+      "viewQuote": "Ver Presupuesto",
+      "infoTitle": "Producción Técnica Profesional",
+      "fullService": "Servicio completo:",
+      "fullServiceItems": {
+        "equipment": "Equipamiento profesional certificado",
+        "transport": "Transporte e instalación incluidos",
+        "technicians": "Técnicos especializados disponibles",
+        "backup": "Backup de equipamiento crítico"
+      },
+      "experience": "Experiencia demostrable:",
+      "experienceItems": {
+        "productions": "Experiencia en producciones",
+        "events": "Festivales, conciertos y eventos",
+        "clients": "Productoras y empresas de confianza",
+        "references": "Referencias verificables"
+      },
+      "services": {
+        "sonidoBasico": {
+          "name": "Sistema Sonido Básico",
+          "description": "2x altavoces 2000W + mezclador + cables"
+        },
+        "sonidoPro": {
+          "name": "Sistema Sonido PRO",
+          "description": "4x altavoces EV 8000W + subs + procesador"
+        },
+        "microsInalambricos": {
+          "name": "Micrófonos Inalámbricos",
+          "description": "Set de 4 micros profesionales"
+        },
+        "monitorEscenario": {
+          "name": "Monitores de Escenario",
+          "description": "2x monitores retorno para artistas"
+        },
+        "lucesBasicas": {
+          "name": "Iluminación Básica",
+          "description": "8x focos PAR LED + controlador DMX"
+        },
+        "lucesProfesionales": {
+          "name": "Iluminación Profesional",
+          "description": "Cabezas móviles + láser + efectos"
+        },
+        "pantallaLed": {
+          "name": "Pantalla LED",
+          "description": "Pantalla LED 3x2m para proyección"
+        },
+        "videoMapping": {
+          "name": "Video Mapping",
+          "description": "Proyección arquitectónica 3D"
+        },
+        "escenarioSmall": {
+          "name": "Escenario Pequeño",
+          "description": "4x3m altura 40cm + escaleras"
+        },
+        "escenarioMedium": {
+          "name": "Escenario Mediano",
+          "description": "6x4m altura 60cm + escaleras + barandilla"
+        },
+        "escenarioLarge": {
+          "name": "Escenario Grande",
+          "description": "8x6m altura 80cm + estructura completa"
+        },
+        "truss": {
+          "name": "Estructura Truss",
+          "description": "Truss aérea para colgar luces/sonido"
+        },
+        "humo": {
+          "name": "Máquinas de Humo",
+          "description": "2x máquinas 1500W + fluido"
+        },
+        "confetiCanones": {
+          "name": "Cañones de Confeti",
+          "description": "4x cañones eléctricos + confeti"
+        },
+        "co2Jets": {
+          "name": "Jets de CO2",
+          "description": "6x jets + tanque CO2"
+        },
+        "pirotecniaFria": {
+          "name": "Pirotecnia Fría",
+          "description": "Chispas frías + fuentes frías"
+        },
+        "tecnicoSonido": {
+          "name": "Técnico de Sonido",
+          "description": "Técnico dedicado para audio"
+        },
+        "tecnicoLuces": {
+          "name": "Técnico de Iluminación",
+          "description": "Técnico dedicado para luces"
+        },
+        "roadie": {
+          "name": "Roadie / Ayudante",
+          "description": "Apoyo en montaje y desmontaje"
+        },
+        "productorEjecutivo": {
+          "name": "Productor Ejecutivo",
+          "description": "Coordinación completa del evento"
+        }
+      },
+      "units": {
+        "perDay": "por día",
+        "perEvent": "por evento",
+        "perProject": "por proyecto"
+      }
     },
     "rental": {
       "title": "Alquiler de equipos",
       "subtitle": "Equipos profesionales a tu alcance",
-      "description": "Alquiler de equipos de sonido, iluminación y DJ para tu evento."
+      "description": "Alquiler de equipos de sonido, iluminación y DJ para tu evento.",
+      "heroTitle": "Alquiler de Equipo Profesional",
+      "heroSubtitle": "Selecciona el equipo que necesitas y recibe tu presupuesto al instante",
+      "categories": {
+        "all": "Todos",
+        "sound": "Sonido",
+        "lighting": "Iluminación",
+        "dj": "DJ",
+        "effects": "Efectos"
+      },
+      "perDay": "/ día",
+      "equipment": "equipo",
+      "equipmentPlural": "equipos",
+      "totalOneDay": "Total (1 día)",
+      "requestQuote": "Pedir Presupuesto",
+      "quote": "Presupuesto",
+      "infoTitle": "Información de Alquiler",
+      "included": "Incluido:",
+      "includedItems": {
+        "transport": "Transporte e instalación",
+        "technician": "Técnico durante el evento",
+        "setup": "Montaje y desmontaje"
+      },
+      "pricing": "Tarifas:",
+      "pricingTiers": {
+        "oneDay": "1 día: Precio indicado",
+        "twoDays": "2-3 días: -10%",
+        "fourDays": "+4 días: -20%"
+      },
+      "catalog": {
+        "evEtx35p": {
+          "name": "EV ETX-35P (2000W)",
+          "description": "Altavoz profesional autoamplificado de 2000W. Ideal para eventos grandes."
+        },
+        "subwooferB150": {
+          "name": "Subwoofer B-150",
+          "description": "Subwoofer profesional de 1200W para graves potentes."
+        },
+        "sistemaSonidoProfesional": {
+          "name": "Sistema de Sonido Profesional",
+          "description": "2x EV ETX 2000W + Pioneer DDJ-REV7 + Cabina DJ + Monitor + Auriculares HDJ-X5 + 2x Luces BASH + Soporte PC + Cableado + Máquina humo + Multibox LED. Setup completo profesional."
+        },
+        "microfonoInalambrico": {
+          "name": "Micrófono Inalámbrico",
+          "description": "Micrófono profesional inalámbrico de doble canal."
+        },
+        "cabezasMovilesLed": {
+          "name": "Cabezas Móviles LED (x4)",
+          "description": "4 cabezas móviles LED RGBW con efectos de movimiento."
+        },
+        "laserProfesional": {
+          "name": "Láser Profesional RGB",
+          "description": "Láser profesional multicolor con efectos automáticos."
+        },
+        "bolaEspejos": {
+          "name": "Bola de Espejos + Foco",
+          "description": "Bola de espejos 50cm con foco LED dedicado."
+        },
+        "pioneerDdjRev7": {
+          "name": "Controladora Pioneer DDJ-REV7",
+          "description": "Controladora profesional Pioneer nivel club con motorized platters. Top de gama."
+        },
+        "mezcladorDjm900": {
+          "name": "Mezclador DJM-900NXS2",
+          "description": "Mezclador profesional Pioneer de 4 canales."
+        },
+        "maquinaHumo": {
+          "name": "Máquina de Humo 1500W",
+          "description": "Máquina de humo profesional con mando a distancia."
+        },
+        "maquinaBurbujas": {
+          "name": "Máquina de Burbujas",
+          "description": "Máquina de burbujas profesional con líquido incluido."
+        },
+        "canonConfeti": {
+          "name": "Cañón de Confeti",
+          "description": "Cañón eléctrico de confeti con mando remoto."
+        }
+      }
+    },
+    "animacion": {
+      "title": "Animación Infantil",
+      "subtitle": "Diversión para los más pequeños",
+      "description": "Animadores profesionales para fiestas infantiles.",
+      "hero": {
+        "badge": "Animación Infantil Profesional",
+        "title": "Fiestas mágicas",
+        "titleHighlight": "para los más pequeños",
+        "subtitle": "Animadores profesionales que hacen que los niños disfruten al máximo. Juegos, magia, pintacaras y mucho más!"
+      },
+      "services": {
+        "title": "¿Qué ofrecemos?",
+        "subtitle": "Actividades adaptadas a cada edad para garantizar diversión y sonrisas",
+        "items": {
+          "jocs": {
+            "title": "Juegos y Actividades",
+            "desc": "Gymkanas, carreras de sacos, juegos de agua, competiciones..."
+          },
+          "pintacares": {
+            "title": "Pintacaras",
+            "desc": "Diseños creativos que encantan a los niños."
+          },
+          "magia": {
+            "title": "Magia",
+            "desc": "Espectáculos de magia adaptados a cada edad."
+          },
+          "globoflexia": {
+            "title": "Globoflexia",
+            "desc": "Figuras de globos para todos los gustos."
+          },
+          "tallers": {
+            "title": "Talleres Creativos",
+            "desc": "Manualidades, slime, pulseras..."
+          },
+          "musica": {
+            "title": "Música Infantil",
+            "desc": "DJ con música adaptada y canciones de moda."
+          }
+        }
+      },
+      "packs": {
+        "title": "Elige tu pack",
+        "subtitle": "Todos los packs incluyen desplazamiento hasta 25km de Granollers",
+        "hours": "horas",
+        "recommended": "MÁS POPULAR",
+        "names": {
+          "basic": "Pack Básico",
+          "complet": "Pack Completo",
+          "premium": "Pack Premium"
+        },
+        "features": {
+          "basic": [
+            "1 animador/a",
+            "Juegos y actividades",
+            "Música infantil",
+            "Material básico"
+          ],
+          "complet": [
+            "1 animador/a",
+            "Juegos y actividades",
+            "Pintacaras O Globoflexia",
+            "Música infantil",
+            "Material completo"
+          ],
+          "premium": [
+            "2 animadores",
+            "Juegos y actividades",
+            "Pintacaras + Globoflexia",
+            "Espectáculo de magia",
+            "Música infantil",
+            "Todo el material"
+          ]
+        }
+      },
+      "cta": {
+        "button": "Pide presupuesto",
+        "info": "Respuesta en menos de 2 horas"
+      },
+      "info": {
+        "title": "¿Por qué elegirnos?",
+        "items": {
+          "experience": "Animadores con experiencia y formación",
+          "ages": "Adaptado a la edad de los niños (3-12 años)",
+          "punctuality": "Puntualidad y profesionalidad",
+          "coverage": "Barcelona y Girona - Desplazamiento incluido"
+        }
+      }
     }
   },
   "legal": {
@@ -1511,18 +2179,539 @@
     },
     "cookies": {
       "title": "Política de Cookies",
-      "lastUpdate": "Última actualización"
+      "metadata": {
+        "title": "Política de Cookies | Òrbita Events",
+        "description": "Información sobre el uso de cookies en el sitio web de Òrbita Events."
+      },
+      "lastUpdate": "Última actualización:",
+      "section1": {
+        "title": "¿Qué son las cookies?",
+        "content": "Las cookies son pequeños archivos de texto que los sitios web almacenan en tu dispositivo cuando los visitas. Se utilizan ampliamente para hacer que los sitios web funcionen de manera más eficiente y para proporcionar información a los propietarios del sitio."
+      },
+      "section2": {
+        "title": "Cookies que utilizamos",
+        "technical": {
+          "title": "Cookies técnicas (necesarias)",
+          "description": "Son esenciales para el funcionamiento del sitio web.",
+          "table": {
+            "nombre": "Nombre",
+            "finalidad": "Finalidad",
+            "duracion": "Duración",
+            "sessionId": {
+              "name": "session_id",
+              "purpose": "Mantener la sesión del usuario",
+              "duration": "Sesión"
+            },
+            "cookieConsent": {
+              "name": "cookie_consent",
+              "purpose": "Guardar preferencias de cookies",
+              "duration": "1 año"
+            }
+          }
+        },
+        "analytical": {
+          "title": "Cookies analíticas",
+          "description": "Nos ayudan a entender cómo los visitantes interactúan con el sitio.",
+          "table": {
+            "nombre": "Nombre",
+            "proveedor": "Proveedor",
+            "finalidad": "Finalidad",
+            "duracion": "Duración",
+            "ga": {
+              "name": "_ga",
+              "provider": "Google Analytics",
+              "purpose": "Distinguir usuarios",
+              "duration": "2 años"
+            },
+            "gid": {
+              "name": "_gid",
+              "provider": "Google Analytics",
+              "purpose": "Distinguir usuarios",
+              "duration": "24 horas"
+            }
+          }
+        }
+      },
+      "section3": {
+        "title": "¿Cómo gestionar las cookies?",
+        "content": "Puedes configurar tu navegador para rechazar todas las cookies o para que te avise cuando se envía una cookie. Sin embargo, si rechazas las cookies, es posible que algunas partes del sitio no funcionen correctamente.",
+        "browsers": {
+          "chrome": "Google Chrome",
+          "firefox": "Mozilla Firefox",
+          "safari": "Safari",
+          "edge": "Microsoft Edge"
+        }
+      },
+      "section4": {
+        "title": "Contacto",
+        "intro": "Si tienes preguntas sobre nuestra política de cookies, contacta con nosotros:"
+      }
+    },
+    "avisoLegal": {
+      "title": "Aviso Legal",
+      "metadata": {
+        "title": "Aviso Legal | Òrbita Events",
+        "description": "Aviso legal e información corporativa de Òrbita Events."
+      },
+      "section1": {
+        "title": "1. Datos Identificativos",
+        "intro": "En cumplimiento del deber de información establecido en la Ley 34/2002 de Servicios de la Sociedad de la Información y el Comercio Electrónico (LSSI-CE), se facilitan los siguientes datos:",
+        "titular": "Titular:",
+        "ubicacion": "Ubicación:",
+        "email": "Email:",
+        "telefono": "Teléfono:",
+        "sitioWeb": "Sitio web:",
+        "datosCompletos": "Para datos fiscales completos (NIF, dirección), contactar por email."
+      },
+      "section2": {
+        "title": "2. Objeto",
+        "content": "El presente sitio web tiene por objeto facilitar información sobre los servicios de DJ, iluminación, efectos especiales y producción de eventos que ofrece {businessName}, así como permitir el contacto con potenciales clientes."
+      },
+      "section3": {
+        "title": "3. Condiciones de Uso",
+        "intro": "El acceso a este sitio web es gratuito y no requiere suscripción o registro previo. No obstante, el uso de determinados servicios puede requerir la cumplimentación de formularios de contacto.",
+        "compromiso": "El usuario se compromete a hacer un uso adecuado de los contenidos y servicios ofrecidos, absteniéndose de:",
+        "item1": "Realizar actividades ilícitas o contrarias a la buena fe",
+        "item2": "Difundir contenidos delictivos, violentos, pornográficos o discriminatorios",
+        "item3": "Intentar acceder a áreas restringidas del sistema",
+        "item4": "Introducir virus o programas maliciosos"
+      },
+      "section4": {
+        "title": "4. Propiedad Intelectual e Industrial",
+        "content1": "Todos los contenidos de este sitio web, incluyendo textos, fotografías, gráficos, imágenes, iconos, tecnología, software, diseño gráfico y código fuente, son propiedad de {businessName} o de terceros que han autorizado su uso.",
+        "content2": "Queda prohibida la reproducción, distribución, transformación o comunicación pública de dichos contenidos sin autorización expresa del titular."
+      },
+      "section5": {
+        "title": "5. Exclusión de Responsabilidad",
+        "intro": "{businessName} no se hace responsable de:",
+        "item1": "Errores u omisiones en los contenidos",
+        "item2": "Falta de disponibilidad del sitio web",
+        "item3": "Transmisión de virus o programas maliciosos",
+        "item4": "Uso ilícito o negligente por parte de los usuarios",
+        "item5": "Contenidos de sitios web enlazados"
+      },
+      "section6": {
+        "title": "6. Enlaces",
+        "content": "Este sitio web puede contener enlaces a páginas externas. {businessName} no se responsabiliza del contenido, políticas de privacidad o prácticas de dichos sitios web de terceros."
+      },
+      "section7": {
+        "title": "7. Legislación Aplicable",
+        "content": "El presente aviso legal se rige por la legislación española. Para cualquier controversia que pudiera derivarse del acceso o uso de este sitio web, las partes se someten a los Juzgados y Tribunales de {city}."
+      },
+      "section8": {
+        "title": "8. Modificaciones",
+        "content": "{businessName} se reserva el derecho de modificar el presente aviso legal en cualquier momento. Las modificaciones entrarán en vigor desde su publicación en el sitio web."
+      },
+      "section9": {
+        "title": "9. Contacto",
+        "intro": "Para cualquier consulta relacionada con este aviso legal, puede contactar con nosotros a través de:"
+      }
+    },
+    "privacidad": {
+      "title": "Política de Privacidad",
+      "metadata": {
+        "title": "Política de Privacidad | Òrbita Events",
+        "description": "Política de privacidad y protección de datos de Òrbita Events según RGPD y LOPDGDD."
+      },
+      "lastUpdate": "Última actualización:",
+      "portalBanner": {
+        "title": "Gestiona tus datos personales",
+        "description": "Puedes ejercer tus derechos RGPD de forma rápida y sencilla desde nuestro Portal de Privacidad.",
+        "button": "Acceder al Portal"
+      },
+      "section1": {
+        "title": "1. Responsable del Tratamiento",
+        "empresa": "Empresa:",
+        "ubicacion": "Ubicación:",
+        "email": "Email:",
+        "telefono": "Teléfono:",
+        "datosCompletos": "Para datos fiscales completos, contactar por email."
+      },
+      "section2": {
+        "title": "2. Datos que Recopilamos",
+        "intro": "Recopilamos la información que nos proporcionas directamente:",
+        "identificacion": {
+          "title": "2.1. Datos de identificación",
+          "item1": "Nombre y apellidos",
+          "item2": "Correo electrónico",
+          "item3": "Número de teléfono",
+          "item4": "Ciudad",
+          "item5": "Cuenta de Instagram (opcional)"
+        },
+        "evento": {
+          "title": "2.2. Datos del evento",
+          "item1": "Tipo de evento",
+          "item2": "Fecha y ubicación",
+          "item3": "Número de invitados",
+          "item4": "Preferencias y solicitudes especiales"
+        },
+        "navegacion": {
+          "title": "2.3. Datos de navegación",
+          "item1": "Dirección IP",
+          "item2": "Tipo de navegador",
+          "item3": "Páginas visitadas",
+          "item4": "Tiempo de navegación"
+        }
+      },
+      "section3": {
+        "title": "3. Finalidad del Tratamiento",
+        "table": {
+          "finalidad": "Finalidad",
+          "baseLegal": "Base legal",
+          "conservacion": "Conservación",
+          "row1": {
+            "purpose": "Gestión de contratos y servicios",
+            "legal": "Ejecución contractual",
+            "retention": "5 años (obligación fiscal)"
+          },
+          "row2": {
+            "purpose": "Facturación",
+            "legal": "Obligación legal",
+            "retention": "5 años"
+          },
+          "row3": {
+            "purpose": "Comunicaciones comerciales",
+            "legal": "Consentimiento",
+            "retention": "Hasta retirada del consentimiento"
+          },
+          "row4": {
+            "purpose": "Publicación de testimonios y fotos",
+            "legal": "Consentimiento",
+            "retention": "Hasta retirada del consentimiento"
+          },
+          "row5": {
+            "purpose": "Análisis y mejora del servicio",
+            "legal": "Interés legítimo",
+            "retention": "2 años"
+          }
+        }
+      },
+      "section4": {
+        "title": "4. Destinatarios de los Datos",
+        "intro": "Tus datos pueden ser comunicados a:",
+        "providers": "Proveedores de servicios:",
+        "providersDetail": "Hosting (Vercel), Base de datos (PostgreSQL), Email transaccional",
+        "public": "Administraciones públicas:",
+        "publicDetail": "Cuando sea legalmente obligatorio",
+        "noSale": "No vendemos ni cedemos datos a terceros con finalidades comerciales."
+      },
+      "section5": {
+        "title": "5. Transferencias Internacionales",
+        "content": "Algunos de nuestros proveedores pueden estar ubicados fuera del Espacio Económico Europeo. En estos casos, garantizamos que existen garantías adecuadas (Cláusulas Contractuales Tipo, adecuación de la Comisión Europea, etc.)."
+      },
+      "section6": {
+        "title": "6. Tus Derechos (ARCO-POL)",
+        "intro": "Según el RGPD y la LOPDGDD, tienes derecho a:",
+        "acceso": "Acceso:",
+        "accesoDesc": "Conocer qué datos tenemos sobre ti",
+        "rectificacion": "Rectificación:",
+        "rectificacionDesc": "Corregir datos inexactos o incompletos",
+        "supresion": "Supresión:",
+        "supresionDesc": "Solicitar que eliminemos tus datos (\"derecho al olvido\")",
+        "oposicion": "Oposición:",
+        "oposicionDesc": "Oponerte a determinados tratamientos",
+        "portabilidad": "Portabilidad:",
+        "portabilidadDesc": "Recibir tus datos en formato estructurado",
+        "limitacion": "Limitación:",
+        "limitacionDesc": "Solicitar que limitemos el tratamiento",
+        "plazo": "Plazo de respuesta:",
+        "plazoDesc": "Responderemos a tu solicitud en un máximo de 30 días.",
+        "portalButton": "Portal de Privacidad",
+        "emailButton": "Contactar por email"
+      },
+      "section7": {
+        "title": "7. Seguridad",
+        "intro": "Implementamos medidas técnicas y organizativas para proteger tus datos:",
+        "item1": "Cifrado de datos en tránsito (HTTPS/TLS)",
+        "item2": "Cifrado de datos en reposo",
+        "item3": "Controles de acceso basados en roles",
+        "item4": "Registros de auditoría",
+        "item5": "Copias de seguridad regulares"
+      },
+      "section8": {
+        "title": "8. Cookies",
+        "content": "Utilizamos cookies para mejorar tu experiencia. Consulta nuestra",
+        "link": "Política de Cookies",
+        "contentEnd": "para más información."
+      },
+      "section9": {
+        "title": "9. Menores",
+        "content": "Nuestros servicios no están dirigidos a menores de 14 años. No recopilamos conscientemente datos de menores sin consentimiento de los tutores legales."
+      },
+      "section10": {
+        "title": "10. Reclamaciones",
+        "content": "Si consideras que hemos vulnerado tus derechos, puedes presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD):"
+      },
+      "section11": {
+        "title": "11. Contacto",
+        "intro": "Para cualquier consulta sobre esta política de privacidad:",
+        "email": "Email:",
+        "telefono": "Teléfono:"
+      },
+      "section12": {
+        "title": "12. Actualizaciones",
+        "content": "Podemos actualizar esta política periódicamente. Te informaremos de cambios significativos a través de nuestra web o por email."
+      },
+      "ctaFinal": {
+        "button": "Gestiona tus datos personales"
+      }
+    },
+    "terminos": {
+      "title": "Términos y Condiciones",
+      "metadata": {
+        "title": "Términos y Condiciones | Òrbita Events",
+        "description": "Términos y condiciones de uso de los servicios de Òrbita Events."
+      },
+      "lastUpdate": "Última actualización:",
+      "section1": {
+        "title": "1. Identificación",
+        "intro": "Estos términos y condiciones regulan el uso de los servicios ofrecidos por:",
+        "empresa": "Empresa:",
+        "ubicacion": "Ubicación:",
+        "contacto": "Contacto:",
+        "datosCompletos": "Para datos fiscales completos, contactar por email."
+      },
+      "section2": {
+        "title": "2. Servicios",
+        "content": "Òrbita Events ofrece servicios de DJ, iluminación, efectos especiales, tematización y producción técnica para eventos como bodas, fiestas privadas, eventos corporativos y celebraciones."
+      },
+      "section3": {
+        "title": "3. Reservas y Pagos",
+        "proceso": {
+          "title": "3.1 Proceso de Reserva",
+          "item1": "Solicitud de presupuesto personalizado",
+          "item2": "Aceptación del presupuesto por parte del cliente",
+          "item3": "Pago de la señal para confirmar la reserva",
+          "item4": "Firma del contrato de servicios"
+        },
+        "condiciones": {
+          "title": "3.2 Condiciones de Pago",
+          "senal": "Señal:",
+          "senalDesc": "30% del total para confirmar la reserva",
+          "resto": "Resto:",
+          "restoDesc": "El día del evento o según acuerdo",
+          "metodos": "Métodos:",
+          "metodosDesc": "Transferencia bancaria, Bizum, efectivo"
+        }
+      },
+      "section4": {
+        "title": "4. Cancelaciones",
+        "item1": "Más de 30 días antes:",
+        "item1Desc": "Devolución del 50% de la señal",
+        "item2": "Entre 15-30 días:",
+        "item2Desc": "Sin devolución de la señal",
+        "item3": "Menos de 15 días:",
+        "item3Desc": "Cobro del 100% del servicio",
+        "item4": "Fuerza mayor:",
+        "item4Desc": "Se acordarán condiciones especiales"
+      },
+      "section5": {
+        "title": "5. Obligaciones del Cliente",
+        "item1": "Proporcionar información veraz sobre el evento",
+        "item2": "Garantizar acceso al lugar del evento para montaje",
+        "item3": "Disponer de suministro eléctrico adecuado",
+        "item4": "Informar de cualquier cambio con antelación",
+        "item5": "Cumplir con los pagos acordados"
+      },
+      "section6": {
+        "title": "6. Obligaciones de Òrbita Events",
+        "item1": "Prestar los servicios contratados con profesionalidad",
+        "item2": "Disponer de equipo técnico en perfecto estado",
+        "item3": "Contar con equipamiento de respaldo",
+        "item4": "Cumplir con los horarios acordados",
+        "item5": "Disponer de seguro de responsabilidad civil"
+      },
+      "section7": {
+        "title": "7. Limitación de Responsabilidad",
+        "intro": "Òrbita Events no será responsable de:",
+        "item1": "Cortes de suministro eléctrico ajenos a nuestro control",
+        "item2": "Daños causados por condiciones meteorológicas adversas",
+        "item3": "Incidencias causadas por terceros",
+        "item4": "Eventos de fuerza mayor"
+      },
+      "section8": {
+        "title": "8. Propiedad Intelectual",
+        "content": "Las fotografías y vídeos realizados durante los eventos podrán ser utilizados por Òrbita Events con fines promocionales, salvo indicación expresa en contrario por parte del cliente."
+      },
+      "section9": {
+        "title": "9. Resolución de Conflictos",
+        "content": "Para cualquier controversia derivada de estos términos, las partes se someten a los Juzgados y Tribunales de {city}, renunciando a cualquier otro fuero que pudiera corresponderles."
+      },
+      "section10": {
+        "title": "10. Contacto",
+        "intro": "Para consultas sobre estos términos:"
+      }
     }
   },
   "sensorial": {
-    "title": "Experiencia Sensorial",
-    "subtitle": "Un espacio diseñado para todos",
-    "description": "Creamos eventos accesibles y adaptados para personas con sensibilidades sensoriales."
+    "loading": "Preparando un espacio especial para ti...",
+    "grabElements": "¡Agarra los elementos con el dedo o el ratón!",
+    "brandName": "Òrbita Events",
+    "title": "Espacio Sensorial",
+    "ariaInfo": "Información",
+    "ariaSettings": "Configuración",
+    "breathe": "Respira...",
+    "infoTitle": "¿Qué es el Espacio Sensorial?",
+    "infoP1": "Un lugar digital diseñado para personas con sensibilidades sensoriales, niños y niñas con autismo, o cualquiera que quiera un momento de calma o diversión controlada.",
+    "infoP2": "Ajusta la velocidad y densidad de las partículas a tu gusto. ¡Prueba los diferentes temas para encontrar el que más te guste! 💜",
+    "understood": "¡Entendido!",
+    "controls": "Controles",
+    "customizeExperience": "Personaliza la experiencia",
+    "categories": "Categorías",
+    "all": "Todos",
+    "themesLabel": "Temas",
+    "sound": "Sonido",
+    "ambientSound": "Sonido ambiente y efectos",
+    "soundOn": "Activado · Música relajante",
+    "soundOff": "Desactivado · Toca para activar",
+    "intensity": "Intensidad",
+    "elements": "Elementos",
+    "speedLabel": "Velocidad",
+    "presets": "Presets",
+    "presetSoft": "Suave",
+    "presetNormal": "Normal",
+    "presetActive": "Activo",
+    "tips": "Consejos",
+    "tipDrag": "Haz clic y arrastra para coger elementos",
+    "tipBounce": "¡Lánzalos para ver cómo rebotan!",
+    "tipCursor": "Tu cursor es un {cursor}",
+    "footer": "Òrbita Events · Desde 2023",
+    "chooseTheme": "🎨 Elige un tema",
+    "speed": "Velocidad",
+    "slow": "🐢 Lento",
+    "fast": "🐇 Rápido",
+    "density": "Densidad",
+    "few": "Pocas",
+    "many": "Muchas",
+    "touchInteraction": "Interacción táctil",
+    "touchDescription": "Las partículas seguirán tu dedo o ratón",
+    "pause": "Pausa",
+    "play": "Play",
+    "madeWithLove": "Hecho con amor",
+    "forSpecialPeople": "Para todas las personas especiales 💜",
+    "backHome": "Volver al inicio",
+    "themeNames": {
+      "calm": "Calma",
+      "ocean": "Océano",
+      "forest": "Bosque",
+      "sky": "Cielo",
+      "garden": "Jardín",
+      "aurora": "Aurora",
+      "fireflies": "Luciérnagas",
+      "cosmos": "Cosmos",
+      "planets": "Planetas",
+      "aquarium": "Acuario",
+      "safari": "Safari",
+      "pets": "Mascotas",
+      "dinosaurs": "Dinosaurios",
+      "unicorn": "Unicornio",
+      "fairy": "Hadas",
+      "dragon": "Dragones",
+      "mermaid": "Sirenas",
+      "candy": "Dulces",
+      "fruits": "Frutas",
+      "monmagic": "Mundo Mágico",
+      "halloween": "Halloween",
+      "christmas": "Navidad",
+      "tropical": "Tropical",
+      "disco": "Disco",
+      "elegant": "Elegante",
+      "carnival": "Carnaval",
+      "zen": "Zen",
+      "rain": "Lluvia",
+      "snow": "Nieve"
+    },
+    "categoryNames": {
+      "natura": "Naturaleza",
+      "espai": "Espacio",
+      "animals": "Animales",
+      "fantasia": "Fantasía",
+      "menjar": "Comida",
+      "orbita": "Fiestas Òrbita",
+      "zen": "Relajación"
+    },
+    "themes": {
+      "calm": {
+        "name": "Calma",
+        "description": "Relajación y paz"
+      },
+      "elegant": {
+        "name": "Elegante",
+        "description": "Sofisticación dorada"
+      },
+      "halloween": {
+        "name": "Halloween",
+        "description": "Misterio y diversión"
+      },
+      "monmagic": {
+        "name": "Mundo Mágico",
+        "description": "Magia de escuela de hechicería"
+      },
+      "disco": {
+        "name": "Disco",
+        "description": "Ritmo y luz"
+      },
+      "tropical": {
+        "name": "Tropical",
+        "description": "Paraíso verde"
+      }
+    },
+    "presetNames": {
+      "relaxed": "🧘 Relajado",
+      "normal": "✨ Normal",
+      "party": "🎉 Fiesta"
+    },
+    "exit": "Salir",
+    "tutorial": {
+      "step1": {
+        "title": "Bienvenido/a al Espacio Sensorial",
+        "p1": "Este espacio está creado con mucho amor para <strong>todas las personas</strong>, especialmente para aquellas con <strong>sensibilidad sensorial</strong>.",
+        "p2": "Sabemos que el mundo digital puede ser a menudo demasiado estimulante. Por eso hemos creado este rincón tranquilo donde puedes relajarte, jugar y encontrar un momento de paz.",
+        "p3": "Cada persona es única y especial. Esta página es para ti. 💜"
+      },
+      "step2": {
+        "title": "¡Agarra y juega!",
+        "intro": "Todos los elementos de la pantalla <strong>se pueden agarrar</strong> con el dedo o el ratón!",
+        "click": "<strong>Haz clic</strong> sobre un elemento para agarrarlo",
+        "drag": "<strong>Arrastra</strong> para moverlo",
+        "throw": "<strong>Lánzalo</strong> soltándolo!",
+        "bounce": "Mira cómo <strong>rebotan</strong> por la pantalla",
+        "cursor": "¡Tu cursor se convierte en un elemento del tema!"
+      },
+      "step3": {
+        "title": "Muchos temas para elegir",
+        "intro": "Tenemos <strong>muchos temas diferentes</strong> para todos los gustos:",
+        "outro": "¡Desde el océano hasta el espacio, desde unicornios hasta dinosaurios!"
+      },
+      "step4": {
+        "title": "Sonido y calma",
+        "p1": "Puedes activar <strong>música ambiente</strong> relajante que se adapta al tema que elijas.",
+        "p2": "El sonido es muy suave y <strong>\"respira\"</strong> contigo, subiendo y bajando de volumen lentamente.",
+        "p3": "Si prefieres silencio, solo tienes que dejar el sonido desactivado. <strong>¡Tú decides!</strong>",
+        "p4": "Cada interacción tiene un pequeño sonido agradable (que también puedes desactivar)."
+      },
+      "back": "Atrás",
+      "next": "Siguiente",
+      "start": "¡Empezar a jugar!",
+      "skip": "Saltar introducción",
+      "madeBy": "Creado con 💜 por Òrbita Events · Desde 2023"
+    }
   },
   "notFound": {
-    "title": "Página no encontrada",
-    "description": "Lo sentimos, la página que buscas no existe.",
-    "backHome": "Volver al inicio"
+    "title": "Esta Página No Existe",
+    "description": "Parece que esta página se fue de fiesta y no volvió.",
+    "descriptionExtra": "Pero tranquilo, podemos ayudarte a encontrar lo que buscas.",
+    "backToHome": "Volver al Inicio",
+    "viewServices": "Ver Servicios",
+    "lookingFor": "¿Buscabas algo específico?",
+    "links": {
+      "djWeddings": "DJ Bodas",
+      "discomovil": "Discomóvil",
+      "rental": "Alquiler",
+      "corporate": "Empresas",
+      "faq": "FAQ",
+      "contact": "Contacto"
+    }
   },
   "error": {
     "title": "Algo salió mal",
@@ -1586,6 +2775,67 @@
     "sensorial": "Espacio Sensorial",
     "monMagic": "Temática Mundo Mágico"
   },
+  "zoneLanding": {
+    "specialistsIn": "Especialistas en",
+    "fromPrice": "Desde",
+    "requestBudget": "Pedir Presupuesto Gratis",
+    "callNow": "Llamar Ahora",
+    "seoTitle": {
+      "bodas": "DJ Profesional para Bodas en",
+      "discomovil": "DJ Profesional para Eventos en",
+      "fiestas": "DJ Profesional para Fiestas en"
+    },
+    "whyChooseUs": "¿Por qué elegir Òrbita Events en",
+    "townsTitle": "Poblaciones de {zone} donde trabajamos",
+    "whatIncluded": "¿Qué incluye el servicio?",
+    "includes": {
+      "dj": {
+        "title": "DJ Profesional",
+        "desc": "DJ con experiencia que adapta la música en tiempo real"
+      },
+      "sound": {
+        "title": "Sonido 4000W",
+        "desc": "Equipo profesional EV + Pioneer para hasta 300 personas"
+      },
+      "allIncluded": {
+        "title": "Todo incluido",
+        "desc": "Montaje, desmontaje y desplazamiento en"
+      }
+    },
+    "faqTitle": "Preguntas Frecuentes -",
+    "finalCta": {
+      "titleBodas": "¿Tu boda es en",
+      "titleOther": "¿Tu evento es en",
+      "subtitle": "Cuéntanos tu fecha y te enviamos presupuesto en menos de 2 horas"
+    }
+  },
+  "themingSection": {
+    "badge": "¿Quieres ir más allá?",
+    "title": "Experiencias Temáticas",
+    "subtitle": "Transformamos tu evento en otro mundo. Decoración, iluminación y detalles personalizados para que tenga narrativa propia.",
+    "themes": {
+      "magic": "Mundo Mágico",
+      "halloween": "Halloween",
+      "disco": "Disco 80s",
+      "tropical": "Tropical",
+      "custom": "Tu Idea"
+    },
+    "featured": {
+      "title": "Experiencia Mundo Mágico",
+      "desc": "Transforma tu evento en una escuela de brujería. Velas flotantes, sobres con lacre, ambiente de castillo encantado...",
+      "features": [
+        "Velas flotantes con LED",
+        "Sobres personalizados con lacre",
+        "Iluminación y efectos temáticos"
+      ],
+      "cta": "Ver experiencia"
+    },
+    "testimonial": {
+      "quote": "¡Transformaron nuestra boda en magia pura. Los invitados aún hablan de ello!",
+      "author": "Lorena y Carles, 2025"
+    },
+    "addTo": "Se añade a cualquier servicio"
+  },
   "servicesGrid": {
     "title": "Servicios",
     "learnMore": "Más información →",
@@ -1637,6 +2887,15 @@
       "Sa",
       "Do"
     ],
+    "daysShort": [
+      "Dom",
+      "Lun",
+      "Mar",
+      "Mié",
+      "Jue",
+      "Vie",
+      "Sáb"
+    ],
     "months": [
       "Enero",
       "Febrero",
@@ -1656,7 +2915,12 @@
     "available": "Disponible",
     "notAvailable": "No disponible",
     "occupied": "Ocupado",
+    "reserved": "Reservados",
+    "blocked": "Bloqueados",
     "highSeason": "Temporada alta",
+    "selected": "Seleccionado",
+    "legend": "Leyenda:",
+    "dateSelected": "Fecha seleccionada",
     "daysAvailable": "{count} días disponibles",
     "pastDate": "Fecha pasada",
     "saturdaysAvailable": "{count, plural, =1 {sábado disponible} other {sábados disponibles}} este mes"
@@ -1672,15 +2936,19 @@
     "imageNotAvailable": "Imagen no disponible"
   },
   "videoTestimonials": {
-    "items": [
-      {
-        "name": "Lorena y Carles",
-        "event": "Boda Mundo Mágico",
-        "location": "Catalunya",
-        "date": "Septiembre 2024",
-        "quote": "Transformaron nuestra boda en una experiencia mágica de escuela de magia. Las velas flotantes, los sobres personalizados con lacre rojo, la decoración con elementos mágicos... ¡los invitados aún hablan de ello! Todo fue exactamente como lo habíamos soñado."
-      }
-    ]
+    "badge": "Próxima Boda",
+    "upcomingEvent": "Próximamente",
+    "wantSame": "¿Quieres una experiencia así?",
+    "seeHP": "Descubre Mundo Mágico",
+    "leaveReview": "Deja tu opinión",
+    "hadEvent": "¿Has celebrado un evento con nosotros?",
+    "testimonial": {
+      "name": "Lorena y Carles",
+      "event": "Boda Mundo Mágico",
+      "date": "Próximamente",
+      "location": "Catalunya",
+      "quote": "Estamos preparando nuestra boda temática con Òrbita Events. La planificación ha sido increíble: velas flotantes, sobres personalizados con lacre rojo, decoración con símbolos mágicos... ¡Estamos muy ilusionados!"
+    }
   },
   "portfolioGrid": {
     "title": "Casos recientes",
@@ -1700,7 +2968,21 @@
     ]
   },
   "logoWall": {
-    "title": "MARCAS QUE CONFÍAN EN ÒRBITA"
+    "title": "MARCAS QUE CONFÍAN EN ÒRBITA",
+    "clients": {
+      "0": "Moto Offroad Academy",
+      "1": "Masia El Massaguer",
+      "2": "AECC",
+      "3": "Clap",
+      "4": "Ajuntament de Granollers",
+      "5": "Ajuntament de Terrassa",
+      "6": "MG Medicina Estètica",
+      "7": "Zona Motor L'Ametlla Park"
+    }
+  },
+  "languages": {
+    "ca": "Català",
+    "es": "Español"
   },
   "gallery": {
     "preparingTitle": "Esta experiencia está en preparación",
@@ -1883,6 +3165,7 @@
   },
   "calculator": {
     "badge": "Calculadora de Eventos",
+    "popular": "Popular",
     "title": "Descubre el precio",
     "titleHighlight": "de tu evento perfecto",
     "subtitle": "Responde 4 preguntas y obtén una estimación instantánea. Sin compromiso.",
@@ -2021,26 +3304,33 @@
   },
   "mobileExperience": {
     "hero": {
-      "title1": "Fiestas que",
-      "title2": "no se olvidan",
-      "subtitle": "Tematización · Música · Magia",
-      "discover": "Descubre",
-      "swipe": "← swipe →"
+      "title1": "Creamos",
+      "title2": "experiencias",
+      "subtitle": "DJ + Sonido + Luces + Tematización. Todo lo que necesitas para hacer tu evento memorable.",
+      "discover": "Descubre más",
+      "swipe": "← Desliza →",
+      "altHalloween": "Fiesta Halloween Òrbita Events",
+      "altMonMagic": "Fiesta Mundo Mágico Òrbita Events",
+      "altBoda": "Boda con Òrbita Events",
+      "altFesta": "Fiesta privada Òrbita Events"
+    },
+    "gallery": {
+      "sectionTitle": "Portfolio",
+      "title": "Más",
+      "titleHighlight": "pruebas",
+      "viewAll": "Ver todo el portfolio"
     },
     "revelation": {
       "title1": "No ponemos música.",
       "title2": "Creamos mundos.",
-      "description1": "Cada luz. Cada detalle. Cada momento.",
-      "description2": "Tu evento, tal como lo imaginas.",
-      "touchHint": "Toca la pantalla y descubre la magia"
+      "description1": "Cada evento es único.",
+      "description2": "Diseñamos experiencias completas que tus invitados recordarán siempre.",
+      "touchHint": "Toca la pantalla para ver magia"
     },
     "realms": {
-      "sectionTitle": "Tematizaciones",
-      "title": "Escoge tu",
-      "titleHighlight": "mundo",
-      "swipeHint": "← swipe para ver más →",
-      "wantParty": "Quiero una fiesta",
-      "contact": "Contactar →",
+      "sectionTitle": "Tematización",
+      "title": "Elige tu",
+      "titleHighlight": "reino",
       "halloween": {
         "name": "Halloween",
         "title": "La Noche de los Muertos",
@@ -2050,39 +3340,66 @@
         "name": "Mundo Mágico",
         "title": "Bienvenido a la Escuela de Magia",
         "description": "Varitas, casas, magia... El sueño de todo fan de la fantasía hecho realidad."
-      }
-    },
-    "gallery": {
-      "sectionTitle": "2+ años experiencia",
-      "title": "Experiencias",
-      "titleHighlight": "reales",
-      "viewAll": "Ver todo el portfolio"
+      },
+      "wantParty": "¿Quieres una fiesta",
+      "contact": "Contáctanos",
+      "swipeHint": "👆 Desliza para ver más fotos"
     },
     "testimonials": {
-      "sectionTitle": "100% recomendado",
-      "title": "Sus",
-      "titleHighlight": "palabras",
-      "swipe": "← swipe →"
+      "sectionTitle": "Opiniones",
+      "title": "Lo que dicen",
+      "titleHighlight": "los clientes",
+      "swipe": "← Desliza para ver más →"
     },
     "cta": {
       "title": "¿Tienes una fecha",
       "titleHighlight": "en mente?",
-      "description1": "Cuéntanos tu idea.",
-      "description2": "Te respondemos en menos de 2 horas.",
-      "whatsapp": "WhatsApp directo",
+      "description1": "Cuéntanos tu evento.",
+      "description2": "Respuesta en menos de 2 horas.",
+      "whatsapp": "Escríbenos por WhatsApp",
       "contactForm": "Formulario de contacto",
-      "call": "Llamar ahora",
-      "trustYears": "2+ años en el sector",
-      "trustLocation": "BCN + Girona",
-      "trustResponse": "2h respuesta",
-      "guarantee": "Respuesta garantizada en menos de 2h, incluso fines de semana"
+      "call": "Llámanos: 699 121 023",
+      "trustYears": "🎯 +2 años de experiencia",
+      "trustLocation": "📍 Barcelona y Girona",
+      "trustResponse": "⚡ Respuesta en 2h",
+      "guarantee": "✓ Presupuesto sin compromiso · Cancelación gratuita hasta 7 días antes"
+    },
+    "testimonis": {
+      "0": {
+        "text": "Estamos preparando nuestra boda temática con Òrbita Events. ¡La planificación está siendo increíble!",
+        "nom": "Lorena & Carles",
+        "event": "Boda Mundo Mágico · Próximamente"
+      },
+      "1": {
+        "text": "La mejor fiesta de Halloween de mi vida. El humo, las luces, todo perfecto. Mis amigos alucinaban.",
+        "nom": "Àngela",
+        "event": "18 cumpleaños Halloween · Octubre 2024"
+      },
+      "2": {
+        "text": "Queríamos algo diferente para la empresa. Superaron todas las expectativas. Profesional y creativo.",
+        "nom": "TechCat S.L.",
+        "event": "Evento corporativo · Diciembre 2024"
+      }
     }
   },
   "floatingButtons": {
     "callNow": "Llamar ahora",
     "email": "Email",
     "whatsapp": "WhatsApp",
-    "contactUs": "¡Contáctanos!"
+    "contactUs": "¡Contáctanos!",
+    "whatsappMessage": "¡Hola! Me gustaría información sobre un evento."
+  },
+  "whatsappMessages": {
+    "general": "¡Hola! Me interesa saber más sobre vuestros servicios de eventos",
+    "bodas": "¡Hola! Me gustaría información sobre vuestros servicios para bodas",
+    "discomovil": "¡Hola! Estoy interesado en contratar una disco móvil",
+    "empresas": "¡Hola! Necesito un presupuesto para un evento corporativo",
+    "produccion": "¡Hola! Me interesa una producción técnica completa",
+    "fiestas": "¡Hola! Quiero animar mi fiesta con vuestros servicios",
+    "alquiler": "¡Hola! Necesito alquilar equipamiento para un evento",
+    "configurador": "¡Hola! He configurado un pack. ¿Podemos hablar sobre disponibilidad?",
+    "halloween": "¡Hola! Quiero info sobre fiestas Halloween",
+    "experiencias": "¡Hola! Me interesa una experiencia temática personalizada"
   },
   "mobileLanding": {
     "heroSlides": {
@@ -2160,7 +3477,21 @@
   "elViatge": {
     "portal": {
       "magicBegins": "La magia comienza...",
-      "skipIntro": "Saltar intro →"
+      "skipIntro": "Saltar intro →",
+      "logoText": "ÒRBITA",
+      "logoSubtext": "EVENTS"
+    },
+    "promesa": {
+      "title1": "El día que siempre",
+      "title2": "imaginaste",
+      "subtitle1": "Ese momento en que miras a tu alrededor y ves a todos sonriendo.",
+      "subtitle2": "La música perfecta. Las luces justas. Y sabes que ese instante quedará para siempre.",
+      "cta": "Empieza a crearlo",
+      "stats": {
+        "anys": "años en el sector",
+        "ubicacio": "+ Girona",
+        "resposta": "respuesta"
+      }
     },
     "mons": {
       "halloween": {
@@ -2212,18 +3543,6 @@
         "data": "Diciembre 2024"
       }
     ],
-    "promesa": {
-      "title1": "El día que siempre",
-      "title2": "imaginaste",
-      "subtitle1": "Ese momento en que miras a tu alrededor y ves a todos sonriendo.",
-      "subtitle2": "La música perfecta. Las luces justas. Y sabes que ese instante quedará para siempre.",
-      "cta": "Empieza a crearlo",
-      "stats": {
-        "anys": "años en el sector",
-        "ubicacio": "+ Girona",
-        "resposta": "respuesta"
-      }
-    },
     "elsMons": {
       "sectionTitle": "Escoge tu universo",
       "title1": "Cada evento es un",
@@ -2267,44 +3586,6 @@
       "trustResponse": "2h respuesta",
       "miniTestimonial": "\"Transformaron nuestra boda en una experiencia mágica inolvidable.\"",
       "miniTestimonialAuthor": "— Lorena y Carles"
-    }
-  },
-  "sensorial": {
-    "brandName": "Òrbita Events",
-    "title": "Espacio Sensorial",
-    "breathe": "Respira...",
-    "infoTitle": "¿Qué es el Espacio Sensorial?",
-    "infoP1": "Un lugar digital diseñado para personas con sensibilidades sensoriales, niños y niñas con autismo, o cualquiera que quiera un momento de calma o diversión controlada.",
-    "infoP2": "Ajusta la velocidad y densidad de las partículas a tu gusto. ¡Prueba los diferentes temas para encontrar el que más te guste! 💜",
-    "understood": "¡Entendido!",
-    "controls": "Controles",
-    "chooseTheme": "🎨 Elige un tema",
-    "presets": "⚡ Presets",
-    "speed": "Velocidad",
-    "slow": "🐢 Lento",
-    "fast": "🐇 Rápido",
-    "density": "Densidad",
-    "few": "Pocas",
-    "many": "Muchas",
-    "touchInteraction": "Interacción táctil",
-    "touchDescription": "Las partículas seguirán tu dedo o ratón",
-    "pause": "Pausa",
-    "play": "Play",
-    "madeWithLove": "Hecho con amor",
-    "forSpecialPeople": "Para todas las personas especiales 💜",
-    "backHome": "Volver al inicio",
-    "themes": {
-      "calm": { "name": "Calma", "description": "Relajación y paz" },
-      "elegant": { "name": "Elegante", "description": "Sofisticación dorada" },
-      "halloween": { "name": "Halloween", "description": "Misterio y diversión" },
-      "monmagic": { "name": "Mundo Mágico", "description": "Magia de escuela de hechicería" },
-      "disco": { "name": "Disco", "description": "Ritmo y luz" },
-      "tropical": { "name": "Tropical", "description": "Paraíso verde" }
-    },
-    "presetNames": {
-      "relaxed": "🧘 Relajado",
-      "normal": "✨ Normal",
-      "party": "🎉 Fiesta"
     }
   },
   "testimonialForm": {
@@ -2458,6 +3739,691 @@
         "submitting": "Enviando...",
         "currentReward": "Recompensa actual:"
       }
+    }
+  },
+  "servicesShowcase": {
+    "sectionTitle": "Cada evento es un",
+    "sectionTitleHighlight": "universo",
+    "sectionSubtitle": "Explora las posibilidades. Encuentra tu mundo.",
+    "explore": "Explora",
+    "emotionalSubtitles": {
+      "weddings": "El amor celebrado",
+      "parties": "La alegría compartida",
+      "mobile": "La música donde quieras",
+      "corporate": "El impacto memorable"
+    }
+  },
+  "errorPage": {
+    "title": "¡Ups! Algo Salió Mal",
+    "defaultMessage": "Error inesperado en la web.",
+    "reassurance": "Pero tranquilo, tu evento será perfecto. Prometido.",
+    "technicalDetails": "Ver detalles técnicos (solo desarrollo)",
+    "tryAgain": "Intentar de Nuevo",
+    "backToHome": "Volver al Inicio",
+    "contactHelp": "Contactar (Ayuda Rápida)",
+    "persistentProblem": "¿Problema persistente?",
+    "contactUs": "Contáctanos a través del formulario",
+    "errorCode": "Código error:"
+  },
+  "bodaHalloween": {
+    "badge": "Especialistas en Bodas Temáticas",
+    "heroTitle1": "Tu Boda",
+    "heroTitle2": "Halloween",
+    "heroTitle3": "Será Inolvidable",
+    "heroSubtitle": "Especialistas en bodas temáticas en Barcelona y Catalunya. Creamos la atmósfera terroríficamente perfecta para tu día especial.",
+    "ctaBudget": "Pedir Presupuesto Gratis",
+    "ctaWhatsapp": "WhatsApp Directo",
+    "trustEvents": "eventos realizados",
+    "trustRecommend": "nos recomiendan",
+    "trustResponse": "Respuesta en <2h",
+    "featuresTitle": "¿Por Qué Elegir Òrbita para tu Boda Halloween?",
+    "featuresSubtitle": "No somos solo DJs. Somos especialistas en crear experiencias temáticas completas.",
+    "features": {
+      "theming": {
+        "title": "Tematización Completa",
+        "description": "Decoración inmersiva con elementos Halloween: calabazas, telarañas, iluminación tenebrosa y más."
+      },
+      "effects": {
+        "title": "Efectos Especiales",
+        "description": "Humo bajo para el primer baile, luces espectaculares, efectos de terror controlados."
+      },
+      "dj": {
+        "title": "DJ Especializado",
+        "description": "Playlist personalizada mezclando tus canciones favoritas con clásicos de Halloween."
+      },
+      "experience": {
+        "title": "Experiencia Única",
+        "description": "Especialistas en bodas Halloween. Sabemos exactamente cómo crear la atmósfera perfecta."
+      }
+    },
+    "testimonialsTitle": "Lo Que Dicen Nuestras Parejas",
+    "faqTitle": "Preguntas Frecuentes",
+    "faq": {
+      "q1": "¿Qué incluye el servicio de boda Halloween?",
+      "a1": "DJ profesional, iluminación temática, efectos especiales (humo, luces), decoración básica Halloween, coordinación del evento y playlist personalizada.",
+      "q2": "¿Puedo hacer una boda Halloween en cualquier época del año?",
+      "a2": "¡Por supuesto! Aunque octubre es el mes estrella, realizamos bodas temáticas Halloween durante todo el año.",
+      "q3": "¿Cuánto cuesta una boda Halloween?",
+      "a3": "Los precios varían según el nivel de tematización. Desde 2.900€ para un pack básico hasta 5.500€+ para tematización completa.",
+      "q4": "¿Trabajáis fuera de Barcelona?",
+      "a4": "Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Transporte incluido hasta 25km desde Granollers."
+    },
+    "finalCtaTitle": "¿Listo para una Boda Terroríficamente Perfecta?",
+    "finalCtaSubtitle": "Contacta ahora y recibe tu presupuesto personalizado en menos de 2 horas.",
+    "finalCtaBudget": "Quiero mi Presupuesto",
+    "finalCtaCall": "Llamar:"
+  },
+  "privacy": {
+    "title": "Tus Derechos de Privacidad",
+    "subtitle": "Gestiona tus datos personales según el RGPD",
+    "selectRight": "Selecciona tu derecho",
+    "whichRight": "¿Qué derecho quieres ejercer?",
+    "howItWorks": "¿Cómo funciona?",
+    "howItWorksDesc": "Selecciona el derecho que quieres ejercer, rellena tus datos y recibirás un email para verificar tu identidad. Tenemos 30 días para responder a tu solicitud.",
+    "ariaBack": "Volver atrás",
+    "nameLabel": "Nombre completo",
+    "namePlaceholder": "Tu nombre y apellidos",
+    "phoneLabel": "Teléfono (opcional)",
+    "phonePlaceholder": "+34 600 000 000",
+    "descriptionLabel": "Descripción",
+    "descriptionPlaceholder": "Describe tu solicitud con detalle...",
+    "rights": {
+      "access": {
+        "title": "Acceder a mis datos",
+        "description": "Solicita una copia de todos los datos que tenemos sobre ti",
+        "article": "Art. 15 RGPD"
+      },
+      "rectification": {
+        "title": "Rectificar datos",
+        "description": "Corrige información inexacta o incompleta",
+        "article": "Art. 16 RGPD",
+        "descriptionLabel": "¿Qué datos quieres rectificar?"
+      },
+      "erasure": {
+        "title": "Eliminar datos",
+        "description": "Solicita la eliminación de tus datos",
+        "article": "Art. 17 RGPD",
+        "descriptionLabel": "Motivo de la eliminación (opcional)"
+      },
+      "portability": {
+        "title": "Portabilidad",
+        "description": "Recibe tus datos en formato portable",
+        "article": "Art. 20 RGPD"
+      },
+      "objection": {
+        "title": "Oposición",
+        "description": "Oponte al tratamiento de tus datos",
+        "article": "Art. 21 RGPD",
+        "descriptionLabel": "Motivo de la oposición"
+      },
+      "restriction": {
+        "title": "Limitación",
+        "description": "Limita cómo usamos tus datos",
+        "article": "Art. 18 RGPD",
+        "descriptionLabel": "¿Qué tratamiento quieres limitar?"
+      }
+    },
+    "form": {
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "Tu email registrado",
+      "descriptionPlaceholder": "Describe tu solicitud...",
+      "consent": "Acepto el tratamiento de mis datos para gestionar esta solicitud",
+      "submitting": "Enviando...",
+      "submit": "Enviar solicitud",
+      "back": "Volver"
+    },
+    "success": {
+      "title": "Solicitud enviada",
+      "message": "Hemos recibido tu solicitud. Te responderemos en un máximo de 30 días.",
+      "ticketLabel": "Número de seguimiento:",
+      "newRequest": "Nueva solicitud"
+    },
+    "info": {
+      "responseTime": "Tiempo de respuesta: máximo 30 días",
+      "contact": "Contacto DPO:"
+    }
+  },
+  "accessibility": {
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "closeVideo": "Cerrar vídeo",
+    "changeLanguageTo": "Cambiar idioma a {language}",
+    "breadcrumb": "Ruta de navegación",
+    "visitSocialMedia": "Visitar {name}",
+    "goToConfigurator": "Ir al configurador de presupuestos"
+  },
+  "themeSwitcher": {
+    "tryMagic": "¡Prueba nuestra magia! ✨",
+    "transformWeb": "Transforma la web. Imagina tu evento.",
+    "secretCodes": "🎃 Escribe \"BOO\" | 🪄 Escribe \"LUMOS\"",
+    "chooseWorld": "Elige tu mundo",
+    "transformExperience": "Transforma la experiencia",
+    "shakeHint": "📱 2x agita = efecto mágico · 4x agita = cambio tema"
+  },
+  "ui": {
+    "whatsappDirect": "WhatsApp Directo",
+    "callUs": "Llámanos",
+    "videoNotSupported": "Tu navegador no soporta vídeo HTML5.",
+    "demoCaption": "Demo Òrbita Events — Experiencias que se recuerdan",
+    "more": "Más",
+    "pressupost": "Presupuesto",
+    "quote": "Presupuesto",
+    "menu": "Menú",
+    "coverage": "Barcelona + Girona",
+    "responseTime": "Respuesta en 2h"
+  },
+  "structuredData": {
+    "organization": {
+      "description": "Creamos experiencias completas personalizadas para eventos en Barcelona y Girona. DJ profesional, tematización, animación, efectos especiales."
+    },
+    "service": {
+      "catalogName": "Servicios de DJ y Eventos",
+      "djWeddings": "DJ para Bodas",
+      "djWeddingsDesc": "Servicio completo de DJ, música y animación para bodas con tematización personalizada.",
+      "discomovil": "Discomóvil Profesional",
+      "discomovilDesc": "Discomóvil con equipamiento profesional, luces LED y efectos especiales.",
+      "corporate": "Eventos Corporativos",
+      "corporateDesc": "Producción técnica completa para eventos de empresa y team building."
+    },
+    "faq": {
+      "q1": "¿Qué hace diferente a Òrbita de otros DJ/proveedores de eventos?",
+      "a1": "Creamos experiencias completas personalizadas. No solo música: tematización + animación + música adaptada en tiempo real + juegos + efectos. Nuestro DJ lee el ambiente y ajusta sobre la marcha.",
+      "q2": "¿Cuánto cuesta contratar Òrbita para mi boda/fiesta/evento?",
+      "a2": "Trabajamos con packs claros desde 250€. Los precios se calculan automáticamente según horas, equipo y tipo de evento en nuestro configurador.",
+      "q3": "¿Trabajáis fuera de Barcelona? ¿Cubrís Girona y Costa Brava?",
+      "a3": "Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Transporte GRATIS hasta 25km desde Granollers. Más allá, se añade según distancia.",
+      "q4": "¿Qué equipo de sonido e iluminación utilizáis?",
+      "a4": "Utilizamos equipos profesionales Pioneer DJ, sistemas de sonido JBL/EV con potencia adaptada al espacio, y cabezas móviles LED con control DMX para efectos sincronizados.",
+      "q5": "¿Con cuánta antelación debo reservar?",
+      "a5": "Recomendamos reservar con 2-3 meses de antelación para bodas y eventos grandes. Para fiestas privadas, 2-4 semanas suele ser suficiente. Las fechas populares (sábados de verano) se agotan rápido.",
+      "q6": "¿Puedo elegir la música de mi evento?",
+      "a6": "Sí, te enviamos un formulario previo para conocer tus gustos y peticiones especiales. Durante el evento, nuestro DJ adapta la música en tiempo real según la respuesta del público.",
+      "q7": "¿Qué pasa si hay un problema técnico durante el evento?",
+      "a7": "Llevamos siempre equipo de backup y un técnico profesional. Tenemos protocolos de contingencia para garantizar que tu evento no se detenga nunca."
+    },
+    "localBusiness": {
+      "openingHours": "Lunes a Domingo: 08:00 - 20:00"
+    },
+    "knowsAbout": [
+      "DJ",
+      "discomóvil",
+      "sonido para eventos",
+      "iluminación para eventos",
+      "producción técnica",
+      "bodas",
+      "eventos corporativos",
+      "tematización",
+      "fiestas temáticas de magia",
+      "Halloween",
+      "Navidad"
+    ]
+  },
+  "seoJsonLd": {
+    "organization": {
+      "description": "Eventos profesionales en Barcelona y Girona: bodas, fiestas privadas, eventos corporativos. DJ profesional, tematización de fiestas y efectos especiales. +2 años de experiencia."
+    },
+    "services": {
+      "bodas": {
+        "name": "Bodas",
+        "description": "DJ + luces + efectos para bodas épicas"
+      },
+      "discomovil": {
+        "name": "Discomóvil",
+        "description": "DJ profesional + equipamiento para fiestas"
+      },
+      "fiestas": {
+        "name": "Fiestas Privadas",
+        "description": "Cumpleaños, despedidas y fiestas temáticas"
+      },
+      "corporativo": {
+        "name": "Eventos Corporativos",
+        "description": "Team building, cenas empresa, presentaciones"
+      },
+      "produccion": {
+        "name": "Producción Técnica",
+        "description": "Montaje y operación técnica profesional"
+      },
+      "alquiler": {
+        "name": "Alquiler Equipamiento",
+        "description": "Alquiler sonido, luces y equipamiento DJ"
+      }
+    }
+  },
+  "layoutJsonLd": {
+    "description": "DJ profesional para bodas, fiestas y eventos corporativos en Barcelona y Girona. Discomóvil con sonido 4000W, luces LED y efectos. Experiencia desde 2023.",
+    "services": {
+      "catalogName": "Servicios DJ y Eventos Barcelona",
+      "djBodas": {
+        "name": "DJ Bodas Barcelona",
+        "description": "DJ profesional para bodas con sonido 4000W, iluminación y efectos especiales. Ceremonia, cóctel y fiesta."
+      },
+      "discomovil": {
+        "name": "Discomóvil Barcelona",
+        "description": "Discomóvil profesional con DJ, sonido, luces LED y efectos. Nos desplazamos a toda Catalunya."
+      },
+      "fiestas": {
+        "name": "Fiestas Privadas Barcelona",
+        "description": "DJ para fiestas privadas: cumpleaños, despedidas, aniversarios. Sonido, luces y animación."
+      },
+      "corporativo": {
+        "name": "Eventos Corporativos Barcelona",
+        "description": "DJ y producción técnica para eventos de empresa: cenas, team building, presentaciones."
+      }
+    }
+  },
+  "monMagic": {
+    "badge": "Lacre Artesanal Real",
+    "heroTitle": "Tu Boda en el",
+    "heroTitleHighlight": "Mundo Mágico",
+    "heroSubtitle": "Sobres completos con carta de la Directora, texto personalizado y lacre artesanal.",
+    "heroPrice": "✨ Desde 8€/sobre con todo incluido ✨",
+    "priceUnit": "sobre completo",
+    "pricePackLabel": "pack +50",
+    "housesLabel": "casas",
+    "calculateBudget": "Calcular presupuesto",
+    "seeHouses": "Ver las 5 casas",
+    "chooseCasa": "Elige tu Casa",
+    "chooseCasaDesc": "Todos los sobres de tu pedido llevarán el lacre de la casa que elijas. ¿Quieres sellos diferentes? Añade la opción Multi-Sello.",
+    "lacreTitle": "Lacre",
+    "products": "Productos",
+    "productsDesc": "Compra por unidades o aprovecha los packs con descuento",
+    "mostSold": "MÁS VENDIDO",
+    "perUnit": "Por unidad",
+    "askBudget": "Pedir presupuesto",
+    "packsDiscount": "Packs con Descuento",
+    "packsDiscountDesc": "Ahorra hasta un 15% con nuestros packs completos",
+    "recommended": "RECOMENDADO",
+    "saving": "AHORRO",
+    "requestPack": "Solicitar pack",
+    "calculator": "Calculadora Rápida",
+    "calculatorDesc": "Selecciona tu cantidad de invitados",
+    "guests": "inv.",
+    "packBasic": "Pack Básico",
+    "packPremium": "Pack Premium",
+    "requestBudgetFor": "Solicitar presupuesto para {count} invitados",
+    "realPhotos": "Fotos Reales de Bodas",
+    "realPhotosDesc": "Mira cómo quedaron nuestros sobres en bodas reales. ¡La magia es palpable!",
+    "allPhotosReal": "Todas las fotos son de bodas reales de nuestros clientes",
+    "completeLetter": "Sobre completo con carta",
+    "realReaction": "❤️ La reacción real",
+    "altSobreObert": "Sobre mágico abierto con carta de la Directora",
+    "altSobrePlat": "Sobre personalizado en el plato",
+    "altConvidada": "Invitada leyendo carta mágica",
+    "altMussol": "Búho con pergaminos",
+    "altEscombres": "Decoración deportiva mágica",
+    "faq": "Preguntas Frecuentes",
+    "wantCompletePack": "¿Quieres el pack completo de tematización?",
+    "wantCompletePackDesc": "La papelería es solo el principio. Combínala con DJ, efectos especiales, iluminación y decoración para crear una experiencia mágica completa.",
+    "configureComplete": "Configura evento completo",
+    "talkToUs": "Hablar con nosotros",
+    "houses": {
+      "escola": {
+        "nom": "Escuela de Magia",
+        "descripcio": "El escudo oficial con las cuatro casas"
+      },
+      "lleons": {
+        "nom": "Casa de los Leones",
+        "descripcio": "Para los valientes de corazón"
+      },
+      "serps": {
+        "nom": "Casa de las Serpientes",
+        "descripcio": "Para los ambiciosos y astutos"
+      },
+      "teixons": {
+        "nom": "Casa de los Tejones",
+        "descripcio": "Para los leales y justos"
+      },
+      "aguiles": {
+        "nom": "Casa de las Águilas",
+        "descripcio": "Para los sabios y creativos"
+      }
+    },
+    "productes": {
+      "sobreComplet": {
+        "nom": "Sobre Completo Escuela de Magia",
+        "descripcio": "El pack de invitación completo: sobre de papel pergamino con texto personalizado, carta de la Directora de la Escuela, frame personalizado para cada invitado, y lacre de cera artesanal con el sello de la casa elegida.",
+        "caracteristiques": [
+          "Papel pergamino auténtico",
+          "Texto personalizado para cada invitado",
+          "Carta de la Directora de la Escuela",
+          "Frame personalizado con nombre y rol",
+          "Lacre de cera artesanal",
+          "Sello de la casa elegida"
+        ],
+        "ideal": "Todo incluido en un solo producto"
+      },
+      "pergamiAmor": {
+        "nom": "Pergamino de Amor Mágico",
+        "descripcio": "Poemas originales de amor escritos en estilo mágico, enrollados individualmente y atados con una cinta elegante. Perfectos para decorar las mesas o regalar a los invitados.",
+        "caracteristiques": [
+          "Poemas originales y exclusivos",
+          "Enrollados individualmente",
+          "Atados con cinta elegante",
+          "Papel pergamino de calidad",
+          "12 poemas en catalán + 12 en castellano",
+          "Perfecto como recuerdo para invitados"
+        ],
+        "ideal": "Decoración de mesas y recuerdos"
+      },
+      "cartellDecoratiu": {
+        "nom": "Carteles Decorativos Escuela de Magia",
+        "descripcio": "Carteles temáticos para decorar el espacio: Bienvenidos a la Boda, Zona de Entrenamiento de Vuelo, señalización mágica...",
+        "caracteristiques": [
+          "Diseño estilo Consejo de Magia",
+          "Impresión alta calidad",
+          "Tamaño A3 o A2 disponible",
+          "Personalizable con nombres",
+          "Escudos de las casas mágicas",
+          "Ideal para photocall"
+        ],
+        "ideal": "Decoración y photocall"
+      }
+    },
+    "packs": {
+      "basic": {
+        "nom": "Pack Básico \"Carta Aceptación\"",
+        "descripcio": "El pack esencial: sobres completos para todos los invitados + 1 cartel de bienvenida personalizado.",
+        "caracteristiques": [
+          "Sobres completos para todos",
+          "1 cartel bienvenida A2",
+          "Lacre casa elegida",
+          "Revisión gratuita antes de imprimir",
+          "Entrega en 10-14 días"
+        ],
+        "ideal": "Bodas hasta 100 invitados"
+      },
+      "premium": {
+        "nom": "Pack Premium \"Gran Salón\"",
+        "descripcio": "Todo incluido: sobres completos + pergaminos para cada mesa + pack de 5 carteles decorativos + opción multi-sello.",
+        "caracteristiques": [
+          "Sobres completos para todos",
+          "Pergaminos para cada mesa (1/mesa)",
+          "5 carteles decorativos A2",
+          "Opción multi-sello incluida",
+          "Entrega prioritaria 7-10 días",
+          "Prueba física antes de producción"
+        ],
+        "ideal": "Bodas premium"
+      }
+    },
+    "multiSegell": {
+      "nom": "Opción Multi-Sello",
+      "descripcio": "Cada invitado con el lacre del color de su casa asignada"
+    },
+    "faqs": {
+      "q1": {
+        "pregunta": "¿Qué incluye el \"Sobre Completo\"?",
+        "respuesta": "Incluye todo lo que necesitas: sobre de papel pergamino con el nombre del invitado, carta de la Directora de la Escuela, un frame personalizado según el rol del invitado (novio, padre, amigo...), y lacre de cera artesanal con el sello de la casa que elijas."
+      },
+      "q2": {
+        "pregunta": "¿Puedo tener sobres con diferentes sellos?",
+        "respuesta": "Por defecto, todos los sobres llevan el mismo sello (la casa que elijas). Si quieres que cada invitado tenga el sello de su casa asignada, puedes añadir la opción Multi-Sello por un suplemento de 75-120€ según la cantidad."
+      },
+      "q3": {
+        "pregunta": "¿Cómo son los pergaminos de amor?",
+        "respuesta": "Cada pergamino es un poema original de amor con temática mágica. Vienen enrollados individualmente y atados con una cinta elegante. Son perfectos para dejar en cada asiento o como detalle de mesa."
+      },
+      "q4": {
+        "pregunta": "¿Cuánto tiempo tardan?",
+        "respuesta": "El tiempo de producción es de 10-14 días laborables una vez aprobada la prueba digital. El Pack Premium incluye entrega prioritaria en 7-10 días. Para pedidos urgentes (+30%), podemos entregar en 5-7 días."
+      },
+      "q5": {
+        "pregunta": "¿Puedo ver una prueba antes?",
+        "respuesta": "Sí. Antes de imprimir, te enviamos una prueba digital en PDF con 3-4 sobres de ejemplo. El Pack Premium incluye una prueba física real antes de la producción completa."
+      },
+      "q6": {
+        "pregunta": "¿Hacéis envíos a toda España?",
+        "respuesta": "Sí. Envío a todo el territorio nacional con embalaje especial para proteger los lacres. Recogida gratuita en Granollers. Envío por mensajero: 10-18€ según peso."
+      }
+    }
+  },
+  "configuradorPage": {
+    "meta": {
+      "title": "Configurador de Eventos | Calcula tu Presupuesto Online | Òrbita Events",
+      "description": "Configura tu evento paso a paso y recibe presupuesto al instante. Elige tipo de evento, opciones de sonido, luces, DJ y extras. Compara packs y personaliza tu experiencia.",
+      "ogTitle": "Configurador de Eventos | Tu Presupuesto en 3 Minutos",
+      "ogDescription": "Calcula el presupuesto de tu evento al instante. Compara opciones y personaliza todo."
+    },
+    "breadcrumbs": {
+      "home": "Inicio",
+      "configurador": "Configurador"
+    }
+  },
+  "bodaHalloweenPage": {
+    "meta": {
+      "title": "Boda Halloween Barcelona | Especialistas en Bodas Temáticas | Òrbita Events",
+      "description": "Especialistas en bodas Halloween en Barcelona y Catalunya. Decoración, efectos especiales y DJ especializado. Presupuesto sin compromiso.",
+      "ogTitle": "Boda Halloween Barcelona | Especialistas en Bodas Temáticas",
+      "ogDescription": "Tematización completa, DJ especializado, efectos especiales. Haz tu boda inolvidable."
+    }
+  },
+  "tematicaMonMagicPage": {
+    "meta": {
+      "title": "Boda Mundo Mágico con Lacre Artesanal | Invitaciones Escuela de Magia | Òrbita Events",
+      "description": "Invitaciones de boda temática mágica con lacre de cera REAL. Cartas personalizadas, sobres con sello de las 5 casas mágicas. Hecho a mano en Catalunya. Experiencias únicas para bodas.",
+      "ogTitle": "Boda Mundo Mágico con Lacre Artesanal Real",
+      "ogDescription": "Transforma tu boda en una experiencia mágica. Sobres sellados con lacre de cera real, cartas personalizadas. El detalle que tus invitados guardarán para siempre."
+    }
+  },
+  "homePage": {
+    "meta": {
+      "title": "DJ Bodas y Eventos Barcelona | Discomóvil + Tematización | Òrbita Events",
+      "description": "DJ profesional para bodas, fiestas y eventos en Barcelona y Girona. Discomóvil con sonido 4000W, luces LED, efectos especiales y tematización única. Presupuesto en 2h.",
+      "ogTitle": "DJ Bodas y Eventos Barcelona | Desde 400€ | Òrbita Events",
+      "ogDescription": "DJ + Sonido + Luces + Efectos + Tematización. Barcelona y Girona."
+    }
+  },
+  "privacyPortal": {
+    "title": "Portal de Privacidad",
+    "subtitle": "Gestiona tus datos personales de acuerdo con el RGPD. Ejerce tus derechos de forma sencilla y segura.",
+    "requestTypes": {
+      "ACCESS": {
+        "title": "Acceder a mis datos",
+        "description": "Obtener una copia de todos los datos personales que tenemos sobre ti",
+        "label": "Derecho de Acceso"
+      },
+      "PORTABILITY": {
+        "title": "Descargar mis datos",
+        "description": "Recibir tus datos en formato estructurado y legible por máquina",
+        "label": "Derecho de Portabilidad"
+      },
+      "RECTIFICATION": {
+        "title": "Rectificar datos",
+        "description": "Corregir datos personales inexactos o incompletos",
+        "label": "Derecho de Rectificación",
+        "descriptionLabel": "¿Qué datos quieres corregir y cuál es el valor correcto?"
+      },
+      "ERASURE": {
+        "title": "Eliminar mis datos",
+        "description": "Solicitar la supresión de tus datos personales",
+        "label": "Derecho de Supresión"
+      },
+      "OBJECTION": {
+        "title": "Oponerme al tratamiento",
+        "description": "Detener el tratamiento de tus datos para finalidades específicas",
+        "label": "Derecho de Oposición",
+        "descriptionLabel": "¿A qué tratamiento quieres oponerte? (marketing, perfilado, etc.)"
+      },
+      "RESTRICTION": {
+        "title": "Limitar el tratamiento",
+        "description": "Restringir temporalmente cómo utilizamos tus datos",
+        "label": "Derecho de Limitación",
+        "descriptionLabel": "¿Qué tratamiento quieres limitar y por qué motivo?"
+      }
+    },
+    "selectStep": {
+      "heading": "Selecciona tu derecho",
+      "subheading": "¿Qué derecho quieres ejercer?",
+      "infoBox": {
+        "title": "¿Cómo funciona?",
+        "text": "Selecciona el derecho que quieres ejercer, rellena tus datos y recibirás un email para verificar tu identidad. Tenemos 30 días para responder a tu solicitud."
+      }
+    },
+    "form": {
+      "backButton": "Volver atrás",
+      "fullName": "Nombre completo",
+      "fullNamePlaceholder": "Tu nombre y apellidos",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "Tu email",
+      "emailHint": "Recibirás un email de verificación en esta dirección",
+      "phone": "Teléfono",
+      "phoneOptional": "(opcional)",
+      "phonePlaceholder": "+34 600 000 000",
+      "descriptionPlaceholder": "Describe tu solicitud con detalle...",
+      "characterCount": "{count}/1000",
+      "gdprConsent": "He leído y acepto la",
+      "privacyPolicy": "Política de Privacidad",
+      "gdprConsentText": "y autorizo el tratamiento de mis datos para gestionar esta solicitud.",
+      "required": "*",
+      "submitButton": "Enviar solicitud",
+      "submitting": "Enviando...",
+      "errorDefault": "Error al procesar la solicitud. Inténtalo de nuevo.",
+      "errorConnection": "Error de conexión. Comprueba tu conexión a internet e inténtalo de nuevo."
+    },
+    "success": {
+      "title": "¡Solicitud enviada!",
+      "message": "Te hemos enviado un email de verificación a",
+      "nextStepsTitle": "Próximos pasos:",
+      "step1": "Abre tu correo electrónico",
+      "step2": "Haz clic en el enlace de verificación",
+      "step3": "Procesaremos tu solicitud",
+      "legalDeadline": "Plazo legal de respuesta:",
+      "legalDeadlineDays": "30 días",
+      "importantTitle": "Importante:",
+      "importantText": "Para proteger tus datos, la solicitud no se procesará hasta que verifiques tu identidad haciendo clic en el enlace del email. Revisa la carpeta de spam si no lo encuentras.",
+      "anotherRequestButton": "Hacer otra solicitud",
+      "backToHomeButton": "Volver al inicio"
+    },
+    "footer": {
+      "rgpdText": "Estos derechos están garantizados por el",
+      "rgpdName": "Reglamento General de Protección de Datos (RGPD)",
+      "lopdgddText": "y la",
+      "lopdgddName": "Ley Orgánica de Protección de Datos (LOPDGDD)",
+      "privacyPolicy": "Política de Privacidad",
+      "cookiesPolicy": "Política de Cookies",
+      "legalNotice": "Aviso Legal"
+    }
+  },
+  "admin": {
+    "common": {
+      "dashboard": "Dashboard",
+      "bookings": "Reservas",
+      "leads": "Leads",
+      "inventory": "Inventario",
+      "newBooking": "+ Nueva Reserva",
+      "viewAll": "Ver todos →",
+      "viewAllFem": "Ver todas →",
+      "manage": "Gestionar →",
+      "back": "← Volver",
+      "view": "Ver",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "add": "Añadir",
+      "adding": "Añadiendo...",
+      "loading": "Cargando...",
+      "error": "Error",
+      "success": "Éxito",
+      "unknown": "desconocido"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "confirmed": "Confirmada",
+      "preparing": "Preparando",
+      "completed": "Completada",
+      "cancelled": "Cancelada",
+      "new": "Nuevo",
+      "contacted": "Contactado",
+      "quoteSent": "Presupuesto",
+      "won": "Ganado",
+      "lost": "Perdido"
+    },
+    "eventTypes": {
+      "wedding": "💍 Boda",
+      "birthday": "🎂 Cumpleaños",
+      "corporate": "🎯 Corporativo",
+      "communion": "⛪ Comunión",
+      "baptism": "👶 Bautizo",
+      "graduation": "🎓 Graduación",
+      "anniversary": "💑 Aniversario",
+      "privateParty": "🎉 Fiesta Privada",
+      "other": "📋 Otro"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Resumen de actividad y estadísticas en tiempo real",
+      "errorLoading": "Error cargando el dashboard. Asegúrate de que la base de datos está configurada.",
+      "publicStats": "Estadísticas Públicas (Web)",
+      "eventsCompleted": "Eventos Realizados",
+      "happyPeople": "Personas Felices",
+      "satisfaction": "Satisfacción",
+      "activeSince": "Activos Desde",
+      "total": "Total",
+      "thisMonth": "Este mes",
+      "toContact": "Por contactar",
+      "converted": "Convertidos",
+      "confirmedFem": "Confirmadas",
+      "pendingFem": "Pendientes",
+      "completedFem": "Completadas",
+      "billing": "Facturación",
+      "eventsCompletedLower": "Eventos completados",
+      "available": "Disponibles",
+      "inUse": "En uso",
+      "maintenance": "Mantenimiento",
+      "upcomingEvents": "Próximos Eventos",
+      "noUpcomingEvents": "No hay eventos próximos",
+      "recentLeads": "Últimos Leads",
+      "noLeadsYet": "No hay leads todavía"
+    },
+    "bookings": {
+      "title": "Reservas",
+      "subtitle": "Gestiona todas las reservas y eventos",
+      "noBookings": "Todavía no hay reservas",
+      "bookingsAppearHere": "Las reservas creadas aparecerán aquí",
+      "autoIncrement": "Cuando una reserva pasa a COMPLETED, las estadísticas públicas (eventos + personas) se actualizan automáticamente.",
+      "ref": "Ref.",
+      "client": "Cliente",
+      "type": "Tipo",
+      "eventDate": "Fecha Evento",
+      "location": "Ubicación",
+      "pack": "Pack",
+      "totalAmount": "Total",
+      "state": "Estado",
+      "actions": "Acciones",
+      "extras": "extras",
+      "depositPending": "Pago pendiente",
+      "booking": "Reserva",
+      "viewOriginalLead": "Ver lead original →"
+    },
+    "contacts": {
+      "title": "Gestión de Contactos",
+      "subtitle": "CRM - Añade contactos e inicia procesos",
+      "withEvents": "Con eventos",
+      "searchContact": "Buscar contacto...",
+      "addContact": "Añadir Contacto",
+      "noContacts": "No hay contactos",
+      "name": "Nombre",
+      "contact": "Contacto",
+      "source": "Fuente",
+      "events": "Eventos",
+      "nameRequired": "Nombre *",
+      "emailRequired": "Email *",
+      "phone": "Teléfono",
+      "city": "Ciudad",
+      "instagram": "Instagram",
+      "notes": "Notas",
+      "notAuthorized": "No autorizado",
+      "errorLoading": "Error cargando contactos",
+      "unknownError": "Error desconocido",
+      "nameEmailRequired": "Nombre y email son obligatorios",
+      "errorCreating": "Error creando contacto",
+      "errorStartingProcess": "Error iniciando proceso",
+      "startProcess": "Iniciar proceso",
+      "requestOpinion": "Solicitar Opinión",
+      "postEventComplete": "Post-Event Completo",
+      "welcome": "Bienvenida",
+      "promotion": "Promoción"
     }
   }
 }

@@ -6,16 +6,22 @@ import { useTranslations } from "next-intl";
 export default function LogoWall() {
   const t = useTranslations("logoWall");
 
-  const logos = [
-    { src: "/img/logos/cliente1.webp", alt: "Moto Offroad Academy" },
-    { src: "/img/logos/cliente2.webp", alt: "Masia El Massaguer" },
-    { src: "/img/logos/cliente3.webp", alt: "AECC" },
-    { src: "/img/logos/cliente4.webp", alt: "Clap" },
-    { src: "/img/logos/cliente5.webp", alt: "Ajuntament de Granollers" },
-    { src: "/img/logos/cliente6.webp", alt: "Ajuntament de Terrassa" },
-    { src: "/img/logos/cliente7.webp", alt: "MG Medicina Estètica" },
-    { src: "/img/logos/cliente8.webp", alt: "Zona Motor L'Ametlla Park" },
+  // Els src són fixes; els alt es treuen de traduccions
+  const logoSrcs = [
+    "/img/logos/cliente1.webp",
+    "/img/logos/cliente2.webp",
+    "/img/logos/cliente3.webp",
+    "/img/logos/cliente4.webp",
+    "/img/logos/cliente5.webp",
+    "/img/logos/cliente6.webp",
+    "/img/logos/cliente7.webp",
+    "/img/logos/cliente8.webp",
   ];
+
+  const logos = logoSrcs.map((src, idx) => ({
+    src,
+    alt: t(`clients.${idx}`),
+  }));
 
   return (
     <section className="bg-gradient-to-b from-bg-surface to-bg-main py-16">

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Check, ArrowRight, Star, Clock, Shield } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export interface ZoneConfig {
   zone: string;
@@ -23,6 +24,8 @@ interface Props {
 }
 
 export default function ZoneLandingPage({ config }: Props) {
+  const t = useTranslations('zoneLanding');
+
   const {
     zone,
     zoneSlug,
@@ -36,8 +39,6 @@ export default function ZoneLandingPage({ config }: Props) {
     whyChooseUs,
     faqs,
   } = config;
-
-  const serviceLabel = service === 'bodas' ? 'bodas' : service === 'discomovil' ? 'discomóvil' : 'fiestas';
 
   return (
     <main className="min-h-screen bg-[var(--bg-main)]">
@@ -54,7 +55,7 @@ export default function ZoneLandingPage({ config }: Props) {
           >
             <MapPin className="w-4 h-4 text-[var(--oe-gold)]" />
             <span className="text-sm font-medium text-[var(--oe-gold)]">
-              Especialistas en {zone}
+              {t('specialistsIn')} {zone}
             </span>
           </motion.div>
 
@@ -86,7 +87,7 @@ export default function ZoneLandingPage({ config }: Props) {
             className="mb-8"
           >
             <span className="text-4xl md:text-5xl font-bold text-[var(--oe-gold)]">
-              Desde {minPrice}€
+              {t('fromPrice')} {minPrice}€
             </span>
           </motion.div>
 
@@ -101,7 +102,7 @@ export default function ZoneLandingPage({ config }: Props) {
               href={`/contacto?zona=${zoneSlug}&servicio=${service}`}
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--oe-gold)] text-black font-bold rounded-full hover:bg-[var(--oe-gold-light)] transition-all duration-300 hover:scale-105"
             >
-              Pedir Presupuesto Gratis
+              {t('requestBudget')}
               <ArrowRight className="w-5 h-5" />
             </Link>
             <a
@@ -109,7 +110,7 @@ export default function ZoneLandingPage({ config }: Props) {
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 text-white font-bold rounded-full border border-white/20 hover:bg-white/20 transition-all duration-300"
             >
               <Phone className="w-5 h-5" />
-              Llamar Ahora
+              {t('callNow')}
             </a>
           </motion.div>
 
@@ -134,7 +135,7 @@ export default function ZoneLandingPage({ config }: Props) {
       <section className="py-16 px-4 bg-white/5">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-6">
-            DJ Profesional para {serviceLabel === 'bodas' ? 'Bodas' : serviceLabel === 'discomóvil' ? 'Eventos' : 'Fiestas'} en {zone}
+            {t(`seoTitle.${service}`)} {zone}
           </h2>
           <div className="prose prose-invert prose-lg max-w-none">
             <p className="text-white/80 leading-relaxed whitespace-pre-line">
@@ -148,7 +149,7 @@ export default function ZoneLandingPage({ config }: Props) {
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">
-            ¿Por qué elegir Òrbita Events en {zone}?
+            {t('whyChooseUs')} {zone}?
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             {whyChooseUs.map((reason, i) => (
@@ -170,7 +171,7 @@ export default function ZoneLandingPage({ config }: Props) {
       <section className="py-16 px-4 bg-white/5">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">
-            Poblaciones de {zone} donde trabajamos
+            {t('townsTitle', { zone })}
           </h2>
           <div className="flex flex-wrap justify-center gap-3">
             {towns.map((town) => (
@@ -189,34 +190,34 @@ export default function ZoneLandingPage({ config }: Props) {
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">
-            ¿Qué incluye el servicio?
+            {t('whatIncluded')}
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--oe-gold)]/20 flex items-center justify-center">
                 <Star className="w-8 h-8 text-[var(--oe-gold)]" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">DJ Profesional</h3>
+              <h3 className="text-xl font-bold text-white mb-2">{t('includes.dj.title')}</h3>
               <p className="text-white/60 text-sm">
-                DJ con experiencia que adapta la música en tiempo real
+                {t('includes.dj.desc')}
               </p>
             </div>
             <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--oe-gold)]/20 flex items-center justify-center">
                 <Shield className="w-8 h-8 text-[var(--oe-gold)]" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Sonido 4000W</h3>
+              <h3 className="text-xl font-bold text-white mb-2">{t('includes.sound.title')}</h3>
               <p className="text-white/60 text-sm">
-                Equipo profesional EV + Pioneer para hasta 300 personas
+                {t('includes.sound.desc')}
               </p>
             </div>
             <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--oe-gold)]/20 flex items-center justify-center">
                 <Clock className="w-8 h-8 text-[var(--oe-gold)]" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Todo incluido</h3>
+              <h3 className="text-xl font-bold text-white mb-2">{t('includes.allIncluded.title')}</h3>
               <p className="text-white/60 text-sm">
-                Montaje, desmontaje y desplazamiento en {zone}
+                {t('includes.allIncluded.desc')} {zone}
               </p>
             </div>
           </div>
@@ -227,7 +228,7 @@ export default function ZoneLandingPage({ config }: Props) {
       <section className="py-16 px-4 bg-white/5">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-12 text-center">
-            Preguntas Frecuentes - {zone}
+            {t('faqTitle')} {zone}
           </h2>
           <div className="space-y-6">
             {faqs.map((faq, index) => (
@@ -249,17 +250,17 @@ export default function ZoneLandingPage({ config }: Props) {
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            ¿Tu {serviceLabel === 'bodas' ? 'boda' : 'evento'} es en {zone}?
+            {service === 'bodas' ? t('finalCta.titleBodas') : t('finalCta.titleOther')} {zone}?
           </h2>
           <p className="text-xl text-white/70 mb-8">
-            Cuéntanos tu fecha y te enviamos presupuesto en menos de 2 horas
+            {t('finalCta.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={`/contacto?zona=${zoneSlug}&servicio=${service}`}
               className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-[var(--oe-gold)] text-black font-bold text-lg rounded-full hover:bg-[var(--oe-gold-light)] transition-all duration-300 hover:scale-105"
             >
-              Pedir Presupuesto Gratis
+              {t('requestBudget')}
               <ArrowRight className="w-6 h-6" />
             </Link>
           </div>

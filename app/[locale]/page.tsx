@@ -34,25 +34,14 @@ export const revalidate = 3600;
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const isSpanish = locale === 'es';
-  
+  const t = await getTranslations({ locale, namespace: 'homePage' });
+
   return {
-    title: isSpanish 
-      ? 'DJ Bodas y Eventos Barcelona | Discomóvil + Tematización | Òrbita Events'
-      : 'DJ Casaments i Events Barcelona | Discomòbil + Tematització | Òrbita Events',
-    description: isSpanish
-      ? 'DJ profesional para bodas, fiestas y eventos en Barcelona y Girona. Discomóvil con sonido 4000W, luces LED, efectos especiales y tematización única. Presupuesto en 2h.'
-      : 'DJ professional per a casaments, festes i events a Barcelona i Girona. Discomòbil amb so 4000W, llums LED, efectes especials i tematització única. Pressupost en 2h.',
-    keywords: isSpanish
-      ? ['dj bodas barcelona', 'discomóvil barcelona', 'dj eventos girona', 'fiestas tematizadas', 'bodas harry potter']
-      : ['dj casaments barcelona', 'discomòbil barcelona', 'dj events girona', 'festes temàtiques', 'casaments harry potter'],
+    title: t('meta.title'),
+    description: t('meta.description'),
     openGraph: {
-      title: isSpanish 
-        ? 'DJ Bodas y Eventos Barcelona | Desde 400€ | Òrbita Events'
-        : 'DJ Casaments i Events Barcelona | Des de 400€ | Òrbita Events',
-      description: isSpanish
-        ? 'DJ + Sonido + Luces + Efectos + Tematización. Barcelona y Girona.'
-        : 'DJ + So + Llums + Efectes + Tematització. Barcelona i Girona.',
+      title: t('meta.ogTitle'),
+      description: t('meta.ogDescription'),
       images: [{ url: '/og-home.jpg', width: 1200, height: 630, alt: 'Òrbita Events' }],
     },
   };
@@ -106,7 +95,7 @@ async function ServicesSection() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <span className="inline-block px-4 py-2 mb-4 bg-amber-500/10 text-amber-400 text-sm font-medium rounded-full border border-amber-500/20">
-            🎯 {t('badge') || 'Els nostres serveis'}
+            🎯 {t('badge')}
           </span>
           <h2 className="text-3xl md:text-5xl font-black text-white mb-4">
             {t('title')}
@@ -234,7 +223,7 @@ async function ThemesSection() {
         </div>
 
         <p className="text-center mt-8 text-white/40 text-sm">
-          {t('custom')} <span className="text-purple-400">qualsevol</span> {t('customSuffix')}
+          {t('custom')} <span className="text-purple-400">{t('customAny')}</span> {t('customSuffix')}
         </p>
       </div>
     </section>

@@ -1,7 +1,10 @@
 // app/[locale]/not-found.tsx
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function NotFound() {
+  const t = useTranslations('notFound');
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -42,7 +45,7 @@ export default function NotFound() {
           fontWeight: 900,
           marginBottom: '1rem'
         }}>
-          Esta Página No Existe
+          {t('title')}
         </h2>
 
         {/* Descripción */}
@@ -52,9 +55,9 @@ export default function NotFound() {
           marginBottom: '2rem',
           lineHeight: '1.75'
         }}>
-          Parece que esta página se fue de fiesta y no volvió.
+          {t('description')}
           <br />
-          Pero tranquilo, podemos ayudarte a encontrar lo que buscas.
+          {t('descriptionExtra')}
         </p>
 
         {/* Botones */}
@@ -80,7 +83,7 @@ export default function NotFound() {
               fontSize: '1.125rem'
             }}
           >
-            Volver al Inicio
+            {t('backToHome')}
           </Link>
 
           <Link
@@ -99,7 +102,7 @@ export default function NotFound() {
               fontSize: '1.125rem'
             }}
           >
-            Ver Servicios
+            {t('viewServices')}
           </Link>
         </div>
 
@@ -113,7 +116,7 @@ export default function NotFound() {
             color: 'rgba(255, 255, 255, 0.6)',
             marginBottom: '1rem'
           }}>
-            ¿Buscabas algo específico?
+            {t('lookingFor')}
           </p>
           <div style={{
             display: 'flex',
@@ -123,22 +126,22 @@ export default function NotFound() {
             fontSize: '0.875rem'
           }}>
             <Link href="/servicios/bodas" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
-              DJ Bodas
+              {t('links.djWeddings')}
             </Link>
             <Link href="/servicios/discomovil" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
-              Discomóvil
+              {t('links.discomovil')}
             </Link>
-            <Link href="/servicios/alquiler" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
-              Alquiler
+            <Link href="/servicios/fiestas" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
+              {t('links.parties')}
             </Link>
             <Link href="/servicios/empresas" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
-              Empresas
+              {t('links.corporate')}
             </Link>
             <Link href="/faq" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
-              FAQ
+              {t('links.faq')}
             </Link>
             <Link href="/contacto" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
-              Contacto
+              {t('links.contact')}
             </Link>
           </div>
         </div>

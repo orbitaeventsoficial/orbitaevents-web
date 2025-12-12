@@ -117,7 +117,7 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialPublic }) {
           <div className="flex items-center gap-2 text-sm text-white/60">
             <span>{eventEmoji}</span>
             {testimonial.eventType && (
-              <span>{t(`eventTypes.${testimonial.eventType.toLowerCase()}`) || testimonial.eventType}</span>
+              <span>{t(`eventTypes.${testimonial.eventType.toLowerCase()}`)}</span>
             )}
             {formattedDate && (
               <>
@@ -135,7 +135,7 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialPublic }) {
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
-            {t('verified') || 'Verificat'}
+            {t('verified')}
           </span>
         </div>
       </div>
@@ -158,7 +158,7 @@ function StatsBar() {
   const statsItems = [
     {
       value: stats.googleRating ? `${stats.googleRating}` : '--',
-      label: t('stats.googleRating') || 'Google',
+      label: t('stats.googleRating'),
       icon: (
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -170,17 +170,17 @@ function StatsBar() {
     },
     {
       value: isLoading ? '--' : `${stats.totalEvents}+`,
-      label: t('stats.events') || 'Events',
+      label: t('stats.events'),
       icon: <span className="text-xl">🎉</span>,
     },
     {
       value: isLoading ? '--' : stats.averageRating.toFixed(1),
-      label: t('stats.rating') || 'Valoració',
+      label: t('stats.rating'),
       icon: <span className="text-amber-400 text-xl">★</span>,
     },
     {
       value: testimonialsData.stats.total || '--',
-      label: t('stats.reviews') || 'Opinions',
+      label: t('stats.reviews'),
       icon: <span className="text-xl">💬</span>,
     },
   ];
@@ -208,16 +208,16 @@ function EmptyState() {
     <div className="text-center py-12">
       <div className="text-6xl mb-4">🎤</div>
       <h3 className="text-2xl font-bold text-white mb-2">
-        {t('emptyState.title') || 'Sigues el primer!'}
+        {t('emptyState.title')}
       </h3>
       <p className="text-white/60 mb-6 max-w-md mx-auto">
-        {t('emptyState.description') || "Encara no tenim opinions publicades. Contracta'ns i deixa la primera!"}
+        {t('emptyState.description')}
       </p>
       <Link
         href="/contacto"
         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all"
       >
-        {t('emptyState.cta') || 'Sol·licita pressupost'}
+        {t('emptyState.cta')}
         <span>→</span>
       </Link>
     </div>
@@ -244,10 +244,10 @@ function GamificationBanner() {
         {/* Content */}
         <div className="flex-1 text-center md:text-left">
           <h3 className="text-xl md:text-2xl font-black text-white mb-2">
-            {t('gamification.title') || 'Deixa la teva opinió i guanya fins a 25% de descompte!'}
+            {t('gamification.title')}
           </h3>
           <p className="text-white/70 mb-4">
-            {t('gamification.description') || "Valora'ns i acumula descomptes pel teu proper event. Més detalls = més beneficis!"}
+            {t('gamification.description')}
           </p>
           
           {/* Rewards breakdown */}
@@ -273,7 +273,7 @@ function GamificationBanner() {
             href="/opiniones"
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all whitespace-nowrap"
           >
-            {t('gamification.cta') || "Deixa opinió"}
+            {t('gamification.cta')}
             <span>→</span>
           </Link>
         </div>
@@ -319,7 +319,7 @@ export default function TestimonialsBrutalReal() {
             animate={{ opacity: 1, y: 0 }}
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 mb-4 bg-amber-500/10 text-amber-400 text-sm font-medium rounded-full border border-amber-500/20">
-              ⭐ {t('badge') || 'Opinions verificades'}
+              ⭐ {t('badge')}
             </span>
           </motion.div>
           
@@ -329,9 +329,9 @@ export default function TestimonialsBrutalReal() {
             transition={{ delay: 0.1 }}
             className="text-3xl md:text-5xl font-black text-white mb-4"
           >
-            {t('title') || 'El que diuen els nostres'}{' '}
+            {t('title')}{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-              {t('titleHighlight') || 'clients'}
+              {t('titleHighlight')}
             </span>
           </motion.h2>
           
@@ -341,7 +341,7 @@ export default function TestimonialsBrutalReal() {
             transition={{ delay: 0.2 }}
             className="text-white/60 max-w-2xl mx-auto"
           >
-            {t('subtitle') || 'Opinions reals de clients reals. Sense trampa ni cartó.'}
+            {t('subtitle')}
           </motion.p>
         </div>
 
@@ -373,7 +373,7 @@ export default function TestimonialsBrutalReal() {
         {/* Error State */}
         {error && (
           <div className="text-center py-8">
-            <p className="text-red-400">{t('error') || 'Error carregant opinions'}</p>
+            <p className="text-red-400">{t('error')}</p>
           </div>
         )}
 

@@ -20,7 +20,6 @@ import { useTranslations } from 'next-intl';
 const CONFIG = {
   phone: '34699121023',
   email: 'info@orbitaevents.com',
-  whatsappMessage: "Hola! M'agradaria informació sobre un event.",
   showAfterScroll: 200, // px
   autoCollapseDelay: 5000, // ms
 };
@@ -61,7 +60,8 @@ export default function FloatingContactButtons() {
     }
   }, [isExpanded]);
 
-  const whatsappUrl = `https://wa.me/${CONFIG.phone}?text=${encodeURIComponent(CONFIG.whatsappMessage)}`;
+  const whatsappMessage = t('whatsappMessage');
+  const whatsappUrl = `https://wa.me/${CONFIG.phone}?text=${encodeURIComponent(whatsappMessage)}`;
 
   if (!mounted) return null;
 

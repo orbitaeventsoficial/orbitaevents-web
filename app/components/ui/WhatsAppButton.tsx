@@ -13,8 +13,7 @@ const PAGE_MESSAGES: Record<string, WhatsAppMessageType> = {
   '/servicios/discomovil': 'discomovil',
   '/servicios/empresas': 'empresas',
   '/servicios/fiestas': 'fiestas',
-  '/servicios/alquiler': 'alquiler',
-  '/servicios/produccion': 'produccion',
+  '/servicios/animacion-infantil': 'fiestas',
   '/boda-halloween': 'bodas',
   '/configurador': 'configurador',
 };

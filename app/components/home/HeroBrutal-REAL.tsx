@@ -100,7 +100,7 @@ function CountdownTimerReal() {
     return (
       <div className="text-center py-4">
         <span className="text-amber-400 font-bold animate-pulse">
-          ⚡ {t('urgencyExpired') || 'Consulta disponibilitat ara!'}
+          ⚡ {t('urgencyExpired')}
         </span>
       </div>
     );
@@ -109,17 +109,17 @@ function CountdownTimerReal() {
   return (
     <div className="space-y-3">
       <p className="text-white/70 text-sm text-center">
-        {t('countdownPrefix') || 'Proper dissabte disponible en:'}
+        {t('countdownPrefix')}
       </p>
       <div className="flex items-center justify-center gap-2 md:gap-4">
-        <CountdownUnit value={timeLeft.days} label={t('days') || 'Dies'} />
+        <CountdownUnit value={timeLeft.days} label={t('days')} />
         <span className="text-2xl md:text-4xl text-amber-400/50 font-light">:</span>
-        <CountdownUnit value={timeLeft.hours} label={t('hours') || 'Hores'} />
+        <CountdownUnit value={timeLeft.hours} label={t('hours')} />
         <span className="text-2xl md:text-4xl text-amber-400/50 font-light">:</span>
-        <CountdownUnit value={timeLeft.minutes} label={t('mins') || 'Mins'} />
+        <CountdownUnit value={timeLeft.minutes} label={t('mins')} />
         <span className="text-2xl md:text-4xl text-amber-400/50 font-light hidden md:block">:</span>
         <div className="hidden md:block">
-          <CountdownUnit value={timeLeft.seconds} label={t('secs') || 'Segs'} />
+          <CountdownUnit value={timeLeft.seconds} label={t('secs')} />
         </div>
       </div>
       {data.scarcityMessage && (
@@ -168,7 +168,7 @@ function SocialProofBadge() {
         ) : (
           <>
             <span className="text-amber-400 font-bold">{stats.totalEvents}+</span>
-            <span className="text-white/70"> {t('happyClients') || 'events feliços'}</span>
+            <span className="text-white/70"> {t('happyClients')}</span>
           </>
         )}
       </div>
@@ -213,23 +213,6 @@ function GoogleRatingBadge() {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Headlines per idioma - hardcoded per garantir que sempre funciona
-const HEADLINES_CA = [
-  { line1: 'A les 4am la teva sogra', line2: 'BALLAVA DESCALÇA' },
-  { line1: "L'únic DJ que et garanteix", line2: 'FESTES ÈPIQUES' },
-  { line1: 'Convertim el teu event en', line2: 'LLEGENDA' },
-  { line1: 'No contractes un DJ', line2: "CONTRACTA UNA EXPERIÈNCIA" },
-  { line1: 'El teu casament mereix', line2: 'SER INOLVIDABLE' },
-];
-
-const HEADLINES_ES = [
-  { line1: 'A las 4am tu suegra', line2: 'BAILABA DESCALZA' },
-  { line1: 'El único DJ que te garantiza', line2: 'FIESTAS ÉPICAS' },
-  { line1: 'Convertimos tu evento en', line2: 'LEYENDA' },
-  { line1: 'No contrates un DJ', line2: 'CONTRATA UNA EXPERIENCIA' },
-  { line1: 'Tu boda merece', line2: 'SER INOLVIDABLE' },
-];
-
 export default function HeroBrutalReal() {
   const t = useTranslations('hero');
   const { stats, isLoading: statsLoading } = usePublicStats();
@@ -237,9 +220,14 @@ export default function HeroBrutalReal() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
 
-  // Detectar idioma pel text del badge
-  const isSpanish = t('badge')?.includes('Sonido') || t('badge')?.includes('Luces');
-  const headlines = isSpanish ? HEADLINES_ES : HEADLINES_CA;
+  // Headlines des de traduccions
+  const headlines = [
+    { line1: t('headlines.0.line1'), line2: t('headlines.0.line2') },
+    { line1: t('headlines.1.line1'), line2: t('headlines.1.line2') },
+    { line1: t('headlines.2.line1'), line2: t('headlines.2.line2') },
+    { line1: t('headlines.3.line1'), line2: t('headlines.3.line2') },
+    { line1: t('headlines.4.line1'), line2: t('headlines.4.line2') },
+  ];
 
   const [currentHeadline, setCurrentHeadline] = useState(0);
 
@@ -305,7 +293,7 @@ export default function HeroBrutalReal() {
           >
             <span className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-black px-4 py-2 rounded-full text-sm font-bold">
               <span className="animate-pulse">🔥</span>
-              {t('badge') || 'DJ + So + Llums + Efectes Especials'}
+              {t('badge')}
               <span className="animate-pulse">🔥</span>
             </span>
           </motion.div>
@@ -340,7 +328,7 @@ export default function HeroBrutalReal() {
             transition={{ delay: 0.4 }}
             className="text-lg md:text-xl text-white/70 mb-8 max-w-3xl mx-auto"
           >
-            {t('subtitle') || 'Casaments, festes privades i events corporatius a Barcelona i Girona. Equipament professional de 4000W, llums LED intel·ligents i efectes especials que deixen sense alè.'}
+            {t('subtitle')}
           </motion.p>
 
           {/* STATS REALS */}
@@ -352,23 +340,23 @@ export default function HeroBrutalReal() {
           >
             <AnimatedStat
               value={stats.yearsExperience}
-              label={t('stats.years') || 'Anys experiència'}
+              label={t('stats.years')}
               isLoading={statsLoading}
             />
             <AnimatedStat
               value={stats.totalEvents}
               suffix="+"
-              label={t('stats.events') || 'Events realitzats'}
+              label={t('stats.events')}
               isLoading={statsLoading}
             />
             <AnimatedStat
               value={stats.responseTime}
-              label={t('stats.response') || 'Temps resposta'}
+              label={t('stats.response')}
               isLoading={statsLoading}
             />
             <AnimatedStat
               value={stats.coverage}
-              label={t('stats.coverage') || 'Cobertura'}
+              label={t('stats.coverage')}
               isLoading={statsLoading}
             />
           </motion.div>
@@ -385,7 +373,7 @@ export default function HeroBrutalReal() {
               className="group relative w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-lg rounded-full overflow-hidden transition-all hover:shadow-lg hover:shadow-amber-500/30 hover:scale-105"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
-                {t('cta.primary') || 'Sol·licita Pressupost GRATIS'}
+                {t('cta.primary')}
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -396,7 +384,7 @@ export default function HeroBrutalReal() {
               className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold text-lg rounded-full hover:bg-white/20 hover:border-white/40 transition-all flex items-center justify-center gap-2"
             >
               <span>▶</span>
-              {t('cta.secondary') || 'Veure Portfolio'}
+              {t('cta.secondary')}
             </Link>
           </motion.div>
 
@@ -419,15 +407,15 @@ export default function HeroBrutalReal() {
           >
             <span className="flex items-center gap-2">
               <span className="text-green-400">✓</span>
-              {t('trust.guarantee') || 'Garantia 100% satisfacció'}
+              {t('trust.guarantee')}
             </span>
             <span className="flex items-center gap-2">
               <span className="text-green-400">✓</span>
-              {t('trust.response') || 'Resposta en menys de 2h'}
+              {t('trust.response')}
             </span>
             <span className="flex items-center gap-2">
               <span className="text-green-400">✓</span>
-              {t('trust.equipment') || 'Equipament professional'}
+              {t('trust.equipment')}
             </span>
           </motion.div>
         </div>
@@ -441,7 +429,7 @@ export default function HeroBrutalReal() {
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
       >
         <div className="flex flex-col items-center gap-2 text-white/40">
-          <span className="text-xs uppercase tracking-widest">{t('scroll') || 'Descobreix més'}</span>
+          <span className="text-xs uppercase tracking-widest">{t('scroll')}</span>
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}

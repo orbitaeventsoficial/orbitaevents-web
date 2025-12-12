@@ -24,19 +24,18 @@ type Review = {
 
 // TESTIMONI DEL FUNDADOR - Casament pendent (Juliol 2025)
 // NOTA: Encara no celebrat - mostrar com a "Pròximament"
-const REVIEWS: Review[] = [
+// Dades amb keys de traducció per role i date
+const REVIEWS_DATA = [
   {
     author: "Lorena i Carles",
-    role: "Boda",
-    event: "Casament Món Màgic – Catalunya",
+    roleKey: "founderRole",
+    eventKey: "founderEvent",
     rating: 5,
-    date: "Pròximament",
-    text: "Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació ha estat increïble: veles flotants, sobres personalitzats amb lacre vermell, decoració amb símbols màgics... Estem molt il·lusionats!",
+    dateKey: "comingSoon",
+    textKey: "founderText",
     photo: "/images/tematicas/mon-magic/hero/01-taula-panoramica-cartell.jpg",
   },
 ];
-
-const AVG = (REVIEWS.reduce((sum, r) => sum + r.rating, 0) / REVIEWS.length).toFixed(1);
 
 function Stars({ n }: { n: number }) {
   return (
@@ -53,6 +52,21 @@ type FilterType = "all" | "bodas" | "fiestas" | "empresas";
 export default function OpinionesClient() {
   const t = useTranslations('reviews');
   const [filter, setFilter] = useState<FilterType>("all");
+
+  // Crear REVIEWS amb traduccions
+  const REVIEWS: Review[] = REVIEWS_DATA.map(r => ({
+    author: r.author,
+    role: t(r.roleKey),
+    event: t(r.eventKey),
+    rating: r.rating,
+    date: t(r.dateKey),
+    text: t(r.textKey),
+    photo: r.photo,
+  }));
+
+  const AVG = REVIEWS.length > 0
+    ? (REVIEWS.reduce((sum, r) => sum + r.rating, 0) / REVIEWS.length).toFixed(1)
+    : "0";
 
   const filteredReviews = REVIEWS.filter((r) => {
     if (filter === "all") return true;

@@ -142,7 +142,7 @@ export default function SmartStats({
       {/* RESPOSTA */}
       <div className="text-center">
         <p className={s.number}>{REAL_STATS.response}</p>
-        <p className={s.label}>{t('response') || 'resposta'}</p>
+        <p className={s.label}>{t('response')}</p>
       </div>
     </motion.div>
   );

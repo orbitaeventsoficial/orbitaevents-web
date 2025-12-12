@@ -234,17 +234,17 @@ function EmptyState({ t }: { t: (key: string) => string }) {
     <div className="max-w-2xl mx-auto text-center py-12">
       <div className="text-6xl mb-6">🌟</div>
       <h3 className="text-2xl font-bold text-white mb-4">
-        {t('emptyState.title') || 'Sigues el primer!'}
+        {t('emptyState.title')}
       </h3>
       <p className="text-white/60 mb-8">
-        {t('emptyState.description') || 'Encara no tenim opinions publicades. Has celebrat un event amb nosaltres? Deixa la teva opinió i guanya fins un 25% de descompte!'}
+        {t('emptyState.description')}
       </p>
       <Link
         href="/opiniones/nueva"
         className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-400 text-black font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/25 transition-all"
       >
         <span>✨</span>
-        <span>{t('emptyState.cta') || 'Deixa la primera opinió'}</span>
+        <span>{t('emptyState.cta')}</span>
       </Link>
     </div>
   );
@@ -390,11 +390,11 @@ export function TestimonialsBrutalReal() {
         >
           {/* Banner promocional del sistema de reviews */}
           <div className="max-w-2xl mx-auto mb-8 p-6 bg-gradient-to-r from-amber-500/10 to-purple-500/10 rounded-2xl border border-amber-500/20">
-            <p className="text-amber-400 font-bold mb-2">🎁 Sistema de Recompenses</p>
+            <p className="text-amber-400 font-bold mb-2">🎁 {t('rewardsSystem')}</p>
             <p className="text-white/70 text-sm">
-              Deixa la teva opinió i guanya fins a <span className="text-amber-400 font-bold">25% de descompte</span> al proper event!
+              {t('rewardsDescription')}
               <br />
-              <span className="text-white/50">Base 5% + Foto +5% + Vídeo +10% + Google +5%</span>
+              <span className="text-white/50">{t('rewardsBreakdown')}</span>
             </p>
           </div>
 

@@ -63,7 +63,7 @@ const experiences = [
     icon: '🪄',
     titleKey: 'monMagic',
     descKey: 'monMagicDesc',
-    badge: 'Popular',
+    badgeKey: 'badges.popular',
   },
   {
     href: '/tematica-halloween',
@@ -82,6 +82,7 @@ const experiences = [
 export function HeaderPro() {
   const t = useTranslations('header');
   const tCommon = useTranslations('common');
+  const tWhatsapp = useTranslations('whatsappMessages');
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<'services' | 'experiences' | null>(null);
@@ -285,9 +286,9 @@ export function HeaderPro() {
                                 <span className="text-white font-semibold group-hover:text-amber-400 transition-colors">
                                   {t(exp.titleKey)}
                                 </span>
-                                {exp.badge && (
+                                {exp.badgeKey && (
                                   <span className="px-2 py-0.5 text-[10px] font-bold bg-amber-500 text-black rounded-full">
-                                    {exp.badge}
+                                    {t(exp.badgeKey)}
                                   </span>
                                 )}
                               </div>
@@ -315,7 +316,7 @@ export function HeaderPro() {
                           href="/experiencias"
                           className="flex items-center justify-center gap-2 text-sm text-amber-400 hover:text-amber-300 font-medium transition-colors"
                         >
-                          Veure totes les experiències
+                          {t('viewAllExperiences')}
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                           </svg>
@@ -353,7 +354,7 @@ export function HeaderPro() {
 
               {/* WhatsApp */}
               <a
-                href="https://wa.me/34699121023?text=Hola!%20M'agradaria%20informació%20sobre%20els%20vostres%20serveis"
+                href={`https://wa.me/34699121023?text=${encodeURIComponent(tWhatsapp('general'))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative p-2.5 text-white/60 hover:text-green-400 hover:bg-green-400/10 rounded-xl transition-all"

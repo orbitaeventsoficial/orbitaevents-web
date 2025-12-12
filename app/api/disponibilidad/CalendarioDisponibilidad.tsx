@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Calendar, Check, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface DiaCalendario {
   fecha: string;
@@ -25,6 +26,8 @@ export default function CalendarioDisponibilidad({
   mostrarLeyenda = true,
   compacto = false
 }: CalendarioDisponibilidadProps) {
+  const t = useTranslations('common');
+  const tCal = useTranslations('calendar');
   const [mesActual, setMesActual] = useState(new Date());
   const [calendario, setCalendario] = useState<DiaCalendario[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +88,7 @@ export default function CalendarioDisponibilidad({
   }
 
   const nombreMes = mesActual.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
-  const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const diasSemana = tCal.raw('daysShort') as string[];
 
   // Calcular días vacíos al inicio del mes
   const primerDiaMes = new Date(mesActual.getFullYear(), mesActual.getMonth(), 1).getDay();
@@ -102,14 +105,14 @@ export default function CalendarioDisponibilidad({
           <button
             onClick={mesAnterior}
             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
-            aria-label="Mes anterior"
+            aria-label={tCal('prevMonth')}
           >
             <ChevronLeft className="w-5 h-5 text-white" />
           </button>
           <button
             onClick={mesSiguiente}
             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
-            aria-label="Mes siguiente"
+            aria-label={tCal('nextMonth')}
           >
             <ChevronRight className="w-5 h-5 text-white" />
           </button>
@@ -137,7 +140,7 @@ export default function CalendarioDisponibilidad({
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
               className="w-8 h-8 border-3 border-[var(--oe-gold)] border-t-transparent rounded-full"
             />
-            <p className="text-white/60 text-sm">Cargando disponibilidad...</p>
+            <p className="text-white/60 text-sm">{t('loading')}</p>
           </div>
         </div>
       ) : (
@@ -199,15 +202,15 @@ export default function CalendarioDisponibilidad({
         <div className="mt-6 grid grid-cols-3 gap-4">
           <div className="text-center p-3 bg-green-500/10 rounded-lg border border-green-500/20">
             <div className="text-2xl font-bold text-green-400">{stats.diasDisponibles}</div>
-            <div className="text-xs text-white/60">Disponibles</div>
+            <div className="text-xs text-white/60">{tCal('available')}</div>
           </div>
           <div className="text-center p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
             <div className="text-2xl font-bold text-orange-400">{stats.diasReservados}</div>
-            <div className="text-xs text-white/60">Reservados</div>
+            <div className="text-xs text-white/60">{tCal('reserved')}</div>
           </div>
           <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
             <div className="text-2xl font-bold text-red-400">{stats.diasBloqueados}</div>
-            <div className="text-xs text-white/60">Bloqueados</div>
+            <div className="text-xs text-white/60">{tCal('blocked')}</div>
           </div>
         </div>
       )}
@@ -215,25 +218,25 @@ export default function CalendarioDisponibilidad({
       {/* Leyenda */}
       {mostrarLeyenda && (
         <div className="mt-6 pt-6 border-t border-white/10">
-          <h4 className="text-sm font-medium text-white mb-3">Leyenda:</h4>
+          <h4 className="text-sm font-medium text-white mb-3">{tCal('legend')}</h4>
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-white/5 border border-white/10" />
-              <span className="text-white/60">Disponible</span>
+              <span className="text-white/60">{tCal('available')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-white/5 border border-orange-500 relative">
                 <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-orange-500 rounded-full" />
               </div>
-              <span className="text-white/60">Temporada alta</span>
+              <span className="text-white/60">{tCal('highSeason')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-white/5 opacity-50" />
-              <span className="text-white/60">No disponible</span>
+              <span className="text-white/60">{tCal('notAvailable')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded bg-[var(--oe-gold)]" />
-              <span className="text-white/60">Seleccionado</span>
+              <span className="text-white/60">{tCal('selected')}</span>
             </div>
           </div>
         </div>
@@ -252,7 +255,7 @@ export default function CalendarioDisponibilidad({
               <Calendar className="w-5 h-5 text-[var(--oe-gold)] mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-white">
-                  Fecha seleccionada
+                  {tCal('dateSelected')}
                 </p>
                 <p className="text-xs text-white/60 mt-1">
                   {new Date(fechaSeleccionada).toLocaleDateString('es-ES', {

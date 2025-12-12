@@ -5,7 +5,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Sora } from 'next/font/google';
 
-import StructuredData from './components/seo/StructuredData';
+// StructuredData mogut a [locale]/layout.tsx per suportar i18n
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 // Sora - Font moderna, geomètrica i elegant per tota la web
@@ -163,7 +163,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
 
-        <StructuredData />
+        {/* StructuredData és ara a [locale]/layout.tsx per i18n */}
 
         {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_METRICOOL_HASH && (
           <script

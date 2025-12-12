@@ -3,6 +3,7 @@
 
 import type { Metadata } from "next";
 import nextDynamic from "next/dynamic";
+import { getTranslations } from 'next-intl/server';
 import Breadcrumbs from "@\/components/seo/Breadcrumbs";
 import { FAQ_DATA } from "@/config/faq-data";
 
@@ -48,12 +49,14 @@ export const metadata: Metadata = {
 
 const FAQClient = nextDynamic(() => import("./client"));
 
-export default function FAQPage() {
+export default async function FAQPage() {
+  const t = await getTranslations('common');
+
   return (
     <>
       <Breadcrumbs
         items={[
-          { name: "Inicio", url: "/" },
+          { name: t('nav.home'), url: "/" },
           { name: "FAQ", url: "/faq" },
         ]}
       />

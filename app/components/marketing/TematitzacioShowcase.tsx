@@ -303,7 +303,7 @@ export default function TematitzacioShowcase() {
         >
           <p className="text-white/60 text-lg mb-6">
             {t('custom')}{' '}
-            <span className="text-amber-400 font-semibold">QUALSEVOL</span>{' '}
+            <span className="text-amber-400 font-semibold uppercase">{t('customAny')}</span>{' '}
             {t('customSuffix')}
           </p>
           <Link href="/contacto">

@@ -29,7 +29,7 @@ const EXPERIENCES = [
     image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
     gradient: 'from-purple-600 to-blue-600',
     bgGradient: 'from-purple-900/40 to-blue-900/40',
-    badge: 'Popular',
+    badgeKey: 'badges.popular',
     badgeColor: 'bg-purple-500',
     featuresKey: 'monMagic.features',
   },
@@ -43,7 +43,7 @@ const EXPERIENCES = [
     image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
     gradient: 'from-orange-600 to-red-700',
     bgGradient: 'from-orange-900/40 to-red-900/40',
-    badge: 'Terrorific',
+    badgeKey: 'badges.terrific',
     badgeColor: 'bg-orange-500',
     featuresKey: 'halloween.features',
   },
@@ -57,7 +57,7 @@ const EXPERIENCES = [
     image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-02.webp',
     gradient: 'from-gray-700 to-purple-800',
     bgGradient: 'from-gray-900/40 to-purple-900/40',
-    badge: 'Exclusiu',
+    badgeKey: 'badges.exclusive',
     badgeColor: 'bg-gray-600',
     featuresKey: 'bodaHalloween.features',
   },
@@ -71,7 +71,7 @@ const EXPERIENCES = [
     image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
     gradient: 'from-pink-600 to-purple-600',
     bgGradient: 'from-pink-900/40 to-purple-900/40',
-    badge: 'Retro',
+    badgeKey: 'badges.retro',
     badgeColor: 'bg-pink-500',
     featuresKey: 'disco80s.features',
     comingSoon: true,
@@ -86,7 +86,7 @@ const EXPERIENCES = [
     image: '/img/portfolio/fiestas-privadas/fiestas-privadas-02.webp',
     gradient: 'from-green-500 to-teal-600',
     bgGradient: 'from-green-900/40 to-teal-900/40',
-    badge: 'Estiu',
+    badgeKey: 'badges.summer',
     badgeColor: 'bg-green-500',
     featuresKey: 'tropical.features',
     comingSoon: true,
@@ -101,7 +101,7 @@ const EXPERIENCES = [
     image: '/img/portfolio/bodas/bodas-01.webp',
     gradient: 'from-amber-500 to-yellow-600',
     bgGradient: 'from-amber-900/40 to-yellow-900/40',
-    badge: 'Premium',
+    badgeKey: 'badges.premium',
     badgeColor: 'bg-amber-500',
     featuresKey: 'elegant.features',
     comingSoon: true,
@@ -110,6 +110,7 @@ const EXPERIENCES = [
 
 export default async function ExperienciasPage() {
   const t = await getTranslations('experiences');
+  const tWhatsapp = await getTranslations('whatsappMessages');
 
   return (
     <main className="min-h-screen bg-black">
@@ -201,10 +202,10 @@ export default async function ExperienciasPage() {
                 </div>
 
                 {/* Badge */}
-                {exp.badge && (
+                {exp.badgeKey && (
                   <div className="absolute top-4 right-4">
                     <span className={`px-3 py-1.5 ${exp.badgeColor} text-white text-xs font-bold rounded-full shadow-lg`}>
-                      {exp.comingSoon ? t('comingSoon') : exp.badge}
+                      {exp.comingSoon ? t('comingSoon') : t(exp.badgeKey)}
                     </span>
                   </div>
                 )}
@@ -270,7 +271,7 @@ export default async function ExperienciasPage() {
                 {t('cta.custom')}
               </Link>
               <a
-                href="https://wa.me/34699121023?text=Hola!%20M'interessa%20una%20experiencia%20tematica%20personalitzada"
+                href={`https://wa.me/34699121023?text=${encodeURIComponent(tWhatsapp('experiencias'))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-full transition-colors flex items-center justify-center gap-2"

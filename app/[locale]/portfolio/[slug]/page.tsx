@@ -1,5 +1,6 @@
 // app/portfolio/[slug]/page.tsx
 import { notFound } from "next/navigation";
+import { getTranslations } from 'next-intl/server';
 import { PORTFOLIO_IMAGES, PORTFOLIO_CATEGORIES } from "@/config/portfolio-images";
 import { Gallery } from "@/components/Gallery";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
@@ -11,7 +12,8 @@ type PageProps = {
 };
 
 export default async function PortfolioSlugPage({ params }: PageProps) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'common' });
 
   const images =
     (PORTFOLIO_IMAGES as Record<string, { src: string; alt: string }[]>)[slug] ??
@@ -28,8 +30,8 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
     <>
       <Breadcrumbs
         items={[
-          { name: "Inicio", url: "/" },
-          { name: "Portfolio", url: "/portfolio" },
+          { name: t('nav.home'), url: "/" },
+          { name: t('nav.portfolio'), url: "/portfolio" },
           { name: title, url: `/portfolio/${slug}` }
         ]}
       />

@@ -15,15 +15,17 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Zap, FileText, Star, TrendingUp, ArrowRight, Check } from 'lucide-react';
-import { 
-  getPacksByService, 
-  getRecommendedPack, 
+import { useTranslations } from 'next-intl';
+import {
+  getPacksByService,
+  getRecommendedPack,
   getOfertaFlash,
   OFERTA_FLASH,
-  type PackDefinition 
+  type PackDefinition
 } from '@/config/packs-config';
 
 export default function FiestasClient() {
+  const t = useTranslations('pages.parties');
   const [numGuests, setNumGuests] = useState(60);
   const [selectedPack, setSelectedPack] = useState<string | null>(null);
   const [showRecommendation, setShowRecommendation] = useState(false);
@@ -79,10 +81,10 @@ export default function FiestasClient() {
       {/* Header */}
       <div className="text-center space-y-4">
         <h1 className="text-4xl md:text-5xl font-bold">
-          DJ Fiestas Privadas Barcelona
+          {t('heroTitle')}
         </h1>
         <p className="text-xl text-text-muted max-w-2xl mx-auto">
-          Desde cumpleaños temáticos hasta celebraciones familiares. Música, animación y efectos adaptados a tu grupo.
+          {t('heroSubtitle')}
         </p>
       </div>
 
@@ -90,7 +92,7 @@ export default function FiestasClient() {
       <div className="max-w-3xl mx-auto p-8 bg-gradient-to-br from-bg-surface to-bg-card rounded-3xl border border-oe-gold/30">
         <div className="flex items-center gap-3 mb-6">
           <Users className="w-6 h-6 text-oe-gold" />
-          <h3 className="text-2xl font-bold">¿Cuántos invitados esperas?</h3>
+          <h3 className="text-2xl font-bold">{t('guestsQuestion')}</h3>
         </div>
 
         {/* Número grande */}
@@ -98,7 +100,7 @@ export default function FiestasClient() {
           <div className="text-7xl font-bold bg-gradient-to-r from-oe-gold to-oe-gold-light bg-clip-text text-transparent">
             {numGuests}
           </div>
-          <div className="text-text-muted mt-2">personas</div>
+          <div className="text-text-muted mt-2">{t('people')}</div>
         </div>
 
         {/* Slider */}
@@ -113,8 +115,8 @@ export default function FiestasClient() {
             className="w-full h-3 rounded-full appearance-none cursor-pointer slider-custom"
           />
           <div className="flex justify-between text-sm text-text-muted">
-            <span>20 personas</span>
-            <span>200 personas</span>
+            <span>20 {t('people')}</span>
+            <span>200 {t('people')}</span>
           </div>
         </div>
 
@@ -127,10 +129,10 @@ export default function FiestasClient() {
           >
             <div className="flex items-center gap-2 text-oe-gold-light font-bold">
               <Zap className="w-5 h-5" fill="currentColor" />
-              ¡Puedes acceder a la {OFERTA_FLASH.nombre}!
+              {t('flashAccess')} {OFERTA_FLASH.nombre}!
             </div>
             <p className="text-sm text-text-muted mt-1">
-              Hasta {OFERTA_FLASH.maxInvitados} invitados con {OFERTA_FLASH.descuentoPorcentaje}% de descuento
+              {t('upToGuests', { max: OFERTA_FLASH.maxInvitados })} {OFERTA_FLASH.descuentoPorcentaje}% {t('discount')}
             </p>
           </motion.div>
         )}
@@ -146,7 +148,7 @@ export default function FiestasClient() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-5 h-5 text-purple-400" />
-                <span className="font-bold text-purple-300">Recomendado para {numGuests} personas:</span>
+                <span className="font-bold text-purple-300">{t('recommendedFor', { guests: numGuests })}</span>
               </div>
               <div className="text-lg">
                 <strong>{recommendedPack.name}</strong> - {recommendedPack.price}
@@ -194,14 +196,14 @@ export default function FiestasClient() {
                 {flashPack.priceOriginalValue && (
                   <div className="inline-block px-4 py-2 bg-green-500/20 border border-green-500/50 rounded-lg">
                     <span className="text-green-400 font-bold">
-                      Ahorras {flashPack.priceOriginalValue - flashPack.priceValue}€ ({flashPack.flashDiscount}% OFF)
+                      {t('youSave')} {flashPack.priceOriginalValue - flashPack.priceValue}€ ({flashPack.flashDiscount}% OFF)
                     </span>
                   </div>
                 )}
 
                 {/* Rango */}
                 <div className="text-text-muted">
-                  📊 Ideal para {flashPack.capacidadMinima}-{flashPack.capacidadMaxima} personas
+                  📊 {t('idealFor')} {flashPack.capacidadMinima}-{flashPack.capacidadMaxima} {t('people')}
                 </div>
               </div>
 
@@ -223,7 +225,7 @@ export default function FiestasClient() {
                   className="w-full py-4 bg-gradient-to-r from-oe-gold to-oe-gold-light text-black rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:shadow-2xl hover:shadow-amber-500/40 transition-all hover:scale-105"
                 >
                   <FileText className="w-5 h-5" />
-                  Consultar Disponibilidad
+                  {t('checkAvailability')}
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </div>
@@ -234,15 +236,15 @@ export default function FiestasClient() {
 
       {/* Resto de packs */}
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold text-center mb-8">Todos los Packs</h2>
-        
+        <h2 className="text-3xl font-bold text-center mb-8">{t('allPacks')}</h2>
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {regularPacks.map(pack => {
             const isSelected = selectedPack === pack.id;
             const isRecommended = recommendedPack?.id === pack.id;
-            const isInRange = numGuests >= (pack.capacidadMinima || 0) && 
+            const isInRange = numGuests >= (pack.capacidadMinima || 0) &&
                              numGuests <= (pack.capacidadMaxima || Infinity);
-            
+
             return (
               <motion.div
                 key={pack.id}
@@ -265,7 +267,7 @@ export default function FiestasClient() {
                   <div className="absolute -top-3 right-4">
                     <div className="px-3 py-1 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full text-xs font-bold flex items-center gap-1">
                       <Star className="w-3 h-3" fill="currentColor" />
-                      MÁS VENDIDO
+                      {t('mostSold')}
                     </div>
                   </div>
                 )}
@@ -275,7 +277,7 @@ export default function FiestasClient() {
                   <div className="absolute -top-3 left-4">
                     <div className="px-3 py-1 bg-oe-gold text-black rounded-full text-xs font-bold flex items-center gap-1">
                       <TrendingUp className="w-3 h-3" />
-                      RECOMENDADO
+                      {t('recommended')}
                     </div>
                   </div>
                 )}
@@ -302,7 +304,7 @@ export default function FiestasClient() {
                   {/* Rango */}
                   {pack.capacidadMinima && pack.capacidadMaxima && (
                     <div className="text-sm text-text-muted">
-                      📊 {pack.capacidadMinima}-{pack.capacidadMaxima} personas
+                      📊 {pack.capacidadMinima}-{pack.capacidadMaxima} {t('people')}
                     </div>
                   )}
 
@@ -316,7 +318,7 @@ export default function FiestasClient() {
                     ))}
                     {pack.features.length > 5 && (
                       <li className="text-sm text-oe-gold">
-                        +{pack.features.length - 5} más...
+                        +{pack.features.length - 5} {t('more')}
                       </li>
                     )}
                   </ul>
@@ -335,7 +337,7 @@ export default function FiestasClient() {
                     `}
                   >
                     <FileText className="w-4 h-4" />
-                    Solicitar Información
+                    {t('requestInfo')}
                   </Link>
                 </div>
               </motion.div>
@@ -346,24 +348,24 @@ export default function FiestasClient() {
 
       {/* Info adicional */}
       <div className="mt-16 p-8 bg-bg-surface rounded-2xl border border-border max-w-4xl mx-auto">
-        <h3 className="text-2xl font-bold mb-4">💡 Información Importante</h3>
+        <h3 className="text-2xl font-bold mb-4">💡 {t('importantInfo')}</h3>
         <div className="grid md:grid-cols-2 gap-6 text-text-muted">
           <div>
-            <strong className="text-white">✅ Todos los packs incluyen:</strong>
+            <strong className="text-white">✅ {t('allPacksInclude')}</strong>
             <ul className="mt-2 space-y-1 ml-4">
-              <li>• Transporte e instalación</li>
-              <li>• Técnico/DJ durante el evento</li>
-              <li>• Montaje y desmontaje completo</li>
-              <li>• Seguro de responsabilidad civil</li>
+              <li>• {t('packFeatures.transport')}</li>
+              <li>• {t('packFeatures.techDj')}</li>
+              <li>• {t('packFeatures.setup')}</li>
+              <li>• {t('packFeatures.insurance')}</li>
             </ul>
           </div>
           <div>
-            <strong className="text-white">🎨 Personalización:</strong>
+            <strong className="text-white">🎨 {t('customization')}</strong>
             <ul className="mt-2 space-y-1 ml-4">
-              <li>• Tematización disponible (consultar)</li>
-              <li>• Decoración personalizada</li>
-              <li>• Show especial de luces</li>
-              <li>• ¡Consulta sin compromiso!</li>
+              <li>• {t('customFeatures.theming')}</li>
+              <li>• {t('customFeatures.decoration')}</li>
+              <li>• {t('customFeatures.lightShow')}</li>
+              <li>• {t('customFeatures.consultation')}</li>
             </ul>
           </div>
         </div>

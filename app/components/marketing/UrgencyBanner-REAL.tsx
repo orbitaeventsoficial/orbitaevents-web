@@ -80,7 +80,7 @@ function CountdownDisplay() {
   if (isExpired || !countdownTarget) {
     return (
       <span className="text-amber-400 font-bold animate-pulse">
-        ⚡ {t('consultNow') || 'Consulta disponibilitat ara!'}
+        ⚡ {t('consultNow')}
       </span>
     );
   }
@@ -88,7 +88,7 @@ function CountdownDisplay() {
   return (
     <div className="flex items-center gap-3">
       <span className="text-white/70 text-sm">
-        {t('nextSaturday') || 'Proper dissabte en:'}
+        {t('nextSaturday')}
       </span>
       <div className="flex items-center gap-1 font-mono font-bold text-amber-400">
         <span className="bg-black/40 px-2 py-1 rounded">{String(timeLeft.days).padStart(2, '0')}</span>
@@ -109,6 +109,7 @@ function CountdownDisplay() {
 
 export default function UrgencyBannerReal() {
   const t = useTranslations('urgency');
+  const tCommon = useTranslations('common.buttons');
   const { data, isLoading, error } = useAvailability();
   const [dismissed, setDismissed] = useState(false);
 
@@ -176,7 +177,7 @@ export default function UrgencyBannerReal() {
                   {isLoading ? (
                     <span className="inline-block w-48 h-5 bg-white/20 rounded animate-pulse" />
                   ) : (
-                    data.scarcityMessage || t('defaultMessage') || 'Consulta la nostra disponibilitat'
+                    data.scarcityMessage || t('defaultMessage')
                   )}
                 </h3>
                 <p className="text-white/60 text-sm">
@@ -184,7 +185,7 @@ export default function UrgencyBannerReal() {
                     <span className="inline-block w-32 h-4 bg-white/10 rounded animate-pulse" />
                   ) : (
                     <>
-                      {totalAvailable} {t('saturdaysAvailable') || 'dissabtes disponibles'} {t('nextMonths') || 'els propers mesos'}
+                      {totalAvailable} {t('saturdaysAvailable')} {t('nextMonths')}
                     </>
                   )}
                 </p>
@@ -204,7 +205,7 @@ export default function UrgencyBannerReal() {
                 href="/contacto"
                 className={`px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all whitespace-nowrap flex items-center gap-2 ${style.pulse ? 'animate-pulse' : ''}`}
               >
-                {t('cta') || 'Reserva ara'}
+                {t('cta')}
                 <span>→</span>
               </Link>
             </div>
@@ -213,7 +214,7 @@ export default function UrgencyBannerReal() {
             <button
               onClick={() => setDismissed(true)}
               className="absolute top-2 right-2 lg:relative lg:top-auto lg:right-auto text-white/40 hover:text-white/70 transition-colors p-1"
-              aria-label="Tancar"
+              aria-label={tCommon('close')}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

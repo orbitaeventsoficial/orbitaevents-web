@@ -36,6 +36,7 @@ interface NextBooking {
 
 export default function HeroCinematic() {
   const t = useTranslations('hero');
+  const tAccessibility = useTranslations('accessibility');
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -124,9 +125,9 @@ export default function HeroCinematic() {
   };
 
   // Títol des de traduccions
-  const titleLine1 = t('title.line1') || "El dia que sempre";
-  const titleLine2 = t('title.line2') || "vas imaginar";
-  const titleLine3 = t('title.line3') || "és més a prop";
+  const titleLine1 = t('title.line1');
+  const titleLine2 = t('title.line2');
+  const titleLine3 = t('title.line3');
 
   // Enhanced particles with multiple colors (gold, purple, fuchsia)
   const enhancedParticles = useMemo(() => {
@@ -248,7 +249,7 @@ export default function HeroCinematic() {
                          border border-amber-500/30 backdrop-blur-xl shadow-2xl">
               <span className="text-lg">🎭</span>
               <span className="text-amber-400 text-sm font-semibold">
-                Especialistes en Tematització
+                {t('themingSpecialists')}
               </span>
             </div>
 
@@ -297,17 +298,17 @@ export default function HeroCinematic() {
               {
                 icon: Sparkles,
                 value: stats.yearsExperience,
-                label: t('yearsLabel') || 'anys experiència',
+                label: t('stats.yearsExperience'),
               },
               {
                 icon: MapPin,
                 value: stats.coverage,
-                label: t('coverage') || 'cobertura',
+                label: t('stats.coverage'),
               },
               {
                 icon: Zap,
                 value: '2h',
-                label: 'resposta',
+                label: t('stats.response'),
               },
             ].map((stat, index) => (
               <motion.div
@@ -486,7 +487,7 @@ export default function HeroCinematic() {
               exit={{ opacity: 0 }}
               onClick={() => setShowVideoModal(false)}
               className="absolute top-4 right-4 sm:top-8 sm:right-8 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
-              aria-label="Tancar vídeo"
+              aria-label={tAccessibility('closeVideo')}
             >
               <X className="w-6 h-6" />
             </motion.button>

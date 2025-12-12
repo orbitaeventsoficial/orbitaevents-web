@@ -1,4 +1,93 @@
 {
+  "halloweenPage": {
+    "meta": {
+      "title": "Festa Halloween Barcelona | Decoració + DJ + Efectes | Òrbita Events",
+      "description": "Transforma el teu event en una nit de terror. Decoració temàtica, DJ especialitzat, fum, llums sincronitzades i efectes especials. Des de 600€."
+    },
+    "badge": "Temporada Halloween 2025",
+    "hero": {
+      "title1": "NITS DE",
+      "title2": "TERROR",
+      "subtitle": "Transforma el teu event en una experiència terroríficament memorable. Decoració, DJ, efectes especials i tot el que necessites."
+    },
+    "cta": {
+      "reserve": "Reserva la teva nit de terror",
+      "whatsapp": "WhatsApp directe",
+      "reserve2025": "Reserva Halloween 2025",
+      "requestInfo": "Sol·licitar info"
+    },
+    "gallery": {
+      "title": "Events Halloween",
+      "titleHighlight": "reals",
+      "subtitle": "No són mockups. Són festes que hem creat."
+    },
+    "includes": {
+      "title": "Què inclou una nit",
+      "titleHighlight": "Halloween?",
+      "dj": {
+        "title": "DJ Temàtic",
+        "description": "Playlist curada de Halloween: des de clàssics (Thriller, Ghostbusters) fins a remixes actuals. El DJ pot anar caracteritzat."
+      },
+      "decoration": {
+        "title": "Decoració Completa",
+        "description": "Teranyines, carabasses LED, esquelets, calaveres, teles de sac, veles falses, cartells vintage de terror..."
+      },
+      "effects": {
+        "title": "Efectes Especials",
+        "description": "Fum baix que recorre el terra, llums vermelles i verdes sincronitzades, efectes de so terrorífics, chispas frías."
+      }
+    },
+    "packs": {
+      "title": "Packs",
+      "titleHighlight": "Halloween",
+      "subtitle": "Tria el nivell de terror que vols",
+      "mostRequested": "MÉS DEMANAT",
+      "hours": "hores",
+      "basic": {
+        "name": "Terror Bàsic",
+        "includes": [
+          "DJ temàtic 4 hores",
+          "So 4000W",
+          "Il·luminació vermella/verda",
+          "Màquina de fum",
+          "Playlist Halloween curada"
+        ]
+      },
+      "night": {
+        "name": "Nit de Por",
+        "includes": [
+          "DJ temàtic 5 hores",
+          "So 4000W + subwoofer",
+          "4 caps mòbils sincronitzats",
+          "Fum baix (terra)",
+          "Decoració bàsica (teranyines, carabasses LED)",
+          "Efectes de so terrorífics"
+        ]
+      },
+      "zombie": {
+        "name": "Apocalipsi Zombie",
+        "includes": [
+          "DJ + Tècnic de llums 6 hores",
+          "So club 4000W",
+          "Show de llums complet",
+          "Fum baix + màquina de boira",
+          "Decoració completa (200+ elements)",
+          "Chispas frías per moments clau",
+          "CO2 criogènic",
+          "Actor/animador zombie opcional"
+        ]
+      }
+    },
+    "testimonial": {
+      "quote": "La millor festa de Halloween que hem fet mai. Els nens no paraven de cridar d'emoció (i una mica de por!). Repetirem segur.",
+      "author": "Família Martínez, Halloween 2024"
+    },
+    "finalCta": {
+      "title1": "Preparat per una nit",
+      "title2": "terroríficament bona?",
+      "footer": "📍 Barcelona i Girona · ⚡ Resposta en 2 hores · ✓ Sense compromís"
+    }
+  },
   "loader": {
     "launching": "Llançant Òrbita…",
     "wow": "WOW en",
@@ -91,6 +180,37 @@
   },
   "hero": {
     "badge": "🔥 DJ + So + Llums + Efectes Especials",
+    "themingSpecialists": "Especialistes en Tematització",
+    "location": "Barcelona + Girona",
+    "stats": {
+      "dreams": "somnis fets realitat",
+      "rating": "a Google",
+      "repeat": "repeteixen amb nosaltres",
+      "years": "anys d'experiència",
+      "yearsValue": "15+",
+      "events": "events amb Òrbita",
+      "eventsValue": "48+",
+      "response": "resposta garantida",
+      "responseTime": "resposta garantida",
+      "responseTimeValue": "2h",
+      "coverage": "Cobertura",
+      "location": "BCN + Girona"
+    },
+    "simpleBadge": "Venim del sector d'esdeveniments",
+    "simpleTitle1": "DJ y Discomóvil per a",
+    "simpleTitle2": "Casaments i Events Barcelona",
+    "simpleSubtitle": "No som un DJ qualsevol. Venim del món dels esdeveniments – hem viscut milers de casaments des de dins.",
+    "simpleSubtitleHighlight": "Sabem exactament què fa que el teu event funcioni.",
+    "simpleServices": {
+      "dj": "DJ Professional",
+      "lighting": "Il·luminació PRO",
+      "effects": "Efectes Especials",
+      "theming": "Tematització"
+    },
+    "simpleCta": {
+      "budget": "Demana pressupost",
+      "whatsapp": "WhatsApp directe 💬"
+    },
     "headlines": [
       {
         "line1": "A les 4am la teva sogra",
@@ -138,7 +258,6 @@
     },
     "punchline": "Això fem.",
     "services": "DJ + So + Llums + Efectes + Tematització",
-    "location": "Barcelona + Girona",
     "response": "Resposta en 2h",
     "cta": {
       "primary": "Demana Pressupost Gratis",
@@ -148,20 +267,6 @@
     },
     "scarcity": "Gener 2026: queden 2 dissabtes",
     "mobileCta": "Pressupost Gratis",
-    "stats": {
-      "dreams": "somnis fets realitat",
-      "rating": "a Google",
-      "repeat": "repeteixen amb nosaltres",
-      "years": "anys d'experiència",
-      "yearsValue": "15+",
-      "events": "events amb Òrbita",
-      "eventsValue": "48+",
-      "response": "resposta garantida",
-      "responseTime": "resposta garantida",
-      "responseTimeValue": "2h",
-      "coverage": "Cobertura",
-      "location": "BCN + Girona"
-    },
     "serviceLabels": {
       "dj": "DJ",
       "sound": "So",
@@ -274,6 +379,7 @@
     "timeAgo": "fa {time}"
   },
   "services": {
+    "badge": "El que necessites",
     "title": "Què necessites?",
     "subtitle": "Tria el tipus d'event i t'ajudem a crear-lo",
     "viewMore": "Veure més",
@@ -323,10 +429,15 @@
       "name": "Lloguer d'equips",
       "icon": "🔊",
       "tagline": "Equips professionals al teu abast"
-    }
+    },
+    "badge": "El que necessites"
   },
   "stats": {
     "badge": "📊 Números reals",
+    "yearsExperience": "anys en el sector",
+    "eventsCompleted": "Esdeveniments celebrats",
+    "response": "Resposta",
+    "coverage": "BCN + Girona",
     "title": "Els nostres",
     "titleHighlight": "resultats",
     "subtitle": "Dades actualitzades en temps real des de la nostra base de dades. Zero números inventats.",
@@ -466,51 +577,103 @@
     "subtitle": "No fem events normals. Creem experiències immersives que transporten els teus convidats a un altre món.",
     "cta": "Vull aquest tema!",
     "examples": "Veure exemples",
-    "testimonial": "\"La tematització d'Escola de Màgia va ser INCREÏBLE. Els convidats no paraven de fer fotos. Semblava que estàvem en un castell encantat de veritat!\"",
+    "testimonial": "\"La tematització màgica va ser INCREÏBLE. Els convidats no paraven de fer fotos. Semblava que estàvem en una escola de bruixeria de veritat!\"",
     "testimonialAuthor": "— Lorena i Carles, Casament Món Màgic",
     "custom": "No veus el que busques? Fem",
+    "customAny": "qualsevol",
     "customSuffix": "temàtica que imaginis.",
     "contact": "Explica'ns la teva idea",
+    "monMagic": {
+      "title": "Món Màgic",
+      "subtitle": "Màgia d'escola de bruixeria al teu event",
+      "description": "Transforma el teu event en una experiència màgica: efectes de varetes, il·luminació de veles flotants, música encantada, i fins i tot humo que sembla màgia real."
+    },
+    "halloween": {
+      "title": "Halloween",
+      "subtitle": "La nit més terrorífica",
+      "description": "Convertim qualsevol espai en una casa encantada: llums vermelles i taronges, humo baixa, efectes de so terrorífics."
+    },
     "themes": {
       "monmagic": {
         "name": "Món Màgic",
         "tagline": "Màgia d'escola de bruixeria al teu event",
         "description": "Transforma el teu event en una experiència màgica: efectes de varetes, il·luminació de veles flotants, música encantada, i fins i tot humo que sembla màgia real.",
-        "features": ["Efectes de vareta màgica", "Veles flotants", "Efectes de boira màgica", "Playlist temàtica"]
+        "features": [
+          "Efectes de vareta màgica",
+          "Veles flotants",
+          "Efectes de boira màgica",
+          "Playlist temàtica"
+        ]
       },
       "halloween": {
         "name": "Halloween",
         "tagline": "La nit més terrorífica",
         "description": "Convertim qualsevol espai en una casa encantada: llums vermelles i taronges, humo baixa, efectes de so terrorífics, i una ambientació que farà cridar els teus convidats.",
-        "features": ["Decoració terrorífica", "Efectes de boira", "Llums estroboscòpiques", "So ambient esgarrifós"]
+        "features": [
+          "Decoració terrorífica",
+          "Efectes de boira",
+          "Llums estroboscòpiques",
+          "So ambient esgarrifós"
+        ]
       },
       "tropical": {
         "name": "Tropical",
         "tagline": "Paradís a Catalunya",
         "description": "Porta el Carib a casa teva: llums càlides, efectes de palmeres projectades, música reggaeton i salsa, i una atmosfera que et farà sentir a la platja.",
-        "features": ["Projeccions tropicals", "Llums càlides", "Playlist caribenyes", "Efectes de posta de sol"]
+        "features": [
+          "Projeccions tropicals",
+          "Llums càlides",
+          "Playlist caribenyes",
+          "Efectes de posta de sol"
+        ]
       },
       "disco": {
         "name": "Disco 80s",
         "tagline": "Viatja als anys daurats",
         "description": "Bola de discoteca gegant, llums de neó, màquina de fum, i els millors hits dels 70s i 80s. Una festa retro que farà ballar a totes les generacions.",
-        "features": ["Bola disco gegant", "Llums de neó", "Vestits d'època opcional", "Greatest hits 70s-80s"]
+        "features": [
+          "Bola disco gegant",
+          "Llums de neó",
+          "Vestits d'època opcional",
+          "Greatest hits 70s-80s"
+        ]
       },
       "elegant": {
         "name": "Elegant Gold",
         "tagline": "Sofisticació pura",
         "description": "Per als que busquen classe i distinció: il·luminació daurada, efectes subtils però impressionants, música lounge i jazz, i una atmosfera de gala.",
-        "features": ["Il·luminació daurada", "Efectes subtils", "Jazz & Lounge", "Ambientació premium"]
+        "features": [
+          "Il·luminació daurada",
+          "Efectes subtils",
+          "Jazz & Lounge",
+          "Ambientació premium"
+        ]
       },
       "custom": {
         "name": "La Teva Idea",
         "tagline": "Tu imagines, nosaltres creem",
         "description": "Tens una idea diferent? Peaky Blinders, Star Wars, Anime, Medieval... Digue'ns la teva visió i la fem realitat amb efectes, música i ambientació a mida.",
-        "features": ["Disseny personalitzat", "Qualsevol temàtica", "Efectes a mida", "Assessorament creatiu"]
+        "features": [
+          "Disseny personalitzat",
+          "Qualsevol temàtica",
+          "Efectes a mida",
+          "Assessorament creatiu"
+        ]
       }
+    },
+    "monMagic": {
+      "title": "Món Màgic",
+      "subtitle": "Màgia d'escola de bruixeria al teu event",
+      "description": "Transforma el teu event en una experiència màgica: efectes de varetes, il·luminació de veles flotants, música encantada, i fins i tot humo que sembla màgia real."
+    },
+    "halloween": {
+      "title": "Halloween",
+      "subtitle": "La nit més terrorífica",
+      "description": "Convertim qualsevol espai en una casa encantada: llums vermelles i taronges, humo baixa, efectes de so terrorífics, i una ambientació que farà cridar els teus convidats."
     }
   },
   "footer": {
+    "whatsappButton": "WhatsApp",
     "trust": {
       "experience": "Anys d'experiència",
       "events": "Esdeveniments celebrats",
@@ -552,7 +715,7 @@
       }
     },
     "copyright": "Tots els drets reservats.",
-    "since": "15+ anys d'experiència · Des de 2023",
+    "since": "2+ anys d'experiència · Des de 2023",
     "tagline": "L'esdeveniment que la teva gent no oblidarà"
   },
   "contact": {
@@ -818,11 +981,45 @@
       }
     }
   },
+  "opinionsPage": {
+    "comingSoon": "Pròximament",
+    "meta": {
+      "title": "Opinions i Ressenyes | Òrbita Events - DJ Casaments Barcelona",
+      "titleWithReviews": "Opinions Reals DJ Casaments Barcelona | {rating}/5 en {count} Ressenyes | Òrbita Events",
+      "description": "Més de {events} esdeveniments realitzats. Pròximament ressenyes verificades de Google. DJ professional per a casaments i esdeveniments a Barcelona.",
+      "descriptionWithReviews": "Opinions reals de casaments, festes i esdeveniments. {rating}/5 en {count} ressenyes verificades. So impecable, il·luminació acurada i plena de moments inoblidables.",
+      "ogTitle": "Opinions i Ressenyes | Òrbita Events",
+      "ogTitleWithReviews": "Opinions Reals | {rating}/5 | Òrbita Events",
+      "ogDescription": "Més de {events} esdeveniments realitzats. DJ professional a Barcelona.",
+      "ogDescriptionWithReviews": "{rating}/5 en {count} ressenyes de casaments i esdeveniments.",
+      "twitterDescription": "Més de {events} esdeveniments realitzats.",
+      "twitterDescriptionWithReviews": "{rating}/5 en {count} ressenyes verificades.",
+      "imageAlt": "Ressenyes de casaments amb DJ a Barcelona"
+    },
+    "jsonLd": {
+      "description": "Més de {events} esdeveniments realitzats a Catalunya."
+    },
+    "faq": {
+      "q1": "Què opinen els clients d'Òrbita Events?",
+      "a1": "Hem realitzat més de {events} esdeveniments amb clients satisfets. Pròximament podràs veure ressenyes verificades de Google.",
+      "a1WithReviews": "Valoració mitjana de {rating}/5 en {count} ressenyes. Els nostres clients destaquen el so, el muntatge i la capacitat del DJ per mantenir la pista i divertir els convidats.",
+      "q2": "Són ressenyes reals?",
+      "a2": "Estem en procés de recopilar ressenyes verificades a Google Business. Mentrestant, pots contactar-nos per a referències directes.",
+      "a2WithReviews": "Sí, totes verificades de casaments i esdeveniments a Barcelona i Girona. Enllacem directament a Google.",
+      "q3": "Com puc deixar una ressenya?",
+      "a3": "Pots enviar-nos la teva opinió per correu a {email}. Aviat activarem el nostre perfil de Google Business per a ressenyes públiques.",
+      "a3WithGoogleUrl": "Pots fer-ho des del nostre perfil de Google Business o enviant-la per correu a {email}. Cada opinió compta i ens ajuda a seguir millorant."
+    }
+  },
   "reviews": {
     "title": "Opinions reals",
     "subtitle": "El que diuen les nostres parelles i clients",
     "ratingText": "en {count} ressenyes",
     "verifiedReviews": "opinions verificades",
+    "comingSoon": "Pròximament",
+    "founderRole": "Boda",
+    "founderEvent": "Casament Món Màgic – Catalunya",
+    "founderText": "Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació ha estat increïble: veles flotants, sobres personalitzats amb lacre vermell, decoració amb símbols màgics... Estem molt il·lusionats!",
     "filters": {
       "all": "Tots",
       "weddings": "Casament",
@@ -1090,8 +1287,33 @@
         "party": "Festa"
       },
       "badge": "Experiència en casaments",
-      "heroTitle": "El teu casament, exactament com t'ho imagines",
+      "badgeYears": "2+ anys en el sector",
+      "heroTitle": "DJ per a Casaments a Barcelona",
       "heroSubtitle": "Experiència personalitzada completa: música, il·luminació i efectes adaptats a la teva història. Pressupost instantani.",
+      "coverage": {
+        "badge": "Cobertura a Catalunya",
+        "title": "On és el teu casament?",
+        "subtitle": "Especialistes a cada zona",
+        "zones": {
+          "maresme": {
+            "name": "Maresme",
+            "desc": "Mataró, Calella..."
+          },
+          "girona": {
+            "name": "Girona",
+            "desc": "Ciutat i província"
+          },
+          "costaBrava": {
+            "name": "Costa Brava",
+            "desc": "Cadaqués, Tossa..."
+          },
+          "valles": {
+            "name": "Vallès",
+            "desc": "Granollers, Sabadell..."
+          }
+        }
+      },
+      "recommendedBadge": "RECOMANAT",
       "guestsQuestion": "Quants convidats espereu?",
       "people": "persones",
       "recommended": "Recomanat per a tu",
@@ -1128,27 +1350,456 @@
     "parties": {
       "title": "Festes privades",
       "subtitle": "La festa que la teva gent no oblidarà",
-      "description": "DJ professional per a festes privades, aniversaris i celebracions especials."
+      "description": "DJ professional per a festes privades, aniversaris i celebracions especials.",
+      "heroTitle": "DJ Festes Privades Barcelona",
+      "heroSubtitle": "Des d'aniversaris temàtics fins a celebracions familiars. Música, animació i efectes adaptats al teu grup.",
+      "guestsQuestion": "Quants convidats esperes?",
+      "people": "persones",
+      "flashAccess": "Pots accedir a la",
+      "upToGuests": "Fins a {max} convidats amb",
+      "discount": "de descompte",
+      "recommendedFor": "Recomanat per a {guests} persones:",
+      "allPacks": "Tots els Packs",
+      "mostSold": "MÉS VENUT",
+      "recommended": "RECOMANAT",
+      "checkAvailability": "Consultar Disponibilitat",
+      "requestInfo": "Sol·licitar Informació",
+      "youSave": "Estalvies",
+      "idealFor": "Ideal per a",
+      "importantInfo": "Informació Important",
+      "allPacksInclude": "Tots els packs inclouen:",
+      "packFeatures": {
+        "transport": "Transport i instal·lació",
+        "techDj": "Tècnic/DJ durant l'event",
+        "setup": "Muntatge i desmuntatge complet",
+        "insurance": "Assegurança de responsabilitat civil"
+      },
+      "customization": "Personalització:",
+      "customFeatures": {
+        "theming": "Tematització disponible (consultar)",
+        "decoration": "Decoració personalitzada",
+        "lightShow": "Show especial de llums",
+        "consultation": "Consulta sense compromís!"
+      },
+      "more": "més..."
     },
     "corporate": {
       "title": "Esdeveniments d'empresa",
       "subtitle": "Esdeveniments corporatius d'impacte",
-      "description": "Producció tècnica professional per a esdeveniments corporatius, convencions i gales."
+      "description": "Producció tècnica professional per a esdeveniments corporatius, convencions i gales.",
+      "heroTitle": "DJ Esdeveniments Corporatius",
+      "heroTitleCity": "Barcelona",
+      "heroSubtitle": "Sopars d'empresa, team building, presentacions i networking elegant.",
+      "heroSubtitle2": "Professionalisme que reforça la teva marca.",
+      "configureEvent": "Configurar El Meu Esdeveniment",
+      "requestProposal": "Sol·licitar Proposta",
+      "eventsTitle": "Esdeveniments que",
+      "eventsTitleHighlight": "Connecten",
+      "events": {
+        "companyDinners": {
+          "title": "Sopars d'Empresa",
+          "text": "Música ambient elegant, il·luminació corporativa i coordinació impecable perquè el teu equip gaudeixi sense preocupacions."
+        },
+        "teamBuilding": {
+          "title": "Team Building",
+          "text": "Dinàmiques musicals, jocs interactius i ambient que genera connexió real entre el teu equip."
+        },
+        "networking": {
+          "title": "Networking Empresarial",
+          "text": "Música de fons sofisticada, il·luminació professional i ambient que facilita la conversa."
+        },
+        "presentations": {
+          "title": "Presentacions Corporatives",
+          "text": "So professional per a speakers, pantalles LED, il·luminació escènica i coordinació amb protocol."
+        },
+        "productLaunch": {
+          "title": "Llançaments de Producte",
+          "text": "Producció tècnica completa, branding integrat i efectes especials per impactar els teus convidats."
+        },
+        "institutional": {
+          "title": "Esdeveniments Institucionals",
+          "text": "Professionalisme en cada detall: muntatge discret, tècnic onsite i backup total de l'equipament."
+        }
+      },
+      "valueTitle": "Professionalisme que Reforça la Teva Marca",
+      "valueText": "No només producció tècnica: creem networking elegant, ambient professional i moments de connexió real entre assistents. El teu equip recorda l'esdeveniment, el teu client queda impressionat.",
+      "stats": {
+        "experience": {
+          "value": "2+",
+          "label": "Anys experiència"
+        },
+        "location": {
+          "value": "BCN",
+          "label": "+ Girona"
+        },
+        "dedication": {
+          "value": "100%",
+          "label": "Dedicació"
+        }
+      },
+      "includesTitle": "Què Inclou",
+      "includesTitleHighlight": "El Teu Esdeveniment",
+      "techProduction": "Producció Tècnica",
+      "techFeatures": {
+        "sound": "So professional Pioneer + EV (cobertura perfecta)",
+        "lighting": "Il·luminació LED corporativa sincronitzada amb branding",
+        "mics": "Micròfons sense fils per a speakers/presentadors",
+        "screens": "Pantalles LED opcionals per a projecció corporativa",
+        "setup": "Muntatge discret, tècnic onsite i backup total"
+      },
+      "ambientTitle": "Ambient Professional",
+      "ambientFeatures": {
+        "music": "Música ambient adaptada al moment de l'esdeveniment",
+        "branding": "Integració d'identitat corporativa (logo, colors, missatges)",
+        "networking": "Dinàmiques de networking si es requereixen",
+        "coordination": "Coordinació amb càtering, venue i proveïdors",
+        "protocol": "Protocol i timing impecable durant l'esdeveniment"
+      },
+      "formTitle": "Explica'ns El Teu Esdeveniment",
+      "formSubtitle": "Digues-nos què necessites i t'enviarem una proposta adaptada a la teva empresa."
     },
     "mobile": {
       "title": "Discomòbil",
       "subtitle": "DJ professional allà on ho necessitis",
-      "description": "Servei complet de discomòbil amb so i il·luminació professionals."
+      "description": "Servei complet de discomòbil amb so i il·luminació professionals.",
+      "badgeYears": "2+ anys en el sector",
+      "heroTitle": "Discomòbil Barcelona",
+      "heroSubtitle": "Música adaptada en temps real, il·luminació d'ambient i efectes especials. Molt més que posar música. Pressupost a l'instant.",
+      "guestsQuestion": "Quantes persones espereu?",
+      "people": "persones",
+      "recommended": "Recomanat per a tu:",
+      "choosePack": "Tria el Teu Pack Base",
+      "mostPopular": "MÉS POPULAR",
+      "recommendedBadge": "RECOMANAT",
+      "selected": "Seleccionat",
+      "select": "Seleccionar",
+      "extendParty": "Vols allargar la festa?",
+      "noExtraHours": "Sense hores extra",
+      "perHour": "per hora extra",
+      "maxHours": "Màxim +3 hores",
+      "addEffects": "Afegeix Efectes Especials",
+      "extrasDiscount": "Contracta 3+ extres i estalvia",
+      "comboDiscount": "Descompte Combo Activat!",
+      "youSave": "Estalvies",
+      "inEffects": "en efectes",
+      "effects": "efecte",
+      "effectsPlural": "efectes",
+      "continueToConfig": "Continuar al Configurador",
+      "configure": "Configurar",
+      "partyIncludes": "Què Inclou La Teva Festa",
+      "allPacksInclude": "Tots els packs:",
+      "packFeatures": {
+        "dj": "DJ professional que llegeix la pista",
+        "setup": "Muntatge i desmuntatge inclosos",
+        "backup": "Backup d'equipament",
+        "playlist": "Playlist personalitzada prèvia"
+      },
+      "flexiblePayment": "Pagament flexible:",
+      "paymentFeatures": {
+        "deposit": "30% en reservar la teva data",
+        "rest": "70% el dia de l'event",
+        "cancel": "Cancel·lació gratuïta fins 15 dies abans"
+      }
     },
     "production": {
       "title": "Producció tècnica",
       "subtitle": "So i il·luminació professional",
-      "description": "Equipament tècnic d'alta qualitat per a qualsevol tipus d'esdeveniment."
+      "description": "Equipament tècnic d'alta qualitat per a qualsevol tipus d'esdeveniment.",
+      "badge": "Producció Tècnica Professional",
+      "heroTitle": "Configura la Teva Producció Tècnica",
+      "heroSubtitle": "Sistema modular adaptat a les teves necessitats. Selecciona només el que necessites: àudio, visual, escenari, efectes i equip tècnic.",
+      "categories": {
+        "audio": "Àudio",
+        "visual": "Visual",
+        "stage": "Escenari",
+        "effects": "Efectes",
+        "crew": "Equip"
+      },
+      "popular": "POPULAR",
+      "premium": "PREMIUM",
+      "currentConfig": "La Teva Configuració Actual",
+      "volumeDiscount": "Descompte per Volum Activat",
+      "volumeDiscountText": "Producció +2.000€ = Estalvi de {discount}€ (10%)",
+      "volumeTag": "-10% volum",
+      "service": "servei",
+      "servicePlural": "serveis",
+      "selected": "seleccionat",
+      "selectedPlural": "seleccionats",
+      "requestProposal": "Sol·licitar Proposta",
+      "viewQuote": "Veure Pressupost",
+      "infoTitle": "Producció Tècnica Professional",
+      "fullService": "Servei complet:",
+      "fullServiceItems": {
+        "equipment": "Equipament professional certificat",
+        "transport": "Transport i instal·lació inclosos",
+        "technicians": "Tècnics especialitzats disponibles",
+        "backup": "Backup d'equipament crític"
+      },
+      "experience": "Experiència demostrable:",
+      "experienceItems": {
+        "productions": "Experiència en produccions",
+        "events": "Festivals, concerts i esdeveniments",
+        "clients": "Productores i empreses de confiança",
+        "references": "Referències verificables"
+      },
+      "services": {
+        "sonidoBasico": {
+          "name": "Sistema So Bàsic",
+          "description": "2x altaveus 2000W + mesclador + cables"
+        },
+        "sonidoPro": {
+          "name": "Sistema So PRO",
+          "description": "4x altaveus EV 8000W + subs + processador"
+        },
+        "microsInalambricos": {
+          "name": "Micròfons Sense Fils",
+          "description": "Set de 4 micros professionals"
+        },
+        "monitorEscenario": {
+          "name": "Monitors d'Escenari",
+          "description": "2x monitors retorn per a artistes"
+        },
+        "lucesBasicas": {
+          "name": "Il·luminació Bàsica",
+          "description": "8x focus PAR LED + controlador DMX"
+        },
+        "lucesProfesionales": {
+          "name": "Il·luminació Professional",
+          "description": "Caps mòbils + làser + efectes"
+        },
+        "pantallaLed": {
+          "name": "Pantalla LED",
+          "description": "Pantalla LED 3x2m per a projecció"
+        },
+        "videoMapping": {
+          "name": "Video Mapping",
+          "description": "Projecció arquitectònica 3D"
+        },
+        "escenarioSmall": {
+          "name": "Escenari Petit",
+          "description": "4x3m alçada 40cm + escales"
+        },
+        "escenarioMedium": {
+          "name": "Escenari Mitjà",
+          "description": "6x4m alçada 60cm + escales + barana"
+        },
+        "escenarioLarge": {
+          "name": "Escenari Gran",
+          "description": "8x6m alçada 80cm + estructura completa"
+        },
+        "truss": {
+          "name": "Estructura Truss",
+          "description": "Truss aèria per penjar llums/so"
+        },
+        "humo": {
+          "name": "Màquines de Fum",
+          "description": "2x màquines 1500W + fluid"
+        },
+        "confetiCanones": {
+          "name": "Canons de Confeti",
+          "description": "4x canons elèctrics + confeti"
+        },
+        "co2Jets": {
+          "name": "Jets de CO2",
+          "description": "6x jets + tanc CO2"
+        },
+        "pirotecniaFria": {
+          "name": "Pirotècnia Freda",
+          "description": "Espurnes fredes + fonts fredes"
+        },
+        "tecnicoSonido": {
+          "name": "Tècnic de So",
+          "description": "Tècnic dedicat per a àudio"
+        },
+        "tecnicoLuces": {
+          "name": "Tècnic d'Il·luminació",
+          "description": "Tècnic dedicat per a llums"
+        },
+        "roadie": {
+          "name": "Roadie / Ajudant",
+          "description": "Suport en muntatge i desmuntatge"
+        },
+        "productorEjecutivo": {
+          "name": "Productor Executiu",
+          "description": "Coordinació completa de l'event"
+        }
+      },
+      "units": {
+        "perDay": "per dia",
+        "perEvent": "per event",
+        "perProject": "per projecte"
+      }
     },
     "rental": {
       "title": "Lloguer d'equips",
       "subtitle": "Equips professionals al teu abast",
-      "description": "Lloguer d'equips de so, il·luminació i DJ per al teu esdeveniment."
+      "description": "Lloguer d'equips de so, il·luminació i DJ per al teu esdeveniment.",
+      "heroTitle": "Lloguer d'Equip Professional",
+      "heroSubtitle": "Selecciona l'equip que necessites i rep el teu pressupost a l'instant",
+      "categories": {
+        "all": "Tots",
+        "sound": "So",
+        "lighting": "Il·luminació",
+        "dj": "DJ",
+        "effects": "Efectes"
+      },
+      "perDay": "/ dia",
+      "equipment": "equip",
+      "equipmentPlural": "equips",
+      "totalOneDay": "Total (1 dia)",
+      "requestQuote": "Demanar Pressupost",
+      "quote": "Pressupost",
+      "infoTitle": "Informació de Lloguer",
+      "included": "Inclòs:",
+      "includedItems": {
+        "transport": "Transport i instal·lació",
+        "technician": "Tècnic durant l'event",
+        "setup": "Muntatge i desmuntatge"
+      },
+      "pricing": "Tarifes:",
+      "pricingTiers": {
+        "oneDay": "1 dia: Preu indicat",
+        "twoDays": "2-3 dies: -10%",
+        "fourDays": "+4 dies: -20%"
+      },
+      "catalog": {
+        "evEtx35p": {
+          "name": "EV ETX-35P (2000W)",
+          "description": "Altaveu professional autoamplificat de 2000W. Ideal per a esdeveniments grans."
+        },
+        "subwooferB150": {
+          "name": "Subwoofer B-150",
+          "description": "Subwoofer professional de 1200W per a greus potents."
+        },
+        "sistemaSonidoProfesional": {
+          "name": "Sistema de So Professional",
+          "description": "2x EV ETX 2000W + Pioneer DDJ-REV7 + Cabina DJ + Monitor + Auriculars HDJ-X5 + 2x Llums BASH + Suport PC + Cablejat + Màquina fum + Multibox LED. Setup complet professional."
+        },
+        "microfonoInalambrico": {
+          "name": "Micròfon Sense Fils",
+          "description": "Micròfon professional sense fils de doble canal."
+        },
+        "cabezasMovilesLed": {
+          "name": "Caps Mòbils LED (x4)",
+          "description": "4 caps mòbils LED RGBW amb efectes de moviment."
+        },
+        "laserProfesional": {
+          "name": "Làser Professional RGB",
+          "description": "Làser professional multicolor amb efectes automàtics."
+        },
+        "bolaEspejos": {
+          "name": "Bola de Miralls + Focus",
+          "description": "Bola de miralls 50cm amb focus LED dedicat."
+        },
+        "pioneerDdjRev7": {
+          "name": "Controladora Pioneer DDJ-REV7",
+          "description": "Controladora professional Pioneer nivell club amb motorized platters. Top de gamma."
+        },
+        "mezcladorDjm900": {
+          "name": "Mesclador DJM-900NXS2",
+          "description": "Mesclador professional Pioneer de 4 canals."
+        },
+        "maquinaHumo": {
+          "name": "Màquina de Fum 1500W",
+          "description": "Màquina de fum professional amb comandament a distància."
+        },
+        "maquinaBurbujas": {
+          "name": "Màquina de Bombolles",
+          "description": "Màquina de bombolles professional amb líquid inclòs."
+        },
+        "canonConfeti": {
+          "name": "Canó de Confeti",
+          "description": "Canó elèctric de confeti amb comandament remot."
+        }
+      }
+    },
+    "animacion": {
+      "title": "Animació Infantil",
+      "subtitle": "Diversió per als més petits",
+      "description": "Animadors professionals per a festes infantils.",
+      "hero": {
+        "badge": "Animació Infantil Professional",
+        "title": "Festes màgiques",
+        "titleHighlight": "per als més petits",
+        "subtitle": "Animadors professionals que fan que els nens gaudeixin al màxim. Jocs, màgia, pintacares i molt més!"
+      },
+      "services": {
+        "title": "Què oferim?",
+        "subtitle": "Activitats adaptades a cada edat per garantir diversió i somriures",
+        "items": {
+          "jocs": {
+            "title": "Jocs i Activitats",
+            "desc": "Gimcanes, curses de sacs, jocs d'aigua, competicions..."
+          },
+          "pintacares": {
+            "title": "Pintacares",
+            "desc": "Dissenys creatius que encanten els nens."
+          },
+          "magia": {
+            "title": "Màgia",
+            "desc": "Espectacles de màgia adaptats a cada edat."
+          },
+          "globoflexia": {
+            "title": "Globoflèxia",
+            "desc": "Figures de globus per a tots els gustos."
+          },
+          "tallers": {
+            "title": "Tallers Creatius",
+            "desc": "Manualitats, slime, polseres..."
+          },
+          "musica": {
+            "title": "Música Infantil",
+            "desc": "DJ amb música adaptada i cançons de moda."
+          }
+        }
+      },
+      "packs": {
+        "title": "Escull el teu pack",
+        "subtitle": "Tots els packs inclouen desplaçament fins a 25km de Granollers",
+        "hours": "hores",
+        "recommended": "MÉS POPULAR",
+        "names": {
+          "basic": "Pack Bàsic",
+          "complet": "Pack Complet",
+          "premium": "Pack Premium"
+        },
+        "features": {
+          "basic": [
+            "1 animador/a",
+            "Jocs i activitats",
+            "Música infantil",
+            "Material bàsic"
+          ],
+          "complet": [
+            "1 animador/a",
+            "Jocs i activitats",
+            "Pintacares O Globoflèxia",
+            "Música infantil",
+            "Material complet"
+          ],
+          "premium": [
+            "2 animadors",
+            "Jocs i activitats",
+            "Pintacares + Globoflèxia",
+            "Espectacle de màgia",
+            "Música infantil",
+            "Tot el material"
+          ]
+        }
+      },
+      "cta": {
+        "button": "Demana pressupost",
+        "info": "Resposta en menys de 2 hores"
+      },
+      "info": {
+        "title": "Per què triar-nos?",
+        "items": {
+          "experience": "Animadors amb experiència i formació",
+          "ages": "Adaptat a l'edat dels nens (3-12 anys)",
+          "punctuality": "Puntualitat i professionalitat",
+          "coverage": "Barcelona i Girona - Desplaçament inclòs"
+        }
+      }
     }
   },
   "extras": {
@@ -1196,6 +1847,9 @@
       "description": "Valora'ns i acumula descomptes pel teu proper event. Més detalls = més beneficis!",
       "cta": "Deixa opinió"
     },
+    "rewardsSystem": "Sistema de Recompenses",
+    "rewardsDescription": "Deixa la teva opinió i guanya fins a 25% de descompte al proper event!",
+    "rewardsBreakdown": "Base 5% + Foto +5% + Vídeo +10% + Google +5%",
     "testimonial1": {
       "eventType": "Casament temàtic",
       "highlight": "Una experiència màgica!",
@@ -1253,6 +1907,67 @@
     "sensorial": "Espai Sensorial",
     "monMagic": "Temàtica Món Màgic"
   },
+  "zoneLanding": {
+    "specialistsIn": "Especialistes a",
+    "fromPrice": "Des de",
+    "requestBudget": "Demana Pressupost Gratis",
+    "callNow": "Trucar Ara",
+    "seoTitle": {
+      "bodas": "DJ Professional per a Casaments a",
+      "discomovil": "DJ Professional per a Events a",
+      "fiestas": "DJ Professional per a Festes a"
+    },
+    "whyChooseUs": "Per què escollir Òrbita Events a",
+    "townsTitle": "Poblacions de {zone} on treballem",
+    "whatIncluded": "Què inclou el servei?",
+    "includes": {
+      "dj": {
+        "title": "DJ Professional",
+        "desc": "DJ amb experiència que adapta la música en temps real"
+      },
+      "sound": {
+        "title": "So 4000W",
+        "desc": "Equip professional EV + Pioneer per a fins a 300 persones"
+      },
+      "allIncluded": {
+        "title": "Tot inclòs",
+        "desc": "Muntatge, desmuntatge i desplaçament a"
+      }
+    },
+    "faqTitle": "Preguntes Freqüents -",
+    "finalCta": {
+      "titleBodas": "El teu casament és a",
+      "titleOther": "El teu event és a",
+      "subtitle": "Explica'ns la teva data i t'enviem pressupost en menys de 2 hores"
+    }
+  },
+  "themingSection": {
+    "badge": "Vols anar més enllà?",
+    "title": "Experiències Temàtiques",
+    "subtitle": "Transformem el teu event en un altre món. Decoració, il·luminació i detalls personalitzats perquè tingui narrativa pròpia.",
+    "themes": {
+      "magic": "Món Màgic",
+      "halloween": "Halloween",
+      "disco": "Disco 80s",
+      "tropical": "Tropical",
+      "custom": "La Teva Idea"
+    },
+    "featured": {
+      "title": "Experiència Món Màgic",
+      "desc": "Transforma el teu event en una escola de bruixeria. Veles flotants, sobres amb lacre, ambient de castell encantat...",
+      "features": [
+        "Veles flotants amb LED",
+        "Sobres personalitzats amb lacre",
+        "Il·luminació i efectes temàtics"
+      ],
+      "cta": "Veure experiència"
+    },
+    "testimonial": {
+      "quote": "Van transformar el nostre casament en màgia pura. Els convidats encara en parlen!",
+      "author": "Lorena i Carles, 2025"
+    },
+    "addTo": "S'afegeix a qualsevol servei"
+  },
   "servicesGrid": {
     "title": "Serveis",
     "learnMore": "Més informació →",
@@ -1304,6 +2019,15 @@
       "Ds",
       "Dg"
     ],
+    "daysShort": [
+      "Dg",
+      "Dl",
+      "Dt",
+      "Dc",
+      "Dj",
+      "Dv",
+      "Ds"
+    ],
     "months": [
       "Gener",
       "Febrer",
@@ -1323,7 +2047,12 @@
     "available": "Disponible",
     "notAvailable": "No disponible",
     "occupied": "Ocupat",
+    "reserved": "Reservats",
+    "blocked": "Bloquejats",
     "highSeason": "Temporada alta",
+    "selected": "Seleccionat",
+    "legend": "Llegenda:",
+    "dateSelected": "Data seleccionada",
     "daysAvailable": "{count} dies disponibles",
     "pastDate": "Data passada",
     "saturdaysAvailable": "{count, plural, =1 {dissabte disponible} other {dissabtes disponibles}} aquest mes"
@@ -1361,7 +2090,15 @@
     "bodaHalloween": "Boda Halloween",
     "bodaHalloweenDesc": "L'amor en la foscor",
     "viewAllExperiences": "Veure totes les experiències",
-    "cta": "Demana Pressupost"
+    "cta": "Demana Pressupost",
+    "badges": {
+      "popular": "Popular",
+      "terrific": "Terrorífic",
+      "exclusive": "Exclusiu",
+      "summer": "Estiu",
+      "retro": "Retro",
+      "premium": "Premium"
+    }
   },
   "smartImage": {
     "loadError": "Error en carregar",
@@ -1394,21 +2131,389 @@
       "privacy": "Política de privadesa",
       "privacyPortal": "Gestió de dades",
       "terms": "Termes i condicions",
-      "cookies": "Política de cookies",
-      "legalNotice": "Avís Legal"
+      "cookies": {
+        "title": "Política de Cookies",
+        "metadata": {
+          "title": "Política de Cookies | Òrbita Events",
+          "description": "Informació sobre l'ús de cookies al lloc web d'Òrbita Events."
+        },
+        "lastUpdate": "Última actualització:",
+        "section1": {
+          "title": "Què són les cookies?",
+          "content": "Les cookies són petits arxius de text que els llocs web emmagatzemen al teu dispositiu quan els visites. S'utilitzen àmpliament per fer que els llocs web funcionin de manera més eficient i per proporcionar informació als propietaris del lloc."
+        },
+        "section2": {
+          "title": "Cookies que utilitzem",
+          "technical": {
+            "title": "Cookies tècniques (necessàries)",
+            "description": "Són essencials per al funcionament del lloc web.",
+            "table": {
+              "nombre": "Nom",
+              "finalidad": "Finalitat",
+              "duracion": "Duració",
+              "sessionId": {
+                "name": "session_id",
+                "purpose": "Mantenir la sessió de l'usuari",
+                "duration": "Sessió"
+              },
+              "cookieConsent": {
+                "name": "cookie_consent",
+                "purpose": "Guardar preferències de cookies",
+                "duration": "1 any"
+              }
+            }
+          },
+          "analytical": {
+            "title": "Cookies analítiques",
+            "description": "Ens ajuden a entendre com els visitants interactuen amb el lloc.",
+            "table": {
+              "nombre": "Nom",
+              "proveedor": "Proveïdor",
+              "finalidad": "Finalitat",
+              "duracion": "Duració",
+              "ga": {
+                "name": "_ga",
+                "provider": "Google Analytics",
+                "purpose": "Distingir usuaris",
+                "duration": "2 anys"
+              },
+              "gid": {
+                "name": "_gid",
+                "provider": "Google Analytics",
+                "purpose": "Distingir usuaris",
+                "duration": "24 hores"
+              }
+            }
+          }
+        },
+        "section3": {
+          "title": "Com gestionar les cookies?",
+          "content": "Pots configurar el teu navegador per rebutjar totes les cookies o perquè t'avisi quan s'envia una cookie. No obstant això, si rebutges les cookies, és possible que algunes parts del lloc no funcionin correctament.",
+          "browsers": {
+            "chrome": "Google Chrome",
+            "firefox": "Mozilla Firefox",
+            "safari": "Safari",
+            "edge": "Microsoft Edge"
+          }
+        },
+        "section4": {
+          "title": "Contacte",
+          "intro": "Si tens preguntes sobre la nostra política de cookies, contacta amb nosaltres:"
+        }
+      },
+      "legalNotice": "Avís Legal",
+      "avisoLegal": {
+        "title": "Avís Legal",
+        "metadata": {
+          "title": "Avís Legal | Òrbita Events",
+          "description": "Avís legal i informació corporativa d'Òrbita Events."
+        },
+        "section1": {
+          "title": "1. Dades Identificatives",
+          "intro": "En compliment del deure d'informació establert a la Llei 34/2002 de Serveis de la Societat de la Informació i el Comerç Electrònic (LSSI-CE), es faciliten les següents dades:",
+          "titular": "Titular:",
+          "ubicacion": "Ubicació:",
+          "email": "Email:",
+          "telefono": "Telèfon:",
+          "sitioWeb": "Lloc web:",
+          "datosCompletos": "Per a dades fiscals completes (NIF, adreça), contactar per email."
+        },
+        "section2": {
+          "title": "2. Objecte",
+          "content": "El present lloc web té per objecte facilitar informació sobre els serveis de DJ, il·luminació, efectes especials i producció d'esdeveniments que ofereix {businessName}, així com permetre el contacte amb potencials clients."
+        },
+        "section3": {
+          "title": "3. Condicions d'Ús",
+          "intro": "L'accés a aquest lloc web és gratuït i no requereix subscripció o registre previ. No obstant això, l'ús de determinats serveis pot requerir l'emplenament de formularis de contacte.",
+          "compromiso": "L'usuari es compromet a fer un ús adequat dels continguts i serveis oferts, abstenint-se de:",
+          "item1": "Realitzar activitats il·lícites o contràries a la bona fe",
+          "item2": "Difondre continguts delictius, violents, pornogràfics o discriminatoris",
+          "item3": "Intentar accedir a àrees restringides del sistema",
+          "item4": "Introduir virus o programes maliciosos"
+        },
+        "section4": {
+          "title": "4. Propietat Intel·lectual i Industrial",
+          "content1": "Tots els continguts d'aquest lloc web, incloent textos, fotografies, gràfics, imatges, icones, tecnologia, programari, disseny gràfic i codi font, són propietat de {businessName} o de tercers que han autoritzat el seu ús.",
+          "content2": "Queda prohibida la reproducció, distribució, transformació o comunicació pública d'aquests continguts sense autorització expressa del titular."
+        },
+        "section5": {
+          "title": "5. Exclusió de Responsabilitat",
+          "intro": "{businessName} no es fa responsable de:",
+          "item1": "Errors o omissions en els continguts",
+          "item2": "Falta de disponibilitat del lloc web",
+          "item3": "Transmissió de virus o programes maliciosos",
+          "item4": "Ús il·lícit o negligent per part dels usuaris",
+          "item5": "Continguts de llocs web enllaçats"
+        },
+        "section6": {
+          "title": "6. Enllaços",
+          "content": "Aquest lloc web pot contenir enllaços a pàgines externes. {businessName} no es responsabilitza del contingut, polítiques de privadesa o pràctiques d'aquests llocs web de tercers."
+        },
+        "section7": {
+          "title": "7. Legislació Aplicable",
+          "content": "El present avís legal es regeix per la legislació espanyola. Per a qualsevol controvèrsia que pogués derivar-se de l'accés o ús d'aquest lloc web, les parts se sotmeten als Jutjats i Tribunals de {city}."
+        },
+        "section8": {
+          "title": "8. Modificacions",
+          "content": "{businessName} es reserva el dret de modificar el present avís legal en qualsevol moment. Les modificacions entraran en vigor des de la seva publicació al lloc web."
+        },
+        "section9": {
+          "title": "9. Contacte",
+          "intro": "Per a qualsevol consulta relacionada amb aquest avís legal, podeu contactar amb nosaltres a través de:"
+        }
+      },
+      "privacidad": {
+        "title": "Política de Privadesa",
+        "metadata": {
+          "title": "Política de Privadesa | Òrbita Events",
+          "description": "Política de privadesa i protecció de dades d'Òrbita Events segons RGPD i LOPDGDD."
+        },
+        "lastUpdate": "Última actualització:",
+        "portalBanner": {
+          "title": "Gestiona les teves dades personals",
+          "description": "Pots exercir els teus drets RGPD de forma ràpida i senzilla des del nostre Portal de Privadesa.",
+          "button": "Accedir al Portal"
+        },
+        "section1": {
+          "title": "1. Responsable del Tractament",
+          "empresa": "Empresa:",
+          "ubicacion": "Ubicació:",
+          "email": "Email:",
+          "telefono": "Telèfon:",
+          "datosCompletos": "Per a dades fiscals completes, contactar per email."
+        },
+        "section2": {
+          "title": "2. Dades que Recopilem",
+          "intro": "Recopilem la informació que ens proporciones directament:",
+          "identificacion": {
+            "title": "2.1. Dades d'identificació",
+            "item1": "Nom i cognoms",
+            "item2": "Correu electrònic",
+            "item3": "Número de telèfon",
+            "item4": "Ciutat",
+            "item5": "Compte d'Instagram (opcional)"
+          },
+          "evento": {
+            "title": "2.2. Dades de l'esdeveniment",
+            "item1": "Tipus d'esdeveniment",
+            "item2": "Data i ubicació",
+            "item3": "Nombre de convidats",
+            "item4": "Preferències i sol·licituds especials"
+          },
+          "navegacion": {
+            "title": "2.3. Dades de navegació",
+            "item1": "Adreça IP",
+            "item2": "Tipus de navegador",
+            "item3": "Pàgines visitades",
+            "item4": "Temps de navegació"
+          }
+        },
+        "section3": {
+          "title": "3. Finalitat del Tractament",
+          "table": {
+            "finalidad": "Finalitat",
+            "baseLegal": "Base legal",
+            "conservacion": "Conservació",
+            "row1": {
+              "purpose": "Gestió de contractes i serveis",
+              "legal": "Execució contractual",
+              "retention": "5 anys (obligació fiscal)"
+            },
+            "row2": {
+              "purpose": "Facturació",
+              "legal": "Obligació legal",
+              "retention": "5 anys"
+            },
+            "row3": {
+              "purpose": "Comunicacions comercials",
+              "legal": "Consentiment",
+              "retention": "Fins a retirada del consentiment"
+            },
+            "row4": {
+              "purpose": "Publicació de testimonis i fotos",
+              "legal": "Consentiment",
+              "retention": "Fins a retirada del consentiment"
+            },
+            "row5": {
+              "purpose": "Anàlisi i millora del servei",
+              "legal": "Interès legítim",
+              "retention": "2 anys"
+            }
+          }
+        },
+        "section4": {
+          "title": "4. Destinataris de les Dades",
+          "intro": "Les teves dades poden ser comunicades a:",
+          "providers": "Proveïdors de serveis:",
+          "providersDetail": "Hosting (Vercel), Base de dades (PostgreSQL), Email transaccional",
+          "public": "Administracions públiques:",
+          "publicDetail": "Quan sigui legalment obligatori",
+          "noSale": "No venem ni cedim dades a tercers amb finalitats comercials."
+        },
+        "section5": {
+          "title": "5. Transferències Internacionals",
+          "content": "Alguns dels nostres proveïdors poden estar ubicats fora de l'Espai Econòmic Europeu. En aquests casos, garantim que existeixen garanties adequades (Clàusules Contractuals Tipus, adequació de la Comissió Europea, etc.)."
+        },
+        "section6": {
+          "title": "6. Els teus Drets (ARCO-POL)",
+          "intro": "Segons el RGPD i la LOPDGDD, tens dret a:",
+          "acceso": "Accés:",
+          "accesoDesc": "Conèixer quines dades tenim sobre tu",
+          "rectificacion": "Rectificació:",
+          "rectificacionDesc": "Corregir dades inexactes o incompletes",
+          "supresion": "Supressió:",
+          "supresionDesc": "Sol·licitar que eliminem les teves dades (\"dret a l'oblit\")",
+          "oposicion": "Oposició:",
+          "oposicionDesc": "Oposar-te a determinats tractaments",
+          "portabilidad": "Portabilitat:",
+          "portabilidadDesc": "Rebre les teves dades en format estructurat",
+          "limitacion": "Limitació:",
+          "limitacionDesc": "Sol·licitar que limitem el tractament",
+          "plazo": "Termini de resposta:",
+          "plazoDesc": "Respondrem a la teva sol·licitud en un màxim de 30 dies.",
+          "portalButton": "Portal de Privadesa",
+          "emailButton": "Contactar per email"
+        },
+        "section7": {
+          "title": "7. Seguretat",
+          "intro": "Implementem mesures tècniques i organitzatives per protegir les teves dades:",
+          "item1": "Xifratge de dades en trànsit (HTTPS/TLS)",
+          "item2": "Xifratge de dades en repòs",
+          "item3": "Controls d'accés basats en rols",
+          "item4": "Registres d'auditoria",
+          "item5": "Còpies de seguretat regulars"
+        },
+        "section8": {
+          "title": "8. Cookies",
+          "content": "Utilitzem cookies per millorar la teva experiència. Consulta la nostra",
+          "link": "Política de Cookies",
+          "contentEnd": "per a més informació."
+        },
+        "section9": {
+          "title": "9. Menors",
+          "content": "Els nostres serveis no estan dirigits a menors de 14 anys. No recopilem conscientment dades de menors sense consentiment dels tutors legals."
+        },
+        "section10": {
+          "title": "10. Reclamacions",
+          "content": "Si consideres que hem vulnerat els teus drets, pots presentar una reclamació davant l'Agència Espanyola de Protecció de Dades (AEPD):"
+        },
+        "section11": {
+          "title": "11. Contacte",
+          "intro": "Per a qualsevol consulta sobre aquesta política de privadesa:",
+          "email": "Email:",
+          "telefono": "Telèfon:"
+        },
+        "section12": {
+          "title": "12. Actualitzacions",
+          "content": "Podem actualitzar aquesta política periòdicament. T'informarem de canvis significatius a través de la nostra web o per email."
+        },
+        "ctaFinal": {
+          "button": "Gestiona les teves dades personals"
+        }
+      },
+      "terminos": {
+        "title": "Termes i Condicions",
+        "metadata": {
+          "title": "Termes i Condicions | Òrbita Events",
+          "description": "Termes i condicions d'ús dels serveis d'Òrbita Events."
+        },
+        "lastUpdate": "Última actualització:",
+        "section1": {
+          "title": "1. Identificació",
+          "intro": "Aquests termes i condicions regulen l'ús dels serveis oferts per:",
+          "empresa": "Empresa:",
+          "ubicacion": "Ubicació:",
+          "contacto": "Contacte:",
+          "datosCompletos": "Per a dades fiscals completes, contactar per email."
+        },
+        "section2": {
+          "title": "2. Serveis",
+          "content": "Òrbita Events ofereix serveis de DJ, il·luminació, efectes especials, tematització i producció tècnica per a esdeveniments com casaments, festes privades, esdeveniments corporatius i celebracions."
+        },
+        "section3": {
+          "title": "3. Reserves i Pagaments",
+          "proceso": {
+            "title": "3.1 Procés de Reserva",
+            "item1": "Sol·licitud de pressupost personalitzat",
+            "item2": "Acceptació del pressupost per part del client",
+            "item3": "Pagament del senyal per confirmar la reserva",
+            "item4": "Signatura del contracte de serveis"
+          },
+          "condiciones": {
+            "title": "3.2 Condicions de Pagament",
+            "senal": "Senyal:",
+            "senalDesc": "30% del total per confirmar la reserva",
+            "resto": "Resta:",
+            "restoDesc": "El dia de l'esdeveniment o segons acord",
+            "metodos": "Mètodes:",
+            "metodosDesc": "Transferència bancària, Bizum, efectiu"
+          }
+        },
+        "section4": {
+          "title": "4. Cancel·lacions",
+          "item1": "Més de 30 dies abans:",
+          "item1Desc": "Devolució del 50% del senyal",
+          "item2": "Entre 15-30 dies:",
+          "item2Desc": "Sense devolució del senyal",
+          "item3": "Menys de 15 dies:",
+          "item3Desc": "Cobrament del 100% del servei",
+          "item4": "Força major:",
+          "item4Desc": "S'acordaran condicions especials"
+        },
+        "section5": {
+          "title": "5. Obligacions del Client",
+          "item1": "Proporcionar informació veraç sobre l'esdeveniment",
+          "item2": "Garantir accés al lloc de l'esdeveniment per al muntatge",
+          "item3": "Disposar de subministrament elèctric adequat",
+          "item4": "Informar de qualsevol canvi amb antelació",
+          "item5": "Complir amb els pagaments acordats"
+        },
+        "section6": {
+          "title": "6. Obligacions d'Òrbita Events",
+          "item1": "Prestar els serveis contractats amb professionalitat",
+          "item2": "Disposar d'equip tècnic en perfecte estat",
+          "item3": "Comptar amb equipament de resposta",
+          "item4": "Complir amb els horaris acordats",
+          "item5": "Disposar d'assegurança de responsabilitat civil"
+        },
+        "section7": {
+          "title": "7. Limitació de Responsabilitat",
+          "intro": "Òrbita Events no serà responsable de:",
+          "item1": "Talls de subministrament elèctric aliens al nostre control",
+          "item2": "Danys causats per condicions meteorològiques adverses",
+          "item3": "Incidències causades per tercers",
+          "item4": "Esdeveniments de força major"
+        },
+        "section8": {
+          "title": "8. Propietat Intel·lectual",
+          "content": "Les fotografies i vídeos realitzats durant els esdeveniments podran ser utilitzats per Òrbita Events amb fins promocionals, llevat d'indicació expressa en contrari per part del client."
+        },
+        "section9": {
+          "title": "9. Resolució de Conflictes",
+          "content": "Per a qualsevol controvèrsia derivada d'aquests termes, les parts se sotmeten als Jutjats i Tribunals de {city}, renunciant a qualsevol altre fur que pogués correspondre'ls."
+        },
+        "section10": {
+          "title": "10. Contacte",
+          "intro": "Per a consultes sobre aquests termes:"
+        }
+      }
     },
     "description": "Creem experiències completes que els teus convidats recordaran. DJ, so, il·luminació i producció tècnica personalitzada arreu de Catalunya."
   },
   "videoTestimonials": {
-    "items": [
-      {
-        "name": "Lorena i Carles",
-        "event": "Casament Món Màgic",
-        "location": "Catalunya",
-        "date": "Setembre 2024",
-        "quote": "Van transformar el nostre casament en una experiència màgica d'escola de bruixeria. Les veles flotants, els sobres personalitzats amb lacre vermell, la decoració amb elements màgics... els convidats encara en parlen! Tot va ser exactament com ho havíem somiat."
-      }
-    ]
+    "badge": "Proper Casament",
+    "upcomingEvent": "Pròximament",
+    "wantSame": "Vols una experiència així?",
+    "seeHP": "Descobreix Món Màgic",
+    "leaveReview": "Deixa la teva opinió",
+    "hadEvent": "Has celebrat un event amb nosaltres?",
+    "testimonial": {
+      "name": "Lorena i Carles",
+      "event": "Casament Món Màgic",
+      "date": "Pròximament",
+      "location": "Catalunya",
+      "quote": "Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació ha estat increïble: veles flotants, sobres personalitzats amb lacre vermell, decoració amb símbols màgics... Estem molt il·lusionats!"
+    }
   },
   "portfolioGrid": {
     "title": "Casos recents",
@@ -1428,7 +2533,21 @@
     ]
   },
   "logoWall": {
-    "title": "MARQUES QUE CONFIEN EN ÒRBITA"
+    "title": "MARQUES QUE CONFIEN EN ÒRBITA",
+    "clients": {
+      "0": "Moto Offroad Academy",
+      "1": "Masia El Massaguer",
+      "2": "AECC",
+      "3": "Clap",
+      "4": "Ajuntament de Granollers",
+      "5": "Ajuntament de Terrassa",
+      "6": "MG Medicina Estètica",
+      "7": "Zona Motor L'Ametlla Park"
+    }
+  },
+  "languages": {
+    "ca": "Català",
+    "es": "Español"
   },
   "gallery": {
     "preparingTitle": "Aquesta experiència està en preparació",
@@ -1611,6 +2730,7 @@
   },
   "calculator": {
     "badge": "Calculadora d'Esdeveniments",
+    "popular": "Popular",
     "title": "Descobreix el preu",
     "titleHighlight": "del teu event perfecte",
     "subtitle": "Respon 4 preguntes i obtén una estimació instantània. Sense compromís.",
@@ -1743,6 +2863,8 @@
     "coverage": "Barcelona · Girona · Costa Brava",
     "experience": "15+ anys",
     "locations": "BCN + Girona",
+    "location": "Barcelona + Girona",
+    "response": "Resposta en 2h",
     "weddingsDesc": "DJ professional per al teu casament",
     "partiesDesc": "Aniversaris i celebracions",
     "corporateDesc": "Events d'empresa",
@@ -1891,6 +3013,14 @@
       "description": "Descobreix les nostres experiències temàtiques úniques: Món Màgic (estil Harry Potter), Halloween, Disco 80s, Tropical i més. Tematització completa per al teu event."
     },
     "badge": "Experiències Úniques",
+    "badges": {
+      "popular": "Popular",
+      "terrific": "Terrorífic",
+      "exclusive": "Exclusiu",
+      "summer": "Estiu",
+      "retro": "Retro",
+      "premium": "Premium"
+    },
     "title": {
       "line1": "Transforma el teu event en una",
       "highlight": "experiència inolvidable"
@@ -1947,26 +3077,33 @@
   },
   "mobileExperience": {
     "hero": {
-      "title1": "Festes que",
-      "title2": "no s'obliden",
-      "subtitle": "Tematització · Música · Màgia",
-      "discover": "Descobreix",
-      "swipe": "← swipe →"
+      "title1": "Creem",
+      "title2": "experiències",
+      "subtitle": "DJ + So + Llums + Tematització. Tot el que necessites per fer el teu event memorable.",
+      "discover": "Descobreix més",
+      "swipe": "← Llisca →",
+      "altHalloween": "Festa Halloween Òrbita Events",
+      "altMonMagic": "Festa Món Màgic Òrbita Events",
+      "altBoda": "Boda amb Òrbita Events",
+      "altFesta": "Festa privada Òrbita Events"
+    },
+    "gallery": {
+      "sectionTitle": "Portfolio",
+      "title": "Més",
+      "titleHighlight": "proves",
+      "viewAll": "Veure tot el portfolio"
     },
     "revelation": {
       "title1": "No posem música.",
       "title2": "Creem mons.",
-      "description1": "Cada llum. Cada detall. Cada moment.",
-      "description2": "El teu event, tal com l'imagines.",
-      "touchHint": "Toca la pantalla i descobreix la màgia"
+      "description1": "Cada event és únic.",
+      "description2": "Dissenyem experiències completes que els teus convidats recordaran sempre.",
+      "touchHint": "Toca la pantalla per veure màgia"
     },
     "realms": {
-      "sectionTitle": "Tematitzacions",
+      "sectionTitle": "Tematització",
       "title": "Escull el teu",
-      "titleHighlight": "món",
-      "swipeHint": "← swipe per veure més →",
-      "wantParty": "Vull una festa",
-      "contact": "Contactar →",
+      "titleHighlight": "regne",
       "halloween": {
         "name": "Halloween",
         "title": "La Nit dels Morts",
@@ -1976,82 +3113,45 @@
         "name": "Món Màgic",
         "title": "Benvingut a l'Escola de Màgia",
         "description": "Varetes, cases, màgia... El somni de tot fan de la fantasia fet realitat."
-      }
-    },
-    "gallery": {
-      "sectionTitle": "2+ anys experiència",
-      "title": "Experiències",
-      "titleHighlight": "reals",
-      "viewAll": "Veure tot el portfolio"
+      },
+      "wantParty": "Vols una festa",
+      "contact": "Contacta'ns",
+      "swipeHint": "👆 Llisca per veure més fotos"
     },
     "testimonials": {
-      "sectionTitle": "100% recomanat",
-      "title": "Les seves",
-      "titleHighlight": "paraules",
-      "swipe": "← swipe →"
+      "sectionTitle": "Opinions",
+      "title": "El que diuen",
+      "titleHighlight": "els clients",
+      "swipe": "← Llisca per veure més →"
     },
     "cta": {
       "title": "Tens una data",
       "titleHighlight": "al cap?",
-      "description1": "Explica'ns la teva idea.",
-      "description2": "Et responem en menys de 2 hores.",
-      "whatsapp": "WhatsApp directe",
+      "description1": "Explica'ns el teu event.",
+      "description2": "Resposta en menys de 2 hores.",
+      "whatsapp": "Escriu-nos per WhatsApp",
       "contactForm": "Formulari de contacte",
-      "call": "Trucar ara",
-      "trustYears": "2+ anys en el sector",
-      "trustLocation": "BCN + Girona",
-      "trustResponse": "2h resposta",
-      "guarantee": "Resposta garantida en menys de 2h, fins i tot caps de setmana"
-    }
-  },
-  "tematitzacio": {
-    "badge": "El Nostre Punt Fort",
-    "title": "Tematització",
-    "titleSuffix": "d'Events",
-    "subtitle": "No fem events normals. Creem experiències immersives que transporten els teus convidats a un altre món.",
-    "cta": "Vull aquest tema!",
-    "examples": "Veure exemples",
-    "testimonial": "\"La tematització màgica va ser INCREÏBLE. Els convidats no paraven de fer fotos. Semblava que estàvem en una escola de bruixeria de veritat!\"",
-    "testimonialAuthor": "— Lorena i Carles, Casament Món Màgic",
-    "custom": "No veus el que busques? Fem",
-    "customSuffix": "temàtica que imaginis.",
-    "contact": "Explica'ns la teva idea",
-    "themes": {
-      "monmagic": {
-        "name": "Món Màgic",
-        "tagline": "Màgia d'escola de bruixeria al teu event",
-        "description": "Transforma el teu event en una experiència màgica: efectes de varetes, il·luminació de veles flotants, música encantada, i fins i tot humo que sembla màgia real.",
-        "features": ["Efectes de vareta màgica", "Veles flotants", "Efectes de boira màgica", "Playlist temàtica"]
+      "call": "Truca'ns: 699 121 023",
+      "trustYears": "🎯 +2 anys d'experiència",
+      "trustLocation": "📍 Barcelona i Girona",
+      "trustResponse": "⚡ Resposta en 2h",
+      "guarantee": "✓ Pressupost sense compromís · Cancel·lació gratuïta fins 7 dies abans"
+    },
+    "testimonis": {
+      "0": {
+        "text": "Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació està sent increïble!",
+        "nom": "Lorena & Carles",
+        "event": "Boda Món Màgic · Pròximament"
       },
-      "halloween": {
-        "name": "Halloween",
-        "tagline": "La nit més terrorífica",
-        "description": "Convertim qualsevol espai en una casa encantada: llums vermelles i taronges, humo baixa, efectes de so terrorífics, i una ambientació que farà cridar els teus convidats.",
-        "features": ["Decoració terrorífica", "Efectes de boira", "Llums estroboscòpiques", "So ambient esgarrifós"]
+      "1": {
+        "text": "La millor festa de Halloween de la meva vida. El fum, les llums, tot perfecte. Els meus amics al·lucinaven.",
+        "nom": "Àngela",
+        "event": "18 aniversari Halloween · Octubre 2024"
       },
-      "tropical": {
-        "name": "Tropical",
-        "tagline": "Paradís a Catalunya",
-        "description": "Porta el Carib a casa teva: llums càlides, efectes de palmeres projectades, música reggaeton i salsa, i una atmosfera que et farà sentir a la platja.",
-        "features": ["Projeccions tropicals", "Llums càlides", "Playlist caribenyes", "Efectes de posta de sol"]
-      },
-      "disco": {
-        "name": "Disco 80s",
-        "tagline": "Viatja als anys daurats",
-        "description": "Bola de discoteca gegant, llums de neó, màquina de fum, i els millors hits dels 70s i 80s. Una festa retro que farà ballar a totes les generacions.",
-        "features": ["Bola disco gegant", "Llums de neó", "Vestits d'època opcional", "Greatest hits 70s-80s"]
-      },
-      "elegant": {
-        "name": "Elegant Gold",
-        "tagline": "Sofisticació pura",
-        "description": "Per als que busquen classe i distinció: il·luminació daurada, efectes subtils però impressionants, música lounge i jazz, i una atmosfera de gala.",
-        "features": ["Il·luminació daurada", "Efectes subtils", "Jazz & Lounge", "Ambientació premium"]
-      },
-      "custom": {
-        "name": "La Teva Idea",
-        "tagline": "Tu imagines, nosaltres creem",
-        "description": "Tens una idea diferent? Peaky Blinders, Star Wars, Anime, Medieval... Digue'ns la teva visió i la fem realitat amb efectes, música i ambientació a mida.",
-        "features": ["Disseny personalitzat", "Qualsevol temàtica", "Efectes a mida", "Assessorament creatiu"]
+      "2": {
+        "text": "Volíem quelcom diferent per l'empresa. Van superar totes les expectatives. Professional i creatiu.",
+        "nom": "TechCat S.L.",
+        "event": "Event corporatiu · Desembre 2024"
       }
     }
   },
@@ -2059,7 +3159,20 @@
     "callNow": "Trucar ara",
     "email": "Email",
     "whatsapp": "WhatsApp",
-    "contactUs": "Contacta'ns!"
+    "contactUs": "Contacta'ns!",
+    "whatsappMessage": "Hola! M'agradaria informació sobre un event."
+  },
+  "whatsappMessages": {
+    "general": "Hola! M'interessa saber més sobre els vostres serveis d'esdeveniments",
+    "bodas": "Hola! M'agradaria informació sobre els vostres serveis per a casaments",
+    "discomovil": "Hola! Estic interessat en contractar una discomòbil",
+    "empresas": "Hola! Necessito un pressupost per a un event corporatiu",
+    "produccion": "Hola! M'interessa una producció tècnica completa",
+    "fiestas": "Hola! Vull animar la meva festa amb els vostres serveis",
+    "alquiler": "Hola! Necessito llogar equipament per a un event",
+    "configurador": "Hola! He configurat un pack. Podem parlar sobre disponibilitat?",
+    "halloween": "Hola! Vull info sobre festes Halloween",
+    "experiencias": "Hola! M'interessa una experiència temàtica personalitzada"
   },
   "mobileLanding": {
     "heroSlides": {
@@ -2137,7 +3250,21 @@
   "elViatge": {
     "portal": {
       "magicBegins": "La màgia comença...",
-      "skipIntro": "Saltar intro →"
+      "skipIntro": "Saltar intro →",
+      "logoText": "ÒRBITA",
+      "logoSubtext": "EVENTS"
+    },
+    "promesa": {
+      "title1": "El dia que sempre",
+      "title2": "vas imaginar",
+      "subtitle1": "Aquell moment en què mires al teu voltant i veus tothom somrient.",
+      "subtitle2": "La música perfecta. Les llums justes. I saps que aquest instant quedarà per sempre.",
+      "cta": "Comença a crear-lo",
+      "stats": {
+        "anys": "anys en el sector",
+        "ubicacio": "+ Girona",
+        "resposta": "resposta"
+      }
     },
     "mons": {
       "halloween": {
@@ -2189,18 +3316,6 @@
         "data": "Desembre 2024"
       }
     ],
-    "promesa": {
-      "title1": "El dia que sempre",
-      "title2": "vas imaginar",
-      "subtitle1": "Aquell moment en què mires al teu voltant i veus tothom somrient.",
-      "subtitle2": "La música perfecta. Les llums justes. I saps que aquest instant quedarà per sempre.",
-      "cta": "Comença a crear-lo",
-      "stats": {
-        "anys": "anys en el sector",
-        "ubicacio": "+ Girona",
-        "resposta": "resposta"
-      }
-    },
     "elsMons": {
       "sectionTitle": "Escull el teu univers",
       "title1": "Cada event és un",
@@ -2247,16 +3362,39 @@
     }
   },
   "sensorial": {
+    "loading": "Preparant un espai especial per a tu...",
+    "grabElements": "Agafa els elements amb el dit o el ratolí!",
     "brandName": "Òrbita Events",
     "title": "Espai Sensorial",
+    "ariaInfo": "Informació",
+    "ariaSettings": "Configuració",
     "breathe": "Respira...",
     "infoTitle": "Què és l'Espai Sensorial?",
     "infoP1": "Un lloc digital dissenyat per a persones amb sensibilitats sensorials, nens i nenes amb autisme, o qualsevol que vulgui un moment de calma o diversió controlada.",
     "infoP2": "Ajusta la velocitat i densitat de les partícules al teu gust. Prova els diferents temes per trobar el que més t'agradi! 💜",
     "understood": "Entès!",
     "controls": "Controls",
+    "customizeExperience": "Personalitza l'experiència",
+    "categories": "Categories",
+    "all": "Tots",
+    "themesLabel": "Temes",
+    "sound": "So",
+    "ambientSound": "So ambient i efectes",
+    "soundOn": "Activat · Música relaxant",
+    "soundOff": "Desactivat · Toca per activar",
+    "intensity": "Intensitat",
+    "elements": "Elements",
+    "speedLabel": "Velocitat",
+    "presets": "Presets",
+    "presetSoft": "Suau",
+    "presetNormal": "Normal",
+    "presetActive": "Actiu",
+    "tips": "Consells",
+    "tipDrag": "Clica i arrossega per agafar elements",
+    "tipBounce": "Llança'ls per veure com reboten!",
+    "tipCursor": "El teu cursor és un {cursor}",
+    "footer": "Òrbita Events · Des de 2023",
     "chooseTheme": "🎨 Tria un tema",
-    "presets": "⚡ Presets",
     "speed": "Velocitat",
     "slow": "🐢 Lent",
     "fast": "🐇 Ràpid",
@@ -2270,18 +3408,111 @@
     "madeWithLove": "Fet amb amor",
     "forSpecialPeople": "Per a totes les persones especials 💜",
     "backHome": "Tornar a l'inici",
+    "themeNames": {
+      "calm": "Calma",
+      "ocean": "Oceà",
+      "forest": "Bosc",
+      "sky": "Cel",
+      "garden": "Jardí",
+      "aurora": "Aurora",
+      "fireflies": "Lluernes",
+      "cosmos": "Cosmos",
+      "planets": "Planetes",
+      "aquarium": "Aquari",
+      "safari": "Safari",
+      "pets": "Mascotes",
+      "dinosaurs": "Dinosaures",
+      "unicorn": "Unicorn",
+      "fairy": "Fades",
+      "dragon": "Dracs",
+      "mermaid": "Sirenes",
+      "candy": "Dolços",
+      "fruits": "Fruites",
+      "monmagic": "Món Màgic",
+      "halloween": "Halloween",
+      "christmas": "Nadal",
+      "tropical": "Tropical",
+      "disco": "Disco",
+      "elegant": "Elegant",
+      "carnival": "Carnaval",
+      "zen": "Zen",
+      "rain": "Pluja",
+      "snow": "Neu"
+    },
+    "categoryNames": {
+      "natura": "Natura",
+      "espai": "Espai",
+      "animals": "Animals",
+      "fantasia": "Fantasia",
+      "menjar": "Menjar",
+      "orbita": "Festes Òrbita",
+      "zen": "Relaxació"
+    },
     "themes": {
-      "calm": { "name": "Calma", "description": "Relaxació i pau" },
-      "elegant": { "name": "Elegant", "description": "Sofisticació daurada" },
-      "halloween": { "name": "Halloween", "description": "Misteri i diversió" },
-      "monmagic": { "name": "Món Màgic", "description": "Màgia d'escola de bruixeria" },
-      "disco": { "name": "Disco", "description": "Ritme i llum" },
-      "tropical": { "name": "Tropical", "description": "Paradís verd" }
+      "calm": {
+        "name": "Calma",
+        "description": "Relaxació i pau"
+      },
+      "elegant": {
+        "name": "Elegant",
+        "description": "Sofisticació daurada"
+      },
+      "halloween": {
+        "name": "Halloween",
+        "description": "Misteri i diversió"
+      },
+      "monmagic": {
+        "name": "Món Màgic",
+        "description": "Màgia d'escola de bruixeria"
+      },
+      "disco": {
+        "name": "Disco",
+        "description": "Ritme i llum"
+      },
+      "tropical": {
+        "name": "Tropical",
+        "description": "Paradís verd"
+      }
     },
     "presetNames": {
       "relaxed": "🧘 Relaxat",
       "normal": "✨ Normal",
       "party": "🎉 Festa"
+    },
+    "exit": "Sortir",
+    "tutorial": {
+      "step1": {
+        "title": "Benvingut/da a l'Espai Sensorial",
+        "p1": "Aquest espai està creat amb molt d'amor per a <strong>totes les persones</strong>, especialment per aquelles amb <strong>sensibilitat sensorial</strong>.",
+        "p2": "Sabem que el món digital pot ser sovint massa estimulant. Per això hem creat aquest racó tranquil on pots relaxar-te, jugar, i trobar un moment de pau.",
+        "p3": "Cada persona és única i especial. Aquesta pàgina és per a tu. 💜"
+      },
+      "step2": {
+        "title": "Agafa i juga!",
+        "intro": "Tots els elements de la pantalla <strong>es poden agafar</strong> amb el dit o el ratolí!",
+        "click": "<strong>Clica</strong> sobre un element per agafar-lo",
+        "drag": "<strong>Arrossega</strong> per moure'l",
+        "throw": "<strong>Llança'l</strong> deixant anar!",
+        "bounce": "Mira com <strong>reboten</strong> per la pantalla",
+        "cursor": "El teu cursor es converteix en un element del tema!"
+      },
+      "step3": {
+        "title": "Molts temes per triar",
+        "intro": "Tenim <strong>molts temes diferents</strong> per a tots els gustos:",
+        "outro": "Des de l'oceà fins a l'espai, des d'unicorns fins a dinosaures!"
+      },
+      "step4": {
+        "title": "So i calma",
+        "p1": "Pots activar <strong>música ambient</strong> relaxant que s'adapta al tema que triïs.",
+        "p2": "El so és molt suau i <strong>\"respira\"</strong> amb tu, pujant i baixant de volum lentament.",
+        "p3": "Si prefereixes silenci, només has de deixar el so desactivat. <strong>Tu decideixes!</strong>",
+        "p4": "Cada interacció té un petit so agradable (que també pots desactivar)."
+      },
+      "back": "Enrere",
+      "next": "Següent",
+      "start": "Començar a jugar!",
+      "skip": "Saltar introducció",
+      "madeBy": "Creat amb 💜 per Òrbita Events · Des de 2023"
     }
   },
   "testimonialForm": {
@@ -2435,6 +3666,707 @@
         "submitting": "Enviant...",
         "currentReward": "Recompensa actual:"
       }
+    }
+  },
+  "servicesShowcase": {
+    "sectionTitle": "Cada event és un",
+    "sectionTitleHighlight": "univers",
+    "sectionSubtitle": "Explora les possibilitats. Troba el teu món.",
+    "explore": "Explora",
+    "emotionalSubtitles": {
+      "weddings": "L'amor celebrat",
+      "parties": "L'alegria compartida",
+      "mobile": "La música on vulguis",
+      "corporate": "L'impacte memorable"
+    }
+  },
+  "notFound": {
+    "title": "Aquesta Pàgina No Existeix",
+    "description": "Sembla que aquesta pàgina se'n va anar de festa i no va tornar.",
+    "descriptionExtra": "Però tranquil, podem ajudar-te a trobar el que busques.",
+    "backToHome": "Tornar a l'Inici",
+    "viewServices": "Veure Serveis",
+    "lookingFor": "Buscaves alguna cosa específica?",
+    "links": {
+      "djWeddings": "DJ Casaments",
+      "discomovil": "Discomòbil",
+      "rental": "Lloguer",
+      "corporate": "Empreses",
+      "faq": "FAQ",
+      "contact": "Contacte"
+    }
+  },
+  "errorPage": {
+    "title": "Ui! Alguna cosa ha anat malament",
+    "defaultMessage": "Error inesperat a la web.",
+    "reassurance": "Però tranquil, el teu event serà perfecte. Promès.",
+    "technicalDetails": "Veure detalls tècnics (només desenvolupament)",
+    "tryAgain": "Intentar de Nou",
+    "backToHome": "Tornar a l'Inici",
+    "contactHelp": "Contactar (Ajuda Ràpida)",
+    "persistentProblem": "Problema persistent?",
+    "contactUs": "Contacta'ns a través del formulari",
+    "errorCode": "Codi error:"
+  },
+  "bodaHalloween": {
+    "badge": "Especialistes en Bodes Temàtiques",
+    "heroTitle1": "El Teu Casament",
+    "heroTitle2": "Halloween",
+    "heroTitle3": "Serà Inoblidable",
+    "heroSubtitle": "Especialistes en casaments temàtics a Barcelona i Catalunya. Creem l'atmosfera terroríficament perfecta pel teu dia especial.",
+    "ctaBudget": "Demana Pressupost Gratis",
+    "ctaWhatsapp": "WhatsApp Directe",
+    "trustEvents": "events realitzats",
+    "trustRecommend": "ens recomanen",
+    "trustResponse": "Resposta en <2h",
+    "featuresTitle": "Per Què Escollir Òrbita pel Teu Casament Halloween?",
+    "featuresSubtitle": "No som només DJs. Som especialistes en crear experiències temàtiques completes.",
+    "features": {
+      "theming": {
+        "title": "Tematització Completa",
+        "description": "Decoració immersiva amb elements Halloween: carbasses, teranyines, il·luminació tenebrosa i més."
+      },
+      "effects": {
+        "title": "Efectes Especials",
+        "description": "Fum baix pel primer ball, llums espectaculars, efectes de terror controlats."
+      },
+      "dj": {
+        "title": "DJ Especialitzat",
+        "description": "Playlist personalitzada barrejant les teves cançons favorites amb clàssics de Halloween."
+      },
+      "experience": {
+        "title": "Experiència Única",
+        "description": "Especialistes en casaments Halloween. Sabem exactament com crear l'atmosfera perfecta."
+      }
+    },
+    "testimonialsTitle": "El Que Diuen Les Nostres Parelles",
+    "faqTitle": "Preguntes Freqüents",
+    "faq": {
+      "q1": "Què inclou el servei de casament Halloween?",
+      "a1": "DJ professional, il·luminació temàtica, efectes especials (fum, llums), decoració bàsica Halloween, coordinació de l'event i playlist personalitzada.",
+      "q2": "Puc fer un casament Halloween en qualsevol època de l'any?",
+      "a2": "Per descomptat! Tot i que octubre és el mes estrella, realitzem casaments temàtics Halloween durant tot l'any.",
+      "q3": "Quant costa un casament Halloween?",
+      "a3": "Els preus varien segons el nivell de tematització. Des de 2.900€ per un pack bàsic fins a 5.500€+ per tematització completa.",
+      "q4": "Treballeu fora de Barcelona?",
+      "a4": "Sí, cobrim província de Barcelona i Girona (incloent Costa Brava). Transport inclòs fins a 25km des de Granollers."
+    },
+    "finalCtaTitle": "Preparat per un Casament Terroríficament Perfecte?",
+    "finalCtaSubtitle": "Contacta ara i rep el teu pressupost personalitzat en menys de 2 hores.",
+    "finalCtaBudget": "Vull el Meu Pressupost",
+    "finalCtaCall": "Trucar:"
+  },
+  "privacy": {
+    "title": "Els Teus Drets de Privacitat",
+    "subtitle": "Gestiona les teves dades personals segons el RGPD",
+    "selectRight": "Selecciona el teu dret",
+    "whichRight": "Quin dret vols exercir?",
+    "howItWorks": "Com funciona?",
+    "howItWorksDesc": "Selecciona el dret que vols exercir, omple les teves dades i rebràs un email per verificar la teva identitat. Tenim 30 dies per respondre a la teva sol·licitud.",
+    "ariaBack": "Tornar enrere",
+    "nameLabel": "Nom complet",
+    "namePlaceholder": "El teu nom i cognoms",
+    "phoneLabel": "Telèfon (opcional)",
+    "phonePlaceholder": "+34 600 000 000",
+    "descriptionLabel": "Descripció",
+    "descriptionPlaceholder": "Descriu la teva sol·licitud amb detall...",
+    "rights": {
+      "access": {
+        "title": "Accedir a les meves dades",
+        "description": "Sol·licita una còpia de totes les dades que tenim sobre tu",
+        "article": "Art. 15 RGPD"
+      },
+      "rectification": {
+        "title": "Rectificar dades",
+        "description": "Corregeix informació inexacta o incompleta",
+        "article": "Art. 16 RGPD",
+        "descriptionLabel": "Quines dades vols rectificar?"
+      },
+      "erasure": {
+        "title": "Eliminar dades",
+        "description": "Sol·licita l'eliminació de les teves dades",
+        "article": "Art. 17 RGPD",
+        "descriptionLabel": "Motiu de l'eliminació (opcional)"
+      },
+      "portability": {
+        "title": "Portabilitat",
+        "description": "Rep les teves dades en format portable",
+        "article": "Art. 20 RGPD"
+      },
+      "objection": {
+        "title": "Oposició",
+        "description": "Oposa't al tractament de les teves dades",
+        "article": "Art. 21 RGPD",
+        "descriptionLabel": "Motiu de l'oposició"
+      },
+      "restriction": {
+        "title": "Limitació",
+        "description": "Limita com utilitzem les teves dades",
+        "article": "Art. 18 RGPD",
+        "descriptionLabel": "Quin tractament vols limitar?"
+      }
+    },
+    "form": {
+      "emailLabel": "Correu electrònic",
+      "emailPlaceholder": "El teu email registrat",
+      "descriptionPlaceholder": "Descriu la teva sol·licitud...",
+      "consent": "Accepto el tractament de les meves dades per gestionar aquesta sol·licitud",
+      "submitting": "Enviant...",
+      "submit": "Enviar sol·licitud",
+      "back": "Tornar"
+    },
+    "success": {
+      "title": "Sol·licitud enviada",
+      "message": "Hem rebut la teva sol·licitud. Et respondrem en un màxim de 30 dies.",
+      "ticketLabel": "Número de seguiment:",
+      "newRequest": "Nova sol·licitud"
+    },
+    "info": {
+      "responseTime": "Temps de resposta: màxim 30 dies",
+      "contact": "Contacte DPO:"
+    }
+  },
+  "accessibility": {
+    "openMenu": "Obrir menú",
+    "closeMenu": "Tancar menú",
+    "closeVideo": "Tancar vídeo",
+    "changeLanguageTo": "Canviar idioma a {language}",
+    "breadcrumb": "Ruta de navegació",
+    "visitSocialMedia": "Visitar {name}",
+    "goToConfigurator": "Anar al configurador de pressupostos"
+  },
+  "themeSwitcher": {
+    "tryMagic": "Prova la nostra màgia! ✨",
+    "transformWeb": "Transforma la web. Imagina el teu event.",
+    "secretCodes": "🎃 Escriu \"BOO\" | 🪄 Escriu \"LUMOS\"",
+    "chooseWorld": "Tria el teu món",
+    "transformExperience": "Transforma l'experiència",
+    "shakeHint": "📱 2x sacseja = efecte màgic · 4x sacseja = canvi tema"
+  },
+  "ui": {
+    "whatsappDirect": "WhatsApp Directe",
+    "callUs": "Truca'ns",
+    "videoNotSupported": "El teu navegador no suporta vídeo HTML5.",
+    "demoCaption": "Demo Òrbita Events — Experiències que es recorden",
+    "more": "Més",
+    "pressupost": "Pressupost",
+    "quote": "Pressupost",
+    "menu": "Menú",
+    "coverage": "Barcelona + Girona",
+    "responseTime": "Resposta en 2h"
+  },
+  "structuredData": {
+    "organization": {
+      "description": "Creem experiències completes personalitzades per a events a Barcelona i Girona. DJ professional, tematització, animació, efectes especials."
+    },
+    "service": {
+      "catalogName": "Serveis de DJ i Events",
+      "djWeddings": "DJ per a Casaments",
+      "djWeddingsDesc": "Servei complet de DJ, música i animació per a casaments amb tematització personalitzada.",
+      "discomovil": "Discomòbil Professional",
+      "discomovilDesc": "Discomòbil amb equipament professional, llums LED i efectes especials.",
+      "corporate": "Events Corporatius",
+      "corporateDesc": "Producció tècnica completa per a events d'empresa i team building."
+    },
+    "faq": {
+      "q1": "Què fa diferent a Òrbita d'altres DJ/proveïdors d'events?",
+      "a1": "Creem experiències completes personalitzades. No només música: tematització + animació + música adaptada en temps real + jocs + efectes. El nostre DJ llegeix l'ambient i ajusta sobre la marxa.",
+      "q2": "Quant costa contractar Òrbita per al meu casament/festa/event?",
+      "a2": "Treballem amb packs clars des de 250€. Els preus es calculen automàticament segons hores, equip i tipus d'event al nostre configurador.",
+      "q3": "Treballeu fora de Barcelona? Cobriu Girona i Costa Brava?",
+      "a3": "Sí, cobrim Barcelona província i Girona província (incloent Costa Brava). Transport GRATIS fins a 25km des de Granollers. Més enllà, s'afegeix segons distància.",
+      "q4": "Quin equip de so i il·luminació utilitzeu?",
+      "a4": "Utilitzem equips professionals Pioneer DJ, sistemes de so JBL/EV amb potència adaptada a l'espai, i caps mòbils LED amb control DMX per a efectes sincronitzats.",
+      "q5": "Amb quanta antelació he de reservar?",
+      "a5": "Recomanem reservar amb 2-3 mesos d'antelació per a casaments i events grans. Per a festes privades, 2-4 setmanes sol ser suficient. Les dates populars (dissabtes d'estiu) s'esgoten ràpid.",
+      "q6": "Puc triar la música del meu event?",
+      "a6": "Sí, t'enviem un formulari previ per conèixer els teus gustos i peticions especials. Durant l'event, el nostre DJ adapta la música en temps real segons la resposta del públic.",
+      "q7": "Què passa si hi ha un problema tècnic durant l'event?",
+      "a7": "Portem sempre equip de backup i un tècnic professional. Tenim protocols de contingència per garantir que el teu event no s'aturi mai."
+    },
+    "localBusiness": {
+      "openingHours": "Dilluns a Diumenge: 08:00 - 20:00"
+    },
+    "knowsAbout": [
+      "DJ",
+      "discomòbil",
+      "so per a events",
+      "il·luminació per a events",
+      "producció tècnica",
+      "casaments",
+      "events corporatius",
+      "tematització",
+      "festes temàtiques de màgia",
+      "Halloween",
+      "Nadal"
+    ]
+  },
+  "seoJsonLd": {
+    "organization": {
+      "description": "Events professionals a Barcelona i Girona: casaments, festes privades, events corporatius. DJ professional, tematització de festes i efectes especials. +2 anys d'experiència."
+    },
+    "services": {
+      "bodas": {
+        "name": "Casaments",
+        "description": "DJ + llums + efectes per a casaments èpics"
+      },
+      "discomovil": {
+        "name": "Discomòbil",
+        "description": "DJ professional + equipament per a festes"
+      },
+      "fiestas": {
+        "name": "Festes Privades",
+        "description": "Aniversaris, comiat de solter/a i festes temàtiques"
+      },
+      "corporativo": {
+        "name": "Events Corporatius",
+        "description": "Team building, sopars d'empresa, presentacions"
+      },
+      "produccion": {
+        "name": "Producció Tècnica",
+        "description": "Muntatge i operació tècnica professional"
+      },
+      "alquiler": {
+        "name": "Lloguer Equipament",
+        "description": "Lloguer so, llums i equipament DJ"
+      }
+    }
+  },
+  "layoutJsonLd": {
+    "description": "DJ professional per a casaments, festes i events corporatius a Barcelona i Girona. Discomòbil amb so 4000W, llums LED i efectes. Experiència des de 2023.",
+    "services": {
+      "catalogName": "Serveis DJ i Events Barcelona",
+      "djBodas": {
+        "name": "DJ Casaments Barcelona",
+        "description": "DJ professional per a casaments amb so 4000W, il·luminació i efectes especials. Cerimònia, còctel i festa."
+      },
+      "discomovil": {
+        "name": "Discomòbil Barcelona",
+        "description": "Discomòbil professional amb DJ, so, llums LED i efectes. Ens desplacem a tot Catalunya."
+      },
+      "fiestas": {
+        "name": "Festes Privades Barcelona",
+        "description": "DJ per a festes privades: aniversaris, comiats, aniversaris de casament. So, llums i animació."
+      },
+      "corporativo": {
+        "name": "Events Corporatius Barcelona",
+        "description": "DJ i producció tècnica per a events d'empresa: sopars, team building, presentacions."
+      }
+    }
+  },
+  "monMagic": {
+    "badge": "Lacre Artesanal Real",
+    "heroTitle": "El Teu Casament al",
+    "heroTitleHighlight": "Món Màgic",
+    "heroSubtitle": "Sobres complets amb carta de la Directora, text personalitzat i lacre artesanal.",
+    "heroPrice": "✨ Des de 8€/sobre amb tot inclòs ✨",
+    "priceUnit": "sobre complet",
+    "pricePackLabel": "pack +50",
+    "housesLabel": "cases",
+    "calculateBudget": "Calcula pressupost",
+    "seeHouses": "Veure les 5 cases",
+    "chooseCasa": "Escull la Teva Casa",
+    "chooseCasaDesc": "Tots els sobres del teu encàrrec portaran el lacre de la casa que escullis. Vols segells diferents? Afegeix l'opció Multi-Segell.",
+    "lacreTitle": "Lacre",
+    "products": "Productes",
+    "productsDesc": "Compra per unitats o aprofita els packs amb descompte",
+    "mostSold": "MÉS VENUT",
+    "perUnit": "Per unitat",
+    "askBudget": "Demana pressupost",
+    "packsDiscount": "Packs amb Descompte",
+    "packsDiscountDesc": "Estalvia fins a un 15% amb els nostres packs complets",
+    "recommended": "RECOMANAT",
+    "saving": "ESTALVI",
+    "requestPack": "Sol·licitar pack",
+    "calculator": "Calculadora Ràpida",
+    "calculatorDesc": "Selecciona la teva quantitat de convidats",
+    "guests": "conv.",
+    "packBasic": "Pack Bàsic",
+    "packPremium": "Pack Premium",
+    "requestBudgetFor": "Sol·licitar pressupost per {count} convidats",
+    "realPhotos": "Fotos Reals de Casaments",
+    "realPhotosDesc": "Mira com van quedar els nostres sobres en casaments reals. La màgia és palpable!",
+    "allPhotosReal": "Totes les fotos són de casaments reals dels nostres clients",
+    "completeLetter": "Sobre complet amb carta",
+    "realReaction": "❤️ La reacció real",
+    "altSobreObert": "Sobre màgic obert amb carta de la Directora",
+    "altSobrePlat": "Sobre personalitzat al plat",
+    "altConvidada": "Convidada llegint carta màgica",
+    "altMussol": "Mussol amb pergamins",
+    "altEscombres": "Decoració esportiva màgica",
+    "faq": "Preguntes Freqüents",
+    "wantCompletePack": "Vols el pack complet de tematització?",
+    "wantCompletePackDesc": "La papereria és només el principi. Combina-la amb DJ, efectes especials, il·luminació i decoració per crear una experiència màgica completa.",
+    "configureComplete": "Configura event complet",
+    "talkToUs": "Parlar amb nosaltres",
+    "houses": {
+      "escola": {
+        "nom": "Escola de Màgia",
+        "descripcio": "L'escut oficial amb les quatre cases"
+      },
+      "lleons": {
+        "nom": "Casa dels Lleons",
+        "descripcio": "Per als valents de cor"
+      },
+      "serps": {
+        "nom": "Casa de les Serps",
+        "descripcio": "Per als ambiciosos i astuts"
+      },
+      "teixons": {
+        "nom": "Casa dels Teixons",
+        "descripcio": "Per als lleials i justos"
+      },
+      "aguiles": {
+        "nom": "Casa de les Àguiles",
+        "descripcio": "Per als savis i creatius"
+      }
+    },
+    "productes": {
+      "sobreComplet": {
+        "nom": "Sobre Complet Escola de Màgia",
+        "descripcio": "El pack d'invitació complet: sobre de paper pergamí amb text personalitzat, carta de la Directora de l'Escola, frame personalitzat per cada convidat, i lacre de cera artesanal amb el segell de la casa escollida.",
+        "caracteristiques": [
+          "Paper pergamí autèntic",
+          "Text personalitzat per cada convidat",
+          "Carta de la Directora de l'Escola",
+          "Frame personalitzat amb nom i rol",
+          "Lacre de cera artesanal",
+          "Segell de la casa escollida"
+        ],
+        "ideal": "Tot inclòs en un sol producte"
+      },
+      "pergamiAmor": {
+        "nom": "Pergamí d'Amor Màgic",
+        "descripcio": "Poemes originals d'amor escrits en estil màgic, enrollats individualment i lligats amb una cinta elegant. Perfectes per decorar les taules o regalar als convidats.",
+        "caracteristiques": [
+          "Poemes originals i exclusius",
+          "Enrollats individualment",
+          "Lligats amb cinta elegant",
+          "Paper pergamí de qualitat",
+          "12 poemes en català + 12 en castellà",
+          "Perfecte com a record per convidats"
+        ],
+        "ideal": "Decoració de taules i records"
+      },
+      "cartellDecoratiu": {
+        "nom": "Cartells Decoratius Escola de Màgia",
+        "descripcio": "Cartells temàtics per decorar l'espai: Benvinguts a la Boda, Zona d'Entrenament de Vol, senyalització màgica...",
+        "caracteristiques": [
+          "Disseny estil Consell de Màgia",
+          "Impressió alta qualitat",
+          "Mida A3 o A2 disponible",
+          "Personalitzable amb noms",
+          "Escuts de les cases màgiques",
+          "Ideal per photocall"
+        ],
+        "ideal": "Decoració i photocall"
+      }
+    },
+    "packs": {
+      "basic": {
+        "nom": "Pack Bàsic \"Carta Acceptació\"",
+        "descripcio": "El pack essencial: sobres complets per a tots els convidats + 1 cartell de benvinguda personalitzat.",
+        "caracteristiques": [
+          "Sobres complets per a tots",
+          "1 cartell benvinguda A2",
+          "Lacre casa escollida",
+          "Revisió gratuïta abans imprimir",
+          "Entrega en 10-14 dies"
+        ],
+        "ideal": "Casaments fins a 100 convidats"
+      },
+      "premium": {
+        "nom": "Pack Premium \"Gran Saló\"",
+        "descripcio": "Tot inclòs: sobres complets + pergamins per a cada taula + pack de 5 cartells decoratius + opció multi-segell.",
+        "caracteristiques": [
+          "Sobres complets per a tots",
+          "Pergamins per cada taula (1/taula)",
+          "5 cartells decoratius A2",
+          "Opció multi-segell inclosa",
+          "Entrega prioritària 7-10 dies",
+          "Prova física abans producció"
+        ],
+        "ideal": "Casaments premium"
+      }
+    },
+    "multiSegell": {
+      "nom": "Opció Multi-Segell",
+      "descripcio": "Cada convidat amb el lacre del color de la seva casa assignada"
+    },
+    "faqs": {
+      "q1": {
+        "pregunta": "Què inclou el \"Sobre Complet\"?",
+        "resposta": "Inclou tot el que necessites: sobre de paper pergamí amb el nom del convidat, carta de la Directora de l'Escola, un frame personalitzat segons el rol del convidat (nuvi, pare, amic...), i lacre de cera artesanal amb el segell de la casa que escullis."
+      },
+      "q2": {
+        "pregunta": "Puc tenir sobres amb diferents segells?",
+        "resposta": "Per defecte, tots els sobres porten el mateix segell (la casa que escullis). Si vols que cada convidat tingui el segell de la seva casa assignada, pots afegir l'opció Multi-Segell per un suplement de 75-120€ segons la quantitat."
+      },
+      "q3": {
+        "pregunta": "Com són els pergamins d'amor?",
+        "resposta": "Cada pergamí és un poema original d'amor amb temàtica màgica. Venen enrollats individualment i lligats amb una cinta elegant. Són perfectes per deixar a cada seient o com a detall de taula."
+      },
+      "q4": {
+        "pregunta": "Quant temps triguen?",
+        "resposta": "El temps de producció és de 10-14 dies laborables un cop aprovada la prova digital. El Pack Premium inclou entrega prioritària en 7-10 dies. Per comandes urgents (+30%), podem entregar en 5-7 dies."
+      },
+      "q5": {
+        "pregunta": "Puc veure una prova abans?",
+        "resposta": "Sí! Abans d'imprimir, t'enviem una prova digital en PDF amb 3-4 sobres d'exemple. El Pack Premium inclou una prova física real abans de la producció completa."
+      },
+      "q6": {
+        "pregunta": "Feu enviaments a tota Espanya?",
+        "resposta": "Sí! Enviament a tot el territori nacional amb embalatge especial per protegir els lacres. Recollida gratuïta a Granollers. Enviament per missatger: 10-18€ segons pes."
+      }
+    }
+  },
+  "configuradorPage": {
+    "meta": {
+      "title": "Configurador d'Events | Calcula el teu Pressupost Online | Òrbita Events",
+      "description": "Configura el teu event pas a pas i rep pressupost a l'instant. Tria tipus d'event, opcions de so, llums, DJ i extres. Compara packs i personalitza la teva experiència.",
+      "ogTitle": "Configurador d'Events | El teu Pressupost en 3 Minuts",
+      "ogDescription": "Calcula el pressupost del teu event a l'instant. Compara opcions i personalitza tot."
+    },
+    "breadcrumbs": {
+      "home": "Inici",
+      "configurador": "Configurador"
+    }
+  },
+  "bodaHalloweenPage": {
+    "meta": {
+      "title": "Boda Halloween Barcelona | Especialistes en Bodes Temàtiques | Òrbita Events",
+      "description": "Especialistes en bodes Halloween a Barcelona i Catalunya. Decoració, efectes especials i DJ especialitzat. Pressupost sense compromís.",
+      "ogTitle": "Boda Halloween Barcelona | Especialistes en Bodes Temàtiques",
+      "ogDescription": "Tematització completa, DJ especialitzat, efectes especials. Fes la teva boda inoblidable."
+    }
+  },
+  "tematicaMonMagicPage": {
+    "meta": {
+      "title": "Boda Món Màgic amb Lacre Artesanal | Invitacions Escola de Màgia | Òrbita Events",
+      "description": "Invitacions de boda temàtica màgica amb lacre de cera REAL. Cartes personalitzades, sobres amb segell de les 5 cases màgiques. Fet a mà a Catalunya. Experiències úniques per casaments.",
+      "ogTitle": "Boda Món Màgic amb Lacre Artesanal Real",
+      "ogDescription": "Transforma el teu casament en una experiència màgica. Sobres segellats amb lacre de cera real, cartes personalitzades. El detall que els teus convidats guardaran per sempre."
+    }
+  },
+  "homePage": {
+    "meta": {
+      "title": "DJ Casaments i Events Barcelona | Discomòbil + Tematització | Òrbita Events",
+      "description": "DJ professional per a casaments, festes i events a Barcelona i Girona. Discomòbil amb so 4000W, llums LED, efectes especials i tematització única. Pressupost en 2h.",
+      "ogTitle": "DJ Casaments i Events Barcelona | Des de 400€ | Òrbita Events",
+      "ogDescription": "DJ + So + Llums + Efectes + Tematització. Barcelona i Girona."
+    }
+  },
+  "privacyPortal": {
+    "title": "Portal de Privacitat",
+    "subtitle": "Gestiona les teves dades personals d'acord amb el RGPD. Exerceix els teus drets de forma senzilla i segura.",
+    "requestTypes": {
+      "ACCESS": {
+        "title": "Accedir a les meves dades",
+        "description": "Obtenir una còpia de totes les dades personals que tenim sobre tu",
+        "label": "Dret d'Accés"
+      },
+      "PORTABILITY": {
+        "title": "Descarregar les meves dades",
+        "description": "Rebre les teves dades en format estructurat i llegible per màquina",
+        "label": "Dret de Portabilitat"
+      },
+      "RECTIFICATION": {
+        "title": "Rectificar dades",
+        "description": "Corregir dades personals inexactes o incompletes",
+        "label": "Dret de Rectificació",
+        "descriptionLabel": "Quines dades vols corregir i quin és el valor correcte?"
+      },
+      "ERASURE": {
+        "title": "Eliminar les meves dades",
+        "description": "Sol·licitar la supressió de les teves dades personals",
+        "label": "Dret de Supressió"
+      },
+      "OBJECTION": {
+        "title": "Oposar-me al tractament",
+        "description": "Aturar el tractament de les teves dades per finalitats específiques",
+        "label": "Dret d'Oposició",
+        "descriptionLabel": "A quin tractament vols oposar-te? (màrqueting, perfilat, etc.)"
+      },
+      "RESTRICTION": {
+        "title": "Limitar el tractament",
+        "description": "Restringir temporalment com utilitzem les teves dades",
+        "label": "Dret de Limitació",
+        "descriptionLabel": "Quin tractament vols limitar i per quin motiu?"
+      }
+    },
+    "selectStep": {
+      "heading": "Selecciona el teu dret",
+      "subheading": "Quin dret vols exercir?",
+      "infoBox": {
+        "title": "Com funciona?",
+        "text": "Selecciona el dret que vols exercir, omple les teves dades i rebràs un email per verificar la teva identitat. Tenim 30 dies per respondre a la teva sol·licitud."
+      }
+    },
+    "form": {
+      "backButton": "Tornar enrere",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "El teu nom i cognoms",
+      "email": "Correu electrònic",
+      "emailPlaceholder": "El teu email",
+      "emailHint": "Rebràs un email de verificació a aquesta adreça",
+      "phone": "Telèfon",
+      "phoneOptional": "(opcional)",
+      "phonePlaceholder": "+34 600 000 000",
+      "descriptionPlaceholder": "Descriu la teva sol·licitud amb detall...",
+      "characterCount": "{count}/1000",
+      "gdprConsent": "He llegit i accepto la",
+      "privacyPolicy": "Política de Privacitat",
+      "gdprConsentText": "i autoritzo el tractament de les meves dades per gestionar aquesta sol·licitud.",
+      "required": "*",
+      "submitButton": "Enviar sol·licitud",
+      "submitting": "Enviant...",
+      "errorDefault": "Error en processar la sol·licitud. Torna-ho a provar.",
+      "errorConnection": "Error de connexió. Comprova la teva connexió a internet i torna-ho a provar."
+    },
+    "success": {
+      "title": "Sol·licitud enviada!",
+      "message": "T'hem enviat un email de verificació a",
+      "nextStepsTitle": "Propers passos:",
+      "step1": "Obre el teu correu electrònic",
+      "step2": "Fes clic a l'enllaç de verificació",
+      "step3": "Processarem la teva sol·licitud",
+      "legalDeadline": "Termini legal de resposta:",
+      "legalDeadlineDays": "30 dies",
+      "importantTitle": "Important:",
+      "importantText": "Per protegir les teves dades, la sol·licitud no es processarà fins que verifiquis la teva identitat clicant l'enllaç de l'email. Revisa la carpeta de spam si no el trobes.",
+      "anotherRequestButton": "Fer una altra sol·licitud",
+      "backToHomeButton": "Tornar a l'inici"
+    },
+    "footer": {
+      "rgpdText": "Aquests drets estan garantits pel",
+      "rgpdName": "Reglament General de Protecció de Dades (RGPD)",
+      "lopdgddText": "i la",
+      "lopdgddName": "Llei Orgànica de Protecció de Dades (LOPDGDD)",
+      "privacyPolicy": "Política de Privacitat",
+      "cookiesPolicy": "Política de Cookies",
+      "legalNotice": "Avís Legal"
+    }
+  },
+  "admin": {
+    "common": {
+      "dashboard": "Dashboard",
+      "bookings": "Reserves",
+      "leads": "Leads",
+      "inventory": "Inventari",
+      "newBooking": "+ Nova Reserva",
+      "viewAll": "Veure tots →",
+      "viewAllFem": "Veure totes →",
+      "manage": "Gestionar →",
+      "back": "← Tornar",
+      "view": "Veure",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "cancel": "Cancel·lar",
+      "save": "Desar",
+      "add": "Afegir",
+      "adding": "Afegint...",
+      "loading": "Carregant...",
+      "error": "Error",
+      "success": "Èxit",
+      "unknown": "desconegut"
+    },
+    "status": {
+      "pending": "Pendent",
+      "confirmed": "Confirmada",
+      "preparing": "Preparant",
+      "completed": "Completada",
+      "cancelled": "Cancel·lada",
+      "new": "Nou",
+      "contacted": "Contactat",
+      "quoteSent": "Pressupost",
+      "won": "Guanyat",
+      "lost": "Perdut"
+    },
+    "eventTypes": {
+      "wedding": "💍 Boda",
+      "birthday": "🎂 Aniversari",
+      "corporate": "🎯 Corporatiu",
+      "communion": "⛪ Comunió",
+      "baptism": "👶 Bateig",
+      "graduation": "🎓 Graduació",
+      "anniversary": "💑 Aniversari",
+      "privateParty": "🎉 Festa Privada",
+      "other": "📋 Altre"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Resum d'activitat i estadístiques en temps real",
+      "errorLoading": "Error carregant el dashboard. Assegura't que la base de dades està configurada.",
+      "publicStats": "Estadístiques Públiques (Web)",
+      "eventsCompleted": "Events Realitzats",
+      "happyPeople": "Persones Feliçes",
+      "satisfaction": "Satisfacció",
+      "activeSince": "Actius Des de",
+      "total": "Total",
+      "thisMonth": "Aquest mes",
+      "toContact": "Per contactar",
+      "converted": "Convertits",
+      "confirmedFem": "Confirmades",
+      "pendingFem": "Pendents",
+      "completedFem": "Completades",
+      "billing": "Facturació",
+      "eventsCompletedLower": "Events completats",
+      "available": "Disponibles",
+      "inUse": "En ús",
+      "maintenance": "Manteniment",
+      "upcomingEvents": "Pròxims Events",
+      "noUpcomingEvents": "No hi ha events pròxims",
+      "recentLeads": "Últims Leads",
+      "noLeadsYet": "No hi ha leads encara"
+    },
+    "bookings": {
+      "title": "Reserves",
+      "subtitle": "Gestiona totes les reserves i events",
+      "noBookings": "Encara no hi ha reserves",
+      "bookingsAppearHere": "Les reserves creades apareixeran aquí",
+      "autoIncrement": "Quan una reserva passa a COMPLETED, les estadístiques públiques (events + persones) s'actualitzen automàticament.",
+      "ref": "Ref.",
+      "client": "Client",
+      "type": "Tipus",
+      "eventDate": "Data Event",
+      "location": "Ubicació",
+      "pack": "Pack",
+      "totalAmount": "Total",
+      "state": "Estat",
+      "actions": "Accions",
+      "extras": "extras",
+      "depositPending": "Paga pendent",
+      "booking": "Reserva",
+      "viewOriginalLead": "Veure lead original →"
+    },
+    "contacts": {
+      "title": "Gestió de Contactes",
+      "subtitle": "CRM - Afegeix contactes i inicia processos",
+      "withEvents": "Amb events",
+      "searchContact": "Buscar contacte...",
+      "addContact": "Afegir Contacte",
+      "noContacts": "No hi ha contactes",
+      "name": "Nom",
+      "contact": "Contacte",
+      "source": "Font",
+      "events": "Events",
+      "nameRequired": "Nom *",
+      "emailRequired": "Email *",
+      "phone": "Telèfon",
+      "city": "Ciutat",
+      "instagram": "Instagram",
+      "notes": "Notes",
+      "notAuthorized": "No autoritzat",
+      "errorLoading": "Error carregant contactes",
+      "unknownError": "Error desconegut",
+      "nameEmailRequired": "Nom i email són obligatoris",
+      "errorCreating": "Error creant contacte",
+      "errorStartingProcess": "Error iniciant procés",
+      "startProcess": "Iniciar procés",
+      "requestOpinion": "Demanar Opinió",
+      "postEventComplete": "Post-Event Complet",
+      "welcome": "Benvinguda",
+      "promotion": "Promoció"
     }
   }
 }

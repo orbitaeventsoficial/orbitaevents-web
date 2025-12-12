@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════
 // IMATGES - Fotos reals del casament
@@ -28,285 +28,54 @@ const IMATGES = {
 };
 
 // ═══════════════════════════════════════════════════════════════
-// CASES DE L'ESCOLA DE MÀGIA - Amb colors de lacre
+// CASES DE L'ESCOLA DE MÀGIA - Només dades estàtiques (colors, gradients)
+// Textos via t('monMagic.houses.{id}.nom') i t('monMagic.houses.{id}.descripcio')
 // ═══════════════════════════════════════════════════════════════
 
-const CASES_MAGIA = [
-  {
-    id: 'escola',
-    nom: 'Escola de Màgia',
-    nomEs: 'Escuela de Magia',
-    color: '#1A1A1A',
-    colorLacre: '#D4AF37',
-    gradient: 'from-amber-600 to-amber-800',
-    descripcio: "L'escut oficial amb les quatre cases",
-    descripcionEs: 'El escudo oficial con las cuatro casas',
-    animal: '🏰',
-  },
-  {
-    id: 'lleons',
-    nom: 'Casa dels Lleons',
-    nomEs: 'Casa de los Leones',
-    color: '#740001',
-    colorLacre: '#740001',
-    gradient: 'from-red-700 to-red-900',
-    descripcio: 'Per als valents de cor',
-    descripcionEs: 'Para los valientes de corazón',
-    animal: '🦁',
-  },
-  {
-    id: 'serps',
-    nom: 'Casa de les Serps',
-    nomEs: 'Casa de las Serpientes',
-    color: '#1A472A',
-    colorLacre: '#1A472A',
-    gradient: 'from-green-700 to-green-900',
-    descripcio: 'Per als ambiciosos i astuts',
-    descripcionEs: 'Para los ambiciosos y astutos',
-    animal: '🐍',
-  },
-  {
-    id: 'teixons',
-    nom: 'Casa dels Teixons',
-    nomEs: 'Casa de los Tejones',
-    color: '#FFD700',
-    colorLacre: '#1A1A1A',
-    gradient: 'from-yellow-500 to-amber-600',
-    descripcio: 'Per als lleials i justos',
-    descripcionEs: 'Para los leales y justos',
-    animal: '🦡',
-  },
-  {
-    id: 'aguiles',
-    nom: 'Casa de les Àguiles',
-    nomEs: 'Casa de las Águilas',
-    color: '#0E1A40',
-    colorLacre: '#0E1A40',
-    gradient: 'from-blue-800 to-blue-950',
-    descripcio: 'Per als savis i creatius',
-    descripcionEs: 'Para los sabios y creativos',
-    animal: '🦅',
-  },
+const CASES_MAGIA_DATA = [
+  { id: 'escola', color: '#1A1A1A', colorLacre: '#D4AF37', gradient: 'from-amber-600 to-amber-800', animal: '🏰' },
+  { id: 'lleons', color: '#740001', colorLacre: '#740001', gradient: 'from-red-700 to-red-900', animal: '🦁' },
+  { id: 'serps', color: '#1A472A', colorLacre: '#1A472A', gradient: 'from-green-700 to-green-900', animal: '🐍' },
+  { id: 'teixons', color: '#FFD700', colorLacre: '#1A1A1A', gradient: 'from-yellow-500 to-amber-600', animal: '🦡' },
+  { id: 'aguiles', color: '#0E1A40', colorLacre: '#0E1A40', gradient: 'from-blue-800 to-blue-950', animal: '🦅' },
 ];
 
 // ═══════════════════════════════════════════════════════════════
-// PRODUCTES - PREUS ACTUALITZATS
+// PRODUCTES - Només dades estàtiques (preus, emojis)
+// Textos via t('monMagic.productes.{key}.*')
 // ═══════════════════════════════════════════════════════════════
 
-const PRODUCTES = [
-  {
-    id: 'sobre-complet',
-    nom: 'Sobre Complet Escola de Màgia',
-    nomEs: 'Sobre Completo Escuela de Magia',
-    emoji: '✉️',
-    descripcio: "El pack d'invitació complet: sobre de paper pergamí amb text personalitzat, carta de la Directora de l'Escola, frame personalitzat per cada convidat, i lacre de cera artesanal amb el segell de la casa escollida.",
-    descripcionEs: 'El pack de invitación completo: sobre de papel pergamino con texto personalizado, carta de la Directora de la Escuela, frame personalizado para cada invitado, y lacre de cera artesanal con el sello de la casa elegida.',
-    preuUnitat: 10,
-    preuPack: 8,
-    packMinim: 50,
-    destacat: true,
-    caracteristiques: [
-      'Paper pergamí autèntic',
-      'Text personalitzat per cada convidat',
-      'Carta de la Directora de l\'Escola',
-      'Frame personalitzat amb nom i rol',
-      'Lacre de cera artesanal',
-      'Segell de la casa escollida',
-    ],
-    caracteristicasEs: [
-      'Papel pergamino auténtico',
-      'Texto personalizado para cada invitado',
-      'Carta de la Directora de la Escuela',
-      'Frame personalizado con nombre y rol',
-      'Lacre de cera artesanal',
-      'Sello de la casa elegida',
-    ],
-    ideal: 'Tot inclòs en un sol producte',
-    idealEs: 'Todo incluido en un solo producto',
-  },
-  {
-    id: 'pergami-amor',
-    nom: "Pergamí d'Amor Màgic",
-    nomEs: 'Pergamino de Amor Mágico',
-    emoji: '📜',
-    descripcio: "Poemes originals d'amor escrits en estil màgic, enrollats individualment i lligats amb una cinta elegant. Perfectes per decorar les taules o regalar als convidats.",
-    descripcionEs: 'Poemas originales de amor escritos en estilo mágico, enrollados individualmente y atados con una cinta elegante. Perfectos para decorar las mesas o regalar a los invitados.',
-    preuUnitat: 4,
-    preuPack: 3,
-    packMinim: 30,
-    caracteristiques: [
-      'Poemes originals i exclusius',
-      'Enrollats individualment',
-      'Lligats amb cinta elegant',
-      'Paper pergamí de qualitat',
-      '12 poemes en català + 12 en castellà',
-      'Perfecte com a record per convidats',
-    ],
-    caracteristicasEs: [
-      'Poemas originales y exclusivos',
-      'Enrollados individualmente',
-      'Atados con cinta elegante',
-      'Papel pergamino de calidad',
-      '12 poemas en catalán + 12 en castellano',
-      'Perfecto como recuerdo para invitados',
-    ],
-    ideal: 'Decoració de taules i records',
-    idealEs: 'Decoración de mesas y recuerdos',
-  },
-  {
-    id: 'cartell-decoratiu',
-    nom: 'Cartells Decoratius Escola de Màgia',
-    nomEs: 'Carteles Decorativos Escuela de Magia',
-    emoji: '🪧',
-    descripcio: "Cartells temàtics per decorar l'espai: Benvinguts a la Boda, Zona d'Entrenament de Vol, senyalització màgica...",
-    descripcionEs: 'Carteles temáticos para decorar el espacio: Bienvenidos a la Boda, Zona de Entrenamiento de Vuelo, señalización mágica...',
-    preuUnitat: 15,
-    preuPack: 12,
-    packMinim: 5,
-    caracteristiques: [
-      'Disseny estil Consell de Màgia',
-      'Impressió alta qualitat',
-      'Mida A3 o A2 disponible',
-      'Personalitzable amb noms',
-      'Escuts de les cases màgiques',
-      'Ideal per photocall',
-    ],
-    caracteristicasEs: [
-      'Diseño estilo Consejo de Magia',
-      'Impresión alta calidad',
-      'Tamaño A3 o A2 disponible',
-      'Personalizable con nombres',
-      'Escudos de las casas mágicas',
-      'Ideal para photocall',
-    ],
-    ideal: 'Decoració i photocall',
-    idealEs: 'Decoración y photocall',
-  },
+const PRODUCTES_DATA = [
+  { id: 'sobre-complet', key: 'sobreComplet', emoji: '✉️', preuUnitat: 10, preuPack: 8, packMinim: 50, destacat: true, numCaracteristiques: 6 },
+  { id: 'pergami-amor', key: 'pergamiAmor', emoji: '📜', preuUnitat: 4, preuPack: 3, packMinim: 30, numCaracteristiques: 6 },
+  { id: 'cartell-decoratiu', key: 'cartellDecoratiu', emoji: '🪧', preuUnitat: 15, preuPack: 12, packMinim: 5, numCaracteristiques: 6 },
 ];
 
 // ═══════════════════════════════════════════════════════════════
-// PACKS AMB DESCOMPTE
+// PACKS AMB DESCOMPTE - Només dades estàtiques (preus, emojis)
+// Textos via t('monMagic.packs.{key}.*')
 // ═══════════════════════════════════════════════════════════════
 
-const PACKS = [
-  {
-    id: 'pack-basic',
-    nom: 'Pack Bàsic "Carta Acceptació"',
-    nomEs: 'Pack Básico "Carta Aceptación"',
-    emoji: '📨',
-    descripcio: 'El pack essencial: sobres complets per a tots els convidats + 1 cartell de benvinguda personalitzat.',
-    descripcionEs: 'El pack esencial: sobres completos para todos los invitados + 1 cartel de bienvenida personalizado.',
-    preuPack50: 450,
-    preuPack80: 680,
-    preuPack100: 800,
-    estalviPercent: 10,
-    caracteristiques: [
-      'Sobres complets per a tots',
-      '1 cartell benvinguda A2',
-      'Lacre casa escollida',
-      'Revisió gratuïta abans imprimir',
-      'Entrega en 10-14 dies',
-    ],
-    caracteristicasEs: [
-      'Sobres completos para todos',
-      '1 cartel bienvenida A2',
-      'Lacre casa elegida',
-      'Revisión gratuita antes de imprimir',
-      'Entrega en 10-14 días',
-    ],
-    ideal: 'Casaments fins a 100 convidats',
-    idealEs: 'Bodas hasta 100 invitados',
-  },
-  {
-    id: 'pack-premium',
-    nom: 'Pack Premium "Gran Saló"',
-    nomEs: 'Pack Premium "Gran Salón"',
-    emoji: '🏆',
-    descripcio: 'Tot inclòs: sobres complets + pergamins per a cada taula + pack de 5 cartells decoratius + opció multi-segell.',
-    descripcionEs: 'Todo incluido: sobres completos + pergaminos para cada mesa + pack de 5 carteles decorativos + opción multi-sello.',
-    preuPack50: 650,
-    preuPack80: 950,
-    preuPack100: 1100,
-    estalviPercent: 15,
-    destacat: true,
-    caracteristiques: [
-      'Sobres complets per a tots',
-      'Pergamins per cada taula (1/taula)',
-      '5 cartells decoratius A2',
-      'Opció multi-segell inclosa',
-      'Entrega prioritària 7-10 dies',
-      'Prova física abans producció',
-    ],
-    caracteristicasEs: [
-      'Sobres completos para todos',
-      'Pergaminos para cada mesa (1/mesa)',
-      '5 carteles decorativos A2',
-      'Opción multi-sello incluida',
-      'Entrega prioritaria 7-10 días',
-      'Prueba física antes de producción',
-    ],
-    ideal: 'Casaments premium',
-    idealEs: 'Bodas premium',
-  },
+const PACKS_DATA = [
+  { id: 'pack-basic', key: 'basic', emoji: '📨', preuPack50: 450, preuPack80: 680, preuPack100: 800, estalviPercent: 10, numCaracteristiques: 5 },
+  { id: 'pack-premium', key: 'premium', emoji: '🏆', preuPack50: 650, preuPack80: 950, preuPack100: 1100, estalviPercent: 15, destacat: true, numCaracteristiques: 6 },
 ];
 
 // ═══════════════════════════════════════════════════════════════
-// EXTRA: MULTI-SEGELL
+// EXTRA: MULTI-SEGELL - Només preus (textos via t('monMagic.multiSegell.*'))
 // ═══════════════════════════════════════════════════════════════
 
 const EXTRA_MULTISEGELL = {
-  id: 'multi-segell',
-  nom: 'Opció Multi-Segell',
-  nomEs: 'Opción Multi-Sello',
-  descripcio: 'Cada convidat amb el lacre del color de la seva casa assignada',
-  descripcionEs: 'Cada invitado con el lacre del color de su casa asignada',
   preuExtra50: 75,
   preuExtra80: 100,
   preuExtra100: 120,
 };
 
 // ═══════════════════════════════════════════════════════════════
-// FAQS ACTUALITZADES
+// FAQS - Només keys, textos via t('monMagic.faqs.q{n}.*')
 // ═══════════════════════════════════════════════════════════════
 
-const FAQS = [
-  {
-    pregunta: 'Què inclou el "Sobre Complet"?',
-    resposta: "Inclou tot el que necessites: sobre de paper pergamí amb el nom del convidat, carta de la Directora de l'Escola, un frame personalitzat segons el rol del convidat (nuvi, pare, amic...), i lacre de cera artesanal amb el segell de la casa que escullis.",
-    preguntaEs: '¿Qué incluye el "Sobre Completo"?',
-    respuestaEs: 'Incluye todo lo que necesitas: sobre de papel pergamino con el nombre del invitado, carta de la Directora de la Escuela, un frame personalizado según el rol del invitado (novio, padre, amigo...), y lacre de cera artesanal con el sello de la casa que elijas.',
-  },
-  {
-    pregunta: 'Puc tenir sobres amb diferents segells?',
-    resposta: "Per defecte, tots els sobres porten el mateix segell (la casa que escullis). Si vols que cada convidat tingui el segell de la seva casa assignada, pots afegir l'opció Multi-Segell per un suplement de 75-120€ segons la quantitat.",
-    preguntaEs: '¿Puedo tener sobres con diferentes sellos?',
-    respuestaEs: 'Por defecto, todos los sobres llevan el mismo sello (la casa que elijas). Si quieres que cada invitado tenga el sello de su casa asignada, puedes añadir la opción Multi-Sello por un suplemento de 75-120€ según la cantidad.',
-  },
-  {
-    pregunta: "Com són els pergamins d'amor?",
-    resposta: "Cada pergamí és un poema original d'amor amb temàtica màgica. Venen enrollats individualment i lligats amb una cinta elegant. Són perfectes per deixar a cada seient o com a detall de taula.",
-    preguntaEs: '¿Cómo son los pergaminos de amor?',
-    respuestaEs: 'Cada pergamino es un poema original de amor con temática mágica. Vienen enrollados individualmente y atados con una cinta elegante. Son perfectos para dejar en cada asiento o como detalle de mesa.',
-  },
-  {
-    pregunta: 'Quant temps triguen?',
-    resposta: "El temps de producció és de 10-14 dies laborables un cop aprovada la prova digital. El Pack Premium inclou entrega prioritària en 7-10 dies. Per comandes urgents (+30%), podem entregar en 5-7 dies.",
-    preguntaEs: '¿Cuánto tiempo tardan?',
-    respuestaEs: 'El tiempo de producción es de 10-14 días laborables una vez aprobada la prueba digital. El Pack Premium incluye entrega prioritaria en 7-10 días. Para pedidos urgentes (+30%), podemos entregar en 5-7 días.',
-  },
-  {
-    pregunta: 'Puc veure una prova abans?',
-    resposta: "Sí! Abans d'imprimir, t'enviem una prova digital en PDF amb 3-4 sobres d'exemple. El Pack Premium inclou una prova física real abans de la producció completa.",
-    preguntaEs: '¿Puedo ver una prueba antes?',
-    respuestaEs: 'Sí. Antes de imprimir, te enviamos una prueba digital en PDF con 3-4 sobres de ejemplo. El Pack Premium incluye una prueba física real antes de la producción completa.',
-  },
-  {
-    pregunta: 'Feu enviaments a tota Espanya?',
-    resposta: 'Sí! Enviament a tot el territori nacional amb embalatge especial per protegir els lacres. Recollida gratuïta a Granollers. Enviament per missatger: 10-18€ segons pes.',
-    preguntaEs: '¿Hacéis envíos a toda España?',
-    respuestaEs: 'Sí. Envío a todo el territorio nacional con embalaje especial para proteger los lacres. Recogida gratuita en Granollers. Envío por mensajero: 10-18€ según peso.',
-  },
-];
+const FAQS_KEYS = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6'];
 
 // ═══════════════════════════════════════════════════════════════
 // COMPONENT: Veles Flotants (Gran Saló)
@@ -375,15 +144,14 @@ function FloatingCandles() {
 // ═══════════════════════════════════════════════════════════════
 
 export default function ProductesMonMagic() {
-  const locale = useLocale();
-  const isEs = locale === 'es';
+  const t = useTranslations('monMagic');
 
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [quantitat, setQuantitat] = useState<50 | 80 | 100>(80);
   const [casaSeleccionada, setCasaSeleccionada] = useState('escola');
   const [multiSegell, setMultiSegell] = useState(false);
 
-  const casaActual = CASES_MAGIA.find(c => c.id === casaSeleccionada) || CASES_MAGIA[0];
+  const casaActual = CASES_MAGIA_DATA.find(c => c.id === casaSeleccionada) || CASES_MAGIA_DATA[0];
 
   // Calcular preu extra multi-segell
   const preuMultiSegell = quantitat === 50 ? EXTRA_MULTISEGELL.preuExtra50
@@ -434,42 +202,38 @@ export default function ProductesMonMagic() {
             >
               <span className="animate-pulse">⚡</span>
               <span className="text-amber-300 font-medium">
-                Lacre Artesanal Real
+                {t('badge')}
               </span>
               <span className="animate-pulse">⚡</span>
             </motion.div>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
-              {isEs ? 'Tu Boda en el' : 'El Teu Casament al'}{' '}
+              {t('heroTitle')}{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">
-                Món Màgic
+                {t('heroTitleHighlight')}
               </span>
             </h1>
 
             <p className="text-xl md:text-2xl text-white/80 mb-4 max-w-3xl mx-auto">
-              {isEs
-                ? 'Sobres completos con carta de la Directora, texto personalizado y lacre artesanal.'
-                : 'Sobres complets amb carta de la Directora, text personalitzat i lacre artesanal.'}
+              {t('heroSubtitle')}
             </p>
 
             <p className="text-lg text-amber-400/80 mb-8">
-              {isEs
-                ? '✨ Desde 8€/sobre con todo incluido ✨'
-                : '✨ Des de 8€/sobre amb tot inclòs ✨'}
+              {t('heroPrice')}
             </p>
 
             <div className="flex justify-center gap-8 md:gap-12 flex-wrap mb-10">
               <div className="text-center">
                 <div className="text-4xl font-bold text-amber-400">10€</div>
-                <div className="text-white/50 text-sm">{isEs ? 'sobre completo' : 'sobre complet'}</div>
+                <div className="text-white/50 text-sm">{t('priceUnit')}</div>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-amber-400">8€</div>
-                <div className="text-white/50 text-sm">pack +50</div>
+                <div className="text-white/50 text-sm">{t('pricePackLabel')}</div>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-amber-400">5</div>
-                <div className="text-white/50 text-sm">{isEs ? 'casas' : 'cases'}</div>
+                <div className="text-white/50 text-sm">{t('housesLabel')}</div>
               </div>
             </div>
 
@@ -483,13 +247,13 @@ export default function ProductesMonMagic() {
                 href="#calculadora"
                 className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-lg rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all"
               >
-                {isEs ? 'Calcular presupuesto' : 'Calcula pressupost'} 🧮
+                {t('calculateBudget')} 🧮
               </Link>
               <Link
                 href="#casas"
                 className="px-8 py-4 bg-white/10 text-white font-bold text-lg rounded-full hover:bg-white/20 transition-all border border-white/20"
               >
-                {isEs ? 'Ver las 5 casas' : 'Veure les 5 cases'} 🏰
+                {t('seeHouses')} 🏰
               </Link>
             </motion.div>
           </motion.div>
@@ -506,17 +270,15 @@ export default function ProductesMonMagic() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              {isEs ? 'Elige tu Casa' : 'Escull la Teva Casa'}
+              {t('chooseCasa')}
             </h2>
             <p className="text-white/60 max-w-2xl mx-auto">
-              {isEs
-                ? 'Todos los sobres de tu pedido llevarán el lacre de la casa que elijas. ¿Quieres sellos diferentes? Añade la opción Multi-Sello.'
-                : "Tots els sobres del teu encàrrec portaran el lacre de la casa que escullis. Vols segells diferents? Afegeix l'opció Multi-Segell."}
+              {t('chooseCasaDesc')}
             </p>
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-4xl mx-auto mb-8">
-            {CASES_MAGIA.map((casa, index) => (
+            {CASES_MAGIA_DATA.map((casa, index) => (
               <motion.button
                 key={casa.id}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -531,9 +293,9 @@ export default function ProductesMonMagic() {
                 }`}
               >
                 <div className="text-4xl mb-2">{casa.animal}</div>
-                <div className="text-white font-bold">{casa.nom}</div>
+                <div className="text-white font-bold">{t(`houses.${casa.id}.nom`)}</div>
                 <div className="text-white/50 text-xs mt-1">
-                  {isEs ? casa.descripcionEs : casa.descripcio}
+                  {t(`houses.${casa.id}.descripcio`)}
                 </div>
                 {casaSeleccionada === casa.id && (
                   <motion.div
@@ -563,10 +325,10 @@ export default function ProductesMonMagic() {
               {casaActual.animal}
             </div>
             <h3 className="text-xl font-bold text-white mb-2">
-              Lacre {casaActual.nom}
+              {t('lacreTitle')} {t(`houses.${casaActual.id}.nom`)}
             </h3>
             <p className="text-white/60 text-sm">
-              {isEs ? casaActual.descripcionEs : casaActual.descripcio}
+              {t(`houses.${casaActual.id}.descripcio`)}
             </p>
           </motion.div>
         </div>
@@ -576,16 +338,14 @@ export default function ProductesMonMagic() {
       <section className="py-16 border-t border-white/10">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-white text-center mb-4">
-            {isEs ? 'Productos' : 'Productes'}
+            {t('products')}
           </h2>
           <p className="text-white/60 text-center mb-12 max-w-2xl mx-auto">
-            {isEs
-              ? 'Compra por unidades o aprovecha los packs con descuento'
-              : 'Compra per unitats o aprofita els packs amb descompte'}
+            {t('productsDesc')}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {PRODUCTES.map((producte, index) => (
+            {PRODUCTES_DATA.map((producte, index) => (
               <motion.div
                 key={producte.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -600,7 +360,7 @@ export default function ProductesMonMagic() {
               >
                 {producte.destacat && (
                   <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-amber-500 to-orange-500 text-black text-center py-2 text-sm font-bold">
-                    ⭐ {isEs ? 'MÁS VENDIDO' : 'MÉS VENUT'}
+                    ⭐ {t('mostSold')}
                   </div>
                 )}
 
@@ -608,17 +368,17 @@ export default function ProductesMonMagic() {
                   <div className="text-5xl mb-4 text-center">{producte.emoji}</div>
 
                   <h3 className="text-xl font-bold text-white mb-2 text-center">
-                    {isEs ? producte.nomEs : producte.nom}
+                    {t(`productes.${producte.key}.nom`)}
                   </h3>
                   <p className="text-white/60 text-sm mb-4 text-center line-clamp-3">
-                    {isEs ? producte.descripcionEs : producte.descripcio}
+                    {t(`productes.${producte.key}.descripcio`)}
                   </p>
 
                   <ul className="space-y-1.5 mb-6">
-                    {(isEs ? producte.caracteristicasEs : producte.caracteristiques).slice(0, 4).map((item, i) => (
+                    {Array.from({ length: 4 }).map((_, i) => (
                       <li key={i} className="text-white/70 text-sm flex items-start gap-2">
                         <span className="text-amber-400 mt-0.5">✓</span>
-                        <span>{item}</span>
+                        <span>{t(`productes.${producte.key}.caracteristiques.${i}`)}</span>
                       </li>
                     ))}
                   </ul>
@@ -626,7 +386,7 @@ export default function ProductesMonMagic() {
                   <div className="bg-black/20 rounded-xl p-4 mb-4">
                     <div className="flex justify-between items-end">
                       <div>
-                        <span className="text-white/50 text-xs block">{isEs ? 'Por unidad' : 'Per unitat'}</span>
+                        <span className="text-white/50 text-xs block">{t('perUnit')}</span>
                         <span className="text-2xl font-bold text-white">{producte.preuUnitat}€</span>
                       </div>
                       <div className="text-right">
@@ -644,7 +404,7 @@ export default function ProductesMonMagic() {
                         : 'bg-white/10 text-white hover:bg-white/20'
                     }`}
                   >
-                    {isEs ? 'Pedir presupuesto' : 'Demana pressupost'}
+                    {t('askBudget')}
                   </Link>
                 </div>
               </motion.div>
@@ -657,16 +417,14 @@ export default function ProductesMonMagic() {
       <section className="py-16 border-t border-white/10 bg-gradient-to-b from-amber-950/20 to-transparent">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-white text-center mb-4">
-            {isEs ? 'Packs con Descuento' : 'Packs amb Descompte'}
+            {t('packsDiscount')}
           </h2>
           <p className="text-white/60 text-center mb-12 max-w-2xl mx-auto">
-            {isEs
-              ? 'Ahorra hasta un 15% con nuestros packs completos'
-              : 'Estalvia fins a un 15% amb els nostres packs complets'}
+            {t('packsDiscountDesc')}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {PACKS.map((pack, index) => (
+            {PACKS_DATA.map((pack, index) => (
               <motion.div
                 key={pack.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -681,7 +439,7 @@ export default function ProductesMonMagic() {
               >
                 {pack.destacat && (
                   <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-black text-center py-2 font-bold">
-                    🏆 {isEs ? 'RECOMENDADO' : 'RECOMANAT'} - {pack.estalviPercent}% {isEs ? 'AHORRO' : 'ESTALVI'}
+                    🏆 {t('recommended')} - {pack.estalviPercent}% {t('saving')}
                   </div>
                 )}
 
@@ -690,23 +448,23 @@ export default function ProductesMonMagic() {
                     <span className="text-4xl">{pack.emoji}</span>
                     <div>
                       <h3 className="text-xl font-bold text-white">
-                        {isEs ? pack.nomEs : pack.nom}
+                        {t(`packs.${pack.key}.nom`)}
                       </h3>
                       {!pack.destacat && (
-                        <span className="text-amber-400 text-sm">{pack.estalviPercent}% {isEs ? 'ahorro' : 'estalvi'}</span>
+                        <span className="text-amber-400 text-sm">{pack.estalviPercent}% {t('saving')}</span>
                       )}
                     </div>
                   </div>
 
                   <p className="text-white/60 text-sm mb-6">
-                    {isEs ? pack.descripcionEs : pack.descripcio}
+                    {t(`packs.${pack.key}.descripcio`)}
                   </p>
 
                   <ul className="space-y-2 mb-6">
-                    {(isEs ? pack.caracteristicasEs : pack.caracteristiques).map((item, i) => (
+                    {Array.from({ length: pack.numCaracteristiques }).map((_, i) => (
                       <li key={i} className="text-white/80 text-sm flex items-start gap-2">
                         <span className="text-amber-400">✓</span>
-                        <span>{item}</span>
+                        <span>{t(`packs.${pack.key}.caracteristiques.${i}`)}</span>
                       </li>
                     ))}
                   </ul>
@@ -715,15 +473,15 @@ export default function ProductesMonMagic() {
                   <div className="bg-black/30 rounded-xl p-4 mb-4">
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className={`p-2 rounded-lg ${quantitat === 50 ? 'bg-amber-500/30 ring-1 ring-amber-500' : ''}`}>
-                        <div className="text-white/50 text-xs">50 conv.</div>
+                        <div className="text-white/50 text-xs">50 {t('guests')}</div>
                         <div className="text-lg font-bold text-white">{pack.preuPack50}€</div>
                       </div>
                       <div className={`p-2 rounded-lg ${quantitat === 80 ? 'bg-amber-500/30 ring-1 ring-amber-500' : ''}`}>
-                        <div className="text-white/50 text-xs">80 conv.</div>
+                        <div className="text-white/50 text-xs">80 {t('guests')}</div>
                         <div className="text-lg font-bold text-white">{pack.preuPack80}€</div>
                       </div>
                       <div className={`p-2 rounded-lg ${quantitat === 100 ? 'bg-amber-500/30 ring-1 ring-amber-500' : ''}`}>
-                        <div className="text-white/50 text-xs">100 conv.</div>
+                        <div className="text-white/50 text-xs">100 {t('guests')}</div>
                         <div className="text-lg font-bold text-white">{pack.preuPack100}€</div>
                       </div>
                     </div>
@@ -737,7 +495,7 @@ export default function ProductesMonMagic() {
                         : 'bg-white/10 text-white hover:bg-white/20'
                     }`}
                   >
-                    {isEs ? 'Solicitar pack' : "Sol·licitar pack"}
+                    {t('requestPack')}
                   </Link>
                 </div>
               </motion.div>
@@ -751,10 +509,10 @@ export default function ProductesMonMagic() {
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto bg-white/5 rounded-2xl p-8 border border-amber-500/20">
             <h2 className="text-2xl font-bold text-white text-center mb-2">
-              🧮 {isEs ? 'Calculadora Rápida' : 'Calculadora Ràpida'}
+              🧮 {t('calculator')}
             </h2>
             <p className="text-center text-white/50 mb-6">
-              {isEs ? 'Selecciona tu cantidad de invitados' : 'Selecciona la teva quantitat de convidats'}
+              {t('calculatorDesc')}
             </p>
 
             {/* Selector quantitat */}
@@ -769,7 +527,7 @@ export default function ProductesMonMagic() {
                       : 'bg-white/10 text-white hover:bg-white/20'
                   }`}
                 >
-                  {q} {isEs ? 'inv.' : 'conv.'}
+                  {q} {t('guests')}
                 </button>
               ))}
             </div>
@@ -785,11 +543,11 @@ export default function ProductesMonMagic() {
                 />
                 <div className="flex-1">
                   <span className="text-white font-medium">
-                    🎨 {isEs ? EXTRA_MULTISEGELL.nomEs : EXTRA_MULTISEGELL.nom}
+                    🎨 {t('multiSegell.nom')}
                   </span>
                   <span className="text-purple-400 ml-2">(+{preuMultiSegell}€)</span>
                   <p className="text-white/50 text-sm mt-1">
-                    {isEs ? EXTRA_MULTISEGELL.descripcionEs : EXTRA_MULTISEGELL.descripcio}
+                    {t('multiSegell.descripcio')}
                   </p>
                 </div>
               </label>
@@ -798,13 +556,13 @@ export default function ProductesMonMagic() {
             {/* Resultats */}
             <div className="space-y-3 mb-6">
               <div className="flex justify-between items-center p-3 bg-black/20 rounded-lg">
-                <span className="text-white/70">📨 {isEs ? 'Pack Básico' : 'Pack Bàsic'}</span>
+                <span className="text-white/70">📨 {t('packBasic')}</span>
                 <span className="text-white font-bold">
                   {(quantitat === 50 ? 450 : quantitat === 80 ? 680 : 800) + (multiSegell ? preuMultiSegell : 0)}€
                 </span>
               </div>
               <div className="flex justify-between items-center p-3 bg-amber-900/30 rounded-lg ring-1 ring-amber-500/50">
-                <span className="text-white">🏆 {isEs ? 'Pack Premium' : 'Pack Premium'}</span>
+                <span className="text-white">🏆 {t('packPremium')}</span>
                 <span className="text-amber-400 font-bold text-xl">
                   {(quantitat === 50 ? 650 : quantitat === 80 ? 950 : 1100) + (multiSegell ? preuMultiSegell : 0)}€
                 </span>
@@ -815,9 +573,7 @@ export default function ProductesMonMagic() {
               href={`/contacto?pack=premium&quantitat=${quantitat}&casa=${casaSeleccionada}${multiSegell ? '&multisegell=true' : ''}`}
               className="block w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-xl text-center text-lg hover:shadow-lg hover:shadow-amber-500/30 transition-all"
             >
-              {isEs
-                ? `Solicitar presupuesto para ${quantitat} invitados`
-                : `Sol·licitar pressupost per ${quantitat} convidats`}
+              {t('requestBudgetFor', { count: quantitat })}
             </Link>
           </div>
         </div>
@@ -827,12 +583,10 @@ export default function ProductesMonMagic() {
       <section className="py-16 border-t border-white/10">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-white text-center mb-4">
-            📸 {isEs ? 'Fotos Reales de Bodas' : 'Fotos Reals de Casaments'}
+            📸 {t('realPhotos')}
           </h2>
           <p className="text-white/60 text-center mb-10 max-w-2xl mx-auto">
-            {isEs
-              ? 'Mira cómo quedaron nuestros sobres en bodas reales. ¡La magia es palpable!'
-              : 'Mira com van quedar els nostres sobres en casaments reals. La màgia és palpable!'}
+            {t('realPhotosDesc')}
           </p>
 
           {/* Grid de fotos */}
@@ -846,17 +600,17 @@ export default function ProductesMonMagic() {
             >
               <Image
                 src={IMATGES.sobreComplet}
-                alt="Sobre màgic obert amb carta de la Directora"
+                alt={t('altSobreObert')}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
                 <span className="bg-amber-500 text-black px-3 py-1 rounded-full text-sm font-bold">
-                  ⭐ {isEs ? 'Más vendido' : 'Més venut'}
+                  ⭐ {t('mostSold')}
                 </span>
                 <p className="text-white font-medium mt-2">
-                  {isEs ? 'Sobre completo con carta' : 'Sobre complet amb carta'}
+                  {t('completeLetter')}
                 </p>
               </div>
             </motion.div>
@@ -871,7 +625,7 @@ export default function ProductesMonMagic() {
             >
               <Image
                 src={IMATGES.sobrePlat}
-                alt="Sobre personalitzat al plat"
+                alt={t('altSobrePlat')}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -887,14 +641,14 @@ export default function ProductesMonMagic() {
             >
               <Image
                 src={IMATGES.provaSocial}
-                alt="Convidada llegint carta màgica"
+                alt={t('altConvidada')}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-2 left-2 right-2">
                 <span className="text-white/90 text-xs">
-                  {isEs ? '❤️ La reacción real' : '❤️ La reacció real'}
+                  {t('realReaction')}
                 </span>
               </div>
             </motion.div>
@@ -909,7 +663,7 @@ export default function ProductesMonMagic() {
             >
               <Image
                 src={IMATGES.mussol}
-                alt="Mussol amb pergamins"
+                alt={t('altMussol')}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -925,7 +679,7 @@ export default function ProductesMonMagic() {
             >
               <Image
                 src={IMATGES.escombres}
-                alt="Decoració esportiva màgica"
+                alt={t('altEscombres')}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -935,7 +689,7 @@ export default function ProductesMonMagic() {
           {/* Badge de fotos reals */}
           <div className="text-center mt-8">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-white/70 text-sm">
-              📷 {isEs ? 'Todas las fotos son de bodas reales de nuestros clientes' : 'Totes les fotos són de casaments reals dels nostres clients'}
+              📷 {t('allPhotosReal')}
             </span>
           </div>
         </div>
@@ -945,11 +699,11 @@ export default function ProductesMonMagic() {
       <section className="py-16 border-t border-white/10">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-white text-center mb-8">
-            {isEs ? 'Preguntas Frecuentes' : 'Preguntes Freqüents'}
+            {t('faq')}
           </h2>
 
           <div className="max-w-2xl mx-auto space-y-3">
-            {FAQS.map((faq, index) => (
+            {FAQS_KEYS.map((faqKey, index) => (
               <motion.div
                 key={index}
                 className="bg-white/5 rounded-xl overflow-hidden"
@@ -959,7 +713,7 @@ export default function ProductesMonMagic() {
                   className="w-full px-6 py-4 text-left flex items-center justify-between"
                 >
                   <span className="text-white font-medium">
-                    {isEs ? faq.preguntaEs : faq.pregunta}
+                    {t(`faqs.${faqKey}.pregunta`)}
                   </span>
                   <span className="text-amber-400 text-xl">
                     {faqOpen === index ? '−' : '+'}
@@ -974,7 +728,7 @@ export default function ProductesMonMagic() {
                       className="px-6 pb-4"
                     >
                       <p className="text-white/70">
-                        {isEs ? faq.respuestaEs : faq.resposta}
+                        {t(`faqs.${faqKey}.resposta`)}
                       </p>
                     </motion.div>
                   )}
@@ -989,25 +743,23 @@ export default function ProductesMonMagic() {
       <section className="py-16 border-t border-white/10">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
-            🪄 {isEs ? '¿Quieres el pack completo de tematización?' : 'Vols el pack complet de tematització?'}
+            🪄 {t('wantCompletePack')}
           </h2>
           <p className="text-white/70 mb-8 max-w-xl mx-auto">
-            {isEs
-              ? 'La papelería es solo el principio. Combínala con DJ, efectos especiales, iluminación y decoración para crear una experiencia mágica completa.'
-              : "La papereria és només el principi. Combina-la amb DJ, efectes especials, il·luminació i decoració per crear una experiència màgica completa."}
+            {t('wantCompletePackDesc')}
           </p>
           <div className="flex justify-center gap-4 flex-wrap">
             <Link
               href="/configurador?tema=monmagic"
               className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/25 transition-all"
             >
-              {isEs ? 'Configura evento completo' : 'Configura event complet'} ⚡
+              {t('configureComplete')} ⚡
             </Link>
             <Link
               href="/contacto"
               className="px-8 py-4 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all"
             >
-              {isEs ? 'Hablar con nosotros' : 'Parlar amb nosaltres'}
+              {t('talkToUs')}
             </Link>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_CONFIG, getWhatsAppUrl } from '@/config/site-config';
 import { Ghost, Skull, Moon, Sparkles, Star, CheckCircle, Calendar, MessageCircle, ArrowRight } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,60 +22,20 @@ export const metadata: Metadata = {
   },
 };
 
-const FEATURES = [
-  {
-    icon: Ghost,
-    title: 'Tematización Completa',
-    description: 'Decoración inmersiva con elementos Halloween: calabazas, telarañas, iluminación tenebrosa y más.',
-  },
-  {
-    icon: Sparkles,
-    title: 'Efectos Especiales',
-    description: 'Humo bajo para el primer baile, luces espectaculares, efectos de terror controlados.',
-  },
-  {
-    icon: Moon,
-    title: 'DJ Especializado',
-    description: 'Playlist personalizada mezclando tus canciones favoritas con clásicos de Halloween.',
-  },
-  {
-    icon: Skull,
-    title: 'Experiencia Única',
-    description: 'Especialistes en bodes Halloween. Sabem exactament com crear l\'atmosfera perfecta.',
-  },
-];
+const FEATURE_ICONS = {
+  theming: Ghost,
+  effects: Sparkles,
+  dj: Moon,
+  experience: Skull,
+};
 
-const TESTIMONIALS = [
-  {
-    name: 'Lorena & Carles',
-    event: 'Casament Món Màgic',
-    quote: 'Van transformar el nostre casament en una experiència màgica inoblidable. Els convidats encara en parlen!',
-    rating: 5,
-  },
-];
-
-const FAQ = [
-  {
-    question: '¿Qué incluye el servicio de boda Halloween?',
-    answer: 'DJ profesional, iluminación temática, efectos especiales (humo, luces), decoración básica Halloween, coordinación del evento y playlist personalizada.',
-  },
-  {
-    question: '¿Puedo hacer una boda Halloween en cualquier época del año?',
-    answer: '¡Por supuesto! Aunque octubre es el mes estrella, realizamos bodas temáticas Halloween durante todo el año.',
-  },
-  {
-    question: '¿Cuánto cuesta una boda Halloween?',
-    answer: 'Los precios varían según el nivel de tematización. Desde 2.900€ para un pack básico hasta 5.500€+ para tematización completa.',
-  },
-  {
-    question: '¿Trabajáis fuera de Barcelona?',
-    answer: 'Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Transporte incluido hasta 25km desde Granollers.',
-  },
-];
-
-export default function BodaHalloweenPage() {
+export default async function BodaHalloweenPage() {
+  const t = await getTranslations('bodaHalloween');
   const whatsappUrl = getWhatsAppUrl('bodas');
-  
+
+  const features = ['theming', 'effects', 'dj', 'experience'] as const;
+  const faqItems = ['q1', 'q2', 'q3', 'q4'] as const;
+
   return (
     <>
       {/* Schema.org JSON-LD */}
@@ -109,7 +70,7 @@ export default function BodaHalloweenPage() {
         <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
           {/* Background con gradiente Halloween */}
           <div className="absolute inset-0 bg-gradient-to-br from-orange-950/40 via-bg-main to-purple-950/30" />
-          
+
           {/* Elementos decorativos */}
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute top-20 left-10 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl animate-pulse" />
@@ -122,23 +83,22 @@ export default function BodaHalloweenPage() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 border border-orange-500/30 rounded-full mb-8">
                 <Ghost className="w-5 h-5 text-orange-400" />
-                <span className="text-orange-300 font-medium">Especialistes en Bodes Temàtiques</span>
+                <span className="text-orange-300 font-medium">{t('badge')}</span>
               </div>
 
               {/* Título */}
               <h1 className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">
-                Tu Boda{' '}
+                {t('heroTitle1')}{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-red-500">
-                  Halloween
+                  {t('heroTitle2')}
                 </span>
                 <br />
-                Será Inolvidable
+                {t('heroTitle3')}
               </h1>
 
               {/* Subtítulo */}
               <p className="text-xl md:text-2xl text-white/70 mb-8 max-w-2xl mx-auto">
-                Especialistas en bodas temáticas en Barcelona y Catalunya. 
-                Creamos la atmósfera terroríficamente perfecta para tu día especial.
+                {t('heroSubtitle')}
               </p>
 
               {/* CTAs */}
@@ -148,7 +108,7 @@ export default function BodaHalloweenPage() {
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl transition-all hover:scale-105 shadow-lg shadow-orange-500/30"
                 >
                   <Calendar className="w-5 h-5" />
-                  Pedir Presupuesto Gratis
+                  {t('ctaBudget')}
                 </Link>
                 <a
                   href={whatsappUrl}
@@ -157,7 +117,7 @@ export default function BodaHalloweenPage() {
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl border border-white/20 transition-all"
                 >
                   <MessageCircle className="w-5 h-5" />
-                  WhatsApp Directo
+                  {t('ctaWhatsapp')}
                 </a>
               </div>
 
@@ -165,15 +125,15 @@ export default function BodaHalloweenPage() {
               <div className="flex flex-wrap justify-center gap-6 mt-12 text-white/60 text-sm">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-400" />
-                  <span>+{SITE_CONFIG.stats.eventsCompleted} eventos realizados</span>
+                  <span>+{SITE_CONFIG.stats.eventsCompleted} {t('trustEvents')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Star className="w-4 h-4 text-yellow-400" />
-                  <span>{SITE_CONFIG.stats.recommendRate}% nos recomiendan</span>
+                  <span>{SITE_CONFIG.stats.recommendRate}% {t('trustRecommend')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-400" />
-                  <span>Respuesta en &lt;2h</span>
+                  <span>{t('trustResponse')}</span>
                 </div>
               </div>
             </div>
@@ -185,57 +145,29 @@ export default function BodaHalloweenPage() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-white mb-4">
-                ¿Por Qué Elegir Òrbita para tu Boda Halloween?
+                {t('featuresTitle')}
               </h2>
               <p className="text-xl text-white/60 max-w-2xl mx-auto">
-                No somos solo DJs. Somos especialistas en crear experiencias temáticas completas.
+                {t('featuresSubtitle')}
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {FEATURES.map((feature, idx) => (
-                <div
-                  key={idx}
-                  className="bg-bg-card border border-border rounded-2xl p-8 hover:border-orange-500/50 transition-all group"
-                >
-                  <div className="w-14 h-14 bg-orange-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <feature.icon className="w-7 h-7 text-orange-400" />
+              {features.map((featureKey) => {
+                const Icon = FEATURE_ICONS[featureKey];
+                return (
+                  <div
+                    key={featureKey}
+                    className="bg-bg-card border border-border rounded-2xl p-8 hover:border-orange-500/50 transition-all group"
+                  >
+                    <div className="w-14 h-14 bg-orange-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                      <Icon className="w-7 h-7 text-orange-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">{t(`features.${featureKey}.title`)}</h3>
+                    <p className="text-white/60">{t(`features.${featureKey}.description`)}</p>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                  <p className="text-white/60">{feature.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* SOCIAL PROOF */}
-        <section className="py-24">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-white mb-4">
-                Lo Que Dicen Nuestras Parejas
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {TESTIMONIALS.map((testimonial, idx) => (
-                <div
-                  key={idx}
-                  className="bg-bg-card border border-border rounded-2xl p-8"
-                >
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-white/80 text-lg mb-6 italic">"{testimonial.quote}"</p>
-                  <div>
-                    <div className="font-bold text-white">{testimonial.name}</div>
-                    <div className="text-white/50 text-sm">{testimonial.event}</div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
@@ -245,18 +177,18 @@ export default function BodaHalloweenPage() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-white mb-4">
-                Preguntas Frecuentes
+                {t('faqTitle')}
               </h2>
             </div>
 
             <div className="max-w-3xl mx-auto space-y-4">
-              {FAQ.map((item, idx) => (
+              {faqItems.map((faqKey) => (
                 <div
-                  key={idx}
+                  key={faqKey}
                   className="bg-bg-card border border-border rounded-xl p-6"
                 >
-                  <h3 className="text-lg font-bold text-white mb-2">{item.question}</h3>
-                  <p className="text-white/60">{item.answer}</p>
+                  <h3 className="text-lg font-bold text-white mb-2">{t(`faq.${faqKey}`)}</h3>
+                  <p className="text-white/60">{t(`faq.a${faqKey.slice(1)}`)}</p>
                 </div>
               ))}
             </div>
@@ -269,24 +201,24 @@ export default function BodaHalloweenPage() {
             <div className="max-w-4xl mx-auto text-center bg-gradient-to-br from-orange-950/50 to-purple-950/50 border border-orange-500/30 rounded-3xl p-12">
               <Ghost className="w-16 h-16 text-orange-400 mx-auto mb-6" />
               <h2 className="text-4xl font-bold text-white mb-4">
-                ¿Listo para una Boda Terroríficamente Perfecta?
+                {t('finalCtaTitle')}
               </h2>
               <p className="text-xl text-white/70 mb-8">
-                Contacta ahora y recibe tu presupuesto personalizado en menos de 2 horas.
+                {t('finalCtaSubtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/contacto"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl transition-all hover:scale-105 shadow-lg shadow-orange-500/30"
                 >
-                  Quiero mi Presupuesto
+                  {t('finalCtaBudget')}
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <a
                   href={`tel:${SITE_CONFIG.business.phone}`}
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl border border-white/20 transition-all"
                 >
-                  Llamar: {SITE_CONFIG.business.phoneDisplay}
+                  {t('finalCtaCall')} {SITE_CONFIG.business.phoneDisplay}
                 </a>
               </div>
             </div>

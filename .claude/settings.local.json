@@ -21,7 +21,10 @@
       "Bash(dir:*)",
       "Bash(findstr:*)",
       "Bash(timeout /t 120 /nobreak)",
-      "Bash(del \"C:\\Users\\Lore\\Desktop\\orbitaevents\\lib\\navigation.ts\")"
+      "Bash(del \"C:\\Users\\Lore\\Desktop\\orbitaevents\\lib\\navigation.ts\")",
+      "Bash(node -e:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)"
     ]
   }
 }

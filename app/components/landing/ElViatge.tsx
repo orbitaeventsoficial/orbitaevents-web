@@ -346,10 +346,10 @@ function Portal({ onComplete, t }: { onComplete: () => void; t: (key: string) =>
               transition={{ duration: 3, repeat: Infinity }}
               style={{ backgroundSize: '200% 200%' }}
             >
-              ÒRBITA
+              {t('portal.logoText')}
             </motion.h1>
             <p className="text-center text-white/60 text-sm tracking-[0.5em] mt-2">
-              EVENTS
+              {t('portal.logoSubtext')}
             </p>
           </motion.div>
         )}
@@ -445,7 +445,7 @@ function LaPromesa({ t }: { t: (key: string) => string }) {
           >
             <Image
               src={heroImages[currentImage]}
-              alt="Event Òrbita"
+              alt={t('promesa.heroImageAlt')}
               fill
               className="object-cover"
               priority

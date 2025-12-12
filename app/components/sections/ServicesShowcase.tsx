@@ -59,17 +59,11 @@ const services: Service[] = [
   },
 ];
 
-// Títols emocionals per cada món
-const EMOTIONAL_SUBTITLES: Record<string, string> = {
-  weddings: "L'amor celebrat",
-  parties: "L'alegria compartida",
-  mobile: "La música on vulguis",
-  corporate: "L'impacte memorable",
-};
 
 // Card 3D Individual amb seguiment del mouse
 const ServiceCard3D = ({ service }: { service: Service }) => {
   const t = useTranslations('services');
+  const tShowcase = useTranslations('servicesShowcase');
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -189,7 +183,7 @@ const ServiceCard3D = ({ service }: { service: Service }) => {
 
               {/* Subtítol emocional */}
               <p className="text-white/60 text-lg italic mb-3">
-                {EMOTIONAL_SUBTITLES[service.id] || t(`${service.translationKey}.tagline`)}
+                {tShowcase(`emotionalSubtitles.${service.id}`)}
               </p>
 
               {/* CTA */}
@@ -200,7 +194,7 @@ const ServiceCard3D = ({ service }: { service: Service }) => {
                 }}
                 transition={{ duration: 0.2 }}
               >
-                <span className="text-sm sm:text-base">Explora</span>
+                <span className="text-sm sm:text-base">{tShowcase('explore')}</span>
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform" />
               </motion.div>
             </motion.div>
@@ -229,7 +223,7 @@ const ServiceCard3D = ({ service }: { service: Service }) => {
 
 // Component principal
 export default function ServicesShowcase() {
-  const _t = useTranslations('common');
+  const t = useTranslations('servicesShowcase');
 
   return (
     <section className="relative py-20 sm:py-32 bg-[#030303] overflow-hidden">
@@ -248,13 +242,13 @@ export default function ServicesShowcase() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
-              Cada event és un{' '}
+              {t('sectionTitle')}{' '}
               <span className="bg-gradient-to-r from-amber-400 via-fuchsia-400 to-purple-400 bg-clip-text text-transparent">
-                univers
+                {t('sectionTitleHighlight')}
               </span>
             </h2>
             <p className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto">
-              Explora les possibilitats. Troba el teu món.
+              {t('sectionSubtitle')}
             </p>
           </motion.div>
         </div>

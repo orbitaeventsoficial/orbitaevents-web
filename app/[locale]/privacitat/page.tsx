@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import {
   Shield, Download, Trash2, Edit3, Eye, Mail,
   CheckCircle, AlertCircle, ArrowRight, Lock,
@@ -22,75 +23,6 @@ interface RequestTypeConfig {
   requiresDescription: boolean;
   descriptionLabel?: string;
 }
-
-const REQUEST_TYPES: RequestTypeConfig[] = [
-  {
-    type: 'ACCESS',
-    icon: Eye,
-    title: 'Accedir a les meves dades',
-    description: 'Obtenir una còpia de totes les dades personals que tenim sobre tu',
-    color: 'blue',
-    article: 'Art. 15 RGPD',
-    requiresDescription: false,
-  },
-  {
-    type: 'PORTABILITY',
-    icon: Download,
-    title: 'Descarregar les meves dades',
-    description: 'Rebre les teves dades en format estructurat i llegible per màquina',
-    color: 'green',
-    article: 'Art. 20 RGPD',
-    requiresDescription: false,
-  },
-  {
-    type: 'RECTIFICATION',
-    icon: Edit3,
-    title: 'Rectificar dades',
-    description: 'Corregir dades personals inexactes o incompletes',
-    color: 'amber',
-    article: 'Art. 16 RGPD',
-    requiresDescription: true,
-    descriptionLabel: 'Quines dades vols corregir i quin és el valor correcte?',
-  },
-  {
-    type: 'ERASURE',
-    icon: Trash2,
-    title: 'Eliminar les meves dades',
-    description: 'Sol·licitar la supressió de les teves dades personals',
-    color: 'red',
-    article: 'Art. 17 RGPD',
-    requiresDescription: false,
-  },
-  {
-    type: 'OBJECTION',
-    icon: Ban,
-    title: 'Oposar-me al tractament',
-    description: 'Aturar el tractament de les teves dades per finalitats específiques',
-    color: 'purple',
-    article: 'Art. 21 RGPD',
-    requiresDescription: true,
-    descriptionLabel: 'A quin tractament vols oposar-te? (màrqueting, perfilat, etc.)',
-  },
-  {
-    type: 'RESTRICTION',
-    icon: UserCog,
-    title: 'Limitar el tractament',
-    description: 'Restringir temporalment com utilitzem les teves dades',
-    color: 'orange',
-    article: 'Art. 18 RGPD',
-    requiresDescription: true,
-    descriptionLabel: 'Quin tractament vols limitar i per quin motiu?',
-  },
-];
-
-const REQUEST_TYPE_LABELS: Record<RequestType, string> = {
-  ACCESS: "Dret d'Accés",
-  RECTIFICATION: 'Dret de Rectificació',
-  ERASURE: 'Dret de Supressió',
-  RESTRICTION: 'Dret de Limitació',
-  PORTABILITY: 'Dret de Portabilitat',
-  OBJECTION: "Dret d'Oposició",
-};
 
 const COLOR_CLASSES: Record<string, { bg: string; text: string; border: string; hover: string }> = {
   blue: {
@@ -132,6 +64,7 @@ const COLOR_CLASSES: Record<string, { bg: string; text: string; border: string; 
 };
 
 export default function PrivacyPortalPage() {
+  const t = useTranslations('privacyPortal');
   const [step, setStep] = useState<'options' | 'form' | 'success'>('options');
   const [selectedRequest, setSelectedRequest] = useState<RequestTypeConfig | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -143,6 +76,76 @@ export default function PrivacyPortalPage() {
   const [phone, setPhone] = useState('');
   const [description, setDescription] = useState('');
   const [gdprConsent, setGdprConsent] = useState(false);
+
+  // Request types with translations
+  const REQUEST_TYPES: RequestTypeConfig[] = [
+    {
+      type: 'ACCESS',
+      icon: Eye,
+      title: t('requestTypes.ACCESS.title'),
+      description: t('requestTypes.ACCESS.description'),
+      color: 'blue',
+      article: 'Art. 15 RGPD',
+      requiresDescription: false,
+    },
+    {
+      type: 'PORTABILITY',
+      icon: Download,
+      title: t('requestTypes.PORTABILITY.title'),
+      description: t('requestTypes.PORTABILITY.description'),
+      color: 'green',
+      article: 'Art. 20 RGPD',
+      requiresDescription: false,
+    },
+    {
+      type: 'RECTIFICATION',
+      icon: Edit3,
+      title: t('requestTypes.RECTIFICATION.title'),
+      description: t('requestTypes.RECTIFICATION.description'),
+      color: 'amber',
+      article: 'Art. 16 RGPD',
+      requiresDescription: true,
+      descriptionLabel: t('requestTypes.RECTIFICATION.descriptionLabel'),
+    },
+    {
+      type: 'ERASURE',
+      icon: Trash2,
+      title: t('requestTypes.ERASURE.title'),
+      description: t('requestTypes.ERASURE.description'),
+      color: 'red',
+      article: 'Art. 17 RGPD',
+      requiresDescription: false,
+    },
+    {
+      type: 'OBJECTION',
+      icon: Ban,
+      title: t('requestTypes.OBJECTION.title'),
+      description: t('requestTypes.OBJECTION.description'),
+      color: 'purple',
+      article: 'Art. 21 RGPD',
+      requiresDescription: true,
+      descriptionLabel: t('requestTypes.OBJECTION.descriptionLabel'),
+    },
+    {
+      type: 'RESTRICTION',
+      icon: UserCog,
+      title: t('requestTypes.RESTRICTION.title'),
+      description: t('requestTypes.RESTRICTION.description'),
+      color: 'orange',
+      article: 'Art. 18 RGPD',
+      requiresDescription: true,
+      descriptionLabel: t('requestTypes.RESTRICTION.descriptionLabel'),
+    },
+  ];
+
+  const REQUEST_TYPE_LABELS: Record<RequestType, string> = {
+    ACCESS: t('requestTypes.ACCESS.label'),
+    RECTIFICATION: t('requestTypes.RECTIFICATION.label'),
+    ERASURE: t('requestTypes.ERASURE.label'),
+    RESTRICTION: t('requestTypes.RESTRICTION.label'),
+    PORTABILITY: t('requestTypes.PORTABILITY.label'),
+    OBJECTION: t('requestTypes.OBJECTION.label'),
+  };
 
   const handleSelectRequest = (config: RequestTypeConfig) => {
     setSelectedRequest(config);
@@ -187,10 +190,10 @@ export default function PrivacyPortalPage() {
       if (data.success) {
         setStep('success');
       } else {
-        setError(data.error || 'Error en processar la sol·licitud. Torna-ho a provar.');
+        setError(data.error || t('form.errorDefault'));
       }
     } catch {
-      setError('Error de connexió. Comprova la teva connexió a internet i torna-ho a provar.');
+      setError(t('form.errorConnection'));
     } finally {
       setIsLoading(false);
     }
@@ -213,11 +216,10 @@ export default function PrivacyPortalPage() {
             <Shield className="w-10 h-10 text-black" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Portal de Privacitat
+            {t('title')}
           </h1>
           <p className="text-text-muted max-w-md mx-auto">
-            Gestiona les teves dades personals d&apos;acord amb el RGPD.
-            Exerceix els teus drets de forma senzilla i segura.
+            {t('subtitle')}
           </p>
         </div>
 
@@ -239,8 +241,8 @@ export default function PrivacyPortalPage() {
                     <FileText className="w-5 h-5 text-oe-gold" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-white">Selecciona el teu dret</h2>
-                    <p className="text-sm text-text-muted">Quin dret vols exercir?</p>
+                    <h2 className="text-lg font-semibold text-white">{t('selectStep.heading')}</h2>
+                    <p className="text-sm text-text-muted">{t('selectStep.subheading')}</p>
                   </div>
                 </div>
 
@@ -277,9 +279,7 @@ export default function PrivacyPortalPage() {
                   <div className="flex gap-3">
                     <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                     <div className="text-sm text-blue-200">
-                      <strong>Com funciona?</strong> Selecciona el dret que vols exercir,
-                      omple les teves dades i rebràs un email per verificar la teva identitat.
-                      Tenim 30 dies per respondre a la teva sol·licitud.
+                      <strong>{t('selectStep.infoBox.title')}</strong> {t('selectStep.infoBox.text')}
                     </div>
                   </div>
                 </div>
@@ -305,7 +305,7 @@ export default function PrivacyPortalPage() {
                       setError(null);
                     }}
                     className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-text-muted hover:text-white transition-colors"
-                    aria-label="Tornar enrere"
+                    aria-label={t('form.backButton')}
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
@@ -326,7 +326,7 @@ export default function PrivacyPortalPage() {
                   {/* Nom */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1.5">
-                      Nom complet <span className="text-red-400">*</span>
+                      {t('form.fullName')} <span className="text-red-400">{t('form.required')}</span>
                     </label>
                     <input
                       id="name"
@@ -336,7 +336,7 @@ export default function PrivacyPortalPage() {
                       required
                       minLength={2}
                       maxLength={100}
-                      placeholder="El teu nom i cognoms"
+                      placeholder={t('form.fullNamePlaceholder')}
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-oe-gold/50 focus:ring-1 focus:ring-oe-gold/50 transition-colors"
                     />
                   </div>
@@ -344,7 +344,7 @@ export default function PrivacyPortalPage() {
                   {/* Email */}
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">
-                      Correu electrònic <span className="text-red-400">*</span>
+                      {t('form.email')} <span className="text-red-400">{t('form.required')}</span>
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
@@ -354,19 +354,19 @@ export default function PrivacyPortalPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        placeholder="El teu email"
+                        placeholder={t('form.emailPlaceholder')}
                         className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-oe-gold/50 focus:ring-1 focus:ring-oe-gold/50 transition-colors"
                       />
                     </div>
                     <p className="text-xs text-text-muted mt-1">
-                      Rebràs un email de verificació a aquesta adreça
+                      {t('form.emailHint')}
                     </p>
                   </div>
 
                   {/* Telèfon */}
                   <div>
                     <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-1.5">
-                      Telèfon <span className="text-text-muted">(opcional)</span>
+                      {t('form.phone')} <span className="text-text-muted">{t('form.phoneOptional')}</span>
                     </label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
@@ -375,7 +375,7 @@ export default function PrivacyPortalPage() {
                         type="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+34 600 000 000"
+                        placeholder={t('form.phonePlaceholder')}
                         className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-oe-gold/50 focus:ring-1 focus:ring-oe-gold/50 transition-colors"
                       />
                     </div>
@@ -385,20 +385,20 @@ export default function PrivacyPortalPage() {
                   {selectedRequest.requiresDescription && (
                     <div>
                       <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-1.5">
-                        {selectedRequest.descriptionLabel} <span className="text-red-400">*</span>
+                        {selectedRequest.descriptionLabel} <span className="text-red-400">{t('form.required')}</span>
                       </label>
                       <textarea
                         id="description"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         required={selectedRequest.requiresDescription}
-                        placeholder="Descriu la teva sol·licitud amb detall..."
+                        placeholder={t('form.descriptionPlaceholder')}
                         rows={4}
                         maxLength={1000}
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-oe-gold/50 focus:ring-1 focus:ring-oe-gold/50 transition-colors resize-none"
                       />
                       <p className="text-xs text-text-muted mt-1 text-right">
-                        {description.length}/1000
+                        {t('form.characterCount', { count: description.length })}
                       </p>
                     </div>
                   )}
@@ -414,12 +414,12 @@ export default function PrivacyPortalPage() {
                         className="mt-1 w-5 h-5 rounded border-white/20 bg-white/5 text-oe-gold focus:ring-oe-gold focus:ring-offset-0 cursor-pointer"
                       />
                       <span className="text-sm text-text-muted group-hover:text-gray-300 transition-colors">
-                        He llegit i accepto la{' '}
+                        {t('form.gdprConsent')}{' '}
                         <Link href="/legal/privacidad" target="_blank" className="text-oe-gold hover:underline">
-                          Política de Privacitat
+                          {t('form.privacyPolicy')}
                         </Link>
-                        {' '}i autoritzo el tractament de les meves dades per gestionar aquesta sol·licitud.
-                        <span className="text-red-400"> *</span>
+                        {' '}{t('form.gdprConsentText')}
+                        <span className="text-red-400"> {t('form.required')}</span>
                       </span>
                     </label>
                   </div>
@@ -449,11 +449,11 @@ export default function PrivacyPortalPage() {
                     {isLoading ? (
                       <>
                         <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                        Enviant...
+                        {t('form.submitting')}
                       </>
                     ) : (
                       <>
-                        Enviar sol·licitud
+                        {t('form.submitButton')}
                         <ArrowRight className="w-5 h-5" />
                       </>
                     )}
@@ -476,28 +476,28 @@ export default function PrivacyPortalPage() {
                   <CheckCircle className="w-10 h-10 text-green-400" />
                 </div>
 
-                <h2 className="text-2xl font-bold text-white mb-2">Sol·licitud enviada!</h2>
+                <h2 className="text-2xl font-bold text-white mb-2">{t('success.title')}</h2>
 
                 <p className="text-text-muted mb-6">
-                  T&apos;hem enviat un email de verificació a{' '}
+                  {t('success.message')}{' '}
                   <span className="text-white font-medium">{email}</span>
                 </p>
 
                 {/* Steps */}
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6 text-left">
-                  <h3 className="font-medium text-white mb-3">Propers passos:</h3>
+                  <h3 className="font-medium text-white mb-3">{t('success.nextStepsTitle')}</h3>
                   <ol className="space-y-2 text-sm text-text-muted">
                     <li className="flex gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-oe-gold/20 text-oe-gold text-xs flex items-center justify-center font-bold">1</span>
-                      <span>Obre el teu correu electrònic</span>
+                      <span>{t('success.step1')}</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-oe-gold/20 text-oe-gold text-xs flex items-center justify-center font-bold">2</span>
-                      <span>Fes clic a l&apos;enllaç de verificació</span>
+                      <span>{t('success.step2')}</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-oe-gold/20 text-oe-gold text-xs flex items-center justify-center font-bold">3</span>
-                      <span>Processarem la teva sol·licitud</span>
+                      <span>{t('success.step3')}</span>
                     </li>
                   </ol>
                 </div>
@@ -505,7 +505,7 @@ export default function PrivacyPortalPage() {
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-6">
                   <div className="flex items-center justify-center gap-2 text-blue-400 text-sm">
                     <Clock className="w-4 h-4" />
-                    <span>Termini legal de resposta: <strong>30 dies</strong></span>
+                    <span>{t('success.legalDeadline')} <strong>{t('success.legalDeadlineDays')}</strong></span>
                   </div>
                 </div>
 
@@ -513,9 +513,7 @@ export default function PrivacyPortalPage() {
                   <div className="flex items-start gap-3 text-left">
                     <Lock className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-amber-200">
-                      <strong>Important:</strong> Per protegir les teves dades, la sol·licitud no es processarà
-                      fins que verifiquis la teva identitat clicant l&apos;enllaç de l&apos;email.
-                      Revisa la carpeta de spam si no el trobes.
+                      <strong>{t('success.importantTitle')}</strong> {t('success.importantText')}
                     </p>
                   </div>
                 </div>
@@ -525,13 +523,13 @@ export default function PrivacyPortalPage() {
                     onClick={resetForm}
                     className="flex-1 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium rounded-xl transition-colors"
                   >
-                    Fer una altra sol·licitud
+                    {t('success.anotherRequestButton')}
                   </button>
                   <Link
                     href="/"
                     className="flex-1 px-6 py-3 bg-oe-gold/10 hover:bg-oe-gold/20 border border-oe-gold/30 text-oe-gold font-medium rounded-xl transition-colors text-center"
                   >
-                    Tornar a l&apos;inici
+                    {t('success.backToHomeButton')}
                   </Link>
                 </div>
               </motion.div>
@@ -542,22 +540,22 @@ export default function PrivacyPortalPage() {
         {/* Footer legal */}
         <footer className="mt-8 text-center text-sm text-text-muted">
           <p className="mb-3">
-            Aquests drets estan garantits pel{' '}
-            <strong className="text-gray-400">Reglament General de Protecció de Dades (RGPD)</strong>
-            {' '}i la{' '}
-            <strong className="text-gray-400">Llei Orgànica de Protecció de Dades (LOPDGDD)</strong>.
+            {t('footer.rgpdText')}{' '}
+            <strong className="text-gray-400">{t('footer.rgpdName')}</strong>
+            {' '}{t('footer.lopdgddText')}{' '}
+            <strong className="text-gray-400">{t('footer.lopdgddName')}</strong>.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Link href="/legal/privacidad" className="text-oe-gold hover:underline">
-              Política de Privacitat
+              {t('footer.privacyPolicy')}
             </Link>
             <span className="text-gray-600">•</span>
             <Link href="/legal/cookies" className="text-oe-gold hover:underline">
-              Política de Cookies
+              {t('footer.cookiesPolicy')}
             </Link>
             <span className="text-gray-600">•</span>
             <Link href="/legal/aviso-legal" className="text-oe-gold hover:underline">
-              Avís Legal
+              {t('footer.legalNotice')}
             </Link>
           </div>
         </footer>

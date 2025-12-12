@@ -8,117 +8,122 @@ import "@/app/globals.css";
 
 // Components
 import LayoutWrapper from "@/app/components/layout/LayoutWrapper";
+import StructuredData from "@/app/components/seo/StructuredData";
 
-// Schema.org JSON-LD per SEO - OPTIMITZAT
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
-  '@id': 'https://orbitaevents.com/#organization',
-  name: 'Òrbita Events',
-  alternateName: 'Orbita Events',
-  description: 'DJ profesional para bodas, fiestas y eventos corporativos en Barcelona y Girona. Discomóvil con sonido 4000W, luces LED y efectos. Experiencia desde 2023.',
-  url: 'https://orbitaevents.com',
-  logo: 'https://orbitaevents.com/img/logoplanetatextdreta.svg',
-  image: 'https://orbitaevents.com/img/og-image.jpg',
-  telephone: '+34699121023',
-  email: 'info@orbitaevents.com',
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: 'Granollers',
-    addressRegion: 'Barcelona',
-    postalCode: '08400',
-    addressCountry: 'ES',
-  },
-  geo: {
-    '@type': 'GeoCoordinates',
-    latitude: 41.6083,
-    longitude: 2.2875,
-  },
-  areaServed: [
-    { '@type': 'City', name: 'Barcelona' },
-    { '@type': 'City', name: 'Girona' },
-    { '@type': 'City', name: 'Granollers' },
-    { '@type': 'City', name: 'Mataró' },
-    { '@type': 'City', name: 'Sabadell' },
-    { '@type': 'City', name: 'Terrassa' },
-    { '@type': 'AdministrativeArea', name: 'Maresme' },
-    { '@type': 'AdministrativeArea', name: 'Costa Brava' },
-    { '@type': 'State', name: 'Catalunya' },
-  ],
-  priceRange: '400€ - 1500€',
-  openingHoursSpecification: {
-    '@type': 'OpeningHoursSpecification',
-    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-    opens: '09:00',
-    closes: '21:00',
-  },
-  sameAs: [
-    'https://www.instagram.com/orbitaevents',
-    'https://www.facebook.com/orbitaevents',
-  ],
-  hasOfferCatalog: {
-    '@type': 'OfferCatalog',
-    name: 'Servicios DJ y Eventos Barcelona',
-    itemListElement: [
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'DJ Bodas Barcelona',
-          description: 'DJ profesional para bodas con sonido 4000W, iluminación y efectos especiales. Ceremonia, cóctel y fiesta.',
-          offers: {
-            '@type': 'Offer',
-            price: '650',
-            priceCurrency: 'EUR',
-            priceValidUntil: '2025-12-31',
-          },
-        },
-      },
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Discomóvil Barcelona',
-          description: 'Discomóvil profesional con DJ, sonido, luces LED y efectos. Nos desplazamos a toda Catalunya.',
-          offers: {
-            '@type': 'Offer',
-            price: '400',
-            priceCurrency: 'EUR',
-            priceValidUntil: '2025-12-31',
-          },
-        },
-      },
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Fiestas Privadas Barcelona',
-          description: 'DJ para fiestas privadas: cumpleaños, despedidas, aniversarios. Sonido, luces y animación.',
-          offers: {
-            '@type': 'Offer',
-            price: '400',
-            priceCurrency: 'EUR',
-            priceValidUntil: '2025-12-31',
-          },
-        },
-      },
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Eventos Corporativos Barcelona',
-          description: 'DJ y producción técnica para eventos de empresa: cenas, team building, presentaciones.',
-          offers: {
-            '@type': 'Offer',
-            price: '500',
-            priceCurrency: 'EUR',
-            priceValidUntil: '2025-12-31',
-          },
-        },
-      },
+// Helper per generar JSON-LD amb traduccions
+async function generateJsonLd(locale: string) {
+  const t = await getTranslations({ locale, namespace: 'layoutJsonLd' });
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    '@id': 'https://orbitaevents.com/#organization',
+    name: 'Òrbita Events',
+    alternateName: 'Orbita Events',
+    description: t('description'),
+    url: 'https://orbitaevents.com',
+    logo: 'https://orbitaevents.com/img/logoplanetatextdreta.svg',
+    image: 'https://orbitaevents.com/img/og-image.jpg',
+    telephone: '+34699121023',
+    email: 'info@orbitaevents.com',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Granollers',
+      addressRegion: 'Barcelona',
+      postalCode: '08400',
+      addressCountry: 'ES',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 41.6083,
+      longitude: 2.2875,
+    },
+    areaServed: [
+      { '@type': 'City', name: 'Barcelona' },
+      { '@type': 'City', name: 'Girona' },
+      { '@type': 'City', name: 'Granollers' },
+      { '@type': 'City', name: 'Mataró' },
+      { '@type': 'City', name: 'Sabadell' },
+      { '@type': 'City', name: 'Terrassa' },
+      { '@type': 'AdministrativeArea', name: 'Maresme' },
+      { '@type': 'AdministrativeArea', name: 'Costa Brava' },
+      { '@type': 'State', name: 'Catalunya' },
     ],
-  },
-};
+    priceRange: '400€ - 1500€',
+    openingHoursSpecification: {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '09:00',
+      closes: '21:00',
+    },
+    sameAs: [
+      'https://www.instagram.com/orbitaevents',
+      'https://www.facebook.com/orbitaevents',
+    ],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: t('services.catalogName'),
+      itemListElement: [
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: t('services.djBodas.name'),
+            description: t('services.djBodas.description'),
+            offers: {
+              '@type': 'Offer',
+              price: '650',
+              priceCurrency: 'EUR',
+              priceValidUntil: '2025-12-31',
+            },
+          },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: t('services.discomovil.name'),
+            description: t('services.discomovil.description'),
+            offers: {
+              '@type': 'Offer',
+              price: '400',
+              priceCurrency: 'EUR',
+              priceValidUntil: '2025-12-31',
+            },
+          },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: t('services.fiestas.name'),
+            description: t('services.fiestas.description'),
+            offers: {
+              '@type': 'Offer',
+              price: '400',
+              priceCurrency: 'EUR',
+              priceValidUntil: '2025-12-31',
+            },
+          },
+        },
+        {
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: t('services.corporativo.name'),
+            description: t('services.corporativo.description'),
+            offers: {
+              '@type': 'Offer',
+              price: '500',
+              priceCurrency: 'EUR',
+              priceValidUntil: '2025-12-31',
+            },
+          },
+        },
+      ],
+    },
+  };
+}
 
 // METADATA MILLORADA
 export const metadata: Metadata = {
@@ -227,6 +232,7 @@ export default async function LocaleLayout({
   // Carregar missatges i traduccions
   const messages = await getMessages();
   const t = await getTranslations('nav');
+  const jsonLd = await generateJsonLd(locale);
 
   return (
     <html
@@ -240,6 +246,8 @@ export default async function LocaleLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* StructuredData amb traduccions */}
+        <StructuredData locale={locale} />
       </head>
       <body
         className={`${inter.variable} ${outfit.variable} ${space.variable} font-sans antialiased bg-neutral-950 text-white`}

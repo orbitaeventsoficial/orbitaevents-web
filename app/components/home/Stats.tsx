@@ -23,9 +23,9 @@ export function Stats({ variant = 'default' }: StatsProps) {
   }
 
   const stats = [
-    { value: '2+', label: 'anys en el sector' },
-    { value: 'BCN', label: '+ Girona' },
-    { value: '2h', label: 'resposta' },
+    { value: '2+', labelKey: 'yearsExperience' },
+    { value: 'BCN', labelKey: 'coverage' },
+    { value: '2h', labelKey: 'response' },
   ];
 
   return (
@@ -42,7 +42,7 @@ export function Stats({ variant = 'default' }: StatsProps) {
             {stat.value}
           </div>
           <div className="text-white/80 text-sm font-medium">
-            {stat.label}
+            {t(stat.labelKey)}
           </div>
         </motion.div>
       ))}

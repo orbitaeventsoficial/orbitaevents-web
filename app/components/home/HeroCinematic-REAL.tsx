@@ -110,7 +110,7 @@ function CountdownTimerReal({ targetDate }: { targetDate: Date | null }) {
   const { timeLeft } = useCountdown(targetDate);
 
   if (!targetDate) {
-    return <span className="text-white/50 text-sm">Carregant...</span>;
+    return <span className="text-white/50 text-sm">...</span>;
   }
 
   return (
@@ -240,7 +240,7 @@ function SocialProofBadge({
       >
         <span className={`text-lg ${proofs[currentIndex].color}`}>{proofs[currentIndex].icon}</span>
         <span className="text-sm text-white/80">
-          {isLoading ? 'Carregant...' : proofs[currentIndex].text}
+          {isLoading ? '...' : proofs[currentIndex].text}
         </span>
       </motion.div>
     </AnimatePresence>
@@ -253,6 +253,7 @@ function SocialProofBadge({
 
 export default function HeroCinematicBrutalReal() {
   const t = useTranslations('hero');
+  const tWhatsapp = useTranslations('whatsappMessages');
   
   // 🔥 DADES REALS DE BD!
   const { stats, isLoading: statsLoading } = usePublicStats();
@@ -420,7 +421,7 @@ export default function HeroCinematicBrutalReal() {
           className="mt-5 flex items-center gap-6"
         >
           <Link
-            href="https://wa.me/34699121023?text=Hola!%20Quiero%20info%20sobre%20un%20evento"
+            href={`https://wa.me/34699121023?text=${encodeURIComponent(tWhatsapp('general'))}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-white/60 hover:text-green-400 transition-colors group"

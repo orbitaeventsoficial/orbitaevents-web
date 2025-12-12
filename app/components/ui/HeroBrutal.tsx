@@ -297,7 +297,7 @@ export default function HeroBrutal() {
           {/* Ubicaciones - Copy estático definido por ti (no métrica) */}
           <div className="bg-white/10 backdrop-blur-md rounded-full px-6 py-3 border border-white/20">
             <span className="text-oe-gold font-medium">
-              📍 Barcelona
+              📍 {t('location')}
             </span>
           </div>
         </div>

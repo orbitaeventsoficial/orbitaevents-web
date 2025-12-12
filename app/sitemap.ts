@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Landing SEO especial (diferenciador)
     { url: `${base}/boda-halloween`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${base}/tematica-mon-magic`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${base}/tematica-halloween`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     
     // Servicios principales
     { url: `${base}/servicios`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
@@ -24,8 +25,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/servicios/discomovil`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${base}/servicios/empresas`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${base}/servicios/fiestas`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/servicios/alquiler`, lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
-    { url: `${base}/servicios/produccion`, lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
     { url: `${base}/servicios/animacion-infantil`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
 
     // Landing pages por zonas - Long-tail SEO

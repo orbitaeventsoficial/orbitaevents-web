@@ -235,7 +235,7 @@ export default function EmotionalCalculator() {
                       >
                         {option.popular && (
                           <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-oe-gold text-black text-xs font-bold">
-                            Popular
+                            {t('popular')}
                           </span>
                         )}
                         <div className={`w-12 h-12 rounded-xl mb-3 flex items-center justify-center ${

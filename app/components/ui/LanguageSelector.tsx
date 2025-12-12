@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -33,11 +33,9 @@ const flags: Record<string, JSX.Element> = {
   ),
 };
 
-// Configuració dels idiomes - NOMÉS CA/ES
-const languages = [
-  { code: 'ca', name: 'Català', shortName: 'CA' },
-  { code: 'es', name: 'Español', shortName: 'ES' },
-];
+// Configuració dels idiomes - NOMÉS CA/ES (shortName no es tradueix)
+const languageCodes = ['ca', 'es'] as const;
+const shortNames: Record<string, string> = { ca: 'CA', es: 'ES' };
 
 interface LanguageSelectorProps {
   variant?: 'flags' | 'flags-text' | 'compact';
@@ -53,6 +51,8 @@ export default function LanguageSelector({
   const locale = useLocale();
   const pathname = usePathname();
   const [hoveredLang, setHoveredLang] = useState<string | null>(null);
+  const tAccessibility = useTranslations('accessibility');
+  const tLang = useTranslations('languages');
 
   const switchLocale = (newLocale: string) => {
     // Guardar preferència a cookie
@@ -60,7 +60,7 @@ export default function LanguageSelector({
 
     // Obtenir path sense locale actual
     const segments = pathname.split('/');
-    const hasLocalePrefix = languages.some(l => l.code === segments[1]);
+    const hasLocalePrefix = languageCodes.some(code => code === segments[1]);
     const pathWithoutLocale = hasLocalePrefix
       ? '/' + segments.slice(2).join('/')
       : pathname;
@@ -84,20 +84,21 @@ export default function LanguageSelector({
   if (variant === 'flags') {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        {languages.map((lang) => {
-          const isActive = locale === lang.code;
+        {languageCodes.map((code) => {
+          const isActive = locale === code;
+          const langName = tLang(code);
           return (
             <button
-              key={lang.code}
-              onClick={() => switchLocale(lang.code)}
-              onMouseEnter={() => setHoveredLang(lang.code)}
+              key={code}
+              onClick={() => switchLocale(code)}
+              onMouseEnter={() => setHoveredLang(code)}
               onMouseLeave={() => setHoveredLang(null)}
               className={`
                 relative group flex items-center
                 transition-all duration-300 ease-out
                 ${isActive ? 'scale-110 z-10' : 'hover:scale-110'}
               `}
-              aria-label={`Canviar idioma a ${lang.name}`}
+              aria-label={tAccessibility('changeLanguageTo', { language: langName })}
             >
               {/* Glow effect quan actiu */}
               {isActive && (
@@ -113,7 +114,7 @@ export default function LanguageSelector({
                   : 'ring-1 ring-white/20 hover:ring-white/50 shadow-black/30'
                 }
               `}>
-                {flags[lang.code]}
+                {flags[code]}
               </div>
 
               {/* Punt indicador actiu */}
@@ -122,9 +123,9 @@ export default function LanguageSelector({
               )}
 
               {/* Tooltip */}
-              {showTooltip && hoveredLang === lang.code && !isActive && (
+              {showTooltip && hoveredLang === code && !isActive && (
                 <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-3 py-1.5 text-xs font-medium bg-neutral-900 text-white rounded-lg whitespace-nowrap z-50 shadow-xl border border-white/10">
-                  {lang.name}
+                  {langName}
                 </span>
               )}
             </button>
@@ -140,12 +141,13 @@ export default function LanguageSelector({
   if (variant === 'flags-text') {
     return (
       <div className={`flex items-center gap-1 ${className}`}>
-        {languages.map((lang) => {
-          const isActive = locale === lang.code;
+        {languageCodes.map((code) => {
+          const isActive = locale === code;
+          const langName = tLang(code);
           return (
             <button
-              key={lang.code}
-              onClick={() => switchLocale(lang.code)}
+              key={code}
+              onClick={() => switchLocale(code)}
               className={`
                 flex items-center gap-2 px-3 py-2 rounded-lg
                 text-sm font-medium
@@ -155,12 +157,12 @@ export default function LanguageSelector({
                   : 'text-neutral-400 hover:text-white hover:bg-white/10'
                 }
               `}
-              aria-label={`Canviar idioma a ${lang.name}`}
+              aria-label={tAccessibility('changeLanguageTo', { language: langName })}
             >
               <div className="w-6 h-5 rounded overflow-hidden ring-1 ring-white/20">
-                {flags[lang.code]}
+                {flags[code]}
               </div>
-              <span className="hidden sm:inline">{lang.shortName}</span>
+              <span className="hidden sm:inline">{shortNames[code]}</span>
             </button>
           );
         })}
@@ -174,12 +176,13 @@ export default function LanguageSelector({
   if (variant === 'compact') {
     return (
       <div className={`grid grid-cols-2 gap-2 ${className}`}>
-        {languages.map((lang) => {
-          const isActive = locale === lang.code;
+        {languageCodes.map((code) => {
+          const isActive = locale === code;
+          const langName = tLang(code);
           return (
             <button
-              key={lang.code}
-              onClick={() => switchLocale(lang.code)}
+              key={code}
+              onClick={() => switchLocale(code)}
               className={`
                 flex flex-col items-center justify-center
                 p-2 rounded-xl
@@ -189,13 +192,13 @@ export default function LanguageSelector({
                   : 'bg-white/5 hover:bg-white/10'
                 }
               `}
-              aria-label={`Canviar idioma a ${lang.name}`}
+              aria-label={tAccessibility('changeLanguageTo', { language: langName })}
             >
               <div className="w-8 h-6 rounded overflow-hidden mb-1 ring-1 ring-white/20">
-                {flags[lang.code]}
+                {flags[code]}
               </div>
               <span className={`text-xs font-medium ${isActive ? 'text-orange-500' : 'text-neutral-400'}`}>
-                {lang.shortName}
+                {shortNames[code]}
               </span>
             </button>
           );
@@ -214,14 +217,15 @@ export function LanguageSelectorMobile({ className = '' }: { className?: string 
   const locale = useLocale();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const tLang = useTranslations('languages');
 
-  const currentLang = languages.find(l => l.code === locale) || languages[0];
+  const currentLangCode = languageCodes.find(code => code === locale) || languageCodes[0];
 
   const switchLocale = (newLocale: string) => {
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
 
     const segments = pathname.split('/');
-    const hasLocalePrefix = languages.some(l => l.code === segments[1]);
+    const hasLocalePrefix = languageCodes.some(code => code === segments[1]);
     const pathWithoutLocale = hasLocalePrefix
       ? '/' + segments.slice(2).join('/')
       : pathname;
@@ -244,7 +248,7 @@ export function LanguageSelectorMobile({ className = '' }: { className?: string 
         className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
       >
         <div className="w-7 h-5 rounded overflow-hidden ring-1 ring-white/20">
-          {flags[currentLang.code]}
+          {flags[currentLangCode]}
         </div>
         <svg
           className={`w-4 h-4 text-neutral-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -261,19 +265,20 @@ export function LanguageSelectorMobile({ className = '' }: { className?: string 
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
           <div className="absolute top-full right-0 mt-2 p-3 min-w-[180px] bg-neutral-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-50">
             <div className="space-y-2">
-              {languages.map((lang) => {
-                const isActive = locale === lang.code;
+              {languageCodes.map((code) => {
+                const isActive = locale === code;
+                const langName = tLang(code);
                 return (
                   <button
-                    key={lang.code}
-                    onClick={() => switchLocale(lang.code)}
+                    key={code}
+                    onClick={() => switchLocale(code)}
                     className={`flex items-center gap-3 w-full p-3 rounded-xl transition-all ${isActive ? 'bg-orange-500/20 ring-1 ring-orange-500/50' : 'hover:bg-white/5'}`}
                   >
                     <div className="w-9 h-7 rounded-md overflow-hidden ring-1 ring-white/20 shadow-lg">
-                      {flags[lang.code]}
+                      {flags[code]}
                     </div>
                     <span className={`text-sm font-medium ${isActive ? 'text-orange-400' : 'text-white'}`}>
-                      {lang.name}
+                      {langName}
                     </span>
                     {isActive && <span className="ml-auto text-orange-400">✓</span>}
                   </button>
@@ -298,7 +303,7 @@ export function LanguageBar({ className = '' }: { className?: string }) {
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
 
     const segments = pathname.split('/');
-    const hasLocalePrefix = languages.some(l => l.code === segments[1]);
+    const hasLocalePrefix = languageCodes.some(code => code === segments[1]);
     const pathWithoutLocale = hasLocalePrefix
       ? '/' + segments.slice(2).join('/')
       : pathname;
@@ -317,12 +322,12 @@ export function LanguageBar({ className = '' }: { className?: string }) {
   return (
     <div className={`flex items-center justify-center gap-4 py-4 ${className}`}>
       <span className="text-neutral-500 text-sm mr-2">🌍</span>
-      {languages.map((lang, index) => {
-        const isActive = locale === lang.code;
+      {languageCodes.map((code, index) => {
+        const isActive = locale === code;
         return (
-          <div key={lang.code} className="flex items-center">
+          <div key={code} className="flex items-center">
             <button
-              onClick={() => switchLocale(lang.code)}
+              onClick={() => switchLocale(code)}
               className={`
                 flex items-center gap-2 px-3 py-1.5 rounded-full
                 transition-all duration-200
@@ -333,11 +338,11 @@ export function LanguageBar({ className = '' }: { className?: string }) {
               `}
             >
               <div className="w-5 h-4 rounded overflow-hidden">
-                {flags[lang.code]}
+                {flags[code]}
               </div>
-              <span className="text-sm font-medium">{lang.shortName}</span>
+              <span className="text-sm font-medium">{shortNames[code]}</span>
             </button>
-            {index < languages.length - 1 && (
+            {index < languageCodes.length - 1 && (
               <span className="text-neutral-700 mx-2">|</span>
             )}
           </div>

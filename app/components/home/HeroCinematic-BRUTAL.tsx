@@ -234,6 +234,7 @@ function SocialProofBadge({ t }: { t: (key: string) => string }) {
 
 export function HeroCinematicBrutal() {
   const t = useTranslations('hero');
+  const tWhatsapp = useTranslations('whatsappMessages');
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -475,7 +476,7 @@ export function HeroCinematicBrutal() {
           className="mt-5 flex items-center gap-6"
         >
           <Link
-            href="https://wa.me/34699121023?text=Hola!%20Quiero%20info%20sobre%20un%20evento"
+            href={`https://wa.me/34699121023?text=${encodeURIComponent(tWhatsapp('general'))}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-white/60 hover:text-green-400 transition-colors group"

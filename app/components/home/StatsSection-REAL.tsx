@@ -145,46 +145,46 @@ export default function StatsSectionReal() {
       icon: '🎉',
       value: stats.totalEvents || 0,
       suffix: '+',
-      label: t('events.label') || 'Events realitzats',
-      description: t('events.description') || 'Casaments, festes i corporatius',
+      label: t('events.label'),
+      description: t('events.description'),
       color: 'amber',
     },
     {
       icon: '💍',
       value: stats.totalWeddings || 0,
       suffix: '+',
-      label: t('weddings.label') || 'Casaments',
-      description: t('weddings.description') || 'Dies especials memorables',
+      label: t('weddings.label'),
+      description: t('weddings.description'),
       color: 'pink',
     },
     {
       icon: '⭐',
       value: stats.averageRating || 5,
       decimals: 1,
-      label: t('rating.label') || 'Valoració mitjana',
-      description: t('rating.description') || 'De clients verificats',
+      label: t('rating.label'),
+      description: t('rating.description'),
       color: 'amber',
     },
     {
       icon: '💬',
       value: testimonialsData.stats.total || 0,
-      label: t('reviews.label') || 'Opinions',
-      description: t('reviews.description') || 'Clients satisfets',
+      label: t('reviews.label'),
+      description: t('reviews.description'),
       color: 'purple',
     },
     {
       icon: '🏆',
       value: yearsExperience,
       suffix: '+',
-      label: t('years.label') || "Anys d'experiència",
-      description: t('years.description') || 'En el sector events',
+      label: t('years.label'),
+      description: t('years.description'),
       color: 'blue',
     },
     {
       icon: '📍',
       value: 2,
-      label: t('coverage.label') || 'Províncies',
-      description: t('coverage.description') || 'Barcelona i Girona',
+      label: t('coverage.label'),
+      description: t('coverage.description'),
       color: 'green',
     },
   ];
@@ -205,10 +205,10 @@ export default function StatsSectionReal() {
             viewport={{ once: true }}
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 mb-4 bg-amber-500/10 text-amber-400 text-sm font-medium rounded-full border border-amber-500/20">
-              📊 {t('badge') || 'Números reals'}
+              📊 {t('badge')}
             </span>
           </motion.div>
-          
+
           <motion.h2
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -216,12 +216,12 @@ export default function StatsSectionReal() {
             transition={{ delay: 0.1 }}
             className="text-3xl md:text-5xl font-black text-white mb-4"
           >
-            {t('title') || 'Els nostres'}{' '}
+            {t('title')}{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-              {t('titleHighlight') || 'resultats'}
+              {t('titleHighlight')}
             </span>
           </motion.h2>
-          
+
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -229,7 +229,7 @@ export default function StatsSectionReal() {
             transition={{ delay: 0.2 }}
             className="text-white/60 max-w-2xl mx-auto"
           >
-            {t('subtitle') || 'Dades actualitzades en temps real des de la nostra base de dades. Zero números inventats.'}
+            {t('subtitle')}
           </motion.p>
         </div>
 
@@ -271,7 +271,7 @@ export default function StatsSectionReal() {
                   </div>
                 </div>
                 <div className="text-white/60 text-sm">
-                  {stats.googleReviewsCount} {t('googleReviews') || 'ressenyes a Google'}
+                  {stats.googleReviewsCount} {t('googleReviews')}
                 </div>
               </div>
             </div>
@@ -286,7 +286,7 @@ export default function StatsSectionReal() {
           transition={{ delay: 0.6 }}
           className="text-center mt-8 text-white/40 text-sm"
         >
-          {t('footer') || 'Dades actualitzades automàticament. Última actualització: avui.'}
+          {t('footer')}
         </motion.p>
       </div>
     </section>

@@ -25,6 +25,7 @@ export default function ConfiguradorSticky() {
 
   const t = useTranslations('common.buttons');
   const tSticky = useTranslations('sticky');
+  const tAccessibility = useTranslations('accessibility');
   const { track: trackEvent } = useAnalytics();
 
   // ========================================
@@ -142,7 +143,7 @@ export default function ConfiguradorSticky() {
                      transition-all duration-300 ease-out
                      focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--oe-gold)]/50
                      active:scale-95"
-            aria-label="Ir al configurador de presupuestos"
+            aria-label={tAccessibility('goToConfigurator')}
           >
             {/* Icon with animation */}
             <motion.div

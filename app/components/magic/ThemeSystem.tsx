@@ -9,6 +9,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 // ════════════════════════════════════════════════════════════
 // TIPUS I CONFIGURACIÓ
@@ -177,6 +178,7 @@ export function MagicThemeProvider({ children }: { children: React.ReactNode }) 
 // ════════════════════════════════════════════════════════════
 
 export function ThemeSwitcher() {
+  const t = useTranslations('themeSwitcher');
   const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -219,7 +221,7 @@ export function ThemeSwitcher() {
             exit={{ opacity: 0, x: -10 }}
             className="absolute left-20 top-1/2 -translate-y-1/2 px-4 py-2 rounded-xl bg-black/90 backdrop-blur-xl border border-white/20 whitespace-nowrap"
           >
-            <span className="text-white/80 text-sm">Prova la nostra màgia! ✨</span>
+            <span className="text-white/80 text-sm">{t('tryMagic')}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -234,32 +236,32 @@ export function ThemeSwitcher() {
             className="absolute bottom-20 left-0 p-4 rounded-3xl bg-black/95 backdrop-blur-2xl border border-white/20 shadow-2xl min-w-[280px]"
           >
             <p className="text-white/60 text-sm mb-4 text-center">
-              Transforma la web. Imagina el teu event.
+              {t('transformWeb')}
             </p>
 
             <div className="grid grid-cols-1 gap-2">
-              {themes.map((t) => (
+              {themes.map((themeItem) => (
                 <motion.button
-                  key={t.id}
+                  key={themeItem.id}
                   onClick={() => {
-                    setTheme(t.id);
+                    setTheme(themeItem.id);
                     setTimeout(() => setIsOpen(false), 300);
                   }}
                   className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all ${
-                    theme === t.id
+                    theme === themeItem.id
                       ? 'bg-gradient-to-r from-white/20 to-white/10 border border-white/30'
                       : 'hover:bg-white/10 border border-transparent'
                   }`}
                   whileHover={{ x: 5 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <span className="text-3xl">{t.icon}</span>
-                  <span className="text-white font-medium">{t.name}</span>
-                  {theme === t.id && (
+                  <span className="text-3xl">{themeItem.icon}</span>
+                  <span className="text-white font-medium">{themeItem.name}</span>
+                  {theme === themeItem.id && (
                     <motion.div
                       layoutId="active-indicator"
                       className="ml-auto w-3 h-3 rounded-full"
-                      style={{ backgroundColor: t.colors.accent }}
+                      style={{ backgroundColor: themeItem.colors.accent }}
                     />
                   )}
                 </motion.button>
@@ -267,7 +269,7 @@ export function ThemeSwitcher() {
             </div>
 
             <p className="text-white/40 text-xs mt-4 text-center">
-              🎃 Escriu "BOO" | 🪄 Escriu "LUMOS"
+              {t('secretCodes')}
             </p>
           </motion.div>
         )}
@@ -281,6 +283,7 @@ export function ThemeSwitcher() {
 // ════════════════════════════════════════════════════════════
 
 export function MobileThemeSwitcher() {
+  const t = useTranslations('themeSwitcher');
   const { theme, setTheme, config } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -354,8 +357,8 @@ export function MobileThemeSwitcher() {
             {/* Header */}
             <div className="flex items-center justify-between p-4 pt-safe">
               <div>
-                <h2 className="text-2xl font-bold text-white">🎭 Tria el teu món</h2>
-                <p className="text-sm text-white/50 mt-1">Transforma l'experiència</p>
+                <h2 className="text-2xl font-bold text-white">🎭 {t('chooseWorld')}</h2>
+                <p className="text-sm text-white/50 mt-1">{t('transformExperience')}</p>
               </div>
               <motion.button
                 onClick={() => setIsOpen(false)}
@@ -368,48 +371,48 @@ export function MobileThemeSwitcher() {
 
             {/* Grid de temes 2x3 */}
             <div className="flex-1 p-4 grid grid-cols-2 gap-4 content-center">
-              {Object.values(THEME_CONFIGS).map((t, index) => (
+              {Object.values(THEME_CONFIGS).map((themeItem, index) => (
                 <motion.button
-                  key={t.id}
-                  onClick={() => handleSelect(t.id)}
+                  key={themeItem.id}
+                  onClick={() => handleSelect(themeItem.id)}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.08 }}
                   className={`relative aspect-square rounded-3xl flex flex-col items-center justify-center gap-3 transition-all duration-300 overflow-hidden ${
-                    theme === t.id
+                    theme === themeItem.id
                       ? 'bg-white/15 scale-[1.02]'
                       : 'bg-white/5 active:bg-white/10 active:scale-[0.98]'
                   }`}
                   style={{
-                    border: theme === t.id ? `3px solid ${t.colors.accent}` : '3px solid transparent',
-                    boxShadow: theme === t.id ? `0 0 30px ${t.colors.glow}` : 'none',
+                    border: theme === themeItem.id ? `3px solid ${themeItem.colors.accent}` : '3px solid transparent',
+                    boxShadow: theme === themeItem.id ? `0 0 30px ${themeItem.colors.glow}` : 'none',
                   }}
                 >
                   {/* Fons gradient del tema */}
                   <div
                     className="absolute inset-0 opacity-30"
                     style={{
-                      background: `radial-gradient(circle at center, ${t.colors.accent}40 0%, transparent 70%)`,
+                      background: `radial-gradient(circle at center, ${themeItem.colors.accent}40 0%, transparent 70%)`,
                     }}
                   />
 
                   {/* Icona gran */}
                   <motion.span
                     className="text-6xl relative z-10"
-                    animate={theme === t.id ? {
+                    animate={theme === themeItem.id ? {
                       scale: [1, 1.1, 1],
                       rotate: [0, 5, -5, 0]
                     } : {}}
                     transition={{ duration: 1, repeat: Infinity }}
                   >
-                    {t.icon}
+                    {themeItem.icon}
                   </motion.span>
 
                   {/* Nom */}
-                  <span className="text-white font-bold text-lg relative z-10">{t.name}</span>
+                  <span className="text-white font-bold text-lg relative z-10">{themeItem.name}</span>
 
                   {/* Badge actiu */}
-                  {theme === t.id && (
+                  {theme === themeItem.id && (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -425,7 +428,7 @@ export function MobileThemeSwitcher() {
             {/* Footer amb hint */}
             <div className="p-4 pb-safe text-center">
               <p className="text-white/40 text-sm">
-                📱 2x sacseja = efecte màgic · 4x sacseja = canvi tema
+                {t('shakeHint')}
               </p>
             </div>
           </motion.div>

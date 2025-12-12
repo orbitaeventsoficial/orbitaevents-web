@@ -57,34 +57,17 @@ import { useTranslations } from 'next-intl';
 // 📸 DADES - Les fotos REALS d'Òrbita
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-const FOTOS_HERO = [
-  {
-    src: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
-    alt: 'Festa Halloween Òrbita Events',
-    tema: 'halloween',
-  },
-  {
-    src: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
-    alt: 'Festa Món Màgic Òrbita Events',
-    tema: 'monmagic',
-  },
-  {
-    src: '/img/portfolio/bodas/bodas-01.webp',
-    alt: 'Boda amb Òrbita Events',
-    tema: 'boda',
-  },
-  {
-    src: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
-    alt: 'Festa privada Òrbita Events',
-    tema: 'festa',
-  },
+// Fotos hero - els alt vindran de traduccions
+const FOTOS_HERO_DATA = [
+  { src: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg', tema: 'halloween', altKey: 'hero.altHalloween' },
+  { src: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp', tema: 'monmagic', altKey: 'hero.altMonMagic' },
+  { src: '/img/portfolio/bodas/bodas-01.webp', tema: 'boda', altKey: 'hero.altBoda' },
+  { src: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp', tema: 'festa', altKey: 'hero.altFesta' },
 ];
 
-const REGNES = {
+// Dades estàtiques dels regnes (no traduïbles: colors, gradients, fotos, emojis)
+const REGNES_DATA = {
   halloween: {
-    nom: '🎃 Halloween',
-    titol: 'La Nit dels Morts',
-    desc: 'Fum, llums verdes, carbasses, terror... Una nit que no oblidaran.',
     color: '#ff6b00',
     gradient: 'from-orange-600 via-red-700 to-black',
     fotos: [
@@ -104,9 +87,6 @@ const REGNES = {
     particules: ['🎃', '👻', '🦇', '🕷️', '💀', '🕸️'],
   },
   monmagic: {
-    nom: '🧙‍♂️ Món Màgic',
-    titol: "Benvingut a l'Escola de Màgia",
-    desc: 'Varetes, cases, màgia... El somni de tot fan de la fantasia fet realitat.',
     color: '#ffd700',
     gradient: 'from-amber-600 via-red-800 to-black',
     fotos: [
@@ -127,25 +107,17 @@ const REGNES = {
   },
 };
 
-const TESTIMONIS = [
+// Dades estàtiques dels testimonis (fotos i ratings)
+const TESTIMONIS_DATA = [
   {
-    text: "Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació està sent increïble!",
-    nom: "Lorena & Carles",
-    event: "Boda Món Màgic · Pròximament",
     foto: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-06.webp',
     rating: 5,
   },
   {
-    text: "La millor festa de Halloween de la meva vida. El fum, les llums, tot perfecte. Els meus amics al·lucinaven.",
-    nom: "Àngela",
-    event: "18 aniversari Halloween · Octubre 2024",
     foto: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-06.webp',
     rating: 5,
   },
   {
-    text: "Volíem quelcom diferent per l'empresa. Van superar totes les expectatives. Professional i creatiu.",
-    nom: "TechCat S.L.",
-    event: "Event corporatiu · Desembre 2024",
     foto: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
     rating: 5,
   },
@@ -359,6 +331,12 @@ function Capitol1_Encantament({ t }: { t: (key: string) => string }) {
   const touchStartX = useRef(0);
   const autoplayRef = useRef<NodeJS.Timeout>();
 
+  // Genera fotos amb alt traduït
+  const FOTOS_HERO = FOTOS_HERO_DATA.map(foto => ({
+    ...foto,
+    alt: t(foto.altKey),
+  }));
+
   // Autoplay amb progress bar
   useEffect(() => {
     const duration = 5000; // 5 segons per slide
@@ -370,7 +348,7 @@ function Capitol1_Encantament({ t }: { t: (key: string) => string }) {
       setProgress((elapsed / duration) * 100);
 
       if (elapsed >= duration) {
-        setCurrent((prev) => (prev + 1) % FOTOS_HERO.length);
+        setCurrent((prev) => (prev + 1) % FOTOS_HERO_DATA.length);
         elapsed = 0;
       }
     }, interval);
@@ -389,9 +367,9 @@ function Capitol1_Encantament({ t }: { t: (key: string) => string }) {
     const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) {
       if (diff > 0) {
-        setCurrent((prev) => (prev + 1) % FOTOS_HERO.length);
+        setCurrent((prev) => (prev + 1) % FOTOS_HERO_DATA.length);
       } else {
-        setCurrent((prev) => (prev - 1 + FOTOS_HERO.length) % FOTOS_HERO.length);
+        setCurrent((prev) => (prev - 1 + FOTOS_HERO_DATA.length) % FOTOS_HERO_DATA.length);
       }
       setProgress(0);
     }
@@ -431,7 +409,7 @@ function Capitol1_Encantament({ t }: { t: (key: string) => string }) {
 
       {/* Progress bars estil Stories */}
       <div className="absolute top-0 left-0 right-0 flex gap-1 p-3 pt-safe z-20">
-        {FOTOS_HERO.map((_, idx) => (
+        {FOTOS_HERO_DATA.map((_, idx) => (
           <div key={idx} className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-white rounded-full"
@@ -552,7 +530,7 @@ function Capitol3_Regnes({ t }: { t: (key: string) => string }) {
   const [fotoIndex, setFotoIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const regne = REGNES[regneActiu];
+  const regneData = REGNES_DATA[regneActiu];
 
   // Reset foto index quan canvia de regne
   useEffect(() => {
@@ -579,14 +557,14 @@ function Capitol3_Regnes({ t }: { t: (key: string) => string }) {
 
       {/* Selector de regne */}
       <div className="flex gap-3 px-6 mb-6">
-        {(Object.keys(REGNES) as Array<keyof typeof REGNES>).map((key) => (
+        {(Object.keys(REGNES_DATA) as Array<keyof typeof REGNES_DATA>).map((key) => (
           <motion.button
             key={key}
             onClick={() => setRegneActiu(key)}
             whileTap={{ scale: 0.95 }}
             className={`px-5 py-3 rounded-2xl font-bold text-sm transition-all ${
               regneActiu === key
-                ? `bg-gradient-to-r ${REGNES[key].gradient} text-white shadow-lg`
+                ? `bg-gradient-to-r ${REGNES_DATA[key].gradient} text-white shadow-lg`
                 : 'bg-white/5 text-white/50 border border-white/10'
             }`}
           >
@@ -615,7 +593,7 @@ function Capitol3_Regnes({ t }: { t: (key: string) => string }) {
         className="flex gap-4 px-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {regne.fotos.map((foto, idx) => (
+        {regneData.fotos.map((foto, idx) => (
           <motion.div
             key={`${regneActiu}-${idx}`}
             initial={{ opacity: 0, scale: 0.9 }}
@@ -637,7 +615,7 @@ function Capitol3_Regnes({ t }: { t: (key: string) => string }) {
                 sizes="75vw"
               />
               {/* Gradient overlay */}
-              <div className={`absolute inset-0 bg-gradient-to-t ${regne.gradient} opacity-30`} />
+              <div className={`absolute inset-0 bg-gradient-to-t ${regneData.gradient} opacity-30`} />
 
               {/* Número de foto */}
               <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
@@ -651,9 +629,9 @@ function Capitol3_Regnes({ t }: { t: (key: string) => string }) {
         <div className="snap-center flex-shrink-0">
           <Link
             href="/contacto"
-            className={`flex flex-col items-center justify-center w-[75vw] max-w-[300px] aspect-[3/4] rounded-3xl bg-gradient-to-br ${regne.gradient} p-8`}
+            className={`flex flex-col items-center justify-center w-[75vw] max-w-[300px] aspect-[3/4] rounded-3xl bg-gradient-to-br ${regneData.gradient} p-8`}
           >
-            <span className="text-6xl mb-4">{regne.particules[0]}</span>
+            <span className="text-6xl mb-4">{regneData.particules[0]}</span>
             <p className="text-white font-bold text-xl text-center mb-2">
               {t('realms.wantParty')}
               <br />
@@ -672,7 +650,7 @@ function Capitol3_Regnes({ t }: { t: (key: string) => string }) {
           {t('realms.swipeHint')}
         </p>
         <p className="text-white/40 text-xs">
-          {fotoIndex + 1} / {regne.fotos.length}
+          {fotoIndex + 1} / {regneData.fotos.length}
         </p>
       </div>
     </section>
@@ -724,7 +702,7 @@ function Capitol4_Proves({ t }: { t: (key: string) => string }) {
             <div className="relative rounded-2xl overflow-hidden">
               <Image
                 src={foto}
-                alt={`Event ${idx + 1}`}
+                alt={`${t('gallery.imageAlt')} ${idx + 1}`}
                 width={400}
                 height={idx % 3 === 0 ? 500 : 350}
                 className="w-full object-cover"
@@ -765,14 +743,14 @@ function Capitol5_Testimonis({ t }: { t: (key: string) => string }) {
     const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) {
       if (diff > 0) {
-        setCurrent((prev) => (prev + 1) % TESTIMONIS.length);
+        setCurrent((prev) => (prev + 1) % TESTIMONIS_DATA.length);
       } else {
-        setCurrent((prev) => (prev - 1 + TESTIMONIS.length) % TESTIMONIS.length);
+        setCurrent((prev) => (prev - 1 + TESTIMONIS_DATA.length) % TESTIMONIS_DATA.length);
       }
     }
   };
 
-  const testimoni = TESTIMONIS[current];
+  const testimoniData = TESTIMONIS_DATA[current];
 
   return (
     <section className="py-16 bg-neutral-950">
@@ -806,8 +784,8 @@ function Capitol5_Testimonis({ t }: { t: (key: string) => string }) {
             {/* Imatge de l'event */}
             <div className="relative aspect-video">
               <Image
-                src={testimoni.foto}
-                alt={testimoni.event}
+                src={testimoniData.foto}
+                alt={t(`testimonis.${current}.event`)}
                 fill
                 className="object-cover"
                 sizes="100vw"
@@ -816,7 +794,7 @@ function Capitol5_Testimonis({ t }: { t: (key: string) => string }) {
 
               {/* Rating */}
               <div className="absolute top-4 right-4 flex gap-0.5">
-                {[...Array(testimoni.rating)].map((_, i) => (
+                {[...Array(testimoniData.rating)].map((_, i) => (
                   <span key={i} className="text-amber-400 text-lg">★</span>
                 ))}
               </div>
@@ -824,7 +802,7 @@ function Capitol5_Testimonis({ t }: { t: (key: string) => string }) {
               {/* Event badge */}
               <div className="absolute bottom-4 left-4">
                 <span className="px-3 py-1.5 bg-amber-500 rounded-full text-black text-xs font-bold">
-                  {testimoni.event}
+                  {t(`testimonis.${current}.event`)}
                 </span>
               </div>
             </div>
@@ -832,10 +810,10 @@ function Capitol5_Testimonis({ t }: { t: (key: string) => string }) {
             {/* Text */}
             <div className="p-6">
               <blockquote className="text-white text-lg leading-relaxed mb-4">
-                &ldquo;{testimoni.text}&rdquo;
+                &ldquo;{t(`testimonis.${current}.text`)}&rdquo;
               </blockquote>
               <p className="text-amber-400 font-bold">
-                — {testimoni.nom}
+                — {t(`testimonis.${current}.nom`)}
               </p>
             </div>
           </motion.div>
@@ -843,7 +821,7 @@ function Capitol5_Testimonis({ t }: { t: (key: string) => string }) {
 
         {/* Navegació */}
         <div className="flex items-center justify-center gap-2 mt-6">
-          {TESTIMONIS.map((_, idx) => (
+          {TESTIMONIS_DATA.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrent(idx)}

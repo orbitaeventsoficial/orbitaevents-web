@@ -1,18 +1,25 @@
 import { SITE_CONFIG } from '@/config/site-config';
+import { getTranslations } from 'next-intl/server';
 
 /**
  * STRUCTURED DATA (JSON-LD) - SEO BRUTAL
  * Google ama esto - Rich snippets, Knowledge Graph, mejor ranking
  */
 
-export default function StructuredData() {
+interface Props {
+  locale: string;
+}
+
+export default async function StructuredData({ locale }: Props) {
+  const t = await getTranslations({ locale, namespace: 'structuredData' });
+
   // 1. Organization Schema
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'EventPlanner',
     name: SITE_CONFIG.business.name,
     legalName: SITE_CONFIG.business.legalName,
-    description: 'Creamos experiencias completas personalizadas para eventos en Barcelona y Girona. DJ profesional, tematización, animación, efectos especiales.',
+    description: t('organization.description'),
     url: SITE_CONFIG.web.url,
     logo: `${SITE_CONFIG.web.url}${SITE_CONFIG.web.logo}`,
     image: `${SITE_CONFIG.web.url}/og-home.jpg`,
@@ -123,30 +130,30 @@ export default function StructuredData() {
     },
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
-      name: 'Servicios de DJ y Eventos',
+      name: t('service.catalogName'),
       itemListElement: [
         {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'DJ para Bodas',
-            description: 'Servicio completo de DJ, música y animación para bodas con tematización personalizada.',
+            name: t('service.djWeddings'),
+            description: t('service.djWeddingsDesc'),
           },
         },
         {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'Discomóvil Profesional',
-            description: 'Discomóvil con equipamiento profesional, luces LED y efectos especiales.',
+            name: t('service.discomovil'),
+            description: t('service.discomovilDesc'),
           },
         },
         {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'Eventos Corporativos',
-            description: 'Producción técnica completa para eventos de empresa y team building.',
+            name: t('service.corporate'),
+            description: t('service.corporateDesc'),
           },
         },
       ],
@@ -160,58 +167,58 @@ export default function StructuredData() {
     mainEntity: [
       {
         '@type': 'Question',
-        name: '¿Qué hace diferente a Òrbita de otros DJ/proveedores de eventos?',
+        name: t('faq.q1'),
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Creamos experiencias completas personalizadas. No solo música: tematización + animación + música adaptada en tiempo real + juegos + efectos. Nuestro DJ lee el ambiente y ajusta sobre la marcha.',
+          text: t('faq.a1'),
         },
       },
       {
         '@type': 'Question',
-        name: '¿Cuánto cuesta contratar Òrbita para mi boda/fiesta/evento?',
+        name: t('faq.q2'),
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Trabajamos con packs claros desde 250€. Los precios se calculan automáticamente según horas, equipo y tipo de evento en nuestro configurador.',
+          text: t('faq.a2'),
         },
       },
       {
         '@type': 'Question',
-        name: '¿Trabajáis fuera de Barcelona? ¿Cubrís Girona y Costa Brava?',
+        name: t('faq.q3'),
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Transporte GRATIS hasta 25km desde Granollers. Más allá, se añade según distancia.',
+          text: t('faq.a3'),
         },
       },
       {
         '@type': 'Question',
-        name: '¿Qué equipo de sonido e iluminación utilizáis?',
+        name: t('faq.q4'),
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Utilizamos equipos profesionales Pioneer DJ, sistemas de sonido JBL/EV con potencia adaptada al espacio, y cabezas móviles LED con control DMX para efectos sincronizados.',
+          text: t('faq.a4'),
         },
       },
       {
         '@type': 'Question',
-        name: '¿Con cuánta antelación debo reservar?',
+        name: t('faq.q5'),
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Recomendamos reservar con 2-3 meses de antelación para bodas y eventos grandes. Para fiestas privadas, 2-4 semanas suele ser suficiente. Las fechas populares (sábados de verano) se agotan rápido.',
+          text: t('faq.a5'),
         },
       },
       {
         '@type': 'Question',
-        name: '¿Puedo elegir la música de mi evento?',
+        name: t('faq.q6'),
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Sí, te enviamos un formulario previo para conocer tus gustos y peticiones especiales. Durante el evento, nuestro DJ adapta la música en tiempo real según la respuesta del público.',
+          text: t('faq.a6'),
         },
       },
       {
         '@type': 'Question',
-        name: '¿Qué pasa si hay un problema técnico durante el evento?',
+        name: t('faq.q7'),
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Llevamos siempre equipo de backup y un técnico profesional. Tenemos protocolos de contingencia para garantizar que tu evento no se detenga nunca.',
+          text: t('faq.a7'),
         },
       },
     ],

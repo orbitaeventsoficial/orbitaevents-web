@@ -4,9 +4,11 @@ import { useEffect } from "react";
 import Link from 'next/link';
 import ContactForm from "@/components/forms/ContactForm.client";
 import { Briefcase, Users, Lightbulb, Star, Check, FileText, Shield, TrendingUp, Handshake, Sparkles } from "lucide-react";
+import { useTranslations } from 'next-intl';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
 
 export default function EmpresasClient() {
+  const t = useTranslations('pages.corporate');
   const { track } = useAnalytics();
 
   useEffect(() => {
@@ -38,13 +40,13 @@ export default function EmpresasClient() {
 
         <div className="relative z-20 mx-auto max-w-6xl px-4 py-20 text-center">
           <h1 className="text-5xl sm:text-7xl font-display font-black text-white mb-6 leading-[1.05]">
-            DJ Eventos Corporativos
+            {t('heroTitle')}
             <br />
-            <span className="gradient-text breathe">Barcelona</span>
+            <span className="gradient-text breathe">{t('heroTitleCity')}</span>
           </h1>
           <p className="text-xl sm:text-2xl text-text-muted max-w-3xl mx-auto mb-10 leading-relaxed">
-            Cenas de empresa, team building, presentaciones y networking elegante.
-            <br />Profesionalismo que refuerza tu marca.
+            {t('heroSubtitle')}
+            <br />{t('heroSubtitle2')}
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -54,7 +56,7 @@ export default function EmpresasClient() {
               onClick={() => track("CTA_Configurador_Empresas")}
             >
               <Sparkles className="w-5 h-5" />
-              Configurar Mi Evento
+              {t('configureEvent')}
             </Link>
             <Link
               href="/contacto"
@@ -62,7 +64,7 @@ export default function EmpresasClient() {
               onClick={() => track("CTA_Contact_Empresas")}
             >
               <FileText className="w-5 h-5" />
-              Solicitar Propuesta
+              {t('requestProposal')}
             </Link>
           </div>
         </div>
@@ -72,49 +74,25 @@ export default function EmpresasClient() {
       <section className="py-20 sm:py-32 bg-gradient-to-b from-bg-main to-bg-surface">
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-h2 text-center text-white mb-12">
-            Eventos que <span className="text-oe-gold">Conectan</span>
+            {t('eventsTitle')} <span className="text-oe-gold">{t('eventsTitleHighlight')}</span>
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              {
-                icon: Briefcase,
-                title: "Cenas de Empresa",
-                text: "Música ambiente elegante, iluminación corporativa y coordinación impecable para que tu equipo disfrute sin preocupaciones.",
-              },
-              {
-                icon: Users,
-                title: "Team Building",
-                text: "Dinámicas musicales, juegos interactivos y ambiente que genera conexión real entre tu equipo.",
-              },
-              {
-                icon: Handshake,
-                title: "Networking Empresarial",
-                text: "Música de fondo sofisticada, iluminación profesional y ambiente que facilita la conversación.",
-              },
-              {
-                icon: TrendingUp,
-                title: "Presentaciones Corporativas",
-                text: "Sonido profesional para speakers, pantallas LED, iluminación escénica y coordinación con protocolo.",
-              },
-              {
-                icon: Lightbulb,
-                title: "Lanzamientos de Producto",
-                text: "Producción técnica completa, branding integrado y efectos especiales para impactar a tus invitados.",
-              },
-              {
-                icon: Star,
-                title: "Eventos Institucionales",
-                text: "Profesionalismo en cada detalle: montaje discreto, técnico onsite y backup total del equipamiento.",
-              },
+              { icon: Briefcase, key: 'companyDinners' },
+              { icon: Users, key: 'teamBuilding' },
+              { icon: Handshake, key: 'networking' },
+              { icon: TrendingUp, key: 'presentations' },
+              { icon: Lightbulb, key: 'productLaunch' },
+              { icon: Star, key: 'institutional' },
             ].map((s, i) => (
               <div
                 key={i}
                 className="p-8 rounded-3xl bg-bg-surface border border-border hover:border-oe-gold/50 transition-all text-center"
               >
                 <s.icon className="w-12 h-12 text-oe-gold mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-white mb-2">{s.title}</h3>
-                <p className="text-text-muted text-sm leading-relaxed">{s.text}</p>
+                <h3 className="text-2xl font-bold text-white mb-2">{t(`events.${s.key}.title`)}</h3>
+                <p className="text-text-muted text-sm leading-relaxed">{t(`events.${s.key}.text`)}</p>
               </div>
             ))}
           </div>
@@ -129,27 +107,27 @@ export default function EmpresasClient() {
               <Shield className="w-10 h-10 text-oe-gold" />
             </div>
             <h2 className="text-3xl sm:text-4xl font-display font-black text-white mb-4 text-center">
-              Profesionalismo que Refuerza tu Marca
+              {t('valueTitle')}
             </h2>
             <p className="text-xl text-text-muted mb-8 leading-relaxed text-center">
-              No solo producción técnica: creamos networking elegante, ambiente profesional y momentos de conexión real entre asistentes. Tu equipo recuerda el evento, tu cliente queda impresionado.
+              {t('valueText')}
             </p>
 
             <div className="grid sm:grid-cols-3 gap-6 text-center">
               <div className="p-4 bg-bg-main rounded-xl">
                 <Star className="w-6 h-6 text-oe-gold mx-auto mb-2" />
-                <p className="text-white font-bold">2+</p>
-                <p className="text-text-muted text-xs">Años experiencia</p>
+                <p className="text-white font-bold">{t('stats.experience.value')}</p>
+                <p className="text-text-muted text-xs">{t('stats.experience.label')}</p>
               </div>
               <div className="p-4 bg-bg-main rounded-xl">
                 <Check className="w-6 h-6 text-oe-gold mx-auto mb-2" />
-                <p className="text-white font-bold">BCN</p>
-                <p className="text-text-muted text-xs">+ Girona</p>
+                <p className="text-white font-bold">{t('stats.location.value')}</p>
+                <p className="text-text-muted text-xs">{t('stats.location.label')}</p>
               </div>
               <div className="p-4 bg-bg-main rounded-xl">
                 <Briefcase className="w-6 h-6 text-oe-gold mx-auto mb-2" />
-                <p className="text-white font-bold">100%</p>
-                <p className="text-text-muted text-xs">Dedicación</p>
+                <p className="text-white font-bold">{t('stats.dedication.value')}</p>
+                <p className="text-text-muted text-xs">{t('stats.dedication.label')}</p>
               </div>
             </div>
           </div>
@@ -160,35 +138,35 @@ export default function EmpresasClient() {
       <section className="py-20 sm:py-32 bg-gradient-to-b from-bg-surface to-bg-main">
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="text-h2 text-center text-white mb-12">
-            Qué Incluye <span className="text-oe-gold">Tu Evento</span>
+            {t('includesTitle')} <span className="text-oe-gold">{t('includesTitleHighlight')}</span>
           </h2>
 
           <div className="grid md:grid-cols-2 gap-8">
             <div className="p-8 rounded-3xl bg-bg-surface border border-oe-gold/30">
               <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                 <Check className="w-6 h-6 text-oe-gold" />
-                Producción Técnica
+                {t('techProduction')}
               </h3>
               <ul className="space-y-3 text-text-muted">
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-oe-gold flex-shrink-0 mt-0.5" />
-                  <span>Sonido profesional Pioneer + EV (cobertura perfecta)</span>
+                  <span>{t('techFeatures.sound')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-oe-gold flex-shrink-0 mt-0.5" />
-                  <span>Iluminación LED corporativa sincronizada con branding</span>
+                  <span>{t('techFeatures.lighting')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-oe-gold flex-shrink-0 mt-0.5" />
-                  <span>Micrófonos inalámbricos para speakers/presentadores</span>
+                  <span>{t('techFeatures.mics')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-oe-gold flex-shrink-0 mt-0.5" />
-                  <span>Pantallas LED opcionales para proyección corporativa</span>
+                  <span>{t('techFeatures.screens')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-oe-gold flex-shrink-0 mt-0.5" />
-                  <span>Montaje discreto, técnico onsite y backup total</span>
+                  <span>{t('techFeatures.setup')}</span>
                 </li>
               </ul>
             </div>
@@ -196,28 +174,28 @@ export default function EmpresasClient() {
             <div className="p-8 rounded-3xl bg-bg-surface border border-oe-gold/30">
               <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                 <Sparkles className="w-6 h-6 text-oe-gold" />
-                Ambiente Profesional
+                {t('ambientTitle')}
               </h3>
               <ul className="space-y-3 text-text-muted">
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-oe-gold flex-shrink-0 mt-0.5" />
-                  <span>Música ambiente adaptada al momento del evento</span>
+                  <span>{t('ambientFeatures.music')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-oe-gold flex-shrink-0 mt-0.5" />
-                  <span>Integración de identidad corporativa (logo, colores, mensajes)</span>
+                  <span>{t('ambientFeatures.branding')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-oe-gold flex-shrink-0 mt-0.5" />
-                  <span>Dinámicas de networking si se requieren</span>
+                  <span>{t('ambientFeatures.networking')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-oe-gold flex-shrink-0 mt-0.5" />
-                  <span>Coordinación con catering, venue y proveedores</span>
+                  <span>{t('ambientFeatures.coordination')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-oe-gold flex-shrink-0 mt-0.5" />
-                  <span>Protocolo y timing impecable durante el evento</span>
+                  <span>{t('ambientFeatures.protocol')}</span>
                 </li>
               </ul>
             </div>
@@ -229,10 +207,10 @@ export default function EmpresasClient() {
       <section className="py-20 sm:py-32 bg-gradient-to-b from-bg-main to-bg-surface">
         <div className="mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-4xl font-display font-black text-white mb-6">
-            Cuéntanos Tu Evento
+            {t('formTitle')}
           </h2>
           <p className="text-lg text-text-muted mb-10">
-            Dinos qué necesitas y te enviaremos una propuesta adaptada a tu empresa.
+            {t('formSubtitle')}
           </p>
           <ContactForm />
         </div>

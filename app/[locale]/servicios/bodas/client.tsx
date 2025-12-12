@@ -129,11 +129,11 @@ export default function BodasClientV2() {
       <section className="py-16 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-6">
           <Heart className="w-4 h-4 text-oe-gold" fill="currentColor" />
-          <span className="text-sm font-bold text-oe-gold">2+ anys en el sector</span>
+          <span className="text-sm font-bold text-oe-gold">{t('badgeYears')}</span>
         </div>
 
         <h1 className="text-5xl md:text-6xl font-display font-black text-text-primary mb-4">
-          DJ para Bodas en Barcelona
+          {t('heroTitle')}
         </h1>
         <p className="text-xl text-text-muted max-w-2xl mx-auto">
           {t('heroSubtitle')}
@@ -222,7 +222,7 @@ export default function BodasClientV2() {
                   <div className="absolute -top-3 right-4">
                     <div className="px-3 py-1 bg-oe-gold rounded-full text-xs font-bold flex items-center gap-1">
                       <TrendingUp className="w-3 h-3" />
-                      RECOMENDADO
+                      {t('recommendedBadge')}
                     </div>
                   </div>
                 )}
@@ -478,10 +478,10 @@ export default function BodasClientV2() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-4">
             <MapPin className="w-4 h-4 text-oe-gold" />
-            <span className="text-sm font-medium text-oe-gold">Cobertura en Catalunya</span>
+            <span className="text-sm font-medium text-oe-gold">{t('coverage.badge')}</span>
           </div>
-          <h3 className="text-2xl font-bold text-text-primary">¿Dónde es tu boda?</h3>
-          <p className="text-text-muted mt-2">Especialistas en cada zona</p>
+          <h3 className="text-2xl font-bold text-text-primary">{t('coverage.title')}</h3>
+          <p className="text-text-muted mt-2">{t('coverage.subtitle')}</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Link
@@ -489,32 +489,32 @@ export default function BodasClientV2() {
             className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
           >
             <div className="text-2xl mb-2">🏖️</div>
-            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">Maresme</div>
-            <div className="text-xs text-text-muted">Mataró, Calella...</div>
+            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">{t('coverage.zones.maresme.name')}</div>
+            <div className="text-xs text-text-muted">{t('coverage.zones.maresme.desc')}</div>
           </Link>
           <Link
             href="/servicios/dj-bodas-girona"
             className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
           >
             <div className="text-2xl mb-2">🏛️</div>
-            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">Girona</div>
-            <div className="text-xs text-text-muted">Ciudad y provincia</div>
+            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">{t('coverage.zones.girona.name')}</div>
+            <div className="text-xs text-text-muted">{t('coverage.zones.girona.desc')}</div>
           </Link>
           <Link
             href="/servicios/dj-bodas-costa-brava"
             className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
           >
             <div className="text-2xl mb-2">🌊</div>
-            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">Costa Brava</div>
-            <div className="text-xs text-text-muted">Cadaqués, Tossa...</div>
+            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">{t('coverage.zones.costaBrava.name')}</div>
+            <div className="text-xs text-text-muted">{t('coverage.zones.costaBrava.desc')}</div>
           </Link>
           <Link
             href="/servicios/dj-bodas-valles"
             className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
           >
             <div className="text-2xl mb-2">🏡</div>
-            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">Vallès</div>
-            <div className="text-xs text-text-muted">Granollers, Sabadell...</div>
+            <div className="font-semibold text-text-primary group-hover:text-oe-gold transition-colors">{t('coverage.zones.valles.name')}</div>
+            <div className="text-xs text-text-muted">{t('coverage.zones.valles.desc')}</div>
           </Link>
         </div>
       </section>

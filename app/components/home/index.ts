@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // ÒRBITA EVENTS - Components Home
 // ═══════════════════════════════════════════════════════════════════════════
-// 
+//
 // GUIA D'ÚS:
 // - Components "REAL" = Connectats a BD, ZERO fake data
 // - Components "BRUTAL" = Disseny espectacular però dades estàtiques
@@ -10,7 +10,7 @@
 //
 // RECOMANACIÓ: Utilitza sempre els components REAL per la homepage!
 //
-// Versió: 3.0 DEFINITIVA - Desembre 2025
+// Versió: 4.0 NETEJADA - Desembre 2025
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -27,19 +27,13 @@ export { default as TestimonialsBrutalReal } from './TestimonialsBrutal-REAL';
 export { default as StatsSectionReal } from './StatsSection-REAL';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTS BRUTAL - Disseny espectacular (alguns amb dades estàtiques)
+// COMPONENTS BRUTAL - Disseny espectacular (sense dades fake)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Hero amb animacions però stats hardcoded - DEPRECATED, usa HeroBrutalReal
-export { default as HeroCinematicBrutal } from './HeroCinematic-BRUTAL';
-
-// Testimonials amb disseny brutal - DEPRECATED, usa TestimonialsBrutalReal
-export { TestimonialsBrutal } from './Testimonials-BRUTAL';
-
-// CTA Section amb disseny brutal - Aquest està bé, no té dades fake
+// CTA Section amb disseny brutal - Sense dades fake
 export { CTASectionBrutal } from './CTASection-BRUTAL';
 
-// Why Us amb disseny brutal - Aquest està bé, no té dades fake
+// Why Us amb disseny brutal - Sense dades fake
 export { WhyUsBrutal } from './WhyUs-BRUTAL';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -49,12 +43,6 @@ export { WhyUsBrutal } from './WhyUs-BRUTAL';
 export { Stats } from './Stats';
 export { Hero } from './Hero';
 export { HeroCinematic } from './HeroCinematic';
-export { ServicesGrid } from './ServicesGrid';
 export { WhyUs } from './WhyUs';
-export { ThemingSection } from './ThemingSection';
 export { Testimonials } from './Testimonials';
 export { CTASection } from './CTASection';
-
-// Versions anteriors REAL (per compatibilitat)
-export { default as HeroCinematicReal } from './HeroCinematic-REAL';
-export { TestimonialsBrutalReal as TestimonialsReal } from './Testimonials-REAL';

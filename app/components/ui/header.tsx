@@ -32,8 +32,7 @@ const SERVICIOS: ServiceItem[] = [
   { nameKey: 'services.parties.name', href: '/servicios/fiestas', iconKey: 'services.parties.icon' },
   { nameKey: 'services.mobile.name', href: '/servicios/discomovil', iconKey: 'services.mobile.icon' },
   { nameKey: 'services.corporate.name', href: '/servicios/empresas', iconKey: 'services.corporate.icon' },
-  { nameKey: 'services.production.name', href: '/servicios/produccion', iconKey: 'services.production.icon' },
-  { nameKey: 'services.rental.name', href: '/servicios/alquiler', iconKey: 'services.rental.icon' },
+  { nameKey: 'services.kids.name', href: '/servicios/animacion-infantil', iconKey: 'services.kids.icon' },
 ];
 
 const NAV_ITEMS: NavItem[] = [

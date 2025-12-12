@@ -6,6 +6,7 @@ import {
   Check, Star, FileText, Zap,
   Users, Clock, TrendingUp, ChevronRight, Flame
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { getPacksByService, EXTRAS, type PackDefinition } from '@/config/packs-config';
 
 // Obtener packs de discomóvil
@@ -24,6 +25,7 @@ interface ConfigState {
 }
 
 export default function DiscomovilClientV2() {
+  const t = useTranslations('pages.mobile');
   const [config, setConfig] = useState<ConfigState>({
     selectedPack: null,
     selectedExtras: new Set(),
@@ -129,14 +131,14 @@ export default function DiscomovilClientV2() {
       <section className="py-16 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-6">
           <Flame className="w-4 h-4 text-oe-gold" />
-          <span className="text-sm font-bold text-oe-gold">2+ anys en el sector</span>
+          <span className="text-sm font-bold text-oe-gold">{t('badgeYears')}</span>
         </div>
 
         <h1 className="text-5xl md:text-6xl font-display font-black text-text-primary mb-4">
-          Discomóvil Barcelona
+          {t('heroTitle')}
         </h1>
         <p className="text-xl text-text-muted max-w-2xl mx-auto">
-          Música adaptada en tiempo real, iluminación de ambiente y efectos especiales. Mucho más que poner música. Presupuesto al instante.
+          {t('heroSubtitle')}
         </p>
       </section>
 
@@ -145,14 +147,14 @@ export default function DiscomovilClientV2() {
         <div className="p-8 rounded-3xl bg-gradient-to-br from-bg-surface to-bg-card border border-oe-gold/30">
           <div className="flex items-center gap-3 mb-6">
             <Users className="w-6 h-6 text-oe-gold" />
-            <h3 className="text-2xl font-bold text-text-primary">¿Cuántas personas esperáis?</h3>
+            <h3 className="text-2xl font-bold text-text-primary">{t('guestsQuestion')}</h3>
           </div>
 
           <div className="text-center mb-8">
             <div className="text-7xl font-bold bg-gradient-to-r from-oe-gold to-red-400 bg-clip-text text-transparent">
               {config.numGuests}
             </div>
-            <div className="text-text-muted mt-2">personas</div>
+            <div className="text-text-muted mt-2">{t('people')}</div>
           </div>
 
           <input
@@ -165,8 +167,8 @@ export default function DiscomovilClientV2() {
             className="w-full h-3 rounded-full appearance-none cursor-pointer slider-custom"
           />
           <div className="flex justify-between text-sm text-text-muted mt-4">
-            <span>20 personas</span>
-            <span>300 personas</span>
+            <span>20 {t('people')}</span>
+            <span>300 {t('people')}</span>
           </div>
 
           {/* Recomendación */}
@@ -178,7 +180,7 @@ export default function DiscomovilClientV2() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-5 h-5 text-oe-gold" />
-                <span className="font-bold text-oe-gold">Recomendado para ti:</span>
+                <span className="font-bold text-oe-gold">{t('recommended')}</span>
               </div>
               <div className="text-lg text-text-primary">
                 <strong>{recommendedPack.name}</strong> - {recommendedPack.priceValue}€
@@ -192,7 +194,7 @@ export default function DiscomovilClientV2() {
       {/* Selector de packs */}
       <section className="max-w-7xl mx-auto px-4 mb-16">
         <h2 className="text-3xl font-bold text-text-primary text-center mb-12">
-          Elige Tu Pack Base
+          {t('choosePack')}
         </h2>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -222,7 +224,7 @@ export default function DiscomovilClientV2() {
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <div className="px-4 py-1 bg-gradient-to-r from-fuchsia-500 to-purple-500 rounded-full text-xs font-bold flex items-center gap-1 shadow-[0_0_20px_rgba(217,70,239,0.6)] animate-pulse">
                       <Star className="w-4 h-4" fill="currentColor" />
-                      MÁS POPULAR
+                      {t('mostPopular')}
                     </div>
                   </div>
                 )}
@@ -232,7 +234,7 @@ export default function DiscomovilClientV2() {
                   <div className="absolute -top-3 right-4">
                     <div className="px-3 py-1 bg-oe-gold rounded-full text-xs font-bold flex items-center gap-1">
                       <TrendingUp className="w-3 h-3" />
-                      RECOMENDADO
+                      {t('recommendedBadge')}
                     </div>
                   </div>
                 )}
@@ -269,7 +271,7 @@ export default function DiscomovilClientV2() {
                       : 'bg-bg-card text-text-primary hover:bg-white/20'
                     }
                   `}>
-                    {isSelected ? '✓ Seleccionado' : 'Seleccionar'}
+                    {isSelected ? `✓ ${t('selected')}` : t('select')}
                   </div>
                 </div>
               </motion.div>
@@ -288,7 +290,7 @@ export default function DiscomovilClientV2() {
           <div className="p-8 rounded-3xl bg-gradient-to-br from-oe-gold/20 to-oe-gold/20 border border-oe-gold/30">
             <div className="flex items-center gap-3 mb-6">
               <Clock className="w-6 h-6 text-oe-gold" />
-              <h3 className="text-2xl font-bold text-text-primary">¿Quieres alargar la fiesta?</h3>
+              <h3 className="text-2xl font-bold text-text-primary">{t('extendParty')}</h3>
             </div>
 
             <div className="flex items-center justify-center gap-4 mb-6">
@@ -305,7 +307,7 @@ export default function DiscomovilClientV2() {
                   +{config.extraHours}h
                 </div>
                 <div className="text-sm text-text-muted mt-2">
-                  {config.extraHours > 0 ? `+${extraHoursPrice}€` : 'Sin horas extra'}
+                  {config.extraHours > 0 ? `+${extraHoursPrice}€` : t('noExtraHours')}
                 </div>
               </div>
 
@@ -319,7 +321,7 @@ export default function DiscomovilClientV2() {
             </div>
 
             <div className="text-center text-sm text-text-muted">
-              100€ por hora extra · Máximo +3 horas
+              100€ {t('perHour')} · {t('maxHours')}
             </div>
           </div>
         </motion.section>
@@ -334,10 +336,10 @@ export default function DiscomovilClientV2() {
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-text-primary mb-4">
-              Añade Efectos Especiales
+              {t('addEffects')}
             </h2>
             <p className="text-text-muted">
-              Contrata 3+ extras y ahorra <span className="text-oe-gold font-bold">15%</span>
+              {t('extrasDiscount')} <span className="text-oe-gold font-bold">15%</span>
             </p>
           </div>
 
@@ -407,10 +409,10 @@ export default function DiscomovilClientV2() {
             >
               <Zap className="w-12 h-12 text-green-400 mx-auto mb-3" fill="currentColor" />
               <h3 className="text-2xl font-bold text-text-primary mb-2">
-                ¡Descuento Combo Activado!
+                {t('comboDiscount')}
               </h3>
               <p className="text-green-400 text-lg">
-                Ahorras <strong>{discount}€</strong> (15% en efectos)
+                {t('youSave')} <strong>{discount}€</strong> (15% {t('inEffects')})
               </p>
             </motion.div>
           )}
@@ -438,7 +440,7 @@ export default function DiscomovilClientV2() {
                       {config.selectedPack?.name}
                     </div>
                     <div className="flex items-center gap-2 text-xs sm:text-sm text-white/70 mt-1">
-                      <span>{config.numGuests} personas</span>
+                      <span>{config.numGuests} {t('people')}</span>
                       {config.extraHours > 0 && (
                         <>
                           <span>•</span>
@@ -448,7 +450,7 @@ export default function DiscomovilClientV2() {
                       {config.selectedExtras.size > 0 && (
                         <>
                           <span>•</span>
-                          <span>{config.selectedExtras.size} efecto{config.selectedExtras.size !== 1 ? 's' : ''}</span>
+                          <span>{config.selectedExtras.size} {config.selectedExtras.size !== 1 ? t('effectsPlural') : t('effects')}</span>
                         </>
                       )}
                     </div>
@@ -477,8 +479,8 @@ export default function DiscomovilClientV2() {
                   "
                 >
                   <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="hidden sm:inline">Continuar al Configurador</span>
-                  <span className="sm:hidden">Configurar</span>
+                  <span className="hidden sm:inline">{t('continueToConfig')}</span>
+                  <span className="sm:hidden">{t('configure')}</span>
                   <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
@@ -490,23 +492,23 @@ export default function DiscomovilClientV2() {
       {/* Info adicional */}
       <section className="max-w-4xl mx-auto px-4 py-16">
         <div className="p-8 bg-bg-surface rounded-2xl border border-white/10">
-          <h3 className="text-2xl font-bold text-text-primary mb-4">🎉 Qué Incluye Tu Fiesta</h3>
+          <h3 className="text-2xl font-bold text-text-primary mb-4">🎉 {t('partyIncludes')}</h3>
           <div className="grid md:grid-cols-2 gap-6 text-text-muted">
             <div>
-              <strong className="text-text-primary">✅ Todos los packs:</strong>
+              <strong className="text-text-primary">✅ {t('allPacksInclude')}</strong>
               <ul className="mt-2 space-y-1 ml-4 text-sm">
-                <li>• DJ profesional que lee la pista</li>
-                <li>• Montaje y desmontaje incluidos</li>
-                <li>• Backup de equipamiento</li>
-                <li>• Playlist personalizada previa</li>
+                <li>• {t('packFeatures.dj')}</li>
+                <li>• {t('packFeatures.setup')}</li>
+                <li>• {t('packFeatures.backup')}</li>
+                <li>• {t('packFeatures.playlist')}</li>
               </ul>
             </div>
             <div>
-              <strong className="text-text-primary">💰 Pago flexible:</strong>
+              <strong className="text-text-primary">💰 {t('flexiblePayment')}</strong>
               <ul className="mt-2 space-y-1 ml-4 text-sm">
-                <li>• 30% al reservar tu fecha</li>
-                <li>• 70% el día del evento</li>
-                <li>• Cancelación gratuita hasta 15 días antes</li>
+                <li>• {t('paymentFeatures.deposit')}</li>
+                <li>• {t('paymentFeatures.rest')}</li>
+                <li>• {t('paymentFeatures.cancel')}</li>
               </ul>
             </div>
           </div>

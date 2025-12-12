@@ -12,64 +12,67 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 // ============================================================
 // CONFIGURACIÓ DE TEMES (MOLTS MÉS!)
 // ============================================================
 
+// Theme IDs map to translation keys in sensorial.themeNames.*
 const THEMES = [
   // Naturalesa
-  { id: 'calm', name: 'Calma', emoji: '🌙', category: 'natura', items: ['🌙', '⭐', '✨', '💫'], cursor: '🌙', colors: ['#a78bfa', '#818cf8'], bg: 'from-indigo-950 via-violet-950 to-black', sound: [130.81, 196.00, 261.63] },
-  { id: 'ocean', name: 'Oceà', emoji: '🌊', category: 'natura', items: ['🐚', '🐠', '🦀', '🐙', '🦑', '🐡', '🦐', '💎', '🫧'], cursor: '🐚', colors: ['#0ea5e9', '#06b6d4'], bg: 'from-cyan-950 via-blue-950 to-black', sound: [110, 164.81, 220] },
-  { id: 'forest', name: 'Bosc', emoji: '🌲', category: 'natura', items: ['🍃', '🌿', '🦋', '🐦', '🌸', '🍀', '🌺', '🐿️', '🦔'], cursor: '🍃', colors: ['#22c55e', '#10b981'], bg: 'from-emerald-950 via-green-950 to-black', sound: [146.83, 220, 293.66] },
-  { id: 'sky', name: 'Cel', emoji: '☁️', category: 'natura', items: ['☁️', '🌤️', '🌈', '🦅', '🎈', '🪁', '🦜', '🕊️'], cursor: '☁️', colors: ['#38bdf8', '#7dd3fc'], bg: 'from-sky-950 via-blue-950 to-black', sound: [174.61, 220, 261.63] },
-  { id: 'garden', name: 'Jardí', emoji: '🌷', category: 'natura', items: ['🌷', '🌹', '🌻', '🌼', '💐', '🦋', '🐝', '🐞', '🌺'], cursor: '🌸', colors: ['#f472b6', '#fb7185'], bg: 'from-pink-950 via-rose-950 to-black', sound: [196, 246.94, 293.66] },
-  { id: 'aurora', name: 'Aurora', emoji: '🌌', category: 'natura', items: ['✨', '💫', '⭐', '🌟', '❄️', '🦌'], cursor: '✨', colors: ['#34d399', '#a78bfa', '#06b6d4'], bg: 'from-emerald-950 via-violet-950 to-black', sound: [130.81, 164.81, 196] },
-  { id: 'fireflies', name: 'Lluernes', emoji: '✨', category: 'natura', items: ['✨', '💫', '🌙', '🦗', '🌾', '🍃'], cursor: '✨', colors: ['#fbbf24', '#f59e0b'], bg: 'from-amber-950 via-yellow-950 to-black', sound: [220, 277.18, 329.63] },
-  
+  { id: 'calm', emoji: '🌙', category: 'natura', items: ['🌙', '⭐', '✨', '💫'], cursor: '🌙', colors: ['#a78bfa', '#818cf8'], bg: 'from-indigo-950 via-violet-950 to-black', sound: [130.81, 196.00, 261.63] },
+  { id: 'ocean', emoji: '🌊', category: 'natura', items: ['🐚', '🐠', '🦀', '🐙', '🦑', '🐡', '🦐', '💎', '🫧'], cursor: '🐚', colors: ['#0ea5e9', '#06b6d4'], bg: 'from-cyan-950 via-blue-950 to-black', sound: [110, 164.81, 220] },
+  { id: 'forest', emoji: '🌲', category: 'natura', items: ['🍃', '🌿', '🦋', '🐦', '🌸', '🍀', '🌺', '🐿️', '🦔'], cursor: '🍃', colors: ['#22c55e', '#10b981'], bg: 'from-emerald-950 via-green-950 to-black', sound: [146.83, 220, 293.66] },
+  { id: 'sky', emoji: '☁️', category: 'natura', items: ['☁️', '🌤️', '🌈', '🦅', '🎈', '🪁', '🦜', '🕊️'], cursor: '☁️', colors: ['#38bdf8', '#7dd3fc'], bg: 'from-sky-950 via-blue-950 to-black', sound: [174.61, 220, 261.63] },
+  { id: 'garden', emoji: '🌷', category: 'natura', items: ['🌷', '🌹', '🌻', '🌼', '💐', '🦋', '🐝', '🐞', '🌺'], cursor: '🌸', colors: ['#f472b6', '#fb7185'], bg: 'from-pink-950 via-rose-950 to-black', sound: [196, 246.94, 293.66] },
+  { id: 'aurora', emoji: '🌌', category: 'natura', items: ['✨', '💫', '⭐', '🌟', '❄️', '🦌'], cursor: '✨', colors: ['#34d399', '#a78bfa', '#06b6d4'], bg: 'from-emerald-950 via-violet-950 to-black', sound: [130.81, 164.81, 196] },
+  { id: 'fireflies', emoji: '✨', category: 'natura', items: ['✨', '💫', '🌙', '🦗', '🌾', '🍃'], cursor: '✨', colors: ['#fbbf24', '#f59e0b'], bg: 'from-amber-950 via-yellow-950 to-black', sound: [220, 277.18, 329.63] },
+
   // Espai
-  { id: 'cosmos', name: 'Cosmos', emoji: '🚀', category: 'espai', items: ['🚀', '🛸', '🌍', '🌙', '⭐', '🪐', '☄️', '👽', '🛰️'], cursor: '🚀', colors: ['#8b5cf6', '#6366f1'], bg: 'from-violet-950 via-indigo-950 to-black', sound: [98, 130.81, 164.81] },
-  { id: 'planets', name: 'Planetes', emoji: '🪐', category: 'espai', items: ['🪐', '🌍', '🌕', '☀️', '🌑', '🌓', '🌗', '💫'], cursor: '🪐', colors: ['#f59e0b', '#d97706'], bg: 'from-orange-950 via-amber-950 to-black', sound: [65.41, 98, 130.81] },
-  
+  { id: 'cosmos', emoji: '🚀', category: 'espai', items: ['🚀', '🛸', '🌍', '🌙', '⭐', '🪐', '☄️', '👽', '🛰️'], cursor: '🚀', colors: ['#8b5cf6', '#6366f1'], bg: 'from-violet-950 via-indigo-950 to-black', sound: [98, 130.81, 164.81] },
+  { id: 'planets', emoji: '🪐', category: 'espai', items: ['🪐', '🌍', '🌕', '☀️', '🌑', '🌓', '🌗', '💫'], cursor: '🪐', colors: ['#f59e0b', '#d97706'], bg: 'from-orange-950 via-amber-950 to-black', sound: [65.41, 98, 130.81] },
+
   // Animals
-  { id: 'aquarium', name: 'Aquari', emoji: '🐠', category: 'animals', items: ['🐠', '🐟', '🐡', '🦈', '🐙', '🦑', '🦐', '🦞', '🐢', '🦭'], cursor: '🐠', colors: ['#06b6d4', '#0891b2'], bg: 'from-cyan-950 via-teal-950 to-black', sound: [196, 246.94, 293.66] },
-  { id: 'safari', name: 'Safari', emoji: '🦁', category: 'animals', items: ['🦁', '🐘', '🦒', '🦓', '🦛', '🐆', '🦏', '🐊', '🦩'], cursor: '🦁', colors: ['#d97706', '#b45309'], bg: 'from-amber-950 via-orange-950 to-black', sound: [130.81, 164.81, 196] },
-  { id: 'pets', name: 'Mascotes', emoji: '🐱', category: 'animals', items: ['🐱', '🐶', '🐹', '🐰', '🐦', '🐢', '🐠', '🦜', '🐿️'], cursor: '🐾', colors: ['#fb923c', '#fdba74'], bg: 'from-orange-950 via-amber-950 to-black', sound: [261.63, 329.63, 392] },
-  { id: 'dinosaurs', name: 'Dinosaures', emoji: '🦕', category: 'animals', items: ['🦕', '🦖', '🥚', '🌋', '🌿', '🦴', '🪨'], cursor: '🦕', colors: ['#84cc16', '#65a30d'], bg: 'from-lime-950 via-green-950 to-black', sound: [65.41, 82.41, 98] },
-  
+  { id: 'aquarium', emoji: '🐠', category: 'animals', items: ['🐠', '🐟', '🐡', '🦈', '🐙', '🦑', '🦐', '🦞', '🐢', '🦭'], cursor: '🐠', colors: ['#06b6d4', '#0891b2'], bg: 'from-cyan-950 via-teal-950 to-black', sound: [196, 246.94, 293.66] },
+  { id: 'safari', emoji: '🦁', category: 'animals', items: ['🦁', '🐘', '🦒', '🦓', '🦛', '🐆', '🦏', '🐊', '🦩'], cursor: '🦁', colors: ['#d97706', '#b45309'], bg: 'from-amber-950 via-orange-950 to-black', sound: [130.81, 164.81, 196] },
+  { id: 'pets', emoji: '🐱', category: 'animals', items: ['🐱', '🐶', '🐹', '🐰', '🐦', '🐢', '🐠', '🦜', '🐿️'], cursor: '🐾', colors: ['#fb923c', '#fdba74'], bg: 'from-orange-950 via-amber-950 to-black', sound: [261.63, 329.63, 392] },
+  { id: 'dinosaurs', emoji: '🦕', category: 'animals', items: ['🦕', '🦖', '🥚', '🌋', '🌿', '🦴', '🪨'], cursor: '🦕', colors: ['#84cc16', '#65a30d'], bg: 'from-lime-950 via-green-950 to-black', sound: [65.41, 82.41, 98] },
+
   // Fantasia
-  { id: 'unicorn', name: 'Unicorn', emoji: '🦄', category: 'fantasia', items: ['🦄', '🌈', '⭐', '💖', '🎀', '👑', '💎', '🌸', '✨'], cursor: '🦄', colors: ['#f472b6', '#c084fc', '#60a5fa'], bg: 'from-pink-950 via-purple-950 to-black', sound: [392, 493.88, 587.33] },
-  { id: 'fairy', name: 'Fades', emoji: '🧚', category: 'fantasia', items: ['🧚', '🦋', '🌸', '✨', '🍄', '🌺', '💫', '🌙'], cursor: '🧚', colors: ['#a855f7', '#d946ef'], bg: 'from-purple-950 via-fuchsia-950 to-black', sound: [523.25, 659.25, 783.99] },
-  { id: 'dragon', name: 'Dracs', emoji: '🐉', category: 'fantasia', items: ['🐉', '🔥', '💎', '⚔️', '🏰', '👑', '🛡️', '🗡️'], cursor: '🐉', colors: ['#dc2626', '#f97316'], bg: 'from-red-950 via-orange-950 to-black', sound: [98, 116.54, 146.83] },
-  { id: 'mermaid', name: 'Sirenes', emoji: '🧜', category: 'fantasia', items: ['🧜', '🐚', '💎', '🦪', '🌊', '✨', '👑', '🔱'], cursor: '🧜', colors: ['#06b6d4', '#8b5cf6'], bg: 'from-cyan-950 via-violet-950 to-black', sound: [293.66, 369.99, 440] },
-  
+  { id: 'unicorn', emoji: '🦄', category: 'fantasia', items: ['🦄', '🌈', '⭐', '💖', '🎀', '👑', '💎', '🌸', '✨'], cursor: '🦄', colors: ['#f472b6', '#c084fc', '#60a5fa'], bg: 'from-pink-950 via-purple-950 to-black', sound: [392, 493.88, 587.33] },
+  { id: 'fairy', emoji: '🧚', category: 'fantasia', items: ['🧚', '🦋', '🌸', '✨', '🍄', '🌺', '💫', '🌙'], cursor: '🧚', colors: ['#a855f7', '#d946ef'], bg: 'from-purple-950 via-fuchsia-950 to-black', sound: [523.25, 659.25, 783.99] },
+  { id: 'dragon', emoji: '🐉', category: 'fantasia', items: ['🐉', '🔥', '💎', '⚔️', '🏰', '👑', '🛡️', '🗡️'], cursor: '🐉', colors: ['#dc2626', '#f97316'], bg: 'from-red-950 via-orange-950 to-black', sound: [98, 116.54, 146.83] },
+  { id: 'mermaid', emoji: '🧜', category: 'fantasia', items: ['🧜', '🐚', '💎', '🦪', '🌊', '✨', '👑', '🔱'], cursor: '🧜', colors: ['#06b6d4', '#8b5cf6'], bg: 'from-cyan-950 via-violet-950 to-black', sound: [293.66, 369.99, 440] },
+
   // Menjar
-  { id: 'candy', name: 'Dolços', emoji: '🍭', category: 'menjar', items: ['🍭', '🍬', '🍫', '🧁', '🍩', '🍪', '🎂', '🍰', '🍦'], cursor: '🍭', colors: ['#f472b6', '#fb7185', '#fbbf24'], bg: 'from-pink-950 via-rose-950 to-black', sound: [523.25, 587.33, 659.25] },
-  { id: 'fruits', name: 'Fruites', emoji: '🍎', category: 'menjar', items: ['🍎', '🍊', '🍋', '🍇', '🍓', '🍑', '🍒', '🥝', '🍍', '🥭'], cursor: '🍎', colors: ['#ef4444', '#f97316', '#eab308'], bg: 'from-red-950 via-orange-950 to-black', sound: [261.63, 329.63, 392] },
-  
+  { id: 'candy', emoji: '🍭', category: 'menjar', items: ['🍭', '🍬', '🍫', '🧁', '🍩', '🍪', '🎂', '🍰', '🍦'], cursor: '🍭', colors: ['#f472b6', '#fb7185', '#fbbf24'], bg: 'from-pink-950 via-rose-950 to-black', sound: [523.25, 587.33, 659.25] },
+  { id: 'fruits', emoji: '🍎', category: 'menjar', items: ['🍎', '🍊', '🍋', '🍇', '🍓', '🍑', '🍒', '🥝', '🍍', '🥭'], cursor: '🍎', colors: ['#ef4444', '#f97316', '#eab308'], bg: 'from-red-950 via-orange-950 to-black', sound: [261.63, 329.63, 392] },
+
   // Festes (Òrbita!)
-  { id: 'monmagic', name: 'Món Màgic', emoji: '⚡', category: 'orbita', items: ['⚡', '🪄', '🦉', '📚', '🏰', '🧹', '🐍', '🦁', '🦅', '🦡', '⭐', '✨'], cursor: '🪄', colors: ['#fbbf24', '#7c3aed'], bg: 'from-amber-950 via-violet-950 to-black', sound: [261.63, 329.63, 392] },
-  { id: 'halloween', name: 'Halloween', emoji: '🎃', category: 'orbita', items: ['🎃', '👻', '🦇', '💀', '🕷️', '🕸️', '🧙', '🧛', '🌙', '🦴', '⚰️'], cursor: '🎃', colors: ['#f97316', '#7c2d12'], bg: 'from-orange-950 via-black to-black', sound: [146.83, 174.61, 220] },
-  { id: 'christmas', name: 'Nadal', emoji: '🎄', category: 'orbita', items: ['🎄', '🎅', '🎁', '⭐', '❄️', '☃️', '🦌', '🔔', '🎀', '🍪'], cursor: '🎄', colors: ['#dc2626', '#16a34a'], bg: 'from-red-950 via-green-950 to-black', sound: [261.63, 329.63, 392] },
-  { id: 'tropical', name: 'Tropical', emoji: '🌴', category: 'orbita', items: ['🌴', '🌺', '🍹', '🥥', '🦜', '🐠', '🌊', '☀️', '🏝️', '🦀'], cursor: '🌴', colors: ['#06b6d4', '#10b981'], bg: 'from-cyan-950 via-emerald-950 to-black', sound: [196, 246.94, 293.66] },
-  { id: 'disco', name: 'Disco', emoji: '🪩', category: 'orbita', items: ['🪩', '💃', '🕺', '🎵', '🎤', '🎧', '💜', '💖', '✨', '🌟'], cursor: '🪩', colors: ['#ec4899', '#8b5cf6', '#06b6d4'], bg: 'from-fuchsia-950 via-violet-950 to-black', sound: [130.81, 164.81, 196] },
-  { id: 'elegant', name: 'Elegant', emoji: '✨', category: 'orbita', items: ['✨', '💎', '👑', '🥂', '🌹', '💫', '⭐', '🎀'], cursor: '💎', colors: ['#fbbf24', '#f59e0b'], bg: 'from-amber-950 via-yellow-950 to-black', sound: [220, 277.18, 329.63] },
-  { id: 'carnival', name: 'Carnaval', emoji: '🎭', category: 'orbita', items: ['🎭', '🎪', '🎠', '🎡', '🎢', '🎨', '🎈', '🎉', '🤡'], cursor: '🎭', colors: ['#f43f5e', '#8b5cf6', '#fbbf24'], bg: 'from-rose-950 via-violet-950 to-black', sound: [261.63, 329.63, 392] },
-  
+  { id: 'monmagic', emoji: '⚡', category: 'orbita', items: ['⚡', '🪄', '🦉', '📚', '🏰', '🧹', '🐍', '🦁', '🦅', '🦡', '⭐', '✨'], cursor: '🪄', colors: ['#fbbf24', '#7c3aed'], bg: 'from-amber-950 via-violet-950 to-black', sound: [261.63, 329.63, 392] },
+  { id: 'halloween', emoji: '🎃', category: 'orbita', items: ['🎃', '👻', '🦇', '💀', '🕷️', '🕸️', '🧙', '🧛', '🌙', '🦴', '⚰️'], cursor: '🎃', colors: ['#f97316', '#7c2d12'], bg: 'from-orange-950 via-black to-black', sound: [146.83, 174.61, 220] },
+  { id: 'christmas', emoji: '🎄', category: 'orbita', items: ['🎄', '🎅', '🎁', '⭐', '❄️', '☃️', '🦌', '🔔', '🎀', '🍪'], cursor: '🎄', colors: ['#dc2626', '#16a34a'], bg: 'from-red-950 via-green-950 to-black', sound: [261.63, 329.63, 392] },
+  { id: 'tropical', emoji: '🌴', category: 'orbita', items: ['🌴', '🌺', '🍹', '🥥', '🦜', '🐠', '🌊', '☀️', '🏝️', '🦀'], cursor: '🌴', colors: ['#06b6d4', '#10b981'], bg: 'from-cyan-950 via-emerald-950 to-black', sound: [196, 246.94, 293.66] },
+  { id: 'disco', emoji: '🪩', category: 'orbita', items: ['🪩', '💃', '🕺', '🎵', '🎤', '🎧', '💜', '💖', '✨', '🌟'], cursor: '🪩', colors: ['#ec4899', '#8b5cf6', '#06b6d4'], bg: 'from-fuchsia-950 via-violet-950 to-black', sound: [130.81, 164.81, 196] },
+  { id: 'elegant', emoji: '✨', category: 'orbita', items: ['✨', '💎', '👑', '🥂', '🌹', '💫', '⭐', '🎀'], cursor: '💎', colors: ['#fbbf24', '#f59e0b'], bg: 'from-amber-950 via-yellow-950 to-black', sound: [220, 277.18, 329.63] },
+  { id: 'carnival', emoji: '🎭', category: 'orbita', items: ['🎭', '🎪', '🎠', '🎡', '🎢', '🎨', '🎈', '🎉', '🤡'], cursor: '🎭', colors: ['#f43f5e', '#8b5cf6', '#fbbf24'], bg: 'from-rose-950 via-violet-950 to-black', sound: [261.63, 329.63, 392] },
+
   // Zen / Relaxació
-  { id: 'zen', name: 'Zen', emoji: '🪷', category: 'zen', items: ['🪷', '🧘', '☯️', '🕯️', '🪨', '💧', '🌸'], cursor: '🪷', colors: ['#a3a3a3', '#737373'], bg: 'from-stone-950 via-neutral-950 to-black', sound: [174.61, 220, 261.63] },
-  { id: 'rain', name: 'Pluja', emoji: '🌧️', category: 'zen', items: ['💧', '🌧️', '☔', '🌈', '🍃', '🐸'], cursor: '💧', colors: ['#60a5fa', '#3b82f6'], bg: 'from-blue-950 via-slate-950 to-black', sound: [196, 233.08, 261.63] },
-  { id: 'snow', name: 'Neu', emoji: '❄️', category: 'zen', items: ['❄️', '☃️', '🌨️', '⛄', '🏔️', '🎿'], cursor: '❄️', colors: ['#e0f2fe', '#bae6fd'], bg: 'from-sky-950 via-slate-950 to-black', sound: [293.66, 349.23, 392] },
+  { id: 'zen', emoji: '🪷', category: 'zen', items: ['🪷', '🧘', '☯️', '🕯️', '🪨', '💧', '🌸'], cursor: '🪷', colors: ['#a3a3a3', '#737373'], bg: 'from-stone-950 via-neutral-950 to-black', sound: [174.61, 220, 261.63] },
+  { id: 'rain', emoji: '🌧️', category: 'zen', items: ['💧', '🌧️', '☔', '🌈', '🍃', '🐸'], cursor: '💧', colors: ['#60a5fa', '#3b82f6'], bg: 'from-blue-950 via-slate-950 to-black', sound: [196, 233.08, 261.63] },
+  { id: 'snow', emoji: '❄️', category: 'zen', items: ['❄️', '☃️', '🌨️', '⛄', '🏔️', '🎿'], cursor: '❄️', colors: ['#e0f2fe', '#bae6fd'], bg: 'from-sky-950 via-slate-950 to-black', sound: [293.66, 349.23, 392] },
 ];
 
+// Category IDs map to translation keys in sensorial.categoryNames.*
 const CATEGORIES = [
-  { id: 'natura', name: 'Natura', emoji: '🌿' },
-  { id: 'espai', name: 'Espai', emoji: '🚀' },
-  { id: 'animals', name: 'Animals', emoji: '🐾' },
-  { id: 'fantasia', name: 'Fantasia', emoji: '✨' },
-  { id: 'menjar', name: 'Menjar', emoji: '🍭' },
-  { id: 'orbita', name: 'Festes Òrbita', emoji: '🎉' },
-  { id: 'zen', name: 'Relaxació', emoji: '🧘' },
+  { id: 'natura', emoji: '🌿' },
+  { id: 'espai', emoji: '🚀' },
+  { id: 'animals', emoji: '🐾' },
+  { id: 'fantasia', emoji: '✨' },
+  { id: 'menjar', emoji: '🍭' },
+  { id: 'orbita', emoji: '🎉' },
+  { id: 'zen', emoji: '🧘' },
 ];
 
 // ============================================================
@@ -451,58 +454,47 @@ function InteractiveCanvas({
 // MODAL D'EXPLICACIÓ (PER QUÈ EXISTEIX AQUESTA PÀGINA)
 // ============================================================
 
-function ExplanationModal({ onClose, color }: { onClose: () => void; color: string }) {
+function ExplanationModal({ onClose, color, t }: { onClose: () => void; color: string; t: (key: string, values?: Record<string, string>) => string }) {
   const [step, setStep] = useState(0);
 
   const steps = [
     {
       emoji: '💜',
-      title: 'Benvingut/da a l\'Espai Sensorial',
+      titleKey: 'tutorial.step1.title',
       content: (
         <div className="space-y-4 text-white/70">
-          <p>
-            Aquest espai està creat amb molt d'amor per a <strong className="text-white">totes les persones</strong>, 
-            especialment per aquelles amb <strong className="text-white">sensibilitat sensorial</strong>.
-          </p>
-          <p>
-            Sabem que el món digital pot ser sovint massa estimulant. Per això hem creat 
-            aquest racó tranquil on pots relaxar-te, jugar, i trobar un moment de pau.
-          </p>
+          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step1.p1') }} />
+          <p>{t('tutorial.step1.p2')}</p>
           <p className="text-white/50 text-sm italic">
-            Cada persona és única i especial. Aquesta pàgina és per a tu. 💜
+            {t('tutorial.step1.p3')}
           </p>
         </div>
       ),
     },
     {
       emoji: '👆',
-      title: 'Agafa i juga!',
+      titleKey: 'tutorial.step2.title',
       content: (
         <div className="space-y-4 text-white/70">
-          <p>
-            Tots els elements de la pantalla <strong className="text-white">es poden agafar</strong> 
-            amb el dit o el ratolí!
-          </p>
+          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step2.intro') }} />
           <ul className="space-y-2 ml-4">
-            <li>🖱️ <strong>Clica</strong> sobre un element per agafar-lo</li>
-            <li>↔️ <strong>Arrossega</strong> per moure'l</li>
-            <li>🚀 <strong>Llança'l</strong> deixant anar!</li>
-            <li>🏀 Mira com <strong>reboten</strong> per la pantalla</li>
+            <li dangerouslySetInnerHTML={{ __html: '🖱️ ' + t('tutorial.step2.click') }} />
+            <li dangerouslySetInnerHTML={{ __html: '↔️ ' + t('tutorial.step2.drag') }} />
+            <li dangerouslySetInnerHTML={{ __html: '🚀 ' + t('tutorial.step2.throw') }} />
+            <li dangerouslySetInnerHTML={{ __html: '🏀 ' + t('tutorial.step2.bounce') }} />
           </ul>
           <p className="text-white/50 text-sm">
-            El teu cursor es converteix en un element del tema!
+            {t('tutorial.step2.cursor')}
           </p>
         </div>
       ),
     },
     {
       emoji: '🎨',
-      title: 'Molts temes per triar',
+      titleKey: 'tutorial.step3.title',
       content: (
         <div className="space-y-4 text-white/70">
-          <p>
-            Tenim <strong className="text-white">molts temes diferents</strong> per a tots els gustos:
-          </p>
+          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step3.intro') }} />
           <div className="grid grid-cols-4 gap-2 text-center text-2xl">
             {['🌊', '🦄', '🚀', '🎃', '🐠', '🌈', '🎄', '🦁', '🍭', '🐉', '❄️', '🪩'].map((e, i) => (
               <motion.span
@@ -516,30 +508,21 @@ function ExplanationModal({ onClose, color }: { onClose: () => void; color: stri
             ))}
           </div>
           <p className="text-white/50 text-sm">
-            Des de l'oceà fins a l'espai, des d'unicorns fins a dinosaures!
+            {t('tutorial.step3.outro')}
           </p>
         </div>
       ),
     },
     {
       emoji: '🎵',
-      title: 'So i calma',
+      titleKey: 'tutorial.step4.title',
       content: (
         <div className="space-y-4 text-white/70">
-          <p>
-            Pots activar <strong className="text-white">música ambient</strong> relaxant 
-            que s'adapta al tema que triïs.
-          </p>
-          <p>
-            El so és molt suau i <strong className="text-white">"respira"</strong> amb tu, 
-            pujant i baixant de volum lentament.
-          </p>
-          <p>
-            Si prefereixes silenci, només has de deixar el so desactivat. 
-            <strong className="text-white"> Tu decideixes!</strong>
-          </p>
+          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step4.p1') }} />
+          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step4.p2') }} />
+          <p dangerouslySetInnerHTML={{ __html: t('tutorial.step4.p3') }} />
           <p className="text-white/50 text-sm">
-            Cada interacció té un petit so agradable (que també pots desactivar).
+            {t('tutorial.step4.p4')}
           </p>
         </div>
       ),
@@ -590,7 +573,7 @@ function ExplanationModal({ onClose, color }: { onClose: () => void; color: stri
               >
                 {cur.emoji}
               </motion.span>
-              <h2 className="text-2xl font-bold text-white">{cur.title}</h2>
+              <h2 className="text-2xl font-bold text-white">{t(cur.titleKey)}</h2>
             </div>
             {cur.content}
           </motion.div>
@@ -603,7 +586,7 @@ function ExplanationModal({ onClose, color }: { onClose: () => void; color: stri
               onClick={() => setStep(step - 1)}
               className="px-6 py-3 rounded-full bg-white/10 text-white/70 hover:bg-white/20 transition-colors"
             >
-              ← Enrere
+              ← {t('tutorial.back')}
             </button>
           )}
           {step < steps.length - 1 ? (
@@ -612,7 +595,7 @@ function ExplanationModal({ onClose, color }: { onClose: () => void; color: stri
               className="px-8 py-3 rounded-full font-semibold text-black transition-transform hover:scale-105"
               style={{ backgroundColor: color }}
             >
-              Següent →
+              {t('tutorial.next')} →
             </button>
           ) : (
             <button
@@ -620,7 +603,7 @@ function ExplanationModal({ onClose, color }: { onClose: () => void; color: stri
               className="px-8 py-3 rounded-full font-bold text-black transition-transform hover:scale-105"
               style={{ backgroundColor: color }}
             >
-              Començar a jugar! 🎮
+              {t('tutorial.start')} 🎮
             </button>
           )}
         </div>
@@ -630,12 +613,12 @@ function ExplanationModal({ onClose, color }: { onClose: () => void; color: stri
             onClick={onClose}
             className="mt-6 text-white/30 text-sm block mx-auto hover:text-white/50"
           >
-            Saltar introducció
+            {t('tutorial.skip')}
           </button>
         )}
 
         <p className="text-white/20 text-xs text-center mt-8">
-          Creat amb 💜 per Òrbita Events · Des de 2023
+          {t('tutorial.madeBy')}
         </p>
       </motion.div>
     </motion.div>
@@ -657,6 +640,7 @@ function ControlPanel({
   soundEnabled,
   onSoundToggle,
   color,
+  t,
 }: {
   open: boolean;
   theme: typeof THEMES[0];
@@ -668,13 +652,14 @@ function ControlPanel({
   soundEnabled: boolean;
   onSoundToggle: () => void;
   color: string;
+  t: (key: string, values?: Record<string, string>) => string;
 }) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   if (!open) return null;
 
   const filteredThemes = selectedCategory
-    ? THEMES.filter(t => t.category === selectedCategory)
+    ? THEMES.filter(themeItem => themeItem.category === selectedCategory)
     : THEMES;
 
   return (
@@ -691,14 +676,14 @@ function ControlPanel({
         <div className="flex items-center gap-3 mb-8">
           <span className="text-3xl">🎛️</span>
           <div>
-            <h2 className="text-xl font-bold text-white">Controls</h2>
-            <p className="text-white/40 text-sm">Personalitza l'experiència</p>
+            <h2 className="text-xl font-bold text-white">{t('controls')}</h2>
+            <p className="text-white/40 text-sm">{t('customizeExperience')}</p>
           </div>
         </div>
 
         {/* Categories */}
         <div className="mb-6">
-          <h3 className="text-white/40 text-xs uppercase mb-3">📁 Categories</h3>
+          <h3 className="text-white/40 text-xs uppercase mb-3">📁 {t('categories')}</h3>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedCategory(null)}
@@ -706,7 +691,7 @@ function ControlPanel({
                 !selectedCategory ? 'bg-white/20 text-white' : 'bg-white/5 text-white/60'
               }`}
             >
-              Tots
+              {t('all')}
             </button>
             {CATEGORIES.map(cat => (
               <button
@@ -717,7 +702,7 @@ function ControlPanel({
                 }`}
               >
                 <span>{cat.emoji}</span>
-                <span>{cat.name}</span>
+                <span>{t(`categoryNames.${cat.id}`)}</span>
               </button>
             ))}
           </div>
@@ -725,20 +710,20 @@ function ControlPanel({
 
         {/* Temes */}
         <div className="mb-8">
-          <h3 className="text-white/40 text-xs uppercase mb-3">🎨 Temes ({filteredThemes.length})</h3>
+          <h3 className="text-white/40 text-xs uppercase mb-3">🎨 {t('themesLabel')} ({filteredThemes.length})</h3>
           <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-2">
-            {filteredThemes.map(t => (
+            {filteredThemes.map(themeItem => (
               <button
-                key={t.id}
-                onClick={() => onThemeChange(t)}
+                key={themeItem.id}
+                onClick={() => onThemeChange(themeItem)}
                 className={`p-2 rounded-xl text-center transition-all ${
-                  theme.id === t.id ? 'ring-2 bg-white/15' : 'bg-white/5 hover:bg-white/10'
+                  theme.id === themeItem.id ? 'ring-2 bg-white/15' : 'bg-white/5 hover:bg-white/10'
                 }`}
-                style={{ '--tw-ring-color': t.colors[0] } as React.CSSProperties}
-                title={t.name}
+                style={{ '--tw-ring-color': themeItem.colors[0] } as React.CSSProperties}
+                title={t(`themeNames.${themeItem.id}`)}
               >
-                <span className="text-2xl block">{t.emoji}</span>
-                <span className="text-white/50 text-[10px] truncate block">{t.name}</span>
+                <span className="text-2xl block">{themeItem.emoji}</span>
+                <span className="text-white/50 text-[10px] truncate block">{t(`themeNames.${themeItem.id}`)}</span>
               </button>
             ))}
           </div>
@@ -746,7 +731,7 @@ function ControlPanel({
 
         {/* So */}
         <div className="mb-8">
-          <h3 className="text-white/40 text-xs uppercase mb-3">🔊 So</h3>
+          <h3 className="text-white/40 text-xs uppercase mb-3">🔊 {t('sound')}</h3>
           <button
             onClick={onSoundToggle}
             className={`w-full p-4 rounded-xl text-left flex items-center gap-4 transition-all ${
@@ -756,9 +741,9 @@ function ControlPanel({
           >
             <span className="text-3xl">{soundEnabled ? '🔊' : '🔇'}</span>
             <div className="flex-1">
-              <p className="text-white font-medium">So ambient i efectes</p>
+              <p className="text-white font-medium">{t('ambientSound')}</p>
               <p className="text-white/40 text-xs">
-                {soundEnabled ? 'Activat · Música relaxant' : 'Desactivat · Toca per activar'}
+                {soundEnabled ? t('soundOn') : t('soundOff')}
               </p>
             </div>
           </button>
@@ -766,11 +751,11 @@ function ControlPanel({
 
         {/* Sliders */}
         <div className="mb-8 space-y-4">
-          <h3 className="text-white/40 text-xs uppercase mb-3">🎚️ Intensitat</h3>
-          
+          <h3 className="text-white/40 text-xs uppercase mb-3">🎚️ {t('intensity')}</h3>
+
           <div>
             <div className="flex justify-between text-sm mb-2">
-              <span className="text-white/60">Elements</span>
+              <span className="text-white/60">{t('elements')}</span>
               <span className="text-white/40 font-mono">{intensity}</span>
             </div>
             <input
@@ -789,7 +774,7 @@ function ControlPanel({
 
           <div>
             <div className="flex justify-between text-sm mb-2">
-              <span className="text-white/60">Velocitat</span>
+              <span className="text-white/60">{t('speedLabel')}</span>
               <span className="text-white/40 font-mono">{speed.toFixed(1)}x</span>
             </div>
             <input
@@ -809,41 +794,41 @@ function ControlPanel({
 
         {/* Presets */}
         <div className="mb-8">
-          <h3 className="text-white/40 text-xs uppercase mb-3">⚡ Presets</h3>
+          <h3 className="text-white/40 text-xs uppercase mb-3">⚡ {t('presets')}</h3>
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={() => { onIntensityChange(15); onSpeedChange(0.3); }}
               className="py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 text-sm"
             >
-              🧘 Suau
+              🧘 {t('presetSoft')}
             </button>
             <button
               onClick={() => { onIntensityChange(30); onSpeedChange(0.8); }}
               className="py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 text-sm"
             >
-              ✨ Normal
+              ✨ {t('presetNormal')}
             </button>
             <button
               onClick={() => { onIntensityChange(50); onSpeedChange(1.5); }}
               className="py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 text-sm"
             >
-              🎉 Actiu
+              🎉 {t('presetActive')}
             </button>
           </div>
         </div>
 
         {/* Info */}
         <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-white/50">
-          <p className="mb-2"><strong className="text-white/70">💡 Consells:</strong></p>
+          <p className="mb-2"><strong className="text-white/70">💡 {t('tips')}:</strong></p>
           <ul className="space-y-1">
-            <li>• Clica i arrossega per agafar elements</li>
-            <li>• Llança'ls per veure com reboten!</li>
-            <li>• El teu cursor és un {theme.cursor}</li>
+            <li>• {t('tipDrag')}</li>
+            <li>• {t('tipBounce')}</li>
+            <li>• {t('tipCursor', { cursor: theme.cursor })}</li>
           </ul>
         </div>
 
         <div className="pt-8 mt-8 border-t border-white/10 text-center">
-          <p className="text-white/30 text-xs">🪐 Òrbita Events · Des de 2023</p>
+          <p className="text-white/30 text-xs">🪐 {t('footer')}</p>
         </div>
       </div>
     </motion.aside>
@@ -855,6 +840,7 @@ function ControlPanel({
 // ============================================================
 
 export default function EspaiSensorial() {
+  const t = useTranslations('sensorial');
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const [showExplanation, setShowExplanation] = useState(true);
@@ -896,7 +882,7 @@ export default function EspaiSensorial() {
           >
             💜
           </motion.span>
-          <p className="text-white/50">Preparant un espai especial per a tu...</p>
+          <p className="text-white/50">{t('loading')}</p>
         </motion.div>
       </div>
     );
@@ -919,18 +905,18 @@ export default function EspaiSensorial() {
             onClick={exit}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 
-                     border border-white/20 text-white/80 font-medium text-sm 
+            className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20
+                     border border-white/20 text-white/80 font-medium text-sm
                      backdrop-blur-sm transition-all"
           >
-            ← Sortir
+            ← {t('exit')}
           </motion.button>
 
           <div className="absolute left-1/2 -translate-x-1/2 text-center">
-            <p className="text-white/40 text-xs uppercase tracking-wider">Espai Sensorial</p>
+            <p className="text-white/40 text-xs uppercase tracking-wider">{t('title')}</p>
             <h1 className="text-white font-medium flex items-center gap-2">
               <span className="text-xl">{theme.emoji}</span>
-              <span>{theme.name}</span>
+              <span>{t(`themeNames.${theme.id}`)}</span>
             </h1>
           </div>
 
@@ -969,7 +955,7 @@ export default function EspaiSensorial() {
         style={{ backgroundColor: `${color}15`, borderColor: `${color}30`, color }}
       >
         <span>{theme.cursor}</span>
-        <span>Agafa els elements amb el dit o el ratolí!</span>
+        <span>{t('grabElements')}</span>
       </motion.div>
 
       {/* Panel */}
@@ -986,6 +972,7 @@ export default function EspaiSensorial() {
             soundEnabled={soundEnabled}
             onSoundToggle={() => setSoundEnabled(!soundEnabled)}
             color={color}
+            t={t}
           />
         )}
       </AnimatePresence>
@@ -993,7 +980,7 @@ export default function EspaiSensorial() {
       {/* Modal explicació */}
       <AnimatePresence>
         {showExplanation && (
-          <ExplanationModal onClose={() => setShowExplanation(false)} color={color} />
+          <ExplanationModal onClose={() => setShowExplanation(false)} color={color} t={t} />
         )}
       </AnimatePresence>
     </main>

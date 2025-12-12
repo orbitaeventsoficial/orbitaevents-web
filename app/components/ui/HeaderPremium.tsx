@@ -71,7 +71,7 @@ const experiences = [
     descKey: 'monMagicDesc',
     gradient: 'from-purple-600/30 to-blue-600/30',
     image: '/images/tematicas/mon-magic/hero/01-taula-panoramica-cartell.jpg',
-    badge: 'Popular',
+    badgeKey: 'badges.popular',
     badgeColor: 'bg-purple-500',
   },
   {
@@ -81,7 +81,7 @@ const experiences = [
     descKey: 'halloweenDesc',
     gradient: 'from-orange-600/30 to-red-600/30',
     image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
-    badge: 'Terrorífic',
+    badgeKey: 'badges.terrific',
     badgeColor: 'bg-orange-500',
   },
   {
@@ -97,6 +97,8 @@ const experiences = [
 export function HeaderPremium() {
   const t = useTranslations('header');
   const tCommon = useTranslations('common');
+  const tWhatsapp = useTranslations('whatsappMessages');
+  const tAccessibility = useTranslations('accessibility');
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -326,9 +328,9 @@ export function HeaderPremium() {
                                 <span className="text-white font-bold group-hover:text-amber-400 transition-colors">
                                   {t(exp.titleKey)}
                                 </span>
-                                {exp.badge && (
+                                {exp.badgeKey && (
                                   <span className={`px-2 py-0.5 text-[10px] font-bold ${exp.badgeColor} text-white rounded-full`}>
-                                    {exp.badge}
+                                    {t(exp.badgeKey)}
                                   </span>
                                 )}
                               </div>
@@ -372,7 +374,7 @@ export function HeaderPremium() {
                 href="/portfolio"
                 className="px-4 py-2.5 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-xl transition-all"
               >
-                Portfolio
+                {tCommon('nav.portfolio')}
               </Link>
 
               {/* CONTACTE */}
@@ -394,7 +396,7 @@ export function HeaderPremium() {
 
               {/* WhatsApp icon con pulse */}
               <a
-                href="https://wa.me/34699121023?text=Hola!%20M'agradaria%20informació%20sobre%20els%20vostres%20serveis"
+                href={`https://wa.me/34699121023?text=${encodeURIComponent(tWhatsapp('general'))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative p-2.5 text-white/50 hover:text-green-400 hover:bg-green-400/10 rounded-xl transition-all group"
@@ -429,7 +431,7 @@ export function HeaderPremium() {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden p-2 text-white hover:bg-white/10 rounded-xl transition-colors"
-              aria-label={isMobileMenuOpen ? 'Tancar menú' : 'Obrir menú'}
+              aria-label={isMobileMenuOpen ? tAccessibility('closeMenu') : tAccessibility('openMenu')}
               aria-expanded={isMobileMenuOpen}
             >
               <motion.div

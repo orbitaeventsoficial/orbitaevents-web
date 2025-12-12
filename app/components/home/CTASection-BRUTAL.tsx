@@ -124,6 +124,7 @@ function AvailabilityMini({ t, locale }: { t: (key: string) => string; locale: s
 
 export function CTASectionBrutal() {
   const t = useTranslations('ctaSection');
+  const tWhatsapp = useTranslations('whatsappMessages');
   const locale = useLocale();
 
   return (
@@ -253,7 +254,7 @@ export function CTASectionBrutal() {
 
             {/* Secondary CTA - WhatsApp */}
             <Link
-              href="https://wa.me/34699121023?text=Hola!%20Quiero%20info%20sobre%20un%20evento"
+              href={`https://wa.me/34699121023?text=${encodeURIComponent(tWhatsapp('general'))}`}
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-lg rounded-full transition-all duration-300 shadow-lg shadow-[#25D366]/30 hover:shadow-[#25D366]/50 hover:-translate-y-0.5"

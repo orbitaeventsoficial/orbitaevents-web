@@ -3,13 +3,23 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Stats } from './Stats';
+import { useTranslations } from 'next-intl';
 
 export function Hero() {
+  const t = useTranslations('hero');
+
+  const services = [
+    { icon: '🎵', key: 'dj' },
+    { icon: '💡', key: 'lighting' },
+    { icon: '✨', key: 'effects' },
+    { icon: '🎭', key: 'theming' },
+  ];
+
   return (
     <section className="relative min-h-screen flex items-center justify-center py-20 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/20 to-black" />
-      
+
       {/* Partícules decoratives (opcional) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
@@ -32,10 +42,10 @@ export function Hero() {
           />
         ))}
       </div>
-      
+
       {/* Contingut */}
       <div className="container mx-auto px-4 text-center relative z-10">
-        
+
         {/* Badge diferenciador */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -45,10 +55,10 @@ export function Hero() {
         >
           <span className="text-amber-400">🎯</span>
           <span className="text-amber-300 text-sm font-medium">
-            Venim del sector d'esdeveniments
+            {t('simpleBadge')}
           </span>
         </motion.div>
-        
+
         {/* Títol principal - SEO optimitzat */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
@@ -56,13 +66,13 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
         >
-          DJ y Discomóvil para{' '}
+          {t('simpleTitle1')}{' '}
           <br className="hidden sm:block" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-            Bodas y Eventos Barcelona
+            {t('simpleTitle2')}
           </span>
         </motion.h1>
-        
+
         {/* Subtítol - La narrativa REAL */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -70,11 +80,10 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-8"
         >
-          No som un DJ qualsevol. Venim del món dels esdeveniments – 
-          hem viscut milers de bodes des de dins. 
-          <span className="text-white font-medium"> Sabem exactament què fa que el teu event funcioni.</span>
+          {t('simpleSubtitle')}
+          <span className="text-white font-medium"> {t('simpleSubtitleHighlight')}</span>
         </motion.p>
-        
+
         {/* Serveis en pills */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -82,21 +91,16 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-wrap justify-center gap-3 mb-10"
         >
-          {[
-            { icon: '🎵', text: 'DJ Professional' },
-            { icon: '💡', text: 'Il·luminació PRO' },
-            { icon: '✨', text: 'Efectes Especials' },
-            { icon: '🎭', text: 'Tematització' },
-          ].map((service) => (
-            <span 
-              key={service.text}
+          {services.map((service) => (
+            <span
+              key={service.key}
               className="px-4 py-2 bg-white/10 backdrop-blur rounded-full text-white text-sm border border-white/10"
             >
-              {service.icon} {service.text}
+              {service.icon} {t(`simpleServices.${service.key}`)}
             </span>
           ))}
         </motion.div>
-        
+
         {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -104,22 +108,22 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
         >
-          <Link 
+          <Link
             href="/contacto"
             className="group px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full hover:scale-105 transition-all duration-300 shadow-lg shadow-amber-500/25"
           >
-            Demana pressupost 
+            {t('simpleCta.budget')}
             <span className="inline-block ml-2 group-hover:translate-x-1 transition-transform">🚀</span>
           </Link>
-          <Link 
+          <Link
             href="https://wa.me/34699121023"
             target="_blank"
             className="px-8 py-4 bg-white/10 backdrop-blur text-white font-bold rounded-full border border-white/20 hover:bg-white/20 transition-all duration-300"
           >
-            WhatsApp directe 💬
+            {t('simpleCta.whatsapp')}
           </Link>
         </motion.div>
-        
+
         {/* Stats honestos */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -128,7 +132,7 @@ export function Hero() {
         >
           <Stats />
         </motion.div>
-        
+
         {/* Indicador scroll */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -144,7 +148,7 @@ export function Hero() {
             <div className="w-1 h-2 bg-white/50 rounded-full" />
           </motion.div>
         </motion.div>
-        
+
       </div>
     </section>
   );

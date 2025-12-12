@@ -32,195 +32,43 @@ import {
   PartyPopper,
   Sparkles
 } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
-// Serveis d'animacio infantil
-const SERVEIS = [
-  {
-    id: 'jocs',
-    icon: Gamepad2,
-    color: 'from-pink-500 to-rose-500',
-    bgColor: 'bg-pink-500/10',
-    borderColor: 'border-pink-500/30',
-  },
-  {
-    id: 'pintacares',
-    icon: Palette,
-    color: 'from-purple-500 to-violet-500',
-    bgColor: 'bg-purple-500/10',
-    borderColor: 'border-purple-500/30',
-  },
-  {
-    id: 'magia',
-    icon: Wand2,
-    color: 'from-blue-500 to-cyan-500',
-    bgColor: 'bg-blue-500/10',
-    borderColor: 'border-blue-500/30',
-  },
-  {
-    id: 'globoflexia',
-    icon: Heart,
-    color: 'from-red-500 to-orange-500',
-    bgColor: 'bg-red-500/10',
-    borderColor: 'border-red-500/30',
-  },
-  {
-    id: 'tallers',
-    icon: Scissors,
-    color: 'from-green-500 to-emerald-500',
-    bgColor: 'bg-green-500/10',
-    borderColor: 'border-green-500/30',
-  },
-  {
-    id: 'musica',
-    icon: Music,
-    color: 'from-amber-500 to-yellow-500',
-    bgColor: 'bg-amber-500/10',
-    borderColor: 'border-amber-500/30',
-  },
+// Serveis d'animacio infantil (solo datos estaticos)
+const SERVEIS_DATA = [
+  { id: 'jocs', icon: Gamepad2, color: 'from-pink-500 to-rose-500', bgColor: 'bg-pink-500/10', borderColor: 'border-pink-500/30' },
+  { id: 'pintacares', icon: Palette, color: 'from-purple-500 to-violet-500', bgColor: 'bg-purple-500/10', borderColor: 'border-purple-500/30' },
+  { id: 'magia', icon: Wand2, color: 'from-blue-500 to-cyan-500', bgColor: 'bg-blue-500/10', borderColor: 'border-blue-500/30' },
+  { id: 'globoflexia', icon: Heart, color: 'from-red-500 to-orange-500', bgColor: 'bg-red-500/10', borderColor: 'border-red-500/30' },
+  { id: 'tallers', icon: Scissors, color: 'from-green-500 to-emerald-500', bgColor: 'bg-green-500/10', borderColor: 'border-green-500/30' },
+  { id: 'musica', icon: Music, color: 'from-amber-500 to-yellow-500', bgColor: 'bg-amber-500/10', borderColor: 'border-amber-500/30' },
 ];
 
-// Packs d'animacio
-const PACKS = [
-  {
-    id: 'basic',
-    hours: 2,
-    price: 150,
-    features: ['1 animador/a', 'Jocs i activitats', 'Musica infantil', 'Material basic'],
-    recommended: false,
-  },
-  {
-    id: 'complet',
-    hours: 3,
-    price: 220,
-    features: ['1 animador/a', 'Jocs i activitats', 'Pintacares O Globoflexia', 'Musica infantil', 'Material complet'],
-    recommended: true,
-  },
-  {
-    id: 'premium',
-    hours: 4,
-    price: 320,
-    features: ['2 animadors', 'Jocs i activitats', 'Pintacares + Globoflexia', 'Espectacle de magia', 'Musica infantil', 'Tot el material'],
-    recommended: false,
-  },
+// Packs d'animacio (solo datos estaticos)
+const PACKS_DATA = [
+  { id: 'basic', hours: 2, price: 150, recommended: false },
+  { id: 'complet', hours: 3, price: 220, recommended: true },
+  { id: 'premium', hours: 4, price: 320, recommended: false },
+];
+
+// Info items con iconos
+const INFO_ITEMS = [
+  { id: 'experience', icon: Star },
+  { id: 'ages', icon: Users },
+  { id: 'punctuality', icon: Clock },
+  { id: 'coverage', icon: MapPin },
 ];
 
 export default function AnimacionInfantilClient() {
-  const locale = useLocale();
-  const t = useTranslations('animacion');
-  const tCommon = useTranslations('common');
+  const t = useTranslations('pages.animacion');
   const [selectedPack, setSelectedPack] = useState('complet');
-
-  // Textos en ambdos idiomes
-  const texts = {
-    ca: {
-      hero: {
-        badge: 'Animacio Infantil Professional',
-        title: 'Festes magiques',
-        titleHighlight: 'per als mes petits',
-        subtitle: 'Animadors professionals que fan que els nens gaudeixin al maxim. Jocs, magia, pintacares i molt mes!',
-      },
-      services: {
-        title: 'Que oferim?',
-        subtitle: 'Activitats adaptades a cada edat per garantir diversio i somriures',
-        items: {
-          jocs: { title: 'Jocs i Activitats', desc: 'Gimcanes, curses de sacs, jocs d\'aigua, competicions...' },
-          pintacares: { title: 'Pintacares', desc: 'Dissenys creatius que encanten els nens.' },
-          magia: { title: 'Magia', desc: 'Espectacles de magia adaptats a cada edat.' },
-          globoflexia: { title: 'Globoflexia', desc: 'Figures de globus per a tots els gustos.' },
-          tallers: { title: 'Tallers Creatius', desc: 'Manualitats, slime, polseres...' },
-          musica: { title: 'Musica Infantil', desc: 'DJ amb musica adaptada i cancons de moda.' },
-        },
-      },
-      packs: {
-        title: 'Escull el teu pack',
-        subtitle: 'Tots els packs inclouen desplacament fins a 25km de Granollers',
-        hours: 'hores',
-        recommended: 'MES POPULAR',
-        features: {
-          basic: ['1 animador/a', 'Jocs i activitats', 'Musica infantil', 'Material basic'],
-          complet: ['1 animador/a', 'Jocs i activitats', 'Pintacares O Globoflexia', 'Musica infantil', 'Material complet'],
-          premium: ['2 animadors', 'Jocs i activitats', 'Pintacares + Globoflexia', 'Espectacle de magia', 'Musica infantil', 'Tot el material'],
-        },
-        names: {
-          basic: 'Pack Basic',
-          complet: 'Pack Complet',
-          premium: 'Pack Premium',
-        },
-      },
-      cta: {
-        button: 'Demana pressupost',
-        info: 'Resposta en menys de 2 hores',
-      },
-      info: {
-        title: 'Per que triar-nos?',
-        items: [
-          { icon: Star, text: 'Animadors amb experiencia i formacio' },
-          { icon: Users, text: 'Adaptat a l\'edat dels nens (3-12 anys)' },
-          { icon: Clock, text: 'Puntualitat i professionalitat' },
-          { icon: MapPin, text: 'Barcelona i Girona - Desplacament inclos' },
-        ],
-      },
-    },
-    es: {
-      hero: {
-        badge: 'Animacion Infantil Profesional',
-        title: 'Fiestas magicas',
-        titleHighlight: 'para los mas pequenos',
-        subtitle: 'Animadores profesionales que hacen que los ninos disfruten al maximo. Juegos, magia, pintacaras y mucho mas!',
-      },
-      services: {
-        title: 'Que ofrecemos?',
-        subtitle: 'Actividades adaptadas a cada edad para garantizar diversion y sonrisas',
-        items: {
-          jocs: { title: 'Juegos y Actividades', desc: 'Gymkanas, carreras de sacos, juegos de agua, competiciones...' },
-          pintacares: { title: 'Pintacaras', desc: 'Disenos creativos que encantan a los ninos.' },
-          magia: { title: 'Magia', desc: 'Espectaculos de magia adaptados a cada edad.' },
-          globoflexia: { title: 'Globoflexia', desc: 'Figuras de globos para todos los gustos.' },
-          tallers: { title: 'Talleres Creativos', desc: 'Manualidades, slime, pulseras...' },
-          musica: { title: 'Musica Infantil', desc: 'DJ con musica adaptada y canciones de moda.' },
-        },
-      },
-      packs: {
-        title: 'Elige tu pack',
-        subtitle: 'Todos los packs incluyen desplazamiento hasta 25km de Granollers',
-        hours: 'horas',
-        recommended: 'MAS POPULAR',
-        features: {
-          basic: ['1 animador/a', 'Juegos y actividades', 'Musica infantil', 'Material basico'],
-          complet: ['1 animador/a', 'Juegos y actividades', 'Pintacaras O Globoflexia', 'Musica infantil', 'Material completo'],
-          premium: ['2 animadores', 'Juegos y actividades', 'Pintacaras + Globoflexia', 'Espectaculo de magia', 'Musica infantil', 'Todo el material'],
-        },
-        names: {
-          basic: 'Pack Basico',
-          complet: 'Pack Completo',
-          premium: 'Pack Premium',
-        },
-      },
-      cta: {
-        button: 'Pide presupuesto',
-        info: 'Respuesta en menos de 2 horas',
-      },
-      info: {
-        title: 'Por que elegirnos?',
-        items: [
-          { icon: Star, text: 'Animadores con experiencia y formacion' },
-          { icon: Users, text: 'Adaptado a la edad de los ninos (3-12 anos)' },
-          { icon: Clock, text: 'Puntualidad y profesionalidad' },
-          { icon: MapPin, text: 'Barcelona y Girona - Desplazamiento incluido' },
-        ],
-      },
-    },
-  };
-
-  const content = locale === 'ca' ? texts.ca : texts.es;
 
   // URL de contacte
   const getContactUrl = (packId: string) => {
-    const pack = PACKS.find(p => p.id === packId);
+    const pack = PACKS_DATA.find(p => p.id === packId);
     const params = new URLSearchParams({
       servicio: 'animacion-infantil',
-      pack: content.packs.names[packId as keyof typeof content.packs.names] || packId,
+      pack: t(`packs.names.${packId}`),
       precio: pack?.price.toString() || '',
     });
     return `/contacto?${params.toString()}`;
@@ -244,21 +92,21 @@ export default function AnimacionInfantilClient() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-full border border-pink-500/30 mb-6">
               <PartyPopper className="w-5 h-5 text-pink-400" />
-              <span className="text-pink-300 text-sm font-medium">{content.hero.badge}</span>
+              <span className="text-pink-300 text-sm font-medium">{t('hero.badge')}</span>
             </div>
 
             {/* Titol */}
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-              {content.hero.title}
+              {t('hero.title')}
               <br />
               <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-                {content.hero.titleHighlight}
+                {t('hero.titleHighlight')}
               </span>
             </h1>
 
             {/* Subtitol */}
             <p className="text-xl text-white/70 max-w-2xl mx-auto mb-8">
-              {content.hero.subtitle}
+              {t('hero.subtitle')}
             </p>
 
             {/* CTA */}
@@ -267,7 +115,7 @@ export default function AnimacionInfantilClient() {
               className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-full shadow-lg hover:shadow-pink-500/30 transition-all hover:scale-105"
             >
               <Sparkles className="w-5 h-5" />
-              {content.cta.button}
+              {t('cta.button')}
               <ArrowRight className="w-5 h-5" />
             </Link>
           </motion.div>
@@ -278,17 +126,16 @@ export default function AnimacionInfantilClient() {
       <section className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            {content.services.title}
+            {t('services.title')}
           </h2>
           <p className="text-white/60 max-w-2xl mx-auto">
-            {content.services.subtitle}
+            {t('services.subtitle')}
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {SERVEIS.map((servei, idx) => {
+          {SERVEIS_DATA.map((servei, idx) => {
             const Icon = servei.icon;
-            const item = content.services.items[servei.id as keyof typeof content.services.items];
 
             return (
               <motion.div
@@ -302,8 +149,8 @@ export default function AnimacionInfantilClient() {
                 <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${servei.color} flex items-center justify-center mb-4`}>
                   <Icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
-                <p className="text-white/60">{item.desc}</p>
+                <h3 className="text-xl font-bold text-white mb-2">{t(`services.items.${servei.id}.title`)}</h3>
+                <p className="text-white/60">{t(`services.items.${servei.id}.desc`)}</p>
               </motion.div>
             );
           })}
@@ -314,18 +161,17 @@ export default function AnimacionInfantilClient() {
       <section className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            {content.packs.title}
+            {t('packs.title')}
           </h2>
           <p className="text-white/60">
-            {content.packs.subtitle}
+            {t('packs.subtitle')}
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {PACKS.map((pack) => {
+          {PACKS_DATA.map((pack) => {
             const isSelected = selectedPack === pack.id;
-            const features = content.packs.features[pack.id as keyof typeof content.packs.features];
-            const name = content.packs.names[pack.id as keyof typeof content.packs.names];
+            const features = t.raw(`packs.features.${pack.id}`) as string[];
 
             return (
               <motion.div
@@ -348,19 +194,19 @@ export default function AnimacionInfantilClient() {
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <div className="px-4 py-1 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full text-xs font-bold text-white flex items-center gap-1">
                       <Star className="w-3 h-3" fill="currentColor" />
-                      {content.packs.recommended}
+                      {t('packs.recommended')}
                     </div>
                   </div>
                 )}
 
                 {/* Contingut */}
                 <div className="text-center pt-4">
-                  <h3 className="text-2xl font-bold text-white mb-2">{name}</h3>
+                  <h3 className="text-2xl font-bold text-white mb-2">{t(`packs.names.${pack.id}`)}</h3>
 
                   {/* Hores */}
                   <div className="flex items-center justify-center gap-2 text-pink-300 mb-4">
                     <Clock className="w-5 h-5" />
-                    <span className="font-medium">{pack.hours} {content.packs.hours}</span>
+                    <span className="font-medium">{pack.hours} {t('packs.hours')}</span>
                   </div>
 
                   {/* Preu */}
@@ -389,7 +235,7 @@ export default function AnimacionInfantilClient() {
                       }
                     `}
                   >
-                    {content.cta.button}
+                    {t('cta.button')}
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -403,18 +249,18 @@ export default function AnimacionInfantilClient() {
       <section className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto p-8 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-3xl border border-pink-500/20">
           <h3 className="text-2xl font-bold text-white text-center mb-8">
-            {content.info.title}
+            {t('info.title')}
           </h3>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {content.info.items.map((item, idx) => {
+            {INFO_ITEMS.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={idx} className="flex items-start gap-4">
+                <div key={item.id} className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center flex-shrink-0">
                     <Icon className="w-6 h-6 text-pink-400" />
                   </div>
-                  <p className="text-white/80 pt-2">{item.text}</p>
+                  <p className="text-white/80 pt-2">{t(`info.items.${item.id}`)}</p>
                 </div>
               );
             })}
@@ -427,9 +273,9 @@ export default function AnimacionInfantilClient() {
               className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-full shadow-lg hover:shadow-pink-500/30 transition-all hover:scale-105"
             >
               <PartyPopper className="w-5 h-5" />
-              {content.cta.button}
+              {t('cta.button')}
             </Link>
-            <p className="text-white/50 text-sm mt-3">{content.cta.info}</p>
+            <p className="text-white/50 text-sm mt-3">{t('cta.info')}</p>
           </div>
         </div>
       </section>

@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { MessageCircle, Home, RefreshCcw, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 export default function Error({
   error,
@@ -13,6 +14,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations('errorPage');
+
   useEffect(() => {
     // Log error to monitoring service (Sentry, etc)
     console.error('Error caught by error boundary:', error);
@@ -46,15 +49,15 @@ export default function Error({
 
         {/* Title */}
         <h1 className="text-5xl md:text-6xl font-black mb-4 text-white">
-          ¡Ups! Algo Salió Mal
+          {t('title')}
         </h1>
 
         {/* Description */}
         <p className="text-xl text-text-muted mb-8 leading-relaxed">
-          {error?.message || 'Error inesperado en la web.'}
+          {error?.message || t('defaultMessage')}
           <br />
           <span className="text-oe-gold font-bold">
-            Pero tranquilo, tu evento será perfecto. Prometido.
+            {t('reassurance')}
           </span>
         </p>
 
@@ -62,7 +65,7 @@ export default function Error({
         {process.env.NODE_ENV === 'development' && error?.stack && (
           <details className="mb-8 text-left bg-bg-surface border border-border rounded-xl p-4">
             <summary className="cursor-pointer text-sm font-mono text-text-muted hover:text-white">
-              Ver detalles técnicos (solo desarrollo)
+              {t('technicalDetails')}
             </summary>
             <pre className="mt-4 text-xs text-red-400 overflow-auto max-h-40">
               {error.stack}
@@ -77,12 +80,12 @@ export default function Error({
             className="oe-btn inline-flex items-center justify-center gap-2 group"
           >
             <RefreshCcw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
-            Intentar de Nuevo
+            {t('tryAgain')}
           </button>
 
           <Link href="/" className="oe-btn inline-flex items-center justify-center gap-2">
             <Home className="w-5 h-5" />
-            Volver al Inicio
+            {t('backToHome')}
           </Link>
 
           <Link
@@ -90,21 +93,21 @@ export default function Error({
             className="oe-btn-gold inline-flex items-center justify-center gap-2"
           >
             <MessageCircle className="w-5 h-5" />
-            Contactar (Ayuda Rápida)
+            {t('contactHelp')}
           </Link>
         </div>
 
         {/* Support info */}
         <p className="text-sm text-text-muted">
-          ¿Problema persistente?{' '}
+          {t('persistentProblem')}{' '}
           <Link
             href="/contacto"
             className="text-oe-gold hover:underline"
           >
-            Contáctanos a través del formulario
+            {t('contactUs')}
           </Link>
           <br />
-          Código error: {error?.digest || 'No disponible'}
+          {t('errorCode')} {error?.digest || 'No disponible'}
         </p>
       </motion.div>
     </main>
