@@ -200,50 +200,33 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  // Obtenir configuració de l'idioma
-  const config = localeConfig[locale as Locale];
-  const dir = config?.dir || 'ltr';
-  const isRTL = dir === 'rtl';
-
   // Carregar missatges i traduccions
   const messages = await getMessages();
   const t = await getTranslations({ locale, namespace: 'common.nav' });
 
+  // HYDRATION FIX: No renderizar <html> aquí - ya lo hace app/layout.tsx
+  // Solo renderizar el contenido con el provider de i18n
   return (
-    <html
-      lang={locale}
-      dir={dir}
-      className={isRTL ? 'rtl' : 'ltr'}
-    >
-      <head>
-        {/* Schema.org JSON-LD per SEO */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_DATA) }}
-        />
-        {/* StructuredData desactivat temporalment per evitar errors d'hidratació */}
-        {/* <StructuredData locale={locale} /> */}
-      </head>
-      <body
-        className={`${inter.variable} ${outfit.variable} ${space.variable} font-sans antialiased bg-neutral-950 text-white`}
-        suppressHydrationWarning
-      >
-        {/* Skip link per accessibilitat */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
-                     focus:z-[100] focus:px-4 focus:py-2 focus:bg-amber-400 focus:text-black
-                     focus:rounded-lg focus:font-bold focus:outline-none"
-        >
-          {t('skip')}
-        </a>
+    <NextIntlClientProvider messages={messages} locale={locale}>
+      {/* Schema.org JSON-LD per SEO - injectat com a script inline */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_DATA) }}
+      />
 
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+      {/* Skip link per accessibilitat */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
+                   focus:z-[100] focus:px-4 focus:py-2 focus:bg-amber-400 focus:text-black
+                   focus:rounded-lg focus:font-bold focus:outline-none"
+      >
+        {t('skip')}
+      </a>
+
+      <LayoutWrapper>
+        {children}
+      </LayoutWrapper>
+    </NextIntlClientProvider>
   );
 }
