@@ -475,9 +475,17 @@
     "subtitle": "Datos actualizados en tiempo real desde nuestra base de datos. Cero números inventados.",
     "footer": "Datos actualizados automáticamente. Última actualización: hoy.",
     "googleReviews": "reseñas en Google",
+    "events": {
+      "label": "Eventos realizados",
+      "description": "Bodas, fiestas y corporativos"
+    },
     "weddings": {
       "label": "Bodas",
       "description": "Días especiales memorables"
+    },
+    "rating": {
+      "label": "Valoración media",
+      "description": "De clientes verificados"
     },
     "reviews": {
       "label": "Opiniones",
@@ -486,6 +494,10 @@
     "years": {
       "label": "Años de experiencia",
       "description": "En el sector eventos"
+    },
+    "coverage": {
+      "label": "Provincias",
+      "description": "Barcelona y Girona"
     },
     "ratingOld": "Google",
     "eventsOld": "eventos",
