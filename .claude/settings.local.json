@@ -41,7 +41,8 @@
       "Bash(for page in \"/\" \"/contacto\" \"/es\")",
       "Bash(do echo -n \"$page: \")",
       "Bash(ls:*)",
-      "Bash(git show:*)"
+      "Bash(git show:*)",
+      "Bash(timeout /t 60 /nobreak)"
     ]
   }
 }
