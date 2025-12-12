@@ -3,10 +3,50 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { locales, type Locale } from "@/i18n";
+import { inter, outfit, space } from "@/app/fonts";
 import "@/app/globals.css";
 
 // Components
 import LayoutWrapper from "@/app/components/layout/LayoutWrapper";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
+// Analytics component
+function AnalyticsScripts() {
+  if (process.env.NODE_ENV !== 'production') return null;
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  if (!gaId) return null;
+
+  return (
+    <>
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
+      <script
+        id="gtag-init"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('consent', 'default', {
+              'ad_storage': 'denied',
+              'analytics_storage': 'denied',
+              'ad_user_data': 'denied',
+              'ad_personalization': 'denied',
+              'wait_for_update': 500
+            });
+            gtag('js', new Date());
+            gtag('config', '${gaId}', {
+              anonymize_ip: true,
+              send_page_view: false
+            });
+            window.gtagConsentUpdate = function() {
+              gtag('consent', 'update', { 'analytics_storage': 'granted' });
+              gtag('event', 'page_view', { page_location: window.location.href });
+            };
+          `,
+        }}
+      />
+    </>
+  );
+}
 
 // JSON-LD estàtic per SEO (no necessita traduccions - Google entén qualsevol idioma)
 const JSON_LD_DATA = {
@@ -201,13 +241,66 @@ export default async function LocaleLayout({
   // Carregar missatges per i18n
   const messages = await getMessages();
 
-  // HYDRATION FIX: No renderizar <html> aquí - ya lo hace app/layout.tsx
-  // Solo renderizar el contenido con el provider de i18n
   return (
-    <NextIntlClientProvider messages={messages} locale={locale}>
-      <LayoutWrapper>
-        {children}
-      </LayoutWrapper>
-    </NextIntlClientProvider>
+    <html
+      lang={locale}
+      className={`${inter.variable} ${outfit.variable} ${space.variable} scroll-smooth`}
+      suppressHydrationWarning
+    >
+      <head>
+        <AnalyticsScripts />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.google-analytics.com" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_DATA) }}
+        />
+
+        {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_METRICOOL_HASH && (
+          <script
+            id="metricool-tracker"
+            dangerouslySetInnerHTML={{
+              __html: `
+                function loadScript(a){
+                  var b=document.getElementsByTagName("head")[0],
+                  c=document.createElement("script");
+                  c.type="text/javascript";
+                  c.src="https://tracker.metricool.com/resources/be.js";
+                  c.onreadystatechange=a;
+                  c.onload=a;
+                  b.appendChild(c);
+                }
+                loadScript(function(){
+                  beTracker.t({hash:"${process.env.NEXT_PUBLIC_METRICOOL_HASH}"});
+                });
+              `,
+            }}
+          />
+        )}
+      </head>
+      <body
+        className="font-sans antialiased bg-neutral-950 text-white overflow-x-hidden"
+        suppressHydrationWarning
+      >
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
+        </NextIntlClientProvider>
+        <SpeedInsights />
+      </body>
+    </html>
   );
 }

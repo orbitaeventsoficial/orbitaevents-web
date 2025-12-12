@@ -40,7 +40,8 @@
       "Bash(do echo -n \"$js: \")",
       "Bash(for page in \"/\" \"/contacto\" \"/es\")",
       "Bash(do echo -n \"$page: \")",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git show:*)"
     ]
   }
 }
