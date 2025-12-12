@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import Image from 'next/image';
@@ -78,19 +78,77 @@ const EXTRA_MULTISEGELL = {
 const FAQS_KEYS = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6'];
 
 // ═══════════════════════════════════════════════════════════════
+// COMPONENT: Client-only Stars (to avoid hydration mismatch)
+// ═══════════════════════════════════════════════════════════════
+
+function ClientOnlyStars() {
+  const [mounted, setMounted] = useState(false);
+  const [stars, setStars] = useState<Array<{ left: number; top: number; duration: number; delay: number }>>([]);
+
+  useEffect(() => {
+    setMounted(true);
+    // Generate stars only on client
+    const newStars = Array.from({ length: 50 }, () => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: 2 + Math.random() * 2,
+      delay: Math.random() * 2,
+    }));
+    setStars(newStars);
+  }, []);
+
+  if (!mounted) return null;
+
+  return (
+    <div className="absolute inset-0">
+      {stars.map((star, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 bg-white rounded-full"
+          style={{
+            left: `${star.left}%`,
+            top: `${star.top}%`,
+          }}
+          animate={{
+            opacity: [0.2, 1, 0.2],
+            scale: [1, 1.5, 1],
+          }}
+          transition={{
+            duration: star.duration,
+            repeat: Infinity,
+            delay: star.delay,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
 // COMPONENT: Veles Flotants (Gran Saló)
 // ═══════════════════════════════════════════════════════════════
 
+// Pre-computed candle data to avoid hydration mismatch
+const CANDLE_DATA = [
+  { id: 0, left: '5%', delay: 2.3, duration: 5.1, size: 22 },
+  { id: 1, left: '11%', delay: 0.8, duration: 4.3, size: 26 },
+  { id: 2, left: '17%', delay: 4.1, duration: 5.8, size: 19 },
+  { id: 3, left: '23%', delay: 1.5, duration: 4.7, size: 28 },
+  { id: 4, left: '29%', delay: 3.2, duration: 5.4, size: 21 },
+  { id: 5, left: '35%', delay: 0.3, duration: 4.1, size: 25 },
+  { id: 6, left: '41%', delay: 2.9, duration: 5.6, size: 23 },
+  { id: 7, left: '47%', delay: 1.1, duration: 4.5, size: 27 },
+  { id: 8, left: '53%', delay: 4.5, duration: 5.2, size: 20 },
+  { id: 9, left: '59%', delay: 0.6, duration: 4.9, size: 24 },
+  { id: 10, left: '65%', delay: 3.7, duration: 5.0, size: 29 },
+  { id: 11, left: '71%', delay: 1.8, duration: 4.2, size: 22 },
+  { id: 12, left: '77%', delay: 2.5, duration: 5.5, size: 26 },
+  { id: 13, left: '83%', delay: 0.9, duration: 4.8, size: 21 },
+  { id: 14, left: '89%', delay: 3.4, duration: 5.3, size: 25 },
+];
+
 function FloatingCandles() {
-  const candles = useMemo(() => {
-    return Array.from({ length: 15 }, (_, i) => ({
-      id: i,
-      left: `${5 + (i * 6)}%`,
-      delay: Math.random() * 5,
-      duration: 4 + Math.random() * 2,
-      size: 18 + Math.random() * 12,
-    }));
-  }, []);
+  const candles = CANDLE_DATA;
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -165,27 +223,8 @@ export default function ProductesMonMagic() {
       <section className="relative py-20 md:py-28 overflow-hidden">
         <FloatingCandles />
 
-        <div className="absolute inset-0">
-          {[...Array(50)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-white rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                opacity: [0.2, 1, 0.2],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: 2 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
-          ))}
-        </div>
+        {/* Stars rendered client-side only to avoid hydration mismatch */}
+        <ClientOnlyStars />
 
         <div className="container mx-auto px-4 relative z-10">
           <motion.div

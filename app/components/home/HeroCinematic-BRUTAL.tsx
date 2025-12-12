@@ -527,7 +527,7 @@ export function HeroCinematicBrutal() {
           </div>
 
           <p className="mt-3 text-xs sm:text-sm text-white/50 text-center" suppressHydrationWarning>
-            {t('urgency.remaining')} <span className="text-amber-400 font-bold">2 {t('urgency.saturdays')}</span> {t('urgency.in')} {new Date().toLocaleDateString('ca-ES', { month: 'long' })}
+            {t('urgency.remaining')} <span className="text-amber-400 font-bold">2 {t('urgency.saturdays')}</span> {t('urgency.in')} <span suppressHydrationWarning>{new Date().toLocaleDateString('ca-ES', { month: 'long' })}</span>
           </p>
         </motion.div>
 

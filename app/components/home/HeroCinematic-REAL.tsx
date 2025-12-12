@@ -472,7 +472,7 @@ export default function HeroCinematicBrutalReal() {
             <span className="text-amber-400 font-bold">
               {isLoading ? '--' : currentMonthAvailable} {t('urgency.saturdays')}
             </span>{' '}
-            {t('urgency.in')} {new Date().toLocaleDateString('ca-ES', { month: 'long' })}
+            {t('urgency.in')} <span suppressHydrationWarning>{new Date().toLocaleDateString('ca-ES', { month: 'long' })}</span>
           </p>
         </motion.div>
 

@@ -14,8 +14,8 @@ export default function PrivacidadPage() {
         <h1 className="text-4xl font-bold text-white mb-8">{t('title')}</h1>
 
         <div className="prose prose-invert prose-gold max-w-none space-y-8 text-white/80">
-          <p className="text-lg">
-            {t('lastUpdate')} {new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+          <p className="text-lg" suppressHydrationWarning>
+            {t('lastUpdate')} 13 de diciembre de 2025
           </p>
 
           {/* Banner Portal de Privacitat */}
