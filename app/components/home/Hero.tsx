@@ -1,9 +1,35 @@
 'use client';
 
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { Stats } from './Stats';
 import { useTranslations } from 'next-intl';
+
+// HYDRATION FIX: Pre-computed deterministic particle positions
+// Using seeded pseudo-random values to avoid hydration mismatch
+const PARTICLE_POSITIONS = [
+  { left: 15, top: 23, duration: 3.2, delay: 0.5 },
+  { left: 42, top: 67, duration: 4.1, delay: 1.2 },
+  { left: 78, top: 12, duration: 3.8, delay: 0.8 },
+  { left: 5, top: 89, duration: 4.5, delay: 1.8 },
+  { left: 91, top: 45, duration: 3.5, delay: 0.3 },
+  { left: 33, top: 78, duration: 4.2, delay: 1.5 },
+  { left: 67, top: 34, duration: 3.9, delay: 0.9 },
+  { left: 23, top: 56, duration: 4.4, delay: 1.1 },
+  { left: 88, top: 91, duration: 3.3, delay: 0.6 },
+  { left: 51, top: 8, duration: 4.0, delay: 1.4 },
+  { left: 12, top: 42, duration: 3.7, delay: 0.7 },
+  { left: 76, top: 65, duration: 4.3, delay: 1.9 },
+  { left: 38, top: 19, duration: 3.4, delay: 0.4 },
+  { left: 95, top: 73, duration: 4.6, delay: 1.0 },
+  { left: 8, top: 31, duration: 3.6, delay: 1.6 },
+  { left: 62, top: 87, duration: 4.1, delay: 0.2 },
+  { left: 29, top: 4, duration: 3.8, delay: 1.3 },
+  { left: 84, top: 58, duration: 4.4, delay: 0.1 },
+  { left: 47, top: 95, duration: 3.5, delay: 1.7 },
+  { left: 71, top: 26, duration: 4.2, delay: 0.0 },
+];
 
 export function Hero() {
   const t = useTranslations('hero');
@@ -20,24 +46,24 @@ export function Hero() {
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/20 to-black" />
 
-      {/* Partícules decoratives (opcional) */}
+      {/* Partícules decoratives - HYDRATION FIX: Using pre-computed positions */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+        {PARTICLE_POSITIONS.map((particle, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-amber-400/30 rounded-full"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
             }}
             animate={{
               opacity: [0.2, 0.8, 0.2],
               scale: [1, 1.5, 1],
             }}
             transition={{
-              duration: 3 + Math.random() * 2,
+              duration: particle.duration,
               repeat: Infinity,
-              delay: Math.random() * 2,
+              delay: particle.delay,
             }}
           />
         ))}

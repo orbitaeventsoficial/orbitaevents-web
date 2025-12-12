@@ -67,30 +67,31 @@ function GuaranteeBadge({ t }: { t: (key: string) => string }) {
 // AVAILABILITY CALENDAR MINI
 // ═══════════════════════════════════════════════════════════════════════════
 
-type MonthStatus = 'critical' | 'warning' | 'ok';
-type MonthData = { name: string; available: number; status: MonthStatus };
-
 function AvailabilityMini({ t, locale }: { t: (key: string) => string; locale: string }) {
-  // SSR-safe: use static defaults, update on client
-  const [months, setMonths] = useState<MonthData[]>([
-    { name: 'DES', available: 2, status: 'warning' },
-    { name: 'GEN', available: 3, status: 'ok' },
-    { name: 'FEB', available: 2, status: 'warning' },
-  ]);
+  // HYDRATION FIX: Use fixed values for SSR, then update on client
+  // Using deterministic values based on month offset to avoid Math.random()
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const now = new Date();
-    const newMonths = [0, 1, 2].map(offset => {
+    setMounted(true);
+  }, []);
+
+  const months = useMemo(() => {
+    // Use current date only after mounting to avoid hydration mismatch
+    const now = mounted ? new Date() : new Date(2025, 0, 1); // Fixed date for SSR
+    return [0, 1, 2].map(offset => {
       const date = new Date(now.getFullYear(), now.getMonth() + offset, 1);
-      const available = Math.floor(Math.random() * 3) + 1;
+      // HYDRATION FIX: Use deterministic values instead of Math.random()
+      // Pattern: 2, 1, 3 (creates urgency with first months showing scarcity)
+      const availablePattern = [2, 1, 3];
+      const available = availablePattern[offset];
       return {
         name: date.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { month: 'short' }).toUpperCase(),
         available,
-        status: (available <= 1 ? 'critical' : available <= 2 ? 'warning' : 'ok') as MonthStatus
+        status: available <= 1 ? 'critical' : available <= 2 ? 'warning' : 'ok'
       };
     });
-    setMonths(newMonths);
-  }, [locale]);
+  }, [locale, mounted]);
 
   return (
     <div className="flex justify-center gap-4 mt-6">
@@ -236,13 +237,13 @@ export function CTASectionBrutal() {
             {/* Primary CTA - Form */}
             <Link
               href="/contacto"
-              className="group relative w-full sm:w-auto px-8 py-4 overflow-hidden rounded-full font-bold text-lg transition-all duration-300"
+              className="group relative w-full sm:w-auto px-10 py-5 overflow-hidden rounded-full font-bold text-lg transition-all duration-300 hover:scale-105"
             >
               {/* Animated gradient background */}
-              <span className="absolute inset-0 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 bg-[length:200%_100%] animate-shimmer" />
+              <span className="absolute inset-0 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 bg-[length:200%_100%] animate-shimmer pointer-events-none" />
               
               {/* Glow on hover */}
-              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full"
+              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full pointer-events-none"
                 style={{ boxShadow: '0 0 40px rgba(245, 158, 11, 0.6), 0 0 80px rgba(245, 158, 11, 0.3)' }}
               />
               

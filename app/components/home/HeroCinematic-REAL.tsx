@@ -23,24 +23,24 @@ import { useTranslations } from 'next-intl';
 import { usePublicStats, useAvailability, useCountdown } from '@/hooks/usePublicData';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PARTICLES MÁGICAS
+// PARTICLES MÁGICAS - HYDRATION FIX: Pre-computed deterministic values
 // ═══════════════════════════════════════════════════════════════════════════
 
-function MagicParticles() {
-  const particles = useMemo(() => {
-    return [...Array(50)].map((_, i) => ({
-      id: i,
-      size: Math.random() * 4 + 2,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      duration: Math.random() * 20 + 15,
-      delay: Math.random() * 10,
-    }));
-  }, []);
+// Pre-computed particle data to avoid hydration mismatch
+const MAGIC_PARTICLES_DATA = Array.from({ length: 50 }, (_, i) => ({
+  id: i,
+  size: 2 + (i % 5), // 2-6px deterministically
+  x: (i * 17 + 11) % 100, // Distributed positions
+  y: (i * 23 + 7) % 100,
+  duration: 15 + (i % 21), // 15-35s
+  delay: (i % 11), // 0-10s
+  xOffset: ((i * 13) % 50) - 25, // -25 to 25
+}));
 
+function MagicParticles() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map((particle) => (
+      {MAGIC_PARTICLES_DATA.map((particle) => (
         <motion.div
           key={particle.id}
           className="absolute rounded-full bg-amber-400/30"
@@ -53,7 +53,7 @@ function MagicParticles() {
           }}
           animate={{
             y: [0, -100, 0],
-            x: [0, Math.random() * 50 - 25, 0],
+            x: [0, particle.xOffset, 0],
             opacity: [0.3, 0.8, 0.3],
             scale: [1, 1.2, 1],
           }}
