@@ -44,10 +44,14 @@ export default function CalendarioDisponibilidad({
   const t = useTranslations("calendar");
   const DIAS_SEMANA = t.raw("days") as string[];
   const MESES = t.raw("months") as string[];
-  const [mesActual, setMesActual] = useState(() => {
+  // Use stable default for SSR, update on client
+  const [mesActual, setMesActual] = useState("2025-01");
+
+  // Set actual month on client to avoid hydration mismatch
+  useEffect(() => {
     const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  });
+    setMesActual(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
+  }, []);
   const [calendario, setCalendario] = useState<CalendarioMes | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);

@@ -15,7 +15,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
@@ -116,11 +116,17 @@ function SimpleCaptcha({
   onVerify: (verified: boolean) => void;
   t: (key: string) => string;
 }) {
-  const [num1] = useState(() => Math.floor(Math.random() * 10) + 1);
-  const [num2] = useState(() => Math.floor(Math.random() * 10) + 1);
+  const [num1, setNum1] = useState(5); // Default values for SSR
+  const [num2, setNum2] = useState(3);
   const [answer, setAnswer] = useState('');
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState(false);
+
+  // Generate random numbers only on client to avoid hydration mismatch
+  useEffect(() => {
+    setNum1(Math.floor(Math.random() * 10) + 1);
+    setNum2(Math.floor(Math.random() * 10) + 1);
+  }, []);
 
   const checkAnswer = (value: string) => {
     setAnswer(value);
