@@ -13,7 +13,12 @@ interface CalendarDay {
 
 export default function AvailabilityCalendar() {
   const t = useTranslations('calendar');
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState(() => new Date(2025, 0, 1)); // SSR-safe default
+
+  // Set actual date on client to avoid hydration mismatch
+  useEffect(() => {
+    setCurrentMonth(new Date());
+  }, []);
   const [days, setDays] = useState<CalendarDay[]>([]);
   const [, setLoading] = useState(true);
   const DIAS_SEMANA = t.raw('days') as string[];

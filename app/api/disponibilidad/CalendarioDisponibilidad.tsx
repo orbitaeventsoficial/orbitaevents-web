@@ -28,7 +28,12 @@ export default function CalendarioDisponibilidad({
 }: CalendarioDisponibilidadProps) {
   const t = useTranslations('common');
   const tCal = useTranslations('calendar');
-  const [mesActual, setMesActual] = useState(new Date());
+  const [mesActual, setMesActual] = useState(() => new Date(2025, 0, 1)); // SSR-safe default
+
+  // Set actual date on client to avoid hydration mismatch
+  useEffect(() => {
+    setMesActual(new Date());
+  }, []);
   const [calendario, setCalendario] = useState<DiaCalendario[]>([]);
   const [loading, setLoading] = useState(true);
   const [fechaSeleccionada, setFechaSeleccionada] = useState<string | null>(null);
