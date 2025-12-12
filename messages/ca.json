@@ -2131,76 +2131,7 @@
       "privacy": "Política de privadesa",
       "privacyPortal": "Gestió de dades",
       "terms": "Termes i condicions",
-      "cookies": {
-        "title": "Política de Cookies",
-        "metadata": {
-          "title": "Política de Cookies | Òrbita Events",
-          "description": "Informació sobre l'ús de cookies al lloc web d'Òrbita Events."
-        },
-        "lastUpdate": "Última actualització:",
-        "section1": {
-          "title": "Què són les cookies?",
-          "content": "Les cookies són petits arxius de text que els llocs web emmagatzemen al teu dispositiu quan els visites. S'utilitzen àmpliament per fer que els llocs web funcionin de manera més eficient i per proporcionar informació als propietaris del lloc."
-        },
-        "section2": {
-          "title": "Cookies que utilitzem",
-          "technical": {
-            "title": "Cookies tècniques (necessàries)",
-            "description": "Són essencials per al funcionament del lloc web.",
-            "table": {
-              "nombre": "Nom",
-              "finalidad": "Finalitat",
-              "duracion": "Duració",
-              "sessionId": {
-                "name": "session_id",
-                "purpose": "Mantenir la sessió de l'usuari",
-                "duration": "Sessió"
-              },
-              "cookieConsent": {
-                "name": "cookie_consent",
-                "purpose": "Guardar preferències de cookies",
-                "duration": "1 any"
-              }
-            }
-          },
-          "analytical": {
-            "title": "Cookies analítiques",
-            "description": "Ens ajuden a entendre com els visitants interactuen amb el lloc.",
-            "table": {
-              "nombre": "Nom",
-              "proveedor": "Proveïdor",
-              "finalidad": "Finalitat",
-              "duracion": "Duració",
-              "ga": {
-                "name": "_ga",
-                "provider": "Google Analytics",
-                "purpose": "Distingir usuaris",
-                "duration": "2 anys"
-              },
-              "gid": {
-                "name": "_gid",
-                "provider": "Google Analytics",
-                "purpose": "Distingir usuaris",
-                "duration": "24 hores"
-              }
-            }
-          }
-        },
-        "section3": {
-          "title": "Com gestionar les cookies?",
-          "content": "Pots configurar el teu navegador per rebutjar totes les cookies o perquè t'avisi quan s'envia una cookie. No obstant això, si rebutges les cookies, és possible que algunes parts del lloc no funcionin correctament.",
-          "browsers": {
-            "chrome": "Google Chrome",
-            "firefox": "Mozilla Firefox",
-            "safari": "Safari",
-            "edge": "Microsoft Edge"
-          }
-        },
-        "section4": {
-          "title": "Contacte",
-          "intro": "Si tens preguntes sobre la nostra política de cookies, contacta amb nosaltres:"
-        }
-      },
+      "cookies": "Política de Cookies",
       "legalNotice": "Avís Legal",
       "avisoLegal": {
         "title": "Avís Legal",
@@ -3678,6 +3609,86 @@
       "parties": "L'alegria compartida",
       "mobile": "La música on vulguis",
       "corporate": "L'impacte memorable"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "title": "Política de Privadesa",
+      "lastUpdate": "Última actualització"
+    },
+    "terms": {
+      "title": "Termes i Condicions",
+      "lastUpdate": "Última actualització"
+    },
+    "cookies": {
+      "title": "Política de Cookies",
+      "metadata": {
+        "title": "Política de Cookies | Òrbita Events",
+        "description": "Informació sobre l'ús de cookies al lloc web d'Òrbita Events."
+      },
+      "lastUpdate": "Última actualització:",
+      "section1": {
+        "title": "Què són les cookies?",
+        "content": "Les cookies són petits arxius de text que els llocs web emmagatzemen al teu dispositiu quan els visites. S'utilitzen àmpliament per fer que els llocs web funcionin de manera més eficient i per proporcionar informació als propietaris del lloc."
+      },
+      "section2": {
+        "title": "Cookies que utilitzem",
+        "technical": {
+          "title": "Cookies tècniques (necessàries)",
+          "description": "Són essencials per al funcionament del lloc web.",
+          "table": {
+            "nombre": "Nom",
+            "finalidad": "Finalitat",
+            "duracion": "Duració",
+            "sessionId": {
+              "name": "session_id",
+              "purpose": "Mantenir la sessió de l'usuari",
+              "duration": "Sessió"
+            },
+            "cookieConsent": {
+              "name": "cookie_consent",
+              "purpose": "Guardar preferències de cookies",
+              "duration": "1 any"
+            }
+          }
+        },
+        "analytical": {
+          "title": "Cookies analítiques",
+          "description": "Ens ajuden a entendre com els visitants interactuen amb el lloc.",
+          "table": {
+            "nombre": "Nom",
+            "proveedor": "Proveïdor",
+            "finalidad": "Finalitat",
+            "duracion": "Duració",
+            "ga": {
+              "name": "_ga",
+              "provider": "Google Analytics",
+              "purpose": "Distingir usuaris",
+              "duration": "2 anys"
+            },
+            "gid": {
+              "name": "_gid",
+              "provider": "Google Analytics",
+              "purpose": "Distingir usuaris",
+              "duration": "24 hores"
+            }
+          }
+        }
+      },
+      "section3": {
+        "title": "Com gestionar les cookies?",
+        "content": "Pots configurar el teu navegador per rebutjar totes les cookies o perquè t'avisi quan s'envia una cookie. No obstant això, si rebutges les cookies, és possible que algunes parts del lloc no funcionin correctament.",
+        "browsers": {
+          "chrome": "Google Chrome",
+          "firefox": "Mozilla Firefox",
+          "safari": "Safari",
+          "edge": "Microsoft Edge"
+        }
+      },
+      "section4": {
+        "title": "Contacte",
+        "intro": "Si tens preguntes sobre la nostra política de cookies, contacta amb nosaltres:"
+      }
     }
   },
   "notFound": {

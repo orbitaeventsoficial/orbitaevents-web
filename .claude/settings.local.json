@@ -25,7 +25,10 @@
       "Bash(node -e:*)",
       "Bash(grep:*)",
       "Bash(find:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(for url in \"/\" \"/es\" \"/servicios/bodas\" \"/servicios/discomovil\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/contacto\" \"/portfolio\")",
+      "Bash(do echo -n \"$url: \")",
+      "Bash(done)"
     ]
   }
 }

@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, Sparkles } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 
 interface StickyCTAProps {
