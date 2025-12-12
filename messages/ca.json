@@ -463,20 +463,16 @@
       "label": "Anys d'experiència",
       "description": "En el sector events"
     },
-    "coverage": {
+    "coverageDetailed": {
       "label": "Províncies",
       "description": "Barcelona i Girona"
     },
     "ratingOld": "Google",
     "eventsOld": "esdeveniments",
-    "eventsCompleted": "Esdeveniments celebrats",
     "peopleDancing": "gent ballant",
     "recommendRate": "Ens recomanen",
-    "yearsExperience": "anys en el sector",
     "satisfaction": "satisfacció",
-    "coverageOld": "Barcelona + Girona",
     "dedication": "dedicació",
-    "response": "Resposta",
     "recommendation": "satisfacció",
     "noIncidents": "Esdeveniments realitzats sense incidents",
     "backupEquipment": "Amb un equip de seguretat complet",

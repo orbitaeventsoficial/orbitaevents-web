@@ -28,7 +28,8 @@
       "Bash(pkill:*)",
       "Bash(for url in \"/\" \"/es\" \"/servicios/bodas\" \"/servicios/discomovil\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/contacto\" \"/portfolio\")",
       "Bash(do echo -n \"$url: \")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(for url in \"/\" \"/es\" \"/servicios/bodas\" \"/servicios/discomovil\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/contacto\" \"/portfolio\" \"/legal/cookies\" \"/legal/privacidad\" \"/legal/terminos\")"
     ]
   }
 }
