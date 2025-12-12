@@ -231,7 +231,7 @@ export default async function LocaleLayout({
 
   // Carregar missatges i traduccions
   const messages = await getMessages();
-  const t = await getTranslations('nav');
+  const t = await getTranslations({ locale, namespace: 'nav' });
   const jsonLd = await generateJsonLd(locale);
 
   return (
