@@ -246,8 +246,8 @@ export default async function LocaleLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {/* StructuredData amb traduccions */}
-        <StructuredData locale={locale} />
+        {/* StructuredData desactivat temporalment per evitar errors d'hidratació */}
+        {/* <StructuredData locale={locale} /> */}
       </head>
       <body
         className={`${inter.variable} ${outfit.variable} ${space.variable} font-sans antialiased bg-neutral-950 text-white`}
