@@ -68,20 +68,16 @@ function GuaranteeBadge({ t }: { t: (key: string) => string }) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function AvailabilityMini({ t, locale }: { t: (key: string) => string; locale: string }) {
-  // HYDRATION FIX: Use fixed values for SSR, then update on client
-  // Using deterministic values based on month offset to avoid Math.random()
+  // HYDRATION FIX: Only render after mount to avoid SSR/client mismatch
   const [mounted, setMounted] = useState(false);
+  const [months, setMonths] = useState<Array<{name: string; available: number; status: string}>>([]);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
-
-  const months = useMemo(() => {
-    // Use current date only after mounting to avoid hydration mismatch
-    const now = mounted ? new Date() : new Date(2025, 0, 1); // Fixed date for SSR
-    return [0, 1, 2].map(offset => {
+    // Calculate months only on client side
+    const now = new Date();
+    const calculatedMonths = [0, 1, 2].map(offset => {
       const date = new Date(now.getFullYear(), now.getMonth() + offset, 1);
-      // HYDRATION FIX: Use deterministic values instead of Math.random()
       // Pattern: 2, 1, 3 (creates urgency with first months showing scarcity)
       const availablePattern = [2, 1, 3];
       const available = availablePattern[offset];
@@ -91,7 +87,21 @@ function AvailabilityMini({ t, locale }: { t: (key: string) => string; locale: s
         status: available <= 1 ? 'critical' : available <= 2 ? 'warning' : 'ok'
       };
     });
-  }, [locale, mounted]);
+    setMonths(calculatedMonths);
+  }, [locale]);
+
+  // Don't render until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="flex justify-center gap-4 mt-6">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="text-center">
+            <div className="w-16 h-16 rounded-xl bg-white/10 animate-pulse" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center gap-4 mt-6">
