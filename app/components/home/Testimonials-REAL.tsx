@@ -81,11 +81,13 @@ function TestimonialCard({
   const dateDisplay = testimonial.eventDate 
     ? new Date(testimonial.eventDate).toLocaleDateString('ca-ES', { 
         month: 'long', 
-        year: 'numeric' 
+        year: 'numeric',
+        timeZone: 'UTC',
       })
     : new Date(testimonial.createdAt).toLocaleDateString('ca-ES', { 
         month: 'long', 
-        year: 'numeric' 
+        year: 'numeric',
+        timeZone: 'UTC',
       });
 
   return (

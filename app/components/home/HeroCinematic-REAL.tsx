@@ -254,6 +254,14 @@ function SocialProofBadge({
 export default function HeroCinematicBrutalReal() {
   const t = useTranslations('hero');
   const tWhatsapp = useTranslations('whatsappMessages');
+  const currentMonth = useMemo(
+    () =>
+      new Intl.DateTimeFormat('ca-ES', {
+        month: 'long',
+        timeZone: 'UTC', // Evita desajustos server/cliente
+      }).format(new Date()),
+    []
+  );
   
   // 🔥 DADES REALS DE BD!
   const { stats, isLoading: statsLoading } = usePublicStats();
@@ -472,7 +480,8 @@ export default function HeroCinematicBrutalReal() {
             <span className="text-amber-400 font-bold">
               {isLoading ? '--' : currentMonthAvailable} {t('urgency.saturdays')}
             </span>{' '}
-            {t('urgency.in')} <span suppressHydrationWarning>{new Date().toLocaleDateString('ca-ES', { month: 'long' })}</span>
+            {t('urgency.in')}{' '}
+            <span suppressHydrationWarning>{currentMonth}</span>
           </p>
         </motion.div>
 

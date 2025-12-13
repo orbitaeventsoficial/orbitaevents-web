@@ -47,7 +47,7 @@ function CalendarPreview() {
       {saturdays.map((saturday, i) => {
         const date = new Date(saturday.date);
         const day = date.getDate();
-        const month = date.toLocaleDateString('ca-ES', { month: 'short' });
+        const month = date.toLocaleDateString('ca-ES', { month: 'short', timeZone: 'UTC' });
         
         return (
           <div

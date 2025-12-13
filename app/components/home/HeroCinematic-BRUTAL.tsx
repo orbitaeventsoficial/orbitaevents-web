@@ -238,6 +238,14 @@ export function HeroCinematicBrutal() {
   const tWhatsapp = useTranslations('whatsappMessages');
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const currentMonth = useMemo(
+    () =>
+      new Intl.DateTimeFormat('ca-ES', {
+        month: 'long',
+        timeZone: 'UTC', // Evita diferencias de zona horaria entre servidor y cliente
+      }).format(new Date()),
+    []
+  );
   
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -527,7 +535,8 @@ export function HeroCinematicBrutal() {
           </div>
 
           <p className="mt-3 text-xs sm:text-sm text-white/50 text-center" suppressHydrationWarning>
-            {t('urgency.remaining')} <span className="text-amber-400 font-bold">2 {t('urgency.saturdays')}</span> {t('urgency.in')} <span suppressHydrationWarning>{new Date().toLocaleDateString('ca-ES', { month: 'long' })}</span>
+            {t('urgency.remaining')} <span className="text-amber-400 font-bold">2 {t('urgency.saturdays')}</span> {t('urgency.in')}{' '}
+            <span suppressHydrationWarning>{currentMonth}</span>
           </p>
         </motion.div>
 

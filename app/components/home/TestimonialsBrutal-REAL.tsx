@@ -64,7 +64,8 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialPublic }) {
   const formattedDate = testimonial.eventDate 
     ? new Date(testimonial.eventDate).toLocaleDateString('ca-ES', { 
         month: 'long', 
-        year: 'numeric' 
+        year: 'numeric',
+        timeZone: 'UTC',
       })
     : null;
 

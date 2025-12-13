@@ -82,7 +82,12 @@ function AvailabilityMini({ t, locale }: { t: (key: string) => string; locale: s
       const availablePattern = [2, 1, 3];
       const available = availablePattern[offset];
       return {
-        name: date.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { month: 'short' }).toUpperCase(),
+        name: date
+          .toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', {
+            month: 'short',
+            timeZone: 'UTC',
+          })
+          .toUpperCase(),
         available,
         status: available <= 1 ? 'critical' : available <= 2 ? 'warning' : 'ok'
       };
