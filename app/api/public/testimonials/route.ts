@@ -12,6 +12,8 @@ import { prisma } from '@/lib/prisma';
 
 // Cache: revalidar cada 30 minutos
 export const revalidate = 1800;
+// Fuerza ruta dinámica: evita intentos de SSG y el error por usar request.url
+export const dynamic = 'force-dynamic';
 
 interface TestimonialPublic {
   id: string;

@@ -16,6 +16,8 @@ import { prisma } from '@/lib/prisma';
 
 // Cache: revalidar cada 5 minutos
 export const revalidate = 300;
+// Evita SSG/ISR y acceso a DB en build si no hay credenciales
+export const dynamic = 'force-dynamic';
 
 // Tipos
 interface AvailabilityResponse {

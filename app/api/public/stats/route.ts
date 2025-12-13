@@ -19,6 +19,8 @@ import { prisma } from '@/lib/prisma';
 
 // Cache: revalidar cada hora
 export const revalidate = 3600;
+// Evita que el build intente pre-renderizar esta ruta y use la DB sin credenciales
+export const dynamic = 'force-dynamic';
 
 interface StatsResponse {
   ok: boolean;
