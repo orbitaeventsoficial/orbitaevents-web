@@ -12,7 +12,7 @@
 // - Datos por defecto mientras carga
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -158,11 +158,12 @@ export function useAvailability(): UseAvailabilityReturn {
   }, [fetchData]);
 
   // Helpers calculados
-  const nextSaturdayDate = data.nextAvailableSaturday
-    ? new Date(data.nextAvailableSaturday + 'T00:00:00')
-    : null;
+  const countdownTarget = useMemo(() => {
+    if (!data.nextAvailableSaturday) return null;
+    return new Date(data.nextAvailableSaturday + 'T00:00:00');
+  }, [data.nextAvailableSaturday]);
 
-  const countdownTarget = nextSaturdayDate;
+  const nextSaturdayDate = countdownTarget;
 
   const currentMonthAvailable = data.monthlyAvailability[0]?.availableSaturdays || 0;
 

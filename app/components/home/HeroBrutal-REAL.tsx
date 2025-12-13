@@ -261,7 +261,7 @@ export default function HeroBrutalReal() {
           onLoadedData={() => setVideoLoaded(true)}
           className={`w-full h-full object-cover transition-opacity duration-1000 ${videoLoaded ? 'opacity-40' : 'opacity-0'}`}
         >
-          <source src="/videos/hero-loop.mp4" type="video/mp4" />
+          <source src="/video/hero.mp4" type="video/mp4" />
         </video>
         
         {/* Fallback image mentre carrega video */}
@@ -270,6 +270,7 @@ export default function HeroBrutalReal() {
             src="/img/hero-home-visual.jpg"
             alt="Òrbita Events - DJ Barcelona"
             fill
+            sizes="100vw"
             className="object-cover opacity-40"
             priority
           />
