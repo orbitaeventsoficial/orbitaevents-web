@@ -9,6 +9,7 @@ import "@/app/globals.css";
 // Components
 import LayoutWrapper from "@/app/components/layout/LayoutWrapper";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 // Analytics component
 function AnalyticsScripts() {
@@ -300,6 +301,7 @@ export default async function LocaleLayout({
           </LayoutWrapper>
         </NextIntlClientProvider>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
