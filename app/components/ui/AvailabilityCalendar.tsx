@@ -14,9 +14,11 @@ interface CalendarDay {
 export default function AvailabilityCalendar() {
   const t = useTranslations('calendar');
   const [currentMonth, setCurrentMonth] = useState(() => new Date(2025, 0, 1)); // SSR-safe default
+  const [mounted, setMounted] = useState(false);
 
   // Set actual date on client to avoid hydration mismatch
   useEffect(() => {
+    setMounted(true);
     setCurrentMonth(new Date());
   }, []);
   const [days, setDays] = useState<CalendarDay[]>([]);
@@ -63,6 +65,19 @@ export default function AvailabilityCalendar() {
   const firstDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
   const lastDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
   const startPadding = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Lunes = 0
+
+  if (!mounted) {
+    return (
+      <div className="bg-bg-card rounded-2xl p-6 border border-white/10">
+        <div className="animate-pulse h-6 w-40 bg-white/10 rounded mb-6" />
+        <div className="grid grid-cols-7 gap-2">
+          {Array.from({ length: 28 }).map((_, i) => (
+            <div key={i} className="aspect-square bg-white/5 rounded" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-bg-card rounded-2xl p-6 border border-white/10">
