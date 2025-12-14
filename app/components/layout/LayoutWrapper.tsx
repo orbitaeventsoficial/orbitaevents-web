@@ -1,14 +1,6 @@
 // app/components/layout/LayoutWrapper.tsx
 // ═══════════════════════════════════════════════════════════════════════════
-// ÒRBITA EVENTS - LAYOUT WRAPPER v3.0 SIMPLIFICAT
-// ═══════════════════════════════════════════════════════════════════════════
-//
-// MILLORES:
-// - Un sol header per desktop i mòbil (eliminada duplicació)
-// - Menys wrappers ClientOnly
-// - Millor gestió de la intro animada
-// - Rendiment optimitzat
-//
+// ÒRBITA EVENTS - LAYOUT WRAPPER v3.1 - FIX HYDRATION
 // ═══════════════════════════════════════════════════════════════════════════
 
 'use client';
@@ -18,13 +10,29 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback } from 'react';
 
 // Components principals
-import Header from '@/app/components/ui/Header';
 import Footer from '@/app/components/ui/footer';
-import CookieConsent from '@/app/components/legal/CookieConsent.client';
-import BottomNav from '@/app/components/ui/BottomNav';
-import FloatingContactButtons from '@/app/components/ui/FloatingContactButtons';
 
-// Components dinàmics (lazy loading)
+// Components dinàmics (lazy loading + ssr: false per evitar hydration issues)
+const Header = dynamic(
+  () => import('@/app/components/ui/Header'),
+  { ssr: false, loading: () => <div className="h-16 bg-zinc-950" /> }
+);
+
+const BottomNav = dynamic(
+  () => import('@/app/components/ui/BottomNav'),
+  { ssr: false }
+);
+
+const FloatingContactButtons = dynamic(
+  () => import('@/app/components/ui/FloatingContactButtons'),
+  { ssr: false }
+);
+
+const CookieConsent = dynamic(
+  () => import('@/app/components/legal/CookieConsent.client'),
+  { ssr: false }
+);
+
 const HeroPortalLogo = dynamic(
   () => import('@/app/components/ui/HeroPortalLogo'),
   { ssr: false }
@@ -102,9 +110,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       )}
 
       {/* Flash Offer banner */}
-      {isMounted && <FlashOffer />}
+      <FlashOffer />
 
-      {/* Header unificat (desktop + mòbil) */}
+      {/* Header unificat (desktop + mòbil) - dynamic amb ssr:false */}
       <Header />
 
       {/* Contingut principal */}
@@ -126,7 +134,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       <BottomNav />
 
       {/* Consentiment cookies */}
-      {isMounted && <CookieConsent />}
+      <CookieConsent />
     </>
   );
 }
