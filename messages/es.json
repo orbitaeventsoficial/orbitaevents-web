@@ -1074,119 +1074,62 @@
     "responseTime": "Respondemos en menos de 2 horas"
   },
   "contactForm": {
-    "sections": {
-      "personalData": "Tus datos",
-      "eventData": "Tu evento",
-      "tellUsMore": "Cuéntanos más"
-    },
+    "title": "Solicita presupuesto",
+    "subtitle": "Te respondemos en menos de 2 horas",
     "labels": {
-      "fullName": "Nombre y apellidos",
+      "name": "Nombre y apellidos",
       "email": "Email",
       "phone": "Teléfono",
       "eventType": "Tipo de evento",
       "eventDate": "Fecha aproximada",
-      "guestCount": "Número de invitados",
+      "guests": "Número de invitados",
       "location": "Ubicación (ciudad/pueblo)",
       "budget": "Presupuesto aproximado",
-      "message": "¿Qué tienes en mente? ¿Algún detalle especial?",
-      "howFound": "¿Cómo nos has encontrado?"
+      "message": "Cuéntanos tu evento"
     },
     "placeholders": {
-      "fullName": "Tu nombre completo",
+      "name": "Tu nombre completo",
       "email": "tu@email.com",
       "phone": "+34 600 000 000",
+      "eventDate": "dd/mm/aaaa",
       "location": "Barcelona, Girona...",
-      "message": "Cuéntanos tu visión: temática, estilo de música, efectos especiales que te gustarían...",
-      "selectEventType": "Selecciona un tipo",
-      "selectGuests": "Selecciona",
-      "selectBudget": "Selecciona",
-      "selectHowFound": "Selecciona"
+      "message": "Detalles de tu evento, qué te gustaría, estilo...",
+      "selectEventType": "Selecciona el tipo de evento",
+      "selectGuests": "Selecciona el número de invitados",
+      "selectBudget": "Selecciona el presupuesto aproximado"
     },
     "eventTypes": {
-      "boda": "💒 Boda",
-      "fiesta": "🎉 Fiesta privada",
-      "cumpleanos": "🎂 Cumpleaños",
-      "corporativo": "💼 Evento corporativo",
-      "comunion": "⛪ Comunión / Bautizo",
-      "graduacion": "🎓 Graduación",
-      "otro": "✨ Otro"
+      "wedding": "Boda",
+      "corporate": "Evento corporativo",
+      "birthday": "Cumpleaños / Fiesta privada",
+      "communion": "Comunión / Bautizo",
+      "other": "Otro"
     },
     "guestOptions": {
-      "1-50": "1 - 50 personas",
-      "51-100": "51 - 100 personas",
-      "101-200": "101 - 200 personas",
-      "201-300": "201 - 300 personas",
-      "300+": "Más de 300 personas"
+      "lessThan50": "Menos de 50",
+      "50to100": "50-100",
+      "100to150": "100-150",
+      "150to200": "150-200",
+      "moreThan200": "Más de 200"
     },
     "budgetOptions": {
-      "menys500": "Menos de 500€",
-      "500-1000": "500€ - 1.000€",
-      "1000-2000": "1.000€ - 2.000€",
-      "2000-3000": "2.000€ - 3.000€",
-      "3000+": "Más de 3.000€",
-      "nosabe": "No lo sé todavía"
+      "lessThan1000": "Menos de 1.000€",
+      "1000to2000": "1.000€ - 2.000€",
+      "2000to3000": "2.000€ - 3.000€",
+      "3000to5000": "3.000€ - 5.000€",
+      "moreThan5000": "Más de 5.000€"
     },
-    "howFoundOptions": {
-      "google": "🔍 Google",
-      "instagram": "📸 Instagram",
-      "facebook": "👥 Facebook",
-      "tiktok": "🎵 TikTok",
-      "recomendacion": "👋 Recomendación",
-      "evento": "🎉 Os vi en un evento",
-      "otro": "✨ Otro"
-    },
-    "captcha": {
-      "title": "Verifica que eres humano",
-      "placeholder": "?"
-    },
-    "privacy": {
-      "text": "He leído y acepto la",
-      "link": "política de privacidad",
-      "and": "y los",
-      "termsLink": "términos y condiciones"
-    },
-    "marketing": {
-      "text": "Quiero recibir ofertas exclusivas y novedades de Òrbita Events (opcional)"
-    },
-    "gdpr": {
-      "title": "Información sobre protección de datos:",
-      "responsible": "Responsable",
-      "responsibleValue": "Òrbita Events",
-      "purpose": "Finalidad",
-      "purposeValue": "Gestionar tu solicitud y ofrecerte presupuesto",
-      "legitimacy": "Legitimación",
-      "legitimacyValue": "Consentimiento del interesado",
-      "recipients": "Destinatarios",
-      "recipientsValue": "No se cederán datos a terceros",
-      "rights": "Derechos",
-      "rightsValue": "Acceso, rectificación, supresión, oposición y portabilidad",
-      "contact": "Contacto"
-    },
-    "validation": {
-      "fullNameRequired": "El nombre es obligatorio",
-      "fullNameMinLength": "El nombre debe tener mínimo 3 caracteres",
-      "fullNameLastName": "Por favor, introduce nombre y apellidos",
-      "emailRequired": "El email es obligatorio",
-      "emailInvalid": "El email no es válido",
-      "phoneRequired": "El teléfono es obligatorio",
-      "phoneInvalid": "El teléfono no es válido (mínimo 9 dígitos)",
-      "eventTypeRequired": "Selecciona un tipo de evento",
-      "dateFuture": "La fecha debe ser futura",
-      "privacyRequired": "Debes aceptar la política de privacidad",
-      "captchaRequired": "Completa la verificación"
-    },
+    "submit": "Enviar solicitud",
+    "sending": "Enviando...",
     "success": {
-      "title": "¡Mensaje enviado!",
-      "message": "Gracias por contactar con nosotros. Te responderemos en menos de 2 horas.",
-      "sendAnother": "Enviar otro mensaje"
+      "title": "¡Solicitud recibida! 🎉",
+      "message": "Te contactaremos en menos de 2 horas."
     },
     "error": {
-      "title": "Error al enviar",
-      "message": "Ha habido un error al enviar el formulario. Por favor, vuelve a intentarlo o contacta con nosotros directamente al"
+      "title": "Error",
+      "message": "Ha habido un error. Inténtalo de nuevo."
     },
-    "submit": "Enviar solicitud 🚀",
-    "sending": "Enviando...",
-    "responseNote": "Te responderemos en menos de 2 horas · También puedes llamarnos:"
+    "required": "Campo obligatorio"
   },
   "configurator": {
     "step1": {

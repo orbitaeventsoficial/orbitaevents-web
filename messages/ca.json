@@ -752,134 +752,62 @@
     "subtitle": "Explica'ns el teu event i et respondrem en menys de 2 hores"
   },
   "contactForm": {
-    "sections": {
-      "personalData": "Les teves dades",
-      "eventData": "El teu event",
-      "tellUsMore": "Explica'ns més"
-    },
+    "title": "Sol·licita pressupost",
+    "subtitle": "Et responem en menys de 2 hores",
     "labels": {
-      "fullName": "Nom i cognoms",
+      "name": "Nom i cognoms",
       "email": "Email",
       "phone": "Telèfon",
       "eventType": "Tipus d'event",
       "eventDate": "Data aproximada",
-      "guestCount": "Nombre de convidats",
+      "guests": "Nombre de convidats",
       "location": "Ubicació (ciutat/poble)",
       "budget": "Pressupost aproximat",
-      "message": "Què tens al cap? Algun detall especial?",
-      "howFound": "Com ens has trobat?",
-      "required": "*"
+      "message": "Explica'ns el teu event"
     },
     "placeholders": {
-      "fullName": "El teu nom complet",
+      "name": "El teu nom complet",
       "email": "el.teu@email.com",
       "phone": "+34 600 000 000",
+      "eventDate": "dd/mm/aaaa",
       "location": "Barcelona, Girona...",
-      "message": "Explica'ns la teva visió: temàtica, estil de música, efectes especials que t'agradaria...",
-      "selectHowFound": "Selecciona"
+      "message": "Detalls del teu event, què t'agradaria, estil...",
+      "selectEventType": "Selecciona el tipus d'event",
+      "selectGuests": "Selecciona el nombre de convidats",
+      "selectBudget": "Selecciona el pressupost aproximat"
     },
     "eventTypes": {
-      "select": "Selecciona un tipus",
-      "wedding": "💒 Casament",
-      "party": "🎉 Festa privada",
-      "birthday": "🎂 Aniversari",
-      "corporate": "💼 Event corporatiu",
-      "communion": "⛪ Comunió / Bateig",
-      "graduation": "🎓 Graduació",
-      "other": "✨ Altre"
+      "wedding": "Casament",
+      "corporate": "Event corporatiu",
+      "birthday": "Aniversari / Festa privada",
+      "communion": "Comunió / Bateig",
+      "other": "Altre"
     },
     "guestOptions": {
-      "select": "Selecciona",
-      "1-50": "1 - 50 persones",
-      "51-100": "51 - 100 persones",
-      "101-200": "101 - 200 persones",
-      "201-300": "201 - 300 persones",
-      "300+": "Més de 300 persones"
+      "lessThan50": "Menys de 50",
+      "50to100": "50-100",
+      "100to150": "100-150",
+      "150to200": "150-200",
+      "moreThan200": "Més de 200"
     },
     "budgetOptions": {
-      "select": "Selecciona",
-      "menys500": "Menys de 500€",
-      "less500": "Menys de 500€",
-      "500-1000": "500€ - 1.000€",
-      "1000-2000": "1.000€ - 2.000€",
-      "2000-3000": "2.000€ - 3.000€",
-      "3000+": "Més de 3.000€",
-      "nosabe": "No ho sé encara",
-      "dontKnow": "No ho sé encara"
+      "lessThan1000": "Menys de 1.000€",
+      "1000to2000": "1.000€ - 2.000€",
+      "2000to3000": "2.000€ - 3.000€",
+      "3000to5000": "3.000€ - 5.000€",
+      "moreThan5000": "Més de 5.000€"
     },
-    "howFoundOptions": {
-      "select": "Selecciona",
-      "google": "🔍 Google",
-      "instagram": "📸 Instagram",
-      "facebook": "👥 Facebook",
-      "tiktok": "🎵 TikTok",
-      "recomendacion": "🤝 Recomanació",
-      "evento": "🎉 Us vaig veure en un event",
-      "recommendation": "👋 Recomanació",
-      "event": "🎉 Vaig veure-us a un event",
-      "other": "✨ Altre"
-    },
-    "captcha": {
-      "title": "Verifica que ets humà",
-      "placeholder": "🔒",
-      "verify": "Verifica que ets humà",
-      "complete": "Completa la verificació"
-    },
-    "privacy": {
-      "text": "He llegit i accepto la",
-      "link": "política de privacitat",
-      "accept": "He llegit i accepto la",
-      "policy": "política de privacitat",
-      "and": "i els",
-      "terms": "termes i condicions",
-      "termsLink": "termes i condicions",
-      "marketing": "Vull rebre ofertes exclusives i novetats d'Òrbita Events (opcional)"
-    },
-    "marketing": {
-      "text": "Vull rebre ofertes exclusives i novetats d'Òrbita Events (opcional)"
-    },
-    "gdpr": {
-      "title": "Informació sobre protecció de dades:",
-      "responsible": "Responsable:",
-      "responsibleValue": "Òrbita Events",
-      "purpose": "Finalitat:",
-      "purposeText": "Gestionar la teva sol·licitud i oferir-te pressupost",
-      "purposeValue": "Gestionar la teva sol·licitud i oferir-te pressupost",
-      "legitimation": "Legitimació:",
-      "legitimacy": "Legitimació:",
-      "legitimacyValue": "Consentiment de l'interessat",
-      "legitimationText": "Consentiment de l'interessat",
-      "recipients": "Destinataris:",
-      "recipientsValue": "No es cediran dades a tercers",
-      "recipientsText": "No es cediran dades a tercers",
-      "rights": "Drets:",
-      "rightsValue": "Accés, rectificació, supressió, oposició i portabilitat",
-      "rightsText": "Accés, rectificació, supressió, oposició i portabilitat",
-      "contact": "Contacte:"
-    },
-    "validation": {
-      "nameRequired": "El nom és obligatori",
-      "nameMin": "El nom ha de tenir mínim 3 caràcters",
-      "nameFullRequired": "Si us plau, introdueix nom i cognoms",
-      "emailRequired": "L'email és obligatori",
-      "emailInvalid": "L'email no és vàlid",
-      "phoneRequired": "El telèfon és obligatori",
-      "phoneInvalid": "El telèfon no és vàlid (mínim 9 dígits)",
-      "eventTypeRequired": "Selecciona un tipus d'event",
-      "dateFuture": "La data ha de ser futura",
-      "privacyRequired": "Has d'acceptar la política de privacitat"
-    },
+    "submit": "Enviar sol·licitud",
+    "sending": "Enviant...",
     "success": {
-      "title": "Missatge enviat!",
-      "message": "Gràcies per contactar amb nosaltres. Et respondrem en menys de 2 hores.",
-      "sendAnother": "Enviar un altre missatge"
+      "title": "Sol·licitud rebuda! 🎉",
+      "message": "Et contactarem en menys de 2 hores."
     },
     "error": {
-      "message": "Hi ha hagut un error al enviar el formulari. Si us plau, torna-ho a provar o contacta'ns directament a"
+      "title": "Error",
+      "message": "Hi ha hagut un error. Torna-ho a provar."
     },
-    "submit": "Enviar sol·licitud 🚀",
-    "sending": "Enviant...",
-    "responseNote": "Et respondrem en menys de 2 hores · També pots trucar-nos:"
+    "required": "Camp obligatori"
   },
   "configurator": {
     "step1": {

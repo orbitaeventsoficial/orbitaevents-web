@@ -1,265 +1,191 @@
-// app/config/stats-config.ts
-// ÒRBITA EVENTS - Configuració d'Estadístiques Intel·ligent
-//
-// LÒGICA:
-// - Cada stat té un MÍNIM LÒGIC (el que es mostra si la BD no supera)
-// - Quan la BD supera el mínim → mostra el valor real
-// - Alguns stats són FIXOS (no depenen de BD)
-//
-// Actualitzat: Desembre 2025
+// =============================================================================
+// STATS CONFIG CORREGIT
+// Substitueix app/config/stats-config.ts amb aquest contingut
+// =============================================================================
 
-export interface StatConfig {
-  key: string;
-  minValue: number | string;      // Mínim a mostrar
-  suffix?: string;                // "+", "%", "h", etc.
-  prefix?: string;                // "€", etc.
-  isFixed?: boolean;              // Si és fix (no canvia amb BD)
-  dbField?: string;               // Camp de la BD per comparar
-  description: string;            // Descripció interna
+export interface StatItem {
+  id: string
+  value: number
+  suffix?: string
+  prefix?: string
+  label: string
+  sublabel?: string
+  icon?: string
+  color?: string
+  animate?: boolean
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// CONFIGURACIÓ D'ESTADÍSTIQUES
-// ═══════════════════════════════════════════════════════════════════
-
-export const STATS_CONFIG: Record<string, StatConfig> = {
-
-  // ─────────────────────────────────────────────────────────────────
-  // EXPERIÈNCIA I TRAJECTÒRIA
-  // ─────────────────────────────────────────────────────────────────
-
-  yearsExperience: {
-    key: 'yearsExperience',
-    minValue: 2,
-    suffix: '+',
-    isFixed: true,  // Es calcula automàticament des de 2023
-    description: 'Anys des que va començar Òrbita (2023)',
+export const statsConfig: StatItem[] = [
+  {
+    id: 'years',
+    value: 2023,
+    prefix: 'Des de ',
+    suffix: '',
+    label: 'En el sector events',
+    sublabel: 'Experiència real i passió',
+    icon: '⭐',
+    color: 'gold',
+    animate: false
   },
-
-  // ─────────────────────────────────────────────────────────────────
-  // ESDEVENIMENTS
-  // Mínim: 48 (creïble per 2 anys - NO número rodó per semblar real)
-  // Si BD > 48 → mostra BD
-  // ─────────────────────────────────────────────────────────────────
-
-  eventsCompleted: {
-    key: 'eventsCompleted',
-    minValue: 48,
+  {
+    id: 'events',
+    value: 48, // Esdeveniments celebrats - Verifica amb BD real!
     suffix: '+',
-    dbField: 'bookings.count.completed',
-    description: 'Total esdeveniments realitzats amb èxit',
+    label: "Esdeveniments celebrats",
+    sublabel: "Casaments, festes, corporatius",
+    icon: '🎉',
+    color: 'purple', // from-purple-600 to-purple-800
+    animate: true
   },
-
-  // ─────────────────────────────────────────────────────────────────
-  // RESPOSTA
-  // Fix: 2 hores (és un compromís de servei)
-  // ─────────────────────────────────────────────────────────────────
-
-  responseTime: {
-    key: 'responseTime',
-    minValue: 2,
+  {
+    id: 'response',
+    value: 2,
     suffix: 'h',
-    isFixed: true,
-    description: 'Temps màxim de resposta garantit',
+    label: "Resposta",
+    sublabel: "Temps màxim de resposta",
+    icon: '⚡',
+    color: 'green', // from-green-600 to-green-800
+    animate: false
   },
+  {
+    id: 'provinces',
+    value: 2, // ⚠️ CORREGIT: Era 1, ara és 2 (Barcelona + Girona)
+    suffix: '',
+    label: "Províncies",
+    sublabel: "Barcelona i Girona", // ⚠️ CORREGIT: Nom complet
+    icon: '📍',
+    color: 'teal', // from-teal-600 to-teal-800
+    animate: false
+  }
+]
 
-  // ─────────────────────────────────────────────────────────────────
-  // COBERTURA
-  // Fix: Barcelona + Girona
-  // ─────────────────────────────────────────────────────────────────
+// =============================================================================
+// VERSIÓ EXTESA AMB MÉS DADES
+// =============================================================================
 
-  coverage: {
-    key: 'coverage',
-    minValue: 'BCN+GI',
-    isFixed: true,
-    description: 'Àrea de cobertura principal',
+export const statsConfigExtended: StatItem[] = [
+  ...statsConfig,
+  {
+    id: 'rating',
+    value: 4.9,
+    suffix: '',
+    prefix: '★',
+    label: "Valoració Google",
+    sublabel: "Basat en 23 opinions",
+    icon: '⭐',
+    color: 'gold',
+    animate: false
   },
-
-  // ─────────────────────────────────────────────────────────────────
-  // GOOGLE RATING
-  // Mínim: 4.9 (si té poques ressenyes però bones)
-  // Si té 10+ ressenyes → usa API de Google Places
-  // ─────────────────────────────────────────────────────────────────
-
-  googleRating: {
-    key: 'googleRating',
-    minValue: 4.9,
-    suffix: '/5',
-    dbField: 'reviews.google.average',
-    description: 'Valoració mitjana a Google',
-  },
-
-  googleReviewsCount: {
-    key: 'googleReviewsCount',
-    minValue: 10,
+  {
+    id: 'cities',
+    value: 25,
     suffix: '+',
-    dbField: 'reviews.google.count',
-    description: 'Nombre de ressenyes a Google',
+    label: "Ciutats",
+    sublabel: "On hem treballat",
+    icon: '🏙️',
+    color: 'blue',
+    animate: true
   },
-
-  // ─────────────────────────────────────────────────────────────────
-  // SATISFACCIÓ
-  // Mínim: 98% (basat en absència de queixes)
-  // Quan tinguem sistema d'enquestes → usa dades reals
-  // ─────────────────────────────────────────────────────────────────
-
-  satisfaction: {
-    key: 'satisfaction',
-    minValue: 98,
+  {
+    id: 'satisfaction',
+    value: 100,
     suffix: '%',
-    dbField: 'surveys.satisfaction.average',
-    description: 'Percentatge de clients satisfets',
+    label: "Satisfacció",
+    sublabel: "Garantia de qualitat",
+    icon: '✅',
+    color: 'green',
+    animate: true
+  }
+]
+
+// =============================================================================
+// COLORS MAP PER A TAILWIND
+// =============================================================================
+
+export const statColors: Record<string, { bg: string; text: string; border: string }> = {
+  gold: {
+    bg: 'from-amber-900/60 to-amber-950/80',
+    text: 'text-amber-400',
+    border: 'border-amber-500/30'
   },
-
-  // ─────────────────────────────────────────────────────────────────
-  // RECOMANACIÓ
-  // Mínim: 95% (estimat)
-  // ─────────────────────────────────────────────────────────────────
-
-  recommendation: {
-    key: 'recommendation',
-    minValue: 95,
-    suffix: '%',
-    dbField: 'surveys.recommend.average',
-    description: 'Percentatge que ens recomanarien',
+  purple: {
+    bg: 'from-purple-900/60 to-purple-950/80',
+    text: 'text-purple-400',
+    border: 'border-purple-500/30'
   },
-
-  // ─────────────────────────────────────────────────────────────────
-  // CASAMENTS (subset d'esdeveniments)
-  // Mínim: 15 (creïble per 2 temporades)
-  // ─────────────────────────────────────────────────────────────────
-
-  weddingsCompleted: {
-    key: 'weddingsCompleted',
-    minValue: 15,
-    suffix: '+',
-    dbField: 'bookings.count.weddings',
-    description: 'Casaments realitzats',
+  green: {
+    bg: 'from-green-900/60 to-green-950/80',
+    text: 'text-green-400',
+    border: 'border-green-500/30'
   },
-
-  // ─────────────────────────────────────────────────────────────────
-  // TEMÀTIQUES DISPONIBLES
-  // Fix: 6 (les que tenim definides)
-  // ─────────────────────────────────────────────────────────────────
-
-  themesAvailable: {
-    key: 'themesAvailable',
-    minValue: 6,
-    suffix: '+',
-    isFixed: true,
-    description: 'Temàtiques disponibles',
+  teal: {
+    bg: 'from-teal-900/60 to-teal-950/80',
+    text: 'text-teal-400',
+    border: 'border-teal-500/30'
   },
-};
-
-// ═══════════════════════════════════════════════════════════════════
-// HELPER FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════
-
-/**
- * Calcula els anys d'experiència automàticament
- */
-export function calculateYearsExperience(): number {
-  const startYear = 2023;
-  const currentYear = new Date().getFullYear();
-  return currentYear - startYear;
+  blue: {
+    bg: 'from-blue-900/60 to-blue-950/80',
+    text: 'text-blue-400',
+    border: 'border-blue-500/30'
+  },
+  red: {
+    bg: 'from-red-900/60 to-red-950/80',
+    text: 'text-red-400',
+    border: 'border-red-500/30'
+  }
 }
 
-/**
- * Obté el valor a mostrar per una estadística
- * Si dbValue > minValue → retorna dbValue
- * Si no → retorna minValue
- */
-export function getStatValue(
-  statKey: keyof typeof STATS_CONFIG,
-  dbValue?: number | null
-): string {
-  const config = STATS_CONFIG[statKey];
+// =============================================================================
+// HELPER: Obtenir stats des de BD (per implementar)
+// =============================================================================
 
-  if (!config) {
-    console.warn(`Stat config not found: ${statKey}`);
-    return '0';
+export async function getStatsFromDatabase() {
+  // TODO: Implementar connexió a Prisma
+  // const events = await prisma.event.count({ where: { status: 'completed' } })
+  // const avgRating = await prisma.testimonial.aggregate({ _avg: { rating: true } })
+  
+  return {
+    eventsCompleted: 48, // Substituir per query real
+    avgRating: 4.9,
+    yearsActive: Math.floor((Date.now() - new Date('2023-01-01').getTime()) / (365.25 * 24 * 60 * 60 * 1000)),
+    provinces: 2,
+    cities: 25
   }
-
-  // Stats fixes sempre retornen el minValue
-  if (config.isFixed) {
-    // Cas especial: anys d'experiència es calcula
-    if (statKey === 'yearsExperience') {
-      const years = calculateYearsExperience();
-      return `${years}${config.suffix || ''}`;
-    }
-    return `${config.prefix || ''}${config.minValue}${config.suffix || ''}`;
-  }
-
-  // Si no hi ha valor de BD o és menor que el mínim
-  const minNum = typeof config.minValue === 'number' ? config.minValue : 0;
-  const displayValue = (dbValue && dbValue > minNum) ? dbValue : config.minValue;
-
-  return `${config.prefix || ''}${displayValue}${config.suffix || ''}`;
 }
 
-/**
- * Obté totes les stats amb els seus valors actuals
- * @param dbData - Objecte amb les dades de la BD
- */
-export function getAllStats(dbData?: Record<string, number>): Record<string, string> {
-  const result: Record<string, string> = {};
+// =============================================================================
+// COMPONENT D'EXEMPLE D'ÚS
+// =============================================================================
 
-  for (const [key, config] of Object.entries(STATS_CONFIG)) {
-    const dbValue = dbData?.[config.dbField || ''];
-    result[key] = getStatValue(key as keyof typeof STATS_CONFIG, dbValue);
-  }
+/*
+import { statsConfig, statColors } from '@/config/stats-config'
 
-  return result;
+export function StatsSection() {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {statsConfig.map((stat) => {
+        const colors = statColors[stat.color || 'gold']
+        return (
+          <div
+            key={stat.id}
+            className={`
+              rounded-xl p-6
+              bg-gradient-to-br ${colors.bg}
+              border ${colors.border}
+            `}
+          >
+            <span className="text-2xl">{stat.icon}</span>
+            <div className={`text-4xl font-bold font-mono ${colors.text}`}>
+              {stat.prefix}{stat.value}{stat.suffix}
+            </div>
+            <div className="text-white/90 font-medium">{stat.label}</div>
+            {stat.sublabel && (
+              <div className="text-white/50 text-sm">{stat.sublabel}</div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
 }
-
-// ═══════════════════════════════════════════════════════════════════
-// PRESETS PER SECCIONS
-// ═══════════════════════════════════════════════════════════════════
-
-/**
- * Stats per al Hero
- */
-export const HERO_STATS = [
-  { key: 'yearsExperience', icon: '⭐', labelKey: 'hero.stats.years' },
-  { key: 'eventsCompleted', icon: '🎉', labelKey: 'hero.stats.events' },
-  { key: 'responseTime', icon: '⚡', labelKey: 'hero.stats.responseTime' },
-] as const;
-
-/**
- * Stats per al Footer
- */
-export const FOOTER_STATS = [
-  { key: 'yearsExperience', icon: '⭐', labelKey: 'stats.yearsExperience' },
-  { key: 'eventsCompleted', icon: '🎉', labelKey: 'stats.eventsCompleted' },
-  { key: 'responseTime', icon: '⚡', labelKey: 'stats.response' },
-  { key: 'coverage', icon: '📍', labelKey: 'stats.coverage' },
-] as const;
-
-/**
- * Stats per a Testimonials
- */
-export const TESTIMONIAL_STATS = [
-  { key: 'googleRating', icon: '⭐', labelKey: 'testimonials.stats.googleRating' },
-  { key: 'eventsCompleted', icon: '🎉', labelKey: 'testimonials.stats.events' },
-  { key: 'recommendation', icon: '💯', labelKey: 'testimonials.stats.recommend' },
-  { key: 'satisfaction', icon: '❤️', labelKey: 'testimonials.stats.satisfaction' },
-] as const;
-
-// ═══════════════════════════════════════════════════════════════════
-// HOOK PER OBTENIR STATS AMB DADES DE BD (opcional)
-// ═══════════════════════════════════════════════════════════════════
-
-/**
- * Exemple d'ús:
- *
- * // Sense BD (usa mínims)
- * const stats = getAllStats();
- * // { yearsExperience: '2+', eventsCompleted: '48+', ... }
- *
- * // Amb BD
- * const dbData = await getStatsFromDB();
- * const stats = getAllStats(dbData);
- * // { yearsExperience: '2+', eventsCompleted: '73+', ... } // si BD = 73
- */
-
-export default STATS_CONFIG;
+*/

@@ -581,3 +581,256 @@ a,
     scroll-behavior: auto !important;
   }
 }
+/* =============================================================================
+   CORRECCIONS CSS URGENTS - ÒRBITA EVENTS
+   Afegeix aquest codi a app/globals.css o crea un fitxer separat i importa'l
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   FIX 1: PARTÍCULES DARRERE DEL CONTINGUT
+   ----------------------------------------------------------------------------- */
+.particles-container,
+.particle,
+[class*="particle"],
+.tsparticles,
+#tsparticles,
+canvas[class*="particle"] {
+  z-index: 0 !important;
+  pointer-events: none !important;
+  position: absolute;
+}
+
+/* Contingut sempre per sobre */
+main,
+section,
+header,
+.content-wrapper,
+.hero-content,
+.card,
+form,
+button,
+a {
+  position: relative;
+  z-index: 1;
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 2: HEADER MÉS VISIBLE
+   ----------------------------------------------------------------------------- */
+header,
+.header,
+[class*="Header"] {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.85) 50%,
+    rgba(0, 0, 0, 0.6) 80%,
+    transparent 100%
+  ) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 100 !important;
+}
+
+/* Header quan es fa scroll */
+header.scrolled,
+.header-scrolled {
+  background: rgba(0, 0, 0, 0.98) !important;
+  border-bottom: 1px solid rgba(215, 184, 110, 0.2);
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 3: TEXT HERO MÉS VISIBLE
+   ----------------------------------------------------------------------------- */
+.hero-subtitle,
+.hero-tagline,
+[class*="hero"] p,
+[class*="Hero"] p {
+  color: rgba(255, 255, 255, 0.95) !important;
+  text-shadow: 
+    0 2px 10px rgba(0, 0, 0, 0.9),
+    0 4px 20px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(0, 0, 0, 0.6) !important;
+  font-weight: 500 !important;
+}
+
+/* Títol principal hero */
+.hero-title,
+[class*="hero"] h1,
+[class*="Hero"] h1 {
+  text-shadow: 
+    0 2px 10px rgba(0, 0, 0, 0.9),
+    0 4px 30px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 4: CARD HALLOWEEN CONTRAST
+   ----------------------------------------------------------------------------- */
+[class*="halloween"],
+[class*="Halloween"] {
+  background: linear-gradient(
+    135deg,
+    rgba(154, 52, 18, 0.9) 0%,
+    rgba(127, 29, 29, 0.85) 50%,
+    rgba(0, 0, 0, 0.95) 100%
+  ) !important;
+  border: 1px solid rgba(251, 146, 60, 0.4) !important;
+}
+
+[class*="halloween"] h3,
+[class*="Halloween"] h3 {
+  color: #fb923c !important; /* orange-400 */
+  text-shadow: 0 2px 10px rgba(251, 146, 60, 0.5);
+}
+
+[class*="halloween"] p,
+[class*="Halloween"] p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 5: BOTONS CTA MÉS VISIBLES
+   ----------------------------------------------------------------------------- */
+.btn-cta,
+.cta-button,
+[class*="cta"],
+button[class*="pressupost" i],
+a[class*="pressupost" i] {
+  background: linear-gradient(135deg, #d7b86e 0%, #f59e0b 100%) !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+  border: none !important;
+  box-shadow: 
+    0 4px 15px rgba(215, 184, 110, 0.4),
+    0 0 30px rgba(215, 184, 110, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-cta:hover,
+.cta-button:hover,
+[class*="cta"]:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 
+    0 6px 25px rgba(215, 184, 110, 0.5),
+    0 0 40px rgba(215, 184, 110, 0.3) !important;
+}
+
+/* Botons secundaris */
+.btn-secondary,
+[class*="secondary"] button {
+  background: transparent !important;
+  border: 2px solid rgba(215, 184, 110, 0.6) !important;
+  color: #d7b86e !important;
+}
+
+.btn-secondary:hover {
+  background: rgba(215, 184, 110, 0.1) !important;
+  border-color: #d7b86e !important;
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 6: STATS SECTION - NÚMEROS MÉS LLEGIBLES
+   ----------------------------------------------------------------------------- */
+.stat-number,
+[class*="stat"] span[class*="number"],
+[class*="Stats"] .number {
+  font-family: 'JetBrains Mono', 'Sora', monospace !important;
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 7: BADGE "NÚMEROS REALS" - ELIMINAR ICONA DUPLICADA SI CAL
+   ----------------------------------------------------------------------------- */
+/* Això s'ha de fer al component, però si hi ha CSS: */
+.badge-icon + .badge-icon {
+  display: none; /* Amaga segona icona duplicada */
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 8: TIPOGRAFIA SORA
+   ----------------------------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6,
+.heading,
+.title,
+[class*="title"],
+[class*="heading"] {
+  font-family: 'Sora', 'Plus Jakarta Sans', system-ui, sans-serif !important;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+body,
+p,
+span:not([class*="icon"]),
+div:not([class*="icon"]),
+input,
+textarea,
+select,
+button {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Font mono per números i stats */
+.mono,
+[class*="countdown"],
+[class*="timer"],
+[class*="stat"] {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace !important;
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 9: FORMULARIS - SELECTS I INPUTS
+   ----------------------------------------------------------------------------- */
+select,
+select option {
+  color: white !important;
+  background-color: rgba(30, 30, 30, 0.95) !important;
+}
+
+select:invalid,
+select option:disabled {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 10: DISPONIBILITAT - MESOS
+   ----------------------------------------------------------------------------- */
+/* Estils per als badges de mesos */
+.month-badge {
+  min-width: 80px;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.month-badge.scarce {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  color: white;
+  border: 1px solid #ef4444;
+}
+
+.month-badge.limited {
+  background: linear-gradient(135deg, #ca8a04 0%, #a16207 100%);
+  color: white;
+  border: 1px solid #eab308;
+}
+
+.month-badge.available {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: white;
+  border: 1px solid #22c55e;
+}
+
+/* =============================================================================
+   FI DE CORRECCIONS
+   ============================================================================= */
