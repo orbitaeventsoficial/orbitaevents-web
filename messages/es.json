@@ -451,8 +451,7 @@
       "name": "Alquiler de equipos",
       "icon": "🔊",
       "tagline": "Equipos profesionales a tu alcance"
-    },
-    "badge": "Lo que necesitas"
+    }
   },
   "stats": {
     "badge": "📊 Números reales",
@@ -609,7 +608,7 @@
     "halloween": {
       "title": "Halloween",
       "subtitle": "La noche más terrorífica",
-      "description": "Convertimos cualquier espacio en una casa encantada: luces rojas y naranjas, humo bajo, efectos de sonido terroríficos."
+      "description": "Convertimos cualquier espacio en una casa encantada: luces rojas y naranjas, humo bajo, efectos de sonido terroríficos, y una ambientación que hará gritar a tus invitados."
     },
     "themes": {
       "monmagic": {
@@ -678,16 +677,6 @@
           "Asesoramiento creativo"
         ]
       }
-    },
-    "monMagic": {
-      "title": "Mundo Mágico",
-      "subtitle": "Magia de escuela de hechicería en tu evento",
-      "description": "Transforma tu evento en una experiencia mágica: efectos de varitas, iluminación de velas flotantes, música encantada, e incluso humo que parece magia real."
-    },
-    "halloween": {
-      "title": "Halloween",
-      "subtitle": "La noche más terrorífica",
-      "description": "Convertimos cualquier espacio en una casa encantada: luces rojas y naranjas, humo bajo, efectos de sonido terroríficos, y una ambientación que hará gritar a tus invitados."
     }
   },
   "themes": {
@@ -963,38 +952,50 @@
   "bottomNav": {
     "home": "Inicio",
     "services": "Servicios",
-    "create": "Crear",
+    "configure": "Presupuesto",
     "portfolio": "Portfolio",
     "contact": "Contacto"
   },
   "header": {
-    "logoAria": "Òrbita Events - Ir a inicio",
+    "logoAria": "Òrbita Events - Inicio",
     "mainNav": "Navegación principal",
-    "mobileNav": "Navegación móvil",
+    "mobileNav": "Menú móvil",
     "openMenu": "Abrir menú",
     "closeMenu": "Cerrar menú",
-    "serveis": "Servicios",
-    "bodes": "Bodas",
-    "bodesDesc": "Ceremonia, cóctel y fiesta",
-    "festes": "Fiestas Privadas",
-    "festesDesc": "Cumpleaños, comuniones, celebraciones",
-    "empreses": "Empresas",
-    "empresesDesc": "Eventos corporativos y networking",
-    "discomovil": "Discomóvil",
-    "discomovilDesc": "DJ profesional donde quieras",
-    "tematiques": "Experiencias Temáticas",
-    "tematiquesDesc": "Mundo Mágico, Halloween, Tropical...",
-    "experiencies": "Experiencias",
-    "experienciesTitle": "Experiencias Temáticas",
-    "experienciesSubtitle": "Transforma tu evento en una experiencia única",
-    "monMagic": "Mundo Mágico",
-    "monMagicDesc": "Escuela de magia para tu evento",
-    "halloween": "Halloween",
-    "halloweenDesc": "Noches de terror épicas",
-    "bodaHalloween": "Boda Halloween",
-    "bodaHalloweenDesc": "El amor en la oscuridad",
-    "viewAllExperiences": "Ver todas las experiencias",
     "cta": "Pide Presupuesto",
+    "ctaShort": "Presupuesto",
+    "nav": {
+      "services": "Servicios",
+      "experiences": "Experiencias",
+      "portfolio": "Portfolio",
+      "reviews": "Opiniones",
+      "contact": "Contacto",
+      "faq": "FAQ"
+    },
+    "dropdowns": {
+      "servicesTitle": "Nuestros servicios",
+      "servicesSubtitle": "Todo lo que necesitas para tu evento",
+      "experiencesTitle": "Experiencias temáticas",
+      "experiencesSubtitle": "Fiestas únicas y memorables"
+    },
+    "services": {
+      "bodas": "DJ Bodas",
+      "bodasDesc": "La emotividad que tu día merece",
+      "fiestas": "Fiestas Privadas",
+      "fiestasDesc": "Cumpleaños, despedidas y celebraciones",
+      "empresas": "Eventos Corporativos",
+      "empresasDesc": "Conferencias, teambuildings y más",
+      "discomovil": "Discomóvil",
+      "discomovilDesc": "Sonido, luces y DJ profesionales"
+    },
+    "experiences": {
+      "monMagic": "Mundo Mágico",
+      "monMagicDesc": "Tematización completa Harry Potter",
+      "halloween": "Halloween",
+      "halloweenDesc": "Noches de terror con todos los efectos",
+      "bodaHalloween": "Boda Halloween",
+      "bodaHalloweenDesc": "Boda con toque terrorífico"
+    },
     "badges": {
       "popular": "Popular",
       "terrific": "Terrorífico",
@@ -1026,22 +1027,51 @@
   },
   "contact": {
     "errors": {
-      "sendError": "Ha ocurrido un error al enviar el mensaje"
+      "title": "No hemos podido enviar tu mensaje",
+      "sendError": "Ha ocurrido un error al enviar el mensaje",
+      "unknown": "Ha ocurrido un error inesperado. Inténtalo de nuevo."
+    },
+    "success": {
+      "title": "¡Mensaje enviado!",
+      "message": "Gracias por contactar con nosotros. Te responderemos en menos de 2 horas.",
+      "discount": "5% de descuento en tu primera reserva si contactas hoy."
     },
     "title": "¿Hablamos?",
     "subtitle": "Cuéntanos tu evento y te respondemos en menos de 2 horas",
     "form": {
+      "nameRequired": "Nombre",
+      "nameMinChars": "El nombre debe tener al menos 2 caracteres",
       "name": "Tu nombre",
+      "contact": "Tu email o teléfono",
+      "contactPlaceholder": "tu@email.com o 600 123 456",
+      "contactError": "Introduce un email o teléfono válido",
       "email": "Email",
       "phone": "Teléfono",
       "eventType": "Tipo de evento",
+      "eventSelect": "Selecciona un tipo de evento",
+      "eventRequired": "Selecciona un tipo de evento",
       "date": "Fecha aproximada",
       "message": "Cuéntanos tu idea",
+      "messagePlaceholder": "Horario, ubicación, número de invitados, música...",
+      "callUs": "O llámanos:",
       "submit": "Enviar mensaje",
+      "submitting": "Enviando...",
       "sending": "Enviando...",
       "success": "¡Mensaje enviado! Te contactaremos pronto.",
       "error": "Error al enviar. Inténtalo de nuevo."
-    }
+    },
+    "events": {
+      "wedding": "Boda",
+      "discomovil": "Discomóvil",
+      "corporate": "Empresa",
+      "party": "Fiesta privada",
+      "birthday": "Cumpleaños",
+      "theming": "Tematización",
+      "other": "Otro"
+    },
+    "privacy": "Privacidad",
+    "privacyPolicy": "Política de privacidad",
+    "responseTime": "Respondemos en menos de 2 horas"
   },
   "contactForm": {
     "sections": {
@@ -3646,11 +3676,11 @@
     "form": {
       "ratingQuestion": "¿Cómo valoras tu experiencia con nosotros?",
       "ratingLabels": {
-        "5": "¡Excelente!",
-        "4": "¡Muy bien!",
-        "3": "Correcto",
+        "1": "No satisfecho",
         "2": "Puede mejorar",
-        "1": "No satisfecho"
+        "3": "Correcto",
+        "4": "¡Muy bien!",
+        "5": "¡Excelente!"
       },
       "nameOptional": "Nombre (opcional)",
       "phoneOptional": "Teléfono (opcional)",

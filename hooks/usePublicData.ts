@@ -159,9 +159,14 @@ export function useAvailability(): UseAvailabilityReturn {
 
   // Helpers calculados
   const countdownTarget = useMemo(() => {
-    if (!data.nextAvailableSaturday) return null;
-    return new Date(data.nextAvailableSaturday + 'T00:00:00');
-  }, [data.nextAvailableSaturday]);
+    if (data.nextAvailableSaturday) {
+      return new Date(data.nextAvailableSaturday + 'T00:00:00');
+    }
+    if (data.nextAvailableDate) {
+      return new Date(data.nextAvailableDate + 'T00:00:00');
+    }
+    return null;
+  }, [data.nextAvailableSaturday, data.nextAvailableDate]);
 
   const nextSaturdayDate = countdownTarget;
 

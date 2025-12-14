@@ -261,7 +261,7 @@ export default function HeroBrutalReal() {
           onLoadedData={() => setVideoLoaded(true)}
           className={`w-full h-full object-cover transition-opacity duration-1000 ${videoLoaded ? 'opacity-40' : 'opacity-0'}`}
         >
-          <source src="/video/hero.mp4" type="video/mp4" />
+          <source src="/video/promohalloween.mp4" type="video/mp4" />
         </video>
         
         {/* Fallback image mentre carrega video */}

@@ -429,8 +429,7 @@
       "name": "Lloguer d'equips",
       "icon": "🔊",
       "tagline": "Equips professionals al teu abast"
-    },
-    "badge": "El que necessites"
+    }
   },
   "stats": {
     "badge": "📊 Números reals",
@@ -587,7 +586,7 @@
     "halloween": {
       "title": "Halloween",
       "subtitle": "La nit més terrorífica",
-      "description": "Convertim qualsevol espai en una casa encantada: llums vermelles i taronges, humo baixa, efectes de so terrorífics."
+      "description": "Convertim qualsevol espai en una casa encantada: llums vermelles i taronges, humo baixa, efectes de so terrorífics, i una ambientació que farà cridar els teus convidats."
     },
     "themes": {
       "monmagic": {
@@ -656,16 +655,6 @@
           "Assessorament creatiu"
         ]
       }
-    },
-    "monMagic": {
-      "title": "Món Màgic",
-      "subtitle": "Màgia d'escola de bruixeria al teu event",
-      "description": "Transforma el teu event en una experiència màgica: efectes de varetes, il·luminació de veles flotants, música encantada, i fins i tot humo que sembla màgia real."
-    },
-    "halloween": {
-      "title": "Halloween",
-      "subtitle": "La nit més terrorífica",
-      "description": "Convertim qualsevol espai en una casa encantada: llums vermelles i taronges, humo baixa, efectes de so terrorífics, i una ambientació que farà cridar els teus convidats."
     }
   },
   "footer": {
@@ -715,22 +704,51 @@
     "tagline": "L'esdeveniment que la teva gent no oblidarà"
   },
   "contact": {
-    "title": "Demana Pressupost",
     "errors": {
-      "sendError": "S'ha produït un error en enviar el missatge"
+      "title": "No hem pogut enviar el teu missatge",
+      "sendError": "S'ha produït un error en enviar el missatge",
+      "unknown": "S'ha produït un error inesperat. Torna-ho a provar."
     },
+    "success": {
+      "title": "Missatge enviat!",
+      "message": "Gràcies per contactar amb nosaltres. Et respondrem en menys de 2 hores.",
+      "discount": "5% de descompte en la teva primera reserva si contactes avui."
+    },
+    "title": "Demana Pressupost",
     "form": {
+      "nameRequired": "Nom",
+      "nameMinChars": "El nom ha de tenir almenys 2 caràcters",
       "date": "Data",
       "email": "Email",
       "error": "Error en enviar el formulari",
+      "contact": "Email o telèfon",
+      "contactPlaceholder": "el.teu@email.com o 600 123 456",
+      "contactError": "Introdueix un email o telèfon vàlid",
       "eventType": "Tipus d'esdeveniment",
+      "eventSelect": "Selecciona un tipus d'esdeveniment",
+      "eventRequired": "Selecciona un tipus d'esdeveniment",
       "message": "Missatge",
+      "messagePlaceholder": "Horari, ubicació, nombre de convidats, música...",
+      "callUs": "O truca'ns:",
+      "submit": "Enviar",
+      "submitting": "Enviant...",
       "name": "Nom",
       "phone": "Telèfon",
       "sending": "Enviant...",
-      "submit": "Enviar",
       "success": "Formulari enviat correctament!"
     },
+    "events": {
+      "wedding": "Casament",
+      "discomovil": "Discomòbil",
+      "corporate": "Empresa",
+      "party": "Festa privada",
+      "birthday": "Aniversari",
+      "theming": "Tematització",
+      "other": "Altres"
+    },
+    "privacy": "Privadesa",
+    "privacyPolicy": "Política de privadesa",
+    "responseTime": "Respondrem en menys de 2 hores",
     "subtitle": "Explica'ns el teu event i et respondrem en menys de 2 hores"
   },
   "contactForm": {
@@ -757,7 +775,8 @@
       "email": "el.teu@email.com",
       "phone": "+34 600 000 000",
       "location": "Barcelona, Girona...",
-      "message": "Explica'ns la teva visió: temàtica, estil de música, efectes especials que t'agradaria..."
+      "message": "Explica'ns la teva visió: temàtica, estil de música, efectes especials que t'agradaria...",
+      "selectHowFound": "Selecciona"
     },
     "eventTypes": {
       "select": "Selecciona un tipus",
@@ -779,11 +798,13 @@
     },
     "budgetOptions": {
       "select": "Selecciona",
+      "menys500": "Menys de 500€",
       "less500": "Menys de 500€",
       "500-1000": "500€ - 1.000€",
       "1000-2000": "1.000€ - 2.000€",
       "2000-3000": "2.000€ - 3.000€",
       "3000+": "Més de 3.000€",
+      "nosabe": "No ho sé encara",
       "dontKnow": "No ho sé encara"
     },
     "howFoundOptions": {
@@ -792,31 +813,47 @@
       "instagram": "📸 Instagram",
       "facebook": "👥 Facebook",
       "tiktok": "🎵 TikTok",
+      "recomendacion": "🤝 Recomanació",
+      "evento": "🎉 Us vaig veure en un event",
       "recommendation": "👋 Recomanació",
       "event": "🎉 Vaig veure-us a un event",
       "other": "✨ Altre"
     },
     "captcha": {
+      "title": "Verifica que ets humà",
+      "placeholder": "🔒",
       "verify": "Verifica que ets humà",
       "complete": "Completa la verificació"
     },
     "privacy": {
+      "text": "He llegit i accepto la",
+      "link": "política de privacitat",
       "accept": "He llegit i accepto la",
       "policy": "política de privacitat",
       "and": "i els",
       "terms": "termes i condicions",
+      "termsLink": "termes i condicions",
       "marketing": "Vull rebre ofertes exclusives i novetats d'Òrbita Events (opcional)"
+    },
+    "marketing": {
+      "text": "Vull rebre ofertes exclusives i novetats d'Òrbita Events (opcional)"
     },
     "gdpr": {
       "title": "Informació sobre protecció de dades:",
       "responsible": "Responsable:",
+      "responsibleValue": "Òrbita Events",
       "purpose": "Finalitat:",
       "purposeText": "Gestionar la teva sol·licitud i oferir-te pressupost",
+      "purposeValue": "Gestionar la teva sol·licitud i oferir-te pressupost",
       "legitimation": "Legitimació:",
+      "legitimacy": "Legitimació:",
+      "legitimacyValue": "Consentiment de l'interessat",
       "legitimationText": "Consentiment de l'interessat",
       "recipients": "Destinataris:",
+      "recipientsValue": "No es cediran dades a tercers",
       "recipientsText": "No es cediran dades a tercers",
       "rights": "Drets:",
+      "rightsValue": "Accés, rectificació, supressió, oposició i portabilitat",
       "rightsText": "Accés, rectificació, supressió, oposició i portabilitat",
       "contact": "Contacte:"
     },
@@ -2060,33 +2097,45 @@
     "noCommitment": "Sense compromís • 10% de descompte web"
   },
   "header": {
-    "logoAria": "Òrbita Events - Anar a inici",
+    "logoAria": "Òrbita Events - Inici",
     "mainNav": "Navegació principal",
-    "mobileNav": "Navegació mòbil",
-    "openMenu": "Obre el menú",
-    "closeMenu": "Tanca el menú",
-    "serveis": "Serveis",
-    "bodes": "Bodes",
-    "bodesDesc": "Cerimònia, còctel i festa",
-    "festes": "Festes Privades",
-    "festesDesc": "Aniversaris, comunions, celebracions",
-    "empreses": "Empreses",
-    "empresesDesc": "Events corporatius i networking",
-    "discomovil": "Discomòbil",
-    "discomovilDesc": "DJ professional on vulguis",
-    "tematiques": "Experiències Temàtiques",
-    "tematiquesDesc": "Món Màgic, Halloween, Tropical...",
-    "experiencies": "Experiències",
-    "experienciesTitle": "Experiències Temàtiques",
-    "experienciesSubtitle": "Transforma el teu event en una experiència única",
-    "monMagic": "Món Màgic",
-    "monMagicDesc": "Escola de màgia pel teu event",
-    "halloween": "Halloween",
-    "halloweenDesc": "Nits de terror èpiques",
-    "bodaHalloween": "Boda Halloween",
-    "bodaHalloweenDesc": "L'amor en la foscor",
-    "viewAllExperiences": "Veure totes les experiències",
+    "mobileNav": "Menú mòbil",
+    "openMenu": "Obrir menú",
+    "closeMenu": "Tancar menú",
     "cta": "Demana Pressupost",
+    "ctaShort": "Pressupost",
+    "nav": {
+      "services": "Serveis",
+      "experiences": "Experiències",
+      "portfolio": "Portfolio",
+      "reviews": "Opinions",
+      "contact": "Contacte",
+      "faq": "FAQ"
+    },
+    "dropdowns": {
+      "servicesTitle": "Els nostres serveis",
+      "servicesSubtitle": "Tot el que necessites per al teu event",
+      "experiencesTitle": "Experiències temàtiques",
+      "experiencesSubtitle": "Festes úniques i memorables"
+    },
+    "services": {
+      "bodas": "DJ Casaments",
+      "bodasDesc": "L'emotivitat que el teu dia mereix",
+      "fiestas": "Festes Privades",
+      "fiestasDesc": "Aniversaris, comiats i celebracions",
+      "empresas": "Events Corporatius",
+      "empresasDesc": "Conferences, teambuildings i més",
+      "discomovil": "Discomòbil",
+      "discomovilDesc": "So, llums i DJ professionals"
+    },
+    "experiences": {
+      "monMagic": "Món Màgic",
+      "monMagicDesc": "Tematització completa Harry Potter",
+      "halloween": "Halloween",
+      "halloweenDesc": "Nits de terror amb tots els efectes",
+      "bodaHalloween": "Boda Halloween",
+      "bodaHalloweenDesc": "Casament amb toc terrorífic"
+    },
     "badges": {
       "popular": "Popular",
       "terrific": "Terrorífic",
@@ -2930,7 +2979,7 @@
   "bottomNav": {
     "home": "Inici",
     "services": "Serveis",
-    "create": "Crear",
+    "configure": "Pressupost",
     "portfolio": "Portfolio",
     "contact": "Contacte"
   },
@@ -3490,11 +3539,11 @@
     "form": {
       "ratingQuestion": "Com valores la teva experiència amb nosaltres?",
       "ratingLabels": {
-        "5": "Excel·lent!",
-        "4": "Molt bé!",
-        "3": "Correcte",
+        "1": "No satisfet",
         "2": "Pot millorar",
-        "1": "No satisfet"
+        "3": "Correcte",
+        "4": "Molt bé!",
+        "5": "Excel·lent!"
       },
       "nameOptional": "Nom (opcional)",
       "phoneOptional": "Telèfon (opcional)",

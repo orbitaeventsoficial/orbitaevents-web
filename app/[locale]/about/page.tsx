@@ -5,8 +5,8 @@ import { getTranslations } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-  const { locale } = await params;
+export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
+  const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'pages.about' });
   return {
     title: t('meta.title'),
@@ -14,8 +14,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+export default async function AboutPage({ params }: { params: { locale: string } }) {
+  const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'pages.about' });
 
   const stats = [
@@ -144,4 +144,3 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
     </section>
   );
 }
-

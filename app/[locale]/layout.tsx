@@ -1,17 +1,33 @@
-import type { Metadata, Viewport } from "next";
-import { notFound } from "next/navigation";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
-import { locales, type Locale } from "@/i18n";
-import { inter, outfit, space } from "@/app/fonts";
-import "@/app/globals.css";
+// app/[locale]/layout.tsx
+// ═══════════════════════════════════════════════════════════════════════════
+// ÒRBITA EVENTS - LAYOUT PRINCIPAL v3.0
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// MILLORES:
+// - Tipografia millorada: Plus Jakarta Sans + Inter
+// - SEO optimitzat amb JSON-LD complet
+// - Performance millorada
+// - Accessibility millorat
+//
+// ═══════════════════════════════════════════════════════════════════════════
+
+import type { Metadata, Viewport } from 'next';
+import { notFound } from 'next/navigation';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+import { locales, type Locale } from '@/i18n';
+import { inter, plusJakarta, jetbrains } from '@/app/fonts';
+import '@/app/globals.css';
 
 // Components
-import LayoutWrapper from "@/app/components/layout/LayoutWrapper";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/next";
+import LayoutWrapper from '@/app/components/layout/LayoutWrapper';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 
-// Analytics component
+// ═══════════════════════════════════════════════════════════════════════════
+// GOOGLE ANALYTICS SCRIPT
+// ═══════════════════════════════════════════════════════════════════════════
+
 function AnalyticsScripts() {
   if (process.env.NODE_ENV !== 'production') return null;
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
@@ -49,21 +65,34 @@ function AnalyticsScripts() {
   );
 }
 
-// JSON-LD estàtic per SEO (no necessita traduccions - Google entén qualsevol idioma)
-const JSON_LD_DATA = {
+// ═══════════════════════════════════════════════════════════════════════════
+// JSON-LD STRUCTURED DATA - SEO MILLORAT
+// ═══════════════════════════════════════════════════════════════════════════
+
+const JSON_LD_ORGANIZATION = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
   '@id': 'https://orbitaevents.com/#organization',
   name: 'Òrbita Events',
-  alternateName: 'Orbita Events',
-  description: 'DJ professional per a casaments, festes i events corporatius a Barcelona i Girona. Discomòbil amb so 4000W, llums LED i efectes especials.',
+  alternateName: ['Orbita Events', 'Òrbita Events Barcelona'],
+  description: 'DJ professional i tematització completa per a casaments, festes i events corporatius a Barcelona i Girona. Especialistes en experiències úniques amb so 4000W, il·luminació LED i efectes especials.',
   url: 'https://orbitaevents.com',
-  logo: 'https://orbitaevents.com/img/logoplanetatextdreta.svg',
-  image: 'https://orbitaevents.com/img/og-image.jpg',
+  logo: {
+    '@type': 'ImageObject',
+    url: 'https://orbitaevents.com/img/logoplanetatextdreta.svg',
+    width: 280,
+    height: 80,
+  },
+  image: [
+    'https://orbitaevents.com/img/og-image.jpg',
+    'https://orbitaevents.com/img/portfolio/bodas/bodas-01.webp',
+    'https://orbitaevents.com/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
+  ],
   telephone: '+34699121023',
   email: 'info@orbitaevents.com',
   address: {
     '@type': 'PostalAddress',
+    streetAddress: 'Granollers',
     addressLocality: 'Granollers',
     addressRegion: 'Barcelona',
     postalCode: '08400',
@@ -81,21 +110,44 @@ const JSON_LD_DATA = {
     { '@type': 'City', name: 'Mataró' },
     { '@type': 'City', name: 'Sabadell' },
     { '@type': 'City', name: 'Terrassa' },
+    { '@type': 'City', name: 'Badalona' },
+    { '@type': 'City', name: 'Vic' },
+    { '@type': 'City', name: 'Manresa' },
     { '@type': 'AdministrativeArea', name: 'Maresme' },
+    { '@type': 'AdministrativeArea', name: 'Vallès Oriental' },
+    { '@type': 'AdministrativeArea', name: 'Vallès Occidental' },
     { '@type': 'AdministrativeArea', name: 'Costa Brava' },
     { '@type': 'State', name: 'Catalunya' },
   ],
-  priceRange: '400€ - 1500€',
-  openingHoursSpecification: {
-    '@type': 'OpeningHoursSpecification',
-    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-    opens: '09:00',
-    closes: '21:00',
-  },
+  priceRange: '€€',
+  currenciesAccepted: 'EUR',
+  paymentAccepted: 'Cash, Credit Card, Bank Transfer',
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '09:00',
+      closes: '20:00',
+    },
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Saturday', 'Sunday'],
+      opens: '10:00',
+      closes: '18:00',
+    },
+  ],
   sameAs: [
     'https://www.instagram.com/orbitaevents',
     'https://www.facebook.com/orbitaevents',
+    'https://www.tiktok.com/@orbitaevents',
   ],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    ratingCount: '48',
+    bestRating: '5',
+    worstRating: '1',
+  },
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Serveis DJ i Events Barcelona',
@@ -105,59 +157,63 @@ const JSON_LD_DATA = {
         itemOffered: {
           '@type': 'Service',
           name: 'DJ Casaments Barcelona',
-          description: 'DJ professional per a casaments amb so 4000W, il·luminació i efectes especials.',
-          offers: { '@type': 'Offer', price: '650', priceCurrency: 'EUR', priceValidUntil: '2025-12-31' },
+          description: 'DJ professional per a casaments amb so 4000W, il·luminació i efectes especials. Música de cerimònia, còctel i ball fins la matinada.',
         },
+        price: '650',
+        priceCurrency: 'EUR',
+        priceValidUntil: '2025-12-31',
       },
       {
         '@type': 'Offer',
         itemOffered: {
           '@type': 'Service',
           name: 'Discomòbil Barcelona',
-          description: 'Discomòbil professional amb DJ, so, llums LED i efectes.',
-          offers: { '@type': 'Offer', price: '400', priceCurrency: 'EUR', priceValidUntil: '2025-12-31' },
+          description: 'Discomòbil professional amb DJ, so de qualitat, llums LED i efectes especials per a qualsevol celebració.',
         },
+        price: '400',
+        priceCurrency: 'EUR',
+        priceValidUntil: '2025-12-31',
       },
       {
         '@type': 'Offer',
         itemOffered: {
           '@type': 'Service',
-          name: 'Festes Privades',
-          description: 'DJ per a festes privades: aniversaris, comiats. So, llums i animació.',
-          offers: { '@type': 'Offer', price: '400', priceCurrency: 'EUR', priceValidUntil: '2025-12-31' },
+          name: 'Festes Temàtiques',
+          description: 'Tematització completa per a festes: Món Màgic (Harry Potter), Halloween, anys 80 i més. Decoració, efectes i ambientació.',
         },
-      },
-      {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Events Corporatius',
-          description: 'DJ i producció tècnica per a events d\'empresa.',
-          offers: { '@type': 'Offer', price: '500', priceCurrency: 'EUR', priceValidUntil: '2025-12-31' },
-        },
+        price: '800',
+        priceCurrency: 'EUR',
+        priceValidUntil: '2025-12-31',
       },
     ],
   },
 };
 
-// METADATA MILLORADA
+// ═══════════════════════════════════════════════════════════════════════════
+// METADATA
+// ═══════════════════════════════════════════════════════════════════════════
+
 export const metadata: Metadata = {
   title: {
-    default: "Òrbita Events | Creem l'Experiència Completa Que Imagines | Barcelona",
-    template: '%s | Òrbita Events'
+    default: "DJ Casaments Barcelona i Girona | Òrbita Events | Des de 400€",
+    template: '%s | Òrbita Events',
   },
-  description: "DJ professional, tematització completa (Món Màgic, Halloween, Disco 80s) i efectes especials. 2+ anys creant experiències úniques a Barcelona i Girona.",
+  description: 'DJ professional per a casaments, festes i events corporatius a Barcelona i Girona. So 4000W, llums LED, efectes especials i tematització completa. Pressupost en 2h. ★★★★★ 4.9/5',
   keywords: [
     'DJ casament Barcelona',
     'DJ boda Girona',
-    'discomòbil Catalunya',
-    'events temàtics Barcelona',
-    'magic theme party',
-    'so i llums events',
-    'tematització festes',
-    'animació casaments'
+    'discomòbil Barcelona',
+    'DJ events corporatius',
+    'festa temàtica Halloween',
+    'festa Harry Potter Barcelona',
+    'so i llums casament',
+    'DJ Costa Brava',
+    'DJ Maresme',
+    'DJ Vallès',
+    'animació casaments',
+    'efectes especials events',
   ],
-  authors: [{ name: 'Òrbita Events' }],
+  authors: [{ name: 'Òrbita Events', url: 'https://orbitaevents.com' }],
   creator: 'Òrbita Events',
   publisher: 'Òrbita Events',
   formatDetection: {
@@ -169,44 +225,57 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
     languages: {
-      'ca': '/',
-      'es': '/es',
+      'ca-ES': '/ca',
+      'es-ES': '/es',
     },
   },
   openGraph: {
     type: 'website',
     locale: 'ca_ES',
+    alternateLocale: ['es_ES'],
     url: 'https://orbitaevents.com',
     siteName: 'Òrbita Events',
-    title: "Òrbita Events | Creem l'Experiència Completa Que Imagines",
-    description: "DJ, so, il·luminació i tematització per a casaments, festes i events corporatius a Barcelona i Girona. Experiències úniques que es recorden per sempre.",
+    title: 'DJ Casaments Barcelona i Girona | Òrbita Events',
+    description: 'DJ professional, so, il·luminació i tematització per a casaments i events. Experiències úniques que es recorden per sempre. ★★★★★ 4.9/5',
     images: [
       {
         url: '/img/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Òrbita Events - Experiències que es recorden',
+        alt: 'Òrbita Events - DJ Casaments Barcelona',
+        type: 'image/jpeg',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Òrbita Events | Creem l'Experiència Completa Que Imagines",
-    description: "DJ, so, il·luminació i tematització per a casaments, festes i events corporatius a Barcelona i Girona.",
+    title: 'DJ Casaments Barcelona i Girona | Òrbita Events',
+    description: 'DJ professional per a casaments i events. So, llums i tematització. ★★★★★ 4.9/5',
     images: ['/img/og-image.jpg'],
+    creator: '@orbitaevents',
   },
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
+      noimageindex: false,
       'max-video-preview': -1,
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
+  },
+  category: 'entertainment',
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VIEWPORT
+// ═══════════════════════════════════════════════════════════════════════════
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -215,84 +284,69 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0b' },
   ],
+  colorScheme: 'dark',
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GENERATE STATIC PARAMS
+// ═══════════════════════════════════════════════════════════════════════════
 
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// LAYOUT COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════
+
 interface LocaleLayoutProps {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
+  params: { locale: string };
 }
 
 export default async function LocaleLayout({
   children,
   params,
 }: LocaleLayoutProps) {
-  const { locale } = await params;
+  const { locale } = params;
 
   // Validar locale
   if (!locales.includes(locale as Locale)) {
     notFound();
   }
 
-  // Carregar missatges per i18n
+  // Carregar missatges
   const messages = await getMessages();
 
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${outfit.variable} ${space.variable} scroll-smooth`}
+      className={`${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
         <AnalyticsScripts />
 
+        {/* Preconnects per performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://www.google-analytics.com" />
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
 
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
-
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        {/* Favicons */}
+        <link rel="icon" href="/favicon.ico" sizes="48x48" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
 
+        {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_DATA) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_ORGANIZATION) }}
         />
-
-        {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_METRICOOL_HASH && (
-          <script
-            id="metricool-tracker"
-            dangerouslySetInnerHTML={{
-              __html: `
-                function loadScript(a){
-                  var b=document.getElementsByTagName("head")[0],
-                  c=document.createElement("script");
-                  c.type="text/javascript";
-                  c.src="https://tracker.metricool.com/resources/be.js";
-                  c.onreadystatechange=a;
-                  c.onload=a;
-                  b.appendChild(c);
-                }
-                loadScript(function(){
-                  beTracker.t({hash:"${process.env.NEXT_PUBLIC_METRICOOL_HASH}"});
-                });
-              `,
-            }}
-          />
-        )}
       </head>
       <body
-        className="font-sans antialiased bg-neutral-950 text-white overflow-x-hidden"
+        className="font-sans antialiased bg-[var(--bg-main)] text-white overflow-x-hidden"
         suppressHydrationWarning
       >
         <NextIntlClientProvider messages={messages} locale={locale}>
@@ -300,6 +354,8 @@ export default async function LocaleLayout({
             {children}
           </LayoutWrapper>
         </NextIntlClientProvider>
+        
+        {/* Vercel Analytics */}
         <SpeedInsights />
         <Analytics />
       </body>

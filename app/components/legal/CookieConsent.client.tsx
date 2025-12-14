@@ -19,6 +19,14 @@ export default function CookieConsent() {
     marketing: false,
   });
 
+  const triggerPageView = () => {
+    if (typeof window === 'undefined' || !window.gtag) return;
+    window.gtag('event', 'page_view', {
+      page_location: window.location.href,
+      page_path: window.location.pathname,
+    });
+  };
+
   useEffect(() => {
     const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
     if (!consent) {
@@ -47,6 +55,7 @@ export default function CookieConsent() {
           ad_user_data: 'granted',
           ad_personalization: 'granted',
         });
+        triggerPageView();
       }
     }
   };
@@ -82,6 +91,7 @@ export default function CookieConsent() {
       // Dispara GA4 cuando aceptas analíticas
       if (preferences.analytics) {
         window.gtagConsentUpdate?.();
+        triggerPageView();
       }
 
       if (window.gtag) {

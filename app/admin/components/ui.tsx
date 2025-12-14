@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 
 /**
  * 🎨 COMPONENTS UI ADMIN - Base Components
@@ -346,24 +347,28 @@ export function Avatar({ name, src, size = 'md' }: AvatarProps) {
     .slice(0, 2);
 
   const sizes = {
-    sm: 'w-8 h-8 text-xs',
-    md: 'w-10 h-10 text-sm',
-    lg: 'w-12 h-12 text-base',
+    sm: { className: 'w-8 h-8 text-xs', dimension: 32 },
+    md: { className: 'w-10 h-10 text-sm', dimension: 40 },
+    lg: { className: 'w-12 h-12 text-base', dimension: 48 },
   };
+
+  const sizeConfig = sizes[size];
 
   if (src) {
     return (
-      <img 
-        src={src} 
+      <Image
+        src={src}
         alt={name}
-        className={`${sizes[size]} rounded-full object-cover`}
+        width={sizeConfig.dimension}
+        height={sizeConfig.dimension}
+        className={`${sizeConfig.className} rounded-full object-cover`}
       />
     );
   }
 
   return (
     <div className={`
-      ${sizes[size]} rounded-full 
+      ${sizeConfig.className} rounded-full 
       bg-gradient-to-br from-orange-500/20 to-orange-600/20 
       flex items-center justify-center 
       text-orange-400 font-medium

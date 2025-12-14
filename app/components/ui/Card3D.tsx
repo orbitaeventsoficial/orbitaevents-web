@@ -6,6 +6,7 @@
 
 import { useState, useRef, ReactNode } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import Image from 'next/image';
 
 interface Card3DProps {
   children: ReactNode;
@@ -161,10 +162,13 @@ export function Card3DContent({
         {/* Image if provided */}
         {image && (
           <div className="relative h-48 -mx-6 -mt-6 mb-6 overflow-hidden rounded-t-2xl">
-            <img
+            <Image
               src={image}
               alt={title || ''}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              priority={false}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>

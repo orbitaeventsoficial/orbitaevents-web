@@ -6,6 +6,7 @@ import ContactForm from "@/components/forms/ContactForm.client";
 import { Briefcase, Users, Lightbulb, Star, Check, FileText, Shield, TrendingUp, Handshake, Sparkles } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
+import Image from "next/image";
 
 export default function EmpresasClient() {
   const t = useTranslations('pages.corporate');
@@ -31,10 +32,13 @@ export default function EmpresasClient() {
       <section className="relative min-h-[80vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-bg-main z-10" />
-          <img
+          <Image
             src="/img/portfolio/empresas-cover.webp"
             alt="Eventos corporativos Òrbita Events"
-            className="w-full h-full object-cover animate-slow-zoom"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover animate-slow-zoom"
           />
         </div>
 

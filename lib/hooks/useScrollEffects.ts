@@ -293,7 +293,7 @@ export function useScrollDirection(): ScrollDirection {
 // EXPORTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export default {
+const scrollEffects = {
   useInView,
   useScrollReveal,
   useCountUp,
@@ -302,3 +302,5 @@ export default {
   useScrollProgress,
   useScrollDirection,
 };
+
+export default scrollEffects;

@@ -18,8 +18,8 @@ import Breadcrumbs from '@/components/seo/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-  const { locale } = await params;
+export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
+  const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'pages.servicios' });
   return {
     title: t('meta.title'),
@@ -63,8 +63,8 @@ const serviciosConfig = [
   { key: 'alquiler', icon: Package, href: '/servicios/alquiler', popular: false },
 ] as const;
 
-export default async function ServiciosPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+export default async function ServiciosPage({ params }: { params: { locale: string } }) {
+  const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'pages.servicios' });
   return (
     <div className="min-h-screen bg-bg-main">

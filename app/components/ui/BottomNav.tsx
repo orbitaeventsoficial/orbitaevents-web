@@ -1,129 +1,148 @@
+// app/components/ui/BottomNav.tsx
+// ═══════════════════════════════════════════════════════════════════════════
+// ÒRBITA EVENTS - BOTTOM NAVIGATION v2.0
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// Navegació inferior per a mòbil:
+// - Disseny elegant i minimalista
+// - Icones grans i touch-friendly
+// - Animacions subtils
+// - Safe area support
+//
+// ═══════════════════════════════════════════════════════════════════════════
+
 'use client';
 
-import { Link, usePathname } from '@/lib/navigation';
-import { motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
+import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
+import { Home, Briefcase, Image, MessageCircle, Calculator } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-/**
- * BottomNav - Navegació inferior estil app
- *
- * Només visible en mòbil (md:hidden)
- * Respecta safe areas iPhone
- * 5 items amb el central destacat
- * USA TRADUCCIONS per català/espanyol
- */
+// ═══════════════════════════════════════════════════════════════════════════
+// NAVIGATION ITEMS
+// ═══════════════════════════════════════════════════════════════════════════
 
-interface NavItem {
-  href: string;
-  labelKey: string;
-  icon: string;
-  isSpecial?: boolean;
-}
-
-const NAV_ITEMS: NavItem[] = [
+const NAV_ITEMS = [
   {
     href: '/',
+    icon: Home,
     labelKey: 'home',
-    icon: '🏠',
+    exactMatch: true,
   },
   {
-    href: '/servicios',
+    href: '/servicios/bodas',
+    icon: Briefcase,
     labelKey: 'services',
-    icon: '🎵',
+    exactMatch: false,
   },
   {
     href: '/configurador',
-    labelKey: 'create',
-    icon: '✨',
-    isSpecial: true, // Botó central destacat
+    icon: Calculator,
+    labelKey: 'configure',
+    exactMatch: true,
+    highlight: true,
   },
   {
     href: '/portfolio',
+    icon: Image,
     labelKey: 'portfolio',
-    icon: '📸',
+    exactMatch: true,
   },
   {
     href: '/contacto',
+    icon: MessageCircle,
     labelKey: 'contact',
-    icon: '💬',
+    exactMatch: true,
   },
 ];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════
 
 export default function BottomNav() {
   const pathname = usePathname();
   const t = useTranslations('bottomNav');
 
-  // Determinar si un link està actiu
-  const isActive = (href: string) => {
-    if (href === '/') return pathname === '/' || pathname === '/ca' || pathname === '/es';
-    return pathname?.includes(href);
+  // Comprovar si un link és actiu
+  const isActive = (href: string, exactMatch: boolean) => {
+    if (exactMatch) {
+      return pathname === href || pathname === `/ca${href}` || pathname === `/es${href}`;
+    }
+    return pathname?.includes(href.replace('/', ''));
   };
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-t border-white/10 md:hidden"
-      style={{
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-      }}
+      className="
+        fixed bottom-0 left-0 right-0 z-40
+        lg:hidden
+        bg-zinc-950/95 backdrop-blur-xl
+        border-t border-white/5
+        pb-safe
+      "
+      role="navigation"
+      aria-label="Navegació mòbil"
     >
-      <div className="flex items-end justify-around h-16 px-2">
+      <div className="flex items-center justify-around h-16 px-2">
         {NAV_ITEMS.map((item) => {
-          const active = isActive(item.href);
+          const Icon = item.icon;
+          const active = isActive(item.href, item.exactMatch);
+          const isHighlight = item.highlight;
 
-          if (item.isSpecial) {
-            // Botó central especial (més gran, destacat)
+          if (isHighlight) {
+            // Botó central destacat (Configurador)
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className="relative -mt-4 flex flex-col items-center"
+                className="relative -mt-4"
               >
                 <motion.div
-                  className="w-14 h-14 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg shadow-orange-500/30"
-                  whileTap={{ scale: 0.9 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="
+                    flex items-center justify-center
+                    w-14 h-14 rounded-full
+                    bg-gradient-to-br from-amber-500 to-amber-600
+                    shadow-lg shadow-amber-500/30
+                    text-black
+                  "
                 >
-                  <span className="text-2xl">{item.icon}</span>
+                  <Icon className="w-6 h-6" strokeWidth={2.5} />
                 </motion.div>
-                <span className="text-[10px] text-white/70 mt-1">{t(item.labelKey)}</span>
+                {/* Glow effect */}
+                <div className="absolute inset-0 rounded-full bg-amber-500/20 blur-xl -z-10" />
               </Link>
             );
           }
 
-          // Items normals
           return (
             <Link
               key={item.href}
               href={item.href}
-              className="flex flex-col items-center justify-center py-2 px-3 min-w-[60px] relative"
-              style={{ minHeight: '56px' }}
+              className={`
+                flex flex-col items-center justify-center
+                min-w-[60px] h-full
+                transition-colors duration-200
+                ${active ? 'text-amber-400' : 'text-white/50'}
+              `}
             >
-              {/* Indicador actiu */}
-              {active && (
-                <motion.div
-                  layoutId="bottomNavActive"
-                  className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-amber-500 rounded-full"
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                />
-              )}
-
-              {/* Icona */}
-              <motion.span
-                className="text-xl"
-                animate={{
-                  scale: active ? 1.1 : 1,
-                }}
-                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              <motion.div
+                whileTap={{ scale: 0.9 }}
+                className="relative"
               >
-                {item.icon}
-              </motion.span>
-
-              {/* Label */}
-              <span
-                className={`text-[10px] mt-0.5 transition-colors ${
-                  active ? 'text-white' : 'text-white/50'
-                }`}
-              >
+                <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} />
+                {/* Indicador actiu */}
+                {active && (
+                  <motion.div
+                    layoutId="bottomNavIndicator"
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-400"
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                )}
+              </motion.div>
+              <span className={`text-[10px] mt-1 font-medium ${active ? 'text-amber-400' : ''}`}>
                 {t(item.labelKey)}
               </span>
             </Link>

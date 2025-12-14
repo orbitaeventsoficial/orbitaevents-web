@@ -7,8 +7,8 @@ import { getTranslations } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
-export default async function PortfolioHome({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+export default async function PortfolioHome({ params }: { params: { locale: string } }) {
+  const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'pages.portfolio' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
 
@@ -67,4 +67,3 @@ export default async function PortfolioHome({ params }: { params: Promise<{ loca
     </>
   );
 }
-

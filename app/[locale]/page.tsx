@@ -11,6 +11,7 @@ import type { Metadata } from 'next';
 import { Link } from '@/lib/navigation';
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
+import ClientOnly from '../components/ClientOnly';
 
 // Components REAL - Connectats a BD!
 import HeroBrutalReal from '../components/home/HeroBrutal-REAL';
@@ -32,8 +33,8 @@ export const revalidate = 3600;
 // METADATA DINÀMICA
 // ═══════════════════════════════════════════════════════════════════════════
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+export async function generateMetadata({ params }: { params: { locale: string } }) {
+  const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'homePage' });
 
   return {
@@ -238,39 +239,42 @@ async function ThemesSection() {
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-black">
+    <ClientOnly>
+      <main className="min-h-screen bg-black">
       {/* 🔥 HERO - Stats i disponibilitat REALS de BD */}
-      <HeroBrutalReal />
+      <ClientOnly><HeroBrutalReal /></ClientOnly>
       
       {/* 🔥 NOTIFICACIONS EN VIU - "Joan acaba de reservar..." */}
-      <LiveNotifications />
+      <ClientOnly><LiveNotifications /></ClientOnly>
       
       {/* Serveis principals */}
       <ServicesSection />
       
       {/* 🔥 URGÈNCIA - Disponibilitat REAL */}
-      <UrgencyBannerReal />
+      <ClientOnly><UrgencyBannerReal /></ClientOnly>
       
       {/* Tematització */}
       <ThemesSection />
       
       {/* Transformació - Abans vs Després */}
-      <TransformationSection />
+      <ClientOnly><TransformationSection /></ClientOnly>
       
       {/* Per què nosaltres */}
-      <WhyUsBrutal />
+      <ClientOnly><WhyUsBrutal /></ClientOnly>
       
       {/* Garanties */}
-      <GuaranteeSection />
+      <ClientOnly><GuaranteeSection /></ClientOnly>
       
       {/* 🔥 TESTIMONIALS - Opinions REALS de BD */}
-      <TestimonialsBrutalReal />
+      <ClientOnly><TestimonialsBrutalReal /></ClientOnly>
       
       {/* 🔥 STATS - Números REALS */}
-      <StatsSectionReal />
+      <ClientOnly><StatsSectionReal /></ClientOnly>
       
       {/* CTA Final */}
-      <CTASectionBrutal />
-    </main>
+      <ClientOnly><CTASectionBrutal /></ClientOnly>
+      </main>
+    </ClientOnly>
   );
 }
+

@@ -1,100 +1,132 @@
+// app/components/layout/LayoutWrapper.tsx
+// ═══════════════════════════════════════════════════════════════════════════
+// ÒRBITA EVENTS - LAYOUT WRAPPER v3.0 SIMPLIFICAT
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// MILLORES:
+// - Un sol header per desktop i mòbil (eliminada duplicació)
+// - Menys wrappers ClientOnly
+// - Millor gestió de la intro animada
+// - Rendiment optimitzat
+//
+// ═══════════════════════════════════════════════════════════════════════════
+
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
-// Headers PROFESSIONALS v6 - Sense rosa, tot daurat
-import HeaderPro from "@/app/components/ui/HeaderPro";
-import MobileHeaderPro from "@/app/components/ui/MobileHeaderPro";
-import Footer from "@/app/components/ui/footer";
-import CookieConsent from "@/app/components/legal/CookieConsent.client";
-import { MagicThemeSystem } from "@/app/components/magic/ThemeSystem";
-import FlashOffer from "@/app/components/marketing/FlashOffer";
-import BottomNav from "@/app/components/ui/BottomNav";
-import FloatingContactButtons from "@/app/components/ui/FloatingContactButtons";
-import MobileOptimizations from "@/app/components/ui/MobileOptimizations";
-import HeroPortalLogo from "@/app/components/ui/HeroPortalLogo";
+import dynamic from 'next/dynamic';
+import { useState, useEffect, useCallback } from 'react';
 
-// Pàgines que NO mostren header/footer (experiència immersiva)
+// Components principals
+import Header from '@/app/components/ui/Header';
+import Footer from '@/app/components/ui/footer';
+import CookieConsent from '@/app/components/legal/CookieConsent.client';
+import BottomNav from '@/app/components/ui/BottomNav';
+import FloatingContactButtons from '@/app/components/ui/FloatingContactButtons';
+
+// Components dinàmics (lazy loading)
+const HeroPortalLogo = dynamic(
+  () => import('@/app/components/ui/HeroPortalLogo'),
+  { ssr: false }
+);
+
+const FlashOffer = dynamic(
+  () => import('@/app/components/marketing/FlashOffer'),
+  { ssr: false }
+);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Pàgines immersives sense header/footer
 const IMMERSIVE_PAGES = ['/sensorial'];
+
+// Pàgines on mostrar la intro
+const INTRO_PAGES = ['/', '/ca', '/es'];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COMPONENT PRINCIPAL
+// ═══════════════════════════════════════════════════════════════════════════
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [showIntro, setShowIntro] = useState(false);
-  const [introComplete, setIntroComplete] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Mostrar intro només a la home i si no s'ha vist
+  // Evitar hydration mismatch
   useEffect(() => {
-    // Només mostrar a la home (ruta exacta / o /ca o /es)
-    const isHomePage = pathname === '/' || pathname === '/ca' || pathname === '/es';
+    setIsMounted(true);
+  }, []);
 
-    if (isHomePage) {
-      // Per ara, mostrar SEMPRE (després es pot afegir lògica de 1 cop/dia)
-      // const hasSeenIntro = sessionStorage.getItem('orbita-intro-seen');
-      // if (!hasSeenIntro) {
+  // Gestionar intro animada
+  useEffect(() => {
+    if (!isMounted) return;
+
+    const isHomePage = INTRO_PAGES.some(page => pathname === page);
+    const hasSeenIntro = sessionStorage.getItem('orbita-intro-seen');
+
+    if (isHomePage && !hasSeenIntro) {
       setShowIntro(true);
-      // }
     }
-  }, [pathname]);
+  }, [pathname, isMounted]);
 
-  const handleIntroFinish = () => {
+  // Handler per quan acaba la intro
+  const handleIntroFinish = useCallback(() => {
     setShowIntro(false);
-    setIntroComplete(true);
-    // sessionStorage.setItem('orbita-intro-seen', 'true');
-  };
+    sessionStorage.setItem('orbita-intro-seen', 'true');
+  }, []);
 
-  // Comprovar si és una pàgina immersiva (sense header/footer)
+  // Comprovar si és pàgina immersiva
   const isImmersive = IMMERSIVE_PAGES.some(page => pathname?.includes(page));
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // RENDER: Pàgina immersiva (sense header/footer)
+  // ─────────────────────────────────────────────────────────────────────────
   if (isImmersive) {
-    // Pàgina immersiva - SENSE header, footer, whatsapp, cookies
-    return (
-      <MagicThemeSystem>
-      <MobileOptimizations />
-        {children}
-      </MagicThemeSystem>
-    );
+    return <>{children}</>;
   }
 
-  // Pàgina normal - AMB tot
+  // ─────────────────────────────────────────────────────────────────────────
+  // RENDER: Pàgina normal
+  // ─────────────────────────────────────────────────────────────────────────
   return (
-    <MagicThemeSystem>
-      <MobileOptimizations />
-
-      {/* 🌟 INTRO ANIMADA - Només a la home */}
-      {showIntro && (
+    <>
+      {/* Intro animada (només home, primer cop) */}
+      {showIntro && isMounted && (
         <HeroPortalLogo
           onFinish={handleIntroFinish}
-          totalMs={6000}
-          fadeMs={2500}
+          totalMs={5000}
+          fadeMs={2000}
         />
       )}
 
-      <FlashOffer />
+      {/* Flash Offer banner */}
+      {isMounted && <FlashOffer />}
 
-      {/* Header mòbil (només visible en mòbil) */}
-      <div className="md:hidden">
-        <MobileHeaderPro />
-      </div>
+      {/* Header unificat (desktop + mòbil) */}
+      <Header />
 
-      {/* Header desktop (només visible en desktop) */}
-      <div className="hidden md:block">
-        <HeaderPro />
-      </div>
-
-      {/* Main content - padding bottom per BottomNav en mòbil */}
-      <main id="main-content" tabIndex={-1} className="min-h-screen outline-none pb-20 md:pb-0">
+      {/* Contingut principal */}
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="min-h-screen outline-none"
+      >
         {children}
       </main>
 
+      {/* Footer */}
       <Footer />
 
-      {/* Floating contact buttons - visible en totes les pantalles */}
+      {/* Botons flotants de contacte */}
       <FloatingContactButtons />
 
-      {/* Bottom navigation només mòbil */}
+      {/* Navegació inferior mòbil */}
       <BottomNav />
 
-      <CookieConsent />
-    </MagicThemeSystem>
+      {/* Consentiment cookies */}
+      {isMounted && <CookieConsent />}
+    </>
   );
 }

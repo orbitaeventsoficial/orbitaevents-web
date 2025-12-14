@@ -138,7 +138,7 @@ export function HeaderPremium() {
           isScrolled
             ? 'bg-black/95 backdrop-blur-xl shadow-2xl shadow-black/50'
             : 'bg-gradient-to-b from-black/90 via-black/50 to-transparent'
-        }`}
+        } font-display tracking-tight`}
       >
         <div className="container mx-auto px-4 lg:px-6">
           <div className="flex items-center justify-between h-16 lg:h-20">
