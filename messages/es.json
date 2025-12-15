@@ -108,11 +108,11 @@
       "select": "Seleccionar",
       "selected": "Seleccionado ✓",
       "goToConfigurator": "Ir al configurador",
-      "requestQuote": "Pide presupuesto",
+      "requestQuote": "RESERVA HOY",
       "leaveReview": "Deja un comentario",
       "calculate": "Calcula el precio",
       "calculatePrice": "Calcula el precio",
-      "reserveToday": "RESERVA HOY",
+      "reserveToday": "🔥 RESERVA HOY",
       "portfolio": "Ver Portfolio",
       "learnMore": "Más información",
       "getStarted": "Empieza",
@@ -179,7 +179,7 @@
     "success": "Éxito"
   },
   "hero": {
-    "badge": "🔥 DJ + Sonido + Luces + Efectos Especiales",
+    "badge": "🔥 48+ eventos sin ningún invitado sentado",
     "themingSpecialists": "Especialistas en Tematización",
     "location": "Barcelona + Girona",
     "stats": {
@@ -214,7 +214,7 @@
     "happyClients": "eventos felices",
     "headline1": "A las 4am tu suegra",
     "headline2": "BAILABA DESCALZA",
-    "headline3": "El único DJ que te garantiza FIESTAS ÉPICAS",
+    "headline3": "Y tú lo viste todo desde la pista",
     "headlines": [
       {
         "line1": "A las 4am tu suegra",
@@ -247,9 +247,9 @@
     "urgencyExpired": "¡Consulta disponibilidad ahora!",
     "scroll": "Descubre más",
     "trust": {
-      "guarantee": "Garantía 100% satisfacción",
-      "response": "Respuesta en menos de 2h",
-      "equipment": "Equipamiento profesional"
+      "guarantee": "💯 100% clientes satisfechos (de verdad)",
+      "response": "⚡ Respuesta en 2h (de verdad)",
+      "equipment": "🎧 Equipo profesional de club"
     },
     "headline": {
       "line1": "A las 4am tu suegra",
@@ -259,12 +259,12 @@
     "services": "DJ + Sonido + Luces + Efectos + Tematización",
     "response": "Respuesta en 2h",
     "cta": {
-      "primary": "Pide Presupuesto Gratis",
-      "secondary": "Ver Portfolio",
+      "primary": "RESERVA TU FECHA",
+      "secondary": "Ver eventos reales",
       "whatsapp": "WhatsApp",
       "call": "Llamar"
     },
-    "scarcity": "Enero 2026: quedan 2 sábados",
+    "scarcity": "⚠️ Enero-Marzo 2026: Solo quedan 3 sábados",
     "mobileCta": "Presupuesto Gratis",
     "serviceLabels": {
       "dj": "DJ",
@@ -286,7 +286,7 @@
     "scrollMore": "Descubre más",
     "titleLine1": "TU EVENTO",
     "titleLine2": "SERÁ LEYENDA",
-    "subtitle": "DJ + Sonido + Luces + Efectos + Tematización",
+    "subtitle": "Creamos fiestas donde TODOS bailan. Garantizado.",
     "subtitleHighlight": "Todo lo que necesitas. Un solo equipo.",
     "ctaPrimary": "Pide Presupuesto",
     "ctaSecondary": "WhatsApp",
@@ -373,8 +373,8 @@
     }
   },
   "guarantees": {
-    "title": "Cuidamos cada detalle de tu experiencia completa",
-    "description": "No solo montamos equipos. Diseñamos tu experiencia desde cero: Reunión previa • Personalización total • Coordinación el día del evento • Adaptación en tiempo real. Tu visión se hace realidad.",
+    "title": "¿Por qué confiar en Òrbita?",
+    "description": "Lo sabemos: contratar un DJ es arriesgado. Por eso te damos garantías REALES. Reunión previa • Personalización total • Equipo backup • Coordinación con venue.",
     "stat1": "Eventos realizados sin incidentes",
     "stat1Desc": "Con un equipo de seguridad completo",
     "stat2": "Repiten o recomiendan",
@@ -408,9 +408,9 @@
     "from": "Desde",
     "popular": "El más pedido",
     "bodas": {
-      "title": "Bodas",
-      "subtitle": "El día más importante, perfecto",
-      "description": "Ceremonia, cóctel y fiesta. DJ + sonido + luces + coordinación total."
+      "title": "La boda de tus sueños",
+      "subtitle": "Que hablen de ella durante años",
+      "description": "El primer baile que hace llorar. La fiesta que no acaba. Los invitados que aún hoy dicen: 'Qué bodorrio'."
     },
     "fiestas": {
       "title": "Fiestas",
@@ -1207,8 +1207,8 @@
     }
   },
   "faq": {
-    "title": "Preguntas frecuentes",
-    "subtitle": "Respuestas claras y transparentes",
+    "title": "Preguntas que te haces (y las respuestas)",
+    "subtitle": "Sin letra pequeña. Sin sorpresas.",
     "searchPlaceholder": "Buscar dudas (ej: precio, limitador, lluvia...)",
     "categories": {
       "all": "📋 Todos",
@@ -1517,7 +1517,7 @@
         "configureButton": "Configurar Mi Evento Ahora",
         "exploreBelow": "O explora cada servicio en detalle abajo ↓",
         "features": {
-          "equipment": "Equipamiento profesional",
+          "equipment": "🎧 Equipo profesional de club",
           "backup": "Backup completo",
           "guarantee": "Pista llena garantizada"
         }
