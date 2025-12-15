@@ -210,7 +210,7 @@ export function TestimonialsBrutal() {
       role: t('testimonial2.role'),
       date: t('testimonial2.date'),
       image: "/images/testimonials/marc.jpg",
-      eventImage: "/images/tematicas/halloween/hero.jpg",
+      eventImage: "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg",
       rating: 5,
       eventType: t('testimonial2.eventType'),
       highlight: t('testimonial2.highlight')

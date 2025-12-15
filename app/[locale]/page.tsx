@@ -171,7 +171,7 @@ const THEMES = [
     titleKey: 'halloween.title',
     subtitleKey: 'halloween.subtitle',
     descriptionKey: 'halloween.description',
-    image: '/images/tematicas/halloween/hero.jpg',
+    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
     href: '/tematica-halloween',
     gradient: 'from-orange-600 to-red-600',
   },
