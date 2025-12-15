@@ -209,7 +209,7 @@ const MINIMUM_STATS = {
 };
 
 const defaultStats: StatsData = {
-  yearsExperience: '+2 anys',      // Empresa fundada Agost 2023 → 2 anys actius
+  yearsExperience: 'Des de 2023',  // Empresa fundada Agost 2023
   coverage: 'Barcelona + Girona',  // 2 províncies de cobertura
   responseTime: '2h',
   totalEvents: MINIMUM_STATS.totalEvents,
