@@ -102,7 +102,6 @@ const EXPERIENCIAS_LINKS = [
 // Recursos
 const RECURSOS_LINKS = [
   { nameKey: 'portfolio', href: '/portfolio' },
-  { nameKey: 'faq', href: '/faq' },
   { nameKey: 'about', href: '/about' },
   { nameKey: 'reviews', href: '/opiniones' },
 ];
