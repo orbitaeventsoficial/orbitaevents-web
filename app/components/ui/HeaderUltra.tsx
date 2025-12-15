@@ -17,10 +17,10 @@ import { useTranslations } from 'next-intl';
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const SERVICES = [
-  { href: '/servicios/bodas', icon: '💍', key: 'bodes', price: '800€', gradient: 'from-rose-500/20 to-pink-500/20', popular: true },
-  { href: '/servicios/fiestas', icon: '🎉', key: 'festes', price: '450€', gradient: 'from-amber-500/20 to-orange-500/20' },
-  { href: '/servicios/empresas', icon: '💼', key: 'empreses', price: '600€', gradient: 'from-blue-500/20 to-cyan-500/20' },
-  { href: '/servicios/discomovil', icon: '🎵', key: 'discomovil', price: '400€', gradient: 'from-purple-500/20 to-pink-500/20' },
+  { href: '/servicios/bodas', icon: '💍', key: 'bodes', price: '550€', gradient: 'from-rose-500/20 to-pink-500/20', popular: true },
+  { href: '/servicios/fiestas', icon: '🎉', key: 'festes', price: '350€', gradient: 'from-amber-500/20 to-orange-500/20' },
+  { href: '/servicios/empresas', icon: '💼', key: 'empreses', price: '400€', gradient: 'from-blue-500/20 to-cyan-500/20' },
+  { href: '/servicios/discomovil', icon: '🎵', key: 'discomovil', price: '350€', gradient: 'from-purple-500/20 to-pink-500/20' },
   { href: '/servicios/animacion-infantil', icon: '🎈', key: 'infantil', price: '250€', gradient: 'from-green-500/20 to-emerald-500/20' },
 ];
 

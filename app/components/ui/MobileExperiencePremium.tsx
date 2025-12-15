@@ -39,7 +39,7 @@ const STORIES = [
     image: '/img/portfolio/bodas/bodas-01.webp',
     emoji: '💒',
     gradient: 'from-rose-500/80 to-amber-500/80',
-    price: '800€',
+    price: '550€',
     badge: 'POPULAR',
   },
   {
@@ -47,7 +47,7 @@ const STORIES = [
     image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
     emoji: '⚡',
     gradient: 'from-violet-600/80 to-fuchsia-500/80',
-    price: '900€',
+    price: '600€',
     badge: 'MÀGIA',
   },
   {
