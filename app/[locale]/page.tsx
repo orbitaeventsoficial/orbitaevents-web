@@ -12,6 +12,7 @@ import { Link } from '@/lib/navigation';
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import ClientOnly from '../components/ClientOnly';
+import HomeWrapper from '../components/home/HomeWrapper';
 
 // Components REAL - Connectats a BD!
 import HeroBrutalReal from '../components/home/HeroBrutal-REAL';
@@ -239,40 +240,44 @@ async function ThemesSection() {
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-black">
-      {/* 🔥 HERO - Stats i disponibilitat REALS de BD */}
-      <ClientOnly><HeroBrutalReal /></ClientOnly>
+    <ClientOnly>
+      <HomeWrapper>
+        <main className="min-h-screen bg-black">
+          {/* 🔥 HERO - Stats i disponibilitat REALS de BD */}
+          <HeroBrutalReal />
 
-      {/* 🔥 NOTIFICACIONS EN VIU - "Joan acaba de reservar..." */}
-      <ClientOnly><LiveNotifications /></ClientOnly>
+          {/* 🔥 NOTIFICACIONS EN VIU - "Joan acaba de reservar..." */}
+          <LiveNotifications />
 
-      {/* Serveis principals */}
-      <ServicesSection />
+          {/* Serveis principals */}
+          <ServicesSection />
 
-      {/* 🔥 URGÈNCIA - Disponibilitat REAL */}
-      <ClientOnly><UrgencyBannerReal /></ClientOnly>
+          {/* 🔥 URGÈNCIA - Disponibilitat REAL */}
+          <UrgencyBannerReal />
 
-      {/* Tematització */}
-      <ThemesSection />
+          {/* Tematització */}
+          <ThemesSection />
 
-      {/* Transformació - Abans vs Després */}
-      <ClientOnly><TransformationSection /></ClientOnly>
+          {/* Transformació - Abans vs Després */}
+          <TransformationSection />
 
-      {/* Per què nosaltres */}
-      <ClientOnly><WhyUsBrutal /></ClientOnly>
+          {/* Per què nosaltres */}
+          <WhyUsBrutal />
 
-      {/* Garanties */}
-      <ClientOnly><GuaranteeSection /></ClientOnly>
+          {/* Garanties */}
+          <GuaranteeSection />
 
-      {/* 🔥 TESTIMONIALS - Opinions REALS de BD */}
-      <ClientOnly><TestimonialsBrutalReal /></ClientOnly>
+          {/* 🔥 TESTIMONIALS - Opinions REALS de BD */}
+          <TestimonialsBrutalReal />
 
-      {/* 🔥 STATS - Números REALS */}
-      <ClientOnly><StatsSectionReal /></ClientOnly>
+          {/* 🔥 STATS - Números REALS */}
+          <StatsSectionReal />
 
-      {/* CTA Final */}
-      <ClientOnly><CTASectionBrutal /></ClientOnly>
-    </main>
+          {/* CTA Final */}
+          <CTASectionBrutal />
+        </main>
+      </HomeWrapper>
+    </ClientOnly>
   );
 }
 

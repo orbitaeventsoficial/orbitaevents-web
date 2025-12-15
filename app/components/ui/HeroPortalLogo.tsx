@@ -62,47 +62,55 @@ export default function HeroPortalLogo({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Seqüència d'animació cinematogràfica
+  // Seqüència d'animació - MÒBIL MÉS RÀPID I IMPACTANT
   useEffect(() => {
     if (hasStarted.current) return;
     hasStarted.current = true;
 
-    const mobileDuration = Math.min(duration, 4000);
-    const actualDuration = isMobile ? mobileDuration : duration;
-
-    // Timeline cinematogràfica:
-    // 0ms      - Negre absolut
-    // 300ms    - Glow comença
-    // 600ms    - Logo apareix
-    // 1400ms   - Text "ÒRBITA" apareix
-    // 2000ms   - Text "EVENTS" apareix
-    // 2600ms   - Tagline apareix
-    // 3200ms   - Tot complet
-    // -1200ms  - Fade out comença
-    // final    - Desapareix
-
-    timersRef.current.push(setTimeout(() => setPhase('glow'), 300));
-    timersRef.current.push(setTimeout(() => setPhase('logo'), 600));
-    timersRef.current.push(setTimeout(() => setPhase('text'), 1400));
-    timersRef.current.push(setTimeout(() => setPhase('tagline'), 2400));
-    timersRef.current.push(setTimeout(() => setPhase('complete'), 3000));
-    timersRef.current.push(setTimeout(() => setPhase('fadeout'), actualDuration - 1200));
+    // MÒBIL: 3 segons màxim, tot més ràpid
+    // DESKTOP: 5.5 segons, més cinematogràfic
     
-    timersRef.current.push(setTimeout(() => {
-      setMounted(false);
-      onFinish?.();
-    }, actualDuration));
+    if (isMobile) {
+      // Timeline MÒBIL - RÀPID I IMPACTANT
+      // Total: 3000ms
+      timersRef.current.push(setTimeout(() => setPhase('glow'), 100));
+      timersRef.current.push(setTimeout(() => setPhase('logo'), 200));
+      timersRef.current.push(setTimeout(() => setPhase('text'), 500));
+      timersRef.current.push(setTimeout(() => setPhase('tagline'), 800));
+      timersRef.current.push(setTimeout(() => setPhase('complete'), 1000));
+      timersRef.current.push(setTimeout(() => setPhase('fadeout'), 2200));
+      
+      timersRef.current.push(setTimeout(() => {
+        setMounted(false);
+        onFinish?.();
+      }, 3000));
+    } else {
+      // Timeline DESKTOP - Cinematogràfic
+      const actualDuration = duration;
+      
+      timersRef.current.push(setTimeout(() => setPhase('glow'), 300));
+      timersRef.current.push(setTimeout(() => setPhase('logo'), 600));
+      timersRef.current.push(setTimeout(() => setPhase('text'), 1400));
+      timersRef.current.push(setTimeout(() => setPhase('tagline'), 2400));
+      timersRef.current.push(setTimeout(() => setPhase('complete'), 3000));
+      timersRef.current.push(setTimeout(() => setPhase('fadeout'), actualDuration - 1200));
+      
+      timersRef.current.push(setTimeout(() => {
+        setMounted(false);
+        onFinish?.();
+      }, actualDuration));
+    }
 
     return () => {
       timersRef.current.forEach(t => clearTimeout(t));
     };
   }, [duration, isMobile, onFinish]);
 
-  // Skip amb tap (mòbil)
+  // Skip amb tap (mòbil) - AMB HAPTIC FEEDBACK
   const handleSkip = useCallback(() => {
     if (!isMobile) return;
     
-    // Vibració hàptica
+    // Haptic feedback
     if ('vibrate' in navigator) {
       navigator.vibrate(15);
     }
@@ -113,7 +121,7 @@ export default function HeroPortalLogo({
     setTimeout(() => {
       setMounted(false);
       onFinish?.();
-    }, 400);
+    }, 300); // Més ràpid en skip
   }, [isMobile, onFinish]);
 
   if (!mounted) return null;
