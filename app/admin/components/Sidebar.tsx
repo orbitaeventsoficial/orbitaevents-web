@@ -115,6 +115,7 @@ export default function AdminSidebar() {
           <NavItem icon="❓" label="FAQ" href="/admin/faq" />
           <NavItem icon="⭐" label="Testimonis" href="/admin/testimonios" />
           <NavItem icon="🌍" label="Textos" href="/admin/texts" />
+          <NavItem icon="📝" label="Textos PRO" href="/admin/text-manager" badge="PRO" badgeColor="green" />
         </NavSection>
 
         <NavSection title={collapsed ? '' : 'Operacions'}>
@@ -203,6 +204,7 @@ export function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: (
             <NavItem icon="❓" label="FAQ" href="/admin/faq" />
             <NavItem icon="⭐" label="Testimonis" href="/admin/testimonios" />
             <NavItem icon="🌍" label="Textos" href="/admin/texts" />
+            <NavItem icon="📝" label="Textos PRO" href="/admin/text-manager" badge="PRO" badgeColor="green" />
           </NavSection>
 
           <NavSection title="Operacions">

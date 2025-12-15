@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 // Components dinàmics (lazy loading + ssr: false per evitar hydration issues)
 const Header = dynamic(
-  () => import('@/app/components/ui/HeaderUltra'),
+  () => import('@/app/components/ui/HeaderChampion'),
   { ssr: false, loading: () => <div className="h-16 bg-zinc-950" /> }
 );
 
