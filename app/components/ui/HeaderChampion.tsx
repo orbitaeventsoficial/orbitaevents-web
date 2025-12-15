@@ -291,7 +291,7 @@ function MegaDropdown({ isOpen, onClose, type, t }: MegaDropdownProps) {
             transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="absolute top-full left-1/2 -translate-x-1/2 mt-3 z-50"
           >
-            <div className="relative bg-zinc-950/98 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden min-w-[420px]">
+            <div className="relative bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden min-w-[420px]">
               {/* Glow superior */}
               <div className="absolute -top-px left-1/2 -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-amber-500/60 to-transparent" />
               
@@ -689,8 +689,8 @@ export default function HeaderChampion() {
           }
         `}
       >
-        {/* Urgency Bar */}
-        <UrgencyBar isVisible={!isScrolled} />
+        {/* Urgency Bar - DESACTIVADA para simplificar */}
+        {/* <UrgencyBar isVisible={!isScrolled} /> */}
 
         {/* Main Header */}
         <div className="container mx-auto px-4 lg:px-6">
@@ -704,7 +704,7 @@ export default function HeaderChampion() {
                   alt="Òrbita Events"
                   width={170}
                   height={48}
-                  className={`transition-all duration-500 ${isScrolled ? 'h-9 lg:h-10' : 'h-10 lg:h-12'} w-auto`}
+                  className={`transition-all duration-500 ${isScrolled ? 'h-10 lg:h-12' : 'h-12 lg:h-14'} w-auto`}
                   priority
                 />
               </motion.div>
@@ -807,13 +807,13 @@ export default function HeaderChampion() {
               {/* CTA Principal */}
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Link
-                  href="/configurador"
-                  className="group relative px-5 py-2.5 rounded-xl overflow-hidden"
+                  href="/contacto"
+                  className="group relative px-6 py-3 rounded-xl overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 bg-[length:200%_100%] animate-gradient" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 blur-lg opacity-60 group-hover:opacity-80 transition-opacity" />
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative flex items-center gap-2 text-black font-bold text-sm">
+                  <span className="relative flex items-center gap-2 text-black font-extrabold text-base">
                     <Icons.Sparkles />
                     <span>Presupuesto Gratis</span>
                   </span>
