@@ -43,7 +43,10 @@
       "Bash(ls:*)",
       "Bash(git show:*)",
       "Bash(timeout /t 60 /nobreak)",
-      "Bash(timeout 15 pnpm run dev:*)"
+      "Bash(timeout 15 pnpm run dev:*)",
+      "Bash(git mv:*)",
+      "Bash(git fetch:*)",
+      "Bash(pnpm add:*)"
     ]
   }
 }

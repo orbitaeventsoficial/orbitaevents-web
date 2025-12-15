@@ -4,7 +4,7 @@
 import { EXTRAS, OFFERS, getPacksByService, type ServiceSlug } from '@/config/packs-config';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Check,
   ChevronRight,
@@ -19,8 +19,10 @@ import {
   TrendingDown,
   ArrowLeft,
   CheckCircle,
+  Download,
 } from 'lucide-react';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
+import { generateQuotePDF } from '@/lib/pdf-utils';
 
 type EventType = 'bodas' | 'discomovil' | 'fiestas' | 'alquiler' | 'empresas';
 
@@ -35,6 +37,7 @@ interface ConfigState {
 
 export default function ConfiguradorClient() {
   const t = useTranslations('configurator');
+  const locale = useLocale() as 'ca' | 'es' | 'en';
   const { track } = useAnalytics();
   const [step, setStep] = useState(1);
   const [config, setConfig] = useState<ConfigState>({
@@ -669,9 +672,39 @@ export default function ConfiguradorClient() {
             <p className="text-green-400 font-bold text-lg mb-6">
               {t('step4.youSaved', { amount: earlyBirdDiscount })}
             </p>
-            <p className="text-white/60 text-sm">
+            <p className="text-white/60 text-sm mb-6">
               {t('step4.checkEmail')}
             </p>
+
+            {/* Download PDF Button */}
+            <button
+              onClick={() => {
+                const extrasNames = config.extras
+                  .map((id) => EXTRAS.find((e) => e.id === id)?.name)
+                  .filter(Boolean) as string[];
+
+                const doc = generateQuotePDF({
+                  eventType: config.eventType || 'evento',
+                  pack: config.selectedPack,
+                  date: config.date,
+                  guests: config.guests,
+                  extras: extrasNames,
+                  basePrice: pricing.basePrice,
+                  extrasPrice: pricing.extrasPrice,
+                  discount: earlyBirdDiscount,
+                  discountReason: pricing.discountReason || t('step4.bookToday'),
+                  total: finalPrice,
+                  clientName: formData.name,
+                }, locale);
+
+                doc.save(`orbita-pressupost-${Date.now()}.pdf`);
+                track('Configurador_DownloadPDF', { total: finalPrice });
+              }}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-oe-gold text-black font-bold hover:bg-oe-gold-bright transition-colors"
+            >
+              <Download className="w-5 h-5" />
+              {t('step4.downloadPDF')}
+            </button>
           </motion.div>
         ) : (
           <form onSubmit={handleDirectSubmit} className="space-y-6">

@@ -187,7 +187,7 @@
       "rating": "en Google",
       "repeat": "repiten con nosotros",
       "years": "años de experiencia",
-      "yearsValue": "15+",
+      "yearsValue": "2+",
       "events": "eventos con Òrbita",
       "eventsValue": "48+",
       "response": "respuesta garantizada",
@@ -1202,7 +1202,8 @@
       "responseTime": "Respuesta en menos de 2 horas",
       "errorName": "Introduce tu nombre completo",
       "errorContact": "Introduce tu email o número de teléfono",
-      "errorSend": "Error al enviar. Por favor, inténtalo de nuevo o llámanos directamente."
+      "errorSend": "Error al enviar. Por favor, inténtalo de nuevo o llámanos directamente.",
+      "downloadPDF": "Descargar Presupuesto PDF"
     }
   },
   "faq": {
@@ -4407,6 +4408,29 @@
       "postEventComplete": "Post-Event Completo",
       "welcome": "Bienvenida",
       "promotion": "Promoción"
+    }
+  },
+  "resources": {
+    "breadcrumb": "Recursos",
+    "title": "Recursos y Descargas",
+    "subtitle": "Descarga catálogos, imágenes del portfolio y genera presupuestos personalizados para tu evento.",
+    "downloaded": "¡Descargado!",
+    "brochures": {
+      "title": "Catálogos de Servicios",
+      "subtitle": "PDFs con información detallada de cada servicio",
+      "description": "Catálogo completo con packs, precios y características",
+      "download": "Descargar PDF"
+    },
+    "portfolio": {
+      "title": "Galería de Imágenes",
+      "subtitle": "Descarga fotos de nuestros eventos",
+      "images": "imágenes",
+      "downloadAll": "Descargar todas"
+    },
+    "quote": {
+      "title": "Presupuesto Personalizado",
+      "description": "Utiliza nuestro configurador para crear un presupuesto a medida y descárgalo en PDF.",
+      "cta": "Ir al Configurador"
     }
   }
 }
