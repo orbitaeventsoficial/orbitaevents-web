@@ -408,19 +408,88 @@
     "from": "Desde",
     "popular": "El más pedido",
     "bodas": {
-      "title": "La boda de tus sueños",
-      "subtitle": "Que hablen de ella durante años",
-      "description": "El primer baile que hace llorar. La fiesta que no acaba. Los invitados que aún hoy dicen: 'Qué bodorrio'."
+      "faq": [
+        {
+          "q": "¿Podemos personalizar completamente la música y el ambiente?",
+          "a": "Totalmente. Vuestra boda exactamente como la imagináis: nos pasáis vuestra playlist, temas imprescindibles y ambiente que queréis. El DJ adapta la música en tiempo real para que la pista funcione durante toda la celebración."
+        },
+        {
+          "q": "¿Incluye música para ceremonia, cóctel y banquete?",
+          "a": "Depende del pack. Los packs Premium y VIP incluyen experiencia completa desde la ceremonia hasta el final del baile. El pack Esencial se centra en el banquete y la fiesta."
+        },
+        {
+          "q": "¿Cómo personalizáis la iluminación y los efectos?",
+          "a": "Adaptamos colores, intensidad y efectos según vuestra decoración y el estilo de la boda. Humo y burbujas según espacio. Confeti, chispas frías y CO2 como extras para momentos clave."
+        },
+        {
+          "q": "¿Qué pasa si hay problemas técnicos durante la boda?",
+          "a": "Llevamos equipo de backup completo (controladora, cables y altavoces de reserva). Si algo falla, se cambia sin parar la música. Vuestros invitados ni se enterarán."
+        },
+        {
+          "q": "¿Trabajáis en fincas y exteriores?",
+          "a": "Sí, trabajamos en cualquier espacio. Revisamos potencia eléctrica, accesos y adaptamos el montaje. Si hay limitador de ruido, configuramos el equipo para cumplirlo sin perder calidad."
+        },
+        {
+          "q": "¿Cuánto tiempo antes hay que reservar?",
+          "a": "Para bodas, recomendamos reservar con 4-6 meses de antelación. Las fechas de primavera y verano se llenan rápido. Consultad disponibilidad para vuestra fecha específica."
+        }
+      ]
     },
     "fiestas": {
-      "title": "Fiestas",
-      "subtitle": "La fiesta que no olvidarán",
-      "description": "Cumpleaños, aniversarios, comuniones. Discomóvil completa donde quieras."
+      "faq": [
+        {
+          "q": "¿Qué incluye una experiencia completa de fiesta privada?",
+          "a": "Nuestras fiestas incluyen mucho más que música: DJ profesional que lee el ambiente, sonido 4.000W, iluminación LED adaptada, y animación con juegos personalizados según edades y grupo."
+        },
+        {
+          "q": "¿Hacéis fiestas temáticas personalizadas (Halloween, años 80, mundo mágico)?",
+          "a": "Totalmente. Creamos experiencias temáticas completas: adaptamos música, iluminación, decoración y animación al concepto que elijas (Halloween, años 80, mundo mágico, tropical, etc.). No es solo \"poner música temática\", es crear una experiencia inmersiva para tus invitados."
+        },
+        {
+          "q": "¿Incluye animación y juegos para todos los invitados?",
+          "a": "Durante las horas contratadas, SÍ incluimos animación y juegos adaptados a las edades de tus invitados (juegos musicales, concursos interactivos, etc.). Algunos juegos requieren material adicional que se valora aparte con un extra pequeño."
+        },
+        {
+          "q": "¿Puedo personalizar completamente la música y el ambiente?",
+          "a": "Absolutamente. Antes del evento revisamos tus gustos musicales, artistas favoritos, canciones imprescindibles y ambiente deseado. El DJ adapta la música en tiempo real según cómo responde tu grupo, no es una playlist fija."
+        },
+        {
+          "q": "¿Trabajáis fuera de Barcelona?",
+          "a": "Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Nos adaptamos a cualquier espacio: locales privados, jardines, fincas, pabellones. Revisamos el espacio y ajustamos equipamiento y montaje según necesidades."
+        },
+        {
+          "q": "¿Cuánto tiempo antes hay que reservar?",
+          "a": "Para fiestas normales, mínimo 3 semanas. Para viernes y sábados, mejor 6-8 semanas porque son las primeras fechas que se llenan. Para fiestas temáticas con decoración, recomendamos 2 meses."
+        }
+      ]
     },
     "empresas": {
-      "title": "Empresas",
-      "subtitle": "Eventos corporativos de impacto",
-      "description": "Team building, cenas de empresa, inauguraciones. Profesionalidad garantizada."
+      "faq": [
+        {
+          "q": "¿Cómo refuerza vuestra producción la imagen de nuestra marca?",
+          "a": "Profesionalismo en cada detalle: montaje discreto, coordinación impecable, branding integrado y ambiente elegante. Tu equipo recordará el evento, tu cliente quedará impresionado."
+        },
+        {
+          "q": "¿Qué incluye un evento corporativo con toque humano?",
+          "a": "No solo producción técnica: creamos networking elegante, ambiente profesional y momentos de conexión real entre asistentes. Música ambiente, iluminación corporativa y dinámicas que generan conversación."
+        },
+        {
+          "q": "¿Podéis integrar nuestra identidad corporativa en el evento?",
+          "a": "Totalmente. Integramos tu logo, colores corporativos y mensajes clave en pantallas, iluminación y dinámicas. El evento refleja tu marca sin resultar forzado."
+        },
+        {
+          "q": "¿Trabajáis en oficinas, hoteles y espacios corporativos?",
+          "a": "Sí, nos adaptamos a cualquier espacio empresarial. Incluye visita previa para revisar accesos, potencia eléctrica y coordinación con el venue. Montaje discreto y profesional."
+        },
+        {
+          "q": "¿Cómo garantizáis que no haya problemas técnicos?",
+          "a": "Equipamiento profesional certificado + backup completo + técnicos experimentados. Si algo falla (que no suele pasar), se soluciona sin que los asistentes se enteren. El evento NO se para."
+        },
+        {
+          "q": "¿Coordináis con catering, venue y otros proveedores?",
+          "a": "Totalmente. Nos encargamos de la coordinación técnica completa: tiempos, montaje, desmontaje y sincronización con otros proveedores. Tú te centras en tus invitados."
+        }
+      ]
     },
     "weddings": {
       "name": "DJ Bodas",
@@ -451,6 +520,34 @@
       "name": "Alquiler de equipos",
       "icon": "🔊",
       "tagline": "Equipos profesionales a tu alcance"
+    },
+    "discomovil": {
+      "faq": [
+        {
+          "q": "¿Qué incluye una experiencia completa de discomóvil?",
+          "a": "Mucho más que poner música: DJ profesional que adapta la música en tiempo real según tu grupo, sonido EV profesional, iluminación LED de ambiente y efectos especiales. Todo coordinado para crear la mejor experiencia para tus invitados."
+        },
+        {
+          "q": "¿Cómo personalizáis la música y el ambiente?",
+          "a": "Antes del evento revisamos tus gustos musicales, artistas favoritos y ambiente deseado. El DJ adapta la música en tiempo real según cómo responde tu grupo: si un tema no funciona, cambia; si la energía sube, aprieta. No es una playlist estática."
+        },
+        {
+          "q": "¿Qué incluye la iluminación y los efectos especiales?",
+          "a": "Todos los packs incluyen iluminación LED de ambiente adaptada al espacio. Los packs superiores añaden más puntos de luz, máquina de humo y efectos especiales (confeti, CO2, humo bajo) para momentos clave. Todo se adapta a tu evento."
+        },
+        {
+          "q": "¿Trabajáis fuera de Barcelona?",
+          "a": "Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Nos adaptamos a cualquier espacio: locales, jardines, fincas, pabellones. Transporte GRATIS hasta 25km desde Granollers; otras zonas pueden tener pequeño suplemento detallado en presupuesto."
+        },
+        {
+          "q": "¿Qué pasa si hay problemas técnicos durante la fiesta?",
+          "a": "Llevamos equipo de backup completo (cables, controladora y altavoces de reserva). Si algo falla (que no suele pasar), se cambia rápido y la música no se para. El objetivo es que tú ni te enteres del problema."
+        },
+        {
+          "q": "¿Cuánto tiempo antes hay que reservar?",
+          "a": "Mínimo 2 semanas, pero para viernes y sábados lo normal es reservar con 6-8 semanas de antelación. Son los días que se llenan primero. Consulta disponibilidad para tu fecha específica."
+        }
+      ]
     }
   },
   "stats": {
@@ -1159,7 +1256,31 @@
       "dateFuture": "La fecha debe ser futura",
       "privacyRequired": "Debes aceptar la política de privacidad",
       "captchaRequired": "Resuelve la verificación"
-    }
+    },
+    "privacy": {
+      "text": "He leído y acepto la",
+      "link": "Política de Privacidad",
+      "and": "y los",
+      "termsLink": "Términos y Condiciones"
+    },
+    "marketing": {
+      "text": "Acepto recibir comunicaciones comerciales y novedades de Òrbita Events"
+    },
+    "gdpr": {
+      "title": "Información básica sobre protección de datos",
+      "responsible": "Responsable",
+      "responsibleValue": "Òrbita Events",
+      "purpose": "Finalidad",
+      "purposeValue": "Gestionar tu solicitud y enviarte presupuesto",
+      "legitimacy": "Legitimación",
+      "legitimacyValue": "Consentimiento del interesado",
+      "recipients": "Destinatarios",
+      "recipientsValue": "No se cederán datos a terceros",
+      "rights": "Derechos",
+      "rightsValue": "Acceder, rectificar y suprimir los datos",
+      "contact": "Contacto"
+    },
+    "responseNote": "Te respondemos en menos de 2 horas. Llámanos si lo prefieres:"
   },
   "configurator": {
     "step1": {

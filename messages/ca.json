@@ -386,19 +386,88 @@
     "from": "Des de",
     "popular": "El més demanat",
     "bodas": {
-      "title": "El casament dels teus somnis",
-      "subtitle": "Que en parlin durant anys",
-      "description": "El primer ball que fa plorar. La festa que no s'acaba. Els convidats que encara avui diuen: 'Quin casament més bèstia'."
+      "faq": [
+        {
+          "q": "Podem personalitzar completament la música i l'ambient?",
+          "a": "Totalment. El vostre casament exactament com l'imagineu: ens passeu la vostra playlist, temes imprescindibles i ambient que voleu. El DJ adapta la música en temps real perquè la pista funcioni durant tota la celebració."
+        },
+        {
+          "q": "Inclou música per a cerimònia, còctel i banquet?",
+          "a": "Depèn del pack. Els packs Premium i VIP inclouen experiència completa des de la cerimònia fins al final del ball. El pack Essencial se centra en el banquet i la festa."
+        },
+        {
+          "q": "Com personalitzeu la il·luminació i els efectes?",
+          "a": "Adaptem colors, intensitat i efectes segons la vostra decoració i l'estil del casament. Fum i bombolles segons espai. Confeti, espurnes fredes i CO2 com a extres per a moments clau."
+        },
+        {
+          "q": "Què passa si hi ha problemes tècnics durant el casament?",
+          "a": "Portem equip de backup complet (controladora, cables i altaveus de reserva). Si alguna cosa falla, es canvia sense parar la música. Els vostres convidats ni s'assabentaran."
+        },
+        {
+          "q": "Treballeu en finques i exteriors?",
+          "a": "Sí, treballem a qualsevol espai. Revisem potència elèctrica, accessos i adaptem el muntatge. Si hi ha limitador de soroll, configurem l'equip per complir-lo sense perdre qualitat."
+        },
+        {
+          "q": "Quant temps abans cal reservar?",
+          "a": "Per a casaments, recomanem reservar amb 4-6 mesos d'antelació. Les dates de primavera i estiu s'omplen ràpid. Consulteu disponibilitat per a la vostra data específica."
+        }
+      ]
     },
     "fiestas": {
-      "title": "Festes",
-      "subtitle": "De les que es recorden sempre",
-      "description": "Aquella festa que 10 anys després encara diuen: 'T'enrecordes de la festa de...?' La que TU mereixes."
+      "faq": [
+        {
+          "q": "Què inclou una experiència completa de festa privada?",
+          "a": "Les nostres festes inclouen molt més que música: DJ professional que llegeix l'ambient, so 4.000W, il·luminació LED adaptada, i animació amb jocs personalitzats segons edats i grup."
+        },
+        {
+          "q": "Feu festes temàtiques personalitzades (Halloween, anys 80, món màgic)?",
+          "a": "Totalment. Creem experiències temàtiques completes: adaptem música, il·luminació, decoració i animació al concepte que triïs (Halloween, anys 80, món màgic, tropical, etc.). No és només \"posar música temàtica\", és crear una experiència immersiva per als teus convidats."
+        },
+        {
+          "q": "Inclou animació i jocs per a tots els convidats?",
+          "a": "Durant les hores contractades, SÍ incloem animació i jocs adaptats a les edats dels teus convidats (jocs musicals, concursos interactius, etc.). Alguns jocs requereixen material addicional que es valora a part amb un extra petit."
+        },
+        {
+          "q": "Puc personalitzar completament la música i l'ambient?",
+          "a": "Absolutament. Abans de l'event revisem els teus gustos musicals, artistes favorits, cançons imprescindibles i ambient desitjat. El DJ adapta la música en temps real segons com respon el teu grup, no és una playlist fixa."
+        },
+        {
+          "q": "Treballeu fora de Barcelona?",
+          "a": "Sí, cobrim Barcelona província i Girona província (incloent Costa Brava). Ens adaptem a qualsevol espai: locals privats, jardins, finques, pavellons. Revisem l'espai i ajustem equipament i muntatge segons necessitats."
+        },
+        {
+          "q": "Quant temps abans cal reservar?",
+          "a": "Per a festes normals, mínim 3 setmanes. Per a divendres i dissabtes, millor 6-8 setmanes perquè són les primeres dates que s'omplen. Per a festes temàtiques amb decoració, recomanem 2 mesos."
+        }
+      ]
     },
     "empresas": {
-      "title": "Empreses",
-      "subtitle": "No el típic sopar avorrit",
-      "description": "Team building, sopars d'empresa, inauguracions. Professionalitat garantida."
+      "faq": [
+        {
+          "q": "Com reforça la vostra producció la imatge de la nostra marca?",
+          "a": "Professionalisme en cada detall: muntatge discret, coordinació impecable, branding integrat i ambient elegant. El teu equip recordarà l'event, el teu client quedarà impressionat."
+        },
+        {
+          "q": "Què inclou un event corporatiu amb toc humà?",
+          "a": "No només producció tècnica: creem networking elegant, ambient professional i moments de connexió real entre assistents. Música ambient, il·luminació corporativa i dinàmiques que generen conversa."
+        },
+        {
+          "q": "Podeu integrar la nostra identitat corporativa a l'event?",
+          "a": "Totalment. Integrem el teu logo, colors corporatius i missatges clau en pantalles, il·luminació i dinàmiques. L'event reflecteix la teva marca sense resultar forçat."
+        },
+        {
+          "q": "Treballeu en oficines, hotels i espais corporatius?",
+          "a": "Sí, ens adaptem a qualsevol espai empresarial. Inclou visita prèvia per revisar accessos, potència elèctrica i coordinació amb el venue. Muntatge discret i professional."
+        },
+        {
+          "q": "Com garantiu que no hi hagi problemes tècnics?",
+          "a": "Equipament professional certificat + backup complet + tècnics experimentats. Si alguna cosa falla (que no sol passar), es soluciona sense que els assistents s'enteressin. L'event NO es para."
+        },
+        {
+          "q": "Coordineu amb càtering, venue i altres proveïdors?",
+          "a": "Totalment. Ens encarreguem de la coordinació tècnica completa: temps, muntatge, desmuntatge i sincronització amb altres proveïdors. Tu et centres en els teus convidats."
+        }
+      ]
     },
     "weddings": {
       "name": "DJ Casaments",
@@ -429,6 +498,34 @@
       "name": "Lloguer d'equips",
       "icon": "🔊",
       "tagline": "Equips professionals al teu abast"
+    },
+    "discomovil": {
+      "faq": [
+        {
+          "q": "Què inclou una experiència completa de discomòbil?",
+          "a": "Molt més que posar música: DJ professional que adapta la música en temps real segons el teu grup, so EV professional, il·luminació LED d'ambient i efectes especials. Tot coordinat per crear la millor experiència per als teus convidats."
+        },
+        {
+          "q": "Com personalitzeu la música i l'ambient?",
+          "a": "Abans de l'event revisem els teus gustos musicals, artistes favorits i ambient desitjat. El DJ adapta la música en temps real segons com respon el teu grup: si un tema no funciona, canvia; si l'energia puja, apreta. No és una playlist estàtica."
+        },
+        {
+          "q": "Què inclou la il·luminació i els efectes especials?",
+          "a": "Tots els packs inclouen il·luminació LED d'ambient adaptada a l'espai. Els packs superiors afegeixen més punts de llum, màquina de fum i efectes especials (confeti, CO2, fum baix) per a moments clau. Tot s'adapta al teu event."
+        },
+        {
+          "q": "Treballeu fora de Barcelona?",
+          "a": "Sí, cobrim Barcelona província i Girona província (incloent Costa Brava). Ens adaptem a qualsevol espai: locals, jardins, finques, pavellons. Transport GRATIS fins a 25km des de Granollers; altres zones poden tenir petit suplement detallat en pressupost."
+        },
+        {
+          "q": "Què passa si hi ha problemes tècnics durant la festa?",
+          "a": "Portem equip de backup complet (cables, controladora i altaveus de reserva). Si alguna cosa falla (que no sol passar), es canvia ràpid i la música no es para. L'objectiu és que tu ni t'enteris del problema."
+        },
+        {
+          "q": "Quant temps abans cal reservar?",
+          "a": "Mínim 2 setmanes, però per a divendres i dissabtes el normal és reservar amb 6-8 setmanes d'antelació. Són els dies que s'omplen primer. Consulta disponibilitat per a la teva data específica."
+        }
+      ]
     }
   },
   "stats": {
@@ -837,7 +934,31 @@
       "dateFuture": "La data ha de ser futura",
       "privacyRequired": "Has d'acceptar la política de privacitat",
       "captchaRequired": "Resol la verificació"
-    }
+    },
+    "privacy": {
+      "text": "He llegit i accepto la",
+      "link": "Política de Privacitat",
+      "and": "i els",
+      "termsLink": "Termes i Condicions"
+    },
+    "marketing": {
+      "text": "Accepto rebre comunicacions comercials i novetats d'Òrbita Events"
+    },
+    "gdpr": {
+      "title": "Informació bàsica sobre protecció de dades",
+      "responsible": "Responsable",
+      "responsibleValue": "Òrbita Events",
+      "purpose": "Finalitat",
+      "purposeValue": "Gestionar la teva sol·licitud i enviar-te pressupost",
+      "legitimacy": "Legitimació",
+      "legitimacyValue": "Consentiment de l'interessat",
+      "recipients": "Destinataris",
+      "recipientsValue": "No se cediran dades a tercers",
+      "rights": "Drets",
+      "rightsValue": "Accedir, rectificar i suprimir les dades",
+      "contact": "Contacte"
+    },
+    "responseNote": "Et responem en menys de 2 hores. Truca'ns si ho prefereixes:"
   },
   "configurator": {
     "step1": {
