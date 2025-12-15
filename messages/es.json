@@ -548,6 +548,130 @@
           "a": "Mínimo 2 semanas, pero para viernes y sábados lo normal es reservar con 6-8 semanas de antelación. Son los días que se llenan primero. Consulta disponibilidad para tu fecha específica."
         }
       ]
+    },
+    "animacion-infantil": {
+      "faq": [
+        {
+          "q": "¿Qué incluye el servicio de animación infantil?",
+          "a": "Nuestro servicio incluye animadores profesionales, juegos y actividades adaptadas a la edad de los niños, material para todas las actividades, y coordinación completa del entretenimiento durante las horas contratadas. Podemos añadir pintacaras, magia, globoflexia o talleres según tus preferencias."
+        },
+        {
+          "q": "¿Para qué edades es adecuado?",
+          "a": "Ofrecemos animación para niños de 3 a 12 años. Adaptamos todas las actividades, juegos y música según el rango de edad de los participantes para asegurar que todos disfruten al máximo."
+        },
+        {
+          "q": "¿Cuánto tiempo dura la animación?",
+          "a": "El tiempo mínimo es de 2 horas. Recomendamos entre 2-4 horas para fiestas de cumpleaños. Para comuniones o eventos más largos, podemos ofrecer servicios de media jornada o jornada completa."
+        },
+        {
+          "q": "¿Qué necesito tener preparado?",
+          "a": "Solo necesitas un espacio adecuado para los niños (interior o exterior). Nosotros llevamos todo el material necesario: pinturas, globos, material de magia, juegos, altavoces para la música, etc."
+        },
+        {
+          "q": "¿Hacéis servicio a domicilio?",
+          "a": "¡Sí! Vamos a cualquier ubicación: casa particular, sala de fiestas, restaurante, parque... Cubrimos Barcelona y Girona con desplazamiento incluido hasta 25km de Granollers."
+        },
+        {
+          "q": "¿Con cuánta antelación debo reservar?",
+          "a": "Recomendamos reservar con 2-3 semanas de antelación, especialmente para fines de semana. Para fechas muy solicitadas (temporada de comuniones), mejor con 1-2 meses."
+        }
+      ]
+    },
+    "dj-bodas-girona": {
+      "faq": [
+        {
+          "q": "¿Cuánto cuesta un DJ para bodas en Girona?",
+          "a": "El precio de DJ para bodas en Girona empieza desde 590€. Este pack incluye DJ profesional, sonido 4000W EV, iluminación LED y desplazamiento a cualquier punto de la provincia de Girona."
+        },
+        {
+          "q": "¿Cubrís toda la provincia de Girona?",
+          "a": "Sí, trabajamos en toda la provincia: Girona ciudad, Figueres, Olot, Banyoles, Salt, la Costa Brava completa, el Empordà, la Garrotxa y más. El desplazamiento está incluido en el precio."
+        },
+        {
+          "q": "¿Tenéis experiencia en masías del Empordà?",
+          "a": "Sí, hemos trabajado en numerosas masías del Alt y Baix Empordà. Conocemos las particularidades de estos espacios: accesos, potencia eléctrica, acústica y coordinación con catering."
+        },
+        {
+          "q": "¿Qué idiomas habláis para las bodas?",
+          "a": "Hablamos catalán, castellano e inglés. Muchas bodas en Girona tienen invitados internacionales y nos adaptamos perfectamente a bodas multilingües."
+        },
+        {
+          "q": "¿Hacéis bodas en espacios con historia como Besalú o Peratallada?",
+          "a": "Sí, tenemos experiencia en espacios medievales y con patrimonio histórico. Adaptamos el montaje y el volumen respetando las normativas de cada espacio."
+        }
+      ]
+    },
+    "dj-bodas-costa-brava": {
+      "faq": [
+        {
+          "q": "¿Cuánto cuesta un DJ para bodas en la Costa Brava?",
+          "a": "El precio de DJ para bodas en la Costa Brava empieza desde 590€. Este pack incluye DJ profesional, sonido 4000W resistente a exteriores, iluminación LED y desplazamiento a cualquier punto de la costa."
+        },
+        {
+          "q": "¿Hacéis bodas en la playa o chiringuitos?",
+          "a": "Sí, somos especialistas en bodas de costa. Tenemos equipo preparado para exteriores, con protección contra la humedad y el viento. Hemos trabajado en playas, calas, chiringuitos y terrazas con vistas al mar."
+        },
+        {
+          "q": "¿Qué pasa si hay viento o mal tiempo?",
+          "a": "Tenemos protocolos para condiciones de costa: equipo resistente, cableado asegurado y plan B preparado. Si el evento se traslada a interior, nos adaptamos sin problema adicional."
+        },
+        {
+          "q": "¿Conocéis los espacios para bodas de la Costa Brava?",
+          "a": "Sí, hemos trabajado en los espacios más emblemáticos: desde masías con vistas al mar hasta hoteles boutique en calas escondidas. Conocemos Cap Roig, Aiguablava, Calella de Palafrugell y muchos más."
+        },
+        {
+          "q": "¿El sonido se escucha bien en exteriores junto al mar?",
+          "a": "Sí, nuestro equipo de 4000W está dimensionado para espacios abiertos. Hacemos prueba de sonido previa para ajustar la orientación y potencia según el espacio y la dirección del viento."
+        }
+      ]
+    },
+    "dj-bodas-maresme": {
+      "faq": [
+        {
+          "q": "¿Cuánto cuesta un DJ para bodas en el Maresme?",
+          "a": "El precio de DJ para bodas en el Maresme empieza desde 590€. Este precio incluye DJ profesional, sonido 4000W, iluminación LED y desplazamiento a cualquier población del Maresme como Mataró, Calella o Arenys de Mar."
+        },
+        {
+          "q": "¿Os desplazáis a todas las poblaciones del Maresme?",
+          "a": "Sí, cubrimos toda la comarca del Maresme: Mataró, Calella, Arenys de Mar, Vilassar de Mar, Premià de Mar, El Masnou, Canet de Mar, Sant Pol de Mar, Pineda de Mar, Tordera, Argentona y más. El desplazamiento está incluido en el precio."
+        },
+        {
+          "q": "¿Conocéis las fincas y espacios para bodas del Maresme?",
+          "a": "Sí, hemos trabajado en múltiples espacios del Maresme: masías con encanto, restaurantes con vistas al mar, hoteles de costa y espacios privados. Conocemos las particularidades de cada tipo de espacio y adaptamos el equipo según necesidades."
+        },
+        {
+          "q": "¿Qué pasa si mi boda es en una finca sin mucha potencia eléctrica?",
+          "a": "Muchas fincas del Maresme tienen limitaciones eléctricas. Nuestro equipo está preparado para funcionar con generador o adaptarnos a la potencia disponible sin perder calidad de sonido."
+        },
+        {
+          "q": "¿Hacéis bodas en la playa en el Maresme?",
+          "a": "Sí, realizamos bodas en playas y chiringuitos de la costa del Maresme. Tenemos equipo resistente y experiencia en exteriores con protocolos específicos para espacios abiertos."
+        }
+      ]
+    },
+    "dj-bodas-valles": {
+      "faq": [
+        {
+          "q": "¿Cuánto cuesta un DJ para bodas en el Vallès?",
+          "a": "El precio de DJ para bodas en el Vallès empieza desde 590€. Como tenemos base en Granollers, el desplazamiento está completamente incluido para cualquier población del Vallès Oriental y Occidental."
+        },
+        {
+          "q": "¿Por qué elegir un DJ local del Vallès?",
+          "a": "Al tener base en Granollers, conocemos perfectamente la zona: las fincas, masías, restaurantes y espacios para bodas del Vallès. Además, el desplazamiento está incluido y podemos hacer visitas previas sin problema."
+        },
+        {
+          "q": "¿Cubrís tanto el Vallès Oriental como el Occidental?",
+          "a": "Sí, cubrimos ambas comarcas: desde Granollers, Mollet y Cardedeu en el Oriental hasta Sabadell, Terrassa y Sant Cugat en el Occidental. Todo el Vallès sin coste adicional de desplazamiento."
+        },
+        {
+          "q": "¿Conocéis las masías y espacios del Vallès?",
+          "a": "Sí, hemos trabajado en las masías más emblemáticas del Vallès: Can Bonastre, Cal Blay, Can Ribas, y muchas más. Conocemos los accesos, la potencia eléctrica y las particularidades de cada espacio."
+        },
+        {
+          "q": "¿Podéis hacer la visita previa al espacio?",
+          "a": "Sí, al ser locales hacemos visitas previas sin problema. Es importante conocer el espacio, revisar accesos, potencia eléctrica y planificar el montaje con el coordinador del venue."
+        }
+      ]
     }
   },
   "stats": {

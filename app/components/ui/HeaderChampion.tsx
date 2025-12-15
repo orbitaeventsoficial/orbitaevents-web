@@ -1,22 +1,11 @@
 // app/components/ui/HeaderChampion.tsx
 // ═══════════════════════════════════════════════════════════════════════════
-// ÒRBITA EVENTS - HEADER CHAMPION v2.0
-// ═══════════════════════════════════════════════════════════════════════════
-// 
-// El header que VENDE. Características:
-// - Barra de urgencia con disponibilidad real
-// - Mega menús con preview de servicios
-// - CTA animado con gradiente en movimiento
-// - WhatsApp con indicador online pulsante
-// - Hide on scroll down, show on scroll up
-// - Mobile menu inmersivo fullscreen
-// - Integración con sistema de disponibilidad
-//
+// ÒRBITA EVENTS - HEADER CHAMPION v2.1 (Simplificado)
 // ═══════════════════════════════════════════════════════════════════════════
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from '@/lib/navigation';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
@@ -25,7 +14,7 @@ import { useTranslations } from 'next-intl';
 import LanguageSelector from './LanguageSelector';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ICONOS SVG INLINE (Zero dependencies)
+// ICONOS SVG INLINE
 // ═══════════════════════════════════════════════════════════════════════════
 
 const Icons = {
@@ -68,25 +57,6 @@ const Icons = {
       <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z"/>
     </svg>
   ),
-  Calendar: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-      <line x1="16" y1="2" x2="16" y2="6"/>
-      <line x1="8" y1="2" x2="8" y2="6"/>
-      <line x1="3" y1="10" x2="21" y2="10"/>
-    </svg>
-  ),
-  Fire: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 23c-4.97 0-9-4.03-9-9 0-3.87 2.47-7.17 5.91-8.41L12 2l3.09 3.59C18.53 6.83 21 10.13 21 14c0 4.97-4.03 9-9 9z"/>
-    </svg>
-  ),
-  Location: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-      <circle cx="12" cy="10" r="3"/>
-    </svg>
-  ),
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -94,31 +64,31 @@ const Icons = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const SERVICES = [
-  { 
-    href: '/servicios/bodas', 
-    icon: '💍', 
+  {
+    href: '/servicios/bodas',
+    icon: '💍',
     titleKey: 'services.bodas',
     descKey: 'services.bodasDesc',
     color: 'from-rose-500 to-pink-600',
     badge: 'MÁS PEDIDO'
   },
-  { 
-    href: '/servicios/fiestas', 
-    icon: '🎉', 
+  {
+    href: '/servicios/fiestas',
+    icon: '🎉',
     titleKey: 'services.fiestas',
     descKey: 'services.fiestasDesc',
     color: 'from-amber-500 to-orange-600',
   },
-  { 
-    href: '/servicios/empresas', 
-    icon: '💼', 
+  {
+    href: '/servicios/empresas',
+    icon: '💼',
     titleKey: 'services.empresas',
     descKey: 'services.empresasDesc',
     color: 'from-blue-500 to-indigo-600',
   },
-  { 
-    href: '/servicios/discomovil', 
-    icon: '🎵', 
+  {
+    href: '/servicios/discomovil',
+    icon: '🎵',
     titleKey: 'services.discomovil',
     descKey: 'services.discomovilDesc',
     color: 'from-purple-500 to-violet-600',
@@ -126,24 +96,24 @@ const SERVICES = [
 ];
 
 const EXPERIENCES = [
-  { 
-    href: '/tematica-mon-magic', 
-    icon: '🪄', 
+  {
+    href: '/tematica-mon-magic',
+    icon: '🪄',
     titleKey: 'experiences.monMagic',
     descKey: 'experiences.monMagicDesc',
     badge: '★ EXCLUSIVO',
     color: 'from-amber-400 to-yellow-500'
   },
-  { 
-    href: '/tematica-halloween', 
-    icon: '🎃', 
+  {
+    href: '/tematica-halloween',
+    icon: '🎃',
     titleKey: 'experiences.halloween',
     descKey: 'experiences.halloweenDesc',
     color: 'from-orange-500 to-red-600'
   },
-  { 
-    href: '/sensorial', 
-    icon: '✨', 
+  {
+    href: '/sensorial',
+    icon: '✨',
     titleKey: 'experiences.sensorial',
     descKey: 'experiences.sensorialDesc',
     badge: 'NUEVO',
@@ -158,106 +128,7 @@ const NAV_LINKS = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HOOK: Disponibilidad de sábados
-// ═══════════════════════════════════════════════════════════════════════════
-
-function useAvailability() {
-  const [availability, setAvailability] = useState<{
-    currentMonth: string;
-    saturdays: number;
-    status: 'scarce' | 'limited' | 'available';
-  }>({ currentMonth: '', saturdays: 0, status: 'available' });
-
-  useEffect(() => {
-    const now = new Date();
-    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    
-    // Simular disponibilidad (reemplazar con API real)
-    const mockAvailability: Record<number, number> = {
-      0: 3, 1: 4, 2: 3, 3: 2, 4: 1, 5: 2, 
-      6: 3, 7: 4, 8: 2, 9: 3, 10: 2, 11: 1
-    };
-    
-    const month = now.getMonth();
-    const sats = mockAvailability[month] || 2;
-    
-    setAvailability({
-      currentMonth: monthNames[month],
-      saturdays: sats,
-      status: sats <= 1 ? 'scarce' : sats <= 2 ? 'limited' : 'available'
-    });
-  }, []);
-
-  return availability;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTE: Urgency Bar (Top bar con disponibilidad)
-// ═══════════════════════════════════════════════════════════════════════════
-
-function UrgencyBar({ isVisible }: { isVisible: boolean }) {
-  const availability = useAvailability();
-  
-  const statusColors = {
-    scarce: 'text-red-400 bg-red-500/20',
-    limited: 'text-amber-400 bg-amber-500/20',
-    available: 'text-emerald-400 bg-emerald-500/20'
-  };
-
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="hidden lg:block bg-zinc-950/80 border-b border-white/5 overflow-hidden"
-        >
-          <div className="container mx-auto px-6">
-            <div className="flex items-center justify-between h-10 text-xs">
-              {/* Izquierda: Online + Teléfono */}
-              <div className="flex items-center gap-6">
-                <span className="flex items-center gap-2 text-white/60">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span className="text-emerald-400 font-medium">Online ahora</span>
-                </span>
-                <span className="text-white/20">|</span>
-                <a href="tel:+34699121023" className="text-white/60 hover:text-white transition-colors flex items-center gap-1.5">
-                  <Icons.Phone />
-                  <span>699 121 023</span>
-                </a>
-              </div>
-
-              {/* Centro: Ubicación */}
-              <div className="flex items-center gap-1.5 text-white/50">
-                <Icons.Location />
-                <span>Barcelona & Girona</span>
-              </div>
-
-              {/* Derecha: URGENCIA - Disponibilidad */}
-              <div className="flex items-center gap-3">
-                <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${statusColors[availability.status]}`}>
-                  <Icons.Fire />
-                  <span className="font-bold">
-                    Solo {availability.saturdays} {availability.saturdays === 1 ? 'sábado' : 'sábados'} en {availability.currentMonth}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTE: Mega Dropdown Premium
+// COMPONENTE: Mega Dropdown (SÓLIDO)
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface MegaDropdownProps {
@@ -269,13 +140,11 @@ interface MegaDropdownProps {
 
 function MegaDropdown({ isOpen, onClose, type, t }: MegaDropdownProps) {
   const items = type === 'services' ? SERVICES : EXPERIENCES;
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -283,7 +152,7 @@ function MegaDropdown({ isOpen, onClose, type, t }: MegaDropdownProps) {
             className="fixed inset-0 z-40"
             onClick={onClose}
           />
-          
+
           <motion.div
             initial={{ opacity: 0, y: 8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -291,42 +160,31 @@ function MegaDropdown({ isOpen, onClose, type, t }: MegaDropdownProps) {
             transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="absolute top-full left-1/2 -translate-x-1/2 mt-3 z-50"
           >
-            <div className="relative bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden min-w-[420px]">
-              {/* Glow superior */}
+            {/* FONDO SÓLIDO */}
+            <div className="relative bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl shadow-black/80 overflow-hidden min-w-[420px]">
               <div className="absolute -top-px left-1/2 -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-amber-500/60 to-transparent" />
-              
-              {/* Header */}
-              <div className="px-5 py-3 border-b border-white/5 bg-gradient-to-r from-white/5 to-transparent">
+
+              <div className="px-5 py-3 border-b border-zinc-700 bg-zinc-800">
                 <h3 className="text-xs font-bold text-white/80 uppercase tracking-wider">
                   {type === 'services' ? '🎯 Nuestros Servicios' : '✨ Experiencias Únicas'}
                 </h3>
               </div>
 
-              {/* Items */}
-              <div className="p-2">
-                {items.map((item, idx) => (
+              <div className="p-2 bg-zinc-900">
+                {items.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={onClose}
-                    onMouseEnter={() => setHoveredIndex(idx)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                    className="group relative flex items-center gap-4 p-3 rounded-xl transition-all duration-200 hover:bg-white/5"
+                    className="group relative flex items-center gap-4 p-3 rounded-xl transition-all duration-200 hover:bg-zinc-800"
                   >
-                    {/* Glow de fondo en hover */}
-                    <motion.div
-                      className={`absolute inset-0 rounded-xl bg-gradient-to-r ${item.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
-                    />
-                    
-                    {/* Icono */}
                     <div className={`relative w-11 h-11 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200`}>
                       <span className="text-xl">{item.icon}</span>
                     </div>
 
-                    {/* Contenido */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-white group-hover:text-white transition-colors">
+                        <span className="text-sm font-semibold text-white">
                           {t(item.titleKey)}
                         </span>
                         {'badge' in item && item.badge && (
@@ -344,7 +202,6 @@ function MegaDropdown({ isOpen, onClose, type, t }: MegaDropdownProps) {
                       </p>
                     </div>
 
-                    {/* Flecha */}
                     <div className="text-white/20 group-hover:text-white/60 group-hover:translate-x-0.5 transition-all duration-200">
                       <Icons.ArrowRight />
                     </div>
@@ -352,12 +209,11 @@ function MegaDropdown({ isOpen, onClose, type, t }: MegaDropdownProps) {
                 ))}
               </div>
 
-              {/* Footer CTA */}
-              <div className="px-4 py-3 border-t border-white/5 bg-gradient-to-r from-amber-500/5 to-orange-500/5">
+              <div className="px-4 py-3 border-t border-zinc-700 bg-zinc-800">
                 <Link
                   href="/configurador"
                   onClick={onClose}
-                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold text-sm rounded-xl transition-all hover:shadow-lg hover:shadow-amber-500/20"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm rounded-xl transition-all"
                 >
                   <Icons.Sparkles />
                   <span>Presupuesto en 2 minutos</span>
@@ -372,7 +228,7 @@ function MegaDropdown({ isOpen, onClose, type, t }: MegaDropdownProps) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTE: Mobile Menu Fullscreen
+// COMPONENTE: Mobile Menu (SIN URGENCIA)
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface MobileMenuProps {
@@ -384,7 +240,6 @@ interface MobileMenuProps {
 
 function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  const availability = useAvailability();
 
   useEffect(() => {
     if (isOpen) {
@@ -400,12 +255,6 @@ function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
     setExpandedSection(expandedSection === section ? null : section);
   };
 
-  const statusColors = {
-    scarce: 'bg-red-500/20 border-red-500/30 text-red-400',
-    limited: 'bg-amber-500/20 border-amber-500/30 text-amber-400',
-    available: 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400'
-  };
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -415,7 +264,6 @@ function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-[100] lg:hidden"
         >
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -424,7 +272,6 @@ function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
             onClick={onClose}
           />
 
-          {/* Panel */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -432,7 +279,6 @@ function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-zinc-950 border-l border-white/10 overflow-y-auto"
           >
-            {/* Header */}
             <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-white/10 bg-zinc-950/95 backdrop-blur-lg">
               <Image
                 src="/img/logoplanetatextdreta.svg"
@@ -449,20 +295,6 @@ function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
               </button>
             </div>
 
-            {/* Banner de urgencia */}
-            <div className={`mx-4 mt-4 p-3 rounded-xl border ${statusColors[availability.status]}`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Icons.Fire />
-                  <span className="text-sm font-bold">
-                    {availability.saturdays} {availability.saturdays === 1 ? 'sábado' : 'sábados'} en {availability.currentMonth}
-                  </span>
-                </div>
-                <span className="text-xs opacity-70">¡Reserva ya!</span>
-              </div>
-            </div>
-
-            {/* Nav */}
             <nav className="p-4 space-y-2">
               {/* Servicios */}
               <div className="rounded-xl border border-white/10 overflow-hidden">
@@ -481,7 +313,7 @@ function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
                     <Icons.ChevronDown />
                   </motion.div>
                 </button>
-                
+
                 <AnimatePresence>
                   {expandedSection === 'services' && (
                     <motion.div
@@ -532,7 +364,7 @@ function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
                     <Icons.ChevronDown />
                   </motion.div>
                 </button>
-                
+
                 <AnimatePresence>
                   {expandedSection === 'experiences' && (
                     <motion.div
@@ -592,9 +424,9 @@ function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
               </a>
 
               <Link
-                href="/configurador"
+                href="/contacto"
                 onClick={onClose}
-                className="flex items-center justify-center gap-3 w-full p-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-xl transition-all"
+                className="flex items-center justify-center gap-3 w-full p-4 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl transition-all"
               >
                 <Icons.Sparkles />
                 <span>Presupuesto Gratis</span>
@@ -609,7 +441,6 @@ function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
               </a>
             </div>
 
-            {/* Language */}
             <div className="p-4 border-t border-white/10">
               <LanguageSelector />
             </div>
@@ -628,29 +459,27 @@ export default function HeaderChampion() {
   const t = useTranslations('header');
   const tCommon = useTranslations('common');
   const pathname = usePathname();
-  
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<'services' | 'experiences' | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  
+
   const lastScrollY = useRef(0);
   const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Scroll handler
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
       setIsScrolled(currentScrollY > 20);
-      
+
       if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
         setIsVisible(false);
         setActiveDropdown(null);
       } else {
         setIsVisible(true);
       }
-      
+
       lastScrollY.current = currentScrollY;
     };
 
@@ -658,13 +487,11 @@ export default function HeaderChampion() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setActiveDropdown(null);
   }, [pathname]);
 
-  // Dropdown handlers
   const handleMouseEnter = useCallback((dropdown: 'services' | 'experiences') => {
     if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
     setActiveDropdown(dropdown);
@@ -683,19 +510,15 @@ export default function HeaderChampion() {
         className={`
           fixed top-0 left-0 right-0 z-50
           transition-all duration-500
-          ${isScrolled 
-            ? 'bg-zinc-950/95 backdrop-blur-2xl shadow-xl shadow-black/20 border-b border-white/5' 
+          ${isScrolled
+            ? 'bg-zinc-950/95 backdrop-blur-2xl shadow-xl shadow-black/20 border-b border-white/5'
             : 'bg-gradient-to-b from-black/90 via-black/50 to-transparent'
           }
         `}
       >
-        {/* Urgency Bar - DESACTIVADA para simplificar */}
-        {/* <UrgencyBar isVisible={!isScrolled} /> */}
-
-        {/* Main Header */}
         <div className="container mx-auto px-4 lg:px-6">
           <div className={`flex items-center justify-between transition-all duration-500 ${isScrolled ? 'h-16' : 'h-18 lg:h-20'}`}>
-            
+
             {/* Logo */}
             <Link href="/" className="flex-shrink-0 group relative">
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -721,8 +544,8 @@ export default function HeaderChampion() {
               >
                 <button className={`
                   flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                  ${activeDropdown === 'services' 
-                    ? 'text-amber-400 bg-amber-500/10' 
+                  ${activeDropdown === 'services'
+                    ? 'text-amber-400 bg-amber-500/10'
                     : 'text-white/70 hover:text-white hover:bg-white/5'
                   }
                 `}>
@@ -747,8 +570,8 @@ export default function HeaderChampion() {
               >
                 <button className={`
                   flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                  ${activeDropdown === 'experiences' 
-                    ? 'text-purple-400 bg-purple-500/10' 
+                  ${activeDropdown === 'experiences'
+                    ? 'text-purple-400 bg-purple-500/10'
                     : 'text-white/70 hover:text-white hover:bg-white/5'
                   }
                 `}>
@@ -795,28 +618,19 @@ export default function HeaderChampion() {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="relative p-2.5 text-white/50 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all"
+                className="relative p-2.5 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all"
               >
-                <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                </span>
                 <Icons.WhatsApp />
               </motion.a>
 
-              {/* CTA Principal */}
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              {/* CTA Principal - VISIBLE Y SIMPLE */}
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
                   href="/contacto"
-                  className="group relative px-6 py-3 rounded-xl overflow-hidden"
+                  className="flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black font-black text-sm rounded-xl shadow-lg shadow-amber-500/30 transition-all uppercase tracking-wide"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 bg-[length:200%_100%] animate-gradient" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 blur-lg opacity-60 group-hover:opacity-80 transition-opacity" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative flex items-center gap-2 text-black font-extrabold text-base">
-                    <Icons.Sparkles />
-                    <span>Presupuesto Gratis</span>
-                  </span>
+                  <Icons.Sparkles />
+                  <span>Presupuesto Gratis</span>
                 </Link>
               </motion.div>
             </div>
@@ -830,10 +644,6 @@ export default function HeaderChampion() {
                 whileTap={{ scale: 0.9 }}
                 className="relative p-2.5 text-emerald-400 bg-emerald-500/10 rounded-xl"
               >
-                <span className="absolute top-1 right-1 flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
                 <Icons.WhatsApp />
               </motion.a>
 
@@ -850,7 +660,7 @@ export default function HeaderChampion() {
       </motion.header>
 
       {/* Spacer */}
-      <div className={`transition-all duration-500 ${isScrolled ? 'h-16' : 'h-[104px] lg:h-[120px]'}`} />
+      <div className={`transition-all duration-500 ${isScrolled ? 'h-16' : 'h-[72px] lg:h-[80px]'}`} />
 
       {/* Mobile Menu */}
       <MobileMenu
@@ -859,18 +669,6 @@ export default function HeaderChampion() {
         t={t}
         tCommon={tCommon}
       />
-
-      {/* Gradient animation */}
-      <style jsx global>{`
-        @keyframes gradient {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animate-gradient {
-          animation: gradient 3s ease infinite;
-        }
-      `}</style>
     </>
   );
 }
