@@ -765,7 +765,9 @@
       "guests": "Nombre de convidats",
       "location": "Ubicació (ciutat/poble)",
       "budget": "Pressupost aproximat",
-      "message": "Explica'ns el teu event"
+      "message": "Explica'ns el teu event",
+      "fullName": "Nom i cognoms",
+      "guestCount": "Nombre de convidats"
     },
     "placeholders": {
       "name": "El teu nom complet",
@@ -776,40 +778,66 @@
       "message": "Detalls del teu event, què t'agradaria, estil...",
       "selectEventType": "Selecciona el tipus d'event",
       "selectGuests": "Selecciona el nombre de convidats",
-      "selectBudget": "Selecciona el pressupost aproximat"
+      "selectBudget": "Selecciona el pressupost aproximat",
+      "fullName": "El teu nom complet"
     },
     "eventTypes": {
-      "wedding": "Casament",
-      "corporate": "Event corporatiu",
-      "birthday": "Aniversari / Festa privada",
-      "communion": "Comunió / Bateig",
-      "other": "Altre"
+      "boda": "Casament",
+      "fiesta": "Festa privada",
+      "cumpleanos": "Aniversari",
+      "corporativo": "Event corporatiu",
+      "comunion": "Comunió / Bateig",
+      "graduacion": "Graduació",
+      "otro": "Altre"
     },
     "guestOptions": {
-      "lessThan50": "Menys de 50",
-      "50to100": "50-100",
-      "100to150": "100-150",
-      "150to200": "150-200",
-      "moreThan200": "Més de 200"
+      "1-50": "Menys de 50",
+      "51-100": "50-100",
+      "101-200": "100-200",
+      "201-300": "200-300",
+      "300+": "Més de 300"
     },
     "budgetOptions": {
-      "lessThan1000": "Menys de 1.000€",
-      "1000to2000": "1.000€ - 2.000€",
-      "2000to3000": "2.000€ - 3.000€",
-      "3000to5000": "3.000€ - 5.000€",
-      "moreThan5000": "Més de 5.000€"
+      "500-1000": "500€ - 1.000€",
+      "1000-2000": "1.000€ - 2.000€",
+      "2000-3000": "2.000€ - 3.000€",
+      "3000-5000": "3.000€ - 5.000€",
+      "5000+": "Més de 5.000€"
     },
     "submit": "Enviar sol·licitud",
     "sending": "Enviant...",
     "success": {
       "title": "Sol·licitud rebuda! 🎉",
-      "message": "Et contactarem en menys de 2 hores."
+      "message": "Et contactarem en menys de 2 hores.",
+      "sendAnother": "Enviar altra sol·licitud"
     },
     "error": {
       "title": "Error",
       "message": "Hi ha hagut un error. Torna-ho a provar."
     },
-    "required": "Camp obligatori"
+    "required": "Camp obligatori",
+    "sections": {
+      "personalData": "👤 Dades personals",
+      "eventData": "🎉 Dades de l'event",
+      "tellUsMore": "💬 Explica'ns més"
+    },
+    "captcha": {
+      "title": "🔒 Verificació de seguretat",
+      "placeholder": "Escriu el resultat"
+    },
+    "validation": {
+      "fullNameRequired": "El nom és obligatori",
+      "fullNameMinLength": "El nom ha de tenir almenys 3 caràcters",
+      "fullNameLastName": "Si us plau, inclou el cognom",
+      "emailRequired": "L'email és obligatori",
+      "emailInvalid": "Email no vàlid",
+      "phoneRequired": "El telèfon és obligatori",
+      "phoneInvalid": "Telèfon no vàlid",
+      "eventTypeRequired": "Selecciona el tipus d'event",
+      "dateFuture": "La data ha de ser futura",
+      "privacyRequired": "Has d'acceptar la política de privacitat",
+      "captchaRequired": "Resol la verificació"
+    }
   },
   "configurator": {
     "step1": {

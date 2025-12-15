@@ -1087,7 +1087,9 @@
       "guests": "Número de invitados",
       "location": "Ubicación (ciudad/pueblo)",
       "budget": "Presupuesto aproximado",
-      "message": "Cuéntanos tu evento"
+      "message": "Cuéntanos tu evento",
+      "fullName": "Nombre y apellidos",
+      "guestCount": "Número de invitados"
     },
     "placeholders": {
       "name": "Tu nombre completo",
@@ -1098,40 +1100,66 @@
       "message": "Detalles de tu evento, qué te gustaría, estilo...",
       "selectEventType": "Selecciona el tipo de evento",
       "selectGuests": "Selecciona el número de invitados",
-      "selectBudget": "Selecciona el presupuesto aproximado"
+      "selectBudget": "Selecciona el presupuesto aproximado",
+      "fullName": "Tu nombre completo"
     },
     "eventTypes": {
-      "wedding": "Boda",
-      "corporate": "Evento corporativo",
-      "birthday": "Cumpleaños / Fiesta privada",
-      "communion": "Comunión / Bautizo",
-      "other": "Otro"
+      "boda": "Boda",
+      "fiesta": "Fiesta privada",
+      "cumpleanos": "Cumpleaños",
+      "corporativo": "Evento corporativo",
+      "comunion": "Comunión / Bautizo",
+      "graduacion": "Graduación",
+      "otro": "Otro"
     },
     "guestOptions": {
-      "lessThan50": "Menos de 50",
-      "50to100": "50-100",
-      "100to150": "100-150",
-      "150to200": "150-200",
-      "moreThan200": "Más de 200"
+      "1-50": "Menos de 50",
+      "51-100": "50-100",
+      "101-200": "100-200",
+      "201-300": "200-300",
+      "300+": "Más de 300"
     },
     "budgetOptions": {
-      "lessThan1000": "Menos de 1.000€",
-      "1000to2000": "1.000€ - 2.000€",
-      "2000to3000": "2.000€ - 3.000€",
-      "3000to5000": "3.000€ - 5.000€",
-      "moreThan5000": "Más de 5.000€"
+      "500-1000": "500€ - 1.000€",
+      "1000-2000": "1.000€ - 2.000€",
+      "2000-3000": "2.000€ - 3.000€",
+      "3000-5000": "3.000€ - 5.000€",
+      "5000+": "Más de 5.000€"
     },
     "submit": "Enviar solicitud",
     "sending": "Enviando...",
     "success": {
       "title": "¡Solicitud recibida! 🎉",
-      "message": "Te contactaremos en menos de 2 horas."
+      "message": "Te contactaremos en menos de 2 horas.",
+      "sendAnother": "Enviar otra solicitud"
     },
     "error": {
       "title": "Error",
       "message": "Ha habido un error. Inténtalo de nuevo."
     },
-    "required": "Campo obligatorio"
+    "required": "Campo obligatorio",
+    "sections": {
+      "personalData": "👤 Datos personales",
+      "eventData": "🎉 Datos del evento",
+      "tellUsMore": "💬 Cuéntanos más"
+    },
+    "captcha": {
+      "title": "🔒 Verificación de seguridad",
+      "placeholder": "Escribe el resultado"
+    },
+    "validation": {
+      "fullNameRequired": "El nombre es obligatorio",
+      "fullNameMinLength": "El nombre debe tener al menos 3 caracteres",
+      "fullNameLastName": "Por favor, incluye el apellido",
+      "emailRequired": "El email es obligatorio",
+      "emailInvalid": "Email no válido",
+      "phoneRequired": "El teléfono es obligatorio",
+      "phoneInvalid": "Teléfono no válido",
+      "eventTypeRequired": "Selecciona el tipo de evento",
+      "dateFuture": "La fecha debe ser futura",
+      "privacyRequired": "Debes aceptar la política de privacidad",
+      "captchaRequired": "Resuelve la verificación"
+    }
   },
   "configurator": {
     "step1": {
