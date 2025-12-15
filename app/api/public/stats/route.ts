@@ -63,9 +63,8 @@ interface StatsResponse {
 
 // CONSTANTS HARDCODED - Sempre correctes
 const COMPANY_START_YEAR = 2023;  // Òrbita Events fundada Agost 2023
-const CURRENT_YEAR = 2025;        // Any actual
-const YEARS_ACTIVE = `+${CURRENT_YEAR - COMPANY_START_YEAR} anys`;  // "+2 anys"
-const COVERAGE_AREAS = 'Barcelona + Girona';  // 2 províncies
+const YEARS_ACTIVE = 'Des de 2023';  // Més clar que "+2 anys"
+const COVERAGE_AREAS = 'BCN + Girona';  // 2 províncies - format curt
 
 const FALLBACK_STATS = {
   yearsExperience: YEARS_ACTIVE,   // "+2 anys" - calculat
