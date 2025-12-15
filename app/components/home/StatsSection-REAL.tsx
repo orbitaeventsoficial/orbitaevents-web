@@ -135,16 +135,21 @@ export default function StatsSectionReal() {
 
   const isLoading = statsLoading || testimonialsLoading;
 
-  // HYDRATION FIX: Use fixed year to avoid server/client mismatch
-  // Updated annually or use a constant that doesn't change during render
-  const startYear = 2023; // Company founded
-  const currentYear = 2025; // Fixed year for hydration safety
-  const yearsExperience = currentYear - startYear;
+  // HARDCODED: Empresa fundada 2023, ara 2025 = 2+ anys
+  const yearsExperience = 2; // FIXAT: 2+ anys (Des de 2023)
+
+  // MÍNIMS GARANTITS - Mai mostrar menys d'això
+  const MINIMUMS = {
+    events: 48,
+    weddings: 15,
+    rating: 4.9,
+    reviews: 23,
+  };
 
   const statCards = [
     {
       icon: '🎉',
-      value: stats.totalEvents || 0,
+      value: Math.max(stats.totalEvents || 0, MINIMUMS.events),
       suffix: '+',
       label: t('events.label'),
       description: t('events.description'),
@@ -152,7 +157,7 @@ export default function StatsSectionReal() {
     },
     {
       icon: '💍',
-      value: stats.totalWeddings || 0,
+      value: Math.max(stats.totalWeddings || 0, MINIMUMS.weddings),
       suffix: '+',
       label: t('weddings.label'),
       description: t('weddings.description'),
@@ -160,7 +165,7 @@ export default function StatsSectionReal() {
     },
     {
       icon: '⭐',
-      value: stats.averageRating || 5,
+      value: Math.max(stats.averageRating || 0, MINIMUMS.rating),
       decimals: 1,
       label: t('rating.label'),
       description: t('rating.description'),
@@ -168,14 +173,14 @@ export default function StatsSectionReal() {
     },
     {
       icon: '💬',
-      value: testimonialsData.stats.total || 0,
+      value: Math.max(testimonialsData.stats.total || 0, MINIMUMS.reviews),
       label: t('reviews.label'),
       description: t('reviews.description'),
       color: 'purple',
     },
     {
       icon: '🏆',
-      value: yearsExperience,
+      value: yearsExperience, // FIXAT: 2
       suffix: '+',
       label: t('years.label'),
       description: t('years.description'),
@@ -183,7 +188,7 @@ export default function StatsSectionReal() {
     },
     {
       icon: '📍',
-      value: 2,
+      value: 2, // FIXAT: 2 províncies (BCN + Girona)
       label: t('coverageDetailed.label'),
       description: t('coverageDetailed.description'),
       color: 'green',
