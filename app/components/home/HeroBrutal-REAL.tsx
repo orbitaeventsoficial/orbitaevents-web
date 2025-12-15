@@ -347,7 +347,7 @@ export default function HeroBrutalReal() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-lg md:text-xl lg:text-2xl text-white/80 mb-10 max-w-3xl mx-auto font-light"
+            className="text-lg md:text-xl lg:text-2xl text-white/90 mb-10 max-w-3xl mx-auto font-medium [text-shadow:_0_2px_20px_rgba(0,0,0,0.9),_0_4px_40px_rgba(0,0,0,0.7)]"
           >
             {t('subtitle')}
           </motion.p>
