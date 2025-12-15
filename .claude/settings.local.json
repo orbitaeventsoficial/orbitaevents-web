@@ -51,7 +51,8 @@
       "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/portfolio\" \"/ca/sensorial\")",
       "Bash(for url in \"/\" \"/es\" \"/contacto\")",
       "Bash(openssl s_client:*)",
-      "Bash(openssl x509:*)"
+      "Bash(openssl x509:*)",
+      "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/portfolio\" \"/packs\" \"/faq\" \"/ca/sensorial\")"
     ]
   }
 }

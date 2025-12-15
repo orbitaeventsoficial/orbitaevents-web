@@ -23,7 +23,7 @@ const services = [
     icon: '💍',
     image: '/img/portfolio/bodas/bodas-01.webp',
     href: '/servicios/bodas',
-    priceFrom: 650,
+    priceFrom: 550,
     highlight: false
   },
   {
@@ -33,7 +33,7 @@ const services = [
     icon: '💼',
     image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
     href: '/servicios/empresas',
-    priceFrom: 500,
+    priceFrom: 400,
     highlight: false
   }
 ];
