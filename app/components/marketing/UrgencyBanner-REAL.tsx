@@ -13,7 +13,7 @@
 // Versió: 3.0 DEFINITIVA - Desembre 2025
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,8 +25,14 @@ import { useAvailability, useCountdown } from '@/hooks/usePublicData';
 
 function CalendarPreview() {
   const { data, isLoading } = useAvailability();
-  
-  if (isLoading) {
+  const [isClient, setIsClient] = useState(false);
+
+  // HYDRATION FIX: Only format dates after client mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (isLoading || !isClient) {
     return (
       <div className="flex gap-2">
         {[...Array(4)].map((_, i) => (
@@ -39,16 +45,17 @@ function CalendarPreview() {
   // Get next 4 Saturdays from first month
   const firstMonth = data.monthlyAvailability[0];
   if (!firstMonth) return null;
-  
+
   const saturdays = firstMonth.saturdayDates.slice(0, 4);
 
   return (
     <div className="flex gap-2">
       {saturdays.map((saturday, i) => {
+        // Safe to format dates now - only runs on client
         const date = new Date(saturday.date);
         const day = date.getDate();
         const month = date.toLocaleDateString('ca-ES', { month: 'short', timeZone: 'UTC' });
-        
+
         return (
           <div
             key={i}
@@ -60,7 +67,7 @@ function CalendarPreview() {
                 : 'bg-white/10 border-white/20 text-white/40'
             }`}
           >
-            <span className="text-xs uppercase" suppressHydrationWarning>{month}</span>
+            <span className="text-xs uppercase">{month}</span>
             <span className="text-lg font-bold">{day}</span>
             {saturday.status === 'booked' && (
               <span className="absolute -top-1 -right-1 text-xs">🔒</span>
