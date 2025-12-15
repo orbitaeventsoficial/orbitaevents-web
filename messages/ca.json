@@ -187,7 +187,7 @@
       "rating": "a Google",
       "repeat": "repeteixen amb nosaltres",
       "years": "anys d'experiència",
-      "yearsValue": "15+",
+      "yearsValue": "2+",
       "events": "events amb Òrbita",
       "eventsValue": "48+",
       "response": "resposta garantida",
@@ -880,7 +880,8 @@
       "responseTime": "Resposta en menys de 2 hores",
       "errorName": "Introduïu el vostre nom complet",
       "errorContact": "Introduïu el vostre correu electrònic o número de telèfon",
-      "errorSend": "Error en enviar. Si us plau, torna-ho a provar o truca'ns directament."
+      "errorSend": "Error en enviar. Si us plau, torna-ho a provar o truca'ns directament.",
+      "downloadPDF": "Descarregar Pressupost PDF"
     }
   },
   "faq": {
@@ -4352,6 +4353,29 @@
       "postEventComplete": "Post-Event Complet",
       "welcome": "Benvinguda",
       "promotion": "Promoció"
+    }
+  },
+  "resources": {
+    "breadcrumb": "Recursos",
+    "title": "Recursos i Descàrregues",
+    "subtitle": "Descarrega catàlegs, imatges del portfolio i genera pressupostos personalitzats per al teu event.",
+    "downloaded": "Descarregat!",
+    "brochures": {
+      "title": "Catàlegs de Serveis",
+      "subtitle": "PDFs amb informació detallada de cada servei",
+      "description": "Catàleg complet amb packs, preus i característiques",
+      "download": "Descarregar PDF"
+    },
+    "portfolio": {
+      "title": "Galeria d'Imatges",
+      "subtitle": "Descarrega fotos dels nostres events",
+      "images": "imatges",
+      "downloadAll": "Descarregar totes"
+    },
+    "quote": {
+      "title": "Pressupost Personalitzat",
+      "description": "Utilitza el nostre configurador per crear un pressupost a mida i descarrega'l en PDF.",
+      "cta": "Anar al Configurador"
     }
   }
 }
