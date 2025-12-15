@@ -1,5 +1,6 @@
 // app/servicios/fiestas/page.tsx
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
@@ -7,7 +8,6 @@ import Client from './FiestasClient';
 import {
   getMinPriceByService,
   getPacksByService,
-  getPackById,
 } from '@/config/packs-config';
 
 // ===============================
@@ -15,9 +15,6 @@ import {
 // ===============================
 const FIESTAS_MIN_PRICE = getMinPriceByService('fiestas');
 const FIESTAS_PACKS = getPacksByService('fiestas');
-
-// CORRECCIÓN AQUÍ: Usamos los IDs reales que existen en packs-config.ts
-const PACK_ESENCIAL = getPackById('disco-basico')!;
 
 // ===============================
 // METADATA SEO (USANDO CONFIG)
@@ -63,13 +60,35 @@ export const metadata: Metadata = {
 // ===============================
 // PÁGINA
 // ===============================
-export default function FiestasPage() {
+type PageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function FiestasPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'services.fiestas' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+
+  // Obtener FAQs del archivo de traducciones
+  const faqItems = [];
+  for (let i = 0; i < 6; i++) {
+    try {
+      const q = t(`faq.${i}.q`);
+      const a = t(`faq.${i}.a`);
+      if (q && a && !q.includes('faq.')) {
+        faqItems.push({ q, a });
+      }
+    } catch {
+      break;
+    }
+  }
+
   return (
     <>
       <Breadcrumbs
         items={[
-          { name: 'Inicio', url: '/' },
-          { name: 'Servicios', url: '/servicios' },
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
           { name: 'Fiestas Privadas', url: '/servicios/fiestas' },
         ]}
       />
@@ -108,34 +127,7 @@ export default function FiestasPage() {
 
       <Client />
 
-      <FAQ
-        items={[
-          {
-            q: '¿Qué incluye una experiencia completa de fiesta privada?',
-            a: `Nuestras fiestas incluyen mucho más que música: DJ profesional que lee el ambiente, sonido 4.000W, iluminación LED adaptada, y animación con juegos personalizados según edades y grupo. Desde ${PACK_ESENCIAL.price} hasta fiestas temáticas completas con decoración y tematización total.`,
-          },
-          {
-            q: '¿Hacéis fiestas temáticas personalizadas (Halloween, años 80, mundo mágico)?',
-            a: `Totalmente. Creamos experiencias temáticas completas: adaptamos música, iluminación, decoración y animación al concepto que elijas (Halloween, años 80, mundo mágico, tropical, etc.). No es solo "poner música temática", es crear una experiencia inmersiva para tus invitados.`,
-          },
-          {
-            q: '¿Incluye animación y juegos para todos los invitados?',
-            a: 'Durante las horas contratadas, SÍ incluimos animación y juegos adaptados a las edades de tus invitados (juegos musicales, concursos interactivos, etc.). Algunos juegos requieren material adicional que se valora aparte con un extra pequeño. Si quieres actividades fuera de las horas contratadas, se cobra material + hora extra.',
-          },
-          {
-            q: '¿Puedo personalizar completamente la música y el ambiente?',
-            a: 'Absolutamente. Antes del evento revisamos tus gustos musicales, artistas favoritos, canciones imprescindibles y ambiente deseado. El DJ adapta la música en tiempo real según cómo responde tu grupo, no es una playlist fija.',
-          },
-          {
-            q: '¿Trabajáis fuera de Barcelona?',
-            a: 'Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Nos adaptamos a cualquier espacio: locales privados, jardines, fincas, pabellones. Revisamos el espacio y ajustamos equipamiento y montaje según necesidades.',
-          },
-          {
-            q: '¿Cuánto tiempo antes hay que reservar?',
-            a: 'Para fiestas normales, mínimo 3 semanas. Para viernes y sábados, mejor 6-8 semanas porque son las primeras fechas que se llenan. Para fiestas temáticas con decoración, recomendamos 2 meses.',
-          },
-        ]}
-      />
+      <FAQ items={faqItems} />
     </>
   );
 }

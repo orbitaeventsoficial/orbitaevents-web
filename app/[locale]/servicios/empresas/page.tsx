@@ -1,8 +1,9 @@
 // app/servicios/empresas/page.tsx
 import type { Metadata } from 'next';
-import Breadcrumbs from '@\/components/seo/Breadcrumbs';
-import ServiceJsonLD from '@\/components/seo/ServiceJsonLD';
-import FAQ from '@\/components/seo/FAQ';
+import { getTranslations } from 'next-intl/server';
+import Breadcrumbs from '@/components/seo/Breadcrumbs';
+import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
+import FAQ from '@/components/seo/FAQ';
 import Client from './client';
 import { getMinPriceByService, getPacksByService } from '@/config/packs-config';
 
@@ -46,13 +47,35 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function EmpresasPage() {
+type PageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function EmpresasPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'services.empresas' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+
+  // Obtener FAQs del archivo de traducciones
+  const faqItems = [];
+  for (let i = 0; i < 6; i++) {
+    try {
+      const q = t(`faq.${i}.q`);
+      const a = t(`faq.${i}.a`);
+      if (q && a && !q.includes('faq.')) {
+        faqItems.push({ q, a });
+      }
+    } catch {
+      break;
+    }
+  }
+
   return (
     <>
       <Breadcrumbs
         items={[
-          { name: 'Inicio', url: '/' },
-          { name: 'Servicios', url: '/servicios' },
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
           { name: 'Eventos Empresas', url: '/servicios/empresas' },
         ]}
       />
@@ -90,35 +113,7 @@ export default function EmpresasPage() {
 
       <Client />
 
-      <FAQ
-        items={[
-          {
-            q: '¿Cómo refuerza vuestra producción la imagen de nuestra marca?',
-            a: 'Profesionalismo en cada detalle: montaje discreto, coordinación impecable, branding integrado y ambiente elegante. Tu equipo recordará el evento, tu cliente quedará impresionado.',
-          },
-          {
-            q: '¿Qué incluye un evento corporativo con toque humano?',
-            a: 'No solo producción técnica: creamos networking elegante, ambiente profesional y momentos de conexión real entre asistentes. Música ambiente, iluminación corporativa y dinámicas que generan conversación.',
-          },
-          {
-            q: '¿Podéis integrar nuestra identidad corporativa en el evento?',
-            a: 'Totalmente. Integramos tu logo, colores corporativos y mensajes clave en pantallas, iluminación y dinámicas. El evento refleja tu marca sin resultar forzado.',
-          },
-          {
-            q: '¿Trabajáis en oficinas, hoteles y espacios corporativos?',
-            a: 'Sí, nos adaptamos a cualquier espacio empresarial. Incluye visita previa para revisar accesos, potencia eléctrica y coordinación con el venue. Montaje discreto y profesional.',
-          },
-          {
-            q: '¿Cómo garantizáis que no haya problemas técnicos?',
-            a: 'Equipamiento profesional certificado + backup completo + técnicos experimentados. Si algo falla (que no suele pasar), se soluciona sin que los asistentes se enteren. El evento NO se para.',
-          },
-          {
-            q: '¿Coordináis con catering, venue y otros proveedores?',
-            a: 'Totalmente. Nos encargamos de la coordinación técnica completa: tiempos, montaje, desmontaje y sincronización con otros proveedores. Tú te centras en tus invitados.',
-          },
-        ]}
-      />
+      <FAQ items={faqItems} />
     </>
   );
 }
-
