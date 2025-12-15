@@ -1,8 +1,8 @@
 "use client";
-// app/error.tsx (global fallback sin next-intl context)
-// Mantenerlo sin hooks de traducción para evitar errores cuando falla el provider
+// app/error.tsx - Error boundary for route segments
+// NO html/body tags - uses parent layout
 
-export default function GlobalError({
+export default function Error({
   error,
   reset,
 }: {
@@ -10,63 +10,35 @@ export default function GlobalError({
   reset: () => void;
 }) {
   return (
-    <html lang="es">
-      <head>
-        <title>Algo fue mal | órbita Events</title>
-        <meta name="robots" content="noindex" />
-      </head>
-      <body
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#0a0a0a',
-          color: '#fff',
-          fontFamily: '-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif',
-          textAlign: 'center',
-          padding: '24px',
-        }}
-      >
-        <div style={{ maxWidth: 520 }}>
-          <div style={{ fontSize: '48px', marginBottom: '12px' }}>😕</div>
-          <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>Algo salió mal</h1>
-          <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '16px' }}>
-            {error?.message || 'Error inesperado. Intenta recargar.'}
-          </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <button
-              onClick={() => reset()}
-              style={{
-                padding: '10px 16px',
-                borderRadius: '12px',
-                border: '1px solid #d7b86e',
-                background: '#d7b86e',
-                color: '#000',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              Reintentar
-            </button>
-            <a
-              href="/"
-              style={{
-                padding: '10px 16px',
-                borderRadius: '12px',
-                border: '1px solid rgba(255,255,255,0.2)',
-                color: '#fff',
-                textDecoration: 'none',
-              }}
-            >
-              Ir al inicio
-            </a>
-          </div>
-          <p style={{ marginTop: '12px', fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
-            Código: {error?.digest || 'N/D'}
-          </p>
+    <div
+      className="min-h-screen flex items-center justify-center bg-black text-white p-6"
+    >
+      <div className="max-w-md text-center">
+        <div className="text-5xl mb-4">😕</div>
+        <h1 className="text-2xl font-bold mb-2">Algo salió mal</h1>
+        <p className="text-white/70 mb-6">
+          {error?.message || 'Error inesperado. Intenta recargar.'}
+        </p>
+        <div className="flex gap-3 justify-center">
+          <button
+            onClick={() => reset()}
+            className="px-4 py-2 rounded-xl bg-amber-500 text-black font-bold hover:bg-amber-400 transition-colors"
+          >
+            Reintentar
+          </button>
+          <a
+            href="/"
+            className="px-4 py-2 rounded-xl border border-white/20 text-white hover:bg-white/10 transition-colors"
+          >
+            Ir al inicio
+          </a>
         </div>
-      </body>
-    </html>
+        {error?.digest && (
+          <p className="mt-4 text-xs text-white/40">
+            Código: {error.digest}
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
