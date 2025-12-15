@@ -165,7 +165,7 @@ export default function Footer() {
         <div className="py-10 border-b border-white/10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { metric: '2+', labelKey: 'yearsExperience', icon: '⭐', color: 'from-amber-500/20 to-orange-500/20' },
+              { metric: 'Des de 2023', labelKey: 'yearsExperience', icon: '⭐', color: 'from-amber-500/20 to-orange-500/20' },
               { metric: '48+', labelKey: 'eventsCompleted', icon: '🎉', color: 'from-purple-500/20 to-pink-500/20' },
               { metric: '2h', labelKey: 'response', icon: '⚡', color: 'from-green-500/20 to-emerald-500/20' },
               { metric: '', labelKey: 'coverage', icon: '📍', color: 'from-blue-500/20 to-cyan-500/20' },

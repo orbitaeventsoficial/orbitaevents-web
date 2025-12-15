@@ -209,8 +209,8 @@ const MINIMUM_STATS = {
 };
 
 const defaultStats: StatsData = {
-  yearsExperience: '15+',  // Fundador amb 15+ anys experiència en sector events
-  coverage: 'BCN + Girona',
+  yearsExperience: 'Des de 2023',  // Empresa fundada Agost 2023
+  coverage: 'Barcelona + Girona',
   responseTime: '2h',
   totalEvents: MINIMUM_STATS.totalEvents,
   totalWeddings: MINIMUM_STATS.totalWeddings,
