@@ -22,8 +22,8 @@ import {
 import { SITE_CONFIG } from '@/config/site-config';
 // Estadístiques reals - empresa fundada 2023
 const REAL_STATS = {
-  yearsExperience: '2+',
-  coverage: 'BCN + GI',
+  yearsExperience: 'Des de 2023',
+  coverage: 'Barcelona + Girona',
   dedication: 100,
 };
 

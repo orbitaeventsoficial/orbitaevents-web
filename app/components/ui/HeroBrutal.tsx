@@ -84,7 +84,7 @@ export default function HeroBrutal() {
         setEventsThisYear(siteStats.eventsCompleted); // Aproximació
         setEventsNext90Days(null); // No tenim aquesta dada
         setClientsTotal(siteStats.happyClients);
-        setExperienceLabel(`${siteStats.yearsExperience}+ anys`);
+        setExperienceLabel(siteStats.yearsLabel || 'Des de 2023');
         setNextEvent(null);
       } catch (error) {
         console.error('Error fetching hero data:', error);

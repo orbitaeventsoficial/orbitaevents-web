@@ -167,7 +167,7 @@ export const SITE_CONFIG = {
       const diffYears = (now.getTime() - fundingDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
       return Math.max(2, Math.floor(diffYears)); // Des de 2023 = 2+ anys
     })(),
-    yearsLabel: '2+', // Per mostrar "2+ anys" a la home
+    yearsLabel: 'Des de 2023', // Per mostrar "Des de 2023" a la home
     eventsCompleted: 50, // ⚠️ CONSERVADOR - Si no tens número exacte, millor ser modest
     happyClients: 50,    // ⚠️ CONSERVADOR - Clients satisfets verificables
     citiesCovered: 2,     // Barcelona província, Girona província (Costa Brava)
