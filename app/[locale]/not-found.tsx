@@ -137,9 +137,6 @@ export default function NotFound() {
             <Link href="/servicios/empresas" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
               {t('links.corporate')}
             </Link>
-            <Link href="/faq" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
-              {t('links.faq')}
-            </Link>
             <Link href="/contacto" style={{ color: 'var(--oe-gold)', textDecoration: 'none' }}>
               {t('links.contact')}
             </Link>

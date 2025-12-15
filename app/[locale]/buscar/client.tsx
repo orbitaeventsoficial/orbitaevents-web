@@ -14,7 +14,6 @@ function BuscarContent() {
     { href: '/servicios/bodas', labelKey: 'weddings' },
     { href: '/servicios/discomovil', labelKey: 'dj' },
     { href: '/servicios/empresas', labelKey: 'corporate' },
-    { href: '/faq', labelKey: 'faq' },
     { href: '/opiniones', labelKey: 'reviews' },
     { href: '/servicios', labelKey: 'services' },
     { href: '/portfolio', labelKey: 'portfolio' },
