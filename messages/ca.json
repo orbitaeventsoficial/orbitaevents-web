@@ -108,11 +108,11 @@
       "select": "Seleccioneu",
       "selected": "Seleccionat ✓",
       "goToConfigurator": "Aneu al configurador",
-      "requestQuote": "Demana pressupost",
+      "requestQuote": "RESERVA AVUI",
       "leaveReview": "Deixa un comentari",
       "calculate": "Calcula el preu",
       "calculatePrice": "Calcula el preu",
-      "reserveToday": "RESERVA AVUI",
+      "reserveToday": "🔥 RESERVA AVUI",
       "portfolio": "Veure Portfolio",
       "learnMore": "Més informació",
       "getStarted": "Comença",
@@ -179,7 +179,7 @@
     "success": "Èxit"
   },
   "hero": {
-    "badge": "🔥 DJ + So + Llums + Efectes Especials",
+    "badge": "🔥 48+ events sense cap convidat assegut",
     "themingSpecialists": "Especialistes en Tematització",
     "location": "Barcelona + Girona",
     "stats": {
@@ -235,8 +235,8 @@
     ],
     "headline1": "A les 4am la teva sogra",
     "headline2": "BALLAVA DESCALÇA",
-    "headline3": "L'únic DJ que et garanteix FESTES ÈPIQUES",
-    "subtitle": "DJ + So + Llums + Efectes + Tematització",
+    "headline3": "I tu ho vas veure tot des de la pista",
+    "subtitle": "Creem festes on TOTHOM balla. Garantit.",
     "countdownPrefix": "Proper dissabte disponible en:",
     "days": "Dies",
     "hours": "Hores",
@@ -246,9 +246,9 @@
     "happyClients": "events feliços",
     "scroll": "Descobreix més",
     "trust": {
-      "guarantee": "Garantia 100% satisfacció",
-      "response": "Resposta en menys de 2h",
-      "equipment": "Equipament professional"
+      "guarantee": "💯 100% clients satisfets (de veritat)",
+      "response": "⚡ Resposta en 2h (de veritat)",
+      "equipment": "🎧 Equip professional de club"
     },
     "headlineOld1": "A les 4am la teva sogra",
     "headlineOld2": "ballava descalça",
@@ -256,16 +256,16 @@
       "line1": "A les 4am la teva sogra",
       "line2": "ballava descalça"
     },
-    "punchline": "Això fem.",
+    "punchline": "No fem events. Creem records que duren tota la vida.",
     "services": "DJ + So + Llums + Efectes + Tematització",
     "response": "Resposta en 2h",
     "cta": {
-      "primary": "Demana Pressupost Gratis",
-      "secondary": "Veure Portfolio",
+      "primary": "RESERVA LA TEVA DATA",
+      "secondary": "Veure events reals",
       "whatsapp": "WhatsApp",
       "call": "Trucar"
     },
-    "scarcity": "Gener 2026: queden 2 dissabtes",
+    "scarcity": "⚠️ Gener-Març 2026: Només queden 3 dissabtes",
     "mobileCta": "Pressupost Gratis",
     "serviceLabels": {
       "dj": "DJ",
@@ -331,7 +331,7 @@
     "clients": "Han confiat en nosaltres"
   },
   "comparison": {
-    "title": "Esdeveniment normal vs esdeveniment òrbita",
+    "title": "La diferència entre 'va estar bé' i 'INCREÏBLE'",
     "subtitle": "La diferència entre una festa “que va ser bona” i una festa que es recordarà durant anys.",
     "normal": {
       "music": "Només música de fons",
@@ -351,8 +351,8 @@
     }
   },
   "guarantees": {
-    "title": "Cuidem cada detall de la teva experiència completa",
-    "description": "No només muntem equips. Dissenyem la teva experiència des de zero: Reunió prèvia • Personalització total • Coordinació el dia de l'esdeveniment • Adaptació en temps real. La teva visió es fa realitat.",
+    "title": "Per què confiar en Òrbita?",
+    "description": "Ho sabem: contractar un DJ és arriscat. Per això et donem garanties REALS. Reunió prèvia • Personalització total • Equip backup • Coordinació amb venue.",
     "stat1": "Esdeveniments realitzats sense incidents",
     "stat1Desc": "Amb un equip de seguretat complet",
     "stat2": "Repeteixen o recomanen",
@@ -386,18 +386,18 @@
     "from": "Des de",
     "popular": "El més demanat",
     "bodas": {
-      "title": "Casaments",
-      "subtitle": "El dia més important, perfecte",
-      "description": "Cerimònia, còctel i festa. DJ + so + llums + coordinació total."
+      "title": "El casament dels teus somnis",
+      "subtitle": "Que en parlin durant anys",
+      "description": "El primer ball que fa plorar. La festa que no s'acaba. Els convidats que encara avui diuen: 'Quin casament més bèstia'."
     },
     "fiestas": {
       "title": "Festes",
-      "subtitle": "La festa que no oblidaran",
-      "description": "Aniversaris, comunions, celebracions. Discomòbil completa on vulguis."
+      "subtitle": "De les que es recorden sempre",
+      "description": "Aquella festa que 10 anys després encara diuen: 'T'enrecordes de la festa de...?' La que TU mereixes."
     },
     "empresas": {
       "title": "Empreses",
-      "subtitle": "Events corporatius d'impacte",
+      "subtitle": "No el típic sopar avorrit",
       "description": "Team building, sopars d'empresa, inauguracions. Professionalitat garantida."
     },
     "weddings": {
@@ -714,7 +714,7 @@
       "message": "Gràcies per contactar amb nosaltres. Et respondrem en menys de 2 hores.",
       "discount": "5% de descompte en la teva primera reserva si contactes avui."
     },
-    "title": "Demana Pressupost",
+    "title": "Parlem del teu event",
     "form": {
       "nameRequired": "Nom",
       "nameMinChars": "El nom ha de tenir almenys 2 caràcters",
@@ -730,7 +730,7 @@
       "message": "Missatge",
       "messagePlaceholder": "Horari, ubicació, nombre de convidats, música...",
       "callUs": "O truca'ns:",
-      "submit": "Enviar",
+      "submit": "ENVIAR (resposta en 2h)",
       "submitting": "Enviant...",
       "name": "Nom",
       "phone": "Telèfon",
@@ -749,7 +749,7 @@
     "privacy": "Privadesa",
     "privacyPolicy": "Política de privadesa",
     "responseTime": "Respondrem en menys de 2 hores",
-    "subtitle": "Explica'ns el teu event i et respondrem en menys de 2 hores"
+    "subtitle": "Resposta en 2h. De veritat. Sense compromís."
   },
   "contactForm": {
     "title": "Sol·licita pressupost",
@@ -885,8 +885,8 @@
     }
   },
   "faq": {
-    "title": "Preguntes freqüents",
-    "subtitle": "Respostes clares i transparents",
+    "title": "Preguntes que et fas (i les respostes)",
+    "subtitle": "Sense lletra petita. Sense sorpreses.",
     "searchPlaceholder": "Cercar dubtes (per exemple, preu, limitador, pluja...)",
     "categories": {
       "all": "📋 Tots",
@@ -991,7 +991,7 @@
     "cta": {
       "title": "El teu esdeveniment? Deixa'ns una ressenya a Google.",
       "leaveReview": "Deixa un comentari",
-      "requestQuote": "Demana pressupost",
+      "requestQuote": "RESERVA AVUI",
       "contactUs": "Contactar",
       "whatsappMessage": "Hola! M'agradaria deixar una ressenya de la meva experiència amb Òrbita Events"
     }
@@ -1127,7 +1127,7 @@
         "configureButton": "Configurar El Meu Esdeveniment Ara",
         "exploreBelow": "O explora cada servei en detall a sota ↓",
         "features": {
-          "equipment": "Equipament professional",
+          "equipment": "🎧 Equip professional de club",
           "backup": "Backup complet",
           "guarantee": "Pista plena garantida"
         }
