@@ -482,11 +482,13 @@
     },
     "years": {
       "label": "Años de experiencia",
-      "description": "En el sector eventos"
+      "description": "En el sector eventos",
+      "value": "Desde 2023"
     },
     "coverageDetailed": {
-      "label": "Provincias",
-      "description": "Barcelona y Girona"
+      "label": "Cobertura",
+      "description": "Barcelona y Girona",
+      "value": "2"
     },
     "ratingOld": "Google",
     "eventsOld": "eventos",

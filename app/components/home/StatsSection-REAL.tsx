@@ -81,16 +81,17 @@ function AnimatedCounter({
 
 interface StatCardProps {
   icon: string;
-  value: number;
+  value: number | string;
   suffix?: string;
   decimals?: number;
   label: string;
   description?: string;
   color: string;
   isLoading?: boolean;
+  isText?: boolean;
 }
 
-function StatCard({ icon, value, suffix = '', decimals = 0, label, description, color, isLoading }: StatCardProps) {
+function StatCard({ icon, value, suffix = '', decimals = 0, label, description, color, isLoading, isText = false }: StatCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -101,21 +102,23 @@ function StatCard({ icon, value, suffix = '', decimals = 0, label, description, 
     >
       {/* Background glow */}
       <div className={`absolute -top-20 -right-20 w-40 h-40 bg-${color}-500/10 rounded-full blur-3xl group-hover:bg-${color}-500/20 transition-all duration-500`} />
-      
+
       {/* Content */}
       <div className="relative z-10">
         <div className="text-4xl mb-4">{icon}</div>
-        
-        <div className={`text-4xl md:text-5xl font-black text-${color}-400 mb-2`}>
+
+        <div className={`text-3xl md:text-4xl font-black text-${color}-400 mb-2`}>
           {isLoading ? (
             <span className="inline-block w-20 h-12 bg-white/10 rounded animate-pulse" />
+          ) : isText ? (
+            <span>{value}</span>
           ) : (
-            <AnimatedCounter target={value} suffix={suffix} decimals={decimals} />
+            <AnimatedCounter target={value as number} suffix={suffix} decimals={decimals} />
           )}
         </div>
-        
+
         <div className="text-white font-semibold mb-1">{label}</div>
-        
+
         {description && (
           <div className="text-white/50 text-sm">{description}</div>
         )}
@@ -135,9 +138,6 @@ export default function StatsSectionReal() {
 
   const isLoading = statsLoading || testimonialsLoading;
 
-  // HARDCODED: Empresa fundada 2023, ara 2025 = 2+ anys
-  const yearsExperience = 2; // FIXAT: 2+ anys (Des de 2023)
-
   // MÍNIMS GARANTITS - Mai mostrar menys d'això
   const MINIMUMS = {
     events: 48,
@@ -145,6 +145,10 @@ export default function StatsSectionReal() {
     rating: 4.9,
     reviews: 23,
   };
+
+  // Valors des del JSON de traduccions
+  const yearsValue = t('years.value'); // "Des de 2023"
+  const coverageValue = parseInt(t('coverageDetailed.value')) || 2; // "2"
 
   const statCards = [
     {
@@ -154,6 +158,7 @@ export default function StatsSectionReal() {
       label: t('events.label'),
       description: t('events.description'),
       color: 'amber',
+      isText: false,
     },
     {
       icon: '💍',
@@ -162,6 +167,7 @@ export default function StatsSectionReal() {
       label: t('weddings.label'),
       description: t('weddings.description'),
       color: 'pink',
+      isText: false,
     },
     {
       icon: '⭐',
@@ -170,6 +176,7 @@ export default function StatsSectionReal() {
       label: t('rating.label'),
       description: t('rating.description'),
       color: 'amber',
+      isText: false,
     },
     {
       icon: '💬',
@@ -177,21 +184,23 @@ export default function StatsSectionReal() {
       label: t('reviews.label'),
       description: t('reviews.description'),
       color: 'purple',
+      isText: false,
     },
     {
       icon: '🏆',
-      value: yearsExperience, // FIXAT: 2
-      suffix: '+',
+      value: yearsValue, // "Des de 2023" des del JSON
       label: t('years.label'),
       description: t('years.description'),
       color: 'blue',
+      isText: true, // Mostrar com a text, no número animat
     },
     {
       icon: '📍',
-      value: 2, // FIXAT: 2 províncies (BCN + Girona)
+      value: coverageValue, // 2 des del JSON
       label: t('coverageDetailed.label'),
       description: t('coverageDetailed.description'),
       color: 'green',
+      isText: false,
     },
   ];
 
