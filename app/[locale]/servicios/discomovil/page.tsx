@@ -1,8 +1,9 @@
 // app/servicios/discomovil/page.tsx
 import type { Metadata } from 'next';
-import Breadcrumbs from '@\/components/seo/Breadcrumbs';
-import ServiceJsonLD from '@\/components/seo/ServiceJsonLD';
-import FAQ from '@\/components/seo/FAQ';
+import { getTranslations } from 'next-intl/server';
+import Breadcrumbs from '@/components/seo/Breadcrumbs';
+import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
+import FAQ from '@/components/seo/FAQ';
 import Client from './client';
 import { getMinPriceByService, getPacksByService } from '@/config/packs-config';
 
@@ -20,12 +21,7 @@ export const metadata: Metadata = {
     title: `Discomóvil Barcelona | Desde ${DISCO_MIN_PRICE}€`,
     description: `DJ profesional + Sonido 4000W + Luces LED + Efectos. Barcelona y Girona. Presupuesto gratis.`,
     url: '/servicios/discomovil',
-    images: [
-      {
-        url: '/img/portfolio/discomovil/discomovil-01.png',
-        alt: 'Discomóvil Barcelona - Òrbita Events',
-      },
-    ],
+    images: [{ url: '/img/portfolio/discomovil/discomovil-01.png', alt: 'Discomóvil Barcelona - Òrbita Events' }],
     type: 'website',
   },
   twitter: {
@@ -35,49 +31,48 @@ export const metadata: Metadata = {
     images: ['/img/portfolio/discomovil/discomovil-01.png'],
   },
   robots: { index: true, follow: true },
-  keywords: [
-    'discomóvil barcelona',
-    'discomóvil girona',
-    'dj fiestas privadas barcelona',
-    'discomóvil cumpleaños',
-    'discomóvil bodas',
-    'alquiler dj barcelona',
-    'discomóvil maresme',
-    'discomóvil costa brava',
-  ],
+  keywords: ['discomóvil barcelona', 'discomóvil girona', 'dj fiestas privadas barcelona', 'discomóvil cumpleaños', 'discomóvil bodas'],
 };
 
-export default function discomovilPage() {
+type PageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function DiscomovilPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'services.discomovil' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+
+  const faqItems = [];
+  for (let i = 0; i < 6; i++) {
+    try {
+      const q = t(`faq.${i}.q`);
+      const a = t(`faq.${i}.a`);
+      if (q && a && !q.includes('faq.')) {
+        faqItems.push({ q, a });
+      }
+    } catch { break; }
+  }
+
   return (
     <>
       <Breadcrumbs
         items={[
-          { name: 'Inicio', url: '/' },
-          { name: 'Servicios', url: '/servicios' },
-          { name: 'Discomóvil', url: '/servicios/discomovil' },
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
+          { name: 'Discomòbil', url: '/servicios/discomovil' },
         ]}
       />
-
       <ServiceJsonLD
         name="Discomóvil Completa - Experiencia Personalizada"
         slugPath="/servicios/discomovil"
-        description={`Experiencia completa personalizada: DJ profesional que adapta la música en tiempo real, sonido EV profesional, iluminación LED ambiente y efectos especiales. Mucho más que poner música. Para fiestas, bodas y eventos privados en Catalunya. Packs desde ${DISCO_MIN_PRICE}€.`}
-        serviceType={[
-          'Discomóvil',
-          'DJ para fiestas',
-          'DJ bodas',
-          'DJ cumpleaños',
-          'Iluminación LED',
-          'Efectos especiales',
-        ]}
+        description={`Experiencia completa personalizada: DJ profesional, sonido EV profesional, iluminación LED ambiente y efectos especiales. Packs desde ${DISCO_MIN_PRICE}€.`}
+        serviceType={['Discomóvil', 'DJ para fiestas', 'DJ bodas', 'DJ cumpleaños', 'Iluminación LED', 'Efectos especiales']}
         areaServed={['Barcelona', 'Girona', 'Costa Brava', 'Maresme']}
         priceFrom={String(DISCO_MIN_PRICE)}
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
-        aggregateRating={{
-          ratingValue: 4.9,
-          reviewCount: 203,
-        }}
+        aggregateRating={{ ratingValue: 4.9, reviewCount: 203 }}
         offers={DISCO_PACKS.map((pack) => ({
           '@type': 'Offer',
           name: pack.name,
@@ -88,38 +83,8 @@ export default function discomovilPage() {
           description: pack.tagline,
         }))}
       />
-
       <Client />
-
-      <FAQ
-        items={[
-          {
-            q: '¿Qué incluye una experiencia completa de discomóvil?',
-            a: 'Mucho más que poner música: DJ profesional que adapta la música en tiempo real según tu grupo, sonido EV profesional, iluminación LED de ambiente y efectos especiales. Todo coordinado para crear la mejor experiencia para tus invitados.',
-          },
-          {
-            q: '¿Cómo personalizáis la música y el ambiente?',
-            a: 'Antes del evento revisamos tus gustos musicales, artistas favoritos y ambiente deseado. El DJ adapta la música en tiempo real según cómo responde tu grupo: si un tema no funciona, cambia; si la energía sube, aprieta. No es una playlist estática.',
-          },
-          {
-            q: '¿Qué incluye la iluminación y los efectos especiales?',
-            a: 'Todos los packs incluyen iluminación LED de ambiente adaptada al espacio. Los packs superiores añaden más puntos de luz, máquina de humo y efectos especiales (confeti, CO2, humo bajo) para momentos clave. Todo se adapta a tu evento.',
-          },
-          {
-            q: '¿Trabajáis fuera de Barcelona?',
-            a: 'Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Nos adaptamos a cualquier espacio: locales, jardines, fincas, pabellones. Transporte GRATIS hasta 25km desde Granollers; otras zonas pueden tener pequeño suplemento detallado en presupuesto.',
-          },
-          {
-            q: '¿Qué pasa si hay problemas técnicos durante la fiesta?',
-            a: 'Llevamos equipo de backup completo (cables, controladora y altavoces de reserva). Si algo falla (que no suele pasar), se cambia rápido y la música no se para. El objetivo es que tú ni te enteres del problema.',
-          },
-          {
-            q: '¿Cuánto tiempo antes hay que reservar?',
-            a: 'Mínimo 2 semanas, pero para viernes y sábados lo normal es reservar con 6-8 semanas de antelación. Son los días que se llenan primero. Consulta disponibilidad para tu fecha específica.',
-          },
-        ]}
-      />
+      <FAQ items={faqItems} />
     </>
   );
 }
-

@@ -1,5 +1,6 @@
 // app/servicios/bodas/page.tsx
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
@@ -37,13 +38,35 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function BodasPage() {
+type PageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function BodasPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'services.bodas' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+
+  // Obtener FAQs del archivo de traducciones
+  const faqItems = [];
+  for (let i = 0; i < 6; i++) {
+    try {
+      const q = t(`faq.${i}.q`);
+      const a = t(`faq.${i}.a`);
+      if (q && a && !q.includes('faq.')) {
+        faqItems.push({ q, a });
+      }
+    } catch {
+      break;
+    }
+  }
+
   return (
     <>
       <Breadcrumbs
         items={[
-          { name: 'Inicio', url: '/' },
-          { name: 'Servicios', url: '/servicios' },
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
           { name: 'DJ Bodas Barcelona', url: '/servicios/bodas' },
         ]}
       />
@@ -76,35 +99,7 @@ export default function BodasPage() {
 
       <BodasClient />
 
-      <FAQ
-        items={[
-          {
-            q: '¿Podemos personalizar completamente la música y el ambiente?',
-            a: 'Totalmente. Vuestra boda exactamente como la imagináis: nos pasáis vuestra playlist, temas imprescindibles y ambiente que queréis. El DJ adapta la música en tiempo real para que la pista funcione durante toda la celebración.',
-          },
-          {
-            q: '¿Incluye música para ceremonia, cóctel y banquete?',
-            a: 'Depende del pack. Los packs Premium y VIP incluyen experiencia completa desde la ceremonia hasta el final del baile. El pack Esencial se centra en el banquete y la fiesta.',
-          },
-          {
-            q: '¿Cómo personalizáis la iluminación y los efectos?',
-            a: 'Adaptamos colores, intensidad y efectos según vuestra decoración y el estilo de la boda. Humo y burbujas según espacio. Confeti, chispas frías y CO2 como extras para momentos clave.',
-          },
-          {
-            q: '¿Qué pasa si hay problemas técnicos durante la boda?',
-            a: 'Llevamos equipo de backup completo (controladora, cables y altavoces de reserva). Si algo falla, se cambia sin parar la música. Vuestros invitados ni se enterarán.',
-          },
-          {
-            q: '¿Trabajáis en fincas y exteriores?',
-            a: 'Sí, trabajamos en cualquier espacio. Revisamos potencia eléctrica, accesos y adaptamos el montaje. Si hay limitador de ruido, configuramos el equipo para cumplirlo sin perder calidad.',
-          },
-          {
-            q: '¿Cuánto tiempo antes hay que reservar?',
-            a: 'Para bodas, recomendamos reservar con 4-6 meses de antelación. Las fechas de primavera y verano se llenan rápido. Consultad disponibilidad para vuestra fecha específica.',
-          },
-        ]}
-      />
+      <FAQ items={faqItems} />
     </>
   );
 }
-

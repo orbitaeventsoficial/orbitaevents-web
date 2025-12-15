@@ -54,7 +54,11 @@
       "Bash(openssl x509:*)",
       "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/portfolio\" \"/packs\" \"/faq\" \"/ca/sensorial\")",
       "Bash(powershell -Command \"Get-ChildItem ''C:\\Users\\Lore\\Downloads'' | Sort-Object LastWriteTime -Descending\")",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/portfolio\" \"/faq\")",
+      "Bash(start https://orbitaevents.com/contacto)",
+      "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/servicios/discomovil\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/portfolio\" \"/faq\" \"/about\" \"/packs\" \"/opiniones\")",
+      "Bash(do echo \"=== $url ===\")"
     ]
   }
 }
