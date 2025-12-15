@@ -24,7 +24,7 @@ export function Stats({ variant = 'default' }: StatsProps) {
 
   const stats = [
     { value: 'Des de 2023', labelKey: 'yearsExperience' },
-    { value: 'BCN + GI', labelKey: 'coverage' },
+    { value: 'Barcelona + Girona', labelKey: 'coverage' },
     { value: '2h', labelKey: 'response' },
   ];
 

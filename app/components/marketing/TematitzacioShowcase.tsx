@@ -310,9 +310,11 @@ export default function TematitzacioShowcase() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 rounded-full bg-white/10 hover:bg-white/20
-                       text-white font-semibold border border-white/20
-                       transition-all"
+              className="px-8 py-4 rounded-full
+                       bg-gradient-to-r from-amber-500 to-orange-500
+                       hover:from-amber-400 hover:to-orange-400
+                       text-black font-bold shadow-lg shadow-amber-500/30
+                       hover:shadow-amber-500/50 transition-all"
             >
               {t('contact')} 💡
             </motion.button>
