@@ -239,42 +239,40 @@ async function ThemesSection() {
 
 export default function HomePage() {
   return (
-    <ClientOnly>
-      <main className="min-h-screen bg-black">
+    <main className="min-h-screen bg-black">
       {/* 🔥 HERO - Stats i disponibilitat REALS de BD */}
       <ClientOnly><HeroBrutalReal /></ClientOnly>
-      
+
       {/* 🔥 NOTIFICACIONS EN VIU - "Joan acaba de reservar..." */}
       <ClientOnly><LiveNotifications /></ClientOnly>
-      
+
       {/* Serveis principals */}
       <ServicesSection />
-      
+
       {/* 🔥 URGÈNCIA - Disponibilitat REAL */}
       <ClientOnly><UrgencyBannerReal /></ClientOnly>
-      
+
       {/* Tematització */}
       <ThemesSection />
-      
+
       {/* Transformació - Abans vs Després */}
       <ClientOnly><TransformationSection /></ClientOnly>
-      
+
       {/* Per què nosaltres */}
       <ClientOnly><WhyUsBrutal /></ClientOnly>
-      
+
       {/* Garanties */}
       <ClientOnly><GuaranteeSection /></ClientOnly>
-      
+
       {/* 🔥 TESTIMONIALS - Opinions REALS de BD */}
       <ClientOnly><TestimonialsBrutalReal /></ClientOnly>
-      
+
       {/* 🔥 STATS - Números REALS */}
       <ClientOnly><StatsSectionReal /></ClientOnly>
-      
+
       {/* CTA Final */}
       <ClientOnly><CTASectionBrutal /></ClientOnly>
-      </main>
-    </ClientOnly>
+    </main>
   );
 }
 
