@@ -65,11 +65,15 @@ export default function UrgencyBanner() {
     fetchAvailability();
   }, []);
 
-  // Obtenim el mes traduït
+  // Obtenim el mes traduït - HYDRATION FIX: només al client
   const monthKeys = ['january', 'february', 'march', 'april', 'may', 'june',
                     'july', 'august', 'september', 'october', 'november', 'december'] as const;
-  const now = new Date();
-  const currentMonthTranslated = `${tMonths(monthKeys[now.getMonth()])} ${now.getFullYear()}`;
+  const [currentMonthTranslated, setCurrentMonthTranslated] = useState('');
+
+  useEffect(() => {
+    const now = new Date();
+    setCurrentMonthTranslated(`${tMonths(monthKeys[now.getMonth()])} ${now.getFullYear()}`);
+  }, [tMonths]);
 
   // Si está cargando o no hay datos, mostrar versión genérica
   if (data.loading) {

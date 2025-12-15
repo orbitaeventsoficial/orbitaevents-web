@@ -60,9 +60,16 @@ interface StatsResponse {
 // - 15 casaments (uns 7-8 per any)
 // - 23 ressenyes Google (creixement orgànic)
 // ═══════════════════════════════════════════════════════════════════════════
+
+// CONSTANTS HARDCODED - Sempre correctes
+const COMPANY_START_YEAR = 2023;  // Òrbita Events fundada Agost 2023
+const CURRENT_YEAR = 2025;        // Any actual
+const YEARS_ACTIVE = `+${CURRENT_YEAR - COMPANY_START_YEAR} anys`;  // "+2 anys"
+const COVERAGE_AREAS = 'Barcelona + Girona';  // 2 províncies
+
 const FALLBACK_STATS = {
-  yearsExperience: 'Des de 2023',  // Empresa fundada Agost 2023
-  coverage: 'Barcelona + Girona',  // Zones reals de cobertura
+  yearsExperience: YEARS_ACTIVE,   // "+2 anys" - calculat
+  coverage: COVERAGE_AREAS,        // "Barcelona + Girona" - 2 províncies
   responseTime: '2h',              // Compromís real
   totalEvents: 48,                 // Creïble per 2 anys
   totalWeddings: 15,               // ~7 per any
@@ -155,13 +162,13 @@ export async function GET() {
       }),
     ]);
 
-    // 3. Valores por defecto si no hay en Settings
-    // IMPORTANT: Òrbita Events fundada Agost 2023
-    const yearsExperience = settingsMap['years_experience'] || 'Des de 2023';
-    const coverage = settingsMap['coverage'] || 'Barcelona + Girona';
+    // 3. Valores hardcoded para años y cobertura (SIEMPRE correctos)
+    // No usamos los valores de BD porque pueden estar desactualizados
+    const yearsExperience = YEARS_ACTIVE;   // Siempre "+2 anys"
+    const coverage = COVERAGE_AREAS;        // Siempre "Barcelona + Girona"
     const responseTime = settingsMap['response_time'] || '2h';
     const googleRating = settingsMap['google_rating'] ? parseFloat(settingsMap['google_rating']) : 4.9;
-    const googleReviewsCount = settingsMap['google_reviews_count'] ? parseInt(settingsMap['google_reviews_count']) : 50;
+    const googleReviewsCount = settingsMap['google_reviews_count'] ? parseInt(settingsMap['google_reviews_count']) : 23;
 
     // 4. Calcular rating promedio de testimonios
     const averageRating = testimonialStats._avg.rating || 5;

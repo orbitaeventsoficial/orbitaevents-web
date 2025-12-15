@@ -45,14 +45,17 @@ interface CountdownUnitProps {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function AnimatedStat({ value, suffix = '', label, isLoading }: AnimatedStatProps) {
+  // Detectar si el valor és text llarg (cobertura) per ajustar el tamany
+  const isLongText = typeof value === 'string' && value.length > 5;
+
   return (
     <div className="group text-center px-6 py-3 relative">
       {/* Glow subtil en hover */}
       <div className="absolute inset-0 bg-amber-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-      
+
       {/* Valor */}
       <div className="relative">
-        <div className="text-3xl md:text-5xl font-black mb-1">
+        <div className={`font-black mb-1 ${isLongText ? 'text-xl md:text-2xl lg:text-3xl' : 'text-3xl md:text-5xl'}`}>
           {isLoading ? (
             <span className="inline-block w-16 h-10 bg-gradient-to-r from-amber-400/20 to-amber-400/40 rounded-lg animate-pulse" />
           ) : (
