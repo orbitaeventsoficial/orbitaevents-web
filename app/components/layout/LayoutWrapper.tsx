@@ -9,9 +9,6 @@ import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback } from 'react';
 
-// Components principals
-import Footer from '@/app/components/ui/footer';
-
 // Components dinàmics (lazy loading + ssr: false per evitar hydration issues)
 const Header = dynamic(
   () => import('@/app/components/ui/Header'),
@@ -40,6 +37,11 @@ const HeroPortalLogo = dynamic(
 
 const FlashOffer = dynamic(
   () => import('@/app/components/marketing/FlashOffer'),
+  { ssr: false }
+);
+
+const Footer = dynamic(
+  () => import('@/app/components/ui/footer'),
   { ssr: false }
 );
 
