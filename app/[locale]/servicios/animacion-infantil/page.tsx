@@ -1,5 +1,6 @@
 // app/[locale]/servicios/animacion-infantil/page.tsx
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
@@ -8,39 +9,39 @@ import AnimacionInfantilClient from './AnimacionInfantilClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Animacio Infantil Barcelona | Festes Infantils Professionals | Orbita Events',
+  title: 'Animació Infantil Barcelona | Festes Infantils Professionals | Òrbita Events',
   description:
-    'Animacio infantil professional per a festes, comunions i esdeveniments. Jocs, pintacares, magia, globoflexia, tallers i musica infantil. Barcelona i Girona.',
+    'Animació infantil professional per a festes, comunions i esdeveniments. Jocs, pintacares, màgia, globoflèxia, tallers i música infantil. Barcelona i Girona.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
   alternates: { canonical: '/servicios/animacion-infantil' },
   openGraph: {
-    title: 'Animacio Infantil | Festes per als Mes Petits',
+    title: 'Animació Infantil | Festes per als Més Petits',
     description:
-      'Animadors professionals per a festes infantils. Jocs, magia, pintacares, globoflexia i molt mes. Diversio garantida!',
+      'Animadors professionals per a festes infantils. Jocs, màgia, pintacares, globoflèxia i molt més. Diversió garantida!',
     url: '/servicios/animacion-infantil',
     images: [
       {
         url: '/api/og?title=Animacio%20Infantil%20Barcelona',
-        alt: 'Animacio infantil amb jocs i activitats',
+        alt: 'Animació infantil amb jocs i activitats',
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Animacio Infantil | Festes Infantils Barcelona',
+    title: 'Animació Infantil | Festes Infantils Barcelona',
     description:
-      'Animadors professionals + Jocs + Magia + Pintacares + Globoflexia. Festes inolvidables per als petits!',
+      'Animadors professionals + Jocs + Màgia + Pintacares + Globoflèxia. Festes inoblidables per als petits!',
     images: ['/api/og?title=Animacio%20Infantil'],
   },
   robots: { index: true, follow: true },
   keywords: [
-    'animacio infantil Barcelona',
+    'animació infantil Barcelona',
     'festes infantils Girona',
     'animadors infantils',
     'pintacares Barcelona',
-    'magia infantil',
-    'globoflexia festes',
+    'màgia infantil',
+    'globoflèxia festes',
     'jocs infantils',
     'comunions Barcelona',
     'festes aniversari nens',
@@ -48,31 +49,52 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function AnimacionInfantilPage() {
+type PageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function AnimacionInfantilPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'services.animacion-infantil' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+
+  const faqItems = [];
+  for (let i = 0; i < 6; i++) {
+    try {
+      const q = t(`faq.${i}.q`);
+      const a = t(`faq.${i}.a`);
+      if (q && a && !q.includes('faq.')) {
+        faqItems.push({ q, a });
+      }
+    } catch {
+      break;
+    }
+  }
+
   return (
     <>
       <Breadcrumbs
         items={[
-          { name: 'Inicio', url: '/' },
-          { name: 'Servicios', url: '/servicios' },
-          { name: 'Animacio Infantil', url: '/servicios/animacion-infantil' },
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
+          { name: 'Animació Infantil', url: '/servicios/animacion-infantil' },
         ]}
       />
 
       <ServiceJsonLD
-        name="Animacio Infantil Professional"
+        name="Animació Infantil Professional"
         slugPath="/servicios/animacion-infantil"
-        description="Servei d'animacio infantil complet: jocs, pintacares, magia, globoflexia, tallers creatius i musica infantil. Animadors professionals per a festes d'aniversari, comunions i esdeveniments familiars. Barcelona i Girona."
+        description="Servei d'animació infantil complet: jocs, pintacares, màgia, globoflèxia, tallers creatius i música infantil. Animadors professionals per a festes d'aniversari, comunions i esdeveniments familiars. Barcelona i Girona."
         serviceType={[
-          'Animacio infantil',
+          'Animació infantil',
           'Festes infantils',
           'Pintacares',
-          'Magia infantil',
-          'Globoflexia',
+          'Màgia infantil',
+          'Globoflèxia',
           'Tallers creatius',
           'Jocs infantils',
         ]}
-        areaServed={['Barcelona', 'Girona', 'Maresme', 'Valles']}
+        areaServed={['Barcelona', 'Girona', 'Maresme', 'Vallès']}
         priceFrom="150"
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
@@ -84,34 +106,7 @@ export default function AnimacionInfantilPage() {
 
       <AnimacionInfantilClient />
 
-      <FAQ
-        items={[
-          {
-            q: 'Que inclou el servei d\'animacio infantil?',
-            a: 'El nostre servei inclou animadors professionals, jocs i activitats adaptades a l\'edat dels nens, material per a totes les activitats, i coordinacio completa de l\'entreteniment durant les hores contractades. Podem afegir pintacares, magia, globoflexia o tallers segons les teves preferencies.',
-          },
-          {
-            q: 'Per a quines edats es adequat?',
-            a: 'Oferim animacio per a nens de 3 a 12 anys. Adaptem totes les activitats, jocs i musica segons el rang d\'edat dels participants per assegurar que tots gaudeixin al maxim.',
-          },
-          {
-            q: 'Quant de temps dura l\'animacio?',
-            a: 'El temps minim es de 2 hores. Recomanem entre 2-4 hores per a festes d\'aniversari. Per a comunions o esdeveniments mes llargs, podem oferir serveis de mitja jornada o jornada completa.',
-          },
-          {
-            q: 'Que necessito tenir preparat?',
-            a: 'Nomes necessites un espai adequat per als nens (interior o exterior). Nosaltres portem tot el material necessari: pintures, globus, material de magia, jocs, altaveus per a la musica, etc.',
-          },
-          {
-            q: 'Feu servei a domicili?',
-            a: 'Si! Anem a qualsevol localitzacio: casa particular, sala de festes, restaurant, parc... Cobrim Barcelona i Girona amb despla\u00e7ament inclos fins a 25km de Granollers.',
-          },
-          {
-            q: 'Amb quanta antelacio he de reservar?',
-            a: 'Recomanem reservar amb 2-3 setmanes d\'antelacio, especialment per a caps de setmana. Per a dates molt sol·licitades (temporada de comunions), millor amb 1-2 mesos.',
-          },
-        ]}
-      />
+      <FAQ items={faqItems} />
     </>
   );
 }

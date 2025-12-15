@@ -526,6 +526,130 @@
           "a": "Mínim 2 setmanes, però per a divendres i dissabtes el normal és reservar amb 6-8 setmanes d'antelació. Són els dies que s'omplen primer. Consulta disponibilitat per a la teva data específica."
         }
       ]
+    },
+    "animacion-infantil": {
+      "faq": [
+        {
+          "q": "Què inclou el servei d'animació infantil?",
+          "a": "El nostre servei inclou animadors professionals, jocs i activitats adaptades a l'edat dels nens, material per a totes les activitats, i coordinació completa de l'entreteniment durant les hores contractades. Podem afegir pintacares, màgia, globoflèxia o tallers segons les teves preferències."
+        },
+        {
+          "q": "Per a quines edats és adequat?",
+          "a": "Oferim animació per a nens de 3 a 12 anys. Adaptem totes les activitats, jocs i música segons el rang d'edat dels participants per assegurar que tots gaudeixin al màxim."
+        },
+        {
+          "q": "Quant de temps dura l'animació?",
+          "a": "El temps mínim és de 2 hores. Recomanem entre 2-4 hores per a festes d'aniversari. Per a comunions o esdeveniments més llargs, podem oferir serveis de mitja jornada o jornada completa."
+        },
+        {
+          "q": "Què necessito tenir preparat?",
+          "a": "Només necessites un espai adequat per als nens (interior o exterior). Nosaltres portem tot el material necessari: pintures, globus, material de màgia, jocs, altaveus per a la música, etc."
+        },
+        {
+          "q": "Feu servei a domicili?",
+          "a": "Sí! Anem a qualsevol localització: casa particular, sala de festes, restaurant, parc... Cobrim Barcelona i Girona amb desplaçament inclòs fins a 25km de Granollers."
+        },
+        {
+          "q": "Amb quanta antelació he de reservar?",
+          "a": "Recomanem reservar amb 2-3 setmanes d'antelació, especialment per a caps de setmana. Per a dates molt sol·licitades (temporada de comunions), millor amb 1-2 mesos."
+        }
+      ]
+    },
+    "dj-bodas-girona": {
+      "faq": [
+        {
+          "q": "Quant costa un DJ per a casaments a Girona?",
+          "a": "El preu de DJ per a casaments a Girona comença des de 590€. Aquest pack inclou DJ professional, so 4000W EV, il·luminació LED i desplaçament a qualsevol punt de la província de Girona."
+        },
+        {
+          "q": "Cobriu tota la província de Girona?",
+          "a": "Sí, treballem a tota la província: Girona ciutat, Figueres, Olot, Banyoles, Salt, tota la Costa Brava, l'Empordà, la Garrotxa i més. El desplaçament està inclòs en el preu."
+        },
+        {
+          "q": "Teniu experiència en masies de l'Empordà?",
+          "a": "Sí, hem treballat en nombroses masies de l'Alt i Baix Empordà. Coneixem les particularitats d'aquests espais: accessos, potència elèctrica, acústica i coordinació amb càtering."
+        },
+        {
+          "q": "Quins idiomes parleu per als casaments?",
+          "a": "Parlem català, castellà i anglès. Molts casaments a Girona tenen convidats internacionals i ens adaptem perfectament a casaments multilingües."
+        },
+        {
+          "q": "Feu casaments en espais amb història com Besalú o Peratallada?",
+          "a": "Sí, tenim experiència en espais medievals i amb patrimoni històric. Adaptem el muntatge i el volum respectant les normatives de cada espai."
+        }
+      ]
+    },
+    "dj-bodas-costa-brava": {
+      "faq": [
+        {
+          "q": "Quant costa un DJ per a casaments a la Costa Brava?",
+          "a": "El preu de DJ per a casaments a la Costa Brava comença des de 590€. Aquest pack inclou DJ professional, so 4000W resistent a exteriors, il·luminació LED i desplaçament a qualsevol punt de la costa."
+        },
+        {
+          "q": "Feu casaments a la platja o xiringuitos?",
+          "a": "Sí, som especialistes en casaments de costa. Tenim equip preparat per a exteriors, amb protecció contra la humitat i el vent. Hem treballat en platges, cales, xiringuitos i terrasses amb vistes al mar."
+        },
+        {
+          "q": "Què passa si hi ha vent o mal temps?",
+          "a": "Tenim protocols per a condicions de costa: equip resistent, cablejat assegurat i pla B preparat. Si l'event es trasllada a interior, ens adaptem sense problema addicional."
+        },
+        {
+          "q": "Coneixeu els espais per a casaments de la Costa Brava?",
+          "a": "Sí, hem treballat en els espais més emblemàtics: des de masies amb vistes al mar fins a hotels boutique en cales amagades. Coneixem Cap Roig, Aiguablava, Calella de Palafrugell i molts més."
+        },
+        {
+          "q": "El so s'escolta bé en exteriors vora el mar?",
+          "a": "Sí, el nostre equip de 4000W està dimensionat per a espais oberts. Fem prova de so prèvia per ajustar l'orientació i potència segons l'espai i la direcció del vent."
+        }
+      ]
+    },
+    "dj-bodas-maresme": {
+      "faq": [
+        {
+          "q": "Quant costa un DJ per a casaments al Maresme?",
+          "a": "El preu de DJ per a casaments al Maresme comença des de 590€. Aquest preu inclou DJ professional, so 4000W, il·luminació LED i desplaçament a qualsevol població del Maresme com Mataró, Calella o Arenys de Mar."
+        },
+        {
+          "q": "Us desplaceu a totes les poblacions del Maresme?",
+          "a": "Sí, cobrim tota la comarca del Maresme: Mataró, Calella, Arenys de Mar, Vilassar de Mar, Premià de Mar, El Masnou, Canet de Mar, Sant Pol de Mar, Pineda de Mar, Tordera, Argentona i més. El desplaçament està inclòs en el preu."
+        },
+        {
+          "q": "Coneixeu les finques i espais per a casaments del Maresme?",
+          "a": "Sí, hem treballat en múltiples espais del Maresme: masies amb encant, restaurants amb vistes al mar, hotels de costa i espais privats. Coneixem les particularitats de cada tipus d'espai i adaptem l'equip segons necessitats."
+        },
+        {
+          "q": "Què passa si el meu casament és en una finca sense molta potència elèctrica?",
+          "a": "Moltes finques del Maresme tenen limitacions elèctriques. El nostre equip està preparat per funcionar amb generador o adaptar-nos a la potència disponible sense perdre qualitat de so."
+        },
+        {
+          "q": "Feu casaments a la platja al Maresme?",
+          "a": "Sí, realitzem casaments en platges i xiringuitos de la costa del Maresme. Tenim equip resistent i experiència en exteriors amb protocols específics per a espais oberts."
+        }
+      ]
+    },
+    "dj-bodas-valles": {
+      "faq": [
+        {
+          "q": "Quant costa un DJ per a casaments al Vallès?",
+          "a": "El preu de DJ per a casaments al Vallès comença des de 590€. Com que tenim base a Granollers, el desplaçament està completament inclòs per a qualsevol població del Vallès Oriental i Occidental."
+        },
+        {
+          "q": "Per què triar un DJ local del Vallès?",
+          "a": "Al tenir base a Granollers, coneixem perfectament la zona: les finques, masies, restaurants i espais per a casaments del Vallès. A més, el desplaçament està inclòs i podem fer visites prèvies sense problema."
+        },
+        {
+          "q": "Cobriu tant el Vallès Oriental com l'Occidental?",
+          "a": "Sí, cobrim ambdues comarques: des de Granollers, Mollet i Cardedeu a l'Oriental fins a Sabadell, Terrassa i Sant Cugat a l'Occidental. Tot el Vallès sense cost addicional de desplaçament."
+        },
+        {
+          "q": "Coneixeu les masies i espais del Vallès?",
+          "a": "Sí, hem treballat en les masies més emblemàtiques del Vallès: Can Bonastre, Cal Blay, Can Ribas, i moltes més. Coneixem els accessos, la potència elèctrica i les particularitats de cada espai."
+        },
+        {
+          "q": "Podeu fer la visita prèvia a l'espai?",
+          "a": "Sí, al ser locals fem visites prèvies sense problema. És important conèixer l'espai, revisar accessos, potència elèctrica i planificar el muntatge amb el coordinador del venue."
+        }
+      ]
     }
   },
   "stats": {
