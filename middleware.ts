@@ -2,8 +2,9 @@ import createMiddleware from 'next-intl/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 import { locales, defaultLocale, type Locale } from './i18n';
 
-const USER = process.env.ADMIN_USER;
-const PASS = process.env.ADMIN_PASSWORD;
+// Credencials hardcoded per Edge Runtime (process.env no funciona bé)
+const USER = 'orbita';
+const PASS = 'admin2024';
 
 function unauthorized() {
   return new NextResponse('Authentication required', {
@@ -30,13 +31,15 @@ export function middleware(req: NextRequest) {
   // Si es ruta protegida, aplicar auth básica
   if (isProtected) {
     const authHeader = req.headers.get('authorization');
+
     if (!authHeader || !authHeader.startsWith('Basic ')) {
       return unauthorized();
     }
 
     const base64Credentials = authHeader.split(' ')[1]!;
-    const decoded = Buffer.from(base64Credentials, 'base64').toString('utf8');
-    const [user, pass] = decoded.split(':');
+    const decoded = atob(base64Credentials);
+    const [user, ...passParts] = decoded.split(':');
+    const pass = passParts.join(':');
 
     if (user !== USER || pass !== PASS) {
       return unauthorized();
