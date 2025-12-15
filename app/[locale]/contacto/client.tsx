@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import ContactFormComplete from '@/app/components/forms/ContactFormComplete';
+import CalendarioUrgencia from '@/app/components/ui/CalendarioUrgencia';
 
 export default function ContactClient() {
   const searchParams = useSearchParams();
@@ -13,7 +14,7 @@ export default function ContactClient() {
   const preselectedDate = searchParams.get('fecha') || undefined;
 
   return (
-    <section className="mx-auto max-w-3xl px-4 sm:px-6 py-8 sm:py-12 lg:py-16">
+    <section className="mx-auto max-w-4xl px-4 sm:px-6 py-8 sm:py-12 lg:py-16">
       <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white text-center mb-3">
         {t('title')}
       </h1>
@@ -21,12 +22,18 @@ export default function ContactClient() {
         {t('subtitle')}
       </p>
 
+      {/* Calendario de disponibilidad con urgencia */}
+      <div className="mb-12">
+        <CalendarioUrgencia />
+      </div>
+
       {/* Formulari complet amb RGPD i captcha */}
-      <ContactFormComplete
-        preselectedService={preselectedService}
-        preselectedDate={preselectedDate}
-      />
+      <div className="max-w-3xl mx-auto">
+        <ContactFormComplete
+          preselectedService={preselectedService}
+          preselectedDate={preselectedDate}
+        />
+      </div>
     </section>
   );
 }
-

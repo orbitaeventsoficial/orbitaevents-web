@@ -2,7 +2,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from 'next-intl/server';
 import { PORTFOLIO_IMAGES, PORTFOLIO_CATEGORIES } from "@/config/portfolio-images";
-import { Gallery } from "@/components/Gallery";
+import { SimpleGallery } from "@/app/components/GalleryPro";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 
 export const dynamic = 'force-dynamic';
@@ -41,7 +41,7 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
           {title}
         </h1>
 
-        <Gallery images={images} />
+        <SimpleGallery images={images} />
       </main>
     </>
   );
