@@ -279,8 +279,8 @@ export default function HeroBrutalReal() {
           />
         )}
         
-        {/* Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
+        {/* Overlays - Reduït per més lluminositat */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/25 to-black/90" />
         <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-amber-900/20" />
       </div>
 
