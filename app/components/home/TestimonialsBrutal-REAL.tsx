@@ -59,15 +59,20 @@ function StarRating({ rating, size = 'md' }: { rating: number; size?: 'sm' | 'md
 
 function TestimonialCard({ testimonial }: { testimonial: TestimonialPublic }) {
   const t = useTranslations('testimonials');
-  
-  // Format date
-  const formattedDate = testimonial.eventDate 
-    ? new Date(testimonial.eventDate).toLocaleDateString('ca-ES', { 
-        month: 'long', 
-        year: 'numeric',
-        timeZone: 'UTC',
-      })
-    : null;
+  const [formattedDate, setFormattedDate] = useState<string | null>(null);
+
+  // HYDRATION FIX: Format date only on client
+  useEffect(() => {
+    if (testimonial.eventDate) {
+      setFormattedDate(
+        new Date(testimonial.eventDate).toLocaleDateString('ca-ES', {
+          month: 'long',
+          year: 'numeric',
+          timeZone: 'UTC',
+        })
+      );
+    }
+  }, [testimonial.eventDate]);
 
   // Event type emoji
   const eventEmojis: Record<string, string> = {
@@ -123,7 +128,7 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialPublic }) {
             {formattedDate && (
               <>
                 <span>•</span>
-                <span suppressHydrationWarning>{formattedDate}</span>
+                <span>{formattedDate}</span>
               </>
             )}
           </div>

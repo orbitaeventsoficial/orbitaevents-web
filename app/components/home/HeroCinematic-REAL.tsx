@@ -14,7 +14,7 @@
  * Manolo: "Cada número que veus és REAL. Zero mentides."
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
@@ -254,15 +254,18 @@ function SocialProofBadge({
 export default function HeroCinematicBrutalReal() {
   const t = useTranslations('hero');
   const tWhatsapp = useTranslations('whatsappMessages');
-  const currentMonth = useMemo(
-    () =>
+  const [currentMonth, setCurrentMonth] = useState<string>('');
+
+  // HYDRATION FIX: Format month only on client
+  useEffect(() => {
+    setCurrentMonth(
       new Intl.DateTimeFormat('ca-ES', {
         month: 'long',
-        timeZone: 'UTC', // Evita desajustos server/cliente
-      }).format(new Date()),
-    []
-  );
-  
+        timeZone: 'UTC',
+      }).format(new Date())
+    );
+  }, []);
+
   // 🔥 DADES REALS DE BD!
   const { stats, isLoading: statsLoading } = usePublicStats();
   const { countdownTarget, currentMonthAvailable, isLoading: availLoading } = useAvailability();
@@ -475,13 +478,13 @@ export default function HeroCinematicBrutalReal() {
             <CountdownTimerReal targetDate={countdownTarget} />
           </div>
 
-          <p className="mt-3 text-xs sm:text-sm text-white/50 text-center" suppressHydrationWarning>
+          <p className="mt-3 text-xs sm:text-sm text-white/50 text-center">
             {t('urgency.remaining')}{' '}
             <span className="text-amber-400 font-bold">
               {isLoading ? '--' : currentMonthAvailable} {t('urgency.saturdays')}
             </span>{' '}
             {t('urgency.in')}{' '}
-            <span suppressHydrationWarning>{currentMonth}</span>
+            <span>{currentMonth || '...'}</span>
           </p>
         </motion.div>
 
