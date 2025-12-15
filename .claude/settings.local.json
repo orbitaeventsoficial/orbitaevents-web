@@ -46,7 +46,8 @@
       "Bash(timeout 15 pnpm run dev:*)",
       "Bash(git mv:*)",
       "Bash(git fetch:*)",
-      "Bash(pnpm add:*)"
+      "Bash(pnpm add:*)",
+      "Bash(timeout 120 pnpm run build:*)"
     ]
   }
 }
