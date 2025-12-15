@@ -63,7 +63,7 @@ const SERVICES = [
     image: '/img/portfolio/bodas/bodas-01.webp',
     href: '/servicios/bodas',
     popular: false,
-    price: '650€',
+    price: '550€',
   },
   {
     id: 'fiestas',
@@ -74,7 +74,7 @@ const SERVICES = [
     image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
     href: '/servicios/fiestas',
     popular: true,
-    price: '400€',
+    price: '350€',
   },
   {
     id: 'empresas',
@@ -85,7 +85,7 @@ const SERVICES = [
     image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
     href: '/servicios/empresas',
     popular: false,
-    price: '500€',
+    price: '400€',
   },
 ];
 
