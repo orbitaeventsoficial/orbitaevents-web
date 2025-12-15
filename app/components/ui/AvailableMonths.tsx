@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 // Noms dels mesos en català (abreujats)
@@ -78,20 +78,25 @@ const getStatus = (available: number): { status: 'scarce' | 'limited' | 'availab
 }
 
 export function AvailableMonths() {
-  // Calcula els 3 propers mesos dinàmicament
-  const monthsData = useMemo((): MonthAvailability[] => {
+  // Estat inicial buit per evitar hydration mismatch
+  const [monthsData, setMonthsData] = useState<MonthAvailability[]>([])
+  const [isClient, setIsClient] = useState(false)
+
+  // Calcula els 3 propers mesos NOMÉS al client
+  useEffect(() => {
+    setIsClient(true)
     const now = new Date()
     const currentMonth = now.getMonth() // 0-indexed
     const currentYear = now.getFullYear()
-    
+
     const months: MonthAvailability[] = []
-    
+
     for (let i = 0; i < 3; i++) {
       const monthIndex = (currentMonth + i) % 12
       const year = currentYear + Math.floor((currentMonth + i) / 12)
       const available = getAvailabilityForMonth(monthIndex, year)
       const { status, label } = getStatus(available)
-      
+
       months.push({
         month: monthIndex,
         year,
@@ -102,8 +107,8 @@ export function AvailableMonths() {
         statusLabel: label
       })
     }
-    
-    return months
+
+    setMonthsData(months)
   }, [])
 
   const statusColors = {
@@ -127,6 +132,18 @@ export function AvailableMonths() {
     }
   }
 
+  // No renderitzar res fins que el client estigui llest
+  if (!isClient || monthsData.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-4">
+        <div className="flex items-center gap-2 text-white/70">
+          <span className="text-xl">📅</span>
+          <span className="text-sm font-medium">Carregant disponibilitat...</span>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col items-center gap-4">
       {/* Títol */}
@@ -134,7 +151,7 @@ export function AvailableMonths() {
         <span className="text-xl">📅</span>
         <span className="text-sm font-medium">Dissabtes disponibles:</span>
       </div>
-      
+
       {/* Cards de mesos */}
       <div className="flex gap-3 md:gap-4">
         {monthsData.map((monthData, index) => {
@@ -180,34 +197,45 @@ export function AvailableMonths() {
       
       {/* Nota */}
       <p className="text-xs text-white/40 mt-2">
-        Actualitzat automàticament · {new Date().toLocaleDateString('ca-ES', { month: 'long', year: 'numeric' })}
+        Actualitzat automàticament
       </p>
     </div>
   )
 }
 
 // =============================================================================
-// VERSIÓ SIMPLIFICADA (sense framer-motion)
+// VERSIÓ SIMPLIFICADA (sense framer-motion) - HYDRATION SAFE
 // =============================================================================
 
 export function AvailableMonthsSimple() {
-  const now = new Date()
-  const currentMonth = now.getMonth()
-  const currentYear = now.getFullYear()
-  
-  const months = [0, 1, 2].map(i => {
-    const monthIndex = (currentMonth + i) % 12
-    const year = currentYear + Math.floor((currentMonth + i) / 12)
-    const available = getAvailabilityForMonth(monthIndex, year)
-    const { status, label } = getStatus(available)
-    
-    return {
-      name: MONTH_NAMES_CA[monthIndex],
-      available,
-      status,
-      label
-    }
-  })
+  const [months, setMonths] = useState<Array<{name: string, available: number, status: string, label: string}>>([])
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+
+    const calculatedMonths = [0, 1, 2].map(i => {
+      const monthIndex = (currentMonth + i) % 12
+      const year = currentYear + Math.floor((currentMonth + i) / 12)
+      const available = getAvailabilityForMonth(monthIndex, year)
+      const { status, label } = getStatus(available)
+
+      return {
+        name: MONTH_NAMES_CA[monthIndex],
+        available,
+        status,
+        label
+      }
+    })
+    setMonths(calculatedMonths)
+  }, [])
+
+  if (!isClient || months.length === 0) {
+    return <div className="text-white/50 text-sm">Carregant...</div>
+  }
 
   return (
     <div className="flex items-center gap-4">
