@@ -53,7 +53,8 @@
       "Bash(openssl s_client:*)",
       "Bash(openssl x509:*)",
       "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/portfolio\" \"/packs\" \"/faq\" \"/ca/sensorial\")",
-      "Bash(powershell -Command \"Get-ChildItem ''C:\\Users\\Lore\\Downloads'' | Sort-Object LastWriteTime -Descending\")"
+      "Bash(powershell -Command \"Get-ChildItem ''C:\\Users\\Lore\\Downloads'' | Sort-Object LastWriteTime -Descending\")",
+      "Bash(xargs:*)"
     ]
   }
 }

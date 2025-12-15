@@ -3,18 +3,14 @@
 // ÒRBITA EVENTS - Components Home
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// GUIA D'ÚS:
-// - Components "REAL" = Connectats a BD, ZERO fake data
-// - Components "BRUTAL" = Disseny espectacular però dades estàtiques
-// - Components sense sufix = Originals/Legacy
+// Components REAL = Connectats a BD, ZERO fake data
+// Components BRUTAL = Disseny espectacular
 //
-// RECOMANACIÓ: Utilitza sempre els components REAL per la homepage!
-//
-// Versió: 4.0 NETEJADA - Desembre 2025
+// Versió: 5.0 NETEJADA - Desembre 2025
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 🔥 COMPONENTS REAL - CONNECTATS A BD - UTILITZA AQUESTS!
+// 🔥 COMPONENTS REAL - CONNECTATS A BD
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Hero principal amb stats i countdown REALS
@@ -27,22 +23,11 @@ export { default as TestimonialsBrutalReal } from './TestimonialsBrutal-REAL';
 export { default as StatsSectionReal } from './StatsSection-REAL';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTS BRUTAL - Disseny espectacular (sense dades fake)
+// COMPONENTS BRUTAL - Disseny espectacular
 // ═══════════════════════════════════════════════════════════════════════════
 
-// CTA Section amb disseny brutal - Sense dades fake
+// CTA Section amb disseny brutal
 export { CTASectionBrutal } from './CTASection-BRUTAL';
 
-// Why Us amb disseny brutal - Sense dades fake
+// Why Us amb disseny brutal
 export { WhyUsBrutal } from './WhyUs-BRUTAL';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTS LEGACY - Per compatibilitat
-// ═══════════════════════════════════════════════════════════════════════════
-
-export { Stats } from './Stats';
-export { Hero } from './Hero';
-export { HeroCinematic } from './HeroCinematic';
-export { WhyUs } from './WhyUs';
-export { Testimonials } from './Testimonials';
-export { CTASection } from './CTASection';
