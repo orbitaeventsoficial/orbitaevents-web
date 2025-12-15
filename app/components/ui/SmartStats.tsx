@@ -15,9 +15,9 @@ import { useTranslations } from 'next-intl';
 // ============================================================
 
 const REAL_STATS = {
-  yearsExperience: '2+',   // 2+ anys des de 2023
-  coverage: 'BCN + Girona', // Barcelona i Girona
-  response: '2h',          // Resposta en 2 hores
+  yearsExperience: 'Des de 2023',   // Fundat l'any 2023
+  coverage: 'Barcelona + Girona',    // 2 províncies
+  response: '2h',                    // Resposta en 2 hores
 };
 
 // ============================================================

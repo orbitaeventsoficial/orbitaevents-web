@@ -13,9 +13,9 @@ export function Stats({ variant = 'default' }: StatsProps) {
   if (variant === 'compact') {
     return (
       <div className="flex flex-wrap justify-center gap-4 text-sm text-white/60">
-        <span>2+ {t('yearsExperience')}</span>
+        <span>Des de 2023</span>
         <span>•</span>
-        <span>BCN {t('coverage')}</span>
+        <span>Barcelona + Girona</span>
         <span>•</span>
         <span>2h {t('response')}</span>
       </div>
@@ -23,8 +23,8 @@ export function Stats({ variant = 'default' }: StatsProps) {
   }
 
   const stats = [
-    { value: '2+', labelKey: 'yearsExperience' },
-    { value: 'BCN', labelKey: 'coverage' },
+    { value: 'Des de 2023', labelKey: 'yearsExperience' },
+    { value: 'BCN + GI', labelKey: 'coverage' },
     { value: '2h', labelKey: 'response' },
   ];
 

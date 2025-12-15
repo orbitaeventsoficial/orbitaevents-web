@@ -512,8 +512,8 @@ function LaPromesa({ t }: { t: (key: string) => string }) {
           className="flex flex-wrap justify-center gap-8 mt-12"
         >
           {[
-            { num: '2+', label: t('promesa.stats.anys') },
-            { num: 'BCN', label: t('promesa.stats.ubicacio') },
+            { num: 'Des de 2023', label: t('promesa.stats.anys') },
+            { num: 'BCN + GI', label: t('promesa.stats.ubicacio') },
             { num: '2h', label: t('promesa.stats.resposta') },
           ].map((stat, i) => (
             <div key={i} className="text-center">
