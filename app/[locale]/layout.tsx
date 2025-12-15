@@ -16,7 +16,7 @@ import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { locales, type Locale } from '@/i18n';
-import { inter, plusJakarta, jetbrains } from '@/app/fonts';
+import { inter, plusJakarta, jetbrains, sora } from '@/app/fonts';
 import '@/app/globals.css';
 
 // Components
@@ -323,7 +323,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} scroll-smooth`}
+      className={`${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} ${sora.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <head>

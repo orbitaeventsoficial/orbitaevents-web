@@ -254,8 +254,8 @@ const PACKS: PackDefinition[] = [
     name: "Essential (Baile Final)",
     tagline: "Tu fiesta final, exactamente como la imaginas",
     emotion: "Ese momento cuando todos bailan juntos... tu boda, tu estilo, tu música",
-    price: "650€",
-    priceValue: 650,
+    price: "550€",
+    priceValue: 550,
     features: [
       "DJ profesional 3 horas (Solo baile final)", // ← CORRECCIÓN: 3h para solo baile
       `Sonido PRO ${INVENTARIO.altavoces.potenciaTotal}W (${INVENTARIO.altavoces.nombre}) + ${INVENTARIO.controladora.nombre}`,
@@ -276,8 +276,8 @@ const PACKS: PackDefinition[] = [
     name: "Signature (Día Completo)",
     tagline: "Vivimos tu boda contigo desde el primer momento",
     emotion: "Desde que entras hasta el último baile: música, tematización y animación pensadas para vosotros",
-    price: "950€",
-    priceValue: 950,
+    price: "800€",
+    priceValue: 800,
     features: [
       "DJ profesional 5 horas (Ceremonia, Cóctel, Baile)",
       `Sonido PRO ${INVENTARIO.altavoces.potenciaTotal}W + ${INVENTARIO.controladora.nombre}`,
@@ -301,8 +301,8 @@ const PACKS: PackDefinition[] = [
     name: "Royal Wedding (Full FX)",
     tagline: "La experiencia VIP que tus invitados jamás olvidarán",
     emotion: "No solo una boda. Un espectáculo diseñado para que cada invitado diga: 'Nunca había visto algo así'",
-    price: "1.200€",
-    priceValue: 1200,
+    price: "1.000€",
+    priceValue: 1000,
     features: [
       "DJ + TÉCNICO DE LUCES (2 Personas, 6 horas)",
       `Sonido Audiófilo ${INVENTARIO.altavoces.potenciaTotal}W ${INVENTARIO.altavoces.nombre.replace('2x ', '')}`,
@@ -329,8 +329,8 @@ const PACKS: PackDefinition[] = [
     name: "Party Starter",
     tagline: "Tu fiesta, tu estilo. Nosotros la hacemos realidad",
     emotion: "Desde cumpleaños temáticos hasta celebraciones familiares: creamos el ambiente perfecto para que todos disfruten",
-    price: "400€",
-    priceValue: 400,
+    price: "350€",
+    priceValue: 350,
     features: [
       "DJ profesional 3 horas",
       `Sonido ${INVENTARIO.altavoces.potenciaTotal}W ${INVENTARIO.altavoces.nombre} + ${INVENTARIO.controladora.nombre}`,
@@ -351,8 +351,8 @@ const PACKS: PackDefinition[] = [
     slug: "party-machine",
     name: "Party Machine",
     tagline: "Más duración y efectos para fiestas que no paran",
-    price: "500€",
-    priceValue: 500,
+    price: "400€",
+    priceValue: 400,
     features: [
       "DJ profesional 4 horas",
       `Sonido ${INVENTARIO.altavoces.potenciaTotal}W ${INVENTARIO.altavoces.nombre} + ${INVENTARIO.controladora.nombre}`,
@@ -374,8 +374,8 @@ const PACKS: PackDefinition[] = [
     slug: "vip-experience",
     name: "VIP Experience",
     tagline: "Máxima duración, efectos espectaculares y potencia profesional",
-    price: "900€",
-    priceValue: 900,
+    price: "700€",
+    priceValue: 700,
     features: [
       "DJ profesional 6 horas",
       `Sonido Club (${INVENTARIO.altavoces.potenciaTotal}W + Subwoofer de refuerzo)`,
@@ -401,8 +401,8 @@ const PACKS: PackDefinition[] = [
     name: "Corporate Cocktail",
     tagline: "Profesionalismo que refuerza tu marca",
     emotion: "Networking elegante con el ambiente perfecto que refleja los valores de tu empresa",
-    price: "450€",
-    priceValue: 450,
+    price: "400€",
+    priceValue: 400,
     features: [
       "DJ/Hilo musical 4 horas", // ← 3h → 4h
       `Sonido ambiente cristalino (${INVENTARIO.altavoces.nombre.replace('2x ', '')})`,
@@ -421,8 +421,8 @@ const PACKS: PackDefinition[] = [
     slug: "corporate-event",
     name: "Corporate Event",
     tagline: "La opción equilibrada para presentaciones y fiesta.",
-    price: "1.050€",
-    priceValue: 1050,
+    price: "850€",
+    priceValue: 850,
     features: [
       "DJ + Técnico 5 horas",
       `Sonido ${INVENTARIO.altavoces.potenciaTotal}W para speech y música`,
@@ -443,8 +443,8 @@ const PACKS: PackDefinition[] = [
     slug: "corporate-gala",
     name: "Corporate Gala",
     tagline: "Producción completa con refuerzo técnico.",
-    price: "1.900€",
-    priceValue: 1900,
+    price: "1.400€",
+    priceValue: 1400,
     features: [
       "Servicio integral 6 horas",
       "DJ + Técnico de Sonido dedicado",
@@ -469,8 +469,8 @@ const PACKS: PackDefinition[] = [
     slug: "tech-support",
     name: "Tech Support",
     tagline: "Alquiler de equipo propio con técnico operador.",
-    price: "750€",
-    priceValue: 750,
+    price: "600€",
+    priceValue: 600,
     features: [
       `Sonido ${INVENTARIO.altavoces.potenciaTotal}W ${INVENTARIO.altavoces.nombre}`,
       getDescripcionIluminacionPRO(),
@@ -488,8 +488,8 @@ const PACKS: PackDefinition[] = [
     slug: "tech-team",
     name: "Tech Team",
     tagline: "Doble personal para asegurar el éxito.",
-    price: "1.200€",
-    priceValue: 1200,
+    price: "1.000€",
+    priceValue: 1000,
     features: [
       `Sonido ${INVENTARIO.altavoces.potenciaTotal}W ${INVENTARIO.altavoces.nombre}`,
       "Iluminación completa propia",
@@ -509,8 +509,8 @@ const PACKS: PackDefinition[] = [
     slug: "full-service",
     name: "Full Service",
     tagline: "Máxima cobertura horaria y técnica.",
-    price: "1.900€",
-    priceValue: 1900,
+    price: "1.400€",
+    priceValue: 1400,
     features: [
       "Todo el equipamiento de sonido y luz",
       "Refuerzo de graves (Subwoofer alquiler)",
