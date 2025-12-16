@@ -16,6 +16,7 @@
 
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { usePublicStats } from '@/hooks/usePublicData';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ICONOS
@@ -171,6 +172,7 @@ export default function GarantiaSection() {
   const t = useTranslations('common');
   const isEs = t('language') === 'es';
   const guarantees = getGuarantees(isEs);
+  const { stats } = usePublicStats();
 
   // Textos bilingües
   const texts = {
@@ -181,7 +183,9 @@ export default function GarantiaSection() {
       ? 'Nos comprometemos al 100% con cada evento. Si algo no es como esperabas, lo solucionamos o te devolvemos el dinero.'
       : 'Ens comprometem al 100% amb cada event. Si alguna cosa no és com esperaves, ho solucionem o et tornem els diners.',
     sealTitle: isEs ? 'Compromiso Òrbita Events' : 'Compromís Òrbita Events',
-    sealSubtitle: isEs ? '+195 eventos sin incidencias graves' : '+195 events sense incidències greus',
+    sealSubtitle: isEs
+      ? `+${stats.totalEvents} eventos sin incidencias graves`
+      : `+${stats.totalEvents} events sense incidències greus`,
   };
 
   return (

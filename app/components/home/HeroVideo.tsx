@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // HERO VIDEO - AMB SCROLL DELAY I STATS QUE FUNCIONEN
 // Fix: El fundido ara comença més tard (després de 200px scroll)
-// Fix: Stats amb valors reals (195+, 92%, 100%, 2h)
+// Fix: Stats dinàmics des de la BBDD (48+ events mínim)
 // Fix: Internacionalització CA/ES completa
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -13,6 +13,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { usePublicStats } from '@/hooks/usePublicData';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HOOK: Números animats
@@ -48,7 +49,7 @@ function useAnimatedNumber(target: number, duration: number = 2000, trigger: boo
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STATS DATA (Bilingüe)
+// STATS DATA (Bilingüe) - Ara dinàmic des de BBDD
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface StatData {
@@ -58,11 +59,17 @@ interface StatData {
   labelEs: string;
 }
 
-const statsData: StatData[] = [
-  { value: 195, suffix: '+', labelCa: 'Events realitzats', labelEs: 'Eventos realizados' },
+// Stats estàtics (no depenen de BBDD)
+const STATIC_STATS: StatData[] = [
   { value: 92, suffix: '%', labelCa: 'Repeteixen o recomanen', labelEs: 'Repiten o recomiendan' },
   { value: 100, suffix: '%', labelCa: 'Amb equip backup', labelEs: 'Con equipo backup' },
   { value: 2, suffix: 'h', labelCa: 'Temps de resposta', labelEs: 'Tiempo de respuesta' },
+];
+
+// Helper per crear stats amb valor dinàmic d'events
+const getStatsData = (totalEvents: number): StatData[] => [
+  { value: totalEvents, suffix: '+', labelCa: 'Events realitzats', labelEs: 'Eventos realizados' },
+  ...STATIC_STATS,
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -115,6 +122,10 @@ function StatItem({
 export default function HeroVideo() {
   const t = useTranslations('common');
   const isEs = t('language') === 'es';
+
+  // Stats dinàmics des de BBDD
+  const { stats } = usePublicStats();
+  const statsData = getStatsData(stats.totalEvents);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
