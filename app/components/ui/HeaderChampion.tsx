@@ -627,7 +627,7 @@ export default function HeaderChampion() {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
                   href="/contacto"
-                  className="flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black font-black text-sm rounded-xl shadow-lg shadow-amber-500/30 transition-all uppercase tracking-wide"
+                  className="flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-white font-black text-sm rounded-xl shadow-lg shadow-amber-500/30 transition-all uppercase tracking-wide"
                 >
                   <Icons.Sparkles />
                   <span>{t('ctaFree')}</span>

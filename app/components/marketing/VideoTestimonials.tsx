@@ -129,7 +129,7 @@ function VideoTestimonials() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/tematica-mon-magic"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full hover:scale-105 transition-transform"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-full hover:scale-105 transition-transform"
             >
               <Sparkles className="w-5 h-5" />
               {tVideo('seeHP')}

@@ -309,7 +309,7 @@ export default function HeroBrutalReal() {
               {/* Fons sòlid */}
               <span className="absolute inset-0 bg-amber-500 pointer-events-none" />
               {/* Contingut */}
-              <span className="relative z-10 text-black uppercase tracking-wide">
+              <span className="relative z-10 text-white uppercase tracking-wide">
                 {t('badge')}
               </span>
             </span>
@@ -401,7 +401,7 @@ export default function HeroBrutalReal() {
               </div>
               
               {/* Contingut */}
-              <span className="relative z-10 flex items-center justify-center gap-3 text-black font-black text-lg uppercase tracking-wider">
+              <span className="relative z-10 flex items-center justify-center gap-3 text-white font-black text-lg uppercase tracking-wider">
                 {t('cta.primary')}
                 <span className="group-hover:translate-x-2 transition-transform duration-300 text-xl">→</span>
               </span>

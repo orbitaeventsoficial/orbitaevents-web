@@ -210,7 +210,7 @@ export default function UrgencyBannerReal() {
               
               <Link
                 href="/contacto"
-                className={`px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all whitespace-nowrap flex items-center gap-2 ${style.pulse ? 'animate-pulse' : ''}`}
+                className={`px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all whitespace-nowrap flex items-center gap-2 ${style.pulse ? 'animate-pulse' : ''}`}
               >
                 {t('cta')}
                 <span>→</span>

@@ -675,7 +675,7 @@
     }
   },
   "stats": {
-    "badge": "📊 Números reales",
+    "badge": "Números reales",
     "yearsExperience": "En el sector eventos",
     "eventsCompleted": "Eventos celebrados",
     "response": "Respuesta",
@@ -709,7 +709,7 @@
     "coverageDetailed": {
       "label": "Cobertura",
       "description": "Barcelona y Girona",
-      "value": "1"
+      "value": "2"
     },
     "ratingOld": "Google",
     "eventsOld": "eventos",
