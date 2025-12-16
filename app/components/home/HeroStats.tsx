@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // HERO STATS - Números animats amb delay
 // ═══════════════════════════════════════════════════════════════════════════
-// - Números animats (195+, 92%, 100%, 2h)
+// - Números animats dinàmics des de BBDD (48+ events mínim)
 // - Delay més llarg (apareixen més tard)
 // - Fons més llegible
 // ═══════════════════════════════════════════════════════════════════════════
@@ -12,6 +12,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { usePublicStats } from '@/hooks/usePublicData';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DADES
@@ -24,11 +25,17 @@ interface Stat {
   labelEs: string;
 }
 
-const stats: Stat[] = [
-  { value: '195', suffix: '+', label: 'Events realitzats', labelEs: 'Eventos realizados' },
+// Stats estàtics (no depenen de BBDD)
+const STATIC_STATS: Stat[] = [
   { value: '92', suffix: '%', label: 'Repeteixen o recomanen', labelEs: 'Repiten o recomiendan' },
   { value: '100', suffix: '%', label: 'Amb equip backup', labelEs: 'Con equipo backup' },
   { value: '2', suffix: 'h', label: 'Temps de resposta', labelEs: 'Tiempo de respuesta' },
+];
+
+// Helper per crear stats amb valor dinàmic d'events
+const getStats = (totalEvents: number): Stat[] => [
+  { value: String(totalEvents), suffix: '+', label: 'Events realitzats', labelEs: 'Eventos realizados' },
+  ...STATIC_STATS,
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -122,6 +129,10 @@ function AnimatedStat({
 export default function HeroStats() {
   const t = useTranslations('common');
   const isEs = t('language') === 'es';
+
+  // Stats dinàmics des de BBDD
+  const { stats: publicStats } = usePublicStats();
+  const stats = getStats(publicStats.totalEvents);
 
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, {

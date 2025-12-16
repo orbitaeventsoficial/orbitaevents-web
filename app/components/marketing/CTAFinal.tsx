@@ -19,6 +19,7 @@ import { useState, useEffect } from 'react';
 import { Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { usePublicStats } from '@/hooks/usePublicData';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ICONOS
@@ -90,6 +91,7 @@ export default function CTAFinal() {
   const t = useTranslations('common');
   const isEs = t('language') === 'es';
   const availability = useAvailability(isEs);
+  const { stats } = usePublicStats();
 
   const statusColors = {
     scarce: 'from-red-500 to-rose-500',
@@ -261,7 +263,7 @@ export default function CTAFinal() {
           >
             <span className="flex items-center gap-2">
               <span className="text-2xl">🎯</span>
-              <span><strong className="text-white">+195</strong> {texts.events}</span>
+              <span><strong className="text-white">+{stats.totalEvents}</strong> {texts.events}</span>
             </span>
             <span className="hidden md:block w-px h-4 bg-white/20" />
             <span className="flex items-center gap-2">
