@@ -17,9 +17,8 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -42,31 +41,37 @@ interface Testimonial {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// DATOS MOCK - REEMPLAZAR CON API/PRISMA
+// TIPUS PER TESTIMONIS DES DE JSON
 // ═══════════════════════════════════════════════════════════════════════════
 
-const MOCK_TESTIMONIALS: Testimonial[] = [
+interface TranslatedTestimonial {
+  id: string;
+  translationKey: string;
+  avatar?: string;
+  rating: number;
+  eventType: 'boda' | 'fiesta' | 'empresa' | 'tematica';
+  location?: string;
+  verified: boolean;
+  source: 'google' | 'bodas.net' | 'direct';
+}
+
+// 3 testimonis amb dades i claus de traducció
+const TESTIMONIALS_CONFIG: TranslatedTestimonial[] = [
   {
     id: '1',
-    name: 'Maria i Jordi',
-    role: 'Casament a Mas Terrats',
-    avatar: '/img/testimonials/maria-jordi.webp',
+    translationKey: 'testimonial1',
+    avatar: '/img/testimonials/lorena-carles.webp',
     rating: 5,
-    text: 'Increïble! Van fer que el nostre casament fos màgic. La tematització Harry Potter va deixar a tots amb la boca oberta. Els convidats encara en parlen!',
-    date: '2024-09-14',
-    eventType: 'boda',
+    eventType: 'tematica',
     location: 'Girona',
     verified: true,
     source: 'google'
   },
   {
     id: '2',
-    name: 'Laura Martínez',
-    role: 'Festa 40 aniversari',
-    avatar: '/img/testimonials/laura.webp',
+    translationKey: 'testimonial2',
+    avatar: '/img/testimonials/marc-puig.webp',
     rating: 5,
-    text: 'La millor festa que hem fet mai! El DJ va saber llegir perfectament l\'ambient i la gent no va parar de ballar. Repetirem segur!',
-    date: '2024-10-28',
     eventType: 'fiesta',
     location: 'Barcelona',
     verified: true,
@@ -74,42 +79,13 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   },
   {
     id: '3',
-    name: 'TechCorp BCN',
-    role: 'Event corporatiu anual',
-    avatar: '/img/testimonials/techcorp.webp',
+    translationKey: 'testimonial3',
+    avatar: '/img/testimonials/anna-garcia.webp',
     rating: 5,
-    text: 'Professionalitat màxima. Van gestionar tot l\'audiovisual del nostre event de 200 persones sense cap problema. El so i les llums, espectaculars.',
-    date: '2024-11-15',
     eventType: 'empresa',
     location: 'Barcelona',
     verified: true,
     source: 'direct'
-  },
-  {
-    id: '4',
-    name: 'Família Puig',
-    role: 'Festa Halloween infantil',
-    avatar: '/img/testimonials/familia-puig.webp',
-    rating: 5,
-    text: 'Els nens van flipar amb la decoració de Halloween! L\'animació va ser genial i els efectes de fum i llum van crear un ambient increïble.',
-    date: '2024-10-31',
-    eventType: 'tematica',
-    location: 'Granollers',
-    verified: true,
-    source: 'google'
-  },
-  {
-    id: '5',
-    name: 'Anna i Marc',
-    role: 'Casament a Can Ribas',
-    avatar: '/img/testimonials/anna-marc.webp',
-    rating: 5,
-    text: 'Des del primer moment ens van entendre perfectament. La coordinació el dia del casament va ser impecable. 100% recomanables!',
-    date: '2024-08-24',
-    eventType: 'boda',
-    location: 'Maresme',
-    verified: true,
-    source: 'bodas.net'
   },
 ];
 
@@ -121,11 +97,6 @@ const Icons = {
   Star: ({ filled }: { filled: boolean }) => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  ),
-  Play: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <polygon points="5 3 19 12 5 21 5 3" />
     </svg>
   ),
   Quote: () => (
@@ -149,16 +120,6 @@ const Icons = {
   BodasNet: () => (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="#FF6B6B">
       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-    </svg>
-  ),
-  ChevronLeft: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  ),
-  ChevronRight: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polyline points="9 18 15 12 9 6" />
     </svg>
   ),
 };
@@ -224,44 +185,64 @@ function EventTypeBadge({ type, isEs }: { type: string; isEs: boolean }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTE: Testimonial Card
+// COMPONENTE: Testimonial Card amb Traduccions
 // ═══════════════════════════════════════════════════════════════════════════
 
-function TestimonialCard({ testimonial, isActive, isEs }: { testimonial: Testimonial; isActive: boolean; isEs: boolean }) {
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(isEs ? 'es-ES' : 'ca-ES', { month: 'long', year: 'numeric' });
-  };
+function TranslatedTestimonialCard({
+  config,
+  t,
+  isEs
+}: {
+  config: TranslatedTestimonial;
+  t: (key: string) => string;
+  isEs: boolean;
+}) {
+  const { translationKey, avatar, rating, eventType, location, verified, source } = config;
+
+  // Obtenir traduccions
+  const author = t(`${translationKey}.author`);
+  const role = t(`${translationKey}.role`);
+  const quote = t(`${translationKey}.quote`);
+  const date = t(`${translationKey}.date`);
+  const highlight = t(`${translationKey}.highlight`);
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: isActive ? 1 : 0.5, scale: isActive ? 1 : 0.95 }}
-      transition={{ duration: 0.4 }}
-      className={`relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 rounded-3xl p-6 md:p-8 ${isActive ? 'shadow-2xl shadow-amber-500/10' : ''}`}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className="relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl shadow-amber-500/5 hover:shadow-amber-500/10 transition-shadow"
     >
       {/* Quote icon */}
       <div className="absolute top-6 right-6">
         <Icons.Quote />
       </div>
 
+      {/* Highlight badge */}
+      <div className="mb-4">
+        <span className="inline-block px-3 py-1 bg-amber-500/20 border border-amber-500/30 rounded-full text-amber-400 text-sm font-medium">
+          {highlight}
+        </span>
+      </div>
+
       {/* Header */}
       <div className="flex items-start gap-4 mb-6">
         {/* Avatar */}
         <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 flex-shrink-0">
-          {testimonial.avatar ? (
+          {avatar ? (
             <Image
-              src={testimonial.avatar}
-              alt={testimonial.name}
+              src={avatar}
+              alt={author}
               fill
               className="object-cover"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-xl font-bold text-white">
-              {testimonial.name.charAt(0)}
+              {author.charAt(0)}
             </div>
           )}
-          {testimonial.verified && (
+          {verified && (
             <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-zinc-900">
               <Icons.Verified />
             </div>
@@ -270,42 +251,33 @@ function TestimonialCard({ testimonial, isActive, isEs }: { testimonial: Testimo
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h4 className="font-bold text-white text-lg">{testimonial.name}</h4>
-          {testimonial.role && (
-            <p className="text-sm text-white/60 truncate">{testimonial.role}</p>
-          )}
+          <h4 className="font-bold text-white text-lg">{author}</h4>
+          <p className="text-sm text-white/60 truncate">{role}</p>
           <div className="flex items-center gap-3 mt-2">
-            <RatingStars rating={testimonial.rating} />
-            <SourceBadge source={testimonial.source} isEs={isEs} />
+            <RatingStars rating={rating} />
+            <SourceBadge source={source} isEs={isEs} />
           </div>
         </div>
       </div>
 
       {/* Text */}
-      <blockquote className="text-white/80 text-base md:text-lg leading-relaxed mb-6">
-        "{testimonial.text}"
+      <blockquote className="text-white/80 text-base leading-relaxed mb-6 line-clamp-4">
+        "{quote}"
       </blockquote>
 
       {/* Footer */}
       <div className="flex items-center justify-between pt-4 border-t border-white/5">
-        <EventTypeBadge type={testimonial.eventType} isEs={isEs} />
+        <EventTypeBadge type={eventType} isEs={isEs} />
         <div className="flex items-center gap-2 text-sm text-white/50">
-          {testimonial.location && (
+          {location && (
             <>
-              <span>📍 {testimonial.location}</span>
+              <span>📍 {location}</span>
               <span>•</span>
             </>
           )}
-          <span>{formatDate(testimonial.date)}</span>
+          <span>{date}</span>
         </div>
       </div>
-
-      {/* Video button if available */}
-      {testimonial.videoUrl && (
-        <button className="absolute bottom-6 right-6 w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center text-black hover:scale-110 transition-transform shadow-lg shadow-amber-500/30">
-          <Icons.Play />
-        </button>
-      )}
     </motion.div>
   );
 }
@@ -355,53 +327,16 @@ function SummaryStats({ isEs }: { isEs: boolean }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTE PRINCIPAL
+// COMPONENTE PRINCIPAL - 3 Testimonis en Grid
 // ═══════════════════════════════════════════════════════════════════════════
 
-interface TestimoniosRealesProps {
-  testimonials?: Testimonial[];
-  autoplay?: boolean;
-  autoplayInterval?: number;
-}
-
-export default function TestimoniosReales({
-  testimonials = MOCK_TESTIMONIALS,
-  autoplay = true,
-  autoplayInterval = 5000,
-}: TestimoniosRealesProps) {
+export default function TestimoniosReales() {
   const t = useTranslations('testimonials');
   const tCommon = useTranslations('common');
   const isEs = tCommon('language') === 'es';
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: false, margin: '-100px' });
-
-  // Autoplay
-  useEffect(() => {
-    if (!autoplay || isPaused || !isInView) return;
-
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-    }, autoplayInterval);
-
-    return () => clearInterval(timer);
-  }, [autoplay, autoplayInterval, isPaused, isInView, testimonials.length]);
-
-  const goTo = (index: number) => {
-    setCurrentIndex(index);
-    setIsPaused(true);
-    setTimeout(() => setIsPaused(false), 10000);
-  };
-
-  const goPrev = () => goTo((currentIndex - 1 + testimonials.length) % testimonials.length);
-  const goNext = () => goTo((currentIndex + 1) % testimonials.length);
 
   return (
-    <section
-      ref={containerRef}
-      className="relative py-20 md:py-32 overflow-hidden"
-    >
+    <section className="relative py-20 md:py-32 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.05),transparent_70%)]" />
@@ -415,63 +350,36 @@ export default function TestimoniosReales({
           className="text-center mb-12"
         >
           <span className="inline-block px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-6">
-            {isEs ? '⭐ Lo que dicen nuestros clientes' : '⭐ El que diuen els nostres clients'}
+            {t('badge')}
           </span>
           <h2 className="text-3xl md:text-5xl font-black text-white mb-4">
-            {isEs ? 'Historias' : 'Històries'} <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">{isEs ? 'reales' : 'reals'}</span>
+            {t('title')} <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">{t('titleHighlight')}</span>
           </h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            {isEs
-              ? 'No nos creas a nosotros. Escucha lo que dicen las personas que ya han vivido la experiencia Òrbita.'
-              : 'No ens creguis a nosaltres. Escolta el que diuen les persones que ja han viscut l\'experiència Òrbita.'}
+            {t('subtitle')}
           </p>
         </motion.div>
 
         {/* Summary Stats */}
         <SummaryStats isEs={isEs} />
 
-        {/* Carousel */}
-        <div className="relative max-w-4xl mx-auto">
-          {/* Navigation buttons */}
-          <button
-            onClick={goPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-16 z-10 w-12 h-12 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white transition-all"
-          >
-            <Icons.ChevronLeft />
-          </button>
-          <button
-            onClick={goNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-16 z-10 w-12 h-12 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white transition-all"
-          >
-            <Icons.ChevronRight />
-          </button>
-
-          {/* Cards */}
-          <div className="overflow-hidden">
-            <AnimatePresence mode="wait">
-              <TestimonialCard
-                key={testimonials[currentIndex].id}
-                testimonial={testimonials[currentIndex]}
-                isActive={true}
+        {/* 3 Testimonials Grid */}
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {TESTIMONIALS_CONFIG.map((config, index) => (
+            <motion.div
+              key={config.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <TranslatedTestimonialCard
+                config={config}
+                t={t}
                 isEs={isEs}
               />
-            </AnimatePresence>
-          </div>
-
-          {/* Dots */}
-          <div className="flex items-center justify-center gap-2 mt-8">
-            {testimonials.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goTo(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentIndex
-                    ? 'w-8 bg-gradient-to-r from-amber-500 to-orange-500'
-                    : 'bg-white/20 hover:bg-white/40'
-                }`}
-              />
-            ))}
-          </div>
+            </motion.div>
+          ))}
         </div>
 
         {/* CTA */}
@@ -482,13 +390,13 @@ export default function TestimoniosReales({
           className="text-center mt-16"
         >
           <p className="text-white/60 mb-4">
-            {isEs ? '¿Quieres ser el próximo testimonio?' : 'Vols ser el pròxim testimoni?'}
+            {t('cta')}
           </p>
           <a
-            href="/configurador"
+            href="/contacto"
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-2xl transition-all hover:scale-105"
           >
-            <span>{isEs ? 'Pide tu presupuesto' : 'Demana el teu pressupost'}</span>
+            <span>{t('ctaButton')}</span>
             <span>→</span>
           </a>
         </motion.div>

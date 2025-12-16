@@ -737,6 +737,38 @@
     "testimonials": {
       "badge": "💬 Qué dicen de nosotros",
       "title": "Historias reales, emociones reales"
+    },
+    "experiencies": {
+      "badge": "✨ Lo que nos hace únicos",
+      "title": "Experiencias",
+      "titleHighlight": "Inmersivas",
+      "subtitle": "No es decoración. Es una experiencia completa. Tematización + DJ profesional para crear momentos mágicos.",
+      "viewExperience": "Ver experiencia",
+      "otherThemes": "También creamos experiencias personalizadas: Años 80, Tropical, Gatsby, Disco...",
+      "consultIdea": "Consulta tu idea",
+      "separatorText": "¿Solo quieres música y luces sin tematización?",
+      "separatorCta": "👇 Descubre nuestros packs de discomóvil",
+      "from": "Desde",
+      "monMagic": {
+        "name": "Mundo Mágico",
+        "tagline": "La experiencia Harry Potter definitiva",
+        "description": "Transforma tu evento en un mundo de magia. Velas flotantes, pociones, decoración completa y mucho más.",
+        "badge": "✨ Exclusivo",
+        "features": ["Tematización completa", "DJ profesional 4h", "Velas flotantes", "Decoración inmersiva"]
+      },
+      "halloween": {
+        "name": "Halloween",
+        "tagline": "La noche más terrorífica",
+        "description": "Una experiencia que pondrá los pelos de punta. Fantasmas, decoración de terror y ambiente único.",
+        "badge": "🎃 Popular",
+        "features": ["Tematización completa", "DJ profesional 4h", "Efectos especiales", "Decoración terror"]
+      }
+    },
+    "discomovil": {
+      "badge": "🎵 Sin tematización",
+      "title": "Solo",
+      "titleHighlight": "Discomóvil",
+      "subtitle": "DJ profesional + equipo de sonido + iluminación. Sin tematización, solo la mejor música."
     }
   },
   "proof": {
