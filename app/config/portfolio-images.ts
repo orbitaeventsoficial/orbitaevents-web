@@ -125,6 +125,10 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/discomovil/discomovil-03.jpg",
       "alt": "Discomovil – Discomovil  03"
+    },
+    {
+      "src": "/img/portfolio/discomovil/discomovil-04.jpg",
+      "alt": "Discomovil – Discomovil  04"
     }
   ],
   "eventos-empresa": [
@@ -157,6 +161,14 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-01.webp",
       "alt": "Fiestas infantiles – Fiestas infantiles  01"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-02.jpg",
+      "alt": "Fiestas infantiles – Fiestas infantiles  02"
+    },
+    {
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-03.jpg",
+      "alt": "Fiestas infantiles – Fiestas infantiles  03"
     }
   ],
   "fiestas-privadas": [
@@ -277,16 +289,16 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  09"
     },
     {
-      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-10.webp",
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-10.jpg",
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  10"
     },
     {
-      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-11.webp",
-      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  11"
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-13.webp",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  13"
     },
     {
-      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-12.webp",
-      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  12"
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-14.jpg",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  14"
     }
   ],
   "produccion-tecnica": [
