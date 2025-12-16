@@ -2,9 +2,13 @@ import createMiddleware from 'next-intl/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 import { locales, defaultLocale, type Locale } from './i18n';
 
-// Credencials hardcoded per Edge Runtime (process.env no funciona bé)
-const USER = 'orbita';
-const PASS = 'admin2024';
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN SECURITY - Credencials des de variables d'entorn
+// ═══════════════════════════════════════════════════════════════════════════════
+// IMPORTANT: Configura aquestes variables a Vercel Dashboard:
+// - ADMIN_USER: nom d'usuari per l'admin
+// - ADMIN_PASS: contrasenya segura (mínim 16 caràcters)
+// ═══════════════════════════════════════════════════════════════════════════════
 
 function unauthorized() {
   return new NextResponse('Authentication required', {
@@ -12,6 +16,12 @@ function unauthorized() {
     headers: {
       'WWW-Authenticate': 'Basic realm="Orbita Admin"',
     },
+  });
+}
+
+function forbidden() {
+  return new NextResponse('Access denied - Invalid credentials', {
+    status: 403,
   });
 }
 
@@ -30,18 +40,35 @@ export function middleware(req: NextRequest) {
 
   // Si es ruta protegida, aplicar auth básica
   if (isProtected) {
+    // Obtenir credencials des de variables d'entorn
+    const ADMIN_USER = process.env.ADMIN_USER;
+    const ADMIN_PASS = process.env.ADMIN_PASS;
+
+    // Si no hi ha variables configurades, bloquejar accés
+    if (!ADMIN_USER || !ADMIN_PASS) {
+      console.error('⚠️ ADMIN_USER or ADMIN_PASS not configured in environment variables');
+      return forbidden();
+    }
+
     const authHeader = req.headers.get('authorization');
 
     if (!authHeader || !authHeader.startsWith('Basic ')) {
       return unauthorized();
     }
 
-    const base64Credentials = authHeader.split(' ')[1]!;
-    const decoded = atob(base64Credentials);
-    const [user, ...passParts] = decoded.split(':');
-    const pass = passParts.join(':');
+    try {
+      const base64Credentials = authHeader.split(' ')[1]!;
+      const decoded = atob(base64Credentials);
+      const [user, ...passParts] = decoded.split(':');
+      const pass = passParts.join(':');
 
-    if (user !== USER || pass !== PASS) {
+      // Verificar credencials
+      if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
+        // Log intent fallit (sense revelar credencials)
+        console.warn(`⚠️ Failed admin login attempt from IP: ${req.headers.get('x-forwarded-for') || 'unknown'}`);
+        return unauthorized();
+      }
+    } catch {
       return unauthorized();
     }
 
