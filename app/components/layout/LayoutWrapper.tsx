@@ -20,8 +20,9 @@ const BottomNav = dynamic(
   { ssr: false }
 );
 
-const FloatingContactButtons = dynamic(
-  () => import('@/app/components/ui/FloatingContactButtons'),
+// FloatingCTAs - FIX SOLAPAMENT BOTONS (WhatsApp desktop + Bottom bar mòbil)
+const FloatingCTAs = dynamic(
+  () => import('@/app/components/ui/FloatingCTAs'),
   { ssr: false }
 );
 
@@ -40,10 +41,7 @@ const FlashOffer = dynamic(
   { ssr: false }
 );
 
-const WhatsAppPremium = dynamic(
-  () => import('@/app/components/ui/WhatsAppPremium'),
-  { ssr: false }
-);
+// ELIMINAT: WhatsAppPremium - Ara usat FloatingCTAs que inclou WhatsApp + Bottom Bar
 
 const Footer = dynamic(
   () => import('@/app/components/ui/footer'),
@@ -134,14 +132,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       {/* Footer */}
       <Footer />
 
-      {/* Botons flotants de contacte */}
-      <FloatingContactButtons />
-
-      {/* WhatsApp Premium flotant */}
-      <WhatsAppPremium />
-
-      {/* Navegació inferior mòbil */}
-      <BottomNav />
+      {/* FloatingCTAs - WhatsApp desktop + Bottom bar mòbil (FIX SOLAPAMENT) */}
+      <FloatingCTAs />
 
       {/* Consentiment cookies */}
       <CookieConsent />
