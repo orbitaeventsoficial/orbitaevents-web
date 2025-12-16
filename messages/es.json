@@ -1187,6 +1187,9 @@
     "closeMenu": "Cerrar menú",
     "cta": "Pide Presupuesto",
     "ctaShort": "Presupuesto",
+    "ctaFree": "Presupuesto Gratis",
+    "ctaQuick": "Presupuesto en 2 minutos",
+    "whatsappDirect": "WhatsApp Directo",
     "nav": {
       "services": "Servicios",
       "experiences": "Experiencias",
@@ -1199,7 +1202,9 @@
       "servicesTitle": "Nuestros servicios",
       "servicesSubtitle": "Todo lo que necesitas para tu evento",
       "experiencesTitle": "Experiencias temáticas",
-      "experiencesSubtitle": "Fiestas únicas y memorables"
+      "experiencesSubtitle": "Fiestas únicas y memorables",
+      "servicesEmoji": "🎯 Nuestros Servicios",
+      "experiencesEmoji": "✨ Experiencias Únicas"
     },
     "services": {
       "bodas": "DJ Bodas",

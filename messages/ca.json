@@ -2308,6 +2308,9 @@
     "closeMenu": "Tancar menú",
     "cta": "Demana Pressupost",
     "ctaShort": "Pressupost",
+    "ctaFree": "Pressupost Gratis",
+    "ctaQuick": "Pressupost en 2 minuts",
+    "whatsappDirect": "WhatsApp Directe",
     "nav": {
       "services": "Serveis",
       "experiences": "Experiències",
@@ -2320,7 +2323,9 @@
       "servicesTitle": "Els nostres serveis",
       "servicesSubtitle": "Tot el que necessites per al teu event",
       "experiencesTitle": "Experiències temàtiques",
-      "experiencesSubtitle": "Festes úniques i memorables"
+      "experiencesSubtitle": "Festes úniques i memorables",
+      "servicesEmoji": "🎯 Els nostres Serveis",
+      "experiencesEmoji": "✨ Experiències Úniques"
     },
     "services": {
       "bodas": "DJ Casaments",
