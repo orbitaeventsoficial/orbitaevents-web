@@ -208,7 +208,7 @@ export default function HeroVideo() {
     trust2: isEs ? 'Respuesta en < 2h' : 'Resposta en < 2h',
     trust3: isEs ? 'Equipo backup 100%' : 'Equip backup 100%',
     cta1: isEs ? 'Presupuesto Gratis' : 'Pressupost Gratis',
-    cta2: 'WhatsApp Directe',
+    cta2: isEs ? 'WhatsApp Directo' : 'WhatsApp Directe',
     scroll: isEs ? 'Descubre más' : 'Descobreix més',
   };
 
