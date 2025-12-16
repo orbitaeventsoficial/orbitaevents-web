@@ -1286,7 +1286,7 @@
     "ratingText": "en {count} ressenyes",
     "verifiedReviews": "opinions verificades",
     "comingSoon": "Pròximament",
-    "founderRole": "Boda",
+    "founderRole": "Casament",
     "founderEvent": "Casament Món Màgic – Catalunya",
     "founderText": "Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació ha estat increïble: veles flotants, sobres personalitzats amb lacre vermell, decoració amb símbols màgics... Estem molt il·lusionats!",
     "filters": {
@@ -3066,7 +3066,7 @@
     "title": "Quin event tens al cap?",
     "subtitle": "Escull i comença a crear la teva experiència.",
     "options": {
-      "wedding": "Una boda",
+      "wedding": "Un casament",
       "party": "Una festa",
       "corporate": "Un event corporatiu",
       "other": "Una altra cosa"
