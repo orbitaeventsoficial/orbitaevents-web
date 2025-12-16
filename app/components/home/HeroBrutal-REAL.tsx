@@ -232,6 +232,15 @@ export default function HeroBrutalReal() {
   const { data: availability, isLoading: availLoading } = useAvailability();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detectar si és mòbil per carregar video optimitzat
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Headlines des de traduccions
   const headlines = [
@@ -261,16 +270,20 @@ export default function HeroBrutalReal() {
           muted
           loop
           playsInline
+          poster="/img/hero-poster.webp"
           onLoadedData={() => setVideoLoaded(true)}
           className={`w-full h-full object-cover transition-opacity duration-1000 ${videoLoaded ? 'opacity-40' : 'opacity-0'}`}
         >
-          <source src="/video/promohalloween.mp4" type="video/mp4" />
+          <source
+            src={isMobile ? '/videos/hero-orbita-mobile.mp4' : '/videos/hero-orbita.mp4'}
+            type="video/mp4"
+          />
         </video>
-        
-        {/* Fallback image mentre carrega video */}
+
+        {/* Fallback poster mentre carrega video */}
         {!videoLoaded && (
           <Image
-            src="/img/hero-home-visual.jpg"
+            src="/img/hero-poster.webp"
             alt="Òrbita Events - DJ Barcelona"
             fill
             sizes="100vw"

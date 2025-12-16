@@ -63,7 +63,9 @@
       "Bash(for url in \"/servicios/dj-bodas-maresme\" \"/servicios/dj-bodas-valles\" \"/servicios/dj-bodas-costa-brava\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/servicios/discomovil\" \"/opiniones\" \"/sensorial\" \"/tematica-mon-magic\")",
       "Bash(__NEW_LINE__ echo \"\")",
       "Bash(python3:*)",
-      "Bash(# Check fiestas images cd /c/Users/Lore/Desktop/orbitaevents echo \"\"=== IMÁGENES FIESTAS DISPONIBLES ===\"\" ls -la public/img/portfolio/fiestas/)"
+      "Bash(# Check fiestas images cd /c/Users/Lore/Desktop/orbitaevents echo \"\"=== IMÁGENES FIESTAS DISPONIBLES ===\"\" ls -la public/img/portfolio/fiestas/)",
+      "Bash(powershell -Command \"Get-ChildItem ''C:\\Users\\Lore\\Downloads'' | Sort-Object LastWriteTime -Descending | Select-Object -First 20\")",
+      "Bash(mkdir:*)"
     ]
   }
 }

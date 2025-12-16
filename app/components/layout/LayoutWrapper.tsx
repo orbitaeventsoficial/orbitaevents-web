@@ -40,6 +40,11 @@ const FlashOffer = dynamic(
   { ssr: false }
 );
 
+const WhatsAppPremium = dynamic(
+  () => import('@/app/components/ui/WhatsAppPremium'),
+  { ssr: false }
+);
+
 const Footer = dynamic(
   () => import('@/app/components/ui/footer'),
   { ssr: false }
@@ -131,6 +136,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
       {/* Botons flotants de contacte */}
       <FloatingContactButtons />
+
+      {/* WhatsApp Premium flotant */}
+      <WhatsAppPremium />
 
       {/* Navegació inferior mòbil */}
       <BottomNav />
