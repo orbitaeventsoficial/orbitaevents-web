@@ -298,23 +298,19 @@ export default function HeroBrutalReal() {
             <GoogleRatingBadge />
           </motion.div>
 
-          {/* Badge principal - Premium amb glow */}
+          {/* Badge principal - VISIBLE */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
             className="mb-8"
           >
-            <span className="relative inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold overflow-hidden group">
-              {/* Fons gradient animat */}
-              <span className="absolute inset-0 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 bg-[length:200%_auto] animate-shimmer pointer-events-none" />
-              {/* Glow blur */}
-              <span className="absolute inset-0 blur-xl bg-amber-500/50 scale-150 opacity-50 pointer-events-none" />
+            <span className="relative inline-flex items-center gap-2 px-8 py-4 rounded-full text-base md:text-lg font-black overflow-hidden shadow-[0_0_30px_rgba(251,191,36,0.6)]">
+              {/* Fons sòlid */}
+              <span className="absolute inset-0 bg-amber-500 pointer-events-none" />
               {/* Contingut */}
-              <span className="relative z-10 flex items-center gap-2 text-black">
-                <span className="animate-bounce">🔥</span>
+              <span className="relative z-10 text-black uppercase tracking-wide">
                 {t('badge')}
-                <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>🔥</span>
               </span>
             </span>
           </motion.div>
