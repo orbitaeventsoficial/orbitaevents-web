@@ -99,6 +99,7 @@
     "description": "DJ, sonido, iluminación y tematización para bodas, fiestas y eventos corporativos en Barcelona y Girona."
   },
   "common": {
+    "language": "es",
     "buttons": {
       "contact": "Contacta",
       "whatsapp": "WhatsApp",
