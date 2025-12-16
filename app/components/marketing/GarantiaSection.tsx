@@ -69,46 +69,58 @@ const Icons = {
 // DATOS
 // ═══════════════════════════════════════════════════════════════════════════
 
-const GUARANTEES = [
+const getGuarantees = (isEs: boolean) => [
   {
     icon: Icons.Shield,
-    title: 'Garantia de Satisfacció',
-    description: 'Si no estàs 100% satisfet amb el nostre servei, et tornem els diners. Sense preguntes.',
+    title: isEs ? 'Garantía de Satisfacción' : 'Garantia de Satisfacció',
+    description: isEs
+      ? 'Si no estás 100% satisfecho con nuestro servicio, te devolvemos el dinero. Sin preguntas.'
+      : 'Si no estàs 100% satisfet amb el nostre servei, et tornem els diners. Sense preguntes.',
     highlight: '100%',
     color: 'from-emerald-500 to-teal-500',
   },
   {
     icon: Icons.Backup,
-    title: 'Equip Backup Complet',
-    description: 'Portem duplicat de tot: so, llums, mescalador, reproductors. El teu event MAI es para.',
+    title: isEs ? 'Equipo Backup Completo' : 'Equip Backup Complet',
+    description: isEs
+      ? 'Llevamos duplicado de todo: sonido, luces, mezclador, reproductores. Tu evento NUNCA se para.'
+      : 'Portem duplicat de tot: so, llums, mescalador, reproductors. El teu event MAI es para.',
     highlight: '2x',
     color: 'from-blue-500 to-indigo-500',
   },
   {
     icon: Icons.Clock,
-    title: 'Resposta en 2 Hores',
-    description: 'Resposta garantida en menys de 2 hores. Comunicació directa i sense intermediaris.',
+    title: isEs ? 'Respuesta en 2 Horas' : 'Resposta en 2 Hores',
+    description: isEs
+      ? 'Respuesta garantizada en menos de 2 horas. Comunicación directa y sin intermediarios.'
+      : 'Resposta garantida en menys de 2 hores. Comunicació directa i sense intermediaris.',
     highlight: '<2h',
     color: 'from-amber-500 to-orange-500',
   },
   {
     icon: Icons.Receipt,
-    title: 'Sense Sorpreses',
-    description: 'Pressupost tancat i definitiu. El preu que et donem és el que pagaràs, sense costos ocults.',
+    title: isEs ? 'Sin Sorpresas' : 'Sense Sorpreses',
+    description: isEs
+      ? 'Presupuesto cerrado y definitivo. El precio que te damos es el que pagarás, sin costes ocultos.'
+      : 'Pressupost tancat i definitiu. El preu que et donem és el que pagaràs, sense costos ocults.',
     highlight: '0€',
     color: 'from-purple-500 to-violet-500',
   },
   {
     icon: Icons.Headset,
-    title: 'Suport Total',
-    description: 'Acompanyament des de la reserva fins al final del event. Sempre disponibles per tu.',
+    title: isEs ? 'Soporte Total' : 'Suport Total',
+    description: isEs
+      ? 'Acompañamiento desde la reserva hasta el final del evento. Siempre disponibles para ti.'
+      : 'Acompanyament des de la reserva fins al final del event. Sempre disponibles per tu.',
     highlight: '24/7',
     color: 'from-rose-500 to-pink-500',
   },
   {
     icon: Icons.Heart,
-    title: 'Passió pel Detall',
-    description: 'Cada event és únic. Personalitzem cada detall per crear exactament el que imagines.',
+    title: isEs ? 'Pasión por el Detalle' : 'Passió pel Detall',
+    description: isEs
+      ? 'Cada evento es único. Personalizamos cada detalle para crear exactamente lo que imaginas.'
+      : 'Cada event és únic. Personalitzem cada detall per crear exactament el que imagines.',
     highlight: '∞',
     color: 'from-red-500 to-orange-500',
   },
@@ -118,7 +130,7 @@ const GUARANTEES = [
 // COMPONENTE: Guarantee Card
 // ═══════════════════════════════════════════════════════════════════════════
 
-function GuaranteeCard({ guarantee, index }: { guarantee: typeof GUARANTEES[0]; index: number }) {
+function GuaranteeCard({ guarantee, index }: { guarantee: ReturnType<typeof getGuarantees>[0]; index: number }) {
   const Icon = guarantee.icon;
 
   return (
@@ -156,13 +168,29 @@ function GuaranteeCard({ guarantee, index }: { guarantee: typeof GUARANTEES[0]; 
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function GarantiaSection() {
+  const t = useTranslations('common');
+  const isEs = t('language') === 'es';
+  const guarantees = getGuarantees(isEs);
+
+  // Textos bilingües
+  const texts = {
+    badge: isEs ? '🛡️ Tranquilidad garantizada' : '🛡️ Tranquil·litat garantida',
+    title1: isEs ? 'Tu evento,' : 'El teu event,',
+    title2: isEs ? 'sin riesgos' : 'sense riscos',
+    subtitle: isEs
+      ? 'Nos comprometemos al 100% con cada evento. Si algo no es como esperabas, lo solucionamos o te devolvemos el dinero.'
+      : 'Ens comprometem al 100% amb cada event. Si alguna cosa no és com esperaves, ho solucionem o et tornem els diners.',
+    sealTitle: isEs ? 'Compromiso Òrbita Events' : 'Compromís Òrbita Events',
+    sealSubtitle: isEs ? '+195 eventos sin incidencias graves' : '+195 events sense incidències greus',
+  };
+
   return (
     <section className="relative py-20 md:py-32 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-zinc-900" />
-      
+
       {/* Grid pattern */}
-      <div 
+      <div
         className="absolute inset-0 opacity-[0.02]"
         style={{
           backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
@@ -180,19 +208,19 @@ export default function GarantiaSection() {
           className="text-center mb-16"
         >
           <span className="inline-block px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-sm font-medium mb-6">
-            🛡️ Tranquil·litat garantida
+            {texts.badge}
           </span>
           <h2 className="text-3xl md:text-5xl font-black text-white mb-4">
-            El teu event, <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">sense riscos</span>
+            {texts.title1} <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">{texts.title2}</span>
           </h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Ens comprometem al 100% amb cada event. Si alguna cosa no és com esperaves, ho solucionem o et tornem els diners.
+            {texts.subtitle}
           </p>
         </motion.div>
 
         {/* Guarantee Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {GUARANTEES.map((guarantee, index) => (
+          {guarantees.map((guarantee, index) => (
             <GuaranteeCard key={index} guarantee={guarantee} index={index} />
           ))}
         </div>
@@ -209,8 +237,8 @@ export default function GarantiaSection() {
               <Icons.Shield />
             </div>
             <div className="text-left">
-              <div className="text-white font-bold">Compromís Òrbita Events</div>
-              <div className="text-emerald-400 text-sm">+195 events sense incidències greus</div>
+              <div className="text-white font-bold">{texts.sealTitle}</div>
+              <div className="text-emerald-400 text-sm">{texts.sealSubtitle}</div>
             </div>
           </div>
         </motion.div>

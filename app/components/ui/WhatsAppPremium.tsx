@@ -18,6 +18,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -50,7 +51,7 @@ const WhatsAppIcon = ({ size = 28 }: { size?: number }) => (
 
 export default function WhatsAppPremium({
   phoneNumber = '34699121023',
-  message = 'Hola! M\'agradaria informació sobre els vostres serveis per a un event.',
+  message,
   position = 'bottom-right',
   showTooltip = true,
   showOnlineIndicator = true,
@@ -58,6 +59,24 @@ export default function WhatsAppPremium({
   delay = 2000,
   pulseAnimation = true,
 }: WhatsAppPremiumProps) {
+  const t = useTranslations('common');
+  const isEs = t('language') === 'es';
+
+  // Textos bilingües
+  const texts = {
+    defaultMessage: isEs
+      ? 'Hola! Me gustaría información sobre vuestros servicios para un evento.'
+      : 'Hola! M\'agradaria informació sobre els vostres serveis per a un event.',
+    onlineNow: isEs ? 'Online ahora' : 'Online ara',
+    tooltipGreeting: isEs
+      ? '👋 ¡Hola! ¿Tienes alguna pregunta? ¡Estamos aquí para ayudarte!'
+      : '👋 Hola! Tens alguna pregunta? Estem aquí per ajudar-te!',
+    responseTime: isEs ? 'Respuesta típica' : 'Resposta típica',
+    writeUs: isEs ? '¡Escríbenos!' : 'Escriu-nos!',
+  };
+
+  const finalMessage = message || texts.defaultMessage;
+
   const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [tooltipDismissed, setTooltipDismissed] = useState(false);
@@ -76,7 +95,7 @@ export default function WhatsAppPremium({
     }
   }, [showTooltip, tooltipDismissed]);
 
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(finalMessage)}`;
 
   const positionClasses = {
     'bottom-right': 'right-4 md:right-6',
@@ -117,16 +136,16 @@ export default function WhatsAppPremium({
                         <div className="font-bold text-gray-900 text-sm">Òrbita Events</div>
                         <div className="flex items-center gap-1 text-xs text-emerald-600">
                           <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                          <span>Online ara</span>
+                          <span>{texts.onlineNow}</span>
                         </div>
                       </div>
                     </div>
                     <p className="text-gray-600 text-sm">
-                      👋 Hola! Tens alguna pregunta? Estem aquí per ajudar-te!
+                      {texts.tooltipGreeting}
                     </p>
                     {showResponseTime && (
                       <div className="mt-2 text-xs text-gray-400">
-                        ⚡ Resposta típica: &lt;5 min
+                        ⚡ {texts.responseTime}: &lt;5 min
                       </div>
                     )}
                   </div>
@@ -164,7 +183,7 @@ export default function WhatsAppPremium({
                       </span>
                     )}
                     <span className="text-white/40">|</span>
-                    <span className="text-white text-sm font-medium">Escriu-nos!</span>
+                    <span className="text-white text-sm font-medium">{texts.writeUs}</span>
                     {showResponseTime && (
                       <>
                         <span className="text-white/40">|</span>
@@ -219,8 +238,8 @@ export default function WhatsAppPremium({
 
 export function WhatsAppInline({
   phoneNumber = '34699121023',
-  message = 'Hola! M\'agradaria informació sobre els vostres serveis.',
-  text = 'WhatsApp Directe',
+  message,
+  text,
   variant = 'primary',
 }: {
   phoneNumber?: string;
@@ -228,7 +247,18 @@ export function WhatsAppInline({
   text?: string;
   variant?: 'primary' | 'secondary' | 'outline';
 }) {
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  const t = useTranslations('common');
+  const isEs = t('language') === 'es';
+
+  const defaultMessage = isEs
+    ? 'Hola! Me gustaría información sobre vuestros servicios.'
+    : 'Hola! M\'agradaria informació sobre els vostres serveis.';
+  const defaultText = 'WhatsApp Directe';
+
+  const finalMessage = message || defaultMessage;
+  const finalText = text || defaultText;
+
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(finalMessage)}`;
 
   const variants = {
     primary: 'bg-emerald-500 hover:bg-emerald-400 text-white',
@@ -246,7 +276,7 @@ export function WhatsAppInline({
       className={`inline-flex items-center justify-center gap-3 px-6 py-3 rounded-xl font-semibold transition-all ${variants[variant]}`}
     >
       <WhatsAppIcon size={20} />
-      <span>{text}</span>
+      <span>{finalText}</span>
       <span className="relative flex h-2 w-2">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75"></span>
         <span className="relative inline-flex rounded-full h-2 w-2 bg-current"></span>

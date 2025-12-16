@@ -181,13 +181,13 @@ function RatingStars({ rating }: { rating: number }) {
 // COMPONENTE: Source Badge
 // ═══════════════════════════════════════════════════════════════════════════
 
-function SourceBadge({ source }: { source?: string }) {
+function SourceBadge({ source, isEs }: { source?: string; isEs: boolean }) {
   if (!source) return null;
 
   const config = {
     google: { icon: <Icons.Google />, label: 'Google', color: 'bg-white/10' },
     'bodas.net': { icon: <Icons.BodasNet />, label: 'Bodas.net', color: 'bg-rose-500/10' },
-    direct: { icon: <Icons.Verified />, label: 'Verificat', color: 'bg-emerald-500/10' },
+    direct: { icon: <Icons.Verified />, label: isEs ? 'Verificado' : 'Verificat', color: 'bg-emerald-500/10' },
   };
 
   const { icon, label, color } = config[source as keyof typeof config] || config.direct;
@@ -204,15 +204,16 @@ function SourceBadge({ source }: { source?: string }) {
 // COMPONENTE: Event Type Badge
 // ═══════════════════════════════════════════════════════════════════════════
 
-function EventTypeBadge({ type }: { type: string }) {
-  const config: Record<string, { emoji: string; label: string; color: string }> = {
-    boda: { emoji: '💍', label: 'Casament', color: 'from-rose-500/20 to-pink-500/20 border-rose-500/30' },
-    fiesta: { emoji: '🎉', label: 'Festa', color: 'from-amber-500/20 to-orange-500/20 border-amber-500/30' },
-    empresa: { emoji: '💼', label: 'Empresa', color: 'from-blue-500/20 to-indigo-500/20 border-blue-500/30' },
-    tematica: { emoji: '🎃', label: 'Temàtica', color: 'from-purple-500/20 to-violet-500/20 border-purple-500/30' },
+function EventTypeBadge({ type, isEs }: { type: string; isEs: boolean }) {
+  const config: Record<string, { emoji: string; labelCa: string; labelEs: string; color: string }> = {
+    boda: { emoji: '💍', labelCa: 'Casament', labelEs: 'Boda', color: 'from-rose-500/20 to-pink-500/20 border-rose-500/30' },
+    fiesta: { emoji: '🎉', labelCa: 'Festa', labelEs: 'Fiesta', color: 'from-amber-500/20 to-orange-500/20 border-amber-500/30' },
+    empresa: { emoji: '💼', labelCa: 'Empresa', labelEs: 'Empresa', color: 'from-blue-500/20 to-indigo-500/20 border-blue-500/30' },
+    tematica: { emoji: '🎃', labelCa: 'Temàtica', labelEs: 'Temática', color: 'from-purple-500/20 to-violet-500/20 border-purple-500/30' },
   };
 
-  const { emoji, label, color } = config[type] || config.fiesta;
+  const { emoji, labelCa, labelEs, color } = config[type] || config.fiesta;
+  const label = isEs ? labelEs : labelCa;
 
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r ${color} border rounded-full text-xs font-medium text-white/80`}>
@@ -226,10 +227,10 @@ function EventTypeBadge({ type }: { type: string }) {
 // COMPONENTE: Testimonial Card
 // ═══════════════════════════════════════════════════════════════════════════
 
-function TestimonialCard({ testimonial, isActive }: { testimonial: Testimonial; isActive: boolean }) {
+function TestimonialCard({ testimonial, isActive, isEs }: { testimonial: Testimonial; isActive: boolean; isEs: boolean }) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('ca-ES', { month: 'long', year: 'numeric' });
+    return date.toLocaleDateString(isEs ? 'es-ES' : 'ca-ES', { month: 'long', year: 'numeric' });
   };
 
   return (
@@ -275,7 +276,7 @@ function TestimonialCard({ testimonial, isActive }: { testimonial: Testimonial; 
           )}
           <div className="flex items-center gap-3 mt-2">
             <RatingStars rating={testimonial.rating} />
-            <SourceBadge source={testimonial.source} />
+            <SourceBadge source={testimonial.source} isEs={isEs} />
           </div>
         </div>
       </div>
@@ -287,7 +288,7 @@ function TestimonialCard({ testimonial, isActive }: { testimonial: Testimonial; 
 
       {/* Footer */}
       <div className="flex items-center justify-between pt-4 border-t border-white/5">
-        <EventTypeBadge type={testimonial.eventType} />
+        <EventTypeBadge type={testimonial.eventType} isEs={isEs} />
         <div className="flex items-center gap-2 text-sm text-white/50">
           {testimonial.location && (
             <>
@@ -313,7 +314,7 @@ function TestimonialCard({ testimonial, isActive }: { testimonial: Testimonial; 
 // COMPONENTE: Summary Stats
 // ═══════════════════════════════════════════════════════════════════════════
 
-function SummaryStats() {
+function SummaryStats({ isEs }: { isEs: boolean }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 mb-12">
       <div className="flex items-center gap-3">
@@ -326,7 +327,7 @@ function SummaryStats() {
         </div>
         <div className="text-sm">
           <span className="text-white font-bold">+150</span>
-          <span className="text-white/60"> clients satisfets</span>
+          <span className="text-white/60"> {isEs ? 'clientes satisfechos' : 'clients satisfets'}</span>
         </div>
       </div>
 
@@ -339,7 +340,7 @@ function SummaryStats() {
           ))}
         </div>
         <span className="text-white font-bold">4.9</span>
-        <span className="text-white/60 text-sm">valoració mitjana</span>
+        <span className="text-white/60 text-sm">{isEs ? 'valoración media' : 'valoració mitjana'}</span>
       </div>
 
       <div className="h-8 w-px bg-white/10 hidden md:block" />
@@ -347,7 +348,7 @@ function SummaryStats() {
       <div className="flex items-center gap-3">
         <Icons.Google />
         <Icons.BodasNet />
-        <span className="text-white/60 text-sm">Opinions verificades</span>
+        <span className="text-white/60 text-sm">{isEs ? 'Opiniones verificadas' : 'Opinions verificades'}</span>
       </div>
     </div>
   );
@@ -369,6 +370,8 @@ export default function TestimoniosReales({
   autoplayInterval = 5000,
 }: TestimoniosRealesProps) {
   const t = useTranslations('testimonials');
+  const tCommon = useTranslations('common');
+  const isEs = tCommon('language') === 'es';
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -412,18 +415,20 @@ export default function TestimoniosReales({
           className="text-center mb-12"
         >
           <span className="inline-block px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-6">
-            ⭐ El que diuen els nostres clients
+            {isEs ? '⭐ Lo que dicen nuestros clientes' : '⭐ El que diuen els nostres clients'}
           </span>
           <h2 className="text-3xl md:text-5xl font-black text-white mb-4">
-            Històries <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">reals</span>
+            {isEs ? 'Historias' : 'Històries'} <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">{isEs ? 'reales' : 'reals'}</span>
           </h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            No ens creguis a nosaltres. Escolta el que diuen les persones que ja han viscut l'experiència Òrbita.
+            {isEs
+              ? 'No nos creas a nosotros. Escucha lo que dicen las personas que ya han vivido la experiencia Òrbita.'
+              : 'No ens creguis a nosaltres. Escolta el que diuen les persones que ja han viscut l\'experiència Òrbita.'}
           </p>
         </motion.div>
 
         {/* Summary Stats */}
-        <SummaryStats />
+        <SummaryStats isEs={isEs} />
 
         {/* Carousel */}
         <div className="relative max-w-4xl mx-auto">
@@ -448,6 +453,7 @@ export default function TestimoniosReales({
                 key={testimonials[currentIndex].id}
                 testimonial={testimonials[currentIndex]}
                 isActive={true}
+                isEs={isEs}
               />
             </AnimatePresence>
           </div>
@@ -476,13 +482,13 @@ export default function TestimoniosReales({
           className="text-center mt-16"
         >
           <p className="text-white/60 mb-4">
-            Vols ser el pròxim testimoni?
+            {isEs ? '¿Quieres ser el próximo testimonio?' : 'Vols ser el pròxim testimoni?'}
           </p>
           <a
             href="/configurador"
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-2xl transition-all hover:scale-105"
           >
-            <span>Demana el teu pressupost</span>
+            <span>{isEs ? 'Pide tu presupuesto' : 'Demana el teu pressupost'}</span>
             <span>→</span>
           </a>
         </motion.div>
