@@ -293,12 +293,12 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  10"
     },
     {
-      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-13.webp",
-      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  13"
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-11.webp",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  11"
     },
     {
-      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-14.jpg",
-      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  14"
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-12.jpg",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  12"
     }
   ],
   "produccion-tecnica": [
