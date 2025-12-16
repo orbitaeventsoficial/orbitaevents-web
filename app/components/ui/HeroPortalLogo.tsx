@@ -1,14 +1,22 @@
 /**
  * HeroPortalLogo.tsx
  *
- * ANIMACIÓN PORTAL ÓRBITA EVENTS - VERSIÓN CINEMATOGRÁFICA
- * ✨ Sin parpadeo - Transiciones suaves - Magia pura
+ * ANIMACIÓN PORTAL ÓRBITA EVENTS - VERSIÓN ULTRA CINEMATOGRÁFICA v2.0
+ * ✨ Logo compacte - Tipografia premium - Màgia pura
  */
 
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Plus_Jakarta_Sans } from "next/font/google";
+
+// Tipografia premium pel text màgic
+const jakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  display: "swap",
+});
 
 type GlowColor = "gold" | "fuchsia" | "none";
 
@@ -625,41 +633,44 @@ export default function HeroPortalLogo({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.22, 0.61, 0.36, 1] }}
           >
-            {/* Logo animat */}
+            {/* Logo animat - COMPACTE */}
             {svgMarkup && (
               <motion.div
                 className="relative"
                 style={{
-                  width: "min(40vmin, 180px)",
-                  height: "min(40vmin, 180px)",
-                  maxWidth: "180px",
-                  maxHeight: "180px",
+                  width: "min(28vmin, 120px)",
+                  height: "min(28vmin, 120px)",
+                  maxWidth: "120px",
+                  maxHeight: "120px",
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
                 }}
                 dangerouslySetInnerHTML={{ __html: svgMarkup }}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, scale: 0.85, filter: "blur(10px)" }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                 transition={{
-                  duration: 1,
+                  duration: 1.2,
                   ease: [0.22, 0.61, 0.36, 1],
-                  delay: 0.2
+                  delay: 0.3
                 }}
               />
             )}
 
-            {/* Text subliminal */}
+            {/* Text subliminal - TIPOGRAFIA PREMIUM */}
             <motion.p
-              className="text-magic text-magic-lg animate-magic-breathe mt-8"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
+              className={`${jakartaSans.className} text-xl font-light tracking-[0.25em] text-white/90 mt-10 uppercase`}
+              style={{
+                textShadow: "0 0 30px rgba(215, 184, 110, 0.4), 0 0 60px rgba(215, 184, 110, 0.2)",
+              }}
+              initial={{ opacity: 0, y: 20, letterSpacing: "0.5em" }}
+              animate={{ opacity: 1, y: 0, letterSpacing: "0.25em" }}
               transition={{
-                duration: 4.5,
-                delay: 1.2,
+                duration: 1.5,
+                delay: 1.0,
                 ease: [0.22, 0.61, 0.36, 1],
               }}
             >
-              La màgia comença...
+              La màgia comença
             </motion.p>
 
             {/* Hint per saltar */}
@@ -728,25 +739,30 @@ export default function HeroPortalLogo({
             }}
           />
 
-          {/* ✨ TEXT SUBLIMINAL - "La màgia comença..." - MILLORAT */}
+          {/* ✨ TEXT SUBLIMINAL - TIPOGRAFIA ULTRA PREMIUM */}
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             style={{ zIndex: 7, pointerEvents: "none" }}
-            initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+            initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
             animate={{
               opacity: [0, 1, 1, 0],
-              y: [20, 0, 0, -10],
-              filter: ["blur(10px)", "blur(0px)", "blur(0px)", "blur(5px)"]
+              y: [30, 0, 0, -15],
+              filter: ["blur(12px)", "blur(0px)", "blur(0px)", "blur(8px)"]
             }}
             transition={{
-              times: [0, 0.12, 0.88, 1],
+              times: [0, 0.15, 0.85, 1],
               duration: 5.5,
-              delay: (SEQ_TELON_END + 200) / 1000,
+              delay: (SEQ_TELON_END + 300) / 1000,
               ease: [0.22, 0.61, 0.36, 1],
             }}
           >
-            <span className="text-magic text-magic-lg text-magic-glow">
-              La màgia comença...
+            <span
+              className={`${jakartaSans.className} text-2xl md:text-3xl font-light tracking-[0.3em] text-white/95 uppercase`}
+              style={{
+                textShadow: "0 0 40px rgba(215, 184, 110, 0.5), 0 0 80px rgba(215, 184, 110, 0.25), 0 0 120px rgba(215, 184, 110, 0.15)",
+              }}
+            >
+              La màgia comença
             </span>
           </motion.div>
 
@@ -870,10 +886,10 @@ export default function HeroPortalLogo({
               ref={hostRef}
               className="relative overflow-visible"
               style={{
-                width: "min(38vmin, 240px)",
-                height: "min(38vmin, 240px)",
-                maxWidth: "240px",
-                maxHeight: "240px",
+                width: "min(22vmin, 140px)",
+                height: "min(22vmin, 140px)",
+                maxWidth: "140px",
+                maxHeight: "140px",
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
                 transform: 'translateZ(0)',
