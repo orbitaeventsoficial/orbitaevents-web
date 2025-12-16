@@ -962,3 +962,67 @@ input, select, textarea {
     display: none !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ELEGANT THEME - Paleta sofisticada
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Colors primaris - Daurat sofisticat */
+  --color-gold: #C9A962;
+  --color-gold-light: #D4B978;
+  --color-gold-dark: #A68B4B;
+  --color-gold-muted: rgba(201, 169, 98, 0.15);
+
+  /* Fons - Negres profunds */
+  --color-bg-primary: #0A0A0A;
+  --color-bg-secondary: #111111;
+  --color-bg-card: #141414;
+
+  /* Textos */
+  --color-text-secondary: #A0A0A0;
+  --color-text-muted: #666666;
+
+  /* Borders subtils */
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(201, 169, 98, 0.3);
+}
+
+/* Títols amb gradient daurat */
+.title-gradient {
+  background: linear-gradient(135deg, var(--color-gold-light) 0%, var(--color-gold) 50%, var(--color-gold-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Botó primari elegant */
+.btn-primary-elegant {
+  background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%);
+  color: var(--color-bg-primary);
+  font-weight: 600;
+  padding: 14px 28px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 300ms ease;
+  box-shadow: 0 4px 20px rgba(201, 169, 98, 0.15);
+}
+
+.btn-primary-elegant:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(201, 169, 98, 0.25);
+}
+
+/* Card elegant */
+.card-elegant {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  transition: all 300ms ease;
+}
+
+.card-elegant:hover {
+  border-color: var(--color-border-hover);
+  transform: translateY(-4px);
+}
