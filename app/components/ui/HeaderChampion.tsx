@@ -205,9 +205,9 @@ export default function HeaderChampion() {
               <Image
                 src="/img/logoplanetatextdreta.svg"
                 alt="Òrbita Events"
-                width={140}
-                height={36}
-                className="h-8 md:h-9 w-auto"
+                width={160}
+                height={42}
+                className="h-9 md:h-11 w-auto"
                 priority
               />
             </Link>
@@ -226,8 +226,8 @@ export default function HeaderChampion() {
                   <Link
                     href={item.dropdown ? '#' : item.href}
                     className={`
-                      relative px-3 py-2 text-sm font-medium
-                      transition-colors flex items-center gap-1.5
+                      relative px-4 py-2 text-base font-semibold
+                      transition-colors flex items-center gap-2
                       ${activeDropdown === item.label ? 'text-amber-400' : 'text-zinc-300 hover:text-white'}
                     `}
                     onClick={(e) => {
@@ -383,11 +383,11 @@ export default function HeaderChampion() {
                 href="/configurador"
                 className="
                   relative overflow-hidden
-                  flex items-center justify-center gap-1.5
-                  px-4 py-2 md:px-5 md:py-2.5
+                  flex items-center justify-center gap-2
+                  px-5 py-2.5 md:px-6 md:py-3
                   bg-gradient-to-r from-amber-500 to-amber-400
-                  text-zinc-900 text-sm font-bold
-                  rounded-lg
+                  text-zinc-900 text-base font-bold
+                  rounded-xl
                   transition-all duration-200
                   hover:from-amber-400 hover:to-amber-300
                   hover:scale-105
