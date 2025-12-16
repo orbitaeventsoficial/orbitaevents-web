@@ -108,7 +108,7 @@ function ComparisonTable({ t }: { t: (key: string) => string }) {
           <span className="text-amber-400 font-bold">🚀 {t('comparison.us')}</span>
         </div>
         <div className="p-4 text-center">
-          <span className="text-white/40">{t('comparison.them')}</span>
+          <span className="text-white/70 font-medium">{t('comparison.them')}</span>
         </div>
       </div>
 
@@ -126,9 +126,9 @@ function ComparisonTable({ t }: { t: (key: string) => string }) {
             <span className="text-green-400">✓</span>
             <span className="text-white/80 text-sm">{item.us}</span>
           </div>
-          <div className="p-4 flex items-center gap-2 bg-red-500/5">
-            <span className="text-red-400/50">✗</span>
-            <span className="text-white/40 text-sm">{item.them}</span>
+          <div className="p-4 flex items-center gap-2 bg-red-500/10">
+            <span className="text-red-400">✗</span>
+            <span className="text-white/60 text-sm">{item.them}</span>
           </div>
         </motion.div>
       ))}

@@ -243,7 +243,7 @@ function EmptyState({ t }: { t: (key: string) => string }) {
       </p>
       <Link
         href="/opiniones/nueva"
-        className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-400 text-black font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/25 transition-all"
+        className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-400 text-white font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/25 transition-all"
       >
         <span>✨</span>
         <span>{t('emptyState.cta')}</span>

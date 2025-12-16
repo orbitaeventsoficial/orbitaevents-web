@@ -85,7 +85,6 @@ function AvailabilityMini({ t, locale }: { t: (key: string) => string; locale: s
         name: date
           .toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', {
             month: 'short',
-            timeZone: 'UTC',
           })
           .toUpperCase(),
         available,
@@ -263,7 +262,7 @@ export function CTASectionBrutal() {
               />
               
               {/* Content */}
-              <span className="relative flex items-center justify-center gap-3 text-black">
+              <span className="relative flex items-center justify-center gap-3 text-white">
                 <span>📝</span>
                 <span>{t('ctaPrimary')}</span>
                 <motion.svg

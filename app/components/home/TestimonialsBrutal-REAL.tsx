@@ -221,7 +221,7 @@ function EmptyState() {
       </p>
       <Link
         href="/contacto"
-        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all"
       >
         {t('emptyState.cta')}
         <span>→</span>
@@ -277,7 +277,7 @@ function GamificationBanner() {
         <div className="flex-shrink-0">
           <Link
             href="/opiniones"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all whitespace-nowrap"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all whitespace-nowrap"
           >
             {t('gamification.cta')}
             <span>→</span>
