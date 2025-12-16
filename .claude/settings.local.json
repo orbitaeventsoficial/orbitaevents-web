@@ -69,7 +69,9 @@
       "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/portfolio\" \"/tematica-mon-magic\" \"/tematica-halloween\")",
       "Bash(do)",
       "Bash(echo:*)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(for dir in C:/Users/Lore/Desktop/orbitaevents/public/img/portfolio/*/)",
+      "Bash(for url in \"/about\" \"/portfolio\" \"/tematica-halloween\" \"/tematica-mon-magic\" \"/faq\")"
     ]
   }
 }

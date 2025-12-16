@@ -1287,6 +1287,27 @@
     "ratingText": "en {count} ressenyes",
     "verifiedReviews": "opinions verificades",
     "comingSoon": "Pròximament",
+
+    "review1Role": "Casament",
+    "review1Event": "Casament a Mas Marroch, Girona",
+    "review1Date": "Setembre 2024",
+    "review1Text": "Increïble! El Carles va fer que la nostra boda fos màgica. La pista sempre plena, la música perfecta i el tracte excepcional. Tots els convidats ens pregunten pel DJ!",
+
+    "review2Role": "Festa privada",
+    "review2Event": "Aniversari 40 a Barcelona",
+    "review2Date": "Octubre 2024",
+    "review2Text": "Contractàrem Òrbita per la meva festa de 40 i va ser espectacular. L'equip de so professional, les llums creaven un ambient brutal i el DJ va clavar tots els estils que li vaig demanar.",
+
+    "review3Role": "Festa infantil",
+    "review3Event": "Aniversari temàtic a Mataró",
+    "review3Date": "Novembre 2024",
+    "review3Text": "Els nens van flipar amb la festa temàtica! L'animador era genial, els jocs molt ben organitzats i la decoració preciosa. El meu fill encara en parla cada dia!",
+
+    "review4Role": "Event corporatiu",
+    "review4Event": "Festa d'empresa a Sant Cugat",
+    "review4Date": "Desembre 2024",
+    "review4Text": "Professionalitat màxima. Van muntar tot l'equip en temps rècord, el so era perfecte per l'espai i van adaptar la música al públic. Repetirem segur l'any vinent!",
+
     "founderRole": "Casament",
     "founderEvent": "Casament Món Màgic – Catalunya",
     "founderText": "Estem preparant el nostre casament temàtic amb Òrbita Events. La planificació ha estat increïble: veles flotants, sobres personalitzats amb lacre vermell, decoració amb símbols màgics... Estem molt il·lusionats!",
@@ -1384,6 +1405,50 @@
           "animations": {
             "title": "Animacions Interactives",
             "desc": "Trivial, jocs, dinàmiques. Ningú es queda quiet."
+          }
+        }
+      },
+      "process": {
+        "title": "Com Treballem",
+        "subtitle": "De la idea a la festa perfecta en 4 passos simples. Sense estressos, tot sota control.",
+        "steps": {
+          "contact": {
+            "title": "Ens Contactes",
+            "desc": "Explica'ns la teva idea per WhatsApp, formulari o trucada. Resposta en menys de 2h!"
+          },
+          "plan": {
+            "title": "Planifiquem Junts",
+            "desc": "Dissenyem la festa ideal: música, llums, temàtica, horaris. Tot personalitzat per a tu."
+          },
+          "setup": {
+            "title": "Muntem Tot",
+            "desc": "Arribem amb temps, muntem l'equip i comprovem que tot estigui perfecte abans de començar."
+          },
+          "party": {
+            "title": "A Gaudir!",
+            "desc": "Tu només has de gaudir. Nosaltres ens encarreguem que la festa sigui èpica de principi a fi."
+          }
+        }
+      },
+      "guarantees": {
+        "title": "Per Què Escollir-nos",
+        "subtitle": "No som una empresa més. Som gent apassionada que fa festes increïbles.",
+        "items": {
+          "professional": {
+            "title": "100% Professionals",
+            "desc": "Equip propi d'alta qualitat. Assegurança civil. Factura legal."
+          },
+          "punctual": {
+            "title": "Sempre Puntuals",
+            "desc": "Arribem mínim 1h abans. Mai t'hauràs de preocupar per res."
+          },
+          "passion": {
+            "title": "Passió Real",
+            "desc": "Ens encanta el que fem. I es nota en cada detall de la teva festa."
+          },
+          "quality": {
+            "title": "Qualitat Garantida",
+            "desc": "Si no quedes satisfet, treballem fins que ho estiguis. Paraula."
           }
         }
       },

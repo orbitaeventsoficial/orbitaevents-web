@@ -869,3 +869,96 @@ html::before {
     display: none !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MOBILE BRUTAL - EXPERIENCE PREMIUM
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Touch targets mínim 44px (Apple HIG) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Elimina el delay de 300ms en tocs */
+* {
+  touch-action: manipulation;
+}
+
+/* Scroll suau natiu */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevenir zoom accidental en inputs */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* Bottom CTA Bar */
+.bottom-cta-bar {
+  @apply fixed bottom-0 left-0 right-0 z-40;
+  @apply bg-zinc-900/95 backdrop-blur-lg border-t border-zinc-800;
+  @apply px-4 py-3;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+/* Cards swipeable */
+.cards-swipe-container {
+  @apply -mx-4 px-4;
+  @apply overflow-x-auto overflow-y-hidden;
+  @apply snap-x snap-mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cards-swipe-container::-webkit-scrollbar {
+  display: none;
+}
+
+.card-swipe-item {
+  @apply flex-shrink-0 w-[85vw] max-w-sm;
+  @apply snap-center;
+}
+
+/* Safe areas iPhone X+ */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* Hide scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Respectar preferències d'usuari */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mobile/Desktop visibility */
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .desktop-only {
+    display: none !important;
+  }
+}

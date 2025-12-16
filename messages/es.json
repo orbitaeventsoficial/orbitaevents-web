@@ -1614,6 +1614,27 @@
     "ratingText": "en {count} reseñas",
     "verifiedReviews": "opiniones verificadas",
     "comingSoon": "Próximamente",
+
+    "review1Role": "Boda",
+    "review1Event": "Boda en Mas Marroch, Girona",
+    "review1Date": "Septiembre 2024",
+    "review1Text": "¡Increíble! Carles hizo que nuestra boda fuera mágica. La pista siempre llena, la música perfecta y el trato excepcional. ¡Todos los invitados nos preguntan por el DJ!",
+
+    "review2Role": "Fiesta privada",
+    "review2Event": "Cumpleaños 40 en Barcelona",
+    "review2Date": "Octubre 2024",
+    "review2Text": "Contratamos a Òrbita para mi fiesta de 40 y fue espectacular. El equipo de sonido profesional, las luces creaban un ambiente brutal y el DJ clavó todos los estilos que le pedí.",
+
+    "review3Role": "Fiesta infantil",
+    "review3Event": "Cumpleaños temático en Mataró",
+    "review3Date": "Noviembre 2024",
+    "review3Text": "¡Los niños fliparon con la fiesta temática! El animador era genial, los juegos muy bien organizados y la decoración preciosa. ¡Mi hijo todavía habla de ello cada día!",
+
+    "review4Role": "Evento corporativo",
+    "review4Event": "Fiesta de empresa en Sant Cugat",
+    "review4Date": "Diciembre 2024",
+    "review4Text": "Profesionalidad máxima. Montaron todo el equipo en tiempo récord, el sonido era perfecto para el espacio y adaptaron la música al público. ¡Repetiremos seguro el año que viene!",
+
     "founderRole": "Boda",
     "founderEvent": "Boda Mundo Mágico – Cataluña",
     "founderText": "Estamos preparando nuestra boda temática con Òrbita Events. La planificación ha sido increíble: velas flotantes, sobres personalizados con lacre rojo, decoración con símbolos mágicos... ¡Estamos muy ilusionados!",
@@ -1779,6 +1800,50 @@
           "animations": {
             "title": "Animaciones Interactivas",
             "desc": "Trivial, juegos, dinámicas. Nadie se queda quieto."
+          }
+        }
+      },
+      "process": {
+        "title": "Cómo Trabajamos",
+        "subtitle": "De la idea a la fiesta perfecta en 4 pasos simples. Sin estrés, todo bajo control.",
+        "steps": {
+          "contact": {
+            "title": "Nos Contactas",
+            "desc": "Cuéntanos tu idea por WhatsApp, formulario o llamada. ¡Respuesta en menos de 2h!"
+          },
+          "plan": {
+            "title": "Planificamos Juntos",
+            "desc": "Diseñamos la fiesta ideal: música, luces, temática, horarios. Todo personalizado para ti."
+          },
+          "setup": {
+            "title": "Montamos Todo",
+            "desc": "Llegamos con tiempo, montamos el equipo y comprobamos que todo esté perfecto antes de empezar."
+          },
+          "party": {
+            "title": "¡A Disfrutar!",
+            "desc": "Tú solo tienes que disfrutar. Nosotros nos encargamos de que la fiesta sea épica de principio a fin."
+          }
+        }
+      },
+      "guarantees": {
+        "title": "Por Qué Elegirnos",
+        "subtitle": "No somos una empresa más. Somos gente apasionada que hace fiestas increíbles.",
+        "items": {
+          "professional": {
+            "title": "100% Profesionales",
+            "desc": "Equipo propio de alta calidad. Seguro civil. Factura legal."
+          },
+          "punctual": {
+            "title": "Siempre Puntuales",
+            "desc": "Llegamos mínimo 1h antes. Nunca tendrás que preocuparte por nada."
+          },
+          "passion": {
+            "title": "Pasión Real",
+            "desc": "Nos encanta lo que hacemos. Y se nota en cada detalle de tu fiesta."
+          },
+          "quality": {
+            "title": "Calidad Garantizada",
+            "desc": "Si no quedas satisfecho, trabajamos hasta que lo estés. Palabra."
           }
         }
       },
