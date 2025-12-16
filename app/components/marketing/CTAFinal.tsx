@@ -62,11 +62,13 @@ const Icons = {
 // HOOK: Disponibilidad
 // ═══════════════════════════════════════════════════════════════════════════
 
-function useAvailability() {
+function useAvailability(isEs: boolean) {
   const [data, setData] = useState<{ month: string; saturdays: number; status: 'scarce' | 'limited' | 'available' }>({ month: '', saturdays: 0, status: 'available' });
 
   useEffect(() => {
-    const monthNames = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
+    const monthNamesCa = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
+    const monthNamesEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const monthNames = isEs ? monthNamesEs : monthNamesCa;
     const mockAvailability: Record<number, number> = { 0: 3, 1: 4, 2: 3, 3: 2, 4: 1, 5: 2, 6: 3, 7: 4, 8: 2, 9: 3, 10: 2, 11: 1 };
     const month = new Date().getMonth();
     const sats = mockAvailability[month] || 2;
@@ -75,7 +77,7 @@ function useAvailability() {
       saturdays: sats,
       status: sats <= 1 ? 'scarce' : sats <= 2 ? 'limited' : 'available'
     });
-  }, []);
+  }, [isEs]);
 
   return data;
 }
@@ -85,7 +87,9 @@ function useAvailability() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function CTAFinal() {
-  const availability = useAvailability();
+  const t = useTranslations('common');
+  const isEs = t('language') === 'es';
+  const availability = useAvailability(isEs);
 
   const statusColors = {
     scarce: 'from-red-500 to-rose-500',
@@ -94,9 +98,35 @@ export default function CTAFinal() {
   };
 
   const statusText = {
-    scarce: '⚠️ Gairebé ple!',
-    limited: '🔥 S\'acaba ràpid!',
-    available: '✓ Disponible',
+    scarce: isEs ? '⚠️ ¡Casi lleno!' : '⚠️ Gairebé ple!',
+    limited: isEs ? '🔥 ¡Se acaba rápido!' : '🔥 S\'acaba ràpid!',
+    available: isEs ? '✓ Disponible' : '✓ Disponible',
+  };
+
+  // Textos bilingües
+  const texts = {
+    saturdaysSingular: isEs ? 'sábado libre en' : 'dissabte lliure a',
+    saturdaysPlural: isEs ? 'sábados libres en' : 'dissabtes lliures a',
+    title1: isEs ? '¿Preparado para crear' : 'Preparat per crear',
+    title2: isEs ? 'el evento perfecto?' : 'l\'event perfecte?',
+    subtitle: isEs
+      ? 'En 2 minutos tienes tu presupuesto personalizado. Sin compromiso.'
+      : 'En 2 minuts tens el teu pressupost personalitzat. Sense compromís.',
+    feature1: isEs ? 'Respuesta en < 2h' : 'Resposta en < 2h',
+    feature2: isEs ? 'Garantía 100%' : 'Garantia 100%',
+    feature3: isEs ? 'Sin sorpresas' : 'Sense sorpreses',
+    ctaPrimary: isEs ? 'Pide Presupuesto Gratis' : 'Demana Pressupost Gratis',
+    ctaSecondary: 'WhatsApp Directe',
+    whatsappMsg: isEs
+      ? 'Hola! Me gustaría información para mi evento.'
+      : 'Hola! M\'agradaria informació per al meu event.',
+    events: 'events',
+    rating: isEs ? 'valoración' : 'valoració',
+    payment: isEs ? 'Pago' : 'Pagament',
+    secure: isEs ? 'seguro' : 'segur',
+    guarantee: isEs
+      ? '🛡️ Garantía de satisfacción 100%. Si no estás contento, te devolvemos el dinero.'
+      : '🛡️ Garantia de satisfacció 100%. Si no estàs content, et tornem els diners.',
   };
 
   return (
@@ -132,7 +162,7 @@ export default function CTAFinal() {
             <div className={`inline-flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r ${statusColors[availability.status]} rounded-full`}>
               <Icons.Fire />
               <span className="font-bold text-white">
-                {availability.saturdays} {availability.saturdays === 1 ? 'dissabte' : 'dissabtes'} lliures a {availability.month}
+                {availability.saturdays} {availability.saturdays === 1 ? texts.saturdaysSingular : texts.saturdaysPlural} {availability.month}
               </span>
               <span className="text-white/80 text-sm">{statusText[availability.status]}</span>
             </div>
@@ -147,14 +177,14 @@ export default function CTAFinal() {
             className="text-center mb-10"
           >
             <h2 className="text-4xl md:text-6xl font-black text-white mb-6">
-              Preparat per crear
+              {texts.title1}
               <br />
               <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
-                l'event perfecte?
+                {texts.title2}
               </span>
             </h2>
             <p className="text-xl text-white/70 max-w-2xl mx-auto">
-              En 2 minuts tens el teu pressupost personalitzat. Sense compromís.
+              {texts.subtitle}
             </p>
           </motion.div>
 
@@ -167,9 +197,9 @@ export default function CTAFinal() {
             className="flex flex-wrap justify-center gap-4 mb-12"
           >
             {[
-              { icon: <Icons.Clock />, text: 'Resposta en < 2h' },
-              { icon: <Icons.Shield />, text: 'Garantia 100%' },
-              { icon: <Icons.Check />, text: 'Sense sorpreses' },
+              { icon: <Icons.Clock />, text: texts.feature1 },
+              { icon: <Icons.Shield />, text: texts.feature2 },
+              { icon: <Icons.Check />, text: texts.feature3 },
             ].map((feature, i) => (
               <span
                 key={i}
@@ -199,20 +229,20 @@ export default function CTAFinal() {
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               <span className="relative flex items-center gap-3 text-black font-bold text-lg">
                 <Icons.Sparkles />
-                <span>Demana Pressupost Gratis</span>
+                <span>{texts.ctaPrimary}</span>
               </span>
             </Link>
 
             {/* Secondary CTA */}
             <a
-              href="https://wa.me/34699121023?text=Hola! M'agradaria informació per al meu event."
+              href={`https://wa.me/34699121023?text=${encodeURIComponent(texts.whatsappMsg)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center justify-center gap-3 px-10 py-5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/50 rounded-2xl transition-all w-full sm:w-auto"
             >
               <Icons.WhatsApp />
               <span className="font-bold text-emerald-400 group-hover:text-emerald-300">
-                WhatsApp Directe
+                {texts.ctaSecondary}
               </span>
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -231,17 +261,17 @@ export default function CTAFinal() {
           >
             <span className="flex items-center gap-2">
               <span className="text-2xl">🎯</span>
-              <span><strong className="text-white">+195</strong> events</span>
+              <span><strong className="text-white">+195</strong> {texts.events}</span>
             </span>
             <span className="hidden md:block w-px h-4 bg-white/20" />
             <span className="flex items-center gap-2">
               <span className="text-2xl">⭐</span>
-              <span><strong className="text-white">4.9/5</strong> valoració</span>
+              <span><strong className="text-white">4.9/5</strong> {texts.rating}</span>
             </span>
             <span className="hidden md:block w-px h-4 bg-white/20" />
             <span className="flex items-center gap-2">
               <span className="text-2xl">🔒</span>
-              <span>Pagament <strong className="text-white">segur</strong></span>
+              <span>{texts.payment} <strong className="text-white">{texts.secure}</strong></span>
             </span>
           </motion.div>
 
@@ -253,7 +283,7 @@ export default function CTAFinal() {
             transition={{ delay: 0.5 }}
             className="text-center text-white/40 text-sm mt-8"
           >
-            🛡️ Garantia de satisfacció 100%. Si no estàs content, et tornem els diners.
+            {texts.guarantee}
           </motion.p>
         </div>
       </div>
