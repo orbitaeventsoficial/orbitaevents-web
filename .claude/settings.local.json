@@ -71,7 +71,11 @@
       "Bash(echo:*)",
       "Bash(powershell -Command:*)",
       "Bash(for dir in C:/Users/Lore/Desktop/orbitaevents/public/img/portfolio/*/)",
-      "Bash(for url in \"/about\" \"/portfolio\" \"/tematica-halloween\" \"/tematica-mon-magic\" \"/faq\")"
+      "Bash(for url in \"/about\" \"/portfolio\" \"/tematica-halloween\" \"/tematica-mon-magic\" \"/faq\")",
+      "Bash(for url in \"/\" \"/about\" \"/portfolio\" \"/opiniones\" \"/contacto\" \"/servicios/bodas\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/tematica-halloween\" \"/tematica-mon-magic\" \"/faq\" \"/packs\")",
+      "Bash(for url in \"/servicios/dj-bodas-girona\" \"/servicios/dj-bodas-maresme\" \"/servicios/dj-bodas-costa-brava\" \"/servicios/dj-bodas-valles\" \"/servicios/animacion-infantil\")",
+      "Bash(for url in \"/legal/privacidad\" \"/legal/cookies\" \"/legal/terminos\")",
+      "Bash(openssl rand:*)"
     ]
   }
 }
