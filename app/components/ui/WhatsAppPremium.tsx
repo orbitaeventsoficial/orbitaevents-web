@@ -253,7 +253,7 @@ export function WhatsAppInline({
   const defaultMessage = isEs
     ? 'Hola! Me gustaría información sobre vuestros servicios.'
     : 'Hola! M\'agradaria informació sobre els vostres serveis.';
-  const defaultText = 'WhatsApp Directe';
+  const defaultText = isEs ? 'WhatsApp Directo' : 'WhatsApp Directe';
 
   const finalMessage = message || defaultMessage;
   const finalText = text || defaultText;

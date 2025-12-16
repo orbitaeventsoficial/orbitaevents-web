@@ -118,7 +118,7 @@ export default function CTAFinal() {
     feature2: isEs ? 'Garantía 100%' : 'Garantia 100%',
     feature3: isEs ? 'Sin sorpresas' : 'Sense sorpreses',
     ctaPrimary: isEs ? 'Pide Presupuesto Gratis' : 'Demana Pressupost Gratis',
-    ctaSecondary: 'WhatsApp Directe',
+    ctaSecondary: isEs ? 'WhatsApp Directo' : 'WhatsApp Directe',
     whatsappMsg: isEs
       ? 'Hola! Me gustaría información para mi evento.'
       : 'Hola! M\'agradaria informació per al meu event.',
