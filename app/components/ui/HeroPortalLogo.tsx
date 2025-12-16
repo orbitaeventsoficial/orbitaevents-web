@@ -57,7 +57,23 @@ export default function HeroPortalLogo({
   const [visible, setVisible] = useState(true);
   const [_svgError, setSvgError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isReady, setIsReady] = useState(false); // 🆕 Control de carga
+  const [isReady, setIsReady] = useState(false);
+
+  // 🆕 Bloquejar scroll i amagar contingut IMMEDIATAMENT per evitar flicker
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+      mainContent.style.visibility = 'hidden';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      if (mainContent) {
+        mainContent.style.visibility = '';
+      }
+    };
+  }, []);
 
   const hostRef = useRef<HTMLDivElement | null>(null);
   const timers = useRef<number[]>([]);
@@ -81,6 +97,10 @@ export default function HeroPortalLogo({
         timers.current.push(tid);
 
         const tid2 = window.setTimeout(() => {
+          // Restaurar visibilitat
+          const mainContent = document.getElementById('main-content');
+          if (mainContent) mainContent.style.visibility = '';
+          document.body.style.overflow = '';
           setMounted(false);
           onFinish?.();
         }, MOBILE_TOTAL_MS);
@@ -139,6 +159,10 @@ export default function HeroPortalLogo({
     setVisible(false);
 
     const tid = window.setTimeout(() => {
+      // Restaurar visibilitat
+      const mainContent = document.getElementById('main-content');
+      if (mainContent) mainContent.style.visibility = '';
+      document.body.style.overflow = '';
       setMounted(false);
       onFinish?.();
     }, 400);
@@ -376,19 +400,19 @@ export default function HeroPortalLogo({
       delay: PLANET_START,
     });
 
-    // Añadir glow suave al planeta - PROGRESIVO
+    // Añadir glow suave al planeta - PROGRESIVO (amber/carbassa)
     timers.current.push(
       window.setTimeout(() => {
         for (const el of planetEls) {
           try {
             const htmlEl = el as any;
             // Empezar con filter sin intensidad
-            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(218, 165, 32, 0))";
+            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(245, 158, 11, 0))";
             htmlEl.style.transition = "filter 1800ms ease-out";
 
             // Después de un frame, aplicar el glow progresivamente
             requestAnimationFrame(() => {
-              htmlEl.style.filter = "drop-shadow(0 0 12px rgba(218, 165, 32, 0.3)) drop-shadow(0 0 24px rgba(218, 165, 32, 0.15))";
+              htmlEl.style.filter = "drop-shadow(0 0 12px rgba(245, 158, 11, 0.3)) drop-shadow(0 0 24px rgba(245, 158, 11, 0.15))";
 
               // Una vez llegado a intensidad máxima, añadir pulso
               setTimeout(() => {
@@ -409,19 +433,19 @@ export default function HeroPortalLogo({
       delay: RING_START,
     });
 
-    // Shimmer suave en el anillo - PROGRESIVO
+    // Shimmer suave en el anillo - PROGRESIVO (amber/carbassa)
     timers.current.push(
       window.setTimeout(() => {
         for (const el of ringEls) {
           try {
             const htmlEl = el as any;
             // Empezar sin filter
-            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(255, 215, 0, 0))";
+            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(251, 191, 36, 0))";
             htmlEl.style.transition = "filter 1500ms ease-out";
 
             // Aplicar glow progresivamente
             requestAnimationFrame(() => {
-              htmlEl.style.filter = "drop-shadow(0 0 10px rgba(255, 215, 0, 0.25))";
+              htmlEl.style.filter = "drop-shadow(0 0 10px rgba(251, 191, 36, 0.25))";
             });
 
             // Crear efecto shimmer con pseudo-elemento usando custom animation
@@ -477,13 +501,13 @@ export default function HeroPortalLogo({
         for (const el of satEls) {
           try {
             const htmlEl = el as any;
-            // Empezar sin glow
-            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(218, 165, 32, 0))";
+            // Empezar sin glow (amber/carbassa)
+            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(245, 158, 11, 0))";
             htmlEl.style.transition = "filter 1600ms ease-out";
 
             // Aplicar glow progresivamente
             requestAnimationFrame(() => {
-              htmlEl.style.filter = "drop-shadow(0 0 8px rgba(218, 165, 32, 0.3)) drop-shadow(0 0 16px rgba(218, 165, 32, 0.15))";
+              htmlEl.style.filter = "drop-shadow(0 0 8px rgba(245, 158, 11, 0.3)) drop-shadow(0 0 16px rgba(245, 158, 11, 0.15))";
             });
 
             setTimeout(() => {
@@ -504,19 +528,19 @@ export default function HeroPortalLogo({
       delay: WORDMARK_START,
     });
 
-    // Añadir glow dorado suave al texto - PROGRESIVO
+    // Añadir glow amber/carbassa suave al texto - PROGRESIVO
     timers.current.push(
       window.setTimeout(() => {
         for (const el of wmEls) {
           try {
             const htmlEl = el as any;
-            // Empezar sin glow
-            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(218, 165, 32, 0))";
+            // Empezar sin glow (amber/carbassa)
+            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(245, 158, 11, 0))";
             htmlEl.style.transition = "filter 1400ms ease-out";
 
             // Aplicar glow progresivamente
             requestAnimationFrame(() => {
-              htmlEl.style.filter = "drop-shadow(0 0 6px rgba(218, 165, 32, 0.4)) drop-shadow(0 0 12px rgba(218, 165, 32, 0.2))";
+              htmlEl.style.filter = "drop-shadow(0 0 6px rgba(245, 158, 11, 0.4)) drop-shadow(0 0 12px rgba(245, 158, 11, 0.2))";
             });
 
             htmlEl.style.animation = "fade-in-up 1.5s ease-out forwards";
@@ -565,6 +589,10 @@ export default function HeroPortalLogo({
 
     timers.current.push(
       window.setTimeout(() => {
+        // Restaurar visibilitat ABANS de desmuntar
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) mainContent.style.visibility = '';
+        document.body.style.overflow = '';
         setMounted(false);
         clearTimers();
         onFinish?.();
@@ -595,12 +623,12 @@ export default function HeroPortalLogo({
     onFinish,
   ]);
 
-  // Glow ambient styles
+  // Glow ambient styles - Amber/carbassa corporate color
   const glowStyle =
     glowColor === "gold"
       ? {
           background:
-            "radial-gradient(70% 60% at 50% 45%, rgba(218, 165, 32, 0.22) 0%, rgba(218, 165, 32, 0.08) 40%, transparent 70%)",
+            "radial-gradient(70% 60% at 50% 45%, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0.08) 40%, transparent 70%)",
           opacity: 0,
         }
       : glowColor === "fuchsia"
@@ -656,11 +684,12 @@ export default function HeroPortalLogo({
               />
             )}
 
-            {/* Text subliminal - TIPOGRAFIA PREMIUM */}
+            {/* Text subliminal - TIPOGRAFIA PREMIUM DAURAT */}
             <motion.p
-              className={`${jakartaSans.className} text-xl font-light tracking-[0.25em] text-white/90 mt-10 uppercase`}
+              className={`${jakartaSans.className} text-xl font-light tracking-[0.25em] mt-10 uppercase bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
               style={{
-                textShadow: "0 0 30px rgba(215, 184, 110, 0.4), 0 0 60px rgba(215, 184, 110, 0.2)",
+                textShadow: "0 0 30px rgba(245, 158, 11, 0.5), 0 0 60px rgba(245, 158, 11, 0.3)",
+                filter: "drop-shadow(0 0 20px rgba(217, 119, 6, 0.4))",
               }}
               initial={{ opacity: 0, y: 20, letterSpacing: "0.5em" }}
               animate={{ opacity: 1, y: 0, letterSpacing: "0.25em" }}
@@ -687,7 +716,7 @@ export default function HeroPortalLogo({
             <motion.div
               className="absolute w-64 h-64 rounded-full"
               style={{
-                background: 'radial-gradient(circle, rgba(215, 184, 110, 0.15) 0%, transparent 70%)',
+                background: 'radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%)',
                 filter: 'blur(40px)',
               }}
               initial={{ opacity: 0, scale: 0.5 }}
@@ -739,7 +768,7 @@ export default function HeroPortalLogo({
             }}
           />
 
-          {/* ✨ TEXT SUBLIMINAL - TIPOGRAFIA ULTRA PREMIUM */}
+          {/* ✨ TEXT SUBLIMINAL - TIPOGRAFIA ULTRA PREMIUM DAURAT */}
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             style={{ zIndex: 7, pointerEvents: "none" }}
@@ -757,9 +786,9 @@ export default function HeroPortalLogo({
             }}
           >
             <span
-              className={`${jakartaSans.className} text-2xl md:text-3xl font-light tracking-[0.3em] text-white/95 uppercase`}
+              className={`${jakartaSans.className} text-2xl md:text-3xl lg:text-4xl font-light tracking-[0.25em] uppercase bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
               style={{
-                textShadow: "0 0 40px rgba(215, 184, 110, 0.5), 0 0 80px rgba(215, 184, 110, 0.25), 0 0 120px rgba(215, 184, 110, 0.15)",
+                filter: "drop-shadow(0 0 30px rgba(245, 158, 11, 0.5))",
               }}
             >
               La màgia comença
@@ -981,10 +1010,10 @@ function ChampagneBubbles({
 
         ctx.save();
         ctx.shadowBlur = blur;
-        ctx.shadowColor = "rgba(255,215,130,0.45)";
+        ctx.shadowColor = "rgba(251,191,36,0.45)";
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,215,130,${b.a * tw * opacity})`;
+        ctx.fillStyle = `rgba(251,191,36,${b.a * tw * opacity})`;
         ctx.fill();
         ctx.restore();
       }
