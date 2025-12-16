@@ -1,712 +1,122 @@
 // app/components/ui/HeaderChampion.tsx
 // ═══════════════════════════════════════════════════════════════════════════
-// ÒRBITA EVENTS - HEADER CHAMPION v2.0
+// HEADER PREMIUM - ÒRBITA EVENTS v3.0
 // ═══════════════════════════════════════════════════════════════════════════
-// 
-// El header que VENDE. Características:
-// - Barra de urgencia con disponibilidad real
-// - Mega menús con preview de servicios
-// - CTA animado con gradiente en movimiento
-// - WhatsApp con indicador online pulsante
-// - Hide on scroll down, show on scroll up
-// - Mobile menu inmersivo fullscreen
-// - Integración con sistema de disponibilidad
-//
+// Soluciona: temblor, botón invisible, transiciones bruscas
+// - Scroll optimitzat amb requestAnimationFrame + threshold
+// - GPU acceleration (will-change, backfaceVisibility)
+// - Botó CTA daurat brillant + text negre + "GRATIS" font-black
 // ═══════════════════════════════════════════════════════════════════════════
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from '@/lib/navigation';
-import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { motion, AnimatePresence } from 'framer-motion';
 import LanguageSelector from './LanguageSelector';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ICONOS SVG INLINE (Zero dependencies)
+// NAVEGACIÓ
 // ═══════════════════════════════════════════════════════════════════════════
 
-const Icons = {
-  Menu: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <line x1="4" y1="12" x2="20" y2="12" />
-      <line x1="4" y1="18" x2="20" y2="18" />
-    </svg>
-  ),
-  Close: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  ),
-  ChevronDown: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
-  ),
-  ArrowRight: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
-    </svg>
-  ),
-  WhatsApp: () => (
-    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-    </svg>
-  ),
-  Phone: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-    </svg>
-  ),
-  Sparkles: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z"/>
-    </svg>
-  ),
-  Calendar: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-      <line x1="16" y1="2" x2="16" y2="6"/>
-      <line x1="8" y1="2" x2="8" y2="6"/>
-      <line x1="3" y1="10" x2="21" y2="10"/>
-    </svg>
-  ),
-  Fire: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 23c-4.97 0-9-4.03-9-9 0-3.87 2.47-7.17 5.91-8.41L12 2l3.09 3.59C18.53 6.83 21 10.13 21 14c0 4.97-4.03 9-9 9z"/>
-    </svg>
-  ),
-  Location: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-      <circle cx="12" cy="10" r="3"/>
-    </svg>
-  ),
-};
+interface NavItem {
+  label: string;
+  labelEs: string;
+  href: string;
+  badge?: string;
+}
 
-// ═══════════════════════════════════════════════════════════════════════════
-// CONFIGURACIÓN DE NAVEGACIÓN
-// ═══════════════════════════════════════════════════════════════════════════
-
-const SERVICES = [
-  { 
-    href: '/servicios/bodas', 
-    icon: '💍', 
-    titleKey: 'services.bodas',
-    descKey: 'services.bodasDesc',
-    color: 'from-rose-500 to-pink-600',
-    badge: 'MÁS PEDIDO'
-  },
-  { 
-    href: '/servicios/fiestas', 
-    icon: '🎉', 
-    titleKey: 'services.fiestas',
-    descKey: 'services.fiestasDesc',
-    color: 'from-amber-500 to-orange-600',
-  },
-  { 
-    href: '/servicios/empresas', 
-    icon: '💼', 
-    titleKey: 'services.empresas',
-    descKey: 'services.empresasDesc',
-    color: 'from-blue-500 to-indigo-600',
-  },
-  { 
-    href: '/servicios/discomovil', 
-    icon: '🎵', 
-    titleKey: 'services.discomovil',
-    descKey: 'services.discomovilDesc',
-    color: 'from-purple-500 to-violet-600',
-  },
-];
-
-const EXPERIENCES = [
-  { 
-    href: '/tematica-mon-magic', 
-    icon: '🪄', 
-    titleKey: 'experiences.monMagic',
-    descKey: 'experiences.monMagicDesc',
-    badge: '★ EXCLUSIVO',
-    color: 'from-amber-400 to-yellow-500'
-  },
-  { 
-    href: '/tematica-halloween', 
-    icon: '🎃', 
-    titleKey: 'experiences.halloween',
-    descKey: 'experiences.halloweenDesc',
-    color: 'from-orange-500 to-red-600'
-  },
-  { 
-    href: '/sensorial', 
-    icon: '✨', 
-    titleKey: 'experiences.sensorial',
-    descKey: 'experiences.sensorialDesc',
-    badge: 'NUEVO',
-    color: 'from-emerald-400 to-teal-500'
-  },
-];
-
-const NAV_LINKS = [
-  { href: '/portfolio', labelKey: 'nav.portfolio', icon: '📸' },
-  { href: '/opiniones', labelKey: 'nav.reviews', icon: '⭐' },
-  { href: '/contacto', labelKey: 'nav.contact', icon: '📧' },
+const navItems: NavItem[] = [
+  { label: 'Experiències', labelEs: 'Experiencias', href: '/tematica-mon-magic', badge: '✨' },
+  { label: 'Casaments', labelEs: 'Bodas', href: '/servicios/bodas' },
+  { label: 'Festes', labelEs: 'Fiestas', href: '/servicios/fiestas' },
+  { label: 'Empreses', labelEs: 'Empresas', href: '/servicios/empresas' },
+  { label: 'Portfolio', labelEs: 'Portfolio', href: '/portfolio' },
+  { label: 'Contacte', labelEs: 'Contacto', href: '/contacto' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HOOK: Disponibilidad de sábados
-// ═══════════════════════════════════════════════════════════════════════════
-
-function useAvailability() {
-  const [availability, setAvailability] = useState<{
-    currentMonth: string;
-    saturdays: number;
-    status: 'scarce' | 'limited' | 'available';
-  }>({ currentMonth: '', saturdays: 0, status: 'available' });
-
-  useEffect(() => {
-    const now = new Date();
-    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    
-    // Simular disponibilidad (reemplazar con API real)
-    const mockAvailability: Record<number, number> = {
-      0: 3, 1: 4, 2: 3, 3: 2, 4: 1, 5: 2, 
-      6: 3, 7: 4, 8: 2, 9: 3, 10: 2, 11: 1
-    };
-    
-    const month = now.getMonth();
-    const sats = mockAvailability[month] || 2;
-    
-    setAvailability({
-      currentMonth: monthNames[month],
-      saturdays: sats,
-      status: sats <= 1 ? 'scarce' : sats <= 2 ? 'limited' : 'available'
-    });
-  }, []);
-
-  return availability;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTE: Urgency Bar (Top bar con disponibilidad)
-// ═══════════════════════════════════════════════════════════════════════════
-
-function UrgencyBar({ isVisible }: { isVisible: boolean }) {
-  const availability = useAvailability();
-  
-  const statusColors = {
-    scarce: 'text-red-400 bg-red-500/20',
-    limited: 'text-amber-400 bg-amber-500/20',
-    available: 'text-emerald-400 bg-emerald-500/20'
-  };
-
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="hidden lg:block bg-zinc-950/80 border-b border-white/5 overflow-hidden"
-        >
-          <div className="container mx-auto px-6">
-            <div className="flex items-center justify-between h-10 text-xs">
-              {/* Izquierda: Online + Teléfono */}
-              <div className="flex items-center gap-6">
-                <span className="flex items-center gap-2 text-white/60">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span className="text-emerald-400 font-medium">Online ahora</span>
-                </span>
-                <span className="text-white/20">|</span>
-                <a href="tel:+34699121023" className="text-white/60 hover:text-white transition-colors flex items-center gap-1.5">
-                  <Icons.Phone />
-                  <span>699 121 023</span>
-                </a>
-              </div>
-
-              {/* Centro: Ubicación */}
-              <div className="flex items-center gap-1.5 text-white/50">
-                <Icons.Location />
-                <span>Barcelona & Girona</span>
-              </div>
-
-              {/* Derecha: URGENCIA - Disponibilidad */}
-              <div className="flex items-center gap-3">
-                <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${statusColors[availability.status]}`}>
-                  <Icons.Fire />
-                  <span className="font-bold">
-                    Solo {availability.saturdays} {availability.saturdays === 1 ? 'sábado' : 'sábados'} en {availability.currentMonth}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTE: Mega Dropdown Premium
-// ═══════════════════════════════════════════════════════════════════════════
-
-interface MegaDropdownProps {
-  isOpen: boolean;
-  onClose: () => void;
-  type: 'services' | 'experiences';
-  t: (key: string) => string;
-}
-
-function MegaDropdown({ isOpen, onClose, type, t }: MegaDropdownProps) {
-  const items = type === 'services' ? SERVICES : EXPERIENCES;
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40"
-            onClick={onClose}
-          />
-          
-          <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-            className="absolute top-full left-1/2 -translate-x-1/2 mt-3 z-50"
-          >
-            <div className="relative bg-zinc-950/98 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden min-w-[420px]">
-              {/* Glow superior */}
-              <div className="absolute -top-px left-1/2 -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-amber-500/60 to-transparent" />
-              
-              {/* Header */}
-              <div className="px-5 py-3 border-b border-white/5 bg-gradient-to-r from-white/5 to-transparent">
-                <h3 className="text-xs font-bold text-white/80 uppercase tracking-wider">
-                  {type === 'services' ? '🎯 Nuestros Servicios' : '✨ Experiencias Únicas'}
-                </h3>
-              </div>
-
-              {/* Items */}
-              <div className="p-2">
-                {items.map((item, idx) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={onClose}
-                    onMouseEnter={() => setHoveredIndex(idx)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                    className="group relative flex items-center gap-4 p-3 rounded-xl transition-all duration-200 hover:bg-white/5"
-                  >
-                    {/* Glow de fondo en hover */}
-                    <motion.div
-                      className={`absolute inset-0 rounded-xl bg-gradient-to-r ${item.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
-                    />
-                    
-                    {/* Icono */}
-                    <div className={`relative w-11 h-11 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200`}>
-                      <span className="text-xl">{item.icon}</span>
-                    </div>
-
-                    {/* Contenido */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-white group-hover:text-white transition-colors">
-                          {t(item.titleKey)}
-                        </span>
-                        {'badge' in item && item.badge && (
-                          <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${
-                            item.badge === 'MÁS PEDIDO' ? 'bg-rose-500 text-white' :
-                            item.badge === '★ EXCLUSIVO' ? 'bg-amber-500 text-black' :
-                            'bg-emerald-500 text-white'
-                          }`}>
-                            {item.badge}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-white/50 mt-0.5 group-hover:text-white/70 transition-colors line-clamp-1">
-                        {t(item.descKey)}
-                      </p>
-                    </div>
-
-                    {/* Flecha */}
-                    <div className="text-white/20 group-hover:text-white/60 group-hover:translate-x-0.5 transition-all duration-200">
-                      <Icons.ArrowRight />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-
-              {/* Footer CTA */}
-              <div className="px-4 py-3 border-t border-white/5 bg-gradient-to-r from-amber-500/5 to-orange-500/5">
-                <Link
-                  href="/configurador"
-                  onClick={onClose}
-                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold text-sm rounded-xl transition-all hover:shadow-lg hover:shadow-amber-500/20"
-                >
-                  <Icons.Sparkles />
-                  <span>Presupuesto en 2 minutos</span>
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTE: Mobile Menu Fullscreen
-// ═══════════════════════════════════════════════════════════════════════════
-
-interface MobileMenuProps {
-  isOpen: boolean;
-  onClose: () => void;
-  t: (key: string) => string;
-  tCommon: (key: string) => string;
-}
-
-function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  const availability = useAvailability();
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-      setExpandedSection(null);
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
-
-  const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
-  };
-
-  const statusColors = {
-    scarce: 'bg-red-500/20 border-red-500/30 text-red-400',
-    limited: 'bg-amber-500/20 border-amber-500/30 text-amber-400',
-    available: 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400'
-  };
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] lg:hidden"
-        >
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/95 backdrop-blur-xl"
-            onClick={onClose}
-          />
-
-          {/* Panel */}
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-zinc-950 border-l border-white/10 overflow-y-auto"
-          >
-            {/* Header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-white/10 bg-zinc-950/95 backdrop-blur-lg">
-              <Image
-                src="/img/logoplanetatextdreta.svg"
-                alt="Òrbita Events"
-                width={130}
-                height={36}
-                className="h-8 w-auto"
-              />
-              <button
-                onClick={onClose}
-                className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all"
-              >
-                <Icons.Close />
-              </button>
-            </div>
-
-            {/* Banner de urgencia */}
-            <div className={`mx-4 mt-4 p-3 rounded-xl border ${statusColors[availability.status]}`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Icons.Fire />
-                  <span className="text-sm font-bold">
-                    {availability.saturdays} {availability.saturdays === 1 ? 'sábado' : 'sábados'} en {availability.currentMonth}
-                  </span>
-                </div>
-                <span className="text-xs opacity-70">¡Reserva ya!</span>
-              </div>
-            </div>
-
-            {/* Nav */}
-            <nav className="p-4 space-y-2">
-              {/* Servicios */}
-              <div className="rounded-xl border border-white/10 overflow-hidden">
-                <button
-                  onClick={() => toggleSection('services')}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition-colors"
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="text-lg">🎯</span>
-                    <span className="font-semibold text-white">{t('nav.services')}</span>
-                  </span>
-                  <motion.div
-                    animate={{ rotate: expandedSection === 'services' ? 180 : 0 }}
-                    className="text-white/40"
-                  >
-                    <Icons.ChevronDown />
-                  </motion.div>
-                </button>
-                
-                <AnimatePresence>
-                  {expandedSection === 'services' && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="border-t border-white/5 bg-white/5"
-                    >
-                      {SERVICES.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={onClose}
-                          className="flex items-center gap-3 p-4 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
-                        >
-                          <span className="text-lg">{item.icon}</span>
-                          <div className="flex-1">
-                            <span className="block text-sm font-medium text-white">{t(item.titleKey)}</span>
-                            <span className="block text-xs text-white/50">{t(item.descKey)}</span>
-                          </div>
-                          {'badge' in item && item.badge && (
-                            <span className="px-2 py-0.5 text-[9px] font-bold bg-rose-500 text-white rounded-full">
-                              {item.badge === 'MÁS PEDIDO' ? 'TOP' : item.badge}
-                            </span>
-                          )}
-                        </Link>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Experiencias */}
-              <div className="rounded-xl border border-white/10 overflow-hidden">
-                <button
-                  onClick={() => toggleSection('experiences')}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition-colors"
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="text-lg">✨</span>
-                    <span className="font-semibold text-white">{t('nav.experiences')}</span>
-                    <span className="px-1.5 py-0.5 text-[9px] font-bold bg-purple-500 text-white rounded">NEW</span>
-                  </span>
-                  <motion.div
-                    animate={{ rotate: expandedSection === 'experiences' ? 180 : 0 }}
-                    className="text-white/40"
-                  >
-                    <Icons.ChevronDown />
-                  </motion.div>
-                </button>
-                
-                <AnimatePresence>
-                  {expandedSection === 'experiences' && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="border-t border-white/5 bg-white/5"
-                    >
-                      {EXPERIENCES.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={onClose}
-                          className="flex items-center gap-3 p-4 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
-                        >
-                          <span className="text-lg">{item.icon}</span>
-                          <div className="flex-1">
-                            <span className="block text-sm font-medium text-white">{t(item.titleKey)}</span>
-                            <span className="block text-xs text-white/50">{t(item.descKey)}</span>
-                          </div>
-                          {'badge' in item && item.badge && (
-                            <span className="px-2 py-0.5 text-[9px] font-bold bg-amber-500 text-black rounded-full">
-                              {item.badge}
-                            </span>
-                          )}
-                        </Link>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Links directos */}
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={onClose}
-                  className="flex items-center gap-3 p-4 rounded-xl border border-white/10 hover:bg-white/5 transition-colors"
-                >
-                  <span className="text-lg">{link.icon}</span>
-                  <span className="font-semibold text-white">{tCommon(link.labelKey)}</span>
-                </Link>
-              ))}
-            </nav>
-
-            {/* CTAs */}
-            <div className="p-4 space-y-3 border-t border-white/10 mt-4">
-              <a
-                href="https://wa.me/34699121023"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-3 w-full p-4 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl transition-all"
-              >
-                <Icons.WhatsApp />
-                <span>WhatsApp Directo</span>
-              </a>
-
-              <Link
-                href="/configurador"
-                onClick={onClose}
-                className="flex items-center justify-center gap-3 w-full p-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-xl transition-all"
-              >
-                <Icons.Sparkles />
-                <span>Presupuesto Gratis</span>
-              </Link>
-
-              <a
-                href="tel:+34699121023"
-                className="flex items-center justify-center gap-3 w-full p-4 border border-white/20 text-white font-medium rounded-xl hover:bg-white/5 transition-all"
-              >
-                <Icons.Phone />
-                <span>699 121 023</span>
-              </a>
-            </div>
-
-            {/* Language */}
-            <div className="p-4 border-t border-white/10">
-              <LanguageSelector />
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPONENTE PRINCIPAL: HeaderChampion
+// COMPONENT PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function HeaderChampion() {
-  const t = useTranslations('header');
-  const tCommon = useTranslations('common');
-  const pathname = usePathname();
-  
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<'services' | 'experiences' | null>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const t = useTranslations('common');
+  const isEs = t('language') === 'es';
+
+  // Estados
   const [isVisible, setIsVisible] = useState(true);
-  
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Refs per evitar temblor
   const lastScrollY = useRef(0);
-  const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
   const ticking = useRef(false);
-  const scrollThreshold = 10; // Mínim de píxels per activar canvi (evita temblor)
+  const scrollThreshold = 10; // Mínim de píxels per activar canvi
 
-  // Scroll handler OPTIMITZAT (sense temblor)
-  useEffect(() => {
-    const handleScroll = () => {
-      if (ticking.current) return;
+  // ─────────────────────────────────────────────────────────────────────────
+  // SCROLL HANDLER OPTIMITZAT (sense temblor)
+  // ─────────────────────────────────────────────────────────────────────────
+  const handleScroll = useCallback(() => {
+    if (ticking.current) return;
 
-      ticking.current = true;
+    ticking.current = true;
 
-      requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
-        const scrollDiff = currentScrollY - lastScrollY.current;
+    requestAnimationFrame(() => {
+      const currentScrollY = window.scrollY;
+      const scrollDiff = currentScrollY - lastScrollY.current;
 
-        // Només canviar si el scroll és significatiu (evita temblor)
-        if (Math.abs(scrollDiff) > scrollThreshold) {
-          if (scrollDiff > 0 && currentScrollY > 100) {
-            // Scrolling DOWN + ja passat 100px → amagar
-            setIsVisible(false);
-            setActiveDropdown(null);
-          } else {
-            // Scrolling UP → mostrar
-            setIsVisible(true);
-          }
-
-          lastScrollY.current = currentScrollY;
+      // Només canviar si el scroll és significatiu (evita temblor)
+      if (Math.abs(scrollDiff) > scrollThreshold) {
+        // Mostrar/amagar basat en direcció
+        if (scrollDiff > 0 && currentScrollY > 100) {
+          // Scrolling DOWN + ja passat 100px → amagar
+          setIsVisible(false);
+        } else {
+          // Scrolling UP → mostrar
+          setIsVisible(true);
         }
 
-        // Background sòlid després de 20px
-        setIsScrolled(currentScrollY > 20);
+        lastScrollY.current = currentScrollY;
+      }
 
-        ticking.current = false;
-      });
-    };
+      // Background sòlid després de 50px
+      setIsScrolled(currentScrollY > 50);
 
+      ticking.current = false;
+    });
+  }, []);
+
+  useEffect(() => {
     // Inicialitzar posició
     lastScrollY.current = window.scrollY;
-    setIsScrolled(window.scrollY > 20);
+    setIsScrolled(window.scrollY > 50);
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [handleScroll]);
 
-  // Close on route change
+  // Tancar menú mòbil al fer scroll
   useEffect(() => {
-    setMobileMenuOpen(false);
-    setActiveDropdown(null);
-  }, [pathname]);
+    if (isMobileMenuOpen && isScrolled) {
+      setIsMobileMenuOpen(false);
+    }
+  }, [isScrolled, isMobileMenuOpen]);
 
-  // Dropdown handlers
-  const handleMouseEnter = useCallback((dropdown: 'services' | 'experiences') => {
-    if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
-    setActiveDropdown(dropdown);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    dropdownTimeout.current = setTimeout(() => setActiveDropdown(null), 100);
-  }, []);
-
+  // ─────────────────────────────────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
-      <motion.header
-        initial={{ y: 0 }}
-        animate={{ y: isVisible ? 0 : -100 }}
-        transition={{ duration: 0.3 }}
+      <header
         className={`
           fixed top-0 left-0 right-0 z-50
           transition-all duration-300 ease-out
+          ${isVisible ? 'translate-y-0' : '-translate-y-full'}
           ${isScrolled
-            ? 'bg-zinc-950/95 backdrop-blur-2xl shadow-xl shadow-black/20 border-b border-white/5'
-            : 'bg-gradient-to-b from-black/90 via-black/50 to-transparent'
+            ? 'bg-zinc-950/95 backdrop-blur-xl shadow-lg shadow-black/20 border-b border-zinc-800/50'
+            : 'bg-gradient-to-b from-black/80 to-transparent'
           }
         `}
         style={{
@@ -716,187 +126,227 @@ export default function HeaderChampion() {
           WebkitBackfaceVisibility: 'hidden',
         }}
       >
-        {/* Urgency Bar */}
-        <UrgencyBar isVisible={!isScrolled} />
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16 md:h-20">
 
-        {/* Main Header */}
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className={`flex items-center justify-between transition-all duration-500 ${isScrolled ? 'h-16' : 'h-18 lg:h-20'}`}>
-            
-            {/* Logo */}
-            <Link href="/" className="flex-shrink-0 group relative">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Image
-                  src="/img/logoplanetatextdreta.svg"
-                  alt="Òrbita Events"
-                  width={170}
-                  height={48}
-                  className={`transition-all duration-500 ${isScrolled ? 'h-9 lg:h-10' : 'h-10 lg:h-12'} w-auto`}
-                  priority
-                />
-              </motion.div>
-              <div className="absolute inset-0 bg-amber-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            {/* ══════════════════════════════════════════════════════════════ */}
+            {/* LOGO */}
+            {/* ══════════════════════════════════════════════════════════════ */}
+            <Link
+              href="/"
+              className="flex items-center gap-2 group"
+            >
+              <Image
+                src="/img/logoplanetatextdreta.svg"
+                alt="Òrbita Events"
+                width={150}
+                height={40}
+                className="h-9 md:h-11 w-auto"
+                priority
+              />
             </Link>
 
-            {/* Desktop Nav */}
+            {/* ══════════════════════════════════════════════════════════════ */}
+            {/* NAV DESKTOP */}
+            {/* ══════════════════════════════════════════════════════════════ */}
             <nav className="hidden lg:flex items-center gap-1">
-              {/* Servicios */}
-              <div
-                className="relative"
-                onMouseEnter={() => handleMouseEnter('services')}
-                onMouseLeave={handleMouseLeave}
-              >
-                <button className={`
-                  flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                  ${activeDropdown === 'services' 
-                    ? 'text-amber-400 bg-amber-500/10' 
-                    : 'text-white/70 hover:text-white hover:bg-white/5'
-                  }
-                `}>
-                  <span>{t('nav.services')}</span>
-                  <motion.div animate={{ rotate: activeDropdown === 'services' ? 180 : 0 }}>
-                    <Icons.ChevronDown />
-                  </motion.div>
-                </button>
-                <MegaDropdown
-                  isOpen={activeDropdown === 'services'}
-                  onClose={() => setActiveDropdown(null)}
-                  type="services"
-                  t={t}
-                />
-              </div>
-
-              {/* Experiencias */}
-              <div
-                className="relative"
-                onMouseEnter={() => handleMouseEnter('experiences')}
-                onMouseLeave={handleMouseLeave}
-              >
-                <button className={`
-                  flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                  ${activeDropdown === 'experiences' 
-                    ? 'text-purple-400 bg-purple-500/10' 
-                    : 'text-white/70 hover:text-white hover:bg-white/5'
-                  }
-                `}>
-                  <span>{t('nav.experiences')}</span>
-                  <span className="ml-1 px-1.5 py-0.5 text-[9px] font-bold bg-purple-500 text-white rounded">NEW</span>
-                  <motion.div animate={{ rotate: activeDropdown === 'experiences' ? 180 : 0 }}>
-                    <Icons.ChevronDown />
-                  </motion.div>
-                </button>
-                <MegaDropdown
-                  isOpen={activeDropdown === 'experiences'}
-                  onClose={() => setActiveDropdown(null)}
-                  type="experiences"
-                  t={t}
-                />
-              </div>
-
-              {/* Links directos */}
-              {NAV_LINKS.map((link) => (
+              {navItems.map((item) => (
                 <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`
-                    px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                    ${pathname === link.href
-                      ? 'text-amber-400 bg-amber-500/10'
-                      : 'text-white/70 hover:text-white hover:bg-white/5'
-                    }
-                  `}
+                  key={item.href}
+                  href={item.href}
+                  className="relative px-4 py-2 text-sm text-zinc-300 hover:text-white transition-colors group"
                 >
-                  {tCommon(link.labelKey)}
+                  <span className="relative z-10 flex items-center gap-1">
+                    {item.badge && <span className="text-xs">{item.badge}</span>}
+                    {isEs ? item.labelEs : item.label}
+                  </span>
+                  {/* Hover effect */}
+                  <span className="absolute inset-0 bg-white/5 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-200" />
                 </Link>
               ))}
             </nav>
 
-            {/* Desktop CTAs */}
-            <div className="hidden lg:flex items-center gap-3">
-              <LanguageSelector />
+            {/* ══════════════════════════════════════════════════════════════ */}
+            {/* CTA BUTTONS */}
+            {/* ══════════════════════════════════════════════════════════════ */}
+            <div className="flex items-center gap-2 md:gap-3">
 
-              {/* WhatsApp */}
-              <motion.a
-                href="https://wa.me/34699121023"
+              {/* Language Selector - Desktop */}
+              <div className="hidden lg:block">
+                <LanguageSelector />
+              </div>
+
+              {/* WhatsApp - Solo icono en móvil */}
+              <a
+                href="https://wa.me/34699121023?text=Hola! M'agradaria informació sobre els vostres serveis"
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative p-2.5 text-white/50 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all"
+                className="
+                  flex items-center justify-center
+                  w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2.5
+                  bg-green-600 hover:bg-green-500
+                  text-white text-sm font-medium
+                  rounded-full md:rounded-lg
+                  transition-all duration-200
+                  hover:scale-105 hover:shadow-lg hover:shadow-green-500/25
+                "
+                aria-label="WhatsApp"
               >
-                <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                </span>
-                <Icons.WhatsApp />
-              </motion.a>
+                {/* Icono WhatsApp */}
+                <svg className="w-5 h-5 md:mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                <span className="hidden md:inline">WhatsApp</span>
+              </a>
 
-              {/* CTA Principal - MÀXIMA VISIBILITAT */}
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
-                <Link
-                  href="/configurador"
-                  className="group relative px-6 py-3 rounded-xl overflow-hidden bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 shadow-lg hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-200"
+              {/* ═══════════════════════════════════════════════════════════ */}
+              {/* CTA PRINCIPAL - MÀXIMA VISIBILITAT */}
+              {/* ═══════════════════════════════════════════════════════════ */}
+              <Link
+                href="/configurador"
+                className="
+                  relative overflow-hidden
+                  flex items-center justify-center gap-2
+                  px-4 py-2.5 md:px-6 md:py-3
+                  bg-gradient-to-r from-amber-500 to-amber-400
+                  text-zinc-900 text-sm md:text-base font-bold
+                  rounded-lg
+                  transition-all duration-200
+                  hover:from-amber-400 hover:to-amber-300
+                  hover:scale-105
+                  hover:shadow-xl hover:shadow-amber-500/30
+                  group
+                "
+              >
+                {/* Shine effect */}
+                <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+
+                {/* Text */}
+                <span className="relative z-10 whitespace-nowrap">
+                  <span className="hidden sm:inline">{isEs ? 'Presupuesto ' : 'Pressupost '}</span>
+                  <span className="font-black">GRATIS</span>
+                </span>
+
+                {/* Arrow */}
+                <svg
+                  className="relative z-10 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
                 >
-                  {/* Shine effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative flex items-center gap-2 text-zinc-900 font-bold text-sm">
-                    <Icons.Sparkles />
-                    <span>Pressupost <span className="font-black">GRATIS</span></span>
-                  </span>
-                </Link>
-              </motion.div>
-            </div>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
 
-            {/* Mobile CTAs + Hamburger */}
-            <div className="flex lg:hidden items-center gap-2">
-              <motion.a
-                href="https://wa.me/34699121023"
-                target="_blank"
-                rel="noopener noreferrer"
-                whileTap={{ scale: 0.9 }}
-                className="relative p-2.5 text-emerald-400 bg-emerald-500/10 rounded-xl"
+              {/* ═══════════════════════════════════════════════════════════ */}
+              {/* HAMBURGER MÒBIL */}
+              {/* ═══════════════════════════════════════════════════════════ */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5"
+                aria-label="Menú"
+                aria-expanded={isMobileMenuOpen}
               >
-                <span className="absolute top-1 right-1 flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <Icons.WhatsApp />
-              </motion.a>
+                <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`} />
+                <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+              </button>
 
-              <motion.button
-                onClick={() => setMobileMenuOpen(true)}
-                whileTap={{ scale: 0.9 }}
-                className="p-2.5 text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all"
-              >
-                <Icons.Menu />
-              </motion.button>
             </div>
           </div>
         </div>
-      </motion.header>
+      </header>
 
-      {/* Spacer */}
-      <div className={`transition-all duration-500 ${isScrolled ? 'h-16' : 'h-[104px] lg:h-[120px]'}`} />
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* MENÚ MÒBIL */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-40 lg:hidden"
+          >
+            {/* Overlay */}
+            <div
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
 
-      {/* Mobile Menu */}
-      <MobileMenu
-        isOpen={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-        t={t}
-        tCommon={tCommon}
-      />
+            {/* Menu Content */}
+            <motion.nav
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.3 }}
+              className="absolute top-0 right-0 h-full w-80 max-w-[85vw] bg-zinc-950 border-l border-zinc-800 shadow-2xl"
+            >
+              <div className="flex flex-col h-full pt-20 pb-6 px-6">
 
-      {/* Gradient animation */}
-      <style jsx global>{`
-        @keyframes gradient {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animate-gradient {
-          animation: gradient 3s ease infinite;
-        }
-      `}</style>
+                {/* Nav Items */}
+                <div className="flex-1 space-y-1">
+                  {navItems.map((item, i) => (
+                    <motion.div
+                      key={item.href}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                    >
+                      <Link
+                        href={item.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-lg text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors"
+                      >
+                        {item.badge && <span>{item.badge}</span>}
+                        {isEs ? item.labelEs : item.label}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Language Selector - Mobile */}
+                <div className="py-4 border-t border-zinc-800">
+                  <LanguageSelector />
+                </div>
+
+                {/* CTA en mòbil */}
+                <div className="space-y-3 pt-4 border-t border-zinc-800">
+                  <Link
+                    href="/configurador"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r from-amber-500 to-amber-400 text-zinc-900 font-bold rounded-lg"
+                  >
+                    {isEs ? 'Presupuesto' : 'Pressupost'} GRATIS
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </Link>
+
+                  <a
+                    href="https://wa.me/34699121023"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 w-full py-4 bg-green-600 text-white font-semibold rounded-lg"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    WhatsApp Directe
+                  </a>
+                </div>
+
+              </div>
+            </motion.nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Spacer per evitar que el contingut quedi darrere del header */}
+      <div className="h-16 md:h-20" />
     </>
   );
 }
