@@ -51,9 +51,9 @@ export default function HeroElegant() {
             transition={{ delay: 0.3 }}
             className="inline-flex items-center gap-2 mb-8"
           >
-            <span className="w-2 h-2 bg-[#C9A962] rounded-full animate-pulse" />
-            <span className="text-[#A0A0A0] text-sm tracking-wide">
-              Més de 195 events a Catalunya
+            <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+            <span className="text-white/60 text-sm tracking-wide">
+              +48 events a Catalunya
             </span>
           </motion.div>
           
@@ -61,7 +61,7 @@ export default function HeroElegant() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white mb-6 leading-[1.1] tracking-tight">
             No posem música.
             <br />
-            <span className="bg-gradient-to-r from-[#D4B978] via-[#C9A962] to-[#A68B4B] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent">
               Creem experiències.
             </span>
           </h1>
@@ -76,7 +76,7 @@ export default function HeroElegant() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link
               href="/configurador"
-              className="group relative inline-flex items-center gap-2 bg-gradient-to-r from-[#C9A962] to-[#A68B4B] text-[#0A0A0A] font-semibold px-8 py-4 rounded-xl overflow-hidden transition-all hover:shadow-[0_8px_30px_rgba(201,169,98,0.3)]"
+              className="group relative inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-600 text-[#0A0A0A] font-semibold px-8 py-4 rounded-xl overflow-hidden transition-all hover:shadow-[0_8px_30px_rgba(245,158,11,0.3)]"
             >
               {/* Shine effect */}
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -98,30 +98,28 @@ export default function HeroElegant() {
             </Link>
           </div>
           
-          {/* Trust badges - Subtils */}
+          {/* Mini Stats - Elegants */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-6 text-sm text-[#666666]"
+            className="flex flex-wrap items-center justify-center gap-8 md:gap-12"
           >
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-[#C9A962]" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              <span>Resposta en &lt;2h</span>
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-amber-500">+48</div>
+              <div className="text-xs text-white/50 uppercase tracking-wider">Events</div>
             </div>
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-[#C9A962]" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              <span>Equip backup 100%</span>
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-white">4.9<span className="text-amber-500">★</span></div>
+              <div className="text-xs text-white/50 uppercase tracking-wider">Valoració</div>
             </div>
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-[#C9A962]" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              <span>Garantia satisfacció</span>
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-white">&lt;2h</div>
+              <div className="text-xs text-white/50 uppercase tracking-wider">Resposta</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-white">100%</div>
+              <div className="text-xs text-white/50 uppercase tracking-wider">Backup</div>
             </div>
           </motion.div>
         </motion.div>
@@ -139,7 +137,7 @@ export default function HeroElegant() {
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           className="w-6 h-10 border border-white/20 rounded-full flex justify-center pt-2"
         >
-          <div className="w-1 h-2 bg-[#C9A962] rounded-full" />
+          <div className="w-1 h-2 bg-amber-500 rounded-full" />
         </motion.div>
       </motion.div>
     </section>
