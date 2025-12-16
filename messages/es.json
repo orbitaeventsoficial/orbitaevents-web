@@ -4745,5 +4745,535 @@
       "description": "Utiliza nuestro configurador para crear un presupuesto a medida y descárgalo en PDF.",
       "cta": "Ir al Configurador"
     }
+  },
+  "galeriaPortfolio": {
+    "badge": "Nuestro trabajo",
+    "title": "Portfolio",
+    "titleHighlight": "de Eventos",
+    "subtitle": "Más de 195 eventos transformando espacios en experiencias únicas. Descubre lo que podemos crear para ti.",
+    "categories": {
+      "tots": "Todos",
+      "harryPotter": "Mundo Mágico",
+      "halloween": "Halloween",
+      "casaments": "Bodas",
+      "festes": "Fiestas",
+      "corporatiu": "Corporativo"
+    },
+    "cta": {
+      "question": "¿Quieres que tu evento sea el próximo?",
+      "button": "Pide tu presupuesto"
+    },
+    "items": {
+      "hw1": { "alt": "Fiesta Halloween con decoración terrorífica", "title": "Fiesta Halloween", "location": "Barcelona", "date": "Octubre 2024" },
+      "hw2": { "alt": "Decoración Halloween con luces", "title": "Noche de Terror", "location": "Girona", "date": "Octubre 2024" },
+      "hw3": { "alt": "Ambiente Halloween", "title": "Halloween Party", "location": "Granollers", "date": "Octubre 2024" },
+      "hp1": { "alt": "Boda tematización Harry Potter", "title": "Boda Mundo Mágico", "location": "Mas Terrats, Girona", "date": "Septiembre 2024" },
+      "hp2": { "alt": "Velas flotantes Harry Potter", "title": "Velas Flotantes", "location": "Barcelona", "date": "Julio 2024" },
+      "hp3": { "alt": "Decoración Hogwarts", "title": "Experiencia Hogwarts", "location": "Girona", "date": "Agosto 2024" },
+      "boda1": { "alt": "Boda elegante", "title": "Boda Marc & Laura", "location": "Barcelona", "date": "Julio 2024" },
+      "boda2": { "alt": "Primer baile", "title": "Primer Baile", "location": "Girona", "date": "Junio 2024" },
+      "boda3": { "alt": "Fiesta boda", "title": "Fiesta Nupcial", "location": "Barcelona", "date": "Septiembre 2024" },
+      "festa1": { "alt": "Fiesta aniversario", "title": "Aniversario 40", "location": "Barcelona", "date": "Agosto 2024" },
+      "festa2": { "alt": "Fiesta comunión", "title": "Comunión", "location": "Granollers", "date": "Mayo 2024" },
+      "corp1": { "alt": "Evento corporativo", "title": "Cena Empresa", "location": "Barcelona", "date": "Diciembre 2024" },
+      "corp2": { "alt": "Team building", "title": "Team Building", "location": "Girona", "date": "Noviembre 2024" }
+    }
+  },
+  "procesVisual": {
+    "badge": "Cómo Funciona",
+    "title": "Del Contacto a la",
+    "titleHighlight": "Fiesta Perfecta",
+    "subtitle": "4 pasos simples. Nosotros nos encargamos de todo. Tú solo tienes que disfrutar.",
+    "steps": {
+      "step1": {
+        "number": "01",
+        "title": "Contacto",
+        "description": "Nos explicas tu evento: fecha, lugar, tipo de fiesta, y qué tienes en mente. Respuesta en menos de 2 horas.",
+        "time": "< 2h",
+        "action": "Formulario o WhatsApp"
+      },
+      "step2": {
+        "number": "02",
+        "title": "Propuesta",
+        "description": "Te preparamos un presupuesto detallado sin sorpresas. Precio cerrado con todo incluido: equipo, montaje, DJ.",
+        "time": "24-48h",
+        "action": "Presupuesto personalizado"
+      },
+      "step3": {
+        "number": "03",
+        "title": "Reunión",
+        "description": "Hablamos de los detalles: playlist, momentos clave, coordinación con el venue. Nos aseguramos de que todo esté perfecto.",
+        "time": "1-2 semanas antes",
+        "action": "Videollamada o presencial"
+      },
+      "step4": {
+        "number": "04",
+        "title": "Tu Evento",
+        "description": "Llegamos, montamos, y hacemos que tu evento sea increíble. Tú solo tienes que disfrutar.",
+        "time": "¡El gran día!",
+        "action": "Magia garantizada"
+      }
+    },
+    "garanties": {
+      "satisfaccio": "Garantía satisfacción 100%",
+      "backup": "Equipo backup completo",
+      "suport": "Soporte 24/7",
+      "costos": "Sin costes ocultos"
+    },
+    "cta": {
+      "question": "¿Preparado para empezar?",
+      "button": "Empieza Ahora - Paso 1",
+      "whatsapp": "O hablamos por WhatsApp"
+    },
+    "compact": {
+      "title": "¿Cómo Funciona?"
+    }
+  },
+  "casosExit": {
+    "badge": "Historias Reales",
+    "title": "Casos",
+    "titleHighlight": "de Éxito",
+    "subtitle": "Descubre cómo hemos transformado eventos en experiencias inolvidables.",
+    "filters": {
+      "tots": "Todos",
+      "casament": "Bodas",
+      "festa": "Fiestas",
+      "corporatiu": "Corporativo",
+      "tematica": "Temáticas"
+    },
+    "cta": {
+      "question": "¿Quieres ser el próximo caso de éxito?",
+      "button": "Empieza tu proyecto"
+    },
+    "modal": {
+      "guests": "invitados",
+      "servicesUsed": "Servicios Utilizados",
+      "gallery": "Galería",
+      "wantThis": "Quiero un evento así",
+      "whatsapp": "WhatsApp"
+    },
+    "cases": {
+      "mariaJordi": {
+        "clientName": "Maria & Jordi",
+        "eventType": "Boda",
+        "title": "Boda Harry Potter en Mas Terrats",
+        "location": "Girona",
+        "venue": "Mas Terrats",
+        "date": "Septiembre 2024",
+        "guests": 150,
+        "services": ["DJ 6h", "Tematización HP completa", "Velas flotantes", "Estación pociones", "Efectos FX"],
+        "story": "Maria y Jordi son fans de Harry Potter desde pequeños. Querían que su boda fuera mágica, literalmente. Transformamos Mas Terrats en el Gran Comedor de Hogwarts con velas flotantes, mesas por casas, y una estación de pociones. El momento del primer baile con Hedwig's Theme hizo llorar a todos.",
+        "quote": "¡Increíble! Hicieron que nuestra boda fuera mágica. La tematización Harry Potter dejó a todos con la boca abierta. ¡Los invitados aún hablan de ello!"
+      },
+      "angela18": {
+        "clientName": "Àngela García",
+        "eventType": "Cumpleaños",
+        "title": "Fiesta de los 18 Halloween",
+        "location": "Barcelona",
+        "venue": "Casa particular",
+        "date": "Octubre 2024",
+        "guests": 80,
+        "services": ["DJ 4h", "Decoración Halloween", "Máquina humo", "Luces LED", "Efectos láser"],
+        "story": "Àngela quería una fiesta de los 18 que nadie olvidara. Como su cumpleaños es en octubre, hicimos una fiesta temática Halloween brutal. Transformamos el jardín de sus padres en un escenario de terror con humo, luces naranjas, y música que hizo bailar a todos hasta las 3 de la madrugada.",
+        "quote": "Contraté la discomóvil y mis amigos TODAVÍA me preguntan dónde encontré al DJ. Los efectos especiales y la puesta en escena fueron espectaculares. ¡Repetiría 100%!"
+      },
+      "techCorp": {
+        "clientName": "TechCorp Barcelona",
+        "eventType": "Empresa",
+        "title": "Cena de Navidad Corporativa",
+        "location": "Girona",
+        "venue": "Hotel Carlemany",
+        "date": "Diciembre 2024",
+        "guests": 120,
+        "services": ["DJ 5h", "Sonido profesional", "Micro inalámbrico", "Iluminación ambiente", "Coordinación discursos"],
+        "story": "TechCorp necesitaba una cena de Navidad que combinara momentos formales (discursos, premios) con fiesta. Coordinamos perfectamente los tiempos: música de ambiente durante la cena, silencio para los discursos, y después fiesta hasta que cerraron el hotel. El CEO nos felicitó personalmente.",
+        "quote": "Necesitábamos un evento corporativo profesional pero divertido. Òrbita nos dio exactamente eso: equipamiento top, coordinación perfecta y una animación de la que el equipo todavía habla."
+      }
+    }
+  },
+  "faqAmpliat": {
+    "badge": "Preguntas Frecuentes",
+    "title": "Todo lo que",
+    "titleHighlight": "Necesitas Saber",
+    "subtitle": "Respuestas a las preguntas más habituales. Si no encuentras lo que buscas, ¡contáctanos por WhatsApp!",
+    "cta": {
+      "question": "¿No encuentras la respuesta que buscas?",
+      "button": "Pregunta por WhatsApp"
+    },
+    "categories": {
+      "general": {
+        "title": "General",
+        "faqs": [
+          {
+            "question": "¿Qué incluye exactamente el servicio?",
+            "answer": "Cada pack incluye: DJ profesional, equipo de sonido completo, iluminación LED, montaje y desmontaje, transporte (gratis hasta 25km de Granollers), y coordinación con el venue. Los packs más avanzados incluyen efectos especiales, tematización, y servicios extra."
+          },
+          {
+            "question": "¿En qué zonas trabajáis?",
+            "answer": "Cubrimos Barcelona y Girona (provincia). Transporte gratis hasta 25km desde Granollers. Para distancias mayores, añadimos un suplemento de transporte que te comunicamos en el presupuesto."
+          },
+          {
+            "question": "¿Con cuánta antelación tengo que reservar?",
+            "answer": "Recomendamos: 6-8 semanas para fines de semana, 3-4 semanas para días laborables. Para tematizaciones complejas (Harry Potter, Halloween), mejor 2 meses. ¡Pero siempre consúltanos - a veces tenemos fechas libres a última hora!"
+          },
+          {
+            "question": "¿Hacéis eventos entre semana?",
+            "answer": "¡Sí! De lunes a jueves tenemos disponibilidad y a menudo ofrecemos precios especiales. Ideal para eventos corporativos o fiestas privadas."
+          }
+        ]
+      },
+      "preus": {
+        "title": "Precios y Pago",
+        "faqs": [
+          {
+            "question": "¿Los precios que veo son finales?",
+            "answer": "¡Sí! Trabajamos con precios cerrados y sin sorpresas. El presupuesto que te damos es lo que pagarás. Incluye todo: equipo, transporte, montaje, IVA... Todo."
+          },
+          {
+            "question": "¿Cómo es el pago?",
+            "answer": "Reserva con un 30% para confirmar la fecha. El 70% restante se paga 7 días antes del evento. Aceptamos transferencia, Bizum, y tarjeta."
+          },
+          {
+            "question": "¿Qué pasa si tengo que cancelar?",
+            "answer": "Entendemos que a veces las cosas cambian. Cancelación gratuita hasta 30 días antes. Entre 30-15 días, retenemos el 50% de la reserva. Menos de 15 días, no hay devolución. ¡Pero si quieres cambiar de fecha, siempre intentamos adaptarnos!"
+          },
+          {
+            "question": "¿Hay costes extra?",
+            "answer": "No, si nos dices todo lo que necesitas desde el principio. Los únicos posibles extras son: horas extra de DJ (precio acordado previamente), desplazamiento extra (si cambias de lugar), o servicios adicionales que añadas después."
+          }
+        ]
+      },
+      "equip": {
+        "title": "Equipo y Técnica",
+        "faqs": [
+          {
+            "question": "¿Qué equipo lleváis?",
+            "answer": "Equipo profesional propio: Controladora Pioneer DDJ-REV7, altavoces EV ETX (hasta 4000W), 4 cabezas móviles LED, multiefectos, máquina de humo, y mucho más. Todo preparado para cualquier espacio."
+          },
+          {
+            "question": "¿Y si falla algo?",
+            "answer": "Llevamos backup COMPLETO de todo: controladora extra, portátil extra, cables duplicados, altavoz extra... En 15 años, nunca hemos tenido que parar un evento. Y si pasara algo, tenemos equipo de recambio a mano."
+          },
+          {
+            "question": "¿Funciona en exterior?",
+            "answer": "¡Sí! Todo nuestro equipo está preparado para exterior. Llevamos protecciones para la lluvia y viento. Lo único que necesitamos es acceso a electricidad (mínimo 16A)."
+          },
+          {
+            "question": "¿Cuánta potencia de sonido necesito?",
+            "answer": "Lo calculamos según el espacio y el número de invitados. Para 100 personas en interior, 2000W son suficientes. Para 200+ o exterior, llevamos 4000W. Siempre llevamos más de lo necesario por seguridad."
+          }
+        ]
+      },
+      "musica": {
+        "title": "Música y DJ",
+        "faqs": [
+          {
+            "question": "¿Puedo elegir la música?",
+            "answer": "¡Por supuesto! Antes del evento hacemos una reunión para hablar de tus gustos, canciones especiales (primer baile, entrada, etc.), y lo que NO quieres escuchar. El DJ combina tus preferencias con la lectura del público en tiempo real."
+          },
+          {
+            "question": "¿Qué estilo de música hacéis?",
+            "answer": "¡De todo! Pop, hits actuales, reggaeton, electrónica, clásicos de los 80-90, rock, indie, latino... Tenemos una biblioteca de +15.000 canciones y siempre actualizamos con las novedades. Si nos pides algo que no tenemos, lo descargamos."
+          },
+          {
+            "question": "¿Puedo enviar una playlist?",
+            "answer": "¡Sí! Puedes enviarnos una playlist de Spotify o YouTube. El DJ la usará como guía e irá intercalando tus canciones con selección propia para mantener la energía."
+          },
+          {
+            "question": "¿El DJ habla por micro?",
+            "answer": "¡Solo si quieres! Algunos clientes quieren animación activa (concursos, anuncios...) y otros prefieren que la música hable por sí sola. Tú decides el estilo."
+          }
+        ]
+      },
+      "tematiques": {
+        "title": "Tematizaciones",
+        "faqs": [
+          {
+            "question": "¿Cómo funciona la tematización Harry Potter?",
+            "answer": "Transformamos el espacio en Hogwarts: velas flotantes LED, mesas por casas, estación de pociones, decoración completa, y música temática. Puedes elegir el nivel: desde un toque sutil hasta inmersión total. Somos los únicos en Cataluña que ofrecemos este servicio profesionalmente."
+          },
+          {
+            "question": "¿Hacéis otras temáticas aparte de Halloween y Harry Potter?",
+            "answer": "¡Sí! Podemos crear cualquier temática: Años 80, Tropical, Gatsby, Disco, Mafia, Cirque du Soleil... Dinos la idea y te proponemos cómo hacerla realidad."
+          },
+          {
+            "question": "¿Qué pasa si el venue ya tiene decoración?",
+            "answer": "¡Perfecto! Nos adaptamos. Podemos añadir elementos temáticos que complementen la decoración existente o trabajar con vuestro wedding planner para integrarlo todo."
+          },
+          {
+            "question": "¿La decoración se queda montada todo el evento?",
+            "answer": "¡Sí! Montamos antes de que lleguen los invitados y desmontamos cuando acaba el evento. La decoración se queda toda la noche para fotos y ambiente."
+          }
+        ]
+      },
+      "logistica": {
+        "title": "Logística",
+        "faqs": [
+          {
+            "question": "¿Cuánto tiempo necesitáis para montar?",
+            "answer": "Depende del servicio: DJ básico = 1-1.5h, con iluminación completa = 2h, tematización = 3-4h. Siempre coordinamos con el venue para no molestar otros preparativos."
+          },
+          {
+            "question": "¿Qué necesitáis del venue?",
+            "answer": "Básicamente electricidad (mínimo 16A, idealmente 32A para montajes grandes) y un espacio para montar. Siempre contactamos con el venue antes para confirmar todo."
+          },
+          {
+            "question": "¿Qué pasa si llueve?",
+            "answer": "Si el evento es exterior, llevamos protecciones para el equipo. Si es necesario, podemos movernos a interior rápidamente. Siempre tenemos un plan B preparado."
+          },
+          {
+            "question": "¿A qué hora tenéis que llegar?",
+            "answer": "Normalmente llegamos 2-3 horas antes del inicio. Para tematizaciones, puede ser 4-5 horas. Lo acordamos contigo y el venue."
+          }
+        ]
+      },
+      "garanties": {
+        "title": "Garantías",
+        "faqs": [
+          {
+            "question": "¿Tenéis seguro?",
+            "answer": "¡Sí! Tenemos seguro de responsabilidad civil que cubre cualquier incidente durante el evento. Puedes pedirnos el certificado si el venue lo requiere."
+          },
+          {
+            "question": "¿Qué es la garantía de satisfacción?",
+            "answer": "Si no estás 100% satisfecho con nuestro servicio, hablamos y lo solucionamos. Si realmente no hemos cumplido lo que prometimos, te devolvemos el dinero. Sin preguntas. Nunca hemos tenido que usarla porque nos lo tomamos muy en serio."
+          },
+          {
+            "question": "¿Y si el DJ se pone enfermo?",
+            "answer": "Tenemos una red de DJs de confianza que conocen nuestro estilo. Si pasa algo, te avisamos inmediatamente y buscamos la mejor solución. En 15 años, esto solo ha pasado 2 veces y siempre hemos encontrado un reemplazo a la altura."
+          }
+        ]
+      }
+    }
+  },
+  "googleReviews": {
+    "title": "Opiniones en",
+    "titleHighlight": "Google",
+    "rating": "4.9",
+    "totalReviews": "47",
+    "verified": "opiniones verificadas",
+    "viewAll": "Ver todas las opiniones en Google",
+    "leaveReview": "¿Has contratado Òrbita?",
+    "leaveReviewLink": "¡Deja tu opinión!",
+    "compact": {
+      "opinions": "opiniones"
+    },
+    "badge": {
+      "opinions": "opiniones en Google"
+    },
+    "reviews": [
+      {
+        "author": "Maria Garcia",
+        "date": "Hace 2 semanas",
+        "text": "¡Increíble! Hicieron que nuestra boda fuera mágica. La tematización Harry Potter dejó a todos con la boca abierta. ¡100% recomendado!"
+      },
+      {
+        "author": "Joan Martínez",
+        "date": "Hace 1 mes",
+        "text": "El DJ hizo que la fiesta no parara. Muy profesional, gran selección musical y los efectos de luz fueron espectaculares."
+      },
+      {
+        "author": "Laura Puig",
+        "date": "Hace 1 mes",
+        "text": "Los contratamos para la fiesta de los 40 de mi marido. Todo perfecto: comunicación, puntualidad, y un ambiente increíble."
+      },
+      {
+        "author": "Marc Ferrer",
+        "date": "Hace 2 meses",
+        "text": "Cena de empresa con Òrbita. Coordinación perfecta con el hotel, sonido impecable, y el equipo todavía habla de la fiesta."
+      },
+      {
+        "author": "Anna Soler",
+        "date": "Hace 3 meses",
+        "text": "Los encontramos por Instagram y fue un acierto total. Muy atentos a todo, responden rápido, y el día fue perfecto."
+      }
+    ]
+  },
+  "sobreNosaltres": {
+    "meta": {
+      "title": "Sobre Nosotros | Quiénes Somos | Òrbita Events",
+      "description": "Conoce quiénes somos y por qué hacemos lo que hacemos. 15+ años de experiencia creando experiencias únicas en Barcelona y Girona."
+    },
+    "badge": "Quiénes somos",
+    "hero": {
+      "greeting": "Hola, soy",
+      "name": "Carles",
+      "subtitle": "El fundador de Òrbita Events y la persona que estará en tu evento asegurándose de que todo sea perfecto.",
+      "description": "Después de 15 años en el sector de eventos, fundé Òrbita con una misión clara: no poner música, sino crear experiencias. Experiencias que la gente recuerda años después. Experiencias que hacen llorar de emoción. Experiencias que transforman un día especial en algo mágico.",
+      "cta": {
+        "talk": "Hablemos de tu evento",
+        "whatsapp": "WhatsApp directo"
+      },
+      "badges": {
+        "experience": "años de experiencia",
+        "available": "Disponible"
+      }
+    },
+    "stats": {
+      "years": { "value": "15+", "label": "Años de experiencia" },
+      "events": { "value": "195+", "label": "Eventos realizados" },
+      "repeat": { "value": "92%", "label": "Clientes repiten" },
+      "backup": { "value": "100%", "label": "Equipo backup" }
+    },
+    "history": {
+      "title": "Mi",
+      "titleHighlight": "Historia",
+      "subtitle": "De DJ amateur a crear experiencias inmersivas. Un camino de pasión y dedicación.",
+      "timeline": [
+        { "year": "2008", "title": "Los Inicios", "description": "Empecé como DJ amateur en fiestas de amigos. La pasión por la música y crear ambientes únicos nació aquí." },
+        { "year": "2015", "title": "Profesionalización", "description": "Primer equipo profesional, primeras bodas. Descubrí que lo que realmente me apasionaba era crear experiencias completas." },
+        { "year": "2020", "title": "Tematización", "description": "La primera boda Harry Potter lo cambió todo. Vi que la gente quería más que música: quería magia." },
+        { "year": "2023", "title": "Òrbita Events", "description": "Nace Òrbita Events como marca. Experiencias inmersivas completas: tematización + DJ + animación + efectos." },
+        { "year": "2024", "title": "Hoy", "description": "+195 eventos, equipo propio valorado en 12.000€, y el único servicio de tematización Harry Potter profesional en Cataluña." }
+      ]
+    },
+    "valors": {
+      "title": "Nuestros",
+      "titleHighlight": "Valores",
+      "subtitle": "Lo que nos guía en cada evento que hacemos.",
+      "items": [
+        { "icon": "sparkles", "title": "Pasión por el Detalle", "description": "Cada evento es único. No hacemos copias. Personalizamos cada detalle para crear exactamente lo que imaginas." },
+        { "icon": "target", "title": "Profesionalidad", "description": "Equipamiento profesional, backup completo, y experiencia demostrada. Tu evento NUNCA se para." },
+        { "icon": "stars", "title": "Creatividad", "description": "Desde tematizaciones Harry Potter hasta Halloween terrorífico. Si puedes imaginarlo, podemos crearlo." },
+        { "icon": "handshake", "title": "Compromiso", "description": "Garantía de satisfacción 100%. Si no estás contento, te devolvemos el dinero. Sin preguntas." }
+      ]
+    },
+    "equip": {
+      "title": "Equipo",
+      "titleHighlight": "Profesional",
+      "description": "No alquilamos equipo. Todo es nuestro. Esto nos permite conocer cada pieza, mantenerla perfectamente, y garantizar que NUNCA falle.",
+      "items": [
+        { "icon": "mixer", "title": "Controladora Pioneer DDJ-REV7", "description": "La mejor del mercado para eventos" },
+        { "icon": "speaker", "title": "Sonido 4000W (2x EV ETX)", "description": "Potencia profesional para cualquier espacio" },
+        { "icon": "lights", "title": "4 Cabezas Móviles LED + Multiefectos", "description": "Iluminación sincronizada con la música" },
+        { "icon": "fog", "title": "Máquina de Humo + Efectos FX", "description": "Para crear la atmósfera perfecta" }
+      ],
+      "backup": "Backup 100%: Llevamos duplicado de TODO"
+    },
+    "cta": {
+      "title": "¿Preparado para crear",
+      "titleHighlight": "magia?",
+      "description": "Hablemos de tu evento. Sin compromiso, sin presiones. Solo una conversación para entender qué necesitas.",
+      "buttons": {
+        "quote": "Pide Presupuesto Gratis",
+        "portfolio": "Ver Portfolio"
+      }
+    }
+  },
+  "monMagicPage": {
+    "meta": {
+      "title": "Experiencia Mundo Mágico | Boda Harry Potter Barcelona | Òrbita Events",
+      "description": "La experiencia Harry Potter definitiva para tu boda o evento. Velas flotantes, estación de pociones, decoración Hogwarts. El único servicio profesional en Cataluña."
+    },
+    "badge": "Experiencia Exclusiva",
+    "hero": {
+      "title": "Mundo",
+      "titleHighlight": "Mágico",
+      "subtitle": "La experiencia Harry Potter definitiva para tu boda o evento.",
+      "exclusive": "El único servicio profesional de tematización HP en Cataluña",
+      "cta": {
+        "quote": "Pide Presupuesto",
+        "cases": "Ver Bodas Reales"
+      },
+      "stats": {
+        "weddings": { "value": "25+", "label": "Bodas HP" },
+        "price": { "value": "Desde 850€", "label": "Todo incluido" },
+        "unique": { "value": "Únicos", "label": "En Cataluña" }
+      }
+    },
+    "features": {
+      "title": "Crea Tu Propio",
+      "titleHighlight": "Hogwarts",
+      "subtitle": "Todo lo que necesitas para transportar a tus invitados al mundo mágico de Harry Potter.",
+      "items": [
+        { "icon": "candle", "title": "Velas Flotantes", "description": "Las icónicas velas flotantes del Gran Comedor de Hogwarts. Creadas con LED y efecto levitación." },
+        { "icon": "potion", "title": "Estación de Pociones", "description": "Con tarros de cristal, etiquetas antiguas, humo seco y luces. Perfecto para fotos." },
+        { "icon": "scroll", "title": "Invitaciones Hogwarts", "description": "Cartas estilo Hogwarts con lacre rojo y pluma. Hacemos el diseño por ti." },
+        { "icon": "music", "title": "Banda Sonora Mágica", "description": "Desde Hedwig's Theme hasta los hits que harán bailar a todos. DJ profesional." },
+        { "icon": "castle", "title": "Decoración Hogwarts", "description": "Escudos de las casas, banderas, libros antiguos, copas doradas... Todo el universo HP." },
+        { "icon": "sparkles", "title": "Efectos Mágicos", "description": "Humo bajo, luces doradas, láser, y momentos \"mágicos\" sincronizados con la música." }
+      ]
+    },
+    "candles": {
+      "badge": "Lo más pedido",
+      "title": "Velas Flotantes del",
+      "titleHighlight": "Gran Comedor",
+      "description": "Recrea el ambiente mágico del Gran Comedor de Hogwarts con nuestras velas LED flotantes. Cada vela tiene efecto parpadeo realista y se cuelga a diferentes alturas para crear profundidad.",
+      "features": [
+        "Velas LED con efecto parpadeo",
+        "Hilo transparente invisible",
+        "Montaje y desmontaje incluido",
+        "Adaptado a cualquier techo"
+      ],
+      "cta": "Añade velas a tu evento"
+    },
+    "cases": {
+      "title": "Bodas",
+      "titleHighlight": "Mágicas Reales",
+      "subtitle": "Descubre cómo hemos transformado bodas en experiencias Hogwarts.",
+      "items": [
+        {
+          "title": "Boda Maria & Jordi",
+          "location": "Mas Terrats, Girona",
+          "date": "Septiembre 2024",
+          "description": "El Gran Comedor de Hogwarts recreado en una masía centenaria. 150 invitados, velas flotantes, ceremonia con Hedwig's Theme.",
+          "quote": "¡Hicieron que nuestra boda fuera mágica. Los invitados todavía hablan de ello!"
+        },
+        {
+          "title": "Boda Anna & Pere",
+          "location": "Can Ribas, Barcelona",
+          "date": "Julio 2024",
+          "description": "Boda íntima de 80 personas con tematización HP elegante. Mesas por casas de Hogwarts, estación de pociones.",
+          "quote": "¡Superaron todas nuestras expectativas. Profesional y creativo!"
+        }
+      ]
+    },
+    "packs": {
+      "title": "Packs",
+      "titleHighlight": "Mundo Mágico",
+      "subtitle": "Elige el nivel de magia que quieres para tu evento.",
+      "recommended": "RECOMENDADO",
+      "items": [
+        {
+          "name": "Magia Básica",
+          "price": "850",
+          "description": "Para fiestas temáticas",
+          "features": ["DJ Profesional 4h", "Decoración HP básica", "Velas flotantes (10u)", "Equipo sonido 2000W", "Luces temáticas", "Playlist HP + hits"]
+        },
+        {
+          "name": "Experiencia Hogwarts",
+          "price": "1200",
+          "description": "La boda mágica completa",
+          "features": ["Todo del pack Básico", "DJ 6h (ceremonia a fiesta)", "Velas flotantes (20u)", "Estación de pociones", "Decoración completa", "Efectos humo + láser", "Coordinación con venue", "Micro inalámbrico"],
+          "highlighted": true
+        },
+        {
+          "name": "Hogwarts Premium",
+          "price": "1800",
+          "description": "La experiencia definitiva",
+          "features": ["Todo del pack Hogwarts", "DJ 8h jornada completa", "Velas flotantes (30u)", "Photo corner HP completo", "Invitaciones diseño incluido", "Varita mágica para invitados", "Mapping básico", "Backup 100%"]
+        }
+      ]
+    },
+    "faq": {
+      "title": "Preguntas",
+      "titleHighlight": "Frecuentes",
+      "items": [
+        { "question": "¿Cómo funcionan las velas flotantes?", "answer": "Son velas LED con efecto parpadeo realista, colgadas con hilo transparente a diferentes alturas. Crean el efecto del Gran Comedor de Hogwarts. El montaje es seguro y no necesita fuego real." },
+        { "question": "¿Puedo personalizar la tematización?", "answer": "¡Por supuesto! Podemos centrarnos en una casa específica (Gryffindor, Slytherin...), crear un ambiente más elegante o más fantástico, adaptarnos a cualquier venue." },
+        { "question": "¿Funciona para bodas civiles?", "answer": "¡Sí! Podemos adaptar el nivel de tematización. Desde un toque sutil con elementos HP hasta una inmersión total. Tú decides." },
+        { "question": "¿Cuánto tiempo necesitáis para montar?", "answer": "Para un montaje completo con velas flotantes, entre 3-4 horas. Lo coordinamos con el venue para no interferir con otros preparativos." },
+        { "question": "¿Podéis trabajar con mi wedding planner?", "answer": "¡Sí! Trabajamos regularmente con wedding planners. Nos coordinamos perfectamente para integrar la tematización con el resto de la decoración y el timing del día." }
+      ]
+    },
+    "cta": {
+      "title": "¿Preparado para crear",
+      "titleHighlight": "magia",
+      "description": "Las fechas de fin de semana se acaban rápido. Reserva tu experiencia Hogwarts ahora.",
+      "buttons": {
+        "quote": "Pide Presupuesto Gratis",
+        "whatsapp": "WhatsApp Directo"
+      }
+    }
   }
 }
