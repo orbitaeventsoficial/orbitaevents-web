@@ -1,7 +1,8 @@
-import { Star, Users, Calendar, Zap, Music, Lightbulb, Sparkles, PartyPopper, ArrowRight } from 'lucide-react';
+import { Star, Users, Calendar, Zap, Music, Lightbulb, Sparkles, PartyPopper, ArrowRight, MessageCircle, ClipboardList, Truck, PartyPopperIcon, Shield, Clock, Heart, Award } from 'lucide-react';
 import { Metadata } from 'next';
 import { Link } from '@/lib/navigation';
 import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,7 +35,16 @@ export default async function AboutPage({ params }: { params: { locale: string }
     { icon: Zap, key: 'animations' },
   ];
 
-  const teamMembers = ['dj', 'tech', 'animator'];
+  // Membres de l'equip amb les seves imatges
+  // IMPORTANT: Puja les fotos a /public/img/team/ amb aquests noms:
+  // - carles.jpg (DJ principal)
+  // - tecnic.jpg (Tècnic de so i llums)
+  // - animador.jpg (Animador infantil)
+  const teamMembers = [
+    { key: 'dj', image: '/img/team/carles.jpg' },
+    { key: 'tech', image: '/img/team/tecnic.jpg' },
+    { key: 'animator', image: '/img/team/animador.jpg' },
+  ];
 
   return (
     <section className="min-h-screen bg-bg-main py-20">
@@ -104,6 +114,75 @@ export default async function AboutPage({ params }: { params: { locale: string }
           </div>
         </div>
 
+        {/* PROCÉS - TIMELINE 4 PASSOS */}
+        <div className="mb-20">
+          <h2 className="text-3xl font-bold text-center text-white mb-4">
+            {t('process.title')}
+          </h2>
+          <p className="text-center text-white/60 mb-12 max-w-2xl mx-auto">
+            {t('process.subtitle')}
+          </p>
+
+          <div className="relative">
+            {/* Línia connectora (només desktop) */}
+            <div className="hidden md:block absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-oe-gold/30 to-transparent" />
+
+            <div className="grid md:grid-cols-4 gap-8">
+              {[
+                { icon: MessageCircle, step: 1, key: 'contact' },
+                { icon: ClipboardList, step: 2, key: 'plan' },
+                { icon: Truck, step: 3, key: 'setup' },
+                { icon: PartyPopperIcon, step: 4, key: 'party' },
+              ].map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <div key={i} className="relative text-center">
+                    {/* Número del pas */}
+                    <div className="relative z-10 w-14 h-14 mx-auto mb-4 rounded-full bg-oe-gold/10 border-2 border-oe-gold flex items-center justify-center">
+                      <Icon className="w-6 h-6 text-oe-gold" />
+                    </div>
+                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 w-6 h-6 bg-oe-gold text-black text-xs font-bold rounded-full flex items-center justify-center">
+                      {item.step}
+                    </span>
+                    <h3 className="text-lg font-bold text-white mb-2">{t(`process.steps.${item.key}.title`)}</h3>
+                    <p className="text-sm text-white/60">{t(`process.steps.${item.key}.desc`)}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* GARANTIES / PER QUÈ NOSALTRES */}
+        <div className="mb-20">
+          <h2 className="text-3xl font-bold text-center text-white mb-4">
+            {t('guarantees.title')}
+          </h2>
+          <p className="text-center text-white/60 mb-12 max-w-2xl mx-auto">
+            {t('guarantees.subtitle')}
+          </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: Shield, key: 'professional' },
+              { icon: Clock, key: 'punctual' },
+              { icon: Heart, key: 'passion' },
+              { icon: Award, key: 'quality' },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div key={i} className="oe-card p-6 rounded-2xl text-center hover:border-oe-gold/30 transition-all group">
+                  <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-oe-gold/10 flex items-center justify-center group-hover:bg-oe-gold/20 transition-colors">
+                    <Icon className="w-6 h-6 text-oe-gold" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">{t(`guarantees.items.${item.key}.title`)}</h3>
+                  <p className="text-sm text-white/60">{t(`guarantees.items.${item.key}.desc`)}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* EQUIPO (HUMANIZA) */}
         <div className="mb-20">
           <h2 className="text-3xl font-bold text-center text-white mb-12">
@@ -112,10 +191,22 @@ export default async function AboutPage({ params }: { params: { locale: string }
           <div className="grid md:grid-cols-3 gap-8">
             {teamMembers.map((member, i) => (
               <div key={i} className="oe-card p-6 rounded-3xl text-center">
-                <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-oe-gold to-oe-gold" />
-                <h3 className="text-xl font-bold text-white">{t(`team.members.${member}.name`)}</h3>
-                <p className="text-oe-gold text-sm mb-2">{t(`team.members.${member}.role`)}</p>
-                <p className="text-sm text-white/70">{t(`team.members.${member}.desc`)}</p>
+                <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-oe-gold/20 to-oe-gold/10 relative">
+                  <Image
+                    src={member.image}
+                    alt={t(`team.members.${member.key}.name`)}
+                    fill
+                    className="object-cover"
+                    sizes="96px"
+                    onError={(e) => {
+                      // Fallback si no hi ha imatge
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-white">{t(`team.members.${member.key}.name`)}</h3>
+                <p className="text-oe-gold text-sm mb-2">{t(`team.members.${member.key}.role`)}</p>
+                <p className="text-sm text-white/70">{t(`team.members.${member.key}.desc`)}</p>
               </div>
             ))}
           </div>

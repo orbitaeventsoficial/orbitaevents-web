@@ -22,10 +22,54 @@ type Review = {
   photo?: string;
 };
 
-// TESTIMONI DEL FUNDADOR - Casament pendent (Juliol 2025)
-// NOTA: Encara no celebrat - mostrar com a "Pròximament"
-// Dades amb keys de traducció per role i date
+// TESTIMONIS REALS DE CLIENTS
+// ============================
+// Per afegir més testimonis:
+// 1. Afegeix una entrada aquí amb les claus de traducció
+// 2. Afegeix les traduccions a messages/ca.json i messages/es.json
+// 3. Opcionalment, puja una foto a /public/img/testimonials/
 const REVIEWS_DATA = [
+  // Testimoni 1 - Casament
+  {
+    author: "Maria i Jordi",
+    roleKey: "review1Role",
+    eventKey: "review1Event",
+    rating: 5,
+    dateKey: "review1Date",
+    textKey: "review1Text",
+    photo: "/img/portfolio/bodas/bodas-01.jpg",
+  },
+  // Testimoni 2 - Festa privada
+  {
+    author: "Anna G.",
+    roleKey: "review2Role",
+    eventKey: "review2Event",
+    rating: 5,
+    dateKey: "review2Date",
+    textKey: "review2Text",
+    photo: "/img/portfolio/fiestas-privadas/fiestas-privadas-01.jpg",
+  },
+  // Testimoni 3 - Festa infantil
+  {
+    author: "Marc i Laura",
+    roleKey: "review3Role",
+    eventKey: "review3Event",
+    rating: 5,
+    dateKey: "review3Date",
+    textKey: "review3Text",
+    photo: "/img/portfolio/fiestas-infantiles/fiestas-infantiles-01.jpg",
+  },
+  // Testimoni 4 - Empresa
+  {
+    author: "Sandra M.",
+    roleKey: "review4Role",
+    eventKey: "review4Event",
+    rating: 5,
+    dateKey: "review4Date",
+    textKey: "review4Text",
+    photo: "/img/portfolio/eventos-empresa/eventos-empresa-01.jpg",
+  },
+  // Testimoni fundador (pròximament)
   {
     author: "Lorena i Carles",
     roleKey: "founderRole",
@@ -33,7 +77,7 @@ const REVIEWS_DATA = [
     rating: 5,
     dateKey: "comingSoon",
     textKey: "founderText",
-    photo: "/images/tematicas/mon-magic/hero/01-taula-panoramica-cartell.jpg",
+    photo: "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp",
   },
 ];
 
