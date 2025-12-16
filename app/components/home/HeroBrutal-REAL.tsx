@@ -391,10 +391,10 @@ export default function HeroBrutalReal() {
           >
             <Link
               href="/contacto"
-              className="group relative w-full sm:w-auto px-10 py-5 overflow-hidden rounded-full transform hover:scale-105 transition-all duration-500 hover:shadow-[0_0_60px_rgba(251,191,36,0.4)]"
+              className="group relative w-full sm:w-auto px-10 py-5 overflow-hidden rounded-full transform hover:scale-105 transition-all duration-500 shadow-[0_0_30px_rgba(251,191,36,0.5)] hover:shadow-[0_0_60px_rgba(251,191,36,0.7)]"
             >
               {/* Fons base gradient */}
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 pointer-events-none" />
+              <div className="absolute inset-0 bg-amber-500 pointer-events-none" />
               
               {/* Shimmer animat */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
@@ -405,7 +405,7 @@ export default function HeroBrutalReal() {
               </div>
               
               {/* Contingut */}
-              <span className="relative z-10 flex items-center justify-center gap-3 text-black font-black text-lg tracking-wide">
+              <span className="relative z-10 flex items-center justify-center gap-3 text-black font-black text-lg uppercase tracking-wider">
                 {t('cta.primary')}
                 <span className="group-hover:translate-x-2 transition-transform duration-300 text-xl">→</span>
               </span>
