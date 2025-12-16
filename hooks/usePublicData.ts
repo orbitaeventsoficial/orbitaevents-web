@@ -210,7 +210,7 @@ const MINIMUM_STATS = {
 
 const defaultStats: StatsData = {
   yearsExperience: 'Des de 2023',     // Empresa fundada Agost 2023
-  coverage: 'BCN + Girona',  // 2 províncies de cobertura
+  coverage: '2 Prov.',  // 2 províncies de cobertura
   responseTime: '2h',
   totalEvents: MINIMUM_STATS.totalEvents,
   totalWeddings: MINIMUM_STATS.totalWeddings,
