@@ -166,7 +166,7 @@ function MegaDropdown({ isOpen, onClose, type, t }: MegaDropdownProps) {
 
               <div className="px-5 py-3 border-b border-zinc-700 bg-zinc-800">
                 <h3 className="text-xs font-bold text-white/80 uppercase tracking-wider">
-                  {type === 'services' ? '🎯 Nuestros Servicios' : '✨ Experiencias Únicas'}
+                  {type === 'services' ? t('dropdowns.servicesEmoji') : t('dropdowns.experiencesEmoji')}
                 </h3>
               </div>
 
@@ -216,7 +216,7 @@ function MegaDropdown({ isOpen, onClose, type, t }: MegaDropdownProps) {
                   className="flex items-center justify-center gap-2 w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm rounded-xl transition-all"
                 >
                   <Icons.Sparkles />
-                  <span>Presupuesto en 2 minutos</span>
+                  <span>{t('ctaQuick')}</span>
                 </Link>
               </div>
             </div>
@@ -420,7 +420,7 @@ function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
                 className="flex items-center justify-center gap-3 w-full p-4 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl transition-all"
               >
                 <Icons.WhatsApp />
-                <span>WhatsApp Directo</span>
+                <span>{t('whatsappDirect')}</span>
               </a>
 
               <Link
@@ -429,7 +429,7 @@ function MobileMenu({ isOpen, onClose, t, tCommon }: MobileMenuProps) {
                 className="flex items-center justify-center gap-3 w-full p-4 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl transition-all"
               >
                 <Icons.Sparkles />
-                <span>Presupuesto Gratis</span>
+                <span>{t('ctaFree')}</span>
               </Link>
 
               <a
@@ -630,7 +630,7 @@ export default function HeaderChampion() {
                   className="flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black font-black text-sm rounded-xl shadow-lg shadow-amber-500/30 transition-all uppercase tracking-wide"
                 >
                   <Icons.Sparkles />
-                  <span>Presupuesto Gratis</span>
+                  <span>{t('ctaFree')}</span>
                 </Link>
               </motion.div>
             </div>
