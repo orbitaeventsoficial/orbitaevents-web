@@ -715,6 +715,38 @@
     "testimonials": {
       "badge": "💬 Què diuen de nosaltres",
       "title": "Històries reals, emocions reals"
+    },
+    "experiencies": {
+      "badge": "✨ El que ens fa únics",
+      "title": "Experiències",
+      "titleHighlight": "Immersives",
+      "subtitle": "No és decoració. És una experiència completa. Tematització + DJ professional per crear moments màgics.",
+      "viewExperience": "Veure experiència",
+      "otherThemes": "També creem experiències personalitzades: Anys 80, Tropical, Gatsby, Disco...",
+      "consultIdea": "Consulta la teva idea",
+      "separatorText": "Només vols música i llums sense tematització?",
+      "separatorCta": "👇 Descobreix els nostres packs de discomòbil",
+      "from": "Des de",
+      "monMagic": {
+        "name": "Món Màgic",
+        "tagline": "L'experiència Harry Potter definitiva",
+        "description": "Transforma el teu event en un món de màgia. Veles flotants, pocions, decoració completa i molt més.",
+        "badge": "✨ Exclusiu",
+        "features": ["Tematització completa", "DJ professional 4h", "Veles flotants", "Decoració immersiva"]
+      },
+      "halloween": {
+        "name": "Halloween",
+        "tagline": "La nit més terrorífica",
+        "description": "Una experiència que posarà els pèls de punta. Fantasmes, decoració de terror i ambient únic.",
+        "badge": "🎃 Popular",
+        "features": ["Tematització completa", "DJ professional 4h", "Efectes especials", "Decoració terror"]
+      }
+    },
+    "discomovil": {
+      "badge": "🎵 Sense tematització",
+      "title": "Només",
+      "titleHighlight": "Discomòbil",
+      "subtitle": "DJ professional + equip de so + il·luminació. Sense tematització, només la millor música."
     }
   },
   "proof": {
@@ -2094,6 +2126,22 @@
       "author": "Lorena i Carles",
       "role": "Nuvis - Casament Món Màgic",
       "date": "Setembre 2024"
+    },
+    "testimonial2": {
+      "eventType": "Festa privada",
+      "highlight": "Professionals de veritat",
+      "quote": "Els vam contractar pel 50 aniversari del meu pare i va ser brutal. El DJ va saber llegir l'ambient perfectament i la gent no va parar de ballar fins les 5am.",
+      "author": "Marc Puig",
+      "role": "Festa 50 aniversari",
+      "date": "Novembre 2024"
+    },
+    "testimonial3": {
+      "eventType": "Event corporatiu",
+      "highlight": "Molt professionals",
+      "quote": "Per la nostra festa d'empresa necessitàvem quelcom diferent. Òrbita va muntar una temàtica Tropical increïble amb so i llums professionals. Els companys encara ho comenten!",
+      "author": "Anna García",
+      "role": "Directora RRHH",
+      "date": "Desembre 2024"
     }
   },
   "urgency": {

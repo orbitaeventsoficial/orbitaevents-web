@@ -195,10 +195,10 @@ const JSON_LD_ORGANIZATION = {
 
 export const metadata: Metadata = {
   title: {
-    default: "DJ Casaments Barcelona i Girona | Òrbita Events | Des de 400€",
+    default: "Experiències Immersives per Events | DJ + Tematització Barcelona | Òrbita Events | Des de 200€",
     template: '%s | Òrbita Events',
   },
-  description: 'DJ professional per a casaments, festes i events corporatius a Barcelona i Girona. So 4000W, llums LED, efectes especials i tematització completa. Pressupost en 2h. ★★★★★ 4.9/5',
+  description: 'Creem experiències úniques: casaments Harry Potter, festes Halloween, events corporatius. DJ professional + tematització completa. Des de 200€. Barcelona i Girona. ★★★★★ 4.9/5',
   keywords: [
     'DJ casament Barcelona',
     'DJ boda Girona',
@@ -235,8 +235,8 @@ export const metadata: Metadata = {
     alternateLocale: ['es_ES'],
     url: 'https://orbitaevents.com',
     siteName: 'Òrbita Events',
-    title: 'DJ Casaments Barcelona i Girona | Òrbita Events',
-    description: 'DJ professional, so, il·luminació i tematització per a casaments i events. Experiències úniques que es recorden per sempre. ★★★★★ 4.9/5',
+    title: 'Experiències Immersives per Events | DJ + Tematització Barcelona',
+    description: 'Creem experiències úniques: casaments Harry Potter, festes Halloween, events corporatius. DJ professional + tematització completa. Des de 200€. ★★★★★ 4.9/5',
     images: [
       {
         url: '/img/og-image.jpg',
@@ -249,8 +249,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'DJ Casaments Barcelona i Girona | Òrbita Events',
-    description: 'DJ professional per a casaments i events. So, llums i tematització. ★★★★★ 4.9/5',
+    title: 'Experiències Immersives per Events | Òrbita Events',
+    description: 'Casaments Harry Potter, festes Halloween, events corporatius. DJ + tematització completa. Des de 200€. ★★★★★ 4.9/5',
     images: ['/img/og-image.jpg'],
     creator: '@orbitaevents',
   },
