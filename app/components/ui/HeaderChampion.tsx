@@ -636,23 +636,44 @@ export default function HeaderChampion() {
   
   const lastScrollY = useRef(0);
   const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
+  const ticking = useRef(false);
+  const scrollThreshold = 10; // Mínim de píxels per activar canvi (evita temblor)
 
-  // Scroll handler
+  // Scroll handler OPTIMITZAT (sense temblor)
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      setIsScrolled(currentScrollY > 20);
-      
-      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
-        setIsVisible(false);
-        setActiveDropdown(null);
-      } else {
-        setIsVisible(true);
-      }
-      
-      lastScrollY.current = currentScrollY;
+      if (ticking.current) return;
+
+      ticking.current = true;
+
+      requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        const scrollDiff = currentScrollY - lastScrollY.current;
+
+        // Només canviar si el scroll és significatiu (evita temblor)
+        if (Math.abs(scrollDiff) > scrollThreshold) {
+          if (scrollDiff > 0 && currentScrollY > 100) {
+            // Scrolling DOWN + ja passat 100px → amagar
+            setIsVisible(false);
+            setActiveDropdown(null);
+          } else {
+            // Scrolling UP → mostrar
+            setIsVisible(true);
+          }
+
+          lastScrollY.current = currentScrollY;
+        }
+
+        // Background sòlid després de 20px
+        setIsScrolled(currentScrollY > 20);
+
+        ticking.current = false;
+      });
     };
+
+    // Inicialitzar posició
+    lastScrollY.current = window.scrollY;
+    setIsScrolled(window.scrollY > 20);
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -682,12 +703,18 @@ export default function HeaderChampion() {
         transition={{ duration: 0.3 }}
         className={`
           fixed top-0 left-0 right-0 z-50
-          transition-all duration-500
-          ${isScrolled 
-            ? 'bg-zinc-950/95 backdrop-blur-2xl shadow-xl shadow-black/20 border-b border-white/5' 
+          transition-all duration-300 ease-out
+          ${isScrolled
+            ? 'bg-zinc-950/95 backdrop-blur-2xl shadow-xl shadow-black/20 border-b border-white/5'
             : 'bg-gradient-to-b from-black/90 via-black/50 to-transparent'
           }
         `}
+        style={{
+          // Optimització GPU per evitar temblor
+          willChange: 'transform',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+        }}
       >
         {/* Urgency Bar */}
         <UrgencyBar isVisible={!isScrolled} />
@@ -804,18 +831,17 @@ export default function HeaderChampion() {
                 <Icons.WhatsApp />
               </motion.a>
 
-              {/* CTA Principal */}
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              {/* CTA Principal - MÀXIMA VISIBILITAT */}
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
                 <Link
                   href="/configurador"
-                  className="group relative px-5 py-2.5 rounded-xl overflow-hidden"
+                  className="group relative px-6 py-3 rounded-xl overflow-hidden bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 shadow-lg hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-200"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 bg-[length:200%_100%] animate-gradient" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative flex items-center gap-2 text-black font-bold text-sm">
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <span className="relative flex items-center gap-2 text-zinc-900 font-bold text-sm">
                     <Icons.Sparkles />
-                    <span>Presupuesto Gratis</span>
+                    <span>Pressupost <span className="font-black">GRATIS</span></span>
                   </span>
                 </Link>
               </motion.div>

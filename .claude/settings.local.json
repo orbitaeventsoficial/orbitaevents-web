@@ -65,7 +65,11 @@
       "Bash(python3:*)",
       "Bash(# Check fiestas images cd /c/Users/Lore/Desktop/orbitaevents echo \"\"=== IMÁGENES FIESTAS DISPONIBLES ===\"\" ls -la public/img/portfolio/fiestas/)",
       "Bash(powershell -Command \"Get-ChildItem ''C:\\Users\\Lore\\Downloads'' | Sort-Object LastWriteTime -Descending | Select-Object -First 20\")",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/portfolio\" \"/tematica-mon-magic\" \"/tematica-halloween\")",
+      "Bash(do)",
+      "Bash(echo:*)",
+      "Bash(powershell -Command:*)"
     ]
   }
 }
