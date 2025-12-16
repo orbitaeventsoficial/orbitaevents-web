@@ -1,15 +1,14 @@
 // app/[locale]/page.tsx
 // ═══════════════════════════════════════════════════════════════════════════
-// ÒRBITA EVENTS - MEGA PACK v1.0
+// ÒRBITA EVENTS - ELEGANT EDITION v2.0
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
 
-// MEGA PACK Components - NOVA ESTRUCTURA 2025
-import HeroVideo from '@/app/components/home/HeroVideo';
-import ExperienciesSection from '@/app/components/home/ExperienciesSection';
-import DiscomovilSection from '@/app/components/home/DiscomovilSection';
+// ELEGANT Components - Nova versió sofisticada
+import HeroElegant from '@/app/components/ui/HeroElegant';
+import ServicesGridElegant from '@/app/components/ui/ServicesGridElegant';
 import TestimoniosReales from '@/app/components/home/TestimoniosReales';
 import GarantiaSection from '@/app/components/marketing/GarantiaSection';
 import CTAFinal from '@/app/components/marketing/CTAFinal';
@@ -42,30 +41,27 @@ export async function generateMetadata({ params }: { params: { locale: string } 
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-black">
-      {/* 1. HERO - Impacto visual con video */}
-      <HeroVideo />
+    <main className="min-h-screen bg-[#0A0A0A]">
+      {/* 1. HERO ELEGANT - Sofisticat amb vídeo */}
+      <HeroElegant />
 
-      {/* 2. EXPERIÈNCIES - PROTAGONISTA */}
-      <ExperienciesSection />
+      {/* 2. SERVEIS - Grid elegant 4 cards */}
+      <ServicesGridElegant />
 
-      {/* 3. DISCOMÒBIL - SECUNDARI */}
-      <DiscomovilSection />
-
-      {/* 4. CALENDARIO - Urgencia/FOMO */}
-      <section className="py-16 bg-zinc-950">
-        <div className="container mx-auto px-4">
+      {/* 3. CALENDARIO - Urgència subtil */}
+      <section className="py-20 bg-[#0A0A0A]">
+        <div className="container mx-auto px-6">
           <CalendarioUrgencia />
         </div>
       </section>
 
-      {/* 5. TESTIMONIOS - Prueba social */}
+      {/* 4. TESTIMONIOS - Prova social */}
       <TestimoniosReales />
 
-      {/* 6. GARANTÍA - Confianza */}
+      {/* 5. GARANTÍA - Confiança */}
       <GarantiaSection />
 
-      {/* 7. CTA FINAL - Conversión */}
+      {/* 6. CTA FINAL - Conversió */}
       <CTAFinal />
     </main>
   );
