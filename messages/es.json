@@ -1894,7 +1894,18 @@
       "subtitle": "Cada evento es único. Mira lo que hemos creado para otros... e imagina lo que podemos crear para ti.",
       "noCategories": "Aún no hay categorías de portfolio configuradas.",
       "viewGallery": "Ver galería →",
-      "breadcrumb": "Portfolio"
+      "breadcrumb": "Portfolio",
+      "categories": {
+        "bodas": "Bodas",
+        "discomovil": "Discomóvil",
+        "eventos-empresa": "Eventos Empresa",
+        "fiestas-infantiles": "Fiestas Infantiles",
+        "fiestas-privadas": "Fiestas Privadas",
+        "produccion-tecnica": "Producción Técnica",
+        "alquiler-equipo": "Alquiler de Equipo",
+        "fiestas-tematicas-halloween": "Fiestas Temáticas Halloween",
+        "fiestas-tematicas-mon-magic": "Fiestas Temáticas Mundo Mágico"
+      }
     },
     "servicios": {
       "meta": {

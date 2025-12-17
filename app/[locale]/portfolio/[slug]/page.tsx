@@ -14,6 +14,7 @@ type PageProps = {
 export default async function PortfolioSlugPage({ params }: PageProps) {
   const { slug, locale } = await params;
   const t = await getTranslations({ locale, namespace: 'common' });
+  const tPortfolio = await getTranslations({ locale, namespace: 'pages.portfolio' });
 
   const images =
     (PORTFOLIO_IMAGES as Record<string, { src: string; alt: string }[]>)[slug] ??
@@ -24,7 +25,13 @@ export default async function PortfolioSlugPage({ params }: PageProps) {
     notFound();
   }
 
-  const title = category?.name ?? slug;
+  // Obtenir el nom traduït de la categoria
+  let title: string;
+  try {
+    title = tPortfolio(`categories.${slug}`);
+  } catch {
+    title = category?.name ?? slug;
+  }
 
   return (
     <>

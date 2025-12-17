@@ -14,6 +14,17 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
 
   const categories = PORTFOLIO_CATEGORIES;
 
+  // Funció per obtenir el nom traduït de la categoria
+  const getCategoryName = (slug: string): string => {
+    try {
+      return t(`categories.${slug}`);
+    } catch {
+      // Fallback al nom original si no hi ha traducció
+      const cat = categories.find(c => c.slug === slug);
+      return cat?.name ?? slug;
+    }
+  };
+
   return (
     <>
       <Breadcrumbs
@@ -37,30 +48,33 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
           </p>
         ) : (
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/portfolio/${encodeURIComponent(cat.slug)}`}
-                className="group relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl hover:shadow-oe-gold/20 transition-all duration-500 hover:-translate-y-4"
-              >
-                <Image
-                  src={cat.cover}
-                  alt={cat.name}
-                  width={800}
-                  height={600}
-                  className="h-80 w-full object-cover transition group-hover:scale-110 duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute bottom-0 p-8 w-full">
-                  <h3 className="text-3xl font-bold text-white drop-shadow-2xl">
-                    {cat.name}
-                  </h3>
-                  <p className="text-oe-gold mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {t('viewGallery')}
-                  </p>
-                </div>
-              </Link>
-            ))}
+            {categories.map((cat) => {
+              const translatedName = getCategoryName(cat.slug);
+              return (
+                <Link
+                  key={cat.slug}
+                  href={`/portfolio/${encodeURIComponent(cat.slug)}`}
+                  className="group relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl hover:shadow-oe-gold/20 transition-all duration-500 hover:-translate-y-4"
+                >
+                  <Image
+                    src={cat.cover}
+                    alt={translatedName}
+                    width={800}
+                    height={600}
+                    className="h-80 w-full object-cover transition group-hover:scale-110 duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute bottom-0 p-8 w-full">
+                    <h3 className="text-3xl font-bold text-white drop-shadow-2xl">
+                      {translatedName}
+                    </h3>
+                    <p className="text-oe-gold mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {t('viewGallery')}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>
