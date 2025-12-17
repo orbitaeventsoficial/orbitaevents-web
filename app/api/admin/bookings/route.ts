@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { BookingStatus, EventType } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,9 +65,17 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
 
+    // Validar enums
+    const validStatus = status && Object.values(BookingStatus).includes(status as BookingStatus)
+      ? (status as BookingStatus)
+      : undefined;
+    const validEventType = eventType && Object.values(EventType).includes(eventType as EventType)
+      ? (eventType as EventType)
+      : undefined;
+
     const where = {
-      ...(status && { status: status as any }),
-      ...(eventType && { eventType: eventType as any }),
+      ...(validStatus && { status: validStatus }),
+      ...(validEventType && { eventType: validEventType }),
       ...(fromDate && { eventDate: { gte: new Date(fromDate) } }),
       ...(toDate && { eventDate: { lte: new Date(toDate) } }),
       ...(search && {

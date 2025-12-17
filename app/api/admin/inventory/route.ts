@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { InventoryCategory, ItemStatus } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,10 +34,18 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status');
     const search = searchParams.get('search');
 
+    // Validar enums
+    const validCategory = category && Object.values(InventoryCategory).includes(category as InventoryCategory)
+      ? (category as InventoryCategory)
+      : undefined;
+    const validStatus = status && Object.values(ItemStatus).includes(status as ItemStatus)
+      ? (status as ItemStatus)
+      : undefined;
+
     const items = await prisma.inventoryItem.findMany({
       where: {
-        ...(category && { category: category as any }),
-        ...(status && { status: status as any }),
+        ...(validCategory && { category: validCategory }),
+        ...(validStatus && { status: validStatus }),
         ...(search && {
           OR: [
             { code: { contains: search, mode: 'insensitive' } },

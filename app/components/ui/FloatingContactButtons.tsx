@@ -130,6 +130,12 @@ export default function FloatingContactButtons() {
                   setIsExpanded(true);
                 }
               }}
+              onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && !isExpanded) {
+                  e.preventDefault();
+                  setIsExpanded(true);
+                }
+              }}
               className="flex items-center gap-3 pl-4 pr-5 py-3 bg-[#25D366] text-white font-bold rounded-full shadow-xl shadow-green-600/40"
               style={{ minHeight: '52px' }}
               whileHover={{ scale: 1.03 }}

@@ -78,7 +78,9 @@
       "Bash(openssl rand:*)",
       "Bash(for url in \"/\" \"/ca\" \"/es\" \"/contacto\" \"/ca/contacto\")",
       "Bash(for url in \"/es/servicios/bodas\" \"/ca/servicios/bodas\" \"/es/portfolio\" \"/ca/portfolio\" \"/es/contacto\" \"/ca/contacto\" \"/es/about\" \"/ca/about\" \"/es/faq\" \"/ca/faq\")",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm run lint)"
     ]
   }
 }

@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const ADMIN_USER = process.env.ADMIN_USER;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const ADMIN_PASS = process.env.ADMIN_PASS;
 
 export interface AuthResult {
   authenticated: boolean;
@@ -33,12 +33,12 @@ export function verifyBasicAuth(req: NextRequest): AuthResult {
     const decoded = Buffer.from(base64Credentials, 'base64').toString('utf8');
     const [user, pass] = decoded.split(':');
 
-    if (!ADMIN_USER || !ADMIN_PASSWORD) {
+    if (!ADMIN_USER || !ADMIN_PASS) {
       // No logging - evitar exposar info de configuració
       return { authenticated: false, error: 'Server configuration error' };
     }
 
-    if (user === ADMIN_USER && pass === ADMIN_PASSWORD) {
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
       return { authenticated: true, user };
     }
 
