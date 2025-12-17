@@ -1347,7 +1347,19 @@
     },
     "privacy": "Privacidad",
     "privacyPolicy": "Política de privacidad",
-    "responseTime": "Respondemos en menos de 2 horas"
+    "responseTime": "Respondemos en menos de 2 horas",
+    "page": {
+      "badge": "Contacta con nosotros",
+      "titlePart1": "Cuéntanos tu ",
+      "titleHighlight": "evento",
+      "trust": {
+        "response": "Respuesta en menos de 2h",
+        "rating": "4.9/5 valoración",
+        "noCommitment": "Sin compromiso"
+      },
+      "whatsappCta": "O escríbenos por WhatsApp",
+      "whatsappMessage": "Hola! Quiero información para mi evento."
+    }
   },
   "contactForm": {
     "title": "Solicita presupuesto",

@@ -74,8 +74,8 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
 
       <Breadcrumbs
         items={[
-          { name: isEs ? 'Inicio' : 'Inici', url: '/' },
-          { name: isEs ? 'Servicios' : 'Serveis', url: '/servicios' },
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.services'), url: '/servicios' },
         ]}
       />
 
