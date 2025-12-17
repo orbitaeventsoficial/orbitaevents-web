@@ -5399,5 +5399,81 @@
       "loading": "Cargando...",
       "saturdaysFree": "📅 Sábados libres:"
     }
+  },
+  "heroNew": {
+    "badge": "🎃 Especialistas en fiestas temáticas",
+    "title": {
+      "line1": "La fiesta que",
+      "line2": "nadie olvidará."
+    },
+    "subtitle": "DJ + tematización + efectos especiales. Barcelona y Girona.",
+    "cta": {
+      "primary": "Pide Presupuesto",
+      "secondary": "WhatsApp Directo"
+    },
+    "social": {
+      "rating": "4.9",
+      "events": "48+ eventos sin incidentes",
+      "recommended": "Recomendados en"
+    }
+  },
+  "servicesGrid": {
+    "subtitle": "Nuestros servicios",
+    "title": "¿Qué necesitas?",
+    "description": "Elige el tipo de evento y te ayudamos a crearlo exactamente como lo imaginas.",
+    "viewMore": "Ver más",
+    "notFound": "¿No encuentras lo que buscas?",
+    "contact": "Consúltanos sin compromiso",
+    "items": {
+      "tematiques": {
+        "title": "Experiencias Temáticas",
+        "description": "Harry Potter, Halloween y más",
+        "price": "Desde 600€",
+        "badge": "⭐ Lo más pedido",
+        "features": ["Decoración", "Efectos FX", "Ambientación", "Animación"]
+      },
+      "casaments": {
+        "title": "Bodas",
+        "description": "El día más especial merece ser perfecto",
+        "price": "Desde 650€",
+        "features": ["DJ Profesional", "Sonido + Luces", "Coordinación", "Backup 100%"]
+      },
+      "festes": {
+        "title": "Fiestas Privadas",
+        "description": "La fiesta que recordarán siempre",
+        "price": "Desde 400€",
+        "features": ["Discomóvil", "Luces LED", "Efectos", "Todo incluido"]
+      },
+      "empreses": {
+        "title": "Empresas",
+        "description": "Eventos corporativos de impacto",
+        "price": "Desde 500€",
+        "features": ["Audiovisual", "Micro inalámbrico", "Branding", "Factura"]
+      }
+    }
+  },
+  "ctaFinal": {
+    "urgency": {
+      "saturdaysSingular": "sábado libre en",
+      "saturdaysPlural": "sábados libres en",
+      "scarce": "⚠️ ¡Casi lleno!",
+      "limited": "🔥 ¡Se acaba!",
+      "available": "✓ Disponible"
+    },
+    "title": {
+      "line1": "¿Listo para crear",
+      "line2": "el evento perfecto?"
+    },
+    "subtitle": "En 2 minutos tienes tu presupuesto personalizado. Sin compromiso.",
+    "cta": {
+      "primary": "Pide Presupuesto Gratis",
+      "secondary": "WhatsApp Directo"
+    },
+    "trust": {
+      "events": "eventos",
+      "rating": "valoración",
+      "response": "respuesta"
+    },
+    "guarantee": "🛡️ Garantía de satisfacción 100%. Si no estás contento, te devolvemos el dinero."
   }
 }
