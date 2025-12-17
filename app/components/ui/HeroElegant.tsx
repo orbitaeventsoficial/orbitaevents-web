@@ -1,8 +1,9 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
+import { useState, useEffect } from 'react';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HERO ELEGANT v2.0 - Conversió màxima, mobile-first, amb traduccions
@@ -10,6 +11,16 @@ import { Link } from '@/lib/navigation';
 
 export default function HeroElegant() {
   const t = useTranslations('hero.elegant');
+  const rotatingTexts = t.raw('rotatingTexts') as string[];
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Rotar textos cada 3 segons
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % rotatingTexts.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [rotatingTexts.length]);
 
   return (
     <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
@@ -52,21 +63,44 @@ export default function HeroElegant() {
             </span>
           </motion.div>
 
-          {/* Títol - BRUTAL i curt */}
-          <h1 className="text-[2.5rem] leading-[1.05] md:text-6xl lg:text-7xl font-bold text-white mb-5 md:mb-6 tracking-tight">
+          {/* Títol - BRUTAL i curt amb text rotatiu */}
+          <h1 className="text-[2.5rem] leading-[1.05] md:text-6xl lg:text-7xl font-black text-white mb-5 md:mb-6 tracking-tight">
             {t('title1')}
             <br />
-            <span className="relative inline-block">
-              <span className="bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 bg-clip-text text-transparent">
-                {t('title2')}
-              </span>
-              {/* Accent line */}
-              <motion.span
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-                className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-orange-500 origin-left"
-              />
+            <span className="relative inline-block min-h-[1.2em]">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={currentIndex}
+                  initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, y: -20, filter: 'blur(8px)' }}
+                  transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
+                  className="relative inline-block"
+                >
+                  {/* Text amb gradient i glow */}
+                  <span
+                    className="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent"
+                    style={{
+                      textShadow: '0 0 40px rgba(251, 191, 36, 0.4), 0 0 80px rgba(251, 191, 36, 0.2)',
+                      filter: 'drop-shadow(0 0 20px rgba(251, 191, 36, 0.3))',
+                    }}
+                  >
+                    {rotatingTexts[currentIndex]}
+                  </span>
+
+                  {/* Línia decorativa animada */}
+                  <motion.span
+                    initial={{ scaleX: 0, opacity: 0 }}
+                    animate={{ scaleX: 1, opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.4 }}
+                    className="absolute -bottom-2 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent origin-center"
+                  />
+
+                  {/* Efecte de partícules/brillantor als costats */}
+                  <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" style={{ animationDelay: '0s' }} />
+                  <span className="absolute -right-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
+                </motion.span>
+              </AnimatePresence>
             </span>
           </h1>
 

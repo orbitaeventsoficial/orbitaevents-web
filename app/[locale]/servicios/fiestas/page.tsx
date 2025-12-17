@@ -21,41 +21,46 @@ const FIESTAS_PACKS = getPacksByService('fiestas');
 // ===============================
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: `Fiestas Privadas Barcelona | DJ + Luces desde ${FIESTAS_MIN_PRICE}€ | Òrbita Events`,
-  description: `Fiestas privadas en Barcelona con DJ profesional desde ${FIESTAS_MIN_PRICE}€. Cumpleaños, despedidas, aniversarios. Sonido, luces y animación incluidos. ¡Presupuesto gratis!`,
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
-  alternates: { canonical: '/servicios/fiestas' },
-  openGraph: {
-    title: `Fiestas Privadas Barcelona | Desde ${FIESTAS_MIN_PRICE}€`,
-    description: `DJ profesional para fiestas privadas. Cumpleaños, despedidas, aniversarios. Sonido 4000W + luces LED + efectos. Presupuesto gratis en 2h.`,
-    url: '/servicios/fiestas',
-    images: [
-      {
-        url: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
-        alt: 'Fiestas Privadas Barcelona - Òrbita Events',
-      },
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'services.fiestas' });
+
+  return {
+    title: t('meta.title', { price: FIESTAS_MIN_PRICE }),
+    description: t('meta.description', { price: FIESTAS_MIN_PRICE }),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    alternates: { canonical: '/servicios/fiestas' },
+    openGraph: {
+      title: t('meta.ogTitle', { price: FIESTAS_MIN_PRICE }),
+      description: t('meta.ogDescription', { price: FIESTAS_MIN_PRICE }),
+      url: '/servicios/fiestas',
+      images: [
+        {
+          url: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
+          alt: t('breadcrumb'),
+        },
+      ],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('meta.ogTitle', { price: FIESTAS_MIN_PRICE }),
+      description: t('meta.description', { price: FIESTAS_MIN_PRICE }),
+      images: ['/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp'],
+    },
+    robots: { index: true, follow: true },
+    keywords: [
+      'fiestas privadas barcelona',
+      'dj cumpleaños barcelona',
+      'dj fiestas barcelona',
+      'despedidas barcelona',
+      'fiestas temáticas barcelona',
+      'dj fiestas girona',
+      'cumpleaños con dj',
+      'fiesta halloween barcelona',
     ],
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `Fiestas Privadas Barcelona | Desde ${FIESTAS_MIN_PRICE}€`,
-    description: 'DJ profesional + Sonido 4000W + Luces LED + Efectos. Cumpleaños, despedidas y más.',
-    images: ['/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp'],
-  },
-  robots: { index: true, follow: true },
-  keywords: [
-    'fiestas privadas barcelona',
-    'dj cumpleaños barcelona',
-    'dj fiestas barcelona',
-    'despedidas barcelona',
-    'fiestas temáticas barcelona',
-    'dj fiestas girona',
-    'cumpleaños con dj',
-    'fiesta halloween barcelona',
-  ],
-};
+  };
+}
 
 // ===============================
 // PÁGINA
@@ -89,7 +94,7 @@ export default async function FiestasPage({ params }: PageProps) {
         items={[
           { name: tCommon('nav.home'), url: '/' },
           { name: tCommon('nav.services'), url: '/servicios' },
-          { name: 'Fiestas Privadas', url: '/servicios/fiestas' },
+          { name: t('breadcrumb'), url: '/servicios/fiestas' },
         ]}
       />
 

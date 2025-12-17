@@ -60,18 +60,14 @@ export default function HeroPortalLogo({
   const [isReady, setIsReady] = useState(false);
 
   // 🆕 Bloquejar scroll i amagar contingut IMMEDIATAMENT per evitar flicker
+  // Utilitza classe CSS per màxima velocitat (no espera JS parsing)
   useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-      mainContent.style.visibility = 'hidden';
-    }
+    // Afegir classe immediatament
+    document.body.classList.add('hero-loading');
 
     return () => {
-      document.body.style.overflow = '';
-      if (mainContent) {
-        mainContent.style.visibility = '';
-      }
+      // Treure classe quan component es desmunta
+      document.body.classList.remove('hero-loading');
     };
   }, []);
 
@@ -97,10 +93,8 @@ export default function HeroPortalLogo({
         timers.current.push(tid);
 
         const tid2 = window.setTimeout(() => {
-          // Restaurar visibilitat
-          const mainContent = document.getElementById('main-content');
-          if (mainContent) mainContent.style.visibility = '';
-          document.body.style.overflow = '';
+          // Restaurar visibilitat via classe CSS
+          document.body.classList.remove('hero-loading');
           setMounted(false);
           onFinish?.();
         }, MOBILE_TOTAL_MS);
@@ -159,10 +153,8 @@ export default function HeroPortalLogo({
     setVisible(false);
 
     const tid = window.setTimeout(() => {
-      // Restaurar visibilitat
-      const mainContent = document.getElementById('main-content');
-      if (mainContent) mainContent.style.visibility = '';
-      document.body.style.overflow = '';
+      // Restaurar visibilitat via classe CSS
+      document.body.classList.remove('hero-loading');
       setMounted(false);
       onFinish?.();
     }, 400);
@@ -589,10 +581,8 @@ export default function HeroPortalLogo({
 
     timers.current.push(
       window.setTimeout(() => {
-        // Restaurar visibilitat ABANS de desmuntar
-        const mainContent = document.getElementById('main-content');
-        if (mainContent) mainContent.style.visibility = '';
-        document.body.style.overflow = '';
+        // Restaurar visibilitat via classe CSS
+        document.body.classList.remove('hero-loading');
         setMounted(false);
         clearTimers();
         onFinish?.();

@@ -12,27 +12,32 @@ const DISCO_PACKS = getPacksByService('discomovil');
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: `Discomóvil Barcelona | DJ + Sonido + Luces desde ${DISCO_MIN_PRICE}€ | Òrbita`,
-  description: `Discomóvil en Barcelona desde ${DISCO_MIN_PRICE}€. DJ + sonido 4000W + luces LED. Bodas, fiestas, eventos. Nos desplazamos a toda Catalunya. Presupuesto en 2 horas.`,
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
-  alternates: { canonical: '/servicios/discomovil' },
-  openGraph: {
-    title: `Discomóvil Barcelona | Desde ${DISCO_MIN_PRICE}€`,
-    description: `DJ profesional + Sonido 4000W + Luces LED + Efectos. Barcelona y Girona. Presupuesto gratis.`,
-    url: '/servicios/discomovil',
-    images: [{ url: '/img/portfolio/discomovil/discomovil-01.png', alt: 'Discomóvil Barcelona - Òrbita Events' }],
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `Discomóvil Barcelona | Desde ${DISCO_MIN_PRICE}€`,
-    description: 'DJ profesional + Sonido 4000W + Luces LED + Efectos. Barcelona y Girona.',
-    images: ['/img/portfolio/discomovil/discomovil-01.png'],
-  },
-  robots: { index: true, follow: true },
-  keywords: ['discomóvil barcelona', 'discomóvil girona', 'dj fiestas privadas barcelona', 'discomóvil cumpleaños', 'discomóvil bodas'],
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'services.discomovil' });
+
+  return {
+    title: t('meta.title', { price: DISCO_MIN_PRICE }),
+    description: t('meta.description', { price: DISCO_MIN_PRICE }),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    alternates: { canonical: '/servicios/discomovil' },
+    openGraph: {
+      title: t('meta.ogTitle', { price: DISCO_MIN_PRICE }),
+      description: t('meta.ogDescription', { price: DISCO_MIN_PRICE }),
+      url: '/servicios/discomovil',
+      images: [{ url: '/img/portfolio/discomovil/discomovil-01.png', alt: t('breadcrumb') }],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('meta.ogTitle', { price: DISCO_MIN_PRICE }),
+      description: t('meta.description', { price: DISCO_MIN_PRICE }),
+      images: ['/img/portfolio/discomovil/discomovil-01.png'],
+    },
+    robots: { index: true, follow: true },
+    keywords: ['discomóvil barcelona', 'discomóvil girona', 'dj fiestas privadas barcelona', 'discomóvil cumpleaños', 'discomóvil bodas'],
+  };
+}
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -60,7 +65,7 @@ export default async function DiscomovilPage({ params }: PageProps) {
         items={[
           { name: tCommon('nav.home'), url: '/' },
           { name: tCommon('nav.services'), url: '/servicios' },
-          { name: 'Discomòbil', url: '/servicios/discomovil' },
+          { name: t('breadcrumb'), url: '/servicios/discomovil' },
         ]}
       />
       <ServiceJsonLD
