@@ -1499,7 +1499,18 @@
       "subtitle": "Cada esdeveniment és únic. Mira el que hem creat per a altres... i imagina el que podem crear per a tu.",
       "noCategories": "Encara no hi ha categories de portfolio configurades.",
       "viewGallery": "Veure galeria →",
-      "breadcrumb": "Portfolio"
+      "breadcrumb": "Portfolio",
+      "categories": {
+        "bodas": "Casaments",
+        "discomovil": "Discomòbil",
+        "eventos-empresa": "Events Empresa",
+        "fiestas-infantiles": "Festes Infantils",
+        "fiestas-privadas": "Festes Privades",
+        "produccion-tecnica": "Producció Tècnica",
+        "alquiler-equipo": "Lloguer d'Equip",
+        "fiestas-tematicas-halloween": "Festes Temàtiques Halloween",
+        "fiestas-tematicas-mon-magic": "Festes Temàtiques Món Màgic"
+      }
     },
     "servicios": {
       "meta": {
