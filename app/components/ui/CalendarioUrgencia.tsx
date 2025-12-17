@@ -18,10 +18,13 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
+
+// Tipus per traduccions
+type CalendarTranslations = ReturnType<typeof useTranslations<'calendar'>>;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -80,6 +83,14 @@ const MOCK_BOOKED_SATURDAYS: Record<string, string[]> = {
   '2025-04': ['2025-04-05', '2025-04-12', '2025-04-19'],
   '2025-05': ['2025-05-03', '2025-05-10', '2025-05-17', '2025-05-24'],
   '2025-06': ['2025-06-07', '2025-06-14', '2025-06-21'],
+};
+
+// Traduccions per reasons
+const getReasonText = (reason: string | undefined, t: CalendarTranslations): string | undefined => {
+  if (!reason) return undefined;
+  if (reason === 'Reservado') return t('reasons.booked');
+  if (reason === 'Pasado') return t('reasons.past');
+  return reason;
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -149,9 +160,10 @@ interface MiniMonthProps {
   data: MonthData;
   onDayClick: (day: DayStatus) => void;
   locale: 'es' | 'ca';
+  t: CalendarTranslations;
 }
 
-function MiniMonth({ data, onDayClick, locale }: MiniMonthProps) {
+function MiniMonth({ data, onDayClick, locale, t }: MiniMonthProps) {
   const firstDayOfWeek = new Date(data.year, data.month, 1).getDay();
   const offset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
   
@@ -200,14 +212,16 @@ function MiniMonth({ data, onDayClick, locale }: MiniMonthProps) {
           {data.stats.status === 'scarce' && (
             <span className="flex items-center gap-1">
               <span className="animate-pulse">🔥</span>
-              {data.stats.availableSaturdays === 0 ? 'AGOTADO' : `¡${data.stats.availableSaturdays} libre!`}
+              {data.stats.availableSaturdays === 0
+                ? t('status.exhausted')
+                : t('status.lastOne', { count: data.stats.availableSaturdays })}
             </span>
           )}
           {data.stats.status === 'limited' && (
-            <span>{data.stats.availableSaturdays} libres</span>
+            <span>{t('status.few', { count: data.stats.availableSaturdays })}</span>
           )}
           {data.stats.status === 'available' && (
-            <span>{data.stats.availableSaturdays} libres</span>
+            <span>{t('status.available', { count: data.stats.availableSaturdays })}</span>
           )}
         </div>
       </div>
@@ -284,11 +298,11 @@ function MiniMonth({ data, onDayClick, locale }: MiniMonthProps) {
       <div className="flex items-center justify-center gap-4 mt-3 pt-3 border-t border-white/10">
         <div className="flex items-center gap-1.5 text-[10px] text-white/50">
           <span className="w-2 h-2 rounded bg-emerald-500/50" />
-          <span>Libre</span>
+          <span>{t('legend.free')}</span>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] text-white/50">
           <span className="w-2 h-2 rounded bg-red-500/30" />
-          <span>Reservado</span>
+          <span>{t('legend.booked')}</span>
         </div>
       </div>
     </motion.div>
@@ -303,29 +317,30 @@ interface MonthSummaryCardProps {
   data: MonthData;
   index: number;
   onClick: () => void;
+  t: CalendarTranslations;
 }
 
-function MonthSummaryCard({ data, index, onClick }: MonthSummaryCardProps) {
+function MonthSummaryCard({ data, index, onClick, t }: MonthSummaryCardProps) {
   const statusConfig = {
     scarce: {
       bg: 'from-red-900/80 to-red-950',
       border: 'border-red-500/50',
       number: 'text-red-400',
-      label: data.stats.availableSaturdays === 0 ? '¡AGOTADO!' : '¡Últimos!',
+      label: data.stats.availableSaturdays === 0 ? t('status.exhausted') : t('labels.scarce'),
       pulse: true
     },
     limited: {
       bg: 'from-amber-900/80 to-amber-950',
       border: 'border-amber-500/50',
       number: 'text-amber-400',
-      label: 'Pocos',
+      label: t('labels.limited'),
       pulse: false
     },
     available: {
       bg: 'from-emerald-900/80 to-emerald-950',
       border: 'border-emerald-500/50',
       number: 'text-emerald-400',
-      label: 'Disponible',
+      label: t('labels.available'),
       pulse: false
     }
   };
@@ -375,7 +390,7 @@ function MonthSummaryCard({ data, index, onClick }: MonthSummaryCardProps) {
       
       {/* Hover indicator */}
       <span className="absolute bottom-2 text-[9px] text-white/0 group-hover:text-white/50 transition-colors">
-        Ver calendario →
+        {t('viewCalendar')}
       </span>
     </motion.button>
   );
@@ -389,18 +404,21 @@ interface DayModalProps {
   day: DayStatus | null;
   monthName: string;
   onClose: () => void;
+  t: CalendarTranslations;
+  locale: 'es' | 'ca';
 }
 
-function DayModal({ day, monthName, onClose }: DayModalProps) {
+function DayModal({ day, monthName, onClose, t, locale }: DayModalProps) {
   if (!day) return null;
-  
-  const formattedDate = new Date(day.date).toLocaleDateString('es-ES', {
+
+  const dateLocale = locale === 'ca' ? 'ca-ES' : 'es-ES';
+  const formattedDate = new Date(day.date).toLocaleDateString(dateLocale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
     year: 'numeric'
   });
-  
+
   return (
     <AnimatePresence>
       <motion.div
@@ -411,7 +429,7 @@ function DayModal({ day, monthName, onClose }: DayModalProps) {
         onClick={onClose}
       >
         <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-        
+
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -423,42 +441,42 @@ function DayModal({ day, monthName, onClose }: DayModalProps) {
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-500/20 flex items-center justify-center">
             <span className="text-3xl">🎉</span>
           </div>
-          
+
           {/* Contenido */}
           <div className="text-center">
             <h3 className="text-xl font-bold text-white mb-2">
-              ¡Fecha disponible!
+              {t('modal.title')}
             </h3>
             <p className="text-emerald-400 font-medium mb-1 capitalize">
               {formattedDate}
             </p>
             <p className="text-white/50 text-sm mb-6">
-              {day.isHighSeason ? '⭐ Temporada alta - Alta demanda' : 'Reserva antes de que se agote'}
+              {day.isHighSeason ? t('modal.highSeason') : t('modal.reserveBefore')}
             </p>
-            
+
             {/* CTAs */}
             <div className="space-y-3">
               <Link
                 href={`/configurador?fecha=${day.date}`}
                 className="block w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-xl transition-all text-center"
               >
-                Reservar esta fecha
+                {t('modal.reserveDate')}
               </Link>
-              
+
               <a
-                href={`https://wa.me/34699121023?text=Hola! Me interesa el ${formattedDate} para mi evento`}
+                href={`https://wa.me/34699121023?text=${encodeURIComponent(t('modal.whatsappMsg', { date: formattedDate }))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full py-3 px-4 bg-emerald-500/20 text-emerald-400 font-medium rounded-xl hover:bg-emerald-500/30 transition-all text-center"
               >
-                Consultar por WhatsApp
+                {t('modal.consultWhatsapp')}
               </a>
-              
+
               <button
                 onClick={onClose}
                 className="block w-full py-2 text-white/50 hover:text-white text-sm transition-colors"
               >
-                Seguir mirando
+                {t('modal.keepLooking')}
               </button>
             </div>
           </div>
@@ -474,34 +492,36 @@ function DayModal({ day, monthName, onClose }: DayModalProps) {
 
 interface CalendarioUrgenciaProps {
   className?: string;
-  locale?: 'es' | 'ca';
   showFullCalendar?: boolean;
 }
 
-export default function CalendarioUrgencia({ 
-  className = '', 
-  locale = 'es',
-  showFullCalendar = false 
+export default function CalendarioUrgencia({
+  className = '',
+  showFullCalendar = false
 }: CalendarioUrgenciaProps) {
+  const t = useTranslations('calendar');
+  const tCommon = useTranslations('common');
+  const locale = (tCommon('language') === 'ca' ? 'ca' : 'es') as 'es' | 'ca';
+
   const [months, setMonths] = useState<MonthData[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [selectedDay, setSelectedDay] = useState<DayStatus | null>(null);
   const [isClient, setIsClient] = useState(false);
-  
+
   // Generar datos de los próximos 3 meses
   useEffect(() => {
     setIsClient(true);
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-    
+
     const monthsData: MonthData[] = [];
     for (let i = 0; i < 3; i++) {
       const m = (currentMonth + i) % 12;
       const y = currentYear + Math.floor((currentMonth + i) / 12);
       monthsData.push(generateMonthData(m, y, locale));
     }
-    
+
     setMonths(monthsData);
   }, [locale]);
   
@@ -540,16 +560,16 @@ export default function CalendarioUrgencia({
       <div className="text-center mb-6">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-full text-red-400 text-sm font-medium mb-3">
           <span className="animate-pulse">🔥</span>
-          <span>{globalStats.percentage}% de fechas ya reservadas</span>
+          <span>{globalStats.percentage}% {t('badge')}</span>
         </div>
         <h3 className="text-xl md:text-2xl font-bold text-white">
-          Disponibilidad de Sábados
+          {t('title')}
         </h3>
         <p className="text-white/50 text-sm mt-1">
-          Solo {globalStats.available} sábados disponibles en los próximos 3 meses
+          {t('subtitle', { count: globalStats.available })}
         </p>
       </div>
-      
+
       {/* Cards de resumen */}
       <div className="flex justify-center gap-3 md:gap-4 mb-6">
         {months.map((month, index) => (
@@ -558,10 +578,11 @@ export default function CalendarioUrgencia({
             data={month}
             index={index}
             onClick={() => setSelectedMonth(selectedMonth === index ? null : index)}
+            t={t}
           />
         ))}
       </div>
-      
+
       {/* Calendario expandido */}
       <AnimatePresence>
         {(showFullCalendar || selectedMonth !== null) && (
@@ -572,19 +593,20 @@ export default function CalendarioUrgencia({
             className="overflow-hidden"
           >
             <div className="grid md:grid-cols-3 gap-4 mt-4">
-              {months.map((month, index) => (
+              {months.map((month) => (
                 <MiniMonth
                   key={`${month.month}-${month.year}`}
                   data={month}
                   onDayClick={handleDayClick}
                   locale={locale}
+                  t={t}
                 />
               ))}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       {/* Botón para expandir/colapsar */}
       {!showFullCalendar && (
         <div className="text-center mt-4">
@@ -592,11 +614,11 @@ export default function CalendarioUrgencia({
             onClick={() => setSelectedMonth(selectedMonth === null ? 0 : null)}
             className="text-amber-400 hover:text-amber-300 text-sm font-medium transition-colors"
           >
-            {selectedMonth !== null ? 'Ocultar calendario ↑' : 'Ver calendario completo ↓'}
+            {selectedMonth !== null ? t('hideCalendar') : t('viewFullCalendar')}
           </button>
         </div>
       )}
-      
+
       {/* CTA final */}
       <div className="mt-6 text-center">
         <Link
@@ -604,19 +626,21 @@ export default function CalendarioUrgencia({
           className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-amber-500/25"
         >
           <span>🎯</span>
-          <span>Reserva tu fecha ahora</span>
+          <span>{t('cta.title')}</span>
         </Link>
         <p className="text-white/40 text-xs mt-2">
-          Sin compromiso • Respuesta en menos de 2h
+          {t('cta.subtitle')}
         </p>
       </div>
-      
+
       {/* Modal de día seleccionado */}
       {selectedDay && (
         <DayModal
           day={selectedDay}
           monthName={months.find(m => selectedDay.date.startsWith(`${m.year}-${String(m.month + 1).padStart(2, '0')}`))?.name || ''}
           onClose={() => setSelectedDay(null)}
+          t={t}
+          locale={locale}
         />
       )}
     </div>
@@ -627,40 +651,44 @@ export default function CalendarioUrgencia({
 // EXPORT: Versión compacta para Header
 // ═══════════════════════════════════════════════════════════════════════════
 
-export function CalendarioCompacto({ locale = 'es' }: { locale?: 'es' | 'ca' }) {
+export function CalendarioCompacto() {
+  const t = useTranslations('calendar');
+  const tCommon = useTranslations('common');
+  const locale = (tCommon('language') === 'ca' ? 'ca' : 'es') as 'es' | 'ca';
+
   const [months, setMonths] = useState<MonthData[]>([]);
   const [isClient, setIsClient] = useState(false);
-  
+
   useEffect(() => {
     setIsClient(true);
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-    
+
     const monthsData: MonthData[] = [];
     for (let i = 0; i < 3; i++) {
       const m = (currentMonth + i) % 12;
       const y = currentYear + Math.floor((currentMonth + i) / 12);
       monthsData.push(generateMonthData(m, y, locale));
     }
-    
+
     setMonths(monthsData);
   }, [locale]);
-  
+
   if (!isClient || months.length === 0) {
-    return <div className="text-white/50 text-sm">Cargando...</div>;
+    return <div className="text-white/50 text-sm">{t('compact.loading')}</div>;
   }
-  
+
   return (
     <div className="flex items-center gap-3">
-      <span className="text-white/60 text-xs">📅 Sábados libres:</span>
+      <span className="text-white/60 text-xs">{t('compact.saturdaysFree')}</span>
       <div className="flex gap-2">
         {months.map((m) => {
-          const statusColor = 
+          const statusColor =
             m.stats.status === 'scarce' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
             m.stats.status === 'limited' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
             'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
-          
+
           return (
             <div
               key={`${m.month}-${m.year}`}
