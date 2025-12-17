@@ -169,7 +169,7 @@ importers:
         specifier: 14.2.0
         version: 14.2.0(eslint@8.57.0)(typescript@5.4.5)
       prisma:
-        specifier: ^5.21.1
+        specifier: ^5.22.0
         version: 5.22.0
       ts-node:
         specifier: ^10.9.2
