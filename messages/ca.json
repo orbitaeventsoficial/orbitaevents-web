@@ -34,7 +34,7 @@
       },
       "effects": {
         "title": "Efectes Especials",
-        "description": "Fum baix que recorre el terra, llums vermelles i verdes sincronitzades, efectes de so terrorífics, chispas frías."
+        "description": "Fum baix que recorre el terra, llums vermelles i verdes sincronitzades, efectes de so terrorífics, espurnes fredes."
       }
     },
     "packs": {
@@ -72,7 +72,7 @@
           "Show de llums complet",
           "Fum baix + màquina de boira",
           "Decoració completa (200+ elements)",
-          "Chispas frías per moments clau",
+          "Espurnes fredes per a moments clau",
           "CO2 criogènic",
           "Actor/animador zombie opcional"
         ]
@@ -408,6 +408,38 @@
     "viewMore": "Veure més",
     "from": "Des de",
     "popular": "El més demanat",
+    "notFound": "No trobes el que busques?",
+    "contact": "Consulta'ns sense compromís",
+    "grid": {
+      "subtitle": "Els nostres serveis",
+      "title": "Què necessites?",
+      "description": "Tria el tipus d'event i t'ajudem a crear-lo exactament com l'imagines.",
+      "tematiques": {
+        "title": "Experiències Temàtiques",
+        "description": "Harry Potter, Halloween i més",
+        "price": "Des de 600€",
+        "badge": "⭐ El més demanat",
+        "features": ["Decoració", "Efectes FX", "Ambientació", "Animació"]
+      },
+      "casaments": {
+        "title": "Casaments",
+        "description": "El dia més especial mereix ser perfecte",
+        "price": "Des de 650€",
+        "features": ["DJ Professional", "So + Llums", "Coordinació", "Backup 100%"]
+      },
+      "festes": {
+        "title": "Festes Privades",
+        "description": "La festa que recordaran sempre",
+        "price": "Des de 400€",
+        "features": ["Discomòbil", "Llums LED", "Efectes", "Tot inclòs"]
+      },
+      "empreses": {
+        "title": "Empreses",
+        "description": "Events corporatius d'impacte",
+        "price": "Des de 500€",
+        "features": ["Audiovisual", "Micro sense fil", "Branding", "Factura"]
+      }
+    },
     "bodas": {
       "meta": {
         "title": "DJ Casaments Barcelona | Preus des de {price}€ | Òrbita Events",
@@ -2279,8 +2311,10 @@
       "empresa": "Corporatiu",
       "party": "Festa",
       "festa": "Festa",
+      "fiesta": "Festa",
       "birthday": "Aniversari",
-      "aniversari": "Aniversari"
+      "aniversari": "Aniversari",
+      "tematica": "Temàtica"
     },
     "emptyState": {
       "title": "Sigues el primer!",
@@ -2535,6 +2569,8 @@
     "ctaFree": "Pressupost Gratis",
     "ctaQuick": "Pressupost en 2 minuts",
     "whatsappDirect": "WhatsApp Directe",
+    "onlineNow": "Online ara",
+    "urgencyMessage": "Sol 1 dissabte a Desembre",
     "nav": {
       "services": "Serveis",
       "experiences": "Experiències",
@@ -3751,7 +3787,7 @@
           "nosaltres": "Llegim la sala en temps real"
         },
         {
-          "altres": "\"Estuvo bien... nada especial\"",
+          "altres": "\"Va estar bé... res especial\"",
           "nosaltres": "\"Encara en parlen després de mesos\""
         }
       ]
@@ -5539,5 +5575,127 @@
       "response": "resposta"
     },
     "guarantee": "🛡️ Garantia de satisfacció 100%. Si no estàs content, et tornem els diners."
+  },
+  "homeSections": {
+    "discomovil": {
+      "badge": "🎵 Per qui no vol tematització",
+      "title1": "Només",
+      "title2": "Discomòbil",
+      "subtitle": "DJ professional + equip de so + il·luminació. Sense tematització.",
+      "from": "Des de",
+      "viewMore": "Veure més",
+      "popular": "Popular",
+      "equipTitle": "Equip inclòs en tots els packs",
+      "extraHour": "Hora extra: +80€",
+      "packs": {
+        "festes": {
+          "name": "Festes",
+          "subtitle": "Aniversaris, comunions...",
+          "features": ["2-4 hores", "DJ Professional", "So 4000W"]
+        },
+        "bodes": {
+          "name": "Casaments",
+          "subtitle": "Ball o experiència completa",
+          "features": ["Ball 3h o Completa", "Coordinació"]
+        },
+        "corporatiu": {
+          "name": "Corporatius",
+          "subtitle": "Events d'empresa amb factura",
+          "features": ["4h", "Factura inclosa"]
+        }
+      },
+      "equipment": [
+        "DJ professional",
+        "Controladora Pioneer DDJ-REV7",
+        "So 4000W (2x EV ETX)",
+        "4 Caps mòbils LED (a partir 3h)",
+        "Multiefectes LED",
+        "Màquina de fum"
+      ]
+    },
+    "garantia": {
+      "badge": "🛡️ Tranquil·litat garantida",
+      "title1": "El teu event,",
+      "title2": "sense riscos",
+      "subtitle": "Ens comprometem al 100% amb cada event. Si alguna cosa no és com esperaves, ho solucionem o et tornem els diners.",
+      "sealTitle": "Compromís Òrbita Events",
+      "sealSubtitle": "+{events} events sense incidències greus",
+      "guarantees": {
+        "satisfaction": {
+          "title": "Garantia de Satisfacció",
+          "description": "Si no estàs 100% satisfet amb el nostre servei, et tornem els diners. Sense preguntes."
+        },
+        "backup": {
+          "title": "Equip Backup Complet",
+          "description": "Portem duplicat de tot: so, llums, mescalador, reproductors. El teu event MAI es para."
+        },
+        "response": {
+          "title": "Resposta en 2 Hores",
+          "description": "Resposta garantida en menys de 2 hores. Comunicació directa i sense intermediaris."
+        },
+        "noSurprises": {
+          "title": "Sense Sorpreses",
+          "description": "Pressupost tancat i definitiu. El preu que et donem és el que pagaràs, sense costos ocults."
+        },
+        "support": {
+          "title": "Suport Total",
+          "description": "Acompanyament des de la reserva fins al final del event. Sempre disponibles per tu."
+        },
+        "passion": {
+          "title": "Passió pel Detall",
+          "description": "Cada event és únic. Personalitzem cada detall per crear exactament el que imagines."
+        }
+      }
+    },
+    "ctaFinal": {
+      "saturdaysSingular": "dissabte lliure a",
+      "saturdaysPlural": "dissabtes lliures a",
+      "title1": "Preparat per",
+      "title2": "crear el teu event?",
+      "subtitle": "Escriu-nos i et responem en menys de 2 hores.",
+      "ctaPrimary": "Escriu-nos per WhatsApp",
+      "ctaSecondary": "Veure preus",
+      "whatsappMsg": "Hola! Vull informació per al meu event.",
+      "events": "events",
+      "rating": "valoració",
+      "guarantee": "🛡️ Garantia 100%. Si no estàs content, et tornem els diners.",
+      "status": {
+        "scarce": "⚠️ Gairebé ple!",
+        "limited": "🔥 S'acaba!",
+        "available": "✓ Disponible"
+      }
+    },
+    "heroVideo": {
+      "badge": "✨ Creadors d'Experiències Immersives",
+      "title1": "No posem música.",
+      "title2": "Creem experiències.",
+      "subtitle": "Tematització + DJ professional per a casaments i events a Barcelona i Girona.",
+      "trust1": "Pressupost en 2 min",
+      "trust2": "Resposta en < 2h",
+      "trust3": "Equip backup 100%",
+      "cta1": "Pressupost Gratis",
+      "cta2": "WhatsApp Directe",
+      "scroll": "Descobreix més"
+    },
+    "heroStats": {
+      "eventsRealized": "Events realitzats",
+      "repeatOrRecommend": "Repeteixen o recomanen",
+      "withBackup": "Amb equip backup",
+      "responseTime": "Temps de resposta"
+    },
+    "testimonials": {
+      "satisfiedClients": "clients satisfets",
+      "averageRating": "valoració mitjana",
+      "verifiedReviews": "Opinions verificades",
+      "verified": "Verificat"
+    },
+    "whatsapp": {
+      "defaultMessage": "Hola! M'agradaria informació sobre els vostres serveis per a un event.",
+      "onlineNow": "Online ara",
+      "tooltipGreeting": "👋 Hola! Tens alguna pregunta? Estem aquí per ajudar-te!",
+      "responseTime": "Resposta típica",
+      "writeUs": "Escriu-nos!",
+      "directWhatsApp": "WhatsApp Directe"
+    }
   }
 }

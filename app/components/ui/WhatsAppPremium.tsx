@@ -1,17 +1,6 @@
 // app/components/ui/WhatsAppPremium.tsx
 // ═══════════════════════════════════════════════════════════════════════════
-// ÒRBITA EVENTS - WHATSAPP PREMIUM BUTTON v1.0
-// ═══════════════════════════════════════════════════════════════════════════
-//
-// Botón WhatsApp que CONVIERTE:
-// - Indicador "online" pulsante
-// - Mensaje pre-rellenado inteligente
-// - Tooltip con info
-// - Animación de entrada
-// - Contador de respuesta
-// - Mobile optimizado
-// - Modo sticky o inline
-//
+// ÒRBITA EVENTS - WHATSAPP PREMIUM BUTTON v1.1 - i18n complet
 // ═══════════════════════════════════════════════════════════════════════════
 
 'use client';
@@ -59,35 +48,19 @@ export default function WhatsAppPremium({
   delay = 2000,
   pulseAnimation = true,
 }: WhatsAppPremiumProps) {
-  const t = useTranslations('common');
-  const isEs = t('language') === 'es';
+  const t = useTranslations('homeSections.whatsapp');
 
-  // Textos bilingües
-  const texts = {
-    defaultMessage: isEs
-      ? 'Hola! Me gustaría información sobre vuestros servicios para un evento.'
-      : 'Hola! M\'agradaria informació sobre els vostres serveis per a un event.',
-    onlineNow: isEs ? 'Online ahora' : 'Online ara',
-    tooltipGreeting: isEs
-      ? '👋 ¡Hola! ¿Tienes alguna pregunta? ¡Estamos aquí para ayudarte!'
-      : '👋 Hola! Tens alguna pregunta? Estem aquí per ajudar-te!',
-    responseTime: isEs ? 'Respuesta típica' : 'Resposta típica',
-    writeUs: isEs ? '¡Escríbenos!' : 'Escriu-nos!',
-  };
-
-  const finalMessage = message || texts.defaultMessage;
+  const finalMessage = message || t('defaultMessage');
 
   const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [tooltipDismissed, setTooltipDismissed] = useState(false);
 
-  // Delay inicial
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), delay);
     return () => clearTimeout(timer);
   }, [delay]);
 
-  // Auto-dismiss tooltip
   useEffect(() => {
     if (showTooltip && !tooltipDismissed) {
       const timer = setTimeout(() => setTooltipDismissed(true), 8000);
@@ -124,9 +97,8 @@ export default function WhatsAppPremium({
                 className={`absolute bottom-full ${position === 'bottom-right' ? 'right-0' : 'left-0'} mb-3`}
               >
                 <div className="relative bg-white rounded-2xl shadow-2xl p-4 max-w-[240px]">
-                  {/* Arrow */}
                   <div className={`absolute -bottom-2 ${position === 'bottom-right' ? 'right-6' : 'left-6'} w-4 h-4 bg-white transform rotate-45`} />
-                  
+
                   <div className="relative">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white">
@@ -136,21 +108,20 @@ export default function WhatsAppPremium({
                         <div className="font-bold text-gray-900 text-sm">Òrbita Events</div>
                         <div className="flex items-center gap-1 text-xs text-emerald-600">
                           <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                          <span>{texts.onlineNow}</span>
+                          <span>{t('onlineNow')}</span>
                         </div>
                       </div>
                     </div>
                     <p className="text-gray-600 text-sm">
-                      {texts.tooltipGreeting}
+                      {t('tooltipGreeting')}
                     </p>
                     {showResponseTime && (
                       <div className="mt-2 text-xs text-gray-400">
-                        ⚡ {texts.responseTime}: &lt;5 min
+                        ⚡ {t('responseTime')}: &lt;5 min
                       </div>
                     )}
                   </div>
 
-                  {/* Close button */}
                   <button
                     onClick={() => setTooltipDismissed(true)}
                     className="absolute -top-2 -right-2 w-6 h-6 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-500 transition-colors"
@@ -183,7 +154,7 @@ export default function WhatsAppPremium({
                       </span>
                     )}
                     <span className="text-white/40">|</span>
-                    <span className="text-white text-sm font-medium">{texts.writeUs}</span>
+                    <span className="text-white text-sm font-medium">{t('writeUs')}</span>
                     {showResponseTime && (
                       <>
                         <span className="text-white/40">|</span>
@@ -205,7 +176,6 @@ export default function WhatsAppPremium({
             whileTap={{ scale: 0.95 }}
             className="relative block"
           >
-            {/* Pulse rings */}
             {pulseAnimation && (
               <>
                 <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-25" />
@@ -213,11 +183,9 @@ export default function WhatsAppPremium({
               </>
             )}
 
-            {/* Button */}
             <div className="relative w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-shadow">
               <WhatsAppIcon size={32} />
 
-              {/* Online indicator */}
               {showOnlineIndicator && (
                 <span className="absolute top-0 right-0 flex h-4 w-4">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
@@ -247,13 +215,10 @@ export function WhatsAppInline({
   text?: string;
   variant?: 'primary' | 'secondary' | 'outline';
 }) {
-  const t = useTranslations('common');
-  const isEs = t('language') === 'es';
+  const t = useTranslations('homeSections.whatsapp');
 
-  const defaultMessage = isEs
-    ? 'Hola! Me gustaría información sobre vuestros servicios.'
-    : 'Hola! M\'agradaria informació sobre els vostres serveis.';
-  const defaultText = isEs ? 'WhatsApp Directo' : 'WhatsApp Directe';
+  const defaultMessage = t('defaultMessage');
+  const defaultText = t('directWhatsApp');
 
   const finalMessage = message || defaultMessage;
   const finalText = text || defaultText;

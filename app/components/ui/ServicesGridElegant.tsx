@@ -6,84 +6,42 @@ import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SERVICES GRID ELEGANT v2.0
+// SERVICES GRID ELEGANT v2.1 - i18n complert
 // ═══════════════════════════════════════════════════════════════════════════
-// CANVIS:
-// 1. Textos traduïbles via useTranslations
-// 2. Experiències Temàtiques PRIMER (és el diferenciador)
-// 3. Preus dinàmics des de config
-// 4. Millor jerarquia visual
-// ═══════════════════════════════════════════════════════════════════════════
+
+const serviceIds = ['tematiques', 'casaments', 'festes', 'empreses'] as const;
+
+const serviceConfig = {
+  tematiques: {
+    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
+    href: '/experiencies',
+    highlight: true,
+  },
+  casaments: {
+    image: '/img/portfolio/bodas/bodas-01.webp',
+    href: '/servicios/bodas',
+    highlight: false,
+  },
+  festes: {
+    image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
+    href: '/servicios/fiestas',
+    highlight: false,
+  },
+  empreses: {
+    image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
+    href: '/servicios/empresas',
+    highlight: false,
+  },
+};
 
 export default function ServicesGridElegant() {
   const t = useTranslations('services');
-  const tCommon = useTranslations('common');
-  const isEs = tCommon('language') === 'es';
-
-  const services = [
-    {
-      id: 'tematiques',
-      title: isEs ? 'Experiencias Temáticas' : 'Experiències Temàtiques',
-      description: isEs ? 'Harry Potter, Halloween y más' : 'Harry Potter, Halloween i més',
-      price: isEs ? 'Desde 600€' : 'Des de 600€',
-      image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
-      href: '/experiencies',
-      features: isEs 
-        ? ['Decoración', 'Efectos FX', 'Ambientación', 'Animación']
-        : ['Decoració', 'Efectes FX', 'Ambientació', 'Animació'],
-      highlight: true, // DESTACAT - és el diferenciador
-      badge: isEs ? '⭐ Lo más pedido' : '⭐ El més demanat',
-    },
-    {
-      id: 'casaments',
-      title: isEs ? 'Bodas' : 'Casaments',
-      description: isEs ? 'El día más especial merece ser perfecto' : 'El dia més especial mereix ser perfecte',
-      price: isEs ? 'Desde 650€' : 'Des de 650€',
-      image: '/img/portfolio/bodas/bodas-01.webp',
-      href: '/servicios/bodas',
-      features: isEs
-        ? ['DJ Profesional', 'Sonido + Luces', 'Coordinación', 'Backup 100%']
-        : ['DJ Professional', 'So + Llums', 'Coordinació', 'Backup 100%'],
-    },
-    {
-      id: 'festes',
-      title: isEs ? 'Fiestas Privadas' : 'Festes Privades',
-      description: isEs ? 'La fiesta que recordarán siempre' : 'La festa que recordaran sempre',
-      price: isEs ? 'Desde 400€' : 'Des de 400€',
-      image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
-      href: '/servicios/fiestas',
-      features: isEs
-        ? ['Discomóvil', 'Luces LED', 'Efectos', 'Todo incluido']
-        : ['Discomòbil', 'Llums LED', 'Efectes', 'Tot inclòs'],
-    },
-    {
-      id: 'empreses',
-      title: isEs ? 'Empresas' : 'Empreses',
-      description: isEs ? 'Eventos corporativos de impacto' : 'Events corporatius d\'impacte',
-      price: isEs ? 'Desde 500€' : 'Des de 500€',
-      image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
-      href: '/servicios/empresas',
-      features: isEs
-        ? ['Audiovisual', 'Micro inalámbrico', 'Branding', 'Factura']
-        : ['Audiovisual', 'Micro sense fil', 'Branding', 'Factura'],
-    },
-  ];
-
-  const texts = {
-    subtitle: isEs ? 'Nuestros servicios' : 'Els nostres serveis',
-    title: isEs ? '¿Qué necesitas?' : 'Què necessites?',
-    description: isEs 
-      ? 'Elige el tipo de evento y te ayudamos a crearlo exactamente como lo imaginas.'
-      : 'Tria el tipus d\'event i t\'ajudem a crear-lo exactament com l\'imagines.',
-    viewMore: isEs ? 'Ver más' : 'Veure més',
-    notFound: isEs ? '¿No encuentras lo que buscas?' : 'No trobes el que busques?',
-    contact: isEs ? 'Consúltanos sin compromiso' : 'Consulta\'ns sense compromís',
-  };
+  const tGrid = useTranslations('services.grid');
 
   return (
     <section className="py-24 bg-[#0A0A0A]">
       <div className="container mx-auto px-6">
-        
+
         {/* Header */}
         <div className="text-center mb-16">
           <motion.p
@@ -92,7 +50,7 @@ export default function ServicesGridElegant() {
             viewport={{ once: true }}
             className="text-[#C9A962] text-sm font-medium tracking-[0.2em] uppercase mb-4"
           >
-            {texts.subtitle}
+            {tGrid('subtitle')}
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -100,7 +58,7 @@ export default function ServicesGridElegant() {
             viewport={{ once: true }}
             className="text-3xl md:text-4xl font-semibold text-white mb-4"
           >
-            {texts.title}
+            {tGrid('title')}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
@@ -109,96 +67,105 @@ export default function ServicesGridElegant() {
             transition={{ delay: 0.1 }}
             className="text-[#888888] text-lg max-w-xl mx-auto"
           >
-            {texts.description}
+            {tGrid('description')}
           </motion.p>
         </div>
-        
+
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {services.map((service, index) => (
-            <motion.div
-              key={service.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Link href={service.href} className="group block h-full">
-                <div className={`
-                  relative h-full bg-[#111111] rounded-2xl overflow-hidden 
-                  border transition-all duration-500
-                  ${service.highlight 
-                    ? 'border-[#C9A962]/50 hover:border-[#C9A962] ring-1 ring-[#C9A962]/20' 
-                    : 'border-white/[0.06] hover:border-[#C9A962]/30'
-                  }
-                `}>
-                  
-                  {/* Badge */}
-                  {service.badge && (
-                    <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-amber-500 to-orange-500 text-[#0A0A0A] text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                      {service.badge}
+          {serviceIds.map((id, index) => {
+            const config = serviceConfig[id];
+            const title = tGrid(`${id}.title`);
+            const description = tGrid(`${id}.description`);
+            const price = tGrid(`${id}.price`);
+            const features = tGrid.raw(`${id}.features`) as string[];
+            const badge = id === 'tematiques' ? tGrid(`${id}.badge`) : null;
+
+            return (
+              <motion.div
+                key={id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Link href={config.href} className="group block h-full">
+                  <div className={`
+                    relative h-full bg-[#111111] rounded-2xl overflow-hidden
+                    border transition-all duration-500
+                    ${config.highlight
+                      ? 'border-[#C9A962]/50 hover:border-[#C9A962] ring-1 ring-[#C9A962]/20'
+                      : 'border-white/[0.06] hover:border-[#C9A962]/30'
+                    }
+                  `}>
+
+                    {/* Badge */}
+                    {badge && (
+                      <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-amber-500 to-orange-500 text-[#0A0A0A] text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                        {badge}
+                      </div>
+                    )}
+
+                    {/* Image */}
+                    <div className="relative h-48 overflow-hidden">
+                      <Image
+                        src={config.image}
+                        alt={title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-transparent" />
                     </div>
-                  )}
-                  
-                  {/* Image */}
-                  <div className="relative h-48 overflow-hidden">
-                    <Image
-                      src={service.image}
-                      alt={service.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-transparent" />
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="p-6">
-                    {/* Price tag */}
-                    <div className="text-[#C9A962] text-sm font-medium mb-2">
-                      {service.price}
-                    </div>
-                    
-                    {/* Title */}
-                    <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-[#C9A962] transition-colors">
-                      {service.title}
-                    </h3>
-                    
-                    {/* Description */}
-                    <p className="text-[#888888] text-sm mb-4">
-                      {service.description}
-                    </p>
-                    
-                    {/* Features */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {service.features.map((feature) => (
-                        <span
-                          key={feature}
-                          className="text-xs text-[#666666] bg-white/[0.03] px-2 py-1 rounded"
+
+                    {/* Content */}
+                    <div className="p-6">
+                      {/* Price tag */}
+                      <div className="text-[#C9A962] text-sm font-medium mb-2">
+                        {price}
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-[#C9A962] transition-colors">
+                        {title}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="text-[#888888] text-sm mb-4">
+                        {description}
+                      </p>
+
+                      {/* Features */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {features.map((feature) => (
+                          <span
+                            key={feature}
+                            className="text-xs text-[#666666] bg-white/[0.03] px-2 py-1 rounded"
+                          >
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* CTA */}
+                      <div className="flex items-center text-sm text-[#C9A962] font-medium group-hover:gap-3 gap-2 transition-all">
+                        <span>{t('viewMore')}</span>
+                        <svg
+                          className="w-4 h-4 transition-transform group-hover:translate-x-1"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
                         >
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
-                    
-                    {/* CTA */}
-                    <div className="flex items-center text-sm text-[#C9A962] font-medium group-hover:gap-3 gap-2 transition-all">
-                      <span>{texts.viewMore}</span>
-                      <svg 
-                        className="w-4 h-4 transition-transform group-hover:translate-x-1" 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
-        
+
         {/* Bottom CTA */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -206,12 +173,12 @@ export default function ServicesGridElegant() {
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-          <p className="text-[#666666] mb-4">{texts.notFound}</p>
+          <p className="text-[#666666] mb-4">{t('notFound')}</p>
           <Link
             href="/contacto"
             className="inline-flex items-center gap-2 text-white hover:text-[#C9A962] transition-colors"
           >
-            <span>{texts.contact}</span>
+            <span>{t('contact')}</span>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>

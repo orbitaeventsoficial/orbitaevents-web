@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     images: ['/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp'],
   },
   alternates: {
-    canonical: 'https://orbitaevents.com/ca/tematica-mon-magic',
+    canonical: '/tematica-mon-magic',
     languages: {
       'ca': '/ca/tematica-mon-magic',
       'es': '/es/tematica-mon-magic',

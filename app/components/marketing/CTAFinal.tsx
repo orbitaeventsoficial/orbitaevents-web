@@ -3,17 +3,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { usePublicStats } from '@/hooks/usePublicData';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CTA FINAL BRUTAL v2.0
-// ═══════════════════════════════════════════════════════════════════════════
-// CANVIS:
-// 1. WhatsApp com a CTA PRIMARI (80% tràfic mòbil vol parlar directe)
-// 2. Configurador com a secundari
-// 3. Menys text, més acció
-// 4. Urgència real amb disponibilitat
+// CTA FINAL BRUTAL v2.1 - i18n complet
 // ═══════════════════════════════════════════════════════════════════════════
 
 const Icons = {
@@ -40,13 +34,14 @@ const Icons = {
   ),
 };
 
-function useAvailability(isEs: boolean) {
+function useAvailability() {
+  const locale = useLocale();
   const [data, setData] = useState<{ month: string; saturdays: number; status: 'scarce' | 'limited' | 'available' }>({ month: '', saturdays: 0, status: 'available' });
 
   useEffect(() => {
     const monthNamesCa = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
     const monthNamesEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    const monthNames = isEs ? monthNamesEs : monthNamesCa;
+    const monthNames = locale === 'es' ? monthNamesEs : monthNamesCa;
     const mockAvailability: Record<number, number> = { 0: 3, 1: 4, 2: 3, 3: 2, 4: 1, 5: 2, 6: 3, 7: 4, 8: 2, 9: 3, 10: 2, 11: 1 };
     const month = new Date().getMonth();
     const sats = mockAvailability[month] || 2;
@@ -55,47 +50,20 @@ function useAvailability(isEs: boolean) {
       saturdays: sats,
       status: sats <= 1 ? 'scarce' : sats <= 2 ? 'limited' : 'available'
     });
-  }, [isEs]);
+  }, [locale]);
 
   return data;
 }
 
 export default function CTAFinal() {
-  const t = useTranslations('common');
-  const isEs = t('language') === 'es';
-  const availability = useAvailability(isEs);
+  const t = useTranslations('homeSections.ctaFinal');
+  const availability = useAvailability();
   const { stats } = usePublicStats();
 
   const statusColors = {
     scarce: 'from-red-500 to-rose-500',
     limited: 'from-amber-500 to-orange-500',
     available: 'from-emerald-500 to-teal-500',
-  };
-
-  const statusText = {
-    scarce: isEs ? '⚠️ ¡Casi lleno!' : '⚠️ Gairebé ple!',
-    limited: isEs ? '🔥 ¡Se acaba!' : '🔥 S\'acaba!',
-    available: isEs ? '✓ Disponible' : '✓ Disponible',
-  };
-
-  const texts = {
-    saturdaysSingular: isEs ? 'sábado libre en' : 'dissabte lliure a',
-    saturdaysPlural: isEs ? 'sábados libres en' : 'dissabtes lliures a',
-    title1: isEs ? '¿Listo para' : 'Preparat per',
-    title2: isEs ? 'crear tu evento?' : 'crear el teu event?',
-    subtitle: isEs
-      ? 'Escríbenos y te respondemos en menos de 2 horas.'
-      : 'Escriu-nos i et responem en menys de 2 hores.',
-    ctaPrimary: isEs ? 'Escríbenos por WhatsApp' : 'Escriu-nos per WhatsApp',
-    ctaSecondary: isEs ? 'Ver precios' : 'Veure preus',
-    whatsappMsg: isEs
-      ? 'Hola! Quiero información para mi evento.'
-      : 'Hola! Vull informació per al meu event.',
-    events: 'events',
-    rating: isEs ? 'valoración' : 'valoració',
-    guarantee: isEs
-      ? '🛡️ Garantía 100%. Si no estás contento, te devolvemos el dinero.'
-      : '🛡️ Garantia 100%. Si no estàs content, et tornem els diners.',
   };
 
   return (
@@ -108,7 +76,7 @@ export default function CTAFinal() {
 
       <div className="relative container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center">
-          
+
           {/* Urgency badge */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -119,13 +87,13 @@ export default function CTAFinal() {
             <div className={`inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${statusColors[availability.status]} rounded-full text-white text-sm font-semibold`}>
               <Icons.Fire />
               <span>
-                {availability.saturdays} {availability.saturdays === 1 ? texts.saturdaysSingular : texts.saturdaysPlural} {availability.month}
+                {availability.saturdays} {availability.saturdays === 1 ? t('saturdaysSingular') : t('saturdaysPlural')} {availability.month}
               </span>
-              <span className="text-white/80 text-xs">{statusText[availability.status]}</span>
+              <span className="text-white/80 text-xs">{t(`status.${availability.status}`)}</span>
             </div>
           </motion.div>
 
-          {/* Heading - MÉS CURT */}
+          {/* Heading */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -133,18 +101,18 @@ export default function CTAFinal() {
             className="mb-8"
           >
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-              {texts.title1}
+              {t('title1')}
               <br />
               <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-                {texts.title2}
+                {t('title2')}
               </span>
             </h2>
             <p className="text-lg text-white/60">
-              {texts.subtitle}
+              {t('subtitle')}
             </p>
           </motion.div>
 
-          {/* CTAs - WhatsApp PRIMER i MÉS GRAN */}
+          {/* CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -153,13 +121,13 @@ export default function CTAFinal() {
           >
             {/* WhatsApp - PRIMARI */}
             <a
-              href={`https://wa.me/34699121023?text=${encodeURIComponent(texts.whatsappMsg)}`}
+              href={`https://wa.me/34699121023?text=${encodeURIComponent(t('whatsappMsg'))}`}
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center justify-center gap-3 px-8 py-5 bg-[#25D366] hover:bg-[#20BD5A] rounded-2xl transition-all hover:shadow-[0_8px_30px_rgba(37,211,102,0.4)]"
             >
               <Icons.WhatsApp />
-              <span className="font-bold text-white text-lg">{texts.ctaPrimary}</span>
+              <span className="font-bold text-white text-lg">{t('ctaPrimary')}</span>
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
@@ -171,12 +139,12 @@ export default function CTAFinal() {
               href="/configurador"
               className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all text-white/80 hover:text-white"
             >
-              <span className="font-medium">{texts.ctaSecondary}</span>
+              <span className="font-medium">{t('ctaSecondary')}</span>
               <Icons.Arrow />
             </Link>
           </motion.div>
 
-          {/* Trust - SIMPLIFICAT */}
+          {/* Trust */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -185,12 +153,12 @@ export default function CTAFinal() {
           >
             <span className="flex items-center gap-2">
               <span className="text-xl">🎯</span>
-              <span><strong className="text-white">+{stats.totalEvents}</strong> {texts.events}</span>
+              <span><strong className="text-white">+{stats.totalEvents}</strong> {t('events')}</span>
             </span>
             <span className="w-px h-4 bg-white/20" />
             <span className="flex items-center gap-2">
               <span className="text-xl">⭐</span>
-              <span><strong className="text-white">4.9/5</strong> {texts.rating}</span>
+              <span><strong className="text-white">4.9/5</strong> {t('rating')}</span>
             </span>
             <span className="w-px h-4 bg-white/20" />
             <span className="flex items-center gap-1">
@@ -206,7 +174,7 @@ export default function CTAFinal() {
             viewport={{ once: true }}
             className="text-white/40 text-sm"
           >
-            {texts.guarantee}
+            {t('guarantee')}
           </motion.p>
         </div>
       </div>

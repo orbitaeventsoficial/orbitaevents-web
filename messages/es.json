@@ -430,6 +430,38 @@
     "viewMore": "Ver más",
     "from": "Desde",
     "popular": "El más pedido",
+    "notFound": "¿No encuentras lo que buscas?",
+    "contact": "Consúltanos sin compromiso",
+    "grid": {
+      "subtitle": "Nuestros servicios",
+      "title": "¿Qué necesitas?",
+      "description": "Elige el tipo de evento y te ayudamos a crearlo exactamente como lo imaginas.",
+      "tematiques": {
+        "title": "Experiencias Temáticas",
+        "description": "Harry Potter, Halloween y más",
+        "price": "Desde 600€",
+        "badge": "⭐ Lo más pedido",
+        "features": ["Decoración", "Efectos FX", "Ambientación", "Animación"]
+      },
+      "casaments": {
+        "title": "Bodas",
+        "description": "El día más especial merece ser perfecto",
+        "price": "Desde 650€",
+        "features": ["DJ Profesional", "Sonido + Luces", "Coordinación", "Backup 100%"]
+      },
+      "festes": {
+        "title": "Fiestas Privadas",
+        "description": "La fiesta que recordarán siempre",
+        "price": "Desde 400€",
+        "features": ["Discomóvil", "Luces LED", "Efectos", "Todo incluido"]
+      },
+      "empreses": {
+        "title": "Empresas",
+        "description": "Eventos corporativos de impacto",
+        "price": "Desde 500€",
+        "features": ["Audiovisual", "Micro inalámbrico", "Branding", "Factura"]
+      }
+    },
     "bodas": {
       "meta": {
         "title": "DJ Bodas Barcelona | Precios desde {price}€ | Òrbita Events",
@@ -1114,8 +1146,10 @@
       "empresa": "Corporativo",
       "party": "Fiesta",
       "festa": "Fiesta",
+      "fiesta": "Fiesta",
       "birthday": "Cumpleaños",
-      "aniversari": "Cumpleaños"
+      "aniversari": "Cumpleaños",
+      "tematica": "Temática"
     },
     "emptyState": {
       "title": "¡Sé el primero!",
@@ -1273,6 +1307,8 @@
     "ctaFree": "Presupuesto Gratis",
     "ctaQuick": "Presupuesto en 2 minutos",
     "whatsappDirect": "WhatsApp Directo",
+    "onlineNow": "Online ahora",
+    "urgencyMessage": "Solo 1 sábado en Diciembre",
     "nav": {
       "services": "Servicios",
       "experiences": "Experiencias",
@@ -5578,5 +5614,127 @@
       "response": "respuesta"
     },
     "guarantee": "🛡️ Garantía de satisfacción 100%. Si no estás contento, te devolvemos el dinero."
+  },
+  "homeSections": {
+    "discomovil": {
+      "badge": "🎵 Para quien no quiere tematización",
+      "title1": "Solo",
+      "title2": "Discomóvil",
+      "subtitle": "DJ profesional + equipo de sonido + iluminación. Sin tematización.",
+      "from": "Desde",
+      "viewMore": "Ver más",
+      "popular": "Popular",
+      "equipTitle": "Equipo incluido en todos los packs",
+      "extraHour": "Hora extra: +80€",
+      "packs": {
+        "festes": {
+          "name": "Fiestas",
+          "subtitle": "Cumpleaños, comuniones...",
+          "features": ["2-4 horas", "DJ Profesional", "Sonido 4000W"]
+        },
+        "bodes": {
+          "name": "Bodas",
+          "subtitle": "Baile o experiencia completa",
+          "features": ["Baile 3h o Completa", "Coordinación"]
+        },
+        "corporatiu": {
+          "name": "Corporativos",
+          "subtitle": "Eventos de empresa con factura",
+          "features": ["4h", "Factura incluida"]
+        }
+      },
+      "equipment": [
+        "DJ profesional",
+        "Controladora Pioneer DDJ-REV7",
+        "Sonido 4000W (2x EV ETX)",
+        "4 Cabezas móviles LED (a partir 3h)",
+        "Multiefectos LED",
+        "Máquina de humo"
+      ]
+    },
+    "garantia": {
+      "badge": "🛡️ Tranquilidad garantizada",
+      "title1": "Tu evento,",
+      "title2": "sin riesgos",
+      "subtitle": "Nos comprometemos al 100% con cada evento. Si algo no es como esperabas, lo solucionamos o te devolvemos el dinero.",
+      "sealTitle": "Compromiso Òrbita Events",
+      "sealSubtitle": "+{events} eventos sin incidencias graves",
+      "guarantees": {
+        "satisfaction": {
+          "title": "Garantía de Satisfacción",
+          "description": "Si no estás 100% satisfecho con nuestro servicio, te devolvemos el dinero. Sin preguntas."
+        },
+        "backup": {
+          "title": "Equipo Backup Completo",
+          "description": "Llevamos duplicado de todo: sonido, luces, mezclador, reproductores. Tu evento NUNCA se para."
+        },
+        "response": {
+          "title": "Respuesta en 2 Horas",
+          "description": "Respuesta garantizada en menos de 2 horas. Comunicación directa y sin intermediarios."
+        },
+        "noSurprises": {
+          "title": "Sin Sorpresas",
+          "description": "Presupuesto cerrado y definitivo. El precio que te damos es el que pagarás, sin costes ocultos."
+        },
+        "support": {
+          "title": "Soporte Total",
+          "description": "Acompañamiento desde la reserva hasta el final del evento. Siempre disponibles para ti."
+        },
+        "passion": {
+          "title": "Pasión por el Detalle",
+          "description": "Cada evento es único. Personalizamos cada detalle para crear exactamente lo que imaginas."
+        }
+      }
+    },
+    "ctaFinal": {
+      "saturdaysSingular": "sábado libre en",
+      "saturdaysPlural": "sábados libres en",
+      "title1": "¿Listo para",
+      "title2": "crear tu evento?",
+      "subtitle": "Escríbenos y te respondemos en menos de 2 horas.",
+      "ctaPrimary": "Escríbenos por WhatsApp",
+      "ctaSecondary": "Ver precios",
+      "whatsappMsg": "Hola! Quiero información para mi evento.",
+      "events": "eventos",
+      "rating": "valoración",
+      "guarantee": "🛡️ Garantía 100%. Si no estás contento, te devolvemos el dinero.",
+      "status": {
+        "scarce": "⚠️ ¡Casi lleno!",
+        "limited": "🔥 ¡Se acaba!",
+        "available": "✓ Disponible"
+      }
+    },
+    "heroVideo": {
+      "badge": "✨ Creadores de Experiencias Inmersivas",
+      "title1": "No ponemos música.",
+      "title2": "Creamos experiencias.",
+      "subtitle": "Tematización + DJ profesional para bodas y eventos en Barcelona y Girona.",
+      "trust1": "Presupuesto en 2 min",
+      "trust2": "Respuesta en < 2h",
+      "trust3": "Equipo backup 100%",
+      "cta1": "Presupuesto Gratis",
+      "cta2": "WhatsApp Directo",
+      "scroll": "Descubre más"
+    },
+    "heroStats": {
+      "eventsRealized": "Eventos realizados",
+      "repeatOrRecommend": "Repiten o recomiendan",
+      "withBackup": "Con equipo backup",
+      "responseTime": "Tiempo de respuesta"
+    },
+    "testimonials": {
+      "satisfiedClients": "clientes satisfechos",
+      "averageRating": "valoración media",
+      "verifiedReviews": "Opiniones verificadas",
+      "verified": "Verificado"
+    },
+    "whatsapp": {
+      "defaultMessage": "Hola! Me gustaría información sobre vuestros servicios para un evento.",
+      "onlineNow": "Online ahora",
+      "tooltipGreeting": "👋 ¡Hola! ¿Tienes alguna pregunta? ¡Estamos aquí para ayudarte!",
+      "responseTime": "Respuesta típica",
+      "writeUs": "¡Escríbenos!",
+      "directWhatsApp": "WhatsApp Directo"
+    }
   }
 }

@@ -142,13 +142,13 @@ function RatingStars({ rating }: { rating: number }) {
 // COMPONENTE: Source Badge
 // ═══════════════════════════════════════════════════════════════════════════
 
-function SourceBadge({ source, isEs }: { source?: string; isEs: boolean }) {
+function SourceBadge({ source, t }: { source?: string; t: (key: string) => string }) {
   if (!source) return null;
 
   const config = {
     google: { icon: <Icons.Google />, label: 'Google', color: 'bg-white/10' },
     'bodas.net': { icon: <Icons.BodasNet />, label: 'Bodas.net', color: 'bg-rose-500/10' },
-    direct: { icon: <Icons.Verified />, label: isEs ? 'Verificado' : 'Verificat', color: 'bg-emerald-500/10' },
+    direct: { icon: <Icons.Verified />, label: t('verified'), color: 'bg-emerald-500/10' },
   };
 
   const { icon, label, color } = config[source as keyof typeof config] || config.direct;
@@ -165,21 +165,20 @@ function SourceBadge({ source, isEs }: { source?: string; isEs: boolean }) {
 // COMPONENTE: Event Type Badge
 // ═══════════════════════════════════════════════════════════════════════════
 
-function EventTypeBadge({ type, isEs }: { type: string; isEs: boolean }) {
-  const config: Record<string, { emoji: string; labelCa: string; labelEs: string; color: string }> = {
-    boda: { emoji: '💍', labelCa: 'Casament', labelEs: 'Boda', color: 'from-rose-500/20 to-pink-500/20 border-rose-500/30' },
-    fiesta: { emoji: '🎉', labelCa: 'Festa', labelEs: 'Fiesta', color: 'from-amber-500/20 to-orange-500/20 border-amber-500/30' },
-    empresa: { emoji: '💼', labelCa: 'Empresa', labelEs: 'Empresa', color: 'from-blue-500/20 to-indigo-500/20 border-blue-500/30' },
-    tematica: { emoji: '🎃', labelCa: 'Temàtica', labelEs: 'Temática', color: 'from-purple-500/20 to-violet-500/20 border-purple-500/30' },
+function EventTypeBadge({ type, t }: { type: string; t: (key: string) => string }) {
+  const config: Record<string, { emoji: string; color: string }> = {
+    boda: { emoji: '💍', color: 'from-rose-500/20 to-pink-500/20 border-rose-500/30' },
+    fiesta: { emoji: '🎉', color: 'from-amber-500/20 to-orange-500/20 border-amber-500/30' },
+    empresa: { emoji: '💼', color: 'from-blue-500/20 to-indigo-500/20 border-blue-500/30' },
+    tematica: { emoji: '🎃', color: 'from-purple-500/20 to-violet-500/20 border-purple-500/30' },
   };
 
-  const { emoji, labelCa, labelEs, color } = config[type] || config.fiesta;
-  const label = isEs ? labelEs : labelCa;
+  const { emoji, color } = config[type] || config.fiesta;
 
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r ${color} border rounded-full text-xs font-medium text-white/80`}>
       <span>{emoji}</span>
-      <span>{label}</span>
+      <span>{t(`eventTypes.${type}`)}</span>
     </span>
   );
 }
@@ -191,11 +190,11 @@ function EventTypeBadge({ type, isEs }: { type: string; isEs: boolean }) {
 function TranslatedTestimonialCard({
   config,
   t,
-  isEs
+  tStats
 }: {
   config: TranslatedTestimonial;
   t: (key: string) => string;
-  isEs: boolean;
+  tStats: (key: string) => string;
 }) {
   const { translationKey, avatar, rating, eventType, location, verified, source } = config;
 
@@ -255,7 +254,7 @@ function TranslatedTestimonialCard({
           <p className="text-sm text-white/60 truncate">{role}</p>
           <div className="flex items-center gap-3 mt-2">
             <RatingStars rating={rating} />
-            <SourceBadge source={source} isEs={isEs} />
+            <SourceBadge source={source} t={tStats} />
           </div>
         </div>
       </div>
@@ -267,7 +266,7 @@ function TranslatedTestimonialCard({
 
       {/* Footer */}
       <div className="flex items-center justify-between pt-4 border-t border-white/5">
-        <EventTypeBadge type={eventType} isEs={isEs} />
+        <EventTypeBadge type={eventType} t={t} />
         <div className="flex items-center gap-2 text-sm text-white/50">
           {location && (
             <>
@@ -286,7 +285,7 @@ function TranslatedTestimonialCard({
 // COMPONENTE: Summary Stats
 // ═══════════════════════════════════════════════════════════════════════════
 
-function SummaryStats({ isEs }: { isEs: boolean }) {
+function SummaryStats({ t }: { t: (key: string) => string }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 mb-12">
       <div className="flex items-center gap-3">
@@ -299,7 +298,7 @@ function SummaryStats({ isEs }: { isEs: boolean }) {
         </div>
         <div className="text-sm">
           <span className="text-white font-bold">+150</span>
-          <span className="text-white/60"> {isEs ? 'clientes satisfechos' : 'clients satisfets'}</span>
+          <span className="text-white/60"> {t('satisfiedClients')}</span>
         </div>
       </div>
 
@@ -312,7 +311,7 @@ function SummaryStats({ isEs }: { isEs: boolean }) {
           ))}
         </div>
         <span className="text-white font-bold">4.9</span>
-        <span className="text-white/60 text-sm">{isEs ? 'valoración media' : 'valoració mitjana'}</span>
+        <span className="text-white/60 text-sm">{t('averageRating')}</span>
       </div>
 
       <div className="h-8 w-px bg-white/10 hidden md:block" />
@@ -320,7 +319,7 @@ function SummaryStats({ isEs }: { isEs: boolean }) {
       <div className="flex items-center gap-3">
         <Icons.Google />
         <Icons.BodasNet />
-        <span className="text-white/60 text-sm">{isEs ? 'Opiniones verificadas' : 'Opinions verificades'}</span>
+        <span className="text-white/60 text-sm">{t('verifiedReviews')}</span>
       </div>
     </div>
   );
@@ -332,8 +331,7 @@ function SummaryStats({ isEs }: { isEs: boolean }) {
 
 export default function TestimoniosReales() {
   const t = useTranslations('testimonials');
-  const tCommon = useTranslations('common');
-  const isEs = tCommon('language') === 'es';
+  const tStats = useTranslations('homeSections.testimonials');
 
   return (
     <section className="relative py-20 md:py-32 overflow-hidden">
@@ -361,7 +359,7 @@ export default function TestimoniosReales() {
         </motion.div>
 
         {/* Summary Stats */}
-        <SummaryStats isEs={isEs} />
+        <SummaryStats t={tStats} />
 
         {/* 3 Testimonials Grid */}
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -376,7 +374,7 @@ export default function TestimoniosReales() {
               <TranslatedTestimonialCard
                 config={config}
                 t={t}
-                isEs={isEs}
+                tStats={tStats}
               />
             </motion.div>
           ))}

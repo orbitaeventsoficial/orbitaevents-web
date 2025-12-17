@@ -1,12 +1,6 @@
 // app/components/ui/HeaderChampion.tsx
 // ═══════════════════════════════════════════════════════════════════════════
-// HEADER PREMIUM V2 - ÒRBITA EVENTS
-// ═══════════════════════════════════════════════════════════════════════════
-// Fixes: logo gigante, tipografía, desplegables transparents, Barcelona petit
-// - Top bar amb status online + ubicació + urgència
-// - Logo més petit i elegant (32-36px)
-// - Desplegables SÒLIDS (no transparents)
-// - Barcelona & Girona més visible
+// HEADER PREMIUM V2 - ÒRBITA EVENTS (i18n complert)
 // ═══════════════════════════════════════════════════════════════════════════
 
 'use client';
@@ -19,51 +13,47 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LanguageSelector from './LanguageSelector';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// NAVEGACIÓ
+// NAVEGACIÓ - Configuració amb claus de traducció
 // ═══════════════════════════════════════════════════════════════════════════
 
-interface DropdownItem {
-  label: string;
-  labelEs: string;
-  description?: string;
-  descriptionEs?: string;
-  href: string;
-  icon?: string;
-  badge?: string;
-}
-
-interface NavItem {
-  label: string;
-  labelEs: string;
+interface NavItemConfig {
+  labelKey: string;
   href: string;
   badge?: string;
-  dropdown?: DropdownItem[];
+  dropdownType?: 'services' | 'experiences';
+  dropdown?: {
+    labelKey: string;
+    descKey: string;
+    href: string;
+    icon: string;
+    badge?: string;
+  }[];
 }
 
-const navItems: NavItem[] = [
+const navItemsConfig: NavItemConfig[] = [
   {
-    label: 'Serveis',
-    labelEs: 'Servicios',
-    href: '/serveis',
+    labelKey: 'services',
+    href: '/servicios',
+    dropdownType: 'services',
     dropdown: [
-      { label: 'Casaments', labelEs: 'Bodas', description: 'El dia més especial', descriptionEs: 'El día más especial', href: '/servicios/bodas', icon: '💍' },
-      { label: 'Festes', labelEs: 'Fiestas', description: 'Aniversaris i celebracions', descriptionEs: 'Cumpleaños y celebraciones', href: '/servicios/fiestas', icon: '🎉' },
-      { label: 'Empreses', labelEs: 'Empresas', description: 'Events corporatius', descriptionEs: 'Eventos corporativos', href: '/servicios/empresas', icon: '💼' },
+      { labelKey: 'bodas', descKey: 'bodasDesc', href: '/servicios/bodas', icon: '💍' },
+      { labelKey: 'fiestas', descKey: 'fiestasDesc', href: '/servicios/fiestas', icon: '🎉' },
+      { labelKey: 'empresas', descKey: 'empresasDesc', href: '/servicios/empresas', icon: '💼' },
     ]
   },
   {
-    label: 'Experiències',
-    labelEs: 'Experiencias',
-    href: '/experiencies',
+    labelKey: 'experiences',
+    href: '/experiencias',
     badge: 'NEW',
+    dropdownType: 'experiences',
     dropdown: [
-      { label: 'Món Màgic', labelEs: 'Mundo Mágico', description: 'Tematització Harry Potter', descriptionEs: 'Tematización Harry Potter', href: '/tematica-mon-magic', icon: '⚡', badge: 'EXCLUSIU' },
-      { label: 'Halloween', labelEs: 'Halloween', description: 'Nits de terror amb tots els efectes', descriptionEs: 'Noches de terror con todos los efectos', href: '/tematica-halloween', icon: '🎃' },
+      { labelKey: 'monMagic', descKey: 'monMagicDesc', href: '/tematica-mon-magic', icon: '⚡', badge: 'EXCLUSIU' },
+      { labelKey: 'halloween', descKey: 'halloweenDesc', href: '/tematica-halloween', icon: '🎃' },
     ]
   },
-  { label: 'Portfolio', labelEs: 'Portfolio', href: '/portfolio' },
-  { label: 'Opinions', labelEs: 'Opiniones', href: '/opiniones' },
-  { label: 'Contacte', labelEs: 'Contacto', href: '/contacto' },
+  { labelKey: 'portfolio', href: '/portfolio' },
+  { labelKey: 'reviews', href: '/opiniones' },
+  { labelKey: 'contact', href: '/contacto' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -71,8 +61,10 @@ const navItems: NavItem[] = [
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function HeaderChampion() {
-  const t = useTranslations('common');
-  const isEs = t('language') === 'es';
+  const tHeader = useTranslations('header');
+  const tNav = useTranslations('header.nav');
+  const tServices = useTranslations('header.services');
+  const tExperiences = useTranslations('header.experiences');
 
   // Estados
   const [isVisible, setIsVisible] = useState(true);
@@ -145,7 +137,7 @@ export default function HeaderChampion() {
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 <span className="text-green-400 font-medium">
-                  {isEs ? 'Online ahora' : 'Online ara'}
+                  {tHeader('onlineNow')}
                 </span>
               </span>
               <a href="tel:699121023" className="text-zinc-400 hover:text-white transition-colors hidden sm:block">
@@ -165,7 +157,7 @@ export default function HeaderChampion() {
               <span className="hidden md:flex items-center gap-1.5 bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full text-xs">
                 <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" />
                 <span className="font-medium">
-                  {isEs ? 'Solo 1 sábado en Diciembre' : 'Sol 1 dissabte a Desembre'}
+                  {tHeader('urgencyMessage')}
                 </span>
               </span>
 
@@ -216,139 +208,136 @@ export default function HeaderChampion() {
             {/* NAV DESKTOP amb DROPDOWNS SÒLIDS */}
             {/* ════════════════════════════════════════════════════════════ */}
             <nav className="hidden lg:flex items-center gap-0.5">
-              {navItems.map((item) => (
-                <div
-                  key={item.href}
-                  className="relative"
-                  onMouseEnter={() => item.dropdown && setActiveDropdown(item.label)}
-                  onMouseLeave={() => setActiveDropdown(null)}
-                >
-                  <Link
-                    href={item.dropdown ? '#' : item.href}
-                    className={`
-                      relative px-4 py-2 text-base font-semibold
-                      transition-colors flex items-center gap-2
-                      ${activeDropdown === item.label ? 'text-amber-400' : 'text-zinc-300 hover:text-white'}
-                    `}
-                    onClick={(e) => {
-                      if (item.dropdown) {
-                        e.preventDefault();
-                        setActiveDropdown(activeDropdown === item.label ? null : item.label);
-                      }
-                    }}
+              {navItemsConfig.map((item) => {
+                // Seleccionar el traductor correcte per al dropdown
+                const dropdownT = item.dropdownType === 'services' ? tServices : tExperiences;
+
+                return (
+                  <div
+                    key={item.href}
+                    className="relative"
+                    onMouseEnter={() => item.dropdown && setActiveDropdown(item.labelKey)}
+                    onMouseLeave={() => setActiveDropdown(null)}
                   >
-                    {isEs ? item.labelEs : item.label}
-                    {item.badge && (
-                      <span className="bg-amber-500 text-[10px] text-black font-bold px-1.5 py-0.5 rounded">
-                        {item.badge}
-                      </span>
-                    )}
-                    {item.dropdown && (
-                      <svg
-                        className={`w-3.5 h-3.5 transition-transform ${activeDropdown === item.label ? 'rotate-180' : ''}`}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    )}
-                  </Link>
+                    <Link
+                      href={item.dropdown ? '#' : item.href}
+                      className={`
+                        relative px-4 py-2 text-base font-semibold
+                        transition-colors flex items-center gap-2
+                        ${activeDropdown === item.labelKey ? 'text-amber-400' : 'text-zinc-300 hover:text-white'}
+                      `}
+                      onClick={(e) => {
+                        if (item.dropdown) {
+                          e.preventDefault();
+                          setActiveDropdown(activeDropdown === item.labelKey ? null : item.labelKey);
+                        }
+                      }}
+                    >
+                      {tNav(item.labelKey)}
+                      {item.badge && (
+                        <span className="bg-amber-500 text-[10px] text-black font-bold px-1.5 py-0.5 rounded">
+                          {item.badge}
+                        </span>
+                      )}
+                      {item.dropdown && (
+                        <svg
+                          className={`w-3.5 h-3.5 transition-transform ${activeDropdown === item.labelKey ? 'rotate-180' : ''}`}
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      )}
+                    </Link>
 
-                  {/* ══════════════════════════════════════════════════════ */}
-                  {/* DROPDOWN - FONS SÒLID (no transparent!) */}
-                  {/* ══════════════════════════════════════════════════════ */}
-                  <AnimatePresence>
-                    {item.dropdown && activeDropdown === item.label && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        className="
-                          absolute top-full left-0 mt-1
-                          w-72 p-2
-                          bg-zinc-900
-                          border border-zinc-700
-                          rounded-xl
-                          shadow-2xl shadow-black/50
-                        "
-                        style={{
-                          // FONS COMPLETAMENT SÒLID
-                          backgroundColor: 'rgb(24, 24, 27)',
-                        }}
-                      >
-                        {item.dropdown.map((subItem) => (
-                          <Link
-                            key={subItem.href}
-                            href={subItem.href}
-                            className="
-                              flex items-start gap-3 p-3
-                              rounded-lg
-                              hover:bg-zinc-800
-                              transition-colors
-                              group/item
-                            "
-                            onClick={() => setActiveDropdown(null)}
-                          >
-                            {/* Icon */}
-                            <span className="text-2xl mt-0.5">{subItem.icon}</span>
-
-                            {/* Content */}
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className="text-white font-medium group-hover/item:text-amber-400 transition-colors">
-                                  {isEs ? subItem.labelEs : subItem.label}
-                                </span>
-                                {subItem.badge && (
-                                  <span className="text-[10px] font-bold bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded">
-                                    {subItem.badge}
-                                  </span>
-                                )}
-                              </div>
-                              {subItem.description && (
-                                <p className="text-xs text-zinc-400 mt-0.5">
-                                  {isEs ? subItem.descriptionEs : subItem.description}
-                                </p>
-                              )}
-                            </div>
-
-                            {/* Arrow */}
-                            <svg
-                              className="w-4 h-4 text-zinc-600 group-hover/item:text-amber-400 group-hover/item:translate-x-1 transition-all mt-1"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
+                    {/* ══════════════════════════════════════════════════════ */}
+                    {/* DROPDOWN - FONS SÒLID (no transparent!) */}
+                    {/* ══════════════════════════════════════════════════════ */}
+                    <AnimatePresence>
+                      {item.dropdown && activeDropdown === item.labelKey && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.15 }}
+                          className="
+                            absolute top-full left-0 mt-1
+                            w-72 p-2
+                            bg-zinc-900
+                            border border-zinc-700
+                            rounded-xl
+                            shadow-2xl shadow-black/50
+                          "
+                          style={{
+                            backgroundColor: 'rgb(24, 24, 27)',
+                          }}
+                        >
+                          {item.dropdown.map((subItem) => (
+                            <Link
+                              key={subItem.href}
+                              href={subItem.href}
+                              className="
+                                flex items-start gap-3 p-3
+                                rounded-lg
+                                hover:bg-zinc-800
+                                transition-colors
+                                group/item
+                              "
+                              onClick={() => setActiveDropdown(null)}
                             >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          </Link>
-                        ))}
+                              <span className="text-2xl mt-0.5">{subItem.icon}</span>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-white font-medium group-hover/item:text-amber-400 transition-colors">
+                                    {dropdownT(subItem.labelKey)}
+                                  </span>
+                                  {subItem.badge && (
+                                    <span className="text-[10px] font-bold bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded">
+                                      {subItem.badge}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-zinc-400 mt-0.5">
+                                  {dropdownT(subItem.descKey)}
+                                </p>
+                              </div>
+                              <svg
+                                className="w-4 h-4 text-zinc-600 group-hover/item:text-amber-400 group-hover/item:translate-x-1 transition-all mt-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </Link>
+                          ))}
 
-                        {/* CTA al final del dropdown */}
-                        <div className="mt-2 pt-2 border-t border-zinc-800">
-                          <Link
-                            href="/configurador"
-                            onClick={() => setActiveDropdown(null)}
-                            className="
-                              flex items-center justify-center gap-2
-                              w-full py-2.5
-                              bg-gradient-to-r from-amber-500 to-amber-400
-                              text-zinc-900 font-semibold text-sm
-                              rounded-lg
-                              hover:from-amber-400 hover:to-amber-300
-                              transition-all
-                            "
-                          >
-                            <span>✨</span>
-                            {isEs ? 'Presupuesto en 2 minutos' : 'Pressupost en 2 minuts'}
-                          </Link>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
+                          {/* CTA al final del dropdown */}
+                          <div className="mt-2 pt-2 border-t border-zinc-800">
+                            <Link
+                              href="/configurador"
+                              onClick={() => setActiveDropdown(null)}
+                              className="
+                                flex items-center justify-center gap-2
+                                w-full py-2.5
+                                bg-gradient-to-r from-amber-500 to-amber-400
+                                text-zinc-900 font-semibold text-sm
+                                rounded-lg
+                                hover:from-amber-400 hover:to-amber-300
+                                transition-all
+                              "
+                            >
+                              <span>✨</span>
+                              {tHeader('ctaQuick')}
+                            </Link>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
             </nav>
 
             {/* ════════════════════════════════════════════════════════════ */}
@@ -397,7 +386,7 @@ export default function HeaderChampion() {
               >
                 <span className="relative z-10 flex items-center gap-1.5">
                   <span>✨</span>
-                  <span className="hidden sm:inline">{isEs ? 'Presupuesto' : 'Pressupost'}</span>
+                  <span className="hidden sm:inline">{tHeader('ctaShort')}</span>
                   <span className="font-black">GRATIS</span>
                 </span>
 
@@ -445,51 +434,55 @@ export default function HeaderChampion() {
             >
               <div className="flex flex-col h-full pt-24 pb-6 px-6">
                 <div className="flex-1 space-y-1 overflow-y-auto">
-                  {navItems.map((item) => (
-                    <div key={item.href}>
-                      <Link
-                        href={item.dropdown ? '#' : item.href}
-                        onClick={() => !item.dropdown && setIsMobileMenuOpen(false)}
-                        className="flex items-center justify-between px-4 py-3 text-lg text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg"
-                      >
-                        <span className="flex items-center gap-2">
-                          {isEs ? item.labelEs : item.label}
-                          {item.badge && (
-                            <span className="bg-amber-500 text-[10px] text-black font-bold px-1.5 py-0.5 rounded">
-                              {item.badge}
-                            </span>
-                          )}
-                        </span>
-                        {item.dropdown && (
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        )}
-                      </Link>
+                  {navItemsConfig.map((item) => {
+                    const dropdownT = item.dropdownType === 'services' ? tServices : tExperiences;
 
-                      {/* Subitems mòbil */}
-                      {item.dropdown && (
-                        <div className="ml-4 mt-1 space-y-1">
-                          {item.dropdown.map((sub) => (
-                            <Link
-                              key={sub.href}
-                              href={sub.href}
-                              onClick={() => setIsMobileMenuOpen(false)}
-                              className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-400 hover:text-white rounded-lg"
-                            >
-                              <span>{sub.icon}</span>
-                              <span>{isEs ? sub.labelEs : sub.label}</span>
-                              {sub.badge && (
-                                <span className="text-[9px] bg-amber-500/20 text-amber-400 px-1 rounded">
-                                  {sub.badge}
-                                </span>
-                              )}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                    return (
+                      <div key={item.href}>
+                        <Link
+                          href={item.dropdown ? '#' : item.href}
+                          onClick={() => !item.dropdown && setIsMobileMenuOpen(false)}
+                          className="flex items-center justify-between px-4 py-3 text-lg text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg"
+                        >
+                          <span className="flex items-center gap-2">
+                            {tNav(item.labelKey)}
+                            {item.badge && (
+                              <span className="bg-amber-500 text-[10px] text-black font-bold px-1.5 py-0.5 rounded">
+                                {item.badge}
+                              </span>
+                            )}
+                          </span>
+                          {item.dropdown && (
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          )}
+                        </Link>
+
+                        {/* Subitems mòbil */}
+                        {item.dropdown && (
+                          <div className="ml-4 mt-1 space-y-1">
+                            {item.dropdown.map((sub) => (
+                              <Link
+                                key={sub.href}
+                                href={sub.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-400 hover:text-white rounded-lg"
+                              >
+                                <span>{sub.icon}</span>
+                                <span>{dropdownT(sub.labelKey)}</span>
+                                {sub.badge && (
+                                  <span className="text-[9px] bg-amber-500/20 text-amber-400 px-1 rounded">
+                                    {sub.badge}
+                                  </span>
+                                )}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Language selector mòbil */}
@@ -504,7 +497,7 @@ export default function HeaderChampion() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-amber-500 to-amber-400 text-zinc-900 font-bold rounded-lg"
                   >
-                    ✨ {isEs ? 'Presupuesto' : 'Pressupost'} GRATIS
+                    ✨ {tHeader('ctaShort')} GRATIS
                   </Link>
                   <a
                     href="https://wa.me/34699121023"
@@ -516,7 +509,7 @@ export default function HeaderChampion() {
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                     </svg>
-                    {isEs ? 'WhatsApp Directo' : 'WhatsApp Directe'}
+                    {tHeader('whatsappDirect')}
                   </a>
                 </div>
               </div>

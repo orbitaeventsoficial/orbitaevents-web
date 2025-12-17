@@ -1,6 +1,19 @@
 // app/sitemap.ts
 import type { MetadataRoute } from 'next';
 
+// Categorías de portfolio para incluir en sitemap
+const PORTFOLIO_SLUGS = [
+  'bodas',
+  'discomovil',
+  'eventos-empresa',
+  'fiestas-infantiles',
+  'fiestas-privadas',
+  'produccion-tecnica',
+  'alquiler-equipo',
+  'fiestas-tematicas-halloween',
+  'fiestas-tematicas-mon-magic',
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
   const now = new Date();
@@ -65,5 +78,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   });
 
-  return [...staticPages, ...localizedPages];
+  // Páginas dinámicas de portfolio
+  const portfolioPages: MetadataRoute.Sitemap = PORTFOLIO_SLUGS.map(slug => ({
+    url: `${base}/portfolio/${slug}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
+
+  // Versiones localizadas de portfolio
+  const localizedPortfolioPages: MetadataRoute.Sitemap = [];
+  PORTFOLIO_SLUGS.forEach(slug => {
+    locales.forEach(locale => {
+      localizedPortfolioPages.push({
+        url: `${base}/${locale}/portfolio/${slug}`,
+        lastModified: now,
+        changeFrequency: 'monthly' as const,
+        priority: 0.55,
+      });
+    });
+  });
+
+  return [...staticPages, ...localizedPages, ...portfolioPages, ...localizedPortfolioPages];
 }

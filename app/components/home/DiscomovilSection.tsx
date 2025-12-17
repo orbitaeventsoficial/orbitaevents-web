@@ -1,13 +1,6 @@
 // app/components/home/DiscomovilSection.tsx
 // ═══════════════════════════════════════════════════════════════════════════
-// ÒRBITA EVENTS - DISCOMÒBIL SECTION v1.0
-// ═══════════════════════════════════════════════════════════════════════════
-//
-// Secció secundària - Només Discomòbil (sense tematització)
-// - Festes privades
-// - Casaments
-// - Corporatius
-//
+// ÒRBITA EVENTS - DISCOMÒBIL SECTION v1.1 - i18n complet
 // ═══════════════════════════════════════════════════════════════════════════
 
 'use client';
@@ -18,21 +11,15 @@ import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// DADES DISCOMÒBIL
+// DADES DISCOMÒBIL (només configuració, textos via traduccions)
 // ═══════════════════════════════════════════════════════════════════════════
 
-const discomovilPacks = [
+const discomovilPacksConfig = [
   {
     id: 'festes',
     emoji: '🎉',
-    name: 'Festes',
-    nameEs: 'Fiestas',
-    subtitle: 'Aniversaris, comunions...',
-    subtitleEs: 'Cumpleaños, comuniones...',
     priceFrom: 200,
     priceTo: 450,
-    features: ['2-4 hores', 'DJ Professional', 'So 4000W'],
-    featuresEs: ['2-4 horas', 'DJ Profesional', 'Sonido 4000W'],
     href: '/servicios/fiestas',
     image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
     color: 'from-pink-500 to-rose-600',
@@ -42,14 +29,8 @@ const discomovilPacks = [
   {
     id: 'bodes',
     emoji: '💍',
-    name: 'Casaments',
-    nameEs: 'Bodas',
-    subtitle: 'Ball o experiència completa',
-    subtitleEs: 'Baile o experiencia completa',
     priceFrom: 450,
     priceTo: 800,
-    features: ['Ball 3h o Completa', 'Coordinació'],
-    featuresEs: ['Baile 3h o Completa', 'Coordinación'],
     href: '/servicios/bodas',
     image: '/img/portfolio/bodas/bodas-01.webp',
     color: 'from-rose-500 to-pink-600',
@@ -59,30 +40,14 @@ const discomovilPacks = [
   {
     id: 'corporatiu',
     emoji: '💼',
-    name: 'Corporatius',
-    nameEs: 'Corporativos',
-    subtitle: 'Events d\'empresa amb factura',
-    subtitleEs: 'Eventos de empresa con factura',
     priceFrom: 450,
     priceTo: null,
-    features: ['4h', 'Factura inclosa'],
-    featuresEs: ['4h', 'Factura incluida'],
     href: '/servicios/empresas',
     image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
     color: 'from-blue-500 to-indigo-600',
     popular: false,
     badge: null,
   },
-];
-
-// Equip inclòs
-const equipInclou = [
-  { ca: 'DJ professional', es: 'DJ profesional' },
-  { ca: 'Controladora Pioneer DDJ-REV7', es: 'Controladora Pioneer DDJ-REV7' },
-  { ca: 'So 4000W (2x EV ETX)', es: 'Sonido 4000W (2x EV ETX)' },
-  { ca: '4 Caps mòbils LED (a partir 3h)', es: '4 Cabezas móviles LED (a partir 3h)' },
-  { ca: 'Multiefectes LED', es: 'Multiefectos LED' },
-  { ca: 'Màquina de fum', es: 'Máquina de humo' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -115,8 +80,8 @@ const Icons = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function DiscomovilSection() {
-  const t = useTranslations();
-  const isEs = t('common.language') === 'es';
+  const t = useTranslations('homeSections.discomovil');
+  const equipment = t.raw('equipment') as string[];
 
   return (
     <section className="relative py-20 md:py-28 overflow-hidden">
@@ -132,105 +97,106 @@ export default function DiscomovilSection() {
           className="text-center mb-12"
         >
           <span className="inline-block px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-full text-zinc-400 text-sm font-medium mb-6">
-            🎵 {isEs ? 'Para quien no quiere tematización' : 'Per qui no vol tematització'}
+            {t('badge')}
           </span>
           <h2 className="text-3xl md:text-5xl font-black text-white mb-4">
-            {isEs ? 'Solo' : 'Només'}{' '}
-            <span className="text-zinc-400">Discomòbil</span>
+            {t('title1')}{' '}
+            <span className="text-zinc-400">{t('title2')}</span>
           </h2>
           <p className="text-lg text-zinc-500 max-w-2xl mx-auto">
-            {isEs
-              ? 'DJ profesional + equipo de sonido + iluminación. Sin tematización.'
-              : 'DJ professional + equip de so + il·luminació. Sense tematització.'
-            }
+            {t('subtitle')}
           </p>
         </motion.div>
 
         {/* Cards Grid */}
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12">
-          {discomovilPacks.map((pack, i) => (
-            <motion.div
-              key={pack.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="group"
-            >
-              <Link href={pack.href}>
-                <div className="relative bg-zinc-900/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-zinc-800 hover:border-zinc-600 transition-all duration-300 h-full">
-                  {/* Badge */}
-                  {pack.badge && (
-                    <div className="absolute top-3 right-3 z-10">
-                      <span className="inline-block px-2 py-1 bg-amber-500 rounded-full text-xs font-bold text-black">
-                        {pack.badge} {isEs ? 'Popular' : 'Popular'}
-                      </span>
-                    </div>
-                  )}
+          {discomovilPacksConfig.map((pack, i) => {
+            const packData = t.raw(`packs.${pack.id}`) as { name: string; subtitle: string; features: string[] };
 
-                  {/* Image */}
-                  <div className="relative h-40 overflow-hidden">
-                    <Image
-                      src={pack.image}
-                      alt={pack.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/50 to-transparent" />
-
-                    {/* Emoji */}
-                    <div className="absolute bottom-3 right-3 w-12 h-12 bg-white/10 backdrop-blur rounded-xl flex items-center justify-center text-2xl">
-                      {pack.emoji}
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-5">
-                    {/* Price */}
-                    <div className="mb-2">
-                      <span className="text-zinc-500 text-xs">
-                        {isEs ? 'Desde' : 'Des de'}
-                      </span>
-                      <span className="text-2xl font-bold text-white ml-2">
-                        {pack.priceFrom}€
-                        {pack.priceTo && (
-                          <span className="text-zinc-500 text-sm font-normal">
-                            {' '}- {pack.priceTo}€
-                          </span>
-                        )}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-xl font-bold text-white mb-1">
-                      {isEs ? pack.nameEs : pack.name}
-                    </h3>
-                    <p className="text-zinc-500 text-sm mb-3">
-                      {isEs ? pack.subtitleEs : pack.subtitle}
-                    </p>
-
-                    {/* Features */}
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {(isEs ? pack.featuresEs : pack.features).map((f, j) => (
-                        <span key={j} className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-800 rounded text-xs text-zinc-400">
-                          <span className="text-emerald-500"><Icons.Check /></span>
-                          {f}
+            return (
+              <motion.div
+                key={pack.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="group"
+              >
+                <Link href={pack.href}>
+                  <div className="relative bg-zinc-900/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-zinc-800 hover:border-zinc-600 transition-all duration-300 h-full">
+                    {/* Badge */}
+                    {pack.badge && (
+                      <div className="absolute top-3 right-3 z-10">
+                        <span className="inline-block px-2 py-1 bg-amber-500 rounded-full text-xs font-bold text-black">
+                          {pack.badge} {t('popular')}
                         </span>
-                      ))}
+                      </div>
+                    )}
+
+                    {/* Image */}
+                    <div className="relative h-40 overflow-hidden">
+                      <Image
+                        src={pack.image}
+                        alt={packData.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/50 to-transparent" />
+
+                      {/* Emoji */}
+                      <div className="absolute bottom-3 right-3 w-12 h-12 bg-white/10 backdrop-blur rounded-xl flex items-center justify-center text-2xl">
+                        {pack.emoji}
+                      </div>
                     </div>
 
-                    {/* CTA */}
-                    <div className="flex items-center justify-between text-zinc-400 group-hover:text-white transition-colors">
-                      <span className="text-sm font-medium">
-                        {isEs ? 'Ver más' : 'Veure més'}
-                      </span>
-                      <Icons.Arrow />
+                    {/* Content */}
+                    <div className="p-5">
+                      {/* Price */}
+                      <div className="mb-2">
+                        <span className="text-zinc-500 text-xs">
+                          {t('from')}
+                        </span>
+                        <span className="text-2xl font-bold text-white ml-2">
+                          {pack.priceFrom}€
+                          {pack.priceTo && (
+                            <span className="text-zinc-500 text-sm font-normal">
+                              {' '}- {pack.priceTo}€
+                            </span>
+                          )}
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="text-xl font-bold text-white mb-1">
+                        {packData.name}
+                      </h3>
+                      <p className="text-zinc-500 text-sm mb-3">
+                        {packData.subtitle}
+                      </p>
+
+                      {/* Features */}
+                      <div className="flex flex-wrap gap-1.5 mb-4">
+                        {packData.features.map((f, j) => (
+                          <span key={j} className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-800 rounded text-xs text-zinc-400">
+                            <span className="text-emerald-500"><Icons.Check /></span>
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* CTA */}
+                      <div className="flex items-center justify-between text-zinc-400 group-hover:text-white transition-colors">
+                        <span className="text-sm font-medium">
+                          {t('viewMore')}
+                        </span>
+                        <Icons.Arrow />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Equip inclòs */}
@@ -246,14 +212,14 @@ export default function DiscomovilSection() {
                 <Icons.Speaker />
               </div>
               <h3 className="text-lg font-bold text-white">
-                {isEs ? 'Equipo incluido en todos los packs' : 'Equip inclòs en tots els packs'}
+                {t('equipTitle')}
               </h3>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {equipInclou.map((item, i) => (
+              {equipment.map((item, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm text-zinc-400">
                   <span className="text-emerald-500 flex-shrink-0"><Icons.Check /></span>
-                  <span>{isEs ? item.es : item.ca}</span>
+                  <span>{item}</span>
                 </div>
               ))}
             </div>
@@ -268,7 +234,7 @@ export default function DiscomovilSection() {
           className="text-center mt-8"
         >
           <p className="text-zinc-500 text-sm">
-            {isEs ? 'Hora extra: +80€' : 'Hora extra: +80€'}
+            {t('extraHour')}
           </p>
         </motion.div>
       </div>

@@ -84,8 +84,6 @@ const Icons = {
 
 export default function ExperienciesSection() {
   const t = useTranslations('sections.experiencies');
-  const tCommon = useTranslations('common');
-  const isEs = tCommon('language') === 'es';
 
   return (
     <section className="relative py-20 md:py-32 overflow-hidden">
