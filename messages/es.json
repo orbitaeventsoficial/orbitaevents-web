@@ -2039,7 +2039,8 @@
         "title": "¿No sabes qué servicio necesitas?",
         "subtitle": "Cuéntanos tu evento y te recomendamos la mejor opción.",
         "responseTime": "Respondemos en menos de 2 horas.",
-        "button": "Pedir Asesoramiento Gratis"
+        "button": "Pedir Asesoramiento Gratis",
+        "whatsappMessage": "Hola! Quiero información sobre vuestros servicios."
       }
     },
     "search": {
