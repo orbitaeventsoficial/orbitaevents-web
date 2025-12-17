@@ -1,10 +1,6 @@
 // app/components/home/HeroStats.tsx
 // ═══════════════════════════════════════════════════════════════════════════
-// HERO STATS - Números animats amb delay
-// ═══════════════════════════════════════════════════════════════════════════
-// - Números animats dinàmics des de BBDD (48+ events mínim)
-// - Delay més llarg (apareixen més tard)
-// - Fons més llegible
+// HERO STATS - i18n complet v1.1
 // ═══════════════════════════════════════════════════════════════════════════
 
 'use client';
@@ -21,20 +17,17 @@ import { usePublicStats } from '@/hooks/usePublicData';
 interface Stat {
   value: string;
   suffix?: string;
-  label: string;
-  labelEs: string;
+  labelKey: string;
 }
 
-// Stats estàtics (no depenen de BBDD)
 const STATIC_STATS: Stat[] = [
-  { value: '92', suffix: '%', label: 'Repeteixen o recomanen', labelEs: 'Repiten o recomiendan' },
-  { value: '100', suffix: '%', label: 'Amb equip backup', labelEs: 'Con equipo backup' },
-  { value: '2', suffix: 'h', label: 'Temps de resposta', labelEs: 'Tiempo de respuesta' },
+  { value: '92', suffix: '%', labelKey: 'repeatOrRecommend' },
+  { value: '100', suffix: '%', labelKey: 'withBackup' },
+  { value: '2', suffix: 'h', labelKey: 'responseTime' },
 ];
 
-// Helper per crear stats amb valor dinàmic d'events
 const getStats = (totalEvents: number): Stat[] => [
-  { value: String(totalEvents), suffix: '+', label: 'Events realitzats', labelEs: 'Eventos realizados' },
+  { value: String(totalEvents), suffix: '+', labelKey: 'eventsRealized' },
   ...STATIC_STATS,
 ];
 
@@ -58,7 +51,6 @@ function useAnimatedNumber(end: number, duration: number = 2000, start: boolean 
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
 
-      // Easing function (ease-out)
       const easeOut = 1 - Math.pow(1 - progress, 3);
       setCurrent(Math.floor(easeOut * end));
 
@@ -83,12 +75,12 @@ function AnimatedStat({
   stat,
   index,
   isVisible,
-  isEs
+  t
 }: {
   stat: Stat;
   index: number;
   isVisible: boolean;
-  isEs: boolean;
+  t: (key: string) => string;
 }) {
   const numericValue = parseInt(stat.value, 10);
   const animatedValue = useAnimatedNumber(numericValue, 2000, isVisible);
@@ -99,12 +91,11 @@ function AnimatedStat({
       animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
       transition={{
         duration: 0.6,
-        delay: 0.8 + (index * 0.15), // DELAY MÉS LLARG (0.8s base)
+        delay: 0.8 + (index * 0.15),
         ease: 'easeOut'
       }}
       className="text-center"
     >
-      {/* Valor - MÉS GRAN i VISIBLE */}
       <div className="flex items-baseline justify-center">
         <span className="text-4xl md:text-5xl lg:text-6xl font-bold text-white drop-shadow-lg">
           {animatedValue}
@@ -113,10 +104,8 @@ function AnimatedStat({
           {stat.suffix}
         </span>
       </div>
-
-      {/* Label - MÉS VISIBLE */}
       <p className="text-sm md:text-base text-zinc-300 mt-1 font-medium">
-        {isEs ? stat.labelEs : stat.label}
+        {t(stat.labelKey)}
       </p>
     </motion.div>
   );
@@ -127,10 +116,7 @@ function AnimatedStat({
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function HeroStats() {
-  const t = useTranslations('common');
-  const isEs = t('language') === 'es';
-
-  // Stats dinàmics des de BBDD
+  const t = useTranslations('homeSections.heroStats');
   const { stats: publicStats } = usePublicStats();
   const stats = getStats(publicStats.totalEvents);
 
@@ -138,7 +124,6 @@ export default function HeroStats() {
   const isInView = useInView(ref, {
     once: true,
     amount: 0.5,
-    // IMPORTANT: margin negatiu per activar més tard
     margin: '-100px'
   });
 
@@ -152,18 +137,16 @@ export default function HeroStats() {
         border-t border-white/10
       "
     >
-      {/* Backdrop blur per millor llegibilitat */}
       <div className="absolute inset-0 backdrop-blur-sm" />
 
-      {/* Stats */}
       <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 w-full max-w-4xl mx-auto">
         {stats.map((stat, index) => (
           <AnimatedStat
-            key={stat.label}
+            key={stat.labelKey}
             stat={stat}
             index={index}
             isVisible={isInView}
-            isEs={isEs}
+            t={t}
           />
         ))}
       </div>

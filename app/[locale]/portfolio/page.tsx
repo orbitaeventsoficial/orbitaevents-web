@@ -1,5 +1,5 @@
 // app/portfolio/page.tsx
-import Link from "next/link";
+import { Link } from '@/lib/navigation';
 import Image from "next/image";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import { PORTFOLIO_CATEGORIES } from "@/config/portfolio-images";
