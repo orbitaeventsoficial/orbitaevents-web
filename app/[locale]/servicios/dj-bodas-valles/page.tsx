@@ -69,7 +69,7 @@ export default async function DJBodasVallesPage({ params }: PageProps) {
       <Breadcrumbs items={[
         { name: tCommon('nav.home'), url: '/' },
         { name: tCommon('nav.services'), url: '/servicios' },
-        { name: 'Bodas', url: '/servicios/bodas' },
+        { name: tCommon('nav.weddings'), url: '/servicios/bodas' },
         { name: 'DJ Bodas Vallès', url: '/servicios/dj-bodas-valles' },
       ]} />
       <ServiceJsonLD

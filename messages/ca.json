@@ -1020,7 +1020,19 @@
     "privacy": "Privadesa",
     "privacyPolicy": "Política de privadesa",
     "responseTime": "Respondrem en menys de 2 hores",
-    "subtitle": "Resposta en 2h. De veritat. Sense compromís."
+    "subtitle": "Resposta en 2h. De veritat. Sense compromís.",
+    "page": {
+      "badge": "Contacta amb nosaltres",
+      "titlePart1": "Explica'ns el teu ",
+      "titleHighlight": "event",
+      "trust": {
+        "response": "Resposta en menys de 2h",
+        "rating": "4.9/5 valoració",
+        "noCommitment": "Sense compromís"
+      },
+      "whatsappCta": "O escriu-nos per WhatsApp",
+      "whatsappMessage": "Hola! Vull informació per al meu event."
+    }
   },
   "contactForm": {
     "title": "Sol·licita pressupost",

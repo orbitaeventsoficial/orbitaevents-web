@@ -37,8 +37,6 @@ const Icons = {
 export default function ContactClient() {
   const searchParams = useSearchParams();
   const t = useTranslations('contact');
-  const tCommon = useTranslations('common');
-  const isEs = tCommon('language') === 'es';
 
   const preselectedService = searchParams.get('servicio') || undefined;
   const preselectedDate = searchParams.get('fecha') || undefined;
@@ -46,15 +44,15 @@ export default function ContactClient() {
   const trustItems = [
     {
       icon: <Icons.Clock />,
-      text: isEs ? 'Respuesta en menos de 2h' : 'Resposta en menys de 2h',
+      text: t('page.trust.response'),
     },
     {
       icon: <Icons.Star />,
-      text: isEs ? '4.9/5 valoración' : '4.9/5 valoració',
+      text: t('page.trust.rating'),
     },
     {
       icon: <Icons.Shield />,
-      text: isEs ? 'Sin compromiso' : 'Sense compromís',
+      text: t('page.trust.noCommitment'),
     },
   ];
 
@@ -75,13 +73,13 @@ export default function ContactClient() {
             >
               <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-6">
                 <span>💬</span>
-                {isEs ? 'Contacta con nosotros' : 'Contacta amb nosaltres'}
+                {t('page.badge')}
               </span>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4">
-                {isEs ? 'Cuéntanos tu ' : 'Explica\'ns el teu '}
+                {t('page.titlePart1')}
                 <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-                  {isEs ? 'evento' : 'event'}
+                  {t('page.titleHighlight')}
                 </span>
               </h1>
 
@@ -101,15 +99,13 @@ export default function ContactClient() {
 
               {/* WhatsApp quick contact */}
               <a
-                href={`https://wa.me/34699121023?text=${encodeURIComponent(
-                  isEs ? 'Hola! Quiero información para mi evento.' : 'Hola! Vull informació per al meu event.'
-                )}`}
+                href={`https://wa.me/34699121023?text=${encodeURIComponent(t('page.whatsappMessage'))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 px-6 py-3 bg-[#25D366] hover:bg-[#20BD5A] rounded-full transition-all hover:shadow-[0_8px_30px_rgba(37,211,102,0.3)] text-white font-semibold text-sm"
               >
                 <Icons.WhatsApp />
-                <span>{isEs ? 'O escríbenos por WhatsApp' : 'O escriu-nos per WhatsApp'}</span>
+                <span>{t('page.whatsappCta')}</span>
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
