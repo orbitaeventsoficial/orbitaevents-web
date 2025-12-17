@@ -1641,6 +1641,25 @@
     "ratingText": "en {count} reseñas",
     "verifiedReviews": "opiniones verificadas",
     "comingSoon": "Próximamente",
+    "page": {
+      "badge": "Opiniones reales",
+      "titlePart1": "Lo que dicen",
+      "titleHighlight": "nuestros clientes",
+      "stats": {
+        "clients": "clientes satisfechos",
+        "averageRating": "valoración media",
+        "verified": "Opiniones verificadas"
+      },
+      "verified": "Verificado",
+      "whatsappCta": "Escríbenos por WhatsApp",
+      "eventTypes": {
+        "bodas": "Boda",
+        "fiestas": "Fiesta",
+        "empresas": "Empresa",
+        "tematica": "Temática",
+        "infantil": "Infantil"
+      }
+    },
 
     "review1Role": "Boda",
     "review1Event": "Boda en Mas Marroch, Girona",
@@ -4999,9 +5018,17 @@
     "title": "Todo lo que",
     "titleHighlight": "Necesitas Saber",
     "subtitle": "Respuestas a las preguntas más habituales. Si no encuentras lo que buscas, ¡contáctanos por WhatsApp!",
+    "meta": {
+      "title": "Preguntas Frecuentes | FAQ | Òrbita Events",
+      "description": "Respuestas a todas tus preguntas sobre DJ, sonido, iluminación, tematización y eventos. Precios, garantías, logística y más.",
+      "ogTitle": "FAQ - Preguntas Frecuentes",
+      "ogDescription": "Todo lo que necesitas saber sobre nuestros servicios de eventos"
+    },
     "cta": {
       "question": "¿No encuentras la respuesta que buscas?",
-      "button": "Pregunta por WhatsApp"
+      "button": "Pregunta por WhatsApp",
+      "whatsappMessage": "Hola! Tengo una pregunta sobre vuestros servicios",
+      "responseTime": "Respuesta en menos de 2 horas"
     },
     "categories": {
       "general": {
