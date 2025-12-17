@@ -38,8 +38,8 @@ interface ServiciosClientProps {
     ctaSubtitle: string;
     ctaResponseTime: string;
     ctaButton: string;
+    ctaWhatsappMessage: string;
   };
-  isEs: boolean;
 }
 
 const Icons = {
@@ -66,7 +66,7 @@ const Icons = {
   ),
 };
 
-export default function ServiciosClient({ servicios, texts, isEs }: ServiciosClientProps) {
+export default function ServiciosClient({ servicios, texts }: ServiciosClientProps) {
   return (
     <>
       {/* HERO */}
@@ -214,9 +214,7 @@ export default function ServiciosClient({ servicios, texts, isEs }: ServiciosCli
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <a
-                href={`https://wa.me/34699121023?text=${encodeURIComponent(
-                  isEs ? 'Hola! Quiero información sobre vuestros servicios.' : 'Hola! Vull informació sobre els vostres serveis.'
-                )}`}
+                href={`https://wa.me/34699121023?text=${encodeURIComponent(texts.ctaWhatsappMessage)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-3 px-8 py-5 bg-[#25D366] hover:bg-[#20BD5A] rounded-2xl transition-all hover:shadow-[0_8px_30px_rgba(37,211,102,0.4)] text-white font-bold text-lg"

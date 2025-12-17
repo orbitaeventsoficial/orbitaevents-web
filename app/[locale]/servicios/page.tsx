@@ -45,7 +45,6 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
   const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'pages.servicios' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
-  const isEs = locale === 'es';
 
   // Get all service data
   const serviciosConfig = [
@@ -98,8 +97,8 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
           ctaSubtitle: t('cta.subtitle'),
           ctaResponseTime: t('cta.responseTime'),
           ctaButton: t('cta.button'),
+          ctaWhatsappMessage: t('cta.whatsappMessage'),
         }}
-        isEs={isEs}
       />
     </div>
   );

@@ -1647,7 +1647,8 @@
         "title": "No Saps Quin Servei Necessites?",
         "subtitle": "Explica'ns el teu esdeveniment i et recomanem la millor opció.",
         "responseTime": "Responem en menys de 2 hores.",
-        "button": "Demanar Assessorament Gratis"
+        "button": "Demanar Assessorament Gratis",
+        "whatsappMessage": "Hola! Vull informació sobre els vostres serveis."
       }
     },
     "search": {
