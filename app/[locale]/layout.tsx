@@ -84,7 +84,7 @@ const JSON_LD_ORGANIZATION = {
     height: 80,
   },
   image: [
-    'https://orbitaevents.com/img/og-image.jpg',
+    'https://orbitaevents.com/og-home.jpg',
     'https://orbitaevents.com/img/portfolio/bodas/bodas-01.webp',
     'https://orbitaevents.com/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
   ],
@@ -239,7 +239,7 @@ export const metadata: Metadata = {
     description: 'Creem experiències úniques: casaments Harry Potter, festes Halloween, events corporatius. DJ professional + tematització completa. Des de 200€. ★★★★★ 4.9/5',
     images: [
       {
-        url: '/img/og-image.jpg',
+        url: '/og-home.jpg',
         width: 1200,
         height: 630,
         alt: 'Òrbita Events - DJ Casaments Barcelona',
@@ -251,7 +251,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Experiències Immersives per Events | Òrbita Events',
     description: 'Casaments Harry Potter, festes Halloween, events corporatius. DJ + tematització completa. Des de 200€. ★★★★★ 4.9/5',
-    images: ['/img/og-image.jpg'],
+    images: ['/og-home.jpg'],
     creator: '@orbitaevents',
   },
   robots: {

@@ -121,6 +121,7 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={active ? 'page' : undefined}
               className={`
                 flex flex-col items-center justify-center
                 min-w-[60px] h-full

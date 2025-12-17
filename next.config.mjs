@@ -11,11 +11,23 @@ const nextConfig = {
   images: {
     formats: ['image/webp', 'image/avif'],
     unoptimized: false,
-    // Permite TODAS las imágenes locales y externas (necesario para /public/img/portfolio)
+    // Dominios permitidos para imágenes externas
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'orbitaevents.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.orbitaevents.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'maps.googleapis.com',
       },
     ],
   },
