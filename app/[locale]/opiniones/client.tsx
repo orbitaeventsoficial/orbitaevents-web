@@ -336,23 +336,25 @@ export default function OpinionesClient() {
 
               {/* Header */}
               <div className="flex items-start gap-4 mb-5">
-                {/* Avatar */}
-                <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 flex-shrink-0">
-                  {r.photo ? (
-                    <NextImage
-                      src={r.photo}
-                      alt={r.author}
-                      fill
-                      sizes="56px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xl font-bold text-white">
-                      {r.author.charAt(0)}
-                    </div>
-                  )}
+                {/* Avatar with verification badge outside */}
+                <div className="relative flex-shrink-0">
+                  <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500">
+                    {r.photo ? (
+                      <NextImage
+                        src={r.photo}
+                        alt={r.author}
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xl font-bold text-white">
+                        {r.author.charAt(0)}
+                      </div>
+                    )}
+                  </div>
                   {r.verified && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-zinc-900">
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-zinc-900 shadow-lg">
                       <Icons.Verified />
                     </div>
                   )}
@@ -385,12 +387,45 @@ export default function OpinionesClient() {
           ))}
         </div>
 
+        {/* Leave Review CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-16 mb-12"
+        >
+          <div className="relative max-w-2xl mx-auto p-8 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-3xl text-center">
+            {/* Decorative elements */}
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full">
+              <span className="text-black text-sm font-bold">✍️</span>
+            </div>
+
+            <h3 className="text-2xl font-bold text-white mb-2 mt-2">
+              {t('page.leaveReviewCta')}
+            </h3>
+            <p className="text-white/60 mb-6">
+              {t('page.leaveReviewSubtitle')}
+            </p>
+
+            <Link
+              href="/opiniones/nueva"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 text-white font-semibold rounded-2xl transition-all hover:scale-105"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              <span>{t('page.leaveReviewCta')}</span>
+              <span>→</span>
+            </Link>
+          </div>
+        </motion.div>
+
         {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="text-center mt-16"
+          className="text-center"
         >
           <p className="text-white/60 mb-6">
             {t('cta.title')}

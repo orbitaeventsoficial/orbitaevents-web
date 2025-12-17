@@ -183,8 +183,15 @@
     "elegant": {
       "badge": "Especialistes en festes temàtiques",
       "badgeEmoji": "🎃",
-      "title1": "La festa que",
-      "title2": "ningú oblidarà.",
+      "title1": "LA FESTA QUE",
+      "title2": "NINGÚ OBLIDARÀ.",
+      "rotatingTexts": [
+        "NINGÚ OBLIDARÀ.",
+        "ET MEREIXIES.",
+        "SEMPRE SOMIES.",
+        "FARÀ HISTÒRIA.",
+        "SERÀ LLEGENDÀRIA."
+      ],
       "subtitle": "DJ + tematització + efectes especials.",
       "subtitleLocation": "Barcelona i Girona.",
       "ctaWhatsapp": "Escriu-nos ara",
@@ -402,6 +409,13 @@
     "from": "Des de",
     "popular": "El més demanat",
     "bodas": {
+      "meta": {
+        "title": "DJ Casaments Barcelona | Preus des de {price}€ | Òrbita Events",
+        "description": "DJ per a casaments a Barcelona des de {price}€. So professional 4000W, il·luminació i efectes especials. Professionals del sector. Demana pressupost sense compromís.",
+        "ogTitle": "DJ Casaments Barcelona | Des de {price}€",
+        "ogDescription": "DJ professional per al teu casament a Barcelona. So EV 4000W + il·luminació + efectes. Cerimònia, còctel i festa. Pressupost gratis."
+      },
+      "breadcrumb": "DJ Casaments Barcelona",
       "faq": [
         {
           "q": "Podem personalitzar completament la música i l'ambient?",
@@ -430,6 +444,13 @@
       ]
     },
     "fiestas": {
+      "meta": {
+        "title": "Festes Privades Barcelona | DJ + Llums des de {price}€ | Òrbita Events",
+        "description": "Festes privades a Barcelona amb DJ professional des de {price}€. Aniversaris, comiats, aniversaris. So, llums i animació inclosos. Pressupost gratis!",
+        "ogTitle": "Festes Privades Barcelona | Des de {price}€",
+        "ogDescription": "DJ professional per a festes privades. Aniversaris, comiats, aniversaris. So 4000W + llums LED + efectes. Pressupost gratis en 2h."
+      },
+      "breadcrumb": "Festes Privades",
       "faq": [
         {
           "q": "Què inclou una experiència completa de festa privada?",
@@ -458,6 +479,13 @@
       ]
     },
     "empresas": {
+      "meta": {
+        "title": "Events Corporatius Barcelona | DJ Professional des de {price}€ | Òrbita Events",
+        "description": "DJ events corporatius Barcelona. Sopars d'empresa, teambuildings, llançaments. So i il·luminació professional. Pressupost personalitzat en 24h.",
+        "ogTitle": "Events Corporatius Barcelona | Des de {price}€",
+        "ogDescription": "DJ professional per a events d'empresa. Sopars, team building, presentacions. Pressupost gratis."
+      },
+      "breadcrumb": "Events Empreses",
       "faq": [
         {
           "q": "Com reforça la vostra producció la imatge de la nostra marca?",
@@ -516,6 +544,13 @@
       "tagline": "Equips professionals al teu abast"
     },
     "discomovil": {
+      "meta": {
+        "title": "Discomòbil Barcelona | DJ + So + Llums des de {price}€ | Òrbita",
+        "description": "Discomòbil a Barcelona des de {price}€. DJ + so 4000W + llums LED. Casaments, festes, events. Ens desplacem a tota Catalunya. Pressupost en 2 hores.",
+        "ogTitle": "Discomòbil Barcelona | Des de {price}€",
+        "ogDescription": "DJ professional + So 4000W + Llums LED + Efectes. Barcelona i Girona. Pressupost gratis."
+      },
+      "breadcrumb": "Discomòbil",
       "faq": [
         {
           "q": "Què inclou una experiència completa de discomòbil?",
@@ -1052,7 +1087,8 @@
       "budget": "Pressupost aproximat",
       "message": "Explica'ns el teu event",
       "fullName": "Nom i cognoms",
-      "guestCount": "Nombre de convidats"
+      "guestCount": "Nombre de convidats",
+      "howFound": "Com ens has conegut?"
     },
     "placeholders": {
       "name": "El teu nom complet",
@@ -1064,7 +1100,8 @@
       "selectEventType": "Selecciona el tipus d'event",
       "selectGuests": "Selecciona el nombre de convidats",
       "selectBudget": "Selecciona el pressupost aproximat",
-      "fullName": "El teu nom complet"
+      "fullName": "El teu nom complet",
+      "selectHowFound": "Selecciona una opció"
     },
     "eventTypes": {
       "boda": "Casament",
@@ -1088,6 +1125,15 @@
       "2000-3000": "2.000€ - 3.000€",
       "3000-5000": "3.000€ - 5.000€",
       "5000+": "Més de 5.000€"
+    },
+    "howFoundOptions": {
+      "google": "Google",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "recomendacion": "Recomanació d'amic/familiar",
+      "evento": "Em van fer un event",
+      "otro": "Altre"
     },
     "submit": "Enviar sol·licitud",
     "sending": "Enviant...",
@@ -1329,6 +1375,8 @@
       },
       "verified": "Verificat",
       "whatsappCta": "Escriu-nos per WhatsApp",
+      "leaveReviewCta": "Deixa la teva opinió",
+      "leaveReviewSubtitle": "Ja vas treballar amb nosaltres? Explica'ns la teva experiència!",
       "eventTypes": {
         "bodas": "Casament",
         "fiestas": "Festa",

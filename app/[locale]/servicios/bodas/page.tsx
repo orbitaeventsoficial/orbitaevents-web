@@ -15,28 +15,33 @@ const BodasClient = nextDynamic(() => import('./client'));
 const MIN_PRICE = getMinPriceByService('bodas');
 const PACKS = getPacksByService('bodas');
 
-export const metadata: Metadata = {
-  title: `DJ Bodas Barcelona | Precios desde ${MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ para bodas en Barcelona desde ${MIN_PRICE}€. Sonido profesional 4000W, iluminación y efectos especiales. Profesionales del sector. Pide presupuesto sin compromiso.`,
-  keywords:
-    'dj bodas barcelona, dj boda girona, dj bodas maresme, dj bodas costa brava, sonido bodas, musica boda, efectos especiales bodas',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
-  alternates: { canonical: '/servicios/bodas' },
-  openGraph: {
-    title: `DJ Bodas Barcelona | Desde ${MIN_PRICE}€`,
-    description: `DJ profesional para tu boda en Barcelona. Sonido EV 4000W + iluminación + efectos. Ceremonia, cóctel y fiesta. Presupuesto gratis.`,
-    url: '/servicios/bodas',
-    images: [{ url: '/img/portfolio/bodas/bodas-01.webp', alt: 'DJ Bodas Barcelona - Òrbita Events' }],
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `DJ Bodas Barcelona | Desde ${MIN_PRICE}€ | Òrbita`,
-    description: `DJ profesional + Sonido 4000W + Iluminación + Efectos. Packs desde ${MIN_PRICE}€.`,
-    images: ['/img/portfolio/bodas/bodas-01.webp'],
-  },
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'services.bodas' });
+
+  return {
+    title: t('meta.title', { price: MIN_PRICE }),
+    description: t('meta.description', { price: MIN_PRICE }),
+    keywords:
+      'dj bodas barcelona, dj boda girona, dj bodas maresme, dj bodas costa brava, sonido bodas, musica boda, efectos especiales bodas',
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    alternates: { canonical: '/servicios/bodas' },
+    openGraph: {
+      title: t('meta.ogTitle', { price: MIN_PRICE }),
+      description: t('meta.ogDescription', { price: MIN_PRICE }),
+      url: '/servicios/bodas',
+      images: [{ url: '/img/portfolio/bodas/bodas-01.webp', alt: t('breadcrumb') }],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('meta.ogTitle', { price: MIN_PRICE }),
+      description: t('meta.description', { price: MIN_PRICE }),
+      images: ['/img/portfolio/bodas/bodas-01.webp'],
+    },
+    robots: { index: true, follow: true },
+  };
+}
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -67,7 +72,7 @@ export default async function BodasPage({ params }: PageProps) {
         items={[
           { name: tCommon('nav.home'), url: '/' },
           { name: tCommon('nav.services'), url: '/servicios' },
-          { name: 'DJ Bodas Barcelona', url: '/servicios/bodas' },
+          { name: t('breadcrumb'), url: '/servicios/bodas' },
         ]}
       />
 

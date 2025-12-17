@@ -137,6 +137,24 @@
     overflow-x: hidden;
   }
 
+  /* ══════════════════════════════════════════════════════════════════════════
+     HERO PORTAL - Amagar contingut durant animació inicial
+     Evita flash del contingut abans del logo
+     ══════════════════════════════════════════════════════════════════════════ */
+
+  body.hero-loading #main-content,
+  body.hero-loading header,
+  body.hero-loading footer,
+  body.hero-loading .floating-ctas {
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+
+  body.hero-loading {
+    overflow: hidden !important;
+    background: #000 !important;
+  }
+
   /* Subtle noise texture overlay - només desktop */
   @media (min-width: 768px) {
     body::before {

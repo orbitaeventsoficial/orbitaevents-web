@@ -183,8 +183,15 @@
     "elegant": {
       "badge": "Especialistas en fiestas temáticas",
       "badgeEmoji": "🎃",
-      "title1": "La fiesta que",
-      "title2": "nadie olvidará.",
+      "title1": "LA FIESTA QUE",
+      "title2": "NADIE OLVIDARÁ.",
+      "rotatingTexts": [
+        "NADIE OLVIDARÁ.",
+        "TE MERECÍAS.",
+        "SIEMPRE SUEÑAS.",
+        "HARÁ HISTORIA.",
+        "SERÁ LEGENDARIA."
+      ],
       "subtitle": "DJ + tematización + efectos especiales.",
       "subtitleLocation": "Barcelona y Girona.",
       "ctaWhatsapp": "Escríbenos ahora",
@@ -424,6 +431,13 @@
     "from": "Desde",
     "popular": "El más pedido",
     "bodas": {
+      "meta": {
+        "title": "DJ Bodas Barcelona | Precios desde {price}€ | Òrbita Events",
+        "description": "DJ para bodas en Barcelona desde {price}€. Sonido profesional 4000W, iluminación y efectos especiales. Profesionales del sector. Pide presupuesto sin compromiso.",
+        "ogTitle": "DJ Bodas Barcelona | Desde {price}€",
+        "ogDescription": "DJ profesional para tu boda en Barcelona. Sonido EV 4000W + iluminación + efectos. Ceremonia, cóctel y fiesta. Presupuesto gratis."
+      },
+      "breadcrumb": "DJ Bodas Barcelona",
       "faq": [
         {
           "q": "¿Podemos personalizar completamente la música y el ambiente?",
@@ -452,6 +466,13 @@
       ]
     },
     "fiestas": {
+      "meta": {
+        "title": "Fiestas Privadas Barcelona | DJ + Luces desde {price}€ | Òrbita Events",
+        "description": "Fiestas privadas en Barcelona con DJ profesional desde {price}€. Cumpleaños, despedidas, aniversarios. Sonido, luces y animación incluidos. ¡Presupuesto gratis!",
+        "ogTitle": "Fiestas Privadas Barcelona | Desde {price}€",
+        "ogDescription": "DJ profesional para fiestas privadas. Cumpleaños, despedidas, aniversarios. Sonido 4000W + luces LED + efectos. Presupuesto gratis en 2h."
+      },
+      "breadcrumb": "Fiestas Privadas",
       "faq": [
         {
           "q": "¿Qué incluye una experiencia completa de fiesta privada?",
@@ -480,6 +501,13 @@
       ]
     },
     "empresas": {
+      "meta": {
+        "title": "Eventos Corporativos Barcelona | DJ Profesional desde {price}€ | Òrbita Events",
+        "description": "DJ eventos corporativos Barcelona. Cenas de empresa, teambuildings, lanzamientos. Sonido e iluminación profesional. Presupuesto personalizado en 24h.",
+        "ogTitle": "Eventos Corporativos Barcelona | Desde {price}€",
+        "ogDescription": "DJ profesional para eventos de empresa. Cenas, team building, presentaciones. Presupuesto gratis."
+      },
+      "breadcrumb": "Eventos Empresas",
       "faq": [
         {
           "q": "¿Cómo refuerza vuestra producción la imagen de nuestra marca?",
@@ -538,6 +566,13 @@
       "tagline": "Equipos profesionales a tu alcance"
     },
     "discomovil": {
+      "meta": {
+        "title": "Discomóvil Barcelona | DJ + Sonido + Luces desde {price}€ | Òrbita",
+        "description": "Discomóvil en Barcelona desde {price}€. DJ + sonido 4000W + luces LED. Bodas, fiestas, eventos. Nos desplazamos a toda Catalunya. Presupuesto en 2 horas.",
+        "ogTitle": "Discomóvil Barcelona | Desde {price}€",
+        "ogDescription": "DJ profesional + Sonido 4000W + Luces LED + Efectos. Barcelona y Girona. Presupuesto gratis."
+      },
+      "breadcrumb": "Discomóvil",
       "faq": [
         {
           "q": "¿Qué incluye una experiencia completa de discomóvil?",
@@ -1379,7 +1414,8 @@
       "budget": "Presupuesto aproximado",
       "message": "Cuéntanos tu evento",
       "fullName": "Nombre y apellidos",
-      "guestCount": "Número de invitados"
+      "guestCount": "Número de invitados",
+      "howFound": "¿Cómo nos conociste?"
     },
     "placeholders": {
       "name": "Tu nombre completo",
@@ -1391,7 +1427,8 @@
       "selectEventType": "Selecciona el tipo de evento",
       "selectGuests": "Selecciona el número de invitados",
       "selectBudget": "Selecciona el presupuesto aproximado",
-      "fullName": "Tu nombre completo"
+      "fullName": "Tu nombre completo",
+      "selectHowFound": "Selecciona una opción"
     },
     "eventTypes": {
       "boda": "Boda",
@@ -1415,6 +1452,15 @@
       "2000-3000": "2.000€ - 3.000€",
       "3000-5000": "3.000€ - 5.000€",
       "5000+": "Más de 5.000€"
+    },
+    "howFoundOptions": {
+      "google": "Google",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "recomendacion": "Recomendación de amigo/familiar",
+      "evento": "Me hicieron un evento",
+      "otro": "Otro"
     },
     "submit": "Enviar solicitud",
     "sending": "Enviando...",
@@ -1656,6 +1702,8 @@
       },
       "verified": "Verificado",
       "whatsappCta": "Escríbenos por WhatsApp",
+      "leaveReviewCta": "Deja tu opinión",
+      "leaveReviewSubtitle": "¿Ya trabajaste con nosotros? ¡Cuéntanos tu experiencia!",
       "eventTypes": {
         "bodas": "Boda",
         "fiestas": "Fiesta",

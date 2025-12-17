@@ -12,40 +12,45 @@ const EMP_PACKS = getPacksByService('empresas');
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: `Eventos Corporativos Barcelona | DJ Profesional desde ${EMP_MIN_PRICE}€ | Òrbita Events`,
-  description: `DJ eventos corporativos Barcelona. Cenas de empresa, teambuildings, lanzamientos. Sonido e iluminación profesional. Presupuesto personalizado en 24h.`,
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
-  alternates: { canonical: '/servicios/empresas' },
-  openGraph: {
-    title: `Eventos Corporativos Barcelona | Desde ${EMP_MIN_PRICE}€`,
-    description: 'DJ profesional para eventos de empresa. Cenas, team building, presentaciones. Presupuesto gratis.',
-    url: '/servicios/empresas',
-    images: [
-      {
-        url: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
-        alt: 'Eventos Corporativos Barcelona - Òrbita Events',
-      },
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'services.empresas' });
+
+  return {
+    title: t('meta.title', { price: EMP_MIN_PRICE }),
+    description: t('meta.description', { price: EMP_MIN_PRICE }),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    alternates: { canonical: '/servicios/empresas' },
+    openGraph: {
+      title: t('meta.ogTitle', { price: EMP_MIN_PRICE }),
+      description: t('meta.ogDescription', { price: EMP_MIN_PRICE }),
+      url: '/servicios/empresas',
+      images: [
+        {
+          url: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
+          alt: t('breadcrumb'),
+        },
+      ],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('meta.ogTitle', { price: EMP_MIN_PRICE }),
+      description: t('meta.description', { price: EMP_MIN_PRICE }),
+      images: ['/img/portfolio/eventos-empresa/eventos-empresa-01.webp'],
+    },
+    robots: { index: true, follow: true },
+    keywords: [
+      'eventos corporativos barcelona',
+      'dj eventos empresa barcelona',
+      'team building barcelona',
+      'cenas de empresa barcelona',
+      'eventos empresariales',
+      'presentaciones corporativas',
+      'dj empresa girona',
     ],
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `Eventos Corporativos Barcelona | Desde ${EMP_MIN_PRICE}€`,
-    description: 'DJ profesional para eventos de empresa. Sonido e iluminación profesional.',
-    images: ['/img/portfolio/eventos-empresa/eventos-empresa-01.webp'],
-  },
-  robots: { index: true, follow: true },
-  keywords: [
-    'eventos corporativos barcelona',
-    'dj eventos empresa barcelona',
-    'team building barcelona',
-    'cenas de empresa barcelona',
-    'eventos empresariales',
-    'presentaciones corporativas',
-    'dj empresa girona',
-  ],
-};
+  };
+}
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -76,7 +81,7 @@ export default async function EmpresasPage({ params }: PageProps) {
         items={[
           { name: tCommon('nav.home'), url: '/' },
           { name: tCommon('nav.services'), url: '/servicios' },
-          { name: 'Eventos Empresas', url: '/servicios/empresas' },
+          { name: t('breadcrumb'), url: '/servicios/empresas' },
         ]}
       />
 
