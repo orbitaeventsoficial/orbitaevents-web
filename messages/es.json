@@ -1302,6 +1302,10 @@
     "discomovilDesc": "DJ profesional donde quieras"
   },
   "contact": {
+    "meta": {
+      "title": "Contacto | Òrbita Events",
+      "description": "Pide presupuesto de discomovil, tematizaciones, eventos. Respondemos en menos de 2 horas."
+    },
     "errors": {
       "title": "No hemos podido enviar tu mensaje",
       "sendError": "Ha ocurrido un error al enviar el mensaje",

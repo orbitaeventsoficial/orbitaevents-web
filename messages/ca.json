@@ -975,6 +975,10 @@
     "tagline": "L'esdeveniment que la teva gent no oblidarà"
   },
   "contact": {
+    "meta": {
+      "title": "Contacte | Òrbita Events",
+      "description": "Demana pressupost de discomòbil, tematitzacions, events. Responem en menys de 2 hores."
+    },
     "errors": {
       "title": "No hem pogut enviar el teu missatge",
       "sendError": "S'ha produït un error en enviar el missatge",
