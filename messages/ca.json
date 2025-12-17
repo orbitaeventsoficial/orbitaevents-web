@@ -198,7 +198,7 @@
       "location": "BCN + Girona"
     },
     "simpleBadge": "Venim del sector d'esdeveniments",
-    "simpleTitle1": "DJ y Discomóvil per a",
+    "simpleTitle1": "DJ i Discomòbil per a",
     "simpleTitle2": "Casaments i Events Barcelona",
     "simpleSubtitle": "No som un DJ qualsevol. Venim del món dels esdeveniments – hem viscut milers de casaments des de dins.",
     "simpleSubtitleHighlight": "Sabem exactament què fa que el teu event funcioni.",
@@ -231,7 +231,7 @@
       },
       {
         "line1": "El teu casament mereix",
-        "line2": "SER INOLVIDABLE"
+        "line2": "SER INOBLIDABLE"
       }
     ],
     "headline1": "A les 4am la teva sogra",
@@ -3322,7 +3322,7 @@
     },
     "title": {
       "line1": "Transforma el teu event en una",
-      "highlight": "experiència inolvidable"
+      "highlight": "experiència inoblidable"
     },
     "subtitle": "Tematització completa amb decoració, il·luminació, efectes especials i ambient personalitzat per crear moments màgics.",
     "stats": {
@@ -4859,7 +4859,7 @@
     "badge": "Històries Reals",
     "title": "Casos",
     "titleHighlight": "d'Èxit",
-    "subtitle": "Descobreix com hem transformat events en experiències inolvidables.",
+    "subtitle": "Descobreix com hem transformat events en experiències inoblidables.",
     "filters": {
       "tots": "Tots",
       "casament": "Casaments",
@@ -5300,6 +5300,50 @@
         "quote": "Demana Pressupost Gratis",
         "whatsapp": "WhatsApp Directe"
       }
+    }
+  },
+  "calendar": {
+    "badge": "de dates ja reservades",
+    "title": "Disponibilitat de Dissabtes",
+    "subtitle": "Només {count} dissabtes disponibles en els propers 3 mesos",
+    "status": {
+      "exhausted": "ESGOTAT",
+      "lastOne": "Només {count} lliure!",
+      "few": "{count} lliures",
+      "available": "{count} lliures"
+    },
+    "labels": {
+      "scarce": "Últims!",
+      "limited": "Pocs",
+      "available": "Disponible"
+    },
+    "legend": {
+      "free": "Lliure",
+      "booked": "Reservat"
+    },
+    "reasons": {
+      "booked": "Reservat",
+      "past": "Passat"
+    },
+    "viewCalendar": "Veure calendari →",
+    "hideCalendar": "Amagar calendari ↑",
+    "viewFullCalendar": "Veure calendari complet ↓",
+    "modal": {
+      "title": "Data disponible!",
+      "highSeason": "⭐ Temporada alta - Alta demanda",
+      "reserveBefore": "Reserva abans que s'esgoti",
+      "reserveDate": "Reserva aquesta data",
+      "consultWhatsapp": "Consulta per WhatsApp",
+      "keepLooking": "Seguir mirant",
+      "whatsappMsg": "Hola! M'interessa el {date} per al meu event"
+    },
+    "cta": {
+      "title": "Reserva la teva data ara",
+      "subtitle": "Sense compromís • Resposta en menys de 2h"
+    },
+    "compact": {
+      "loading": "Carregant...",
+      "saturdaysFree": "📅 Dissabtes lliures:"
     }
   }
 }

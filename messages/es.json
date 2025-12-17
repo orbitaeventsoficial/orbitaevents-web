@@ -5340,5 +5340,49 @@
         "whatsapp": "WhatsApp Directo"
       }
     }
+  },
+  "calendar": {
+    "badge": "de fechas ya reservadas",
+    "title": "Disponibilidad de Sábados",
+    "subtitle": "Solo {count} sábados disponibles en los próximos 3 meses",
+    "status": {
+      "exhausted": "¡AGOTADO!",
+      "lastOne": "¡Solo {count} libre!",
+      "few": "{count} libres",
+      "available": "{count} libres"
+    },
+    "labels": {
+      "scarce": "¡Últimos!",
+      "limited": "Pocos",
+      "available": "Disponible"
+    },
+    "legend": {
+      "free": "Libre",
+      "booked": "Reservado"
+    },
+    "reasons": {
+      "booked": "Reservado",
+      "past": "Pasado"
+    },
+    "viewCalendar": "Ver calendario →",
+    "hideCalendar": "Ocultar calendario ↑",
+    "viewFullCalendar": "Ver calendario completo ↓",
+    "modal": {
+      "title": "¡Fecha disponible!",
+      "highSeason": "⭐ Temporada alta - Alta demanda",
+      "reserveBefore": "Reserva antes de que se agote",
+      "reserveDate": "Reservar esta fecha",
+      "consultWhatsapp": "Consultar por WhatsApp",
+      "keepLooking": "Seguir mirando",
+      "whatsappMsg": "Hola! Me interesa el {date} para mi evento"
+    },
+    "cta": {
+      "title": "Reserva tu fecha ahora",
+      "subtitle": "Sin compromiso • Respuesta en menos de 2h"
+    },
+    "compact": {
+      "loading": "Cargando...",
+      "saturdaysFree": "📅 Sábados libres:"
+    }
   }
 }
