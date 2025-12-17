@@ -5360,5 +5360,81 @@
       "loading": "Carregant...",
       "saturdaysFree": "📅 Dissabtes lliures:"
     }
+  },
+  "heroNew": {
+    "badge": "🎃 Especialistes en festes temàtiques",
+    "title": {
+      "line1": "La festa que",
+      "line2": "ningú oblidarà."
+    },
+    "subtitle": "DJ + tematització + efectes especials. Barcelona i Girona.",
+    "cta": {
+      "primary": "Demana Pressupost",
+      "secondary": "WhatsApp Directe"
+    },
+    "social": {
+      "rating": "4.9",
+      "events": "48+ events sense incidents",
+      "recommended": "Recomanats a"
+    }
+  },
+  "servicesGrid": {
+    "subtitle": "Els nostres serveis",
+    "title": "Què necessites?",
+    "description": "Tria el tipus d'event i t'ajudem a crear-lo exactament com l'imagines.",
+    "viewMore": "Veure més",
+    "notFound": "No trobes el que busques?",
+    "contact": "Consulta'ns sense compromís",
+    "items": {
+      "tematiques": {
+        "title": "Experiències Temàtiques",
+        "description": "Harry Potter, Halloween i més",
+        "price": "Des de 600€",
+        "badge": "⭐ El més demanat",
+        "features": ["Decoració", "Efectes FX", "Ambientació", "Animació"]
+      },
+      "casaments": {
+        "title": "Casaments",
+        "description": "El dia més especial mereix ser perfecte",
+        "price": "Des de 650€",
+        "features": ["DJ Professional", "So + Llums", "Coordinació", "Backup 100%"]
+      },
+      "festes": {
+        "title": "Festes Privades",
+        "description": "La festa que recordaran sempre",
+        "price": "Des de 400€",
+        "features": ["Discomòbil", "Llums LED", "Efectes", "Tot inclòs"]
+      },
+      "empreses": {
+        "title": "Empreses",
+        "description": "Events corporatius d'impacte",
+        "price": "Des de 500€",
+        "features": ["Audiovisual", "Micro sense fil", "Branding", "Factura"]
+      }
+    }
+  },
+  "ctaFinal": {
+    "urgency": {
+      "saturdaysSingular": "dissabte lliure a",
+      "saturdaysPlural": "dissabtes lliures a",
+      "scarce": "⚠️ Gairebé ple!",
+      "limited": "🔥 S'acaba!",
+      "available": "✓ Disponible"
+    },
+    "title": {
+      "line1": "Preparat per crear",
+      "line2": "l'event perfecte?"
+    },
+    "subtitle": "En 2 minuts tens el teu pressupost personalitzat. Sense compromís.",
+    "cta": {
+      "primary": "Demana Pressupost Gratis",
+      "secondary": "WhatsApp Directe"
+    },
+    "trust": {
+      "events": "events",
+      "rating": "valoració",
+      "response": "resposta"
+    },
+    "guarantee": "🛡️ Garantia de satisfacció 100%. Si no estàs content, et tornem els diners."
   }
 }
