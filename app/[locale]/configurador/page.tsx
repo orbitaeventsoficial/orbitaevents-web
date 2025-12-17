@@ -1,6 +1,7 @@
 // app/configurador/page.tsx
 import type { Metadata } from 'next';
-import Breadcrumbs from '@\/components/seo/Breadcrumbs';
+import { getTranslations } from 'next-intl/server';
+import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import nextDynamic from 'next/dynamic';
 
 export const dynamic = 'force-dynamic';
@@ -42,13 +43,20 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function ConfiguradorPage() {
+type PageProps = {
+  params: { locale: string };
+};
+
+export default async function ConfiguradorPage({ params }: PageProps) {
+  const { locale } = params;
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+
   return (
     <>
       <Breadcrumbs
         items={[
-          { name: 'Inicio', url: '/' },
-          { name: 'Configurador', url: '/configurador' },
+          { name: tCommon('nav.home'), url: '/' },
+          { name: tCommon('nav.configurator'), url: '/configurador' },
         ]}
       />
       <ConfiguradorClient />
