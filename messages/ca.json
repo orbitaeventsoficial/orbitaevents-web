@@ -180,6 +180,21 @@
     "success": "Èxit"
   },
   "hero": {
+    "elegant": {
+      "badge": "Especialistes en festes temàtiques",
+      "badgeEmoji": "🎃",
+      "title1": "La festa que",
+      "title2": "ningú oblidarà.",
+      "subtitle": "DJ + tematització + efectes especials.",
+      "subtitleLocation": "Barcelona i Girona.",
+      "ctaWhatsapp": "Escriu-nos ara",
+      "ctaWhatsappHint": "→ 2h resposta",
+      "ctaPrices": "Veure preus",
+      "rating": "4.9",
+      "socialProof": "48+ events sense incidents",
+      "recommendedAt": "Recomanats a",
+      "whatsappMessage": "Hola! Vull info per al meu event"
+    },
     "badge": "🔥 48+ events sense cap convidat assegut",
     "themingSpecialists": "Especialistes en Tematització",
     "location": "Barcelona + Girona",

@@ -75,7 +75,10 @@
       "Bash(for url in \"/\" \"/about\" \"/portfolio\" \"/opiniones\" \"/contacto\" \"/servicios/bodas\" \"/servicios/fiestas\" \"/servicios/empresas\" \"/tematica-halloween\" \"/tematica-mon-magic\" \"/faq\" \"/packs\")",
       "Bash(for url in \"/servicios/dj-bodas-girona\" \"/servicios/dj-bodas-maresme\" \"/servicios/dj-bodas-costa-brava\" \"/servicios/dj-bodas-valles\" \"/servicios/animacion-infantil\")",
       "Bash(for url in \"/legal/privacidad\" \"/legal/cookies\" \"/legal/terminos\")",
-      "Bash(openssl rand:*)"
+      "Bash(openssl rand:*)",
+      "Bash(for url in \"/\" \"/ca\" \"/es\" \"/contacto\" \"/ca/contacto\")",
+      "Bash(for url in \"/es/servicios/bodas\" \"/ca/servicios/bodas\" \"/es/portfolio\" \"/ca/portfolio\" \"/es/contacto\" \"/ca/contacto\" \"/es/about\" \"/ca/about\" \"/es/faq\" \"/ca/faq\")",
+      "Bash(git pull:*)"
     ]
   }
 }
