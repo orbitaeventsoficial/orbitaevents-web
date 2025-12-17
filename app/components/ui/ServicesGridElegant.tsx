@@ -2,55 +2,84 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/lib/navigation';
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SERVICES GRID ELEGANT
-// Cards netes, sense emojis cridaners, hover subtil
+// SERVICES GRID ELEGANT v2.0
 // ═══════════════════════════════════════════════════════════════════════════
-
-const services = [
-  {
-    id: 'casaments',
-    title: 'Casaments',
-    description: 'El dia més especial mereix ser perfecte',
-    price: 'Des de 650€',
-    image: '/img/portfolio/bodas/bodas-01.webp',
-    href: '/servicios/bodas',
-    features: ['DJ Professional', 'So + Llums', 'Coordinació', 'Backup 100%'],
-  },
-  {
-    id: 'festes',
-    title: 'Festes Privades',
-    description: 'La festa que recordaran sempre',
-    price: 'Des de 400€',
-    image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
-    href: '/servicios/fiestas',
-    features: ['Discomòbil', 'Llums LED', 'Efectes', 'Tot inclòs'],
-    popular: true,
-  },
-  {
-    id: 'empreses',
-    title: 'Empreses',
-    description: 'Events corporatius d\'impacte',
-    price: 'Des de 500€',
-    image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
-    href: '/servicios/empresas',
-    features: ['Audiovisual', 'Micro sense fil', 'Branding', 'Factura'],
-  },
-  {
-    id: 'tematiques',
-    title: 'Experiències Temàtiques',
-    description: 'Harry Potter, Halloween i més',
-    price: 'Des de 600€',
-    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
-    href: '/experiencies',
-    features: ['Decoració', 'Efectes FX', 'Ambientació', 'Animació'],
-    exclusive: true,
-  },
-];
+// CANVIS:
+// 1. Textos traduïbles via useTranslations
+// 2. Experiències Temàtiques PRIMER (és el diferenciador)
+// 3. Preus dinàmics des de config
+// 4. Millor jerarquia visual
+// ═══════════════════════════════════════════════════════════════════════════
 
 export default function ServicesGridElegant() {
+  const t = useTranslations('services');
+  const tCommon = useTranslations('common');
+  const isEs = tCommon('language') === 'es';
+
+  const services = [
+    {
+      id: 'tematiques',
+      title: isEs ? 'Experiencias Temáticas' : 'Experiències Temàtiques',
+      description: isEs ? 'Harry Potter, Halloween y más' : 'Harry Potter, Halloween i més',
+      price: isEs ? 'Desde 600€' : 'Des de 600€',
+      image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
+      href: '/experiencies',
+      features: isEs 
+        ? ['Decoración', 'Efectos FX', 'Ambientación', 'Animación']
+        : ['Decoració', 'Efectes FX', 'Ambientació', 'Animació'],
+      highlight: true, // DESTACAT - és el diferenciador
+      badge: isEs ? '⭐ Lo más pedido' : '⭐ El més demanat',
+    },
+    {
+      id: 'casaments',
+      title: isEs ? 'Bodas' : 'Casaments',
+      description: isEs ? 'El día más especial merece ser perfecto' : 'El dia més especial mereix ser perfecte',
+      price: isEs ? 'Desde 650€' : 'Des de 650€',
+      image: '/img/portfolio/bodas/bodas-01.webp',
+      href: '/servicios/bodas',
+      features: isEs
+        ? ['DJ Profesional', 'Sonido + Luces', 'Coordinación', 'Backup 100%']
+        : ['DJ Professional', 'So + Llums', 'Coordinació', 'Backup 100%'],
+    },
+    {
+      id: 'festes',
+      title: isEs ? 'Fiestas Privadas' : 'Festes Privades',
+      description: isEs ? 'La fiesta que recordarán siempre' : 'La festa que recordaran sempre',
+      price: isEs ? 'Desde 400€' : 'Des de 400€',
+      image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
+      href: '/servicios/fiestas',
+      features: isEs
+        ? ['Discomóvil', 'Luces LED', 'Efectos', 'Todo incluido']
+        : ['Discomòbil', 'Llums LED', 'Efectes', 'Tot inclòs'],
+    },
+    {
+      id: 'empreses',
+      title: isEs ? 'Empresas' : 'Empreses',
+      description: isEs ? 'Eventos corporativos de impacto' : 'Events corporatius d\'impacte',
+      price: isEs ? 'Desde 500€' : 'Des de 500€',
+      image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
+      href: '/servicios/empresas',
+      features: isEs
+        ? ['Audiovisual', 'Micro inalámbrico', 'Branding', 'Factura']
+        : ['Audiovisual', 'Micro sense fil', 'Branding', 'Factura'],
+    },
+  ];
+
+  const texts = {
+    subtitle: isEs ? 'Nuestros servicios' : 'Els nostres serveis',
+    title: isEs ? '¿Qué necesitas?' : 'Què necessites?',
+    description: isEs 
+      ? 'Elige el tipo de evento y te ayudamos a crearlo exactamente como lo imaginas.'
+      : 'Tria el tipus d\'event i t\'ajudem a crear-lo exactament com l\'imagines.',
+    viewMore: isEs ? 'Ver más' : 'Veure més',
+    notFound: isEs ? '¿No encuentras lo que buscas?' : 'No trobes el que busques?',
+    contact: isEs ? 'Consúltanos sin compromiso' : 'Consulta\'ns sense compromís',
+  };
+
   return (
     <section className="py-24 bg-[#0A0A0A]">
       <div className="container mx-auto px-6">
@@ -63,7 +92,7 @@ export default function ServicesGridElegant() {
             viewport={{ once: true }}
             className="text-[#C9A962] text-sm font-medium tracking-[0.2em] uppercase mb-4"
           >
-            Els nostres serveis
+            {texts.subtitle}
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -71,7 +100,7 @@ export default function ServicesGridElegant() {
             viewport={{ once: true }}
             className="text-3xl md:text-4xl font-semibold text-white mb-4"
           >
-            Què necessites?
+            {texts.title}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
@@ -80,7 +109,7 @@ export default function ServicesGridElegant() {
             transition={{ delay: 0.1 }}
             className="text-[#888888] text-lg max-w-xl mx-auto"
           >
-            Tria el tipus d'event i t'ajudem a crear-lo exactament com l'imagines.
+            {texts.description}
           </motion.p>
         </div>
         
@@ -95,17 +124,19 @@ export default function ServicesGridElegant() {
               transition={{ delay: index * 0.1 }}
             >
               <Link href={service.href} className="group block h-full">
-                <div className="relative h-full bg-[#111111] rounded-2xl overflow-hidden border border-white/[0.06] hover:border-[#C9A962]/30 transition-all duration-500">
+                <div className={`
+                  relative h-full bg-[#111111] rounded-2xl overflow-hidden 
+                  border transition-all duration-500
+                  ${service.highlight 
+                    ? 'border-[#C9A962]/50 hover:border-[#C9A962] ring-1 ring-[#C9A962]/20' 
+                    : 'border-white/[0.06] hover:border-[#C9A962]/30'
+                  }
+                `}>
                   
                   {/* Badge */}
-                  {service.popular && (
-                    <div className="absolute top-4 left-4 z-10 bg-[#C9A962] text-[#0A0A0A] text-xs font-semibold px-3 py-1 rounded-full">
-                      Més demanat
-                    </div>
-                  )}
-                  {service.exclusive && (
-                    <div className="absolute top-4 left-4 z-10 bg-white/10 backdrop-blur-sm text-white text-xs font-medium px-3 py-1 rounded-full border border-white/20">
-                      Exclusiu
+                  {service.badge && (
+                    <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-amber-500 to-orange-500 text-[#0A0A0A] text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      {service.badge}
                     </div>
                   )}
                   
@@ -151,7 +182,7 @@ export default function ServicesGridElegant() {
                     
                     {/* CTA */}
                     <div className="flex items-center text-sm text-[#C9A962] font-medium group-hover:gap-3 gap-2 transition-all">
-                      <span>Veure més</span>
+                      <span>{texts.viewMore}</span>
                       <svg 
                         className="w-4 h-4 transition-transform group-hover:translate-x-1" 
                         fill="none" 
@@ -175,12 +206,12 @@ export default function ServicesGridElegant() {
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-          <p className="text-[#666666] mb-4">No trobes el que busques?</p>
+          <p className="text-[#666666] mb-4">{texts.notFound}</p>
           <Link
             href="/contacto"
             className="inline-flex items-center gap-2 text-white hover:text-[#C9A962] transition-colors"
           >
-            <span>Consulta'ns sense compromís</span>
+            <span>{texts.contact}</span>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
