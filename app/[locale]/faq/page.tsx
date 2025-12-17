@@ -14,21 +14,15 @@ import FAQClient from './client';
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;
-  const isEs = locale === 'es';
+  const t = await getTranslations({ locale, namespace: 'faqAmpliat' });
 
   return {
-    title: isEs
-      ? 'Preguntas Frecuentes | FAQ | Òrbita Events'
-      : 'Preguntes Freqüents | FAQ | Òrbita Events',
-    description: isEs
-      ? 'Respuestas a todas tus preguntas sobre DJ, sonido, iluminación, tematización y eventos. Precios, garantías, logística y más.'
-      : 'Respostes a totes les teves preguntes sobre DJ, so, il·luminació, tematització i events. Preus, garanties, logística i més.',
+    title: t('meta.title'),
+    description: t('meta.description'),
     alternates: { canonical: '/faq' },
     openGraph: {
-      title: isEs ? 'FAQ - Preguntas Frecuentes' : 'FAQ - Preguntes Freqüents',
-      description: isEs
-        ? 'Todo lo que necesitas saber sobre nuestros servicios de eventos'
-        : 'Tot el que necessites saber sobre els nostres serveis d\'events',
+      title: t('meta.ogTitle'),
+      description: t('meta.ogDescription'),
     },
   };
 }
@@ -65,8 +59,9 @@ export default async function FAQPage({ params }: { params: { locale: string } }
       subtitle={t('subtitle')}
       ctaQuestion={t('cta.question')}
       ctaButton={t('cta.button')}
+      ctaWhatsappMessage={t('cta.whatsappMessage')}
+      ctaResponseTime={t('cta.responseTime')}
       categories={categoryData}
-      locale={locale}
     />
   );
 }

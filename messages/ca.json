@@ -1314,6 +1314,25 @@
     "ratingText": "en {count} ressenyes",
     "verifiedReviews": "opinions verificades",
     "comingSoon": "Pròximament",
+    "page": {
+      "badge": "Opinions reals",
+      "titlePart1": "El que diuen",
+      "titleHighlight": "els nostres clients",
+      "stats": {
+        "clients": "clients satisfets",
+        "averageRating": "valoració mitjana",
+        "verified": "Opinions verificades"
+      },
+      "verified": "Verificat",
+      "whatsappCta": "Escriu-nos per WhatsApp",
+      "eventTypes": {
+        "bodas": "Casament",
+        "fiestas": "Festa",
+        "empresas": "Empresa",
+        "tematica": "Temàtica",
+        "infantil": "Infantil"
+      }
+    },
 
     "review1Role": "Casament",
     "review1Event": "Casament a Mas Marroch, Girona",
@@ -4960,9 +4979,17 @@
     "title": "Tot el que",
     "titleHighlight": "Necessites Saber",
     "subtitle": "Respostes a les preguntes més habituals. Si no trobes el que busques, contacta'ns per WhatsApp!",
+    "meta": {
+      "title": "Preguntes Freqüents | FAQ | Òrbita Events",
+      "description": "Respostes a totes les teves preguntes sobre DJ, so, il·luminació, tematització i events. Preus, garanties, logística i més.",
+      "ogTitle": "FAQ - Preguntes Freqüents",
+      "ogDescription": "Tot el que necessites saber sobre els nostres serveis d'events"
+    },
     "cta": {
       "question": "No trobes la resposta que busques?",
-      "button": "Pregunta per WhatsApp"
+      "button": "Pregunta per WhatsApp",
+      "whatsappMessage": "Hola! Tinc una pregunta sobre els vostres serveis",
+      "responseTime": "Resposta en menys de 2 hores"
     },
     "categories": {
       "general": {

@@ -75,13 +75,13 @@ function RatingStars({ rating }: { rating: number }) {
   );
 }
 
-function SourceBadge({ source, isEs }: { source?: string; isEs: boolean }) {
+function SourceBadge({ source, verifiedLabel }: { source?: string; verifiedLabel: string }) {
   if (!source) return null;
 
   const config = {
     google: { icon: <Icons.Google />, label: 'Google', color: 'bg-white/10' },
     'bodas.net': { icon: <Icons.BodasNet />, label: 'Bodas.net', color: 'bg-rose-500/10' },
-    direct: { icon: <Icons.Verified />, label: isEs ? 'Verificado' : 'Verificat', color: 'bg-emerald-500/10' },
+    direct: { icon: <Icons.Verified />, label: verifiedLabel, color: 'bg-emerald-500/10' },
   };
 
   const { icon, label, color } = config[source as keyof typeof config] || config.direct;
@@ -94,17 +94,17 @@ function SourceBadge({ source, isEs }: { source?: string; isEs: boolean }) {
   );
 }
 
-function EventTypeBadge({ type, isEs }: { type: string; isEs: boolean }) {
-  const config: Record<string, { emoji: string; labelCa: string; labelEs: string; color: string }> = {
-    bodas: { emoji: '💍', labelCa: 'Casament', labelEs: 'Boda', color: 'from-rose-500/20 to-pink-500/20 border-rose-500/30' },
-    fiestas: { emoji: '🎉', labelCa: 'Festa', labelEs: 'Fiesta', color: 'from-amber-500/20 to-orange-500/20 border-amber-500/30' },
-    empresas: { emoji: '💼', labelCa: 'Empresa', labelEs: 'Empresa', color: 'from-blue-500/20 to-indigo-500/20 border-blue-500/30' },
-    tematica: { emoji: '🎃', labelCa: 'Temàtica', labelEs: 'Temática', color: 'from-purple-500/20 to-violet-500/20 border-purple-500/30' },
-    infantil: { emoji: '🎈', labelCa: 'Infantil', labelEs: 'Infantil', color: 'from-cyan-500/20 to-teal-500/20 border-cyan-500/30' },
+function EventTypeBadge({ type, eventTypeLabels }: { type: string; eventTypeLabels: Record<string, string> }) {
+  const config: Record<string, { emoji: string; color: string }> = {
+    bodas: { emoji: '💍', color: 'from-rose-500/20 to-pink-500/20 border-rose-500/30' },
+    fiestas: { emoji: '🎉', color: 'from-amber-500/20 to-orange-500/20 border-amber-500/30' },
+    empresas: { emoji: '💼', color: 'from-blue-500/20 to-indigo-500/20 border-blue-500/30' },
+    tematica: { emoji: '🎃', color: 'from-purple-500/20 to-violet-500/20 border-purple-500/30' },
+    infantil: { emoji: '🎈', color: 'from-cyan-500/20 to-teal-500/20 border-cyan-500/30' },
   };
 
-  const { emoji, labelCa, labelEs, color } = config[type] || config.fiestas;
-  const label = isEs ? labelEs : labelCa;
+  const { emoji, color } = config[type] || config.fiestas;
+  const label = eventTypeLabels[type] || type;
 
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r ${color} border rounded-full text-xs font-medium text-white/80`}>
@@ -198,9 +198,16 @@ type FilterType = "all" | "bodas" | "fiestas" | "empresas";
 
 export default function OpinionesClient() {
   const t = useTranslations('reviews');
-  const tCommon = useTranslations('common');
-  const isEs = tCommon('language') === 'es';
   const [filter, setFilter] = useState<FilterType>("all");
+
+  // Get event type labels from translations
+  const eventTypeLabels: Record<string, string> = {
+    bodas: t('page.eventTypes.bodas'),
+    fiestas: t('page.eventTypes.fiestas'),
+    empresas: t('page.eventTypes.empresas'),
+    tematica: t('page.eventTypes.tematica'),
+    infantil: t('page.eventTypes.infantil'),
+  };
 
   // Crear REVIEWS amb traduccions
   const REVIEWS: Review[] = REVIEWS_DATA.map(r => ({
@@ -246,12 +253,12 @@ export default function OpinionesClient() {
           className="text-center mb-12"
         >
           <span className="inline-block px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-6">
-            {isEs ? '⭐ Opiniones reales' : '⭐ Opinions reals'}
+            ⭐ {t('page.badge')}
           </span>
           <h1 className="text-4xl md:text-6xl font-black mb-4 text-white">
-            {isEs ? 'Lo que dicen' : 'El que diuen'}{' '}
+            {t('page.titlePart1')}{' '}
             <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-              {isEs ? 'nuestros clientes' : 'els nostres clients'}
+              {t('page.titleHighlight')}
             </span>
           </h1>
           <p className="text-lg text-white/60 mb-8 max-w-2xl mx-auto">
@@ -270,7 +277,7 @@ export default function OpinionesClient() {
               </div>
               <div className="text-sm">
                 <span className="text-white font-bold">+150</span>
-                <span className="text-white/60"> {isEs ? 'clientes satisfechos' : 'clients satisfets'}</span>
+                <span className="text-white/60"> {t('page.stats.clients')}</span>
               </div>
             </div>
 
@@ -279,7 +286,7 @@ export default function OpinionesClient() {
             <div className="flex items-center gap-2">
               <RatingStars rating={5} />
               <span className="text-white font-bold">{AVG}</span>
-              <span className="text-white/60 text-sm">{isEs ? 'valoración media' : 'valoració mitjana'}</span>
+              <span className="text-white/60 text-sm">{t('page.stats.averageRating')}</span>
             </div>
 
             <div className="h-8 w-px bg-white/10 hidden md:block" />
@@ -287,7 +294,7 @@ export default function OpinionesClient() {
             <div className="flex items-center gap-3">
               <Icons.Google />
               <Icons.BodasNet />
-              <span className="text-white/60 text-sm">{isEs ? 'Opiniones verificadas' : 'Opinions verificades'}</span>
+              <span className="text-white/60 text-sm">{t('page.stats.verified')}</span>
             </div>
           </div>
 
@@ -357,7 +364,7 @@ export default function OpinionesClient() {
                   <p className="text-sm text-white/60 truncate">{r.role}</p>
                   <div className="flex items-center gap-3 mt-2">
                     <RatingStars rating={r.rating} />
-                    <SourceBadge source={r.source} isEs={isEs} />
+                    <SourceBadge source={r.source} verifiedLabel={t('page.verified')} />
                   </div>
                 </div>
               </div>
@@ -369,7 +376,7 @@ export default function OpinionesClient() {
 
               {/* Footer */}
               <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                <EventTypeBadge type={r.eventType} isEs={isEs} />
+                <EventTypeBadge type={r.eventType} eventTypeLabels={eventTypeLabels} />
                 <time className="text-sm text-white/50" dateTime={r.date}>
                   {r.date}
                 </time>
@@ -396,7 +403,7 @@ export default function OpinionesClient() {
               className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#25D366] hover:bg-[#20BD5A] rounded-2xl transition-all hover:shadow-[0_8px_30px_rgba(37,211,102,0.4)] text-white font-bold"
             >
               <Icons.WhatsApp />
-              <span>{isEs ? 'Escríbenos por WhatsApp' : 'Escriu-nos per WhatsApp'}</span>
+              <span>{t('page.whatsappCta')}</span>
             </a>
             <Link
               href="/contacto"
