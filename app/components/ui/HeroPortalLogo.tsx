@@ -59,15 +59,11 @@ export default function HeroPortalLogo({
   const [isMobile, setIsMobile] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
-  // 🆕 Bloquejar scroll i amagar contingut IMMEDIATAMENT per evitar flicker
-  // Utilitza classe CSS per màxima velocitat (no espera JS parsing)
+  // Bloquejar scroll durant intro (el CSS ja oculta contingut amb :not(.intro-done))
   useEffect(() => {
-    // Afegir classe immediatament
-    document.body.classList.add('hero-loading');
-
+    document.body.style.overflow = 'hidden';
     return () => {
-      // Treure classe quan component es desmunta
-      document.body.classList.remove('hero-loading');
+      document.body.style.overflow = '';
     };
   }, []);
 
@@ -93,8 +89,6 @@ export default function HeroPortalLogo({
         timers.current.push(tid);
 
         const tid2 = window.setTimeout(() => {
-          // Restaurar visibilitat via classe CSS
-          document.body.classList.remove('hero-loading');
           setMounted(false);
           onFinish?.();
         }, MOBILE_TOTAL_MS);
@@ -153,8 +147,6 @@ export default function HeroPortalLogo({
     setVisible(false);
 
     const tid = window.setTimeout(() => {
-      // Restaurar visibilitat via classe CSS
-      document.body.classList.remove('hero-loading');
       setMounted(false);
       onFinish?.();
     }, 400);
@@ -581,8 +573,6 @@ export default function HeroPortalLogo({
 
     timers.current.push(
       window.setTimeout(() => {
-        // Restaurar visibilitat via classe CSS
-        document.body.classList.remove('hero-loading');
         setMounted(false);
         clearTimers();
         onFinish?.();

@@ -138,10 +138,35 @@
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
-     HERO PORTAL - Amagar contingut durant animació inicial
+     HERO PORTAL - PANTALLA NEGRA INICIAL (CSS puro, sense JS)
      Evita flash del contingut abans del logo
      ══════════════════════════════════════════════════════════════════════════ */
 
+  /* Estat inicial: fons negre, contingut ocult (CSS pur, instant) */
+  body:not(.intro-done) {
+    overflow: hidden !important;
+    background: #000 !important;
+  }
+
+  body:not(.intro-done) #main-content,
+  body:not(.intro-done) header,
+  body:not(.intro-done) footer,
+  body:not(.intro-done) .floating-ctas {
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+
+  /* Quan intro acaba, fade suau del contingut */
+  body.intro-done #main-content,
+  body.intro-done header,
+  body.intro-done footer,
+  body.intro-done .floating-ctas {
+    visibility: visible !important;
+    opacity: 1 !important;
+    transition: opacity 0.4s ease-out;
+  }
+
+  /* Classe legacy per compatibilitat */
   body.hero-loading #main-content,
   body.hero-loading header,
   body.hero-loading footer,
@@ -153,6 +178,15 @@
   body.hero-loading {
     overflow: hidden !important;
     background: #000 !important;
+  }
+
+  /* NOSCRIPT: Si no hi ha JS, mostrar contingut directament */
+  body.no-intro #main-content,
+  body.no-intro header,
+  body.no-intro footer,
+  body.no-intro .floating-ctas {
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   /* Subtle noise texture overlay - només desktop */
