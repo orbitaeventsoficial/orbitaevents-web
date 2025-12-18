@@ -3516,7 +3516,8 @@
           "Factura"
         ]
       }
-    }
+    },
+    "ctaButton": "Contáctanos"
   },
   "offerModal": {
     "ariaLabel": "Oferta de última hora",
