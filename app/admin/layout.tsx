@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import AdminSidebar, { MobileSidebar } from './components/Sidebar';
+import AdminMobileNav from './components/MobileNav';
 
 /**
  * 🎨 ADMIN LAYOUT - Modern & Elegant
+ * v2.0 - Mobile-first amb bottom navigation
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -14,9 +16,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen bg-[#0a0a0a]">
       {/* Sidebar Desktop */}
       <AdminSidebar />
-      
-      {/* Sidebar Mobile */}
+
+      {/* Sidebar Mobile (ara secundari, bottom nav és principal) */}
       <MobileSidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+
+      {/* Bottom Nav Mobile */}
+      <AdminMobileNav />
 
       {/* Main Content */}
       <div className="lg:pl-64">
@@ -86,7 +91,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Page Content */}
-        <main className="p-4 lg:p-6 mt-16 lg:mt-0">
+        <main className="p-4 lg:p-6 mt-16 lg:mt-0 pb-24 lg:pb-6">
           {children}
         </main>
       </div>

@@ -21,6 +21,7 @@ import '@/app/globals.css';
 
 // Components
 import LayoutWrapper from '@/app/components/layout/LayoutWrapper';
+import { PWAProvider } from '@/app/components/pwa/PWAProvider';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -368,9 +369,11 @@ export default async function LocaleLayout({
           `}</style>
         </noscript>
         <NextIntlClientProvider messages={messages} locale={locale}>
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
+          <PWAProvider>
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
+          </PWAProvider>
         </NextIntlClientProvider>
         
         {/* Vercel Analytics */}
