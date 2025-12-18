@@ -121,50 +121,13 @@ export default function HeaderChampion() {
   return (
     <>
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* TOP BAR - Info + Idioma */}
-      {/* ══════════════════════════════════════════════════════════════════ */}
-      <div className={`
-        fixed top-0 left-0 right-0 z-50
-        bg-zinc-950 border-b border-zinc-800/50
-        transition-all duration-300
-        ${isVisible ? 'translate-y-0' : '-translate-y-full'}
-      `}>
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-8 text-xs">
-
-            {/* Left: Status */}
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-green-400 font-medium">
-                  {tHeader('onlineNow')}
-                </span>
-              </span>
-              <a href="tel:699121023" className="text-zinc-400 hover:text-white transition-colors hidden sm:block">
-                📞 699 121 023
-              </a>
-            </div>
-
-            {/* Center: Location - MÉS GRAN */}
-            <div className="flex items-center gap-1.5 text-zinc-300">
-              <span className="text-amber-500">📍</span>
-              <span className="font-medium text-sm">Barcelona & Girona</span>
-            </div>
-
-            {/* Right: Language selector (dropdown compacto) */}
-            <LanguageSelectorMobile />
-          </div>
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* MAIN HEADER */}
+      {/* MAIN HEADER - Clean & Minimal */}
       {/* ══════════════════════════════════════════════════════════════════ */}
       <header
         className={`
-          fixed top-8 left-0 right-0 z-50
+          fixed top-0 left-0 right-0 z-50
           transition-all duration-300 ease-out
-          ${isVisible ? 'translate-y-0' : '-translate-y-[calc(100%+2rem)]'}
+          ${isVisible ? 'translate-y-0' : '-translate-y-full'}
           ${isScrolled
             ? 'bg-zinc-950/98 backdrop-blur-xl shadow-xl shadow-black/30 border-b border-zinc-800/50'
             : 'bg-zinc-950/80 backdrop-blur-md'
@@ -179,16 +142,15 @@ export default function HeaderChampion() {
           <div className="flex items-center justify-between h-14 md:h-16">
 
             {/* ════════════════════════════════════════════════════════════ */}
-            {/* LOGO - Més petit i elegant */}
+            {/* LOGO - Més gran */}
             {/* ════════════════════════════════════════════════════════════ */}
             <Link href="/" className="flex items-center gap-2.5 group">
-              {/* Logo SVG */}
               <Image
                 src="/img/logoplanetatextdreta.svg"
                 alt="Òrbita Events"
-                width={160}
-                height={42}
-                className="h-9 md:h-11 w-auto"
+                width={200}
+                height={52}
+                className="h-11 md:h-14 w-auto"
                 priority
               />
             </Link>
@@ -330,9 +292,14 @@ export default function HeaderChampion() {
             </nav>
 
             {/* ════════════════════════════════════════════════════════════ */}
-            {/* CTA BUTTONS */}
+            {/* CTA BUTTONS + Language */}
             {/* ════════════════════════════════════════════════════════════ */}
             <div className="flex items-center gap-2">
+
+              {/* Language selector - desktop only */}
+              <div className="hidden lg:block">
+                <LanguageSelectorMobile />
+              </div>
 
               {/* WhatsApp */}
               <a
@@ -507,8 +474,8 @@ export default function HeaderChampion() {
         )}
       </AnimatePresence>
 
-      {/* Spacer - top bar (32px) + header (56-64px) */}
-      <div className="h-[88px] md:h-[96px]" />
+      {/* Spacer - header height */}
+      <div className="h-14 md:h-16" />
     </>
   );
 }
