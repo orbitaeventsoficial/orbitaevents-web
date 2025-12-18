@@ -36,7 +36,10 @@ const HeroPortalLogo = dynamic(
   { ssr: false }
 );
 
-// ELIMINAT: WhatsAppPremium - Ara usat FloatingCTAs que inclou WhatsApp + Bottom Bar
+const FlashOfferPopup = dynamic(
+  () => import('@/app/components/ui/FlashOfferPopup'),
+  { ssr: false }
+);
 
 const Footer = dynamic(
   () => import('@/app/components/ui/footer'),
@@ -145,6 +148,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
       {/* Consentiment cookies */}
       <CookieConsent />
+
+      {/* Popup oferta flash */}
+      <FlashOfferPopup />
     </>
   );
 }
