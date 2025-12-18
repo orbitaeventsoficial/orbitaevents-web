@@ -557,15 +557,15 @@ export default function CalendarioUrgencia({
   return (
     <div className={className}>
       {/* Header con urgencia global */}
-      <div className="text-center mb-6">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-full text-red-400 text-sm font-medium mb-3">
+      <div className="flex flex-col items-center justify-center text-center mb-8">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-full text-red-400 text-sm font-medium mb-4">
           <span className="animate-pulse">🔥</span>
           <span>{globalStats.percentage}% {t('badge')}</span>
         </div>
-        <h3 className="text-xl md:text-2xl font-bold text-white">
+        <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
           {t('title')}
         </h3>
-        <p className="text-white/50 text-sm mt-1">
+        <p className="text-lg md:text-xl text-amber-400/90 font-medium">
           {t('subtitle', { count: globalStats.available })}
         </p>
       </div>
