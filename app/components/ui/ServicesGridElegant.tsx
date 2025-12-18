@@ -3,40 +3,51 @@
 import { motion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 
 // ═══════════════════════════════════════════════════════════════
 // SERVICES GRID - Versió amb temàtiques separades
 // Halloween i Món Màgic com a cards independents
+// Amb imatges de fons del portfolio
 // ═══════════════════════════════════════════════════════════════
 
 const SERVICE_KEYS = ['halloween', 'monMagic', 'casaments', 'festes', 'empreses'] as const;
 
-// Icones i colors per servei
-const SERVICE_STYLES: Record<string, { gradient: string; iconBg: string; hoverGlow: string }> = {
+// Imatges de fons per servei (del portfolio)
+const SERVICE_IMAGES: Record<string, string> = {
+  halloween: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
+  monMagic: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
+  casaments: '/img/portfolio/bodas/bodas-01.webp',
+  festes: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
+  empreses: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
+};
+
+// Colors i estils per servei
+const SERVICE_STYLES: Record<string, { overlay: string; accent: string; hoverGlow: string }> = {
   halloween: {
-    gradient: 'from-orange-500/20 to-orange-900/20',
-    iconBg: 'bg-orange-500/20',
-    hoverGlow: 'hover:shadow-orange-500/20',
+    overlay: 'from-orange-950/80 via-black/70 to-black/90',
+    accent: 'text-orange-400',
+    hoverGlow: 'hover:shadow-orange-500/30',
   },
   monMagic: {
-    gradient: 'from-amber-500/20 to-amber-900/20',
-    iconBg: 'bg-amber-500/20',
-    hoverGlow: 'hover:shadow-amber-500/20',
+    overlay: 'from-amber-950/80 via-black/70 to-black/90',
+    accent: 'text-amber-400',
+    hoverGlow: 'hover:shadow-amber-500/30',
   },
   casaments: {
-    gradient: 'from-pink-500/20 to-pink-900/20',
-    iconBg: 'bg-pink-500/20',
-    hoverGlow: 'hover:shadow-pink-500/20',
+    overlay: 'from-pink-950/80 via-black/70 to-black/90',
+    accent: 'text-pink-400',
+    hoverGlow: 'hover:shadow-pink-500/30',
   },
   festes: {
-    gradient: 'from-purple-500/20 to-purple-900/20',
-    iconBg: 'bg-purple-500/20',
-    hoverGlow: 'hover:shadow-purple-500/20',
+    overlay: 'from-purple-950/80 via-black/70 to-black/90',
+    accent: 'text-purple-400',
+    hoverGlow: 'hover:shadow-purple-500/30',
   },
   empreses: {
-    gradient: 'from-blue-500/20 to-blue-900/20',
-    iconBg: 'bg-blue-500/20',
-    hoverGlow: 'hover:shadow-blue-500/20',
+    overlay: 'from-blue-950/80 via-black/70 to-black/90',
+    accent: 'text-blue-400',
+    hoverGlow: 'hover:shadow-blue-500/30',
   },
 };
 
@@ -78,6 +89,7 @@ export default function ServicesGridElegant() {
           {SERVICE_KEYS.map((key, index) => {
             const styles = SERVICE_STYLES[key];
             const href = SERVICE_HREFS[key];
+            const image = SERVICE_IMAGES[key];
             const badge = t(`items.${key}.badge`);
             const features = t.raw(`items.${key}.features`) as string[];
 
@@ -96,18 +108,28 @@ export default function ServicesGridElegant() {
                 <Link href={href}>
                   <div
                     className={`
-                      relative h-full p-6 rounded-2xl
-                      bg-gradient-to-br ${styles.gradient}
+                      relative h-full min-h-[280px] rounded-2xl overflow-hidden
                       border border-white/10
-                      hover:border-white/20
+                      hover:border-white/30
                       transition-all duration-300
                       hover:shadow-xl ${styles.hoverGlow}
                       cursor-pointer
                     `}
                   >
+                    {/* Imatge de fons */}
+                    <Image
+                      src={image}
+                      alt={t(`items.${key}.title`)}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+
+                    {/* Overlay gradient */}
+                    <div className={`absolute inset-0 bg-gradient-to-t ${styles.overlay}`} />
+
                     {/* Badge si existeix */}
                     {badge && badge !== `items.${key}.badge` && (
-                      <div className="absolute -top-3 left-4">
+                      <div className="absolute top-4 left-4 z-10">
                         <span className="px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full shadow-lg">
                           {badge}
                         </span>
@@ -115,20 +137,20 @@ export default function ServicesGridElegant() {
                     )}
 
                     {/* Contingut */}
-                    <div className="pt-2">
+                    <div className="absolute inset-0 flex flex-col justify-end p-6 z-10">
                       <h3 className="text-xl font-bold text-white mb-2">
                         {t(`items.${key}.title`)}
                       </h3>
-                      <p className="text-white/60 text-sm mb-4">
+                      <p className="text-white/70 text-sm mb-4 line-clamp-2">
                         {t(`items.${key}.description`)}
                       </p>
 
                       {/* Features */}
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {features.slice(0, 4).map((feature, i) => (
+                        {features.slice(0, 3).map((feature, i) => (
                           <span
                             key={i}
-                            className="px-2 py-1 bg-white/5 rounded text-white/70 text-xs"
+                            className="px-2 py-1 bg-black/40 backdrop-blur-sm rounded text-white/80 text-xs"
                           >
                             {feature}
                           </span>
@@ -137,10 +159,10 @@ export default function ServicesGridElegant() {
 
                       {/* Preu */}
                       <div className="flex items-center justify-between">
-                        <span className="text-white font-bold">
+                        <span className={`font-bold ${styles.accent}`}>
                           {t(`items.${key}.price`)}
                         </span>
-                        <span className="text-white/40 text-sm group-hover:text-orange-400 transition-colors">
+                        <span className="text-white/50 text-sm group-hover:text-white transition-colors">
                           {t('viewMore')} →
                         </span>
                       </div>
