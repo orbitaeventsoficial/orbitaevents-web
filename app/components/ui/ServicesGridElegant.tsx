@@ -179,14 +179,17 @@ export default function ServicesGridElegant() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mt-12"
+          className="text-center mt-16"
         >
-          <p className="text-white/50 mb-4">{t('notFound')}</p>
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+            {t('notFound')}
+          </h3>
+          <p className="text-white/60 mb-6">{t('contact')}</p>
           <Link
             href="/contacto"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-full text-white font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 rounded-full text-black font-bold transition-all hover:scale-105"
           >
-            {t('contact')}
+            {t('ctaButton')}
             <span>💬</span>
           </Link>
         </motion.div>
