@@ -15,6 +15,7 @@ import Image from 'next/image';
 import { Link } from '@/lib/navigation';
 import { PORTFOLIO_IMAGES } from '@/config/portfolio-images';
 import { getTranslations } from 'next-intl/server';
+import HalloweenDecorationSection from '@/app/components/ui/HalloweenDecorationSection';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('halloweenPage');
@@ -92,6 +93,11 @@ export default async function HalloweenPage() {
           </div>
         </div>
       </section>
+
+      {/* ========================================
+          DECORACIÓ - Elements visuals
+          ======================================== */}
+      <HalloweenDecorationSection />
 
       {/* ========================================
           GALERIA IMMERSIVA
