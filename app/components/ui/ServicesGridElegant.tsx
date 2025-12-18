@@ -181,10 +181,10 @@ export default function ServicesGridElegant() {
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
-            {t('notFound')}
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-6">
+            {t('notFound')}<br />
+            <span className="text-orange-400">{t('contact')}</span>
           </h3>
-          <p className="text-white/60 mb-6">{t('contact')}</p>
           <Link
             href="/contacto"
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 rounded-full text-black font-bold transition-all hover:scale-105"
