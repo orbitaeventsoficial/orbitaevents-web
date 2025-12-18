@@ -2,7 +2,7 @@
 
 /**
  * MobileAdminLayout.tsx
- * 
+ *
  * Layout wrapper para el admin móvil de Òrbita Events
  * - Detección de dispositivo móvil
  * - Safe area handling
@@ -25,11 +25,12 @@ interface MobileAdminLayoutProps {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HOOKS
+// HOOKS (with SSR-safe defaults)
 // ═══════════════════════════════════════════════════════════════════════════
 
 function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
+  // Start with null to indicate "not yet determined" (SSR safe)
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -123,14 +124,15 @@ function SplashScreen({ isLoading }: { isLoading: boolean }) {
   );
 }
 
-// Offline indicator
+// Offline indicator (only renders after mount)
 function OfflineIndicator() {
-  const [isOffline, setIsOffline] = useState(false);
+  const [isOffline, setIsOffline] = useState<boolean | null>(null);
 
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
 
+    // Only check after mount
     setIsOffline(!navigator.onLine);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -140,6 +142,9 @@ function OfflineIndicator() {
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  // Don't render anything until mounted
+  if (isOffline === null) return null;
 
   return (
     <AnimatePresence>
@@ -151,7 +156,7 @@ function OfflineIndicator() {
           exit={{ opacity: 0, y: -50 }}
           style={{ top: 'max(16px, env(safe-area-inset-top))' }}
         >
-          ⚠️ Sense connexió a Internet
+          Sense connexió a Internet
         </motion.div>
       )}
     </AnimatePresence>
@@ -249,9 +254,17 @@ export default function MobileAdminLayout({ children }: MobileAdminLayoutProps) 
   const isMobile = useIsMobile();
   const isStandalone = useStandalone();
   const [isLoading, setIsLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Mark as mounted (client-side only)
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Initial load
   useEffect(() => {
+    if (!isMounted) return;
+
     // Add mobile class to body
     document.body.classList.add('mobile-admin');
 
@@ -264,10 +277,12 @@ export default function MobileAdminLayout({ children }: MobileAdminLayoutProps) 
       document.body.classList.remove('mobile-admin');
       clearTimeout(timer);
     };
-  }, []);
+  }, [isMounted]);
 
   // Inject global styles
   useEffect(() => {
+    if (!isMounted) return;
+
     const styleId = 'mobile-admin-styles';
     if (!document.getElementById(styleId)) {
       const style = document.createElement('style');
@@ -275,13 +290,20 @@ export default function MobileAdminLayout({ children }: MobileAdminLayoutProps) 
       style.textContent = globalMobileStyles;
       document.head.appendChild(style);
     }
-  }, []);
+  }, [isMounted]);
 
-  // Only show mobile layout on mobile devices
+  // During SSR and initial hydration, render children without mobile wrapper
+  // This ensures consistent rendering between server and client
+  if (!isMounted || isMobile === null) {
+    return <>{children}</>;
+  }
+
+  // On desktop, just render children
   if (!isMobile) {
     return <>{children}</>;
   }
 
+  // On mobile, render the full mobile layout
   return (
     <>
       {/* Splash screen */}
@@ -294,9 +316,9 @@ export default function MobileAdminLayout({ children }: MobileAdminLayoutProps) 
       <OfflineIndicator />
 
       {/* Main content */}
-      <main 
+      <main
         className="min-h-screen bg-zinc-950"
-        style={{ 
+        style={{
           paddingTop: isStandalone ? 'env(safe-area-inset-top)' : '0',
         }}
       >
