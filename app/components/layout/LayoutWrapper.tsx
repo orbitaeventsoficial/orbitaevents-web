@@ -62,6 +62,18 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const [showIntro, setShowIntro] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
+  // Funció per treure l'overlay negre
+  const removeOverlay = useCallback(() => {
+    const overlay = document.getElementById('intro-overlay');
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 400);
+    }
+    document.body.classList.add('intro-done');
+  }, []);
+
   // Evitar hydration mismatch + gestionar intro
   useEffect(() => {
     setIsMounted(true);
@@ -70,21 +82,21 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     const hasSeenIntro = sessionStorage.getItem('orbita-intro-seen');
 
     if (isHomePage && !hasSeenIntro) {
-      // Mostrar intro
+      // Mostrar intro - l'overlay es queda
       setShowIntro(true);
     } else {
-      // No mostrar intro - afegir classe directament
-      document.body.classList.add('intro-done');
+      // No mostrar intro - treure overlay immediatament
+      removeOverlay();
     }
-  }, [pathname]);
+  }, [pathname, removeOverlay]);
 
   // Handler per quan acaba la intro
   const handleIntroFinish = useCallback(() => {
     setShowIntro(false);
     sessionStorage.setItem('orbita-intro-seen', 'true');
-    // Afegir classe per mostrar contingut amb fade
-    document.body.classList.add('intro-done');
-  }, []);
+    // Treure overlay amb fade
+    removeOverlay();
+  }, [removeOverlay]);
 
   // Comprovar si és pàgina immersiva
   const isImmersive = IMMERSIVE_PAGES.some(page => pathname?.includes(page));
