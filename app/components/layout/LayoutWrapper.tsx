@@ -113,13 +113,15 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
-      {/* Intro animada (només home, primer cop) - 2.5s total */}
+      {/* Intro animada (només home, primer cop) - 4s total */}
       {showIntro && isMounted && (
         <HeroPortalLogo
           onFinish={handleIntroFinish}
-          totalMs={2500}
-          fadeMs={800}
-          speedMultiplier={1.5}
+          totalMs={4000}
+          fadeMs={1200}
+          introHoldMs={300}
+          introFadeMs={400}
+          speedMultiplier={1.2}
         />
       )}
 
