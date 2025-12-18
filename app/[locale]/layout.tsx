@@ -349,13 +349,22 @@ export default async function LocaleLayout({
         className="font-sans antialiased bg-[var(--bg-main)] text-white overflow-x-hidden"
         suppressHydrationWarning
       >
-        {/* Noscript: Si JS desactivat, mostrar contingut directament */}
+        {/* OVERLAY NEGRE INICIAL - Tapa tot fins que JS el treu */}
+        <div
+          id="intro-overlay"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: '#000',
+            zIndex: 9998,
+            transition: 'opacity 0.4s ease-out',
+          }}
+          aria-hidden="true"
+        />
+        {/* Noscript: Si JS desactivat, amagar overlay i mostrar contingut */}
         <noscript>
           <style>{`
-            body #main-content, body header, body footer, body .floating-ctas {
-              visibility: visible !important;
-              opacity: 1 !important;
-            }
+            #intro-overlay { display: none !important; }
           `}</style>
         </noscript>
         <NextIntlClientProvider messages={messages} locale={locale}>
