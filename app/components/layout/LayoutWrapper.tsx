@@ -62,27 +62,28 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const [showIntro, setShowIntro] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Evitar hydration mismatch
+  // Evitar hydration mismatch + gestionar intro
   useEffect(() => {
     setIsMounted(true);
-  }, []);
-
-  // Gestionar intro animada
-  useEffect(() => {
-    if (!isMounted) return;
 
     const isHomePage = INTRO_PAGES.some(page => pathname === page);
     const hasSeenIntro = sessionStorage.getItem('orbita-intro-seen');
 
     if (isHomePage && !hasSeenIntro) {
+      // Mostrar intro
       setShowIntro(true);
+    } else {
+      // No mostrar intro - afegir classe directament
+      document.body.classList.add('intro-done');
     }
-  }, [pathname, isMounted]);
+  }, [pathname]);
 
   // Handler per quan acaba la intro
   const handleIntroFinish = useCallback(() => {
     setShowIntro(false);
     sessionStorage.setItem('orbita-intro-seen', 'true');
+    // Afegir classe per mostrar contingut amb fade
+    document.body.classList.add('intro-done');
   }, []);
 
   // Comprovar si és pàgina immersiva
@@ -100,12 +101,13 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
-      {/* Intro animada (només home, primer cop) */}
+      {/* Intro animada (només home, primer cop) - 2.5s total */}
       {showIntro && isMounted && (
         <HeroPortalLogo
           onFinish={handleIntroFinish}
-          totalMs={5000}
-          fadeMs={2000}
+          totalMs={2500}
+          fadeMs={800}
+          speedMultiplier={1.5}
         />
       )}
 

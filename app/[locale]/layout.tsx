@@ -349,6 +349,15 @@ export default async function LocaleLayout({
         className="font-sans antialiased bg-[var(--bg-main)] text-white overflow-x-hidden"
         suppressHydrationWarning
       >
+        {/* Noscript: Si JS desactivat, mostrar contingut directament */}
+        <noscript>
+          <style>{`
+            body #main-content, body header, body footer, body .floating-ctas {
+              visibility: visible !important;
+              opacity: 1 !important;
+            }
+          `}</style>
+        </noscript>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <LayoutWrapper>
             {children}
