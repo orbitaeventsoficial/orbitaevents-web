@@ -620,17 +620,20 @@ export default function CalendarioUrgencia({
       )}
 
       {/* CTA final */}
-      <div className="mt-6 text-center">
-        <Link
-          href="/configurador"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-amber-500/25"
-        >
-          <span>🎯</span>
-          <span>{t('cta.title')}</span>
-        </Link>
-        <p className="text-white/40 text-xs mt-2">
+      <div className="mt-8 text-center">
+        <h4 className="text-xl md:text-2xl font-bold text-white mb-2">
+          {t('cta.title')}
+        </h4>
+        <p className="text-amber-400/80 text-sm md:text-base mb-6">
           {t('cta.subtitle')}
         </p>
+        <Link
+          href="/contacto"
+          className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-full transition-all shadow-lg hover:shadow-amber-500/25 hover:scale-105"
+        >
+          <span>🎯</span>
+          <span>Sol·licitar pressupost</span>
+        </Link>
       </div>
 
       {/* Modal de día seleccionado */}
