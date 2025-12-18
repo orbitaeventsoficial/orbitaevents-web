@@ -620,11 +620,11 @@ export default function CalendarioUrgencia({
       )}
 
       {/* CTA final */}
-      <div className="mt-8 text-center">
-        <h4 className="text-xl md:text-2xl font-bold text-white mb-2">
+      <div className="mt-8 flex flex-col items-center justify-center text-center">
+        <h4 className="text-xl md:text-2xl font-bold text-white mb-2 text-center">
           {t('cta.title')}
         </h4>
-        <p className="text-amber-400/80 text-sm md:text-base mb-6">
+        <p className="text-amber-400/80 text-sm md:text-base mb-6 text-center">
           {t('cta.subtitle')}
         </p>
         <Link
