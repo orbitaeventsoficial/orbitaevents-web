@@ -183,19 +183,17 @@
     "elegant": {
       "badge": "Especialistes en festes temàtiques",
       "badgeEmoji": "🎃",
-      "title1": "LA FESTA QUE",
-      "title2": "NINGÚ OBLIDARÀ.",
+      "title1": "CREEM EVENTS",
+      "title2": "INOBLIDABLES.",
       "rotatingTexts": [
-        "NINGÚ OBLIDARÀ.",
-        "ET MEREIXIES.",
-        "SEMPRE SOMIES.",
-        "FARÀ HISTÒRIA.",
-        "SERÀ LLEGENDÀRIA."
+        "INOBLIDABLES.",
+        "ÚNICS.",
+        "MEMORABLES.",
+        "ESPECTACULARS."
       ],
       "subtitle": "DJ + tematització + efectes especials.",
       "subtitleLocation": "Barcelona i Girona.",
-      "ctaWhatsapp": "Escriu-nos ara",
-      "ctaWhatsappHint": "→ 2h resposta",
+      "ctaContact": "Sol·licitar pressupost",
       "ctaPrices": "Veure preus",
       "rating": "4.9",
       "socialProof": "48+ events sense incidents",

@@ -183,19 +183,17 @@
     "elegant": {
       "badge": "Especialistas en fiestas temáticas",
       "badgeEmoji": "🎃",
-      "title1": "LA FIESTA QUE",
-      "title2": "NADIE OLVIDARÁ.",
+      "title1": "CREAMOS EVENTOS",
+      "title2": "INOLVIDABLES.",
       "rotatingTexts": [
-        "NADIE OLVIDARÁ.",
-        "TE MERECÍAS.",
-        "SIEMPRE SUEÑAS.",
-        "HARÁ HISTORIA.",
-        "SERÁ LEGENDARIA."
+        "INOLVIDABLES.",
+        "ÚNICOS.",
+        "MEMORABLES.",
+        "ESPECTACULARES."
       ],
       "subtitle": "DJ + tematización + efectos especiales.",
       "subtitleLocation": "Barcelona y Girona.",
-      "ctaWhatsapp": "Escríbenos ahora",
-      "ctaWhatsappHint": "→ 2h respuesta",
+      "ctaContact": "Solicitar presupuesto",
       "ctaPrices": "Ver precios",
       "rating": "4.9",
       "socialProof": "48+ eventos sin incidentes",

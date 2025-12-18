@@ -10,7 +10,7 @@ import { Link } from '@/lib/navigation';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-import LanguageSelector from './LanguageSelector';
+import LanguageSelector, { LanguageSelectorMobile } from './LanguageSelector';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVEGACIÓ - Configuració amb claus de traducció
@@ -151,19 +151,8 @@ export default function HeaderChampion() {
               <span className="font-medium text-sm">Barcelona & Girona</span>
             </div>
 
-            {/* Right: Urgency + Language */}
-            <div className="flex items-center gap-3">
-              {/* Urgency badge */}
-              <span className="hidden md:flex items-center gap-1.5 bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full text-xs">
-                <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" />
-                <span className="font-medium">
-                  {tHeader('urgencyMessage')}
-                </span>
-              </span>
-
-              {/* Language selector */}
-              <LanguageSelector />
-            </div>
+            {/* Right: Language selector (dropdown compacto) */}
+            <LanguageSelectorMobile />
           </div>
         </div>
       </div>
