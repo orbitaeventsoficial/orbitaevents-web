@@ -1,14 +1,14 @@
 {
   "halloweenPage": {
     "meta": {
-      "title": "Fiesta Halloween Barcelona | Decoración + DJ + Efectos | Òrbita Events",
-      "description": "Transforma tu evento en una noche de terror. Decoración temática, DJ especializado, humo, luces sincronizadas y efectos especiales. Desde 600€."
+      "title": "Fiesta Halloween Barcelona | Decoración Completa + DJ + Efectos | Òrbita Events",
+      "description": "Transforma tu evento en una noche de terror. Decoración por todo el espacio: fantasmas gigantes, jaulas con tarántulas, caldero mágico, velas, espejos extraños... DJ + efectos especiales. Desde 600€."
     },
-    "badge": "Temporada Halloween 2025",
+    "badge": "🎃 Temporada Halloween 2025",
     "hero": {
       "title1": "NOCHES DE",
       "title2": "TERROR",
-      "subtitle": "Transforma tu evento en una experiencia terroríficamente memorable. Decoración, DJ, efectos especiales y todo lo que necesitas."
+      "subtitle": "Decoración completa por todo el espacio + DJ temático + efectos especiales. Todo lo que necesitas para una noche terroríficamente perfecta."
     },
     "cta": {
       "reserve": "Reserva tu noche de terror",
@@ -22,59 +22,64 @@
       "subtitle": "No son mockups. Son fiestas que hemos creado."
     },
     "includes": {
-      "title": "¿Qué incluye una noche",
+      "title": "Qué incluye una noche",
       "titleHighlight": "Halloween?",
+      "intro": "Todo lo que ves en las fotos lo ponemos nosotros. Tú solo tienes que disfrutar.",
       "dj": {
         "title": "DJ Temático",
-        "description": "Playlist curada de Halloween: desde clásicos (Thriller, Ghostbusters) hasta remixes actuales. El DJ puede ir caracterizado."
+        "description": "Playlist curada de Halloween: Thriller, Ghostbusters, remixes actuales. El DJ puede ir caracterizado."
       },
       "decoration": {
         "title": "Decoración Completa",
-        "description": "Telarañas, calabazas LED, esqueletos, calaveras, telas de saco, velas falsas, carteles vintage de terror..."
+        "description": "Fantasmas gigantes, jaulas con tarántulas, caldero mágico, velas, telarañas, calabazas LED, esqueletos..."
       },
       "effects": {
         "title": "Efectos Especiales",
-        "description": "Humo bajo que recorre el suelo, luces rojas y verdes sincronizadas, efectos de sonido terroríficos, chispas frías."
+        "description": "Humo bajo que recorre el suelo, luces sincronizadas, efectos de sonido terroríficos, chispas frías."
       }
     },
     "packs": {
       "title": "Packs",
-      "titleHighlight": "Halloween",
-      "subtitle": "Elige el nivel de terror que quieres",
+      "titleHighlight": "Halloween 2025",
+      "subtitle": "Todo incluye decoración completa. Elige el nivel de intensidad.",
       "mostRequested": "MÁS PEDIDO",
       "hours": "horas",
+      "includesDecoration": "✓ Incluye toda la decoración",
       "basic": {
         "name": "Terror Básico",
+        "price": "600",
         "includes": [
           "DJ temático 4 horas",
           "Sonido 4000W",
           "Iluminación roja/verde",
           "Máquina de humo",
-          "Playlist Halloween curada"
+          "Decoración básica (telarañas, calabazas, velas)"
         ]
       },
       "night": {
         "name": "Noche de Miedo",
+        "price": "900",
         "includes": [
           "DJ temático 5 horas",
           "Sonido 4000W + subwoofer",
           "4 cabezas móviles sincronizadas",
           "Humo bajo (suelo)",
-          "Decoración básica (telarañas, calabazas LED)",
+          "Decoración completa (fantasmas, jaulas, caldero)",
           "Efectos de sonido terroríficos"
         ]
       },
       "zombie": {
         "name": "Apocalipsis Zombie",
+        "price": "1500",
         "includes": [
           "DJ + Técnico de luces 6 horas",
           "Sonido club 4000W",
           "Show de luces completo",
           "Humo bajo + máquina de niebla",
-          "Decoración completa (200+ elementos)",
-          "Chispas frías para momentos clave",
-          "CO2 criogénico",
-          "Actor/animador zombie opcional"
+          "Decoración TOTAL (200+ elementos)",
+          "Chispas frías + CO2 criogénico",
+          "Espejos extraños interactivos",
+          "Opción: actor/animador zombie"
         ]
       }
     },
@@ -85,7 +90,77 @@
     "finalCta": {
       "title1": "¿Preparado para una noche",
       "title2": "terroríficamente buena?",
+      "subtitle": "Decoración completa + DJ + efectos. Todo incluido.",
       "footer": "📍 Barcelona y Girona · ⚡ Respuesta en 2 horas · ✓ Sin compromiso"
+    },
+    "decoration": {
+      "title": "Decoración",
+      "titleHighlight": "por todas partes",
+      "subtitle": "No es solo música. Transformamos el espacio completo.",
+      "items": [
+        {
+          "icon": "👻",
+          "title": "2 Fantasmas Gigantes",
+          "description": "Figuras de 2m que se mueven con el viento. Impacto visual garantizado."
+        },
+        {
+          "icon": "🕷️",
+          "title": "Jaulas con Tarántulas",
+          "description": "Jaulas decorativas con arañas y murciélagos realistas."
+        },
+        {
+          "icon": "🧹",
+          "title": "Escobas de Bruja",
+          "description": "Escobas decorativas por el espacio, perfectas para photocall."
+        },
+        {
+          "icon": "🫕",
+          "title": "Caldero Mágico",
+          "description": "Caldero con humo (hielo seco) y luz verde. El centro de la fiesta."
+        },
+        {
+          "icon": "🕯️",
+          "title": "Velas LED",
+          "description": "Decenas de velas sin llama por todo el espacio. Ambiente mágico."
+        },
+        {
+          "icon": "🪞",
+          "title": "Espejos Extraños",
+          "description": "Espejos con efectos que 'hablan' o muestran reflejos inquietantes."
+        },
+        {
+          "icon": "🕸️",
+          "title": "Telarañas + Calabazas",
+          "description": "Clásicos de Halloween: telarañas por todas partes y calabazas LED."
+        },
+        {
+          "icon": "💀",
+          "title": "Esqueletos y Calaveras",
+          "description": "Elementos decorativos repartidos estratégicamente."
+        }
+      ]
+    },
+    "proof": {
+      "title": "Ya lo hemos hecho",
+      "subtitle": "Clientes satisfechos con nuestra tematización Halloween:",
+      "testimonial": {
+        "quote": "La mejor fiesta de Halloween que hemos hecho nunca. Los niños no paraban de gritar de emoción (¡y un poco de miedo!). La decoración era BRUTAL.",
+        "author": "Familia Martínez",
+        "event": "Halloween 2024"
+      }
+    },
+    "urgency": {
+      "title": "Halloween 2025",
+      "subtitle": "Los sábados de octubre vuelan. Reserva pronto.",
+      "octobrerDates": "Sábados de octubre:",
+      "dates": [
+        "4 oct",
+        "11 oct",
+        "18 oct",
+        "25 oct",
+        "31 oct"
+      ],
+      "warning": "⚠️ Ya tenemos consultas para estas fechas"
     }
   },
   "loader": {
@@ -181,24 +256,25 @@
   },
   "hero": {
     "elegant": {
-      "badge": "Especialistas en fiestas temáticas",
-      "badgeEmoji": "🎃",
-      "title1": "CREAMOS EVENTOS",
-      "title2": "INOLVIDABLES.",
+      "badge": "Especialistas en tematización",
+      "badgeEmoji": "✨",
+      "title1": "EVENTOS TEMÁTICOS",
+      "title2": "QUE NADIE MÁS HACE.",
       "rotatingTexts": [
+        "QUE NADIE MÁS HACE.",
+        "DE HALLOWEEN.",
+        "DE MUNDO MÁGICO.",
         "INOLVIDABLES.",
-        "ÚNICOS.",
-        "MEMORABLES.",
-        "ESPECTACULARES."
+        "ÚNICOS."
       ],
-      "subtitle": "DJ + tematización + efectos especiales.",
+      "subtitle": "Halloween · Mundo Mágico · Años 20 · Lo que imagines.",
       "subtitleLocation": "Barcelona y Girona.",
       "ctaContact": "Solicitar presupuesto",
-      "ctaPrices": "Ver precios",
+      "ctaPrices": "Ver temáticas",
       "rating": "4.9",
-      "socialProof": "48+ eventos sin incidentes",
+      "socialProof": "48+ eventos realizados",
       "recommendedAt": "Recomendados en",
-      "whatsappMessage": "Hola! Quiero info para mi evento"
+      "whatsappMessage": "¡Hola! Quiero info para un evento temático"
     },
     "badge": "🔥 48+ eventos sin ningún invitado sentado",
     "themingSpecialists": "Especialistas en Tematización",
@@ -439,25 +515,45 @@
         "description": "Harry Potter, Halloween y más",
         "price": "Desde 600€",
         "badge": "⭐ Lo más pedido",
-        "features": ["Decoración", "Efectos FX", "Ambientación", "Animación"]
+        "features": [
+          "Decoración",
+          "Efectos FX",
+          "Ambientación",
+          "Animación"
+        ]
       },
       "casaments": {
         "title": "Bodas",
         "description": "El día más especial merece ser perfecto",
         "price": "Desde 650€",
-        "features": ["DJ Profesional", "Sonido + Luces", "Coordinación", "Backup 100%"]
+        "features": [
+          "DJ Profesional",
+          "Sonido + Luces",
+          "Coordinación",
+          "Backup 100%"
+        ]
       },
       "festes": {
         "title": "Fiestas Privadas",
         "description": "La fiesta que recordarán siempre",
         "price": "Desde 400€",
-        "features": ["Discomóvil", "Luces LED", "Efectos", "Todo incluido"]
+        "features": [
+          "Discomóvil",
+          "Luces LED",
+          "Efectos",
+          "Todo incluido"
+        ]
       },
       "empreses": {
         "title": "Empresas",
         "description": "Eventos corporativos de impacto",
         "price": "Desde 500€",
-        "features": ["Audiovisual", "Micro inalámbrico", "Branding", "Factura"]
+        "features": [
+          "Audiovisual",
+          "Micro inalámbrico",
+          "Branding",
+          "Factura"
+        ]
       }
     },
     "bodas": {
@@ -835,14 +931,24 @@
         "tagline": "La experiencia Harry Potter definitiva",
         "description": "Transforma tu evento en un mundo de magia. Velas flotantes, pociones, decoración completa y mucho más.",
         "badge": "✨ Exclusivo",
-        "features": ["Tematización completa", "DJ profesional 4h", "Velas flotantes", "Decoración inmersiva"]
+        "features": [
+          "Tematización completa",
+          "DJ profesional 4h",
+          "Velas flotantes",
+          "Decoración inmersiva"
+        ]
       },
       "halloween": {
         "name": "Halloween",
         "tagline": "La noche más terrorífica",
         "description": "Una experiencia que pondrá los pelos de punta. Fantasmas, decoración de terror y ambiente único.",
         "badge": "🎃 Popular",
-        "features": ["Tematización completa", "DJ profesional 4h", "Efectos especiales", "Decoración terror"]
+        "features": [
+          "Tematización completa",
+          "DJ profesional 4h",
+          "Efectos especiales",
+          "Decoración terror"
+        ]
       }
     },
     "discomovil": {
@@ -1746,27 +1852,22 @@
         "infantil": "Infantil"
       }
     },
-
     "review1Role": "Boda",
     "review1Event": "Boda en Mas Marroch, Girona",
     "review1Date": "Septiembre 2024",
     "review1Text": "¡Increíble! Carles hizo que nuestra boda fuera mágica. La pista siempre llena, la música perfecta y el trato excepcional. ¡Todos los invitados nos preguntan por el DJ!",
-
     "review2Role": "Fiesta privada",
     "review2Event": "Cumpleaños 40 en Barcelona",
     "review2Date": "Octubre 2024",
     "review2Text": "Contratamos a Òrbita para mi fiesta de 40 y fue espectacular. El equipo de sonido profesional, las luces creaban un ambiente brutal y el DJ clavó todos los estilos que le pedí.",
-
     "review3Role": "Fiesta infantil",
     "review3Event": "Cumpleaños temático en Mataró",
     "review3Date": "Noviembre 2024",
     "review3Text": "¡Los niños fliparon con la fiesta temática! El animador era genial, los juegos muy bien organizados y la decoración preciosa. ¡Mi hijo todavía habla de ello cada día!",
-
     "review4Role": "Evento corporativo",
     "review4Event": "Fiesta de empresa en Sant Cugat",
     "review4Date": "Diciembre 2024",
     "review4Text": "Profesionalidad máxima. Montaron todo el equipo en tiempo récord, el sonido era perfecto para el espacio y adaptaron la música al público. ¡Repetiremos seguro el año que viene!",
-
     "founderRole": "Boda",
     "founderEvent": "Boda Mundo Mágico – Cataluña",
     "founderText": "Estamos preparando nuestra boda temática con Òrbita Events. La planificación ha sido increíble: velas flotantes, sobres personalizados con lacre rojo, decoración con símbolos mágicos... ¡Estamos muy ilusionados!",
@@ -3343,31 +3444,76 @@
     "addTo": "Se añade a cualquier servicio"
   },
   "servicesGrid": {
-    "title": "Servicios",
-    "learnMore": "Más información →",
+    "subtitle": "Qué nos hace diferentes",
+    "title": "Experiencias que nadie más ofrece",
+    "description": "No somos solo DJs. Transformamos tu evento en una experiencia completa con decoración, efectos y ambientación.",
+    "viewMore": "Ver más",
+    "notFound": "¿Quieres otra temática?",
+    "contact": "La creamos para ti",
     "items": {
-      "weddings": {
-        "title": "Boda",
-        "points": [
-          "DJ + Efectos y luces",
-          "Ceremonia y banquete",
-          "Espectáculo y animación"
+      "halloween": {
+        "title": "🎃 Temática Halloween",
+        "description": "Noches de terror con decoración completa",
+        "price": "Desde 600€",
+        "badge": "🔥 Temporada 2025",
+        "href": "/tematica-halloween",
+        "features": [
+          "DJ temático",
+          "Decoración completa",
+          "Humo + FX",
+          "2 fantasmas gigantes"
         ]
       },
-      "corporate": {
-        "title": "Empresas",
-        "points": [
-          "Team building",
-          "Galas y estrenos",
-          "Experiencias de marca"
+      "monMagic": {
+        "title": "🪄 Mundo Mágico",
+        "description": "Experiencia escuela de magia",
+        "price": "Desde 600€",
+        "badge": "✨ Experiencia única",
+        "href": "/tematica-mon-magic",
+        "features": [
+          "Sobres con lacre",
+          "Velas flotantes",
+          "Decoración completa",
+          "Ambientación"
         ]
       },
-      "rental": {
-        "title": "Alquiler técnico",
-        "points": [
-          "Sonido",
-          "Iluminación",
-          "Efectos y micrófonos"
+      "casaments": {
+        "title": "💒 Bodas",
+        "description": "El día más especial merece ser perfecto",
+        "price": "Desde 650€",
+        "badge": "",
+        "href": "/servicios/bodas",
+        "features": [
+          "DJ Profesional",
+          "Sonido + Luces",
+          "Coordinación",
+          "Backup 100%"
+        ]
+      },
+      "festes": {
+        "title": "🎉 Fiestas Privadas",
+        "description": "La fiesta que recordarán siempre",
+        "price": "Desde 400€",
+        "badge": "",
+        "href": "/servicios/fiestas",
+        "features": [
+          "Discomóvil",
+          "Luces LED",
+          "Efectos",
+          "Todo incluido"
+        ]
+      },
+      "empreses": {
+        "title": "🏢 Empresas",
+        "description": "Eventos corporativos de impacto",
+        "price": "Desde 500€",
+        "badge": "",
+        "href": "/servicios/empresas",
+        "features": [
+          "Audiovisual",
+          "Micro inalámbrico",
+          "Branding",
+          "Factura"
         ]
       }
     }
@@ -3384,52 +3530,48 @@
     "code": "Código: LAST10 · Descuento aplicado al presupuesto final."
   },
   "calendar": {
-    "days": [
-      "Lu",
-      "Ma",
-      "Mi",
-      "Ju",
-      "Vi",
-      "Sa",
-      "Do"
-    ],
-    "daysShort": [
-      "Dom",
-      "Lun",
-      "Mar",
-      "Mié",
-      "Jue",
-      "Vie",
-      "Sáb"
-    ],
-    "months": [
-      "Enero",
-      "Febrero",
-      "Marzo",
-      "Abril",
-      "Mayo",
-      "Junio",
-      "Julio",
-      "Agosto",
-      "Septiembre",
-      "Octubre",
-      "Noviembre",
-      "Diciembre"
-    ],
-    "prevMonth": "Mes anterior",
-    "nextMonth": "Mes siguiente",
-    "available": "Disponible",
-    "notAvailable": "No disponible",
-    "occupied": "Ocupado",
-    "reserved": "Reservados",
-    "blocked": "Bloqueados",
-    "highSeason": "Temporada alta",
-    "selected": "Seleccionado",
-    "legend": "Leyenda:",
-    "dateSelected": "Fecha seleccionada",
-    "daysAvailable": "{count} días disponibles",
-    "pastDate": "Fecha pasada",
-    "saturdaysAvailable": "{count, plural, =1 {sábado disponible} other {sábados disponibles}} este mes"
+    "badge": "de fechas ya reservadas",
+    "title": "Disponibilidad de Sábados",
+    "subtitle": "Solo {count} sábados disponibles en los próximos 3 meses",
+    "status": {
+      "exhausted": "¡AGOTADO!",
+      "lastOne": "¡Solo {count} libre!",
+      "few": "{count} libres",
+      "available": "{count} libres"
+    },
+    "labels": {
+      "scarce": "¡Últimos!",
+      "limited": "Pocos",
+      "available": "Disponible"
+    },
+    "legend": {
+      "free": "Libre",
+      "booked": "Reservado"
+    },
+    "reasons": {
+      "booked": "Reservado",
+      "past": "Pasado"
+    },
+    "viewCalendar": "Ver calendario →",
+    "hideCalendar": "Ocultar calendario ↑",
+    "viewFullCalendar": "Ver calendario completo ↓",
+    "modal": {
+      "title": "¡Fecha disponible!",
+      "highSeason": "⭐ Temporada alta - Alta demanda",
+      "reserveBefore": "Reserva antes de que se agote",
+      "reserveDate": "Reservar esta fecha",
+      "consultWhatsapp": "Consultar por WhatsApp",
+      "keepLooking": "Seguir mirando",
+      "whatsappMsg": "Hola! Me interesa el {date} para mi evento"
+    },
+    "cta": {
+      "title": "Reserva tu fecha ahora",
+      "subtitle": "Sin compromiso • Respuesta en menos de 2h"
+    },
+    "compact": {
+      "loading": "Cargando...",
+      "saturdaysFree": "📅 Sábados libres:"
+    }
   },
   "stickyCta": {
     "requestQuote": "Pide tu presupuesto",
@@ -4973,19 +5115,84 @@
       "button": "Pide tu presupuesto"
     },
     "items": {
-      "hw1": { "alt": "Fiesta Halloween con decoración terrorífica", "title": "Fiesta Halloween", "location": "Barcelona", "date": "Octubre 2024" },
-      "hw2": { "alt": "Decoración Halloween con luces", "title": "Noche de Terror", "location": "Girona", "date": "Octubre 2024" },
-      "hw3": { "alt": "Ambiente Halloween", "title": "Halloween Party", "location": "Granollers", "date": "Octubre 2024" },
-      "hp1": { "alt": "Boda tematización Harry Potter", "title": "Boda Mundo Mágico", "location": "Mas Terrats, Girona", "date": "Septiembre 2024" },
-      "hp2": { "alt": "Velas flotantes Harry Potter", "title": "Velas Flotantes", "location": "Barcelona", "date": "Julio 2024" },
-      "hp3": { "alt": "Decoración Hogwarts", "title": "Experiencia Hogwarts", "location": "Girona", "date": "Agosto 2024" },
-      "boda1": { "alt": "Boda elegante", "title": "Boda Marc & Laura", "location": "Barcelona", "date": "Julio 2024" },
-      "boda2": { "alt": "Primer baile", "title": "Primer Baile", "location": "Girona", "date": "Junio 2024" },
-      "boda3": { "alt": "Fiesta boda", "title": "Fiesta Nupcial", "location": "Barcelona", "date": "Septiembre 2024" },
-      "festa1": { "alt": "Fiesta aniversario", "title": "Aniversario 40", "location": "Barcelona", "date": "Agosto 2024" },
-      "festa2": { "alt": "Fiesta comunión", "title": "Comunión", "location": "Granollers", "date": "Mayo 2024" },
-      "corp1": { "alt": "Evento corporativo", "title": "Cena Empresa", "location": "Barcelona", "date": "Diciembre 2024" },
-      "corp2": { "alt": "Team building", "title": "Team Building", "location": "Girona", "date": "Noviembre 2024" }
+      "hw1": {
+        "alt": "Fiesta Halloween con decoración terrorífica",
+        "title": "Fiesta Halloween",
+        "location": "Barcelona",
+        "date": "Octubre 2024"
+      },
+      "hw2": {
+        "alt": "Decoración Halloween con luces",
+        "title": "Noche de Terror",
+        "location": "Girona",
+        "date": "Octubre 2024"
+      },
+      "hw3": {
+        "alt": "Ambiente Halloween",
+        "title": "Halloween Party",
+        "location": "Granollers",
+        "date": "Octubre 2024"
+      },
+      "hp1": {
+        "alt": "Boda tematización Harry Potter",
+        "title": "Boda Mundo Mágico",
+        "location": "Mas Terrats, Girona",
+        "date": "Septiembre 2024"
+      },
+      "hp2": {
+        "alt": "Velas flotantes Harry Potter",
+        "title": "Velas Flotantes",
+        "location": "Barcelona",
+        "date": "Julio 2024"
+      },
+      "hp3": {
+        "alt": "Decoración Hogwarts",
+        "title": "Experiencia Hogwarts",
+        "location": "Girona",
+        "date": "Agosto 2024"
+      },
+      "boda1": {
+        "alt": "Boda elegante",
+        "title": "Boda Marc & Laura",
+        "location": "Barcelona",
+        "date": "Julio 2024"
+      },
+      "boda2": {
+        "alt": "Primer baile",
+        "title": "Primer Baile",
+        "location": "Girona",
+        "date": "Junio 2024"
+      },
+      "boda3": {
+        "alt": "Fiesta boda",
+        "title": "Fiesta Nupcial",
+        "location": "Barcelona",
+        "date": "Septiembre 2024"
+      },
+      "festa1": {
+        "alt": "Fiesta aniversario",
+        "title": "Aniversario 40",
+        "location": "Barcelona",
+        "date": "Agosto 2024"
+      },
+      "festa2": {
+        "alt": "Fiesta comunión",
+        "title": "Comunión",
+        "location": "Granollers",
+        "date": "Mayo 2024"
+      },
+      "corp1": {
+        "alt": "Evento corporativo",
+        "title": "Cena Empresa",
+        "location": "Barcelona",
+        "date": "Diciembre 2024"
+      },
+      "corp2": {
+        "alt": "Team building",
+        "title": "Team Building",
+        "location": "Girona",
+        "date": "Noviembre 2024"
+      }
     }
   },
   "procesVisual": {
@@ -5070,7 +5277,13 @@
         "venue": "Mas Terrats",
         "date": "Septiembre 2024",
         "guests": 150,
-        "services": ["DJ 6h", "Tematización HP completa", "Velas flotantes", "Estación pociones", "Efectos FX"],
+        "services": [
+          "DJ 6h",
+          "Tematización HP completa",
+          "Velas flotantes",
+          "Estación pociones",
+          "Efectos FX"
+        ],
         "story": "Maria y Jordi son fans de Harry Potter desde pequeños. Querían que su boda fuera mágica, literalmente. Transformamos Mas Terrats en el Gran Comedor de Hogwarts con velas flotantes, mesas por casas, y una estación de pociones. El momento del primer baile con Hedwig's Theme hizo llorar a todos.",
         "quote": "¡Increíble! Hicieron que nuestra boda fuera mágica. La tematización Harry Potter dejó a todos con la boca abierta. ¡Los invitados aún hablan de ello!"
       },
@@ -5082,7 +5295,13 @@
         "venue": "Casa particular",
         "date": "Octubre 2024",
         "guests": 80,
-        "services": ["DJ 4h", "Decoración Halloween", "Máquina humo", "Luces LED", "Efectos láser"],
+        "services": [
+          "DJ 4h",
+          "Decoración Halloween",
+          "Máquina humo",
+          "Luces LED",
+          "Efectos láser"
+        ],
         "story": "Àngela quería una fiesta de los 18 que nadie olvidara. Como su cumpleaños es en octubre, hicimos una fiesta temática Halloween brutal. Transformamos el jardín de sus padres en un escenario de terror con humo, luces naranjas, y música que hizo bailar a todos hasta las 3 de la madrugada.",
         "quote": "Contraté la discomóvil y mis amigos TODAVÍA me preguntan dónde encontré al DJ. Los efectos especiales y la puesta en escena fueron espectaculares. ¡Repetiría 100%!"
       },
@@ -5094,7 +5313,13 @@
         "venue": "Hotel Carlemany",
         "date": "Diciembre 2024",
         "guests": 120,
-        "services": ["DJ 5h", "Sonido profesional", "Micro inalámbrico", "Iluminación ambiente", "Coordinación discursos"],
+        "services": [
+          "DJ 5h",
+          "Sonido profesional",
+          "Micro inalámbrico",
+          "Iluminación ambiente",
+          "Coordinación discursos"
+        ],
         "story": "TechCorp necesitaba una cena de Navidad que combinara momentos formales (discursos, premios) con fiesta. Coordinamos perfectamente los tiempos: música de ambiente durante la cena, silencio para los discursos, y después fiesta hasta que cerraron el hotel. El CEO nos felicitó personalmente.",
         "quote": "Necesitábamos un evento corporativo profesional pero divertido. Òrbita nos dio exactamente eso: equipamiento top, coordinación perfecta y una animación de la que el equipo todavía habla."
       }
@@ -5327,21 +5552,53 @@
       }
     },
     "stats": {
-      "years": { "value": "15+", "label": "Años de experiencia" },
-      "events": { "value": "195+", "label": "Eventos realizados" },
-      "repeat": { "value": "92%", "label": "Clientes repiten" },
-      "backup": { "value": "100%", "label": "Equipo backup" }
+      "years": {
+        "value": "15+",
+        "label": "Años de experiencia"
+      },
+      "events": {
+        "value": "195+",
+        "label": "Eventos realizados"
+      },
+      "repeat": {
+        "value": "92%",
+        "label": "Clientes repiten"
+      },
+      "backup": {
+        "value": "100%",
+        "label": "Equipo backup"
+      }
     },
     "history": {
       "title": "Mi",
       "titleHighlight": "Historia",
       "subtitle": "De DJ amateur a crear experiencias inmersivas. Un camino de pasión y dedicación.",
       "timeline": [
-        { "year": "2008", "title": "Los Inicios", "description": "Empecé como DJ amateur en fiestas de amigos. La pasión por la música y crear ambientes únicos nació aquí." },
-        { "year": "2015", "title": "Profesionalización", "description": "Primer equipo profesional, primeras bodas. Descubrí que lo que realmente me apasionaba era crear experiencias completas." },
-        { "year": "2020", "title": "Tematización", "description": "La primera boda Harry Potter lo cambió todo. Vi que la gente quería más que música: quería magia." },
-        { "year": "2023", "title": "Òrbita Events", "description": "Nace Òrbita Events como marca. Experiencias inmersivas completas: tematización + DJ + animación + efectos." },
-        { "year": "2024", "title": "Hoy", "description": "+195 eventos, equipo propio valorado en 12.000€, y el único servicio de tematización Harry Potter profesional en Cataluña." }
+        {
+          "year": "2008",
+          "title": "Los Inicios",
+          "description": "Empecé como DJ amateur en fiestas de amigos. La pasión por la música y crear ambientes únicos nació aquí."
+        },
+        {
+          "year": "2015",
+          "title": "Profesionalización",
+          "description": "Primer equipo profesional, primeras bodas. Descubrí que lo que realmente me apasionaba era crear experiencias completas."
+        },
+        {
+          "year": "2020",
+          "title": "Tematización",
+          "description": "La primera boda Harry Potter lo cambió todo. Vi que la gente quería más que música: quería magia."
+        },
+        {
+          "year": "2023",
+          "title": "Òrbita Events",
+          "description": "Nace Òrbita Events como marca. Experiencias inmersivas completas: tematización + DJ + animación + efectos."
+        },
+        {
+          "year": "2024",
+          "title": "Hoy",
+          "description": "+195 eventos, equipo propio valorado en 12.000€, y el único servicio de tematización Harry Potter profesional en Cataluña."
+        }
       ]
     },
     "valors": {
@@ -5349,10 +5606,26 @@
       "titleHighlight": "Valores",
       "subtitle": "Lo que nos guía en cada evento que hacemos.",
       "items": [
-        { "icon": "sparkles", "title": "Pasión por el Detalle", "description": "Cada evento es único. No hacemos copias. Personalizamos cada detalle para crear exactamente lo que imaginas." },
-        { "icon": "target", "title": "Profesionalidad", "description": "Equipamiento profesional, backup completo, y experiencia demostrada. Tu evento NUNCA se para." },
-        { "icon": "stars", "title": "Creatividad", "description": "Desde tematizaciones Harry Potter hasta Halloween terrorífico. Si puedes imaginarlo, podemos crearlo." },
-        { "icon": "handshake", "title": "Compromiso", "description": "Garantía de satisfacción 100%. Si no estás contento, te devolvemos el dinero. Sin preguntas." }
+        {
+          "icon": "sparkles",
+          "title": "Pasión por el Detalle",
+          "description": "Cada evento es único. No hacemos copias. Personalizamos cada detalle para crear exactamente lo que imaginas."
+        },
+        {
+          "icon": "target",
+          "title": "Profesionalidad",
+          "description": "Equipamiento profesional, backup completo, y experiencia demostrada. Tu evento NUNCA se para."
+        },
+        {
+          "icon": "stars",
+          "title": "Creatividad",
+          "description": "Desde tematizaciones Harry Potter hasta Halloween terrorífico. Si puedes imaginarlo, podemos crearlo."
+        },
+        {
+          "icon": "handshake",
+          "title": "Compromiso",
+          "description": "Garantía de satisfacción 100%. Si no estás contento, te devolvemos el dinero. Sin preguntas."
+        }
       ]
     },
     "equip": {
@@ -5360,10 +5633,26 @@
       "titleHighlight": "Profesional",
       "description": "No alquilamos equipo. Todo es nuestro. Esto nos permite conocer cada pieza, mantenerla perfectamente, y garantizar que NUNCA falle.",
       "items": [
-        { "icon": "mixer", "title": "Controladora Pioneer DDJ-REV7", "description": "La mejor del mercado para eventos" },
-        { "icon": "speaker", "title": "Sonido 4000W (2x EV ETX)", "description": "Potencia profesional para cualquier espacio" },
-        { "icon": "lights", "title": "4 Cabezas Móviles LED + Multiefectos", "description": "Iluminación sincronizada con la música" },
-        { "icon": "fog", "title": "Máquina de Humo + Efectos FX", "description": "Para crear la atmósfera perfecta" }
+        {
+          "icon": "mixer",
+          "title": "Controladora Pioneer DDJ-REV7",
+          "description": "La mejor del mercado para eventos"
+        },
+        {
+          "icon": "speaker",
+          "title": "Sonido 4000W (2x EV ETX)",
+          "description": "Potencia profesional para cualquier espacio"
+        },
+        {
+          "icon": "lights",
+          "title": "4 Cabezas Móviles LED + Multiefectos",
+          "description": "Iluminación sincronizada con la música"
+        },
+        {
+          "icon": "fog",
+          "title": "Máquina de Humo + Efectos FX",
+          "description": "Para crear la atmósfera perfecta"
+        }
       ],
       "backup": "Backup 100%: Llevamos duplicado de TODO"
     },
@@ -5393,9 +5682,18 @@
         "cases": "Ver Bodas Reales"
       },
       "stats": {
-        "weddings": { "value": "25+", "label": "Bodas HP" },
-        "price": { "value": "Desde 850€", "label": "Todo incluido" },
-        "unique": { "value": "Únicos", "label": "En Cataluña" }
+        "weddings": {
+          "value": "25+",
+          "label": "Bodas HP"
+        },
+        "price": {
+          "value": "Desde 850€",
+          "label": "Todo incluido"
+        },
+        "unique": {
+          "value": "Únicos",
+          "label": "En Cataluña"
+        }
       }
     },
     "features": {
@@ -5403,12 +5701,36 @@
       "titleHighlight": "Hogwarts",
       "subtitle": "Todo lo que necesitas para transportar a tus invitados al mundo mágico de Harry Potter.",
       "items": [
-        { "icon": "candle", "title": "Velas Flotantes", "description": "Las icónicas velas flotantes del Gran Comedor de Hogwarts. Creadas con LED y efecto levitación." },
-        { "icon": "potion", "title": "Estación de Pociones", "description": "Con tarros de cristal, etiquetas antiguas, humo seco y luces. Perfecto para fotos." },
-        { "icon": "scroll", "title": "Invitaciones Hogwarts", "description": "Cartas estilo Hogwarts con lacre rojo y pluma. Hacemos el diseño por ti." },
-        { "icon": "music", "title": "Banda Sonora Mágica", "description": "Desde Hedwig's Theme hasta los hits que harán bailar a todos. DJ profesional." },
-        { "icon": "castle", "title": "Decoración Hogwarts", "description": "Escudos de las casas, banderas, libros antiguos, copas doradas... Todo el universo HP." },
-        { "icon": "sparkles", "title": "Efectos Mágicos", "description": "Humo bajo, luces doradas, láser, y momentos \"mágicos\" sincronizados con la música." }
+        {
+          "icon": "candle",
+          "title": "Velas Flotantes",
+          "description": "Las icónicas velas flotantes del Gran Comedor de Hogwarts. Creadas con LED y efecto levitación."
+        },
+        {
+          "icon": "potion",
+          "title": "Estación de Pociones",
+          "description": "Con tarros de cristal, etiquetas antiguas, humo seco y luces. Perfecto para fotos."
+        },
+        {
+          "icon": "scroll",
+          "title": "Invitaciones Hogwarts",
+          "description": "Cartas estilo Hogwarts con lacre rojo y pluma. Hacemos el diseño por ti."
+        },
+        {
+          "icon": "music",
+          "title": "Banda Sonora Mágica",
+          "description": "Desde Hedwig's Theme hasta los hits que harán bailar a todos. DJ profesional."
+        },
+        {
+          "icon": "castle",
+          "title": "Decoración Hogwarts",
+          "description": "Escudos de las casas, banderas, libros antiguos, copas doradas... Todo el universo HP."
+        },
+        {
+          "icon": "sparkles",
+          "title": "Efectos Mágicos",
+          "description": "Humo bajo, luces doradas, láser, y momentos \"mágicos\" sincronizados con la música."
+        }
       ]
     },
     "candles": {
@@ -5455,20 +5777,45 @@
           "name": "Magia Básica",
           "price": "850",
           "description": "Para fiestas temáticas",
-          "features": ["DJ Profesional 4h", "Decoración HP básica", "Velas flotantes (10u)", "Equipo sonido 2000W", "Luces temáticas", "Playlist HP + hits"]
+          "features": [
+            "DJ Profesional 4h",
+            "Decoración HP básica",
+            "Velas flotantes (10u)",
+            "Equipo sonido 2000W",
+            "Luces temáticas",
+            "Playlist HP + hits"
+          ]
         },
         {
           "name": "Experiencia Hogwarts",
           "price": "1200",
           "description": "La boda mágica completa",
-          "features": ["Todo del pack Básico", "DJ 6h (ceremonia a fiesta)", "Velas flotantes (20u)", "Estación de pociones", "Decoración completa", "Efectos humo + láser", "Coordinación con venue", "Micro inalámbrico"],
+          "features": [
+            "Todo del pack Básico",
+            "DJ 6h (ceremonia a fiesta)",
+            "Velas flotantes (20u)",
+            "Estación de pociones",
+            "Decoración completa",
+            "Efectos humo + láser",
+            "Coordinación con venue",
+            "Micro inalámbrico"
+          ],
           "highlighted": true
         },
         {
           "name": "Hogwarts Premium",
           "price": "1800",
           "description": "La experiencia definitiva",
-          "features": ["Todo del pack Hogwarts", "DJ 8h jornada completa", "Velas flotantes (30u)", "Photo corner HP completo", "Invitaciones diseño incluido", "Varita mágica para invitados", "Mapping básico", "Backup 100%"]
+          "features": [
+            "Todo del pack Hogwarts",
+            "DJ 8h jornada completa",
+            "Velas flotantes (30u)",
+            "Photo corner HP completo",
+            "Invitaciones diseño incluido",
+            "Varita mágica para invitados",
+            "Mapping básico",
+            "Backup 100%"
+          ]
         }
       ]
     },
@@ -5476,11 +5823,26 @@
       "title": "Preguntas",
       "titleHighlight": "Frecuentes",
       "items": [
-        { "question": "¿Cómo funcionan las velas flotantes?", "answer": "Son velas LED con efecto parpadeo realista, colgadas con hilo transparente a diferentes alturas. Crean el efecto del Gran Comedor de Hogwarts. El montaje es seguro y no necesita fuego real." },
-        { "question": "¿Puedo personalizar la tematización?", "answer": "¡Por supuesto! Podemos centrarnos en una casa específica (Gryffindor, Slytherin...), crear un ambiente más elegante o más fantástico, adaptarnos a cualquier venue." },
-        { "question": "¿Funciona para bodas civiles?", "answer": "¡Sí! Podemos adaptar el nivel de tematización. Desde un toque sutil con elementos HP hasta una inmersión total. Tú decides." },
-        { "question": "¿Cuánto tiempo necesitáis para montar?", "answer": "Para un montaje completo con velas flotantes, entre 3-4 horas. Lo coordinamos con el venue para no interferir con otros preparativos." },
-        { "question": "¿Podéis trabajar con mi wedding planner?", "answer": "¡Sí! Trabajamos regularmente con wedding planners. Nos coordinamos perfectamente para integrar la tematización con el resto de la decoración y el timing del día." }
+        {
+          "question": "¿Cómo funcionan las velas flotantes?",
+          "answer": "Son velas LED con efecto parpadeo realista, colgadas con hilo transparente a diferentes alturas. Crean el efecto del Gran Comedor de Hogwarts. El montaje es seguro y no necesita fuego real."
+        },
+        {
+          "question": "¿Puedo personalizar la tematización?",
+          "answer": "¡Por supuesto! Podemos centrarnos en una casa específica (Gryffindor, Slytherin...), crear un ambiente más elegante o más fantástico, adaptarnos a cualquier venue."
+        },
+        {
+          "question": "¿Funciona para bodas civiles?",
+          "answer": "¡Sí! Podemos adaptar el nivel de tematización. Desde un toque sutil con elementos HP hasta una inmersión total. Tú decides."
+        },
+        {
+          "question": "¿Cuánto tiempo necesitáis para montar?",
+          "answer": "Para un montaje completo con velas flotantes, entre 3-4 horas. Lo coordinamos con el venue para no interferir con otros preparativos."
+        },
+        {
+          "question": "¿Podéis trabajar con mi wedding planner?",
+          "answer": "¡Sí! Trabajamos regularmente con wedding planners. Nos coordinamos perfectamente para integrar la tematización con el resto de la decoración y el timing del día."
+        }
       ]
     },
     "cta": {
@@ -5491,50 +5853,6 @@
         "quote": "Pide Presupuesto Gratis",
         "whatsapp": "WhatsApp Directo"
       }
-    }
-  },
-  "calendar": {
-    "badge": "de fechas ya reservadas",
-    "title": "Disponibilidad de Sábados",
-    "subtitle": "Solo {count} sábados disponibles en los próximos 3 meses",
-    "status": {
-      "exhausted": "¡AGOTADO!",
-      "lastOne": "¡Solo {count} libre!",
-      "few": "{count} libres",
-      "available": "{count} libres"
-    },
-    "labels": {
-      "scarce": "¡Últimos!",
-      "limited": "Pocos",
-      "available": "Disponible"
-    },
-    "legend": {
-      "free": "Libre",
-      "booked": "Reservado"
-    },
-    "reasons": {
-      "booked": "Reservado",
-      "past": "Pasado"
-    },
-    "viewCalendar": "Ver calendario →",
-    "hideCalendar": "Ocultar calendario ↑",
-    "viewFullCalendar": "Ver calendario completo ↓",
-    "modal": {
-      "title": "¡Fecha disponible!",
-      "highSeason": "⭐ Temporada alta - Alta demanda",
-      "reserveBefore": "Reserva antes de que se agote",
-      "reserveDate": "Reservar esta fecha",
-      "consultWhatsapp": "Consultar por WhatsApp",
-      "keepLooking": "Seguir mirando",
-      "whatsappMsg": "Hola! Me interesa el {date} para mi evento"
-    },
-    "cta": {
-      "title": "Reserva tu fecha ahora",
-      "subtitle": "Sin compromiso • Respuesta en menos de 2h"
-    },
-    "compact": {
-      "loading": "Cargando...",
-      "saturdaysFree": "📅 Sábados libres:"
     }
   },
   "heroNew": {
@@ -5554,62 +5872,32 @@
       "recommended": "Recomendados en"
     }
   },
-  "servicesGrid": {
-    "subtitle": "Nuestros servicios",
-    "title": "¿Qué necesitas?",
-    "description": "Elige el tipo de evento y te ayudamos a crearlo exactamente como lo imaginas.",
-    "viewMore": "Ver más",
-    "notFound": "¿No encuentras lo que buscas?",
-    "contact": "Consúltanos sin compromiso",
-    "items": {
-      "tematiques": {
-        "title": "Experiencias Temáticas",
-        "description": "Harry Potter, Halloween y más",
-        "price": "Desde 600€",
-        "badge": "⭐ Lo más pedido",
-        "features": ["Decoración", "Efectos FX", "Ambientación", "Animación"]
-      },
-      "casaments": {
-        "title": "Bodas",
-        "description": "El día más especial merece ser perfecto",
-        "price": "Desde 650€",
-        "features": ["DJ Profesional", "Sonido + Luces", "Coordinación", "Backup 100%"]
-      },
-      "festes": {
-        "title": "Fiestas Privadas",
-        "description": "La fiesta que recordarán siempre",
-        "price": "Desde 400€",
-        "features": ["Discomóvil", "Luces LED", "Efectos", "Todo incluido"]
-      },
-      "empreses": {
-        "title": "Empresas",
-        "description": "Eventos corporativos de impacto",
-        "price": "Desde 500€",
-        "features": ["Audiovisual", "Micro inalámbrico", "Branding", "Factura"]
-      }
-    }
-  },
   "ctaFinal": {
     "urgency": {
       "saturdaysSingular": "sábado libre en",
       "saturdaysPlural": "sábados libres en",
-      "scarce": "⚠️ ¡Casi lleno!",
+      "october": "octubre",
+      "scarce": "⚠️ ¡Últimas fechas!",
       "limited": "🔥 ¡Se acaba!",
       "available": "✓ Disponible"
     },
     "title": {
-      "line1": "¿Listo para crear",
-      "line2": "el evento perfecto?"
+      "line1": "¿Quieres un evento",
+      "line2": "que nadie olvide?"
     },
-    "subtitle": "En 2 minutos tienes tu presupuesto personalizado. Sin compromiso.",
+    "subtitle": "Los únicos especialistas en tematización + DJ en Catalunya.",
+    "badges": {
+      "halloween": "🎃 Halloween disponible",
+      "monMagic": "🪄 Mundo Mágico disponible"
+    },
     "cta": {
-      "primary": "Pide Presupuesto Gratis",
+      "primary": "Pide Presupuesto",
       "secondary": "WhatsApp Directo"
     },
     "trust": {
-      "events": "eventos",
-      "rating": "valoración",
-      "response": "respuesta"
+      "events": "48+ eventos",
+      "rating": "4.9 valoración",
+      "response": "2h respuesta"
     },
     "guarantee": "🛡️ Garantía de satisfacción 100%. Si no estás contento, te devolvemos el dinero."
   },
@@ -5628,17 +5916,27 @@
         "festes": {
           "name": "Fiestas",
           "subtitle": "Cumpleaños, comuniones...",
-          "features": ["2-4 horas", "DJ Profesional", "Sonido 4000W"]
+          "features": [
+            "2-4 horas",
+            "DJ Profesional",
+            "Sonido 4000W"
+          ]
         },
         "bodes": {
           "name": "Bodas",
           "subtitle": "Baile o experiencia completa",
-          "features": ["Baile 3h o Completa", "Coordinación"]
+          "features": [
+            "Baile 3h o Completa",
+            "Coordinación"
+          ]
         },
         "corporatiu": {
           "name": "Corporativos",
           "subtitle": "Eventos de empresa con factura",
-          "features": ["4h", "Factura incluida"]
+          "features": [
+            "4h",
+            "Factura incluida"
+          ]
         }
       },
       "equipment": [
@@ -5733,6 +6031,20 @@
       "responseTime": "Respuesta típica",
       "writeUs": "¡Escríbenos!",
       "directWhatsApp": "WhatsApp Directo"
+    }
+  },
+  "heroUrgency": {
+    "halloween": {
+      "badge": "🎃 Halloween 2025:",
+      "saturdaysLeft": "{count} sábados libres en octubre",
+      "lastOnes": "¡Últimas fechas!",
+      "soldOut": "Agotado 2025",
+      "reserveNow": "Reserva ahora"
+    },
+    "monMagic": {
+      "badge": "🪄 Mundo Mágico:",
+      "available": "Disponible todo el año",
+      "bookNow": "Reserva tu experiencia"
     }
   }
 }

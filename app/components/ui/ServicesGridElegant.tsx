@@ -1,162 +1,148 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SERVICES GRID ELEGANT v2.1 - i18n complert
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// SERVICES GRID - Versió amb temàtiques separades
+// Halloween i Món Màgic com a cards independents
+// ═══════════════════════════════════════════════════════════════
 
-const serviceIds = ['tematiques', 'casaments', 'festes', 'empreses'] as const;
+const SERVICE_KEYS = ['halloween', 'monMagic', 'casaments', 'festes', 'empreses'] as const;
 
-const serviceConfig = {
-  tematiques: {
-    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
-    href: '/experiencies',
-    highlight: true,
+// Icones i colors per servei
+const SERVICE_STYLES: Record<string, { gradient: string; iconBg: string; hoverGlow: string }> = {
+  halloween: {
+    gradient: 'from-orange-500/20 to-orange-900/20',
+    iconBg: 'bg-orange-500/20',
+    hoverGlow: 'hover:shadow-orange-500/20',
+  },
+  monMagic: {
+    gradient: 'from-amber-500/20 to-amber-900/20',
+    iconBg: 'bg-amber-500/20',
+    hoverGlow: 'hover:shadow-amber-500/20',
   },
   casaments: {
-    image: '/img/portfolio/bodas/bodas-01.webp',
-    href: '/servicios/bodas',
-    highlight: false,
+    gradient: 'from-pink-500/20 to-pink-900/20',
+    iconBg: 'bg-pink-500/20',
+    hoverGlow: 'hover:shadow-pink-500/20',
   },
   festes: {
-    image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
-    href: '/servicios/fiestas',
-    highlight: false,
+    gradient: 'from-purple-500/20 to-purple-900/20',
+    iconBg: 'bg-purple-500/20',
+    hoverGlow: 'hover:shadow-purple-500/20',
   },
   empreses: {
-    image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
-    href: '/servicios/empresas',
-    highlight: false,
+    gradient: 'from-blue-500/20 to-blue-900/20',
+    iconBg: 'bg-blue-500/20',
+    hoverGlow: 'hover:shadow-blue-500/20',
   },
 };
 
+// Hrefs per cada servei
+const SERVICE_HREFS: Record<string, string> = {
+  halloween: '/tematica-halloween',
+  monMagic: '/tematica-mon-magic',
+  casaments: '/servicios/bodas',
+  festes: '/servicios/fiestas',
+  empreses: '/servicios/empresas',
+};
+
 export default function ServicesGridElegant() {
-  const t = useTranslations('services');
-  const tGrid = useTranslations('services.grid');
+  const t = useTranslations('servicesGrid');
 
   return (
-    <section className="py-24 bg-[#0A0A0A]">
-      <div className="container mx-auto px-6">
-
+    <section className="py-16 md:py-24 bg-gradient-to-b from-black to-zinc-950">
+      <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16">
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-[#C9A962] text-sm font-medium tracking-[0.2em] uppercase mb-4"
-          >
-            {tGrid('subtitle')}
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-semibold text-white mb-4"
-          >
-            {tGrid('title')}
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-[#888888] text-lg max-w-xl mx-auto"
-          >
-            {tGrid('description')}
-          </motion.p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <span className="text-orange-400 text-sm font-medium tracking-wider uppercase">
+            {t('subtitle')}
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mt-2 mb-4">
+            {t('title')}
+          </h2>
+          <p className="text-white/60 max-w-2xl mx-auto">
+            {t('description')}
+          </p>
+        </motion.div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {serviceIds.map((id, index) => {
-            const config = serviceConfig[id];
-            const title = tGrid(`${id}.title`);
-            const description = tGrid(`${id}.description`);
-            const price = tGrid(`${id}.price`);
-            const features = tGrid.raw(`${id}.features`) as string[];
-            const badge = id === 'tematiques' ? tGrid(`${id}.badge`) : null;
+        {/* Grid de serveis */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {SERVICE_KEYS.map((key, index) => {
+            const styles = SERVICE_STYLES[key];
+            const href = SERVICE_HREFS[key];
+            const badge = t(`items.${key}.badge`);
+            const features = t.raw(`items.${key}.features`) as string[];
 
             return (
               <motion.div
-                key={id}
-                initial={{ opacity: 0, y: 30 }}
+                key={key}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
+                className={`
+                  relative group
+                  ${index < 2 ? 'lg:col-span-1 md:col-span-1' : ''}
+                `}
               >
-                <Link href={config.href} className="group block h-full">
-                  <div className={`
-                    relative h-full bg-[#111111] rounded-2xl overflow-hidden
-                    border transition-all duration-500
-                    ${config.highlight
-                      ? 'border-[#C9A962]/50 hover:border-[#C9A962] ring-1 ring-[#C9A962]/20'
-                      : 'border-white/[0.06] hover:border-[#C9A962]/30'
-                    }
-                  `}>
-
-                    {/* Badge */}
-                    {badge && (
-                      <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-amber-500 to-orange-500 text-[#0A0A0A] text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                        {badge}
+                <Link href={href}>
+                  <div
+                    className={`
+                      relative h-full p-6 rounded-2xl
+                      bg-gradient-to-br ${styles.gradient}
+                      border border-white/10
+                      hover:border-white/20
+                      transition-all duration-300
+                      hover:shadow-xl ${styles.hoverGlow}
+                      cursor-pointer
+                    `}
+                  >
+                    {/* Badge si existeix */}
+                    {badge && badge !== `items.${key}.badge` && (
+                      <div className="absolute -top-3 left-4">
+                        <span className="px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full shadow-lg">
+                          {badge}
+                        </span>
                       </div>
                     )}
 
-                    {/* Image */}
-                    <div className="relative h-48 overflow-hidden">
-                      <Image
-                        src={config.image}
-                        alt={title}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-transparent" />
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6">
-                      {/* Price tag */}
-                      <div className="text-[#C9A962] text-sm font-medium mb-2">
-                        {price}
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-[#C9A962] transition-colors">
-                        {title}
+                    {/* Contingut */}
+                    <div className="pt-2">
+                      <h3 className="text-xl font-bold text-white mb-2">
+                        {t(`items.${key}.title`)}
                       </h3>
-
-                      {/* Description */}
-                      <p className="text-[#888888] text-sm mb-4">
-                        {description}
+                      <p className="text-white/60 text-sm mb-4">
+                        {t(`items.${key}.description`)}
                       </p>
 
                       {/* Features */}
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {features.map((feature) => (
+                        {features.slice(0, 4).map((feature, i) => (
                           <span
-                            key={feature}
-                            className="text-xs text-[#666666] bg-white/[0.03] px-2 py-1 rounded"
+                            key={i}
+                            className="px-2 py-1 bg-white/5 rounded text-white/70 text-xs"
                           >
                             {feature}
                           </span>
                         ))}
                       </div>
 
-                      {/* CTA */}
-                      <div className="flex items-center text-sm text-[#C9A962] font-medium group-hover:gap-3 gap-2 transition-all">
-                        <span>{t('viewMore')}</span>
-                        <svg
-                          className="w-4 h-4 transition-transform group-hover:translate-x-1"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
+                      {/* Preu */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-white font-bold">
+                          {t(`items.${key}.price`)}
+                        </span>
+                        <span className="text-white/40 text-sm group-hover:text-orange-400 transition-colors">
+                          {t('viewMore')} →
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -166,22 +152,20 @@ export default function ServicesGridElegant() {
           })}
         </div>
 
-        {/* Bottom CTA */}
+        {/* CTA altres temàtiques */}
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-          <p className="text-[#666666] mb-4">{t('notFound')}</p>
+          <p className="text-white/50 mb-4">{t('notFound')}</p>
           <Link
             href="/contacto"
-            className="inline-flex items-center gap-2 text-white hover:text-[#C9A962] transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-full text-white font-medium transition-colors"
           >
-            <span>{t('contact')}</span>
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            {t('contact')}
+            <span>💬</span>
           </Link>
         </motion.div>
       </div>

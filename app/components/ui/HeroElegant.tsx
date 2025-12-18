@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import { useState, useEffect } from 'react';
 
+import HeroUrgencyBadge from './HeroUrgencyBadge';
 // ═══════════════════════════════════════════════════════════════════════════
 // HERO ELEGANT v2.0 - Conversió màxima, mobile-first, amb traduccions
 // ═══════════════════════════════════════════════════════════════════════════
@@ -105,10 +106,15 @@ export default function HeroElegant() {
           </h1>
 
           {/* Subtítol - CONCÍS */}
-          <p className="text-lg md:text-xl text-white/70 mb-8 md:mb-10 max-w-xl mx-auto">
+          <p className="text-lg md:text-xl text-white/70 mb-6 max-w-xl mx-auto">
             {t('subtitle')}
             <span className="hidden md:inline"> {t('subtitleLocation')}</span>
           </p>
+
+          {/* Badge de Urgencia - Halloween / Món Màgic */}
+          <div className="mb-8 md:mb-10">
+            <HeroUrgencyBadge />
+          </div>
 
           {/* CTAs - Contacte PRIORITARI */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 mb-10 md:mb-12">
