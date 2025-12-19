@@ -200,9 +200,11 @@ export default function TestimonialFormGamified() {
         body: formDataUpload,
       });
 
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || t('errors.uploadPhotoError'));
+      }
       const result = await res.json();
-      if (!res.ok) throw new Error(result.error);
-
       setFormData(prev => ({ ...prev, photoUrl: result.url }));
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : t('errors.uploadPhotoError'));
@@ -239,9 +241,11 @@ export default function TestimonialFormGamified() {
         body: formDataUpload,
       });
 
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || t('errors.uploadVideoError'));
+      }
       const result = await res.json();
-      if (!res.ok) throw new Error(result.error);
-
       setFormData(prev => ({ ...prev, videoUrl: result.url }));
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : t('errors.uploadVideoError'));
@@ -274,11 +278,13 @@ export default function TestimonialFormGamified() {
         }),
       });
 
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || t('errors.submitError'));
+      }
       const result = await res.json();
-      if (!res.ok) throw new Error(result.error);
-
       setSubmitResult({
-        discountCode: result.data.discountCode,
+        discountCode: result.data?.discountCode || 'ORBITA-THANKS',
         totalDiscount,
       });
 
