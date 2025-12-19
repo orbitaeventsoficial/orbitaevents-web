@@ -1,18 +1,21 @@
 // app/[locale]/page.tsx
 // ═══════════════════════════════════════════════════════════════════════════
-// ÒRBITA EVENTS - ELEGANT EDITION v2.0
+// ÒRBITA EVENTS - ELEGANT EDITION v2.0 + MOBILE ULTIMATE
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
 
-// ELEGANT Components - Nova versió sofisticada
+// ELEGANT Components - Nova versió sofisticada (Desktop)
 import HeroElegant from '@/app/components/ui/HeroElegant';
 import ServicesGridElegant from '@/app/components/ui/ServicesGridElegant';
 import TestimoniosReales from '@/app/components/home/TestimoniosReales';
 import GarantiaSection from '@/app/components/marketing/GarantiaSection';
 import CTAFinal from '@/app/components/marketing/CTAFinal';
 import CalendarioUrgencia from '@/app/components/ui/CalendarioUrgencia';
+
+// Mobile/Desktop Detection Wrapper
+import HomePageWrapper from '@/app/components/HomePageWrapper';
 
 export const revalidate = 3600;
 
@@ -41,28 +44,31 @@ export async function generateMetadata({ params }: { params: { locale: string } 
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-[#0A0A0A]">
-      {/* 1. HERO ELEGANT - Sofisticat amb vídeo */}
-      <HeroElegant />
+    <HomePageWrapper>
+      {/* Desktop: Contingut elegant */}
+      <main className="min-h-screen bg-[#0A0A0A]">
+        {/* 1. HERO ELEGANT - Sofisticat amb vídeo */}
+        <HeroElegant />
 
-      {/* 2. SERVEIS - Grid elegant 4 cards */}
-      <ServicesGridElegant />
+        {/* 2. SERVEIS - Grid elegant 4 cards */}
+        <ServicesGridElegant />
 
-      {/* 3. CALENDARIO - Urgència subtil */}
-      <section className="py-20 bg-[#0A0A0A]">
-        <div className="container mx-auto px-6">
-          <CalendarioUrgencia />
-        </div>
-      </section>
+        {/* 3. CALENDARIO - Urgència subtil */}
+        <section className="py-20 bg-[#0A0A0A]">
+          <div className="container mx-auto px-6">
+            <CalendarioUrgencia />
+          </div>
+        </section>
 
-      {/* 4. TESTIMONIOS - Prova social */}
-      <TestimoniosReales />
+        {/* 4. TESTIMONIOS - Prova social */}
+        <TestimoniosReales />
 
-      {/* 5. GARANTÍA - Confiança */}
-      <GarantiaSection />
+        {/* 5. GARANTÍA - Confiança */}
+        <GarantiaSection />
 
-      {/* 6. CTA FINAL - Conversió */}
-      <CTAFinal />
-    </main>
+        {/* 6. CTA FINAL - Conversió */}
+        <CTAFinal />
+      </main>
+    </HomePageWrapper>
   );
 }
