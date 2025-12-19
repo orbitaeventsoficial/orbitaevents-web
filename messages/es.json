@@ -6036,16 +6036,24 @@
   },
   "heroUrgency": {
     "halloween": {
-      "badge": "🎃 Halloween 2025:",
-      "saturdaysLeft": "{count} sábados libres en octubre",
+      "title": "Halloween {year}:",
+      "saturdaysFree": "{count} sábados libres {month}",
       "lastOnes": "¡Últimas fechas!",
-      "soldOut": "Agotado 2025",
+      "soldOut": "Agotado",
       "reserveNow": "Reserva ahora"
     },
+    "nextDates": {
+      "title": "Próximas fechas ({month} {year}):",
+      "saturdaysFree": "{count} sábados libres {month}",
+      "noData": "Consulta disponibilidad"
+    },
     "monMagic": {
-      "badge": "🪄 Mundo Mágico:",
+      "title": "Mundo Mágico:",
       "available": "Disponible todo el año",
       "bookNow": "Reserva tu experiencia"
+    },
+    "cta": {
+      "reserveNow": "Reserva ahora →"
     }
   }
 }
