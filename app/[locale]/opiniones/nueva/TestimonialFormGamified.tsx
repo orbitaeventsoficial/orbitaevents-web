@@ -704,9 +704,23 @@ export default function TestimonialFormGamified() {
               ))}
             </div>
 
-            <div className="flex justify-between text-xs sm:text-sm text-white/40 px-2">
-              <span>{t('gamified.nps.unlikely')}</span>
-              <span>{t('gamified.nps.likely')}</span>
+            <div className="flex justify-between text-xs sm:text-sm px-2">
+              <span className={`transition-colors ${
+                formData.npsScore >= 0 && formData.npsScore <= 6
+                  ? 'text-red-400 font-semibold'
+                  : 'text-white/40'
+              }`}>
+                {t('gamified.nps.unlikely')}
+              </span>
+              <span className={`transition-colors ${
+                formData.npsScore >= 9
+                  ? 'text-green-400 font-semibold'
+                  : formData.npsScore >= 7
+                    ? 'text-yellow-400 font-semibold'
+                    : 'text-white/40'
+              }`}>
+                {t('gamified.nps.likely')}
+              </span>
             </div>
 
             {/* Google Review CTA */}
