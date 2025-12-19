@@ -95,8 +95,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error creant testimoni:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Error desconegut';
     return NextResponse.json(
-      { error: 'Error processant la sol·licitud' },
+      { error: 'Error processant la sol·licitud', details: errorMessage },
       { status: 500 }
     );
   }
