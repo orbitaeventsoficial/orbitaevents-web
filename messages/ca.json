@@ -5997,16 +5997,24 @@
   },
   "heroUrgency": {
     "halloween": {
-      "badge": "🎃 Halloween 2025:",
-      "saturdaysLeft": "{count} dissabtes lliures a octubre",
+      "title": "Halloween {year}:",
+      "saturdaysFree": "{count} dissabtes lliures {month}",
       "lastOnes": "Últimes dates!",
-      "soldOut": "Esgotat 2025",
+      "soldOut": "Esgotat",
       "reserveNow": "Reserva ara"
     },
+    "nextDates": {
+      "title": "Properes dates ({month} {year}):",
+      "saturdaysFree": "{count} dissabtes lliures {month}",
+      "noData": "Consulta disponibilitat"
+    },
     "monMagic": {
-      "badge": "🪄 Món Màgic:",
+      "title": "Món Màgic:",
       "available": "Disponible tot l'any",
       "bookNow": "Reserva la teva experiència"
+    },
+    "cta": {
+      "reserveNow": "Reserva ara →"
     }
   }
 }

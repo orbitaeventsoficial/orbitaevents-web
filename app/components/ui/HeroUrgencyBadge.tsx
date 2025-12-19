@@ -6,19 +6,23 @@ import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════
 // HERO URGENCY BADGE - Badge dinàmic de disponibilitat
-// Mostra dissabtes lliures d'octubre per Halloween
+// Mostra dissabtes lliures basats en dades reals de la BBDD
 // ═══════════════════════════════════════════════════════════════
 
 interface AvailabilityData {
   month: number;
   year: number;
+  monthName: string;
   totalSaturdays: number;
   freeSaturdays: number;
-  saturdays: Array<{
-    date: string;
-    available: boolean;
-  }>;
+  isHalloweenMonth: boolean;
 }
+
+// Noms dels mesos en català
+const MONTH_NAMES_CA: Record<number, string> = {
+  1: 'gen.', 2: 'feb.', 3: 'març', 4: 'abr.', 5: 'maig', 6: 'juny',
+  7: 'jul.', 8: 'ago.', 9: 'set.', 10: 'oct.', 11: 'nov.', 12: 'des.'
+};
 
 export default function HeroUrgencyBadge() {
   const t = useTranslations('heroUrgency');
@@ -26,35 +30,53 @@ export default function HeroUrgencyBadge() {
   const [loading, setLoading] = useState(true);
   const [currentTheme, setCurrentTheme] = useState<'halloween' | 'monMagic'>('halloween');
 
-  // Fetch disponibilitat
+  // Fetch disponibilitat real de la BBDD
   useEffect(() => {
     async function fetchAvailability() {
       try {
         const res = await fetch('/api/public/availability');
         if (res.ok) {
           const json = await res.json();
-          // Adaptar al format del API existent
           if (json.ok && json.data && json.data.monthlyAvailability && json.data.monthlyAvailability.length > 0) {
+            // Primer busquem octubre (mes de Halloween)
             const octoberData = json.data.monthlyAvailability.find(
-              function(m: { month: string }) { return m.month && m.month.includes('-10'); }
+              (m: { month: string }) => m.month && m.month.includes('-10')
             );
+
+            // Si hi ha octubre, l'usem; si no, agafem el primer mes disponible
             const monthData = octoberData || json.data.monthlyAvailability[0];
+
+            // Extreure mes i any del format "YYYY-MM"
+            const [yearStr, monthStr] = monthData.month.split('-');
+            const monthNum = parseInt(monthStr, 10);
+            const yearNum = parseInt(yearStr, 10);
+
             setAvailability({
-              freeSaturdays: monthData.availableSaturdays || 3,
-              totalSaturdays: monthData.totalSaturdays || 5,
-              month: 10,
-              year: 2025,
-              saturdays: []
+              freeSaturdays: monthData.availableSaturdays || 0,
+              totalSaturdays: monthData.totalSaturdays || 0,
+              month: monthNum,
+              year: yearNum,
+              monthName: MONTH_NAMES_CA[monthNum] || monthData.monthName,
+              isHalloweenMonth: monthNum === 10
             });
           } else {
-            setAvailability({ freeSaturdays: 3, totalSaturdays: 5, month: 10, year: 2025, saturdays: [] });
+            // Fallback sense dades
+            const now = new Date();
+            setAvailability({
+              freeSaturdays: 0,
+              totalSaturdays: 0,
+              month: now.getMonth() + 1,
+              year: now.getFullYear(),
+              monthName: MONTH_NAMES_CA[now.getMonth() + 1],
+              isHalloweenMonth: false
+            });
           }
         } else {
-          setAvailability({ freeSaturdays: 3, totalSaturdays: 5, month: 10, year: 2025, saturdays: [] });
+          setAvailability(null);
         }
       } catch (error) {
         console.error('Error fetching availability:', error);
-        setAvailability({ freeSaturdays: 3, totalSaturdays: 5, month: 10, year: 2025, saturdays: [] });
+        setAvailability(null);
       } finally {
         setLoading(false);
       }
@@ -103,9 +125,38 @@ export default function HeroUrgencyBadge() {
     );
   }
 
+  // Generar text dinàmic basat en dades reals de la BBDD + traduccions
+  const getAvailabilityText = () => {
+    if (!availability) return t('nextDates.noData');
+    if (availability.freeSaturdays === 0) return t('halloween.soldOut');
+
+    // Usar traducció amb paràmetres
+    if (availability.isHalloweenMonth) {
+      return t('halloween.saturdaysFree', {
+        count: availability.freeSaturdays,
+        month: availability.monthName
+      });
+    }
+    return t('nextDates.saturdaysFree', {
+      count: availability.freeSaturdays,
+      month: availability.monthName
+    });
+  };
+
+  const getTitle = () => {
+    if (!availability) return t('nextDates.noData');
+    if (availability.isHalloweenMonth) {
+      return t('halloween.title', { year: availability.year });
+    }
+    return t('nextDates.title', {
+      month: availability.monthName,
+      year: availability.year
+    });
+  };
+
   return (
     <div className="flex flex-col sm:flex-row gap-2 items-center justify-center">
-      {/* Badge Halloween amb disponibilitat dinàmica */}
+      {/* Badge amb disponibilitat dinàmica de la BBDD */}
       <AnimatePresence mode="wait">
         {currentTheme === 'halloween' && (
           <motion.div
@@ -119,15 +170,9 @@ export default function HeroUrgencyBadge() {
               text-sm font-medium shadow-lg
             `}
           >
-            <span className="text-lg">🎃</span>
-            <span>Halloween 2025:</span>
-            {urgencyLevel === 'soldOut' ? (
-              <span className="font-bold">{t('halloween.soldOut')}</span>
-            ) : (
-              <span className="font-bold">
-                {availability?.freeSaturdays} dissabtes lliures oct.
-              </span>
-            )}
+            <span className="text-lg">{availability?.isHalloweenMonth ? '🎃' : '📅'}</span>
+            <span>{getTitle()}</span>
+            <span className="font-bold">{getAvailabilityText()}</span>
             {urgencyLevel === 'scarce' && (
               <span className="ml-1 text-yellow-300">⚠️</span>
             )}
@@ -147,8 +192,8 @@ export default function HeroUrgencyBadge() {
             `}
           >
             <span className="text-lg">🪄</span>
-            <span>Món Màgic:</span>
-            <span className="font-bold">Disponible tot l'any</span>
+            <span>{t('monMagic.title')}</span>
+            <span className="font-bold">{t('monMagic.available')}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -165,7 +210,7 @@ export default function HeroUrgencyBadge() {
           transition-colors cursor-pointer
         "
       >
-        Reserva ara →
+        {t('cta.reserveNow')}
       </motion.a>
     </div>
   );
@@ -175,8 +220,15 @@ export default function HeroUrgencyBadge() {
 // VERSIÓ COMPACTA - Per a mobile o espais reduïts
 // ═══════════════════════════════════════════════════════════════
 
+interface CompactAvailability {
+  freeSaturdays: number;
+  monthName: string;
+  year: number;
+  isHalloweenMonth: boolean;
+}
+
 export function HeroUrgencyBadgeCompact() {
-  const [freeSaturdays, setFreeSaturdays] = useState<number | null>(null);
+  const [availability, setAvailability] = useState<CompactAvailability | null>(null);
 
   useEffect(() => {
     async function fetchAvailability() {
@@ -186,27 +238,30 @@ export function HeroUrgencyBadgeCompact() {
           const json = await res.json();
           if (json.ok && json.data && json.data.monthlyAvailability && json.data.monthlyAvailability.length > 0) {
             const octoberData = json.data.monthlyAvailability.find(
-              function(m: { month: string }) { return m.month && m.month.includes('-10'); }
+              (m: { month: string }) => m.month && m.month.includes('-10')
             );
             const monthData = octoberData || json.data.monthlyAvailability[0];
-            setFreeSaturdays(monthData.availableSaturdays || 3);
-          } else {
-            setFreeSaturdays(3);
+            const [yearStr, monthStr] = monthData.month.split('-');
+            const monthNum = parseInt(monthStr, 10);
+
+            setAvailability({
+              freeSaturdays: monthData.availableSaturdays || 0,
+              monthName: MONTH_NAMES_CA[monthNum] || monthData.monthName,
+              year: parseInt(yearStr, 10),
+              isHalloweenMonth: monthNum === 10
+            });
           }
-        } else {
-          setFreeSaturdays(3);
         }
       } catch (error) {
         console.error('Error:', error);
-        setFreeSaturdays(3);
       }
     }
     fetchAvailability();
   }, []);
 
-  if (freeSaturdays === null) return null;
+  if (!availability) return null;
 
-  const isUrgent = freeSaturdays <= 2;
+  const isUrgent = availability.freeSaturdays <= 2;
 
   return (
     <motion.div
@@ -214,20 +269,20 @@ export function HeroUrgencyBadgeCompact() {
       animate={{ opacity: 1 }}
       className={`
         inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
-        ${isUrgent 
-          ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
+        ${isUrgent
+          ? 'bg-red-500/20 text-red-300 border border-red-500/30'
           : 'bg-orange-500/20 text-orange-300 border border-orange-500/30'
         }
       `}
     >
-      <span>🎃</span>
+      <span>{availability.isHalloweenMonth ? '🎃' : '📅'}</span>
       <span>
-        {freeSaturdays === 0 
-          ? 'Halloween 2025 esgotat' 
-          : `${freeSaturdays} dissabtes lliures oct.`
+        {availability.freeSaturdays === 0
+          ? `${availability.monthName} ${availability.year} esgotat`
+          : `${availability.freeSaturdays} dissabtes lliures ${availability.monthName}`
         }
       </span>
-      {isUrgent && freeSaturdays > 0 && <span>⚠️</span>}
+      {isUrgent && availability.freeSaturdays > 0 && <span>⚠️</span>}
     </motion.div>
   );
 }
