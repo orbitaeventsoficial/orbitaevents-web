@@ -392,62 +392,15 @@ export default function OpinionesClient() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mt-16 mb-12"
+          className="mt-16 text-center"
         >
-          <div className="relative max-w-2xl mx-auto p-8 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-3xl text-center">
-            {/* Decorative elements */}
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full">
-              <span className="text-black text-sm font-bold">✍️</span>
-            </div>
-
-            <h3 className="text-2xl font-bold text-white mb-2 mt-2">
-              {t('page.leaveReviewCta')}
-            </h3>
-            <p className="text-white/60 mb-6">
-              {t('page.leaveReviewSubtitle')}
-            </p>
-
-            <Link
-              href="/opiniones/nueva"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 text-white font-semibold rounded-2xl transition-all hover:scale-105"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              <span>{t('page.leaveReviewCta')}</span>
-              <span>→</span>
-            </Link>
-          </div>
-        </motion.div>
-
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="text-center"
-        >
-          <p className="text-white/60 mb-6">
-            {t('cta.title')}
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <a
-              href={buildWhatsAppUrl(t('cta.whatsappMessage'))}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#25D366] hover:bg-[#20BD5A] rounded-2xl transition-all hover:shadow-[0_8px_30px_rgba(37,211,102,0.4)] text-white font-bold"
-            >
-              <Icons.WhatsApp />
-              <span>{t('page.whatsappCta')}</span>
-            </a>
-            <Link
-              href="/contacto"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-2xl transition-all hover:scale-105"
-            >
-              <span>{t('cta.requestQuote')}</span>
-              <span>→</span>
-            </Link>
-          </div>
+          <Link
+            href="/opiniones/nueva"
+            className="inline-flex items-center justify-center gap-2 text-white/60 hover:text-amber-400 transition-colors text-lg"
+          >
+            <span>{t('page.shareExperienceFullCta')}</span>
+            <span>→</span>
+          </Link>
         </motion.div>
       </div>
     </main>
