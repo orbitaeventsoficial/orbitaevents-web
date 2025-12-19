@@ -20,6 +20,7 @@
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/lib/navigation';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -387,16 +388,14 @@ export default function TestimoniosReales() {
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <p className="text-white/60 mb-4">
-            {t('cta')}
-          </p>
-          <a
-            href="/contacto"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-2xl transition-all hover:scale-105"
+          <Link
+            href="/opiniones/nueva"
+            className="inline-flex items-center gap-2 text-white/60 hover:text-amber-400 transition-colors text-lg"
           >
+            <span>{t('cta')}</span>
             <span>{t('ctaButton')}</span>
             <span>→</span>
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>
