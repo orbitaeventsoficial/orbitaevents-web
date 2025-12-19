@@ -390,11 +390,15 @@ export default function TestimoniosReales() {
         >
           <Link
             href="/opiniones/nueva"
-            className="inline-flex items-center gap-2 text-white/60 hover:text-amber-400 transition-colors text-lg"
+            className="group inline-block"
           >
-            <span>{t('cta')}</span>
-            <span>{t('ctaButton')}</span>
-            <span>→</span>
+            <h3 className="text-2xl md:text-3xl font-bold text-white group-hover:text-amber-400 transition-colors mb-2">
+              {t('cta')}
+            </h3>
+            <p className="text-xl md:text-2xl font-semibold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent group-hover:from-amber-300 group-hover:to-orange-300 transition-all flex items-center justify-center gap-2">
+              {t('ctaButton')}
+              <span className="group-hover:translate-x-1 transition-transform">→</span>
+            </p>
           </Link>
         </motion.div>
       </div>
