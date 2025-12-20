@@ -292,45 +292,52 @@ export default function MobileAdminLayout({ children }: MobileAdminLayoutProps) 
     }
   }, [isMounted]);
 
-  // During SSR and initial hydration, render children without mobile wrapper
+  // During SSR and initial hydration, render children directly
   // This ensures consistent rendering between server and client
-  if (!isMounted || isMobile === null) {
+  // All mobile-specific features are added after hydration is complete
+  if (!isMounted) {
     return <>{children}</>;
   }
 
-  // On desktop, just render children
-  if (!isMobile) {
+  // On desktop (after mount), just render children
+  if (isMobile === false) {
     return <>{children}</>;
   }
 
-  // On mobile, render the full mobile layout
-  return (
-    <>
-      {/* Splash screen */}
-      <SplashScreen isLoading={isLoading} />
+  // On mobile (after mount and detection), render the full mobile layout
+  // This only happens AFTER hydration is complete, so it won't cause mismatches
+  if (isMobile === true) {
+    return (
+      <>
+        {/* Splash screen */}
+        <SplashScreen isLoading={isLoading} />
 
-      {/* PWA status bar */}
-      {isStandalone && <PWAStatusBar />}
+        {/* PWA status bar */}
+        {isStandalone && <PWAStatusBar />}
 
-      {/* Offline indicator */}
-      <OfflineIndicator />
+        {/* Offline indicator */}
+        <OfflineIndicator />
 
-      {/* Main content */}
-      <main
-        className="min-h-screen bg-zinc-950"
-        style={{
-          paddingTop: isStandalone ? 'env(safe-area-inset-top)' : '0',
-        }}
-      >
-        <PageTransition pathname={pathname}>
-          {children}
-        </PageTransition>
-      </main>
+        {/* Main content */}
+        <main
+          className="min-h-screen bg-zinc-950"
+          style={{
+            paddingTop: isStandalone ? 'env(safe-area-inset-top)' : '0',
+          }}
+        >
+          <PageTransition pathname={pathname}>
+            {children}
+          </PageTransition>
+        </main>
 
-      {/* Bottom navigation */}
-      <BottomNavPro />
-    </>
-  );
+        {/* Bottom navigation */}
+        <BottomNavPro />
+      </>
+    );
+  }
+
+  // While isMobile is being determined (null), just render children
+  return <>{children}</>;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
