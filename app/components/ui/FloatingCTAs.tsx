@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FLOATING CTAs - Focus en FORMULARI DE CONTACTE (no WhatsApp)
@@ -93,6 +94,7 @@ export function ContactDesktop() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export function BottomBarMobile() {
+  const t = useTranslations('common');
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -148,7 +150,7 @@ export function BottomBarMobile() {
                   href="/contacto"
                   className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold py-3.5 rounded-xl text-center active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
                 >
-                  Sol·licitar pressupost
+                  {t('buttons.requestQuote')}
                 </Link>
 
                 {/* WhatsApp - Secundari, més discret */}

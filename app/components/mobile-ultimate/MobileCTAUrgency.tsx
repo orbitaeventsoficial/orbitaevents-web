@@ -16,6 +16,7 @@
 import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useMobile } from './MobileAppShell';
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // AVAILABILITY COUNTER
@@ -168,6 +169,7 @@ function TrustBadges() {
 
 export default function MobileCTAUrgency() {
   const { haptic } = useMobile();
+  const t = useTranslations('common');
 
   return (
     <section className="py-16 px-6">
@@ -214,7 +216,7 @@ export default function MobileCTAUrgency() {
               <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl blur-xl opacity-50 group-active:opacity-70 transition-opacity" />
               
               <div className="relative flex items-center justify-center gap-3 py-4 px-6 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl font-bold text-black text-lg shadow-2xl">
-                <span>Demana pressupost gratis</span>
+                <span>{t('buttons.requestQuoteFree')}</span>
                 <motion.svg 
                   className="w-5 h-5" 
                   fill="none" 

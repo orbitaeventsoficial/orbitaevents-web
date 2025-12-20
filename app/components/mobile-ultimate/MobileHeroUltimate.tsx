@@ -18,6 +18,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { useMobile } from './MobileAppShell';
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PARTICLES BACKGROUND
@@ -221,6 +222,7 @@ function ScrollIndicator() {
 
 function FloatingCTAs() {
   const { haptic } = useMobile();
+  const t = useTranslations('common');
 
   return (
     <div className="flex flex-col gap-3 w-full px-6">
@@ -235,7 +237,7 @@ function FloatingCTAs() {
         <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl blur-xl opacity-50 group-active:opacity-70 transition-opacity" />
         
         <div className="relative flex items-center justify-center gap-3 py-4 px-6 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl font-bold text-black text-lg shadow-2xl">
-          <span>Sol·licitar pressupost</span>
+          <span>{t('buttons.requestQuote')}</span>
           <motion.svg 
             className="w-5 h-5" 
             fill="none" 
@@ -270,6 +272,7 @@ function FloatingCTAs() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function MobileHeroUltimate() {
+  const t = useTranslations('common');
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,

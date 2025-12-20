@@ -88,7 +88,8 @@
       "Bash(for url in \"/\" \"/tematica-halloween\" \"/es\")",
       "Bash(node scripts/write-services-grid.js:*)",
       "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/portfolio\" \"/tematica-halloween\" \"/tematica-mon-magic\")",
-      "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/portfolio\" \"/tematica-halloween\")"
+      "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/portfolio\" \"/tematica-halloween\")",
+      "Bash(tasklist:*)"
     ]
   }
 }
