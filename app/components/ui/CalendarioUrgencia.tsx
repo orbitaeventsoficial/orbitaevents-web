@@ -632,7 +632,7 @@ export default function CalendarioUrgencia({
           className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-full transition-all shadow-lg hover:shadow-amber-500/25 hover:scale-105"
         >
           <span>🎯</span>
-          <span>Sol·licitar pressupost</span>
+          <span>{tCommon('buttons.requestQuote')}</span>
         </Link>
       </div>
 
