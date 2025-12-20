@@ -13,6 +13,7 @@ import Image from 'next/image';
 import confetti from 'canvas-confetti';
 import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { supabase } from '@/lib/supabase';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS I CONSTANTS
@@ -172,7 +173,7 @@ export default function TestimonialFormGamified() {
     }
   };
 
-  // Upload foto
+  // Upload foto - Directament a Supabase Storage
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -182,31 +183,45 @@ export default function TestimonialFormGamified() {
       return;
     }
 
+    // Check if Supabase is configured
+    if (!supabase) {
+      setUploadError('Storage no configurat');
+      return;
+    }
+
     // Preview
     const reader = new FileReader();
     reader.onload = (e) => setPhotoPreview(e.target?.result as string);
     reader.readAsDataURL(file);
 
-    // Upload
+    // Upload directament a Supabase Storage
     setPhotoUploading(true);
     setUploadError(null);
 
     try {
-      const formDataUpload = new FormData();
-      formDataUpload.append('file', file);
+      const timestamp = Date.now();
+      const ext = file.name.split('.').pop() || 'jpg';
+      const fileName = `testimonials/photos/${timestamp}-${Math.random().toString(36).substring(7)}.${ext}`;
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formDataUpload,
-      });
+      const { data, error } = await supabase.storage
+        .from('media')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+        });
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || t('errors.uploadPhotoError'));
+      if (error) {
+        throw new Error(error.message);
       }
-      const result = await res.json();
-      setFormData(prev => ({ ...prev, photoUrl: result.url }));
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('media')
+        .getPublicUrl(data.path);
+
+      setFormData(prev => ({ ...prev, photoUrl: urlData.publicUrl }));
     } catch (error) {
+      console.error('Error uploading photo:', error);
       setUploadError(error instanceof Error ? error.message : t('errors.uploadPhotoError'));
       setPhotoPreview(null);
     } finally {
@@ -214,7 +229,7 @@ export default function TestimonialFormGamified() {
     }
   };
 
-  // Upload vídeo
+  // Upload vídeo - Directament a Supabase Storage
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -224,30 +239,44 @@ export default function TestimonialFormGamified() {
       return;
     }
 
+    // Check if Supabase is configured
+    if (!supabase) {
+      setUploadError('Storage no configurat');
+      return;
+    }
+
     // Preview
     const videoUrl = URL.createObjectURL(file);
     setVideoPreview(videoUrl);
 
-    // Upload
+    // Upload directament a Supabase Storage
     setVideoUploading(true);
     setUploadError(null);
 
     try {
-      const formDataUpload = new FormData();
-      formDataUpload.append('file', file);
+      const timestamp = Date.now();
+      const ext = file.name.split('.').pop() || 'mp4';
+      const fileName = `testimonials/videos/${timestamp}-${Math.random().toString(36).substring(7)}.${ext}`;
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formDataUpload,
-      });
+      const { data, error } = await supabase.storage
+        .from('media')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+        });
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || t('errors.uploadVideoError'));
+      if (error) {
+        throw new Error(error.message);
       }
-      const result = await res.json();
-      setFormData(prev => ({ ...prev, videoUrl: result.url }));
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('media')
+        .getPublicUrl(data.path);
+
+      setFormData(prev => ({ ...prev, videoUrl: urlData.publicUrl }));
     } catch (error) {
+      console.error('Error uploading video:', error);
       setUploadError(error instanceof Error ? error.message : t('errors.uploadVideoError'));
       setVideoPreview(null);
     } finally {
