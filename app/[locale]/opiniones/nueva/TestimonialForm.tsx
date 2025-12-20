@@ -22,7 +22,7 @@ import { useTranslations } from 'next-intl';
 // Esquema de validació actualitzat per nou esquema Supabase
 const testimonialSchema = z.object({
   email: z.string().email('Email no vàlid'),
-  name: z.string().min(2, 'El nom ha de tenir mínim 2 caràcters').optional().or(z.literal('')),
+  name: z.string().min(2, 'El nom ha de tenir mínim 2 caràcters'),
   phone: z.string().optional(),
   city: z.string().optional(),
   instagram: z.string().optional(),
@@ -373,13 +373,16 @@ export default function TestimonialForm() {
           {/* CAMPS OPCIONALS - Grid */}
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="testimonial-name" className="block text-sm text-gray-400 mb-2">{t('form.nameOptional')}</label>
+              <label htmlFor="testimonial-name" className="block text-sm text-gray-400 mb-2">
+                {t('form.name')} <span className="text-fuchsia-500">*</span>
+              </label>
               <input
                 id="testimonial-name"
                 type="text"
                 {...register('name')}
                 className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3.5 text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all"
               />
+              {errors.name && <p className="text-red-400 text-sm mt-1.5">{errors.name.message}</p>}
             </div>
 
             <div>

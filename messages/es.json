@@ -4247,7 +4247,11 @@
       "titleMax": "El título debe tener máximo 200 caracteres",
       "commentMin": "El comentario debe tener mínimo 10 caracteres",
       "commentMax": "El comentario debe tener máximo 1000 caracteres",
-      "acceptData": "Debes aceptar el tratamiento de datos"
+      "acceptData": "Debes aceptar el tratamiento de datos",
+      "nameRequired": "El nombre es obligatorio (mínimo 2 caracteres)",
+      "emailRequired": "El email es obligatorio",
+      "ratingRequired": "Debes seleccionar una valoración",
+      "commentRequired": "El comentario debe tener mínimo 10 caracteres"
     },
     "eventTypes": {
       "boda": "Boda",
@@ -4294,6 +4298,7 @@
         "4": "¡Muy bien!",
         "5": "¡Excelente!"
       },
+      "name": "Nombre",
       "nameOptional": "Nombre (opcional)",
       "phoneOptional": "Teléfono (opcional)",
       "cityOptional": "Ciudad (opcional)",

@@ -4111,7 +4111,11 @@
       "titleMax": "El títol ha de tenir màxim 200 caràcters",
       "commentMin": "El comentari ha de tenir mínim 10 caràcters",
       "commentMax": "El comentari ha de tenir màxim 1000 caràcters",
-      "acceptData": "Has d'acceptar el tractament de dades"
+      "acceptData": "Has d'acceptar el tractament de dades",
+      "nameRequired": "El nom és obligatori (mínim 2 caràcters)",
+      "emailRequired": "L'email és obligatori",
+      "ratingRequired": "Has de seleccionar una valoració",
+      "commentRequired": "El comentari ha de tenir mínim 10 caràcters"
     },
     "eventTypes": {
       "boda": "Boda",
@@ -4158,6 +4162,7 @@
         "4": "Molt bé!",
         "5": "Excel·lent!"
       },
+      "name": "Nom",
       "nameOptional": "Nom (opcional)",
       "phoneOptional": "Telèfon (opcional)",
       "cityOptional": "Ciutat (opcional)",

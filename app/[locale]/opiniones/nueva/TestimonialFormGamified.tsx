@@ -153,10 +153,10 @@ export default function TestimonialFormGamified() {
     }
   };
 
-  // Continuar sense codi
+  // Continuar sense codi - mostrar formulari de dades (quedar al pas 0)
   const continueWithoutCode = () => {
     setHasVerificationCode(false);
-    setCurrentStep(1);
+    // NO canviem de step - el pas 0 mostrarà el formulari de dades
   };
 
   // Seleccionar rating amb confetti si és 5
@@ -257,6 +257,23 @@ export default function TestimonialFormGamified() {
 
   // Submit
   const handleSubmit = async () => {
+    // Validar camps obligatoris
+    if (!formData.name || formData.name.length < 2) {
+      setUploadError(t('validation.nameRequired'));
+      return;
+    }
+    if (!formData.email) {
+      setUploadError(t('validation.emailRequired'));
+      return;
+    }
+    if (!formData.rating || formData.rating < 1) {
+      setUploadError(t('validation.ratingRequired'));
+      return;
+    }
+    if (!formData.comment || formData.comment.length < 10) {
+      setUploadError(t('validation.commentRequired'));
+      return;
+    }
     if (!formData.consentDataProcessing) {
       setUploadError(t('validation.acceptData'));
       return;
@@ -279,8 +296,8 @@ export default function TestimonialFormGamified() {
       });
 
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || t('errors.submitError'));
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || t('errors.submitError'));
       }
       const result = await res.json();
       setSubmitResult({
@@ -408,19 +425,27 @@ export default function TestimonialFormGamified() {
                     className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
                   />
 
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder={`${t('form.name')} *`}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
+                  />
+
                   <div className="grid grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder={t('form.nameOptional')}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
-                    />
                     <input
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                       placeholder={t('form.phoneOptional')}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
+                    />
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                      placeholder={t('form.cityOptional')}
                       className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
                     />
                   </div>
@@ -439,7 +464,7 @@ export default function TestimonialFormGamified() {
 
                 <button
                   onClick={() => setCurrentStep(1)}
-                  disabled={!formData.email}
+                  disabled={!formData.email || !formData.name || formData.name.length < 2}
                   className="w-full py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-amber-500/30 transition-all"
                 >
                   {t('gamified.yourData.continue')}
