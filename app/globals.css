@@ -143,19 +143,21 @@
      ══════════════════════════════════════════════════════════════════════════ */
 
   /* Estat inicial: fons negre, contingut ocult (CSS pur, instant) */
-  /* IMPORTANT: No aplicar a /admin per evitar bloqueig */
-  body:not(.intro-done):not(.admin-page) {
+  /* DESACTIVAT TEMPORALMENT per debug admin */
+  /*
+  body:not(.intro-done) {
     overflow: hidden !important;
     background: #000 !important;
   }
 
-  body:not(.intro-done):not(.admin-page) #main-content,
-  body:not(.intro-done):not(.admin-page) header,
-  body:not(.intro-done):not(.admin-page) footer,
-  body:not(.intro-done):not(.admin-page) .floating-ctas {
+  body:not(.intro-done) #main-content,
+  body:not(.intro-done) header,
+  body:not(.intro-done) footer,
+  body:not(.intro-done) .floating-ctas {
     visibility: hidden !important;
     opacity: 0 !important;
   }
+  */
 
   /* Quan intro acaba, fade suau del contingut */
   body.intro-done #main-content,
