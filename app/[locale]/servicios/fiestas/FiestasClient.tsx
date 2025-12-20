@@ -14,8 +14,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Zap, FileText, Star, TrendingUp, ArrowRight, Check } from 'lucide-react';
+import { Users, Zap, FileText, Star, TrendingUp, ArrowRight, Check, PartyPopper } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import {
   getPacksByService,
   getRecommendedPack,
@@ -77,17 +78,37 @@ export default function FiestasClient() {
   const canUseFlashOffer = numGuests <= OFERTA_FLASH.maxInvitados;
 
   return (
-    <div className="space-y-12">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl font-bold">
-          {t('heroTitle')}
-        </h1>
-        <p className="text-xl text-text-muted max-w-2xl mx-auto">
-          {t('heroSubtitle')}
-        </p>
-      </div>
+    <div className="min-h-screen bg-bg-main">
+      {/* HERO with background image */}
+      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-bg-main z-10" />
+          <Image
+            src="/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp"
+            alt="DJ para fiestas privadas Òrbita Events"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
 
+        <div className="relative z-20 mx-auto max-w-6xl px-4 py-20 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-6 backdrop-blur-sm">
+            <PartyPopper className="w-4 h-4 text-oe-gold" />
+            <span className="text-sm font-bold text-oe-gold">{t('badge')}</span>
+          </div>
+
+          <h1 className="text-5xl md:text-6xl font-display font-black text-white mb-4">
+            {t('heroTitle')}
+          </h1>
+          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+            {t('heroSubtitle')}
+          </p>
+        </div>
+      </section>
+
+      <div className="space-y-12 max-w-6xl mx-auto">
       {/* Configurador de invitados */}
       <div className="max-w-3xl mx-auto p-8 bg-gradient-to-br from-bg-surface to-bg-card rounded-3xl border border-oe-gold/30">
         <div className="flex items-center gap-3 mb-6">
@@ -369,6 +390,7 @@ export default function FiestasClient() {
             </ul>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
