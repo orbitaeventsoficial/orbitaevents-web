@@ -7,6 +7,7 @@ import {
   Heart, Check, Star, FileText,
   Users, Zap, TrendingUp, ChevronRight, MapPin
 } from 'lucide-react';
+import Image from 'next/image';
 import { getPacksByService, EXTRAS, type PackDefinition } from '@/config/packs-config';
 import { useTranslations } from 'next-intl';
 
@@ -125,19 +126,33 @@ export default function BodasClientV2() {
 
   return (
     <div className="min-h-screen bg-bg-main">
-      {/* Header */}
-      <section className="py-16 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-6">
-          <Heart className="w-4 h-4 text-oe-gold" fill="currentColor" />
-          <span className="text-sm font-bold text-oe-gold">{t('badgeYears')}</span>
+      {/* HERO with background image */}
+      <section className="relative min-h-[60vh] flex items-center overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-bg-main z-10" />
+          <Image
+            src="/img/portfolio/bodas/bodas-01.webp"
+            alt="DJ para bodas Òrbita Events"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
         </div>
 
-        <h1 className="text-5xl md:text-6xl font-display font-black text-text-primary mb-4">
-          {t('heroTitle')}
-        </h1>
-        <p className="text-xl text-text-muted max-w-2xl mx-auto">
-          {t('heroSubtitle')}
-        </p>
+        <div className="relative z-20 mx-auto max-w-6xl px-4 py-20 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-oe-gold/10 border border-oe-gold/30 mb-6 backdrop-blur-sm">
+            <Heart className="w-4 h-4 text-oe-gold" fill="currentColor" />
+            <span className="text-sm font-bold text-oe-gold">{t('badgeYears')}</span>
+          </div>
+
+          <h1 className="text-5xl md:text-6xl font-display font-black text-white mb-4">
+            {t('heroTitle')}
+          </h1>
+          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+            {t('heroSubtitle')}
+          </p>
+        </div>
       </section>
 
       {/* Configurador de invitados */}
