@@ -28,7 +28,7 @@ function verifyAdminAuth(request: NextRequest): boolean {
     const base64 = authHeader.slice(6);
     const decoded = Buffer.from(base64, 'base64').toString();
     const [user, pass] = decoded.split(':');
-    return user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASSWORD;
+    return user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASS;
   }
 
   if (authHeader.startsWith('Bearer ')) {
