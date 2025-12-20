@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 /**
- * 🎨 ADMIN LAYOUT - Ferrari McLaren Edition
+ * 🎨 ADMIN LAYOUT - Òrbita Events
  * Amb estructura HTML completa per evitar errors d'hidratació
  */
 
@@ -140,8 +140,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="p-3 border-t border-white/5">
               <div className="p-3 rounded-xl bg-gradient-to-r from-orange-500/10 to-orange-600/5 border border-orange-500/20">
                 <p className="text-[10px] text-orange-400 uppercase tracking-wider">Sistema</p>
-                <p className="text-sm text-white font-medium mt-1">Ferrari McLaren</p>
-                <p className="text-xs text-neutral-500">BBDD Prisma + Supabase</p>
+                <p className="text-sm text-white font-medium mt-1">Òrbita Admin</p>
+                <p className="text-xs text-neutral-500">Prisma + Supabase</p>
               </div>
             </div>
           </aside>

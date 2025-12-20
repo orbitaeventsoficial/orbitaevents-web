@@ -3,8 +3,8 @@ import { MetricCard, Card, Button } from './components/ui';
 import Link from 'next/link';
 
 /**
- * 📊 DASHBOARD - Ferrari McLaren BBDD Edition
- * Vista principal Admin amb dades reals de Prisma
+ * 📊 DASHBOARD - Òrbita Admin
+ * Vista principal amb dades reals de Prisma + Supabase
  */
 
 export const dynamic = 'force-dynamic';
