@@ -91,7 +91,8 @@
       "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/portfolio\" \"/tematica-halloween\")",
       "Bash(tasklist:*)",
       "Bash(node scripts/create-bucket.js:*)",
-      "Bash(source .env.local)"
+      "Bash(source .env.local)",
+      "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/portfolio\" \"/admin\")"
     ]
   }
 }
