@@ -23,8 +23,6 @@ export async function POST(request: NextRequest) {
       city,
       instagram,
       rating,
-      npsScore,
-      title,
       comment,
       eventType,
       eventDate,
@@ -32,9 +30,7 @@ export async function POST(request: NextRequest) {
       videoUrl,
       allowGoogleShare,
       consentDataProcessing,
-      consentMarketing,
       consentPhotoPublication,
-      totalDiscount,
     } = body;
 
     // Validacions bàsiques
@@ -54,36 +50,20 @@ export async function POST(request: NextRequest) {
 
     // Crear testimoni
     const result = await createTestimonial({
-      // Dades client
       name,
       email,
-      phone: phone || undefined,
-      city: city || undefined,
-      instagram: instagram || undefined,
-      // Testimoni
+      phone,
+      city,
+      instagram,
       rating,
       comment,
-      title: title || undefined,
-      eventType: eventType || undefined,
-      eventDate: eventDate || undefined,
-      // Media
-      photoUrl: photoUrl || undefined,
-      videoUrl: videoUrl || undefined,
-      // NPS i recompenses
-      npsScore: npsScore || undefined,
-      allowGoogleShare: allowGoogleShare || false,
-      // Consentiments
-      consentDataProcessing,
-      consentMarketing: consentMarketing || false,
-      consentPhotoPublication: consentPhotoPublication || false,
+      eventType,
+      eventDate,
+      photoUrl,
+      videoUrl,
+      allowGoogleShare,
+      consentPhotoPublication,
     });
-
-    if (!result) {
-      return NextResponse.json(
-        { error: 'Error creant el testimoni' },
-        { status: 500 }
-      );
-    }
 
     return NextResponse.json({
       success: true,

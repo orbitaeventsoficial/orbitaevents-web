@@ -1,0 +1,27 @@
+RESUM PER CLAUDE - 20 Desembre 2024
+=====================================
+
+ESTAT ACTUAL:
+- Tot pujat a git correctament
+- Bucket "media" creat a Supabase Storage
+- Upload de fotos/videos ara va directe a Supabase (no passa per API)
+
+PENDENT:
+- L'usuari ha d'afegir 3 variables d'entorn a Vercel:
+  1. NEXT_PUBLIC_SUPABASE_URL = https://syjfkjxjaltcihpogfji.supabase.co
+  2. NEXT_PUBLIC_SUPABASE_ANON_KEY = (de Supabase dashboard)
+  3. SUPABASE_SERVICE_ROLE_KEY = (ja configurada localment)
+- Després fer Redeploy a Vercel
+
+CANVIS FETS AVUI:
+1. Arreglat formulari testimonis (camps obligatoris)
+2. Arreglats textos en català que sortien en castellà
+3. Slider de persones ara és daurat i més gran
+4. Afegides fotos de fons a pàgines: empresas, bodas, fiestas
+5. Logo del header més gran
+6. Upload media directe a Supabase Storage (evita limit 4.5MB Vercel)
+
+FITXER INSTRUCCIONS:
+- C:\Users\Lore\Desktop\INSTRUCCIONS_VERCEL.txt
+
+L'USUARI TENIA PROBLEMES VEIENT LA CONSOLA (tot negre).

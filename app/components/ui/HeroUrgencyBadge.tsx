@@ -106,17 +106,17 @@ export default function HeroUrgencyBadge() {
     ? getUrgencyLevel(availability.freeSaturdays, availability.totalSaturdays)
     : 'available';
 
-  // Colors segons urgència
+  // Colors segons urgència - estil elegant semi-transparent
   const urgencyColors = {
-    soldOut: 'from-gray-600 to-gray-800 text-gray-300',
-    scarce: 'from-red-600 to-red-800 text-white animate-pulse',
-    limited: 'from-orange-500 to-orange-700 text-white',
-    available: 'from-emerald-500 to-emerald-700 text-white',
+    soldOut: 'from-white/10 to-white/5 border border-gray-500/30 text-gray-300 backdrop-blur-sm',
+    scarce: 'from-white/10 to-white/5 border border-red-500/30 text-red-200 backdrop-blur-sm animate-pulse',
+    limited: 'from-white/10 to-white/5 border border-orange-500/30 text-orange-200 backdrop-blur-sm',
+    available: 'from-white/10 to-white/5 border border-emerald-500/30 text-emerald-200 backdrop-blur-sm',
   };
 
   const themeColors = {
-    halloween: 'from-orange-500 to-orange-700',
-    monMagic: 'from-amber-500 to-amber-700',
+    halloween: 'from-white/10 to-white/5 border border-orange-500/30',
+    monMagic: 'from-white/10 to-white/5 border border-amber-500/30',
   };
 
   if (loading) {
@@ -187,8 +187,8 @@ export default function HeroUrgencyBadge() {
             exit={{ opacity: 0, y: 10 }}
             className={`
               inline-flex items-center gap-2 px-4 py-2 rounded-full
-              bg-gradient-to-r ${themeColors.monMagic}
-              text-sm font-medium text-white shadow-lg
+              bg-gradient-to-r ${themeColors.monMagic} backdrop-blur-sm
+              text-sm font-medium text-amber-200 shadow-lg
             `}
           >
             <span className="text-lg">🪄</span>

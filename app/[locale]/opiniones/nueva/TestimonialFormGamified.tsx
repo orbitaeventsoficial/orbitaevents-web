@@ -13,7 +13,6 @@ import Image from 'next/image';
 import confetti from 'canvas-confetti';
 import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { supabase } from '@/lib/supabase';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS I CONSTANTS
@@ -173,19 +172,13 @@ export default function TestimonialFormGamified() {
     }
   };
 
-  // Upload foto - Directament a Supabase Storage
+  // Upload foto via API (bypassa RLS)
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 10 * 1024 * 1024) {
       setUploadError(t('errors.photoMax'));
-      return;
-    }
-
-    // Check if Supabase is configured
-    if (!supabase) {
-      setUploadError('Storage no configurat');
       return;
     }
 
@@ -194,32 +187,27 @@ export default function TestimonialFormGamified() {
     reader.onload = (e) => setPhotoPreview(e.target?.result as string);
     reader.readAsDataURL(file);
 
-    // Upload directament a Supabase Storage
+    // Upload via API
     setPhotoUploading(true);
     setUploadError(null);
 
     try {
-      const timestamp = Date.now();
-      const ext = file.name.split('.').pop() || 'jpg';
-      const fileName = `testimonials/photos/${timestamp}-${Math.random().toString(36).substring(7)}.${ext}`;
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+      formDataUpload.append('folder', 'testimonials/photos');
 
-      const { data, error } = await supabase.storage
-        .from('media')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataUpload,
+      });
 
-      if (error) {
-        throw new Error(error.message);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Error pujant foto');
       }
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('media')
-        .getPublicUrl(data.path);
-
-      setFormData(prev => ({ ...prev, photoUrl: urlData.publicUrl }));
+      setFormData(prev => ({ ...prev, photoUrl: result.url }));
     } catch (error) {
       console.error('Error uploading photo:', error);
       setUploadError(error instanceof Error ? error.message : t('errors.uploadPhotoError'));
@@ -229,7 +217,7 @@ export default function TestimonialFormGamified() {
     }
   };
 
-  // Upload vídeo - Directament a Supabase Storage
+  // Upload vídeo via signed URL (per fitxers grans)
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -239,42 +227,43 @@ export default function TestimonialFormGamified() {
       return;
     }
 
-    // Check if Supabase is configured
-    if (!supabase) {
-      setUploadError('Storage no configurat');
-      return;
-    }
-
     // Preview
     const videoUrl = URL.createObjectURL(file);
     setVideoPreview(videoUrl);
 
-    // Upload directament a Supabase Storage
     setVideoUploading(true);
     setUploadError(null);
 
     try {
-      const timestamp = Date.now();
-      const ext = file.name.split('.').pop() || 'mp4';
-      const fileName = `testimonials/videos/${timestamp}-${Math.random().toString(36).substring(7)}.${ext}`;
+      // 1. Obtenir signed URL de l'API
+      const signedResponse = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: file.name,
+          fileType: file.type,
+          folder: 'testimonials/videos',
+        }),
+      });
 
-      const { data, error } = await supabase.storage
-        .from('media')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+      const signedResult = await signedResponse.json();
 
-      if (error) {
-        throw new Error(error.message);
+      if (!signedResponse.ok || !signedResult.success) {
+        throw new Error(signedResult.error || 'Error obtenint URL de pujada');
       }
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('media')
-        .getPublicUrl(data.path);
+      // 2. Pujar directament a Supabase amb el signed URL
+      const uploadResponse = await fetch(signedResult.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
 
-      setFormData(prev => ({ ...prev, videoUrl: urlData.publicUrl }));
+      if (!uploadResponse.ok) {
+        throw new Error('Error pujant vídeo a storage');
+      }
+
+      setFormData(prev => ({ ...prev, videoUrl: signedResult.publicUrl }));
     } catch (error) {
       console.error('Error uploading video:', error);
       setUploadError(error instanceof Error ? error.message : t('errors.uploadVideoError'));

@@ -1,19 +1,17 @@
 /**
  * API ROUTE: Admin Testimonials
  * ==============================
- * GET - Obtenir tots els testimonis (pendents i aprovats)
- * PATCH - Aprovar/rebutjar/destacar un testimoni
+ * GET - Obtenir tots els testimonis
+ * PATCH - Aprovar un testimoni
  * DELETE - Eliminar un testimoni
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import {
-  getAllTestimonials,
   getPendingTestimonials,
+  getApprovedTestimonials,
   approveTestimonial,
-  rejectTestimonial,
   deleteTestimonial,
-  toggleFeatured,
   getTestimonialStats,
 } from '@/lib/services/testimonialService';
 
@@ -26,7 +24,6 @@ function verifyAdminAuth(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
   if (!authHeader) return false;
 
-  // Basic auth
   if (authHeader.startsWith('Basic ')) {
     const base64 = authHeader.slice(6);
     const decoded = Buffer.from(base64, 'base64').toString();
@@ -34,7 +31,6 @@ function verifyAdminAuth(request: NextRequest): boolean {
     return user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASSWORD;
   }
 
-  // API Key auth
   if (authHeader.startsWith('Bearer ')) {
     const key = authHeader.slice(7);
     return key === process.env.ADMIN_KEY;
@@ -45,9 +41,6 @@ function verifyAdminAuth(request: NextRequest): boolean {
 
 /**
  * GET - Obtenir testimonis
- * Query params:
- * - filter: 'all' | 'pending' | 'approved'
- * - stats: 'true' - retorna estadístiques
  */
 export async function GET(request: NextRequest) {
   if (!verifyAdminAuth(request)) {
@@ -59,42 +52,34 @@ export async function GET(request: NextRequest) {
     const filter = searchParams.get('filter') || 'all';
     const includeStats = searchParams.get('stats') === 'true';
 
-    let testimonials;
+    let data;
     if (filter === 'pending') {
-      testimonials = await getPendingTestimonials();
-    } else {
-      testimonials = await getAllTestimonials();
-    }
-
-    const response: Record<string, unknown> = {
-      success: true,
-      data: testimonials.map(t => ({
+      const pending = await getPendingTestimonials();
+      data = pending.map(t => ({
         id: t.id,
-        title: t.title,
-        comment: t.comment,
+        comment: t.text,
         rating: t.rating,
-        eventType: t.submitted_event_type,
-        eventDate: t.submitted_event_date,
-        photoUrl: t.photo_url,
-        consentPhotoPublication: t.consent_photo_publication,
-        status: t.status,
-        discountCode: t.discount_code,
-        rejectionReason: t.rejection_reason,
-        approvedAt: t.approved_at,
-        createdAt: t.created_at,
-        customer: t.customer ? {
+        eventType: t.eventType,
+        eventDate: t.eventDate,
+        photoUrl: t.photoUrl,
+        isApproved: t.isApproved,
+        createdAt: t.createdAt,
+        customer: {
           id: t.customer.id,
           name: t.customer.name,
           email: t.customer.email,
           phone: t.customer.phone,
-          city: t.customer.city,
           instagram: t.customer.instagram,
-        } : {
-          name: t.submitted_name,
-          email: t.submitted_email,
-          city: t.submitted_city,
         },
-      })),
+      }));
+    } else {
+      const approved = await getApprovedTestimonials();
+      data = approved;
+    }
+
+    const response: Record<string, unknown> = {
+      success: true,
+      data,
     };
 
     if (includeStats) {
@@ -109,12 +94,7 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * PATCH - Actualitzar estat d'un testimoni
- * Body:
- * - id: string
- * - action: 'approve' | 'reject' | 'toggle_featured'
- * - featured?: boolean (per approve)
- * - reason?: string (per reject)
+ * PATCH - Aprovar testimoni
  */
 export async function PATCH(request: NextRequest) {
   if (!verifyAdminAuth(request)) {
@@ -123,7 +103,7 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { id, action, featured, reason } = body;
+    const { id, action } = body;
 
     if (!id || !action) {
       return NextResponse.json({ error: 'Falten paràmetres' }, { status: 400 });
@@ -131,22 +111,12 @@ export async function PATCH(request: NextRequest) {
 
     let result;
 
-    switch (action) {
-      case 'approve':
-        result = await approveTestimonial(id, featured);
-        break;
-      case 'reject':
-        result = await rejectTestimonial(id, reason);
-        break;
-      case 'toggle_featured':
-        result = await toggleFeatured(id);
-        break;
-      default:
-        return NextResponse.json({ error: 'Acció no vàlida' }, { status: 400 });
-    }
-
-    if (!result) {
-      return NextResponse.json({ error: 'Testimoni no trobat' }, { status: 404 });
+    if (action === 'approve') {
+      result = await approveTestimonial(id);
+    } else if (action === 'reject' || action === 'delete') {
+      result = await deleteTestimonial(id);
+    } else {
+      return NextResponse.json({ error: 'Acció no vàlida' }, { status: 400 });
     }
 
     return NextResponse.json({
@@ -161,8 +131,6 @@ export async function PATCH(request: NextRequest) {
 
 /**
  * DELETE - Eliminar un testimoni
- * Query params:
- * - id: string
  */
 export async function DELETE(request: NextRequest) {
   if (!verifyAdminAuth(request)) {
@@ -177,11 +145,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Falta ID' }, { status: 400 });
     }
 
-    const success = await deleteTestimonial(id);
-
-    if (!success) {
-      return NextResponse.json({ error: 'Error eliminant testimoni' }, { status: 500 });
-    }
+    await deleteTestimonial(id);
 
     return NextResponse.json({
       success: true,
