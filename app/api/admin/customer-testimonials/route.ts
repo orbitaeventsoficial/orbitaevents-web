@@ -1,9 +1,6 @@
 /**
  * API ROUTE: Admin Customer Testimonials
- * Gestió dels testimonis enviats pels clients (amb sistema de descomptes)
- *
- * GET - Obtenir tots els testimonis (inclosos pendents)
- * PATCH - Aprovar/rebutjar testimoni
+ * Gestió dels testimonis enviats pels clients
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -11,18 +8,14 @@ import {
   getPendingTestimonials,
   getApprovedTestimonials,
   approveTestimonial,
-  rejectTestimonial,
+  deleteTestimonial,
   getTestimonialStats,
 } from '@/lib/services/testimonialService';
 
-// Forçar ruta dinàmica
 export const dynamic = 'force-dynamic';
 
 /**
  * GET - Obtenir testimonis per admin
- * Query params:
- * - status: 'pending' | 'approved' | 'all'
- * - stats: boolean - incloure estadístiques
  */
 export async function GET(request: NextRequest) {
   try {
@@ -44,37 +37,26 @@ export async function GET(request: NextRequest) {
           getPendingTestimonials(),
           getApprovedTestimonials(),
         ]);
-        testimonials = [...pending, ...approved];
+        // Format pending testimonials to match approved format
+        const formattedPending = pending.map(t => ({
+          id: t.id,
+          name: t.showName ? t.customer.name : 'Client verificat',
+          rating: t.rating,
+          comment: t.text,
+          photoUrl: t.showPhoto ? t.photoUrl : null,
+          eventType: t.eventType,
+          eventDate: t.eventDate,
+          createdAt: t.createdAt,
+          isApproved: t.isApproved,
+          customer: t.customer,
+          source: 'pending' as const,
+        }));
+        testimonials = [...formattedPending, ...approved];
     }
 
     const response: Record<string, unknown> = {
       success: true,
-      data: testimonials.map(t => ({
-        id: t.id,
-        title: t.title,
-        comment: t.comment,
-        rating: t.rating,
-        eventType: t.submitted_event_type,
-        eventDate: t.submitted_event_date,
-        consentPhotoPublication: t.consent_photo_publication,
-        status: t.status,
-        canvasUrl: t.canvas_url,
-        discountCode: t.discount_code,
-        customer: t.customer ? {
-          id: t.customer.id,
-          name: t.customer.name,
-          email: t.customer.email,
-          phone: t.customer.phone,
-          city: t.customer.city,
-          instagram: t.customer.instagram,
-        } : {
-          name: t.submitted_name,
-          email: t.submitted_email,
-          city: t.submitted_city,
-        },
-        createdAt: t.created_at,
-        updatedAt: t.updated_at,
-      })),
+      data: testimonials,
     };
 
     if (includeStats) {
@@ -105,18 +87,18 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Acció invàlida (approve/reject)' }, { status: 400 });
     }
 
-    let testimonial;
+    let result;
 
     if (action === 'approve') {
-      testimonial = await approveTestimonial(id);
+      result = await approveTestimonial(id);
     } else {
-      testimonial = await rejectTestimonial(id);
+      result = await deleteTestimonial(id);
     }
 
     return NextResponse.json({
       success: true,
-      data: testimonial,
-      message: action === 'approve' ? 'Testimoni aprovat' : 'Testimoni rebutjat',
+      data: result,
+      message: action === 'approve' ? 'Testimoni aprovat' : 'Testimoni eliminat',
     });
   } catch (error) {
     console.error('Error updating customer testimonial:', error);

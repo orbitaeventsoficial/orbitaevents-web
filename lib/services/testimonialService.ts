@@ -1,26 +1,10 @@
 /**
- * TESTIMONIAL SERVICE - Supabase Version
- * ========================================
- * Gestió d'opinions/testimonis amb Supabase
- * Esquema actualitzat amb UUID i status en lloc de is_approved
+ * TESTIMONIAL SERVICE - Prisma Version
+ * =====================================
+ * Gestió d'opinions/testimonis amb Prisma
  */
 
-import {
-  supabaseAdmin,
-  generateDiscountCode,
-  type Testimonial,
-  type TestimonialStatus,
-} from '@/lib/supabase';
-import { upsertCustomer, logCustomerActivity } from './customerService';
-import { sendTestimonialApprovedEmail } from '@/lib/email';
-
-// Helper to check if Supabase is configured
-function checkSupabase() {
-  if (!supabaseAdmin) {
-    throw new Error('Database not configured');
-  }
-  return supabaseAdmin;
-}
+import { prisma } from '@/lib/prisma';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -29,7 +13,7 @@ function checkSupabase() {
 export interface CreateTestimonialInput {
   // Dades del client
   email: string;
-  name?: string;
+  name: string;
   phone?: string;
   city?: string;
   instagram?: string;
@@ -37,7 +21,6 @@ export interface CreateTestimonialInput {
   // Testimoni
   comment: string;
   rating: number;
-  title?: string;
   eventType?: string;
   eventDate?: string;
 
@@ -45,34 +28,40 @@ export interface CreateTestimonialInput {
   photoUrl?: string;
   videoUrl?: string;
 
-  // NPS i recompenses
-  npsScore?: number; // 0-10
+  // Permisos
   allowGoogleShare?: boolean;
-
-  // Verificació booking
-  verifiedBookingId?: string;
-
-  // Consentiments
   consentPhotoPublication?: boolean;
-  consentDataProcessing: boolean;
-  consentMarketing?: boolean;
 }
 
 export interface TestimonialResult {
-  testimonial: Testimonial;
+  testimonial: {
+    id: string;
+    rating: number;
+    comment: string;
+  };
   discountCode: string;
-  isNewCustomer: boolean;
 }
 
-export interface TestimonialWithCustomer extends Omit<Testimonial, 'customer'> {
-  customer: {
-    id: string;
-    name: string | null;
-    email: string;
-    phone?: string | null;
-    city?: string | null;
-    instagram?: string | null;
-  } | null;
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function generateDiscountCode(name: string, percent: number): string {
+  const clean = name.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4) || 'ORBI';
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `${clean}${percent}-${random}`;
+}
+
+function normalizeEmail(email: string): string {
+  return email.toLowerCase().trim();
+}
+
+function normalizeName(name: string): string {
+  return name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+function capitalizeWords(str: string): string {
+  return str.replace(/\b\w/g, l => l.toUpperCase());
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -85,411 +74,202 @@ export interface TestimonialWithCustomer extends Omit<Testimonial, 'customer'> {
 export async function createTestimonial(
   input: CreateTestimonialInput
 ): Promise<TestimonialResult> {
-  // 1. Crear o actualitzar client
-  const { customer, isNew } = await upsertCustomer({
-    email: input.email,
-    name: input.name,
-    phone: input.phone,
-    city: input.city,
-    instagram: input.instagram,
-    consentDataProcessing: input.consentDataProcessing,
-    consentMarketing: input.consentMarketing,
-    source: 'testimonial_form',
+  const email = normalizeEmail(input.email);
+  const now = new Date();
+
+  // 1. Buscar o crear client
+  let customer = await prisma.customer.findUnique({
+    where: { email },
   });
 
-  // 2. Calcular descompte basat en recompenses
-  // Base: 5% + foto: 5% + video: 10% + Google: 5% = màx 25%
-  let discountPercent = 5; // Base
+  if (!customer) {
+    customer = await prisma.customer.create({
+      data: {
+        email,
+        emailNormalized: email,
+        name: capitalizeWords(input.name),
+        nameNormalized: normalizeName(input.name),
+        phone: input.phone || null,
+        phoneNormalized: input.phone?.replace(/\D/g, '') || null,
+        instagram: input.instagram?.replace('@', '').toLowerCase() || null,
+        instagramNormalized: input.instagram?.replace('@', '').toLowerCase() || null,
+        gdprConsent: true,
+        gdprConsentDate: now,
+      },
+    });
+  }
+
+  // 2. Calcular descompte
+  let discountPercent = 5;
   if (input.photoUrl) discountPercent += 5;
   if (input.videoUrl) discountPercent += 10;
   if (input.allowGoogleShare) discountPercent += 5;
 
-  // Generar codi de descompte personalitzat
-  const discountCode = generateDiscountCode(input.name || 'CLIENT', discountPercent);
+  const discountCode = generateDiscountCode(input.name, discountPercent);
 
-  // 3. Crear el testimoni
-  const testimonialData = {
-    customer_id: customer.id,
-    rating: Math.min(5, Math.max(1, input.rating)),
-    title: input.title?.trim() || null,
-    comment: input.comment.trim(),
-    photo_url: input.photoUrl || null,
-    video_url: input.videoUrl || null,
-    nps_score: input.npsScore ?? null,
-    allow_google_share: input.allowGoogleShare ?? false,
-    verified_booking_id: input.verifiedBookingId || null,
-    consent_photo_publication: input.consentPhotoPublication ?? false,
-    status: 'pending' as TestimonialStatus,
-    discount_code: discountCode,
-    discount_percent: discountPercent,
-    submitted_name: input.name || null,
-    submitted_email: input.email,
-    submitted_city: input.city || null,
-    submitted_event_type: input.eventType || null,
-    submitted_event_date: input.eventDate || null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+  // 3. Mapear eventType a enum
+  const eventTypeMap: Record<string, 'WEDDING' | 'BIRTHDAY' | 'CORPORATE' | 'COMMUNION' | 'BAPTISM' | 'PRIVATE_PARTY' | 'OTHER'> = {
+    boda: 'WEDDING',
+    cumpleanos: 'BIRTHDAY',
+    corporativo: 'CORPORATE',
+    comunion: 'COMMUNION',
+    bautizo: 'BAPTISM',
+    fiesta: 'PRIVATE_PARTY',
   };
+  const eventType = input.eventType ? eventTypeMap[input.eventType] || 'OTHER' : undefined;
 
-  const db = checkSupabase();
-  const { data: testimonial, error } = await db
-    .from('testimonials')
-    .insert(testimonialData)
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(`Error creant testimoni: ${error.message}`);
-  }
-
-  // 4. Crear codi de descompte a la taula
-  await db.from('discount_codes').insert({
-    code: discountCode,
-    discount_percent: discountPercent,
-    source: 'testimonial',
-    testimonial_id: testimonial!.id,
-    customer_id: customer.id,
-    max_uses: 1,
-    times_used: 0,
-    is_active: true,
-    expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 any
-    created_at: new Date().toISOString(),
+  // 4. Crear testimoni a CustomerTestimonial (per clients)
+  const testimonial = await prisma.customerTestimonial.create({
+    data: {
+      customerId: customer.id,
+      text: input.comment,
+      rating: Math.min(5, Math.max(1, input.rating)),
+      eventType,
+      eventDate: input.eventDate ? new Date(input.eventDate) : null,
+      photoUrl: input.photoUrl || null,
+      showName: true,
+      showPhoto: !!input.photoUrl && input.consentPhotoPublication,
+      isApproved: false,
+    },
   });
 
-  // 5. Log activitat
-  await logCustomerActivity(customer.id, 'create', {
-    testimonialId: testimonial!.id,
-    rating: input.rating,
-    npsScore: input.npsScore,
-    discountCode,
-    discountPercent,
-    hasPhoto: !!input.photoUrl,
-    hasVideo: !!input.videoUrl,
-    allowGoogleShare: input.allowGoogleShare,
+  // 5. Crear codi de descompte
+  await prisma.customerDiscountCode.create({
+    data: {
+      customerId: customer.id,
+      code: discountCode,
+      discountPercent,
+      validFrom: now,
+      validUntil: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
+      maxUses: 1,
+      currentUses: 0,
+      sourceType: 'TESTIMONIAL',
+      sourceId: testimonial.id,
+      isActive: true,
+    },
+  });
+
+  // 6. Log activitat
+  await prisma.customerActivity.create({
+    data: {
+      customerId: customer.id,
+      action: 'TESTIMONIAL_SUBMITTED',
+      details: {
+        testimonialId: testimonial.id,
+        rating: input.rating,
+        discountCode,
+        discountPercent,
+        hasPhoto: !!input.photoUrl,
+        hasVideo: !!input.videoUrl,
+      },
+    },
   });
 
   return {
-    testimonial: testimonial as Testimonial,
+    testimonial: {
+      id: testimonial.id,
+      rating: testimonial.rating,
+      comment: testimonial.text,
+    },
     discountCode,
-    isNewCustomer: isNew,
   };
 }
 
 /**
- * Obtenir tots els testimonis aprovats (per la web)
+ * Obtenir testimonis aprovats (per la web)
  */
-export async function getApprovedTestimonials(limit = 20): Promise<TestimonialWithCustomer[]> {
-  if (!supabaseAdmin) return [];
-  const { data, error } = await supabaseAdmin
-    .from('testimonials')
-    .select(
-      `
-      *,
-      customer:customers (
-        id,
-        name,
-        email,
-        phone,
-        city,
-        instagram
-      )
-    `
-    )
-    .in('status', ['approved', 'featured'])
-    .order('created_at', { ascending: false })
-    .limit(limit);
+export async function getApprovedTestimonials(limit = 20) {
+  // Combinar testimonis aprovats de CustomerTestimonial i Testimonial
+  const customerTestimonials = await prisma.customerTestimonial.findMany({
+    where: { isApproved: true },
+    include: { customer: true },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
 
-  if (error) return [];
-  return (data as TestimonialWithCustomer[]) || [];
+  const staticTestimonials = await prisma.testimonial.findMany({
+    where: { isActive: true },
+    include: { translations: true },
+    orderBy: [{ isFeatured: 'desc' }, { order: 'asc' }],
+    take: limit,
+  });
+
+  // Combinar i formatar
+  const combined = [
+    ...customerTestimonials.map(t => ({
+      id: t.id,
+      name: t.showName ? t.customer.name : 'Client verificat',
+      rating: t.rating,
+      comment: t.text,
+      photoUrl: t.showPhoto ? t.photoUrl : null,
+      eventType: t.eventType,
+      createdAt: t.createdAt,
+      source: 'customer' as const,
+    })),
+    ...staticTestimonials.map(t => ({
+      id: t.id,
+      name: t.authorName,
+      rating: t.rating,
+      comment: t.translations[0]?.quote || '',
+      photoUrl: null,
+      eventType: t.eventType,
+      createdAt: t.createdAt,
+      source: 'static' as const,
+    })),
+  ];
+
+  return combined.slice(0, limit);
 }
 
 /**
- * Obtenir testimonis destacats (featured, rating >= 4)
+ * Obtenir testimonis pendents (per admin)
  */
-export async function getFeaturedTestimonials(limit = 6): Promise<TestimonialWithCustomer[]> {
-  if (!supabaseAdmin) return [];
-  const { data, error } = await supabaseAdmin
-    .from('testimonials')
-    .select(
-      `
-      *,
-      customer:customers (
-        id,
-        name,
-        email,
-        phone,
-        city,
-        instagram
-      )
-    `
-    )
-    .eq('status', 'featured')
-    .gte('rating', 4)
-    .order('rating', { ascending: false })
-    .order('created_at', { ascending: false })
-    .limit(limit);
-
-  if (error) return [];
-  return (data as TestimonialWithCustomer[]) || [];
+export async function getPendingTestimonials() {
+  return prisma.customerTestimonial.findMany({
+    where: { isApproved: false },
+    include: { customer: true },
+    orderBy: { createdAt: 'desc' },
+  });
 }
 
 /**
- * Obtenir testimonis pendents d'aprovació (per admin)
+ * Aprovar testimoni
  */
-export async function getPendingTestimonials(): Promise<TestimonialWithCustomer[]> {
-  if (!supabaseAdmin) return [];
-  const { data, error } = await supabaseAdmin
-    .from('testimonials')
-    .select(
-      `
-      *,
-      customer:customers (
-        id,
-        name,
-        email,
-        phone,
-        city,
-        instagram
-      )
-    `
-    )
-    .eq('status', 'pending')
-    .order('created_at', { ascending: false });
-
-  if (error) return [];
-  return (data as TestimonialWithCustomer[]) || [];
+export async function approveTestimonial(id: string) {
+  return prisma.customerTestimonial.update({
+    where: { id },
+    data: { isApproved: true },
+  });
 }
 
 /**
- * Obtenir tots els testimonis (per admin)
+ * Rebutjar/eliminar testimoni
  */
-export async function getAllTestimonials(): Promise<TestimonialWithCustomer[]> {
-  if (!supabaseAdmin) return [];
-  const { data, error } = await supabaseAdmin
-    .from('testimonials')
-    .select(
-      `
-      *,
-      customer:customers (
-        id,
-        name,
-        email,
-        phone,
-        city,
-        instagram
-      )
-    `
-    )
-    .order('created_at', { ascending: false });
-
-  if (error) return [];
-  return (data as TestimonialWithCustomer[]) || [];
+export async function deleteTestimonial(id: string) {
+  return prisma.customerTestimonial.delete({
+    where: { id },
+  });
 }
 
 /**
- * Obtenir un testimoni per ID
- */
-export async function getTestimonialById(id: string): Promise<TestimonialWithCustomer | null> {
-  if (!supabaseAdmin) return null;
-  const { data, error } = await supabaseAdmin
-    .from('testimonials')
-    .select(
-      `
-      *,
-      customer:customers (
-        id,
-        name,
-        email,
-        phone,
-        city,
-        instagram
-      )
-    `
-    )
-    .eq('id', id)
-    .single();
-
-  if (error || !data) return null;
-  return data as TestimonialWithCustomer;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// FUNCIONS ADMIN
-// ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Aprovar un testimoni
- * Envia email amb canvas i codi de descompte
- */
-export async function approveTestimonial(
-  id: string,
-  featured = false
-): Promise<Testimonial | null> {
-  if (!supabaseAdmin) return null;
-  const newStatus: TestimonialStatus = featured ? 'featured' : 'approved';
-
-  // Obtenir testimoni amb dades del client
-  const testimonial = await getTestimonialById(id);
-  if (!testimonial) return null;
-
-  const { data, error } = await supabaseAdmin
-    .from('testimonials')
-    .update({
-      status: newStatus,
-      approved_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error || !data) return null;
-
-  // Log activitat
-  if (data.customer_id) {
-    await logCustomerActivity(data.customer_id, 'update', {
-      testimonialId: id,
-      action: 'approved',
-      featured,
-    });
-  }
-
-  // Enviar email amb canvas i codi de descompte
-  try {
-    const customerEmail = testimonial.customer?.email || testimonial.submitted_email;
-    const customerName = testimonial.customer?.name || testimonial.submitted_name || 'Client';
-    const discountCode = testimonial.discount_code;
-    // Obtenir el percentatge del testimoni o usar 10% per defecte
-    const discountPercent = (testimonial as unknown as { discount_percent?: number }).discount_percent || 10;
-
-    if (customerEmail && discountCode) {
-      await sendTestimonialApprovedEmail({
-        to: customerEmail,
-        name: customerName,
-        rating: testimonial.rating,
-        discountCode,
-        discountPercent,
-        eventType: testimonial.submitted_event_type || undefined,
-      });
-      console.log(`Email enviat a ${customerEmail} amb codi ${discountCode} (${discountPercent}%)`);
-    }
-  } catch (emailError) {
-    // Log error però no fallar l'aprovació
-    console.error('Error enviant email d\'aprovació:', emailError);
-  }
-
-  return data as Testimonial;
-}
-
-/**
- * Rebutjar un testimoni
- */
-export async function rejectTestimonial(
-  id: string,
-  reason?: string
-): Promise<Testimonial | null> {
-  if (!supabaseAdmin) return null;
-  const { data, error } = await supabaseAdmin
-    .from('testimonials')
-    .update({
-      status: 'rejected' as TestimonialStatus,
-      rejection_reason: reason || 'Rebutjat per admin',
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error || !data) return null;
-
-  // Log activitat
-  if (data.customer_id) {
-    await logCustomerActivity(data.customer_id, 'update', {
-      testimonialId: id,
-      action: 'rejected',
-      reason,
-    });
-  }
-
-  return data as Testimonial;
-}
-
-/**
- * Eliminar un testimoni
- */
-export async function deleteTestimonial(id: string): Promise<boolean> {
-  if (!supabaseAdmin) return false;
-  const { error } = await supabaseAdmin.from('testimonials').delete().eq('id', id);
-  return !error;
-}
-
-/**
- * Marcar/desmarcar com a destacat
- * Utilitza updates condicionals per evitar race conditions
- */
-export async function toggleFeatured(id: string): Promise<Testimonial | null> {
-  if (!supabaseAdmin) return null;
-  // Primer intentar canviar featured -> approved
-  const { data: unfeatured, error: err1 } = await supabaseAdmin
-    .from('testimonials')
-    .update({
-      status: 'approved' as TestimonialStatus,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id)
-    .eq('status', 'featured')
-    .select()
-    .single();
-
-  if (!err1 && unfeatured) {
-    return unfeatured as Testimonial;
-  }
-
-  // Si no era featured, intentar approved -> featured
-  const { data: featured, error: err2 } = await supabaseAdmin
-    .from('testimonials')
-    .update({
-      status: 'featured' as TestimonialStatus,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id)
-    .eq('status', 'approved')
-    .select()
-    .single();
-
-  if (!err2 && featured) {
-    return featured as Testimonial;
-  }
-
-  return null;
-}
-
-/**
- * Obtenir estadístiques de testimonis
+ * Estadístiques
  */
 export async function getTestimonialStats() {
-  if (!supabaseAdmin) return { total: 0, pending: 0, approved: 0, featured: 0, avgRating: 0 };
-  const { data: all } = await supabaseAdmin
-    .from('testimonials')
-    .select('id, status, rating');
+  const [total, pending, approved] = await Promise.all([
+    prisma.customerTestimonial.count(),
+    prisma.customerTestimonial.count({ where: { isApproved: false } }),
+    prisma.customerTestimonial.count({ where: { isApproved: true } }),
+  ]);
 
-  if (!all) return { total: 0, pending: 0, approved: 0, featured: 0, avgRating: 0 };
-
-  const total = all.length;
-  const pending = all.filter(t => t.status === 'pending').length;
-  const approved = all.filter(t => t.status === 'approved' || t.status === 'featured').length;
-  const featured = all.filter(t => t.status === 'featured').length;
-  const approvedItems = all.filter(t => t.status === 'approved' || t.status === 'featured');
-  const avgRating =
-    approvedItems.length > 0
-      ? approvedItems.reduce((acc, t) => acc + t.rating, 0) / approvedItems.length
-      : 0;
+  const ratings = await prisma.customerTestimonial.aggregate({
+    where: { isApproved: true },
+    _avg: { rating: true },
+  });
 
   return {
     total,
     pending,
     approved,
-    featured,
-    avgRating: Math.round(avgRating * 10) / 10,
+    avgRating: Math.round((ratings._avg.rating || 0) * 10) / 10,
   };
 }

@@ -139,18 +139,18 @@ export default function HeaderChampion() {
         }}
       >
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-14 md:h-16">
+          <div className="flex items-center justify-between h-16 md:h-20">
 
             {/* ════════════════════════════════════════════════════════════ */}
-            {/* LOGO - Més gran */}
+            {/* LOGO */}
             {/* ════════════════════════════════════════════════════════════ */}
             <Link href="/" className="flex items-center gap-2.5 group">
               <Image
                 src="/img/logoplanetatextdreta.svg"
                 alt="Òrbita Events"
-                width={240}
-                height={64}
-                className="h-14 md:h-[72px] w-auto"
+                width={200}
+                height={56}
+                className="h-10 md:h-14 w-auto"
                 priority
               />
             </Link>
@@ -452,7 +452,7 @@ export default function HeaderChampion() {
       </AnimatePresence>
 
       {/* Spacer - header height */}
-      <div className="h-14 md:h-16" />
+      <div className="h-16 md:h-20" />
     </>
   );
 }
