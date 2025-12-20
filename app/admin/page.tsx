@@ -1,86 +1,99 @@
-'use client';
-
 /**
- * 📊 DASHBOARD - Vista principal Admin (versió simplificada)
+ * 📊 DASHBOARD - Server Component Pur
  */
+
+import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export default function AdminDashboard() {
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-        <p className="text-neutral-500">Benvingut, Carles 👋</p>
+        <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', margin: 0 }}>Dashboard</h1>
+        <p style={{ color: '#888', marginTop: '4px' }}>Benvingut, Carles</p>
       </div>
 
       {/* Mètriques */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#141414] rounded-2xl border border-white/5 p-6">
-          <div className="flex items-center gap-2 text-neutral-400 text-sm">
-            <span className="text-lg">💰</span>
-            <span>Facturat aquest mes</span>
-          </div>
-          <div className="mt-2 text-3xl font-bold text-white">0€</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+        <div style={{ background: '#141414', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', padding: '24px' }}>
+          <div style={{ color: '#888', fontSize: '14px' }}>💰 Facturat aquest mes</div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'white', marginTop: '8px' }}>0€</div>
         </div>
 
-        <div className="bg-[#141414] rounded-2xl border border-white/5 p-6">
-          <div className="flex items-center gap-2 text-neutral-400 text-sm">
-            <span className="text-lg">📅</span>
-            <span>Events confirmats</span>
-          </div>
-          <div className="mt-2 text-3xl font-bold text-white">0</div>
+        <div style={{ background: '#141414', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', padding: '24px' }}>
+          <div style={{ color: '#888', fontSize: '14px' }}>📅 Events confirmats</div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'white', marginTop: '8px' }}>0</div>
         </div>
 
-        <div className="bg-[#141414] rounded-2xl border border-white/5 p-6">
-          <div className="flex items-center gap-2 text-neutral-400 text-sm">
-            <span className="text-lg">👥</span>
-            <span>Leads nous</span>
-          </div>
-          <div className="mt-2 text-3xl font-bold text-white">0</div>
+        <div style={{ background: '#141414', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', padding: '24px' }}>
+          <div style={{ color: '#888', fontSize: '14px' }}>👥 Leads nous</div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'white', marginTop: '8px' }}>0</div>
         </div>
 
-        <div className="bg-[#141414] rounded-2xl border border-white/5 p-6">
-          <div className="flex items-center gap-2 text-neutral-400 text-sm">
-            <span className="text-lg">⭐</span>
-            <span>Valoració mitjana</span>
-          </div>
-          <div className="mt-2 text-3xl font-bold text-white">5.0</div>
+        <div style={{ background: '#141414', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', padding: '24px' }}>
+          <div style={{ color: '#888', fontSize: '14px' }}>⭐ Valoració</div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'white', marginTop: '8px' }}>5.0</div>
         </div>
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-[#141414] rounded-2xl border border-white/5 p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Pròxims events</h3>
-          <p className="text-neutral-500">No hi ha events programats</p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+        <div style={{ background: '#141414', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', padding: '24px' }}>
+          <h3 style={{ color: 'white', fontSize: '18px', fontWeight: '600', margin: 0 }}>Pròxims events</h3>
+          <p style={{ color: '#666', marginTop: '12px' }}>No hi ha events programats</p>
         </div>
 
-        <div className="bg-[#141414] rounded-2xl border border-white/5 p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Leads recents</h3>
-          <p className="text-neutral-500">No hi ha leads encara</p>
+        <div style={{ background: '#141414', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', padding: '24px' }}>
+          <h3 style={{ color: 'white', fontSize: '18px', fontWeight: '600', margin: 0 }}>Leads recents</h3>
+          <p style={{ color: '#666', marginTop: '12px' }}>No hi ha leads encara</p>
         </div>
       </div>
 
-      {/* Quick links */}
-      <div className="flex gap-4">
-        <a
+      {/* Links */}
+      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+        <Link
           href="/admin/leads"
-          className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium transition-colors"
+          style={{
+            padding: '12px 20px',
+            background: '#f97316',
+            color: 'white',
+            borderRadius: '12px',
+            textDecoration: 'none',
+            fontWeight: '500'
+          }}
         >
           + Nou lead
-        </a>
-        <a
+        </Link>
+        <Link
           href="/admin/bookings"
-          className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl font-medium transition-colors"
+          style={{
+            padding: '12px 20px',
+            background: 'rgba(255,255,255,0.1)',
+            color: 'white',
+            borderRadius: '12px',
+            textDecoration: 'none',
+            fontWeight: '500',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }}
         >
           📅 Reserves
-        </a>
-        <a
+        </Link>
+        <Link
           href="/admin/testimonios"
-          className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl font-medium transition-colors"
+          style={{
+            padding: '12px 20px',
+            background: 'rgba(255,255,255,0.1)',
+            color: 'white',
+            borderRadius: '12px',
+            textDecoration: 'none',
+            fontWeight: '500',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }}
         >
           ⭐ Testimonis
-        </a>
+        </Link>
       </div>
     </div>
   );
