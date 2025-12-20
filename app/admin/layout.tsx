@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminSidebar, { MobileSidebar } from './components/Sidebar';
 import MobileAdminLayout from './components/mobile/MobileAdminLayout';
 
@@ -11,17 +11,23 @@ import MobileAdminLayout from './components/mobile/MobileAdminLayout';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Ensure hydration safety by tracking client mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <MobileAdminLayout>
-      <div className="min-h-screen bg-[#0a0a0a]">
+      <div className="min-h-screen bg-[#0a0a0a]" suppressHydrationWarning>
         {/* Sidebar Desktop */}
         <div className="hidden lg:block">
-          <AdminSidebar />
+          {isMounted && <AdminSidebar />}
         </div>
 
         {/* Sidebar Mobile (drawer) */}
-        <MobileSidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+        {isMounted && <MobileSidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />}
 
         {/* Main Content */}
         <div className="lg:pl-64">
