@@ -6064,5 +6064,210 @@
     "cta": {
       "reserveNow": "Reserva ahora →"
     }
+  },
+  "mobileHero": {
+    "title": "EVENTOS TEMÁTICOS",
+    "subtitle": "Halloween · Mundo Mágico · Lo que imagines.",
+    "location": "Barcelona y Girona.",
+    "scroll": "DESCUBRE",
+    "socialProof": "4.9 · Bodas.net",
+    "badges": {
+      "halloween": "Halloween 2025",
+      "monMagic": "Mundo Mágico",
+      "rating": "4.9/5 · 48+ eventos"
+    },
+    "morphingTexts": {
+      "unique": "ÚNICOS.",
+      "magical": "MÁGICOS.",
+      "brutal": "BRUTALES.",
+      "yours": "TUYOS."
+    }
+  },
+  "mobileServices": {
+    "sectionLabel": "Nuestros servicios",
+    "sectionTitle": "¿Qué necesitas?",
+    "swipeHint": "← Desliza para ver más →",
+    "viewMore": "Ver",
+    "services": {
+      "halloween": {
+        "title": "Halloween",
+        "subtitle": "Noches de terror",
+        "description": "Decoración completa, DJ temático, efectos FX",
+        "price": "Desde 600€",
+        "badge": "🔥 Temporada 2025",
+        "features": {
+          "0": "Fantasmas gigantes",
+          "1": "Caldero mágico",
+          "2": "Humo bajo"
+        }
+      },
+      "monmagic": {
+        "title": "Mundo Mágico",
+        "subtitle": "Escuela de magia",
+        "description": "Sobres con lacre, velas flotantes, ambientación",
+        "price": "Desde 600€",
+        "badge": "✨ Experiencia única",
+        "features": {
+          "0": "Lacre artesanal",
+          "1": "Velas flotantes",
+          "2": "Decoración"
+        }
+      },
+      "bodas": {
+        "title": "Bodas",
+        "subtitle": "Tu día perfecto",
+        "description": "DJ profesional, sonido, luces, coordinación",
+        "price": "Desde 650€",
+        "badge": "",
+        "features": {
+          "0": "DJ Pro",
+          "1": "Sonido 4000W",
+          "2": "Backup 100%"
+        }
+      },
+      "fiestas": {
+        "title": "Fiestas",
+        "subtitle": "Cumpleaños y más",
+        "description": "Discomóvil completo con todo incluido",
+        "price": "Desde 400€",
+        "badge": "",
+        "features": {
+          "0": "Luces LED",
+          "1": "Efectos",
+          "2": "Todo incluido"
+        }
+      },
+      "empresas": {
+        "title": "Empresas",
+        "subtitle": "Eventos corporativos",
+        "description": "Audiovisual, branding, factura",
+        "price": "Desde 500€",
+        "badge": "",
+        "features": {
+          "0": "Micro inalámbrico",
+          "1": "Branding",
+          "2": "Factura"
+        }
+      }
+    }
+  },
+  "mobileTestimonials": {
+    "sectionLabel": "Opiniones reales",
+    "sectionTitle": "Qué dicen de nosotros",
+    "stats": {
+      "rating": "4.9",
+      "ratingLabel": "Valoración",
+      "events": "48+",
+      "eventsLabel": "Eventos",
+      "recommended": "100%",
+      "recommendedLabel": "Recomendados"
+    },
+    "testimonials": {
+      "1": {
+        "name": "Marc y Laia",
+        "event": "Boda · Girona",
+        "date": "Octubre 2024",
+        "quote": "¡Increíble! Transformaron nuestra boda en una experiencia mágica. ¡Los invitados aún hablan de ello!"
+      },
+      "2": {
+        "name": "Familia Martínez",
+        "event": "Fiesta Halloween · Barcelona",
+        "date": "Octubre 2024",
+        "quote": "La mejor fiesta de Halloween que hemos hecho nunca. ¡Los niños no paraban de gritar de emoción!"
+      },
+      "3": {
+        "name": "Anna y Pere",
+        "event": "Boda Mundo Mágico · Maresme",
+        "date": "Septiembre 2024",
+        "quote": "Las cartas con lacre fueron el detalle perfecto. ¡Todos los invitados fliparon! Súper profesionales."
+      },
+      "4": {
+        "name": "Empresa TechBCN",
+        "event": "Evento corporativo · Barcelona",
+        "date": "Noviembre 2024",
+        "quote": "Servicio impecable y muy profesionales. Nuestro team building fue un éxito total gracias a ellos."
+      }
+    }
+  },
+  "mobileCTA": {
+    "title": {
+      "line1": "¿Preparado para crear",
+      "line2": "tu evento?"
+    },
+    "subtitle": "Respuesta garantizada en menos de 2 horas",
+    "guarantee": "Garantía 100% satisfacción",
+    "availability": {
+      "badge": "🎃 Halloween 2025",
+      "saturdaysFree": "sábados libres",
+      "lastOne": "⚠️ ¡Último!",
+      "lastOnes": "🔥 ¡Últimos!"
+    },
+    "badges": {
+      "rating": "Rating",
+      "events": "Eventos",
+      "response": "Respuesta"
+    },
+    "months": {
+      "october": "octubre"
+    }
+  },
+  "mobileNav": {
+    "items": {
+      "home": "Inicio",
+      "services": "Servicios",
+      "portfolio": "Portfolio",
+      "contact": "Contacto"
+    },
+    "fab": {
+      "call": "Llamar",
+      "whatsapp": "WhatsApp",
+      "quote": "Presupuesto"
+    }
+  },
+  "mobileHome": {
+    "quickFeatures": {
+      "halloween": {
+        "title": "Halloween",
+        "desc": "Decoración completa"
+      },
+      "monMagic": {
+        "title": "Mundo Mágico",
+        "desc": "Experiencias únicas"
+      },
+      "djPro": {
+        "title": "DJ Pro",
+        "desc": "Pioneer + 4000W"
+      },
+      "effects": {
+        "title": "Efectos FX",
+        "desc": "Humo, luces, chispas"
+      }
+    },
+    "guarantees": {
+      "sectionLabel": "Tranquilidad garantizada",
+      "sectionTitle": "Tu evento, sin riesgos",
+      "satisfaction": {
+        "title": "Garantía 100%",
+        "desc": "Si no estás contento, te devolvemos el dinero"
+      },
+      "backup": {
+        "title": "Backup completo",
+        "desc": "Equipo duplicado. Tu evento NUNCA se para"
+      },
+      "response": {
+        "title": "Respuesta 2h",
+        "desc": "Comunicación directa y sin intermediarios"
+      }
+    },
+    "footer": {
+      "tagline": "Eventos temáticos que nadie más hace",
+      "location": "Barcelona y Girona",
+      "copyright": "Todos los derechos reservados.",
+      "legal": {
+        "privacy": "Privacidad",
+        "cookies": "Cookies",
+        "legal": "Legal"
+      }
+    }
   }
 }

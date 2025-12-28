@@ -13,9 +13,15 @@
  * - CTAs flotantes con glow
  * - Badge de urgencia animado
  * - Scroll indicator interactivo
+ * 
+ * FIXED:
+ * - Rutas con locale
+ * - Textos usando sistema de traducciones
+ * - Scroll usando container ref
+ * - Dependencias de useEffect
  */
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
@@ -25,14 +31,17 @@ import { useTranslations } from 'next-intl';
 // ═══════════════════════════════════════════════════════════════════════════
 
 function ParticlesBackground() {
-  const particles = Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 4 + 2,
-    duration: Math.random() * 20 + 15,
-    delay: Math.random() * 5,
-  }));
+  const particles = useMemo(() => 
+    Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 4 + 2,
+      duration: Math.random() * 20 + 15,
+      delay: Math.random() * 5,
+      xOffset: Math.random() * 50 - 25,
+    })), []
+  );
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -49,7 +58,7 @@ function ParticlesBackground() {
           }}
           animate={{
             y: [0, -100, 0],
-            x: [0, Math.random() * 50 - 25, 0],
+            x: [0, p.xOffset, 0],
             opacity: [0, 0.6, 0],
             scale: [0, 1.5, 0],
           }}
@@ -70,11 +79,13 @@ function ParticlesBackground() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function AnimatedBadge() {
-  const badges = [
-    { emoji: '🎃', text: 'Halloween 2025' },
-    { emoji: '🪄', text: 'Món Màgic' },
-    { emoji: '⭐', text: '4.9/5 · 48+ events' },
-  ];
+  const t = useTranslations('mobileHero');
+  
+  const badges = useMemo(() => [
+    { emoji: '🎃', text: t('badges.halloween') },
+    { emoji: '🪄', text: t('badges.monMagic') },
+    { emoji: '⭐', text: t('badges.rating') },
+  ], [t]);
   
   const [currentBadge, setCurrentBadge] = useState(0);
 
@@ -83,7 +94,7 @@ function AnimatedBadge() {
       setCurrentBadge((prev) => (prev + 1) % badges.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [badges.length]);
 
   return (
     <div className="relative h-10 overflow-hidden">
@@ -111,7 +122,15 @@ function AnimatedBadge() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function MorphingText() {
-  const texts = ['ÚNICS.', 'MÀGICS.', 'BRUTALS.', 'TEUS.'];
+  const t = useTranslations('mobileHero');
+  
+  const texts = useMemo(() => [
+    t('morphingTexts.unique'),
+    t('morphingTexts.magical'),
+    t('morphingTexts.brutal'),
+    t('morphingTexts.yours'),
+  ], [t]);
+  
   const [currentText, setCurrentText] = useState(0);
 
   useEffect(() => {
@@ -119,7 +138,7 @@ function MorphingText() {
       setCurrentText((prev) => (prev + 1) % texts.length);
     }, 2500);
     return () => clearInterval(interval);
-  }, []);
+  }, [texts.length]);
 
   return (
     <span className="relative inline-block min-w-[200px]">
@@ -175,11 +194,12 @@ function MorphingText() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function ScrollIndicator() {
-  const { haptic } = useMobile();
+  const { haptic, scrollToSection } = useMobile();
+  const t = useTranslations('mobileHero');
   
   const handleClick = () => {
     haptic('light');
-    window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+    scrollToSection('services-section');
   };
 
   return (
@@ -195,7 +215,7 @@ function ScrollIndicator() {
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
-        DESCOBREIX
+        {t('scroll')}
       </motion.span>
       
       <motion.div
@@ -221,14 +241,14 @@ function ScrollIndicator() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function FloatingCTAs() {
-  const { haptic } = useMobile();
+  const { haptic, locale } = useMobile();
   const t = useTranslations('common');
 
   return (
     <div className="flex flex-col gap-3 w-full px-6">
       {/* Primary CTA */}
       <motion.a
-        href="/contacto"
+        href={`/${locale}/contacto`}
         whileTap={{ scale: 0.97 }}
         onTapStart={() => haptic('light')}
         className="relative group w-full"
@@ -261,7 +281,7 @@ function FloatingCTAs() {
         <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
         </svg>
-        <span>WhatsApp directe</span>
+        <span>{t('buttons.whatsapp')} directe</span>
       </motion.a>
     </div>
   );
@@ -272,7 +292,7 @@ function FloatingCTAs() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function MobileHeroUltimate() {
-  const t = useTranslations('common');
+  const t = useTranslations('mobileHero');
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -335,7 +355,7 @@ export default function MobileHeroUltimate() {
             transition={{ delay: 0.7, duration: 0.8 }}
             className="text-[2.75rem] leading-[1.05] font-black text-white mt-6 mb-4"
           >
-            EVENTS TEMÀTICS
+            {t('title')}
             <br />
             <MorphingText />
           </motion.h1>
@@ -347,9 +367,9 @@ export default function MobileHeroUltimate() {
             transition={{ delay: 0.9, duration: 0.8 }}
             className="text-lg text-white/60 mb-8 max-w-sm"
           >
-            Halloween · Món Màgic · El que imaginis.
+            {t('subtitle')}
             <br />
-            <span className="text-white/80">Barcelona i Girona.</span>
+            <span className="text-white/80">{t('location')}</span>
           </motion.p>
 
           {/* CTAs */}
@@ -375,7 +395,7 @@ export default function MobileHeroUltimate() {
                 </svg>
               ))}
             </div>
-            <span className="text-white/60 text-sm">4.9 · Bodas.net</span>
+            <span className="text-white/60 text-sm">{t('socialProof')}</span>
           </motion.div>
         </div>
       </motion.div>
