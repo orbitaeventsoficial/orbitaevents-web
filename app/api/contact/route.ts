@@ -102,8 +102,8 @@ export async function POST(req: NextRequest) {
 
     // Detectar si és un email o un telèfon
     const isEmail = contact.includes("@");
-    const clientEmail = isEmail ? contact : `temp-${Date.now()}@orbitaevents.com`;
-    const clientPhone = isEmail ? null : contact.replace(/[^\d+]/g, '');
+    const clientEmail: string | undefined = isEmail ? contact : undefined;
+    const clientPhone: string | undefined = isEmail ? undefined : contact.replace(/[^\d+]/g, '');
 
     // Generar ID únic per al lead
     const leadId = `OE-${Date.now().toString(36).toUpperCase()}`;
@@ -123,8 +123,8 @@ export async function POST(req: NextRequest) {
     let _savedLeadId: string | null = null;
 
     try {
-      // Buscar si ja existeix un lead amb el mateix email
-      const existingLead = isEmail ? await prisma.lead.findFirst({
+      // Buscar si ja existeix un lead amb el mateix email (només si tenim email)
+      const existingLead = clientEmail ? await prisma.lead.findFirst({
         where: { email: clientEmail }
       }) : null;
 
@@ -157,11 +157,14 @@ export async function POST(req: NextRequest) {
           }
         });
       } else {
-        // Crear nou lead
+        // Crear nou lead - generar email placeholder només per BD si no tenim email
+        // Usem format que indica clarament que és placeholder i inclou el telèfon
+        const emailForDb = clientEmail || `phone-${clientPhone}@leads.orbitaevents.local`;
+
         const newLead = await prisma.lead.create({
           data: {
             name,
-            email: clientEmail,
+            email: emailForDb,
             phone: clientPhone,
             eventType: mapEventType(event),
             eventDate: eventDate ? new Date(eventDate) : null,
@@ -182,13 +185,17 @@ export async function POST(req: NextRequest) {
         await prisma.leadNote.create({
           data: {
             leadId: newLead.id,
-            content: `Lead creat via ${packId ? 'configurador' : 'formulari web'}${packName ? ` - Pack interessat: ${packName}` : ''}`,
+            content: `Lead creat via ${packId ? 'configurador' : 'formulari web'}${packName ? ` - Pack interessat: ${packName}` : ''}${!clientEmail ? ` (Contacte per telèfon: ${clientPhone})` : ''}`,
           }
         });
       }
 
     } catch (dbError) {
-      // Continuar amb l'enviament d'emails encara que falli la BBDD
+      // Log de l'error i continuar amb enviament d'emails
+      const { log } = await import('@/lib/logger');
+      log.error('Error guardant lead a la base de dades', dbError, {
+        context: { name, contact, event, source: determineSource(packId, packName) }
+      });
     }
 
     // ===============================================
@@ -271,11 +278,11 @@ export async function POST(req: NextRequest) {
       </div>
       ` : ''}
 
-      ${extras && extras.length > 0 ? `
+      ${extras && Array.isArray(extras) && extras.length > 0 ? `
       <div class="field">
         <div class="field-label">Extras Sol·licitats</div>
         <div class="extras-list">
-          ${extras.map(e => `<span class="extra-tag">${e}</span>`).join('')}
+          ${extras.filter(e => e != null).map(e => `<span class="extra-tag">${String(e).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`).join('')}
         </div>
       </div>
       ` : ''}
@@ -307,7 +314,7 @@ export async function POST(req: NextRequest) {
       to: process.env.CONTACT_TO || SITE_CONFIG.business.email,
       subject: `🎉 NOU LEAD: ${name} - ${eventLabel} ${estimatedPrice ? `(${estimatedPrice}€)` : ''}`,
       html: adminEmailHtml,
-      replyTo: isEmail ? clientEmail : undefined,
+      replyTo: clientEmail || undefined,
       from: `"Òrbita Events Web" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     });
 
@@ -315,7 +322,7 @@ export async function POST(req: NextRequest) {
     // EMAIL DE CONFIRMACIÓ AL CLIENT (si és email)
     // ===============================================
 
-    if (isEmail) {
+    if (isEmail && clientEmail) {
       const clientEmailHtml = `
 <!DOCTYPE html>
 <html>
