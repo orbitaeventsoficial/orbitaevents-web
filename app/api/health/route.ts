@@ -12,7 +12,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { prisma } from '@/lib/prisma';
 
 interface HealthStatus {
   status: 'healthy' | 'degraded' | 'unhealthy';
@@ -54,44 +54,26 @@ export async function GET() {
     responseTime: 0,
   };
 
-  // Check database connection
+  // Check database connection via Prisma
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const dbStartTime = Date.now();
 
-    if (supabaseUrl && supabaseKey) {
-      const dbStartTime = Date.now();
-      const supabase = createClient(supabaseUrl, supabaseKey);
+    // Simple query to check connection
+    await prisma.$queryRaw`SELECT 1`;
 
-      // Simple query to check connection
-      const { error } = await supabase.from('settings').select('key').limit(1);
+    const dbLatency = Date.now() - dbStartTime;
 
-      const dbLatency = Date.now() - dbStartTime;
-
-      if (error) {
-        health.checks.database = {
-          status: 'warn',
-          message: `Database query failed: ${error.message}`,
-          latency: dbLatency,
-        };
-        health.status = 'degraded';
-      } else {
-        health.checks.database = {
-          status: 'pass',
-          message: 'Database connected',
-          latency: dbLatency,
-        };
-      }
-    } else {
-      health.checks.database = {
-        status: 'warn',
-        message: 'Database not configured',
-      };
-    }
-  } catch (err) {
     health.checks.database = {
-      status: 'fail',
+      status: 'pass',
+      message: 'Database connected',
+      latency: dbLatency,
+    };
+  } catch (err) {
+    const dbLatency = Date.now() - startTime;
+    health.checks.database = {
+      status: 'warn',
       message: `Database error: ${err instanceof Error ? err.message : 'Unknown'}`,
+      latency: dbLatency,
     };
     health.status = 'degraded';
   }
