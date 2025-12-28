@@ -45,3 +45,5 @@ Thumbs.db
 .vercel
 nul
 .env.vercel
+.env.vercel-check
+prisma.zip
