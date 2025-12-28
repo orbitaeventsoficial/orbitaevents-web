@@ -2,6 +2,7 @@
 // API per gestionar reserves
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 import { BookingStatus, EventType } from '@prisma/client';
 
@@ -46,7 +47,7 @@ async function generateReference(): Promise<string> {
 
   let nextNumber = 1;
   if (lastBooking) {
-    const lastNumber = parseInt(lastBooking.reference.split('-').pop() || '0');
+    const lastNumber = safeParseInt(lastBooking.reference.split('-').pop(), 0);
     nextNumber = lastNumber + 1;
   }
 
@@ -62,8 +63,8 @@ export async function GET(req: NextRequest) {
     const fromDate = searchParams.get('fromDate');
     const toDate = searchParams.get('toDate');
     const search = searchParams.get('search');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const page = safeParseInt(searchParams.get('page'), 1, 1);
+    const limit = safeParseInt(searchParams.get('limit'), 50, 1, 200);
 
     // Validar enums
     const validStatus = status && Object.values(BookingStatus).includes(status as BookingStatus)

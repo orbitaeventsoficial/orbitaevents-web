@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { safeParseInt } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'completed';
-    const daysAgo = parseInt(searchParams.get('days') || '30');
+    const daysAgo = safeParseInt(searchParams.get('days'), 30, 1, 365);
 
     // Calcular data límit
     const cutoffDate = new Date();

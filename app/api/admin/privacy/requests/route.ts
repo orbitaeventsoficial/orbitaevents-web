@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { safeParseInt } from '@/lib/utils';
 import type { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
@@ -14,7 +15,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
     const type = searchParams.get('type');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const limit = safeParseInt(searchParams.get('limit'), 50, 1, 200);
 
     const where: Prisma.DataRequestWhereInput = {};
 
