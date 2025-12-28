@@ -199,6 +199,36 @@ export async function POST(req: NextRequest) {
     }
 
     // ===============================================
+    // NOTIFICACIÓ MULTI-CANAL (Email + WhatsApp + Webhook)
+    // ===============================================
+    // Només notifiquem si tenim un lead guardat i email vàlid
+    if (_savedLeadId && clientEmail) {
+      try {
+        const { notifyNewLead } = await import('@/lib/services/notificationService');
+
+        notifyNewLead({
+          id: _savedLeadId,
+          name,
+          email: clientEmail,
+          phone: clientPhone,
+          eventType: mapEventType(event),
+          eventDate: eventDate ? new Date(eventDate) : undefined,
+          guestCount: guests,
+          budget: estimatedPrice ? `${estimatedPrice}€` : undefined,
+          message,
+          source: determineSource(packId, packName),
+          packName,
+          createdAt: new Date(),
+        }).catch(err => {
+          // No bloquejar si falla la notificació
+          console.error('[Notification] Error enviant notificació multi-canal:', err);
+        });
+      } catch {
+        // Ignorar errors d'import en entorns sense el servei
+      }
+    }
+
+    // ===============================================
     // EMAIL AL ADMINISTRADOR (TÚ) - FITXA COMPLETA
     // ===============================================
 

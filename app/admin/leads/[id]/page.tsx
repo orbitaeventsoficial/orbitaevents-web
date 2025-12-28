@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import LeadActions from './LeadActions';
+import LeadActionsEnhanced from './LeadActionsEnhanced';
 
 export const dynamic = 'force-dynamic';
 
@@ -288,7 +288,14 @@ export default async function LeadDetailPage({ params }: Props) {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <LeadActions leadId={lead.id} currentStatus={lead.status} />
+          <LeadActionsEnhanced 
+            leadId={lead.id} 
+            currentStatus={lead.status}
+            clientName={lead.name}
+            clientEmail={lead.email}
+            clientPhone={lead.phone}
+            eventType={eventType}
+          />
 
           {/* Metadades */}
           <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
