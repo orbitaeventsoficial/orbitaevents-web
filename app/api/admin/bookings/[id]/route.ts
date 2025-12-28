@@ -2,6 +2,7 @@
 // API per gestionar reserva individual
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import { z } from 'zod';
 
 interface Params {
@@ -52,7 +53,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       booking,
     });
   } catch (error) {
-    console.error('Error obtenint reserva:', error);
+    log.error('Error obtenint reserva', error, { context: { bookingId: params.id } });
     return NextResponse.json(
       { error: 'Error obtenint reserva' },
       { status: 500 }
@@ -101,44 +102,35 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     // ═══════════════════════════════════════════════════════════════════
     // AUTO-INCREMENT STATS QUAN EVENT PASSA A COMPLETED
+    // Usem transacció per evitar race conditions
     // ═══════════════════════════════════════════════════════════════════
     if (newStatus === 'COMPLETED' && oldStatus !== 'COMPLETED') {
-      // 1. Incrementar total_events
-      const eventsSetting = await prisma.setting.findUnique({
-        where: { key: 'total_events' },
-      });
+      await prisma.$transaction(async (tx) => {
+        // 1. Incrementar total_events amb raw SQL per evitar race condition
+        await tx.$executeRaw`
+          UPDATE settings
+          SET value = CAST(CAST(value AS INTEGER) + 1 AS TEXT)
+          WHERE key = 'total_events'
+        `;
 
-      if (eventsSetting) {
-        await prisma.setting.update({
-          where: { key: 'total_events' },
-          data: { value: String(parseInt(eventsSetting.value) + 1) },
+        // 2. Incrementar total_people amb guestCount
+        await tx.$executeRaw`
+          UPDATE settings
+          SET value = CAST(CAST(value AS INTEGER) + ${existing.guestCount} AS TEXT)
+          WHERE key = 'total_people'
+        `;
+
+        // 3. Crear notificació en viu
+        await tx.liveNotification.create({
+          data: {
+            type: existing.eventType,
+            location: existing.eventLocation,
+            isReal: true,
+            bookingId: id,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dies
+          },
         });
-      }
-
-      // 2. Incrementar total_people amb guestCount
-      const peopleSetting = await prisma.setting.findUnique({
-        where: { key: 'total_people' },
       });
-
-      if (peopleSetting) {
-        await prisma.setting.update({
-          where: { key: 'total_people' },
-          data: { value: String(parseInt(peopleSetting.value) + existing.guestCount) },
-        });
-      }
-
-      // 3. Crear notificació en viu
-      await prisma.liveNotification.create({
-        data: {
-          type: existing.eventType,
-          location: existing.eventLocation,
-          isReal: true,
-          bookingId: id,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dies
-        },
-      });
-
-      console.log(`✅ Event COMPLETED: Stats actualitzats (+1 event, +${existing.guestCount} persones)`);
     }
 
     // Si passa a CANCELLED, alliberar disponibilitat
@@ -172,7 +164,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       statsUpdated: newStatus === 'COMPLETED' && oldStatus !== 'COMPLETED',
     });
   } catch (error) {
-    console.error('Error actualitzant reserva:', error);
+    log.error('Error actualitzant reserva', error, { context: { bookingId: params.id } });
     return NextResponse.json(
       { error: 'Error actualitzant reserva' },
       { status: 500 }
@@ -233,7 +225,7 @@ export async function DELETE(req: NextRequest, { params }: Params) {
       ok: true,
     });
   } catch (error) {
-    console.error('Error eliminant reserva:', error);
+    log.error('Error eliminant reserva', error, { context: { bookingId: params.id } });
     return NextResponse.json(
       { error: 'Error eliminant reserva' },
       { status: 500 }

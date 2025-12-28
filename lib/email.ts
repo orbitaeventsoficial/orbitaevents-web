@@ -38,13 +38,11 @@ function createTransporter() {
       pass: process.env.SMTP_PASS,
     },
     tls: {
-      // NOTA SEGURETAT: rejectUnauthorized: false és necessari quan usem IP directa
-      // perquè el certificat SSL és per smtp.dondominio.com, no per la IP.
-      // Això és acceptable perquè:
-      // 1. Usem IP directa per evitar problemes DNS a Vercel serverless
-      // 2. La connexió segueix sent xifrada amb TLS
-      // 3. Coneixem i confiem en aquesta IP específica (Don Dominio)
-      rejectUnauthorized: false,
+      // SEGURETAT: Només desactivem validació de cert quan usem IP directa de Don Dominio
+      // El certificat SSL és per smtp.dondominio.com, no per la IP 31.214.176.11
+      // La connexió segueix xifrada amb TLS, només s'omet validació del nom del cert
+      // TODO: Migrar a SendGrid/AWS SES per tenir rejectUnauthorized: true sempre
+      rejectUnauthorized: smtpHost === DONDOMINIO_SMTP_IP ? false : true,
     },
   });
 }

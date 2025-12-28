@@ -2,24 +2,28 @@
 // API per gestionar lead individual
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import { z } from 'zod';
 
 interface Params {
   params: { id: string };
 }
 
-// Schema de validació per PATCH
+// Schema de validació per PATCH - Usem els enums correctes de Prisma
 const updateLeadSchema = z.object({
   name: z.string().min(1).optional(),
   email: z.string().email().optional(),
   phone: z.string().optional(),
   eventDate: z.string().optional(),
-  eventType: z.enum(['BODA', 'FIESTA_PRIVADA', 'CORPORATIVO', 'COMUNION', 'BAUTIZO', 'CUMPLEANOS', 'OTRO']).optional(),
-  status: z.enum(['NEW', 'CONTACTED', 'QUALIFIED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST']).optional(),
+  // EventType enum de Prisma
+  eventType: z.enum(['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER']).optional(),
+  // LeadStatus enum de Prisma
+  status: z.enum(['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST']).optional(),
+  // Priority enum de Prisma
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
   source: z.string().optional(),
-  budget: z.number().optional(),
-  guestCount: z.number().optional(),
+  budget: z.string().optional(), // És string a Prisma (ex: "5000€")
+  guestCount: z.number().int().positive().optional(),
   notes: z.string().optional(),
   venue: z.string().optional(),
   assignedTo: z.string().optional(),
@@ -53,7 +57,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       lead,
     });
   } catch (error) {
-    console.error('Error obtenint lead:', error);
+    log.error('Error obtenint lead', error, { context: { leadId: params.id } });
     return NextResponse.json(
       { error: 'Error obtenint lead' },
       { status: 500 }
@@ -64,7 +68,16 @@ export async function GET(req: NextRequest, { params }: Params) {
 // PATCH - Actualitzar lead
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
-    const rawBody = await req.json();
+    // Parsejar JSON amb gestió d'errors
+    let rawBody;
+    try {
+      rawBody = await req.json();
+    } catch {
+      return NextResponse.json(
+        { error: 'JSON invàlid' },
+        { status: 400 }
+      );
+    }
     const { id } = params;
 
     // Validar amb Zod
@@ -89,9 +102,17 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       );
     }
 
-    // Processar dates
+    // Processar dates amb validació
     if (body.eventDate && typeof body.eventDate === 'string') {
-      body.eventDate = new Date(body.eventDate);
+      const parsedDate = new Date(body.eventDate);
+      // Validar que la data és vàlida
+      if (isNaN(parsedDate.getTime())) {
+        return NextResponse.json(
+          { error: 'Data invàlida', details: { eventDate: 'Format de data incorrecte' } },
+          { status: 400 }
+        );
+      }
+      body.eventDate = parsedDate;
     }
 
     // Si canvia a WON, actualitzar convertedAt
@@ -123,7 +144,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       lead,
     });
   } catch (error) {
-    console.error('Error actualitzant lead:', error);
+    log.error('Error actualitzant lead', error, { context: { leadId: params.id } });
     return NextResponse.json(
       { error: 'Error actualitzant lead' },
       { status: 500 }
@@ -173,7 +194,7 @@ export async function DELETE(req: NextRequest, { params }: Params) {
       ok: true,
     });
   } catch (error) {
-    console.error('Error eliminant lead:', error);
+    log.error('Error eliminant lead', error, { context: { leadId: params.id } });
     return NextResponse.json(
       { error: 'Error eliminant lead' },
       { status: 500 }
