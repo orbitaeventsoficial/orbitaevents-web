@@ -2,15 +2,44 @@
  * API ROUTE: File Upload a Supabase Storage
  * ==========================================
  * POST - Pujar fitxer petit directament o generar signed URL per fitxers grans
+ * PROTEGIT: Requereix autenticació admin i rate limiting
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import log from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
 // Límit per upload directe (4MB per evitar límit Vercel)
 const DIRECT_UPLOAD_LIMIT = 4 * 1024 * 1024;
+
+// Verificar autenticació admin
+function verifyAuth(request: NextRequest): boolean {
+  const authHeader = request.headers.get('authorization');
+
+  if (!authHeader || !authHeader.startsWith('Basic ')) {
+    return false;
+  }
+
+  const ADMIN_USER = process.env.ADMIN_USER;
+  const ADMIN_PASS = process.env.ADMIN_PASS;
+
+  if (!ADMIN_USER || !ADMIN_PASS) {
+    return false;
+  }
+
+  try {
+    const base64Credentials = authHeader.split(' ')[1]!;
+    const decoded = atob(base64Credentials);
+    const [user, ...passParts] = decoded.split(':');
+    const pass = passParts.join(':');
+    return user === ADMIN_USER && pass === ADMIN_PASS;
+  } catch {
+    return false;
+  }
+}
 
 // Supabase admin client (amb service key)
 function getSupabaseAdmin() {
@@ -29,6 +58,21 @@ function getSupabaseAdmin() {
  * Per fitxers > 4MB, retorna signed URL per upload directe
  */
 export async function POST(request: NextRequest) {
+  // 1. Rate limiting
+  const rateLimitResult = checkRateLimit(request, RATE_LIMITS.contact);
+  if (rateLimitResult) return rateLimitResult;
+
+  // 2. Autenticació
+  if (!verifyAuth(request)) {
+    log.warn('Intent de upload sense autenticació', {
+      ip: request.headers.get('x-forwarded-for') || 'unknown',
+    });
+    return NextResponse.json(
+      { error: 'No autoritzat' },
+      { status: 401, headers: { 'WWW-Authenticate': 'Basic realm="Upload"' } }
+    );
+  }
+
   try {
     const supabaseAdmin = getSupabaseAdmin();
 
@@ -65,11 +109,8 @@ export async function POST(request: NextRequest) {
         .createSignedUploadUrl(path);
 
       if (error) {
-        console.error('Error creating signed URL:', error);
-        return NextResponse.json(
-          { error: error.message },
-          { status: 500 }
-        );
+        log.error('Error creant signed URL', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
       }
 
       // Get public URL
@@ -93,13 +134,20 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json(
-        { error: 'No s\'ha proporcionat cap fitxer' },
+        { error: "No s'ha proporcionat cap fitxer" },
         { status: 400 }
       );
     }
 
     // Validar tipus
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/quicktime'];
+    const validTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/gif',
+      'video/mp4',
+      'video/quicktime',
+    ];
     if (!validTypes.includes(file.type)) {
       return NextResponse.json(
         { error: 'Tipus de fitxer no permès. Usa JPG, PNG, WebP, GIF o MP4.' },
@@ -110,7 +158,10 @@ export async function POST(request: NextRequest) {
     // Si és massa gran, retornar instruccions per usar signed URL
     if (file.size > DIRECT_UPLOAD_LIMIT) {
       return NextResponse.json(
-        { error: 'Fitxer massa gran per upload directe. Usa signed URL.', useSignedUrl: true },
+        {
+          error: 'Fitxer massa gran per upload directe. Usa signed URL.',
+          useSignedUrl: true,
+        },
         { status: 413 }
       );
     }
@@ -135,11 +186,8 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      console.error('Supabase upload error:', error);
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
+      log.error('Supabase upload error', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     // Get public URL
@@ -147,13 +195,15 @@ export async function POST(request: NextRequest) {
       .from('media')
       .getPublicUrl(data.path);
 
+    log.info('Fitxer pujat correctament', { path: data.path });
+
     return NextResponse.json({
       success: true,
       url: urlData.publicUrl,
       path: data.path,
     });
   } catch (error) {
-    console.error('Error pujant fitxer:', error);
+    log.error('Error pujant fitxer', error);
     return NextResponse.json(
       { error: 'Error processant el fitxer' },
       { status: 500 }
