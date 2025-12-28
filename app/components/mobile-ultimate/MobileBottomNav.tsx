@@ -12,11 +12,16 @@
  * - Haptic feedback
  * - Badge de notificaciones
  * - Safe area support
+ * 
+ * FIXED:
+ * - Rutas con locale
+ * - Textos usando sistema de traducciones
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMobile } from './MobileAppShell';
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ICONS
@@ -47,45 +52,34 @@ const ContactIcon = ({ active }: { active: boolean }) => (
 );
 
 // ═══════════════════════════════════════════════════════════════════════════
-// NAV ITEMS
-// ═══════════════════════════════════════════════════════════════════════════
-
-const NAV_ITEMS = [
-  { id: 'home', label: 'Inici', href: '/', icon: HomeIcon },
-  { id: 'services', label: 'Serveis', href: '/servicios', icon: ServicesIcon },
-  // FAB va aquí (espacio)
-  { id: 'gallery', label: 'Portfolio', href: '/portfolio', icon: GalleryIcon },
-  { id: 'contact', label: 'Contacte', href: '/contacto', icon: ContactIcon },
-];
-
-// ═══════════════════════════════════════════════════════════════════════════
 // FAB MENU (Botón central con acciones)
 // ═══════════════════════════════════════════════════════════════════════════
 
 function FABMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const { haptic } = useMobile();
+  const { haptic, locale } = useMobile();
+  const t = useTranslations('mobileNav');
 
-  const actions = [
+  const actions = useMemo(() => [
     {
       icon: '📞',
-      label: 'Trucar',
+      labelKey: 'fab.call',
       href: 'tel:+34699121023',
       color: 'from-green-500 to-emerald-500'
     },
     {
       icon: '💬',
-      label: 'WhatsApp',
+      labelKey: 'fab.whatsapp',
       href: 'https://wa.me/34699121023',
       color: 'from-green-400 to-green-600'
     },
     { 
       icon: '📝', 
-      label: 'Pressupost', 
-      href: '/contacto',
+      labelKey: 'fab.quote', 
+      href: `/${locale}/contacto`,
       color: 'from-amber-500 to-orange-500'
     },
-  ];
+  ], [locale]);
 
   const toggleMenu = () => {
     haptic('medium');
@@ -118,7 +112,7 @@ function FABMenu() {
           >
             {actions.map((action, i) => (
               <motion.a
-                key={action.label}
+                key={action.labelKey}
                 href={action.href}
                 initial={{ opacity: 0, y: 20, scale: 0.8 }}
                 animate={{ 
@@ -138,7 +132,7 @@ function FABMenu() {
                 className={`flex items-center gap-3 px-5 py-3 rounded-2xl bg-gradient-to-r ${action.color} shadow-xl`}
               >
                 <span className="text-2xl">{action.icon}</span>
-                <span className="text-white font-semibold whitespace-nowrap">{action.label}</span>
+                <span className="text-white font-semibold whitespace-nowrap">{t(action.labelKey)}</span>
               </motion.a>
             ))}
           </motion.div>
@@ -181,25 +175,37 @@ function FABMenu() {
 // NAV ITEM BUTTON
 // ═══════════════════════════════════════════════════════════════════════════
 
-interface NavItemProps {
-  item: typeof NAV_ITEMS[0];
-  isActive: boolean;
-  onClick: () => void;
+interface NavItem {
+  id: string;
+  labelKey: string;
+  href: string;
+  icon: React.FC<{ active: boolean }>;
 }
 
-function NavItem({ item, isActive, onClick }: NavItemProps) {
+interface NavItemProps {
+  item: NavItem;
+  isActive: boolean;
+  onClick: () => void;
+  locale: string;
+  t: ReturnType<typeof useTranslations>;
+}
+
+function NavItemComponent({ item, isActive, onClick, locale, t }: NavItemProps) {
   const { haptic } = useMobile();
   const Icon = item.icon;
+  
+  // Build href with locale
+  const href = item.href === '/' ? `/${locale}` : `/${locale}${item.href}`;
 
   return (
     <motion.a
-      href={item.href}
+      href={href}
       onClick={(e) => {
         e.preventDefault();
         haptic('light');
         onClick();
         // Navigate
-        window.location.href = item.href;
+        window.location.href = href;
       }}
       whileTap={{ scale: 0.9 }}
       className="relative flex flex-col items-center gap-1 py-2 px-4"
@@ -220,7 +226,7 @@ function NavItem({ item, isActive, onClick }: NavItemProps) {
 
       {/* Label */}
       <span className={`text-[10px] font-medium ${isActive ? 'text-amber-400' : 'text-white/50'}`}>
-        {item.label}
+        {t(item.labelKey)}
       </span>
 
       {/* Active dot */}
@@ -241,6 +247,16 @@ function NavItem({ item, isActive, onClick }: NavItemProps) {
 
 export default function MobileBottomNav() {
   const [activeId, setActiveId] = useState('home');
+  const { locale } = useMobile();
+  const t = useTranslations('mobileNav');
+
+  const NAV_ITEMS: NavItem[] = useMemo(() => [
+    { id: 'home', labelKey: 'items.home', href: '/', icon: HomeIcon },
+    { id: 'services', labelKey: 'items.services', href: '/servicios', icon: ServicesIcon },
+    // FAB va aquí (espacio)
+    { id: 'gallery', labelKey: 'items.portfolio', href: '/portfolio', icon: GalleryIcon },
+    { id: 'contact', labelKey: 'items.contact', href: '/contacto', icon: ContactIcon },
+  ], []);
 
   return (
     <motion.nav
@@ -256,11 +272,13 @@ export default function MobileBottomNav() {
       <div className="relative flex items-end justify-around px-2 py-2">
         {/* Left items */}
         {NAV_ITEMS.slice(0, 2).map((item) => (
-          <NavItem
+          <NavItemComponent
             key={item.id}
             item={item}
             isActive={activeId === item.id}
             onClick={() => setActiveId(item.id)}
+            locale={locale}
+            t={t}
           />
         ))}
 
@@ -269,11 +287,13 @@ export default function MobileBottomNav() {
 
         {/* Right items */}
         {NAV_ITEMS.slice(2).map((item) => (
-          <NavItem
+          <NavItemComponent
             key={item.id}
             item={item}
             isActive={activeId === item.id}
             onClick={() => setActiveId(item.id)}
+            locale={locale}
+            t={t}
           />
         ))}
       </div>

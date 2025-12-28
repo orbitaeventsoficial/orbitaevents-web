@@ -12,101 +12,47 @@
  * - Glow effects
  * - Badges animados
  * - Swipe indicators
+ * 
+ * FIXED:
+ * - Removed unused PanInfo import
+ * - Textos usando sistema de traducciones
+ * - Rutas con locale
  */
 
-import { useRef, useState, useEffect } from 'react';
-import { motion, useMotionValue, useTransform, useSpring, PanInfo } from 'framer-motion';
+import { useRef, useState, useEffect, useMemo } from 'react';
+import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import Image from 'next/image';
 import { useMobile } from './MobileAppShell';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════════════════════════════════════════
-
-const SERVICES = [
-  {
-    id: 'halloween',
-    emoji: '🎃',
-    title: 'Halloween',
-    subtitle: 'Nits de terror',
-    description: 'Decoració completa, DJ temàtic, efectes FX',
-    price: 'Des de 600€',
-    badge: '🔥 Temporada 2025',
-    badgeColor: 'from-orange-500 to-red-500',
-    image: '/img/portfolio/tematicas/halloween-01.webp',
-    gradient: 'from-orange-500/20 via-red-500/10 to-transparent',
-    href: '/tematica-halloween',
-    features: ['Fantasmes gegants', 'Caldero màgic', 'Fum baix'],
-  },
-  {
-    id: 'monmagic',
-    emoji: '🪄',
-    title: 'Món Màgic',
-    subtitle: 'Escola de màgia',
-    description: 'Sobres amb lacre, veles flotants, ambientació',
-    price: 'Des de 600€',
-    badge: '✨ Experiència única',
-    badgeColor: 'from-amber-500 to-yellow-500',
-    image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
-    gradient: 'from-amber-500/20 via-purple-500/10 to-transparent',
-    href: '/tematica-mon-magic',
-    features: ['Lacre artesanal', 'Veles flotants', 'Decoració'],
-  },
-  {
-    id: 'bodas',
-    emoji: '💒',
-    title: 'Casaments',
-    subtitle: 'El teu dia perfecte',
-    description: 'DJ professional, so, llums, coordinació',
-    price: 'Des de 650€',
-    badge: '',
-    badgeColor: '',
-    image: '/img/portfolio/bodas/bodas-01.webp',
-    gradient: 'from-pink-500/20 via-rose-500/10 to-transparent',
-    href: '/servicios/bodas',
-    features: ['DJ Pro', 'So 4000W', 'Backup 100%'],
-  },
-  {
-    id: 'fiestas',
-    emoji: '🎉',
-    title: 'Festes',
-    subtitle: 'Aniversaris i més',
-    description: 'Discomòbil complet amb tot inclòs',
-    price: 'Des de 400€',
-    badge: '',
-    badgeColor: '',
-    image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
-    gradient: 'from-purple-500/20 via-violet-500/10 to-transparent',
-    href: '/servicios/fiestas',
-    features: ['Llums LED', 'Efectes', 'Tot inclòs'],
-  },
-  {
-    id: 'empresas',
-    emoji: '🏢',
-    title: 'Empreses',
-    subtitle: 'Events corporatius',
-    description: 'Audiovisual, branding, factura',
-    price: 'Des de 500€',
-    badge: '',
-    badgeColor: '',
-    image: '/img/portfolio/empresas/empresas-01.webp',
-    gradient: 'from-blue-500/20 via-cyan-500/10 to-transparent',
-    href: '/servicios/empresas',
-    features: ['Micro sense fil', 'Branding', 'Factura'],
-  },
-];
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SERVICE CARD 3D
 // ═══════════════════════════════════════════════════════════════════════════
 
-interface ServiceCardProps {
-  service: typeof SERVICES[0];
-  isActive: boolean;
-  index: number;
+interface Service {
+  id: string;
+  emoji: string;
+  titleKey: string;
+  subtitleKey: string;
+  descriptionKey: string;
+  priceKey: string;
+  badgeKey: string;
+  badgeColor: string;
+  image: string;
+  gradient: string;
+  href: string;
+  features: string[];
 }
 
-function ServiceCard3D({ service, isActive, index }: ServiceCardProps) {
+interface ServiceCardProps {
+  service: Service;
+  isActive: boolean;
+  index: number;
+  locale: string;
+  t: ReturnType<typeof useTranslations>;
+}
+
+function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps) {
   const { haptic } = useMobile();
   const cardRef = useRef<HTMLDivElement>(null);
   
@@ -135,6 +81,11 @@ function ServiceCard3D({ service, isActive, index }: ServiceCardProps) {
     y.set(0);
   };
 
+  const title = t(`services.${service.id}.title`);
+  const subtitle = t(`services.${service.id}.subtitle`);
+  const price = t(`services.${service.id}.price`);
+  const badge = service.badgeKey ? t(`services.${service.id}.badge`) : '';
+
   return (
     <motion.div
       ref={cardRef}
@@ -148,7 +99,7 @@ function ServiceCard3D({ service, isActive, index }: ServiceCardProps) {
       className="relative flex-shrink-0 w-[85vw] max-w-[340px] h-[420px] perspective-1000"
     >
       <motion.a
-        href={service.href}
+        href={`/${locale}${service.href}`}
         whileTap={{ scale: 0.98 }}
         onTapStart={() => haptic('light')}
         className="block relative w-full h-full rounded-3xl overflow-hidden bg-zinc-900 border border-white/10 shadow-2xl"
@@ -161,7 +112,7 @@ function ServiceCard3D({ service, isActive, index }: ServiceCardProps) {
         <div className="absolute inset-0">
           <Image
             src={service.image}
-            alt={service.title}
+            alt={title}
             fill
             className="object-cover"
             sizes="340px"
@@ -173,7 +124,7 @@ function ServiceCard3D({ service, isActive, index }: ServiceCardProps) {
         </div>
 
         {/* Badge */}
-        {service.badge && (
+        {badge && (
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -181,7 +132,7 @@ function ServiceCard3D({ service, isActive, index }: ServiceCardProps) {
             className="absolute top-4 left-4 z-10"
           >
             <div className={`px-3 py-1.5 rounded-full bg-gradient-to-r ${service.badgeColor} text-white text-xs font-bold shadow-lg`}>
-              {service.badge}
+              {badge}
             </div>
           </motion.div>
         )}
@@ -205,22 +156,22 @@ function ServiceCard3D({ service, isActive, index }: ServiceCardProps) {
 
           {/* Title */}
           <h3 className="text-2xl font-black text-white mb-1">
-            {service.title}
+            {title}
           </h3>
           
           {/* Subtitle */}
           <p className="text-white/60 text-sm mb-3">
-            {service.subtitle}
+            {subtitle}
           </p>
 
           {/* Features */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {service.features.map((feature, i) => (
+            {service.features.map((featureKey, i) => (
               <span 
                 key={i}
                 className="px-2 py-1 bg-white/10 rounded-lg text-white/70 text-xs"
               >
-                {feature}
+                {t(`services.${service.id}.features.${i}`)}
               </span>
             ))}
           </div>
@@ -228,10 +179,10 @@ function ServiceCard3D({ service, isActive, index }: ServiceCardProps) {
           {/* Price + CTA */}
           <div className="flex items-center justify-between">
             <span className="text-amber-400 font-bold text-lg">
-              {service.price}
+              {price}
             </span>
             <div className="flex items-center gap-1 text-white/50 text-sm">
-              <span>Veure</span>
+              <span>{t('viewMore')}</span>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -262,7 +213,82 @@ function ServiceCard3D({ service, isActive, index }: ServiceCardProps) {
 export default function MobileServicesCards() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const { haptic } = useMobile();
+  const { haptic, locale } = useMobile();
+  const t = useTranslations('mobileServices');
+
+  // Services data with translation keys
+  const SERVICES: Service[] = useMemo(() => [
+    {
+      id: 'halloween',
+      emoji: '🎃',
+      titleKey: 'halloween.title',
+      subtitleKey: 'halloween.subtitle',
+      descriptionKey: 'halloween.description',
+      priceKey: 'halloween.price',
+      badgeKey: 'halloween.badge',
+      badgeColor: 'from-orange-500 to-red-500',
+      image: '/img/portfolio/tematicas/halloween-01.webp',
+      gradient: 'from-orange-500/20 via-red-500/10 to-transparent',
+      href: '/tematica-halloween',
+      features: ['feature1', 'feature2', 'feature3'],
+    },
+    {
+      id: 'monmagic',
+      emoji: '🪄',
+      titleKey: 'monmagic.title',
+      subtitleKey: 'monmagic.subtitle',
+      descriptionKey: 'monmagic.description',
+      priceKey: 'monmagic.price',
+      badgeKey: 'monmagic.badge',
+      badgeColor: 'from-amber-500 to-yellow-500',
+      image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
+      gradient: 'from-amber-500/20 via-purple-500/10 to-transparent',
+      href: '/tematica-mon-magic',
+      features: ['feature1', 'feature2', 'feature3'],
+    },
+    {
+      id: 'bodas',
+      emoji: '💒',
+      titleKey: 'bodas.title',
+      subtitleKey: 'bodas.subtitle',
+      descriptionKey: 'bodas.description',
+      priceKey: 'bodas.price',
+      badgeKey: '',
+      badgeColor: '',
+      image: '/img/portfolio/bodas/bodas-01.webp',
+      gradient: 'from-pink-500/20 via-rose-500/10 to-transparent',
+      href: '/servicios/bodas',
+      features: ['feature1', 'feature2', 'feature3'],
+    },
+    {
+      id: 'fiestas',
+      emoji: '🎉',
+      titleKey: 'fiestas.title',
+      subtitleKey: 'fiestas.subtitle',
+      descriptionKey: 'fiestas.description',
+      priceKey: 'fiestas.price',
+      badgeKey: '',
+      badgeColor: '',
+      image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
+      gradient: 'from-purple-500/20 via-violet-500/10 to-transparent',
+      href: '/servicios/fiestas',
+      features: ['feature1', 'feature2', 'feature3'],
+    },
+    {
+      id: 'empresas',
+      emoji: '🏢',
+      titleKey: 'empresas.title',
+      subtitleKey: 'empresas.subtitle',
+      descriptionKey: 'empresas.description',
+      priceKey: 'empresas.price',
+      badgeKey: '',
+      badgeColor: '',
+      image: '/img/portfolio/empresas/empresas-01.webp',
+      gradient: 'from-blue-500/20 via-cyan-500/10 to-transparent',
+      href: '/servicios/empresas',
+      features: ['feature1', 'feature2', 'feature3'],
+    },
+  ], []);
 
   // Detectar card activa basándose en scroll position
   useEffect(() => {
@@ -273,7 +299,7 @@ export default function MobileServicesCards() {
       const scrollLeft = container.scrollLeft;
       const cardWidth = container.offsetWidth * 0.85 + 16; // width + gap
       const newIndex = Math.round(scrollLeft / cardWidth);
-      if (newIndex !== activeIndex) {
+      if (newIndex !== activeIndex && newIndex >= 0 && newIndex < SERVICES.length) {
         setActiveIndex(newIndex);
         haptic('light');
       }
@@ -281,10 +307,10 @@ export default function MobileServicesCards() {
 
     container.addEventListener('scroll', handleScroll, { passive: true });
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [activeIndex, haptic]);
+  }, [activeIndex, haptic, SERVICES.length]);
 
   return (
-    <section className="py-12 overflow-hidden">
+    <section id="services-section" className="py-12 overflow-hidden">
       {/* Section Header */}
       <div className="px-6 mb-6">
         <motion.span
@@ -293,7 +319,7 @@ export default function MobileServicesCards() {
           viewport={{ once: true }}
           className="text-amber-500 text-sm font-medium tracking-wider uppercase"
         >
-          Els nostres serveis
+          {t('sectionLabel')}
         </motion.span>
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
@@ -302,7 +328,7 @@ export default function MobileServicesCards() {
           transition={{ delay: 0.1 }}
           className="text-3xl font-black text-white mt-2"
         >
-          Què necessites?
+          {t('sectionTitle')}
         </motion.h2>
       </div>
 
@@ -325,6 +351,8 @@ export default function MobileServicesCards() {
               service={service}
               isActive={index === activeIndex}
               index={index}
+              locale={locale}
+              t={t}
             />
           </div>
         ))}
@@ -366,7 +394,7 @@ export default function MobileServicesCards() {
         transition={{ delay: 1 }}
         className="text-center text-white/30 text-xs mt-4"
       >
-        ← Swipe per veure més →
+        {t('swipeHint')}
       </motion.p>
     </section>
   );

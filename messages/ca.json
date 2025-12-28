@@ -6025,5 +6025,210 @@
     "cta": {
       "reserveNow": "Reserva ara →"
     }
+  },
+  "mobileHero": {
+    "title": "EVENTS TEMÀTICS",
+    "subtitle": "Halloween · Món Màgic · El que imaginis.",
+    "location": "Barcelona i Girona.",
+    "scroll": "DESCOBREIX",
+    "socialProof": "4.9 · Bodas.net",
+    "badges": {
+      "halloween": "Halloween 2025",
+      "monMagic": "Món Màgic",
+      "rating": "4.9/5 · 48+ events"
+    },
+    "morphingTexts": {
+      "unique": "ÚNICS.",
+      "magical": "MÀGICS.",
+      "brutal": "BRUTALS.",
+      "yours": "TEUS."
+    }
+  },
+  "mobileServices": {
+    "sectionLabel": "Els nostres serveis",
+    "sectionTitle": "Què necessites?",
+    "swipeHint": "← Swipe per veure més →",
+    "viewMore": "Veure",
+    "services": {
+      "halloween": {
+        "title": "Halloween",
+        "subtitle": "Nits de terror",
+        "description": "Decoració completa, DJ temàtic, efectes FX",
+        "price": "Des de 600€",
+        "badge": "🔥 Temporada 2025",
+        "features": {
+          "0": "Fantasmes gegants",
+          "1": "Caldero màgic",
+          "2": "Fum baix"
+        }
+      },
+      "monmagic": {
+        "title": "Món Màgic",
+        "subtitle": "Escola de màgia",
+        "description": "Sobres amb lacre, veles flotants, ambientació",
+        "price": "Des de 600€",
+        "badge": "✨ Experiència única",
+        "features": {
+          "0": "Lacre artesanal",
+          "1": "Veles flotants",
+          "2": "Decoració"
+        }
+      },
+      "bodas": {
+        "title": "Casaments",
+        "subtitle": "El teu dia perfecte",
+        "description": "DJ professional, so, llums, coordinació",
+        "price": "Des de 650€",
+        "badge": "",
+        "features": {
+          "0": "DJ Pro",
+          "1": "So 4000W",
+          "2": "Backup 100%"
+        }
+      },
+      "fiestas": {
+        "title": "Festes",
+        "subtitle": "Aniversaris i més",
+        "description": "Discomòbil complet amb tot inclòs",
+        "price": "Des de 400€",
+        "badge": "",
+        "features": {
+          "0": "Llums LED",
+          "1": "Efectes",
+          "2": "Tot inclòs"
+        }
+      },
+      "empresas": {
+        "title": "Empreses",
+        "subtitle": "Events corporatius",
+        "description": "Audiovisual, branding, factura",
+        "price": "Des de 500€",
+        "badge": "",
+        "features": {
+          "0": "Micro sense fil",
+          "1": "Branding",
+          "2": "Factura"
+        }
+      }
+    }
+  },
+  "mobileTestimonials": {
+    "sectionLabel": "Opinions reals",
+    "sectionTitle": "Què diuen de nosaltres",
+    "stats": {
+      "rating": "4.9",
+      "ratingLabel": "Valoració",
+      "events": "48+",
+      "eventsLabel": "Events",
+      "recommended": "100%",
+      "recommendedLabel": "Recomanats"
+    },
+    "testimonials": {
+      "1": {
+        "name": "Marc i Laia",
+        "event": "Casament · Girona",
+        "date": "Octubre 2024",
+        "quote": "Increïble! Van transformar el nostre casament en una experiència màgica. Els convidats encara en parlen!"
+      },
+      "2": {
+        "name": "Família Martínez",
+        "event": "Festa Halloween · Barcelona",
+        "date": "Octubre 2024",
+        "quote": "La millor festa de Halloween que hem fet mai. Els nens no paraven de cridar d'emoció!"
+      },
+      "3": {
+        "name": "Anna i Pere",
+        "event": "Boda Món Màgic · Maresme",
+        "date": "Setembre 2024",
+        "quote": "Les cartes amb lacre van ser el detall perfecte. Tots els convidats van flipar! Súper professionals."
+      },
+      "4": {
+        "name": "Empresa TechBCN",
+        "event": "Event corporatiu · Barcelona",
+        "date": "Novembre 2024",
+        "quote": "Servei impecable i molt professionals. El nostre team building va ser un èxit total gràcies a ells."
+      }
+    }
+  },
+  "mobileCTA": {
+    "title": {
+      "line1": "Preparat per crear",
+      "line2": "el teu event?"
+    },
+    "subtitle": "Resposta garantida en menys de 2 hores",
+    "guarantee": "Garantia 100% satisfacció",
+    "availability": {
+      "badge": "🎃 Halloween 2025",
+      "saturdaysFree": "dissabtes lliures",
+      "lastOne": "⚠️ Últim!",
+      "lastOnes": "🔥 Últimes!"
+    },
+    "badges": {
+      "rating": "Rating",
+      "events": "Events",
+      "response": "Resposta"
+    },
+    "months": {
+      "october": "octubre"
+    }
+  },
+  "mobileNav": {
+    "items": {
+      "home": "Inici",
+      "services": "Serveis",
+      "portfolio": "Portfolio",
+      "contact": "Contacte"
+    },
+    "fab": {
+      "call": "Trucar",
+      "whatsapp": "WhatsApp",
+      "quote": "Pressupost"
+    }
+  },
+  "mobileHome": {
+    "quickFeatures": {
+      "halloween": {
+        "title": "Halloween",
+        "desc": "Decoració completa"
+      },
+      "monMagic": {
+        "title": "Món Màgic",
+        "desc": "Experiències úniques"
+      },
+      "djPro": {
+        "title": "DJ Pro",
+        "desc": "Pioneer + 4000W"
+      },
+      "effects": {
+        "title": "Efectes FX",
+        "desc": "Fum, llums, espurnes"
+      }
+    },
+    "guarantees": {
+      "sectionLabel": "Tranquil·litat garantida",
+      "sectionTitle": "El teu event, sense riscos",
+      "satisfaction": {
+        "title": "Garantia 100%",
+        "desc": "Si no estàs content, et tornem els diners"
+      },
+      "backup": {
+        "title": "Backup complet",
+        "desc": "Equip duplicat. El teu event MAI es para"
+      },
+      "response": {
+        "title": "Resposta 2h",
+        "desc": "Comunicació directa i sense intermediaris"
+      }
+    },
+    "footer": {
+      "tagline": "Events temàtics que ningú més fa",
+      "location": "Barcelona i Girona",
+      "copyright": "Tots els drets reservats.",
+      "legal": {
+        "privacy": "Privacitat",
+        "cookies": "Cookies",
+        "legal": "Legal"
+      }
+    }
   }
 }

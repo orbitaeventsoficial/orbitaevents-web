@@ -12,63 +12,31 @@
  * - Fotos/avatares reales
  * - Rating stars animadas
  * - Verificación badges
+ * 
+ * FIXED:
+ * - Textos usando sistema de traducciones
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import Image from 'next/image';
 import { useMobile } from './MobileAppShell';
+import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// DATA
+// TYPES
 // ═══════════════════════════════════════════════════════════════════════════
 
-const TESTIMONIALS = [
-  {
-    id: 1,
-    name: 'Marc i Laia',
-    event: 'Casament · Girona',
-    date: 'Octubre 2024',
-    avatar: '/img/testimonials/avatar-01.webp',
-    rating: 5,
-    quote: 'Increïble! Van transformar el nostre casament en una experiència màgica. Els convidats encara en parlen!',
-    verified: 'Bodas.net',
-    bgColor: 'from-amber-500/20 to-orange-500/10',
-  },
-  {
-    id: 2,
-    name: 'Família Martínez',
-    event: 'Festa Halloween · Barcelona',
-    date: 'Octubre 2024',
-    avatar: '/img/testimonials/avatar-02.webp',
-    rating: 5,
-    quote: 'La millor festa de Halloween que hem fet mai. Els nens no paraven de cridar d\'emoció!',
-    verified: 'Google',
-    bgColor: 'from-orange-500/20 to-red-500/10',
-  },
-  {
-    id: 3,
-    name: 'Anna i Pere',
-    event: 'Boda Món Màgic · Maresme',
-    date: 'Setembre 2024',
-    avatar: '/img/testimonials/avatar-03.webp',
-    rating: 5,
-    quote: 'Les cartes amb lacre van ser el detall perfecte. Tots els convidats van flipar! Súper professionals.',
-    verified: 'Bodas.net',
-    bgColor: 'from-purple-500/20 to-amber-500/10',
-  },
-  {
-    id: 4,
-    name: 'Empresa TechBCN',
-    event: 'Event corporatiu · Barcelona',
-    date: 'Novembre 2024',
-    avatar: '/img/testimonials/avatar-04.webp',
-    rating: 5,
-    quote: 'Servei impecable i molt professionals. El nostre team building va ser un èxit total gràcies a ells.',
-    verified: 'Google',
-    bgColor: 'from-blue-500/20 to-cyan-500/10',
-  },
-];
+interface Testimonial {
+  id: number;
+  nameKey: string;
+  eventKey: string;
+  dateKey: string;
+  avatar: string;
+  rating: number;
+  quoteKey: string;
+  verified: string;
+  bgColor: string;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PROGRESS BAR
@@ -143,10 +111,12 @@ function ProgressBar({
 
 function TestimonialCard({ 
   testimonial, 
-  direction 
+  direction,
+  t,
 }: { 
-  testimonial: typeof TESTIMONIALS[0];
+  testimonial: Testimonial;
   direction: number;
+  t: ReturnType<typeof useTranslations>;
 }) {
   const variants = {
     enter: (direction: number) => ({
@@ -165,6 +135,11 @@ function TestimonialCard({
       scale: 0.9,
     }),
   };
+
+  const name = t(`testimonials.${testimonial.id}.name`);
+  const event = t(`testimonials.${testimonial.id}.event`);
+  const date = t(`testimonials.${testimonial.id}.date`);
+  const quote = t(`testimonials.${testimonial.id}.quote`);
 
   return (
     <motion.div
@@ -196,7 +171,7 @@ function TestimonialCard({
             <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center overflow-hidden">
               {/* Placeholder avatar */}
               <span className="text-3xl">
-                {testimonial.name.charAt(0)}
+                {name.charAt(0)}
               </span>
             </div>
           </div>
@@ -244,7 +219,7 @@ function TestimonialCard({
           transition={{ delay: 0.3 }}
           className="text-xl font-medium text-white leading-relaxed mb-6 max-w-sm"
         >
-          "{testimonial.quote}"
+          &ldquo;{quote}&rdquo;
         </motion.blockquote>
 
         {/* Author info */}
@@ -253,9 +228,9 @@ function TestimonialCard({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <p className="text-white font-bold text-lg">{testimonial.name}</p>
-          <p className="text-white/60 text-sm">{testimonial.event}</p>
-          <p className="text-white/40 text-xs mt-1">{testimonial.date}</p>
+          <p className="text-white font-bold text-lg">{name}</p>
+          <p className="text-white/60 text-sm">{event}</p>
+          <p className="text-white/40 text-xs mt-1">{date}</p>
         </motion.div>
       </div>
     </motion.div>
@@ -271,6 +246,55 @@ export default function MobileTestimonialsReels() {
   const [isPaused, setIsPaused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { haptic } = useMobile();
+  const t = useTranslations('mobileTestimonials');
+
+  // Testimonials data
+  const TESTIMONIALS: Testimonial[] = useMemo(() => [
+    {
+      id: 1,
+      nameKey: '1.name',
+      eventKey: '1.event',
+      dateKey: '1.date',
+      avatar: '/img/testimonials/avatar-01.webp',
+      rating: 5,
+      quoteKey: '1.quote',
+      verified: 'Bodas.net',
+      bgColor: 'from-amber-500/20 to-orange-500/10',
+    },
+    {
+      id: 2,
+      nameKey: '2.name',
+      eventKey: '2.event',
+      dateKey: '2.date',
+      avatar: '/img/testimonials/avatar-02.webp',
+      rating: 5,
+      quoteKey: '2.quote',
+      verified: 'Google',
+      bgColor: 'from-orange-500/20 to-red-500/10',
+    },
+    {
+      id: 3,
+      nameKey: '3.name',
+      eventKey: '3.event',
+      dateKey: '3.date',
+      avatar: '/img/testimonials/avatar-03.webp',
+      rating: 5,
+      quoteKey: '3.quote',
+      verified: 'Bodas.net',
+      bgColor: 'from-purple-500/20 to-amber-500/10',
+    },
+    {
+      id: 4,
+      nameKey: '4.name',
+      eventKey: '4.event',
+      dateKey: '4.date',
+      avatar: '/img/testimonials/avatar-04.webp',
+      rating: 5,
+      quoteKey: '4.quote',
+      verified: 'Google',
+      bgColor: 'from-blue-500/20 to-cyan-500/10',
+    },
+  ], []);
 
   const paginate = useCallback((newDirection: number) => {
     const newIndex = currentIndex + newDirection;
@@ -281,7 +305,7 @@ export default function MobileTestimonialsReels() {
     } else if (newIndex < 0) {
       setPage([TESTIMONIALS.length - 1, -1]);
     }
-  }, [currentIndex]);
+  }, [currentIndex, TESTIMONIALS.length]);
 
   const handleProgressComplete = useCallback(() => {
     paginate(1);
@@ -326,7 +350,7 @@ export default function MobileTestimonialsReels() {
           viewport={{ once: true }}
           className="text-amber-500 text-sm font-medium tracking-wider uppercase"
         >
-          Opinions reals
+          {t('sectionLabel')}
         </motion.span>
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
@@ -335,7 +359,7 @@ export default function MobileTestimonialsReels() {
           transition={{ delay: 0.1 }}
           className="text-3xl font-black text-white mt-2"
         >
-          Què diuen de nosaltres
+          {t('sectionTitle')}
         </motion.h2>
       </div>
 
@@ -373,6 +397,7 @@ export default function MobileTestimonialsReels() {
               key={currentIndex}
               testimonial={TESTIMONIALS[currentIndex]}
               direction={direction}
+              t={t}
             />
           </AnimatePresence>
         </motion.div>
@@ -422,16 +447,16 @@ export default function MobileTestimonialsReels() {
         className="flex justify-center gap-8 mt-8 px-6"
       >
         <div className="text-center">
-          <p className="text-3xl font-black text-amber-400">4.9</p>
-          <p className="text-white/50 text-xs">Valoració</p>
+          <p className="text-3xl font-black text-amber-400">{t('stats.rating')}</p>
+          <p className="text-white/50 text-xs">{t('stats.ratingLabel')}</p>
         </div>
         <div className="text-center">
-          <p className="text-3xl font-black text-amber-400">48+</p>
-          <p className="text-white/50 text-xs">Events</p>
+          <p className="text-3xl font-black text-amber-400">{t('stats.events')}</p>
+          <p className="text-white/50 text-xs">{t('stats.eventsLabel')}</p>
         </div>
         <div className="text-center">
-          <p className="text-3xl font-black text-amber-400">100%</p>
-          <p className="text-white/50 text-xs">Recomanats</p>
+          <p className="text-3xl font-black text-amber-400">{t('stats.recommended')}</p>
+          <p className="text-white/50 text-xs">{t('stats.recommendedLabel')}</p>
         </div>
       </motion.div>
     </section>
