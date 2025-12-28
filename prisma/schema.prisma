@@ -160,7 +160,7 @@ model PackInventory {
   packId     String
   pack       Pack          @relation(fields: [packId], references: [id], onDelete: Cascade)
   itemId     String
-  item       InventoryItem @relation(fields: [itemId], references: [id])
+  item       InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   quantity   Int           @default(1)
   isRequired Boolean       @default(true)
 
@@ -214,7 +214,7 @@ model ExtraInventory {
   extraId  String
   extra    Extra         @relation(fields: [extraId], references: [id], onDelete: Cascade)
   itemId   String
-  item     InventoryItem @relation(fields: [itemId], references: [id])
+  item     InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   quantity Int           @default(1)
 
   @@unique([extraId, itemId])
@@ -535,7 +535,7 @@ model BookingExtra {
   bookingId String
   booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   extraId   String
-  extra     Extra   @relation(fields: [extraId], references: [id])
+  extra     Extra   @relation(fields: [extraId], references: [id], onDelete: Cascade)
   quantity  Int     @default(1)
   price     Float
 

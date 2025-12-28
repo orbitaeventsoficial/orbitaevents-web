@@ -2,6 +2,7 @@
 // API per gestionar leads (nou model)
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -39,8 +40,8 @@ export async function GET(req: NextRequest) {
     const eventType = searchParams.get('eventType');
     const priority = searchParams.get('priority');
     const search = searchParams.get('search');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const page = safeParseInt(searchParams.get('page'), 1, 1);
+    const limit = safeParseInt(searchParams.get('limit'), 50, 1, 200);
 
     const where = {
       ...(status && { status: status as any }),

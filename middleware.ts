@@ -10,6 +10,45 @@ import { locales, defaultLocale, type Locale } from './i18n';
 // - ADMIN_PASS: contrasenya segura (mínim 16 caràcters)
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// Rate limiting per intents d'autenticació admin (protecció força bruta)
+const adminAuthAttempts = new Map<string, { count: number; resetTime: number }>();
+const ADMIN_AUTH_LIMIT = 5; // Màxim 5 intents
+const ADMIN_AUTH_WINDOW = 15 * 60 * 1000; // 15 minuts
+
+// Netejar entrades expirades cada 5 minuts
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of adminAuthAttempts.entries()) {
+      if (entry.resetTime < now) {
+        adminAuthAttempts.delete(key);
+      }
+    }
+  }, 5 * 60 * 1000);
+}
+
+function getClientIp(req: NextRequest): string {
+  return (
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    'unknown'
+  );
+}
+
+function checkAdminRateLimit(req: NextRequest): boolean {
+  const clientIp = getClientIp(req);
+  const now = Date.now();
+  const entry = adminAuthAttempts.get(clientIp);
+
+  if (!entry || entry.resetTime < now) {
+    adminAuthAttempts.set(clientIp, { count: 1, resetTime: now + ADMIN_AUTH_WINDOW });
+    return true;
+  }
+
+  entry.count++;
+  return entry.count <= ADMIN_AUTH_LIMIT;
+}
+
 function unauthorized() {
   return new NextResponse('Authentication required', {
     status: 401,
@@ -22,6 +61,15 @@ function unauthorized() {
 function forbidden() {
   return new NextResponse('Access denied - Invalid credentials', {
     status: 403,
+  });
+}
+
+function tooManyRequests() {
+  return new NextResponse('Too many login attempts. Please try again later.', {
+    status: 429,
+    headers: {
+      'Retry-After': '900', // 15 minuts
+    },
   });
 }
 
@@ -38,15 +86,19 @@ export function middleware(req: NextRequest) {
     (p) => pathname === p || pathname.startsWith(p + '/')
   );
 
-  // Si es ruta protegida, aplicar auth básica
+  // Si es ruta protegida, aplicar auth básica amb rate limiting
   if (isProtected) {
+    // Rate limiting: bloquejar si massa intents
+    if (!checkAdminRateLimit(req)) {
+      return tooManyRequests();
+    }
+
     // Obtenir credencials des de variables d'entorn
     const ADMIN_USER = process.env.ADMIN_USER;
     const ADMIN_PASS = process.env.ADMIN_PASS;
 
-    // Si no hi ha variables configurades, bloquejar accés
+    // Si no hi ha variables configurades, bloquejar accés (sense log d'error)
     if (!ADMIN_USER || !ADMIN_PASS) {
-      console.error('⚠️ ADMIN_USER or ADMIN_PASS not configured in environment variables');
       return forbidden();
     }
 
@@ -64,8 +116,6 @@ export function middleware(req: NextRequest) {
 
       // Verificar credencials
       if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
-        // Log intent fallit (sense revelar credencials)
-        console.warn(`⚠️ Failed admin login attempt from IP: ${req.headers.get('x-forwarded-for') || 'unknown'}`);
         return unauthorized();
       }
     } catch {
