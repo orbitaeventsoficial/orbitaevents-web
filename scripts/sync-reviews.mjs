@@ -19,7 +19,16 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const BUSINESS_NAME = 'Òrbita Events Granollers';
+
+// Múltiples noms per buscar el negoci
+const BUSINESS_SEARCH_QUERIES = [
+  'Òrbita events planificador festes',
+  'Òrbita events Granollers',
+  'Orbita events Catalunya',
+];
+
+// Nom exacte del negoci a Google
+const EXACT_BUSINESS_NAME = 'òrbita events';
 
 console.log('═══════════════════════════════════════════════════════════════');
 console.log('🔄 Sincronitzant ressenyes de Google...');
@@ -37,20 +46,33 @@ async function fetchFromSerpAPI() {
 
   try {
     console.log('[SerpAPI] Buscant negoci...');
-    
-    // Buscar el negoci
-    const searchUrl = `https://serpapi.com/search.json?engine=google_maps&q=${encodeURIComponent(BUSINESS_NAME)}&api_key=${apiKey}`;
-    const searchRes = await fetch(searchUrl);
-    const searchData = await searchRes.json();
-    
-    if (searchData.error) {
-      console.log('[SerpAPI] Error:', searchData.error);
-      return null;
+
+    // Provar múltiples cerques
+    let place = null;
+    for (const query of BUSINESS_SEARCH_QUERIES) {
+      console.log(`[SerpAPI] Provant: "${query}"...`);
+      const searchUrl = `https://serpapi.com/search.json?engine=google_maps&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
+      const searchRes = await fetch(searchUrl);
+      const searchData = await searchRes.json();
+
+      if (searchData.error) {
+        console.log('[SerpAPI] Error:', searchData.error);
+        continue;
+      }
+
+      // Buscar el nom exacte del negoci
+      place = searchData.local_results?.find(r =>
+        r.title?.toLowerCase().replace(/[àáäâ]/g, 'a').replace(/[èéëê]/g, 'e').replace(/[ìíïî]/g, 'i').replace(/[òóöô]/g, 'o').replace(/[ùúüû]/g, 'u') === EXACT_BUSINESS_NAME.toLowerCase().replace(/[àáäâ]/g, 'a').replace(/[èéëê]/g, 'e').replace(/[ìíïî]/g, 'i').replace(/[òóöô]/g, 'o').replace(/[ùúüû]/g, 'u')
+      );
+
+      if (place) {
+        console.log(`[SerpAPI] ✅ Trobat amb "${query}"`);
+        break;
+      }
     }
 
-    const place = searchData.local_results?.[0];
     if (!place) {
-      console.log('[SerpAPI] Negoci no trobat');
+      console.log('[SerpAPI] Negoci no trobat amb cap cerca');
       return null;
     }
 
