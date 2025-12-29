@@ -18,7 +18,7 @@ interface BottomCTABarProps {
 
 export default function BottomCTABar({
   primaryText = 'Pressupost Gratis',
-  primaryHref = '/configurador',
+  primaryHref = '/contacto',
   showWhatsApp = true,
   hideOnScroll = true,
 }: BottomCTABarProps) {

@@ -12,7 +12,6 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from 'framer-motion';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -72,7 +71,7 @@ const stories: Story[] = [
     title: 'Festes Temàtiques',
     subtitle: 'Halloween, Harry Potter, anys 80...',
     bgType: 'image',
-    bgSrc: '/img/portfolio/tematicas/halloween-01.webp',
+    bgSrc: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
     icon: '🎭',
     cta: { text: 'Explorar', href: '/tematica-halloween' },
   },
@@ -81,7 +80,7 @@ const stories: Story[] = [
     title: 'Events Corporatius',
     subtitle: 'Team building, presentacions, galas',
     bgType: 'image',
-    bgSrc: '/img/portfolio/empresas/empresas-01.webp',
+    bgSrc: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
     icon: '🏢',
     cta: { text: 'Sol·licitar', href: '/servicios/empresas' },
   },
@@ -313,7 +312,6 @@ export default function MobileHomeExperience() {
   const [[currentIndex, direction], setPage] = useState([0, 0]);
   const [isPaused, setIsPaused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   // Motion values para drag
   const x = useMotionValue(0);

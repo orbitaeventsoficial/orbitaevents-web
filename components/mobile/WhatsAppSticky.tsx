@@ -31,14 +31,18 @@ export default function WhatsAppSticky({
 
   // Mostrar tooltip automàticament després de 5 segons
   useEffect(() => {
-    const timer = setTimeout(() => {
+    let hideTimer: NodeJS.Timeout;
+    const showTimer = setTimeout(() => {
       setShowTooltip(true);
-      
+
       // Amagar després de 5 segons
-      setTimeout(() => setShowTooltip(false), 5000);
+      hideTimer = setTimeout(() => setShowTooltip(false), 5000);
     }, 5000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(showTimer);
+      if (hideTimer) clearTimeout(hideTimer);
+    };
   }, []);
 
   // Detectar scroll per mostrar

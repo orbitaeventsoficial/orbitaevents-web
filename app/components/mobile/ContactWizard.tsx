@@ -10,8 +10,12 @@
  * - Haptic feedback
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// LocalStorage key for form persistence
+const FORM_STORAGE_KEY = 'orbita_contact_wizard_form';
+const STEP_STORAGE_KEY = 'orbita_contact_wizard_step';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -313,16 +317,48 @@ function DetailsStep({ formData, updateField, onNext, onBack }: StepProps) {
   );
 }
 
+// Shake animation for errors
+const shakeAnimation = {
+  shake: {
+    x: [-8, 8, -6, 6, -4, 4, 0],
+    transition: { duration: 0.5 }
+  }
+};
+
 // Step 3: Contact info
 function ContactStep({ formData, updateField, onNext, onBack }: StepProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [shakeFields, setShakeFields] = useState<Record<string, boolean>>({});
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.name.trim()) newErrors.name = 'El nom és obligatori';
-    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.email = 'Email no vàlid';
-    if (!formData.phone.match(/^[0-9+\s]{9,}$/)) newErrors.phone = 'Telèfon no vàlid';
+    const newShake: Record<string, boolean> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'El nom és obligatori';
+      newShake.name = true;
+    }
+    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      newErrors.email = 'Email no vàlid';
+      newShake.email = true;
+    }
+    // Validació de telèfon espanyol: 9 dígits, pot començar amb +34 o 6/7/8/9
+    const phoneClean = formData.phone.replace(/[\s\-\(\)]/g, '');
+    if (!phoneClean.match(/^(\+34)?[6789]\d{8}$/)) {
+      newErrors.phone = 'Telèfon no vàlid (format: 600000000 o +34600000000)';
+      newShake.phone = true;
+    }
+
     setErrors(newErrors);
+    setShakeFields(newShake);
+
+    // Haptic feedback on error
+    if (Object.keys(newErrors).length > 0) {
+      if ('vibrate' in navigator) navigator.vibrate([50, 30, 50]);
+      // Reset shake after animation
+      setTimeout(() => setShakeFields({}), 500);
+    }
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -345,7 +381,10 @@ function ContactStep({ formData, updateField, onNext, onBack }: StepProps) {
       </div>
 
       {/* Name */}
-      <div>
+      <motion.div
+        animate={shakeFields.name ? 'shake' : ''}
+        variants={shakeAnimation}
+      >
         <label className="block text-white/70 text-sm mb-2">Nom complet *</label>
         <input
           type="text"
@@ -356,14 +395,25 @@ function ContactStep({ formData, updateField, onNext, onBack }: StepProps) {
           }}
           placeholder="El teu nom"
           className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder:text-white/30 focus:outline-none transition-colors ${
-            errors.name ? 'border-red-500' : 'border-white/10 focus:border-amber-500'
+            errors.name ? 'border-red-500 bg-red-500/5' : 'border-white/10 focus:border-amber-500'
           }`}
         />
-        {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
-      </div>
+        {errors.name && (
+          <motion.p
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-red-400 text-xs mt-1"
+          >
+            {errors.name}
+          </motion.p>
+        )}
+      </motion.div>
 
       {/* Email */}
-      <div>
+      <motion.div
+        animate={shakeFields.email ? 'shake' : ''}
+        variants={shakeAnimation}
+      >
         <label className="block text-white/70 text-sm mb-2">Email *</label>
         <input
           type="email"
@@ -374,14 +424,25 @@ function ContactStep({ formData, updateField, onNext, onBack }: StepProps) {
           }}
           placeholder="email@exemple.com"
           className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder:text-white/30 focus:outline-none transition-colors ${
-            errors.email ? 'border-red-500' : 'border-white/10 focus:border-amber-500'
+            errors.email ? 'border-red-500 bg-red-500/5' : 'border-white/10 focus:border-amber-500'
           }`}
         />
-        {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
-      </div>
+        {errors.email && (
+          <motion.p
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-red-400 text-xs mt-1"
+          >
+            {errors.email}
+          </motion.p>
+        )}
+      </motion.div>
 
       {/* Phone */}
-      <div>
+      <motion.div
+        animate={shakeFields.phone ? 'shake' : ''}
+        variants={shakeAnimation}
+      >
         <label className="block text-white/70 text-sm mb-2">Telèfon *</label>
         <input
           type="tel"
@@ -392,11 +453,19 @@ function ContactStep({ formData, updateField, onNext, onBack }: StepProps) {
           }}
           placeholder="+34 600 000 000"
           className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder:text-white/30 focus:outline-none transition-colors ${
-            errors.phone ? 'border-red-500' : 'border-white/10 focus:border-amber-500'
+            errors.phone ? 'border-red-500 bg-red-500/5' : 'border-white/10 focus:border-amber-500'
           }`}
         />
-        {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
-      </div>
+        {errors.phone && (
+          <motion.p
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-red-400 text-xs mt-1"
+          >
+            {errors.phone}
+          </motion.p>
+        )}
+      </motion.div>
 
       {/* Message */}
       <div>
@@ -431,22 +500,49 @@ function ContactStep({ formData, updateField, onNext, onBack }: StepProps) {
 // Step 4: Confirmation
 function ConfirmStep({ formData, onNext, onBack }: StepProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const serviceLabel = serviceOptions.find((s) => s.id === formData.service)?.label || formData.service;
   const budgetLabel = budgetOptions.find((b) => b.id === formData.budget)?.label || formData.budget;
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setError(null);
     if ('vibrate' in navigator) navigator.vibrate(20);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: `[Mobile Wizard] Servei: ${serviceLabel}
+Data: ${formData.date}
+Convidats: ${formData.guests}
+Lloc: ${formData.venue || 'No especificat'}
+Pressupost: ${budgetLabel}
 
-    // In real app, would call API here
-    // await fetch('/api/contact', { method: 'POST', body: JSON.stringify(formData) });
+${formData.message}`,
+          service: formData.service,
+          eventDate: formData.date,
+          guests: formData.guests,
+          budget: formData.budget,
+        }),
+      });
 
-    setIsSubmitting(false);
-    onNext();
+      if (!response.ok) {
+        throw new Error('Error enviant el formulari');
+      }
+
+      setIsSubmitting(false);
+      onNext();
+    } catch (err) {
+      setError('Hi ha hagut un error. Prova de nou o contacta per WhatsApp.');
+      setIsSubmitting(false);
+      if ('vibrate' in navigator) navigator.vibrate([50, 50, 50]);
+    }
   };
 
   return (
@@ -513,6 +609,17 @@ function ConfirmStep({ formData, onNext, onBack }: StepProps) {
           </>
         )}
       </div>
+
+      {/* Error message */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-400 text-sm"
+        >
+          {error}
+        </motion.div>
+      )}
 
       <div className="flex gap-3">
         <button
@@ -608,6 +715,7 @@ function SuccessStep() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function ContactWizard() {
+  const [showRestoredToast, setShowRestoredToast] = useState(false);
   const [currentStep, setCurrentStep] = useState<Step>('service');
   const [showConfetti, setShowConfetti] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -623,8 +731,47 @@ export default function ContactWizard() {
     budget: '',
   });
 
-  const steps: Step[] = ['service', 'details', 'contact', 'confirm'];
+  const steps: Step[] = useMemo(() => ['service', 'details', 'contact', 'confirm'], []);
   const stepIndex = steps.indexOf(currentStep);
+
+  // Restore form data from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedForm = localStorage.getItem(FORM_STORAGE_KEY);
+      const savedStep = localStorage.getItem(STEP_STORAGE_KEY);
+
+      if (savedForm) {
+        const parsed = JSON.parse(savedForm);
+        // Only restore if there's meaningful data
+        if (parsed.service || parsed.name || parsed.email) {
+          setFormData(parsed);
+          if (savedStep && savedStep !== 'success') {
+            setCurrentStep(savedStep as Step);
+            setShowRestoredToast(true);
+            setTimeout(() => setShowRestoredToast(false), 3000);
+          }
+        }
+      }
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+  }, []);
+
+  // Save form data to localStorage on change
+  useEffect(() => {
+    if (currentStep === 'success') {
+      // Clear storage on success
+      localStorage.removeItem(FORM_STORAGE_KEY);
+      localStorage.removeItem(STEP_STORAGE_KEY);
+    } else {
+      try {
+        localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData));
+        localStorage.setItem(STEP_STORAGE_KEY, currentStep);
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+    }
+  }, [formData, currentStep]);
 
   const updateField = useCallback((field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -648,8 +795,47 @@ export default function ContactWizard() {
     }
   }, [stepIndex, steps]);
 
+  // Clear form handler
+  const clearForm = useCallback(() => {
+    setFormData({
+      service: '',
+      eventType: '',
+      date: '',
+      guests: '',
+      venue: '',
+      name: '',
+      email: '',
+      phone: '',
+      message: '',
+      budget: '',
+    });
+    setCurrentStep('service');
+    localStorage.removeItem(FORM_STORAGE_KEY);
+    localStorage.removeItem(STEP_STORAGE_KEY);
+  }, []);
+
   return (
     <section className="py-6 px-4 lg:hidden">
+      {/* Toast de formulari restaurat */}
+      <AnimatePresence>
+        {showRestoredToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-4 left-4 right-4 z-50 p-3 bg-amber-500/90 backdrop-blur-sm rounded-xl text-black text-sm font-medium flex items-center justify-between shadow-lg"
+          >
+            <span>📝 Formulari restaurat de la sessió anterior</span>
+            <button
+              onClick={clearForm}
+              className="ml-2 px-2 py-1 bg-black/20 rounded-lg text-xs"
+            >
+              Esborrar
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Progress */}
       {currentStep !== 'success' && (
         <ProgressBar currentStep={stepIndex} steps={steps} />

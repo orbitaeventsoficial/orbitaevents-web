@@ -10,7 +10,7 @@
  * - Animaciones staggered
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -74,7 +74,7 @@ const services: Service[] = [
     description: 'Halloween, Harry Potter, anys 80... Tematització completa amb decoració, efectes i ambientació immersiva.',
     price: '800€',
     priceNote: 'pack complet',
-    image: '/img/portfolio/tematicas/halloween-01.webp',
+    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
     icon: '🎭',
     features: ['Decoració temàtica', 'Efectes especials', 'Ambientació sonora', 'Photocall'],
     href: '/tematica-halloween',
@@ -86,8 +86,9 @@ const services: Service[] = [
     title: 'Events Corporatius',
     subtitle: 'Professionalitat garantida',
     description: 'Team building, presentacions de producte, convencions, festes d\'empresa. Serveis adaptats a les necessitats corporatives.',
-    price: 'Consultar',
-    image: '/img/portfolio/empresas/empresas-01.webp',
+    price: '400€',
+    priceNote: 'fins 4h',
+    image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
     icon: '🏢',
     features: ['Microfonía wireless', 'So conferència', 'Streaming', 'Coordinació total'],
     href: '/servicios/empresas',
@@ -99,8 +100,8 @@ const services: Service[] = [
     title: 'Discomòbil',
     subtitle: 'La festa a qualsevol lloc',
     description: 'Portem tot l\'equip necessari: DJ, so potent, llums i efectes. Ideal per a festes a l\'aire lliure o espais sense equip.',
-    price: '400€',
-    priceNote: 'fins 5h',
+    price: '350€',
+    priceNote: 'fins 3h',
     image: '/img/portfolio/fiestas-privadas/fiestas-privadas-02.webp',
     icon: '🚐',
     features: ['Equip autònom', 'So potent', 'Llums portàtils', 'Generador opcional'],
@@ -474,11 +475,31 @@ export default function ServiceCards() {
     }),
   };
 
+  // Hide swipe hint after first swipe
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
+  useEffect(() => {
+    if (direction !== 0) setShowSwipeHint(false);
+  }, [direction]);
+
   return (
     <section className="py-12 px-4 lg:hidden">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-white mb-2">Els nostres serveis</h2>
-        <p className="text-white/60">Swipe per explorar</p>
+        <div className="flex items-center gap-2">
+          <p className="text-white/60">Swipe per explorar</p>
+          {/* Animated swipe indicator */}
+          {showSwipeHint && (
+            <motion.div
+              className="flex items-center gap-1 text-amber-500"
+              animate={{ x: [0, 8, 0, -8, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 1 }}
+            >
+              <span className="text-sm">←</span>
+              <span className="text-xs">👆</span>
+              <span className="text-sm">→</span>
+            </motion.div>
+          )}
+        </div>
       </div>
 
       {/* Cards container */}

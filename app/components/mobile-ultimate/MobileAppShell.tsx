@@ -343,20 +343,13 @@ export default function MobileAppShell({
     return () => container?.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Prevenir zoom en iOS
+  // Configurar viewport per a safe areas (sense bloquejar zoom per accessibilitat)
   useEffect(() => {
-    const preventGesture = (e: Event) => e.preventDefault();
-    document.addEventListener('gesturestart', preventGesture);
-    
-    // Establecer viewport
     const viewport = document.querySelector('meta[name=viewport]');
     if (viewport) {
-      viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
+      // Mantenim viewport-fit=cover per safe areas però permetem zoom per accessibilitat
+      viewport.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
     }
-    
-    return () => {
-      document.removeEventListener('gesturestart', preventGesture);
-    };
   }, []);
 
   // Context value

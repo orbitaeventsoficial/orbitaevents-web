@@ -526,7 +526,7 @@
       "casaments": {
         "title": "Bodas",
         "description": "El día más especial merece ser perfecto",
-        "price": "Desde 650€",
+        "price": "Desde 550€",
         "features": [
           "DJ Profesional",
           "Sonido + Luces",
@@ -537,7 +537,7 @@
       "festes": {
         "title": "Fiestas Privadas",
         "description": "La fiesta que recordarán siempre",
-        "price": "Desde 400€",
+        "price": "Desde 350€",
         "features": [
           "Discomóvil",
           "Luces LED",
@@ -548,7 +548,7 @@
       "empreses": {
         "title": "Empresas",
         "description": "Eventos corporativos de impacto",
-        "price": "Desde 500€",
+        "price": "Desde 400€",
         "features": [
           "Audiovisual",
           "Micro inalámbrico",
@@ -3484,7 +3484,7 @@
       "casaments": {
         "title": "💒 Bodas",
         "description": "El día más especial merece ser perfecto",
-        "price": "Desde 650€",
+        "price": "Desde 550€",
         "badge": "",
         "href": "/servicios/bodas",
         "features": [
@@ -3497,7 +3497,7 @@
       "festes": {
         "title": "🎉 Fiestas Privadas",
         "description": "La fiesta que recordarán siempre",
-        "price": "Desde 400€",
+        "price": "Desde 350€",
         "badge": "",
         "href": "/servicios/fiestas",
         "features": [
@@ -3510,7 +3510,7 @@
       "empreses": {
         "title": "🏢 Empresas",
         "description": "Eventos corporativos de impacto",
-        "price": "Desde 500€",
+        "price": "Desde 400€",
         "badge": "",
         "href": "/servicios/empresas",
         "features": [
@@ -6117,7 +6117,7 @@
         "title": "Bodas",
         "subtitle": "Tu día perfecto",
         "description": "DJ profesional, sonido, luces, coordinación",
-        "price": "Desde 650€",
+        "price": "Desde 550€",
         "badge": "",
         "features": {
           "0": "DJ Pro",
@@ -6129,7 +6129,7 @@
         "title": "Fiestas",
         "subtitle": "Cumpleaños y más",
         "description": "Discomóvil completo con todo incluido",
-        "price": "Desde 400€",
+        "price": "Desde 350€",
         "badge": "",
         "features": {
           "0": "Luces LED",
@@ -6141,7 +6141,7 @@
         "title": "Empresas",
         "subtitle": "Eventos corporativos",
         "description": "Audiovisual, branding, factura",
-        "price": "Desde 500€",
+        "price": "Desde 400€",
         "badge": "",
         "features": {
           "0": "Micro inalámbrico",

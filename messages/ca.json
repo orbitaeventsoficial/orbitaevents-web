@@ -504,7 +504,7 @@
       "casaments": {
         "title": "Casaments",
         "description": "El dia més especial mereix ser perfecte",
-        "price": "Des de 650€",
+        "price": "Des de 550€",
         "features": [
           "DJ Professional",
           "So + Llums",
@@ -515,7 +515,7 @@
       "festes": {
         "title": "Festes Privades",
         "description": "La festa que recordaran sempre",
-        "price": "Des de 400€",
+        "price": "Des de 350€",
         "features": [
           "Discomòbil",
           "Llums LED",
@@ -526,7 +526,7 @@
       "empreses": {
         "title": "Empreses",
         "description": "Events corporatius d'impacte",
-        "price": "Des de 500€",
+        "price": "Des de 400€",
         "features": [
           "Audiovisual",
           "Micro sense fil",
@@ -2603,7 +2603,7 @@
       "casaments": {
         "title": "💒 Casaments",
         "description": "El dia més especial mereix ser perfecte",
-        "price": "Des de 650€",
+        "price": "Des de 550€",
         "badge": "",
         "href": "/servicios/bodas",
         "features": [
@@ -2616,7 +2616,7 @@
       "festes": {
         "title": "🎉 Festes Privades",
         "description": "La festa que recordaran sempre",
-        "price": "Des de 400€",
+        "price": "Des de 350€",
         "badge": "",
         "href": "/servicios/fiestas",
         "features": [
@@ -2629,7 +2629,7 @@
       "empreses": {
         "title": "🏢 Empreses",
         "description": "Events corporatius d'impacte",
-        "price": "Des de 500€",
+        "price": "Des de 400€",
         "badge": "",
         "href": "/servicios/empresas",
         "features": [
@@ -6078,7 +6078,7 @@
         "title": "Casaments",
         "subtitle": "El teu dia perfecte",
         "description": "DJ professional, so, llums, coordinació",
-        "price": "Des de 650€",
+        "price": "Des de 550€",
         "badge": "",
         "features": {
           "0": "DJ Pro",
@@ -6090,7 +6090,7 @@
         "title": "Festes",
         "subtitle": "Aniversaris i més",
         "description": "Discomòbil complet amb tot inclòs",
-        "price": "Des de 400€",
+        "price": "Des de 350€",
         "badge": "",
         "features": {
           "0": "Llums LED",
@@ -6102,7 +6102,7 @@
         "title": "Empreses",
         "subtitle": "Events corporatius",
         "description": "Audiovisual, branding, factura",
-        "price": "Des de 500€",
+        "price": "Des de 400€",
         "badge": "",
         "features": {
           "0": "Micro sense fil",

@@ -48,11 +48,11 @@ const portfolioItems: PortfolioItem[] = [
   { id: '1', src: '/img/portfolio/bodas/bodas-01.webp', category: 'bodas', title: 'Casament Mas Torroella', aspectRatio: 'landscape' },
   { id: '2', src: '/img/portfolio/bodas/bodas-02.webp', category: 'bodas', title: 'Casament Can Ribas', aspectRatio: 'portrait' },
   { id: '3', src: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp', category: 'fiestas', title: 'Aniversari 50', aspectRatio: 'square' },
-  { id: '4', src: '/img/portfolio/tematicas/halloween-01.webp', category: 'tematicas', title: 'Festa Halloween', aspectRatio: 'landscape' },
-  { id: '5', src: '/img/portfolio/empresas/empresas-01.webp', category: 'empresas', title: 'Event Corporatiu', aspectRatio: 'portrait' },
+  { id: '4', src: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg', category: 'tematicas', title: 'Festa Halloween', aspectRatio: 'landscape' },
+  { id: '5', src: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp', category: 'empresas', title: 'Event Corporatiu', aspectRatio: 'portrait' },
   { id: '6', src: '/img/portfolio/bodas/bodas-03.webp', category: 'bodas', title: 'Casament Masia', aspectRatio: 'square' },
   { id: '7', src: '/img/portfolio/fiestas-privadas/fiestas-privadas-02.webp', category: 'fiestas', title: 'Comunió Alba', aspectRatio: 'landscape' },
-  { id: '8', src: '/img/portfolio/tematicas/mon-magic-01.webp', category: 'tematicas', title: 'Festa Harry Potter', aspectRatio: 'portrait' },
+  { id: '8', src: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp', category: 'tematicas', title: 'Festa Harry Potter', aspectRatio: 'portrait' },
   { id: '9', src: '/img/portfolio/bodas/bodas-04.webp', category: 'bodas', title: 'Boda Platja', aspectRatio: 'landscape' },
   { id: '10', src: '/img/portfolio/fiestas-privadas/fiestas-privadas-03.webp', category: 'fiestas', title: 'Graduació', aspectRatio: 'square' },
 ];
@@ -99,23 +99,32 @@ interface ThumbnailProps {
 
 function Thumbnail({ item, index, onClick, onDoubleTap }: ThumbnailProps) {
   const [showLike, setShowLike] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
   const lastTapRef = useRef(0);
+  const tapTimeoutRef = useRef<NodeJS.Timeout>();
 
   const handleClick = useCallback(() => {
     const now = Date.now();
-    if (now - lastTapRef.current < 300) {
-      // Double tap
+
+    // Clear pending single tap
+    if (tapTimeoutRef.current) {
+      clearTimeout(tapTimeoutRef.current);
+    }
+
+    if (now - lastTapRef.current < 250) {
+      // Double tap - like
       setShowLike(true);
       setTimeout(() => setShowLike(false), 800);
       onDoubleTap();
       if ('vibrate' in navigator) navigator.vibrate(20);
     } else {
-      // Single tap (delayed to check for double)
-      setTimeout(() => {
-        if (Date.now() - lastTapRef.current >= 300) {
+      // Single tap - open viewer (reduced delay for better UX)
+      tapTimeoutRef.current = setTimeout(() => {
+        if (Date.now() - lastTapRef.current >= 200) {
           onClick();
         }
-      }, 300);
+      }, 200);
     }
     lastTapRef.current = now;
   }, [onClick, onDoubleTap]);
@@ -134,15 +143,38 @@ function Thumbnail({ item, index, onClick, onDoubleTap }: ThumbnailProps) {
       transition={{ delay: index * 0.05 }}
       className={`relative rounded-xl overflow-hidden ${aspectClasses[item.aspectRatio || 'square']}`}
       onClick={handleClick}
+      onTouchStart={() => setIsPressed(true)}
+      onTouchEnd={() => setIsPressed(false)}
+      whileTap={{ scale: 0.97 }}
     >
+      {/* Skeleton loader */}
+      {!isLoaded && (
+        <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/10 to-white/5 animate-pulse" />
+      )}
+
       <Image
         src={item.src}
         alt={item.title}
         fill
-        className="object-cover"
-        sizes="(max-width: 768px) 50vw, 33vw"
+        className={`object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+        sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, 25vw"
+        onLoad={() => setIsLoaded(true)}
+        loading="lazy"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+
+      {/* Overlay on press */}
+      <motion.div
+        className="absolute inset-0 bg-black/20"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isPressed ? 1 : 0 }}
+        transition={{ duration: 0.1 }}
+      />
+
+      {/* Title overlay */}
+      <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
+        <p className="text-white text-xs font-medium truncate">{item.title}</p>
+      </div>
+
       <LikeAnimation show={showLike} />
     </motion.div>
   );

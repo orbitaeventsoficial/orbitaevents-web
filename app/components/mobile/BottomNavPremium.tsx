@@ -281,14 +281,14 @@ export default function BottomNavPremium() {
             >
               <p className="text-white/60 text-xs mb-3 text-center">Accés ràpid</p>
               <div className="flex gap-4">
-                <Link href="https://wa.me/34640000000" className="flex flex-col items-center gap-1 p-3 rounded-xl bg-green-500/20 text-green-400">
+                <a href="https://wa.me/34699121023" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1 p-3 rounded-xl bg-green-500/20 text-green-400">
                   <span className="text-2xl">💬</span>
                   <span className="text-xs">WhatsApp</span>
-                </Link>
-                <Link href="tel:+34640000000" className="flex flex-col items-center gap-1 p-3 rounded-xl bg-blue-500/20 text-blue-400">
+                </a>
+                <a href="tel:+34699121023" className="flex flex-col items-center gap-1 p-3 rounded-xl bg-blue-500/20 text-blue-400">
                   <span className="text-2xl">📞</span>
                   <span className="text-xs">Trucar</span>
-                </Link>
+                </a>
                 <Link href="/contacto" className="flex flex-col items-center gap-1 p-3 rounded-xl bg-amber-500/20 text-amber-400">
                   <span className="text-2xl">📝</span>
                   <span className="text-xs">Form</span>
@@ -303,6 +303,8 @@ export default function BottomNavPremium() {
       <nav
         className="fixed bottom-0 left-0 right-0 z-50 lg:hidden"
         style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+        role="navigation"
+        aria-label="Navegació principal mòbil"
       >
         {/* Blur background */}
         <div className="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl border-t border-white/5" />
@@ -356,7 +358,9 @@ export default function BottomNavPremium() {
               <Link
                 key={item.id}
                 href={item.href}
-                className="relative flex flex-col items-center py-2 px-4 min-w-[64px] overflow-hidden"
+                className="relative flex flex-col items-center py-2 px-4 min-w-[64px] min-h-[44px] overflow-hidden"
+                aria-label={item.label}
+                aria-current={isActive ? 'page' : undefined}
                 onClick={(e) => {
                   createRipple(e);
                   triggerHaptic('light');
