@@ -2,11 +2,16 @@
 // API per gestionar packs
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 // GET - Llistar packs
 export async function GET(req: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(req.url);
     const locale = searchParams.get('locale') || 'ca';
@@ -37,6 +42,10 @@ export async function GET(req: NextRequest) {
 
 // POST - Crear nou pack
 export async function POST(req: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     const { slug, price, originalPrice, extraHourPrice, djHours, soundWatts,

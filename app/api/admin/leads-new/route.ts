@@ -2,6 +2,7 @@
 // API per gestionar leads (nou model)
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 
@@ -34,6 +35,10 @@ const leadSchema = z.object({
 
 // GET - Llistar leads amb filtres
 export async function GET(req: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
@@ -101,6 +106,10 @@ export async function GET(req: NextRequest) {
 
 // POST - Crear nou lead
 export async function POST(req: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     const parsed = leadSchema.safeParse(body);

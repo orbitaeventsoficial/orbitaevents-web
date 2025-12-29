@@ -11,6 +11,20 @@
 import { getFirstName, getInitials } from '@/lib/utils/normalize';
 
 // ═══════════════════════════════════════════════════════════════════════════
+// UTILS - ESCAPE HTML
+// ═══════════════════════════════════════════════════════════════════════════
+
+function escapeHtml(text: string | null | undefined): string {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -133,7 +147,7 @@ export function generateTestimonialCanvasHTML(
           font-size: 48px;
           font-weight: 700;
           color: ${textColor};
-        ">${initials}</span>
+        ">${escapeHtml(initials)}</span>
       </div>
 
       <!-- Nom -->
@@ -142,7 +156,7 @@ export function generateTestimonialCanvasHTML(
         font-weight: 600;
         color: ${textColor};
         margin-bottom: 20px;
-      ">${firstName}</div>
+      ">${escapeHtml(firstName)}</div>
 
       <!-- Estrelles -->
       <div style="
@@ -161,7 +175,7 @@ export function generateTestimonialCanvasHTML(
         max-width: 90%;
         margin-bottom: 60px;
         font-style: italic;
-      ">"${truncatedText}"</div>
+      ">"${escapeHtml(truncatedText)}"</div>
 
       <!-- Separador -->
       <div style="
@@ -191,7 +205,7 @@ export function generateTestimonialCanvasHTML(
           font-weight: 800;
           color: ${accentColor};
           letter-spacing: 4px;
-        ">${discountCode}</span>
+        ">${escapeHtml(discountCode)}</span>
         <span style="
           font-size: 32px;
           font-weight: 700;

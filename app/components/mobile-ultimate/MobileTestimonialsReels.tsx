@@ -42,21 +42,25 @@ interface Testimonial {
 // PROGRESS BAR
 // ═══════════════════════════════════════════════════════════════════════════
 
-function ProgressBar({ 
-  total, 
-  current, 
+function ProgressBar({
+  total,
+  current,
   isPaused,
-  onComplete 
-}: { 
-  total: number; 
-  current: number; 
+  onComplete
+}: {
+  total: number;
+  current: number;
   isPaused: boolean;
   onComplete: () => void;
 }) {
   const [progress, setProgress] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout>();
+  const onCompleteRef = useRef(onComplete);
   const DURATION = 5000; // 5 segundos por testimonio
   const INTERVAL = 50;
+
+  // Actualizar ref cuando cambia onComplete
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     setProgress(0);
@@ -72,7 +76,7 @@ function ProgressBar({
       setProgress((p) => {
         const increment = (100 / DURATION) * INTERVAL;
         if (p >= 100) {
-          onComplete();
+          onCompleteRef.current();
           return 0;
         }
         return p + increment;
@@ -82,7 +86,7 @@ function ProgressBar({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isPaused, onComplete, current]);
+  }, [isPaused, current]);
 
   return (
     <div className="flex gap-1.5 px-4 py-3">

@@ -2,11 +2,16 @@
 // API per gestionar configuracions globals
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 // GET - Obtenir totes les configuracions o per categoria
 export async function GET(req: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
@@ -48,6 +53,10 @@ export async function GET(req: NextRequest) {
 
 // PUT - Actualitzar una o més configuracions
 export async function PUT(req: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     const { settings } = body as { settings: { key: string; value: string | number | boolean }[] };
@@ -96,6 +105,10 @@ export async function PUT(req: NextRequest) {
 
 // POST - Crear nova configuració
 export async function POST(req: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     const { key, value, type, category, label, description } = body;

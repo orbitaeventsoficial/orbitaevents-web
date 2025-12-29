@@ -227,7 +227,7 @@ export default function MobileServicesCards() {
       priceKey: 'halloween.price',
       badgeKey: 'halloween.badge',
       badgeColor: 'from-orange-500 to-red-500',
-      image: '/img/portfolio/tematicas/halloween-01.webp',
+      image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
       gradient: 'from-orange-500/20 via-red-500/10 to-transparent',
       href: '/tematica-halloween',
       features: ['feature1', 'feature2', 'feature3'],
@@ -283,12 +283,16 @@ export default function MobileServicesCards() {
       priceKey: 'empresas.price',
       badgeKey: '',
       badgeColor: '',
-      image: '/img/portfolio/empresas/empresas-01.webp',
+      image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
       gradient: 'from-blue-500/20 via-cyan-500/10 to-transparent',
       href: '/servicios/empresas',
       features: ['feature1', 'feature2', 'feature3'],
     },
   ], []);
+
+  // Ref para haptic (evitar re-ejecuciones del useEffect)
+  const hapticRef = useRef(haptic);
+  hapticRef.current = haptic;
 
   // Detectar card activa basándose en scroll position
   useEffect(() => {
@@ -301,13 +305,13 @@ export default function MobileServicesCards() {
       const newIndex = Math.round(scrollLeft / cardWidth);
       if (newIndex !== activeIndex && newIndex >= 0 && newIndex < SERVICES.length) {
         setActiveIndex(newIndex);
-        haptic('light');
+        hapticRef.current('light');
       }
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [activeIndex, haptic, SERVICES.length]);
+  }, [activeIndex, SERVICES.length]);
 
   return (
     <section id="services-section" className="py-12 overflow-hidden">

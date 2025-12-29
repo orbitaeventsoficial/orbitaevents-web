@@ -7,6 +7,20 @@
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 // ============================================
+// UTILS - ESCAPE HTML
+// ============================================
+
+function escapeHtml(text: string | null | undefined): string {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// ============================================
 // TIPUS
 // ============================================
 
@@ -329,18 +343,18 @@ export function generateQuoteHTML(data: QuoteData): string {
     <div class="info-grid">
       <div class="info-box">
         <h3>Dades del Client</h3>
-        <p><span class="value">${data.clientName}</span></p>
-        <p><span class="label">Email:</span> ${data.clientEmail}</p>
-        ${data.clientPhone ? `<p><span class="label">Telèfon:</span> ${data.clientPhone}</p>` : ''}
-        ${data.clientAddress ? `<p><span class="label">Adreça:</span> ${data.clientAddress}</p>` : ''}
-        ${data.clientNIF ? `<p><span class="label">NIF:</span> ${data.clientNIF}</p>` : ''}
+        <p><span class="value">${escapeHtml(data.clientName)}</span></p>
+        <p><span class="label">Email:</span> ${escapeHtml(data.clientEmail)}</p>
+        ${data.clientPhone ? `<p><span class="label">Telèfon:</span> ${escapeHtml(data.clientPhone)}</p>` : ''}
+        ${data.clientAddress ? `<p><span class="label">Adreça:</span> ${escapeHtml(data.clientAddress)}</p>` : ''}
+        ${data.clientNIF ? `<p><span class="label">NIF:</span> ${escapeHtml(data.clientNIF)}</p>` : ''}
       </div>
       <div class="info-box">
         <h3>Dades de l'Esdeveniment</h3>
-        <p><span class="value">${eventTypeLabel}</span></p>
-        <p><span class="label">Data:</span> ${formattedDate}</p>
-        ${data.eventTime ? `<p><span class="label">Hora:</span> ${data.eventTime}${data.eventEndTime ? ` - ${data.eventEndTime}` : ''}</p>` : ''}
-        <p><span class="label">Lloc:</span> ${data.eventLocation}</p>
+        <p><span class="value">${escapeHtml(eventTypeLabel)}</span></p>
+        <p><span class="label">Data:</span> ${escapeHtml(formattedDate)}</p>
+        ${data.eventTime ? `<p><span class="label">Hora:</span> ${escapeHtml(data.eventTime)}${data.eventEndTime ? ` - ${escapeHtml(data.eventEndTime)}` : ''}</p>` : ''}
+        <p><span class="label">Lloc:</span> ${escapeHtml(data.eventLocation)}</p>
         <p><span class="label">Convidats:</span> ${data.guestCount} persones</p>
       </div>
     </div>
@@ -359,8 +373,8 @@ export function generateQuoteHTML(data: QuoteData): string {
         <tbody>
           <tr>
             <td>
-              <div class="item-name">${data.packName}</div>
-              ${data.packDescription ? `<div class="item-desc">${data.packDescription}</div>` : ''}
+              <div class="item-name">${escapeHtml(data.packName)}</div>
+              ${data.packDescription ? `<div class="item-desc">${escapeHtml(data.packDescription)}</div>` : ''}
             </td>
             <td>
               ${data.djHours}h de DJ professional<br>
@@ -371,8 +385,8 @@ export function generateQuoteHTML(data: QuoteData): string {
           ${data.extras?.map(extra => `
           <tr>
             <td>
-              <div class="item-name">${extra.name}</div>
-              ${extra.description ? `<div class="item-desc">${extra.description}</div>` : ''}
+              <div class="item-name">${escapeHtml(extra.name)}</div>
+              ${extra.description ? `<div class="item-desc">${escapeHtml(extra.description)}</div>` : ''}
             </td>
             <td>${extra.quantity > 1 ? `${extra.quantity} unitats` : ''}</td>
             <td>${(extra.price * extra.quantity).toFixed(2)}€</td>
@@ -390,7 +404,7 @@ export function generateQuoteHTML(data: QuoteData): string {
       </div>
       ${data.discount ? `
       <div class="totals-row discount">
-        <span class="label">Descompte ${data.discountCode ? `(${data.discountCode})` : ''}</span>
+        <span class="label">Descompte ${data.discountCode ? `(${escapeHtml(data.discountCode)})` : ''}</span>
         <span>-${data.discount.toFixed(2)}€</span>
       </div>
       ` : ''}
@@ -408,7 +422,7 @@ export function generateQuoteHTML(data: QuoteData): string {
     <!-- Notes -->
     <div class="notes-section">
       <h3>Notes</h3>
-      <p>${data.notes}</p>
+      <p>${escapeHtml(data.notes)}</p>
     </div>
     ` : ''}
 

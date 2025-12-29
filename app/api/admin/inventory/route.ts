@@ -2,6 +2,7 @@
 // API per gestionar inventari
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 import { z } from 'zod';
 import { InventoryCategory, ItemStatus } from '@prisma/client';
 
@@ -28,6 +29,10 @@ const inventorySchema = z.object({
 
 // GET - Llistar inventari amb filtres
 export async function GET(req: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
@@ -94,6 +99,10 @@ export async function GET(req: NextRequest) {
 
 // POST - Crear nou element d'inventari
 export async function POST(req: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     const parsed = inventorySchema.safeParse(body);

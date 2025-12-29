@@ -9,6 +9,20 @@ import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 // ============================================
+// UTILS - ESCAPE HTML
+// ============================================
+
+function escapeHtml(text: string | null | undefined): string {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// ============================================
 // TIPUS
 // ============================================
 
@@ -350,24 +364,24 @@ function generateAdminEmailHTML(
     <div class="content">
       <div class="field">
         <div class="field-label">Client</div>
-        <div class="field-value">${lead.name}</div>
+        <div class="field-value">${escapeHtml(lead.name)}</div>
       </div>
 
       <div class="field">
         <div class="field-label">${isEmail ? 'Email' : 'Contacte'}</div>
-        <div class="field-value">${isEmail ? lead.email : (lead.phone || lead.email)}</div>
+        <div class="field-value">${escapeHtml(isEmail ? lead.email : (lead.phone || lead.email))}</div>
       </div>
 
       ${lead.phone ? `
       <div class="field">
         <div class="field-label">Telèfon</div>
-        <div class="field-value">📱 ${lead.phone}</div>
+        <div class="field-value">📱 ${escapeHtml(lead.phone)}</div>
       </div>
       ` : ''}
 
       <div class="field">
         <div class="field-label">Tipus d'Esdeveniment</div>
-        <div class="field-value">${eventLabel}</div>
+        <div class="field-value">${escapeHtml(eventLabel)}</div>
       </div>
 
       <div class="stats-grid">
@@ -389,7 +403,7 @@ function generateAdminEmailHTML(
       <div class="field">
         <div class="field-label">Missatge</div>
         <div class="field-value" style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 8px; font-size: 14px;">
-          "${lead.message}"
+          "${escapeHtml(lead.message)}"
         </div>
       </div>
       ` : ''}
@@ -397,7 +411,7 @@ function generateAdminEmailHTML(
       ${lead.packName ? `
       <div class="highlight-box">
         <div class="field-label">Pack Seleccionat</div>
-        <div class="field-value">${lead.packName}</div>
+        <div class="field-value">${escapeHtml(lead.packName)}</div>
         ${lead.estimatedPrice ? `<div class="price">${lead.estimatedPrice.toLocaleString('es-ES')}€</div>` : ''}
       </div>
       ` : ''}
@@ -405,7 +419,7 @@ function generateAdminEmailHTML(
       ${lead.budget && !lead.packName ? `
       <div class="highlight-box">
         <div class="field-label">Pressupost indicat</div>
-        <div class="price">${lead.budget}</div>
+        <div class="price">${escapeHtml(lead.budget)}</div>
       </div>
       ` : ''}
 

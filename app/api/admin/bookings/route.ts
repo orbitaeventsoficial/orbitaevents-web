@@ -2,6 +2,7 @@
 // API per gestionar reserves
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 import { BookingStatus, EventType } from '@prisma/client';
@@ -56,6 +57,10 @@ async function generateReference(): Promise<string> {
 
 // GET - Llistar reserves amb filtres
 export async function GET(req: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
@@ -132,6 +137,10 @@ export async function GET(req: NextRequest) {
 
 // POST - Crear nova reserva
 export async function POST(req: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     const parsed = bookingSchema.safeParse(body);

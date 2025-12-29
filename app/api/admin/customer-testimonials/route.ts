@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth';
 import {
   getPendingTestimonials,
   getApprovedTestimonials,
@@ -18,6 +19,10 @@ export const dynamic = 'force-dynamic';
  * GET - Obtenir testimonis per admin
  */
 export async function GET(request: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'all';
@@ -75,6 +80,10 @@ export async function GET(request: NextRequest) {
  * PATCH - Aprovar o rebutjar testimoni
  */
 export async function PATCH(request: NextRequest) {
+  // Verificar autenticació
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { id, action } = body;

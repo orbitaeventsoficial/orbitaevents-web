@@ -8,6 +8,17 @@ import { prisma } from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import type { EventType, LeadSource } from '@prisma/client';
 
+// Helper per escapar HTML i prevenir XSS
+function escapeHtml(text: string | null | undefined): string {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // Validación de datos con Zod
 const contactSchema = z.object({
   name: z.string().min(2, "Nombre demasiado corto").max(50),
@@ -265,17 +276,17 @@ export async function POST(req: NextRequest) {
     <div class="content">
       <div class="field">
         <div class="field-label">Client</div>
-        <div class="field-value">${name}</div>
+        <div class="field-value">${escapeHtml(name)}</div>
       </div>
 
       <div class="field">
         <div class="field-label">${isEmail ? 'Email' : 'Telèfon'}</div>
-        <div class="field-value">${contact}</div>
+        <div class="field-value">${escapeHtml(contact)}</div>
       </div>
 
       <div class="field">
         <div class="field-label">Tipus d'Esdeveniment</div>
-        <div class="field-value">${eventLabel}</div>
+        <div class="field-value">${escapeHtml(eventLabel)}</div>
       </div>
 
       ${eventDate ? `
@@ -295,16 +306,16 @@ export async function POST(req: NextRequest) {
       ${message ? `
       <div class="field">
         <div class="field-label">Missatge</div>
-        <div class="field-value">${message}</div>
+        <div class="field-value">${escapeHtml(message)}</div>
       </div>
       ` : ''}
 
       ${packName ? `
       <div class="highlight-box">
         <div class="field-label">Pack Seleccionat</div>
-        <div class="field-value">${packName}</div>
+        <div class="field-value">${escapeHtml(packName)}</div>
         ${estimatedPrice ? `<div class="price">${estimatedPrice.toLocaleString('es-ES')}€</div>` : ''}
-        ${packId ? `<div style="font-size: 12px; color: #666; margin-top: 8px;">ID: ${packId}</div>` : ''}
+        ${packId ? `<div style="font-size: 12px; color: #666; margin-top: 8px;">ID: ${escapeHtml(packId)}</div>` : ''}
       </div>
       ` : ''}
 
@@ -318,8 +329,8 @@ export async function POST(req: NextRequest) {
       ` : ''}
 
       ${clientPhone ? `
-      <a href="tel:${clientPhone}" class="cta-button">
-        📱 Trucar a ${name}
+      <a href="tel:${escapeHtml(clientPhone)}" class="cta-button">
+        📱 Trucar a ${escapeHtml(name)}
       </a>
       ` : ''}
 
@@ -384,9 +395,9 @@ export async function POST(req: NextRequest) {
     </div>
 
     <div class="content">
-      <p class="greeting">Hola <strong>${name}</strong>,</p>
+      <p class="greeting">Hola <strong>${escapeHtml(name)}</strong>,</p>
 
-      <p>Gràcies per contactar amb <strong>Òrbita Events</strong>! Hem rebut la teva sol·licitud per a <strong>${eventLabel}</strong> i estem il·lusionats de poder ajudar-te a crear un esdeveniment inoblidable.</p>
+      <p>Gràcies per contactar amb <strong>Òrbita Events</strong>! Hem rebut la teva sol·licitud per a <strong>${escapeHtml(eventLabel)}</strong> i estem il·lusionats de poder ajudar-te a crear un esdeveniment inoblidable.</p>
 
       <div class="info-box">
         <strong>📋 La teva referència: ${leadId}</strong><br>
