@@ -41,12 +41,29 @@ function checkAdminRateLimit(req: NextRequest): boolean {
   const entry = adminAuthAttempts.get(clientIp);
 
   if (!entry || entry.resetTime < now) {
-    adminAuthAttempts.set(clientIp, { count: 1, resetTime: now + ADMIN_AUTH_WINDOW });
+    // No hi ha entrades o ha expirat - permetre
     return true;
   }
 
-  entry.count++;
+  // Bloquejar si supera el límit d'intents fallits
   return entry.count <= ADMIN_AUTH_LIMIT;
+}
+
+function recordFailedAttempt(req: NextRequest): void {
+  const clientIp = getClientIp(req);
+  const now = Date.now();
+  const entry = adminAuthAttempts.get(clientIp);
+
+  if (!entry || entry.resetTime < now) {
+    adminAuthAttempts.set(clientIp, { count: 1, resetTime: now + ADMIN_AUTH_WINDOW });
+  } else {
+    entry.count++;
+  }
+}
+
+function clearFailedAttempts(req: NextRequest): void {
+  const clientIp = getClientIp(req);
+  adminAuthAttempts.delete(clientIp);
 }
 
 function unauthorized() {
@@ -116,9 +133,14 @@ export function middleware(req: NextRequest) {
 
       // Verificar credencials
       if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
+        recordFailedAttempt(req);
         return unauthorized();
       }
+
+      // Autenticació correcta - netejar intents fallits
+      clearFailedAttempts(req);
     } catch {
+      recordFailedAttempt(req);
       return unauthorized();
     }
 
