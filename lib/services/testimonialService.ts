@@ -233,12 +233,12 @@ export async function getPendingTestimonials() {
 }
 
 /**
- * Aprovar testimoni
+ * Aprovar o despublicar testimoni
  */
-export async function approveTestimonial(id: string) {
+export async function approveTestimonial(id: string, approved: boolean = true) {
   return prisma.customerTestimonial.update({
     where: { id },
-    data: { isApproved: true },
+    data: { isApproved: approved },
   });
 }
 

@@ -13,6 +13,8 @@ export function useGoogleReviews() {
     rating: 0,
     user_ratings_total: 0,
     reviews: [],
+    source: 'database',
+    googleReviewsUrl: '',
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

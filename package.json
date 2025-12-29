@@ -5,7 +5,8 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev",
-    "build": "npm run normalize:filenames && npm run rename:portfolio && npm run generate:portfolio && next build",
+    "sync:reviews": "node scripts/sync-reviews.mjs",
+    "build": "npm run normalize:filenames && npm run rename:portfolio && npm run generate:portfolio && npm run sync:reviews && next build",
     "start": "next start",
     "lint": "next lint",
     "generate:portfolio": "node scripts/generate-portfolio-config.mjs",

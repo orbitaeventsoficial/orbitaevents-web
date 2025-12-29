@@ -2,18 +2,21 @@
  * API ROUTE: Google Reviews
  * ═══════════════════════════════════════════════════════════════════════════
  *
- * Obtiene las reseñas reales de Google My Business usando Google Places API.
+ * Obtiene las reseñas de Òrbita Events de múltiples fuentes:
+ * 1. JSON estàtic (generat durant el deploy)
+ * 2. Base de datos (testimonios verificados)
+ * 3. Google Places API (si está configurado)
  * 
- * IMPORTANT: Si l'API no està configurada, retorna DADES CREÏBLES per defecte
- * basades en les opinions reals que tens (Lorena i Carles, etc.)
- *
- * Configuración requerida en .env:
- * - GOOGLE_PLACES_API_KEY
- * - NEXT_PUBLIC_GOOGLE_PLACE_ID
+ * URL de Google Reviews: https://g.page/r/CXcgbvANsXSzEBM/review
+ * CID: CXcgbvANsXSzEBM
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { SITE_CONFIG } from '@/app/config/site-config';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 export interface GoogleReview {
   author_name: string;
@@ -24,74 +27,117 @@ export interface GoogleReview {
   relative_time_description: string;
   text: string;
   time: number;
+  source: 'google' | 'database' | 'json';
+  eventType?: string;
 }
 
 export interface GoogleReviewsResponse {
   rating: number;
   user_ratings_total: number;
   reviews: GoogleReview[];
-  source?: 'google' | 'fallback';
+  source: 'google' | 'database' | 'json' | 'mixed';
+  googleReviewsUrl: string;
+  lastUpdated?: string;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FALLBACK CREÏBLE - Basat en opinions reals d'Òrbita Events
-// Aquestes són opinions REALS que pots verificar, no inventades
+// HELPER: Calcular temps relatiu
 // ═══════════════════════════════════════════════════════════════════════════
-const FALLBACK_REVIEWS: GoogleReview[] = [
-  {
-    author_name: 'Lorena G.',
-    rating: 5,
-    relative_time_description: 'fa 5 mesos',
-    text: 'El nostre casament va ser màgic gràcies a Òrbita Events! La tematització de Món Màgic va superar totes les expectatives. El DJ va saber llegir perfectament l\'ambient i tots els convidats van estar ballant fins al final. 100% recomanable!',
-    time: Date.now() - (5 * 30 * 24 * 60 * 60 * 1000), // fa 5 mesos
-    language: 'ca',
-  },
-  {
-    author_name: 'Marc F.',
-    rating: 5,
-    relative_time_description: 'fa 3 mesos',
-    text: 'Vam contractar Òrbita per la festa de 50 anys del meu pare. Servei impecable, puntualitat perfecta i la música va ser exactament el que volíem. El so era brutal i les llums van crear un ambient increïble.',
-    time: Date.now() - (3 * 30 * 24 * 60 * 60 * 1000),
-    language: 'ca',
-  },
-  {
-    author_name: 'Anna P.',
-    rating: 5,
-    relative_time_description: 'fa 2 mesos',
-    text: 'Festa d\'empresa espectacular. Van adaptar-se perfectament a les nostres necessitats i el tracte va ser molt professional. Repetirem segur!',
-    time: Date.now() - (2 * 30 * 24 * 60 * 60 * 1000),
-    language: 'ca',
-  },
-];
+function getRelativeTime(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  
+  if (diffDays < 1) return 'avui';
+  if (diffDays === 1) return 'ahir';
+  if (diffDays < 7) return `fa ${diffDays} dies`;
+  if (diffDays < 30) return `fa ${Math.floor(diffDays / 7)} setmanes`;
+  if (diffDays < 365) return `fa ${Math.floor(diffDays / 30)} mesos`;
+  return `fa ${Math.floor(diffDays / 365)} anys`;
+}
 
-const FALLBACK_RESPONSE: GoogleReviewsResponse = {
-  rating: 4.9,
-  user_ratings_total: 23, // Número creïble, no "50+" que sembla inventat
-  reviews: FALLBACK_REVIEWS,
-  source: 'fallback',
-};
+// ═══════════════════════════════════════════════════════════════════════════
+// OBTENIR RESSENYES DEL JSON ESTÀTIC (generat durant deploy)
+// ═══════════════════════════════════════════════════════════════════════════
+async function getReviewsFromJson(): Promise<{ reviews: GoogleReview[]; lastUpdated?: string }> {
+  try {
+    const jsonPath = path.join(process.cwd(), 'public', 'data', 'google-reviews.json');
+    const content = await fs.readFile(jsonPath, 'utf-8');
+    const data = JSON.parse(content);
+    
+    const reviews: GoogleReview[] = (data.reviews || []).map((r: any) => ({
+      ...r,
+      source: 'json' as const,
+      language: 'ca',
+    }));
+    
+    return { reviews, lastUpdated: data.lastUpdated };
+  } catch (error) {
+    // Fitxer no existeix, normal si no s'ha executat el script
+    return { reviews: [] };
+  }
+}
 
-export async function GET() {
+// ═══════════════════════════════════════════════════════════════════════════
+// OBTENIR RESSENYES DE LA BASE DE DADES
+// ═══════════════════════════════════════════════════════════════════════════
+async function getReviewsFromDatabase(): Promise<GoogleReview[]> {
+  try {
+    const testimonials = await prisma.customerTestimonial.findMany({
+      where: {
+        isApproved: true,
+        showName: true,
+      },
+      include: {
+        customer: {
+          select: {
+            name: true,
+            email: true,
+            source: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 20,
+    });
+
+    return testimonials
+      .filter(t => !t.customer.email?.includes('@reviews.orbitaevents.com')) // Excloure les de Google (ja estan al JSON)
+      .map((t) => ({
+        author_name: t.customer.name,
+        rating: t.rating,
+        text: t.text,
+        time: Math.floor(t.createdAt.getTime() / 1000),
+        relative_time_description: getRelativeTime(t.createdAt),
+        language: 'ca',
+        source: 'database' as const,
+        eventType: t.eventType || undefined,
+        profile_photo_url: t.photoUrl || undefined,
+      }));
+  } catch (error) {
+    console.error('[Reviews] Error obtenint de BBDD:', error);
+    return [];
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// OBTENIR RESSENYES DE GOOGLE PLACES API (opcional, de pagament)
+// ═══════════════════════════════════════════════════════════════════════════
+async function getReviewsFromGoogle(): Promise<GoogleReview[]> {
   const placeId = process.env.NEXT_PUBLIC_GOOGLE_PLACE_ID;
   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
 
-  // Si no está configurado, devolver fallback CREÏBLE
   if (!placeId || !apiKey) {
-    console.log('[Google Reviews] API no configurada, usant fallback creïble');
-    return NextResponse.json(FALLBACK_RESPONSE, { 
-      status: 200,
-      headers: {
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
-      },
-    });
+    return [];
   }
 
   try {
-    // Obtener detalles del Place usando Google Places API
     const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=rating,user_ratings_total,reviews&key=${apiKey}&language=es`;
 
     const response = await fetch(url, {
-      next: { revalidate: 3600 }, // Cache de 1 hora
+      next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
@@ -100,43 +146,98 @@ export async function GET() {
 
     const data = await response.json();
 
-    if (data.status !== 'OK') {
-      throw new Error(`Google API status: ${data.status}`);
+    if (data.status !== 'OK' || !data.result?.reviews) {
+      return [];
     }
 
-    const result = data.result;
-
-    // Si Google retorna dades, usar-les
-    if (result.rating && result.rating > 0) {
-      return NextResponse.json({
-        rating: result.rating,
-        user_ratings_total: result.user_ratings_total || 0,
-        reviews: result.reviews || [],
-        source: 'google',
-      }, {
-        headers: {
-          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
-        },
-      });
-    }
-
-    // Si Google no té dades, usar fallback
-    console.log('[Google Reviews] Google no té dades, usant fallback');
-    return NextResponse.json(FALLBACK_RESPONSE, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
-      },
-    });
-
+    return data.result.reviews.map((review: any) => ({
+      author_name: review.author_name,
+      author_url: review.author_url,
+      profile_photo_url: review.profile_photo_url,
+      rating: review.rating,
+      text: review.text,
+      time: review.time,
+      relative_time_description: review.relative_time_description,
+      language: review.language || 'es',
+      source: 'google' as const,
+    }));
   } catch (error) {
-    console.error('Error fetching Google reviews:', error);
+    console.error('[Reviews] Error obtenint de Google:', error);
+    return [];
+  }
+}
 
-    // En cas d'error, SEMPRE retornar fallback creïble (no zeros!)
-    return NextResponse.json(FALLBACK_RESPONSE, { 
-      status: 200, // 200, no 500 - el frontend no ha de saber que ha fallat
+// ═══════════════════════════════════════════════════════════════════════════
+// HANDLER PRINCIPAL
+// ═══════════════════════════════════════════════════════════════════════════
+export async function GET() {
+  try {
+    // Obtenir ressenyes de totes les fonts
+    const [jsonData, dbReviews, googleReviews] = await Promise.all([
+      getReviewsFromJson(),
+      getReviewsFromDatabase(),
+      getReviewsFromGoogle(),
+    ]);
+
+    // Prioritat: Google API > JSON estàtic > Database
+    let allReviews: GoogleReview[] = [];
+    let source: 'google' | 'database' | 'json' | 'mixed' = 'database';
+
+    if (googleReviews.length > 0) {
+      allReviews = [...googleReviews, ...dbReviews];
+      source = dbReviews.length > 0 ? 'mixed' : 'google';
+    } else if (jsonData.reviews.length > 0) {
+      allReviews = [...jsonData.reviews, ...dbReviews];
+      source = dbReviews.length > 0 ? 'mixed' : 'json';
+    } else {
+      allReviews = dbReviews;
+      source = 'database';
+    }
+
+    // Ordenar per data i filtrar per rating mínim
+    allReviews.sort((a, b) => b.time - a.time);
+    
+    const minRating = SITE_CONFIG.reviews.minRatingToShow || 4;
+    const filteredReviews = allReviews.filter((r) => r.rating >= minRating);
+
+    // Calcular rating promig
+    let avgRating = 0;
+    if (filteredReviews.length > 0) {
+      avgRating = filteredReviews.reduce((sum, r) => sum + r.rating, 0) / filteredReviews.length;
+      avgRating = Math.round(avgRating * 10) / 10;
+    }
+
+    const response: GoogleReviewsResponse = {
+      rating: avgRating || 5.0,
+      user_ratings_total: filteredReviews.length,
+      reviews: filteredReviews,
+      source,
+      googleReviewsUrl: SITE_CONFIG.reviews.googleBusinessUrl || '',
+      lastUpdated: jsonData.lastUpdated,
+    };
+
+    return NextResponse.json(response, {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600',
       },
     });
+  } catch (error) {
+    console.error('[Reviews] Error general:', error);
+
+    return NextResponse.json(
+      {
+        rating: 0,
+        user_ratings_total: 0,
+        reviews: [],
+        source: 'database',
+        googleReviewsUrl: SITE_CONFIG.reviews.googleBusinessUrl || '',
+      },
+      {
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        },
+      }
+    );
   }
 }
