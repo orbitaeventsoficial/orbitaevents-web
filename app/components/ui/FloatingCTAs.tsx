@@ -91,28 +91,39 @@ export function ContactDesktop() {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 2. BOTTOM BAR MOBILE - Focus en contacte
+// IMPORTANT: Ara la barra NOMÉS apareix després de fer scroll més enllà
+// de l'altura del viewport (quan el Hero ja no és visible)
+// Això evita tenir 2 sets de botons CTA a la vegada
 // ═══════════════════════════════════════════════════════════════════════════
 
 export function BottomBarMobile() {
   const t = useTranslations('common');
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false); // CANVI: Comença OCULT
   const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      const viewportHeight = window.innerHeight;
 
-      // Sempre visible a dalt
-      if (currentScrollY < 100) {
-        setIsVisible(true);
+      // LÒGICA MILLORADA:
+      // - NO mostrar mentre estem al Hero (primer viewport)
+      // - SÍ mostrar quan hem passat el 70% del viewport (el Hero ja no es veu)
+      const heroPassed = currentScrollY > viewportHeight * 0.7;
+
+      if (!heroPassed) {
+        // Encara veiem el Hero - AMAGAR la barra sticky
+        setIsVisible(false);
         setLastScrollY(currentScrollY);
         return;
       }
 
-      // Amagar quan scroll down, mostrar quan scroll up
-      if (currentScrollY > lastScrollY && currentScrollY > 200) {
+      // Ja hem passat el Hero - mostrar/amagar segons direcció scroll
+      if (currentScrollY > lastScrollY && currentScrollY > viewportHeight) {
+        // Scroll down - amagar
         setIsVisible(false);
       } else {
+        // Scroll up - mostrar
         setIsVisible(true);
       }
 
@@ -120,13 +131,15 @@ export function BottomBarMobile() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    // Comprovar estat inicial
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
   return (
     <>
-      {/* Spacer perquè el contingut no quedi tapat */}
-      <div className="h-[72px] md:hidden" />
+      {/* Spacer condicional - només quan la barra és visible */}
+      {isVisible && <div className="h-[72px] md:hidden" />}
 
       {/* Bottom Bar - NOMÉS MÒBIL */}
       <AnimatePresence>
