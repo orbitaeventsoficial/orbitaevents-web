@@ -5,6 +5,7 @@ import EmailStatsCards from './EmailStatsCards';
 import EmailConfigPanel from './EmailConfigPanel';
 import RecentEmailsTable from './RecentEmailsTable';
 import ManualActionsPanel from './ManualActionsPanel';
+import InboxPanel from './InboxPanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -126,6 +127,9 @@ export default async function EmailsAdminPage() {
 
       {/* Stats Cards */}
       <EmailStatsCards stats={stats} />
+
+      {/* Inbox Panel - Lectura d'emails IMAP */}
+      <InboxPanel />
 
       {/* Main Grid */}
       <div className="grid gap-6 lg:grid-cols-3">
