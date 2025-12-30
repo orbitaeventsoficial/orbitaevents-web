@@ -350,13 +350,16 @@ export async function POST(req: NextRequest) {
 </html>
     `;
 
-    // Enviar email al admin
+    // Enviar email al admin (trim per evitar newlines de Vercel env vars)
+    const adminEmail = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
+    const smtpFrom = (process.env.SMTP_FROM || process.env.SMTP_USER || '').trim();
+
     await sendEmail({
-      to: process.env.CONTACT_TO || SITE_CONFIG.business.email,
+      to: adminEmail,
       subject: `🎉 NOU LEAD: ${name} - ${eventLabel} ${estimatedPrice ? `(${estimatedPrice}€)` : ''}`,
       html: adminEmailHtml,
       replyTo: clientEmail || undefined,
-      from: `"Òrbita Events Web" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      from: `"Òrbita Events Web" <${smtpFrom}>`,
     });
 
     // ===============================================
@@ -482,11 +485,16 @@ export async function POST(req: NextRequest) {
       estimatedResponse: "2-4 hores"
     });
 
-  } catch {
+  } catch (error) {
+    // Log error per debugging
+    console.error('[Contact API] Error:', error);
+
     return NextResponse.json(
       {
         error: `Error al enviar el missatge. Si us plau, truca'ns al ${SITE_CONFIG.business.phoneDisplay} o torna a intentar-ho.`,
-        phone: SITE_CONFIG.business.phone
+        phone: SITE_CONFIG.business.phone,
+        // En dev, mostrar error real
+        debug: process.env.NODE_ENV === 'development' ? String(error) : undefined
       },
       { status: 500 }
     );

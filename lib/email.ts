@@ -21,28 +21,22 @@ interface SendEmailOptions {
  * Crear transporter de nodemailer
  */
 function createTransporter() {
-  const smtpPort = parseInt(process.env.SMTP_PORT || '587');
-
-  // Usar IP directa si el host és de Don Dominio (soluciona DNS issues a Vercel)
-  let smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
-  if (smtpHost.includes('dondominio')) {
-    smtpHost = DONDOMINIO_SMTP_IP;
-  }
+  // Trim all env vars to remove any trailing newlines from Vercel env
+  const smtpHost = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
+  const smtpPort = parseInt((process.env.SMTP_PORT || '587').trim());
+  const smtpUser = (process.env.SMTP_USER || '').trim();
+  const smtpPass = (process.env.SMTP_PASS || '').trim();
 
   return nodemailer.createTransport({
     host: smtpHost,
     port: smtpPort,
     secure: process.env.SMTP_SECURE === 'true' || smtpPort === 465,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: smtpUser,
+      pass: smtpPass,
     },
     tls: {
-      // SEGURETAT: Només desactivem validació de cert quan usem IP directa de Don Dominio
-      // El certificat SSL és per smtp.dondominio.com, no per la IP 31.214.176.11
-      // La connexió segueix xifrada amb TLS, només s'omet validació del nom del cert
-      // TODO: Migrar a SendGrid/AWS SES per tenir rejectUnauthorized: true sempre
-      rejectUnauthorized: smtpHost === DONDOMINIO_SMTP_IP ? false : true,
+      rejectUnauthorized: true,
     },
   });
 }
@@ -53,12 +47,17 @@ function createTransporter() {
 export async function sendEmail(options: SendEmailOptions): Promise<void> {
   const transporter = createTransporter();
 
+  // Trim all env vars and options to remove any trailing newlines
+  const smtpFrom = (process.env.SMTP_FROM || process.env.SMTP_USER || '').trim();
+  const fromAddress = options.from?.trim() || `"Òrbita Events" <${smtpFrom}>`;
+  const toAddress = options.to.trim();
+
   await transporter.sendMail({
-    from: options.from || `"Òrbita Events" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-    to: options.to,
+    from: fromAddress,
+    to: toAddress,
     subject: options.subject,
     html: options.html,
-    replyTo: options.replyTo,
+    replyTo: options.replyTo?.trim(),
   });
 }
 

@@ -47,3 +47,6 @@ nul
 .env.vercel
 .env.vercel-check
 prisma.zip
+
+.env.vercel*
+lib.zip
