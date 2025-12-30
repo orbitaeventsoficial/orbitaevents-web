@@ -29,6 +29,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Reserva no trobada' }, { status: 404 });
     }
 
+    // Validate booking is completed
+    if (booking.status !== 'COMPLETED') {
+      return NextResponse.redirect(
+        new URL(`/admin/emails?error=booking_not_completed&status=${booking.status}`, req.url),
+        303
+      );
+    }
+
     if (booking.postEventEmailSent) {
       // Redirect back amb missatge
       return NextResponse.redirect(

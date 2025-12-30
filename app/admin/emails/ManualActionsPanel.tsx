@@ -15,11 +15,9 @@ export default function ManualActionsPanel() {
     setCronResult(null);
 
     try {
-      const res = await fetch('/api/cron/post-event', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_CRON_SECRET || 'dev-secret'}`,
-        },
+      // Use admin-protected endpoint instead of exposing CRON_SECRET
+      const res = await fetch('/api/admin/emails/run-cron', {
+        method: 'POST',
       });
 
       const data = await res.json();

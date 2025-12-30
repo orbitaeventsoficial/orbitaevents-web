@@ -2,8 +2,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 3 test emails per 5 minutes
+  const rateLimitResult = checkRateLimit(req, { ...RATE_LIMITS.contact, limit: 3 });
+  if (rateLimitResult) return rateLimitResult;
+
   try {
     const { email } = await req.json();
 

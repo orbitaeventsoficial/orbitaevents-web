@@ -8,10 +8,19 @@ export const runtime = 'edge';
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
-  const name = searchParams.get('name') || 'Client';
-  const rating = parseInt(searchParams.get('rating') || '10');
-  const code = searchParams.get('code') || 'ORBITA10';
-  const discount = parseInt(searchParams.get('discount') || '10');
+  // Validate and sanitize inputs
+  const rawName = searchParams.get('name') || 'Client';
+  const name = rawName.substring(0, 50); // Limit name length
+
+  const rawRating = parseInt(searchParams.get('rating') || '10');
+  const rating = Math.max(0, Math.min(10, rawRating)); // Clamp 0-10
+
+  const rawCode = searchParams.get('code') || 'ORBITA10';
+  const code = rawCode.substring(0, 20).toUpperCase(); // Limit and uppercase
+
+  const rawDiscount = parseInt(searchParams.get('discount') || '10');
+  const discount = Math.max(1, Math.min(50, rawDiscount)); // Clamp 1-50%
+
   const preset = searchParams.get('preset') || 'default';
 
   // Dimensions segons preset

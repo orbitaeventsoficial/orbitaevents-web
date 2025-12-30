@@ -1,18 +1,25 @@
 /**
  * API ROUTE: Public Testimonials
  * ==============================
- * POST - Enviar una nova opinió (des del formulari públic)
+ * POST - Enviar una nova opinió (des del formulari públic o post-event)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createTestimonial } from '@/lib/services/testimonialService';
+import { prisma } from '@/lib/prisma';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * POST - Crear nou testimoni
+ * Supports both public form and post-event review with token validation
  */
 export async function POST(request: NextRequest) {
+  // Rate limit: 5 submissions per hour
+  const rateLimitResult = checkRateLimit(request, { ...RATE_LIMITS.testimonials, limit: 5 });
+  if (rateLimitResult) return rateLimitResult;
+
   try {
     const body = await request.json();
 
@@ -31,7 +38,34 @@ export async function POST(request: NextRequest) {
       allowGoogleShare,
       consentDataProcessing,
       consentPhotoPublication,
+      // Post-event review fields
+      token,
+      bookingRef,
     } = body;
+
+    // If token provided, validate against booking
+    if (token && bookingRef) {
+      const booking = await prisma.booking.findFirst({
+        where: {
+          reference: bookingRef,
+          reviewToken: token,
+          reviewSubmittedAt: null, // Not already submitted
+        },
+      });
+
+      if (!booking) {
+        return NextResponse.json(
+          { error: 'Token de valoració invàlid o ja utilitzat' },
+          { status: 400 }
+        );
+      }
+
+      // Mark review as submitted
+      await prisma.booking.update({
+        where: { id: booking.id },
+        data: { reviewSubmittedAt: new Date() },
+      });
+    }
 
     // Validacions bàsiques
     if (!name || !email || !rating || !comment) {
@@ -41,7 +75,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!consentDataProcessing) {
+    // Skip consent check for post-event reviews (implicit consent)
+    if (!token && !consentDataProcessing) {
       return NextResponse.json(
         { error: 'Cal acceptar el consentiment de dades' },
         { status: 400 }
