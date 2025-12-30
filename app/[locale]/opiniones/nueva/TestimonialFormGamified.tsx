@@ -163,12 +163,37 @@ export default function TestimonialFormGamified() {
   const selectRating = (rating: number) => {
     setFormData(prev => ({ ...prev, rating }));
     if (rating === 5) {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#FFB800', '#FF6B00', '#FFD700'],
-      });
+      // Disparar confetti amb un petit delay per assegurar que el DOM està llest
+      setTimeout(() => {
+        try {
+          confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 },
+            colors: ['#FFB800', '#FF6B00', '#FFD700', '#FFA500', '#FFCC00'],
+            disableForReducedMotion: true,
+          });
+          // Segona explosió per més efecte
+          setTimeout(() => {
+            confetti({
+              particleCount: 50,
+              angle: 60,
+              spread: 55,
+              origin: { x: 0 },
+              colors: ['#FFB800', '#FF6B00'],
+            });
+            confetti({
+              particleCount: 50,
+              angle: 120,
+              spread: 55,
+              origin: { x: 1 },
+              colors: ['#FFD700', '#FFCC00'],
+            });
+          }, 150);
+        } catch (error) {
+          console.log('Confetti error:', error);
+        }
+      }, 100);
     }
   };
 
@@ -187,16 +212,16 @@ export default function TestimonialFormGamified() {
     reader.onload = (e) => setPhotoPreview(e.target?.result as string);
     reader.readAsDataURL(file);
 
-    // Upload via API
+    // Upload via API pública (sense autenticació)
     setPhotoUploading(true);
     setUploadError(null);
 
     try {
       const formDataUpload = new FormData();
       formDataUpload.append('file', file);
-      formDataUpload.append('folder', 'testimonials/photos');
+      formDataUpload.append('type', 'photo');
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/testimonial-upload', {
         method: 'POST',
         body: formDataUpload,
       });
@@ -235,35 +260,40 @@ export default function TestimonialFormGamified() {
     setUploadError(null);
 
     try {
-      // 1. Obtenir signed URL de l'API
-      const signedResponse = await fetch('/api/upload', {
+      // Per vídeos petits (<4MB), upload directe
+      // Per vídeos grans, l'API retornarà signed URL
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+      formDataUpload.append('type', 'video');
+
+      const response = await fetch('/api/testimonial-upload', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fileName: file.name,
-          fileType: file.type,
-          folder: 'testimonials/videos',
-        }),
+        body: formDataUpload,
       });
 
-      const signedResult = await signedResponse.json();
+      const result = await response.json();
 
-      if (!signedResponse.ok || !signedResult.success) {
-        throw new Error(signedResult.error || 'Error obtenint URL de pujada');
+      if (!response.ok || !result.success) {
+        // Si necessita signed URL per fitxers grans
+        if (result.useSignedUrl && result.signedUrl) {
+          // Pujar directament a Supabase amb el signed URL
+          const uploadResponse = await fetch(result.signedUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': file.type },
+            body: file,
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Error pujant vídeo a storage');
+          }
+
+          setFormData(prev => ({ ...prev, videoUrl: result.url }));
+        } else {
+          throw new Error(result.error || 'Error pujant vídeo');
+        }
+      } else {
+        setFormData(prev => ({ ...prev, videoUrl: result.url }));
       }
-
-      // 2. Pujar directament a Supabase amb el signed URL
-      const uploadResponse = await fetch(signedResult.signedUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': file.type },
-        body: file,
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error('Error pujant vídeo a storage');
-      }
-
-      setFormData(prev => ({ ...prev, videoUrl: signedResult.publicUrl }));
     } catch (error) {
       console.error('Error uploading video:', error);
       setUploadError(error instanceof Error ? error.message : t('errors.uploadVideoError'));

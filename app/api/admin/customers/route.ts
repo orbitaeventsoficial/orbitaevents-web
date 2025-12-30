@@ -6,85 +6,54 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
-
-// Check if Supabase is configured
-function checkSupabase() {
-  if (!supabaseAdmin) {
-    return NextResponse.json(
-      { error: 'Database not configured' },
-      { status: 503 }
-    );
-  }
-  return null;
-}
-
-// Verificar autenticació admin
-function verifyAdminAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader) return false;
-
-  if (authHeader.startsWith('Basic ')) {
-    const base64 = authHeader.slice(6);
-    const decoded = Buffer.from(base64, 'base64').toString();
-    const [user, pass] = decoded.split(':');
-    return user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASS;
-  }
-
-  if (authHeader.startsWith('Bearer ')) {
-    const key = authHeader.slice(7);
-    return key === process.env.ADMIN_KEY;
-  }
-
-  return false;
-}
 
 /**
  * GET - Obtenir clients
  */
 export async function GET(request: NextRequest) {
-  const dbError = checkSupabase();
-  if (dbError) return dbError;
-
-  if (!verifyAdminAuth(request)) {
-    return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
-  }
-
   try {
     const { searchParams } = new URL(request.url);
     const includeStats = searchParams.get('stats') === 'true';
 
-    const { data: customers, error } = await supabaseAdmin!
-      .from('customers')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
+    const customers = await prisma.customer.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: {
+          select: {
+            testimonials: true,
+            discountCodes: true,
+          },
+        },
+      },
+    });
 
     const response: Record<string, unknown> = {
       success: true,
-      data: customers || [],
+      data: customers,
     };
 
     if (includeStats) {
-      const total = customers?.length || 0;
-      const vip = customers?.filter(c => c.is_vip).length || 0;
-      const withEvents = customers?.filter(c => c.total_events > 0).length || 0;
+      const total = customers.length;
+      const withEvents = customers.filter(c => c.totalEvents > 0).length;
 
       // Contactes del últim mes
       const oneMonthAgo = new Date();
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      const recentMonth = customers?.filter(c =>
-        new Date(c.created_at) > oneMonthAgo
-      ).length || 0;
+      const recentMonth = customers.filter(c =>
+        c.createdAt > oneMonthAgo
+      ).length;
+
+      // Amb consentiment GDPR
+      const withGdpr = customers.filter(c => c.gdprConsent).length;
 
       response.stats = {
         total,
-        vip,
         withEvents,
         recentMonth,
+        withGdpr,
       };
     }
 
@@ -99,16 +68,9 @@ export async function GET(request: NextRequest) {
  * POST - Crear client
  */
 export async function POST(request: NextRequest) {
-  const dbError = checkSupabase();
-  if (dbError) return dbError;
-
-  if (!verifyAdminAuth(request)) {
-    return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
-    const { name, email, phone, city, instagram, notes, source } = body;
+    const { name, email, phone, instagram, preferredLocale } = body;
 
     if (!name || !email) {
       return NextResponse.json(
@@ -117,12 +79,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const emailNormalized = email.toLowerCase().trim();
+
     // Comprovar si ja existeix
-    const { data: existing } = await supabaseAdmin!
-      .from('customers')
-      .select('id')
-      .eq('email', email.toLowerCase().trim())
-      .single();
+    const existing = await prisma.customer.findUnique({
+      where: { emailNormalized },
+    });
 
     if (existing) {
       return NextResponse.json(
@@ -131,28 +93,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear client
-    const { data: customer, error } = await supabaseAdmin!
-      .from('customers')
-      .insert({
-        name: name.trim(),
-        email: email.toLowerCase().trim(),
-        phone: phone?.trim() || null,
-        city: city?.trim() || null,
-        instagram: instagram?.replace('@', '').trim() || null,
-        notes: notes?.trim() || null,
-        source: source || 'manual',
-        consent_data_processing: true,
-        consent_data_processing_date: new Date().toISOString(),
-        first_contact_date: new Date().toISOString(),
-        last_contact_date: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
+    // Normalitzar nom (sense accents, lowercase)
+    const nameNormalized = name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
 
-    if (error) throw error;
+    // Normalitzar telèfon
+    const phoneNormalized = phone
+      ? phone.replace(/\D/g, '')
+      : null;
+
+    // Normalitzar Instagram
+    const instagramNormalized = instagram
+      ? instagram.replace('@', '').toLowerCase().trim()
+      : null;
+
+    // Crear client
+    const customer = await prisma.customer.create({
+      data: {
+        name: name.trim(),
+        nameNormalized,
+        email: emailNormalized,
+        emailNormalized,
+        phone: phone?.trim() || null,
+        phoneNormalized,
+        instagram: instagram?.trim() || null,
+        instagramNormalized,
+        preferredLocale: preferredLocale || 'es',
+        source: 'OTHER',
+        gdprConsent: true,
+        gdprConsentDate: new Date(),
+      },
+    });
 
     return NextResponse.json({
       success: true,

@@ -125,7 +125,9 @@ export default function AdminSidebar() {
         </NavSection>
 
         <NavSection title={collapsed ? '' : 'Automatització'}>
+          <NavItem icon="📬" label="Inbox" href="/admin/inbox" badge="NEW" badgeColor="blue" />
           <NavItem icon="📧" label="Emails" href="/admin/emails" badge="AUTO" badgeColor="green" />
+          <NavItem icon="🎨" label="Canvas" href="/admin/canvas" />
           <NavItem icon="⭐" label="Ressenyes" href="/admin/ressenyes" />
         </NavSection>
       </nav>
@@ -219,7 +221,9 @@ export function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: (
           </NavSection>
 
           <NavSection title="Automatització">
+            <NavItem icon="📬" label="Inbox" href="/admin/inbox" badge="NEW" badgeColor="blue" />
             <NavItem icon="📧" label="Emails" href="/admin/emails" badge="AUTO" badgeColor="green" />
+            <NavItem icon="🎨" label="Canvas" href="/admin/canvas" />
             <NavItem icon="⭐" label="Ressenyes" href="/admin/ressenyes" />
           </NavSection>
 
