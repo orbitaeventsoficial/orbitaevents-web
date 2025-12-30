@@ -56,7 +56,7 @@ export default function HeroElegant() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 mb-6 md:mb-8 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20"
+            className="inline-flex items-center gap-2 mb-4 md:mb-5 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20"
           >
             <span className="text-amber-500 text-lg">{t('badgeEmoji')}</span>
             <span className="text-amber-400 text-sm font-medium tracking-wide">
@@ -65,7 +65,7 @@ export default function HeroElegant() {
           </motion.div>
 
           {/* Títol - BRUTAL i curt amb text rotatiu */}
-          <h1 className="text-[2.5rem] leading-[1.05] md:text-6xl lg:text-7xl font-black text-white mb-5 md:mb-6 tracking-tight">
+          <h1 className="text-[2.5rem] leading-[1.05] md:text-6xl lg:text-7xl font-black text-white mb-3 md:mb-4 tracking-tight">
             {t('title1')}
             <br />
             <span className="relative inline-block min-h-[1.2em]">
@@ -106,18 +106,18 @@ export default function HeroElegant() {
           </h1>
 
           {/* Subtítol - CONCÍS */}
-          <p className="text-lg md:text-xl text-white/70 mb-6 max-w-xl mx-auto">
+          <p className="text-lg md:text-xl text-white/70 mb-4 max-w-xl mx-auto">
             {t('subtitle')}
             <span className="hidden md:inline"> {t('subtitleLocation')}</span>
           </p>
 
           {/* Badge de Urgencia - Halloween / Món Màgic */}
-          <div className="mb-8 md:mb-10">
+          <div className="mb-5 md:mb-6">
             <HeroUrgencyBadge />
           </div>
 
           {/* CTAs - Contacte PRIORITARI */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 mb-10 md:mb-12">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 mb-6 md:mb-8">
 
             {/* CTA Principal - Formulario de Contacto */}
             <Link
