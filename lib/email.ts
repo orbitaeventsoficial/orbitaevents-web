@@ -381,3 +381,208 @@ export async function sendTestimonialApprovedEmail(params: {
     `,
   });
 }
+
+/**
+ * Notificar a l'admin quan hi ha una nova opinió per revisar
+ */
+export async function sendTestimonialAdminNotification(params: {
+  customerName: string;
+  customerEmail: string;
+  rating: number;
+  comment: string;
+  discountCode: string;
+  discountPercent: number;
+  hasPhoto: boolean;
+  hasVideo: boolean;
+}): Promise<void> {
+  const { customerName, customerEmail, rating, comment, discountCode, discountPercent, hasPhoto, hasVideo } = params;
+  const adminEmail = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
+
+  const stars = '⭐'.repeat(Math.min(5, Math.max(1, rating)));
+  const mediaIndicators = [
+    hasPhoto ? '📷 Foto' : null,
+    hasVideo ? '🎬 Vídeo' : null,
+  ].filter(Boolean).join(' · ') || 'Sense media';
+
+  await sendEmail({
+    to: adminEmail,
+    subject: `📝 Nova opinió: ${customerName} ${stars} - Pendent d'aprovar`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 30px; text-align: center;">
+            <h1 style="color: #fff; margin: 0; font-size: 24px;">📝 Nova Opinió Rebuda</h1>
+            <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0 0;">Pendent de revisió i aprovació</p>
+          </div>
+
+          <!-- Content -->
+          <div style="padding: 30px;">
+            <!-- Client info -->
+            <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+              <p style="margin: 0 0 8px 0; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px;">Client</p>
+              <p style="margin: 0; font-size: 20px; font-weight: bold; color: #fff;">${customerName}</p>
+              <p style="margin: 4px 0 0 0; font-size: 14px; color: #60a5fa;">${customerEmail}</p>
+            </div>
+
+            <!-- Rating -->
+            <div style="text-align: center; margin: 24px 0;">
+              <p style="margin: 0; font-size: 36px;">${stars}</p>
+              <p style="margin: 4px 0 0 0; font-size: 14px; color: #888;">${rating}/5 estrelles</p>
+            </div>
+
+            <!-- Comment -->
+            <div style="background: rgba(255,255,255,0.03); border-left: 3px solid #FFB800; padding: 16px; border-radius: 0 12px 12px 0; margin: 20px 0;">
+              <p style="margin: 0; font-size: 15px; color: #e5e5e5; line-height: 1.6; font-style: italic;">
+                "${comment.length > 300 ? comment.substring(0, 300) + '...' : comment}"
+              </p>
+            </div>
+
+            <!-- Media & Discount -->
+            <div style="display: flex; gap: 16px; margin: 20px 0;">
+              <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; text-align: center;">
+                <p style="margin: 0 0 4px 0; font-size: 12px; color: #888;">Media</p>
+                <p style="margin: 0; font-size: 14px; color: #fff;">${mediaIndicators}</p>
+              </div>
+              <div style="flex: 1; background: rgba(255,184,0,0.1); border-radius: 12px; padding: 16px; text-align: center;">
+                <p style="margin: 0 0 4px 0; font-size: 12px; color: #888;">Descompte generat</p>
+                <p style="margin: 0; font-size: 14px; color: #FFB800; font-weight: bold;">${discountCode} (${discountPercent}%)</p>
+              </div>
+            </div>
+
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 30px 0 10px;">
+              <a href="${baseUrl}/admin/opiniones"
+                 style="background: linear-gradient(135deg, #22c55e, #16a34a);
+                        color: #fff;
+                        padding: 16px 32px;
+                        text-decoration: none;
+                        border-radius: 12px;
+                        font-weight: bold;
+                        font-size: 16px;
+                        display: inline-block;">
+                ✅ Revisar i Aprovar
+              </a>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="padding: 20px; background: #0a0a0a; text-align: center;">
+            <p style="margin: 0; font-size: 12px; color: #666;">
+              Òrbita Events · Sistema d'Opinions Automatitzat
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    replyTo: customerEmail,
+  });
+}
+
+export async function sendTestimonialReceivedEmail(params: {
+  to: string;
+  name: string;
+  rating: number;
+  discountCode: string;
+  discountPercent: number;
+}): Promise<void> {
+  const { to, name, rating, discountCode, discountPercent } = params;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
+  const firstName = name.split(' ')[0];
+
+  // Emoji segons rating
+  const ratingEmoji = rating >= 5 ? '🤩' : rating >= 4 ? '😊' : rating >= 3 ? '🙂' : '😐';
+  const stars = '⭐'.repeat(Math.min(5, Math.max(1, rating)));
+
+  await sendEmail({
+    to,
+    subject: `🎁 ${firstName}, aquí tens el teu ${discountPercent}% de descompte! - Òrbita Events`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d1f00 50%, #3d2800 100%); padding: 40px; text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 16px;">${ratingEmoji}</div>
+            <h1 style="color: #FFB800; margin: 0; font-size: 28px; font-weight: 300;">
+              <span style="font-weight: 800;">GRÀCIES</span> ${firstName.toUpperCase()}!
+            </h1>
+            <p style="color: rgba(255,255,255,0.6); margin: 12px 0 0 0; font-size: 14px;">
+              ${stars} La teva opinió ens fa molt feliços
+            </p>
+          </div>
+
+          <!-- Discount Code Box -->
+          <div style="padding: 30px;">
+            <div style="background: linear-gradient(135deg, rgba(255,184,0,0.15), rgba(255,140,0,0.1)); border: 2px solid rgba(255,184,0,0.4); border-radius: 20px; padding: 32px; text-align: center;">
+              <p style="margin: 0 0 8px 0; font-size: 14px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 2px;">
+                EL TEU CODI DE DESCOMPTE
+              </p>
+              <p style="margin: 8px 0; font-size: 42px; font-weight: 800; color: #FFB800; letter-spacing: 4px; font-family: monospace;">
+                ${discountCode}
+              </p>
+              <div style="background: linear-gradient(135deg, #FFB800, #FF8C00); color: #000; display: inline-block; padding: 12px 24px; border-radius: 50px; margin-top: 12px;">
+                <span style="font-size: 28px; font-weight: 900;">${discountPercent}% DESCOMPTE</span>
+              </div>
+              <p style="margin: 16px 0 0 0; font-size: 13px; color: rgba(255,255,255,0.5);">
+                🕐 Vàlid durant 1 any · 🎉 Per al teu pròxim event
+              </p>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div style="padding: 0 30px 30px; color: #e5e5e5;">
+            <p style="font-size: 16px; line-height: 1.7; margin: 0;">
+              Hem rebut la teva valoració i la revisarem aviat. Mentrestant, <strong style="color: #FFB800;">ja pots utilitzar el teu codi de descompte</strong> per a qualsevol dels nostres serveis!
+            </p>
+
+            <div style="margin-top: 24px; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border-left: 3px solid #FFB800;">
+              <p style="margin: 0; font-size: 14px; color: #a3a3a3;">
+                💡 <strong style="color: #fff;">Consell:</strong> Guarda aquest email o fes una captura de pantalla del codi. El necessitaràs quan facis la reserva.
+              </p>
+            </div>
+
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 30px 0 10px;">
+              <a href="${baseUrl}/contacto"
+                 style="background: linear-gradient(135deg, #FFB800, #CC9600);
+                        color: #000;
+                        padding: 16px 32px;
+                        text-decoration: none;
+                        border-radius: 12px;
+                        font-weight: bold;
+                        font-size: 16px;
+                        display: inline-block;">
+                🎉 Reservar amb descompte
+              </a>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="padding: 20px; background: #0a0a0a; text-align: center;">
+            <p style="margin: 0; font-size: 12px; color: #666;">
+              © ${new Date().getFullYear()} Òrbita Events · Barcelona i Girona
+            </p>
+            <p style="margin: 8px 0 0 0; font-size: 11px; color: #444;">
+              ${SITE_CONFIG.business.phone} · ${SITE_CONFIG.business.email}
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}

@@ -5,6 +5,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { sendTestimonialReceivedEmail, sendTestimonialAdminNotification } from '@/lib/email';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -163,6 +164,31 @@ export async function createTestimonial(
         hasVideo: !!input.videoUrl,
       },
     },
+  });
+
+  // 7. Enviar email amb codi de descompte al CLIENT (async)
+  sendTestimonialReceivedEmail({
+    to: email,
+    name: input.name,
+    rating: input.rating,
+    discountCode,
+    discountPercent,
+  }).catch((error) => {
+    console.error('Error enviant email testimoni al client:', error);
+  });
+
+  // 8. Notificar a l'ADMIN que hi ha nova opinió per aprovar
+  sendTestimonialAdminNotification({
+    customerName: input.name,
+    customerEmail: email,
+    rating: input.rating,
+    comment: input.comment,
+    discountCode,
+    discountPercent,
+    hasPhoto: !!input.photoUrl,
+    hasVideo: !!input.videoUrl,
+  }).catch((error) => {
+    console.error('Error enviant notificació admin:', error);
   });
 
   return {

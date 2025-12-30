@@ -51,6 +51,7 @@ const nextConfig = {
           "font-src 'self' https://fonts.gstatic.com",
           "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://vercel.live",
           "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://vitals.vercel-insights.com https://vercel.live wss://ws-us3.pusher.com",
+          "worker-src 'self' blob:",
         ].join('; ')
       },
     ];

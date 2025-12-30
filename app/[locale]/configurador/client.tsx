@@ -48,6 +48,12 @@ export default function ConfiguradorClient() {
     extras: [],
     appliedOffer: null,
   });
+  const [minDate, setMinDate] = useState(''); // Hydration-safe
+
+  // Set minDate on client to avoid hydration mismatch
+  useEffect(() => {
+    setMinDate(new Date().toISOString().split('T')[0]);
+  }, []);
 
   // Detectar pack pre-seleccionado desde URL (viene de páginas de servicios)
   useEffect(() => {
@@ -342,7 +348,7 @@ export default function ConfiguradorClient() {
               value={config.date}
               onChange={(e) => setConfig({ ...config, date: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border border-border focus:border-oe-gold outline-none"
-              min={new Date().toISOString().split('T')[0]}
+              min={minDate}
             />
             {config.date && (
               <p className="mt-2 text-xs text-text-muted flex items-center gap-1">

@@ -206,6 +206,12 @@ export default function ContactFormComplete({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+  const [minDate, setMinDate] = useState(''); // Hydration-safe: set in useEffect
+
+  // Set minDate on client to avoid hydration mismatch
+  useEffect(() => {
+    setMinDate(new Date().toISOString().split('T')[0]);
+  }, []);
 
   // Update form
   const updateField = (field: keyof FormData, value: string | boolean) => {
@@ -464,7 +470,7 @@ export default function ContactFormComplete({
               type="date"
               value={formData.eventDate}
               onChange={(e) => updateField('eventDate', e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
+              min={minDate}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
                        text-white outline-none focus:border-amber-500 focus:ring-2
                        focus:ring-amber-500 transition-all"
