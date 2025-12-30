@@ -2,6 +2,12 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "public": true,
+  "crons": [
+    {
+      "path": "/api/cron/post-event",
+      "schedule": "0 10 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/img/portfolio/(.*)",

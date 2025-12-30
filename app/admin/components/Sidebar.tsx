@@ -123,6 +123,11 @@ export default function AdminSidebar() {
           <NavItem icon="📈" label="Analytics" href="/admin/analytics" />
           <NavItem icon="📝" label="Post-Event" href="/admin/post-event" />
         </NavSection>
+
+        <NavSection title={collapsed ? '' : 'Automatització'}>
+          <NavItem icon="📧" label="Emails" href="/admin/emails" badge="AUTO" badgeColor="green" />
+          <NavItem icon="⭐" label="Ressenyes" href="/admin/ressenyes" />
+        </NavSection>
       </nav>
 
       {/* Footer */}
@@ -211,6 +216,11 @@ export function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: (
             <NavItem icon="🎸" label="Inventari" href="/admin/inventory" />
             <NavItem icon="📈" label="Analytics" href="/admin/analytics" />
             <NavItem icon="📝" label="Post-Event" href="/admin/post-event" />
+          </NavSection>
+
+          <NavSection title="Automatització">
+            <NavItem icon="📧" label="Emails" href="/admin/emails" badge="AUTO" badgeColor="green" />
+            <NavItem icon="⭐" label="Ressenyes" href="/admin/ressenyes" />
           </NavSection>
 
           <NavSection title="">

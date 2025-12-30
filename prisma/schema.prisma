@@ -507,9 +507,15 @@ model Booking {
   notes          String?       @db.Text
 
   // Post-event
-  postEventReport  PostEventReport?
-  clientSurvey     ClientSurvey?
-  clientFeedback   ClientFeedback?
+  postEventReport    PostEventReport?
+  clientSurvey       ClientSurvey?
+  clientFeedback     ClientFeedback?
+
+  // Post-event email automation
+  postEventEmailSent   Boolean   @default(false)
+  postEventEmailSentAt DateTime?
+  reviewToken          String?
+  reviewSubmittedAt    DateTime?
 
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
@@ -519,6 +525,7 @@ model Booking {
   @@index([packId])
   @@index([createdAt])
   @@index([status, eventDate]) // Consultes combinades
+  @@index([status, eventDate, postEventEmailSent]) // Per cron post-event
   @@map("bookings")
 }
 
