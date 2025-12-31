@@ -21,6 +21,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
+import { SITE_CONFIG } from '@/config/site-config';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -298,7 +299,7 @@ function SummaryStats({ t }: { t: (key: string) => string }) {
           ))}
         </div>
         <div className="text-sm">
-          <span className="text-white font-bold">+150</span>
+          <span className="text-white font-bold">+{SITE_CONFIG.stats.happyClients}</span>
           <span className="text-white/60"> {t('satisfiedClients')}</span>
         </div>
       </div>
@@ -311,7 +312,7 @@ function SummaryStats({ t }: { t: (key: string) => string }) {
             <Icons.Star key={i} filled={true} />
           ))}
         </div>
-        <span className="text-white font-bold">4.9</span>
+        <span className="text-white font-bold">{SITE_CONFIG.stats.avgRating.toFixed(1)}</span>
         <span className="text-white/60 text-sm">{t('averageRating')}</span>
       </div>
 
@@ -320,7 +321,7 @@ function SummaryStats({ t }: { t: (key: string) => string }) {
       <div className="flex items-center gap-3">
         <Icons.Google />
         <Icons.BodasNet />
-        <span className="text-white/60 text-sm">{t('verifiedReviews')}</span>
+        <span className="text-white/60 text-sm">{t('realTestimonials')}</span>
       </div>
     </div>
   );

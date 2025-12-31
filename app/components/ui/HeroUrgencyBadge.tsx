@@ -193,7 +193,12 @@ export default function HeroUrgencyBadge() {
           >
             <span className="text-lg">🪄</span>
             <span>{t('monMagic.title')}</span>
-            <span className="font-bold">{t('monMagic.available')}</span>
+            <span className="font-bold">
+              {availability && availability.freeSaturdays > 0
+                ? t('monMagic.available')
+                : t('monMagic.soldOut', { defaultValue: t('halloween.soldOut') })
+              }
+            </span>
           </motion.div>
         )}
       </AnimatePresence>

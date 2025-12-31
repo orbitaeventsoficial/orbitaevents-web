@@ -280,11 +280,11 @@
       "ctaContact": "Quiero mi evento",
       "ctaPrices": "Ver qué hacemos",
       "rating": "4.9",
-      "socialProof": "48+ eventos realizados",
+      "socialProof": "50+ eventos realizados",
       "recommendedAt": "Recomendados en",
       "whatsappMessage": "¡Hola! Quiero info para un evento temático"
     },
-    "badge": "🔥 48+ eventos sin ningún invitado sentado",
+    "badge": "🔥 50+ eventos sin ningún invitado sentado",
     "themingSpecialists": "Especialistas en Tematización",
     "location": "Barcelona + Girona",
     "stats": {
@@ -294,7 +294,7 @@
       "years": "años de experiencia",
       "yearsValue": "2+",
       "events": "eventos con Òrbita",
-      "eventsValue": "48+",
+      "eventsValue": 50+",
       "response": "respuesta garantizada",
       "responseTime": "respuesta garantizada",
       "responseTimeValue": "2h",
@@ -379,7 +379,7 @@
     },
     "socialProof": {
       "google": "4.9/5 en Google",
-      "events": "+48 eventos",
+      "events": "+50 eventos",
       "weddings": "15+ bodas"
     },
     "urgency": {
@@ -1306,7 +1306,7 @@
       "ok": "Disponibles"
     },
     "trust": {
-      "events": "+48 eventos",
+      "events": "+50 eventos",
       "eventsDesc": "realizados con éxito",
       "rating": "4.9/5 en Google",
       "ratingDesc": "+50 reseñas verificadas",
@@ -1890,11 +1890,14 @@
       "300+": "Más de 300"
     },
     "budgetOptions": {
+      "menys500": "Menos de 500€",
       "500-1000": "500€ - 1.000€",
       "1000-2000": "1.000€ - 2.000€",
       "2000-3000": "2.000€ - 3.000€",
+      "3000+": "Más de 3.000€",
       "3000-5000": "3.000€ - 5.000€",
-      "5000+": "Más de 5.000€"
+      "5000+": "Más de 5.000€",
+      "nosabe": "No lo sé todavía"
     },
     "howFoundOptions": {
       "google": "Google",
@@ -2082,7 +2085,7 @@
       },
       "4": {
         "question": "¿Qué pasa si hay problemas técnicos durante el evento?",
-        "answer": "Llevamos equipo completo de BACKUP con todo: sonido, luces, mezclador, reproductores. Si algo falla (muy raro), tenemos sustitución en menos de 1 hora. Tu evento NUNCA se para. Más de 48 eventos sin incidencias técnicas graves nos respaldan."
+        "answer": "Llevamos equipo completo de BACKUP con todo: sonido, luces, mezclador, reproductores. Si algo falla (muy raro), tenemos sustitución en menos de 1 hora. Tu evento NUNCA se para. Más de 50 eventos sin incidencias técnicas graves nos respaldan."
       },
       "5": {
         "question": "¿Puedo elegir la música o decides tú?",
@@ -2103,7 +2106,7 @@
     "meta": {
       "title": "Opiniones y Reseñas | Òrbita Events - DJ Bodas Barcelona",
       "titleWithReviews": "Opiniones Reales DJ Bodas Barcelona | {rating}/5 en {count} Reseñas | Òrbita Events",
-      "description": "Más de {events} eventos realizados. Próximamente reseñas verificadas de Google. DJ profesional para bodas y eventos en Barcelona.",
+      "description": "Más de {events} eventos realizados. DJ profesional para bodas y eventos en Barcelona.",
       "descriptionWithReviews": "Opiniones reales de bodas, fiestas y eventos. {rating}/5 en {count} reseñas verificadas. Sonido impecable, iluminación cuidada y momentos inolvidables.",
       "ogTitle": "Opiniones y Reseñas | Òrbita Events",
       "ogTitleWithReviews": "Opiniones Reales | {rating}/5 | Òrbita Events",
@@ -2118,13 +2121,13 @@
     },
     "faq": {
       "q1": "¿Qué opinan los clientes de Òrbita Events?",
-      "a1": "Hemos realizado más de {events} eventos con clientes satisfechos. Próximamente podrás ver reseñas verificadas de Google.",
+      "a1": "Hemos realizado más de {events} eventos con clientes satisfechos. Puedes contactarnos para referencias de clientes anteriores.",
       "a1WithReviews": "Valoración media de {rating}/5 en {count} reseñas. Nuestros clientes destacan el sonido, el montaje y la capacidad del DJ para mantener la pista y divertir a los invitados.",
       "q2": "¿Son reseñas reales?",
-      "a2": "Estamos en proceso de recopilar reseñas verificadas en Google Business. Mientras tanto, puedes contactarnos para referencias directas.",
+      "a2": "Todos nuestros testimonios son de clientes reales de eventos que hemos realizado en Barcelona y Girona.",
       "a2WithReviews": "Sí, todas verificadas de bodas y eventos en Barcelona y Girona. Enlazamos directamente a Google.",
       "q3": "¿Cómo puedo dejar una reseña?",
-      "a3": "Puedes enviarnos tu opinión por correo a {email}. Pronto activaremos nuestro perfil de Google Business para reseñas públicas.",
+      "a3": "Puedes enviarnos tu opinión por correo a {email}.",
       "a3WithGoogleUrl": "Puedes hacerlo desde nuestro perfil de Google Business o enviándola por correo a {email}. Cada opinión cuenta y nos ayuda a seguir mejorando."
     }
   },
@@ -5591,7 +5594,7 @@
     "badge": "Nuestro trabajo",
     "title": "Portfolio",
     "titleHighlight": "de Eventos",
-    "subtitle": "Más de 195 eventos transformando espacios en experiencias únicas. Descubre lo que podemos crear para ti.",
+    "subtitle": "Más de 50 eventos transformando espacios en experiencias únicas. Descubre lo que podemos crear para ti.",
     "categories": {
       "tots": "Todos",
       "harryPotter": "Mundo Mágico",
@@ -6047,7 +6050,7 @@
         "label": "Años de experiencia"
       },
       "events": {
-        "value": "195+",
+        "value": "50+",
         "label": "Eventos realizados"
       },
       "repeat": {
@@ -6087,7 +6090,7 @@
         {
           "year": "2024",
           "title": "Hoy",
-          "description": "+195 eventos, equipo propio valorado en 12.000€, y el único servicio de tematización Harry Potter profesional en Cataluña."
+          "description": "+50 eventos, equipo propio valorado en 12.000€, y el único servicio de tematización Harry Potter profesional en Cataluña."
         }
       ]
     },
@@ -6358,7 +6361,7 @@
     },
     "social": {
       "rating": "4.9",
-      "events": "48+ eventos sin incidentes",
+      "events": "50+ eventos sin incidentes",
       "recommended": "Recomendados en"
     }
   },
@@ -6385,7 +6388,7 @@
       "secondary": "WhatsApp Directo"
     },
     "trust": {
-      "events": "48+ eventos",
+      "events": "50+ eventos",
       "rating": "4.9 valoración",
       "response": "2h respuesta"
     },
@@ -6442,13 +6445,13 @@
       "badge": "🛡️ Tranquilidad garantizada",
       "title1": "Tu evento,",
       "title2": "sin riesgos",
-      "subtitle": "Nos comprometemos al 100% con cada evento. Si algo no es como esperabas, lo solucionamos o te devolvemos el dinero.",
+      "subtitle": "Compromiso total con tu evento. Más de 50 eventos realizados sin incidencias graves.",
       "sealTitle": "Compromiso Òrbita Events",
       "sealSubtitle": "+{events} eventos sin incidencias graves",
       "guarantees": {
         "satisfaction": {
-          "title": "Garantía de Satisfacción",
-          "description": "Si no estás 100% satisfecho con nuestro servicio, te devolvemos el dinero. Sin preguntas."
+          "title": "Compromiso de Calidad",
+          "description": "Equipo profesional con experiencia en +50 eventos. Si surge algún problema técnico por nuestra culpa, lo solucionamos al momento."
         },
         "backup": {
           "title": "Equipo Backup Completo",
@@ -6483,7 +6486,7 @@
       "whatsappMsg": "Hola! Quiero información para mi evento.",
       "events": "eventos",
       "rating": "valoración",
-      "guarantee": "🛡️ Garantía 100%. Si no estás contento, te devolvemos el dinero.",
+      "guarantee": "🛡️ Compromiso 100%. Más de 50 eventos sin incidencias graves.",
       "status": {
         "scarce": "⚠️ ¡Casi lleno!",
         "limited": "🔥 ¡Se acaba!",
@@ -6512,7 +6515,8 @@
       "satisfiedClients": "clientes satisfechos",
       "averageRating": "valoración media",
       "verifiedReviews": "Opiniones verificadas",
-      "verified": "Verificado"
+      "verified": "Verificado",
+      "realTestimonials": "Testimonios reales"
     },
     "whatsapp": {
       "defaultMessage": "Hola! Me gustaría información sobre vuestros servicios para un evento.",
@@ -6554,7 +6558,7 @@
     "badges": {
       "halloween": "Halloween 2025",
       "monMagic": "Mundo Mágico",
-      "rating": "4.9/5 · 48+ eventos"
+      "rating": "4.9/5 · 50+ eventos"
     },
     "morphingTexts": {
       "unique": "ÚNICOS.",
@@ -6637,7 +6641,7 @@
     "stats": {
       "rating": "4.9",
       "ratingLabel": "Valoración",
-      "events": "48+",
+      "events": 50+",
       "eventsLabel": "Eventos",
       "recommended": "100%",
       "recommendedLabel": "Recomendados"

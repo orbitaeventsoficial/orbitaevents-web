@@ -280,11 +280,11 @@
       "ctaContact": "Vull el meu event",
       "ctaPrices": "Veure què fem",
       "rating": "4.9",
-      "socialProof": "48+ events realitzats",
+      "socialProof": "50+ events realitzats",
       "recommendedAt": "Recomanats a",
       "whatsappMessage": "Hola! Vull info per a un event temàtic"
     },
-    "badge": "🔥 48+ events sense cap convidat assegut",
+    "badge": "🔥 50+ events sense cap convidat assegut",
     "themingSpecialists": "Especialistes en Tematització",
     "location": "Barcelona + Girona",
     "stats": {
@@ -294,7 +294,7 @@
       "years": "anys d'experiència",
       "yearsValue": "2+",
       "events": "events amb Òrbita",
-      "eventsValue": "48+",
+      "eventsValue": 50+",
       "response": "resposta garantida",
       "responseTime": "resposta garantida",
       "responseTimeValue": "2h",
@@ -380,7 +380,7 @@
     },
     "socialProof": {
       "google": "4.9/5 a Google",
-      "events": "+48 esdeveniments",
+      "events": "+50 esdeveniments",
       "weddings": "15+ casaments"
     },
     "urgency": {
@@ -1286,11 +1286,14 @@
       "300+": "Més de 300"
     },
     "budgetOptions": {
+      "menys500": "Menys de 500€",
       "500-1000": "500€ - 1.000€",
       "1000-2000": "1.000€ - 2.000€",
       "2000-3000": "2.000€ - 3.000€",
+      "3000+": "Més de 3.000€",
       "3000-5000": "3.000€ - 5.000€",
-      "5000+": "Més de 5.000€"
+      "5000+": "Més de 5.000€",
+      "nosabe": "Encara no ho sé"
     },
     "howFoundOptions": {
       "google": "Google",
@@ -1499,7 +1502,7 @@
     "meta": {
       "title": "Opinions i Ressenyes | Òrbita Events - DJ Casaments Barcelona",
       "titleWithReviews": "Opinions Reals DJ Casaments Barcelona | {rating}/5 en {count} Ressenyes | Òrbita Events",
-      "description": "Més de {events} esdeveniments realitzats. Pròximament ressenyes verificades de Google. DJ professional per a casaments i esdeveniments a Barcelona.",
+      "description": "Més de {events} esdeveniments realitzats. DJ professional per a casaments i esdeveniments a Barcelona.",
       "descriptionWithReviews": "Opinions reals de casaments, festes i esdeveniments. {rating}/5 en {count} ressenyes verificades. So impecable, il·luminació acurada i plena de moments inoblidables.",
       "ogTitle": "Opinions i Ressenyes | Òrbita Events",
       "ogTitleWithReviews": "Opinions Reals | {rating}/5 | Òrbita Events",
@@ -1514,13 +1517,13 @@
     },
     "faq": {
       "q1": "Què opinen els clients d'Òrbita Events?",
-      "a1": "Hem realitzat més de {events} esdeveniments amb clients satisfets. Pròximament podràs veure ressenyes verificades de Google.",
+      "a1": "Hem realitzat més de {events} esdeveniments amb clients satisfets. Pots contactar-nos per referències de clients anteriors.",
       "a1WithReviews": "Valoració mitjana de {rating}/5 en {count} ressenyes. Els nostres clients destaquen el so, el muntatge i la capacitat del DJ per mantenir la pista i divertir els convidats.",
       "q2": "Són ressenyes reals?",
       "a2": "Estem en procés de recopilar ressenyes verificades a Google Business. Mentrestant, pots contactar-nos per a referències directes.",
       "a2WithReviews": "Sí, totes verificades de casaments i esdeveniments a Barcelona i Girona. Enllacem directament a Google.",
       "q3": "Com puc deixar una ressenya?",
-      "a3": "Pots enviar-nos la teva opinió per correu a {email}. Aviat activarem el nostre perfil de Google Business per a ressenyes públiques.",
+      "a3": "Pots enviar-nos la teva opinió per correu a {email}.",
       "a3WithGoogleUrl": "Pots fer-ho des del nostre perfil de Google Business o enviant-la per correu a {email}. Cada opinió compta i ens ajuda a seguir millorant."
     }
   },
@@ -3789,7 +3792,7 @@
       "ok": "Disponibles"
     },
     "trust": {
-      "events": "+48 esdeveniments",
+      "events": "+50 esdeveniments",
       "eventsDesc": "realitzats amb èxit",
       "rating": "4.9/5 a Google",
       "ratingDesc": "+50 ressenyes verificades",
@@ -5580,7 +5583,7 @@
     "badge": "El nostre treball",
     "title": "Portfolio",
     "titleHighlight": "d'Events",
-    "subtitle": "Més de 195 events transformant espais en experiències úniques. Descobreix el que podem crear per a tu.",
+    "subtitle": "Més de 50 events transformant espais en experiències úniques. Descobreix el que podem crear per a tu.",
     "categories": {
       "tots": "Tots",
       "harryPotter": "Món Màgic",
@@ -6036,7 +6039,7 @@
         "label": "Anys d'experiència"
       },
       "events": {
-        "value": "195+",
+        "value": "50+",
         "label": "Events realitzats"
       },
       "repeat": {
@@ -6076,7 +6079,7 @@
         {
           "year": "2024",
           "title": "Avui",
-          "description": "+195 events, equip propi valorat en 12.000€, i l'únic servei de tematització Harry Potter professional a Catalunya."
+          "description": "+50 events, equip propi valorat en 12.000€, i l'únic servei de tematització Harry Potter professional a Catalunya."
         }
       ]
     },
@@ -6347,7 +6350,7 @@
     },
     "social": {
       "rating": "4.9",
-      "events": "48+ events sense incidents",
+      "events": "50+ events sense incidents",
       "recommended": "Recomanats a"
     }
   },
@@ -6374,7 +6377,7 @@
       "secondary": "WhatsApp Directe"
     },
     "trust": {
-      "events": "48+ events",
+      "events": "50+ events",
       "rating": "4.9 valoració",
       "response": "2h resposta"
     },
@@ -6431,13 +6434,13 @@
       "badge": "🛡️ Tranquil·litat garantida",
       "title1": "El teu event,",
       "title2": "sense riscos",
-      "subtitle": "Ens comprometem al 100% amb cada event. Si alguna cosa no és com esperaves, ho solucionem o et tornem els diners.",
+      "subtitle": "Compromís total amb el teu event. Més de 50 events realitzats sense incidències greus.",
       "sealTitle": "Compromís Òrbita Events",
       "sealSubtitle": "+{events} events sense incidències greus",
       "guarantees": {
         "satisfaction": {
-          "title": "Garantia de Satisfacció",
-          "description": "Si no estàs 100% satisfet amb el nostre servei, et tornem els diners. Sense preguntes."
+          "title": "Compromís de Qualitat",
+          "description": "Equip professional amb experiència en +50 events. Si sorgeix algun problema tècnic per culpa nostra, ho solucionem al moment."
         },
         "backup": {
           "title": "Equip Backup Complet",
@@ -6472,7 +6475,7 @@
       "whatsappMsg": "Hola! Vull informació per al meu event.",
       "events": "events",
       "rating": "valoració",
-      "guarantee": "🛡️ Garantia 100%. Si no estàs content, et tornem els diners.",
+      "guarantee": "🛡️ Compromís 100%. Més de 50 events sense incidències greus.",
       "status": {
         "scarce": "⚠️ Gairebé ple!",
         "limited": "🔥 S'acaba!",
@@ -6501,7 +6504,8 @@
       "satisfiedClients": "clients satisfets",
       "averageRating": "valoració mitjana",
       "verifiedReviews": "Opinions verificades",
-      "verified": "Verificat"
+      "verified": "Verificat",
+      "realTestimonials": "Testimonis reals"
     },
     "whatsapp": {
       "defaultMessage": "Hola! M'agradaria informació sobre els vostres serveis per a un event.",
@@ -6543,7 +6547,7 @@
     "badges": {
       "halloween": "Halloween 2025",
       "monMagic": "Món Màgic",
-      "rating": "4.9/5 · 48+ events"
+      "rating": "4.9/5 · 50+ events"
     },
     "morphingTexts": {
       "unique": "ÚNICS.",
@@ -6626,7 +6630,7 @@
     "stats": {
       "rating": "4.9",
       "ratingLabel": "Valoració",
-      "events": "48+",
+      "events": 50+",
       "eventsLabel": "Events",
       "recommended": "100%",
       "recommendedLabel": "Recomanats"
