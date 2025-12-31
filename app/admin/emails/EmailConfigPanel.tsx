@@ -21,11 +21,20 @@ export default function EmailConfigPanel() {
 
   const handleSave = async () => {
     setSaving(true);
-    // TODO: Implement save to database
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      const response = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailConfig: config }),
+      });
+      if (!response.ok) throw new Error('Error saving');
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (error) {
+      console.error('Error saving config:', error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

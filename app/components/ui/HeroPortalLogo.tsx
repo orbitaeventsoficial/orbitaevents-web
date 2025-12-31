@@ -646,10 +646,9 @@ export default function HeroPortalLogo({
               <motion.div
                 className="relative"
                 style={{
-                  width: "min(28vmin, 120px)",
-                  height: "min(28vmin, 120px)",
-                  maxWidth: "120px",
-                  maxHeight: "120px",
+                  width: "min(75vw, 280px)",
+                  height: "auto",
+                  aspectRatio: "1 / 1",
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
                 }}
@@ -895,10 +894,9 @@ export default function HeroPortalLogo({
               ref={hostRef}
               className="relative overflow-visible"
               style={{
-                width: "min(22vmin, 140px)",
-                height: "min(22vmin, 140px)",
-                maxWidth: "140px",
-                maxHeight: "140px",
+                width: "min(65vw, 380px)",
+                height: "auto",
+                aspectRatio: "1 / 1",
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
                 transform: 'translateZ(0)',

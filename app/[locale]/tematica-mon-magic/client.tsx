@@ -299,6 +299,122 @@ export default function ProductesMonMagic() {
         </div>
       </section>
 
+      {/* ═══ GALERIA FOTOS REALS ═══ */}
+      <section className="py-16 border-t border-white/10">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-white text-center mb-4">
+            📸 {t('realPhotos')}
+          </h2>
+          <p className="text-white/60 text-center mb-10 max-w-2xl mx-auto">
+            {t('realPhotosDesc')}
+          </p>
+
+          {/* Grid de fotos */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
+            {/* Foto destacada gran */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden group"
+            >
+              <Image
+                src={IMATGES.sobreComplet}
+                alt={t('altSobreObert')}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4">
+                <span className="bg-amber-500 text-black px-3 py-1 rounded-full text-sm font-bold">
+                  ⭐ {t('mostSold')}
+                </span>
+                <p className="text-white font-medium mt-2">
+                  {t('completeLetter')}
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Foto producte */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="relative rounded-2xl overflow-hidden aspect-square group"
+            >
+              <Image
+                src={IMATGES.sobrePlat}
+                alt={t('altSobrePlat')}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </motion.div>
+
+            {/* Foto prova social */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="relative rounded-2xl overflow-hidden aspect-square group"
+            >
+              <Image
+                src={IMATGES.provaSocial}
+                alt={t('altConvidada')}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-2 left-2 right-2">
+                <span className="text-white/90 text-xs">
+                  {t('realReaction')}
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Foto mussol */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="relative rounded-2xl overflow-hidden aspect-square group"
+            >
+              <Image
+                src={IMATGES.mussol}
+                alt={t('altMussol')}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </motion.div>
+
+            {/* Foto decoració escombres */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="relative rounded-2xl overflow-hidden aspect-square group"
+            >
+              <Image
+                src={IMATGES.escombres}
+                alt={t('altEscombres')}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </motion.div>
+          </div>
+
+          {/* Badge de fotos reals */}
+          <div className="text-center mt-8">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-white/70 text-sm">
+              📷 {t('allPhotosReal')}
+            </span>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ SECCIÓ CASES ═══ */}
       <section id="casas" className="py-16 border-t border-amber-500/20">
         <div className="container mx-auto px-4">
@@ -614,122 +730,6 @@ export default function ProductesMonMagic() {
             >
               {t('requestBudgetFor', { count: quantitat })}
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ GALERIA FOTOS REALS ═══ */}
-      <section className="py-16 border-t border-white/10">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-white text-center mb-4">
-            📸 {t('realPhotos')}
-          </h2>
-          <p className="text-white/60 text-center mb-10 max-w-2xl mx-auto">
-            {t('realPhotosDesc')}
-          </p>
-
-          {/* Grid de fotos */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
-            {/* Foto destacada gran */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden group"
-            >
-              <Image
-                src={IMATGES.sobreComplet}
-                alt={t('altSobreObert')}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4">
-                <span className="bg-amber-500 text-black px-3 py-1 rounded-full text-sm font-bold">
-                  ⭐ {t('mostSold')}
-                </span>
-                <p className="text-white font-medium mt-2">
-                  {t('completeLetter')}
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Foto producte */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="relative rounded-2xl overflow-hidden aspect-square group"
-            >
-              <Image
-                src={IMATGES.sobrePlat}
-                alt={t('altSobrePlat')}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </motion.div>
-
-            {/* Foto prova social */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="relative rounded-2xl overflow-hidden aspect-square group"
-            >
-              <Image
-                src={IMATGES.provaSocial}
-                alt={t('altConvidada')}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-2 left-2 right-2">
-                <span className="text-white/90 text-xs">
-                  {t('realReaction')}
-                </span>
-              </div>
-            </motion.div>
-
-            {/* Foto mussol */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="relative rounded-2xl overflow-hidden aspect-square group"
-            >
-              <Image
-                src={IMATGES.mussol}
-                alt={t('altMussol')}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </motion.div>
-
-            {/* Foto decoració escombres */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="relative rounded-2xl overflow-hidden aspect-square group"
-            >
-              <Image
-                src={IMATGES.escombres}
-                alt={t('altEscombres')}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </motion.div>
-          </div>
-
-          {/* Badge de fotos reals */}
-          <div className="text-center mt-8">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-white/70 text-sm">
-              📷 {t('allPhotosReal')}
-            </span>
           </div>
         </div>
       </section>

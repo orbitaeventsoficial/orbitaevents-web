@@ -1,24 +1,58 @@
 // app/api/admin/packs/[id]/route.ts
-// API per gestionar pack individual
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-interface Params {
-  params: { id: string };
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+
+    // Actualitzar pack
+    const updatedPack = await prisma.pack.update({
+      where: { id },
+      data: {
+        price: body.price,
+        originalPrice: body.originalPrice,
+        extraHourPrice: body.extraHourPrice,
+        djHours: body.djHours,
+        soundWatts: body.soundWatts,
+        includesFog: body.includesFog,
+        includesMic: body.includesMic,
+        minGuests: body.minGuests,
+        maxGuests: body.maxGuests,
+        isActive: body.isActive,
+        isFeatured: body.isFeatured,
+        order: body.order,
+        updatedAt: new Date(),
+      },
+    });
+
+    return NextResponse.json(updatedPack);
+  } catch (error) {
+    console.error('Error actualitzant pack:', error);
+    return NextResponse.json(
+      { error: 'Error actualitzant pack' },
+      { status: 500 }
+    );
+  }
 }
 
-// GET - Detall d'un pack
-export async function GET(req: NextRequest, { params }: Params) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
+
     const pack = await prisma.pack.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         translations: true,
-        inventory: { include: { item: true } },
-        bookings: {
-          select: { id: true, reference: true, eventDate: true, clientName: true, status: true },
-          take: 10,
-          orderBy: { eventDate: 'desc' },
+        inventory: {
+          include: { item: { select: { code: true, name: true } } },
         },
       },
     });
@@ -30,134 +64,11 @@ export async function GET(req: NextRequest, { params }: Params) {
       );
     }
 
-    return NextResponse.json({
-      ok: true,
-      pack,
-    });
+    return NextResponse.json(pack);
   } catch (error) {
     console.error('Error obtenint pack:', error);
     return NextResponse.json(
       { error: 'Error obtenint pack' },
-      { status: 500 }
-    );
-  }
-}
-
-// PATCH - Actualitzar pack
-export async function PATCH(req: NextRequest, { params }: Params) {
-  try {
-    const body = await req.json();
-    const { id } = params;
-    const { translations, inventory, ...packData } = body;
-
-    const existing = await prisma.pack.findUnique({
-      where: { id },
-    });
-
-    if (!existing) {
-      return NextResponse.json(
-        { error: 'Pack no trobat' },
-        { status: 404 }
-      );
-    }
-
-    // Actualitzar pack
-    const pack = await prisma.pack.update({
-      where: { id },
-      data: packData,
-    });
-
-    // Actualitzar traduccions si es proporcionen
-    if (translations) {
-      for (const trans of translations) {
-        await prisma.packTranslation.upsert({
-          where: { packId_locale: { packId: id, locale: trans.locale } },
-          create: { packId: id, ...trans },
-          update: trans,
-        });
-      }
-    }
-
-    // Actualitzar inventari si es proporciona
-    if (inventory) {
-      // Eliminar inventari actual
-      await prisma.packInventory.deleteMany({
-        where: { packId: id },
-      });
-
-      // Crear nou inventari
-      await prisma.packInventory.createMany({
-        data: inventory.map((item: { itemId: string; quantity?: number; isRequired?: boolean }) => ({
-          packId: id,
-          itemId: item.itemId,
-          quantity: item.quantity || 1,
-          isRequired: item.isRequired ?? true,
-        })),
-      });
-    }
-
-    await prisma.adminLog.create({
-      data: {
-        action: 'UPDATE',
-        entity: 'pack',
-        entityId: id,
-        details: { changes: Object.keys(body) },
-      },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      pack,
-    });
-  } catch (error) {
-    console.error('Error actualitzant pack:', error);
-    return NextResponse.json(
-      { error: 'Error actualitzant pack' },
-      { status: 500 }
-    );
-  }
-}
-
-// DELETE - Desactivar pack (soft delete)
-export async function DELETE(req: NextRequest, { params }: Params) {
-  try {
-    const { id } = params;
-
-    const existing = await prisma.pack.findUnique({
-      where: { id },
-      include: { _count: { select: { bookings: true } } },
-    });
-
-    if (!existing) {
-      return NextResponse.json(
-        { error: 'Pack no trobat' },
-        { status: 404 }
-      );
-    }
-
-    // Soft delete - desactivar
-    await prisma.pack.update({
-      where: { id },
-      data: { isActive: false },
-    });
-
-    await prisma.adminLog.create({
-      data: {
-        action: 'DELETE',
-        entity: 'pack',
-        entityId: id,
-        details: { slug: existing.slug, softDeleted: true },
-      },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      softDeleted: true,
-    });
-  } catch (error) {
-    console.error('Error eliminant pack:', error);
-    return NextResponse.json(
-      { error: 'Error eliminant pack' },
       { status: 500 }
     );
   }

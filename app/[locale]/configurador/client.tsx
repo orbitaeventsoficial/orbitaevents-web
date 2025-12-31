@@ -35,8 +35,21 @@ interface ConfigState {
   appliedOffer: string | null;
 }
 
+// Helper per obtenir text traduït de l'extra
+function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, field: 'name' | 'description', fallback: string): string {
+  try {
+    const key = `extras.${extraId}.${field}`;
+    const translated = t(key);
+    // Si retorna la clau, usar fallback
+    return translated === key ? fallback : translated;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function ConfiguradorClient() {
   const t = useTranslations('configurator');
+  const tMobile = useTranslations('pages.mobile'); // Per traduccions d'extres
   const locale = useLocale() as 'ca' | 'es' | 'en';
   const { track } = useAnalytics();
   const [step, setStep] = useState(1);
@@ -437,9 +450,11 @@ export default function ConfiguradorClient() {
                   <div className="flex-1">
                     <div className="text-white font-semibold flex items-center gap-2">
                       <span>{extra.icon}</span>
-                      {extra.name}
+                      {getExtraText(tMobile, extra.id, 'name', extra.name)}
                     </div>
-                    <div className="text-text-muted text-xs mt-1">{extra.description}</div>
+                    <div className="text-text-muted text-xs mt-1">
+                      {getExtraText(tMobile, extra.id, 'description', extra.description)}
+                    </div>
                     <div className="text-oe-gold text-sm font-bold mt-1">
                       {extra.price !== null ? `+${extra.price}€` : t('step3.toConsult')}
                     </div>

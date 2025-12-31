@@ -25,8 +25,21 @@ interface ConfigState {
   numGuests: number;
 }
 
+// Helper per obtenir text traduït de l'extra
+function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, field: 'name' | 'description', fallback: string): string {
+  try {
+    const key = `extras.${extraId}.${field}`;
+    const translated = t(key);
+    // Si retorna la clau, usar fallback
+    return translated === key ? fallback : translated;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function BodasClientV2() {
   const t = useTranslations('pages.weddings');
+  const tMobile = useTranslations('pages.mobile'); // Per traduccions d'extres
   const [config, setConfig] = useState<ConfigState>({
     selectedPack: null,
     selectedExtras: new Set(),
@@ -361,9 +374,13 @@ export default function BodasClientV2() {
 
                   <div className="space-y-3 mt-4">
                     <div className="text-4xl mb-2">{extra.icon}</div>
-                    <h4 className="text-lg font-bold text-text-primary pr-8">{extra.name}</h4>
-                    <p className="text-sm text-text-muted">{extra.description}</p>
-                    
+                    <h4 className="text-lg font-bold text-text-primary pr-8">
+                      {getExtraText(tMobile, extra.id, 'name', extra.name)}
+                    </h4>
+                    <p className="text-sm text-text-muted">
+                      {getExtraText(tMobile, extra.id, 'description', extra.description)}
+                    </p>
+
                     <div className="flex items-center justify-between pt-3 border-t border-white/10">
                       <span className="text-2xl font-bold text-oe-gold">
                         +{extra.price}€

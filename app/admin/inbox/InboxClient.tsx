@@ -1,8 +1,9 @@
 // app/admin/inbox/InboxClient.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import DOMPurify from 'dompurify';
 
 interface LeadData {
   id: string;
@@ -435,8 +436,8 @@ export default function InboxClient({
               <div className="prose prose-slate max-w-none">
                 <h4 className="text-sm font-medium text-slate-500 mb-2">Missatge:</h4>
                 {selectedEmail.imapData?.bodyHtml ? (
-                  <div 
-                    dangerouslySetInnerHTML={{ __html: selectedEmail.imapData.bodyHtml }}
+                  <div
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.imapData.bodyHtml) }}
                     className="text-slate-700 bg-white p-4 rounded-lg border border-slate-200"
                   />
                 ) : (

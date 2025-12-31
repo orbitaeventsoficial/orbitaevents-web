@@ -198,6 +198,7 @@ export default function TestimonialFormGamified() {
   };
 
   // Upload foto via API (bypassa RLS)
+  // Per fotos > 4MB, usem signed URL per evitar límit Vercel de 4.5MB
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -217,22 +218,56 @@ export default function TestimonialFormGamified() {
     setUploadError(null);
 
     try {
-      const formDataUpload = new FormData();
-      formDataUpload.append('file', file);
-      formDataUpload.append('type', 'photo');
+      // Per fotos grans (> 4MB), usar signed URL per evitar límit Vercel
+      if (file.size > 4 * 1024 * 1024) {
+        // Demanar signed URL
+        const signedUrlResponse = await fetch('/api/testimonial-upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileName: file.name,
+            fileType: file.type,
+            type: 'photo'
+          }),
+        });
 
-      const response = await fetch('/api/testimonial-upload', {
-        method: 'POST',
-        body: formDataUpload,
-      });
+        const signedUrlResult = await signedUrlResponse.json();
 
-      const result = await response.json();
+        if (!signedUrlResponse.ok || !signedUrlResult.success) {
+          throw new Error(signedUrlResult.error || 'Error obtenint URL de pujada');
+        }
 
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Error pujant foto');
+        // Upload directe a Supabase
+        const uploadResponse = await fetch(signedUrlResult.signedUrl, {
+          method: 'PUT',
+          body: file,
+          headers: { 'Content-Type': file.type },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Error pujant foto a storage');
+        }
+
+        setFormData(prev => ({ ...prev, photoUrl: signedUrlResult.url }));
+      } else {
+        // Per fotos petites, upload directe
+        const formDataUpload = new FormData();
+        formDataUpload.append('file', file);
+        formDataUpload.append('type', 'photo');
+
+        const response = await fetch('/api/testimonial-upload', {
+          method: 'POST',
+          body: formDataUpload,
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || 'Error pujant foto');
+        }
+
+        setFormData(prev => ({ ...prev, photoUrl: result.url }));
       }
-
-      setFormData(prev => ({ ...prev, photoUrl: result.url }));
     } catch (error) {
       console.error('Error uploading photo:', error);
       setUploadError(error instanceof Error ? error.message : t('errors.uploadPhotoError'));

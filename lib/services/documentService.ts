@@ -91,13 +91,13 @@ export interface ContractData extends QuoteData {
 
 const COMPANY_INFO = {
   name: 'Òrbita Events',
-  legalName: 'Carles Ros Oliveras', // Autònom
-  nif: 'XXXXXXXX-X', // Substituir pel real
+  legalName: process.env.COMPANY_LEGAL_NAME || 'Carles Ros Oliveras',
+  nif: process.env.COMPANY_NIF || 'Pendent de configurar',
   address: 'Granollers, Barcelona',
   phone: SITE_CONFIG.business.phone,
   email: SITE_CONFIG.business.email,
   web: 'www.orbitaevents.com',
-  iban: 'ESXX XXXX XXXX XXXX XXXX XXXX', // Substituir pel real
+  iban: process.env.COMPANY_IBAN || 'Pendent de configurar',
 };
 
 // ============================================

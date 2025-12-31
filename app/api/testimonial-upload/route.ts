@@ -50,10 +50,10 @@ function getSupabaseAdmin() {
 
 export async function POST(request: NextRequest) {
   // 1. Rate limiting per IP
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-             request.headers.get('x-real-ip') || 
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+             request.headers.get('x-real-ip') ||
              'unknown';
-  
+
   if (!checkRateLimit(ip)) {
     return NextResponse.json(
       { success: false, error: 'Massa intents. Espera una hora.' },
@@ -71,6 +71,71 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const contentType = request.headers.get('content-type') || '';
+
+    // Si és petició JSON, generar signed URL per upload directe a Supabase
+    // (per evitar límit de 4.5MB de Vercel)
+    if (contentType.includes('application/json')) {
+      const body = await request.json();
+      const { fileName, fileType, type = 'photo' } = body;
+
+      if (!fileName || !fileType) {
+        return NextResponse.json(
+          { success: false, error: 'Falten paràmetres fileName i fileType' },
+          { status: 400 }
+        );
+      }
+
+      // Validar tipus
+      const validPhotoTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      const validVideoTypes = ['video/mp4', 'video/quicktime', 'video/webm'];
+
+      if (type === 'photo' && !validPhotoTypes.includes(fileType)) {
+        return NextResponse.json(
+          { success: false, error: 'Format no permès. Usa JPG, PNG, WebP o GIF.' },
+          { status: 400 }
+        );
+      }
+
+      if (type === 'video' && !validVideoTypes.includes(fileType)) {
+        return NextResponse.json(
+          { success: false, error: 'Format no permès. Usa MP4, MOV o WebM.' },
+          { status: 400 }
+        );
+      }
+
+      // Generar nom únic
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substring(7);
+      const ext = fileName.split('.').pop()?.toLowerCase() || 'bin';
+      const folder = type === 'video' ? 'testimonials/videos' : 'testimonials/photos';
+      const path = `${folder}/${timestamp}-${random}.${ext}`;
+
+      // Crear signed URL per upload directe (vàlid 1 hora)
+      const { data, error } = await supabaseAdmin.storage
+        .from('media')
+        .createSignedUploadUrl(path);
+
+      if (error) {
+        console.error('Error creant signed URL:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      }
+
+      // Get public URL
+      const { data: urlData } = supabaseAdmin.storage
+        .from('media')
+        .getPublicUrl(path);
+
+      return NextResponse.json({
+        success: true,
+        signedUrl: data.signedUrl,
+        token: data.token,
+        path: path,
+        url: urlData.publicUrl,
+      });
+    }
+
+    // Upload directe via FormData (per fitxers petits < 4MB)
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const type = formData.get('type') as string || 'photo'; // 'photo' o 'video'

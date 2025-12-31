@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 interface Review {
@@ -165,10 +166,13 @@ export default function ReviewsSection({
               <div className="flex items-center gap-3 mb-4">
                 {/* Avatar */}
                 {review.profile_photo_url ? (
-                  <img
+                  <Image
                     src={review.profile_photo_url}
                     alt={review.author_name}
+                    width={48}
+                    height={48}
                     className="w-12 h-12 rounded-full object-cover"
+                    unoptimized
                   />
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold text-lg">

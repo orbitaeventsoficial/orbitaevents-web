@@ -327,9 +327,9 @@ function DayEventsPanel({
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function MobileCalendarWidget({ fullPage = false }: { fullPage?: boolean }) {
-  const today = new Date();
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const today = useMemo(() => new Date(), []);
+  const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [events, setEvents] = useState<Record<string, CalendarEvent[]>>({});
   const [isLoading, setIsLoading] = useState(true);

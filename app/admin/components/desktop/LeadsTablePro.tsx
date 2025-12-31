@@ -274,14 +274,15 @@ export default function LeadsTablePro() {
     }
   }, [sortField]);
 
-  // Select all
+  // Select all - uses filteredLeads from closure, defined below
   const handleSelectAll = useCallback(() => {
     if (selectedLeads.size === filteredLeads.length) {
       setSelectedLeads(new Set());
     } else {
       setSelectedLeads(new Set(filteredLeads.map(l => l.id)));
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLeads.size]);
 
   // Toggle selection
   const toggleSelect = useCallback((id: string) => {

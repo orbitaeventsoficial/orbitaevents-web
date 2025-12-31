@@ -308,7 +308,7 @@ function Lightbox({ items, currentIndex, onClose, onNavigate }: LightboxProps) {
           url: window.location.href,
         });
       } catch (err) {
-        console.log('Share cancelled');
+        // Share cancelled by user
       }
     }
   };

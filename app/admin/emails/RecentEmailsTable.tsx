@@ -9,8 +9,7 @@ interface Activity {
     name: string;
     email: string;
   } | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 export default function RecentEmailsTable({ activities }: { activities: Activity[] }) {

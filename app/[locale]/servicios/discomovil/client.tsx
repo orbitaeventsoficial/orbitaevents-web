@@ -24,6 +24,44 @@ interface ConfigState {
   extraHours: number;
 }
 
+// Helper per obtenir text traduït del pack
+function getPackText(t: ReturnType<typeof useTranslations>, packId: string, field: 'name' | 'tagline' | 'ideal', fallback: string): string {
+  try {
+    const key = `discoPacks.${packId}.${field}`;
+    const translated = t(key);
+    // Si retorna la clau, usar fallback
+    return translated === key ? fallback : translated;
+  } catch {
+    return fallback;
+  }
+}
+
+function getPackFeatures(t: ReturnType<typeof useTranslations>, packId: string, fallbackFeatures: string[]): string[] {
+  try {
+    const features: string[] = [];
+    for (let i = 0; i < fallbackFeatures.length; i++) {
+      const key = `discoPacks.${packId}.features.${i}`;
+      const translated = t(key);
+      features.push(translated === key ? fallbackFeatures[i] : translated);
+    }
+    return features;
+  } catch {
+    return fallbackFeatures;
+  }
+}
+
+// Helper per obtenir text traduït de l'extra
+function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, field: 'name' | 'description', fallback: string): string {
+  try {
+    const key = `extras.${extraId}.${field}`;
+    const translated = t(key);
+    // Si retorna la clau, usar fallback
+    return translated === key ? fallback : translated;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function DiscomovilClientV2() {
   const t = useTranslations('pages.mobile');
   const [config, setConfig] = useState<ConfigState>({
@@ -183,9 +221,9 @@ export default function DiscomovilClientV2() {
                 <span className="font-bold text-oe-gold">{t('recommended')}</span>
               </div>
               <div className="text-lg text-text-primary">
-                <strong>{recommendedPack.name}</strong> - {recommendedPack.priceValue}€
+                <strong>{getPackText(t, recommendedPack.id, 'name', recommendedPack.name)}</strong> - {recommendedPack.priceValue}€
               </div>
-              <p className="text-sm text-text-muted mt-1">{recommendedPack.tagline}</p>
+              <p className="text-sm text-text-muted mt-1">{getPackText(t, recommendedPack.id, 'tagline', recommendedPack.tagline)}</p>
             </motion.div>
           )}
         </div>
@@ -241,8 +279,8 @@ export default function DiscomovilClientV2() {
 
                 <div className="space-y-4 mt-4">
                   <div>
-                    <h3 className="text-2xl font-bold text-text-primary">{pack.name}</h3>
-                    <p className="text-sm text-text-muted">{pack.tagline}</p>
+                    <h3 className="text-2xl font-bold text-text-primary">{getPackText(t, pack.id, 'name', pack.name)}</h3>
+                    <p className="text-sm text-text-muted">{getPackText(t, pack.id, 'tagline', pack.tagline)}</p>
                   </div>
 
                   <div className="flex items-baseline gap-2">
@@ -252,11 +290,11 @@ export default function DiscomovilClientV2() {
                   </div>
 
                   <div className="text-sm text-text-muted">
-                    👥 {pack.ideal} · ⏰ {pack.duration}
+                    👥 {getPackText(t, pack.id, 'ideal', pack.ideal || '')} · ⏰ {pack.duration}
                   </div>
 
                   <ul className="space-y-2 pt-4 border-t border-white/10">
-                    {pack.features.slice(0, 6).map((feature, idx) => (
+                    {getPackFeatures(t, pack.id, pack.features).slice(0, 6).map((feature, idx) => (
                       <li key={idx} className="text-sm text-text-muted flex items-start gap-2">
                         <Check className="w-4 h-4 text-oe-gold flex-shrink-0 mt-0.5" />
                         {feature}
@@ -386,9 +424,13 @@ export default function DiscomovilClientV2() {
 
                   <div className="space-y-3 mt-4">
                     <div className="text-4xl mb-2">{extra.icon}</div>
-                    <h4 className="text-lg font-bold text-text-primary pr-8">{extra.name}</h4>
-                    <p className="text-sm text-text-muted">{extra.description}</p>
-                    
+                    <h4 className="text-lg font-bold text-text-primary pr-8">
+                      {getExtraText(t, extra.id, 'name', extra.name)}
+                    </h4>
+                    <p className="text-sm text-text-muted">
+                      {getExtraText(t, extra.id, 'description', extra.description)}
+                    </p>
+
                     <div className="flex items-center justify-between pt-3 border-t border-white/10">
                       <span className="text-2xl font-bold text-oe-gold">
                         +{extra.price}€

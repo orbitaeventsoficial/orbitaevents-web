@@ -33,7 +33,7 @@ export default function ScrollTracker() {
           
           // Log en desarrollo
           if (process.env.NODE_ENV === 'development') {
-            console.log(`📜 Scroll ${milestone}% alcanzado`);
+            // Scroll milestone reached - analytics tracked
           }
         }
       });

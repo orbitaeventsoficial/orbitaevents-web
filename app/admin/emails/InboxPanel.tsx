@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 
 interface EmailMessage {
   id: string;
@@ -59,6 +60,7 @@ export default function InboxPanel() {
 
   useEffect(() => {
     fetchEmails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   const handleEmailClick = async (email: EmailMessage) => {
@@ -266,7 +268,7 @@ export default function InboxPanel() {
                 {selectedEmail.bodyHtml ? (
                   <div
                     className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: selectedEmail.bodyHtml }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.bodyHtml) }}
                   />
                 ) : (
                   <pre className="whitespace-pre-wrap text-sm text-slate-700 font-sans">

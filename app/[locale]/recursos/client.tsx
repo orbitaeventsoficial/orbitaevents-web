@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
+import NextImage from 'next/image';
 import {
   Download,
   FileText,
@@ -228,11 +229,13 @@ export default function RecursosClient() {
                   className="w-full p-4 flex items-center justify-between bg-bg-surface hover:bg-white/5 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden">
-                      <img
+                    <div className="w-12 h-12 rounded-lg overflow-hidden relative">
+                      <NextImage
                         src={category.cover}
                         alt={category.name}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="48px"
                       />
                     </div>
                     <div className="text-left">
@@ -248,11 +251,13 @@ export default function RecursosClient() {
                     {/* Image preview grid */}
                     <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2 mb-4">
                       {images.slice(0, 8).map((img, i) => (
-                        <div key={i} className="aspect-square rounded-lg overflow-hidden">
-                          <img
+                        <div key={i} className="aspect-square rounded-lg overflow-hidden relative">
+                          <NextImage
                             src={img.src}
                             alt={img.alt}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 640px) 25vw, (max-width: 1024px) 16vw, 12vw"
                           />
                         </div>
                       ))}

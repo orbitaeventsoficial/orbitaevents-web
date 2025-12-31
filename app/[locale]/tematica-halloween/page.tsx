@@ -51,12 +51,12 @@ export default async function HalloweenPage() {
       {/* ========================================
           HERO AMB IMATGE HALLOWEEN
           ======================================== */}
-      <section className="relative h-[80vh] overflow-hidden">
+      <section className="relative h-[80vh] overflow-hidden" style={{ touchAction: 'pan-y' }}>
         <Image
           src="/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg"
           alt="Festa Halloween Òrbita Events"
           fill
-          className="object-cover"
+          className="object-cover pointer-events-none"
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />

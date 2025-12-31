@@ -506,6 +506,7 @@ export default function MobileLeadsPro() {
   // Initial load
   useEffect(() => {
     fetchLeads(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter]);
 
   // Search with debounce
@@ -518,6 +519,7 @@ export default function MobileLeadsPro() {
     return () => {
       if (searchTimeout.current) clearTimeout(searchTimeout.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   // Handlers

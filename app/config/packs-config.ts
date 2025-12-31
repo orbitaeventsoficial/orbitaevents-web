@@ -873,10 +873,10 @@ export const OFFERS = {
 // ============================================
 
 export function getPacksByService(service: ServiceSlug): PackDefinition[] {
-  // Caso especial: Fiestas incluye los packs de discomóvil + oferta flash
-  if (service === 'fiestas') {
+  // Caso especial: Fiestas y Discomóvil incluyen la oferta flash
+  if (service === 'fiestas' || service === 'discomovil') {
     const discovilPacks = PACKS.filter(p => p.service === 'discomovil');
-    const flashPack = PACKS.find(p => p.isFlash && p.service === 'fiestas');
+    const flashPack = PACKS.find(p => p.isFlash);
     return flashPack ? [flashPack, ...discovilPacks] : discovilPacks;
   }
   return PACKS.filter(p => p.service === service);
