@@ -26,43 +26,47 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// GOOGLE ANALYTICS SCRIPT
+// GOOGLE TAG MANAGER (GTM) - Gestiona Analytics, Ads, Meta Pixel, etc.
 // ═══════════════════════════════════════════════════════════════════════════
 
-function AnalyticsScripts() {
+function GoogleTagManager() {
   if (process.env.NODE_ENV !== 'production') return null;
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
-  if (!gaId) return null;
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  if (!gtmId) return null;
 
   return (
     <>
-      <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
+      {/* Google Tag Manager - Head */}
       <script
-        id="gtag-init"
+        id="gtm-head"
         dangerouslySetInnerHTML={{
           __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('consent', 'default', {
-              'ad_storage': 'denied',
-              'analytics_storage': 'denied',
-              'ad_user_data': 'denied',
-              'ad_personalization': 'denied',
-              'wait_for_update': 500
-            });
-            gtag('js', new Date());
-            gtag('config', '${gaId}', {
-              anonymize_ip: true,
-              send_page_view: false
-            });
-            window.gtagConsentUpdate = function() {
-              gtag('consent', 'update', { 'analytics_storage': 'granted' });
-              gtag('event', 'page_view', { page_location: window.location.href });
-            };
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${gtmId}');
           `,
         }}
       />
     </>
+  );
+}
+
+function GoogleTagManagerBody() {
+  if (process.env.NODE_ENV !== 'production') return null;
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  if (!gtmId) return null;
+
+  return (
+    <noscript>
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+        height="0"
+        width="0"
+        style={{ display: 'none', visibility: 'hidden' }}
+      />
+    </noscript>
   );
 }
 
@@ -328,7 +332,7 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <head>
-        <AnalyticsScripts />
+        <GoogleTagManager />
 
         {/* Preconnects per performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -350,6 +354,8 @@ export default async function LocaleLayout({
         className="font-sans antialiased bg-[var(--bg-main)] text-white overflow-x-hidden"
         suppressHydrationWarning
       >
+        <GoogleTagManagerBody />
+
         {/* OVERLAY NEGRE INICIAL - Tapa tot fins que JS el treu */}
         <div
           id="intro-overlay"
