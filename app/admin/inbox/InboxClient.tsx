@@ -462,7 +462,6 @@ export default function InboxClient({
                     <a
                       href={`https://wa.me/${selectedEmail.leadData.phone.replace(/\D/g, '')}`}
                       target="_blank" rel="noopener noreferrer"
-                      rel="noopener noreferrer"
                       className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                     >
                       💬 WhatsApp

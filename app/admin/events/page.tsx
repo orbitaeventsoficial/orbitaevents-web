@@ -10,6 +10,7 @@ import { log } from '@/lib/logger';
 import { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
 import { ca } from 'date-fns/locale';
+import { log } from '@/lib/logger';
 
 interface Booking {
   id: string;

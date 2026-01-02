@@ -224,7 +224,7 @@ export default function TextManagerPage() {
       }
     } catch (err) {
       setError('Error de conexión');
-      log.error(err);
+      log.error('Text manager error', err);
     }
     setLoading(false);
   }
@@ -288,7 +288,7 @@ export default function TextManagerPage() {
       }
     } catch (err) {
       setError('Error de conexión al guardar');
-      log.error(err);
+      log.error('Text manager save error', err);
     }
 
     setSaving(false);

@@ -466,7 +466,6 @@ function DayModal({ day, monthName, onClose, t, locale }: DayModalProps) {
               <a
                 href={`https://wa.me/34699121023?text=${encodeURIComponent(t('modal.whatsappMsg', { date: formattedDate }))}`}
                 target="_blank" rel="noopener noreferrer"
-                rel="noopener noreferrer"
                 className="block w-full py-3 px-4 bg-emerald-500/20 text-emerald-400 font-medium rounded-xl hover:bg-emerald-500/30 transition-all text-center"
               >
                 {t('modal.consultWhatsapp')}

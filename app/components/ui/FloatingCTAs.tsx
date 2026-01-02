@@ -170,7 +170,6 @@ export function BottomBarMobile() {
                 <a
                   href="https://wa.me/34699121023?text=Hola! M'agradaria informació"
                   target="_blank" rel="noopener noreferrer"
-                  rel="noopener noreferrer"
                   className="bg-zinc-800 text-white font-semibold py-3.5 px-4 rounded-xl flex items-center justify-center active:scale-[0.98] transition-transform border border-zinc-700"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

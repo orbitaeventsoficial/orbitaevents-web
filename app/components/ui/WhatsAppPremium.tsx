@@ -171,7 +171,6 @@ export default function WhatsAppPremium({
           <motion.a
             href={whatsappUrl}
             target="_blank" rel="noopener noreferrer"
-            rel="noopener noreferrer"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className="relative block"
@@ -235,7 +234,6 @@ export function WhatsAppInline({
     <motion.a
       href={whatsappUrl}
       target="_blank" rel="noopener noreferrer"
-      rel="noopener noreferrer"
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={`inline-flex items-center justify-center gap-3 px-6 py-3 rounded-xl font-semibold transition-all ${variants[variant]}`}

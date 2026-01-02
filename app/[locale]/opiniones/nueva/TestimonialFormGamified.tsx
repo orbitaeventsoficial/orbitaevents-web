@@ -915,7 +915,6 @@ export default function TestimonialFormGamified() {
               <a
                 href={SITE_CONFIG.reviews.googleBusinessUrl}
                 target="_blank" rel="noopener noreferrer"
-                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-white/90 transition-all"
               >
                 ⭐ {t('success.leaveGoogleReview')}

@@ -213,7 +213,6 @@ export default async function EmailsAdminPage() {
             <a
               href="https://g.page/r/CXcgbvANsXSzEBI/review"
               target="_blank" rel="noopener noreferrer"
-              rel="noopener noreferrer"
               className="mt-4 block w-full text-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
             >
               🔗 Obrir enllaç Google

@@ -163,7 +163,6 @@ export default function AdminReviewsPage() {
           <a
             href={SITE_CONFIG.reviews.googleBusinessUrl || '#'}
             target="_blank" rel="noopener noreferrer"
-            rel="noopener noreferrer"
             className="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">

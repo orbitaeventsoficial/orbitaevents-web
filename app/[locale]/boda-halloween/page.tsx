@@ -113,7 +113,6 @@ export default async function BodaHalloweenPage() {
                 <a
                   href={whatsappUrl}
                   target="_blank" rel="noopener noreferrer"
-                  rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl border border-white/20 transition-all"
                 >
                   <MessageCircle className="w-5 h-5" />

@@ -135,7 +135,6 @@ export default async function MensajesPage() {
         <a
           href="https://wa.me/34600000000"
           target="_blank" rel="noopener noreferrer"
-          rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600"
         >
           💬 Obrir WhatsApp Web
@@ -226,7 +225,6 @@ export default async function MensajesPage() {
                       <a
                         href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`}
                         target="_blank" rel="noopener noreferrer"
-                        rel="noopener noreferrer"
                         className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 text-green-700 hover:bg-green-200"
                         title="WhatsApp"
                       >
