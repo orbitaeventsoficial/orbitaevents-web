@@ -392,9 +392,9 @@ export default function MobileAppShell({
       <OfflineBanner isOnline={isOnline} />
 
       {/* Floating Header */}
-      <FloatingHeader 
-        isVisible={isHeaderVisible} 
-        scrollProgress={scrollYProgress.get()}
+      <FloatingHeader
+        isVisible={isHeaderVisible}
+        scrollProgress={scrollY / 100}
         locale={locale}
       />
 
