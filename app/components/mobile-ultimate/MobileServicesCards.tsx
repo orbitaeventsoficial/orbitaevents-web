@@ -167,8 +167,8 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
           {/* Features */}
           <div className="flex flex-wrap gap-2 mb-4">
             {service.features.map((featureKey, i) => (
-              <span 
-                key={i}
+              <span
+                key={`${service.id}-feature-${i}`}
                 className="px-2 py-1 bg-white/10 rounded-lg text-white/70 text-xs"
               >
                 {t(`services.${service.id}.features.${i}`)}

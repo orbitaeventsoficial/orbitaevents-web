@@ -92,7 +92,7 @@ function ProgressBar({
     <div className="flex gap-1.5 px-4 py-3">
       {Array.from({ length: total }).map((_, i) => (
         <div
-          key={i}
+          key={`progress-bar-${i}`}
           className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden"
         >
           <motion.div
@@ -203,7 +203,7 @@ function TestimonialCard({
         >
           {[...Array(5)].map((_, i) => (
             <motion.svg
-              key={i}
+              key={`rating-star-${i}`}
               initial={{ opacity: 0, scale: 0, rotate: -180 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.2 + i * 0.1, type: 'spring' }}
@@ -427,9 +427,9 @@ export default function MobileTestimonialsReels() {
 
         {/* Navigation dots */}
         <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center gap-2">
-          {TESTIMONIALS.map((_, i) => (
+          {TESTIMONIALS.map((testimonial, i) => (
             <button
-              key={i}
+              key={`testimonial-dot-${testimonial.id}`}
               onClick={(e) => {
                 e.stopPropagation();
                 haptic('light');
