@@ -644,7 +644,7 @@ export default function HeroPortalLogo({
             {/* Logo animat - COMPACTE */}
             {svgMarkup && (
               <motion.div
-                className="relative"
+                className="relative flex items-center justify-center"
                 style={{
                   width: "min(75vw, 280px)",
                   height: "auto",

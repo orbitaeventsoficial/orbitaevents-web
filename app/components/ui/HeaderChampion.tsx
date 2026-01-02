@@ -149,8 +149,8 @@ export default function HeaderChampion() {
                 src="/img/logoplanetatextdreta.svg"
                 alt="Òrbita Events"
                 width={200}
-                height={56}
-                className="h-10 md:h-14 w-auto"
+                height={64}
+                className="h-12 md:h-16 w-auto"
                 priority
               />
             </Link>
