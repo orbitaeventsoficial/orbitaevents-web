@@ -23,6 +23,7 @@
  */
 
 import MobileAppShell from './MobileAppShell';
+import MobileErrorBoundary from './MobileErrorBoundary';
 import MobileHeroUltimate from './MobileHeroUltimate';
 import MobileServicesCards from './MobileServicesCards';
 import MobileTestimonialsReels from './MobileTestimonialsReels';
@@ -218,7 +219,8 @@ function MobileFooter() {
 
 export default function MobileHomePage() {
   return (
-    <MobileAppShell showSplash={true}>
+    <MobileErrorBoundary>
+      <MobileAppShell showSplash={true}>
       {/* Hero */}
       <MobileHeroUltimate />
 
@@ -242,6 +244,7 @@ export default function MobileHomePage() {
 
       {/* Bottom Navigation */}
       <MobileBottomNav />
-    </MobileAppShell>
+      </MobileAppShell>
+    </MobileErrorBoundary>
   );
 }

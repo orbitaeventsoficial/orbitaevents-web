@@ -111,13 +111,13 @@ const MenuIcon = ({ active }: { active: boolean }) => (
 );
 
 // Icono especial para CTA central
-const SparkleIcon = () => (
+const SparkleIcon = ({ active }: { active: boolean }) => (
   <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7">
     <motion.path
       d="M12 2L14.09 8.26L20 9.27L15.55 13.97L16.91 20L12 16.9L7.09 20L8.45 13.97L4 9.27L9.91 8.26L12 2Z"
       fill="currentColor"
       initial={{ scale: 0.8, rotate: 0 }}
-      animate={{ scale: 1, rotate: 360 }}
+      animate={{ scale: active ? 1.1 : 1, rotate: 360 }}
       transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
     />
   </svg>
@@ -154,7 +154,7 @@ const navItems: NavItem[] = [
     id: 'cta',
     href: '/contacto',
     label: 'Pressupost',
-    icon: SparkleIcon as any
+    icon: SparkleIcon
   },
   {
     id: 'portfolio',
