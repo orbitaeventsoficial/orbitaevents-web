@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getEmailByUid, markAsRead, deleteEmail } from '@/lib/services/imapService';
+import { fetchEmailByUid, markAsRead, markAsUnread } from '@/lib/imap';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,11 +22,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 
   try {
-    const email = await getEmailByUid(uidNumber);
+    const email = await fetchEmailByUid(uidNumber);
 
     if (!email) {
       return NextResponse.json({ error: 'Email no trobat' }, { status: 404 });
     }
+
+    // Marcar automàticament com llegit
+    await markAsRead(uidNumber);
 
     return NextResponse.json({ ok: true, email });
 
@@ -39,7 +42,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// PATCH - Accions sobre l'email (marcar llegit)
+// PATCH - Accions sobre l'email (marcar llegit/no llegit)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const { uid } = await params;
   const uidNumber = parseInt(uid);
@@ -53,8 +56,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { action } = body;
 
     if (action === 'markRead') {
-      await markAsRead(uidNumber);
-      return NextResponse.json({ ok: true });
+      const success = await markAsRead(uidNumber);
+      return NextResponse.json({ ok: success });
+    }
+
+    if (action === 'markUnread') {
+      const success = await markAsUnread(uidNumber);
+      return NextResponse.json({ ok: success });
     }
 
     return NextResponse.json({ error: 'Acció no reconeguda' }, { status: 400 });
@@ -64,27 +72,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : 'Error processant acció',
-    }, { status: 500 });
-  }
-}
-
-// DELETE - Eliminar email
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  const { uid } = await params;
-  const uidNumber = parseInt(uid);
-
-  if (isNaN(uidNumber)) {
-    return NextResponse.json({ error: 'UID invàlid' }, { status: 400 });
-  }
-
-  try {
-    await deleteEmail(uidNumber);
-    return NextResponse.json({ ok: true });
-  } catch (error) {
-    console.error('Error eliminant email:', error);
-    return NextResponse.json({
-      ok: false,
-      error: error instanceof Error ? error.message : 'Error eliminant email',
     }, { status: 500 });
   }
 }

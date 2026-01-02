@@ -123,6 +123,7 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
+    overscroll-behavior-y: none;
   }
 
   body {
@@ -135,6 +136,7 @@
     color: var(--text-primary);
     min-height: 100dvh;
     overflow-x: hidden;
+    overscroll-behavior-y: none;
   }
 
   /* ══════════════════════════════════════════════════════════════════════════
@@ -604,6 +606,16 @@ button,
 a,
 [role="button"] {
   touch-action: manipulation;
+}
+
+/* Prevent images from blocking scroll on mobile */
+img,
+picture,
+video,
+[role="img"] {
+  touch-action: pan-y pinch-zoom;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Touch feedback */

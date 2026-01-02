@@ -171,18 +171,12 @@ export default function HeaderChampion() {
                     onMouseLeave={() => setActiveDropdown(null)}
                   >
                     <Link
-                      href={item.dropdown ? '#' : item.href}
+                      href={item.href}
                       className={`
                         relative px-4 py-2 text-base font-semibold
                         transition-colors flex items-center gap-2
                         ${activeDropdown === item.labelKey ? 'text-amber-400' : 'text-zinc-300 hover:text-white'}
                       `}
-                      onClick={(e) => {
-                        if (item.dropdown) {
-                          e.preventDefault();
-                          setActiveDropdown(activeDropdown === item.labelKey ? null : item.labelKey);
-                        }
-                      }}
                     >
                       {tNav(item.labelKey)}
                       {item.badge && (
@@ -319,8 +313,7 @@ export default function HeaderChampion() {
                 "
               >
                 <span className="relative z-10 flex items-center gap-1.5">
-                  <span className="hidden sm:inline">{tHeader('ctaShort')}</span>
-                  <span className="font-black">GRATIS</span>
+                  <span className="font-bold">{tHeader('ctaPrimary')}</span>
                 </span>
 
                 {/* Shine */}
@@ -430,7 +423,7 @@ export default function HeaderChampion() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-amber-500 to-amber-400 text-zinc-900 font-bold rounded-lg"
                   >
-                    {tHeader('ctaShort')} GRATIS
+                    {tHeader('ctaPrimary')}
                   </Link>
                   <a
                     href="https://wa.me/34699121023"

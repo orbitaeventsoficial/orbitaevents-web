@@ -280,11 +280,11 @@
       "ctaContact": "Quiero mi evento",
       "ctaPrices": "Ver qué hacemos",
       "rating": "4.9",
-      "socialProof": "50+ eventos realizados",
+      "socialProof": "48+ eventos realizados",
       "recommendedAt": "Recomendados en",
       "whatsappMessage": "¡Hola! Quiero info para un evento temático"
     },
-    "badge": "🔥 50+ eventos sin ningún invitado sentado",
+    "badge": "🔥 48+ eventos sin ningún invitado sentado",
     "themingSpecialists": "Especialistas en Tematización",
     "location": "Barcelona + Girona",
     "stats": {
@@ -294,7 +294,7 @@
       "years": "años de experiencia",
       "yearsValue": "2+",
       "events": "eventos con Òrbita",
-      "eventsValue": 50+",
+      "eventsValue": "48+",
       "response": "respuesta garantizada",
       "responseTime": "respuesta garantizada",
       "responseTimeValue": "2h",
@@ -379,7 +379,7 @@
     },
     "socialProof": {
       "google": "4.9/5 en Google",
-      "events": "+50 eventos",
+      "events": "+48 eventos",
       "weddings": "15+ bodas"
     },
     "urgency": {
@@ -1306,7 +1306,7 @@
       "ok": "Disponibles"
     },
     "trust": {
-      "events": "+50 eventos",
+      "events": "+48 eventos",
       "eventsDesc": "realizados con éxito",
       "rating": "4.9/5 en Google",
       "ratingDesc": "+50 reseñas verificadas",
@@ -1389,302 +1389,7 @@
       "privacyPortal": "Gestión de datos",
       "terms": "Términos y Condiciones",
       "cookies": "Política de Cookies",
-      "legalNotice": "Aviso Legal",
-      "avisoLegal": {
-        "title": "Avís Legal",
-        "metadata": {
-          "title": "Avís Legal | Òrbita Events",
-          "description": "Avís legal i informació corporativa d'Òrbita Events."
-        },
-        "section1": {
-          "title": "1. Dades Identificatives",
-          "intro": "En compliment del deure d'informació establert a la Llei 34/2002 de Serveis de la Societat de la Informació i el Comerç Electrònic (LSSI-CE), es faciliten les següents dades:",
-          "titular": "Titular:",
-          "ubicacion": "Ubicació:",
-          "email": "Email:",
-          "telefono": "Telèfon:",
-          "sitioWeb": "Lloc web:",
-          "datosCompletos": "Per a dades fiscals completes (NIF, adreça), contactar per email."
-        },
-        "section2": {
-          "title": "2. Objecte",
-          "content": "El present lloc web té per objecte facilitar informació sobre els serveis de DJ, il·luminació, efectes especials i producció d'esdeveniments que ofereix {businessName}, així com permetre el contacte amb potencials clients."
-        },
-        "section3": {
-          "title": "3. Condicions d'Ús",
-          "intro": "L'accés a aquest lloc web és gratuït i no requereix subscripció o registre previ. No obstant això, l'ús de determinats serveis pot requerir l'emplenament de formularis de contacte.",
-          "compromiso": "L'usuari es compromet a fer un ús adequat dels continguts i serveis oferts, abstenint-se de:",
-          "item1": "Realitzar activitats il·lícites o contràries a la bona fe",
-          "item2": "Difondre continguts delictius, violents, pornogràfics o discriminatoris",
-          "item3": "Intentar accedir a àrees restringides del sistema",
-          "item4": "Introduir virus o programes maliciosos"
-        },
-        "section4": {
-          "title": "4. Propietat Intel·lectual i Industrial",
-          "content1": "Tots els continguts d'aquest lloc web, incloent textos, fotografies, gràfics, imatges, icones, tecnologia, programari, disseny gràfic i codi font, són propietat de {businessName} o de tercers que han autoritzat el seu ús.",
-          "content2": "Queda prohibida la reproducció, distribució, transformació o comunicació pública d'aquests continguts sense autorització expressa del titular."
-        },
-        "section5": {
-          "title": "5. Exclusió de Responsabilitat",
-          "intro": "{businessName} no es fa responsable de:",
-          "item1": "Errors o omissions en els continguts",
-          "item2": "Falta de disponibilitat del lloc web",
-          "item3": "Transmissió de virus o programes maliciosos",
-          "item4": "Ús il·lícit o negligent per part dels usuaris",
-          "item5": "Continguts de llocs web enllaçats"
-        },
-        "section6": {
-          "title": "6. Enllaços",
-          "content": "Aquest lloc web pot contenir enllaços a pàgines externes. {businessName} no es responsabilitza del contingut, polítiques de privadesa o pràctiques d'aquests llocs web de tercers."
-        },
-        "section7": {
-          "title": "7. Legislació Aplicable",
-          "content": "El present avís legal es regeix per la legislació espanyola. Per a qualsevol controvèrsia que pogués derivar-se de l'accés o ús d'aquest lloc web, les parts se sotmeten als Jutjats i Tribunals de {city}."
-        },
-        "section8": {
-          "title": "8. Modificacions",
-          "content": "{businessName} es reserva el dret de modificar el present avís legal en qualsevol moment. Les modificacions entraran en vigor des de la seva publicació al lloc web."
-        },
-        "section9": {
-          "title": "9. Contacte",
-          "intro": "Per a qualsevol consulta relacionada amb aquest avís legal, podeu contactar amb nosaltres a través de:"
-        }
-      },
-      "privacidad": {
-        "title": "Política de Privadesa",
-        "metadata": {
-          "title": "Política de Privadesa | Òrbita Events",
-          "description": "Política de privadesa i protecció de dades d'Òrbita Events segons RGPD i LOPDGDD."
-        },
-        "lastUpdate": "Última actualització:",
-        "portalBanner": {
-          "title": "Gestiona les teves dades personals",
-          "description": "Pots exercir els teus drets RGPD de forma ràpida i senzilla des del nostre Portal de Privadesa.",
-          "button": "Accedir al Portal"
-        },
-        "section1": {
-          "title": "1. Responsable del Tractament",
-          "empresa": "Empresa:",
-          "ubicacion": "Ubicació:",
-          "email": "Email:",
-          "telefono": "Telèfon:",
-          "datosCompletos": "Per a dades fiscals completes, contactar per email."
-        },
-        "section2": {
-          "title": "2. Dades que Recopilem",
-          "intro": "Recopilem la informació que ens proporciones directament:",
-          "identificacion": {
-            "title": "2.1. Dades d'identificació",
-            "item1": "Nom i cognoms",
-            "item2": "Correu electrònic",
-            "item3": "Número de telèfon",
-            "item4": "Ciutat",
-            "item5": "Compte d'Instagram (opcional)"
-          },
-          "evento": {
-            "title": "2.2. Dades de l'esdeveniment",
-            "item1": "Tipus d'esdeveniment",
-            "item2": "Data i ubicació",
-            "item3": "Nombre de convidats",
-            "item4": "Preferències i sol·licituds especials"
-          },
-          "navegacion": {
-            "title": "2.3. Dades de navegació",
-            "item1": "Adreça IP",
-            "item2": "Tipus de navegador",
-            "item3": "Pàgines visitades",
-            "item4": "Temps de navegació"
-          }
-        },
-        "section3": {
-          "title": "3. Finalitat del Tractament",
-          "table": {
-            "finalidad": "Finalitat",
-            "baseLegal": "Base legal",
-            "conservacion": "Conservació",
-            "row1": {
-              "purpose": "Gestió de contractes i serveis",
-              "legal": "Execució contractual",
-              "retention": "5 anys (obligació fiscal)"
-            },
-            "row2": {
-              "purpose": "Facturació",
-              "legal": "Obligació legal",
-              "retention": "5 anys"
-            },
-            "row3": {
-              "purpose": "Comunicacions comercials",
-              "legal": "Consentiment",
-              "retention": "Fins a retirada del consentiment"
-            },
-            "row4": {
-              "purpose": "Publicació de testimonis i fotos",
-              "legal": "Consentiment",
-              "retention": "Fins a retirada del consentiment"
-            },
-            "row5": {
-              "purpose": "Anàlisi i millora del servei",
-              "legal": "Interès legítim",
-              "retention": "2 anys"
-            }
-          }
-        },
-        "section4": {
-          "title": "4. Destinataris de les Dades",
-          "intro": "Les teves dades poden ser comunicades a:",
-          "providers": "Proveïdors de serveis:",
-          "providersDetail": "Hosting (Vercel), Base de dades (PostgreSQL), Email transaccional",
-          "public": "Administracions públiques:",
-          "publicDetail": "Quan sigui legalment obligatori",
-          "noSale": "No venem ni cedim dades a tercers amb finalitats comercials."
-        },
-        "section5": {
-          "title": "5. Transferències Internacionals",
-          "content": "Alguns dels nostres proveïdors poden estar ubicats fora de l'Espai Econòmic Europeu. En aquests casos, garantim que existeixen garanties adequades (Clàusules Contractuals Tipus, adequació de la Comissió Europea, etc.)."
-        },
-        "section6": {
-          "title": "6. Els teus Drets (ARCO-POL)",
-          "intro": "Segons el RGPD i la LOPDGDD, tens dret a:",
-          "acceso": "Accés:",
-          "accesoDesc": "Conèixer quines dades tenim sobre tu",
-          "rectificacion": "Rectificació:",
-          "rectificacionDesc": "Corregir dades inexactes o incompletes",
-          "supresion": "Supressió:",
-          "supresionDesc": "Sol·licitar que eliminem les teves dades (\"dret a l'oblit\")",
-          "oposicion": "Oposició:",
-          "oposicionDesc": "Oposar-te a determinats tractaments",
-          "portabilidad": "Portabilitat:",
-          "portabilidadDesc": "Rebre les teves dades en format estructurat",
-          "limitacion": "Limitació:",
-          "limitacionDesc": "Sol·licitar que limitem el tractament",
-          "plazo": "Termini de resposta:",
-          "plazoDesc": "Respondrem a la teva sol·licitud en un màxim de 30 dies.",
-          "portalButton": "Portal de Privadesa",
-          "emailButton": "Contactar per email"
-        },
-        "section7": {
-          "title": "7. Seguretat",
-          "intro": "Implementem mesures tècniques i organitzatives per protegir les teves dades:",
-          "item1": "Xifratge de dades en trànsit (HTTPS/TLS)",
-          "item2": "Xifratge de dades en repòs",
-          "item3": "Controls d'accés basats en rols",
-          "item4": "Registres d'auditoria",
-          "item5": "Còpies de seguretat regulars"
-        },
-        "section8": {
-          "title": "8. Cookies",
-          "content": "Utilitzem cookies per millorar la teva experiència. Consulta la nostra",
-          "link": "Política de Cookies",
-          "contentEnd": "per a més informació."
-        },
-        "section9": {
-          "title": "9. Menors",
-          "content": "Els nostres serveis no estan dirigits a menors de 14 anys. No recopilem conscientment dades de menors sense consentiment dels tutors legals."
-        },
-        "section10": {
-          "title": "10. Reclamacions",
-          "content": "Si consideres que hem vulnerat els teus drets, pots presentar una reclamació davant l'Agència Espanyola de Protecció de Dades (AEPD):"
-        },
-        "section11": {
-          "title": "11. Contacte",
-          "intro": "Per a qualsevol consulta sobre aquesta política de privadesa:",
-          "email": "Email:",
-          "telefono": "Telèfon:"
-        },
-        "section12": {
-          "title": "12. Actualitzacions",
-          "content": "Podem actualitzar aquesta política periòdicament. T'informarem de canvis significatius a través de la nostra web o per email."
-        },
-        "ctaFinal": {
-          "button": "Gestiona les teves dades personals"
-        }
-      },
-      "terminos": {
-        "title": "Termes i Condicions",
-        "metadata": {
-          "title": "Termes i Condicions | Òrbita Events",
-          "description": "Termes i condicions d'ús dels serveis d'Òrbita Events."
-        },
-        "lastUpdate": "Última actualització:",
-        "section1": {
-          "title": "1. Identificació",
-          "intro": "Aquests termes i condicions regulen l'ús dels serveis oferts per:",
-          "empresa": "Empresa:",
-          "ubicacion": "Ubicació:",
-          "contacto": "Contacte:",
-          "datosCompletos": "Per a dades fiscals completes, contactar per email."
-        },
-        "section2": {
-          "title": "2. Serveis",
-          "content": "Òrbita Events ofereix serveis de DJ, il·luminació, efectes especials, tematització i producció tècnica per a esdeveniments com casaments, festes privades, esdeveniments corporatius i celebracions."
-        },
-        "section3": {
-          "title": "3. Reserves i Pagaments",
-          "proceso": {
-            "title": "3.1 Procés de Reserva",
-            "item1": "Sol·licitud de pressupost personalitzat",
-            "item2": "Acceptació del pressupost per part del client",
-            "item3": "Pagament del senyal per confirmar la reserva",
-            "item4": "Signatura del contracte de serveis"
-          },
-          "condiciones": {
-            "title": "3.2 Condicions de Pagament",
-            "senal": "Senyal:",
-            "senalDesc": "30% del total per confirmar la reserva",
-            "resto": "Resta:",
-            "restoDesc": "El dia de l'esdeveniment o segons acord",
-            "metodos": "Mètodes:",
-            "metodosDesc": "Transferència bancària, Bizum, efectiu"
-          }
-        },
-        "section4": {
-          "title": "4. Cancel·lacions",
-          "item1": "Més de 30 dies abans:",
-          "item1Desc": "Devolució del 50% del senyal",
-          "item2": "Entre 15-30 dies:",
-          "item2Desc": "Sense devolució del senyal",
-          "item3": "Menys de 15 dies:",
-          "item3Desc": "Cobrament del 100% del servei",
-          "item4": "Força major:",
-          "item4Desc": "S'acordaran condicions especials"
-        },
-        "section5": {
-          "title": "5. Obligacions del Client",
-          "item1": "Proporcionar informació veraç sobre l'esdeveniment",
-          "item2": "Garantir accés al lloc de l'esdeveniment per al muntatge",
-          "item3": "Disposar de subministrament elèctric adequat",
-          "item4": "Informar de qualsevol canvi amb antelació",
-          "item5": "Complir amb els pagaments acordats"
-        },
-        "section6": {
-          "title": "6. Obligacions d'Òrbita Events",
-          "item1": "Prestar els serveis contractats amb professionalitat",
-          "item2": "Disposar d'equip tècnic en perfecte estat",
-          "item3": "Comptar amb equipament de resposta",
-          "item4": "Complir amb els horaris acordats",
-          "item5": "Disposar d'assegurança de responsabilitat civil"
-        },
-        "section7": {
-          "title": "7. Limitació de Responsabilitat",
-          "intro": "Òrbita Events no serà responsable de:",
-          "item1": "Talls de subministrament elèctric aliens al nostre control",
-          "item2": "Danys causats per condicions meteorològiques adverses",
-          "item3": "Incidències causades per tercers",
-          "item4": "Esdeveniments de força major"
-        },
-        "section8": {
-          "title": "8. Propietat Intel·lectual",
-          "content": "Les fotografies i vídeos realitzats durant els esdeveniments podran ser utilitzats per Òrbita Events amb fins promocionals, llevat d'indicació expressa en contrari per part del client."
-        },
-        "section9": {
-          "title": "9. Resolució de Conflictes",
-          "content": "Per a qualsevol controvèrsia derivada d'aquests termes, les parts se sotmeten als Jutjats i Tribunals de {city}, renunciant a qualsevol altre fur que pogués correspondre'ls."
-        },
-        "section10": {
-          "title": "10. Contacte",
-          "intro": "Per a consultes sobre aquests termes:"
-        }
-      }
+      "legalNotice": "Aviso Legal"
     }
   },
   "nav": {
@@ -1890,14 +1595,11 @@
       "300+": "Más de 300"
     },
     "budgetOptions": {
-      "menys500": "Menos de 500€",
       "500-1000": "500€ - 1.000€",
       "1000-2000": "1.000€ - 2.000€",
       "2000-3000": "2.000€ - 3.000€",
-      "3000+": "Más de 3.000€",
       "3000-5000": "3.000€ - 5.000€",
-      "5000+": "Más de 5.000€",
-      "nosabe": "No lo sé todavía"
+      "5000+": "Más de 5.000€"
     },
     "howFoundOptions": {
       "google": "Google",
@@ -2085,7 +1787,7 @@
       },
       "4": {
         "question": "¿Qué pasa si hay problemas técnicos durante el evento?",
-        "answer": "Llevamos equipo completo de BACKUP con todo: sonido, luces, mezclador, reproductores. Si algo falla (muy raro), tenemos sustitución en menos de 1 hora. Tu evento NUNCA se para. Más de 50 eventos sin incidencias técnicas graves nos respaldan."
+        "answer": "Llevamos equipo completo de BACKUP con todo: sonido, luces, mezclador, reproductores. Si algo falla (muy raro), tenemos sustitución en menos de 1 hora. Tu evento NUNCA se para. Más de 48 eventos sin incidencias técnicas graves nos respaldan."
       },
       "5": {
         "question": "¿Puedo elegir la música o decides tú?",
@@ -2106,7 +1808,7 @@
     "meta": {
       "title": "Opiniones y Reseñas | Òrbita Events - DJ Bodas Barcelona",
       "titleWithReviews": "Opiniones Reales DJ Bodas Barcelona | {rating}/5 en {count} Reseñas | Òrbita Events",
-      "description": "Más de {events} eventos realizados. DJ profesional para bodas y eventos en Barcelona.",
+      "description": "Más de {events} eventos realizados. Próximamente reseñas verificadas de Google. DJ profesional para bodas y eventos en Barcelona.",
       "descriptionWithReviews": "Opiniones reales de bodas, fiestas y eventos. {rating}/5 en {count} reseñas verificadas. Sonido impecable, iluminación cuidada y momentos inolvidables.",
       "ogTitle": "Opiniones y Reseñas | Òrbita Events",
       "ogTitleWithReviews": "Opiniones Reales | {rating}/5 | Òrbita Events",
@@ -2121,13 +1823,13 @@
     },
     "faq": {
       "q1": "¿Qué opinan los clientes de Òrbita Events?",
-      "a1": "Hemos realizado más de {events} eventos con clientes satisfechos. Puedes contactarnos para referencias de clientes anteriores.",
+      "a1": "Hemos realizado más de {events} eventos con clientes satisfechos. Próximamente podrás ver reseñas verificadas de Google.",
       "a1WithReviews": "Valoración media de {rating}/5 en {count} reseñas. Nuestros clientes destacan el sonido, el montaje y la capacidad del DJ para mantener la pista y divertir a los invitados.",
       "q2": "¿Son reseñas reales?",
-      "a2": "Todos nuestros testimonios son de clientes reales de eventos que hemos realizado en Barcelona y Girona.",
+      "a2": "Estamos en proceso de recopilar reseñas verificadas en Google Business. Mientras tanto, puedes contactarnos para referencias directas.",
       "a2WithReviews": "Sí, todas verificadas de bodas y eventos en Barcelona y Girona. Enlazamos directamente a Google.",
       "q3": "¿Cómo puedo dejar una reseña?",
-      "a3": "Puedes enviarnos tu opinión por correo a {email}.",
+      "a3": "Puedes enviarnos tu opinión por correo a {email}. Pronto activaremos nuestro perfil de Google Business para reseñas públicas.",
       "a3WithGoogleUrl": "Puedes hacerlo desde nuestro perfil de Google Business o enviándola por correo a {email}. Cada opinión cuenta y nos ayuda a seguir mejorando."
     }
   },
@@ -2775,183 +2477,11 @@
         "backup": "Backup de equipamiento",
         "playlist": "Playlist personalizada previa"
       },
-      "discoPacks": {
-        "oferta-flash": {
-          "name": "Oferta Flash",
-          "tagline": "Solo para fiestas de hasta 50 invitados",
-          "ideal": "Fiestas privadas de hasta 50 personas",
-          "features": [
-            "Sonido PRO 4000W (2x EV ETX 2000W)",
-            "Multiefectos LED + 2x Focos Bash LED",
-            "DJ profesional 2 horas",
-            "Máquina de humo",
-            "Montaje y desmontaje incluido"
-          ]
-        },
-        "disco-basico": {
-          "name": "Party Starter",
-          "tagline": "Tu fiesta, tu estilo. Nosotros la hacemos realidad",
-          "ideal": "Fiestas privadas, cumpleaños, aniversarios",
-          "features": [
-            "DJ profesional 3 horas",
-            "Sonido 4000W 2x EV ETX 2000W + Pioneer DDJ REV7",
-            "Iluminación básica (Multiefectos LED + 2x Focos Bash LED)",
-            "Máquina de humo",
-            "Música variada (Open format)"
-          ]
-        },
-        "disco-completo": {
-          "name": "Party Machine",
-          "tagline": "Más duración y efectos para fiestas que no paran",
-          "ideal": "Fiestas medianas con ganas de bailar",
-          "features": [
-            "DJ profesional 4 horas",
-            "Sonido 4000W 2x EV ETX 2000W + Pioneer DDJ REV7",
-            "Iluminación básica (Multiefectos LED + 2x Focos Bash LED)",
-            "Máquina de humo + Máquina de Burbujas",
-            "Peticiones de canciones en directo"
-          ]
-        },
-        "disco-premium": {
-          "name": "VIP Experience",
-          "tagline": "Máxima duración, efectos espectaculares y potencia profesional",
-          "ideal": "Eventos largos o espacios grandes",
-          "features": [
-            "DJ profesional 6 horas",
-            "Sonido Club (4000W + Subwoofer de refuerzo)",
-            "Show de luces completo (4 Cabezas Móviles 150W LED)",
-            "Efectos VIP (Humo, Burbujas, Chispas frías, Confeti manual)",
-            "Cabina DJ Pro iluminada"
-          ]
-        }
-      },
       "flexiblePayment": "Pago flexible:",
       "paymentFeatures": {
         "deposit": "30% al reservar tu fecha",
         "rest": "70% el día del evento",
         "cancel": "Cancelación gratuita hasta 15 días antes"
-      },
-      "extras": {
-        "hora-extra": {
-          "name": "Hora Extra",
-          "description": "Si la fiesta sigue, nosotros también"
-        },
-        "humo-bajo": {
-          "name": "Máquina de Humo Bajo",
-          "description": "Efecto 'nube' para el baile nupcial"
-        },
-        "fuego-frio": {
-          "name": "Chispas Frías (2 máquinas)",
-          "description": "Efecto pirotécnico seguro para interior"
-        },
-        "burbujas": {
-          "name": "Máquina de Burbujas",
-          "description": "Toque mágico y divertido"
-        },
-        "co2-gun": {
-          "name": "Pistola/Cañón CO2",
-          "description": "Chorro de aire frío espectacular"
-        },
-        "confeti": {
-          "name": "Cañón de Confeti",
-          "description": "Explosión de color para momentos clave"
-        },
-        "pantalla": {
-          "name": "Proyector + Pantalla",
-          "description": "Para vídeos sorpresa o presentaciones"
-        },
-        "micros-extra": {
-          "name": "Micrófonos Extra (Pack 2)",
-          "description": "Inalámbricos de mano para discursos"
-        },
-        "pulseras-luminosas": {
-          "name": "Pulseras Luminosas (Pack 100)",
-          "description": "Pulseras de luz química para invitados - efecto mágico en la pista"
-        },
-        "barras-led-personalizadas": {
-          "name": "Barras LED Personalizadas (Pack)",
-          "description": "Iluminación LED adicional personalizable con colores de la boda"
-        },
-        "letras-luminosas-love": {
-          "name": "Letras Luminosas LOVE/Iniciales",
-          "description": "Letras gigantes iluminadas para photocall y decoración"
-        },
-        "alfombra-led-pista": {
-          "name": "Alfombra LED para Pista",
-          "description": "Pista de baile iluminada con efectos LED sincronizados"
-        },
-        "gobo-personalizado": {
-          "name": "Gobo Personalizado (Iniciales/Logo)",
-          "description": "Proyección de iniciales o logo en pared/suelo con iluminación"
-        },
-        "bengalas-frias-invitados": {
-          "name": "Bengalas Frías para Invitados (Pack 50)",
-          "description": "Bengalas de mano para momentos especiales (entrada novios, tarta)"
-        },
-        "cortina-led-backdrop": {
-          "name": "Cortina LED Backdrop",
-          "description": "Telón LED iluminado para ceremonia o presidencia"
-        },
-        "first-dance-special": {
-          "name": "Pack 'First Dance Special'",
-          "description": "Humo bajo + iluminación personalizada + bengalas para el primer baile"
-        },
-        "subwoofer-refuerzo": {
-          "name": "Subwoofer de Refuerzo",
-          "description": "Graves potentes para eventos grandes o espacios amplios"
-        },
-        "altavoces-adicionales": {
-          "name": "Altavoces Adicionales (Par)",
-          "description": "Cobertura de sonido para espacios muy grandes o distribuidos"
-        },
-        "neon-personalizado": {
-          "name": "Letrero Neón Personalizado",
-          "description": "Neón LED con mensaje personalizado para photocall"
-        },
-        "laser-show": {
-          "name": "Show de Láser",
-          "description": "Efectos láser sincronizados con la música - espectacular"
-        },
-        "photobooth-360": {
-          "name": "Photobooth 360°",
-          "description": "Cabina de fotos con vídeo 360° para tus invitados"
-        },
-        "alfombra-roja": {
-          "name": "Alfombra Roja + Postes VIP",
-          "description": "Entrada VIP con alfombra roja y cordones dorados"
-        },
-        "efectos-nieve": {
-          "name": "Máquina de Nieve Artificial",
-          "description": "Efecto nevada para momentos mágicos (bodas invierno)"
-        },
-        "humo-pesado": {
-          "name": "Humo Pesado (Dry Ice)",
-          "description": "Efecto nube densa para entrada o primer baile"
-        },
-        "sparklers-fountain": {
-          "name": "Fuentes de Chispas (4 unidades)",
-          "description": "Fuentes pirotécnicas de interior para momentos clave"
-        },
-        "uplighting-colores": {
-          "name": "Uplighting Ambiental (Pack 12)",
-          "description": "Iluminación LED de pared para ambientar el espacio con colores"
-        },
-        "bola-espejos-grande": {
-          "name": "Bola de Espejos Gigante",
-          "description": "Bola de discoteca de gran tamaño con foco dedicado"
-        },
-        "pantalla-led-gigante": {
-          "name": "Pantalla LED Gigante",
-          "description": "Pantalla LED profesional para vídeos y visuales"
-        },
-        "monograma-proyeccion": {
-          "name": "Monograma Proyectado",
-          "description": "Proyección de iniciales o logo en movimiento"
-        },
-        "videoclip-resumen": {
-          "name": "Videoclip Resumen del Evento",
-          "description": "Vídeo profesional editado con los mejores momentos - precio según duración"
-        }
       }
     },
     "production": {
@@ -5288,33 +4818,27 @@
     "faqs": {
       "q1": {
         "pregunta": "¿Qué incluye el \"Sobre Completo\"?",
-        "respuesta": "Incluye todo lo que necesitas: sobre de papel pergamino con el nombre del invitado, carta de la Directora de la Escuela, un frame personalizado según el rol del invitado (novio, padre, amigo...), y lacre de cera artesanal con el sello de la casa que elijas.",
-        "resposta": "Inclou tot el que necessites: sobre de paper pergamí amb el nom del convidat, carta de la Directora de l'Escola, un frame personalitzat segons el rol del convidat (nuvi, pare, amic...), i lacre de cera artesanal amb el segell de la casa que escullis."
+        "respuesta": "Incluye todo lo que necesitas: sobre de papel pergamino con el nombre del invitado, carta de la Directora de la Escuela, un frame personalizado según el rol del invitado (novio, padre, amigo...), y lacre de cera artesanal con el sello de la casa que elijas."
       },
       "q2": {
         "pregunta": "¿Puedo tener sobres con diferentes sellos?",
-        "respuesta": "Por defecto, todos los sobres llevan el mismo sello (la casa que elijas). Si quieres que cada invitado tenga el sello de su casa asignada, puedes añadir la opción Multi-Sello por un suplemento de 75-120€ según la cantidad.",
-        "resposta": "Per defecte, tots els sobres porten el mateix segell (la casa que escullis). Si vols que cada convidat tingui el segell de la seva casa assignada, pots afegir l'opció Multi-Segell per un suplement de 75-120€ segons la quantitat."
+        "respuesta": "Por defecto, todos los sobres llevan el mismo sello (la casa que elijas). Si quieres que cada invitado tenga el sello de su casa asignada, puedes añadir la opción Multi-Sello por un suplemento de 75-120€ según la cantidad."
       },
       "q3": {
         "pregunta": "¿Cómo son los pergaminos de amor?",
-        "respuesta": "Cada pergamino es un poema original de amor con temática mágica. Vienen enrollados individualmente y atados con una cinta elegante. Son perfectos para dejar en cada asiento o como detalle de mesa.",
-        "resposta": "Cada pergamí és un poema original d'amor amb temàtica màgica. Venen enrollats individualment i lligats amb una cinta elegant. Són perfectes per deixar a cada seient o com a detall de taula."
+        "respuesta": "Cada pergamino es un poema original de amor con temática mágica. Vienen enrollados individualmente y atados con una cinta elegante. Son perfectos para dejar en cada asiento o como detalle de mesa."
       },
       "q4": {
         "pregunta": "¿Cuánto tiempo tardan?",
-        "respuesta": "El tiempo de producción es de 10-14 días laborables una vez aprobada la prueba digital. El Pack Premium incluye entrega prioritaria en 7-10 días. Para pedidos urgentes (+30%), podemos entregar en 5-7 días.",
-        "resposta": "El temps de producció és de 10-14 dies laborables un cop aprovada la prova digital. El Pack Premium inclou entrega prioritària en 7-10 dies. Per comandes urgents (+30%), podem entregar en 5-7 dies."
+        "respuesta": "El tiempo de producción es de 10-14 días laborables una vez aprobada la prueba digital. El Pack Premium incluye entrega prioritaria en 7-10 días. Para pedidos urgentes (+30%), podemos entregar en 5-7 días."
       },
       "q5": {
         "pregunta": "¿Puedo ver una prueba antes?",
-        "respuesta": "Sí. Antes de imprimir, te enviamos una prueba digital en PDF con 3-4 sobres de ejemplo. El Pack Premium incluye una prueba física real antes de la producción completa.",
-        "resposta": "Sí! Abans d'imprimir, t'enviem una prova digital en PDF amb 3-4 sobres d'exemple. El Pack Premium inclou una prova física real abans de la producció completa."
+        "respuesta": "Sí. Antes de imprimir, te enviamos una prueba digital en PDF con 3-4 sobres de ejemplo. El Pack Premium incluye una prueba física real antes de la producción completa."
       },
       "q6": {
         "pregunta": "¿Hacéis envíos a toda España?",
-        "respuesta": "Sí. Envío a todo el territorio nacional con embalaje especial para proteger los lacres. Recogida gratuita en Granollers. Envío por mensajero: 10-18€ según peso.",
-        "resposta": "Sí! Enviament a tot el territori nacional amb embalatge especial per protegir els lacres. Recollida gratuïta a Granollers. Enviament per missatger: 10-18€ segons pes."
+        "respuesta": "Sí. Envío a todo el territorio nacional con embalaje especial para proteger los lacres. Recogida gratuita en Granollers. Envío por mensajero: 10-18€ según peso."
       }
     }
   },
@@ -5594,7 +5118,7 @@
     "badge": "Nuestro trabajo",
     "title": "Portfolio",
     "titleHighlight": "de Eventos",
-    "subtitle": "Más de 50 eventos transformando espacios en experiencias únicas. Descubre lo que podemos crear para ti.",
+    "subtitle": "Más de 195 eventos transformando espacios en experiencias únicas. Descubre lo que podemos crear para ti.",
     "categories": {
       "tots": "Todos",
       "harryPotter": "Mundo Mágico",
@@ -6050,7 +5574,7 @@
         "label": "Años de experiencia"
       },
       "events": {
-        "value": "50+",
+        "value": "195+",
         "label": "Eventos realizados"
       },
       "repeat": {
@@ -6090,7 +5614,7 @@
         {
           "year": "2024",
           "title": "Hoy",
-          "description": "+50 eventos, equipo propio valorado en 12.000€, y el único servicio de tematización Harry Potter profesional en Cataluña."
+          "description": "+195 eventos, equipo propio valorado en 12.000€, y el único servicio de tematización Harry Potter profesional en Cataluña."
         }
       ]
     },
@@ -6361,7 +5885,7 @@
     },
     "social": {
       "rating": "4.9",
-      "events": "50+ eventos sin incidentes",
+      "events": "48+ eventos sin incidentes",
       "recommended": "Recomendados en"
     }
   },
@@ -6388,7 +5912,7 @@
       "secondary": "WhatsApp Directo"
     },
     "trust": {
-      "events": "50+ eventos",
+      "events": "48+ eventos",
       "rating": "4.9 valoración",
       "response": "2h respuesta"
     },
@@ -6445,13 +5969,13 @@
       "badge": "🛡️ Tranquilidad garantizada",
       "title1": "Tu evento,",
       "title2": "sin riesgos",
-      "subtitle": "Compromiso total con tu evento. Más de 50 eventos realizados sin incidencias graves.",
+      "subtitle": "Nos comprometemos al 100% con cada evento. Si algo no es como esperabas, lo solucionamos o te devolvemos el dinero.",
       "sealTitle": "Compromiso Òrbita Events",
       "sealSubtitle": "+{events} eventos sin incidencias graves",
       "guarantees": {
         "satisfaction": {
-          "title": "Compromiso de Calidad",
-          "description": "Equipo profesional con experiencia en +50 eventos. Si surge algún problema técnico por nuestra culpa, lo solucionamos al momento."
+          "title": "Garantía de Satisfacción",
+          "description": "Si no estás 100% satisfecho con nuestro servicio, te devolvemos el dinero. Sin preguntas."
         },
         "backup": {
           "title": "Equipo Backup Completo",
@@ -6486,7 +6010,7 @@
       "whatsappMsg": "Hola! Quiero información para mi evento.",
       "events": "eventos",
       "rating": "valoración",
-      "guarantee": "🛡️ Compromiso 100%. Más de 50 eventos sin incidencias graves.",
+      "guarantee": "🛡️ Garantía 100%. Si no estás contento, te devolvemos el dinero.",
       "status": {
         "scarce": "⚠️ ¡Casi lleno!",
         "limited": "🔥 ¡Se acaba!",
@@ -6515,8 +6039,7 @@
       "satisfiedClients": "clientes satisfechos",
       "averageRating": "valoración media",
       "verifiedReviews": "Opiniones verificadas",
-      "verified": "Verificado",
-      "realTestimonials": "Testimonios reales"
+      "verified": "Verificado"
     },
     "whatsapp": {
       "defaultMessage": "Hola! Me gustaría información sobre vuestros servicios para un evento.",
@@ -6558,7 +6081,7 @@
     "badges": {
       "halloween": "Halloween 2025",
       "monMagic": "Mundo Mágico",
-      "rating": "4.9/5 · 50+ eventos"
+      "rating": "4.9/5 · 48+ eventos"
     },
     "morphingTexts": {
       "unique": "ÚNICOS.",
@@ -6641,7 +6164,7 @@
     "stats": {
       "rating": "4.9",
       "ratingLabel": "Valoración",
-      "events": 50+",
+      "events": "48+",
       "eventsLabel": "Eventos",
       "recommended": "100%",
       "recommendedLabel": "Recomendados"

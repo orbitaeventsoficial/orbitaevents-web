@@ -183,7 +183,12 @@ export default async function EmailsAdminPage() {
           </section>
 
           {/* Recent Activity */}
-          <RecentEmailsTable activities={stats.recentActivity} />
+          <RecentEmailsTable
+            activities={stats.recentActivity.map(activity => ({
+              ...activity,
+              details: activity.details as Record<string, unknown> | undefined
+            }))}
+          />
         </div>
 
         {/* Sidebar (1/3) */}
