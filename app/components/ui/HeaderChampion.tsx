@@ -313,7 +313,7 @@ export default function HeaderChampion() {
                 "
               >
                 <span className="relative z-10 flex items-center gap-1.5">
-                  <span className="font-bold">{tHeader('ctaPrimary')}</span>
+                  <span className="font-bold">{tHeader('cta')}</span>
                 </span>
 
                 {/* Shine */}
@@ -423,7 +423,7 @@ export default function HeaderChampion() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-amber-500 to-amber-400 text-zinc-900 font-bold rounded-lg"
                   >
-                    {tHeader('ctaPrimary')}
+                    {tHeader('cta')}
                   </Link>
                   <a
                     href="https://wa.me/34699121023"
