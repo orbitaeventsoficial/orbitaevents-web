@@ -296,8 +296,8 @@ export default function ConfiguradorClient() {
               </div>
 
               <ul className="space-y-2 mb-6">
-                {pack.features.slice(0, 4).map((feature, i) => (
-                  <li key={i} className="flex items-start text-sm text-text-muted">
+                {pack.features.slice(0, 4).map((feature) => (
+                  <li key={feature} className="flex items-start text-sm text-text-muted">
                     <Check className="w-4 h-4 text-oe-gold mr-2 mt-0.5 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>

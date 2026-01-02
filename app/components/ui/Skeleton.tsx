@@ -41,9 +41,9 @@ export default function Skeleton({
 export function SkeletonText({ lines = 3, className = '' }: { lines?: number; className?: string }) {
   return (
     <div className={`space-y-2 ${className}`} aria-hidden="true">
-      {Array.from({ length: lines }).map((_, i) => (
+      {Array.from({ length: lines }, (_, i) => `skeleton-line-${i}`).map((lineId, i) => (
         <Skeleton
-          key={i}
+          key={lineId}
           height={16}
           className={i === lines - 1 ? 'w-2/3' : 'w-full'}
         />
@@ -69,8 +69,8 @@ export function SkeletonAvatar({ size = 48 }: { size?: number }) {
 export function SkeletonStats() {
   return (
     <div className="flex gap-4" aria-hidden="true">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="flex-1 p-4 rounded-xl bg-bg-surface/50 border border-border">
+      {['stat-1', 'stat-2', 'stat-3'].map((statId) => (
+        <div key={statId} className="flex-1 p-4 rounded-xl bg-bg-surface/50 border border-border">
           <Skeleton height={32} className="w-1/2 mb-2" />
           <Skeleton height={16} className="w-3/4" />
         </div>

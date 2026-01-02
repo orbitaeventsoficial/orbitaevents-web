@@ -336,9 +336,9 @@ export default function AdminDuplicatesPage() {
 
                                 {/* Match Reasons */}
                                 <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-white/5">
-                                  {dup.matchReasons.map((reason, i) => (
+                                  {dup.matchReasons.map((reason) => (
                                     <div
-                                      key={i}
+                                      key={`${reason.field}-${reason.type}`}
                                       className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
                                         reason.type === 'exact'
                                           ? 'bg-green-500/10 text-green-400'

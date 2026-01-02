@@ -539,8 +539,7 @@ export default function MobileLeadsPro() {
   }, []);
 
   const handleArchive = useCallback(async (id: string) => {
-    // Implementar archivado
-    console.log('Archive:', id);
+    // TODO: Implementar archivado
   }, []);
 
   const handleLoadMore = useCallback(() => {

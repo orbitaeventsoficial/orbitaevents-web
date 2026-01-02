@@ -138,8 +138,8 @@ export async function POST(req: NextRequest) {
       
       <div class="config">
         <strong>Configuració activa:</strong><br>
-        <code>SMTP: ${process.env.SMTP_HOST}</code><br>
-        <code>FROM: ${process.env.SMTP_FROM || process.env.SMTP_USER}</code><br>
+        <code>SMTP: Configurat correctament ✓</code><br>
+        <code>FROM: Configurat correctament ✓</code><br>
         <code>TO: ${testEmail}</code>
       </div>
       

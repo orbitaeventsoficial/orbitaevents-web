@@ -82,3 +82,18 @@ export interface AnalyticsEventData {
   source?: string;
   [key: string]: unknown;
 }
+
+// Extensiones de tipos globales del navegador
+declare global {
+  interface Window {
+    AudioContext?: typeof AudioContext;
+    webkitAudioContext?: typeof AudioContext;
+  }
+
+  interface Navigator {
+    standalone?: boolean;
+  }
+}
+
+// Export necesario para que TypeScript trate esto como un módulo
+export {};

@@ -77,8 +77,8 @@ export default function WhatsAppButton() {
     setShowTooltip(false);
     
     // Analytics
-    if (typeof window !== 'undefined') {
-      (window as any).gtag?.('event', 'whatsapp_click', {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'whatsapp_click', {
         page: pathname,
         message_type: messageType,
       });

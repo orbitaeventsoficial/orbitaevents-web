@@ -1,5 +1,3 @@
-// app/admin/emails/EmailConfigPanel.tsx
-import { log } from '@/lib/logger';
 'use client';
 
 import { useState } from 'react';
@@ -32,7 +30,7 @@ export default function EmailConfigPanel() {
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (error) {
-      log.error('Error saving config:', error);
+      console.error('Error saving config:', error);
     } finally {
       setSaving(false);
     }

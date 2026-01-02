@@ -292,9 +292,9 @@ function SummaryStats({ t }: { t: (key: string) => string }) {
     <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 mb-12">
       <div className="flex items-center gap-3">
         <div className="flex -space-x-2">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-zinc-900 flex items-center justify-center text-xs font-bold text-white">
-              {['M', 'L', 'A', 'J', 'P'][i - 1]}
+          {[{ id: 'm', letter: 'M' }, { id: 'l', letter: 'L' }, { id: 'a', letter: 'A' }, { id: 'j', letter: 'J' }, { id: 'p', letter: 'P' }].map((item) => (
+            <div key={item.id} className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-zinc-900 flex items-center justify-center text-xs font-bold text-white">
+              {item.letter}
             </div>
           ))}
         </div>
@@ -308,8 +308,8 @@ function SummaryStats({ t }: { t: (key: string) => string }) {
 
       <div className="flex items-center gap-2">
         <div className="flex gap-0.5 text-amber-400">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Icons.Star key={i} filled={true} />
+          {['star-1', 'star-2', 'star-3', 'star-4', 'star-5'].map((starId) => (
+            <Icons.Star key={starId} filled={true} />
           ))}
         </div>
         <span className="text-white font-bold">{SITE_CONFIG.stats.avgRating.toFixed(1)}</span>

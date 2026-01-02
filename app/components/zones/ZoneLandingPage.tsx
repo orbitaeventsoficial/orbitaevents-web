@@ -121,8 +121,8 @@ export default function ZoneLandingPage({ config }: Props) {
             transition={{ delay: 0.5 }}
             className="flex flex-wrap justify-center gap-4 text-sm"
           >
-            {highlights.map((highlight, i) => (
-              <div key={i} className="flex items-center gap-2 text-white/80">
+            {highlights.map((highlight) => (
+              <div key={highlight} className="flex items-center gap-2 text-white/80">
                 <Check className="w-4 h-4 text-[var(--oe-gold)]" />
                 {highlight}
               </div>
@@ -152,9 +152,9 @@ export default function ZoneLandingPage({ config }: Props) {
             {t('whyChooseUs')} {zone}?
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {whyChooseUs.map((reason, i) => (
+            {whyChooseUs.map((reason) => (
               <div
-                key={i}
+                key={reason}
                 className="flex items-start gap-4 p-6 rounded-2xl bg-white/5 border border-white/10"
               >
                 <div className="w-10 h-10 rounded-full bg-[var(--oe-gold)]/20 flex items-center justify-center flex-shrink-0">
