@@ -6000,7 +6000,8 @@
       "satisfiedClients": "clients satisfets",
       "averageRating": "valoració mitjana",
       "verifiedReviews": "Opinions verificades",
-      "verified": "Verificat"
+      "verified": "Verificat",
+      "realTestimonials": "Testimonis reals"
     },
     "whatsapp": {
       "defaultMessage": "Hola! M'agradaria informació sobre els vostres serveis per a un event.",

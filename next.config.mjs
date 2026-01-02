@@ -50,7 +50,7 @@ const nextConfig = {
           "img-src 'self' data: blob: https://orbitaevents.com https://*.supabase.co https://lh3.googleusercontent.com https://maps.googleapis.com",
           "font-src 'self' https://fonts.gstatic.com",
           "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://vercel.live",
-          "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://vitals.vercel-insights.com https://vercel.live wss://ws-us3.pusher.com",
+          "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://vercel.live wss://ws-us3.pusher.com",
           "worker-src 'self' blob:",
         ].join('; ')
       },

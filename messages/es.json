@@ -6039,7 +6039,8 @@
       "satisfiedClients": "clientes satisfechos",
       "averageRating": "valoración media",
       "verifiedReviews": "Opiniones verificadas",
-      "verified": "Verificado"
+      "verified": "Verificado",
+      "realTestimonials": "Testimonios reales"
     },
     "whatsapp": {
       "defaultMessage": "Hola! Me gustaría información sobre vuestros servicios para un evento.",
