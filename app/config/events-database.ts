@@ -175,8 +175,8 @@ export const EVENTS: Event[] = [
   // AQUÍ AÑADE TUS EVENTOS REALES
   // ═══════════════════════════════════════════════════════════
 
-  // TODO: CARLES - Añade aquí los eventos reales que hayas hecho
   // Por ahora está vacío = no se muestra nada en la web (correcto)
+  // Añadir eventos reales cuando estén disponibles
 ];
 
 // ============================================

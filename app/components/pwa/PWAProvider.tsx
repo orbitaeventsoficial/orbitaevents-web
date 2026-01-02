@@ -11,6 +11,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { log } from '@/lib/logger';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -135,16 +136,20 @@ export function PWAProvider({ children }: { children: ReactNode }) {
   const installApp = useCallback(async () => {
     if (!deferredPrompt) return;
 
-    await deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
+    try {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
 
-    if (outcome === 'accepted') {
-      console.log('[PWA] User accepted install');
-    } else {
-      console.log('[PWA] User dismissed install');
+      if (outcome === 'accepted') {
+        log.debug('PWA install accepted');
+      } else {
+        log.debug('PWA install dismissed');
+      }
+
+      setDeferredPrompt(null);
+    } catch (error) {
+      log.error('PWA install prompt error', error);
     }
-
-    setDeferredPrompt(null);
     setCanInstall(false);
     setShowInstallBanner(false);
   }, [deferredPrompt]);

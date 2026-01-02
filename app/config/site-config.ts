@@ -128,7 +128,7 @@ export const SITE_CONFIG = {
     
     // Horario de respuesta automática
     autoReplySchedule: {
-      enabled: false, // TODO: Activar si configuras respuestas automáticas
+      enabled: false, // Auto-respuestas deshabilitadas (respuesta manual preferida)
       message: "Gracias por contactarnos! Te responderemos en menos de 2 horas ⚡",
       officeHours: "Todos los dias de 08:00-20:00",
     },
@@ -138,8 +138,8 @@ export const SITE_CONFIG = {
   // CONFIGURACIÓN WEB
   // ============================================
   web: {
-    domain: "orbitaevents.com", // TODO: Cambiar cuando tengas dominio real
-    url: "https://orbitaevents.com", // TODO: Cambiar en producción
+    domain: "orbitaevents.com",
+    url: "https://orbitaevents.com",
     
     // URLs de assets
     logo: "/img/logoplanetatextdreta.svg",

@@ -23,6 +23,7 @@
 import { useState, useEffect, useRef, createContext, useContext, ReactNode, useCallback } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
+import { log } from '@/lib/logger';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONTEXT - Estado global del móvil
@@ -138,11 +139,16 @@ function PullToRefresh({
   const pullProgress = useTransform(pullY, [0, 100], [0, 1]);
   
   const handleRefresh = async () => {
-    setIsRefreshing(true);
-    triggerHaptic('medium');
-    await onRefresh();
-    setIsRefreshing(false);
-    pullY.set(0);
+    try {
+      setIsRefreshing(true);
+      triggerHaptic('medium');
+      await onRefresh();
+    } catch (error) {
+      log.error('Refresh error', error);
+    } finally {
+      setIsRefreshing(false);
+      pullY.set(0);
+    }
   };
 
   return (
@@ -364,9 +370,13 @@ export default function MobileAppShell({
   };
 
   const handleRefresh = async () => {
-    // Simular refresh
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    window.location.reload();
+    try {
+      // Simular refresh
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      window.location.reload();
+    } catch (error) {
+      log.error('Page refresh error', error);
+    }
   };
 
   return (

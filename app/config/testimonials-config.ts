@@ -67,7 +67,7 @@ export const MANUAL_TESTIMONIALS: Testimonial[] = [
   //   showOnWebsite: true,
   // },
 
-  // TODO: Añadir testimonios reales aquí cuando los tengas
+  // Array vacío - los testimonios se obtienen desde Google Reviews API
 ];
 
 // ============================================

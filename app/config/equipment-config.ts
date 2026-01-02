@@ -63,7 +63,6 @@ export const CONTROLLERS: Equipment[] = [
     description: "Controladora profesional Pioneer DJ de nivel club con motorized platters",
     condition: "excellent",
     images: [
-      // TODO: Añadir fotos reales de TU controladora
       "/img/equipment/ddj-rev7.jpg"
     ],
   },
