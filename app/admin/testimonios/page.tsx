@@ -1,4 +1,5 @@
 // app/admin/testimonios/page.tsx
+import { log } from '@/lib/logger';
 // Pàgina de gestió de testimonis
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -32,7 +33,7 @@ async function getTestimonials() {
 
     return testimonials;
   } catch (error) {
-    console.error('Error obtenint testimonis:', error);
+    log.error('Error obtenint testimonis:', error);
     return [];
   }
 }

@@ -415,7 +415,7 @@ export default function PrivacyPortalPage() {
                       />
                       <span className="text-sm text-text-muted group-hover:text-gray-300 transition-colors">
                         {t('form.gdprConsent')}{' '}
-                        <Link href="/legal/privacidad" target="_blank" className="text-oe-gold hover:underline">
+                        <Link href="/legal/privacidad" target="_blank" rel="noopener noreferrer" className="text-oe-gold hover:underline">
                           {t('form.privacyPolicy')}
                         </Link>
                         {' '}{t('form.gdprConsentText')}

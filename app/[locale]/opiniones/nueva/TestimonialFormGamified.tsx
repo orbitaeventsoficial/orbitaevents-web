@@ -837,7 +837,7 @@ export default function TestimonialFormGamified() {
                 />
                 <span className="text-white/60 text-sm">
                   {t('gamified.consent.dataProcessing')}{' '}
-                  <a href="/legal/privacidad" className="text-amber-400 underline" target="_blank">
+                  <a href="/legal/privacidad" className="text-amber-400 underline" target="_blank" rel="noopener noreferrer">
                     {t('form.privacyPolicy')}
                   </a>{' '}
                   <span className="text-red-400">*</span>
@@ -914,7 +914,7 @@ export default function TestimonialFormGamified() {
             {formData.allowGoogleShare && SITE_CONFIG.reviews.googleBusinessUrl && (
               <a
                 href={SITE_CONFIG.reviews.googleBusinessUrl}
-                target="_blank"
+                target="_blank" rel="noopener noreferrer"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-white/90 transition-all"
               >

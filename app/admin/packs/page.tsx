@@ -1,4 +1,5 @@
 // app/admin/packs/page.tsx
+import { log } from '@/lib/logger';
 // Pàgina de gestió de packs
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -26,7 +27,7 @@ async function getPacks() {
 
     return packs;
   } catch (error) {
-    console.error('Error obtenint packs:', error);
+    log.error('Error obtenint packs:', error);
     return [];
   }
 }

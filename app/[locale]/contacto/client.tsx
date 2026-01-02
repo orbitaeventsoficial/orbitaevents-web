@@ -100,7 +100,7 @@ export default function ContactClient() {
               {/* WhatsApp quick contact */}
               <a
                 href={`https://wa.me/34699121023?text=${encodeURIComponent(t('page.whatsappMessage'))}`}
-                target="_blank"
+                target="_blank" rel="noopener noreferrer"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 px-6 py-3 bg-[#25D366] hover:bg-[#20BD5A] rounded-full transition-all hover:shadow-[0_8px_30px_rgba(37,211,102,0.3)] text-white font-semibold text-sm"
               >

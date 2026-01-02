@@ -1,5 +1,6 @@
 // app/api/admin/packs/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 export async function PATCH(
@@ -32,7 +33,7 @@ export async function PATCH(
 
     return NextResponse.json(updatedPack);
   } catch (error) {
-    console.error('Error actualitzant pack:', error);
+    log.error('Error actualitzant pack:', error);
     return NextResponse.json(
       { error: 'Error actualitzant pack' },
       { status: 500 }
@@ -66,7 +67,7 @@ export async function GET(
 
     return NextResponse.json(pack);
   } catch (error) {
-    console.error('Error obtenint pack:', error);
+    log.error('Error obtenint pack:', error);
     return NextResponse.json(
       { error: 'Error obtenint pack' },
       { status: 500 }

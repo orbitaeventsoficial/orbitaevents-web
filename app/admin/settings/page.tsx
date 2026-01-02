@@ -1,4 +1,5 @@
 // app/admin/settings/page.tsx
+import { log } from '@/lib/logger';
 // Pàgina de configuració - Settings i estadístiques
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -47,7 +48,7 @@ async function getSettings() {
 
     return grouped;
   } catch (error) {
-    console.error('Error obtenint settings:', error);
+    log.error('Error obtenint settings:', error);
     return {};
   }
 }

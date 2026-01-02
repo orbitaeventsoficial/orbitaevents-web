@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { fetchEmails, countUnread, testConnection } from '@/lib/imap';
 
 export const dynamic = 'force-dynamic';
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error IMAP:', error);
+    log.error('Error IMAP:', error);
     
     // Si és error de connexió, donar missatge clar
     const errorMessage = error instanceof Error ? error.message : 'Error desconegut';

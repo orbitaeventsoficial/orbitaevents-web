@@ -1,6 +1,7 @@
 // app/api/admin/dashboard/route.ts
 // API per obtenir dades del dashboard
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
@@ -176,7 +177,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error obtenint dashboard:', error);
+    log.error('Error obtenint dashboard:', error);
     return NextResponse.json(
       { error: 'Error obtenint dades del dashboard' },
       { status: 500 }

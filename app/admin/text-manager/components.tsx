@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 import { useState } from 'react';
 
@@ -99,7 +100,7 @@ export function TextTools({ onRefresh, onExport, onImport, onSync }: ToolsProps)
       const data = JSON.parse(content);
       onImport(data);
     } catch (error) {
-      console.error('Error importing:', error);
+      log.error('Error importing:', error);
       alert('Error importando archivo. Asegúrate de que es un JSON válido.');
     }
     setImporting(false);
@@ -121,7 +122,7 @@ export function TextTools({ onRefresh, onExport, onImport, onSync }: ToolsProps)
         onSync();
       }
     } catch (error) {
-      console.error('Error syncing:', error);
+      log.error('Error syncing:', error);
     }
     setSyncing(false);
   };
@@ -144,7 +145,7 @@ export function TextTools({ onRefresh, onExport, onImport, onSync }: ToolsProps)
         alert(data.error || 'Error restaurando');
       }
     } catch (error) {
-      console.error('Error restoring:', error);
+      log.error('Error restoring:', error);
     }
   };
 

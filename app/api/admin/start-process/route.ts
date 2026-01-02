@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { supabaseAdmin } from '@/lib/supabase';
 import { sendEmail, sendTestimonialApprovedEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
       result,
     });
   } catch (error) {
-    console.error('Error iniciant procés:', error);
+    log.error('Error iniciant procés:', error);
     return NextResponse.json({ error: 'Error iniciant procés' }, { status: 500 });
   }
 }

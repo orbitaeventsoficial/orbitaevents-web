@@ -170,7 +170,7 @@ export default function WhatsAppPremium({
           {/* Main button */}
           <motion.a
             href={whatsappUrl}
-            target="_blank"
+            target="_blank" rel="noopener noreferrer"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
@@ -234,7 +234,7 @@ export function WhatsAppInline({
   return (
     <motion.a
       href={whatsappUrl}
-      target="_blank"
+      target="_blank" rel="noopener noreferrer"
       rel="noopener noreferrer"
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}

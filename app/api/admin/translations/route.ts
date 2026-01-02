@@ -1,6 +1,7 @@
 // app/api/admin/translations/route.ts
 // API per gestionar traduccions del web
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
       raw: translations,
     });
   } catch (error) {
-    console.error('Error obtenint traduccions:', error);
+    log.error('Error obtenint traduccions:', error);
     return NextResponse.json(
       { error: 'Error obtenint traduccions' },
       { status: 500 }
@@ -90,7 +91,7 @@ export async function PUT(req: NextRequest) {
       updated: results.length,
     });
   } catch (error) {
-    console.error('Error actualitzant traduccions:', error);
+    log.error('Error actualitzant traduccions:', error);
     return NextResponse.json(
       { error: 'Error actualitzant traduccions' },
       { status: 500 }
@@ -133,7 +134,7 @@ export async function POST(req: NextRequest) {
       created: results.length,
     });
   } catch (error) {
-    console.error('Error creant traducció:', error);
+    log.error('Error creant traducció:', error);
     return NextResponse.json(
       { error: 'Error creant traducció' },
       { status: 500 }
@@ -172,7 +173,7 @@ export async function DELETE(req: NextRequest) {
       ok: true,
     });
   } catch (error) {
-    console.error('Error eliminant traducció:', error);
+    log.error('Error eliminant traducció:', error);
     return NextResponse.json(
       { error: 'Error eliminant traducció' },
       { status: 500 }

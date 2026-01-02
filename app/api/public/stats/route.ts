@@ -15,6 +15,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 // Cache: revalidar cada hora
@@ -204,7 +205,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Error obteniendo stats:', error);
+    log.error('Error obteniendo stats:', error);
 
     // Fallback con valores por defecto - return 200 with fallback data
     return NextResponse.json({

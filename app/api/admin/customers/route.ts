@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Error obtenint clients:', error);
+    log.error('Error obtenint clients:', error);
     return NextResponse.json({ error: 'Error obtenint clients' }, { status: 500 });
   }
 }
@@ -133,7 +134,7 @@ export async function POST(request: NextRequest) {
       data: customer,
     });
   } catch (error) {
-    console.error('Error creant client:', error);
+    log.error('Error creant client:', error);
     return NextResponse.json({ error: 'Error creant client' }, { status: 500 });
   }
 }

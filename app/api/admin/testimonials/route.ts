@@ -7,6 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import {
   getPendingTestimonials,
   getApprovedTestimonials,
@@ -88,7 +89,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Error obtenint testimonis:', error);
+    log.error('Error obtenint testimonis:', error);
     return NextResponse.json({ error: 'Error obtenint testimonis' }, { status: 500 });
   }
 }
@@ -124,7 +125,7 @@ export async function PATCH(request: NextRequest) {
       data: result,
     });
   } catch (error) {
-    console.error('Error actualitzant testimoni:', error);
+    log.error('Error actualitzant testimoni:', error);
     return NextResponse.json({ error: 'Error actualitzant testimoni' }, { status: 500 });
   }
 }
@@ -152,7 +153,7 @@ export async function DELETE(request: NextRequest) {
       message: 'Testimoni eliminat',
     });
   } catch (error) {
-    console.error('Error eliminant testimoni:', error);
+    log.error('Error eliminant testimoni:', error);
     return NextResponse.json({ error: 'Error eliminant testimoni' }, { status: 500 });
   }
 }

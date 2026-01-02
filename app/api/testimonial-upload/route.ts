@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
@@ -129,7 +130,7 @@ export async function POST(request: NextRequest) {
         .createSignedUploadUrl(fileName);
 
       if (error) {
-        console.error('Error creant signed URL:', error);
+        log.error('Error creant signed URL:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
       }
 
@@ -160,7 +161,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      console.error('Supabase upload error:', error);
+      log.error('Supabase upload error:', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
@@ -176,7 +177,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error pujant fitxer:', error);
+    log.error('Error pujant fitxer:', error);
     return NextResponse.json(
       { success: false, error: 'Error processant el fitxer' },
       { status: 500 }

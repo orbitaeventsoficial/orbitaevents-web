@@ -7,6 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import {
   findAllPotentialDuplicates,
   mergeCustomers,
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error: unknown) {
-    console.error('Error fetching duplicates:', error);
+    log.error('Error fetching duplicates:', error);
     const message = error instanceof Error ? error.message : 'Error obtenint duplicats';
     return NextResponse.json(
       { success: false, error: message },
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
       message: `Fusionats ${duplicateIds.length + 1} clients correctament`,
     });
   } catch (error: unknown) {
-    console.error('Error merging customers:', error);
+    log.error('Error merging customers:', error);
     const message = error instanceof Error ? error.message : 'Error fusionant clients';
     return NextResponse.json(
       { success: false, error: message },

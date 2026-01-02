@@ -13,6 +13,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { promises as fs } from 'fs';
@@ -117,7 +118,7 @@ async function getReviewsFromDatabase(): Promise<GoogleReview[]> {
         profile_photo_url: t.photoUrl || undefined,
       }));
   } catch (error) {
-    console.error('[Reviews] Error obtenint de BBDD:', error);
+    log.error('[Reviews] Error obtenint de BBDD:', error);
     return [];
   }
 }
@@ -162,7 +163,7 @@ async function getReviewsFromGoogle(): Promise<GoogleReview[]> {
       source: 'google' as const,
     }));
   } catch (error) {
-    console.error('[Reviews] Error obtenint de Google:', error);
+    log.error('[Reviews] Error obtenint de Google:', error);
     return [];
   }
 }
@@ -222,7 +223,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('[Reviews] Error general:', error);
+    log.error('[Reviews] Error general:', error);
 
     return NextResponse.json(
       {

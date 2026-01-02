@@ -8,8 +8,9 @@ import { getRequestConfig } from 'next-intl/server';
 export const locales = ['ca', 'es'] as const;
 export type Locale = (typeof locales)[number];
 
-// Idioma per defecte - Català (som a Catalunya!)
-export const defaultLocale: Locale = 'ca';
+// Idioma per defecte - Espanyol (SEO i abast nacional)
+// Català disponible amb prefix /ca/
+export const defaultLocale: Locale = 'es';
 
 // Informació dels idiomes
 export const localeConfig: Record<Locale, {

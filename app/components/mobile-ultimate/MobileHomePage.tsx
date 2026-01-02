@@ -172,7 +172,7 @@ function MobileFooter() {
         <div className="flex justify-center gap-4 mb-6">
           <a 
             href={socialLinks.instagram}
-            target="_blank"
+            target="_blank" rel="noopener noreferrer"
             rel="noopener noreferrer"
             aria-label="Instagram"
             className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors"
@@ -183,7 +183,7 @@ function MobileFooter() {
           </a>
           <a 
             href={socialLinks.facebook}
-            target="_blank"
+            target="_blank" rel="noopener noreferrer"
             rel="noopener noreferrer"
             aria-label="Facebook"
             className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors"

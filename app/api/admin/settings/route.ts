@@ -1,6 +1,7 @@
 // app/api/admin/settings/route.ts
 // API per gestionar configuracions globals
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest) {
       raw: settings,
     });
   } catch (error) {
-    console.error('Error obtenint settings:', error);
+    log.error('Error obtenint settings:', error);
     return NextResponse.json(
       { error: 'Error obtenint configuracions' },
       { status: 500 }
@@ -95,7 +96,7 @@ export async function PUT(req: NextRequest) {
       updated: results.length,
     });
   } catch (error) {
-    console.error('Error actualitzant settings:', error);
+    log.error('Error actualitzant settings:', error);
     return NextResponse.json(
       { error: 'Error actualitzant configuracions' },
       { status: 500 }
@@ -136,7 +137,7 @@ export async function POST(req: NextRequest) {
       setting,
     });
   } catch (error) {
-    console.error('Error creant setting:', error);
+    log.error('Error creant setting:', error);
     return NextResponse.json(
       { error: 'Error creant configuració' },
       { status: 500 }

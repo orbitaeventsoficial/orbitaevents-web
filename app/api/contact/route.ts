@@ -1,6 +1,7 @@
 // app/api/contact/route.ts
 // API de contacto - Crea Leads al model nou
 import { NextRequest, NextResponse } from "next/server";
+import { log } from '@/lib/logger';
 import { SITE_CONFIG } from '@/config/site-config';
 import { z } from "zod";
 import { sendEmail } from '@/lib/email';
@@ -203,7 +204,6 @@ export async function POST(req: NextRequest) {
 
     } catch (dbError) {
       // Log de l'error i continuar amb enviament d'emails
-      const { log } = await import('@/lib/logger');
       log.error('Error guardant lead a la base de dades', dbError, {
         context: { name, contact, event, source: determineSource(packId, packName) }
       });
@@ -232,7 +232,7 @@ export async function POST(req: NextRequest) {
           createdAt: new Date(),
         }).catch(err => {
           // No bloquejar si falla la notificació
-          console.error('[Notification] Error enviant notificació multi-canal:', err);
+          log.error('[Notification] Error enviant notificació multi-canal:', err);
         });
       } catch {
         // Ignorar errors d'import en entorns sense el servei
@@ -487,7 +487,7 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     // Log error per debugging
-    console.error('[Contact API] Error:', error);
+    log.error('[Contact API] Error:', error);
 
     return NextResponse.json(
       {

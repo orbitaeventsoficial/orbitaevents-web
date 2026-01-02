@@ -3,6 +3,7 @@
 // Lee/escribe a los archivos JSON de traducción
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -151,7 +152,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Error leyendo textos:', error);
+    log.error('Error leyendo textos:', error);
     return NextResponse.json(
       { ok: false, error: 'Error leyendo archivos de traducción' },
       { status: 500 }
@@ -207,7 +208,7 @@ export async function PUT(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error guardando textos:', error);
+    log.error('Error guardando textos:', error);
     return NextResponse.json(
       { ok: false, error: 'Error guardando modificaciones' },
       { status: 500 }
@@ -329,7 +330,7 @@ export async function POST(req: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Error en operación:', error);
+    log.error('Error en operación:', error);
     return NextResponse.json(
       { ok: false, error: 'Error en operación' },
       { status: 500 }

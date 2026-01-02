@@ -8,6 +8,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 // Cache: revalidar cada 30 minutos
@@ -180,7 +181,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error obteniendo testimonios:', error);
+    log.error('Error obteniendo testimonios:', error);
 
     // Fallback with default data - return 200
     return NextResponse.json({

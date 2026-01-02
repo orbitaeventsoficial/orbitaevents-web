@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { z } from 'zod';
 import {
   createDataRequest,
@@ -107,7 +108,7 @@ export async function POST(req: NextRequest) {
         reason: 'Email de verificació enviat',
       });
     } catch (emailError) {
-      console.error('Error enviant email de verificació:', emailError);
+      log.error('Error enviant email de verificació:', emailError);
       // Continuem - l'admin pot verificar manualment si cal
     }
 
@@ -121,7 +122,7 @@ export async function POST(req: NextRequest) {
       message: 'Sol·licitud creada. Comprova el teu email per verificar-la.',
     });
   } catch (error: unknown) {
-    console.error('Error creating data request:', error);
+    log.error('Error creating data request:', error);
 
     const errorMessage =
       error instanceof Error ? error.message : 'Error creant la sol·licitud';

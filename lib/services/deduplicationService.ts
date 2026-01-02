@@ -262,14 +262,19 @@ export async function mergeCustomers(
   const updateData: Prisma.CustomerUpdateInput = {};
 
   // Camps a fusionar (preferir valors no buits)
-  const fieldsToMerge: (keyof Customer)[] = ['phone', 'instagram'];
+  type MergeableField = 'phone' | 'instagram';
+  const fieldsToMerge: MergeableField[] = ['phone', 'instagram'];
 
   for (const field of fieldsToMerge) {
     // Si hi ha preferència específica
     if (fieldPreferences?.[field]) {
       const preferredCustomer = allCustomers.find(c => c.id === fieldPreferences[field]);
       if (preferredCustomer?.[field] && preferredCustomer[field] !== primary[field]) {
-        (updateData as any)[field] = preferredCustomer[field];
+        if (field === 'phone') {
+          updateData.phone = preferredCustomer.phone;
+        } else if (field === 'instagram') {
+          updateData.instagram = preferredCustomer.instagram;
+        }
         fieldsUpdated.push(field);
       }
     }
@@ -277,7 +282,11 @@ export async function mergeCustomers(
     else if (!primary[field]) {
       for (const dup of duplicates) {
         if (dup[field]) {
-          (updateData as any)[field] = dup[field];
+          if (field === 'phone') {
+            updateData.phone = dup.phone;
+          } else if (field === 'instagram') {
+            updateData.instagram = dup.instagram;
+          }
           fieldsUpdated.push(field);
           break;
         }

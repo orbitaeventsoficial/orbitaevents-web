@@ -427,7 +427,7 @@ export default function HeaderChampion() {
                   </Link>
                   <a
                     href="https://wa.me/34699121023"
-                    target="_blank"
+                    target="_blank" rel="noopener noreferrer"
                     rel="noopener noreferrer"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center justify-center gap-2 w-full py-3 bg-zinc-800 text-white font-semibold rounded-lg border border-zinc-700"

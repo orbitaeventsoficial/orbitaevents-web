@@ -1,12 +1,34 @@
 // app/api/admin/leads-new/route.ts
 // API per gestionar leads (nou model)
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
+
+// Enum validation helpers
+const VALID_STATUSES = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'] as const;
+const VALID_EVENT_TYPES = ['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER'] as const;
+const VALID_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'] as const;
+
+type LeadStatus = typeof VALID_STATUSES[number];
+type EventType = typeof VALID_EVENT_TYPES[number];
+type Priority = typeof VALID_PRIORITIES[number];
+
+function isValidStatus(value: string | null): value is LeadStatus {
+  return value !== null && VALID_STATUSES.includes(value as LeadStatus);
+}
+
+function isValidEventType(value: string | null): value is EventType {
+  return value !== null && VALID_EVENT_TYPES.includes(value as EventType);
+}
+
+function isValidPriority(value: string | null): value is Priority {
+  return value !== null && VALID_PRIORITIES.includes(value as Priority);
+}
 
 const leadSchema = z.object({
   name: z.string().min(1),
@@ -41,17 +63,17 @@ export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
-    const status = searchParams.get('status');
-    const eventType = searchParams.get('eventType');
-    const priority = searchParams.get('priority');
+    const statusParam = searchParams.get('status');
+    const eventTypeParam = searchParams.get('eventType');
+    const priorityParam = searchParams.get('priority');
     const search = searchParams.get('search');
     const page = safeParseInt(searchParams.get('page'), 1, 1);
     const limit = safeParseInt(searchParams.get('limit'), 50, 1, 200);
 
     const where = {
-      ...(status && { status: status as any }),
-      ...(eventType && { eventType: eventType as any }),
-      ...(priority && { priority: priority as any }),
+      ...(isValidStatus(statusParam) && { status: statusParam }),
+      ...(isValidEventType(eventTypeParam) && { eventType: eventTypeParam }),
+      ...(isValidPriority(priorityParam) && { priority: priorityParam }),
       ...(search && {
         OR: [
           { name: { contains: search, mode: 'insensitive' as const } },
@@ -96,7 +118,7 @@ export async function GET(req: NextRequest) {
       }, {} as Record<string, number>),
     });
   } catch (error) {
-    console.error('Error obtenint leads:', error);
+    log.error('Error obtenint leads:', error);
     return NextResponse.json(
       { error: 'Error obtenint leads' },
       { status: 500 }
@@ -145,7 +167,7 @@ export async function POST(req: NextRequest) {
       lead,
     });
   } catch (error) {
-    console.error('Error creant lead:', error);
+    log.error('Error creant lead:', error);
     return NextResponse.json(
       { error: 'Error creant lead' },
       { status: 500 }

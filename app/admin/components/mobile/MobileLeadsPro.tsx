@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 /**
  * MobileLeadsPro.tsx
@@ -496,7 +497,7 @@ export default function MobileLeadsPro() {
         setHasMore(data.page < data.totalPages);
       }
     } catch (err) {
-      console.error('Error fetching leads:', err);
+      log.error('Error fetching leads:', err);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);

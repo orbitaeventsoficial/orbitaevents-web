@@ -111,7 +111,7 @@ export default function WhatsAppButton() {
       {/* Botón principal */}
       <motion.a
         href={whatsappUrl}
-        target="_blank"
+        target="_blank" rel="noopener noreferrer"
         rel="noopener noreferrer"
         onClick={handleClick}
         className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full

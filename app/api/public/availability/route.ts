@@ -12,6 +12,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 // Cache: revalidar cada 5 minutos
@@ -284,7 +285,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Error obteniendo disponibilidad:', error);
+    log.error('Error obteniendo disponibilidad:', error);
 
     // En caso de error, devolver datos fallback - return 200
     return NextResponse.json(generateFallbackAvailability(), {

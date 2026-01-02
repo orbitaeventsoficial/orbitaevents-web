@@ -1,4 +1,5 @@
 // app/admin/inbox/InboxClient.tsx
+import { log } from '@/lib/logger';
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -460,7 +461,7 @@ export default function InboxClient({
                   <>
                     <a
                       href={`https://wa.me/${selectedEmail.leadData.phone.replace(/\D/g, '')}`}
-                      target="_blank"
+                      target="_blank" rel="noopener noreferrer"
                       rel="noopener noreferrer"
                       className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                     >
@@ -540,7 +541,7 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
         }, 1500);
       }
     } catch (error) {
-      console.error('Error enviant email:', error);
+      log.error('Error enviant email:', error);
     } finally {
       setSending(false);
     }

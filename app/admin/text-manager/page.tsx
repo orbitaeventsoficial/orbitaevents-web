@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 
@@ -223,7 +224,7 @@ export default function TextManagerPage() {
       }
     } catch (err) {
       setError('Error de conexión');
-      console.error(err);
+      log.error(err);
     }
     setLoading(false);
   }
@@ -287,7 +288,7 @@ export default function TextManagerPage() {
       }
     } catch (err) {
       setError('Error de conexión al guardar');
-      console.error(err);
+      log.error(err);
     }
 
     setSaving(false);

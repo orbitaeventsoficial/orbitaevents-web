@@ -1,4 +1,5 @@
 // app/admin/bookings/page.tsx
+import { log } from '@/lib/logger';
 // Pàgina de gestió de reserves
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -50,7 +51,7 @@ async function getBookings() {
 
     return { bookings, stats };
   } catch (error) {
-    console.error('Error obtenint reserves:', error);
+    log.error('Error obtenint reserves:', error);
     return { bookings: [], stats: [] };
   }
 }

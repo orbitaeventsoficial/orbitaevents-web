@@ -243,7 +243,7 @@ export default function Footer() {
                     <motion.a
                       key={social.name}
                       href={social.href}
-                      target="_blank"
+                      target="_blank" rel="noopener noreferrer"
                       rel="noopener noreferrer"
                       onClick={() => handleSocialClick(social.name)}
                       className={`p-3 rounded-xl bg-white/5 text-white/60 ${social.color} transition-all duration-200`}
@@ -368,7 +368,7 @@ export default function Footer() {
 
                 <a
                   href="https://wa.me/34699121023"
-                  target="_blank"
+                  target="_blank" rel="noopener noreferrer"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full px-4 py-3.5 rounded-xl bg-green-600 hover:bg-green-500 text-white font-bold text-sm transition-colors"
                 >

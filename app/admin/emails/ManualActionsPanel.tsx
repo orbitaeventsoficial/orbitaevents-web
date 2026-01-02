@@ -161,7 +161,7 @@ export default function ManualActionsPanel() {
           <div className="space-y-2">
             <a
               href="/api/canvas/rating?name=Prova&rating=10&code=TEST15&discount=15"
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               rel="noopener noreferrer"
               className="block w-full text-center px-3 py-2 text-sm bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
             >
@@ -169,7 +169,7 @@ export default function ManualActionsPanel() {
             </a>
             <a
               href="/ca/valoracio?ref=TEST-001"
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               rel="noopener noreferrer"
               className="block w-full text-center px-3 py-2 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
             >

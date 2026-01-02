@@ -1,6 +1,7 @@
 // app/api/admin/bookings/route.ts
 // API per gestionar reserves
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { safeParseInt } from '@/lib/utils';
@@ -127,7 +128,7 @@ export async function GET(req: NextRequest) {
       }, {} as Record<string, { count: number; revenue: number }>),
     });
   } catch (error) {
-    console.error('Error obtenint reserves:', error);
+    log.error('Error obtenint reserves:', error);
     return NextResponse.json(
       { error: 'Error obtenint reserves' },
       { status: 500 }
@@ -258,7 +259,7 @@ export async function POST(req: NextRequest) {
       booking,
     });
   } catch (error) {
-    console.error('Error creant reserva:', error);
+    log.error('Error creant reserva:', error);
     return NextResponse.json(
       { error: 'Error creant reserva' },
       { status: 500 }

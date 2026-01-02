@@ -1,4 +1,5 @@
 /**
+import { log } from '@/lib/logger';
  * ADMIN EVENTS PASSATS
  * ====================
  * Panel per veure events passats i enviar seqüències post-event
@@ -56,7 +57,7 @@ export default function AdminEventsPage() {
         setBookings(data.data || []);
       }
     } catch (error) {
-      console.error('Error carregant bookings:', error);
+      log.error('Error carregant bookings:', error);
     } finally {
       setLoading(false);
     }
@@ -174,7 +175,7 @@ export default function AdminEventsPage() {
 
       alert('✅ Seqüència post-event enviada correctament!');
     } catch (error) {
-      console.error('Error enviant post-event:', error);
+      log.error('Error enviant post-event:', error);
       alert('❌ Error enviant la seqüència');
     } finally {
       setSending(null);

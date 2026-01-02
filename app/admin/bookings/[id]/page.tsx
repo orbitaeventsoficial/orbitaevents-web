@@ -1,4 +1,5 @@
 // app/admin/bookings/[id]/page.tsx
+import { log } from '@/lib/logger';
 // Detall de reserva amb canvi d'estat
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -48,7 +49,7 @@ async function getBooking(id: string) {
 
     return booking;
   } catch (error) {
-    console.error('Error obtenint reserva:', error);
+    log.error('Error obtenint reserva:', error);
     return null;
   }
 }

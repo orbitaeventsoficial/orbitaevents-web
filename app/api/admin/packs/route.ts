@@ -1,6 +1,7 @@
 // app/api/admin/packs/route.ts
 // API per gestionar packs
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
       packs,
     });
   } catch (error) {
-    console.error('Error obtenint packs:', error);
+    log.error('Error obtenint packs:', error);
     return NextResponse.json(
       { error: 'Error obtenint packs' },
       { status: 500 }
@@ -91,7 +92,7 @@ export async function POST(req: NextRequest) {
       pack,
     });
   } catch (error) {
-    console.error('Error creant pack:', error);
+    log.error('Error creant pack:', error);
     return NextResponse.json(
       { error: 'Error creant pack' },
       { status: 500 }

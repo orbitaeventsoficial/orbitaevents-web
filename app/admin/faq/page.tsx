@@ -1,4 +1,5 @@
 // app/admin/faq/page.tsx
+import { log } from '@/lib/logger';
 // Pàgina de gestió de FAQs
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -28,7 +29,7 @@ async function getFaqs() {
 
     return faqs;
   } catch (error) {
-    console.error('Error obtenint FAQs:', error);
+    log.error('Error obtenint FAQs:', error);
     return [];
   }
 }

@@ -1,5 +1,6 @@
 // app/api/admin/emails/send-post-event/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
@@ -109,7 +110,7 @@ export async function POST(req: NextRequest) {
       303
     );
   } catch (error) {
-    console.error('Error enviant email post-event:', error);
+    log.error('Error enviant email post-event:', error);
     return NextResponse.redirect(
       new URL(`/admin/emails?error=${encodeURIComponent(error instanceof Error ? error.message : 'Error')}`, req.url),
       303

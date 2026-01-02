@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -254,7 +255,7 @@ export async function GET(req: NextRequest) {
     });
     
   } catch (error) {
-    console.error('Error llegint textos:', error);
+    log.error('Error llegint textos:', error);
     return NextResponse.json(
       { error: 'Error llegint textos', details: String(error) },
       { status: 500 }
@@ -308,7 +309,7 @@ export async function PUT(req: NextRequest) {
     });
     
   } catch (error) {
-    console.error('Error actualitzant textos:', error);
+    log.error('Error actualitzant textos:', error);
     return NextResponse.json(
       { error: 'Error actualitzant textos', details: String(error) },
       { status: 500 }

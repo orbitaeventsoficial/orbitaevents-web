@@ -1,4 +1,5 @@
 // app/admin/dashboard/page.tsx
+import { log } from '@/lib/logger';
 // Dashboard principal del panell d'administració - Nou model
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -155,7 +156,7 @@ async function getDashboardData() {
       recentLeads,
     };
   } catch (error) {
-    console.error('Error obtenint dades dashboard:', error);
+    log.error('Error obtenint dades dashboard:', error);
     return null;
   }
 }

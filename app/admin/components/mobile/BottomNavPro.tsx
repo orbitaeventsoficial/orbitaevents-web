@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 /**
  * BottomNavPro.tsx
@@ -243,7 +244,7 @@ export default function BottomNavPro() {
           setNewLeadsCount(data.stats.NEW || 0);
         }
       } catch (err) {
-        console.error('Error fetching leads count:', err);
+        log.error('Error fetching leads count:', err);
       }
     };
 

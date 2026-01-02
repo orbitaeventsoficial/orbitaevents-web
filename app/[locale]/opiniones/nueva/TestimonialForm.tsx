@@ -569,7 +569,7 @@ export default function TestimonialForm() {
               />
               <span className="text-gray-400 group-hover:text-gray-300 transition-colors text-sm">
                 {t('form.acceptData')}{' '}
-                <a href="/legal/privacidad" className="text-purple-400 hover:text-purple-300 underline" target="_blank">
+                <a href="/legal/privacidad" className="text-purple-400 hover:text-purple-300 underline" target="_blank" rel="noopener noreferrer">
                   {t('form.privacyPolicy')}
                 </a>{' '}
                 <span className="text-fuchsia-500">*</span>

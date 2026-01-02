@@ -274,7 +274,7 @@ export default async function ExperienciasPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href={`https://wa.me/34699121023?text=${encodeURIComponent(tWhatsapp('experiencias'))}`}
-                target="_blank"
+                target="_blank" rel="noopener noreferrer"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold rounded-2xl transition-all hover:shadow-[0_8px_30px_rgba(37,211,102,0.4)]"
               >

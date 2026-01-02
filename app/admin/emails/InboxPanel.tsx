@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
@@ -78,7 +79,7 @@ export default function InboxPanel() {
           e.uid === email.uid ? { ...e, isRead: true } : e
         ));
       } catch {
-        console.error('Error marcant email com a llegit');
+        log.error('Error marcant email com a llegit');
       }
     }
   };

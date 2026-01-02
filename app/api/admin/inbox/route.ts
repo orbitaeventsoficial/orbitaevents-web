@@ -1,5 +1,6 @@
 // app/api/admin/inbox/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { getInboxEmails, getEmailByUid, markAsRead, deleteEmail } from '@/lib/services/imapService';
 
 export const dynamic = 'force-dynamic';
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest) {
     const result = await getInboxEmails(limit, offset);
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error obtenint emails:', error);
+    log.error('Error obtenint emails:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error obtenint emails' },
       { status: 500 }
@@ -54,7 +55,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ error: 'Acció no reconeguda' }, { status: 400 });
   } catch (error) {
-    console.error('Error actualitzant email:', error);
+    log.error('Error actualitzant email:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error actualitzant email' },
       { status: 500 }
@@ -76,7 +77,7 @@ export async function DELETE(req: NextRequest) {
     await deleteEmail(uid);
     return NextResponse.json({ ok: true, message: 'Email eliminat' });
   } catch (error) {
-    console.error('Error eliminant email:', error);
+    log.error('Error eliminant email:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error eliminant email' },
       { status: 500 }

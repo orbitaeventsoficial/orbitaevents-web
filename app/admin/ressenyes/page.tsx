@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -70,7 +71,7 @@ export default function AdminReviewsPage() {
       
       setReviews(testimonials);
     } catch (error) {
-      console.error('Error carregant ressenyes:', error);
+      log.error('Error carregant ressenyes:', error);
     } finally {
       setLoading(false);
     }
@@ -85,7 +86,7 @@ export default function AdminReviewsPage() {
       });
       fetchReviews();
     } catch (error) {
-      console.error('Error actualitzant:', error);
+      log.error('Error actualitzant:', error);
     }
   };
 
@@ -98,7 +99,7 @@ export default function AdminReviewsPage() {
       });
       fetchReviews();
     } catch (error) {
-      console.error('Error eliminant:', error);
+      log.error('Error eliminant:', error);
     }
   };
 
@@ -126,7 +127,7 @@ export default function AdminReviewsPage() {
       });
       fetchReviews();
     } catch (error) {
-      console.error('Error afegint ressenya:', error);
+      log.error('Error afegint ressenya:', error);
       alert('Error afegint ressenya');
     } finally {
       setSaving(false);
@@ -161,7 +162,7 @@ export default function AdminReviewsPage() {
         <div className="flex gap-2">
           <a
             href={SITE_CONFIG.reviews.googleBusinessUrl || '#'}
-            target="_blank"
+            target="_blank" rel="noopener noreferrer"
             rel="noopener noreferrer"
             className="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
           >

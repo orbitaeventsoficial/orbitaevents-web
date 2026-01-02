@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 /**
  * MobileDashboardPro.tsx
@@ -495,7 +496,7 @@ export default function MobileDashboardPro() {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error carregant dades');
-      console.error('Dashboard error:', err);
+      log.error('Dashboard error:', err);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);

@@ -263,7 +263,7 @@ export default function LeadActionsEnhanced({
               href={`https://wa.me/${clientPhone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(
                 `Hola ${clientName}! Sóc de Òrbita Events. He preparat el pressupost per al teu event, te l'envio ara mateix 📄✨`
               )}`}
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               rel="noopener noreferrer"
               className="flex items-center gap-3 w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
             >

@@ -1,6 +1,7 @@
 // app/api/admin/faq/route.ts
 // API per gestionar FAQs
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest) {
       total: faqs.length,
     });
   } catch (error) {
-    console.error('Error obtenint FAQs:', error);
+    log.error('Error obtenint FAQs:', error);
     return NextResponse.json(
       { error: 'Error obtenint FAQs' },
       { status: 500 }
@@ -102,7 +103,7 @@ export async function POST(req: NextRequest) {
       faq,
     });
   } catch (error) {
-    console.error('Error creant FAQ:', error);
+    log.error('Error creant FAQ:', error);
     return NextResponse.json(
       { error: 'Error creant FAQ' },
       { status: 500 }

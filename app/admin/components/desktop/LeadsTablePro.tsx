@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 /**
  * LeadsTablePro.tsx - Desktop Version
@@ -237,7 +238,7 @@ export default function LeadsTablePro() {
         ]);
       }
     } catch (error) {
-      console.error('Error fetching leads:', error);
+      log.error('Error fetching leads:', error);
     } finally {
       setIsLoading(false);
     }
@@ -260,7 +261,7 @@ export default function LeadsTablePro() {
         lead.id === leadId ? { ...lead, status: newStatus } : lead
       ));
     } catch (error) {
-      console.error('Error updating status:', error);
+      log.error('Error updating status:', error);
     }
   }, []);
 

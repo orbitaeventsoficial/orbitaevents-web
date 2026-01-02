@@ -1,4 +1,5 @@
 // app/admin/packs/[id]/page.tsx
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -24,7 +25,7 @@ async function getPack(id: string) {
 
     return pack;
   } catch (error) {
-    console.error('Error obtenint pack:', error);
+    log.error('Error obtenint pack:', error);
     return null;
   }
 }

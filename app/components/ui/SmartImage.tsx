@@ -120,7 +120,6 @@ export default function SmartImage({
   const [retryCount, setRetryCount] = useState(0);
   const [currentSrc, setCurrentSrc] = useState(() => normalizeSrc(src, category));
 
-  const imgRef = useRef<HTMLImageElement>(null);
   const MAX_RETRIES = 2;
   
   // ========================================
@@ -204,7 +203,6 @@ export default function SmartImage({
       <div className={`relative ${paddingClass}`}>
         {!error ? (
           <Image
-            ref={imgRef as any}
             src={currentSrc}
             alt={alt}
             fill={useFill}

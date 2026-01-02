@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import {
   getPendingTestimonials,
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Error fetching customer testimonials:', error);
+    log.error('Error fetching customer testimonials:', error);
     const message = error instanceof Error ? error.message : 'Error obtenint testimonis';
     return NextResponse.json({ error: message }, { status: 500 });
   }
@@ -110,7 +111,7 @@ export async function PATCH(request: NextRequest) {
       message: action === 'approve' ? 'Testimoni aprovat' : 'Testimoni eliminat',
     });
   } catch (error) {
-    console.error('Error updating customer testimonial:', error);
+    log.error('Error updating customer testimonial:', error);
     const message = error instanceof Error ? error.message : 'Error actualitzant testimoni';
     return NextResponse.json({ error: message }, { status: 500 });
   }

@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 /**
  * Panel Admin - Gestió de Duplicats
@@ -80,7 +81,7 @@ export default function AdminDuplicatesPage() {
         setTotalDuplicates(data.data.totalDuplicates);
       }
     } catch (error) {
-      console.error('Error loading duplicates:', error);
+      log.error('Error loading duplicates:', error);
     }
     setIsLoading(false);
   };
@@ -110,7 +111,7 @@ export default function AdminDuplicatesPage() {
         alert(`Error: ${data.error}`);
       }
     } catch (error) {
-      console.error('Error merging:', error);
+      log.error('Error merging:', error);
       alert('Error de connexió');
     }
     setMerging(false);

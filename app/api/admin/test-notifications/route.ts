@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
@@ -158,7 +159,7 @@ export async function POST(req: NextRequest) {
       timestamp,
     });
   } catch (error) {
-    console.error('Error enviant email de test:', error);
+    log.error('Error enviant email de test:', error);
     
     return NextResponse.json({
       success: false,

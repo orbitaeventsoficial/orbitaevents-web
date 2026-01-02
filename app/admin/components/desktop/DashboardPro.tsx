@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 /**
  * DashboardPro.tsx - Desktop Version
@@ -439,7 +440,7 @@ export default function DashboardPro() {
 
       setLastUpdated(new Date());
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      log.error('Error fetching dashboard data:', error);
     } finally {
       setIsLoading(false);
     }

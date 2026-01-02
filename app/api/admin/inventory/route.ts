@@ -1,6 +1,7 @@
 // app/api/admin/inventory/route.ts
 // API per gestionar inventari
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { z } from 'zod';
@@ -89,7 +90,7 @@ export async function GET(req: NextRequest) {
       total: items.length,
     });
   } catch (error) {
-    console.error('Error obtenint inventari:', error);
+    log.error('Error obtenint inventari:', error);
     return NextResponse.json(
       { error: 'Error obtenint inventari' },
       { status: 500 }
@@ -144,7 +145,7 @@ export async function POST(req: NextRequest) {
       item,
     });
   } catch (error) {
-    console.error('Error creant element inventari:', error);
+    log.error('Error creant element inventari:', error);
     return NextResponse.json(
       { error: 'Error creant element' },
       { status: 500 }

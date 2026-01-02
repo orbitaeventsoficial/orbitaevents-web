@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { supabaseAdmin } from '@/lib/supabase';
 import { safeParseInt } from '@/lib/utils';
 
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error obtenint events:', error);
+    log.error('Error obtenint events:', error);
     return NextResponse.json({ error: 'Error obtenint events' }, { status: 500 });
   }
 }
@@ -131,7 +132,7 @@ export async function PATCH(request: NextRequest) {
       data: booking,
     });
   } catch (error) {
-    console.error('Error actualitzant booking:', error);
+    log.error('Error actualitzant booking:', error);
     return NextResponse.json({ error: 'Error actualitzant booking' }, { status: 500 });
   }
 }

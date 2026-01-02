@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -48,7 +49,7 @@ export default function SettingsNotificationsPage() {
       setConfig(data.config);
       setInstructions(data.instructions);
     } catch (error) {
-      console.error('Error carregant configuració:', error);
+      log.error('Error carregant configuració:', error);
     } finally {
       setLoading(false);
     }

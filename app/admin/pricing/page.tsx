@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -165,7 +166,7 @@ export default function PricingAdminPage() {
         setStats(data.data.stats);
       }
     } catch (error) {
-      console.error('Error:', error);
+      log.error('Error:', error);
       setMessage({ type: 'error', text: 'Error carregant dades' });
     }
     setLoading(false);
@@ -188,7 +189,7 @@ export default function PricingAdminPage() {
         setMessage({ type: 'error', text: data.error });
       }
     } catch (error) {
-      console.error('Error:', error);
+      log.error('Error:', error);
       setMessage({ type: 'error', text: 'Error guardant preu' });
     }
     setSaving(false);

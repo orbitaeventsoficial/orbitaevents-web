@@ -624,11 +624,11 @@ export default function ContactFormComplete({
             </div>
             <span className="text-white/70 text-sm">
               {t('privacy.text')}{' '}
-              <Link href="/legal/privacidad" className="text-amber-400 hover:underline" target="_blank">
+              <Link href="/legal/privacidad" className="text-amber-400 hover:underline" target="_blank" rel="noopener noreferrer">
                 {t('privacy.link')}
               </Link>{' '}
               {t('privacy.and')}{' '}
-              <Link href="/legal/terminos" className="text-amber-400 hover:underline" target="_blank">
+              <Link href="/legal/terminos" className="text-amber-400 hover:underline" target="_blank" rel="noopener noreferrer">
                 {t('privacy.termsLink')}
               </Link>
               . <span className="text-red-400">*</span>

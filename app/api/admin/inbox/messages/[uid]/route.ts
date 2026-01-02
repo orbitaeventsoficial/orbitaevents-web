@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { fetchEmailByUid, markAsRead, markAsUnread } from '@/lib/imap';
 
 export const dynamic = 'force-dynamic';
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ ok: true, email });
 
   } catch (error) {
-    console.error('Error obtenint email:', error);
+    log.error('Error obtenint email:', error);
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : 'Error obtenint email',
@@ -68,7 +69,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Acció no reconeguda' }, { status: 400 });
 
   } catch (error) {
-    console.error('Error processant acció:', error);
+    log.error('Error processant acció:', error);
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : 'Error processant acció',

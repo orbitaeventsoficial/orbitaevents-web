@@ -175,10 +175,10 @@ export function middleware(req: NextRequest) {
   // Leer cookie NEXT_LOCALE (preferencia manual del usuario)
   const cookieLocale = req.cookies.get('NEXT_LOCALE')?.value as Locale | undefined;
 
-  // Si hay cookie válida y el usuario quiere español (default), quedarse en la URL sin prefijo
+  // Si hay cookie válida y el usuario quiere el idioma por defecto (es), quedarse en la URL sin prefijo
   if (cookieLocale && locales.includes(cookieLocale)) {
     if (cookieLocale === defaultLocale) {
-      // Español: no redirigir, servir la página directamente
+      // Idioma por defecto (es): no redirigir, servir la página directamente
       const intlMiddleware = createMiddleware({
         locales: [...locales],
         defaultLocale,

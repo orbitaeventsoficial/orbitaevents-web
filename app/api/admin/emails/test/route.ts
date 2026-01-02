@@ -1,5 +1,6 @@
 // app/api/admin/emails/test/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, message: 'Email de prova enviat' });
   } catch (error) {
-    console.error('Error enviant email de prova:', error);
+    log.error('Error enviant email de prova:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error enviant email' },
       { status: 500 }

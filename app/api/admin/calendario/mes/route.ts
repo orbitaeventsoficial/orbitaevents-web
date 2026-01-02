@@ -2,6 +2,7 @@
 // API per obtenir dades del calendari amb reserves reals
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -126,7 +127,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ days });
   } catch (error) {
-    console.error('Error obtenint calendari:', error);
+    log.error('Error obtenint calendari:', error);
     return NextResponse.json(
       { error: 'Error obtenint dades del calendari' },
       { status: 500 }

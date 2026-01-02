@@ -2,6 +2,7 @@
 // CRON JOB: Envia emails post-event automàtics
 // Executar diàriament via Vercel Cron o similar
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
@@ -151,7 +152,7 @@ export async function GET(request: NextRequest) {
         });
 
       } catch (emailError) {
-        console.error(`Error enviant email a ${email}:`, emailError);
+        log.error(`Error enviant email a ${email}:`, emailError);
         results.push({
           bookingId: booking.id,
           clientName: name,
@@ -181,7 +182,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error en cron post-event:', error);
+    log.error('Error en cron post-event:', error);
     return NextResponse.json(
       { 
         error: 'Error processant events', 

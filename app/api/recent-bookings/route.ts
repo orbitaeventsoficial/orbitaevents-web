@@ -2,6 +2,7 @@
 // API per obtenir reserves recents per a les notificacions en viu
 
 import { NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 // Forçar ruta dinàmica (no s'executa durant el build)
@@ -75,7 +76,7 @@ export async function GET() {
 
     return NextResponse.json({ bookings: formattedBookings });
   } catch (error) {
-    console.error('Error fetching recent bookings:', error);
+    log.error('Error fetching recent bookings:', error);
     return NextResponse.json({ bookings: [] });
   }
 }

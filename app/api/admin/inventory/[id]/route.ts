@@ -1,6 +1,7 @@
 // app/api/admin/inventory/[id]/route.ts
 // API per gestionar element individual d'inventari
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 interface Params {
@@ -53,7 +54,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       item,
     });
   } catch (error) {
-    console.error('Error obtenint element:', error);
+    log.error('Error obtenint element:', error);
     return NextResponse.json(
       { error: 'Error obtenint element' },
       { status: 500 }
@@ -97,7 +98,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       item,
     });
   } catch (error) {
-    console.error('Error actualitzant element:', error);
+    log.error('Error actualitzant element:', error);
     return NextResponse.json(
       { error: 'Error actualitzant element' },
       { status: 500 }
@@ -152,7 +153,7 @@ export async function DELETE(req: NextRequest, { params }: Params) {
       softDeleted: existing._count.bookingItems > 0 || existing._count.packItems > 0,
     });
   } catch (error) {
-    console.error('Error eliminant element:', error);
+    log.error('Error eliminant element:', error);
     return NextResponse.json(
       { error: 'Error eliminant element' },
       { status: 500 }

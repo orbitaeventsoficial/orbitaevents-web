@@ -1,4 +1,5 @@
 // app/admin/inventory/page.tsx
+import { log } from '@/lib/logger';
 // Pàgina de gestió d'inventari
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -56,7 +57,7 @@ async function getInventory() {
 
     return { items, stats, totalValue };
   } catch (error) {
-    console.error('Error obtenint inventari:', error);
+    log.error('Error obtenint inventari:', error);
     return { items: [], stats: [], totalValue: 0 };
   }
 }

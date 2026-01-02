@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { createTestimonial } from '@/lib/services/testimonialService';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error creant testimoni:', error);
+    log.error('Error creant testimoni:', error);
     const errorMessage = error instanceof Error ? error.message : 'Error desconegut';
     return NextResponse.json(
       { error: 'Error processant la sol·licitud', details: errorMessage },

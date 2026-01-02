@@ -1,6 +1,7 @@
 // app/api/admin/pricing/route.ts
 // API unificada per gestionar preus i veure dades vinculades
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -257,7 +258,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Error obtenint preus:', error);
+    log.error('Error obtenint preus:', error);
     return NextResponse.json(
       { error: 'Error obtenint dades de preus' },
       { status: 500 }
@@ -328,7 +329,7 @@ export async function PUT(req: NextRequest) {
       extra: updated,
     });
   } catch (error) {
-    console.error('Error actualitzant preu:', error);
+    log.error('Error actualitzant preu:', error);
     return NextResponse.json(
       { error: 'Error actualitzant preu' },
       { status: 500 }

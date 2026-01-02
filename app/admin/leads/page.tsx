@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import Link from 'next/link';
 import LeadActions from './LeadActions';
 
@@ -57,7 +58,7 @@ async function getLeads() {
     });
     return leads;
   } catch (e) {
-    console.error('Error obtenint leads:', e);
+    log.error('Error obtenint leads:', e);
     return [];
   }
 }

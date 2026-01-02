@@ -1,4 +1,5 @@
 'use client';
+import { log } from '@/lib/logger';
 
 /**
  * MobileCalendarWidget.tsx
@@ -357,7 +358,7 @@ export default function MobileCalendarWidget({ fullPage = false }: { fullPage?: 
       
       setEvents(grouped);
     } catch (err) {
-      console.error('Error fetching calendar events:', err);
+      log.error('Error fetching calendar events:', err);
     } finally {
       setIsLoading(false);
     }

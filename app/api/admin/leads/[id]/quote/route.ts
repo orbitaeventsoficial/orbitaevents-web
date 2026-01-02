@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { generateQuoteHTML, createQuoteFromLead, generateQuoteNumber } from '@/lib/services/documentService';
 
@@ -86,7 +87,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
       },
     });
   } catch (error) {
-    console.error('Error generant pressupost:', error);
+    log.error('Error generant pressupost:', error);
     return NextResponse.json(
       { error: 'Error generant pressupost' },
       { status: 500 }
@@ -157,7 +158,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       message: 'Pressupost generat correctament',
     });
   } catch (error) {
-    console.error('Error generant pressupost:', error);
+    log.error('Error generant pressupost:', error);
     return NextResponse.json(
       { error: 'Error generant pressupost' },
       { status: 500 }

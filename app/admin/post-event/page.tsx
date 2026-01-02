@@ -1,4 +1,5 @@
 // app/admin/post-event/page.tsx
+import { log } from '@/lib/logger';
 // Pàgina de gestió post-event
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -58,7 +59,7 @@ async function getPostEventData() {
       completedSurveys,
     };
   } catch (error) {
-    console.error('Error obtenint dades post-event:', error);
+    log.error('Error obtenint dades post-event:', error);
     return {
       recentBookings: [],
       pendingReports: 0,

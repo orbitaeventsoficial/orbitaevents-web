@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 const VALID_STATUSES = [
@@ -65,7 +66,7 @@ export async function PATCH(req: Request, { params }: Params) {
       lead: updatedLead,
     });
   } catch (error) {
-    console.error('Error actualitzant estat del lead:', error);
+    log.error('Error actualitzant estat del lead:', error);
     return NextResponse.json(
       { error: 'Error actualitzant estat' },
       { status: 500 }

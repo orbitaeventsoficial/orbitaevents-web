@@ -1,4 +1,5 @@
 // app/admin/analytics/page.tsx
+import { log } from '@/lib/logger';
 // Pàgina d'analytics i estadístiques
 import { prisma } from '@/lib/prisma';
 
@@ -119,7 +120,7 @@ async function getAnalyticsData() {
       },
     };
   } catch (error) {
-    console.error('Error obtenint analytics:', error);
+    log.error('Error obtenint analytics:', error);
     return {
       leads: { total: 0, thisYear: 0, thisMonth: 0, bySource: [], byEventType: [], conversionByMonth: [] },
       bookings: { total: 0, thisYear: 0, byEventType: [], byPack: [] },

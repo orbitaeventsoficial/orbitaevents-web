@@ -1,6 +1,7 @@
 // app/api/admin/texts/route.ts
 // API per gestionar textos de la web (llegeix/escriu directament a es.json)
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -182,7 +183,7 @@ export async function GET() {
       editableCount: texts.filter(t => t.editable).length,
     });
   } catch (error) {
-    console.error('Error llegint textos:', error);
+    log.error('Error llegint textos:', error);
     return NextResponse.json(
       { error: 'Error llegint textos' },
       { status: 500 }
@@ -235,7 +236,7 @@ export async function PUT(req: NextRequest) {
       message: 'Textos actualitzats. Recorda fer push per traduir automàticament.',
     });
   } catch (error) {
-    console.error('Error actualitzant textos:', error);
+    log.error('Error actualitzant textos:', error);
     return NextResponse.json(
       { error: 'Error actualitzant textos' },
       { status: 500 }

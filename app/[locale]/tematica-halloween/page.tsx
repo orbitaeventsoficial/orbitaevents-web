@@ -267,7 +267,7 @@ export default async function HalloweenPage() {
             </Link>
             <Link
               href={`https://wa.me/34699121023?text=${encodeURIComponent(tWhatsapp('halloween'))}`}
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               rel="noopener noreferrer"
               className="px-8 py-4 border border-white/30 hover:border-white/60 text-white font-semibold rounded-full transition-colors inline-flex items-center justify-center gap-2"
             >

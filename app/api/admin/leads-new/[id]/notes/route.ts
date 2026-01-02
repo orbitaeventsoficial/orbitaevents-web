@@ -1,6 +1,7 @@
 // app/api/admin/leads-new/[id]/notes/route.ts
 // API per gestionar notes d'un lead
 import { NextRequest, NextResponse } from 'next/server';
+import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 interface Params {
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest, { params }: Params) {
       note,
     });
   } catch (error) {
-    console.error('Error creant nota:', error);
+    log.error('Error creant nota:', error);
     return NextResponse.json(
       { error: 'Error creant nota' },
       { status: 500 }
@@ -75,7 +76,7 @@ export async function DELETE(req: NextRequest, { params: _params }: Params) {
       ok: true,
     });
   } catch (error) {
-    console.error('Error eliminant nota:', error);
+    log.error('Error eliminant nota:', error);
     return NextResponse.json(
       { error: 'Error eliminant nota' },
       { status: 500 }
