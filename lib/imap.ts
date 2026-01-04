@@ -5,6 +5,7 @@
  */
 
 import { ImapFlow } from 'imapflow';
+import { log } from '@/lib/logger';
 
 // Configuració IMAP - DonDominio
 const IMAP_CONFIG = {
@@ -237,7 +238,9 @@ export async function markAsRead(uid: number, folder: string = 'INBOX'): Promise
       mailbox.release();
     }
   } catch (error) {
-    console.error('Error marcant com llegit:', error);
+    log.error('Failed to mark email as read', error, {
+      context: { uid, folder }
+    });
     return false;
   } finally {
     await client.logout();
@@ -260,7 +263,9 @@ export async function markAsUnread(uid: number, folder: string = 'INBOX'): Promi
       mailbox.release();
     }
   } catch (error) {
-    console.error('Error marcant com no llegit:', error);
+    log.error('Failed to mark email as unread', error, {
+      context: { uid, folder }
+    });
     return false;
   } finally {
     await client.logout();

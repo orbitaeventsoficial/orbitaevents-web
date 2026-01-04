@@ -9,6 +9,7 @@ import { ImageResponse } from '@vercel/og';
 import { NextRequest } from 'next/server';
 import { CANVAS_PRESETS, translateEventType } from '@/lib/services/canvasService';
 import { getInitials, getFirstName } from '@/lib/utils/normalize';
+import { log } from '@/lib/logger';
 
 export const runtime = 'edge';
 
@@ -241,7 +242,7 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error: unknown) {
-    console.error('Error generating canvas:', error);
+    log.error('Failed to generate canvas', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(`Error generating image: ${message}`, {
       status: 500,

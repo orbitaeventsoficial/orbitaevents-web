@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { EVENT_TYPE_LABELS } from '@/lib/constants/labels';
+import { log } from '@/lib/logger';
 
 interface Review {
   author_name: string;
@@ -20,15 +22,6 @@ interface ReviewsData {
   reviews: Review[];
   googleReviewsUrl: string;
 }
-
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Boda',
-  BIRTHDAY: '🎂 Aniversari',
-  CORPORATE: '🎯 Corporatiu',
-  COMMUNION: '⛪ Comunió',
-  BAPTISM: '👶 Bateig',
-  PRIVATE_PARTY: '🎵 Festa',
-};
 
 /**
  * Component de Ressenyes per la web pública
@@ -59,7 +52,7 @@ export default function ReviewsSection({
       const reviewsData = await res.json();
       setData(reviewsData);
     } catch (error) {
-      console.error('Error carregant ressenyes:', error);
+      log.error('Failed to load reviews', error);
     } finally {
       setLoading(false);
     }
@@ -267,7 +260,7 @@ export function ReviewsBadge({ className = '' }: { className?: string }) {
     fetch('/api/google-reviews')
       .then(res => res.json())
       .then(setData)
-      .catch(console.error);
+      .catch(err => log.error('Failed to fetch reviews for badge', err));
   }, []);
 
   if (!data || data.reviews.length === 0) return null;
@@ -305,7 +298,7 @@ export function ReviewsInline({ className = '' }: { className?: string }) {
     fetch('/api/google-reviews')
       .then(res => res.json())
       .then(setData)
-      .catch(console.error);
+      .catch(err => log.error('Failed to fetch reviews for inline display', err));
   }, []);
 
   if (!data || data.reviews.length === 0) return null;

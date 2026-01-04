@@ -6,6 +6,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { sendTestimonialReceivedEmail, sendTestimonialAdminNotification } from '@/lib/email';
+import { log } from '@/lib/logger';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -174,7 +175,9 @@ export async function createTestimonial(
     discountCode,
     discountPercent,
   }).catch((error) => {
-    console.error('Error enviant email testimoni al client:', error);
+    log.error('Failed to send testimonial confirmation email to client', error, {
+      context: { customerId: customer.id, email: customer.email }
+    });
   });
 
   // 8. Notificar a l'ADMIN que hi ha nova opinió per aprovar
@@ -188,7 +191,9 @@ export async function createTestimonial(
     hasPhoto: !!input.photoUrl,
     hasVideo: !!input.videoUrl,
   }).catch((error) => {
-    console.error('Error enviant notificació admin:', error);
+    log.error('Failed to send admin notification for new testimonial', error, {
+      context: { testimonialId: testimonial.id, customerEmail: input.email }
+    });
   });
 
   return {
