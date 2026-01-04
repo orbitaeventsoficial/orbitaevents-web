@@ -7,20 +7,9 @@
 
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
-
-// ============================================
-// UTILS - ESCAPE HTML
-// ============================================
-
-function escapeHtml(text: string | null | undefined): string {
-  if (!text) return '';
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+import { escapeHtml } from '@/lib/utils/sanitize';
+import { EVENT_TYPE_LABELS, SOURCE_LABELS } from '@/lib/constants/labels';
+import { log } from '@/lib/logger';
 
 // ============================================
 // TIPUS
@@ -49,33 +38,6 @@ export interface NotificationResult {
 }
 
 // ============================================
-// CONFIGURACIÓ
-// ============================================
-
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Boda',
-  BIRTHDAY: '🎂 Cumpleaños',
-  CORPORATE: '🎯 Corporativo',
-  COMMUNION: '⛪ Comunión',
-  BAPTISM: '👶 Bautizo',
-  GRADUATION: '🎓 Graduación',
-  ANNIVERSARY: '🎉 Aniversario',
-  PRIVATE_PARTY: '🎵 Fiesta privada',
-  OTHER: '📋 Otro',
-};
-
-const SOURCE_LABELS: Record<string, string> = {
-  WEBSITE: '🌐 Web',
-  CONFIGURATOR: '⚙️ Configurador',
-  PHONE: '📞 Teléfono',
-  WHATSAPP: '💬 WhatsApp',
-  INSTAGRAM: '📸 Instagram',
-  REFERRAL: '🤝 Referido',
-  GOOGLE: '🔍 Google',
-  OTHER: '📋 Otro',
-};
-
-// ============================================
 // NOTIFICACIÓ PRINCIPAL - NOU LEAD
 // ============================================
 
@@ -100,7 +62,12 @@ export async function notifyNewLead(lead: LeadNotificationData): Promise<Notific
 
   // Log dels resultats
   const successCount = results.filter(r => r.success).length;
-  console.log(`[Notification] Lead ${lead.id}: ${successCount}/${results.length} canals exitosos`);
+  log.info('Lead notification sent', {
+    leadId: lead.id,
+    successCount,
+    totalChannels: results.length,
+    channels: results.map(r => ({ channel: r.channel, success: r.success }))
+  });
 
   return results;
 }
@@ -113,7 +80,10 @@ async function sendLeadEmailNotification(lead: LeadNotificationData): Promise<No
   try {
     // Verificar si hi ha configuració SMTP
     if (!process.env.SMTP_HOST || !process.env.SMTP_USER) {
-      console.warn('[Email] SMTP no configurat - saltant email');
+      log.warn('SMTP not configured - skipping email notification', {
+        hasHost: !!process.env.SMTP_HOST,
+        hasUser: !!process.env.SMTP_USER
+      });
       return { success: false, channel: 'email', error: 'SMTP no configurat' };
     }
 
@@ -136,7 +106,9 @@ async function sendLeadEmailNotification(lead: LeadNotificationData): Promise<No
 
     return { success: true, channel: 'email' };
   } catch (error) {
-    console.error('[Email] Error enviant notificació:', error);
+    log.error('Failed to send email notification', error, {
+      context: { leadId: lead.id, leadEmail: lead.email }
+    });
     return {
       success: false,
       channel: 'email',
@@ -193,13 +165,17 @@ ${lead.estimatedPrice ? `💵 Estimat: ${lead.estimatedPrice}€` : ''}
     }
 
     // Si no hi ha res configurat, només loguejem
-    console.log('[WhatsApp] No configurat - generant link manual');
     const waLink = generateWhatsAppLink(lead);
-    console.log('[WhatsApp] Link per notificar manualment:', waLink);
+    log.debug('WhatsApp not configured - manual link generated', {
+      link: waLink,
+      leadId: lead.id
+    });
 
     return { success: false, channel: 'whatsapp', error: 'WhatsApp no configurat' };
   } catch (error) {
-    console.error('[WhatsApp] Error:', error);
+    log.error('Failed to send WhatsApp notification', error, {
+      context: { leadId: lead.id }
+    });
     return {
       success: false,
       channel: 'whatsapp',
@@ -236,7 +212,9 @@ async function sendWhatsAppAPI(lead: LeadNotificationData): Promise<Notification
 
     return { success: true, channel: 'whatsapp' };
   } catch (error) {
-    console.error('[WhatsApp API] Error:', error);
+    log.error('WhatsApp Business API call failed', error, {
+      context: { leadId: lead.id, hasApiUrl: !!process.env.WHATSAPP_API_URL }
+    });
     return {
       success: false,
       channel: 'whatsapp',
@@ -304,7 +282,9 @@ async function sendLeadWebhook(lead: LeadNotificationData): Promise<Notification
 
     return { success: true, channel: 'webhook' };
   } catch (error) {
-    console.error('[Webhook] Error:', error);
+    log.error('Webhook call failed', error, {
+      context: { webhookUrl: process.env.LEAD_WEBHOOK_URL, leadId: lead.id }
+    });
     return {
       success: false,
       channel: 'webhook',
@@ -466,6 +446,11 @@ export async function notifyLeadStatusChange(
 
   if (importantChanges.includes(newStatus)) {
     // Podríem enviar notificació
-    console.log(`[Notification] Lead ${lead.id} canviat de ${oldStatus} a ${newStatus}`);
+    log.info('Lead status changed to important state', {
+      leadId: lead.id,
+      oldStatus,
+      newStatus,
+      note
+    });
   }
 }

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DOMPurify from 'dompurify';
+import { EVENT_TYPE_LABELS } from '@/lib/constants/labels';
+import { log } from '@/lib/logger';
 
 interface LeadData {
   id: string;
@@ -51,16 +53,6 @@ interface Stats {
   unreadLeads: number;
   todayLeads: number;
 }
-
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Boda',
-  BIRTHDAY: '🎂 Aniversari',
-  CORPORATE: '🎯 Corporatiu',
-  COMMUNION: '⛪ Comunió',
-  BAPTISM: '👶 Bateig',
-  PRIVATE_PARTY: '🎉 Festa',
-  OTHER: '📋 Altre',
-};
 
 const STATUS_COLORS: Record<string, string> = {
   NEW: 'bg-blue-100 text-blue-700',

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { log } from '@/lib/logger';
 
 export default function EmailConfigPanel() {
   const [config, setConfig] = useState({
@@ -17,20 +18,30 @@ export default function EmailConfigPanel() {
 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = async () => {
     setSaving(true);
+    setError(null);
     try {
       const response = await fetch('/api/admin/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emailConfig: config }),
       });
-      if (!response.ok) throw new Error('Error saving');
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Error saving configuration');
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-    } catch (error) {
-      console.error('Error saving config:', error);
+      log.info('Email configuration saved successfully', { config });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(errorMessage);
+      log.error('Failed to save email configuration', err, {
+        context: { config }
+      });
     } finally {
       setSaving(false);
     }
@@ -127,6 +138,13 @@ export default function EmailConfigPanel() {
             </div>
           </div>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+            <p className="text-sm text-red-700">❌ {error}</p>
+          </div>
+        )}
 
         {/* Save Button */}
         <button
