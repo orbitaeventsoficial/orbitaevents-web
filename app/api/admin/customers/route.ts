@@ -10,6 +10,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { successResponse, ApiErrors } from '@/lib/api-response';
+import { verifyCsrf } from '@/lib/csrf';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,6 +74,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const authError = requireAuth(request);
   if (authError) return authError;
+
+  // CSRF Protection for state-changing operations
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
 
   try {
     const body = await request.json();
