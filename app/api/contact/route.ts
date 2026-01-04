@@ -7,6 +7,7 @@ import { z } from "zod";
 import { sendEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { verifyCsrf } from '@/lib/csrf';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import type { EventType, LeadSource } from '@prisma/client';
 
@@ -73,6 +74,10 @@ function determineSource(packId?: string, packName?: string): LeadSource {
 }
 
 export async function POST(req: NextRequest) {
+  // CSRF Protection
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
+
   // Rate limiting: 5 requests per 5 minuts
   const rateLimitResult = checkRateLimit(req, RATE_LIMITS.contact);
   if (rateLimitResult) return rateLimitResult;
@@ -238,8 +243,10 @@ export async function POST(req: NextRequest) {
     // ===============================================
     // EMAIL AL ADMINISTRADOR (TÚ) - FITXA COMPLETA
     // ===============================================
+    // CRITICAL FIX: Wrap in try-catch so email failures don't crash the endpoint
 
-    const adminEmailHtml = `
+    try {
+      const adminEmailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -344,26 +351,33 @@ export async function POST(req: NextRequest) {
   </div>
 </body>
 </html>
-    `;
+      `;
 
-    // Enviar email al admin (trim per evitar newlines de Vercel env vars)
-    const adminEmail = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
-    const smtpFrom = (process.env.SMTP_FROM || process.env.SMTP_USER || '').trim();
+      // Enviar email al admin (trim per evitar newlines de Vercel env vars)
+      const adminEmail = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
+      const smtpFrom = (process.env.SMTP_FROM || process.env.SMTP_USER || '').trim();
 
-    await sendEmail({
-      to: adminEmail,
-      subject: `🎉 NOU LEAD: ${name} - ${eventLabel} ${estimatedPrice ? `(${estimatedPrice}€)` : ''}`,
-      html: adminEmailHtml,
-      replyTo: clientEmail || undefined,
-      from: `"Òrbita Events Web" <${smtpFrom}>`,
-    });
+      await sendEmail({
+        to: adminEmail,
+        subject: `🎉 NOU LEAD: ${name} - ${eventLabel} ${estimatedPrice ? `(${estimatedPrice}€)` : ''}`,
+        html: adminEmailHtml,
+        replyTo: clientEmail || undefined,
+        from: `"Òrbita Events Web" <${smtpFrom}>`,
+      });
+    } catch (emailError) {
+      // Log email error but don't fail the request - lead is already saved
+      log.error('Failed to send admin notification email', emailError, {
+        context: { leadId, hasEmail: !!clientEmail }
+      });
+    }
 
     // ===============================================
     // EMAIL DE CONFIRMACIÓ AL CLIENT (si és email)
     // ===============================================
 
     if (isEmail && clientEmail) {
-      const clientEmailHtml = `
+      try {
+        const clientEmailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -461,13 +475,19 @@ export async function POST(req: NextRequest) {
   </div>
 </body>
 </html>
-      `;
+        `;
 
-      await sendEmail({
-        to: clientEmail,
-        subject: `✅ Rebut! La teva sol·licitud per ${eventLabel} - Òrbita Events`,
-        html: clientEmailHtml,
-      });
+        await sendEmail({
+          to: clientEmail,
+          subject: `✅ Rebut! La teva sol·licitud per ${eventLabel} - Òrbita Events`,
+          html: clientEmailHtml,
+        });
+      } catch (clientEmailError) {
+        // Log but don't fail - lead is saved, admin was notified (or logged)
+        log.error('Failed to send client confirmation email', clientEmailError, {
+          context: { leadId, clientEmail }
+        });
+      }
     }
 
     // ===============================================

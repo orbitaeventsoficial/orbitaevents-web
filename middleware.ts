@@ -11,21 +11,17 @@ import { locales, defaultLocale, type Locale } from './i18n';
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Rate limiting per intents d'autenticació admin (protecció força bruta)
+// WARNING: This is in-memory and will NOT work properly in serverless/Vercel production
+// Each serverless function gets its own memory space, so this Map is NOT shared
+// TODO: Migrate to Redis/Vercel KV for production-ready rate limiting
 const adminAuthAttempts = new Map<string, { count: number; resetTime: number }>();
 const ADMIN_AUTH_LIMIT = 5; // Màxim 5 intents
 const ADMIN_AUTH_WINDOW = 15 * 60 * 1000; // 15 minuts
 
-// Netejar entrades expirades cada 5 minuts
-if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of adminAuthAttempts.entries()) {
-      if (entry.resetTime < now) {
-        adminAuthAttempts.delete(key);
-      }
-    }
-  }, 5 * 60 * 1000);
-}
+// CRITICAL FIX: Removed setInterval to prevent memory leak
+// In serverless, each request creates a new function instance, so setInterval
+// would accumulate intervals without ever being cleared
+// Cleanup is now done inline during checkAdminRateLimit()
 
 function getClientIp(req: NextRequest): string {
   return (
@@ -38,6 +34,14 @@ function getClientIp(req: NextRequest): string {
 function checkAdminRateLimit(req: NextRequest): boolean {
   const clientIp = getClientIp(req);
   const now = Date.now();
+
+  // Inline cleanup: remove expired entries to prevent memory growth
+  for (const [key, entry] of adminAuthAttempts.entries()) {
+    if (entry.resetTime < now) {
+      adminAuthAttempts.delete(key);
+    }
+  }
+
   const entry = adminAuthAttempts.get(clientIp);
 
   if (!entry || entry.resetTime < now) {

@@ -19,13 +19,23 @@ const CSRF_TOKEN_HEADER = 'x-csrf-token';
 const TOKEN_MAX_AGE = 3600; // 1 hour in seconds
 
 // Get CSRF secret from environment (required in production)
-const CSRF_SECRET = process.env.CSRF_SECRET || process.env.NEXTAUTH_SECRET || 'dev-csrf-secret-CHANGE-ME';
+// CRITICAL FIX: No fallback secret - fail hard if not configured
+const CSRF_SECRET = process.env.CSRF_SECRET || process.env.NEXTAUTH_SECRET;
 
-if (process.env.NODE_ENV === 'production' && CSRF_SECRET === 'dev-csrf-secret-CHANGE-ME') {
-  log.error('CSRF: Using default CSRF secret in production', undefined, {
-    context: { message: 'Set CSRF_SECRET environment variable immediately!' }
-  });
+if (!CSRF_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    // FAIL HARD in production - no default secret allowed
+    throw new Error('CRITICAL: CSRF_SECRET environment variable is not set. Cannot start application without CSRF protection.');
+  } else {
+    // Development only: use a default but log warning
+    log.warn('CSRF: No CSRF_SECRET set - using insecure development default. This would fail in production.', {
+      message: 'Set CSRF_SECRET environment variable for production'
+    });
+  }
 }
+
+// Development fallback (only used if CSRF_SECRET is not set and we're in development)
+const CSRF_SECRET_SAFE = CSRF_SECRET || 'dev-csrf-secret-CHANGE-ME';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TOKEN GENERATION
@@ -41,7 +51,7 @@ export function generateCsrfToken(): string {
   const payload = `${tokenValue}.${timestamp}`;
 
   // Sign with HMAC to prevent tampering
-  const signature = createHmac('sha256', CSRF_SECRET)
+  const signature = createHmac('sha256', CSRF_SECRET_SAFE)
     .update(payload)
     .digest('hex');
 
@@ -61,7 +71,7 @@ function verifyCsrfToken(token: string): boolean {
   const payload = `${tokenValue}.${timestamp}`;
 
   // Verify signature
-  const expectedSignature = createHmac('sha256', CSRF_SECRET)
+  const expectedSignature = createHmac('sha256', CSRF_SECRET_SAFE)
     .update(payload)
     .digest('hex');
 
