@@ -126,7 +126,7 @@ export default function BottomNav() {
                 flex flex-col items-center justify-center
                 min-w-[60px] h-full
                 transition-colors duration-200
-                ${active ? 'text-amber-400' : 'text-white/50'}
+                ${active ? 'text-amber-400' : 'text-white/70'}
               `}
             >
               <motion.div
@@ -143,7 +143,7 @@ export default function BottomNav() {
                   />
                 )}
               </motion.div>
-              <span className={`text-[10px] mt-1 font-medium ${active ? 'text-amber-400' : ''}`}>
+              <span className={`text-xs mt-1 font-medium ${active ? 'text-amber-400' : ''}`}>
                 {t(item.labelKey)}
               </span>
             </Link>

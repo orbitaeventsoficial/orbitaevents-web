@@ -86,7 +86,10 @@ export default function WhatsAppButton() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
+    <div
+      className="fixed right-4 sm:right-6 z-50"
+      style={{ bottom: 'max(1rem, calc(1rem + env(safe-area-inset-bottom)))' }}
+    >
       {/* Tooltip */}
       <AnimatePresence>
         {showTooltip && (

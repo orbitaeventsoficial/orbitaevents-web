@@ -327,7 +327,8 @@ function FullscreenViewer({ items, initialIndex, onClose }: FullscreenViewerProp
       {currentIndex > 0 && (
         <button
           onClick={() => paginate(-1)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white"
+          aria-label="Imatge anterior"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -337,7 +338,8 @@ function FullscreenViewer({ items, initialIndex, onClose }: FullscreenViewerProp
       {currentIndex < items.length - 1 && (
         <button
           onClick={() => paginate(1)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white"
+          aria-label="Següent imatge"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -450,7 +452,8 @@ export default function PortfolioGallery() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed bottom-24 right-4 z-40 px-4 py-2 bg-red-500/90 backdrop-blur-sm rounded-full text-white text-sm font-medium shadow-lg"
+          className="fixed right-4 z-40 px-4 py-2 bg-red-500/90 backdrop-blur-sm rounded-full text-white text-sm font-medium shadow-lg"
+          style={{ bottom: 'max(6rem, calc(6rem + env(safe-area-inset-bottom)))' }}
         >
           ❤️ {likedItems.size} favorites
         </motion.div>
