@@ -17,13 +17,26 @@ const GOOGLE_REVIEW_URL = 'https://g.page/r/CXcgbvANsXSzEBI/review';
 function isAuthorized(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
-  
-  // Si no hi ha secret configurat, permetre en dev
+
+  // SECURITY: Sempre requerir secret, fins i tot en dev
   if (!cronSecret) {
-    return process.env.NODE_ENV === 'development';
+    log.error('CRON_SECRET no configurat - cron job no pot executar-se');
+    return false;
   }
-  
-  return authHeader === `Bearer ${cronSecret}`;
+
+  if (!authHeader) {
+    log.warn('Intent d\'accés a cron job sense authorization header');
+    return false;
+  }
+
+  const isValid = authHeader === `Bearer ${cronSecret}`;
+  if (!isValid) {
+    log.warn('Intent d\'accés a cron job amb credencials invàlides', {
+      context: { ip: request.headers.get('x-forwarded-for') }
+    });
+  }
+
+  return isValid;
 }
 
 interface ProcessedResult {
@@ -152,7 +165,10 @@ export async function GET(request: NextRequest) {
         });
 
       } catch (emailError) {
-        log.error(`Error enviant email a ${email}:`, emailError);
+        // SECURITY: No registrar email del client per complir GDPR
+        log.error('Error enviant email post-event', emailError, {
+          context: { bookingId: booking.id, bookingRef: booking.reference }
+        });
         results.push({
           bookingId: booking.id,
           clientName: name,

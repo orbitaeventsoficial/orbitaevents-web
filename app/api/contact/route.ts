@@ -204,8 +204,14 @@ export async function POST(req: NextRequest) {
 
     } catch (dbError) {
       // Log de l'error i continuar amb enviament d'emails
+      // SECURITY: No registrar PII (name, email, phone) per complir GDPR
       log.error('Error guardant lead a la base de dades', dbError, {
-        context: { name, contact, event, source: determineSource(packId, packName) }
+        context: {
+          eventType: event,
+          source: determineSource(packId, packName),
+          hasEmail: !!clientEmail,
+          hasPhone: !!clientPhone
+        }
       });
     }
 

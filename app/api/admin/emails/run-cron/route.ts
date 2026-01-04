@@ -116,7 +116,10 @@ export async function POST() {
         });
 
       } catch (emailError) {
-        log.error(`Error enviant email a ${email}:`, emailError);
+        // SECURITY: No registrar email del client per complir GDPR
+        log.error('Error enviant email programat', emailError, {
+          context: { bookingId: booking.id }
+        });
         results.push({
           bookingId: booking.id,
           clientName: name,
