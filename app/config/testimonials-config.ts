@@ -90,7 +90,9 @@ export async function fetchGoogleReviews(): Promise<Testimonial[]> {
     });
 
     if (!response.ok) {
-      console.warn('Google Reviews API failed:', response.status);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Google Reviews API failed:', response.status);
+      }
       return [];
     }
 
@@ -124,7 +126,9 @@ export async function fetchGoogleReviews(): Promise<Testimonial[]> {
     return filteredReviews;
 
   } catch (error) {
-    console.warn('Error fetching Google Reviews:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Error fetching Google Reviews:', error);
+    }
     return [];
   }
 }

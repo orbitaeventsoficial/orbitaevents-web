@@ -175,7 +175,9 @@ export default function HeroPortalLogo({
         }
       })
       .catch((err) => {
-        console.warn(`[HeroPortalLogo] Error loading SVG: ${err.message}`);
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[HeroPortalLogo] Error loading SVG: ${err.message}`);
+        }
         if (alive) {
           setSvgError(true);
           setSvgMarkup(null);

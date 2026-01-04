@@ -4,8 +4,8 @@ const nextConfig = {
   swcMinify: true,
 
   eslint: {
-    // No tombar el build per errors d'ESLint (labels, no-used-vars, etc.)
-    ignoreDuringBuilds: true,
+    // Detectar errores durante el build para mantener calidad de código
+    ignoreDuringBuilds: false,
   },
 
   images: {

@@ -1,0 +1,171 @@
+
+> orbitaevents-prova@1.0.0 build C:\Users\Lore\Desktop\orbitaevents
+> npm run normalize:filenames && npm run rename:portfolio && npm run generate:portfolio && npm run sync:reviews && next build
+
+
+> orbitaevents-prova@1.0.0 normalize:filenames
+> node scripts/normalize-filenames.mjs
+
+
+[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[36m  ÒRBITA EVENTS - Normalización de Archivos[0m
+[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+
+[36mProcesando:[0m public/img
+
+
+[36mProcesando:[0m public/videos
+
+
+[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+[32mRESUMEN[0m
+[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+Archivos procesados: 110
+Archivos renombrados: [32m0[0m
+[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+
+
+> orbitaevents-prova@1.0.0 rename:portfolio
+> node scripts/rename-portfolio-images.mjs
+
+
+📁 Carpeta: alquiler-equipo
+⏭️ Ja correcte, salto alquiler-equipo-01.jpg
+⏭️ Ja correcte, salto alquiler-equipo-02.jpg
+⏭️ Ja correcte, salto alquiler-equipo-03.jpg
+⏭️ Ja correcte, salto alquiler-equipo-04.jpg
+
+📁 Carpeta: bodas
+⏭️ Ja correcte, salto bodas-01.webp
+⏭️ Ja correcte, salto bodas-02.webp
+⏭️ Ja correcte, salto bodas-03.webp
+⏭️ Ja correcte, salto bodas-04.webp
+⏭️ Ja correcte, salto bodas-05.webp
+⏭️ Ja correcte, salto bodas-06.webp
+⏭️ Ja correcte, salto bodas-07.webp
+⏭️ Ja correcte, salto bodas-08.webp
+⏭️ Ja correcte, salto bodas-09.webp
+⏭️ Ja correcte, salto bodas-10.webp
+⏭️ Ja correcte, salto bodas-11.webp
+
+📁 Carpeta: discomovil
+⏭️ Ja correcte, salto discomovil-01.png
+⏭️ Ja correcte, salto discomovil-02.jpg
+⏭️ Ja correcte, salto discomovil-03.jpg
+⏭️ Ja correcte, salto discomovil-04.jpg
+
+📁 Carpeta: eventos-empresa
+⏭️ Ja correcte, salto eventos-empresa-01.webp
+⏭️ Ja correcte, salto eventos-empresa-02.webp
+⏭️ Ja correcte, salto eventos-empresa-03.webp
+⏭️ Ja correcte, salto eventos-empresa-04.webp
+⏭️ Ja correcte, salto eventos-empresa-05.png
+⏭️ Ja correcte, salto eventos-empresa-06.png
+
+📁 Carpeta: fiestas-infantiles
+⏭️ Ja correcte, salto fiestas-infantiles-01.webp
+⏭️ Ja correcte, salto fiestas-infantiles-02.jpg
+⏭️ Ja correcte, salto fiestas-infantiles-03.jpg
+
+📁 Carpeta: fiestas-privadas
+⏭️ Ja correcte, salto fiestas-privadas-01.webp
+⏭️ Ja correcte, salto fiestas-privadas-02.webp
+⏭️ Ja correcte, salto fiestas-privadas-03.webp
+⏭️ Ja correcte, salto fiestas-privadas-04.webp
+⏭️ Ja correcte, salto fiestas-privadas-05.webp
+⏭️ Ja correcte, salto fiestas-privadas-06.webp
+⏭️ Ja correcte, salto fiestas-privadas-07.webp
+
+📁 Carpeta: fiestas-tematicas-halloween
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-01.jpg
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-02.webp
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-03.webp
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-04.webp
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-05.webp
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-06.webp
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-07.webp
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-08.webp
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-09.webp
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-10.webp
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-11.webp
+⏭️ Ja correcte, salto fiestas-tematicas-halloween-12.webp
+
+📁 Carpeta: fiestas-tematicas-mon-magic
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-01.webp
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-02.webp
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-03.webp
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-04.webp
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-05.webp
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-06.webp
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-07.webp
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-08.webp
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-09.webp
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-10.jpg
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-11.webp
+⏭️ Ja correcte, salto fiestas-tematicas-mon-magic-12.jpg
+
+📁 Carpeta: produccion-tecnica
+⏭️ Ja correcte, salto produccion-tecnica-01.jpg
+⏭️ Ja correcte, salto produccion-tecnica-02.webp
+⏭️ Ja correcte, salto produccion-tecnica-03.jpg
+⏭️ Ja correcte, salto produccion-tecnica-04.jpg
+
+✅ Rename complet
+
+> orbitaevents-prova@1.0.0 generate:portfolio
+> node scripts/generate-portfolio-config.mjs
+
+🔄 Normalizando portfolio (carpetas + nombres)...
+📂 Renombrando 4 imágenes en alquiler-equipo
+📂 Renombrando 11 imágenes en bodas
+📂 Renombrando 4 imágenes en discomovil
+📂 Renombrando 6 imágenes en eventos-empresa
+📂 Renombrando 3 imágenes en fiestas-infantiles
+📂 Renombrando 7 imágenes en fiestas-privadas
+📂 Renombrando 12 imágenes en fiestas-tematicas-halloween
+📂 Renombrando 12 imágenes en fiestas-tematicas-mon-magic
+📂 Renombrando 4 imágenes en produccion-tecnica
+📝 Generando configuración del portfolio...
+✔ Config generada: C:\Users\Lore\Desktop\orbitaevents\app\config\portfolio-images.ts
+
+> orbitaevents-prova@1.0.0 sync:reviews
+> node scripts/sync-reviews.mjs
+
+═══════════════════════════════════════════════════════════════
+🔄 Sincronitzant ressenyes de Google...
+═══════════════════════════════════════════════════════════════
+[SerpAPI] No API key
+[Outscraper] No API key
+
+⚠️  No s'han pogut obtenir ressenyes automàticament.
+
+📋 Per activar sincronització automàtica:
+
+   1. SerpAPI (100 gratis/mes):
+      → https://serpapi.com
+      → Afegeix SERPAPI_KEY a Vercel
+
+   2. Outscraper (25 gratis/mes):
+      → https://outscraper.com
+      → Afegeix OUTSCRAPER_KEY a Vercel
+
+
+💾 Guardat a public/data/google-reviews.json
+   Rating: 5⭐
+   Ressenyes: 0
+
+✅ Sincronització completada!
+═══════════════════════════════════════════════════════════════
+  ▲ Next.js 14.2.35
+  - Environments: .env.local, .env
+  - Experiments (use with caution):
+    · largePageDataBytes
+
+   Creating an optimized production build ...
+uncaughtException [Error: EPERM: operation not permitted, open 'C:\Users\Lore\Desktop\orbitaevents\.next\trace'] {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'open',
+  path: 'C:\\Users\\Lore\\Desktop\\orbitaevents\\.next\\trace'
+}
+ ELIFECYCLE  Command failed with exit code 1.

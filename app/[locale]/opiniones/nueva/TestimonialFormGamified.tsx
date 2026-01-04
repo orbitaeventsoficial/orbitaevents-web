@@ -191,7 +191,10 @@ export default function TestimonialFormGamified() {
             });
           }, 150);
         } catch (error) {
-          console.log('Confetti error:', error);
+          // Silenciar error de confetti en producción
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Confetti error:', error);
+          }
         }
       }, 100);
     }

@@ -64,7 +64,9 @@ export function PWAProvider({ children }: { children: ReactNode }) {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
-          console.log('[PWA] Service Worker registered:', registration.scope);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[PWA] Service Worker registered:', registration.scope);
+          }
 
           // Escuchar actualizaciones
           registration.addEventListener('updatefound', () => {
@@ -72,15 +74,19 @@ export function PWAProvider({ children }: { children: ReactNode }) {
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // Nueva versión disponible
-                  console.log('[PWA] New version available');
+                  // Nueva versión disponible - silencioso en producción
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log('[PWA] New version available');
+                  }
                 }
               });
             }
           });
         })
         .catch((error) => {
-          console.error('[PWA] Service Worker registration failed:', error);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[PWA] Service Worker registration failed:', error);
+          }
         });
     }
   }, []);
