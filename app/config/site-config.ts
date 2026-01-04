@@ -58,6 +58,9 @@ export const SITE_CONFIG = {
     // URL de Google Business para enlace directo a reseñas
     googleBusinessUrl: process.env.NEXT_PUBLIC_GOOGLE_BUSINESS_URL || null,
 
+    // URL directa para dejar reseña en Google (acortada de Google Maps)
+    googleReviewUrl: 'https://g.page/r/CXcgbvANsXSzEBI/review',
+
     // URLs de reseñas por plataforma
     platforms: {
       google: process.env.NEXT_PUBLIC_GOOGLE_BUSINESS_URL || null,

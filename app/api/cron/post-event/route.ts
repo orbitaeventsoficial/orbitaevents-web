@@ -10,9 +10,6 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
-// Google Reviews URL - Òrbita Events
-const GOOGLE_REVIEW_URL = 'https://g.page/r/CXcgbvANsXSzEBI/review';
-
 // Verificar autorització (Vercel Cron envia CRON_SECRET)
 function isAuthorized(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
@@ -123,7 +120,7 @@ export async function GET(request: NextRequest) {
           packName,
           eventDate: booking.eventDate,
           reviewUrl,
-          googleReviewUrl: GOOGLE_REVIEW_URL,
+          googleReviewUrl: SITE_CONFIG.reviews.googleReviewUrl,
           locale,
         });
 

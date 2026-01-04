@@ -5,10 +5,11 @@
  * POST - Crear nou client
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
+import { successResponse, ApiErrors } from '@/lib/api-response';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,10 +36,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const response: Record<string, unknown> = {
-      success: true,
-      data: customers,
-    };
+    let responseData: Record<string, unknown> = { customers };
 
     if (includeStats) {
       const total = customers.length;
@@ -54,7 +52,7 @@ export async function GET(request: NextRequest) {
       // Amb consentiment GDPR
       const withGdpr = customers.filter(c => c.gdprConsent).length;
 
-      response.stats = {
+      responseData.stats = {
         total,
         withEvents,
         recentMonth,
@@ -62,10 +60,10 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    return NextResponse.json(response);
+    return successResponse(responseData);
   } catch (error) {
     log.error('Error obtenint clients:', error);
-    return NextResponse.json({ error: 'Error obtenint clients' }, { status: 500 });
+    return ApiErrors.internal('Error obtenint clients');
   }
 }
 
@@ -81,10 +79,7 @@ export async function POST(request: NextRequest) {
     const { name, email, phone, instagram, preferredLocale } = body;
 
     if (!name || !email) {
-      return NextResponse.json(
-        { error: 'Nom i email són obligatoris' },
-        { status: 400 }
-      );
+      return ApiErrors.badRequest('Nom i email són obligatoris');
     }
 
     const emailNormalized = email.toLowerCase().trim();
@@ -95,10 +90,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: 'Ja existeix un client amb aquest email' },
-        { status: 409 }
-      );
+      return ApiErrors.conflict('Ja existeix un client amb aquest email');
     }
 
     // Normalitzar nom (sense accents, lowercase)
@@ -136,12 +128,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      data: customer,
-    });
+    return successResponse(customer, 'Client creat correctament', 201);
   } catch (error) {
     log.error('Error creant client:', error);
-    return NextResponse.json({ error: 'Error creant client' }, { status: 500 });
+    return ApiErrors.internal('Error creant client');
   }
 }

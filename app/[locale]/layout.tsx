@@ -17,6 +17,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { locales, type Locale } from '@/i18n';
 import { inter, plusJakarta, jetbrains, sora } from '@/app/fonts';
+import Script from 'next/script';
 import '@/app/globals.css';
 
 // Components
@@ -37,8 +38,9 @@ function GoogleTagManager() {
   return (
     <>
       {/* Google Tag Manager - Head */}
-      <script
+      <Script
         id="gtm-head"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

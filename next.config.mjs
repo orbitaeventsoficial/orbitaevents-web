@@ -78,12 +78,17 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
-      // No cache per API routes
+      // No cache per API routes + CORS restrictiu
       {
         source: '/api/:path*',
         headers: [
           ...securityHeaders,
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
+          // CORS: Només permetre requests del propi domini
+          { key: 'Access-Control-Allow-Origin', value: 'https://orbitaevents.com' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+          { key: 'Access-Control-Max-Age', value: '86400' },
         ],
       },
     ];
