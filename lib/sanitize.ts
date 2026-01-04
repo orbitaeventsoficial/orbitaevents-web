@@ -1,11 +1,18 @@
 /**
  * HTML Sanitization Utilities
  *
- * Provides server-side and client-side HTML sanitization using DOMPurify.
+ * CLIENT-SIDE ONLY: Provides HTML sanitization using DOMPurify.
  * Prevents XSS attacks when rendering user-generated or external content.
+ *
+ * IMPORTANT USAGE NOTES:
+ * - These functions ONLY work in client components ('use client')
+ * - DO NOT use in server components or API routes
+ * - For server-side: use controlled content (translation files, validated database)
+ * - Use this for: user reviews, comments, rich text from CMS, external HTML
+ * - DON'T use for: internal translation files (already controlled and trusted)
  */
 
-import DOMPurify from 'isomorphic-dompurify';
+import DOMPurify from 'dompurify';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
