@@ -55,15 +55,15 @@ export function errorResponse(
   code?: string,
   details?: unknown
 ): NextResponse<ApiErrorResponse> {
-  return NextResponse.json(
-    {
-      success: false,
-      error,
-      ...(code && { code }),
-      ...(details && { details }),
-    },
-    { status }
-  );
+  const response: ApiErrorResponse = {
+    success: false,
+    error,
+  };
+
+  if (code) response.code = code;
+  if (details !== undefined) response.details = details;
+
+  return NextResponse.json(response, { status });
 }
 
 /**
