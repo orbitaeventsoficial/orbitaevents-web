@@ -194,11 +194,14 @@ export interface AuditLog {
 // Check if Supabase is configured
 const isSupabaseConfigured = supabaseUrl && supabaseAnonKey;
 
-// Debug logging
-if (typeof window === 'undefined') {
-  console.log('[Supabase] URL configured:', !!supabaseUrl);
-  console.log('[Supabase] Anon key configured:', !!supabaseAnonKey);
-  console.log('[Supabase] Service key configured:', !!supabaseServiceKey);
+// Debug logging (only in development)
+if (typeof window === 'undefined' && process.env.NODE_ENV === 'development') {
+  const { log } = require('@/lib/logger');
+  log.debug('Supabase configuration status', {
+    urlConfigured: !!supabaseUrl,
+    anonKeyConfigured: !!supabaseAnonKey,
+    serviceKeyConfigured: !!supabaseServiceKey,
+  });
 }
 
 /**

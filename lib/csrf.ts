@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes, createHmac } from 'crypto';
+import { log } from '@/lib/logger';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONFIGURATION
@@ -21,7 +22,9 @@ const TOKEN_MAX_AGE = 3600; // 1 hour in seconds
 const CSRF_SECRET = process.env.CSRF_SECRET || process.env.NEXTAUTH_SECRET || 'dev-csrf-secret-CHANGE-ME';
 
 if (process.env.NODE_ENV === 'production' && CSRF_SECRET === 'dev-csrf-secret-CHANGE-ME') {
-  console.error('[CSRF] WARNING: Using default CSRF secret in production! Set CSRF_SECRET environment variable.');
+  log.error('CSRF: Using default CSRF secret in production', undefined, {
+    context: { message: 'Set CSRF_SECRET environment variable immediately!' }
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

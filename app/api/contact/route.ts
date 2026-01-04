@@ -7,18 +7,8 @@ import { z } from "zod";
 import { sendEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { escapeHtml } from '@/lib/utils/sanitize';
 import type { EventType, LeadSource } from '@prisma/client';
-
-// Helper per escapar HTML i prevenir XSS
-function escapeHtml(text: string | null | undefined): string {
-  if (!text) return '';
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
 
 // Validación de datos con Zod
 const contactSchema = z.object({
