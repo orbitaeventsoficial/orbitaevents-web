@@ -280,11 +280,11 @@
       "ctaContact": "Quiero mi evento",
       "ctaPrices": "Ver qué hacemos",
       "rating": "4.9",
-      "socialProof": "48+ eventos realizados",
+      "socialProof": "50+ eventos realizados",
       "recommendedAt": "Recomendados en",
       "whatsappMessage": "¡Hola! Quiero info para un evento temático"
     },
-    "badge": "🔥 48+ eventos sin ningún invitado sentado",
+    "badge": "🔥 50+ eventos sin ningún invitado sentado",
     "themingSpecialists": "Especialistas en Tematización",
     "location": "Barcelona + Girona",
     "stats": {
@@ -1595,11 +1595,12 @@
       "300+": "Más de 300"
     },
     "budgetOptions": {
+      "menys500": "Menos de 500€",
       "500-1000": "500€ - 1.000€",
       "1000-2000": "1.000€ - 2.000€",
       "2000-3000": "2.000€ - 3.000€",
-      "3000-5000": "3.000€ - 5.000€",
-      "5000+": "Más de 5.000€"
+      "3000+": "Más de 3.000€",
+      "nosabe": "Todavía no lo sé"
     },
     "howFoundOptions": {
       "google": "Google",
