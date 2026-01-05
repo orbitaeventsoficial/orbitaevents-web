@@ -55,7 +55,7 @@ export default async function AboutPage({ params }: { params: { locale: string }
           <h1 className="text-5xl md:text-7xl font-black text-white mb-6">
             {t('hero.title')}
             <br />
-            <span className="gradient-text">{t('hero.titleHighlight')}</span>
+            <span className="gradient-text-gold">{t('hero.titleHighlight')}</span>
           </h1>
           <p
             className="text-xl text-white/70 max-w-3xl mx-auto"
@@ -68,7 +68,7 @@ export default async function AboutPage({ params }: { params: { locale: string }
           {stats.map((stat, i) => {
             const Icon = stat.icon;
             return (
-              <div key={i} className="oe-card p-6 text-center rounded-3xl">
+              <div key={i} className="card p-6 text-center rounded-3xl">
                 <Icon className="w-10 h-10 text-oe-gold mx-auto mb-3" />
                 <p className="text-4xl font-black text-oe-gold">{t(`stats.${stat.key}.value`)}</p>
                 <p className="text-sm text-white/70">{t(`stats.${stat.key}.label`)}</p>
@@ -78,7 +78,7 @@ export default async function AboutPage({ params }: { params: { locale: string }
         </div>
 
         {/* NUESTRA HISTORIA (SEO + CONFIANZA) */}
-        <div className="oe-card p-10 rounded-3xl mb-20">
+        <div className="card p-10 rounded-3xl mb-20">
           <h2 className="text-3xl font-bold text-white mb-6 text-center">
             {t('history.title')}
           </h2>
@@ -104,7 +104,7 @@ export default async function AboutPage({ params }: { params: { locale: string }
             {services.map((item, i) => {
               const Icon = item.icon;
               return (
-                <div key={i} className="oexm-card p-6 rounded-3xl text-center hover:border-oe-gold/50 transition-all">
+                <div key={i} className="card p-6 rounded-3xl text-center hover:border-oe-gold/50 transition-all">
                   <Icon className="w-12 h-12 text-oe-gold mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-white mb-2">{t(`services.items.${item.key}.title`)}</h3>
                   <p className="text-sm text-white/70">{t(`services.items.${item.key}.desc`)}</p>
@@ -171,7 +171,7 @@ export default async function AboutPage({ params }: { params: { locale: string }
             ].map((item, i) => {
               const Icon = item.icon;
               return (
-                <div key={i} className="oe-card p-6 rounded-2xl text-center hover:border-oe-gold/30 transition-all group">
+                <div key={i} className="card p-6 rounded-2xl text-center hover:border-oe-gold/30 transition-all group">
                   <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-oe-gold/10 flex items-center justify-center group-hover:bg-oe-gold/20 transition-colors">
                     <Icon className="w-6 h-6 text-oe-gold" />
                   </div>
@@ -190,7 +190,7 @@ export default async function AboutPage({ params }: { params: { locale: string }
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {teamMembers.map((member, i) => (
-              <div key={i} className="oe-card p-6 rounded-3xl text-center">
+              <div key={i} className="card p-6 rounded-3xl text-center">
                 <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-oe-gold/20 to-oe-gold/10 relative">
                   <Image
                     src={member.image}
@@ -222,7 +222,7 @@ export default async function AboutPage({ params }: { params: { locale: string }
           </p>
           <Link
             href="/contacto"
-            className="oe-btn-gold text-xl px-10 py-6 inline-flex items-center gap-3"
+            className="btn-primary text-xl px-10 py-6 inline-flex items-center gap-3"
           >
             {t('cta.button')}
             <ArrowRight className="w-6 h-6" />
