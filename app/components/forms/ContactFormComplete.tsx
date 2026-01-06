@@ -494,28 +494,29 @@ export default function ContactFormComplete({
           />
         </div>
 
-        {/* Com ens has trobat */}
-        <div>
-          <label className="block text-white/70 text-sm mb-2">
-            {t('labels.howFound')}
-          </label>
-          <select
-            value={formData.howFound}
-            onChange={(e) => updateField('howFound', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                     text-white outline-none focus:border-amber-500 focus:ring-2
-                     focus:ring-amber-500 transition-all appearance-none cursor-pointer"
-          >
-            <option value="" className="bg-black">{t('placeholders.selectHowFound')}</option>
-            <option value="google" className="bg-black">{t('howFoundOptions.google')}</option>
-            <option value="instagram" className="bg-black">{t('howFoundOptions.instagram')}</option>
-            <option value="facebook" className="bg-black">{t('howFoundOptions.facebook')}</option>
-            <option value="tiktok" className="bg-black">{t('howFoundOptions.tiktok')}</option>
-            <option value="recomendacion" className="bg-black">{t('howFoundOptions.recomendacion')}</option>
-            <option value="evento" className="bg-black">{t('howFoundOptions.evento')}</option>
-            <option value="otro" className="bg-black">{t('howFoundOptions.otro')}</option>
-          </select>
-        </div>
+      </div>
+
+      {/* Com ens has trobat (opcional - al final) */}
+      <div className="pt-4">
+        <label className="block text-white/50 text-sm mb-2">
+          {t('labels.howFound')} <span className="text-white/30">(opcional)</span>
+        </label>
+        <select
+          value={formData.howFound}
+          onChange={(e) => updateField('howFound', e.target.value)}
+          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
+                   text-white outline-none focus:border-amber-500 focus:ring-2
+                   focus:ring-amber-500 transition-all appearance-none cursor-pointer"
+        >
+          <option value="" className="bg-black">{t('placeholders.selectHowFound')}</option>
+          <option value="google" className="bg-black">{t('howFoundOptions.google')}</option>
+          <option value="instagram" className="bg-black">{t('howFoundOptions.instagram')}</option>
+          <option value="facebook" className="bg-black">{t('howFoundOptions.facebook')}</option>
+          <option value="tiktok" className="bg-black">{t('howFoundOptions.tiktok')}</option>
+          <option value="recomendacion" className="bg-black">{t('howFoundOptions.recomendacion')}</option>
+          <option value="evento" className="bg-black">{t('howFoundOptions.evento')}</option>
+          <option value="otro" className="bg-black">{t('howFoundOptions.otro')}</option>
+        </select>
       </div>
 
       {/* Seccio: Legal */}
