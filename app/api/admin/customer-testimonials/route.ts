@@ -211,6 +211,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const eventTypeValue: EventTypeValue | null =
+      eventType && EVENT_TYPES.includes(eventType as EventTypeValue)
+        ? (eventType as EventTypeValue)
+        : null;
+
     const testimonial = await prisma.customerTestimonial.create({
       data: {
         customerId: customer.id,
