@@ -107,72 +107,6 @@ function validateForm(data: FormData, t: (key: string) => string): FormErrors {
 
 // ============================================================
 // SIMPLE CAPTCHA (alternativa a reCAPTCHA)
-// ============================================================
-
-function SimpleCaptcha({
-  onVerify,
-  t
-}: {
-  onVerify: (verified: boolean) => void;
-  t: (key: string) => string;
-}) {
-  const [num1, setNum1] = useState(5); // Default values for SSR
-  const [num2, setNum2] = useState(3);
-  const [answer, setAnswer] = useState('');
-  const [verified, setVerified] = useState(false);
-  const [error, setError] = useState(false);
-
-  // Generate random numbers only on client to avoid hydration mismatch
-  useEffect(() => {
-    setNum1(Math.floor(Math.random() * 10) + 1);
-    setNum2(Math.floor(Math.random() * 10) + 1);
-  }, []);
-
-  const checkAnswer = (value: string) => {
-    setAnswer(value);
-    setError(false);
-
-    if (value === '') {
-      onVerify(false);
-      setVerified(false);
-      return;
-    }
-
-    const correct = parseInt(value) === num1 + num2;
-    setVerified(correct);
-    onVerify(correct);
-
-    if (value.length >= 2 && !correct) {
-      setError(true);
-    }
-  };
-
-  return (
-    <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-      <p className="text-white/60 text-sm mb-3">
-        {t('captcha.title')}
-      </p>
-      <div className="flex items-center gap-3">
-        <span className="text-white font-mono text-lg">
-          {num1} + {num2} =
-        </span>
-        <input
-          type="number"
-          value={answer}
-          onChange={(e) => checkAnswer(e.target.value)}
-          className={`w-20 px-3 py-2 rounded-lg bg-white/10 text-white text-center
-                   font-mono text-lg outline-none transition-all
-                   ${verified ? 'ring-2 ring-green-500 bg-green-500/10' : ''}
-                   ${error ? 'ring-2 ring-red-500 bg-red-500/10' : ''}
-                   focus:ring-2 focus:ring-amber-500`}
-          placeholder={t('captcha.placeholder')}
-        />
-        {verified && <span className="text-green-400 text-xl">✓</span>}
-        {error && <span className="text-red-400 text-xl">✗</span>}
-      </div>
-    </div>
-  );
-}
 
 // ============================================================
 // COMPONENT PRINCIPAL
@@ -202,7 +136,6 @@ export default function ContactFormComplete({
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
-  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
@@ -241,11 +174,6 @@ export default function ContactFormComplete({
 
     // Validate all
     const formErrors = validateForm(formData, t);
-
-    // Check captcha
-    if (!captchaVerified) {
-      formErrors.captcha = t('validation.captchaRequired');
-    }
 
     setErrors(formErrors);
 
@@ -590,14 +518,8 @@ export default function ContactFormComplete({
         </div>
       </div>
 
-      {/* Seccio: Verificacio i Legal */}
+      {/* Seccio: Legal */}
       <div className="space-y-4 pt-4 border-t border-white/10">
-        {/* Captcha */}
-        <SimpleCaptcha onVerify={setCaptchaVerified} t={t} />
-        {errors.captcha && (
-          <p className="text-red-400 text-sm">{errors.captcha}</p>
-        )}
-
         {/* Checkbox privacitat */}
         <div className={`${errors.acceptPrivacy && touched.acceptPrivacy ? 'error-field' : ''}`}>
           <label className="flex items-start gap-3 cursor-pointer group">
