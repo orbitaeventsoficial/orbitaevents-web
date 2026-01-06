@@ -539,8 +539,32 @@ export default function MobileLeadsPro() {
   }, []);
 
   const handleArchive = useCallback(async (id: string) => {
-    // TODO: Implementar archivado
-  }, []);
+    try {
+      const res = await fetch(`/api/admin/leads-new/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'LOST' }),
+      });
+      if (!res.ok) throw new Error('Error arxivant lead');
+
+      // Actualitzar llista (eliminem de la vista actual)
+      setLeads((prev) => prev.filter((lead) => lead.id !== id));
+
+      // Actualitzar stats locals (baixar estat anterior, pujar LOST)
+      setStats((prev) => {
+        const clone = { ...prev };
+        // Restar de l'estat anterior si es coneix
+        const lead = leads.find((l) => l.id === id);
+        if (lead?.status && clone[lead.status] !== undefined) {
+          clone[lead.status] = Math.max(0, clone[lead.status] - 1);
+        }
+        clone.LOST = (clone.LOST || 0) + 1;
+        return clone;
+      });
+    } catch (err) {
+      log.error('Error arxivant lead:', err);
+    }
+  }, [leads]);
 
   const handleLoadMore = useCallback(() => {
     if (!isLoading && hasMore) {
