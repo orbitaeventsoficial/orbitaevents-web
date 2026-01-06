@@ -4,6 +4,7 @@
 import { SITE_CONFIG } from '@/config/site-config';
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
 import { Send, CheckCircle, AlertCircle } from "lucide-react";
@@ -22,6 +23,7 @@ type FormData = {
 
 export default function ContactForm() {
   const t = useTranslations('contact');
+  const router = useRouter();
   const [sent, setSent] = useState(false);
   const [confetti, setConfetti] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -91,11 +93,10 @@ export default function ContactForm() {
         source: "contact_form",
       });
 
-      /* -------------------------- ÉXITO -------------------------- */
-      setSent(true);
-      setConfetti(true);
-      reset();
-      setTimeout(() => setConfetti(false), 4000);
+      /* -------------------------- REDIRECT A /GRACIAS -------------------------- */
+      // Pequeño delay para asegurar que el tracking se envía
+      await new Promise(resolve => setTimeout(resolve, 300));
+      router.push('/gracias');
     } catch (e) {
       setError(
         e instanceof Error ? e.message : t('errors.unknown')

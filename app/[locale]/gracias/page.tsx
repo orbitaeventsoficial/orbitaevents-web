@@ -113,21 +113,29 @@ export default async function GraciasPage() {
         </p>
       </div>
 
-      {/* Tracking script */}
+      {/* Tracking script - GTM + Google Ads */}
       <script
         dangerouslySetInnerHTML={{
           __html: `
-            if (typeof window !== 'undefined' && window.gtag) {
-              window.gtag('event', 'conversion', {
-                'send_to': 'AW-CONVERSION_ID/CONVERSION_LABEL',
-                'value': 1.0,
-                'currency': 'EUR'
-              });
-              window.gtag('event', 'generate_lead', {
+            (function() {
+              // Push to dataLayer (GTM)
+              window.dataLayer = window.dataLayer || [];
+              window.dataLayer.push({
+                'event': 'generate_lead',
                 'event_category': 'engagement',
-                'event_label': 'contact_form_complete'
+                'event_label': 'contact_form_complete',
+                'value': 1
               });
-            }
+
+              // Google Ads Conversion (reemplazar con tu AW-ID cuando lo tengas)
+              if (typeof window.gtag === 'function') {
+                window.gtag('event', 'conversion', {
+                  'send_to': 'AW-CONVERSION_ID/CONVERSION_LABEL',
+                  'value': 1.0,
+                  'currency': 'EUR'
+                });
+              }
+            })();
           `,
         }}
       />
