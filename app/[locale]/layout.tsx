@@ -19,6 +19,7 @@ import { locales, type Locale } from '@/i18n';
 import { inter, plusJakarta, jetbrains, sora } from '@/app/fonts';
 import Script from 'next/script';
 import { SITE_CONFIG } from '@/config/site-config';
+import { getAllPacks, getMinPriceByService } from '@/config/packs-config';
 import '@/app/globals.css';
 
 // Components
@@ -77,13 +78,32 @@ function GoogleTagManagerBody() {
 // JSON-LD STRUCTURED DATA - SEO MILLORAT
 // ═══════════════════════════════════════════════════════════════════════════
 
+const MIN_SERVICE_PRICE = Math.min(
+  getMinPriceByService('bodas'),
+  getMinPriceByService('fiestas'),
+  getMinPriceByService('empresas'),
+  getMinPriceByService('discomovil'),
+);
+
+const ALL_PACKS = getAllPacks();
+const MAX_SERVICE_PRICE = ALL_PACKS.length
+  ? Math.max(...ALL_PACKS.map((p) => p.priceValue))
+  : MIN_SERVICE_PRICE;
+
+const PRICE_RANGE = `${MIN_SERVICE_PRICE} EUR - ${MAX_SERVICE_PRICE} EUR`;
+
+const BODAS_PRICE = getMinPriceByService('bodas');
+const DISCO_PRICE = getMinPriceByService('discomovil');
+const FIESTAS_PRICE = getMinPriceByService('fiestas');
+
 const JSON_LD_ORGANIZATION = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
   '@id': 'https://orbitaevents.com/#organization',
-  name: 'Òrbita Events',
-  alternateName: ['Orbita Events', 'Òrbita Events Barcelona'],
-  description: 'DJ professional i tematització completa per a casaments, festes i events corporatius a Barcelona i Girona. Especialistes en experiències úniques amb so 4000W, il·luminació LED i efectes especials.',
+  name: 'Orbita Events',
+  alternateName: ['Orbita Events', 'Orbita Events Barcelona'],
+  description:
+    'DJ profesional y tematizacion completa para bodas, fiestas y eventos de empresa en Barcelona y Girona. Experiencias inmersivas con sonido 4000W, iluminacion LED y efectos especiales.',
   url: 'https://orbitaevents.com',
   logo: {
     '@type': 'ImageObject',
@@ -96,8 +116,8 @@ const JSON_LD_ORGANIZATION = {
     'https://orbitaevents.com/img/portfolio/bodas/bodas-01.webp',
     'https://orbitaevents.com/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
   ],
-  telephone: '+34699121023',
-  email: 'info@orbitaevents.com',
+  telephone: SITE_CONFIG.business.phone,
+  email: SITE_CONFIG.business.email,
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Granollers',
@@ -115,19 +135,19 @@ const JSON_LD_ORGANIZATION = {
     { '@type': 'City', name: 'Barcelona' },
     { '@type': 'City', name: 'Girona' },
     { '@type': 'City', name: 'Granollers' },
-    { '@type': 'City', name: 'Mataró' },
+    { '@type': 'City', name: 'Mataro' },
     { '@type': 'City', name: 'Sabadell' },
     { '@type': 'City', name: 'Terrassa' },
     { '@type': 'City', name: 'Badalona' },
     { '@type': 'City', name: 'Vic' },
     { '@type': 'City', name: 'Manresa' },
     { '@type': 'AdministrativeArea', name: 'Maresme' },
-    { '@type': 'AdministrativeArea', name: 'Vallès Oriental' },
-    { '@type': 'AdministrativeArea', name: 'Vallès Occidental' },
+    { '@type': 'AdministrativeArea', name: 'Valles Oriental' },
+    { '@type': 'AdministrativeArea', name: 'Valles Occidental' },
     { '@type': 'AdministrativeArea', name: 'Costa Brava' },
     { '@type': 'State', name: 'Catalunya' },
   ],
-  priceRange: '€€',
+  priceRange: PRICE_RANGE,
   currenciesAccepted: 'EUR',
   paymentAccepted: 'Cash, Credit Card, Bank Transfer',
   openingHoursSpecification: [
@@ -158,16 +178,17 @@ const JSON_LD_ORGANIZATION = {
   },
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
-    name: 'Serveis DJ i Events Barcelona',
+    name: 'Servicios DJ y Eventos Barcelona',
     itemListElement: [
       {
         '@type': 'Offer',
         itemOffered: {
           '@type': 'Service',
-          name: 'DJ Casaments Barcelona',
-          description: 'DJ professional per a casaments amb so 4000W, il·luminació i efectes especials. Música de cerimònia, còctel i ball fins la matinada.',
+          name: 'DJ bodas Barcelona',
+          description:
+            'DJ profesional para bodas con sonido 4000W, iluminacion y efectos especiales. Ceremonia, coctel y baile final.',
         },
-        price: '550',
+        price: String(BODAS_PRICE),
         priceCurrency: 'EUR',
         priceValidUntil: '2025-12-31',
       },
@@ -175,10 +196,11 @@ const JSON_LD_ORGANIZATION = {
         '@type': 'Offer',
         itemOffered: {
           '@type': 'Service',
-          name: 'Discomòbil Barcelona',
-          description: 'Discomòbil professional amb DJ, so de qualitat, llums LED i efectes especials per a qualsevol celebració.',
+          name: 'Discomovil Barcelona',
+          description:
+            'Discomovil profesional con DJ, sonido de calidad, luces LED y efectos especiales para cualquier celebracion.',
         },
-        price: '350',
+        price: String(DISCO_PRICE),
         priceCurrency: 'EUR',
         priceValidUntil: '2025-12-31',
       },
@@ -186,10 +208,11 @@ const JSON_LD_ORGANIZATION = {
         '@type': 'Offer',
         itemOffered: {
           '@type': 'Service',
-          name: 'Festes Temàtiques',
-          description: 'Tematització completa per a festes: Món Màgic (Harry Potter), Halloween, anys 80 i més. Decoració, efectes i ambientació.',
+          name: 'Fiestas tematicas y privadas',
+          description:
+            'Tematizacion completa para fiestas: Halloween, anos 80, mundo magico y mas. Decoracion, efectos y ambientacion.',
         },
-        price: '800',
+        price: String(FIESTAS_PRICE),
         priceCurrency: 'EUR',
         priceValidUntil: '2025-12-31',
       },
@@ -203,27 +226,29 @@ const JSON_LD_ORGANIZATION = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'Experiències Immersives per Events | DJ + Tematització Barcelona | Òrbita Events | Des de 250€',
-    template: '%s | Òrbita Events',
+    default:
+      'Experiencias inmersivas para eventos | DJ + tematizacion Barcelona | Orbita Events | Desde 250 EUR',
+    template: '%s | Orbita Events',
   },
-  description: 'Creem experiències úniques: casaments Harry Potter, festes Halloween, esdeveniments corporatius. DJ professional + tematització completa. Des de 250€. Barcelona i Girona. ★★★★★ 5.0/5',
+  description:
+    'Creamos experiencias unicas: bodas, fiestas tematicas y eventos corporativos. DJ profesional + tematizacion completa. Desde 250 EUR. Barcelona y Girona. Valoracion 5.0/5.',
   keywords: [
-    'DJ casament Barcelona',
-    'DJ boda Girona',
-    'discomòbil Barcelona',
-    'DJ events corporatius',
-    'festa temàtica Halloween',
-    'festa Harry Potter Barcelona',
-    'so i llums casament',
+    'DJ bodas Barcelona',
+    'DJ bodas Girona',
+    'discomovil Barcelona',
+    'DJ eventos empresa',
+    'fiesta tematica Halloween',
+    'fiesta Harry Potter Barcelona',
+    'sonido e iluminacion bodas',
     'DJ Costa Brava',
     'DJ Maresme',
-    'DJ Vallès',
-    'animació casaments',
-    'efectes especials events',
+    'DJ Valles',
+    'animacion bodas',
+    'efectos especiales eventos',
   ],
-  authors: [{ name: 'Òrbita Events', url: 'https://orbitaevents.com' }],
-  creator: 'Òrbita Events',
-  publisher: 'Òrbita Events',
+  authors: [{ name: 'Orbita Events', url: 'https://orbitaevents.com' }],
+  creator: 'Orbita Events',
+  publisher: 'Orbita Events',
   formatDetection: {
     email: false,
     address: false,
@@ -242,23 +267,25 @@ export const metadata: Metadata = {
     locale: 'ca_ES',
     alternateLocale: ['es_ES'],
     url: 'https://orbitaevents.com',
-    siteName: 'Òrbita Events',
-    title: 'Experiències Immersives per Events | DJ + Tematització Barcelona',
-    description: 'Creem experiències úniques: casaments Harry Potter, festes Halloween, esdeveniments corporatius. DJ professional + tematització completa. Des de 250€. ★★★★★ 5.0/5',
+    siteName: 'Orbita Events',
+    title: 'Experiencias inmersivas para eventos | DJ + tematizacion Barcelona',
+    description:
+      'Creamos experiencias unicas: bodas, fiestas tematicas y eventos corporativos. DJ profesional + tematizacion completa. Desde 250 EUR. Valoracion 5.0/5.',
     images: [
       {
         url: '/og-home.jpg',
         width: 1200,
         height: 630,
-        alt: 'Òrbita Events - DJ Casaments Barcelona',
+        alt: 'Orbita Events - DJ bodas Barcelona',
         type: 'image/jpeg',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Experiències Immersives per Events | Òrbita Events',
-    description: 'Casaments Harry Potter, festes Halloween, esdeveniments corporatius. DJ + tematització completa. Des de 250€. ★★★★★ 5.0/5',
+    title: 'Experiencias inmersivas para eventos | Orbita Events',
+    description:
+      'Bodas, fiestas tematicas y eventos corporativos. DJ + tematizacion completa. Desde 250 EUR. Valoracion 5.0/5.',
     images: ['/og-home.jpg'],
     creator: '@orbitaevents',
   },
@@ -392,6 +419,9 @@ export default async function LocaleLayout({
     </html>
   );
 }
+
+
+
 
 
 
