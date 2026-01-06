@@ -4,9 +4,16 @@ import crypto from 'crypto';
 export const dynamic = 'force-dynamic';
 
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+function createState(secret: string): string {
+  const ts = Math.floor(Date.now() / 1000);
+  const payload = `${ts}`;
+  const sig = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
+  return `${payload}.${sig}`;
+}
 
 export async function GET(req: NextRequest) {
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET || process.env.CSRF_SECRET;
   const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI;
 
   if (!clientId || !redirectUri) {
@@ -16,9 +23,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const state = crypto.randomUUID();
-  const nextUrl = req.nextUrl.searchParams.get('next') || '/admin/ressenyes?google=connected';
-
+  const state = createState(clientSecret || '');
   const url = new URL(AUTH_URL);
   url.searchParams.set('client_id', clientId);
   url.searchParams.set('redirect_uri', redirectUri);
@@ -29,21 +34,5 @@ export async function GET(req: NextRequest) {
   url.searchParams.set('state', state);
   url.searchParams.set('include_granted_scopes', 'true');
 
-  const response = NextResponse.redirect(url.toString());
-  response.cookies.set('google_oauth_state', state, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'lax',
-    maxAge: 10 * 60,
-    path: '/api/google/oauth/callback',
-  });
-  response.cookies.set('google_oauth_next', nextUrl, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'lax',
-    maxAge: 10 * 60,
-    path: '/api/google/oauth/callback',
-  });
-
-  return response;
+  return NextResponse.redirect(url.toString());
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 
@@ -7,6 +8,19 @@ export const dynamic = 'force-dynamic';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const ACCOUNT_API = 'https://mybusinessaccountmanagement.googleapis.com/v1/accounts';
 const LOCATION_API = 'https://businessprofile.googleapis.com/v1';
+const STATE_TTL_SECONDS = 10 * 60;
+
+function verifyState(state: string, secret: string): boolean {
+  const parts = state.split('.');
+  if (parts.length !== 2) return false;
+  const [payload, sig] = parts;
+  const ts = Number(payload);
+  if (!Number.isFinite(ts)) return false;
+  const age = Math.floor(Date.now() / 1000) - ts;
+  if (age < 0 || age > STATE_TTL_SECONDS) return false;
+  const expected = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
+  return crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
+}
 
 type TokenResponse = {
   access_token?: string;
@@ -50,14 +64,14 @@ export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get('code');
   const state = req.nextUrl.searchParams.get('state');
   const error = req.nextUrl.searchParams.get('error');
-  const cookieState = req.cookies.get('google_oauth_state')?.value;
-  const nextUrl = req.cookies.get('google_oauth_next')?.value || '/admin/ressenyes?google=connected';
+  const nextUrl = '/admin/ressenyes?google=connected';
 
   if (error) {
     return NextResponse.redirect(new URL(`/admin/ressenyes?google=error&reason=${encodeURIComponent(error)}`, req.url));
   }
 
-  if (!code || !state || !cookieState || state !== cookieState) {
+  const secret = process.env.GOOGLE_OAUTH_CLIENT_SECRET || process.env.CSRF_SECRET || '';
+  if (!code || !state || !secret || !verifyState(state, secret)) {
     return NextResponse.json(
       { ok: false, error: 'Invalid OAuth state' },
       { status: 400 }
@@ -121,10 +135,7 @@ export async function GET(req: NextRequest) {
       upsertSetting('integrations.google.connectedAt', new Date().toISOString(), 'Google connection timestamp'),
     ]);
 
-    const response = NextResponse.redirect(new URL(nextUrl, req.url));
-    response.cookies.delete('google_oauth_state');
-    response.cookies.delete('google_oauth_next');
-    return response;
+    return NextResponse.redirect(new URL(nextUrl, req.url));
   } catch (err) {
     log.error('Google OAuth callback error:', err);
     return NextResponse.redirect(new URL('/admin/ressenyes?google=error', req.url));
