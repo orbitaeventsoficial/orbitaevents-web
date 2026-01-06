@@ -131,7 +131,10 @@ export function middleware(req: NextRequest) {
 
     try {
       const base64Credentials = authHeader.split(' ')[1]!;
-      const decoded = atob(base64Credentials);
+      const decoded =
+        typeof atob === 'function'
+          ? atob(base64Credentials)
+          : Buffer.from(base64Credentials, 'base64').toString('utf8');
       const [user, ...passParts] = decoded.split(':');
       const pass = passParts.join(':');
 

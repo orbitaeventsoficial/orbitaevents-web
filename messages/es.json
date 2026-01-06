@@ -541,7 +541,7 @@
       "festes": {
         "title": "Fiestas Privadas",
         "description": "La fiesta que recordarán siempre",
-        "price": "Desde 350€",
+        "price": "Desde 250€",
         "features": [
           "Discomóvil",
           "Luces LED",
@@ -6087,7 +6087,7 @@
         "title": "Fiestas",
         "subtitle": "Cumpleaños y más",
         "description": "Discomóvil completo con todo incluido",
-        "price": "Desde 350€",
+        "price": "Desde 250€",
         "badge": "",
         "features": {
           "0": "Luces LED",

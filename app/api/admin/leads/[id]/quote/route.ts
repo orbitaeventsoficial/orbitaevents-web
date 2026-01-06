@@ -7,53 +7,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
-import { generateQuoteHTML, createQuoteFromLead, generateQuoteNumber } from '@/lib/services/documentService';
+import { generateQuoteHTML, createQuoteFromLead, generateQuoteNumber } from "@/lib/services/documentService";
+import { getPackById, getPacksByService, type PackDefinition } from "@/config/packs-config";
 
-// Configuració dels packs (simplificat - en producció vindria de BBDD)
-const PACKS_CONFIG: Record<string, { name: string; price: number; djHours: number; extraHourPrice: number; description: string }> = {
-  'flash': {
-    name: 'Pack Flash ⚡',
-    price: 450,
-    djHours: 4,
-    extraHourPrice: 75,
-    description: '4h DJ + So 4000W + Il·luminació bàsica + Màquina de fum',
-  },
-  'party-starter': {
-    name: 'Pack Party Starter 🎉',
-    price: 650,
-    djHours: 5,
-    extraHourPrice: 75,
-    description: '5h DJ + So 6000W + Il·luminació avançada + Fum + Micròfon',
-  },
-  'premium': {
-    name: 'Pack Premium ✨',
-    price: 950,
-    djHours: 6,
-    extraHourPrice: 85,
-    description: '6h DJ + So 8000W + Il·luminació pro + Efectes especials + Micròfon',
-  },
-  'corporate': {
-    name: 'Pack Corporate 🎯',
-    price: 800,
-    djHours: 5,
-    extraHourPrice: 90,
-    description: '5h DJ + So professional + Il·luminació ambient + Micròfon sense fils',
-  },
-  'wedding': {
-    name: 'Pack Boda 💍',
-    price: 1200,
-    djHours: 8,
-    extraHourPrice: 85,
-    description: '8h DJ + So premium + Il·luminació elegant + Efectes + Coordinació amb fotògraf',
-  },
-  'default': {
-    name: 'Servei DJ Professional',
-    price: 500,
-    djHours: 4,
-    extraHourPrice: 75,
-    description: 'Servei DJ complet amb so i il·luminació',
-  },
+type QuotePack = {
+  name: string;
+  price: number;
+  djHours: number;
+  extraHourPrice: number;
+  description: string;
 };
+
+function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
+  if (!pack) {
+    return {
+      name: 'Servei DJ Professional',
+      price: 500,
+      djHours: 4,
+      extraHourPrice: 80,
+      description: 'Servei DJ complet amb so i il·luminació',
+    };
+  }
+
+  const djHours = typeof (pack as any).durationHours === 'number' ? (pack as any).durationHours : 4;
+  return {
+    name: pack.name,
+    price: pack.priceValue ?? 500,
+    djHours,
+    extraHourPrice: 80,
+    description: (pack as any).emotion || pack.tagline || pack.name,
+  };
+}
+
+function resolvePack(packKey: string): QuotePack {
+  const pack =
+    getPackById(packKey) ||
+    getPacksByService('fiestas').find((p) => p.slug === packKey) ||
+    getPacksByService('fiestas')[0];
+  return packToQuotePack(pack);
+}
 
 interface RouteContext {
   params: { id: string };
@@ -70,9 +62,9 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: 'Lead no trobat' }, { status: 404 });
     }
 
-    // Determinar pack
+    // Determinar pack des de config centralitzada
     const packKey = lead.interestedPackId?.toLowerCase() || 'default';
-    const packData = PACKS_CONFIG[packKey] || PACKS_CONFIG['default'];
+    const packData = resolvePack(packKey);
 
     // Crear dades del pressupost
     const quoteData = createQuoteFromLead(lead, packData);
@@ -108,13 +100,16 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: 'Lead no trobat' }, { status: 404 });
     }
 
-    // Determinar pack (del body o del lead)
+    // Determinar pack (del body o del lead) des de config centralitzada
     const packKey = body.packId?.toLowerCase() || lead.interestedPackId?.toLowerCase() || 'default';
-    const packData = PACKS_CONFIG[packKey] || PACKS_CONFIG['default'];
+    const basePack = resolvePack(packKey);
 
     // Override amb dades del body si existeixen
-    if (body.customPrice) packData.price = body.customPrice;
-    if (body.customHours) packData.djHours = body.customHours;
+    const packData = {
+      ...basePack,
+      price: body.customPrice ?? basePack.price,
+      djHours: body.customHours ?? basePack.djHours,
+    };
 
     // Crear dades del pressupost
     const quoteData = createQuoteFromLead(

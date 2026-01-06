@@ -519,7 +519,7 @@
       "festes": {
         "title": "Festes Privades",
         "description": "La festa que recordaran sempre",
-        "price": "Des de 350€",
+        "price": "Des de 250€",
         "features": [
           "Discomòbil",
           "Llums LED",
@@ -1749,7 +1749,7 @@
             "Pista plena garantida",
             "Equipament professional",
             "Efectes WOW",
-            "Des de 350€"
+            "Des de 250€"
           ]
         },
         "fiestas": {
@@ -1760,7 +1760,7 @@
             "Tematització personalitzada",
             "DJ + efectes",
             "Playlist curada",
-            "Des de 350€"
+            "Des de 250€"
           ]
         },
         "animacionInfantil": {
@@ -6049,7 +6049,7 @@
         "title": "Festes",
         "subtitle": "Aniversaris i més",
         "description": "Discomòbil complet amb tot inclòs",
-        "price": "Des de 350€",
+        "price": "Des de 250€",
         "badge": "",
         "features": {
           "0": "Llums LED",
