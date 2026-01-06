@@ -142,9 +142,9 @@ export function useAvailability(): UseAvailabilityReturn {
       const json = await response.json();
 
       if (json.ok) {
-        const statsData = json.stats as StatsData;
-        setStats(statsData);
-        setCachedData('stats', statsData);
+        const availabilityData = json.data as AvailabilityData;
+        setData(availabilityData);
+        setCachedData('availability', availabilityData);
         setError(null);
       } else {
         setError(json.error || 'Error desconocido');
