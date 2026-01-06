@@ -167,35 +167,38 @@ export async function createTestimonial(
     },
   });
 
-  // 7. Enviar email amb codi de descompte al CLIENT (async)
-  sendTestimonialReceivedEmail({
-    to: email,
-    name: input.name,
-    rating: input.rating,
-    discountCode,
-    discountPercent,
-  }).catch((error) => {
-    log.error('Failed to send testimonial confirmation email to client', error, {
-      context: { customerId: customer.id, email: customer.email }
-    });
-  });
+  // 7-8. Enviar emails (await per assegurar execucio en serverless)
+  const emailResults = await Promise.allSettled([
+    sendTestimonialReceivedEmail({
+      to: email,
+      name: input.name,
+      rating: input.rating,
+      discountCode,
+      discountPercent,
+    }),
+    sendTestimonialAdminNotification({
+      customerName: input.name,
+      customerEmail: email,
+      rating: input.rating,
+      comment: input.comment,
+      discountCode,
+      discountPercent,
+      hasPhoto: !!input.photoUrl,
+      hasVideo: !!input.videoUrl,
+    }),
+  ]);
 
-  // 8. Notificar a l'ADMIN que hi ha nova opinió per aprovar
-  sendTestimonialAdminNotification({
-    customerName: input.name,
-    customerEmail: email,
-    rating: input.rating,
-    comment: input.comment,
-    discountCode,
-    discountPercent,
-    hasPhoto: !!input.photoUrl,
-    hasVideo: !!input.videoUrl,
-  }).catch((error) => {
-    log.error('Failed to send admin notification for new testimonial', error, {
-      context: { testimonialId: testimonial.id, customerEmail: input.email }
-    });
+  emailResults.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      const context = index === 0
+        ? { customerId: customer.id, email: customer.email }
+        : { testimonialId: testimonial.id, customerEmail: input.email };
+      const message = index === 0
+        ? 'Failed to send testimonial confirmation email to client'
+        : 'Failed to send admin notification for new testimonial';
+      log.error(message, result.reason, { context });
+    }
   });
-
   return {
     testimonial: {
       id: testimonial.id,
