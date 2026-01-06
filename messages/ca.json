@@ -2088,6 +2088,48 @@
         "deposit": "30% en reservar la teva data",
         "rest": "70% el dia de l'event",
         "cancel": "Cancel·lació gratuïta fins 15 dies abans"
+      },
+      "extras": {
+        "hora-extra": {
+          "name": "Hora Extra",
+          "description": "Si la festa segueix, nosaltres també"
+        },
+        "burbujas": {
+          "name": "Màquina de Bombolles",
+          "description": "Toc màgic i divertit"
+        },
+        "confetti": {
+          "name": "Canó de Confeti",
+          "description": "Explosió de color per a moments clau"
+        },
+        "pulseras-luminosas": {
+          "name": "Polseres Lluminoses (Pack 100)",
+          "description": "Polseres de llum química per a convidats - efecte màgic a la pista"
+        },
+        "subwoofer-refuerzo": {
+          "name": "Subwoofer de Reforç",
+          "description": "Greus potents per a esdeveniments grans o espais amplis"
+        },
+        "neon-personalizado": {
+          "name": "Rètol Neó Personalitzat",
+          "description": "Neó LED amb missatge personalitzat per a photocall"
+        },
+        "photobooth-360": {
+          "name": "Photobooth 360°",
+          "description": "Cabina de fotos amb vídeo 360° per als teus convidats"
+        },
+        "alfombra-roja": {
+          "name": "Catifa Vermella + Postes VIP",
+          "description": "Entrada VIP amb catifa vermella i cordons daurats"
+        },
+        "efectos-nieve": {
+          "name": "Màquina de Neu Artificial",
+          "description": "Efecte nevada per a moments màgics (casaments hivern)"
+        },
+        "sparklers-fountain": {
+          "name": "Fonts d'Espurnes (4 unitats)",
+          "description": "Fonts pirotècniques d'interior per a moments clau"
+        }
       }
     },
     "production": {

@@ -2484,6 +2484,48 @@
         "deposit": "30% al reservar tu fecha",
         "rest": "70% el día del evento",
         "cancel": "Cancelación gratuita hasta 15 días antes"
+      },
+      "extras": {
+        "hora-extra": {
+          "name": "Hora Extra",
+          "description": "Si la fiesta sigue, nosotros también"
+        },
+        "burbujas": {
+          "name": "Máquina de Burbujas",
+          "description": "Toque mágico y divertido"
+        },
+        "confetti": {
+          "name": "Cañón de Confeti",
+          "description": "Explosión de color para momentos clave"
+        },
+        "pulseras-luminosas": {
+          "name": "Pulseras Luminosas (Pack 100)",
+          "description": "Pulseras de luz química para invitados - efecto mágico en la pista"
+        },
+        "subwoofer-refuerzo": {
+          "name": "Subwoofer de Refuerzo",
+          "description": "Graves potentes para eventos grandes o espacios amplios"
+        },
+        "neon-personalizado": {
+          "name": "Letrero Neón Personalizado",
+          "description": "Neón LED con mensaje personalizado para photocall"
+        },
+        "photobooth-360": {
+          "name": "Photobooth 360°",
+          "description": "Cabina de fotos con vídeo 360° para tus invitados"
+        },
+        "alfombra-roja": {
+          "name": "Alfombra Roja + Postes VIP",
+          "description": "Entrada VIP con alfombra roja y cordones dorados"
+        },
+        "efectos-nieve": {
+          "name": "Máquina de Nieve Artificial",
+          "description": "Efecto nevada para momentos mágicos (bodas invierno)"
+        },
+        "sparklers-fountain": {
+          "name": "Fuentes de Chispas (4 unidades)",
+          "description": "Fuentes pirotécnicas de interior para momentos clave"
+        }
       }
     },
     "production": {
