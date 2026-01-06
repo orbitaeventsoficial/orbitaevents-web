@@ -239,19 +239,9 @@ export function usePublicStats(): UseStatsReturn {
       const json = await response.json();
 
       if (json.ok) {
-        // Aplicar mínims: mostrem el valor real si és major que el mínim
-        const statsWithMinimums: StatsData = {
-          ...json.stats,
-          totalEvents: Math.max(json.stats.totalEvents || 0, MINIMUM_STATS.totalEvents),
-          totalWeddings: Math.max(json.stats.totalWeddings || 0, MINIMUM_STATS.totalWeddings),
-          totalCorporate: Math.max(json.stats.totalCorporate || 0, MINIMUM_STATS.totalCorporate),
-          totalParties: Math.max(json.stats.totalParties || 0, MINIMUM_STATS.totalParties),
-          averageRating: Math.max(json.stats.averageRating || 0, MINIMUM_STATS.averageRating),
-          googleRating: json.stats.googleRating ? Math.max(json.stats.googleRating, MINIMUM_STATS.googleRating) : MINIMUM_STATS.googleRating,
-          googleReviewsCount: json.stats.googleReviewsCount ? Math.max(json.stats.googleReviewsCount, MINIMUM_STATS.googleReviewsCount) : MINIMUM_STATS.googleReviewsCount,
-        };
-        setStats(statsWithMinimums);
-        setCachedData('stats', statsWithMinimums);
+        const statsData = json.stats as StatsData;
+        setStats(statsData);
+        setCachedData('stats', statsData);
         setError(null);
       } else {
         setError(json.error || 'Error desconocido');
