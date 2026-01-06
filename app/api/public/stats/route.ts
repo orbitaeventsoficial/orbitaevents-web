@@ -57,7 +57,7 @@ interface StatsResponse {
 // 3. La BD no té dades suficients
 //
 // NÚMEROS CREÏBLES per una empresa de 2 anys amb fundador experimentat:
-// - 48 events (uns 2 per setmana en temporada alta)
+// - 50 events (uns 2 per setmana en temporada alta)
 // - 15 casaments (uns 7-8 per any)
 // - 23 ressenyes Google (creixement orgànic)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -71,7 +71,7 @@ const FALLBACK_STATS = {
   yearsExperience: YEARS_ACTIVE,   // "+2 anys" - calculat
   coverage: COVERAGE_AREAS,        // "Barcelona + Girona" - 2 províncies
   responseTime: '2h',              // Compromís real
-  totalEvents: 48,                 // Creïble per 2 anys
+  totalEvents: 50,                 // Creïble per 2 anys
   totalWeddings: 15,               // ~7 per any
   totalCorporate: 10,              // Events corporatius
   totalParties: 23,                // Festes privades
