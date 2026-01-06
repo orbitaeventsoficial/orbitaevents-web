@@ -50,12 +50,23 @@ async function getSettings() {
       orderBy: [{ category: 'asc' }, { key: 'asc' }],
     });
 
+    const normalized = settings.map((s) => ({
+      id: s.id,
+      key: s.key,
+      value: s.value,
+      type: s.type,
+      category: s.category,
+      label: s.label,
+      description: s.description,
+      updatedAt: s.updatedAt.toISOString(),
+    }));
+
     // Agrupar per categoria
-    const grouped = settings.reduce((acc, s) => {
+    const grouped = normalized.reduce((acc, s) => {
       if (!acc[s.category]) acc[s.category] = [];
       acc[s.category].push(s);
       return acc;
-    }, {} as Record<string, typeof settings>);
+    }, {} as Record<string, typeof normalized>);
 
     return grouped;
   } catch (error) {
