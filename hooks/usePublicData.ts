@@ -199,7 +199,7 @@ interface UseStatsReturn {
 // Aquests són els valors mínims que mostrarem. Si la BD té més, es mostrarà el real.
 // ═══════════════════════════════════════════════════════════════════════════
 const MINIMUM_STATS = {
-  totalEvents: 48,      // Mínim 48 events
+  totalEvents: 50,      // Mínim 50 events
   totalWeddings: 15,    // Mínim 15 casaments
   totalCorporate: 10,   // Mínim 10 corporatius
   totalParties: 20,     // Mínim 20 festes
