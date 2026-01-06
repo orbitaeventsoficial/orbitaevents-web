@@ -62,8 +62,6 @@ const Icons = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const guaranteesConfig = [
-  { key: 'satisfaction', icon: Icons.Shield, highlight: '100%', color: 'from-emerald-500 to-teal-500' },
-  { key: 'backup', icon: Icons.Backup, highlight: '2x', color: 'from-blue-500 to-indigo-500' },
   { key: 'response', icon: Icons.Clock, highlight: '<2h', color: 'from-amber-500 to-orange-500' },
   { key: 'noSurprises', icon: Icons.Receipt, highlight: '0€', color: 'from-purple-500 to-violet-500' },
   { key: 'support', icon: Icons.Headset, highlight: '24/7', color: 'from-rose-500 to-pink-500' },
