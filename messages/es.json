@@ -408,14 +408,12 @@
     "forEvents": "Para bodas, empresas y fiestas que merecen una atención profesional",
     "events": "eventos",
     "yearsLabel": "años experiencia",
-    "satisfaction": "satisfacción",
     "coverage": "cobertura",
     "thisYear": "este año",
     "next90Days": "en los próximos 90 días",
     "clients": "recomendación",
     "nextEvent": "Próximo evento",
     "responseTime": "Respuesta en menos de 2 horas",
-    "satisfactionGuaranteed": "Satisfacción asegurada",
     "webDiscount": "10% de descuento web",
     "configureEvent": "Empieza a crearlo",
     "watchDemo": "Ver demo",
@@ -479,7 +477,7 @@
   },
   "guarantees": {
     "title": "¿Por qué confiar en Òrbita?",
-    "description": "Lo sabemos: contratar un DJ es arriesgado. Por eso te damos garantías REALES. Reunión previa • Personalización total • Equipo backup • Coordinación con venue.",
+    "description": "Lo sabemos: contratar un DJ es arriesgado. Por eso te damos garantías REALES. Reunión previa • Personalización total • Coordinación con venue.",
     "stat1": "Eventos realizados sin incidentes",
     "stat1Desc": "Con un equipo de seguridad completo",
     "stat2": "Repiten o recomiendan",
@@ -537,8 +535,7 @@
         "features": [
           "DJ Profesional",
           "Sonido + Luces",
-          "Coordinación",
-          "Backup 100%"
+          "Coordinación"
         ]
       },
       "festes": {
@@ -584,10 +581,6 @@
         {
           "q": "¿Cómo personalizáis la iluminación y los efectos?",
           "a": "Adaptamos colores, intensidad y efectos según vuestra decoración y el estilo de la boda. Humo y burbujas según espacio. Confeti, chispas frías y CO2 como extras para momentos clave."
-        },
-        {
-          "q": "¿Qué pasa si hay problemas técnicos durante la boda?",
-          "a": "Llevamos equipo de backup completo (controladora, cables y altavoces de reserva). Si algo falla, se cambia sin parar la música. Vuestros invitados ni se enterarán."
         },
         {
           "q": "¿Trabajáis en fincas y exteriores?",
@@ -660,10 +653,6 @@
           "a": "Sí, nos adaptamos a cualquier espacio empresarial. Incluye visita previa para revisar accesos, potencia eléctrica y coordinación con el venue. Montaje discreto y profesional."
         },
         {
-          "q": "¿Cómo garantizáis que no haya problemas técnicos?",
-          "a": "Equipamiento profesional certificado + backup completo + técnicos experimentados. Si algo falla (que no suele pasar), se soluciona sin que los asistentes se enteren. El evento NO se para."
-        },
-        {
           "q": "¿Coordináis con catering, venue y otros proveedores?",
           "a": "Totalmente. Nos encargamos de la coordinación técnica completa: tiempos, montaje, desmontaje y sincronización con otros proveedores. Tú te centras en tus invitados."
         }
@@ -723,10 +712,6 @@
         {
           "q": "¿Trabajáis fuera de Barcelona?",
           "a": "Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Nos adaptamos a cualquier espacio: locales, jardines, fincas, pabellones. Transporte GRATIS hasta 25km desde Granollers; otras zonas pueden tener pequeño suplemento detallado en presupuesto."
-        },
-        {
-          "q": "¿Qué pasa si hay problemas técnicos durante la fiesta?",
-          "a": "Llevamos equipo de backup completo (cables, controladora y altavoces de reserva). Si algo falla (que no suele pasar), se cambia rápido y la música no se para. El objetivo es que tú ni te enteres del problema."
         },
         {
           "q": "¿Cuánto tiempo antes hay que reservar?",
@@ -900,11 +885,9 @@
     "eventsOld": "eventos",
     "peopleDancing": "gente bailando",
     "recommendRate": "Nos recomiendan",
-    "satisfaction": "satisfacción",
     "dedication": "dedicación",
     "recommendation": "satisfacción",
     "noIncidents": "Eventos realizados sin incidentes",
-    "backupEquipment": "Con un equipo de seguridad completo",
     "repeatRecommend": "Repiten o recomiendan"
   },
   "sections": {
@@ -1012,7 +995,6 @@
     "commitments": {
       "team": "Equipo técnico y humano preparado para cualquier imprevisto",
       "supervision": "Supervisión personalizada desde la reserva hasta el último tema",
-      "backup": "Equipos de seguridad de la cabina, sonido e iluminación",
       "contract": "Contrato digital instantáneo y factura",
       "communication": "Comunicación directa y total disponibilidad antes del evento"
     },
@@ -1032,7 +1014,6 @@
     "requestQuote": "Pedir presupuesto",
     "responseTime": "Respuesta en menos de 2 horas · Sin compromiso",
     "trustBadges": {
-      "backup": "Equipo de backup",
       "insurance": "Seguro incluido",
       "travel": "Desplazamiento 50km"
     }
@@ -1169,8 +1150,7 @@
       },
       "equipment": {
         "title": "Equipo de verdad",
-        "description": "Sonido EV 4000W, luces sincronizadas, efectos especiales. Y siempre llevamos equipo de backup. Tu evento NO se para nunca. Garantizado.",
-        "highlight": "Backup incluido"
+        "highlight": "Profesional certificado"
       },
       "themes": {
         "title": "Tematización única",
@@ -1187,7 +1167,6 @@
           "them": "Llegan 30 min antes"
         },
         "2": {
-          "us": "Equipo de backup siempre",
           "them": "Sin plan B"
         },
         "3": {
@@ -1222,7 +1201,6 @@
       "googleRating": "Valoración Google",
       "events": "Eventos realizados",
       "recommend": "Nos recomiendan",
-      "satisfaction": "Satisfacción",
       "rating": "Valoración media",
       "reviews": "Opiniones"
     },
@@ -1296,8 +1274,7 @@
     "guarantees": {
       "noCommitment": "Sin compromiso",
       "fastResponse": "Respuesta en 2h",
-      "dataProtected": "Datos protegidos",
-      "satisfaction": "Satisfacción garantizada"
+      "dataProtected": "Datos protegidos"
     },
     "availability": {
       "title": "Sábados disponibles:",
@@ -1319,7 +1296,6 @@
     "trust": {
       "experience": "Años de experiencia",
       "events": "Eventos celebrados",
-      "satisfaction": "Clientes satisfechos",
       "response": "Respuesta rápida"
     },
     "sections": {
@@ -1721,7 +1697,6 @@
       "finalPrice": "Tu precio final:",
       "youSave": "Ahorras {amount}€",
       "normalPrice": "precio normal",
-      "guarantee": "100% garantía de satisfacción",
       "guaranteeText": "Si cambias de opinión en las próximas 48 horas, te reembolsamos el 100% de tu dinero. Sin preguntas. Sin letra pequeña. Riesgo cero.",
       "whyOffer": "¿Por qué esta oferta?",
       "whyOfferText": "Cuando reservas hoy, podemos confirmar tu fecha al instante y empezar a prepararte. Cuanto antes empecemos, mejor será tu evento. Cada día que pasa, perdemos tiempo de personalización.",
@@ -1737,7 +1712,6 @@
       "successMessage": "Nos pondremos en contacto contigo en menos de 2 horas",
       "youSaved": "¡Has ahorrado {amount}€!",
       "checkEmail": "Comprueba tu email/teléfono. Te hemos enviado la confirmación.",
-      "satisfactionGuaranteed": "Satisfacción asegurada",
       "responseTime": "Respuesta en menos de 2 horas",
       "errorName": "Introduce tu nombre completo",
       "errorContact": "Introduce tu email o número de teléfono",
@@ -1787,8 +1761,7 @@
         "answer": "Sí, cubrimos la provincia de Barcelona y la provincia de Girona (incluida la Costa Brava). Transporte GRATUITO hasta 25 km desde Granollers (nuestra base). Más allá, se añade según la distancia. Hemos hecho eventos en Barcelona, Granollers, Mataró, Sabadell, Terrassa, Vic, Girona, Figueres, Blanes, Lloret... Si está en nuestra zona, iremos."
       },
       "4": {
-        "question": "¿Qué pasa si hay problemas técnicos durante el evento?",
-        "answer": "Llevamos equipo completo de BACKUP con todo: sonido, luces, mezclador, reproductores. Si algo falla (muy raro), tenemos sustitución en menos de 1 hora. Tu evento NUNCA se para. Más de 50 eventos sin incidencias técnicas graves nos respaldan."
+        "question": "¿Qué pasa si hay problemas técnicos durante el evento?"
       },
       "5": {
         "question": "¿Puedo elegir la música o decides tú?",
@@ -2000,10 +1973,6 @@
           "value": "2+",
           "label": "Años en el sector"
         },
-        "satisfaction": {
-          "value": "5.0",
-          "label": "Valoración Clientes"
-        },
         "parties": {
           "value": "BCN",
           "label": "+ Girona"
@@ -2152,7 +2121,6 @@
         "exploreBelow": "O explora cada servicio en detalle abajo ↓",
         "features": {
           "equipment": "🎧 Equipo profesional de club",
-          "backup": "Backup completo",
           "guarantee": "Pista llena garantizada"
         }
       },
@@ -2227,7 +2195,6 @@
           "features": [
             "EV + Pioneer + B-150",
             "Con/sin técnico",
-            "Backup garantizado",
             "Consultar"
           ]
         }
@@ -2402,8 +2369,7 @@
           "text": "Producción técnica completa, branding integrado y efectos especiales para impactar a tus invitados."
         },
         "institutional": {
-          "title": "Eventos Institucionales",
-          "text": "Profesionalismo en cada detalle: montaje discreto, técnico onsite y backup total del equipamiento."
+          "title": "Eventos Institucionales"
         }
       },
       "valueTitle": "Profesionalismo que Refuerza tu Marca",
@@ -2429,8 +2395,7 @@
         "sound": "Sonido profesional Pioneer + EV (cobertura perfecta)",
         "lighting": "Iluminación LED corporativa sincronizada con branding",
         "mics": "Micrófonos inalámbricos para speakers/presentadores",
-        "screens": "Pantallas LED opcionales para proyección corporativa",
-        "setup": "Montaje discreto, técnico onsite y backup total"
+        "screens": "Pantallas LED opcionales para proyección corporativa"
       },
       "ambientTitle": "Ambiente Profesional",
       "ambientFeatures": {
@@ -2476,7 +2441,6 @@
       "packFeatures": {
         "dj": "DJ profesional que lee la pista",
         "setup": "Montaje y desmontaje incluidos",
-        "backup": "Backup de equipamiento",
         "playlist": "Playlist personalizada previa"
       },
       "flexiblePayment": "Pago flexible:",
@@ -2559,8 +2523,7 @@
       "fullServiceItems": {
         "equipment": "Equipamiento profesional certificado",
         "transport": "Transporte e instalación incluidos",
-        "technicians": "Técnicos especializados disponibles",
-        "backup": "Backup de equipamiento crítico"
+        "technicians": "Técnicos especializados disponibles"
       },
       "experience": "Experiencia demostrable:",
       "experienceItems": {
@@ -3158,9 +3121,7 @@
       "section4": {
         "title": "4. Cancelaciones",
         "item1": "Más de 30 días antes:",
-        "item1Desc": "Devolución del 50% de la señal",
         "item2": "Entre 15-30 días:",
-        "item2Desc": "Sin devolución de la señal",
         "item3": "Menos de 15 días:",
         "item3Desc": "Cobro del 100% del servicio",
         "item4": "Fuerza mayor:",
@@ -3541,8 +3502,7 @@
         "features": [
           "DJ Profesional",
           "Sonido + Luces",
-          "Coordinación",
-          "Backup 100%"
+          "Coordinación"
         ]
       },
       "festes": {
@@ -4647,8 +4607,7 @@
       "a5": "Recomendamos reservar con 2-3 meses de antelación para bodas y eventos grandes. Para fiestas privadas, 2-4 semanas suele ser suficiente. Las fechas populares (sábados de verano) se agotan rápido.",
       "q6": "¿Puedo elegir la música de mi evento?",
       "a6": "Sí, te enviamos un formulario previo para conocer tus gustos y peticiones especiales. Durante el evento, nuestro DJ adapta la música en tiempo real según la respuesta del público.",
-      "q7": "¿Qué pasa si hay un problema técnico durante el evento?",
-      "a7": "Llevamos siempre equipo de backup y un técnico profesional. Tenemos protocolos de contingencia para garantizar que tu evento no se detenga nunca."
+      "q7": "¿Qué pasa si hay un problema técnico durante el evento?"
     },
     "localBusiness": {
       "openingHours": "Lunes a Domingo: 08:00 - 20:00"
@@ -5066,7 +5025,6 @@
       "publicStats": "Estadísticas Públicas (Web)",
       "eventsCompleted": "Eventos Realizados",
       "happyPeople": "Personas Felices",
-      "satisfaction": "Satisfacción",
       "activeSince": "Activos Desde",
       "total": "Total",
       "thisMonth": "Este mes",
@@ -5292,8 +5250,6 @@
       }
     },
     "garanties": {
-      "satisfaccio": "Garantía satisfacción 100%",
-      "backup": "Equipo backup completo",
       "suport": "Soporte 24/7",
       "costos": "Sin costes ocultos"
     },
@@ -5454,10 +5410,6 @@
             "answer": "Equipo profesional propio: Controladora Pioneer DDJ-REV7, altavoces EV ETX (hasta 4000W), 4 cabezas móviles LED, multiefectos, máquina de humo, y mucho más. Todo preparado para cualquier espacio."
           },
           {
-            "question": "¿Y si falla algo?",
-            "answer": "Llevamos backup COMPLETO de todo: controladora extra, portátil extra, cables duplicados, altavoz extra... En 15 años, nunca hemos tenido que parar un evento. Y si pasara algo, tenemos equipo de recambio a mano."
-          },
-          {
             "question": "¿Funciona en exterior?",
             "answer": "¡Sí! Todo nuestro equipo está preparado para exterior. Llevamos protecciones para la lluvia y viento. Lo único que necesitamos es acceso a electricidad (mínimo 16A)."
           },
@@ -5536,10 +5488,6 @@
           {
             "question": "¿Tenéis seguro?",
             "answer": "¡Sí! Tenemos seguro de responsabilidad civil que cubre cualquier incidente durante el evento. Puedes pedirnos el certificado si el venue lo requiere."
-          },
-          {
-            "question": "¿Qué es la garantía de satisfacción?",
-            "answer": "Si no estás 100% satisfecho con nuestro servicio, hablamos y lo solucionamos. Si realmente no hemos cumplido lo que prometimos, te devolvemos el dinero. Sin preguntas. Nunca hemos tenido que usarla porque nos lo tomamos muy en serio."
           },
           {
             "question": "¿Y si el DJ se pone enfermo?",
@@ -5624,10 +5572,6 @@
       "repeat": {
         "value": "92%",
         "label": "Clientes repiten"
-      },
-      "backup": {
-        "value": "100%",
-        "label": "Equipo backup"
       }
     },
     "history": {
@@ -5673,19 +5617,9 @@
           "description": "Cada evento es único. No hacemos copias. Personalizamos cada detalle para crear exactamente lo que imaginas."
         },
         {
-          "icon": "target",
-          "title": "Profesionalidad",
-          "description": "Equipamiento profesional, backup completo, y experiencia demostrada. Tu evento NUNCA se para."
-        },
-        {
           "icon": "stars",
           "title": "Creatividad",
           "description": "Desde tematizaciones Harry Potter hasta Halloween terrorífico. Si puedes imaginarlo, podemos crearlo."
-        },
-        {
-          "icon": "handshake",
-          "title": "Compromiso",
-          "description": "Garantía de satisfacción 100%. Si no estás contento, te devolvemos el dinero. Sin preguntas."
         }
       ]
     },
@@ -5714,8 +5648,7 @@
           "title": "Máquina de Humo + Efectos FX",
           "description": "Para crear la atmósfera perfecta"
         }
-      ],
-      "backup": "Backup 100%: Llevamos duplicado de TODO"
+      ]
     },
     "cta": {
       "title": "¿Preparado para crear",
@@ -5862,21 +5795,6 @@
             "Micro inalámbrico"
           ],
           "highlighted": true
-        },
-        {
-          "name": "Hogwarts Premium",
-          "price": "1800",
-          "description": "La experiencia definitiva",
-          "features": [
-            "Todo del pack Hogwarts",
-            "DJ 8h jornada completa",
-            "Velas flotantes (30u)",
-            "Photo corner HP completo",
-            "Invitaciones diseño incluido",
-            "Varita mágica para invitados",
-            "Mapping básico",
-            "Backup 100%"
-          ]
         }
       ]
     },
@@ -5959,8 +5877,7 @@
       "events": "50+ eventos",
       "rating": "4.9 valoración",
       "response": "2h respuesta"
-    },
-    "guarantee": "🛡️ Garantía de satisfacción 100%. Si no estás contento, te devolvemos el dinero."
+    }
   },
   "homeSections": {
     "discomovil": {
@@ -6013,18 +5930,9 @@
       "badge": "🛡️ Tranquilidad garantizada",
       "title1": "Tu evento,",
       "title2": "sin riesgos",
-      "subtitle": "Nos comprometemos al 100% con cada evento. Si algo no es como esperabas, lo solucionamos o te devolvemos el dinero.",
       "sealTitle": "Compromiso Òrbita Events",
       "sealSubtitle": "+{events} eventos sin incidencias graves",
       "guarantees": {
-        "satisfaction": {
-          "title": "Garantía de Satisfacción",
-          "description": "Si no estás 100% satisfecho con nuestro servicio, te devolvemos el dinero. Sin preguntas."
-        },
-        "backup": {
-          "title": "Equipo Backup Completo",
-          "description": "Llevamos duplicado de todo: sonido, luces, mezclador, reproductores. Tu evento NUNCA se para."
-        },
         "response": {
           "title": "Respuesta en 2 Horas",
           "description": "Respuesta garantizada en menos de 2 horas. Comunicación directa y sin intermediarios."
@@ -6054,7 +5962,6 @@
       "whatsappMsg": "Hola! Quiero información para mi evento.",
       "events": "eventos",
       "rating": "valoración",
-      "guarantee": "🛡️ Garantía 100%. Si no estás contento, te devolvemos el dinero.",
       "status": {
         "scarce": "⚠️ ¡Casi lleno!",
         "limited": "🔥 ¡Se acaba!",
@@ -6068,7 +5975,6 @@
       "subtitle": "Tematización + DJ profesional para bodas y eventos en Barcelona y Girona.",
       "trust1": "Presupuesto en 2 min",
       "trust2": "Respuesta en < 2h",
-      "trust3": "Equipo backup 100%",
       "cta1": "Presupuesto Gratis",
       "cta2": "WhatsApp Directo",
       "scroll": "Descubre más"
@@ -6076,7 +5982,6 @@
     "heroStats": {
       "eventsRealized": "Eventos realizados",
       "repeatOrRecommend": "Repiten o recomiendan",
-      "withBackup": "Con equipo backup",
       "responseTime": "Tiempo de respuesta"
     },
     "testimonials": {
@@ -6173,8 +6078,7 @@
         "badge": "",
         "features": {
           "0": "DJ Pro",
-          "1": "Sonido 4000W",
-          "2": "Backup 100%"
+          "1": "Sonido 4000W"
         }
       },
       "fiestas": {
@@ -6298,14 +6202,6 @@
     "guarantees": {
       "sectionLabel": "Tranquilidad garantizada",
       "sectionTitle": "Tu evento, sin riesgos",
-      "satisfaction": {
-        "title": "Garantía 100%",
-        "desc": "Si no estás contento, te devolvemos el dinero"
-      },
-      "backup": {
-        "title": "Backup completo",
-        "desc": "Equipo duplicado. Tu evento NUNCA se para"
-      },
       "response": {
         "title": "Respuesta 2h",
         "desc": "Comunicación directa y sin intermediarios"

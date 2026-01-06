@@ -97,7 +97,7 @@ export const FAQ_DATA: FAQItem[] = [
   },
   {
     q: "¿Qué garantía tengo de que todo saldrá bien?",
-    a: `Nuestro compromiso es tu tranquilidad. Firmamos un contrato detallado, tenemos seguro de responsabilidad civil, y llevamos equipamiento backup para emergencias. Con más de ${SITE_CONFIG.stats.eventsCompleted} eventos realizados y ${SITE_CONFIG.stats.yearsExperience} años de experiencia, trabajamos con profesionalidad para que tu evento sea perfecto. Creamos experiencias, no solo ponemos música.`,
+    a: `Nuestro compromiso es tu tranquilidad. Firmamos un contrato detallado, tenemos seguro de responsabilidad civil y trabajamos con equipamiento profesional. Con más de ${SITE_CONFIG.stats.eventsCompleted} eventos realizados y ${SITE_CONFIG.stats.yearsExperience} años de experiencia, trabajamos con profesionalidad para que tu evento sea perfecto. Creamos experiencias, no solo ponemos música.`,
     category: "general",
   },
   {

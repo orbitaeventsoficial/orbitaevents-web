@@ -408,14 +408,12 @@
     "forEvents": "Per a casaments, empreses i festes que mereixen una atenció professional",
     "events": "esdeveniments",
     "yearsLabel": "anys experiència",
-    "satisfaction": "satisfacció",
     "coverage": "cobertura",
     "thisYear": "aquest any",
     "next90Days": "en els propers 90 dies",
     "clients": "recomanació",
     "nextEvent": "Proper esdeveniment",
     "responseTime": "Resposta en menys de 2 hores",
-    "satisfactionGuaranteed": "Satisfacció assegurada",
     "webDiscount": "10% de descompte web",
     "configureEvent": "Comença a crear-lo",
     "watchDemo": "Veure demo",
@@ -457,7 +455,7 @@
   },
   "guarantees": {
     "title": "Per què confiar en Òrbita?",
-    "description": "Ho sabem: contractar un DJ és arriscat. Per això et donem garanties REALS. Reunió prèvia • Personalització total • Equip backup • Coordinació amb venue.",
+    "description": "Ho sabem: contractar un DJ és arriscat. Per això et donem garanties REALS. Reunió prèvia • Personalització total • Coordinació amb venue.",
     "stat1": "Esdeveniments realitzats sense incidents",
     "stat1Desc": "Amb un equip de seguretat complet",
     "stat2": "Repeteixen o recomanen",
@@ -515,8 +513,7 @@
         "features": [
           "DJ Professional",
           "So + Llums",
-          "Coordinació",
-          "Backup 100%"
+          "Coordinació"
         ]
       },
       "festes": {
@@ -562,10 +559,6 @@
         {
           "q": "Com personalitzeu la il·luminació i els efectes?",
           "a": "Adaptem colors, intensitat i efectes segons la vostra decoració i l'estil del casament. Fum i bombolles segons espai. Confeti, espurnes fredes i CO2 com a extres per a moments clau."
-        },
-        {
-          "q": "Què passa si hi ha problemes tècnics durant el casament?",
-          "a": "Portem equip de backup complet (controladora, cables i altaveus de reserva). Si alguna cosa falla, es canvia sense parar la música. Els vostres convidats ni s'assabentaran."
         },
         {
           "q": "Treballeu en finques i exteriors?",
@@ -638,10 +631,6 @@
           "a": "Sí, ens adaptem a qualsevol espai empresarial. Inclou visita prèvia per revisar accessos, potència elèctrica i coordinació amb el venue. Muntatge discret i professional."
         },
         {
-          "q": "Com garantiu que no hi hagi problemes tècnics?",
-          "a": "Equipament professional certificat + backup complet + tècnics experimentats. Si alguna cosa falla (que no sol passar), es soluciona sense que els assistents s'enteressin. L'event NO es para."
-        },
-        {
           "q": "Coordineu amb càtering, venue i altres proveïdors?",
           "a": "Totalment. Ens encarreguem de la coordinació tècnica completa: temps, muntatge, desmuntatge i sincronització amb altres proveïdors. Tu et centres en els teus convidats."
         }
@@ -701,10 +690,6 @@
         {
           "q": "Treballeu fora de Barcelona?",
           "a": "Sí, cobrim Barcelona província i Girona província (incloent Costa Brava). Ens adaptem a qualsevol espai: locals, jardins, finques, pavellons. Transport GRATIS fins a 25km des de Granollers; altres zones poden tenir petit suplement detallat en pressupost."
-        },
-        {
-          "q": "Què passa si hi ha problemes tècnics durant la festa?",
-          "a": "Portem equip de backup complet (cables, controladora i altaveus de reserva). Si alguna cosa falla (que no sol passar), es canvia ràpid i la música no es para. L'objectiu és que tu ni t'enteris del problema."
         },
         {
           "q": "Quant temps abans cal reservar?",
@@ -878,11 +863,9 @@
     "eventsOld": "esdeveniments",
     "peopleDancing": "gent ballant",
     "recommendRate": "Ens recomanen",
-    "satisfaction": "satisfacció",
     "dedication": "dedicació",
     "recommendation": "satisfacció",
     "noIncidents": "Esdeveniments realitzats sense incidents",
-    "backupEquipment": "Amb un equip de seguretat complet",
     "repeatRecommend": "Repeteixen o recomanen"
   },
   "sections": {
@@ -990,7 +973,6 @@
     "commitments": {
       "team": "Equip tècnic i humà preparat per a qualsevol imprevist",
       "supervision": "Supervisió personalitzada des de la reserva fins a l'últim tema",
-      "backup": "Equips de seguretat de la cabina, so i il·luminació",
       "contract": "Contracte digital instantani i factura",
       "communication": "Comunicació directa i total disponibilitat abans de l'esdeveniment"
     },
@@ -1010,7 +992,6 @@
     "requestQuote": "Demanar pressupost",
     "responseTime": "Resposta en menys de 2 hores · Sense compromís",
     "trustBadges": {
-      "backup": "Equip de backup",
       "insurance": "Assegurança inclosa",
       "travel": "Desplaçament 50km"
     }
@@ -1112,7 +1093,6 @@
     "trust": {
       "experience": "Anys d'experiència",
       "events": "Esdeveniments celebrats",
-      "satisfaction": "Clients satisfets",
       "response": "Resposta ràpida"
     },
     "sections": {
@@ -1390,7 +1370,6 @@
       "finalPrice": "El teu preu final:",
       "youSave": "Estalvieu {amount}€",
       "normalPrice": "preu normal",
-      "guarantee": "100% garantia de satisfacció",
       "guaranteeText": "Si canvies d'opinió en les properes 48 hores, et reemborsarem el 100% dels teus diners. Sense preguntes. Sense lletra petita. Risc zero.",
       "whyOffer": "Per què aquesta oferta?",
       "whyOfferText": "Quan reserveu avui, podem confirmar la vostra data a l'instant i començar a preparar-vos. Com més aviat comencem, millor serà el vostre esdeveniment. Cada dia que passa, perdem temps de personalització.",
@@ -1406,7 +1385,6 @@
       "successMessage": "Ens posarem en contacte amb tu en menys de 2 hores",
       "youSaved": "Heu estalviat {amount}€!",
       "checkEmail": "Comproveu el vostre correu electrònic/telèfon. T'hem enviat la confirmació.",
-      "satisfactionGuaranteed": "Satisfacció assegurada",
       "responseTime": "Resposta en menys de 2 hores",
       "errorName": "Introduïu el vostre nom complet",
       "errorContact": "Introduïu el vostre correu electrònic o número de telèfon",
@@ -1456,8 +1434,7 @@
         "answer": "Sí, cobrim la província de Barcelona i la província de Girona (inclosa la Costa Brava). Transport GRATUÏT fins a 25 km des de Granollers (la nostra base). Més enllà d'això, s'afegeix segons la distància. Hem fet actes a Barcelona, ​​​​Granollers, Mataró, Sabadell, Terrassa, Vic, Girona, Figueres, Blanes, Lloret... Si és a la nostra zona, vindrem."
       },
       "4": {
-        "question": "Què passa si hi ha problemes tècnics durant l'esdeveniment?",
-        "answer": "Portem equip complet de BACKUP amb tot: so, llums, mesclador, reproductors. Si alguna cosa falla (molt rar), tenim una substitució en menys d'1 hora. El teu esdeveniment MAI s'atura. Més de 50 esdeveniments sense incidències tècniques greus ens donen suport."
+        "question": "Què passa si hi ha problemes tècnics durant l'esdeveniment?"
       },
       "5": {
         "question": "Puc triar la música o ets tu qui decideixes?",
@@ -1600,10 +1577,6 @@
         "years": {
           "value": "2+",
           "label": "Anys en el sector"
-        },
-        "satisfaction": {
-          "value": "5.0",
-          "label": "Valoració Clients"
         },
         "parties": {
           "value": "BCN",
@@ -1753,7 +1726,6 @@
         "exploreBelow": "O explora cada servei en detall a sota ↓",
         "features": {
           "equipment": "🎧 Equip professional de club",
-          "backup": "Backup complet",
           "guarantee": "Pista plena garantida"
         }
       },
@@ -1831,7 +1803,6 @@
           "features": [
             "EV + Pioneer + B-150",
             "Amb/sense tècnic",
-            "Backup garantit",
             "Consultar"
           ]
         }
@@ -2006,8 +1977,7 @@
           "text": "Producció tècnica completa, branding integrat i efectes especials per impactar els teus convidats."
         },
         "institutional": {
-          "title": "Esdeveniments Institucionals",
-          "text": "Professionalisme en cada detall: muntatge discret, tècnic onsite i backup total de l'equipament."
+          "title": "Esdeveniments Institucionals"
         }
       },
       "valueTitle": "Professionalisme que Reforça la Teva Marca",
@@ -2033,8 +2003,7 @@
         "sound": "So professional Pioneer + EV (cobertura perfecta)",
         "lighting": "Il·luminació LED corporativa sincronitzada amb branding",
         "mics": "Micròfons sense fils per a speakers/presentadors",
-        "screens": "Pantalles LED opcionals per a projecció corporativa",
-        "setup": "Muntatge discret, tècnic onsite i backup total"
+        "screens": "Pantalles LED opcionals per a projecció corporativa"
       },
       "ambientTitle": "Ambient Professional",
       "ambientFeatures": {
@@ -2080,7 +2049,6 @@
       "packFeatures": {
         "dj": "DJ professional que llegeix la pista",
         "setup": "Muntatge i desmuntatge inclosos",
-        "backup": "Backup d'equipament",
         "playlist": "Playlist personalitzada prèvia"
       },
       "flexiblePayment": "Pagament flexible:",
@@ -2163,8 +2131,7 @@
       "fullServiceItems": {
         "equipment": "Equipament professional certificat",
         "transport": "Transport i instal·lació inclosos",
-        "technicians": "Tècnics especialitzats disponibles",
-        "backup": "Backup d'equipament crític"
+        "technicians": "Tècnics especialitzats disponibles"
       },
       "experience": "Experiència demostrable:",
       "experienceItems": {
@@ -2660,8 +2627,7 @@
         "features": [
           "DJ Professional",
           "So + Llums",
-          "Coordinació",
-          "Backup 100%"
+          "Coordinació"
         ]
       },
       "festes": {
@@ -3093,9 +3059,7 @@
         "section4": {
           "title": "4. Cancel·lacions",
           "item1": "Més de 30 dies abans:",
-          "item1Desc": "Devolució del 50% del senyal",
           "item2": "Entre 15-30 dies:",
-          "item2Desc": "Sense devolució del senyal",
           "item3": "Menys de 15 dies:",
           "item3Desc": "Cobrament del 100% del servei",
           "item4": "Força major:",
@@ -3568,8 +3532,7 @@
       },
       "equipment": {
         "title": "Equip de veritat",
-        "description": "So EV 4000W, llums sincronitzades, efectes especials. I sempre portem equip de backup. El teu event NO s'atura mai. Garantit.",
-        "highlight": "Backup inclòs"
+        "highlight": "Professional certificat"
       },
       "themes": {
         "title": "Tematització única",
@@ -3586,7 +3549,6 @@
           "them": "Arriben 30 min abans"
         },
         "2": {
-          "us": "Equip de backup sempre",
           "them": "Sense pla B"
         },
         "3": {
@@ -3623,8 +3585,7 @@
     "guarantees": {
       "noCommitment": "Sense compromís",
       "fastResponse": "Resposta en 2h",
-      "dataProtected": "Dades protegides",
-      "satisfaction": "Satisfacció garantida"
+      "dataProtected": "Dades protegides"
     },
     "availability": {
       "title": "Dissabtes disponibles:",
@@ -4608,8 +4569,7 @@
       "a5": "Recomanem reservar amb 2-3 mesos d'antelació per a casaments i events grans. Per a festes privades, 2-4 setmanes sol ser suficient. Les dates populars (dissabtes d'estiu) s'esgoten ràpid.",
       "q6": "Puc triar la música del meu event?",
       "a6": "Sí, t'enviem un formulari previ per conèixer els teus gustos i peticions especials. Durant l'event, el nostre DJ adapta la música en temps real segons la resposta del públic.",
-      "q7": "Què passa si hi ha un problema tècnic durant l'event?",
-      "a7": "Portem sempre equip de backup i un tècnic professional. Tenim protocols de contingència per garantir que el teu event no s'aturi mai."
+      "q7": "Què passa si hi ha un problema tècnic durant l'event?"
     },
     "localBusiness": {
       "openingHours": "Dilluns a Diumenge: 08:00 - 20:00"
@@ -5027,7 +4987,6 @@
       "publicStats": "Estadístiques Públiques (Web)",
       "eventsCompleted": "Events Realitzats",
       "happyPeople": "Persones Feliçes",
-      "satisfaction": "Satisfacció",
       "activeSince": "Actius Des de",
       "total": "Total",
       "thisMonth": "Aquest mes",
@@ -5253,8 +5212,6 @@
       }
     },
     "garanties": {
-      "satisfaccio": "Garantia satisfacció 100%",
-      "backup": "Equip backup complet",
       "suport": "Suport 24/7",
       "costos": "Sense costos ocults"
     },
@@ -5415,10 +5372,6 @@
             "answer": "Equip professional propi: Controladora Pioneer DDJ-REV7, altaveus EV ETX (fins 4000W), 4 caps mòbils LED, multiefectes, màquina de fum, i molt més. Tot preparat per a qualsevol espai."
           },
           {
-            "question": "I si falla alguna cosa?",
-            "answer": "Portem backup COMPLET de tot: controladora extra, portàtil extra, cables duplicats, altaveu extra... En 15 anys, mai hem hagut de parar un event. I si passés alguna cosa, tenim equip de recanvi a mà."
-          },
-          {
             "question": "Funciona a l'exterior?",
             "answer": "Sí! Tot el nostre equip està preparat per exterior. Portem proteccions per a la pluja i vent. L'únic que necessitem és accés a electricitat (mínim 16A)."
           },
@@ -5497,10 +5450,6 @@
           {
             "question": "Teniu assegurança?",
             "answer": "Sí! Tenim assegurança de responsabilitat civil que cobreix qualsevol incident durant l'event. Pots demanar-nos el certificat si el venue ho requereix."
-          },
-          {
-            "question": "Què és la garantia de satisfacció?",
-            "answer": "Si no estàs 100% satisfet amb el nostre servei, parlem i ho solucionem. Si realment no hem complert el que vam prometre, et tornem els diners. Sense preguntes. Mai hem hagut d'usar-la perquè ens ho prenem molt seriosament."
           },
           {
             "question": "I si el DJ es posa malalt?",
@@ -5585,10 +5534,6 @@
       "repeat": {
         "value": "92%",
         "label": "Clients repeteixen"
-      },
-      "backup": {
-        "value": "100%",
-        "label": "Equip backup"
       }
     },
     "history": {
@@ -5634,19 +5579,9 @@
           "description": "Cada event és únic. No fem còpies. Personalitzem cada detall per crear exactament el que imagines."
         },
         {
-          "icon": "target",
-          "title": "Professionalitat",
-          "description": "Equipament professional, backup complet, i experiència demostrada. El teu event MAI es para."
-        },
-        {
           "icon": "stars",
           "title": "Creativitat",
           "description": "Des de tematitzacions Harry Potter fins a Halloween terrorífic. Si ho pots imaginar, ho podem crear."
-        },
-        {
-          "icon": "handshake",
-          "title": "Compromís",
-          "description": "Garantia de satisfacció 100%. Si no estàs content, et tornem els diners. Sense preguntes."
         }
       ]
     },
@@ -5675,8 +5610,7 @@
           "title": "Màquina de Fum + Efectes FX",
           "description": "Per crear l'atmosfera perfecta"
         }
-      ],
-      "backup": "Backup 100%: Portem duplicat de TOT"
+      ]
     },
     "cta": {
       "title": "Preparat per crear",
@@ -5823,21 +5757,6 @@
             "Micro sense fil"
           ],
           "highlighted": true
-        },
-        {
-          "name": "Hogwarts Premium",
-          "price": "1800",
-          "description": "L'experiència definitiva",
-          "features": [
-            "Tot del pack Hogwarts",
-            "DJ 8h jornada completa",
-            "Veles flotants (30u)",
-            "Photo corner HP complet",
-            "Invitacions disseny inclòs",
-            "Vareta màgica per convidats",
-            "Mapping bàsic",
-            "Backup 100%"
-          ]
         }
       ]
     },
@@ -5920,8 +5839,7 @@
       "events": "50+ events",
       "rating": "4.9 valoració",
       "response": "2h resposta"
-    },
-    "guarantee": "🛡️ Garantia de satisfacció 100%. Si no estàs content, et tornem els diners."
+    }
   },
   "homeSections": {
     "discomovil": {
@@ -5974,18 +5892,9 @@
       "badge": "🛡️ Tranquil·litat garantida",
       "title1": "El teu event,",
       "title2": "sense riscos",
-      "subtitle": "Ens comprometem al 100% amb cada event. Si alguna cosa no és com esperaves, ho solucionem o et tornem els diners.",
       "sealTitle": "Compromís Òrbita Events",
       "sealSubtitle": "+{events} events sense incidències greus",
       "guarantees": {
-        "satisfaction": {
-          "title": "Garantia de Satisfacció",
-          "description": "Si no estàs 100% satisfet amb el nostre servei, et tornem els diners. Sense preguntes."
-        },
-        "backup": {
-          "title": "Equip Backup Complet",
-          "description": "Portem duplicat de tot: so, llums, mescalador, reproductors. El teu event MAI es para."
-        },
         "response": {
           "title": "Resposta en 2 Hores",
           "description": "Resposta garantida en menys de 2 hores. Comunicació directa i sense intermediaris."
@@ -6015,7 +5924,6 @@
       "whatsappMsg": "Hola! Vull informació per al meu event.",
       "events": "events",
       "rating": "valoració",
-      "guarantee": "🛡️ Garantia 100%. Si no estàs content, et tornem els diners.",
       "status": {
         "scarce": "⚠️ Gairebé ple!",
         "limited": "🔥 S'acaba!",
@@ -6029,7 +5937,6 @@
       "subtitle": "Tematització + DJ professional per a casaments i events a Barcelona i Girona.",
       "trust1": "Pressupost en 2 min",
       "trust2": "Resposta en < 2h",
-      "trust3": "Equip backup 100%",
       "cta1": "Pressupost Gratis",
       "cta2": "WhatsApp Directe",
       "scroll": "Descobreix més"
@@ -6037,7 +5944,6 @@
     "heroStats": {
       "eventsRealized": "Events realitzats",
       "repeatOrRecommend": "Repeteixen o recomanen",
-      "withBackup": "Amb equip backup",
       "responseTime": "Temps de resposta"
     },
     "testimonials": {
@@ -6134,8 +6040,7 @@
         "badge": "",
         "features": {
           "0": "DJ Pro",
-          "1": "So 4000W",
-          "2": "Backup 100%"
+          "1": "So 4000W"
         }
       },
       "fiestas": {
@@ -6259,14 +6164,6 @@
     "guarantees": {
       "sectionLabel": "Tranquil·litat garantida",
       "sectionTitle": "El teu event, sense riscos",
-      "satisfaction": {
-        "title": "Garantia 100%",
-        "desc": "Si no estàs content, et tornem els diners"
-      },
-      "backup": {
-        "title": "Backup complet",
-        "desc": "Equip duplicat. El teu event MAI es para"
-      },
       "response": {
         "title": "Resposta 2h",
         "desc": "Comunicació directa i sense intermediaris"
