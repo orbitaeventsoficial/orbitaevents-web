@@ -212,10 +212,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   className="w-64 pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-neutral-500 text-sm transition-all duration-200 hover:border-white/20 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
                 />
               </div>
-              <button className="relative p-2 text-neutral-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors">
+              <Link
+                href="/admin/settings/notifications"
+                className="relative p-2 text-neutral-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
+                aria-label="Notificacions"
+              >
                 🔔
                 <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full" />
-              </button>
+              </Link>
               <button className="flex items-center gap-3 px-3 py-1.5 hover:bg-white/5 rounded-xl transition-colors">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-sm font-medium">
                   C
