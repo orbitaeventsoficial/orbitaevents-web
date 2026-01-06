@@ -5,35 +5,18 @@ import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
-// ═══════════════════════════════════════════════════════════════
-// SERVICES GRID - Versió amb temàtiques separades
-// Halloween i Món Màgic com a cards independents
-// Amb imatges de fons del portfolio
-// ═══════════════════════════════════════════════════════════════
+// Solo tres puertas principales: Bodas / Fiestas / Empresas
+const SERVICE_KEYS = ['casaments', 'festes', 'empreses'] as const;
 
-const SERVICE_KEYS = ['halloween', 'monMagic', 'casaments', 'festes', 'empreses'] as const;
-
-// Imatges de fons per servei (del portfolio)
+// Imagenes de fondo por servicio (portfolio)
 const SERVICE_IMAGES: Record<string, string> = {
-  halloween: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
-  monMagic: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
   casaments: '/img/portfolio/bodas/bodas-01.webp',
   festes: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
   empreses: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
 };
 
-// Colors i estils per servei
+// Estilos por servicio
 const SERVICE_STYLES: Record<string, { overlay: string; accent: string; hoverGlow: string }> = {
-  halloween: {
-    overlay: 'from-orange-950/80 via-black/70 to-black/90',
-    accent: 'text-orange-400',
-    hoverGlow: 'hover:shadow-orange-500/30',
-  },
-  monMagic: {
-    overlay: 'from-amber-950/80 via-black/70 to-black/90',
-    accent: 'text-amber-400',
-    hoverGlow: 'hover:shadow-amber-500/30',
-  },
   casaments: {
     overlay: 'from-pink-950/80 via-black/70 to-black/90',
     accent: 'text-pink-400',
@@ -51,10 +34,8 @@ const SERVICE_STYLES: Record<string, { overlay: string; accent: string; hoverGlo
   },
 };
 
-// Hrefs per cada servei
+// Hrefs por servicio
 const SERVICE_HREFS: Record<string, string> = {
-  halloween: '/tematica-halloween',
-  monMagic: '/tematica-mon-magic',
   casaments: '/servicios/bodas',
   festes: '/servicios/fiestas',
   empreses: '/servicios/empresas',
@@ -116,7 +97,7 @@ export default function ServicesGridElegant() {
                       cursor-pointer
                     `}
                   >
-                    {/* Imatge de fons */}
+                    {/* Imagen de fondo */}
                     <Image
                       src={image}
                       alt={t(`items.${key}.title`)}
@@ -127,7 +108,7 @@ export default function ServicesGridElegant() {
                     {/* Overlay gradient */}
                     <div className={`absolute inset-0 bg-gradient-to-t ${styles.overlay}`} />
 
-                    {/* Badge si existeix */}
+                    {/* Badge si existe */}
                     {badge && badge !== `items.${key}.badge` && (
                       <div className="absolute top-4 left-4 z-10">
                         <span className="px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full shadow-lg">
@@ -136,7 +117,7 @@ export default function ServicesGridElegant() {
                       </div>
                     )}
 
-                    {/* Contingut */}
+                    {/* Contenido */}
                     <div className="absolute inset-0 flex flex-col justify-end p-6 z-10">
                       <h3 className="text-xl font-bold text-white mb-2">
                         {t(`items.${key}.title`)}
@@ -157,13 +138,13 @@ export default function ServicesGridElegant() {
                         ))}
                       </div>
 
-                      {/* Preu */}
+                      {/* Precio */}
                       <div className="flex items-center justify-between">
                         <span className={`font-bold ${styles.accent}`}>
                           {t(`items.${key}.price`)}
                         </span>
                         <span className="text-white/50 text-sm group-hover:text-white transition-colors">
-                          {t('viewMore')} →
+                          {t('viewMore')} ->
                         </span>
                       </div>
                     </div>
@@ -174,7 +155,7 @@ export default function ServicesGridElegant() {
           })}
         </div>
 
-        {/* CTA altres temàtiques */}
+        {/* CTA otras tematicas */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -190,9 +171,35 @@ export default function ServicesGridElegant() {
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 rounded-full text-black font-bold transition-all hover:scale-105"
           >
             {t('ctaButton')}
-            <span>💬</span>
+            <span>-></span>
           </Link>
         </motion.div>
+
+        {/* CTA pegajoso movil */}
+        <div className="md:hidden fixed bottom-4 left-0 right-0 z-30 px-4">
+          <div className="rounded-2xl bg-white/10 border border-white/10 backdrop-blur-lg p-3 shadow-lg shadow-orange-500/10 flex items-center gap-3">
+            <div className="flex-1">
+              <p className="text-white font-semibold text-sm">Listo para tu evento?</p>
+              <p className="text-white/60 text-xs">Respuesta en &lt;2h - Presupuesto gratis</p>
+            </div>
+            <div className="flex gap-2">
+              <a
+                href="https://wa.me/34699121023?text=Hola!%20Quiero%20informacion%20para%20mi%20evento."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-[#25D366] text-white text-xs font-semibold rounded-xl"
+              >
+                WhatsApp
+              </a>
+              <Link
+                href="/configurador"
+                className="px-4 py-2 bg-white text-black text-xs font-semibold rounded-xl"
+              >
+                Ver precios
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
