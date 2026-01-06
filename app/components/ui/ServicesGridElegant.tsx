@@ -144,7 +144,7 @@ export default function ServicesGridElegant() {
                           {t(`items.${key}.price`)}
                         </span>
                         <span className="text-white/50 text-sm group-hover:text-white transition-colors">
-                          {t('viewMore')} ->
+                          {t('viewMore')} -&gt;
                         </span>
                       </div>
                     </div>
@@ -171,7 +171,7 @@ export default function ServicesGridElegant() {
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 rounded-full text-black font-bold transition-all hover:scale-105"
           >
             {t('ctaButton')}
-            <span>-></span>
+            <span>-&gt;</span>
           </Link>
         </motion.div>
 
