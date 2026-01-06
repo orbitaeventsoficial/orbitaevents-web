@@ -1778,11 +1778,11 @@
     }
   },
   "opinionsPage": {
-    "comingSoon": "Próximamente",
+    "comingSoon": "Opiniones verificadas",
     "meta": {
       "title": "Opiniones y Reseñas | Òrbita Events - DJ Bodas Barcelona",
       "titleWithReviews": "Opiniones Reales DJ Bodas Barcelona | {rating}/5 en {count} Reseñas | Òrbita Events",
-      "description": "Más de {events} eventos realizados. Próximamente reseñas verificadas de Google. DJ profesional para bodas y eventos en Barcelona.",
+      "description": "Más de {events} eventos realizados. Reseñas verificadas de clientes reales. DJ profesional para bodas y eventos en Barcelona.",
       "descriptionWithReviews": "Opiniones reales de bodas, fiestas y eventos. {rating}/5 en {count} reseñas verificadas. Sonido impecable, iluminación cuidada y momentos inolvidables.",
       "ogTitle": "Opiniones y Reseñas | Òrbita Events",
       "ogTitleWithReviews": "Opiniones Reales | {rating}/5 | Òrbita Events",
@@ -1797,13 +1797,13 @@
     },
     "faq": {
       "q1": "¿Qué opinan los clientes de Òrbita Events?",
-      "a1": "Hemos realizado más de {events} eventos con clientes satisfechos. Próximamente podrás ver reseñas verificadas de Google.",
+      "a1": "Hemos realizado más de {events} eventos con clientes satisfechos. Mostramos reseñas verificadas (Google) y testimonios directos.",
       "a1WithReviews": "Valoración media de {rating}/5 en {count} reseñas. Nuestros clientes destacan el sonido, el montaje y la capacidad del DJ para mantener la pista y divertir a los invitados.",
       "q2": "¿Son reseñas reales?",
-      "a2": "Estamos en proceso de recopilar reseñas verificadas en Google Business. Mientras tanto, puedes contactarnos para referencias directas.",
+      "a2": "Sí. Publicamos solo reseñas verificadas (Google) y testimonios con permiso del cliente. Puedes pedir referencias directas si lo necesitas.",
       "a2WithReviews": "Sí, todas verificadas de bodas y eventos en Barcelona y Girona. Enlazamos directamente a Google.",
       "q3": "¿Cómo puedo dejar una reseña?",
-      "a3": "Puedes enviarnos tu opinión por correo a {email}. Pronto activaremos nuestro perfil de Google Business para reseñas públicas.",
+      "a3": "Puedes dejar tu reseña en nuestro perfil de Google Business o enviarla por correo a {email}. Cada opinión cuenta y nos ayuda a mejorar.",
       "a3WithGoogleUrl": "Puedes hacerlo desde nuestro perfil de Google Business o enviándola por correo a {email}. Cada opinión cuenta y nos ayuda a seguir mejorando."
     }
   },
@@ -3508,7 +3508,7 @@
       "festes": {
         "title": "🎉 Fiestas Privadas",
         "description": "La fiesta que recordarán siempre",
-        "price": "Desde 350€",
+        "price": "Desde 250€",
         "badge": "",
         "href": "/servicios/fiestas",
         "features": [
@@ -4873,10 +4873,14 @@
       "ogDescription": "Transforma tu boda en una experiencia mágica. Sobres sellados con lacre de cera real, cartas personalizadas. El detalle que tus invitados guardarán para siempre."
     }
   },
-  "homePage": {"meta": {      "title": "Experiencias Inmersivas para Eventos | DJ + Tematización Barcelona | Desde 250€",
+  "homePage": {
+    "meta": {
+      "title": "Experiencias Inmersivas para Eventos | DJ + Tematización Barcelona | Desde 250€",
       "description": "Creamos experiencias únicas: bodas Harry Potter, fiestas Halloween, eventos corporativos. DJ profesional + tematización completa. Desde 250€. Barcelona y Girona. ★★★★★ 5.0/5",
       "ogTitle": "Experiencias Inmersivas para Eventos | Òrbita Events | Desde 250€",
-      "ogDescription": "Bodas Harry Potter, fiestas Halloween, eventos corporativos. DJ + tematización completa. Barcelona y Girona."} },
+      "ogDescription": "Bodas Harry Potter, fiestas Halloween, eventos corporativos. DJ + tematización completa. Barcelona y Girona."
+    }
+  },
   "privacyPortal": {
     "title": "Portal de Privacidad",
     "subtitle": "Gestiona tus datos personales de acuerdo con el RGPD. Ejerce tus derechos de forma sencilla y segura.",
@@ -5945,7 +5949,8 @@
           "title": "Pasión por el Detalle",
           "description": "Cada evento es único. Personalizamos cada detalle para crear exactamente lo que imaginas."
         }
-      }
+      },
+      "subtitle": "Respuesta en 2h, presupuesto cerrado y soporte total. Garantía por escrito."
     },
     "ctaFinal": {
       "saturdaysSingular": "sábado libre en",
@@ -5962,7 +5967,8 @@
         "scarce": "⚠️ ¡Casi lleno!",
         "limited": "🔥 ¡Se acaba!",
         "available": "✓ Disponible"
-      }
+      },
+      "guarantee": "✓ Presupuesto sin compromiso · Cancelación gratuita hasta 7 días antes"
     },
     "heroVideo": {
       "badge": "✨ Creadores de Experiencias Inmersivas",

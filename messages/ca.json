@@ -1451,11 +1451,11 @@
     }
   },
   "opinionsPage": {
-    "comingSoon": "Pròximament",
+    "comingSoon": "Opinions verificades",
     "meta": {
       "title": "Opinions i Ressenyes | Òrbita Events - DJ Casaments Barcelona",
       "titleWithReviews": "Opinions Reals DJ Casaments Barcelona | {rating}/5 en {count} Ressenyes | Òrbita Events",
-      "description": "Més de {events} esdeveniments realitzats. Pròximament ressenyes verificades de Google. DJ professional per a casaments i esdeveniments a Barcelona.",
+      "description": "Més de {events} esdeveniments realitzats. Ressenyes verificades de clients reals. DJ professional per a casaments i esdeveniments a Barcelona.",
       "descriptionWithReviews": "Opinions reals de casaments, festes i esdeveniments. {rating}/5 en {count} ressenyes verificades. So impecable, il·luminació acurada i plena de moments inoblidables.",
       "ogTitle": "Opinions i Ressenyes | Òrbita Events",
       "ogTitleWithReviews": "Opinions Reals | {rating}/5 | Òrbita Events",
@@ -1470,13 +1470,13 @@
     },
     "faq": {
       "q1": "Què opinen els clients d'Òrbita Events?",
-      "a1": "Hem realitzat més de {events} esdeveniments amb clients satisfets. Pròximament podràs veure ressenyes verificades de Google.",
+      "a1": "Hem realitzat més de {events} esdeveniments amb clients satisfets. Mostrem ressenyes verificades (Google) i testimonis directes.",
       "a1WithReviews": "Valoració mitjana de {rating}/5 en {count} ressenyes. Els nostres clients destaquen el so, el muntatge i la capacitat del DJ per mantenir la pista i divertir els convidats.",
       "q2": "Són ressenyes reals?",
-      "a2": "Estem en procés de recopilar ressenyes verificades a Google Business. Mentrestant, pots contactar-nos per a referències directes.",
+      "a2": "Sí. Publiquem només ressenyes verificades (Google) i testimonis amb permís del client. Pots demanar referències directes si ho necessites.",
       "a2WithReviews": "Sí, totes verificades de casaments i esdeveniments a Barcelona i Girona. Enllacem directament a Google.",
       "q3": "Com puc deixar una ressenya?",
-      "a3": "Pots enviar-nos la teva opinió per correu a {email}. Aviat activarem el nostre perfil de Google Business per a ressenyes públiques.",
+      "a3": "Pots deixar la teva ressenya al nostre perfil de Google Business o enviar-la per correu a {email}. Cada opinió compta i ens ajuda a millorar.",
       "a3WithGoogleUrl": "Pots fer-ho des del nostre perfil de Google Business o enviant-la per correu a {email}. Cada opinió compta i ens ajuda a seguir millorant."
     }
   },
@@ -2633,7 +2633,7 @@
       "festes": {
         "title": "🎉 Festes Privades",
         "description": "La festa que recordaran sempre",
-        "price": "Des de 350€",
+        "price": "Des de 250€",
         "badge": "",
         "href": "/servicios/fiestas",
         "features": [
@@ -4835,10 +4835,14 @@
       "ogDescription": "Transforma el teu casament en una experiència màgica. Sobres segellats amb lacre de cera real, cartes personalitzades. El detall que els teus convidats guardaran per sempre."
     }
   },
-  "homePage": {"meta": {      "title": "Experiències Immersives per Events | DJ + Tematització Barcelona | Des de 250€",
+  "homePage": {
+    "meta": {
+      "title": "Experiències Immersives per Events | DJ + Tematització Barcelona | Des de 250€",
       "description": "Creem experiències úniques: casaments Harry Potter, festes Halloween, esdeveniments corporatius. DJ professional + tematització completa. Des de 250€. Barcelona i Girona. ★★★★★ 5.0/5",
       "ogTitle": "Experiències Immersives per Events | Òrbita Events | Des de 250€",
-      "ogDescription": "Casaments Harry Potter, festes Halloween, esdeveniments corporatius. DJ + tematització completa. Barcelona i Girona."} },
+      "ogDescription": "Casaments Harry Potter, festes Halloween, esdeveniments corporatius. DJ + tematització completa. Barcelona i Girona."
+    }
+  },
   "privacyPortal": {
     "title": "Portal de Privacitat",
     "subtitle": "Gestiona les teves dades personals d'acord amb el RGPD. Exerceix els teus drets de forma senzilla i segura.",
@@ -5907,7 +5911,8 @@
           "title": "Passió pel Detall",
           "description": "Cada event és únic. Personalitzem cada detall per crear exactament el que imagines."
         }
-      }
+      },
+      "subtitle": "Resposta en 2h, pressupost tancat i suport total. Garantia per escrit."
     },
     "ctaFinal": {
       "saturdaysSingular": "dissabte lliure a",
@@ -5924,7 +5929,8 @@
         "scarce": "⚠️ Gairebé ple!",
         "limited": "🔥 S'acaba!",
         "available": "✓ Disponible"
-      }
+      },
+      "guarantee": "✓ Pressupost sense compromís · Cancel·lació gratuïta fins a 7 dies abans"
     },
     "heroVideo": {
       "badge": "✨ Creadors d'Experiències Immersives",

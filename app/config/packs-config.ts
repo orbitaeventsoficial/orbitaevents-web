@@ -948,3 +948,4 @@ export function getFAQOfertaFlash(): string {
   if (!flashPack) return "";
   return `Tenemos la ${flash.nombre} para fiestas de hasta ${flash.maxInvitados} personas desde solo ${flashPack.price}. Incluye ${flashPack.durationHours} horas de DJ, sonido profesional e iluminación. ¡${flash.descuentoPorcentaje}% de descuento!`;
 }
+
