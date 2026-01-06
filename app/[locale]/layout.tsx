@@ -150,8 +150,8 @@ const JSON_LD_ORGANIZATION = {
   ],
   aggregateRating: {
     '@type': 'AggregateRating',
-    ratingValue: '4.9',
-    ratingCount: '50',
+    ratingValue: '5.0',
+    ratingCount: '1',
     bestRating: '5',
     worstRating: '1',
   },
@@ -205,7 +205,7 @@ export const metadata: Metadata = {
     default: "Experiències Immersives per Events | DJ + Tematització Barcelona | Òrbita Events | Des de 250€",
     template: '%s | Òrbita Events',
   },
-  description: 'Creem experiències úniques: casaments Harry Potter, festes Halloween, events corporatius. DJ professional + tematització completa. Des de 250€. Barcelona i Girona. ★★★★★ 4.9/5',
+  description: 'Creem experiències úniques: casaments Harry Potter, festes Halloween, events corporatius. DJ professional + tematització completa. Des de 250€. Barcelona i Girona. ★★★★★ 5.0/5',
   keywords: [
     'DJ casament Barcelona',
     'DJ boda Girona',
@@ -243,7 +243,7 @@ export const metadata: Metadata = {
     url: 'https://orbitaevents.com',
     siteName: 'Òrbita Events',
     title: 'Experiències Immersives per Events | DJ + Tematització Barcelona',
-    description: 'Creem experiències úniques: casaments Harry Potter, festes Halloween, events corporatius. DJ professional + tematització completa. Des de 250€. ★★★★★ 4.9/5',
+    description: 'Creem experiències úniques: casaments Harry Potter, festes Halloween, events corporatius. DJ professional + tematització completa. Des de 250€. ★★★★★ 5.0/5',
     images: [
       {
         url: '/og-home.jpg',
@@ -257,7 +257,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Experiències Immersives per Events | Òrbita Events',
-    description: 'Casaments Harry Potter, festes Halloween, events corporatius. DJ + tematització completa. Des de 250€. ★★★★★ 4.9/5',
+    description: 'Casaments Harry Potter, festes Halloween, events corporatius. DJ + tematització completa. Des de 250€. ★★★★★ 5.0/5',
     images: ['/og-home.jpg'],
     creator: '@orbitaevents',
   },

@@ -45,7 +45,7 @@ const stories: Story[] = [
     subtitle: 'que no oblidaràs mai',
     bgType: 'gradient',
     gradient: 'from-zinc-950 via-amber-950/20 to-zinc-950',
-    badge: '★ 4.9/5 · +200 events',
+    badge: '★ 5.0/5 · +200 events',
     cta: { text: 'Descobrir', href: '#servicios' },
   },
   {

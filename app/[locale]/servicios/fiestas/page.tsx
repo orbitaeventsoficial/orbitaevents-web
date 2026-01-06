@@ -117,7 +117,7 @@ export default async function FiestasPage({ params }: PageProps) {
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
         aggregateRating={{
-          ratingValue: 4.9,
+          ratingValue: 5.0,
           reviewCount: 167,
         }}
         offers={FIESTAS_PACKS.map((pack) => ({

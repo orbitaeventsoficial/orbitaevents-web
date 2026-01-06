@@ -24,7 +24,7 @@ const Icons = {
   ),
   Fire: () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 23c-4.97 0-9-4.03-9-9 0-3.87 2.47-7.17 5.91-8.41L12 2l3.09 3.59C18.53 6.83 21 10.13 21 14c0 4.97-4.03 9-9 9z"/>
+      <path d="M12 23c-5.07 0-9-4.03-9-9 0-3.87 2.47-7.17 5.91-8.41L12 2l3.09 3.59C18.53 6.83 21 10.13 21 14c0 5.07-4.03 9-9 9z"/>
     </svg>
   ),
   Arrow: () => (
@@ -157,7 +157,7 @@ export default function CTAFinal() {
             <span className="w-px h-4 bg-white/20" />
             <span className="flex items-center gap-2">
               <span className="text-xl">⭐</span>
-              <span><strong className="text-white">4.9/5</strong> {t('rating')}</span>
+              <span><strong className="text-white">5.0/5</strong> {t('rating')}</span>
             </span>
             <span className="w-px h-4 bg-white/20" />
             <span className="flex items-center gap-1">

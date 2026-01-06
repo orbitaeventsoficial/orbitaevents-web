@@ -203,9 +203,9 @@ const MINIMUM_STATS = {
   totalWeddings: 15,    // Mínim 15 casaments
   totalCorporate: 10,   // Mínim 10 corporatius
   totalParties: 20,     // Mínim 20 festes
-  averageRating: 4.9,   // Mínim 4.9 rating
-  googleRating: 4.9,    // Mínim 4.9 Google
-  googleReviewsCount: 20, // Mínim 20 reviews
+  averageRating: 5.0,   // Rating verificable
+  googleRating: 5.0,    // Rating Google verificable
+  googleReviewsCount: 1, // Reviews verificables
 };
 
 const defaultStats: StatsData = {

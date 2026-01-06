@@ -163,13 +163,6 @@ export default function HeroElegant() {
               <span className="text-white/60 text-sm">{t('socialProof')}</span>
             </div>
 
-            {/* Logos de confiança - petit */}
-            <div className="flex items-center gap-2 text-white/30 text-xs">
-              <span>{t('recommendedAt')}</span>
-              <span className="font-semibold text-white/50">Bodas.net</span>
-              <span>·</span>
-              <span className="font-semibold text-white/50">Google</span>
-            </div>
           </motion.div>
         </motion.div>
       </div>

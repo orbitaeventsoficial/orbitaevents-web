@@ -80,7 +80,6 @@ function SourceBadge({ source, verifiedLabel }: { source?: string; verifiedLabel
 
   const config = {
     google: { icon: <Icons.Google />, label: 'Google', color: 'bg-white/10' },
-    'bodas.net': { icon: <Icons.BodasNet />, label: 'Bodas.net', color: 'bg-rose-500/10' },
     direct: { icon: <Icons.Verified />, label: verifiedLabel, color: 'bg-emerald-500/10' },
   };
 
@@ -127,7 +126,7 @@ type Review = {
   date: string;
   text: string;
   photo?: string;
-  source?: 'google' | 'bodas.net' | 'direct';
+  source?: 'google' | 'direct';
   verified?: boolean;
 };
 
@@ -141,7 +140,7 @@ const REVIEWS_DATA = [
     dateKey: "review1Date",
     textKey: "review1Text",
     photo: "/img/portfolio/bodas/bodas-01.webp",
-    source: "bodas.net" as const,
+    source: "direct" as const,
     verified: true,
   },
   {

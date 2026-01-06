@@ -81,9 +81,9 @@ const FALLBACK_TESTIMONIALS: TestimonialPublic[] = [
 
 // Stats creïbles - no exagerats
 const FALLBACK_STATS = {
-  total: 23, // Número creïble per una empresa de 2 anys
-  averageRating: 4.9,
-  fiveStarCount: 20,
+  total: 1, // Reviews verificables reals
+  averageRating: 5.0,
+  fiveStarCount: 1,
 };
 
 export async function GET(request: NextRequest) {

@@ -614,7 +614,7 @@ function QuickContact() {
         <span>•</span>
         <span>📍 BCN & Girona</span>
         <span>•</span>
-        <span>⭐ 4.9/5</span>
+        <span>⭐ 5.0/5</span>
       </div>
     </div>
   );

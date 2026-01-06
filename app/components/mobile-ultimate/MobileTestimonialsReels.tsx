@@ -262,7 +262,7 @@ export default function MobileTestimonialsReels() {
       avatar: '/img/testimonials/avatar-01.webp',
       rating: 5,
       quoteKey: '1.quote',
-      verified: 'Bodas.net',
+      verified: 'Verificado',
       bgColor: 'from-amber-500/20 to-orange-500/10',
     },
     {
@@ -284,7 +284,7 @@ export default function MobileTestimonialsReels() {
       avatar: '/img/testimonials/avatar-03.webp',
       rating: 5,
       quoteKey: '3.quote',
-      verified: 'Bodas.net',
+      verified: 'Verificado',
       bgColor: 'from-purple-500/20 to-amber-500/10',
     },
     {

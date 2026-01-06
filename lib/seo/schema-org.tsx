@@ -69,11 +69,11 @@ export const localBusinessSchema = {
   ],
   aggregateRating: {
     '@type': 'AggregateRating',
-    ratingValue: '4.9',
+    ratingValue: '5.0',
     bestRating: '5',
     worstRating: '1',
-    ratingCount: '47',
-    reviewCount: '47',
+    ratingCount: '1',
+    reviewCount: '1',
   },
   sameAs: [
     'https://www.instagram.com/orbitaevents',

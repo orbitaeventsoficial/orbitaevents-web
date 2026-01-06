@@ -75,10 +75,10 @@ const FALLBACK_STATS = {
   totalWeddings: 15,               // ~7 per any
   totalCorporate: 10,              // Events corporatius
   totalParties: 23,                // Festes privades
-  totalTestimonials: 23,           // Consistent amb Google reviews
-  averageRating: 4.9,              // Alt però no 5.0 (massa perfecte)
-  googleRating: 4.9,               // Consistent
-  googleReviewsCount: 23,          // Número CREÏBLE, no "50+" exagerat
+  totalTestimonials: 1,            // Opinions verificables reals
+  averageRating: 5.0,              // Rating verificable
+  googleRating: 5.0,               // Rating Google verificable
+  googleReviewsCount: 1,           // Reviews verificables reals
 };
 
 export async function GET() {
@@ -167,8 +167,8 @@ export async function GET() {
     const yearsExperience = YEARS_ACTIVE;   // Siempre "+2 anys"
     const coverage = COVERAGE_AREAS;        // Siempre "Barcelona + Girona"
     const responseTime = settingsMap['response_time'] || '2h';
-    const googleRating = settingsMap['google_rating'] ? parseFloat(settingsMap['google_rating']) : 4.9;
-    const googleReviewsCount = settingsMap['google_reviews_count'] ? parseInt(settingsMap['google_reviews_count']) : 23;
+    const googleRating = settingsMap['google_rating'] ? parseFloat(settingsMap['google_rating']) : 5.0;
+    const googleReviewsCount = settingsMap['google_reviews_count'] ? parseInt(settingsMap['google_reviews_count']) : 1;
 
     // 4. Calcular rating promedio de testimonios
     const averageRating = testimonialStats._avg.rating || 5;

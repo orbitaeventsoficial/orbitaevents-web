@@ -67,11 +67,11 @@ export const statsConfigExtended: StatItem[] = [
   ...statsConfig,
   {
     id: 'rating',
-    value: 4.9,
+    value: 5.0,
     suffix: '',
     prefix: '★',
     label: "Valoració Google",
-    sublabel: "Basat en 23 opinions",
+    sublabel: "Opinions verificades",
     icon: '⭐',
     color: 'gold',
     animate: false
@@ -150,12 +150,12 @@ export async function getStatsFromDatabase() {
       prisma.customerTestimonial.aggregate({
         _avg: { rating: true },
         where: { isApproved: true }
-      }).catch(() => ({ _avg: { rating: 4.9 } })),
+      }).catch(() => ({ _avg: { rating: 5.0 } })),
     ]);
 
     return {
       eventsCompleted: eventsCompleted || 48,
-      avgRating: avgRatingResult._avg?.rating || 4.9,
+      avgRating: avgRatingResult._avg?.rating || 5.0,
       yearsActive: Math.floor((Date.now() - new Date('2023-01-01').getTime()) / (365.25 * 24 * 60 * 60 * 1000)),
       provinces: 2,
       cities: 25
@@ -164,7 +164,7 @@ export async function getStatsFromDatabase() {
     // Fallback a valors estàtics
     return {
       eventsCompleted: 48,
-      avgRating: 4.9,
+      avgRating: 5.0,
       yearsActive: Math.floor((Date.now() - new Date('2023-01-01').getTime()) / (365.25 * 24 * 60 * 60 * 1000)),
       provinces: 2,
       cities: 25

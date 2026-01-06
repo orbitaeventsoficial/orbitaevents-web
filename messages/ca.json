@@ -279,7 +279,7 @@
       "subtitleLocation": "Barcelona i Girona.",
       "ctaContact": "Vull el meu event",
       "ctaPrices": "Veure què fem",
-      "rating": "4.9",
+      "rating": "5.0",
       "socialProof": "50+ events realitzats",
       "recommendedAt": "Recomanats a",
       "whatsappMessage": "Hola! Vull info per a un event temàtic"
@@ -379,7 +379,7 @@
       "magic": "Màgia"
     },
     "socialProof": {
-      "google": "4.9/5 a Google",
+      "google": "5.0/5 a Google",
       "events": "+50 esdeveniments",
       "weddings": "15+ casaments"
     },
@@ -1190,7 +1190,7 @@
       "titleHighlight": "event",
       "trust": {
         "response": "Resposta en menys de 2h",
-        "rating": "4.9/5 valoració",
+        "rating": "5.0/5 valoració",
         "noCommitment": "Sense compromís"
       },
       "whatsappCta": "O escriu-nos per WhatsApp",
@@ -3596,7 +3596,7 @@
     "trust": {
       "events": "+50 esdeveniments",
       "eventsDesc": "realitzats amb èxit",
-      "rating": "4.9/5 a Google",
+      "rating": "5.0/5 a Google",
       "ratingDesc": "+50 ressenyes verificades",
       "coverage": "Barcelona + Girona",
       "coverageDesc": "Servei a tota Catalunya"
@@ -5462,7 +5462,7 @@
   "googleReviews": {
     "title": "Opinions a",
     "titleHighlight": "Google",
-    "rating": "4.9",
+    "rating": "5.0",
     "totalReviews": "47",
     "verified": "opinions verificades",
     "viewAll": "Veure totes les opinions a Google",
@@ -5808,7 +5808,7 @@
       "secondary": "WhatsApp Directe"
     },
     "social": {
-      "rating": "4.9",
+      "rating": "5.0",
       "events": "50+ events sense incidents",
       "recommended": "Recomanats a"
     }
@@ -5837,7 +5837,7 @@
     },
     "trust": {
       "events": "50+ events",
-      "rating": "4.9 valoració",
+      "rating": "5.0 valoració",
       "response": "2h resposta"
     }
   },
@@ -5989,11 +5989,11 @@
     "subtitle": "Halloween · Món Màgic · El que imaginis.",
     "location": "Barcelona i Girona.",
     "scroll": "DESCOBREIX",
-    "socialProof": "4.9 · Bodas.net",
+    "socialProof": "5.0 · Opinions verificades",
     "badges": {
       "halloween": "Halloween 2025",
       "monMagic": "Món Màgic",
-      "rating": "4.9/5 · 50+ events"
+      "rating": "5.0/5 · 50+ events"
     },
     "morphingTexts": {
       "unique": "ÚNICS.",
@@ -6073,7 +6073,7 @@
     "sectionLabel": "Opinions reals",
     "sectionTitle": "Què diuen de nosaltres",
     "stats": {
-      "rating": "4.9",
+      "rating": "5.0",
       "ratingLabel": "Valoració",
       "events": "50+",
       "eventsLabel": "Events",

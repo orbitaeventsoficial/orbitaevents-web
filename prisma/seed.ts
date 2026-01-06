@@ -27,8 +27,8 @@ async function main() {
     { key: 'years_experience', value: '+2 anys', type: 'STRING', category: 'stats', label: 'Anys empresa activa (des de 2023)' },
     { key: 'coverage', value: 'Barcelona + Girona', type: 'STRING', category: 'stats', label: 'Cobertura geogràfica (2 províncies)' },
     { key: 'response_time', value: '2h', type: 'STRING', category: 'stats', label: 'Temps resposta' },
-    { key: 'google_rating', value: '4.9', type: 'STRING', category: 'stats', label: 'Valoració Google' },
-    { key: 'google_reviews_count', value: '23', type: 'NUMBER', category: 'stats', label: 'Ressenyes Google' },
+    { key: 'google_rating', value: '5.0', type: 'STRING', category: 'stats', label: 'Valoració Google' },
+    { key: 'google_reviews_count', value: '1', type: 'NUMBER', category: 'stats', label: 'Ressenyes Google' },
 
     // Contacte
     { key: 'contact.phone', value: '699121023', type: 'STRING', category: 'contact', label: 'Telèfon' },

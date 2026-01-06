@@ -11,7 +11,7 @@
 // - Video testimonials opcionales
 // - Carousel automático
 // - Modal de video
-// - Integración con Google Reviews / Bodas.net
+// - Integración con Google Reviews
 //
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -39,7 +39,7 @@ interface Testimonial {
   location?: string;
   videoUrl?: string;
   verified?: boolean;
-  source?: 'google' | 'bodas.net' | 'direct';
+  source?: 'google' | 'direct';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -54,7 +54,7 @@ interface TranslatedTestimonial {
   eventType: 'boda' | 'fiesta' | 'empresa' | 'tematica';
   location?: string;
   verified: boolean;
-  source: 'google' | 'bodas.net' | 'direct';
+  source: 'google' | 'direct';
 }
 
 // 3 testimonis amb dades i claus de traducció
@@ -77,7 +77,7 @@ const TESTIMONIALS_CONFIG: TranslatedTestimonial[] = [
     eventType: 'fiesta',
     location: 'Barcelona',
     verified: true,
-    source: 'bodas.net'
+    source: 'direct'
   },
   {
     id: '3',
@@ -149,7 +149,6 @@ function SourceBadge({ source, t }: { source?: string; t: (key: string) => strin
 
   const config = {
     google: { icon: <Icons.Google />, label: 'Google', color: 'bg-white/10' },
-    'bodas.net': { icon: <Icons.BodasNet />, label: 'Bodas.net', color: 'bg-rose-500/10' },
     direct: { icon: <Icons.Verified />, label: t('verified'), color: 'bg-emerald-500/10' },
   };
 

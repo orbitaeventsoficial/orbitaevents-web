@@ -102,7 +102,7 @@ export default async function EmpresasPage({ params }: PageProps) {
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
         aggregateRating={{
-          ratingValue: 4.9,
+          ratingValue: 5.0,
           reviewCount: 47,
         }}
         offers={EMP_PACKS.map((pack) => ({
