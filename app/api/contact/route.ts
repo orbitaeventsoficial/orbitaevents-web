@@ -336,7 +336,7 @@ export async function POST(req: NextRequest) {
       ` : ''}
 
       ${isEmail ? `
-      <a href="mailto:${clientEmail}?subject=${encodeURIComponent(`Re: La teva sol·licitud a Òrbita Events - ${eventLabel}`)}" class="cta-button" style="background: #4A90D9;">
+      <a href="mailto:${clientEmail}?subject=${encodeURIComponent('Re: La teva sol·licitud a Òrbita Events - ' + eventLabel)}" class="cta-button" style="background: #4A90D9;">
         ✉️ Respondre per Email
       </a>
       ` : ''}
