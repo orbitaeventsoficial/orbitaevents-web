@@ -144,10 +144,10 @@ function AvailabilityCounter() {
 
 function TrustBadges() {
   const t = useTranslations('mobileCTA');
-  
+
   const badges = [
     { icon: '⭐', value: '4.9', labelKey: 'badges.rating' },
-    { icon: '🎉', value: '48+', labelKey: 'badges.events' },
+    { icon: '🎉', value: '50+', labelKey: 'badges.events' },
     { icon: '⚡', value: '2h', labelKey: 'badges.response' },
   ];
 

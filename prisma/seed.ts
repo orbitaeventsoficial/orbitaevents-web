@@ -16,8 +16,8 @@ async function main() {
   console.log('⚙️ Creant configuració global...');
 
   const settings = [
-    // Stats (DADES REALS: 48 events, 2000 persones, 15+ anys experiència fundador)
-    { key: 'stats.eventsCompleted', value: '48', type: 'NUMBER', category: 'stats', label: 'Esdeveniments completats' },
+    // Stats (DADES REALS: 50+ events, 2000 persones, 15+ anys experiència fundador)
+    { key: 'stats.eventsCompleted', value: '50', type: 'NUMBER', category: 'stats', label: 'Esdeveniments completats' },
     { key: 'stats.peopleEntertained', value: '2000', type: 'NUMBER', category: 'stats', label: 'Persones que han ballat' },
     { key: 'stats.yearStarted', value: '2023', type: 'NUMBER', category: 'stats', label: 'Any inici Òrbita' },
     { key: 'stats.technicalIncidents', value: '0', type: 'NUMBER', category: 'stats', label: 'Incidents tècnics' },

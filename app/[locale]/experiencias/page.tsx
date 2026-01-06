@@ -160,7 +160,7 @@ export default async function ExperienciasPage() {
                 <div className="text-white/60 text-sm">{t('stats.customizable')}</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-green-400">48+</div>
+                <div className="text-3xl md:text-4xl font-bold text-green-400">50+</div>
                 <div className="text-white/60 text-sm">{t('stats.events')}</div>
               </div>
             </div>

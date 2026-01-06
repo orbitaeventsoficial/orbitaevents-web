@@ -151,7 +151,7 @@ const JSON_LD_ORGANIZATION = {
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: '4.9',
-    ratingCount: '48',
+    ratingCount: '50',
     bestRating: '5',
     worstRating: '1',
   },
