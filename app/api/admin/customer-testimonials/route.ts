@@ -1,11 +1,12 @@
 /**
  * API ROUTE: Admin Customer Testimonials
- * Gestió dels testimonis enviats pels clients
+ * Gesti¢ dels testimonis enviats pels clients
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 import {
   getPendingTestimonials,
   getApprovedTestimonials,
@@ -20,7 +21,7 @@ export const dynamic = 'force-dynamic';
  * GET - Obtenir testimonis per admin
  */
 export async function GET(request: NextRequest) {
-  // Verificar autenticació
+  // Verificar autenticaci¢
   const authError = requireAuth(request);
   if (authError) return authError;
 
@@ -38,12 +39,11 @@ export async function GET(request: NextRequest) {
       case 'approved':
         testimonials = await getApprovedTestimonials();
         break;
-      default:
+      default: {
         const [pending, approved] = await Promise.all([
           getPendingTestimonials(),
           getApprovedTestimonials(),
         ]);
-        // Format pending testimonials to match approved format
         const formattedPending = pending.map(t => ({
           id: t.id,
           name: t.showName ? t.customer.name : 'Client verificat',
@@ -58,6 +58,7 @@ export async function GET(request: NextRequest) {
           source: 'pending' as const,
         }));
         testimonials = [...formattedPending, ...approved];
+      }
     }
 
     const response: Record<string, unknown> = {
@@ -81,38 +82,142 @@ export async function GET(request: NextRequest) {
  * PATCH - Aprovar o rebutjar testimoni
  */
 export async function PATCH(request: NextRequest) {
-  // Verificar autenticació
+  // Verificar autenticaci¢
   const authError = requireAuth(request);
   if (authError) return authError;
 
   try {
     const body = await request.json();
-    const { id, action } = body;
+    const { id, action, isApproved } = body as { id?: string; action?: string; isApproved?: boolean };
 
-    if (!id || !action) {
-      return NextResponse.json({ error: 'ID i acció requerits' }, { status: 400 });
-    }
-
-    if (!['approve', 'reject'].includes(action)) {
-      return NextResponse.json({ error: 'Acció invàlida (approve/reject)' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: 'ID requerit' }, { status: 400 });
     }
 
     let result;
-
-    if (action === 'approve') {
-      result = await approveTestimonial(id);
+    if (typeof isApproved === 'boolean') {
+      result = await approveTestimonial(id, isApproved);
     } else {
-      result = await deleteTestimonial(id);
+      if (!action || !['approve', 'reject'].includes(action)) {
+        return NextResponse.json({ error: 'Acci¢ inv…lida (approve/reject)' }, { status: 400 });
+      }
+      result = action === 'approve' ? await approveTestimonial(id) : await deleteTestimonial(id);
     }
 
     return NextResponse.json({
       success: true,
       data: result,
-      message: action === 'approve' ? 'Testimoni aprovat' : 'Testimoni eliminat',
+      message: action === 'approve' || isApproved === true ? 'Testimoni aprovat' : 'Testimoni actualitzat',
     });
   } catch (error) {
     log.error('Error updating customer testimonial:', error);
     const message = error instanceof Error ? error.message : 'Error actualitzant testimoni';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+/**
+ * DELETE - Eliminar testimoni
+ */
+export async function DELETE(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID requerit' }, { status: 400 });
+    }
+
+    const result = await deleteTestimonial(id);
+    return NextResponse.json({ success: true, data: result });
+  } catch (error) {
+    log.error('Error deleting customer testimonial:', error);
+    const message = error instanceof Error ? error.message : 'Error eliminant testimoni';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+/**
+ * POST - Crear testimoni manual (admin)
+ */
+export async function POST(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+
+  try {
+    const body = await request.json();
+    const {
+      customerName,
+      customerEmail,
+      rating,
+      text,
+      eventType,
+      eventDate,
+    } = body as {
+      customerName?: string;
+      customerEmail?: string;
+      rating?: number;
+      text?: string;
+      eventType?: string;
+      eventDate?: string;
+    };
+
+    if (!customerName || !text || !rating) {
+      return NextResponse.json(
+        { error: 'Nom, valoraci¢ i text s¢n obligatoris' },
+        { status: 400 }
+      );
+    }
+
+    const normalizedEmail = (customerEmail || `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@orbitaevents.local`).toLowerCase();
+    const normalizedName = customerName
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+
+    const customer = await prisma.customer.upsert({
+      where: { email: normalizedEmail },
+      update: {
+        name: customerName,
+        nameNormalized: normalizedName,
+      },
+      create: {
+        email: normalizedEmail,
+        emailNormalized: normalizedEmail,
+        name: customerName,
+        nameNormalized: normalizedName,
+        gdprConsent: true,
+        gdprConsentDate: new Date(),
+        source: 'OTHER',
+      },
+    });
+
+    const testimonial = await prisma.customerTestimonial.create({
+      data: {
+        customerId: customer.id,
+        text,
+        rating: Math.min(5, Math.max(1, rating)),
+        eventType: eventType || null,
+        eventDate: eventDate ? new Date(eventDate) : null,
+        showName: true,
+        showPhoto: false,
+        isApproved: true,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: testimonial.id,
+      },
+    });
+  } catch (error) {
+    log.error('Error creating manual testimonial:', error);
+    const message = error instanceof Error ? error.message : 'Error afegint ressenya';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

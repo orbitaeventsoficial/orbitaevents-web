@@ -234,11 +234,11 @@ export default function AdminReviewsPage() {
             </p>
             <div className="mt-2 flex items-center gap-2">
               <code className="flex-1 px-3 py-2 bg-white rounded border border-blue-200 text-sm text-blue-800 break-all">
-                {SITE_CONFIG.reviews.googleBusinessUrl}
+                {SITE_CONFIG.reviews.googleReviewUrl}
               </code>
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText(SITE_CONFIG.reviews.googleBusinessUrl || '');
+                  navigator.clipboard.writeText(SITE_CONFIG.reviews.googleReviewUrl || '');
                   alert('Link copiat!');
                 }}
                 className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
