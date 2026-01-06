@@ -9,16 +9,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-
-// ============================================================
-// ESTADÍSTIQUES REALS I VERIFICABLES - Empresa fundada Agost 2023
-// ============================================================
-
-const REAL_STATS = {
-  yearsExperience: 'Des de 2023',   // Fundat l'any 2023
-  coverage: 'Barcelona + Girona',    // 2 províncies
-  response: '2h',                    // Resposta en 2 hores
-};
+import { usePublicStats } from '@/hooks/usePublicData';
 
 // ============================================================
 // TIPUS
@@ -98,6 +89,7 @@ export default function SmartStats({
   animate = true
 }: SmartStatsProps) {
   const t = useTranslations('stats');
+  const { stats } = usePublicStats();
 
   // Estils segons variant
   const styles = {
@@ -129,27 +121,21 @@ export default function SmartStats({
     >
       {/* ANYS EXPERIÈNCIA */}
       <div className="text-center">
-        <p className={s.number}>{REAL_STATS.yearsExperience}</p>
+        <p className={s.number}>{stats.yearsExperience}</p>
         <p className={s.label}>{t('yearsExperience')}</p>
       </div>
 
       {/* COBERTURA */}
       <div className="text-center">
-        <p className={s.number}>{REAL_STATS.coverage}</p>
+        <p className={s.number}>{stats.coverage}</p>
         <p className={s.label}>{t('coverage')}</p>
       </div>
 
       {/* RESPOSTA */}
       <div className="text-center">
-        <p className={s.number}>{REAL_STATS.response}</p>
+        <p className={s.number}>{stats.responseTime}</p>
         <p className={s.label}>{t('response')}</p>
       </div>
     </motion.div>
   );
 }
-
-// ============================================================
-// EXPORT: Constants per usar a altres components
-// ============================================================
-
-export { REAL_STATS };

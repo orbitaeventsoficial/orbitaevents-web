@@ -30,6 +30,9 @@ interface StatsResponse {
     yearsExperience: string;
     coverage: string;
     responseTime: string;
+    yearStarted: number;
+    peopleEntertained: number;
+    technicalIncidents: number;
 
     // Calculados de la BBDD
     totalEvents: number;
@@ -71,6 +74,9 @@ const FALLBACK_STATS = {
   yearsExperience: YEARS_ACTIVE,   // "+2 anys" - calculat
   coverage: COVERAGE_AREAS,        // "Barcelona + Girona" - 2 províncies
   responseTime: '2h',              // Compromís real
+  yearStarted: COMPANY_START_YEAR,
+  peopleEntertained: 2000,
+  technicalIncidents: 0,
   totalEvents: 50,                 // Creïble per 2 anys
   totalWeddings: 15,               // ~7 per any
   totalCorporate: 10,              // Events corporatius
@@ -162,13 +168,19 @@ export async function GET() {
       }),
     ]);
 
-    // 3. Valores hardcoded para años y cobertura (SIEMPRE correctos)
-    // No usamos los valores de BD porque pueden estar desactualizados
-    const yearsExperience = YEARS_ACTIVE;   // Siempre "+2 anys"
-    const coverage = COVERAGE_AREAS;        // Siempre "Barcelona + Girona"
+    // 3. Valores configurables con minimo y auto-calculo
+    const yearStartedSetting = parseInt(settingsMap['stats.yearStarted'] || String(COMPANY_START_YEAR), 10);
+    const yearStarted = Number.isNaN(yearStartedSetting) ? COMPANY_START_YEAR : yearStartedSetting;
+    const startDate = new Date(Date.UTC(yearStarted, 0, 1));
+    const yearsCount = Math.max(1, Math.floor((Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25)));
+    const yearsExperience = `+${yearsCount} anys`;
+    const coverage = settingsMap['coverage'] || COVERAGE_AREAS;
     const responseTime = settingsMap['response_time'] || '2h';
     const googleRating = settingsMap['google_rating'] ? parseFloat(settingsMap['google_rating']) : 5.0;
     const googleReviewsCount = settingsMap['google_reviews_count'] ? parseInt(settingsMap['google_reviews_count']) : 1;
+    const minEvents = parseInt(settingsMap['stats.eventsCompleted'] || String(FALLBACK_STATS.totalEvents), 10);
+    const peopleEntertainedSetting = parseInt(settingsMap['stats.peopleEntertained'] || String(FALLBACK_STATS.peopleEntertained), 10);
+    const technicalIncidentsSetting = parseInt(settingsMap['stats.technicalIncidents'] || String(FALLBACK_STATS.technicalIncidents), 10);
 
     // 4. Calcular rating promedio de testimonios
     const averageRating = testimonialStats._avg.rating || 5;
@@ -180,9 +192,12 @@ export async function GET() {
         yearsExperience,
         coverage,
         responseTime,
+        yearStarted,
+        peopleEntertained: Number.isNaN(peopleEntertainedSetting) ? FALLBACK_STATS.peopleEntertained : peopleEntertainedSetting,
+        technicalIncidents: Number.isNaN(technicalIncidentsSetting) ? FALLBACK_STATS.technicalIncidents : technicalIncidentsSetting,
 
         // Calculados
-        totalEvents: totalEvents || FALLBACK_STATS.totalEvents,
+        totalEvents: Math.max(totalEvents || 0, Number.isNaN(minEvents) ? FALLBACK_STATS.totalEvents : minEvents),
         totalWeddings: weddingCount || FALLBACK_STATS.totalWeddings,
         totalCorporate: corporateCount || FALLBACK_STATS.totalCorporate,
         totalParties: partyCount || FALLBACK_STATS.totalParties,

@@ -44,6 +44,9 @@ interface StatsData {
   yearsExperience: string;
   coverage: string;
   responseTime: string;
+  yearStarted: number;
+  peopleEntertained: number;
+  technicalIncidents: number;
   totalEvents: number;
   totalWeddings: number;
   totalCorporate: number;
@@ -139,8 +142,9 @@ export function useAvailability(): UseAvailabilityReturn {
       const json = await response.json();
 
       if (json.ok) {
-        setData(json.data);
-        setCachedData('availability', json.data);
+        const statsData = json.stats as StatsData;
+        setStats(statsData);
+        setCachedData('stats', statsData);
         setError(null);
       } else {
         setError(json.error || 'Error desconocido');
@@ -198,28 +202,21 @@ interface UseStatsReturn {
 // VALORS MÍNIMS GARANTITS
 // Aquests són els valors mínims que mostrarem. Si la BD té més, es mostrarà el real.
 // ═══════════════════════════════════════════════════════════════════════════
-const MINIMUM_STATS = {
-  totalEvents: 50,      // Mínim 50 events
-  totalWeddings: 15,    // Mínim 15 casaments
-  totalCorporate: 10,   // Mínim 10 corporatius
-  totalParties: 20,     // Mínim 20 festes
-  averageRating: 5.0,   // Rating verificable
-  googleRating: 5.0,    // Rating Google verificable
-  googleReviewsCount: 1, // Reviews verificables
-};
-
 const defaultStats: StatsData = {
   yearsExperience: 'Des de 2023',     // Empresa fundada Agost 2023
   coverage: '2 Prov.',  // 2 províncies de cobertura
   responseTime: '2h',
-  totalEvents: MINIMUM_STATS.totalEvents,
-  totalWeddings: MINIMUM_STATS.totalWeddings,
-  totalCorporate: MINIMUM_STATS.totalCorporate,
-  totalParties: MINIMUM_STATS.totalParties,
+  yearStarted: 2023,
+  peopleEntertained: 2000,
+  technicalIncidents: 0,
+  totalEvents: 50,
+  totalWeddings: 15,
+  totalCorporate: 10,
+  totalParties: 20,
   totalTestimonials: 0,
-  averageRating: MINIMUM_STATS.averageRating,
-  googleRating: MINIMUM_STATS.googleRating,
-  googleReviewsCount: MINIMUM_STATS.googleReviewsCount,
+  averageRating: 5.0,
+  googleRating: 5.0,
+  googleReviewsCount: 1,
 };
 
 export function usePublicStats(): UseStatsReturn {

@@ -167,9 +167,9 @@ export async function GET(request: NextRequest) {
       ok: true,
       testimonials: publicTestimonials.length > 0 ? publicTestimonials : FALLBACK_TESTIMONIALS,
       stats: {
-        total: stats._count || FALLBACK_STATS.total,
-        averageRating: Math.round((stats._avg.rating || 5) * 10) / 10,
-        fiveStarCount: fiveStarCount || FALLBACK_STATS.fiveStarCount,
+        total: Math.max(stats._count || 0, FALLBACK_STATS.total),
+        averageRating: Math.max(Math.round((stats._avg.rating || 5) * 10) / 10, FALLBACK_STATS.averageRating),
+        fiveStarCount: Math.max(fiveStarCount || 0, FALLBACK_STATS.fiveStarCount),
       },
       generatedAt: new Date().toISOString(),
     };
