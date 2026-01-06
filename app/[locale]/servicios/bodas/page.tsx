@@ -90,7 +90,7 @@ export default async function BodasPage({ params }: PageProps) {
         areaServed={['Barcelona', 'Girona', 'Costa Brava', 'Maresme']}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
-        aggregateRating={{ ratingValue: 5.0, reviewCount: 1 }}
+        aggregateRating={{ ratingValue: 4.9, reviewCount: 1 }}
         offers={PACKS.map((p) => ({
           '@type': 'Offer',
           name: p.name,

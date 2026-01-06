@@ -80,7 +80,7 @@ export default async function DJBodasGironaPage({ params }: PageProps) {
         areaServed={gironaTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
-        aggregateRating={{ ratingValue: 5.0, reviewCount: 18 }}
+        aggregateRating={{ ratingValue: 4.9, reviewCount: 18 }}
       />
       <ZoneLandingPage config={zoneConfig} />
       <FAQ items={faqItems} />
