@@ -121,6 +121,15 @@ export default function TestimonialFormGamified() {
   const photoInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
+  const parseJsonResponse = async (response: Response) => {
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return response.json();
+    }
+    const text = await response.text();
+    return { success: false, error: text || 'Resposta no valida' };
+  };
+
   // Calcular recompensa total
   const calculateReward = useCallback(() => {
     let total = 5; // Base
@@ -205,7 +214,7 @@ export default function TestimonialFormGamified() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > 5 * 1024 * 1024) {
       setUploadError(t('errors.photoMax'));
       return;
     }
@@ -220,18 +229,38 @@ export default function TestimonialFormGamified() {
     setUploadError(null);
 
     try {
-      const formDataUpload = new FormData();
-      formDataUpload.append('file', file);
-      formDataUpload.append('type', 'photo');
-
+      const useSignedUrl = file.size > 4 * 1024 * 1024;
       const response = await fetch('/api/testimonial-upload', {
         method: 'POST',
-        body: formDataUpload,
+        headers: useSignedUrl ? { 'Content-Type': 'application/json' } : undefined,
+        body: useSignedUrl
+          ? JSON.stringify({ fileName: file.name, fileType: file.type, type: 'photo' })
+          : (() => {
+              const formDataUpload = new FormData();
+              formDataUpload.append('file', file);
+              formDataUpload.append('type', 'photo');
+              return formDataUpload;
+            })(),
       });
 
-      const result = await response.json();
+      const result = await parseJsonResponse(response);
 
       if (!response.ok || !result.success) {
+        if (result.useSignedUrl && result.signedUrl) {
+          const uploadResponse = await fetch(result.signedUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': file.type },
+            body: file,
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Error pujant foto a storage');
+          }
+
+          setFormData(prev => ({ ...prev, photoUrl: result.url }));
+          return;
+        }
+
         throw new Error(result.error || 'Error pujant foto');
       }
 
@@ -265,16 +294,21 @@ export default function TestimonialFormGamified() {
     try {
       // Per vídeos petits (<4MB), upload directe
       // Per vídeos grans, l'API retornarà signed URL
-      const formDataUpload = new FormData();
-      formDataUpload.append('file', file);
-      formDataUpload.append('type', 'video');
-
+      const useSignedUrl = file.size > 4 * 1024 * 1024;
       const response = await fetch('/api/testimonial-upload', {
         method: 'POST',
-        body: formDataUpload,
+        headers: useSignedUrl ? { 'Content-Type': 'application/json' } : undefined,
+        body: useSignedUrl
+          ? JSON.stringify({ fileName: file.name, fileType: file.type, type: 'video' })
+          : (() => {
+              const formDataUpload = new FormData();
+              formDataUpload.append('file', file);
+              formDataUpload.append('type', 'video');
+              return formDataUpload;
+            })(),
       });
 
-      const result = await response.json();
+      const result = await parseJsonResponse(response);
 
       if (!response.ok || !result.success) {
         // Si necessita signed URL per fitxers grans

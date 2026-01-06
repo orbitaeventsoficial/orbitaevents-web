@@ -72,6 +72,66 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const contentType = request.headers.get('content-type') || '';
+    const validPhotoTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const validVideoTypes = ['video/mp4', 'video/quicktime', 'video/webm'];
+
+    if (contentType.includes('application/json')) {
+      const body = await request.json().catch(() => null);
+      const fileName = body?.fileName as string | undefined;
+      const fileType = body?.fileType as string | undefined;
+      const type = (body?.type as string) || 'photo';
+
+      if (!fileName || !fileType) {
+        return NextResponse.json(
+          { success: false, error: 'Falten paràmetres fileName i fileType' },
+          { status: 400 }
+        );
+      }
+
+      if (type === 'photo' && !validPhotoTypes.includes(fileType)) {
+        return NextResponse.json(
+          { success: false, error: 'Format no permès. Usa JPG, PNG, WebP o GIF.' },
+          { status: 400 }
+        );
+      }
+
+      if (type === 'video' && !validVideoTypes.includes(fileType)) {
+        return NextResponse.json(
+          { success: false, error: 'Format no permès. Usa MP4, MOV o WebM.' },
+          { status: 400 }
+        );
+      }
+
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substring(7);
+      const ext = fileName.split('.').pop()?.toLowerCase() || 'bin';
+      const folder = type === 'video' ? 'testimonials/videos' : 'testimonials/photos';
+      const path = `${folder}/${timestamp}-${random}.${ext}`;
+
+      const { data, error } = await supabaseAdmin.storage
+        .from('media')
+        .createSignedUploadUrl(path);
+
+      if (error) {
+        log.error('Error creant signed URL:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      }
+
+      const { data: urlData } = supabaseAdmin.storage
+        .from('media')
+        .getPublicUrl(path);
+
+      return NextResponse.json({
+        success: true,
+        useSignedUrl: true,
+        signedUrl: data.signedUrl,
+        token: data.token,
+        path,
+        url: urlData.publicUrl,
+      });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const type = formData.get('type') as string || 'photo'; // 'photo' o 'video'
@@ -84,9 +144,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Validar tipus segons si és foto o vídeo
-    const validPhotoTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    const validVideoTypes = ['video/mp4', 'video/quicktime', 'video/webm'];
-    
     if (type === 'photo' && !validPhotoTypes.includes(file.type)) {
       return NextResponse.json(
         { success: false, error: 'Format no permès. Usa JPG, PNG, WebP o GIF.' },
