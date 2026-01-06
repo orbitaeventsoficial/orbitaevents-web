@@ -316,34 +316,21 @@ export async function POST(req: NextRequest) {
       <div class=\"highlight-box\">
         <div class=\"field-label\">Pack Seleccionat</div>
         <div class=\"field-value\">${escapeHtml(packName)}</div>
-        ${estimatedPrice ? `<div class=\"price\">${estimatedPrice.toLocaleString('es-ES')}?</div>` : ''}
-        ${packId ? `<div style=\"font-size: 12px; color: #666; margin-top: 8px;\">ID: ${escapeHtml(packId)}</div>` : ''}
+      ${estimatedPrice ? `
+      <div class=\"info-box\" style=\"border-left-color: #25D366; background: #f0fff4;\">
+        <strong>Pressupost estimat: ${estimatedPrice.toLocaleString('es-ES')}?</strong><br>
+        <span style=\"font-size: 14px; color: #666;\">*Preu orientatiu. Et confirmarem el preu final al nostre email.</span>
       </div>
-      ` : ''}
 
-      ${extras && Array.isArray(extras) && extras.length > 0 ? `
-      <div class=\"field\">
-        <div class=\"field-label\">Extras Sollicitats</div>
-        <div class=\"extras-list\">
-          ${extras.filter(e => e != null).map(e => `<span class=\"extra-tag\">${String(e).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`).join('')}
-        </div>
+      <div class=\"cta-section\">
+        <p style=\"margin-bottom: 16px; color: #666;\">Tens pressa? Truca'ns directament:</p>
+        <a href=\"tel:${SITE_CONFIG.business.phone}\" class=\"cta-button\" style=\"background: #D7B86E; color: #000;\">Trucar ara al ${SITE_CONFIG.business.phoneDisplay}
+        </a>
       </div>
-      ` : ''}
-
-      ${clientPhone ? `
-      <a href=\"tel:${escapeHtml(clientPhone)}\" class=\"cta-button\">
-        Trucar a ${escapeHtml(name)}
-      </a>
-      ` : ''}
-
-      ${isEmail ? `
-      <a href=\"mailto:${clientEmail}?subject=${encodeURIComponent('Re: La teva sollicitud a Orbita Events - ' + eventLabel)}\" class=\"cta-button\" style=\"background: #4A90D9;\">
-        Respondre per Email
-      </a>
       ` : ''}
     </div>
 
-    <div class="footer">
+    <div class=\"footer\">
       Òrbita Events | Sistema de Leads Automatitzat<br>
       ${timestamp}
     </div>
@@ -464,6 +451,7 @@ export async function POST(req: NextRequest) {
         <a href=\"tel:${SITE_CONFIG.business.phone}" class="cta-button" style="background: #D7B86E; color: #000;">Trucar ara al ${SITE_CONFIG.business.phoneDisplay}
         </a>
       </div>
+      ` : ''}
     </div>
 
     <div class="footer">
