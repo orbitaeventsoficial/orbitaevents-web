@@ -222,7 +222,7 @@ export const SITE_CONFIG = {
   // ============================================
   features: {
     // Sistema de reseñas (activar cuando tengas Google Places API configurado)
-    reviewsEnabled: false,
+    reviewsEnabled: true,
 
     // Calendario de disponibilidad (conectado a /api/calendario)
     calendarEnabled: true,

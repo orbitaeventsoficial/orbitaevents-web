@@ -19,6 +19,10 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 import { promises as fs } from 'fs';
 import path from 'path';
 
+const TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const LOCATION_API = 'https://businessprofile.googleapis.com/v1';
+
+
 export interface GoogleReview {
   author_name: string;
   author_url?: string;
@@ -30,6 +34,122 @@ export interface GoogleReview {
   time: number;
   source: 'google' | 'database' | 'json';
   eventType?: string;
+}
+
+type GoogleIntegrationConfig = {
+  refreshToken?: string;
+  accountId?: string;
+  locationId?: string;
+  locationName?: string;
+};
+
+async function getGoogleIntegrationConfig(): Promise<GoogleIntegrationConfig | null> {
+  if (!process.env.DATABASE_URL) return null;
+  const settings = await prisma.setting.findMany({
+    where: {
+      key: {
+        in: [
+          'integrations.google.refreshToken',
+          'integrations.google.accountId',
+          'integrations.google.locationId',
+          'integrations.google.locationName',
+        ],
+      },
+    },
+  });
+
+  const map = settings.reduce<Record<string, string>>((acc, s) => {
+    acc[s.key] = s.value;
+    return acc;
+  }, {});
+
+  return {
+    refreshToken: map['integrations.google.refreshToken'],
+    accountId: map['integrations.google.accountId'],
+    locationId: map['integrations.google.locationId'],
+    locationName: map['integrations.google.locationName'],
+  };
+}
+
+async function refreshGoogleAccessToken(refreshToken: string): Promise<string | null> {
+  const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) return null;
+
+  const body = new URLSearchParams({
+    client_id: clientId,
+    client_secret: clientSecret,
+    refresh_token: refreshToken,
+    grant_type: 'refresh_token',
+  });
+
+  const res = await fetch(TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+  });
+
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.access_token || null;
+}
+
+function mapStarRating(rating?: string | number): number {
+  if (typeof rating === 'number') return rating;
+  const map: Record<string, number> = {
+    ONE: 1,
+    TWO: 2,
+    THREE: 3,
+    FOUR: 4,
+    FIVE: 5,
+  };
+  return map[rating || ''] || 5;
+}
+
+async function getReviewsFromBusinessProfile(): Promise<GoogleReview[]> {
+  const config = await getGoogleIntegrationConfig();
+  if (!config?.refreshToken || !config.accountId || !config.locationId) {
+    return [];
+  }
+
+  const accessToken = await refreshGoogleAccessToken(config.refreshToken);
+  if (!accessToken) return [];
+
+  try {
+    const reviewsRes = await fetch(
+      `${LOCATION_API}/accounts/${config.accountId}/locations/${config.locationId}/reviews`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        next: { revalidate: 1800 },
+      }
+    );
+
+    if (!reviewsRes.ok) {
+      return [];
+    }
+
+    const data = await reviewsRes.json();
+    const reviews = (data.reviews || []).map((review: any) => {
+      const createdAt = review.createTime ? new Date(review.createTime) : new Date();
+      return {
+        author_name: review.reviewer?.displayName || 'Google User',
+        author_url: review.reviewer?.profilePhotoUrl,
+        profile_photo_url: review.reviewer?.profilePhotoUrl,
+        rating: mapStarRating(review.starRating),
+        text: review.comment || '',
+        time: Math.floor(createdAt.getTime() / 1000),
+        relative_time_description: getRelativeTime(createdAt),
+        language: 'es',
+        source: 'google' as const,
+      };
+    });
+
+    return reviews;
+  } catch (error) {
+    log.error('[Reviews] Error obtenint de GBP:', error);
+    return [];
+  }
 }
 
 export interface GoogleReviewsResponse {
@@ -174,17 +294,21 @@ async function getReviewsFromGoogle(): Promise<GoogleReview[]> {
 export async function GET() {
   try {
     // Obtenir ressenyes de totes les fonts
-    const [jsonData, dbReviews, googleReviews] = await Promise.all([
+    const [jsonData, dbReviews, googleReviews, gbpReviews] = await Promise.all([
       getReviewsFromJson(),
       getReviewsFromDatabase(),
       getReviewsFromGoogle(),
+      getReviewsFromBusinessProfile(),
     ]);
 
     // Prioritat: Google API > JSON estàtic > Database
     let allReviews: GoogleReview[] = [];
     let source: 'google' | 'database' | 'json' | 'mixed' = 'database';
 
-    if (googleReviews.length > 0) {
+    if (gbpReviews.length > 0) {
+      allReviews = [...gbpReviews, ...dbReviews];
+      source = dbReviews.length > 0 ? 'mixed' : 'google';
+    } else if (googleReviews.length > 0) {
       allReviews = [...googleReviews, ...dbReviews];
       source = dbReviews.length > 0 ? 'mixed' : 'google';
     } else if (jsonData.reviews.length > 0) {
