@@ -144,14 +144,19 @@ export default function HeaderChampion() {
             {/* ════════════════════════════════════════════════════════════ */}
             {/* LOGO */}
             {/* ════════════════════════════════════════════════════════════ */}
-            <Link href="/" className="flex items-center gap-2.5 group">
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 group"
+              style={{ touchAction: 'manipulation' }}
+            >
               <Image
                 src="/img/logoplanetatextdreta.svg"
                 alt="Òrbita Events"
                 width={200}
                 height={64}
-                className="h-12 md:h-16 w-auto"
+                className="h-12 md:h-16 w-auto pointer-events-none select-none"
                 priority
+                draggable={false}
               />
             </Link>
 
