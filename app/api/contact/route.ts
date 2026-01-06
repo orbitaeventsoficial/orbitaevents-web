@@ -291,53 +291,54 @@ export async function POST(req: NextRequest) {
         <div class="field-label">Tipus d'Esdeveniment</div>
         <div class="field-value">${escapeHtml(eventLabel)}</div>
       </div>
-
       ${eventDate ? `
-      <div class="field">
-        <div class="field-label">Data de l'Esdeveniment</div>
-        <div class="field-value">📅 ${eventDate}</div>
+      <div class=\"field\">
+        <div class=\"field-label\">Data de l'Esdeveniment</div>
+        <div class=\"field-value\">${eventDate}</div>
       </div>
+      ` : ''}
 
       ${guests ? `
-      <div class="field">
-        <div class="field-label">Nombre de Convidats</div>
-        <div class="field-value">👥 ${guests} persones</div>
+      <div class=\"field\">
+        <div class=\"field-label\">Nombre de Convidats</div>
+        <div class=\"field-value\">${guests} persones</div>
       </div>
+      ` : ''}
 
       ${message ? `
-      <div class="field">
-        <div class="field-label">Missatge</div>
-        <div class="field-value">${escapeHtml(message)}</div>
+      <div class=\"field\">
+        <div class=\"field-label\">Missatge</div>
+        <div class=\"field-value\">${escapeHtml(message)}</div>
       </div>
+      ` : ''}
 
       ${packName ? `
-      <div class="highlight-box">
-        <div class="field-label">Pack Seleccionat</div>
-        <div class="field-value">${escapeHtml(packName)}</div>
-        ${estimatedPrice ? `<div class="price">${estimatedPrice.toLocaleString('es-ES')}€</div>` : ''}
-        ${packId ? `<div style="font-size: 12px; color: #666; margin-top: 8px;">ID: ${escapeHtml(packId)}</div>` : ''}
+      <div class=\"highlight-box\">
+        <div class=\"field-label\">Pack Seleccionat</div>
+        <div class=\"field-value\">${escapeHtml(packName)}</div>
+        ${estimatedPrice ? `<div class=\"price\">${estimatedPrice.toLocaleString('es-ES')}?</div>` : ''}
+        ${packId ? `<div style=\"font-size: 12px; color: #666; margin-top: 8px;\">ID: ${escapeHtml(packId)}</div>` : ''}
       </div>
+      ` : ''}
 
-      
-      
       ${extras && Array.isArray(extras) && extras.length > 0 ? `
-      <div class="field">
-        <div class="field-label">Extras Sol·licitats</div>
-        <div class="extras-list">
-          ${extras.filter(e => e != null).map(e => `<span class="extra-tag">${String(e).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`).join('')}
+      <div class=\"field\">
+        <div class=\"field-label\">Extras Sollicitats</div>
+        <div class=\"extras-list\">
+          ${extras.filter(e => e != null).map(e => `<span class=\"extra-tag\">${String(e).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`).join('')}
         </div>
       </div>
       ` : ''}
 
       ${clientPhone ? `
-      <a href="tel:${escapeHtml(clientPhone)}" class="cta-button">
-        📱 Trucar a ${escapeHtml(name)}
+      <a href=\"tel:${escapeHtml(clientPhone)}\" class=\"cta-button\">
+        Trucar a ${escapeHtml(name)}
       </a>
       ` : ''}
 
       ${isEmail ? `
-      <a href="mailto:${clientEmail}?subject=${encodeURIComponent('Re: La teva sol·licitud a Òrbita Events - ' + eventLabel)}" class="cta-button" style="background: #4A90D9;">
-        ✉️ Respondre per Email
+      <a href=\"mailto:${clientEmail}?subject=${encodeURIComponent('Re: La teva sollicitud a Orbita Events - ' + eventLabel)}\" class=\"cta-button\" style=\"background: #4A90D9;\">
+        Respondre per Email
       </a>
       ` : ''}
     </div>
