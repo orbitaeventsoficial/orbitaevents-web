@@ -17,6 +17,21 @@ import {
 
 export const dynamic = 'force-dynamic';
 
+const EVENT_TYPES = [
+  'WEDDING',
+  'BIRTHDAY',
+  'CORPORATE',
+  'COMMUNION',
+  'BAPTISM',
+  'GRADUATION',
+  'ANNIVERSARY',
+  'PRIVATE_PARTY',
+  'OTHER',
+] as const;
+
+type EventTypeValue = (typeof EVENT_TYPES)[number];
+
+
 /**
  * GET - Obtenir testimonis per admin
  */
@@ -201,7 +216,7 @@ export async function POST(request: NextRequest) {
         customerId: customer.id,
         text,
         rating: Math.min(5, Math.max(1, rating)),
-        eventType: eventType || null,
+        eventType: eventTypeValue,
         eventDate: eventDate ? new Date(eventDate) : null,
         showName: true,
         showPhoto: false,
