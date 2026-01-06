@@ -294,7 +294,7 @@
       "years": "anys d'experiència",
       "yearsValue": "2+",
       "events": "events amb Òrbita",
-      "eventsValue": "48+",
+      "eventsValue": "50+",
       "response": "resposta garantida",
       "responseTime": "resposta garantida",
       "responseTimeValue": "2h",
@@ -380,7 +380,7 @@
     },
     "socialProof": {
       "google": "4.9/5 a Google",
-      "events": "+48 esdeveniments",
+      "events": "+50 esdeveniments",
       "weddings": "15+ casaments"
     },
     "urgency": {
@@ -463,7 +463,7 @@
     "stat2": "Repeteixen o recomanen",
     "stat2Desc": "El nostre compromís amb tu",
     "commitment": "El nostre compromís amb tu",
-    "commitmentText": "Més de 48 celebracions reeixides i l'opinió mitjana és excel·lent."
+    "commitmentText": "Més de 50 celebracions reeixides i l'opinió mitjana és excel·lent."
   },
   "checkout": {
     "title": "Últim pas per al teu esdeveniment!",
@@ -994,7 +994,7 @@
       "contract": "Contracte digital instantani i factura",
       "communication": "Comunicació directa i total disponibilitat abans de l'esdeveniment"
     },
-    "successMessage": "Més de 48 celebracions reeixides i l'opinió mitjana és destacada.",
+    "successMessage": "Més de 50 celebracions reeixides i l'opinió mitjana és destacada.",
     "disclaimer": "Compromís vàlid seguint les recomanacions bàsiques d'espai, horari i públic."
   },
   "finalCta": {
@@ -3591,7 +3591,7 @@
       "ok": "Disponibles"
     },
     "trust": {
-      "events": "+48 esdeveniments",
+      "events": "+50 esdeveniments",
       "eventsDesc": "realitzats amb èxit",
       "rating": "4.9/5 a Google",
       "ratingDesc": "+50 ressenyes verificades",
@@ -5848,7 +5848,7 @@
     },
     "social": {
       "rating": "4.9",
-      "events": "48+ events sense incidents",
+      "events": "50+ events sense incidents",
       "recommended": "Recomanats a"
     }
   },
@@ -5875,7 +5875,7 @@
       "secondary": "WhatsApp Directe"
     },
     "trust": {
-      "events": "48+ events",
+      "events": "50+ events",
       "rating": "4.9 valoració",
       "response": "2h resposta"
     },
@@ -6045,7 +6045,7 @@
     "badges": {
       "halloween": "Halloween 2025",
       "monMagic": "Món Màgic",
-      "rating": "4.9/5 · 48+ events"
+      "rating": "4.9/5 · 50+ events"
     },
     "morphingTexts": {
       "unique": "ÚNICS.",
@@ -6128,7 +6128,7 @@
     "stats": {
       "rating": "4.9",
       "ratingLabel": "Valoració",
-      "events": "48+",
+      "events": "50+",
       "eventsLabel": "Events",
       "recommended": "100%",
       "recommendedLabel": "Recomanats"

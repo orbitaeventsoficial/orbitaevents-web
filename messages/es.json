@@ -294,7 +294,7 @@
       "years": "años de experiencia",
       "yearsValue": "2+",
       "events": "eventos con Òrbita",
-      "eventsValue": "48+",
+      "eventsValue": "50+",
       "response": "respuesta garantizada",
       "responseTime": "respuesta garantizada",
       "responseTimeValue": "2h",
@@ -379,7 +379,7 @@
     },
     "socialProof": {
       "google": "4.9/5 en Google",
-      "events": "+48 eventos",
+      "events": "+50 eventos",
       "weddings": "15+ bodas"
     },
     "urgency": {
@@ -485,7 +485,7 @@
     "stat2": "Repiten o recomiendan",
     "stat2Desc": "Nuestro compromiso contigo",
     "commitment": "Nuestro compromiso contigo",
-    "commitmentText": "Más de 48 celebraciones exitosas y la opinión media es excelente."
+    "commitmentText": "Más de 50 celebraciones exitosas y la opinión media es excelente."
   },
   "checkout": {
     "title": "¡Último paso para tu evento!",
@@ -1016,7 +1016,7 @@
       "contract": "Contrato digital instantáneo y factura",
       "communication": "Comunicación directa y total disponibilidad antes del evento"
     },
-    "successMessage": "Más de 48 celebraciones exitosas y la opinión media es destacada.",
+    "successMessage": "Más de 50 celebraciones exitosas y la opinión media es destacada.",
     "disclaimer": "Compromiso válido siguiendo las recomendaciones básicas de espacio, horario y público."
   },
   "finalCta": {
@@ -1306,7 +1306,7 @@
       "ok": "Disponibles"
     },
     "trust": {
-      "events": "+48 eventos",
+      "events": "+50 eventos",
       "eventsDesc": "realizados con éxito",
       "rating": "4.9/5 en Google",
       "ratingDesc": "+50 reseñas verificadas",
@@ -1788,7 +1788,7 @@
       },
       "4": {
         "question": "¿Qué pasa si hay problemas técnicos durante el evento?",
-        "answer": "Llevamos equipo completo de BACKUP con todo: sonido, luces, mezclador, reproductores. Si algo falla (muy raro), tenemos sustitución en menos de 1 hora. Tu evento NUNCA se para. Más de 48 eventos sin incidencias técnicas graves nos respaldan."
+        "answer": "Llevamos equipo completo de BACKUP con todo: sonido, luces, mezclador, reproductores. Si algo falla (muy raro), tenemos sustitución en menos de 1 hora. Tu evento NUNCA se para. Más de 50 eventos sin incidencias técnicas graves nos respaldan."
       },
       "5": {
         "question": "¿Puedo elegir la música o decides tú?",
@@ -5887,7 +5887,7 @@
     },
     "social": {
       "rating": "4.9",
-      "events": "48+ eventos sin incidentes",
+      "events": "50+ eventos sin incidentes",
       "recommended": "Recomendados en"
     }
   },
@@ -5914,7 +5914,7 @@
       "secondary": "WhatsApp Directo"
     },
     "trust": {
-      "events": "48+ eventos",
+      "events": "50+ eventos",
       "rating": "4.9 valoración",
       "response": "2h respuesta"
     },
@@ -6084,7 +6084,7 @@
     "badges": {
       "halloween": "Halloween 2025",
       "monMagic": "Mundo Mágico",
-      "rating": "4.9/5 · 48+ eventos"
+      "rating": "4.9/5 · 50+ eventos"
     },
     "morphingTexts": {
       "unique": "ÚNICOS.",
@@ -6167,7 +6167,7 @@
     "stats": {
       "rating": "4.9",
       "ratingLabel": "Valoración",
-      "events": "48+",
+      "events": "50+",
       "eventsLabel": "Eventos",
       "recommended": "100%",
       "recommendedLabel": "Recomendados"
