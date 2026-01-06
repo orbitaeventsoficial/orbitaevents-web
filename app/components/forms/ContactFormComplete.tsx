@@ -222,21 +222,11 @@ export default function ContactFormComplete({
         });
 
         setSubmitStatus('success');
-        // Reset form
-        setFormData({
-          fullName: '',
-          email: '',
-          phone: '',
-          eventType: '',
-          eventDate: '',
-          guestCount: '',
-          location: '',
-          budget: '',
-          message: '',
-          howFound: '',
-          acceptPrivacy: false,
-          acceptMarketing: false,
-        });
+
+        // Redirigir a página de gracias
+        setTimeout(() => {
+          window.location.href = '/gracias';
+        }, 1000); // Pequeño delay para que se vea el success
       } else {
         throw new Error('Error al enviar');
       }
