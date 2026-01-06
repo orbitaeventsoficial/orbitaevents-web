@@ -212,6 +212,9 @@ export function generateServiceBrochure(
     // Pack card background
     doc.setFillColor(245, 245, 245);
     doc.roundedRect(15, y - 5, 180, 55, 3, 3, 'F');
+    // Left accent bar
+    doc.setFillColor(...COLORS.gold);
+    doc.rect(15, y - 5, 2, 55, 'F');
 
     // Badge
     if (pack.popular) {
@@ -230,17 +233,19 @@ export function generateServiceBrochure(
       doc.text(t.premium, 172, y + 3, { align: 'center' });
     }
 
-    // Pack name
+    // Pack name with icon
+    doc.setFillColor(...COLORS.gold);
+    doc.circle(20, y + 8, 1.2, 'F');
     doc.setTextColor(...COLORS.black);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text(pack.name, 20, y + 8);
+    doc.text(pack.name, 24, y + 8);
 
     // Price
     doc.setTextColor(...COLORS.gold);
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.text(pack.price, 20, y + 20);
+    doc.text(pack.price, 24, y + 20);
 
     // Duration
     doc.setTextColor(...COLORS.gray);
@@ -254,14 +259,17 @@ export function generateServiceBrochure(
     pack.features.slice(0, 3).forEach((feature, i) => {
       // Clean emoji from feature text for PDF
       const cleanFeature = feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim();
-      doc.text(`• ${cleanFeature.substring(0, 60)}`, 20, y + 30 + i * 5);
+      const featureY = y + 30 + i * 5;
+      doc.setFillColor(...COLORS.gold);
+      doc.circle(20, featureY - 1.3, 1, 'F');
+      doc.setTextColor(...COLORS.black);
+      doc.text(cleanFeature.substring(0, 60), 24, featureY);
     });
-
     // Ideal for
     if (pack.ideal) {
       doc.setTextColor(...COLORS.gray);
       doc.setFontSize(8);
-      doc.text(`${t.idealFor}: ${pack.ideal}`, 20, y + 48);
+      doc.text(`${t.idealFor}: ${pack.ideal}`, 24, y + 48);
     }
 
     y += 65;
@@ -292,9 +300,13 @@ export function generateServiceBrochure(
 
     compatibleExtras.forEach((extra, i) => {
       const col = i % 2 === 0 ? 20 : 110;
+      const textCol = col + 4;
       const row = Math.floor(i / 2) * 12;
-      const priceText = extra.price ? `${extra.price}€` : 'Consultar';
-      doc.text(`• ${extra.name} (${priceText})`, col, y + row);
+      const priceText = extra.price ? `${extra.price}?` : 'Consultar';
+      doc.setFillColor(...COLORS.gold);
+      doc.circle(col, y + row - 1.3, 1, 'F');
+      doc.setTextColor(...COLORS.black);
+      doc.text(`${extra.name} (${priceText})`, textCol, y + row);
     });
   }
 

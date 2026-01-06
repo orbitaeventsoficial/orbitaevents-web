@@ -212,9 +212,9 @@ export async function GET(request: NextRequest) {
 
 function getSubjectLine(locale: string, name: string): string {
   const subjects: Record<string, string> = {
-    es: `🎉 ${name}, ¡gracias por confiar en nosotros! ¿Qué tal fue tu evento?`,
-    ca: `🎉 ${name}, gràcies per confiar en nosaltres! Com va anar el teu event?`,
-    en: `🎉 ${name}, thank you for trusting us! How was your event?`,
+    es: `${name}, gracias por confiar en nosotros! Que tal fue tu evento?`,
+    ca: `${name}, gracies per confiar en nosaltres! Com va anar el teu event?`,
+    en: `${name}, thank you for trusting us! How was your event?`,
   };
   return subjects[locale] || subjects.es;
 }
@@ -247,7 +247,7 @@ function generatePostEventEmail(params: {
       reward: 'Al dejarnos tu valoración recibirás un <strong>código de descuento exclusivo</strong> para tu próximo evento o para compartir con amigos y familiares.',
       cta: 'Dejar mi valoración',
       bonus: '¡Cuanto más compartas, mayor descuento!',
-      bonusDetails: '📸 +5% extra si compartes foto · 🎬 +10% extra si compartes vídeo',
+      bonusDetails: '+5% extra si compartes foto / +10% extra si compartes video',
       googleText: 'También puedes dejarnos una reseña en Google:',
       googleCta: 'Reseña en Google',
       footer: 'Gracias por formar parte de la familia Òrbita Events',
@@ -261,7 +261,7 @@ function generatePostEventEmail(params: {
       reward: 'En deixar-nos la teva valoració rebràs un <strong>codi de descompte exclusiu</strong> pel teu pròxim event o per compartir amb amics i familiars.',
       cta: 'Deixar la meva valoració',
       bonus: 'Com més comparteixis, més descompte!',
-      bonusDetails: '📸 +5% extra si comparteixes foto · 🎬 +10% extra si comparteixes vídeo',
+      bonusDetails: '+5% extra si comparteixes foto / +10% extra si comparteixes video',
       googleText: 'També pots deixar-nos una ressenya a Google:',
       googleCta: 'Ressenya a Google',
       footer: 'Gràcies per formar part de la família Òrbita Events',
@@ -275,7 +275,7 @@ function generatePostEventEmail(params: {
       reward: 'When you leave your review, you\'ll receive an <strong>exclusive discount code</strong> for your next event or to share with friends and family.',
       cta: 'Leave my review',
       bonus: 'The more you share, the bigger the discount!',
-      bonusDetails: '📸 +5% extra for photo · 🎬 +10% extra for video',
+      bonusDetails: '+5% extra for a photo / +10% extra for a video',
       googleText: 'You can also leave us a Google review:',
       googleCta: 'Google Review',
       footer: 'Thank you for being part of the Òrbita Events family',
@@ -295,8 +295,8 @@ function generatePostEventEmail(params: {
   <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
     
     <!-- Header -->
-    <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d1f00 50%, #3d2800 100%); padding: 50px 30px; text-align: center;">
-      <h1 style="color: #FFB800; margin: 0; font-size: 32px; font-weight: 300;">
+    <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d1f00 50%, #3d2800 100%); padding: 32px 24px; text-align: center;">
+      <h1 style="color: #FFB800; margin: 0; font-size: 26px; font-weight: 300;">
         ${t.title}
       </h1>
       <p style="color: rgba(255,255,255,0.5); margin: 16px 0 0 0; font-size: 14px; letter-spacing: 2px;">
@@ -339,7 +339,7 @@ function generatePostEventEmail(params: {
                   font-size: 18px;
                   display: inline-block;
                   box-shadow: 0 4px 20px rgba(255,184,0,0.3);">
-          ⭐ ${t.cta}
+          ${t.cta}
         </a>
       </div>
 
@@ -354,22 +354,10 @@ function generatePostEventEmail(params: {
       </div>
 
       <!-- Google Review -->
-      <div style="background: rgba(66,133,244,0.1); border-radius: 12px; padding: 20px; text-align: center; margin-top: 20px;">
-        <p style="margin: 0 0 12px 0; font-size: 14px; color: rgba(255,255,255,0.7);">
-          ${t.googleText}
-        </p>
-        <a href="${googleReviewUrl}"
-           style="display: inline-block;
-                  background: #4285f4;
-                  color: #fff;
-                  padding: 12px 24px;
-                  text-decoration: none;
-                  border-radius: 8px;
-                  font-weight: 500;
-                  font-size: 14px;">
-          ⭐ ${t.googleCta}
-        </a>
+      <div style="margin-top: 18px; text-align: center; font-size: 13px; color: rgba(255,255,255,0.7);">
+        ${t.googleText} <a href="${googleReviewUrl}" style="color: #8ab4ff; text-decoration: none;">${t.googleCta}</a>
       </div>
+
     </div>
 
     <!-- Footer -->

@@ -297,7 +297,7 @@ export async function sendTestimonialApprovedEmail(params: {
 
   await sendEmail({
     to,
-    subject: `🎉 Gràcies per la teva opinió! Aquí tens el teu ${discountPercent}% de descompte - Òrbita Events`,
+    subject: `Gràcies per la teva opinió! Aquí tens el teu ${discountPercent}% de descompte - Òrbita Events`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -319,7 +319,10 @@ export async function sendTestimonialApprovedEmail(params: {
 
           <!-- Canvas image -->
           <div style="text-align: center; padding: 0;">
-            <img src="${canvasUrl}" alt="El teu regal de ${discountPercent}% descompte" style="width: 100%; max-width: 600px; display: block;" />
+            <img src="${canvasUrl}" alt="El teu regal de ${discountPercent}% descompte" style="width: 100%; max-width: 600px; display: block; border: 0; outline: none; text-decoration: none;" />
+          </div>
+          <div style="padding: 12px 24px; background: #121212; text-align: center; font-size: 12px; color: #9ca3af;">
+            Si no veus la imatge del regal, obre-la aqu¡: <a href="${canvasUrl}" style="color: #FFB800; text-decoration: none;">Veure regal</a>
           </div>
 
           <!-- Content -->
@@ -498,13 +501,13 @@ export async function sendTestimonialReceivedEmail(params: {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
   const firstName = name.split(' ')[0];
 
-  // Emoji segons rating
-  const ratingEmoji = rating >= 5 ? '🤩' : rating >= 4 ? '😊' : rating >= 3 ? '🙂' : '😐';
-  const stars = '⭐'.repeat(Math.min(5, Math.max(1, rating)));
+  // Badge segons rating
+  const ratingBadge = rating >= 5 ? 'Excelent' : rating >= 4 ? 'Genial' : rating >= 3 ? 'Be' : 'Gracies';
+  const stars = '*'.repeat(Math.min(5, Math.max(1, rating)));
 
   await sendEmail({
     to,
-    subject: `🎁 ${firstName}, aquí tens el teu ${discountPercent}% de descompte! - Òrbita Events`,
+    subject: `${firstName}, aqui tens el teu ${discountPercent}% de descompte! - Orbita Events`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -516,12 +519,12 @@ export async function sendTestimonialReceivedEmail(params: {
         <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d1f00 50%, #3d2800 100%); padding: 40px; text-align: center;">
-            <div style="font-size: 48px; margin-bottom: 16px;">${ratingEmoji}</div>
+            <div style="font-size: 12px; margin-bottom: 12px; letter-spacing: 2px; color: #FFB800; text-transform: uppercase;">${ratingBadge}</div>
             <h1 style="color: #FFB800; margin: 0; font-size: 28px; font-weight: 300;">
-              <span style="font-weight: 800;">GRÀCIES</span> ${firstName.toUpperCase()}!
+              <span style="font-weight: 800;">GRACIES</span> ${firstName.toUpperCase()}!
             </h1>
             <p style="color: rgba(255,255,255,0.6); margin: 12px 0 0 0; font-size: 14px;">
-              ${stars} La teva opinió ens fa molt feliços
+              ${stars} La teva opinio ens fa molt felicos
             </p>
           </div>
 
@@ -538,7 +541,7 @@ export async function sendTestimonialReceivedEmail(params: {
                 <span style="font-size: 28px; font-weight: 900;">${discountPercent}% DESCOMPTE</span>
               </div>
               <p style="margin: 16px 0 0 0; font-size: 13px; color: rgba(255,255,255,0.5);">
-                🕐 Vàlid durant 1 any · 🎉 Per al teu pròxim event
+                Valid durant 1 any - Per al teu proxim event
               </p>
             </div>
           </div>
@@ -546,12 +549,12 @@ export async function sendTestimonialReceivedEmail(params: {
           <!-- Message -->
           <div style="padding: 0 30px 30px; color: #e5e5e5;">
             <p style="font-size: 16px; line-height: 1.7; margin: 0;">
-              Hem rebut la teva valoració i la revisarem aviat. Mentrestant, <strong style="color: #FFB800;">ja pots utilitzar el teu codi de descompte</strong> per a qualsevol dels nostres serveis!
+              Hem rebut la teva valoracio i la revisarem aviat. Mentrestant, <strong style="color: #FFB800;">ja pots utilitzar el teu codi de descompte</strong> per a qualsevol dels nostres serveis!
             </p>
 
             <div style="margin-top: 24px; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border-left: 3px solid #FFB800;">
               <p style="margin: 0; font-size: 14px; color: #a3a3a3;">
-                💡 <strong style="color: #fff;">Consell:</strong> Guarda aquest email o fes una captura de pantalla del codi. El necessitaràs quan facis la reserva.
+                <strong style="color: #fff;">Consell:</strong> Guarda aquest email o fes una captura de pantalla del codi. El necessitaras quan facis la reserva.
               </p>
             </div>
 
@@ -566,7 +569,7 @@ export async function sendTestimonialReceivedEmail(params: {
                         font-weight: bold;
                         font-size: 16px;
                         display: inline-block;">
-                🎉 Reservar amb descompte
+                Reservar amb descompte
               </a>
             </div>
           </div>
@@ -574,10 +577,10 @@ export async function sendTestimonialReceivedEmail(params: {
           <!-- Footer -->
           <div style="padding: 20px; background: #0a0a0a; text-align: center;">
             <p style="margin: 0; font-size: 12px; color: #666;">
-              © ${new Date().getFullYear()} Òrbita Events · Barcelona i Girona
+              ${new Date().getFullYear()} Orbita Events - Barcelona i Girona
             </p>
             <p style="margin: 8px 0 0 0; font-size: 11px; color: #444;">
-              ${SITE_CONFIG.business.phone} · ${SITE_CONFIG.business.email}
+              ${SITE_CONFIG.business.phone} - ${SITE_CONFIG.business.email}
             </p>
           </div>
         </div>

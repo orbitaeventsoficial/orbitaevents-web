@@ -170,6 +170,36 @@ function findMissingKeys(master, target, path = '') {
 }
 
 /**
+ * Construeix objecte amb nom‚s les claus que falten
+ */
+function buildMissingSubset(master, target) {
+  const result = Array.isArray(master) ? [] : {};
+  let hasAny = false;
+
+  for (const [key, value] of Object.entries(master)) {
+    if (typeof value === 'string') {
+      if (!target || target[key] === undefined) {
+        result[key] = value;
+        hasAny = true;
+      }
+    } else if (Array.isArray(value)) {
+      if (!target || target[key] === undefined) {
+        result[key] = value;
+        hasAny = true;
+      }
+    } else if (typeof value === 'object' && value !== null) {
+      const child = buildMissingSubset(value, target?.[key]);
+      if (child && Object.keys(child).length > 0) {
+        result[key] = child;
+        hasAny = true;
+      }
+    }
+  }
+
+  return hasAny ? result : Array.isArray(master) ? [] : {};
+}
+
+/**
  * Fusiona traduccions existents amb noves
  */
 function mergeTranslations(existing, newTranslations) {
@@ -239,7 +269,7 @@ async function main() {
     }
     
     if (forceAll || missingKeys.length > 0) {
-      const toTranslate = forceAll ? masterContent : masterContent; // TODO: només traduir el que falta
+      const toTranslate = forceAll ? masterContent : buildMissingSubset(masterContent, existingContent);
       
       log('blue', `   🔄 Traduint ${forceAll ? 'tot' : missingKeys.length + ' claus noves'}...`);
       

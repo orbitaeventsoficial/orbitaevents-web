@@ -329,16 +329,10 @@ export async function POST(req: NextRequest) {
           ${extras.filter(e => e != null).map(e => `<span class="extra-tag">${String(e).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`).join('')}
         </div>
       </div>
-      ` : ''}
-
-      ${clientPhone ? `
-      <a href="tel:${escapeHtml(clientPhone)}" class="cta-button">
+      <a href=\"tel:${escapeHtml(clientPhone)}" class="cta-button">
         📱 Trucar a ${escapeHtml(name)}
       </a>
-      ` : ''}
-
-      ${isEmail ? `
-      <a href="mailto:${clientEmail}?subject=${encodeURIComponent(`Re: La teva sol·licitud a Òrbita Events - ${eventLabel}`)}" class="cta-button" style="background: #4A90D9;">
+      <a href=\"mailto:${clientEmail}?subject=${encodeURIComponent(`Re: La teva sol·licitud a Òrbita Events - ${eventLabel}`)}" class="cta-button" style="background: #4A90D9;">
         ✉️ Respondre per Email
       </a>
       ` : ''}
@@ -391,9 +385,11 @@ export async function POST(req: NextRequest) {
     .greeting { font-size: 20px; margin-bottom: 20px; }
     .info-box { background: #f8f8f8; border-left: 4px solid #DAA520; padding: 20px; margin: 20px 0; border-radius: 0 12px 12px 0; }
     .timeline { margin: 30px 0; }
-    .timeline-item { display: flex; align-items: flex-start; margin-bottom: 16px; }
-    .timeline-icon { width: 32px; height: 32px; background: #DAA520; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; color: #000; font-weight: bold; }
-    .timeline-text { font-size: 14px; color: #666; }
+    .timeline-table { width: 100%; border-collapse: collapse; }
+    .timeline-col { width: 34px; vertical-align: top; }
+    .timeline-dot { width: 28px; height: 28px; background: #DAA520; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; color: #000; font-size: 12px; margin: 0 auto; }
+    .timeline-line { width: 2px; height: 18px; background: #E6D3A1; margin: 0 auto; }
+    .timeline-text { font-size: 14px; color: #666; padding-bottom: 12px; }
     .timeline-text strong { color: #333; display: block; margin-bottom: 4px; }
     .cta-section { text-align: center; margin: 30px 0; }
     .cta-button { display: inline-block; background: #DAA520; color: #000; padding: 16px 40px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 16px; }
@@ -404,7 +400,7 @@ export async function POST(req: NextRequest) {
 <body>
   <div class="container">
     <div class="header">
-      <h1>Missatge Rebut! ✨</h1>
+      <h1>Missatge Rebut!</h1>
     </div>
 
     <div class="content">
@@ -413,49 +409,55 @@ export async function POST(req: NextRequest) {
       <p>Gràcies per contactar amb <strong>Òrbita Events</strong>! Hem rebut la teva sol·licitud per a <strong>${escapeHtml(eventLabel)}</strong> i estem il·lusionats de poder ajudar-te a crear un esdeveniment inoblidable.</p>
 
       <div class="info-box">
-        <strong>📋 La teva referència: ${leadId}</strong><br>
+        <strong>La teva referència: ${leadId}</strong><br>
         <span style="font-size: 14px; color: #666;">Guarda aquest codi per a qualsevol consulta</span>
       </div>
 
       <div class="timeline">
-        <h3 style="color: #DAA520; margin-bottom: 20px;">⏱️ Què passa ara?</h3>
+        <h3 style="color: #DAA520; margin-bottom: 20px;">QuŠ passa ara?</h3>
 
-        <div class="timeline-item">
-          <div class="timeline-icon">1</div>
-          <div class="timeline-text">
-            <strong>Revisem la teva sol·licitud</strong>
-            En les pròximes hores analitzem les teves necessitats
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-icon">2</div>
-          <div class="timeline-text">
-            <strong>Et contactem en menys de 2 hores</strong>
-            Fins i tot caps de setmana. Resposta ultra-ràpida garantida
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-icon">3</div>
-          <div class="timeline-text">
-            <strong>Pressupost personalitzat</strong>
-            T'enviem proposta detallada adaptada al teu event
-          </div>
-        </div>
+        <table class="timeline-table" role="presentation" cellpadding="0" cellspacing="0">
+          <tr>
+            <td class="timeline-col">
+              <div class="timeline-dot">&#9679;</div>
+              <div class="timeline-line"></div>
+            </td>
+            <td class="timeline-text">
+              <strong>Revisem la teva solúlicitud</strong>
+              En les pr•ximes hores analitzem les teves necessitats
+            </td>
+          </tr>
+          <tr>
+            <td class="timeline-col">
+              <div class="timeline-dot">&#9650;</div>
+              <div class="timeline-line"></div>
+            </td>
+            <td class="timeline-text">
+              <strong>Et contactem en menys de 2 hores</strong>
+              Fins i tot caps de setmana. Resposta ultra-r…pida garantida
+            </td>
+          </tr>
+          <tr>
+            <td class="timeline-col">
+              <div class="timeline-dot">&#9632;</div>
+            </td>
+            <td class="timeline-text">
+              <strong>Pressupost personalitzat</strong>
+              T'enviem proposta detallada adaptada al teu event
+            </td>
+          </tr>
+        </table>
       </div>
-
       ${estimatedPrice ? `
       <div class="info-box" style="border-left-color: #25D366; background: #f0fff4;">
-        <strong>💰 Pressupost estimat: ${estimatedPrice.toLocaleString('es-ES')}€</strong><br>
+        <strong>Pressupost estimat: ${estimatedPrice.toLocaleString('es-ES')}€</strong><br>
         <span style="font-size: 14px; color: #666;">*Preu orientatiu. Et confirmarem el preu final al nostre email.</span>
       </div>
       ` : ''}
 
       <div class="cta-section">
         <p style="margin-bottom: 16px; color: #666;">Tens pressa? Truca'ns directament:</p>
-        <a href="tel:${SITE_CONFIG.business.phone}" class="cta-button" style="background: #D7B86E; color: #000;">
-          📱 Trucar ara al ${SITE_CONFIG.business.phoneDisplay}
+        <a href=\"tel:${SITE_CONFIG.business.phone}" class="cta-button" style="background: #D7B86E; color: #000;">Trucar ara al ${SITE_CONFIG.business.phoneDisplay}
         </a>
       </div>
     </div>
@@ -464,8 +466,8 @@ export async function POST(req: NextRequest) {
       <strong>Òrbita Events</strong><br>
       L'Esdeveniment Que La Teva Gent NO Oblidarà<br><br>
 
-      📞 <a href="tel:${SITE_CONFIG.business.phone}">${SITE_CONFIG.business.phoneDisplay}</a> |
-      ✉️ <a href="mailto:${SITE_CONFIG.business.email}">${SITE_CONFIG.business.email}</a><br><br>
+      <a href=\"tel:${SITE_CONFIG.business.phone}">${SITE_CONFIG.business.phoneDisplay}</a> |
+      <a href=\"mailto:${SITE_CONFIG.business.email}">${SITE_CONFIG.business.email}</a><br><br>
 
       <p style="margin-top: 20px; font-size: 10px; color: #666;">
         Has rebut aquest email perquè vas sol·licitar informació a orbitaevents.com.<br>
@@ -479,7 +481,7 @@ export async function POST(req: NextRequest) {
 
         await sendEmail({
           to: clientEmail,
-          subject: `✅ Rebut! La teva sol·licitud per ${eventLabel} - Òrbita Events`,
+          subject: `Rebut! La teva sol·licitud per ${eventLabel} - Òrbita Events`,
           html: clientEmailHtml,
         });
       } catch (clientEmailError) {
