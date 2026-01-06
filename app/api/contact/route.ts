@@ -297,21 +297,18 @@ export async function POST(req: NextRequest) {
         <div class="field-label">Data de l'Esdeveniment</div>
         <div class="field-value">📅 ${eventDate}</div>
       </div>
-      ` : ''}
 
       ${guests ? `
       <div class="field">
         <div class="field-label">Nombre de Convidats</div>
         <div class="field-value">👥 ${guests} persones</div>
       </div>
-      ` : ''}
 
       ${message ? `
       <div class="field">
         <div class="field-label">Missatge</div>
         <div class="field-value">${escapeHtml(message)}</div>
       </div>
-      ` : ''}
 
       ${packName ? `
       <div class="highlight-box">
@@ -320,8 +317,9 @@ export async function POST(req: NextRequest) {
         ${estimatedPrice ? `<div class="price">${estimatedPrice.toLocaleString('es-ES')}€</div>` : ''}
         ${packId ? `<div style="font-size: 12px; color: #666; margin-top: 8px;">ID: ${escapeHtml(packId)}</div>` : ''}
       </div>
-      ` : ''}
 
+      
+      
       ${extras && Array.isArray(extras) && extras.length > 0 ? `
       <div class="field">
         <div class="field-label">Extras Sol·licitats</div>
@@ -329,10 +327,16 @@ export async function POST(req: NextRequest) {
           ${extras.filter(e => e != null).map(e => `<span class="extra-tag">${String(e).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`).join('')}
         </div>
       </div>
-      <a href=\"tel:${escapeHtml(clientPhone)}" class="cta-button">
+      ` : ''}
+
+      ${clientPhone ? `
+      <a href="tel:${escapeHtml(clientPhone)}" class="cta-button">
         📱 Trucar a ${escapeHtml(name)}
       </a>
-      <a href=\"mailto:${clientEmail}?subject=${encodeURIComponent(`Re: La teva sol·licitud a Òrbita Events - ${eventLabel}`)}" class="cta-button" style="background: #4A90D9;">
+      ` : ''}
+
+      ${isEmail ? `
+      <a href="mailto:${clientEmail}?subject=${encodeURIComponent(`Re: La teva sol·licitud a Òrbita Events - ${eventLabel}`)}" class="cta-button" style="background: #4A90D9;">
         ✉️ Respondre per Email
       </a>
       ` : ''}
@@ -453,7 +457,6 @@ export async function POST(req: NextRequest) {
         <strong>Pressupost estimat: ${estimatedPrice.toLocaleString('es-ES')}€</strong><br>
         <span style="font-size: 14px; color: #666;">*Preu orientatiu. Et confirmarem el preu final al nostre email.</span>
       </div>
-      ` : ''}
 
       <div class="cta-section">
         <p style="margin-bottom: 16px; color: #666;">Tens pressa? Truca'ns directament:</p>
