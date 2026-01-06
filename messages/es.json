@@ -4873,14 +4873,10 @@
       "ogDescription": "Transforma tu boda en una experiencia mágica. Sobres sellados con lacre de cera real, cartas personalizadas. El detalle que tus invitados guardarán para siempre."
     }
   },
-  "homePage": {
-    "meta": {
-      "title": "Experiencias Inmersivas para Eventos | DJ + Tematización Barcelona | Desde 250€",
-      "description": "Creamos experiencias únicas: bodas Harry Potter, fiestas Halloween, eventos corporativos. DJ profesional + tematización completa. Desde 250€. Barcelona y Girona. ★★★★★ 4.9/5",
+  "homePage": {"meta": {      "title": "Experiencias Inmersivas para Eventos | DJ + Tematización Barcelona | Desde 250€",
+      "description": "Creamos experiencias únicas: bodas Harry Potter, fiestas Halloween, eventos corporativos. DJ profesional + tematización completa. Desde 250€. Barcelona y Girona. ★★★★★ 5.0/5",
       "ogTitle": "Experiencias Inmersivas para Eventos | Òrbita Events | Desde 250€",
-      "ogDescription": "Bodas Harry Potter, fiestas Halloween, eventos corporativos. DJ + tematización completa. Barcelona y Girona."
-    }
-  },
+      "ogDescription": "Bodas Harry Potter, fiestas Halloween, eventos corporativos. DJ + tematización completa. Barcelona y Girona."} },
   "privacyPortal": {
     "title": "Portal de Privacidad",
     "subtitle": "Gestiona tus datos personales de acuerdo con el RGPD. Ejerce tus derechos de forma sencilla y segura.",

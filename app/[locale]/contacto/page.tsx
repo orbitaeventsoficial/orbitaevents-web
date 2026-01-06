@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   return {
     title: t('meta.title'),
     description: t('meta.description'),
-    alternates: { canonical: '/contacto' },
+    alternates: { canonical: `/${locale}/contacto` },
     robots: { index: true, follow: true },
   };
 }

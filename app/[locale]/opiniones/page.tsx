@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
       ? t('meta.descriptionWithReviews', { rating: ratingDisplay, count: countDisplay })
       : t('meta.description', { events: stats.eventsCompleted }),
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://orbitaevents.com"),
-    alternates: { canonical: "/opiniones" },
+    alternates: { canonical: `/${params.locale}/opiniones` },
     openGraph: {
       title: hasReviews
         ? t('meta.ogTitleWithReviews', { rating: ratingDisplay })
