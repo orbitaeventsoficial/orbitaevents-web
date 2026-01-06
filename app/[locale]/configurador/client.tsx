@@ -521,7 +521,7 @@ export default function ConfiguradorClient() {
               setStep(4);
               track('Configurador_Step3_Continue', { total: pricing.total });
             }}
-            className="w-full oe-btn-gold text-lg py-4 flex items-center justify-center gap-2"
+            className="w-full btn-primary text-lg py-4 flex items-center justify-center gap-2"
           >
             {t('step3.continue')}
             <ChevronRight className="w-5 h-5" />
@@ -779,7 +779,7 @@ export default function ConfiguradorClient() {
             <button
               type="submit"
               disabled={sending}
-              className="w-full oe-btn-gold text-xl py-6 flex items-center justify-center gap-3 animate-pulse hover:animate-none disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full btn-primary text-xl py-6 flex items-center justify-center gap-3 animate-pulse hover:animate-none disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {sending ? (
                 <>

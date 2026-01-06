@@ -46,7 +46,7 @@ export default function EmpresasClient() {
           <h1 className="text-5xl sm:text-7xl font-display font-black text-white mb-6 leading-[1.05]">
             {t('heroTitle')}
             <br />
-            <span className="gradient-text breathe">{t('heroTitleCity')}</span>
+            <span className="gradient-text-gold breathe">{t('heroTitleCity')}</span>
           </h1>
           <p className="text-xl sm:text-2xl text-text-muted max-w-3xl mx-auto mb-10 leading-relaxed">
             {t('heroSubtitle')}
@@ -56,7 +56,7 @@ export default function EmpresasClient() {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
               href="/configurador"
-              className="oe-btn-gold text-lg px-8 py-5 inline-flex items-center justify-center gap-3"
+              className="btn-primary text-lg px-8 py-5 inline-flex items-center justify-center gap-3"
               onClick={() => track("CTA_Configurador_Empresas")}
             >
               <Sparkles className="w-5 h-5" />
@@ -64,7 +64,7 @@ export default function EmpresasClient() {
             </Link>
             <Link
               href="/contacto"
-              className="oe-btn-outline text-lg px-8 py-5 inline-flex items-center justify-center gap-3"
+              className="btn-secondary text-lg px-8 py-5 inline-flex items-center justify-center gap-3"
               onClick={() => track("CTA_Contact_Empresas")}
             >
               <FileText className="w-5 h-5" />
@@ -106,7 +106,7 @@ export default function EmpresasClient() {
       {/* VALOR DIFERENCIAL */}
       <section className="py-20 sm:py-32 bg-bg-surface">
         <div className="mx-auto max-w-5xl px-4">
-          <div className="oe-card p-10 rounded-3xl border-2 border-oe-gold/50">
+          <div className="card p-10 rounded-3xl border-2 border-oe-gold/50">
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-oe-gold/10 flex items-center justify-center">
               <Shield className="w-10 h-10 text-oe-gold" />
             </div>

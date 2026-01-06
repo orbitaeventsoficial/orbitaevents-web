@@ -37,7 +37,7 @@ function BuscarContent() {
         <ul className="mt-6 space-y-3">
           {suggestions.map((s) => (
             <li key={s.href}>
-              <Link href={s.href} className="oe-btn block text-left w-full">
+              <Link href={s.href} className="btn-secondary block text-left w-full">
                 {t(`suggestions.${s.labelKey}`)}
               </Link>
             </li>
@@ -50,7 +50,7 @@ function BuscarContent() {
       )}
 
       <div className="mt-8 text-center">
-        <Link href="/contacto" className="oe-btn oe-btn-gold inline-block">
+        <Link href="/contacto" className="btn-primary inline-block">
           {t('askUs')}
         </Link>
       </div>

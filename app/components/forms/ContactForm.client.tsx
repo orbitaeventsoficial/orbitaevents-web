@@ -281,7 +281,7 @@ export default function ContactForm() {
       <motion.button
         type="submit"
         disabled={isSubmitting || loading}
-        className="w-full oe-btn-gold flex items-center justify-center gap-2 shadow-2xl glow-gold breathe disabled:opacity-50 disabled:cursor-not-allowed py-4 sm:py-3.5 text-base sm:text-lg"
+        className="w-full btn-primary flex items-center justify-center gap-2 shadow-2xl glow-gold breathe disabled:opacity-50 disabled:cursor-not-allowed py-4 sm:py-3.5 text-base sm:text-lg"
         whileHover={{ scale: loading ? 1 : 1.02 }}
         whileTap={{ scale: loading ? 1 : 0.98 }}
         aria-label={t('form.submit')}

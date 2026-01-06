@@ -71,20 +71,20 @@ export default function Error({
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <button
             onClick={() => reset()}
-            className="oe-btn inline-flex items-center justify-center gap-2 group"
+            className="btn-secondary inline-flex items-center justify-center gap-2 group"
           >
             <RefreshCcw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
             {t('tryAgain')}
           </button>
 
-          <Link href="/" className="oe-btn inline-flex items-center justify-center gap-2">
+          <Link href="/" className="btn-secondary inline-flex items-center justify-center gap-2">
             <Home className="w-5 h-5" />
             {t('backToHome')}
           </Link>
 
           <Link
             href="/contacto"
-            className="oe-btn-gold inline-flex items-center justify-center gap-2"
+            className="btn-primary inline-flex items-center justify-center gap-2"
           >
             <MessageCircle className="w-5 h-5" />
             {t('contactHelp')}

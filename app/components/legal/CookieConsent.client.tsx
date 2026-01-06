@@ -218,14 +218,14 @@ export default function CookieConsent() {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={acceptAll}
-                className="oe-btn-gold flex-1 text-center justify-center"
+                className="btn-primary flex-1 text-center justify-center"
               >
                 {t('acceptAll')}
               </button>
 
               <button
                 onClick={acceptNecessary}
-                className="oe-btn flex-1 text-center justify-center"
+                className="btn-secondary flex-1 text-center justify-center"
               >
                 {t('onlyNecessary')}
               </button>
@@ -233,7 +233,7 @@ export default function CookieConsent() {
               {!showSettings ? (
                 <button
                   onClick={() => setShowSettings(true)}
-                  className="oe-btn flex-1 text-center justify-center gap-2"
+                  className="btn-secondary flex-1 text-center justify-center gap-2"
                 >
                   <Settings className="w-4 h-4" />
                   {t('customize')}
@@ -241,7 +241,7 @@ export default function CookieConsent() {
               ) : (
                 <button
                   onClick={savePreferences}
-                  className="oe-btn flex-1 text-center justify-center"
+                  className="btn-secondary flex-1 text-center justify-center"
                 >
                   {t('save')}
                 </button>
