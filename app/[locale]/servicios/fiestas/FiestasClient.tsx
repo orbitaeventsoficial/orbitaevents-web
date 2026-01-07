@@ -207,7 +207,7 @@ export default function FiestasClient() {
                     {flashPack.price}
                   </div>
                   {flashPack.priceOriginal && (
-                    <div className="text-2xl text-gray-500 line-through">
+                    <div className="text-2xl text-gray-300 line-through">
                       {flashPack.priceOriginal}
                     </div>
                   )}

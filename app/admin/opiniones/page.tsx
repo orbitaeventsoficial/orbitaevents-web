@@ -185,7 +185,7 @@ export default function AdminOpinionesPage() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
               Gestió d&apos;Opinions
             </h1>
-            <p className="text-gray-500 mt-1">Aprova, rebutja i destaca les opinions dels clients</p>
+            <p className="text-gray-300 mt-1">Aprova, rebutja i destaca les opinions dels clients</p>
           </div>
 
           {/* Stats */}
@@ -193,7 +193,7 @@ export default function AdminOpinionesPage() {
             <div className="flex gap-4 flex-wrap">
               <div className="bg-stone-50 border border-zinc-800 rounded-xl px-4 py-3 text-center">
                 <p className="text-2xl font-bold text-slate-700">{stats.total}</p>
-                <p className="text-xs text-gray-500">Total</p>
+                <p className="text-xs text-gray-300">Total</p>
               </div>
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 text-center">
                 <p className="text-2xl font-bold text-yellow-400">{stats.pending}</p>
@@ -209,7 +209,7 @@ export default function AdminOpinionesPage() {
               </div>
               <div className="bg-stone-50 border border-zinc-800 rounded-xl px-4 py-3 text-center">
                 <p className="text-2xl font-bold text-slate-700">{stats.avgRating?.toFixed(1) || '0.0'}</p>
-                <p className="text-xs text-gray-500">Mitjana ★</p>
+                <p className="text-xs text-gray-300">Mitjana ★</p>
               </div>
             </div>
           )}
@@ -222,7 +222,7 @@ export default function AdminOpinionesPage() {
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               filter === 'pending'
                 ? 'bg-purple-600 text-white'
-                : 'bg-stone-100 text-gray-400 hover:bg-zinc-700'
+                : 'bg-stone-100 text-gray-200 hover:bg-zinc-700'
             }`}
           >
             Pendents
@@ -232,14 +232,14 @@ export default function AdminOpinionesPage() {
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               filter === 'all'
                 ? 'bg-purple-600 text-white'
-                : 'bg-stone-100 text-gray-400 hover:bg-zinc-700'
+                : 'bg-stone-100 text-gray-200 hover:bg-zinc-700'
             }`}
           >
             Totes
           </button>
           <button
             onClick={() => fetchTestimonials()}
-            className="px-4 py-2 rounded-lg bg-stone-100 text-gray-400 hover:bg-zinc-700 transition-all ml-auto"
+            className="px-4 py-2 rounded-lg bg-stone-100 text-gray-200 hover:bg-zinc-700 transition-all ml-auto"
           >
             Refrescar
           </button>
@@ -262,7 +262,7 @@ export default function AdminOpinionesPage() {
         {/* Empty State */}
         {!loading && testimonials.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-gray-500 text-lg">
+            <p className="text-gray-300 text-lg">
               {filter === 'pending' ? 'No hi ha opinions pendents' : 'No hi ha opinions'}
             </p>
           </div>
@@ -302,7 +302,7 @@ export default function AdminOpinionesPage() {
                             </h3>
                             {renderStars(t.rating)}
                           </div>
-                          <p className="text-gray-500 text-sm">
+                          <p className="text-gray-300 text-sm">
                             {t.customer.email}
                             {t.customer.phone && ` · ${t.customer.phone}`}
                             {t.customer.city && ` · ${t.customer.city}`}
@@ -317,12 +317,12 @@ export default function AdminOpinionesPage() {
                       {(t.eventType || t.eventDate) && (
                         <div className="flex gap-3 mb-3 text-sm">
                           {t.eventType && (
-                            <span className="text-gray-400">
+                            <span className="text-gray-200">
                               {EVENT_TYPE_LABELS[t.eventType] || t.eventType}
                             </span>
                           )}
                           {t.eventDate && (
-                            <span className="text-gray-500">
+                            <span className="text-gray-300">
                               {new Date(t.eventDate).toLocaleDateString('ca-ES')}
                             </span>
                           )}
@@ -338,7 +338,7 @@ export default function AdminOpinionesPage() {
                       <p className="text-gray-300 leading-relaxed mb-4">&quot;{t.comment}&quot;</p>
 
                       {/* Meta */}
-                      <div className="flex flex-wrap gap-3 text-sm text-gray-500">
+                      <div className="flex flex-wrap gap-3 text-sm text-gray-300">
                         {t.discountCode && (
                           <span className="bg-stone-100 px-2 py-1 rounded">
                             {t.discountCode}
@@ -405,7 +405,7 @@ export default function AdminOpinionesPage() {
                       <button
                         onClick={() => handleDelete(t.id)}
                         disabled={actionLoading === t.id}
-                        className="flex-1 bg-stone-100 hover:bg-zinc-700 text-gray-400 px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50 text-sm"
+                        className="flex-1 bg-stone-100 hover:bg-zinc-700 text-gray-200 px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50 text-sm"
                       >
                         Eliminar
                       </button>

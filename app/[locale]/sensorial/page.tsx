@@ -611,7 +611,7 @@ function ExplanationModal({ onClose, color, t }: { onClose: () => void; color: s
         {step < steps.length - 1 && (
           <button
             onClick={onClose}
-            className="mt-6 text-white/30 text-sm block mx-auto hover:text-white/50"
+            className="mt-6 text-white/50 text-sm block mx-auto hover:text-white/50"
           >
             {t('tutorial.skip')}
           </button>
@@ -677,13 +677,13 @@ function ControlPanel({
           <span className="text-3xl">🎛️</span>
           <div>
             <h2 className="text-xl font-bold text-white">{t('controls')}</h2>
-            <p className="text-white/40 text-sm">{t('customizeExperience')}</p>
+            <p className="text-white/60 text-sm">{t('customizeExperience')}</p>
           </div>
         </div>
 
         {/* Categories */}
         <div className="mb-6">
-          <h3 className="text-white/40 text-xs uppercase mb-3">📁 {t('categories')}</h3>
+          <h3 className="text-white/60 text-xs uppercase mb-3">📁 {t('categories')}</h3>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedCategory(null)}
@@ -710,7 +710,7 @@ function ControlPanel({
 
         {/* Temes */}
         <div className="mb-8">
-          <h3 className="text-white/40 text-xs uppercase mb-3">🎨 {t('themesLabel')} ({filteredThemes.length})</h3>
+          <h3 className="text-white/60 text-xs uppercase mb-3">🎨 {t('themesLabel')} ({filteredThemes.length})</h3>
           <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-2">
             {filteredThemes.map(themeItem => (
               <button
@@ -731,7 +731,7 @@ function ControlPanel({
 
         {/* So */}
         <div className="mb-8">
-          <h3 className="text-white/40 text-xs uppercase mb-3">🔊 {t('sound')}</h3>
+          <h3 className="text-white/60 text-xs uppercase mb-3">🔊 {t('sound')}</h3>
           <button
             onClick={onSoundToggle}
             className={`w-full p-4 rounded-xl text-left flex items-center gap-4 transition-all ${
@@ -742,7 +742,7 @@ function ControlPanel({
             <span className="text-3xl">{soundEnabled ? '🔊' : '🔇'}</span>
             <div className="flex-1">
               <p className="text-white font-medium">{t('ambientSound')}</p>
-              <p className="text-white/40 text-xs">
+              <p className="text-white/60 text-xs">
                 {soundEnabled ? t('soundOn') : t('soundOff')}
               </p>
             </div>
@@ -751,12 +751,12 @@ function ControlPanel({
 
         {/* Sliders */}
         <div className="mb-8 space-y-4">
-          <h3 className="text-white/40 text-xs uppercase mb-3">🎚️ {t('intensity')}</h3>
+          <h3 className="text-white/60 text-xs uppercase mb-3">🎚️ {t('intensity')}</h3>
 
           <div>
             <div className="flex justify-between text-sm mb-2">
               <span className="text-white/60">{t('elements')}</span>
-              <span className="text-white/40 font-mono">{intensity}</span>
+              <span className="text-white/60 font-mono">{intensity}</span>
             </div>
             <input
               type="range"
@@ -775,7 +775,7 @@ function ControlPanel({
           <div>
             <div className="flex justify-between text-sm mb-2">
               <span className="text-white/60">{t('speedLabel')}</span>
-              <span className="text-white/40 font-mono">{speed.toFixed(1)}x</span>
+              <span className="text-white/60 font-mono">{speed.toFixed(1)}x</span>
             </div>
             <input
               type="range"
@@ -794,7 +794,7 @@ function ControlPanel({
 
         {/* Presets */}
         <div className="mb-8">
-          <h3 className="text-white/40 text-xs uppercase mb-3">⚡ {t('presets')}</h3>
+          <h3 className="text-white/60 text-xs uppercase mb-3">⚡ {t('presets')}</h3>
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={() => { onIntensityChange(15); onSpeedChange(0.3); }}
@@ -828,7 +828,7 @@ function ControlPanel({
         </div>
 
         <div className="pt-8 mt-8 border-t border-white/10 text-center">
-          <p className="text-white/30 text-xs">🪐 {t('footer')}</p>
+          <p className="text-white/50 text-xs">🪐 {t('footer')}</p>
         </div>
       </div>
     </motion.aside>
@@ -913,7 +913,7 @@ export default function EspaiSensorial() {
           </motion.button>
 
           <div className="absolute left-1/2 -translate-x-1/2 text-center">
-            <p className="text-white/40 text-xs uppercase tracking-wider">{t('title')}</p>
+            <p className="text-white/60 text-xs uppercase tracking-wider">{t('title')}</p>
             <h1 className="text-white font-medium flex items-center gap-2">
               <span className="text-xl">{theme.emoji}</span>
               <span>{t(`themeNames.${theme.id}`)}</span>

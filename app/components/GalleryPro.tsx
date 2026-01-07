@@ -560,7 +560,7 @@ export function GalleryPro({
               <span className="mr-1.5">{cat.icon}</span>
               <span>{cat.label}</span>
               {cat.count !== undefined && (
-                <span className={`ml-1.5 ${activeCategory === cat.id ? 'text-black/60' : 'text-white/40'}`}>
+                <span className={`ml-1.5 ${activeCategory === cat.id ? 'text-black/60' : 'text-white/60'}`}>
                   ({cat.count})
                 </span>
               )}

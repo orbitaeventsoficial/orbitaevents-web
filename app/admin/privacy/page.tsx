@@ -146,7 +146,7 @@ export default function AdminPrivacyPage() {
       red: { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' },
       purple: { bg: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500/30' },
       orange: { bg: 'bg-orange-500/20', text: 'text-orange-400', border: 'border-orange-500/30' },
-      gray: { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-500/30' },
+      gray: { bg: 'bg-gray-500/20', text: 'text-gray-200', border: 'border-gray-500/30' },
     };
     return colors[color] || colors.gray;
   };
@@ -162,7 +162,7 @@ export default function AdminPrivacyPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-700">Gestió de Privacitat</h1>
-              <p className="text-gray-400">Sol·licituds ARCO i compliment RGPD</p>
+              <p className="text-gray-200">Sol·licituds ARCO i compliment RGPD</p>
             </div>
           </div>
           <button
@@ -185,7 +185,7 @@ export default function AdminPrivacyPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-slate-700">{stats.requests.pending}</p>
-                  <p className="text-sm text-gray-400">Pendents</p>
+                  <p className="text-sm text-gray-200">Pendents</p>
                 </div>
               </div>
             </div>
@@ -197,7 +197,7 @@ export default function AdminPrivacyPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-slate-700">{stats.requests.urgent}</p>
-                  <p className="text-sm text-gray-400">Urgents (&lt;5 dies)</p>
+                  <p className="text-sm text-gray-200">Urgents (&lt;5 dies)</p>
                 </div>
               </div>
             </div>
@@ -209,7 +209,7 @@ export default function AdminPrivacyPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-slate-700">{stats.requests.completed}</p>
-                  <p className="text-sm text-gray-400">Completades</p>
+                  <p className="text-sm text-gray-200">Completades</p>
                 </div>
               </div>
             </div>
@@ -221,7 +221,7 @@ export default function AdminPrivacyPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-slate-700">{stats.consents.active}</p>
-                  <p className="text-sm text-gray-400">Consentiments actius</p>
+                  <p className="text-sm text-gray-200">Consentiments actius</p>
                 </div>
               </div>
             </div>
@@ -233,7 +233,7 @@ export default function AdminPrivacyPage() {
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                 <input
                   type="text"
                   placeholder="Cercar per email o nom..."
@@ -245,7 +245,7 @@ export default function AdminPrivacyPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-500" />
+              <Filter className="w-4 h-4 text-gray-300" />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
@@ -287,12 +287,12 @@ export default function AdminPrivacyPage() {
           {isLoading ? (
             <div className="text-center py-12">
               <RefreshCw className="w-8 h-8 text-purple-400 animate-spin mx-auto mb-4" />
-              <p className="text-gray-400">Carregant sol·licituds...</p>
+              <p className="text-gray-200">Carregant sol·licituds...</p>
             </div>
           ) : filteredRequests.length === 0 ? (
             <div className="text-center py-12 bg-stone-50 border border-stone-200 rounded-xl">
               <Shield className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400">No hi ha sol·licituds</p>
+              <p className="text-gray-200">No hi ha sol·licituds</p>
             </div>
           ) : (
             filteredRequests.map((request) => {
@@ -334,7 +334,7 @@ export default function AdminPrivacyPage() {
                             {typeConfig.label}
                           </span>
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-gray-400">
+                        <div className="flex items-center gap-3 text-sm text-gray-200">
                           <span className="flex items-center gap-1">
                             <Mail className="w-3 h-3" />
                             {request.requesterEmail}
@@ -349,7 +349,7 @@ export default function AdminPrivacyPage() {
                       {/* Status & Deadline */}
                       <div className="flex items-center gap-4">
                         {/* Deadline */}
-                        <div className={`text-right ${isUrgent ? 'text-red-400' : 'text-gray-400'}`}>
+                        <div className={`text-right ${isUrgent ? 'text-red-400' : 'text-gray-200'}`}>
                           <div className="text-sm font-medium">
                             {daysLeft > 0 ? `${daysLeft} dies` : 'Vençut!'}
                           </div>
@@ -368,9 +368,9 @@ export default function AdminPrivacyPage() {
 
                         {/* Expand */}
                         {isExpanded ? (
-                          <ChevronUp className="w-5 h-5 text-gray-500" />
+                          <ChevronUp className="w-5 h-5 text-gray-300" />
                         ) : (
-                          <ChevronDown className="w-5 h-5 text-gray-500" />
+                          <ChevronDown className="w-5 h-5 text-gray-300" />
                         )}
                       </div>
                     </div>
@@ -386,17 +386,17 @@ export default function AdminPrivacyPage() {
 
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
-                              <span className="text-gray-400">ID:</span>
+                              <span className="text-gray-200">ID:</span>
                               <span className="text-slate-700 font-mono text-xs">{request.id}</span>
                             </div>
                             {request.requesterPhone && (
                               <div className="flex justify-between">
-                                <span className="text-gray-400">Telèfon:</span>
+                                <span className="text-gray-200">Telèfon:</span>
                                 <span className="text-slate-700">{request.requesterPhone}</span>
                               </div>
                             )}
                             <div className="flex justify-between">
-                              <span className="text-gray-400">Verificat:</span>
+                              <span className="text-gray-200">Verificat:</span>
                               <span className="text-slate-700">
                                 {request.verifiedAt
                                   ? new Date(request.verifiedAt).toLocaleString('ca-ES')
@@ -405,7 +405,7 @@ export default function AdminPrivacyPage() {
                             </div>
                             {request.processedAt && (
                               <div className="flex justify-between">
-                                <span className="text-gray-400">Processat:</span>
+                                <span className="text-gray-200">Processat:</span>
                                 <span className="text-slate-700">
                                   {new Date(request.processedAt).toLocaleString('ca-ES')}
                                 </span>
@@ -415,7 +415,7 @@ export default function AdminPrivacyPage() {
 
                           {request.description && (
                             <div className="mt-4">
-                              <h5 className="text-sm font-medium text-gray-400 mb-2">Descripció:</h5>
+                              <h5 className="text-sm font-medium text-gray-200 mb-2">Descripció:</h5>
                               <p className="text-sm text-slate-700 bg-stone-100 p-3 rounded-lg">
                                 {request.description}
                               </p>
@@ -474,9 +474,9 @@ export default function AdminPrivacyPage() {
 
                           {request.customer && (
                             <div className="mt-4 p-3 bg-stone-100 rounded-lg">
-                              <h5 className="text-sm font-medium text-gray-400 mb-2">Client vinculat:</h5>
+                              <h5 className="text-sm font-medium text-gray-200 mb-2">Client vinculat:</h5>
                               <div className="flex items-center gap-2">
-                                <User className="w-4 h-4 text-gray-500" />
+                                <User className="w-4 h-4 text-gray-300" />
                                 <span className="text-slate-700">{request.customer.name}</span>
                               </div>
                             </div>

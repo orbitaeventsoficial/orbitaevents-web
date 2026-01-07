@@ -470,7 +470,7 @@ export default function TestimonialFormGamified() {
                     verificationCode: e.target.value.toUpperCase()
                   }))}
                   placeholder={t('gamified.enterCode.placeholder')}
-                  className="w-full px-6 py-4 bg-white/5 border border-white/20 rounded-2xl text-white text-center text-xl tracking-wider placeholder-white/30 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all"
+                  className="w-full px-6 py-4 bg-white/5 border border-white/20 rounded-2xl text-white text-center text-xl tracking-wider placeholder-white/50 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all"
                 />
 
                 <button
@@ -641,7 +641,7 @@ export default function TestimonialFormGamified() {
                 className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all resize-none"
               />
               <span className={`absolute bottom-3 right-3 text-sm ${
-                formData.comment.length > 1000 ? 'text-red-400' : 'text-white/40'
+                formData.comment.length > 1000 ? 'text-red-400' : 'text-white/60'
               }`}>
                 {formData.comment.length}/1000
               </span>
@@ -777,7 +777,7 @@ export default function TestimonialFormGamified() {
               </div>
             </div>
 
-            <p className="text-center text-white/40 text-sm">
+            <p className="text-center text-white/60 text-sm">
               {t('gamified.media.maxSizes')}
             </p>
           </motion.div>
@@ -823,7 +823,7 @@ export default function TestimonialFormGamified() {
               <span className={`transition-colors ${
                 formData.npsScore >= 0 && formData.npsScore <= 6
                   ? 'text-red-400 font-semibold'
-                  : 'text-white/40'
+                  : 'text-white/60'
               }`}>
                 {t('gamified.nps.unlikely')}
               </span>
@@ -832,7 +832,7 @@ export default function TestimonialFormGamified() {
                   ? 'text-green-400 font-semibold'
                   : formData.npsScore >= 7
                     ? 'text-yellow-400 font-semibold'
-                    : 'text-white/40'
+                    : 'text-white/60'
               }`}>
                 {t('gamified.nps.likely')}
               </span>
@@ -985,7 +985,7 @@ export default function TestimonialFormGamified() {
               {STEP_IDS.slice(1, -1).map((stepId, i) => (
                 <div
                   key={stepId}
-                  className={`text-xs ${i < currentStep ? 'text-amber-400' : 'text-white/30'}`}
+                  className={`text-xs ${i < currentStep ? 'text-amber-400' : 'text-white/50'}`}
                 >
                   {t(`gamified.steps.${stepId}`)}
                 </div>

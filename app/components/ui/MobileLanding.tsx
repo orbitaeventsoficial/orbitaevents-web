@@ -237,7 +237,7 @@ function LaPromesa({ t }: { t: (key: string) => string }) {
   return (
     <section ref={ref} className="py-20 px-6 bg-black">
       <motion.div style={{ opacity, y }} className="max-w-lg mx-auto text-center">
-        <p className="text-white/40 text-sm uppercase tracking-widest mb-4">
+        <p className="text-white/60 text-sm uppercase tracking-widest mb-4">
           {t('promesa.sectionTitle')}
         </p>
         <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-6">
@@ -289,7 +289,7 @@ function ElsMons({ t }: { t: (key: string) => string }) {
   return (
     <section id="mons" className="py-16 bg-neutral-950">
       <div className="px-6 mb-8">
-        <p className="text-white/40 text-sm uppercase tracking-widest mb-2">
+        <p className="text-white/60 text-sm uppercase tracking-widest mb-2">
           {t('elsMons.sectionTitle')}
         </p>
         <h2 className="text-3xl font-black text-white">
@@ -380,7 +380,7 @@ function LesProves({ t }: { t: (key: string) => string }) {
   return (
     <section className="py-16 bg-black">
       <div className="px-6 mb-8">
-        <p className="text-white/40 text-sm uppercase tracking-widest mb-2">
+        <p className="text-white/60 text-sm uppercase tracking-widest mb-2">
           {t('gallery.sectionTitle')}
         </p>
         <h2 className="text-3xl font-black text-white">
@@ -437,7 +437,7 @@ function LesVeus({ t }: { t: (key: string) => string }) {
   return (
     <section className="py-16 bg-neutral-950">
       <div className="px-6 mb-8">
-        <p className="text-white/40 text-sm uppercase tracking-widest mb-2">
+        <p className="text-white/60 text-sm uppercase tracking-widest mb-2">
           {t('testimonials.sectionTitle')}
         </p>
         <h2 className="text-3xl font-black text-white">
@@ -555,7 +555,7 @@ function ElMoment({ t }: { t: (key: string) => string }) {
           </div>
 
           {/* Trust badges */}
-          <div className="flex justify-center gap-6 mt-8 text-white/40 text-sm">
+          <div className="flex justify-center gap-6 mt-8 text-white/60 text-sm">
             <span>{t('cta.trustYears')}</span>
             <span>•</span>
             <span>{t('cta.trustLocation')}</span>

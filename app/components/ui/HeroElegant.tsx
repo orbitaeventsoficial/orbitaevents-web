@@ -159,7 +159,7 @@ export default function HeroElegant() {
                 ))}
               </div>
               <span className="text-white font-semibold">{t('rating')}</span>
-              <span className="text-white/40">·</span>
+              <span className="text-white/60">·</span>
               <span className="text-white/60 text-sm">{t('socialProof')}</span>
             </div>
 

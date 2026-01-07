@@ -173,7 +173,7 @@ export function AvailabilityCalendar({
       case 'BOOKED':
         return 'bg-red-500/20 border-red-500 text-red-200';
       case 'BLOCKED':
-        return 'bg-gray-500/20 border-gray-500 text-gray-400';
+        return 'bg-gray-500/20 border-gray-500 text-gray-200';
       default:
         return 'bg-white/5 border-white/10 text-white/50';
     }

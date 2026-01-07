@@ -213,7 +213,7 @@ export default function AdminEventsPage() {
       privado: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
       fiesta: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
     };
-    return colors[type?.toLowerCase()] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    return colors[type?.toLowerCase()] || 'bg-gray-500/20 text-gray-200 border-gray-500/30';
   };
 
   return (
@@ -223,7 +223,7 @@ export default function AdminEventsPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-amber-400">📅 Events Passats</h1>
-            <p className="text-gray-400 mt-1">
+            <p className="text-gray-200 mt-1">
               Gestiona les seqüències post-event per als clients
             </p>
           </div>
@@ -280,7 +280,7 @@ export default function AdminEventsPage() {
                 className={`flex-1 px-3 py-2 rounded-lg font-medium transition-all ${
                   filter === f.value
                     ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                    : 'bg-stone-100 text-gray-400 border border-transparent hover:bg-stone-100'
+                    : 'bg-stone-100 text-gray-200 border border-transparent hover:bg-stone-100'
                 }`}
               >
                 {f.icon} {f.label}
@@ -290,7 +290,7 @@ export default function AdminEventsPage() {
 
           {/* Stats */}
           <div className="flex items-center justify-end gap-4 text-sm">
-            <span className="text-gray-400">
+            <span className="text-gray-200">
               Total: <span className="text-slate-700 font-semibold">{filteredBookings.length}</span>
             </span>
             <span className="text-amber-400">
@@ -306,12 +306,12 @@ export default function AdminEventsPage() {
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto" />
-            <p className="mt-4 text-gray-400">Carregant events...</p>
+            <p className="mt-4 text-gray-200">Carregant events...</p>
           </div>
         ) : filteredBookings.length === 0 ? (
           <div className="text-center py-12 bg-stone-100 rounded-xl border border-stone-200">
             <p className="text-4xl mb-4">📭</p>
-            <p className="text-gray-400">No hi ha events amb els filtres seleccionats</p>
+            <p className="text-gray-200">No hi ha events amb els filtres seleccionats</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -341,29 +341,29 @@ export default function AdminEventsPage() {
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-500">Email:</span>
+                        <span className="text-gray-300">Email:</span>
                         <p className="text-gray-300">{booking.client_email}</p>
                       </div>
                       <div>
-                        <span className="text-gray-500">Data event:</span>
+                        <span className="text-gray-300">Data event:</span>
                         <p className="text-gray-300">
                           {format(new Date(booking.event_date), "d MMM yyyy", { locale: ca })}
                         </p>
                       </div>
                       <div>
-                        <span className="text-gray-500">Referència:</span>
+                        <span className="text-gray-300">Referència:</span>
                         <p className="text-amber-400 font-mono">{booking.reference}</p>
                       </div>
                       {booking.event_location && (
                         <div>
-                          <span className="text-gray-500">Lloc:</span>
+                          <span className="text-gray-300">Lloc:</span>
                           <p className="text-gray-300">{booking.event_location}</p>
                         </div>
                       )}
                     </div>
 
                     {booking.post_event_sent_at && (
-                      <p className="mt-3 text-xs text-gray-500">
+                      <p className="mt-3 text-xs text-gray-300">
                         Enviat el{' '}
                         {format(new Date(booking.post_event_sent_at), "d MMM yyyy 'a les' HH:mm", {
                           locale: ca,
@@ -393,7 +393,7 @@ export default function AdminEventsPage() {
                       <button
                         onClick={() => sendPostEvent(booking)}
                         disabled={sending === booking.id}
-                        className="px-4 py-2 bg-stone-100 text-gray-400 rounded-lg hover:bg-stone-100 transition-all border border-stone-200"
+                        className="px-4 py-2 bg-stone-100 text-gray-200 rounded-lg hover:bg-stone-100 transition-all border border-stone-200"
                       >
                         🔄 Re-enviar
                       </button>

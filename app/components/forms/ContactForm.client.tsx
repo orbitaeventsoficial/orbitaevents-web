@@ -302,7 +302,7 @@ export default function ContactForm() {
       </motion.button>
 
       {/* PRIVACIDAD */}
-      <p className="text-xs text-white/40 text-center">
+      <p className="text-xs text-white/60 text-center">
         {t('privacy')}{" "}
         <a href="/legal/privacidad" className="text-oe-gold hover:underline">
           {t('privacyPolicy')}

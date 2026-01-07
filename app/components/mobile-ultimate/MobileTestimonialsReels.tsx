@@ -234,7 +234,7 @@ function TestimonialCard({
         >
           <p className="text-white font-bold text-lg">{name}</p>
           <p className="text-white/60 text-sm">{event}</p>
-          <p className="text-white/40 text-xs mt-1">{date}</p>
+          <p className="text-white/60 text-xs mt-1">{date}</p>
         </motion.div>
       </div>
     </motion.div>

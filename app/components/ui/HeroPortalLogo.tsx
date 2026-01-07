@@ -685,7 +685,7 @@ export default function HeroPortalLogo({
 
             {/* Hint per saltar */}
             <motion.p
-              className="absolute bottom-safe text-white/30 text-xs pb-8"
+              className="absolute bottom-safe text-white/50 text-xs pb-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 0.5, 0.3] }}
               transition={{ duration: 2, delay: 2, repeat: Infinity }}

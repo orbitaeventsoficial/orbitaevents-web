@@ -34,7 +34,7 @@ export default function Error({
           </a>
         </div>
         {error?.digest && (
-          <p className="mt-4 text-xs text-white/40">
+          <p className="mt-4 text-xs text-white/60">
             Código: {error.digest}
           </p>
         )}

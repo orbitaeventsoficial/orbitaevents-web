@@ -164,7 +164,7 @@ function MobileFooter() {
         </p>
 
         {/* Location */}
-        <div className="flex items-center justify-center gap-2 text-white/40 text-sm mb-4">
+        <div className="flex items-center justify-center gap-2 text-white/60 text-sm mb-4">
           <span>📍</span>
           <span>{t('location')}</span>
         </div>
@@ -196,7 +196,7 @@ function MobileFooter() {
         </div>
 
         {/* Legal */}
-        <div className="flex justify-center gap-4 text-white/30 text-xs">
+        <div className="flex justify-center gap-4 text-white/50 text-xs">
           <a href={`/${locale}/legal/privacidad`} className="hover:text-white/60">{t('legal.privacy')}</a>
           <span>·</span>
           <a href={`/${locale}/legal/cookies`} className="hover:text-white/60">{t('legal.cookies')}</a>

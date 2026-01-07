@@ -202,7 +202,7 @@ function ServiceStep({ formData, updateField, onNext }: StepProps) {
       <button
         onClick={onNext}
         disabled={!formData.service}
-        className="w-full py-4 bg-amber-500 disabled:bg-white/10 disabled:text-white/30 text-black font-semibold rounded-xl transition-all active:scale-98"
+        className="w-full py-4 bg-amber-500 disabled:bg-white/10 disabled:text-white/50 text-black font-semibold rounded-xl transition-all active:scale-98"
       >
         Continuar
       </button>
@@ -271,7 +271,7 @@ function DetailsStep({ formData, updateField, onNext, onBack }: StepProps) {
           value={formData.venue}
           onChange={(e) => updateField('venue', e.target.value)}
           placeholder="Nom de la masia, restaurant..."
-          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:border-amber-500 focus:outline-none transition-colors"
+          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/50 focus:border-amber-500 focus:outline-none transition-colors"
         />
       </div>
 
@@ -309,7 +309,7 @@ function DetailsStep({ formData, updateField, onNext, onBack }: StepProps) {
         <button
           onClick={onNext}
           disabled={!formData.date || !formData.guests}
-          className="flex-1 py-4 bg-amber-500 disabled:bg-white/10 disabled:text-white/30 text-black font-semibold rounded-xl transition-all active:scale-98"
+          className="flex-1 py-4 bg-amber-500 disabled:bg-white/10 disabled:text-white/50 text-black font-semibold rounded-xl transition-all active:scale-98"
         >
           Continuar
         </button>
@@ -395,7 +395,7 @@ function ContactStep({ formData, updateField, onNext, onBack }: StepProps) {
             if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
           }}
           placeholder="El teu nom"
-          className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder:text-white/30 focus:outline-none transition-colors ${
+          className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder:text-white/50 focus:outline-none transition-colors ${
             errors.name ? 'border-red-500 bg-red-500/5' : 'border-white/10 focus:border-amber-500'
           }`}
         />
@@ -424,7 +424,7 @@ function ContactStep({ formData, updateField, onNext, onBack }: StepProps) {
             if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
           }}
           placeholder="email@exemple.com"
-          className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder:text-white/30 focus:outline-none transition-colors ${
+          className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder:text-white/50 focus:outline-none transition-colors ${
             errors.email ? 'border-red-500 bg-red-500/5' : 'border-white/10 focus:border-amber-500'
           }`}
         />
@@ -453,7 +453,7 @@ function ContactStep({ formData, updateField, onNext, onBack }: StepProps) {
             if (errors.phone) setErrors((prev) => ({ ...prev, phone: '' }));
           }}
           placeholder="+34 600 000 000"
-          className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder:text-white/30 focus:outline-none transition-colors ${
+          className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder:text-white/50 focus:outline-none transition-colors ${
             errors.phone ? 'border-red-500 bg-red-500/5' : 'border-white/10 focus:border-amber-500'
           }`}
         />
@@ -476,7 +476,7 @@ function ContactStep({ formData, updateField, onNext, onBack }: StepProps) {
           onChange={(e) => updateField('message', e.target.value)}
           placeholder="Explica'ns més sobre el teu event..."
           rows={3}
-          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:border-amber-500 focus:outline-none transition-colors resize-none"
+          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/50 focus:border-amber-500 focus:outline-none transition-colors resize-none"
         />
       </div>
 

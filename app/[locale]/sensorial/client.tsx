@@ -488,7 +488,7 @@ export default function SensorialClient() {
           transition={{ delay: 1 }}
         >
           <motion.p
-            className="text-3xl sm:text-5xl font-light text-white/30"
+            className="text-3xl sm:text-5xl font-light text-white/50"
             animate={{ opacity: [0.2, 0.4, 0.2] }}
             transition={{ duration: 4, repeat: Infinity }}
           >
@@ -611,7 +611,7 @@ export default function SensorialClient() {
                   >
                     <span className="text-2xl">{theme.emoji}</span>
                     <p className="text-white text-sm font-medium mt-1">{t(`themes.${theme.id}.name`)}</p>
-                    <p className="text-white/40 text-xs">{t(`themes.${theme.id}.description`)}</p>
+                    <p className="text-white/60 text-xs">{t(`themes.${theme.id}.description`)}</p>
                   </motion.button>
                 ))}
               </div>
@@ -653,7 +653,7 @@ export default function SensorialClient() {
                 onChange={(e) => setSpeed(parseFloat(e.target.value))}
                 className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-amber-400"
               />
-              <div className="flex justify-between text-xs text-white/40 mt-1">
+              <div className="flex justify-between text-xs text-white/60 mt-1">
                 <span>{t('slow')}</span>
                 <span>{t('fast')}</span>
               </div>
@@ -674,7 +674,7 @@ export default function SensorialClient() {
                 onChange={(e) => setDensity(parseInt(e.target.value))}
                 className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-amber-400"
               />
-              <div className="flex justify-between text-xs text-white/40 mt-1">
+              <div className="flex justify-between text-xs text-white/60 mt-1">
                 <span>{t('few')}</span>
                 <span>{t('many')}</span>
               </div>
@@ -697,7 +697,7 @@ export default function SensorialClient() {
                   />
                 </div>
               </label>
-              <p className="text-white/40 text-xs mt-1">
+              <p className="text-white/60 text-xs mt-1">
                 {t('touchDescription')}
               </p>
             </div>

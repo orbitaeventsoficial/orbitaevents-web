@@ -222,7 +222,7 @@ export default function TestimonialForm() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="text-gray-400 text-center mb-8 text-lg"
+              className="text-gray-200 text-center mb-8 text-lg"
             >
               {t('success.subtitle')}
             </motion.p>
@@ -246,7 +246,7 @@ export default function TestimonialForm() {
                   <span className="text-2xl font-bold text-white">{submitResult.discountPercent}%</span>
                   <span className="text-purple-300">{t('success.discount')}</span>
                 </div>
-                <p className="text-gray-500 text-sm mt-4">{t('success.validFor')}</p>
+                <p className="text-gray-300 text-sm mt-4">{t('success.validFor')}</p>
               </div>
             </motion.div>
 
@@ -276,7 +276,7 @@ export default function TestimonialForm() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}
               href="/"
-              className="block text-center text-gray-500 hover:text-purple-400 mt-6 transition-colors"
+              className="block text-center text-gray-300 hover:text-purple-400 mt-6 transition-colors"
             >
               ← {t('success.backHome')}
             </motion.a>
@@ -357,7 +357,7 @@ export default function TestimonialForm() {
 
           {/* EMAIL - Obligatori */}
           <div className="mb-6">
-            <label htmlFor="testimonial-email" className="block text-sm text-gray-400 mb-2">
+            <label htmlFor="testimonial-email" className="block text-sm text-gray-200 mb-2">
               Email <span className="text-fuchsia-500">*</span>
             </label>
             <input
@@ -373,7 +373,7 @@ export default function TestimonialForm() {
           {/* CAMPS OPCIONALS - Grid */}
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="testimonial-name" className="block text-sm text-gray-400 mb-2">
+              <label htmlFor="testimonial-name" className="block text-sm text-gray-200 mb-2">
                 {t('form.name')} <span className="text-fuchsia-500">*</span>
               </label>
               <input
@@ -386,7 +386,7 @@ export default function TestimonialForm() {
             </div>
 
             <div>
-              <label htmlFor="testimonial-phone" className="block text-sm text-gray-400 mb-2">{t('form.phoneOptional')}</label>
+              <label htmlFor="testimonial-phone" className="block text-sm text-gray-200 mb-2">{t('form.phoneOptional')}</label>
               <input
                 id="testimonial-phone"
                 type="tel"
@@ -397,7 +397,7 @@ export default function TestimonialForm() {
             </div>
 
             <div>
-              <label htmlFor="testimonial-city" className="block text-sm text-gray-400 mb-2">{t('form.cityOptional')}</label>
+              <label htmlFor="testimonial-city" className="block text-sm text-gray-200 mb-2">{t('form.cityOptional')}</label>
               <input
                 id="testimonial-city"
                 type="text"
@@ -407,7 +407,7 @@ export default function TestimonialForm() {
             </div>
 
             <div>
-              <label htmlFor="testimonial-instagram" className="block text-sm text-gray-400 mb-2">{t('form.instagramOptional')}</label>
+              <label htmlFor="testimonial-instagram" className="block text-sm text-gray-200 mb-2">{t('form.instagramOptional')}</label>
               <input
                 id="testimonial-instagram"
                 type="text"
@@ -421,7 +421,7 @@ export default function TestimonialForm() {
           {/* TIPUS D'EVENT I DATA */}
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="testimonial-eventType" className="block text-sm text-gray-400 mb-2">{t('form.eventType')}</label>
+              <label htmlFor="testimonial-eventType" className="block text-sm text-gray-200 mb-2">{t('form.eventType')}</label>
               <select
                 id="testimonial-eventType"
                 {...register('eventType')}
@@ -443,7 +443,7 @@ export default function TestimonialForm() {
             </div>
 
             <div>
-              <label htmlFor="testimonial-eventDate" className="block text-sm text-gray-400 mb-2">{t('form.eventDate')}</label>
+              <label htmlFor="testimonial-eventDate" className="block text-sm text-gray-200 mb-2">{t('form.eventDate')}</label>
               <input
                 id="testimonial-eventDate"
                 type="date"
@@ -455,7 +455,7 @@ export default function TestimonialForm() {
 
           {/* TÍTOL (opcional) */}
           <div className="mb-6">
-            <label htmlFor="testimonial-title" className="block text-sm text-gray-400 mb-2">{t('form.titleOptional')}</label>
+            <label htmlFor="testimonial-title" className="block text-sm text-gray-200 mb-2">{t('form.titleOptional')}</label>
             <input
               id="testimonial-title"
               type="text"
@@ -467,7 +467,7 @@ export default function TestimonialForm() {
 
           {/* COMENTARI */}
           <div className="mb-6">
-            <label htmlFor="testimonial-comment" className="block text-sm text-gray-400 mb-2">
+            <label htmlFor="testimonial-comment" className="block text-sm text-gray-200 mb-2">
               {t('form.yourOpinion')} <span className="text-fuchsia-500">*</span>
             </label>
             <textarea
@@ -491,7 +491,7 @@ export default function TestimonialForm() {
 
           {/* UPLOAD FOTO */}
           <div className="mb-6">
-            <label htmlFor="photo-upload" className="block text-sm text-gray-400 mb-2">
+            <label htmlFor="photo-upload" className="block text-sm text-gray-200 mb-2">
               {t('form.photoOptional')}
             </label>
             <input
@@ -556,7 +556,7 @@ export default function TestimonialForm() {
                 {...register('consentPhotoPublication')}
                 className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-purple-500 focus:ring-purple-500 focus:ring-offset-zinc-900 mt-0.5 cursor-pointer"
               />
-              <span className="text-gray-400 group-hover:text-gray-300 transition-colors text-sm">
+              <span className="text-gray-200 group-hover:text-gray-300 transition-colors text-sm">
                 {t('form.showName')}
               </span>
             </label>
@@ -567,7 +567,7 @@ export default function TestimonialForm() {
                 {...register('consentDataProcessing')}
                 className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-purple-500 focus:ring-purple-500 focus:ring-offset-zinc-900 mt-0.5 cursor-pointer"
               />
-              <span className="text-gray-400 group-hover:text-gray-300 transition-colors text-sm">
+              <span className="text-gray-200 group-hover:text-gray-300 transition-colors text-sm">
                 {t('form.acceptData')}{' '}
                 <a href="/legal/privacidad" className="text-purple-400 hover:text-purple-300 underline" target="_blank" rel="noopener noreferrer">
                   {t('form.privacyPolicy')}
@@ -585,7 +585,7 @@ export default function TestimonialForm() {
                 {...register('consentMarketing')}
                 className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-purple-500 focus:ring-purple-500 focus:ring-offset-zinc-900 mt-0.5 cursor-pointer"
               />
-              <span className="text-gray-400 group-hover:text-gray-300 transition-colors text-sm">
+              <span className="text-gray-200 group-hover:text-gray-300 transition-colors text-sm">
                 {t('form.receiveOffers')}
               </span>
             </label>

@@ -164,7 +164,7 @@ function TrustBadges() {
         >
           <span className="text-xl">{badge.icon}</span>
           <p className="text-white font-bold text-lg">{badge.value}</p>
-          <p className="text-white/40 text-xs">{t(badge.labelKey)}</p>
+          <p className="text-white/60 text-xs">{t(badge.labelKey)}</p>
         </motion.div>
       ))}
     </div>

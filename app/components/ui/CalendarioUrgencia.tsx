@@ -233,7 +233,7 @@ function MiniMonth({ data, onDayClick, locale, t }: MiniMonthProps) {
             key={day}
             className={`
               text-center text-[10px] font-medium py-1
-              ${i >= 5 ? 'text-amber-400/70' : 'text-white/40'}
+              ${i >= 5 ? 'text-amber-400/70' : 'text-white/60'}
             `}
           >
             {day}

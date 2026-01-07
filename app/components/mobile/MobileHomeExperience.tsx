@@ -469,7 +469,7 @@ export default function MobileHomeExperience() {
         transition={{ delay: 2 }}
       >
         <motion.div
-          className="flex items-center gap-2 text-white/40 text-xs"
+          className="flex items-center gap-2 text-white/60 text-xs"
           animate={{ x: [0, 10, 0] }}
           transition={{ duration: 1.5, repeat: 3 }}
         >

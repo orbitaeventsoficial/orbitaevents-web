@@ -197,7 +197,7 @@ export default function AdminContactesPage() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-yellow-400 bg-clip-text text-transparent">
               Gestió de Contactes
             </h1>
-            <p className="text-gray-500 mt-1">CRM - Afegeix contactes i inicia processos</p>
+            <p className="text-gray-300 mt-1">CRM - Afegeix contactes i inicia processos</p>
           </div>
 
           {/* Stats */}
@@ -205,7 +205,7 @@ export default function AdminContactesPage() {
             <div className="flex gap-4 flex-wrap">
               <div className="bg-stone-50 border border-zinc-800 rounded-xl px-4 py-3 text-center">
                 <p className="text-2xl font-bold text-slate-700">{stats.total}</p>
-                <p className="text-xs text-gray-500">Total</p>
+                <p className="text-xs text-gray-300">Total</p>
               </div>
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 text-center">
                 <p className="text-2xl font-bold text-amber-400">{stats.vip}</p>
@@ -262,7 +262,7 @@ export default function AdminContactesPage() {
         {/* Empty */}
         {!loading && filteredCustomers.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-gray-500 text-lg">No hi ha contactes</p>
+            <p className="text-gray-300 text-lg">No hi ha contactes</p>
           </div>
         )}
 

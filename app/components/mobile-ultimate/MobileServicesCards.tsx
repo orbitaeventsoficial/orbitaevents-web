@@ -396,7 +396,7 @@ export default function MobileServicesCards() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="text-center text-white/30 text-xs mt-4"
+        className="text-center text-white/50 text-xs mt-4"
       >
         {t('swipeHint')}
       </motion.p>

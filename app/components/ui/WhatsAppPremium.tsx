@@ -116,7 +116,7 @@ export default function WhatsAppPremium({
                       {t('tooltipGreeting')}
                     </p>
                     {showResponseTime && (
-                      <div className="mt-2 text-xs text-gray-400">
+                      <div className="mt-2 text-xs text-gray-200">
                         ⚡ {t('responseTime')}: &lt;5 min
                       </div>
                     )}
@@ -124,7 +124,7 @@ export default function WhatsAppPremium({
 
                   <button
                     onClick={() => setTooltipDismissed(true)}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-500 transition-colors"
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-300 transition-colors"
                   >
                     ×
                   </button>
@@ -153,11 +153,11 @@ export default function WhatsAppPremium({
                         Online
                       </span>
                     )}
-                    <span className="text-white/40">|</span>
+                    <span className="text-white/60">|</span>
                     <span className="text-white text-sm font-medium">{t('writeUs')}</span>
                     {showResponseTime && (
                       <>
-                        <span className="text-white/40">|</span>
+                        <span className="text-white/60">|</span>
                         <span className="text-white/60 text-sm">⚡ &lt;5 min</span>
                       </>
                     )}

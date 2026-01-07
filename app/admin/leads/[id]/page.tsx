@@ -27,7 +27,7 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }>
   QUOTE_SENT: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Pressupost enviat' },
   NEGOTIATING: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Negociació' },
   WON: { bg: 'bg-green-100', text: 'text-green-700', label: 'Guanyat!' },
-  LOST: { bg: 'bg-gray-100', text: 'text-gray-500', label: 'Perdut' },
+  LOST: { bg: 'bg-gray-100', text: 'text-gray-300', label: 'Perdut' },
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {

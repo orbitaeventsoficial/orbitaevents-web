@@ -530,7 +530,7 @@ function ServicesList({ t, onClose }: ServicesListProps) {
             </div>
             
             {/* Arrow */}
-            <svg className="w-5 h-5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </Link>
@@ -609,7 +609,7 @@ function QuickContact() {
       </div>
 
       {/* Trust badges */}
-      <div className="mt-6 flex items-center justify-center gap-4 text-white/40 text-xs">
+      <div className="mt-6 flex items-center justify-center gap-4 text-white/60 text-xs">
         <span>🏆 15+ anys</span>
         <span>•</span>
         <span>📍 BCN & Girona</span>

@@ -500,7 +500,7 @@ export default function DiscomovilClientV2() {
                   <div className="hidden sm:block h-12 w-px bg-white/20" />
                   <div>
                     {discount > 0 && (
-                      <div className="text-xs sm:text-sm line-through text-white/40">{totalPrice}€</div>
+                      <div className="text-xs sm:text-sm line-through text-white/60">{totalPrice}€</div>
                     )}
                     <div className="text-2xl sm:text-3xl font-bold text-[var(--oe-gold)]">
                       {finalPrice}€

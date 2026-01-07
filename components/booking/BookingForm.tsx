@@ -176,7 +176,7 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
               required
               value={formData.clientName}
               onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-500"
               placeholder="Tu nombre"
             />
           </div>
@@ -190,7 +190,7 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
               required
               value={formData.clientEmail}
               onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-500"
               placeholder="tu@email.com"
             />
           </div>
@@ -204,7 +204,7 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
               required
               value={formData.clientPhone}
               onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-500"
               placeholder="+34 600 000 000"
             />
           </div>
@@ -287,7 +287,7 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
               required
               value={formData.eventLocation}
               onChange={(e) => setFormData({ ...formData, eventLocation: e.target.value })}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-500"
               placeholder="Barcelona, Girona..."
             />
           </div>
@@ -300,7 +300,7 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
               type="text"
               value={formData.eventVenue}
               onChange={(e) => setFormData({ ...formData, eventVenue: e.target.value })}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-500"
               placeholder="Nombre del local"
             />
           </div>
@@ -357,7 +357,7 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
               </div>
               <p className="text-sm text-white/60">{pack.duration}h de servicio</p>
               {pack.pricePerExtraHour && (
-                <p className="text-xs text-white/40 mt-2">
+                <p className="text-xs text-white/60 mt-2">
                   +{pack.pricePerExtraHour}€/h extra
                 </p>
               )}
@@ -430,7 +430,7 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
           value={formData.notes}
           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
           rows={4}
-          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-purple-500"
           placeholder="Cuéntanos más detalles sobre tu evento..."
         />
       </div>

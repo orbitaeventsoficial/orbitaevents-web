@@ -437,7 +437,7 @@ export default function BodasClientV2() {
                       </span>
                       {hasComboDiscount && (
                         <>
-                          <span className="text-xs sm:text-sm text-white/30">•</span>
+                          <span className="text-xs sm:text-sm text-white/50">•</span>
                           <span className="text-xs sm:text-sm bg-[var(--oe-gold)]/20 text-[var(--oe-gold)] px-2 py-1 rounded">
                             -15% {t('extras')}
                           </span>
@@ -448,7 +448,7 @@ export default function BodasClientV2() {
                   <div className="hidden sm:block h-12 w-px bg-white/20" />
                   <div>
                     {discount > 0 && (
-                      <div className="text-xs sm:text-sm line-through text-white/40">{totalPrice}€</div>
+                      <div className="text-xs sm:text-sm line-through text-white/60">{totalPrice}€</div>
                     )}
                     <div className="text-2xl sm:text-3xl font-bold text-[var(--oe-gold)]">
                       {finalPrice}€

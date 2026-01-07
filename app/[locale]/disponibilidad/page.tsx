@@ -65,7 +65,7 @@ export default function AvailabilityPage() {
                 <span>Rojo: Fecha ya reservada</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-gray-400 mt-1">•</span>
+                <span className="text-gray-200 mt-1">•</span>
                 <span>Gris: Fecha bloqueada (festivos, mantenimiento)</span>
               </li>
             </ul>

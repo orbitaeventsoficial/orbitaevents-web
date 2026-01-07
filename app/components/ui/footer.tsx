@@ -387,7 +387,7 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Copyright */}
             {/* HYDRATION FIX: Fixed year to avoid server/client mismatch */}
-            <p className="text-white/40 text-sm text-center md:text-left">
+            <p className="text-white/60 text-sm text-center md:text-left">
               © 2025 Òrbita Events · {t('since')} · {t('copyright')}
             </p>
 
@@ -398,7 +398,7 @@ export default function Footer() {
                   <Link
                     href={link.href}
                     onClick={() => handleLinkClick('legal', link.nameKey)}
-                    className="text-white/40 hover:text-amber-400 transition-colors"
+                    className="text-white/60 hover:text-amber-400 transition-colors"
                   >
                     {tFooterLinks(`legal.${link.nameKey}`)}
                   </Link>

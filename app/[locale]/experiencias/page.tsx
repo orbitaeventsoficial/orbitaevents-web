@@ -293,7 +293,7 @@ export default async function ExperienciasPage() {
               </Link>
             </div>
 
-            <p className="text-white/40 text-sm mt-8">
+            <p className="text-white/60 text-sm mt-8">
               {t('cta.note')}
             </p>
           </div>

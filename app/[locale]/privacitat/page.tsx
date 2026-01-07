@@ -348,7 +348,7 @@ export default function PrivacyPortalPage() {
                       {t('form.email')} <span className="text-red-400">{t('form.required')}</span>
                     </label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
                       <input
                         id="email"
                         type="email"
@@ -370,7 +370,7 @@ export default function PrivacyPortalPage() {
                       {t('form.phone')} <span className="text-text-muted">{t('form.phoneOptional')}</span>
                     </label>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
                       <input
                         id="phone"
                         type="tel"
@@ -542,9 +542,9 @@ export default function PrivacyPortalPage() {
         <footer className="mt-8 text-center text-sm text-text-muted">
           <p className="mb-3">
             {t('footer.rgpdText')}{' '}
-            <strong className="text-gray-400">{t('footer.rgpdName')}</strong>
+            <strong className="text-gray-200">{t('footer.rgpdName')}</strong>
             {' '}{t('footer.lopdgddText')}{' '}
-            <strong className="text-gray-400">{t('footer.lopdgddName')}</strong>.
+            <strong className="text-gray-200">{t('footer.lopdgddName')}</strong>.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Link href="/legal/privacidad" className="text-oe-gold hover:underline">

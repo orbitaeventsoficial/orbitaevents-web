@@ -269,7 +269,7 @@ function FallbackImage({ aspectRatio, alt, t }: FallbackImageProps) {
     >
       {/* Icon */}
       <svg
-        className="w-12 h-12 text-white/30"
+        className="w-12 h-12 text-white/50"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -286,7 +286,7 @@ function FallbackImage({ aspectRatio, alt, t }: FallbackImageProps) {
       {/* Text */}
       <div className="text-center px-4">
         <p className="text-sm text-white/50 mb-1">{t('imageNotAvailable')}</p>
-        <p className="text-xs text-white/30">{alt}</p>
+        <p className="text-xs text-white/50">{alt}</p>
       </div>
     </div>
   );

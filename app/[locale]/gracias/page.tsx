@@ -108,7 +108,7 @@ export default async function GraciasPage() {
         </div>
 
         {/* Footer note */}
-        <p className="text-center text-white/40 text-sm mt-8">
+        <p className="text-center text-white/60 text-sm mt-8">
           Revisa tu bandeja de spam si no ves nuestro email en las próximas horas
         </p>
       </div>

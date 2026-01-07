@@ -593,7 +593,7 @@ export default function ServiceCards() {
       </div>
 
       {/* Counter */}
-      <p className="text-center text-white/40 text-sm mt-3">
+      <p className="text-center text-white/60 text-sm mt-3">
         {currentIndex + 1} / {services.length}
       </p>
 

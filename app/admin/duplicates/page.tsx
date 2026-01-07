@@ -149,7 +149,7 @@ export default function AdminDuplicatesPage() {
         );
       default:
         return (
-          <span className="px-2 py-1 text-xs font-medium bg-gray-500/20 text-gray-400 rounded-full">
+          <span className="px-2 py-1 text-xs font-medium bg-gray-500/20 text-gray-200 rounded-full">
             Baixa probabilitat
           </span>
         );
@@ -189,7 +189,7 @@ export default function AdminDuplicatesPage() {
               <Merge className="w-8 h-8 text-purple-400" />
               Unificació de Clients
             </h1>
-            <p className="text-gray-400 mt-1">
+            <p className="text-gray-200 mt-1">
               Detecta i fusiona clients duplicats intel·ligentment
             </p>
           </div>
@@ -209,25 +209,25 @@ export default function AdminDuplicatesPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
             <div className="text-3xl font-bold text-slate-700">{groups.length}</div>
-            <div className="text-sm text-gray-400">Grups detectats</div>
+            <div className="text-sm text-gray-200">Grups detectats</div>
           </div>
           <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
             <div className="text-3xl font-bold text-red-400">
               {totalDuplicates}
             </div>
-            <div className="text-sm text-gray-400">Possibles duplicats</div>
+            <div className="text-sm text-gray-200">Possibles duplicats</div>
           </div>
           <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
             <div className="text-3xl font-bold text-amber-400">
               {groups.filter(g => g.suggestedAction === 'auto_merge').length}
             </div>
-            <div className="text-sm text-gray-400">Fusió recomanada</div>
+            <div className="text-sm text-gray-200">Fusió recomanada</div>
           </div>
           <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
             <div className="text-3xl font-bold text-purple-400">
               {groups.filter(g => g.suggestedAction === 'review').length}
             </div>
-            <div className="text-sm text-gray-400">Per revisar</div>
+            <div className="text-sm text-gray-200">Per revisar</div>
           </div>
         </div>
 
@@ -239,7 +239,7 @@ export default function AdminDuplicatesPage() {
               <h3 className="text-xl font-semibold text-slate-700 mb-2">
                 Cap duplicat detectat!
               </h3>
-              <p className="text-gray-400">
+              <p className="text-gray-200">
                 La base de dades està neta de duplicats
               </p>
             </div>
@@ -273,7 +273,7 @@ export default function AdminDuplicatesPage() {
                           {group.primaryCustomer.name ||
                             group.primaryCustomer.email}
                         </h3>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-gray-200">
                           {group.duplicates.length} possible
                           {group.duplicates.length > 1 ? 's' : ''} duplicat
                           {group.duplicates.length > 1 ? 's' : ''}
@@ -283,9 +283,9 @@ export default function AdminDuplicatesPage() {
                     <div className="flex items-center gap-3">
                       {getActionBadge(group.suggestedAction)}
                       {expandedGroup === groupIndex ? (
-                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                        <ChevronUp className="w-5 h-5 text-gray-200" />
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                        <ChevronDown className="w-5 h-5 text-gray-200" />
                       )}
                     </div>
                   </div>
@@ -303,7 +303,7 @@ export default function AdminDuplicatesPage() {
                       <div className="p-4 pt-0 border-t border-stone-200">
                         {/* Primary Customer */}
                         <div className="mb-4">
-                          <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">
+                          <div className="text-xs text-gray-300 mb-2 uppercase tracking-wider">
                             Client principal
                           </div>
                           <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
@@ -316,7 +316,7 @@ export default function AdminDuplicatesPage() {
 
                         {/* Duplicates */}
                         <div className="mb-4">
-                          <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">
+                          <div className="text-xs text-gray-300 mb-2 uppercase tracking-wider">
                             Possibles duplicats
                           </div>
                           <div className="space-y-3">
@@ -418,7 +418,7 @@ export default function AdminDuplicatesPage() {
                     <h3 className="text-lg font-semibold text-slate-700">
                       Confirmar fusió
                     </h3>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-200">
                       Es fusionaran {mergeSelection.duplicateIds.length + 1}{' '}
                       clients
                     </p>
@@ -487,24 +487,24 @@ function CustomerCard({
         )}
       </div>
       <div className="grid grid-cols-2 gap-2 text-sm">
-        <div className="flex items-center gap-1 text-gray-400">
+        <div className="flex items-center gap-1 text-gray-200">
           <Mail className="w-3 h-3" />
           <span className="truncate">{customer.email}</span>
         </div>
         {customer.phone && (
-          <div className="flex items-center gap-1 text-gray-400">
+          <div className="flex items-center gap-1 text-gray-200">
             <Phone className="w-3 h-3" />
             <span>{customer.phone}</span>
           </div>
         )}
         {customer.instagram && (
-          <div className="flex items-center gap-1 text-gray-400">
+          <div className="flex items-center gap-1 text-gray-200">
             <Instagram className="w-3 h-3" />
             <span>@{customer.instagram}</span>
           </div>
         )}
       </div>
-      <div className="flex gap-4 mt-2 text-xs text-gray-500">
+      <div className="flex gap-4 mt-2 text-xs text-gray-300">
         <span>{customer.totalEvents} events</span>
         <span>{customer.totalSpent}€ gastat</span>
         <span>

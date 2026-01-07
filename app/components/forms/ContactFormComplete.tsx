@@ -281,7 +281,7 @@ export default function ContactFormComplete({
             onBlur={() => { touchField('fullName'); validateField('fullName'); }}
             placeholder={t('placeholders.fullName')}
             className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
-                     placeholder:text-white/30 outline-none transition-all
+                     placeholder:text-white/50 outline-none transition-all
                      ${errors.fullName && touched.fullName
                        ? 'border-red-500 focus:ring-red-500'
                        : 'border-white/10 focus:border-amber-500 focus:ring-amber-500'
@@ -306,7 +306,7 @@ export default function ContactFormComplete({
               onBlur={() => { touchField('email'); validateField('email'); }}
               placeholder={t('placeholders.email')}
               className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
-                       placeholder:text-white/30 outline-none transition-all
+                       placeholder:text-white/50 outline-none transition-all
                        ${errors.email && touched.email
                          ? 'border-red-500'
                          : 'border-white/10 focus:border-amber-500'
@@ -329,7 +329,7 @@ export default function ContactFormComplete({
               onBlur={() => { touchField('phone'); validateField('phone'); }}
               placeholder={t('placeholders.phone')}
               className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
-                       placeholder:text-white/30 outline-none transition-all
+                       placeholder:text-white/50 outline-none transition-all
                        ${errors.phone && touched.phone
                          ? 'border-red-500'
                          : 'border-white/10 focus:border-amber-500'
@@ -434,7 +434,7 @@ export default function ContactFormComplete({
               onChange={(e) => updateField('location', e.target.value)}
               placeholder={t('placeholders.location')}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                       text-white placeholder:text-white/30 outline-none
+                       text-white placeholder:text-white/50 outline-none
                        focus:border-amber-500 focus:ring-2 focus:ring-amber-500 transition-all"
             />
           </div>
@@ -480,7 +480,7 @@ export default function ContactFormComplete({
             placeholder={t('placeholders.message')}
             rows={4}
             className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                     text-white placeholder:text-white/30 outline-none resize-none
+                     text-white placeholder:text-white/50 outline-none resize-none
                      focus:border-amber-500 focus:ring-2 focus:ring-amber-500 transition-all"
           />
         </div>
@@ -490,7 +490,7 @@ export default function ContactFormComplete({
       {/* Com ens has trobat (opcional - al final) */}
       <div className="pt-4">
         <label className="block text-white/50 text-sm mb-2">
-          {t('labels.howFound')} <span className="text-white/30">(opcional)</span>
+          {t('labels.howFound')} <span className="text-white/50">(opcional)</span>
         </label>
         <select
           value={formData.howFound}
@@ -634,7 +634,7 @@ export default function ContactFormComplete({
       </motion.button>
 
       {/* Nota final */}
-      <p className="text-center text-white/40 text-sm">
+      <p className="text-center text-white/60 text-sm">
         {t('responseNote')}{' '}
         <a href={`tel:${SITE_CONFIG.business.phone}`} className="text-amber-400 hover:underline">
           {SITE_CONFIG.business.phoneDisplay}

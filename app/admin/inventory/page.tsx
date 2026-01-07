@@ -29,7 +29,7 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }>
   IN_USE: { label: 'En ús', bg: 'bg-blue-100', text: 'text-blue-700' },
   MAINTENANCE: { label: 'Manteniment', bg: 'bg-orange-100', text: 'text-orange-700' },
   BROKEN: { label: 'Avariat', bg: 'bg-red-100', text: 'text-red-700' },
-  RETIRED: { label: 'Retirat', bg: 'bg-gray-100', text: 'text-gray-500' },
+  RETIRED: { label: 'Retirat', bg: 'bg-gray-100', text: 'text-gray-300' },
 };
 
 async function getInventory() {
