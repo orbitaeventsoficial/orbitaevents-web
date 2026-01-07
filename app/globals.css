@@ -965,6 +965,18 @@ textarea::placeholder {
 html, body {
   background-color: #000000 !important;
 }
+
+html.admin-mode,
+body.admin-mode,
+body.admin-mode.hero-loading,
+body.admin-mode:not(.intro-done) {
+  background-color: #f7f5f0 !important;
+  background: #f7f5f0 !important;
+}
+
+html.admin-mode::before {
+  background: #f7f5f0 !important;
+}
 html::before {
   content: '';
   position: fixed;

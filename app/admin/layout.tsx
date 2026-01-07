@@ -66,6 +66,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setSidebarOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    document.documentElement.classList.add('admin-mode');
+    document.body.classList.add('admin-mode');
+    return () => {
+      document.documentElement.classList.remove('admin-mode');
+      document.body.classList.remove('admin-mode');
+    };
+  }, []);
+
   const navSections = [
     {
       title: 'General',
