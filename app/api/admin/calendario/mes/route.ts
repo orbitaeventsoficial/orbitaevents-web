@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 type CalendarDay = {
   reservas: {
     id: string;
+    leadId: string | null;
     fechaEvento: string;
     clienteNombre: string | null;
     ubicacion: string | null;
@@ -54,6 +55,7 @@ export async function GET(request: NextRequest) {
       },
       select: {
         id: true,
+        leadId: true,
         eventDate: true,
         clientName: true,
         eventLocation: true,
@@ -102,6 +104,7 @@ export async function GET(request: NextRequest) {
       if (days[key]) {
         days[key].reservas.push({
           id: booking.id,
+          leadId: booking.leadId ?? null,
           fechaEvento: booking.eventDate.toISOString(),
           clienteNombre: booking.clientName,
           ubicacion: booking.eventVenue || booking.eventLocation,
