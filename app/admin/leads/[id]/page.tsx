@@ -158,7 +158,6 @@ export default async function LeadDetailPage({ params }: Props) {
               eventDate: lead.eventDate ? lead.eventDate.toISOString() : null,
               eventType: lead.eventType,
               eventLocation: lead.eventLocation,
-              eventVenue: lead.eventVenue,
               guestCount: lead.guestCount,
               budget: lead.budget,
               message: lead.message,

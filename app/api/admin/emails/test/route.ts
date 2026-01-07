@@ -4,8 +4,11 @@ import { log } from '@/lib/logger';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { requireAuth } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   // Rate limit: 3 test emails per 5 minutes
   const rateLimitResult = checkRateLimit(req, { ...RATE_LIMITS.contact, limit: 3 });
   if (rateLimitResult) return rateLimitResult;

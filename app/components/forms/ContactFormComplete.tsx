@@ -21,6 +21,7 @@ import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/config/site-config';
 import { trackLead } from '@/lib/analytics';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 // ============================================================
 // TIPUS
@@ -194,7 +195,7 @@ export default function ContactFormComplete({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetchWithCsrf('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

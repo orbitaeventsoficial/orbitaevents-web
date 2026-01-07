@@ -8,9 +8,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { requireAuth } from '@/lib/auth';
 
 // GET: Diagnosticar configuració
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   const config = {
     smtp: {
       host: process.env.SMTP_HOST ? '✅ Configurat' : '❌ FALTA',
@@ -84,6 +87,8 @@ Opció B - WhatsApp Business API:
 
 // POST: Enviar email de test
 export async function POST(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const body = await req.json().catch(() => ({}));
     const testEmail = body.email || process.env.CONTACT_TO || SITE_CONFIG.business.email;

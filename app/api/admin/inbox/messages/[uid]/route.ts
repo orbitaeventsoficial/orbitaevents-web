@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { fetchEmailByUid, markAsRead, markAsUnread } from '@/lib/imap';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,8 @@ interface RouteParams {
 
 // GET - Obtenir email per UID
 export async function GET(request: NextRequest, { params }: RouteParams) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   const { uid } = await params;
   const uidNumber = parseInt(uid);
 
@@ -45,6 +48,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 // PATCH - Accions sobre l'email (marcar llegit/no llegit)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   const { uid } = await params;
   const uidNumber = parseInt(uid);
 

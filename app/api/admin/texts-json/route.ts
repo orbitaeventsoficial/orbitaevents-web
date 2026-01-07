@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -191,6 +192,8 @@ function extractTexts(
 // ═══════════════════════════════════════════════════════════════════════════
 
 export async function GET(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { searchParams } = new URL(req.url);
     const sectionFilter = searchParams.get('section');
@@ -268,6 +271,8 @@ export async function GET(req: NextRequest) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export async function PUT(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const body = await req.json();
     const { updates } = body as {

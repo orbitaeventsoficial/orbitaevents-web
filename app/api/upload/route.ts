@@ -14,6 +14,14 @@ export const dynamic = 'force-dynamic';
 
 // Límit per upload directe (4MB per evitar límit Vercel)
 const DIRECT_UPLOAD_LIMIT = 4 * 1024 * 1024;
+const VALID_UPLOAD_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'video/mp4',
+  'video/quicktime',
+];
 
 // Verificar autenticació admin
 function verifyAuth(request: NextRequest): boolean {
@@ -32,7 +40,10 @@ function verifyAuth(request: NextRequest): boolean {
 
   try {
     const base64Credentials = authHeader.split(' ')[1]!;
-    const decoded = atob(base64Credentials);
+    const decoded =
+      typeof atob === 'function'
+        ? atob(base64Credentials)
+        : Buffer.from(base64Credentials, 'base64').toString('utf8');
     const [user, ...passParts] = decoded.split(':');
     const pass = passParts.join(':');
     return user === ADMIN_USER && pass === ADMIN_PASS;
@@ -97,6 +108,13 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      if (!VALID_UPLOAD_TYPES.includes(fileType)) {
+        return NextResponse.json(
+          { error: 'Tipus de fitxer no permès. Usa JPG, PNG, WebP, GIF o MP4.' },
+          { status: 400 }
+        );
+      }
+
       // Generar nom únic
       const timestamp = Date.now();
       const random = Math.random().toString(36).substring(7);
@@ -140,15 +158,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validar tipus
-    const validTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-      'image/gif',
-      'video/mp4',
-      'video/quicktime',
-    ];
-    if (!validTypes.includes(file.type)) {
+    if (!VALID_UPLOAD_TYPES.includes(file.type)) {
       return NextResponse.json(
         { error: 'Tipus de fitxer no permès. Usa JPG, PNG, WebP, GIF o MP4.' },
         { status: 400 }

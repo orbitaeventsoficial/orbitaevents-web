@@ -1,10 +1,11 @@
 // app/api/admin/emails/run-cron/route.ts
 // Wrapper endpoint to run cron from admin panel without exposing CRON_SECRET
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -19,7 +20,9 @@ interface ProcessedResult {
   reason?: string;
 }
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   // This endpoint is protected by admin auth middleware
   const results: ProcessedResult[] = [];
   const now = new Date();

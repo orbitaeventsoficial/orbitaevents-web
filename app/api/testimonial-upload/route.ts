@@ -21,7 +21,13 @@ const MAX_UPLOADS_PER_HOUR = 10;
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const hourAgo = now - 3600000;
-  
+
+  for (const [key, record] of uploadAttempts.entries()) {
+    if (record.timestamp < hourAgo) {
+      uploadAttempts.delete(key);
+    }
+  }
+
   const record = uploadAttempts.get(ip);
   
   if (!record || record.timestamp < hourAgo) {

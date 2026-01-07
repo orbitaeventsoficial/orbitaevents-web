@@ -3,11 +3,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 // GET - Obtenir traduccions
 export async function GET(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { searchParams } = new URL(req.url);
     const namespace = searchParams.get('namespace');
@@ -45,6 +48,8 @@ export async function GET(req: NextRequest) {
 
 // PUT - Actualitzar una o més traduccions
 export async function PUT(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const body = await req.json();
     const { translations } = body as {
@@ -101,6 +106,8 @@ export async function PUT(req: NextRequest) {
 
 // POST - Crear nova traducció
 export async function POST(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const body = await req.json();
     const { namespace, key, translations } = body as {
@@ -144,6 +151,8 @@ export async function POST(req: NextRequest) {
 
 // DELETE - Eliminar traducció
 export async function DELETE(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { searchParams } = new URL(req.url);
     const namespace = searchParams.get('namespace');

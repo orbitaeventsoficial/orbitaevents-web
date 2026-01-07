@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
+import { requireAuth } from '@/lib/auth';
 
 interface Params {
   params: { id: string };
@@ -27,6 +28,8 @@ const updateBookingSchema = z.object({
 
 // GET - Detall d'una reserva
 export async function GET(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: params.id },
@@ -63,6 +66,8 @@ export async function GET(req: NextRequest, { params }: Params) {
 
 // PATCH - Actualitzar reserva
 export async function PATCH(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const rawBody = await req.json();
     const { id } = params;
@@ -174,6 +179,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
 // DELETE - Eliminar reserva (només PENDING/CANCELLED)
 export async function DELETE(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { id } = params;
 

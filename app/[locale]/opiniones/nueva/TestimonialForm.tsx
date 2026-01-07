@@ -123,7 +123,7 @@ export default function TestimonialForm() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/testimonial-upload', {
         method: 'POST',
         body: formData,
       });

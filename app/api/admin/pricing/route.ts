@@ -3,11 +3,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 // GET - Obtenir tots els preus i dades vinculades
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     // 1. Extras (EDITABLES - preus que pots canviar)
     const extras = await prisma.extra.findMany({
@@ -268,6 +271,8 @@ export async function GET() {
 
 // PUT - Actualitzar preus dels extras (NOMÉS els extras són editables aquí)
 export async function PUT(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const body = await req.json();
     const { extraId, price } = body as {

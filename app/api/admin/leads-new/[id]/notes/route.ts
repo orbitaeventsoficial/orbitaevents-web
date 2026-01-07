@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 
 interface Params {
   params: { id: string };
@@ -10,6 +11,8 @@ interface Params {
 
 // POST - Afegir nota a un lead
 export async function POST(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { id } = params;
     const body = await req.json();
@@ -67,6 +70,8 @@ export async function POST(req: NextRequest, { params }: Params) {
 
 // DELETE - Eliminar nota
 export async function DELETE(req: NextRequest, { params: _params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { searchParams } = new URL(req.url);
     const noteId = searchParams.get('noteId');

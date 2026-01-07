@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { requireAuth } from '@/lib/auth';
 
 interface Params {
   params: { id: string };
@@ -13,6 +14,8 @@ type BookingStatus = typeof VALID_STATUSES[number];
 
 // PATCH - Canviar estat de reserva
 export async function PATCH(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { id } = params;
     const body = await req.json();

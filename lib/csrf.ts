@@ -205,6 +205,24 @@ export function getCsrfTokenFromCookie(): string | null {
   return null;
 }
 
+async function ensureCsrfToken(): Promise<string | null> {
+  if (typeof document === 'undefined') return null;
+
+  const existing = getCsrfTokenFromCookie();
+  if (existing) return existing;
+
+  try {
+    await fetch('/api/csrf', {
+      method: 'GET',
+      credentials: 'same-origin',
+    });
+  } catch {
+    return null;
+  }
+
+  return getCsrfTokenFromCookie();
+}
+
 /**
  * Fetch with automatic CSRF token injection
  * Use this instead of regular fetch for protected requests
@@ -219,7 +237,11 @@ export async function fetchWithCsrf(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> {
-  const token = getCsrfTokenFromCookie();
+  if (typeof document === 'undefined' || url.startsWith('/api/csrf')) {
+    return fetch(url, options);
+  }
+
+  const token = await ensureCsrfToken();
 
   const headers = new Headers(options.headers);
   if (token) {

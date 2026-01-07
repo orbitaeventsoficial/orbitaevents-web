@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -132,7 +133,9 @@ function setValueByPath(obj: Record<string, unknown>, path: string, value: unkno
 }
 
 // GET - Obtenir tots els textos amb info d'editabilitat
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const content = await fs.readFile(ES_JSON_PATH, 'utf-8');
     const data = JSON.parse(content);
@@ -193,6 +196,8 @@ export async function GET() {
 
 // PUT - Actualitzar textos (només els editables)
 export async function PUT(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const body = await req.json();
     const { updates } = body as {

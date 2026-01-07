@@ -3,12 +3,15 @@
  * Estadístiques de privacitat per al dashboard
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPrivacyStats } from '@/lib/services/privacyService';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const stats = await getPrivacyStats();
 

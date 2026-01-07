@@ -10,7 +10,6 @@ type LeadProfile = {
   eventDate?: string | null;
   eventType?: string | null;
   eventLocation?: string | null;
-  eventVenue?: string | null;
   guestCount?: number | null;
   budget?: string | null;
   message?: string | null;
@@ -39,7 +38,6 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     eventDate: lead.eventDate ? lead.eventDate.slice(0, 10) : '',
     eventType: lead.eventType || 'OTHER',
     eventLocation: lead.eventLocation || '',
-    eventVenue: lead.eventVenue || '',
     guestCount: lead.guestCount?.toString() || '',
     budget: lead.budget || '',
     message: lead.message || '',
@@ -72,7 +70,6 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         eventDate: form.eventDate || undefined,
         eventType: form.eventType,
         eventLocation: form.eventLocation || null,
-        eventVenue: form.eventVenue || null,
         guestCount: form.guestCount ? Number(form.guestCount) : undefined,
         budget: form.budget || null,
         message: form.message || null,
@@ -180,14 +177,6 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
             value={form.eventLocation}
             onChange={(e) => updateField('eventLocation', e.target.value)}
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
-          Venue
-          <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
-            value={form.eventVenue}
-            onChange={(e) => updateField('eventVenue', e.target.value)}
           />
         </label>
         <label className="flex flex-col gap-1 text-sm text-slate-600">

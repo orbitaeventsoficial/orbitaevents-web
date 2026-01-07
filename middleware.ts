@@ -151,6 +151,23 @@ export function middleware(req: NextRequest) {
       return unauthorized();
     }
 
+    if (pathname.startsWith('/api/admin')) {
+      const method = req.method.toUpperCase();
+      const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method);
+
+      if (isMutation) {
+        const csrfHeader = req.headers.get('x-csrf-token');
+        const csrfCookie = req.cookies.get('csrf-token')?.value;
+
+        if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie) {
+          return NextResponse.json(
+            { error: 'CSRF token missing or invalid' },
+            { status: 403 }
+          );
+        }
+      }
+    }
+
     return NextResponse.next();
   }
 

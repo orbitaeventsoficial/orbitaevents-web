@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
+import { requireAuth } from '@/lib/auth';
 import {
   findAllPotentialDuplicates,
   mergeCustomers,
@@ -22,6 +23,8 @@ export const dynamic = 'force-dynamic';
  * - stats: boolean - només estadístiques
  */
 export async function GET(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const { searchParams } = new URL(request.url);
     const statsOnly = searchParams.get('stats') === 'true';
@@ -80,6 +83,8 @@ export async function GET(request: NextRequest) {
  * POST - Fusionar clients
  */
 export async function POST(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { primaryId, duplicateIds, fieldPreferences } = body;

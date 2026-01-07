@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
 import { generateQuotePDF } from '@/lib/pdf-utils';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 type EventType = 'bodas' | 'discomovil' | 'fiestas' | 'alquiler' | 'empresas';
 
@@ -576,7 +577,7 @@ export default function ConfiguradorClient() {
           .map((id) => EXTRAS.find((e) => e.id === id)?.name)
           .filter(Boolean) as string[];
 
-        const response = await fetch('/api/contact', {
+        const response = await fetchWithCsrf('/api/contact', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

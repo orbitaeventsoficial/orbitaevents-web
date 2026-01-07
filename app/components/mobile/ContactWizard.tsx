@@ -12,6 +12,7 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 // LocalStorage key for form persistence
 const FORM_STORAGE_KEY = 'orbita_contact_wizard_form';
@@ -511,7 +512,7 @@ function ConfirmStep({ formData, onNext, onBack }: StepProps) {
     if ('vibrate' in navigator) navigator.vibrate(20);
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetchWithCsrf('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

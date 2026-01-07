@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
+import { requireAuth } from '@/lib/auth';
 import {
   getPendingTestimonials,
   getApprovedTestimonials,
@@ -44,6 +45,8 @@ function verifyAdminAuth(request: NextRequest): boolean {
  * GET - Obtenir testimonis
  */
 export async function GET(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   if (!verifyAdminAuth(request)) {
     return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
   }
@@ -98,6 +101,8 @@ export async function GET(request: NextRequest) {
  * PATCH - Aprovar testimoni
  */
 export async function PATCH(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   if (!verifyAdminAuth(request)) {
     return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
   }
@@ -134,6 +139,8 @@ export async function PATCH(request: NextRequest) {
  * DELETE - Eliminar un testimoni
  */
 export async function DELETE(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   if (!verifyAdminAuth(request)) {
     return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
   }

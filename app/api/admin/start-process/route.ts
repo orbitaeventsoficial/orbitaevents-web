@@ -10,6 +10,7 @@ import { log } from '@/lib/logger';
 import { supabaseAdmin } from '@/lib/supabase';
 import { sendEmail, sendTestimonialApprovedEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,6 +49,8 @@ function verifyAdminAuth(request: NextRequest): boolean {
  * POST - Iniciar procés
  */
 export async function POST(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   const dbError = checkSupabase();
   if (dbError) return dbError;
 

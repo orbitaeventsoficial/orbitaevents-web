@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
+import { requireAuth } from '@/lib/auth';
 
 interface Params {
   params: { id: string };
@@ -39,6 +40,8 @@ const updateLeadSchema = z.object({
 
 // GET - Detall d'un lead
 export async function GET(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const lead = await prisma.lead.findUnique({
       where: { id: params.id },
@@ -78,6 +81,8 @@ export async function GET(req: NextRequest, { params }: Params) {
 
 // PATCH - Actualitzar lead
 export async function PATCH(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     // Parsejar JSON amb gestió d'errors
     let rawBody;
@@ -165,6 +170,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
 // DELETE - Eliminar lead
 export async function DELETE(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { id } = params;
 

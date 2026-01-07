@@ -4,11 +4,14 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { requireAuth } from '@/lib/auth';
 
 // Google Reviews URL
 const GOOGLE_REVIEW_URL = 'https://g.page/r/CXcgbvANsXSzEBI/review';
 
 export async function POST(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const formData = await req.formData();
     const bookingId = formData.get('bookingId') as string;

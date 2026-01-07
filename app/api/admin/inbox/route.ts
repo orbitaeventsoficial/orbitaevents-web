@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { getInboxEmails, getEmailByUid, markAsRead, deleteEmail } from '@/lib/services/imapService';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +11,8 @@ export const dynamic = 'force-dynamic';
  * Query params: limit, offset
  */
 export async function GET(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const searchParams = req.nextUrl.searchParams;
     const limit = parseInt(searchParams.get('limit') || '50');
@@ -41,6 +44,8 @@ export async function GET(req: NextRequest) {
  * PATCH - Marcar email com a llegit
  */
 export async function PATCH(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { uid, action } = await req.json();
 
@@ -67,6 +72,8 @@ export async function PATCH(req: NextRequest) {
  * DELETE - Eliminar email
  */
 export async function DELETE(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { uid } = await req.json();
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
+import { requireAuth } from '@/lib/auth';
 
 interface Params {
   params: { id: string };
@@ -15,6 +16,8 @@ const activitySchema = z.object({
 });
 
 export async function GET(_req: NextRequest, { params }: Params) {
+  const authError = requireAuth(_req);
+  if (authError) return authError;
   try {
     const activities = await prisma.leadActivity.findMany({
       where: { leadId: params.id },
@@ -28,6 +31,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
 }
 
 export async function POST(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const body = await req.json();
     const parsed = activitySchema.safeParse(body);

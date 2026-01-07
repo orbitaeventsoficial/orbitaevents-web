@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
+import { requireAuth } from '@/lib/auth';
 
 interface Params {
   params: { id: string; taskId: string };
@@ -17,6 +18,8 @@ const updateSchema = z.object({
 });
 
 export async function PATCH(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const body = await req.json();
     const parsed = updateSchema.safeParse(body);
@@ -57,6 +60,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
+  const authError = requireAuth(_req);
+  if (authError) return authError;
   try {
     await prisma.leadTask.delete({
       where: { id: params.taskId },

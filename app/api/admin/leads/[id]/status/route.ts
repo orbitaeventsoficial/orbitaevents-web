@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 
 const VALID_STATUSES = [
   'NEW',
@@ -17,7 +18,9 @@ interface Params {
   params: { id: string };
 }
 
-export async function PATCH(req: Request, { params }: Params) {
+export async function PATCH(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { id } = params;
     const body = await req.json();

@@ -9,6 +9,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { generateQuoteHTML, createQuoteFromLead, generateQuoteNumber } from "@/lib/services/documentService";
 import { getPackById, getPacksByService, type PackDefinition } from "@/config/packs-config";
+import { requireAuth } from '@/lib/auth';
 
 type QuotePack = {
   name: string;
@@ -53,6 +54,8 @@ interface RouteContext {
 
 // GET: Obtenir HTML del pressupost (preview)
 export async function GET(req: NextRequest, { params }: RouteContext) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const lead = await prisma.lead.findUnique({
       where: { id: params.id },
@@ -89,6 +92,8 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
 
 // POST: Generar pressupost i guardar-lo
 export async function POST(req: NextRequest, { params }: RouteContext) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const body = await req.json().catch(() => ({}));
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';

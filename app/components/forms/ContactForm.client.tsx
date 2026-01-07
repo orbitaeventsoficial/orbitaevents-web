@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { trackLead } from "@/lib/analytics";
+import { fetchWithCsrf } from '@/lib/csrf';
 import { useTranslations } from "next-intl";
 
 type FormData = {
@@ -71,7 +72,7 @@ export default function ContactForm() {
     setError(null);
 
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetchWithCsrf("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -311,4 +312,3 @@ export default function ContactForm() {
     </form>
   );
 }
-

@@ -11,7 +11,7 @@ import {
   logPrivacyAction,
 } from '@/lib/services/privacyService';
 import { prisma } from '@/lib/prisma';
-import { verifyBasicAuth } from '@/lib/auth';
+import { requireAuth, verifyBasicAuth } from '@/lib/auth';
 import { Prisma } from '@prisma/client';
 import type { DataResponseType } from '@prisma/client';
 
@@ -26,6 +26,9 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   // Obtenir usuari autenticat
   const auth = verifyBasicAuth(req);
   const adminUser = auth.authenticated ? auth.user || 'admin' : 'admin';

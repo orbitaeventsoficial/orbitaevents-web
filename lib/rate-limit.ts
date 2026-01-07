@@ -14,15 +14,13 @@ interface RateLimitEntry {
 // Store en memòria (per instància de servidor)
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
-// Netejar entrades expirades cada 5 minuts
-setInterval(() => {
-  const now = Date.now();
+function cleanupExpiredEntries(now: number): void {
   for (const [key, entry] of rateLimitStore.entries()) {
     if (entry.resetTime < now) {
       rateLimitStore.delete(key);
     }
   }
-}, 5 * 60 * 1000);
+}
 
 interface RateLimitConfig {
   /** Nombre màxim de requests */
@@ -56,6 +54,8 @@ export function checkRateLimit(
   const clientId = getClientId(req);
   const key = `${prefix}:${clientId}`;
   const now = Date.now();
+
+  cleanupExpiredEntries(now);
 
   const entry = rateLimitStore.get(key);
 

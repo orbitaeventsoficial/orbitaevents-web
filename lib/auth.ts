@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCsrf } from '@/lib/csrf';
 
 const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASS = process.env.ADMIN_PASS;
@@ -72,6 +73,15 @@ export function requireAuth(req: NextRequest): NextResponse | null {
   if (!auth.authenticated) {
     return unauthorizedResponse(auth.error);
   }
+
+  const method = req.method.toUpperCase();
+  const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method);
+
+  if (isMutation && req.nextUrl.pathname.startsWith('/api/admin')) {
+    const csrfError = verifyCsrf(req);
+    if (csrfError) return csrfError;
+  }
+
   return null;
 }
 

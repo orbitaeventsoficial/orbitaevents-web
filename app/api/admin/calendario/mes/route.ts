@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +28,8 @@ type CalendarDay = {
 };
 
 export async function GET(request: NextRequest) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
   try {
     const { searchParams } = new URL(request.url);
     const from = searchParams.get('from');

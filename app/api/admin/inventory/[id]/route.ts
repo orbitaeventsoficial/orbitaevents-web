@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 
 interface Params {
   params: { id: string };
@@ -10,6 +11,8 @@ interface Params {
 
 // GET - Detall d'un element
 export async function GET(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const item = await prisma.inventoryItem.findUnique({
       where: { id: params.id },
@@ -64,6 +67,8 @@ export async function GET(req: NextRequest, { params }: Params) {
 
 // PATCH - Actualitzar element
 export async function PATCH(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const body = await req.json();
     const { id } = params;
@@ -108,6 +113,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
 // DELETE - Eliminar element (soft delete: canviar a RETIRED)
 export async function DELETE(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { id } = params;
 

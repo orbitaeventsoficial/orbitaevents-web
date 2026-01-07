@@ -6,6 +6,7 @@ import EmailConfigPanel from './EmailConfigPanel';
 import RecentEmailsTable from './RecentEmailsTable';
 import ManualActionsPanel from './ManualActionsPanel';
 import InboxPanel from './InboxPanel';
+import SendPostEventButton from './SendPostEventButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -167,15 +168,7 @@ export default async function EmailsAdminPage() {
                         Event: {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · Ref: {booking.reference}
                       </p>
                     </div>
-                    <form action={`/api/admin/emails/send-post-event`} method="POST">
-                      <input type="hidden" name="bookingId" value={booking.id} />
-                      <button
-                        type="submit"
-                        className="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 transition-colors"
-                      >
-                        📤 Enviar ara
-                      </button>
-                    </form>
+                    <SendPostEventButton bookingId={booking.id} />
                   </div>
                 ))}
               </div>

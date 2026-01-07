@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,8 @@ const faqSchema = z.object({
 
 // GET - Llistar FAQs
 export async function GET(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
@@ -52,6 +55,8 @@ export async function GET(req: NextRequest) {
 
 // POST - Crear nova FAQ
 export async function POST(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     const body = await req.json();
     const parsed = faqSchema.safeParse(body);

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { supabaseAdmin } from '@/lib/supabase';
+import { requireAuth } from '@/lib/auth';
+import type { LeadDocumentType } from '@prisma/client';
 
 const MAX_SIZE_BYTES = 8 * 1024 * 1024;
 const ALLOWED_TYPES = new Set([
@@ -27,6 +29,8 @@ interface Params {
 }
 
 export async function GET(_req: NextRequest, { params }: Params) {
+  const authError = requireAuth(_req);
+  if (authError) return authError;
   try {
     const documents = await prisma.leadDocument.findMany({
       where: { leadId: params.id },
@@ -40,6 +44,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
 }
 
 export async function POST(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
   try {
     if (!supabaseAdmin) {
       return NextResponse.json({ error: 'Storage no configurat' }, { status: 500 });
@@ -48,7 +54,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const title = String(formData.get('title') || '').trim();
-    const type = String(formData.get('type') || 'FILE');
+    const rawType = String(formData.get('type') || 'FILE').trim().toUpperCase();
     const createdBy = String(formData.get('createdBy') || 'Admin');
 
     if (!file) {
@@ -57,9 +63,11 @@ export async function POST(req: NextRequest, { params }: Params) {
     if (!title) {
       return NextResponse.json({ error: 'Falta el títol' }, { status: 400 });
     }
-    if (!ALLOWED_DOC_TYPES.has(type)) {
+    if (!ALLOWED_DOC_TYPES.has(rawType)) {
       return NextResponse.json({ error: 'Tipus de document no permès' }, { status: 400 });
     }
+
+    const type = rawType as LeadDocumentType;
     if (!ALLOWED_TYPES.has(file.type)) {
       return NextResponse.json({ error: 'Tipus de fitxer no permès' }, { status: 400 });
     }
