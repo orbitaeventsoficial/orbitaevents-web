@@ -61,6 +61,15 @@ export async function PATCH(req: Request, { params }: Params) {
       },
     });
 
+    await prisma.leadActivity.create({
+      data: {
+        leadId: id,
+        type: 'STATUS_CHANGE',
+        title: "Canvi d'estat",
+        description: `${existingLead.status} → ${status}`,
+      },
+    });
+
     return NextResponse.json({
       ok: true,
       lead: updatedLead,

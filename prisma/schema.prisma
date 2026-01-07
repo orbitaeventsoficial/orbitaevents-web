@@ -388,6 +388,9 @@ model Lead {
 
   notes            LeadNote[]
   booking          Booking?
+  activities       LeadActivity[]
+  tasks            LeadTask[]
+  documents        LeadDocument[]
 
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
@@ -443,6 +446,45 @@ enum Priority {
   URGENT
 }
 
+enum LeadActivityType {
+  NOTE
+  STATUS_CHANGE
+  EMAIL
+  CALL
+  WHATSAPP
+  DOCUMENT
+  TASK
+  SYSTEM
+}
+
+enum LeadTaskStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum LeadTaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum LeadDocumentType {
+  QUOTE
+  CONTRACT
+  INVOICE
+  IMAGE
+  FILE
+  OTHER
+}
+
+enum LeadDocumentSource {
+  AUTO
+  MANUAL
+}
+
 model LeadNote {
   id        String   @id @default(cuid())
   leadId    String
@@ -452,6 +494,58 @@ model LeadNote {
   createdAt DateTime @default(now())
 
   @@map("lead_notes")
+}
+
+model LeadActivity {
+  id          String           @id @default(cuid())
+  leadId      String
+  lead        Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type        LeadActivityType @default(SYSTEM)
+  title       String?
+  description String?          @db.Text
+  metadata    Json?
+  createdBy   String?
+  createdAt   DateTime         @default(now())
+
+  @@index([leadId, createdAt])
+  @@map("lead_activities")
+}
+
+model LeadTask {
+  id          String           @id @default(cuid())
+  leadId      String
+  lead        Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  title       String
+  description String?          @db.Text
+  dueDate     DateTime?
+  status      LeadTaskStatus   @default(OPEN)
+  priority    LeadTaskPriority @default(MEDIUM)
+  assignedTo  String?
+  createdBy   String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  completedAt DateTime?
+
+  @@index([leadId, status])
+  @@map("lead_tasks")
+}
+
+model LeadDocument {
+  id        String             @id @default(cuid())
+  leadId    String
+  lead      Lead               @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type      LeadDocumentType   @default(OTHER)
+  source    LeadDocumentSource @default(MANUAL)
+  title     String
+  fileUrl   String
+  filePath  String?
+  mimeType  String?
+  size      Int?
+  createdBy String?
+  createdAt DateTime           @default(now())
+
+  @@index([leadId, createdAt])
+  @@map("lead_documents")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

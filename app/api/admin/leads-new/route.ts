@@ -40,11 +40,13 @@ const leadSchema = z.object({
   ]),
   eventDate: z.string().optional(),
   eventLocation: z.string().optional(),
+  eventVenue: z.string().optional(),
   guestCount: z.number().optional(),
   budget: z.string().optional(),
   message: z.string().optional(),
   interestedPackId: z.string().optional(),
   interestedExtras: z.array(z.string()).optional(),
+  assignedTo: z.string().optional(),
   source: z.enum([
     'WEBSITE', 'CONFIGURATOR', 'PHONE', 'WHATSAPP',
     'INSTAGRAM', 'REFERRAL', 'GOOGLE', 'OTHER'

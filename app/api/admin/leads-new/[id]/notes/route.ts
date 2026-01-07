@@ -42,6 +42,16 @@ export async function POST(req: NextRequest, { params }: Params) {
       },
     });
 
+    await prisma.leadActivity.create({
+      data: {
+        leadId: id,
+        type: 'NOTE',
+        title: 'Nota afegida',
+        description: content.trim().slice(0, 200),
+        createdBy: createdBy || 'Admin',
+      },
+    });
+
     return NextResponse.json({
       ok: true,
       note,

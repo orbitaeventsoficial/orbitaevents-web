@@ -91,6 +91,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
 export async function POST(req: NextRequest, { params }: RouteContext) {
   try {
     const body = await req.json().catch(() => ({}));
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
     
     const lead = await prisma.lead.findUnique({
       where: { id: params.id },
@@ -139,6 +140,32 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       data: {
         leadId: params.id,
         content: `📄 Pressupost generat: ${quoteNumber}\n💰 Total: ${quoteData.total.toFixed(2)}€\n📦 Pack: ${packData.name}`,
+      },
+    });
+
+    const quoteUrl = `${baseUrl}/api/admin/leads/${params.id}/quote`;
+    const documentTitle = `Pressupost ${quoteNumber}`;
+
+    await prisma.leadDocument.create({
+      data: {
+        leadId: params.id,
+        type: 'QUOTE',
+        source: 'AUTO',
+        title: documentTitle,
+        fileUrl: quoteUrl,
+        mimeType: 'text/html',
+        createdBy: 'Sistema',
+      },
+    });
+
+    await prisma.leadActivity.create({
+      data: {
+        leadId: params.id,
+        type: 'DOCUMENT',
+        title: 'Pressupost generat',
+        description: documentTitle,
+        metadata: { quoteNumber },
+        createdBy: 'Sistema',
       },
     });
 

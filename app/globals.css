@@ -1013,6 +1013,29 @@ body.admin-mode .card-swipe-item {
   background: #faf7f2 !important;
   border-color: #e7e1d6 !important;
 }
+
+html.admin-mode body {
+  color: #6b6660;
+  font-size: 15px;
+}
+
+html.admin-mode h1 {
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: #5b5650;
+}
+
+html.admin-mode h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #5b5650;
+}
+
+html.admin-mode h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #5b5650;
+}
 html::before {
   content: '';
   position: fixed;

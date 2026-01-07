@@ -44,7 +44,7 @@ function formatKey(date: Date): string {
 function getMonthDays({ year, month }: MonthYear): CalendarCell[] {
   const firstOfMonth = new Date(year, month, 1);
   const firstWeekday = firstOfMonth.getDay(); // 0 = Dg, 1 = Dl...
-  const offsetFromMonday = (firstWeekday + 6) % 7; // passar a setmana que comença dilluns
+  const offsetFromMonday = (firstWeekday + 6) % 7; // passar a setmana que comen├ºa dilluns
   const startDate = new Date(year, month, 1 - offsetFromMonday);
 
   const cells: CalendarCell[] = [];
@@ -126,7 +126,7 @@ export default function CalendarMonthClient() {
     const visibleRangeLabel = `${firstVisible.toLocaleDateString('ca-ES', {
       day: '2-digit',
       month: '2-digit',
-    })} – ${lastVisible.toLocaleDateString('ca-ES', {
+    })} ÔÇô ${lastVisible.toLocaleDateString('ca-ES', {
       day: '2-digit',
       month: '2-digit',
     })}`;
@@ -255,7 +255,7 @@ export default function CalendarMonthClient() {
             onClick={() => setMonthYear((prev) => addMonths(prev, -1))}
             className="inline-flex items-center rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
-            ‹ Mes anterior
+            ÔÇ╣ Mes anterior
           </button>
           <button
             type="button"
@@ -274,7 +274,7 @@ export default function CalendarMonthClient() {
             onClick={() => setMonthYear((prev) => addMonths(prev, 1))}
             className="inline-flex items-center rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
-            Mes següent ›
+            Mes seg├╝ent ÔÇ║
           </button>
         </div>
 
@@ -287,7 +287,7 @@ export default function CalendarMonthClient() {
           </div>
           {loading && (
             <div className="text-sm text-slate-500">
-              Carregant ocupació...
+              Carregant ocupaci├│...
             </div>
           )}
           {error && (
@@ -298,7 +298,7 @@ export default function CalendarMonthClient() {
         </div>
       </div>
 
-      {/* Stats ràpids del mes visible */}
+      {/* Stats r├ápids del mes visible */}
       <div className="grid gap-3 text-sm text-slate-700 md:grid-cols-4">
         <div className="flex items-center justify-between rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 shadow-sm">
           <div className="flex flex-col">
@@ -378,7 +378,7 @@ export default function CalendarMonthClient() {
         </div>
       </div>
 
-      {/* Capçalera de dies */}
+      {/* Cap├ºalera de dies */}
       <div className="grid grid-cols-7 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
         {weekdayLabels.map((label) => (
           <div key={label} className="py-2">
@@ -435,29 +435,37 @@ export default function CalendarMonthClient() {
                   {cell.date.getDate()}
                 </span>
                 {hasReservas && (
-                  <span className="rounded-full bg-emerald-600/90 px-2 py-0.5 text-xs font-semibold text-white">
-                    {dayData.reservas.length} R
-                  </span>
-                )}
-                {!hasReservas && hasBloqueos && (
-                  <span className="rounded-full bg-rose-600/90 px-2 py-0.5 text-xs font-semibold text-white">
-                    B
-                  </span>
-                )}
-              </div>
-
-              <div className="mt-1 space-y-0.5">
-                {hasReservas && (
                   <div className="line-clamp-2 text-xs font-medium text-slate-700">
-                    {dayData.reservas
-                      .slice(0, 2)
-                      .map((r) => r.clienteNombre || 'Client')
-                      .join(' · ')}
+                    {dayData.reservas.slice(0, 2).map((r, index) => {
+                      const label = r.clienteNombre || 'Client';
+                      const separator = index > 0 ? ' - ' : '';
+                      if (r.leadId) {
+                        return (
+                          <span key={r.id}>
+                            {separator}
+                            <Link
+                              href={`/admin/leads/${r.leadId}`}
+                              onClick={(event) => event.stopPropagation()}
+                              className="hover:text-amber-600"
+                            >
+                              {label}
+                            </Link>
+                          </span>
+                        );
+                      }
+                      return (
+                        <span key={r.id}>
+                          {separator}
+                          {label}
+                        </span>
+                      );
+                    })}
                     {dayData.reservas.length > 2
                       ? ` +${dayData.reservas.length - 2}`
                       : ''}
                   </div>
                 )}
+
                 {hasBloqueos && (
                   <div className="line-clamp-1 text-xs text-rose-800">
                     {dayData.bloqueos[0].motivo || 'Bloquejat'}
@@ -492,7 +500,7 @@ export default function CalendarMonthClient() {
                 })}
               </h2>
               <p className="mt-0.5 text-sm text-slate-500">
-                Resum d&apos;ocupació i accions ràpides.
+                Resum d&apos;ocupaci├│ i accions r├ápides.
               </p>
             </div>
 
@@ -542,7 +550,7 @@ export default function CalendarMonthClient() {
                         {r.ubicacion && (
                           <>
                             {r.ubicacion}
-                            {' · '}
+                            {' ┬À '}
                           </>
                         )}
                         {new Date(r.fechaEvento).toLocaleTimeString('ca-ES', {
@@ -579,7 +587,7 @@ export default function CalendarMonthClient() {
                       </div>
                       <div className="mt-0.5 text-xs text-slate-600">
                         {b.motivo ?? 'Sense motiu especificat'}
-                        {b.notas ? ` · ${b.notas}` : ''}
+                        {b.notas ? ` ┬À ${b.notas}` : ''}
                       </div>
                     </div>
                   ))

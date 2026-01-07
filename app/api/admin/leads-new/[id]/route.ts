@@ -22,10 +22,18 @@ const updateLeadSchema = z.object({
   // Priority enum de Prisma
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
   source: z.string().optional(),
-  budget: z.string().optional(), // És string a Prisma (ex: "5000€")
+  budget: z.string().optional(),
+  message: z.string().optional(), // És string a Prisma (ex: "5000€")
   guestCount: z.number().int().positive().optional(),
+  eventLocation: z.string().optional(),
+  eventVenue: z.string().optional(),
   notes: z.string().optional(),
-  venue: z.string().optional(),
+  interestedPackId: z.string().optional(),
+  interestedExtras: z.array(z.string()).optional(),
+  landingPage: z.string().optional(),
+  utmSource: z.string().optional(),
+  utmMedium: z.string().optional(),
+  utmCampaign: z.string().optional(),
   assignedTo: z.string().optional(),
 }).strict();
 
@@ -36,6 +44,9 @@ export async function GET(req: NextRequest, { params }: Params) {
       where: { id: params.id },
       include: {
         notes: { orderBy: { createdAt: 'desc' } },
+        activities: { orderBy: { createdAt: 'desc' } },
+        tasks: { orderBy: { createdAt: 'desc' } },
+        documents: { orderBy: { createdAt: 'desc' } },
         booking: {
           include: {
             pack: { include: { translations: true } },

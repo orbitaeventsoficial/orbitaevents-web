@@ -149,7 +149,9 @@ export default async function LeadsPage() {
                     <tr key={lead.id} className="hover:bg-slate-50 transition-colors">
                       {/* Client */}
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-700">{lead.name}</div>
+                        <Link href={`/admin/leads/${lead.id}`} className="font-medium text-slate-700 hover:text-amber-600">
+                          {lead.name}
+                        </Link>
                         {lead.booking && (
                           <div className="text-xs text-green-600">✓ Reserva: {lead.booking.reference}</div>
                         )}

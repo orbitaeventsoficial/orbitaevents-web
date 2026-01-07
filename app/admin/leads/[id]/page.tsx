@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import LeadActionsEnhanced from './LeadActionsEnhanced';
+import LeadProfileEditor from './LeadProfileEditor';
+import LeadWorkspace from './LeadWorkspace';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,17 +42,6 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   OTHER: '📋 Altre',
 };
 
-const SOURCE_LABELS: Record<string, string> = {
-  WEBSITE: '🌐 Web',
-  CONFIGURATOR: '⚙️ Configurador',
-  PHONE: '📞 Telèfon',
-  WHATSAPP: '💬 WhatsApp',
-  INSTAGRAM: '📸 Instagram',
-  REFERRAL: '🤝 Referència',
-  GOOGLE: '🔍 Google',
-  OTHER: '📋 Altre',
-};
-
 const PRIORITY_LABELS: Record<string, { label: string; color: string }> = {
   LOW: { label: 'Baixa', color: 'bg-stone-100 text-slate-700' },
   MEDIUM: { label: 'Mitjana', color: 'bg-blue-100 text-blue-700' },
@@ -66,6 +57,9 @@ export default async function LeadDetailPage({ params }: Props) {
         orderBy: { createdAt: 'desc' },
         take: 20,
       },
+      tasks: { orderBy: { createdAt: 'desc' } },
+      documents: { orderBy: { createdAt: 'desc' } },
+      activities: { orderBy: { createdAt: 'desc' } },
       booking: true,
     },
   });
@@ -77,6 +71,24 @@ export default async function LeadDetailPage({ params }: Props) {
   const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
   const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
   const priorityConf = PRIORITY_LABELS[lead.priority] || PRIORITY_LABELS.MEDIUM;
+
+  const serializedTasks = lead.tasks.map((task) => ({
+    ...task,
+    dueDate: task.dueDate ? task.dueDate.toISOString() : null,
+    createdAt: task.createdAt.toISOString(),
+    updatedAt: task.updatedAt.toISOString(),
+    completedAt: task.completedAt ? task.completedAt.toISOString() : null,
+  }));
+
+  const serializedDocuments = lead.documents.map((doc) => ({
+    ...doc,
+    createdAt: doc.createdAt.toISOString(),
+  }));
+
+  const serializedActivities = lead.activities.map((activity) => ({
+    ...activity,
+    createdAt: activity.createdAt.toISOString(),
+  }));
 
   return (
     <div className="space-y-6">
@@ -137,82 +149,31 @@ export default async function LeadDetailPage({ params }: Props) {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Columna Principal */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Info del client */}
-          <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-700 mb-4">Informació del client</h2>
-            <dl className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <dt className="text-xs font-medium text-slate-500 uppercase">Email</dt>
-                <dd className="mt-1 text-sm text-slate-700">{lead.email}</dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium text-slate-500 uppercase">Telèfon</dt>
-                <dd className="mt-1 text-sm text-slate-700">{lead.phone || '—'}</dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium text-slate-500 uppercase">Data event</dt>
-                <dd className="mt-1 text-sm text-slate-700">
-                  {lead.eventDate
-                    ? new Date(lead.eventDate).toLocaleDateString('ca-ES', {
-                        weekday: 'long',
-                        day: '2-digit',
-                        month: 'long',
-                        year: 'numeric',
-                      })
-                    : '—'}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium text-slate-500 uppercase">Nº invitats</dt>
-                <dd className="mt-1 text-sm text-slate-700">
-                  {lead.guestCount ? `${lead.guestCount} persones` : '—'}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium text-slate-500 uppercase">Pressupost</dt>
-                <dd className="mt-1 text-sm text-slate-700">
-                  {lead.budget || '—'}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium text-slate-500 uppercase">Ubicació</dt>
-                <dd className="mt-1 text-sm text-slate-700">{lead.eventLocation || '—'}</dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium text-slate-500 uppercase">Origen</dt>
-                <dd className="mt-1 text-sm text-slate-700">{SOURCE_LABELS[lead.source] || lead.source}</dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium text-slate-500 uppercase">UTM</dt>
-                <dd className="mt-1 text-sm text-slate-700">
-                  {lead.utmSource || lead.utmCampaign
-                    ? `${lead.utmSource || ''} / ${lead.utmCampaign || ''}`
-                    : '—'}
-                </dd>
-              </div>
-              {lead.interestedPackId && (
-                <div>
-                  <dt className="text-xs font-medium text-slate-500 uppercase">Pack interessat</dt>
-                  <dd className="mt-1 text-sm text-slate-700">{lead.interestedPackId}</dd>
-                </div>
-              )}
-              {lead.interestedExtras.length > 0 && (
-                <div>
-                  <dt className="text-xs font-medium text-slate-500 uppercase">Extras interessat</dt>
-                  <dd className="mt-1 text-sm text-slate-700">{lead.interestedExtras.join(', ')}</dd>
-                </div>
-              )}
-            </dl>
-
-            {lead.message && (
-              <div className="mt-6 pt-4 border-t border-slate-100">
-                <dt className="text-xs font-medium text-slate-500 uppercase mb-2">Missatge</dt>
-                <dd className="text-sm text-slate-700 bg-slate-50 rounded-lg p-3 whitespace-pre-wrap">
-                  {lead.message}
-                </dd>
-              </div>
-            )}
-          </section>
+          <LeadProfileEditor
+            lead={{
+              id: lead.id,
+              name: lead.name,
+              email: lead.email,
+              phone: lead.phone,
+              eventDate: lead.eventDate ? lead.eventDate.toISOString() : null,
+              eventType: lead.eventType,
+              eventLocation: lead.eventLocation,
+              eventVenue: lead.eventVenue,
+              guestCount: lead.guestCount,
+              budget: lead.budget,
+              message: lead.message,
+              status: lead.status,
+              priority: lead.priority,
+              source: lead.source,
+              assignedTo: lead.assignedTo,
+              interestedPackId: lead.interestedPackId,
+              interestedExtras: lead.interestedExtras,
+              landingPage: lead.landingPage,
+              utmSource: lead.utmSource,
+              utmMedium: lead.utmMedium,
+              utmCampaign: lead.utmCampaign,
+            }}
+          />
 
           {/* Notes */}
           <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
@@ -283,6 +244,13 @@ export default async function LeadDetailPage({ params }: Props) {
               </div>
             </section>
           )}
+
+          <LeadWorkspace
+            leadId={lead.id}
+            initialTasks={serializedTasks}
+            initialDocuments={serializedDocuments}
+            initialActivities={serializedActivities}
+          />
         </div>
 
         {/* Sidebar */}
