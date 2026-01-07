@@ -6204,5 +6204,15 @@
     "error": "Error al carregar disponibilitat",
     "previousMonth": "Mes anterior",
     "nextMonth": "Mes següent"
+  },
+  "booking": {
+    "meta": {
+      "title": "Reserva el teu Event | Òrbita Events",
+      "description": "Reserva el teu DJ i serveis d'events per a casaments, festes i events corporatius. Sense compromís."
+    },
+    "hero": {
+      "title": "Reserva el teu Event",
+      "description": "Completa el formulari i reserva la teva data. Et contactarem en les properes 24 hores per confirmar tots els detalls."
+    }
   }
 }

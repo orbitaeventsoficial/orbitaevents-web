@@ -6242,5 +6242,15 @@
     "error": "Error al cargar disponibilidad",
     "previousMonth": "Mes anterior",
     "nextMonth": "Mes siguiente"
+  },
+  "booking": {
+    "meta": {
+      "title": "Reserva tu Evento | Òrbita Events",
+      "description": "Reserva tu DJ y servicios de eventos para bodas, fiestas y eventos corporativos. Sin compromiso."
+    },
+    "hero": {
+      "title": "Reserva tu Evento",
+      "description": "Completa el formulario y reserva tu fecha. Te contactaremos en las próximas 24 horas para confirmar todos los detalles."
+    }
   }
 }
