@@ -2672,48 +2672,10 @@
     "code": "Codi: LAST10 · Descompte aplicat al pressupost final."
   },
   "calendar": {
-    "badge": "de dates ja reservades",
-    "title": "Disponibilitat de Dissabtes",
-    "subtitle": "Només {count} dissabtes disponibles en els propers 3 mesos",
-    "status": {
-      "exhausted": "ESGOTAT",
-      "lastOne": "Només {count} lliure!",
-      "few": "{count} lliures",
-      "available": "{count} lliures"
-    },
-    "labels": {
-      "scarce": "Últims!",
-      "limited": "Pocs",
-      "available": "Disponible"
-    },
-    "legend": {
-      "free": "Lliure",
-      "booked": "Reservat"
-    },
-    "reasons": {
-      "booked": "Reservat",
-      "past": "Passat"
-    },
-    "viewCalendar": "Veure calendari →",
-    "hideCalendar": "Amagar calendari ↑",
-    "viewFullCalendar": "Veure calendari complet ↓",
-    "modal": {
-      "title": "Data disponible!",
-      "highSeason": "⭐ Temporada alta - Alta demanda",
-      "reserveBefore": "Reserva abans que s'esgoti",
-      "reserveDate": "Reserva aquesta data",
-      "consultWhatsapp": "Consulta per WhatsApp",
-      "keepLooking": "Seguir mirant",
-      "whatsappMsg": "Hola! M'interessa el {date} per al meu event"
-    },
-    "cta": {
-      "title": "Reserva la teva data ara",
-      "subtitle": "Sense compromís • Resposta en menys de 2h"
-    },
-    "compact": {
-      "loading": "Carregant...",
-      "saturdaysFree": "📅 Dissabtes lliures:"
-    }
+    "loading": "Carregant...",
+    "error": "Error al carregar disponibilitat",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes següent"
   },
   "stickyCta": {
     "requestQuote": "Demana el teu pressupost",
@@ -6199,12 +6161,6 @@
       "noData": "Sense dades"
     }
   },
-  "calendar": {
-    "loading": "Carregant...",
-    "error": "Error al carregar disponibilitat",
-    "previousMonth": "Mes anterior",
-    "nextMonth": "Mes següent"
-  },
   "booking": {
     "meta": {
       "title": "Reserva el teu Event | Òrbita Events",
@@ -6213,6 +6169,12 @@
     "hero": {
       "title": "Reserva el teu Event",
       "description": "Completa el formulari i reserva la teva data. Et contactarem en les properes 24 hores per confirmar tots els detalls."
+    }
+  },
+  "blog": {
+    "meta": {
+      "title": "Blog - Consells i Tendències | Òrbita Events",
+      "description": "Descobreix consells, tendències i novetats sobre esdeveniments, casaments i música. El blog oficial d'Òrbita Events."
     }
   }
 }
