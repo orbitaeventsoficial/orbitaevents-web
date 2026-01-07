@@ -59,22 +59,29 @@ function createLogEntry(
 const logStore: LogEntry[] = [];
 const MAX_LOGS = 100;
 
-// Preparado para Sentry/LogRocket cuando lo integres
+// Send to external monitoring services
 async function sendToExternalService(entry: LogEntry): Promise<void> {
-  // Descomentar cuando tengas Sentry:
-  // if (process.env.SENTRY_DSN) {
-  //   const Sentry = await import('@sentry/nextjs');
-  //   if (entry.error) {
-  //     Sentry.captureException(new Error(entry.error.message), {
-  //       extra: entry.context,
-  //     });
-  //   } else {
-  //     Sentry.captureMessage(entry.message, {
-  //       level: entry.level as Sentry.SeverityLevel,
-  //       extra: entry.context,
-  //     });
-  //   }
-  // }
+  // Send to Sentry if configured
+  if (process.env.NEXT_PUBLIC_SENTRY_DSN && typeof window !== 'undefined') {
+    try {
+      const Sentry = await import('@sentry/nextjs');
+
+      if (entry.error) {
+        Sentry.captureException(new Error(entry.error.message), {
+          extra: entry.context,
+          level: entry.level as 'error' | 'warning' | 'info' | 'debug',
+        });
+      } else if (entry.level === 'error' || entry.level === 'warn') {
+        // Only send errors and warnings to Sentry, not info/debug
+        Sentry.captureMessage(entry.message, {
+          level: entry.level === 'warn' ? 'warning' : 'error',
+          extra: entry.context,
+        });
+      }
+    } catch {
+      // Silently fail if Sentry not available
+    }
+  }
 
   // Almacenar en memoria para debugging
   logStore.push(entry);

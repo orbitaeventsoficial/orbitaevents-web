@@ -19,7 +19,11 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma db push --force-reset && prisma db seed",
     "monitor": "npx ts-node scripts/monitor.ts",
-    "health": "curl -s https://orbitaevents.com/api/health | node -e \"const d=require('fs').readFileSync(0,'utf8');const h=JSON.parse(d);console.log('Status:',h.status,'| DB:',h.checks?.database?.status,'| Response:',h.responseTime+'ms')\""
+    "health": "curl -s https://orbitaevents.com/api/health | node -e \"const d=require('fs').readFileSync(0,'utf8');const h=JSON.parse(d);console.log('Status:',h.status,'| DB:',h.checks?.database?.status,'| Response:',h.responseTime+'ms')\"",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report"
   },
   "prisma": {
     "seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -33,6 +37,7 @@
     "@react-email/components": "1.0.1",
     "@react-email/render": "2.0.0",
     "@sendgrid/mail": "^8.1.0",
+    "@sentry/nextjs": "^10.32.1",
     "@supabase/supabase-js": "^2.86.0",
     "@use-gesture/react": "^10.3.1",
     "@vercel/analytics": "^1.5.0",
@@ -75,6 +80,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@types/canvas-confetti": "^1.9.0",
     "@types/dompurify": "^3.2.0",
     "@types/imap-simple": "^4.2.10",
@@ -86,6 +92,7 @@
     "@types/react-dom": "18.3.0",
     "eslint": "8.57.0",
     "eslint-config-next": "14.2.35",
+    "playwright": "^1.57.0",
     "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
     "typescript": "5.4.5"
