@@ -175,6 +175,12 @@ export default function AdminReviewsPage() {
         </div>
         
         <div className="flex gap-2">
+          <Link
+            href="/admin/testimonios"
+            className="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            Testimonis
+          </Link>
           <a
             href={SITE_CONFIG.reviews.googleBusinessUrl || '#'}
             target="_blank" rel="noopener noreferrer"
