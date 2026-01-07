@@ -115,7 +115,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
 
       {/* Pricing Section */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">💰 Preus</h3>
+        <h3 className="text-lg font-semibold text-black mb-4">💰 Preus</h3>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-slate-700 mb-1">
@@ -181,7 +181,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
 
       {/* Features Section */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">🎵 Característiques</h3>
+        <h3 className="text-lg font-semibold text-black mb-4">🎵 Característiques</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="djHours" className="block text-sm font-medium text-slate-700 mb-1">
@@ -219,7 +219,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="includesFog"
               checked={formData.includesFog}
               onChange={(e) => setFormData({ ...formData, includesFog: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+              className="h-4 w-4 rounded border-slate-300 text-black focus:ring-slate-900"
             />
             <label htmlFor="includesFog" className="text-sm text-slate-700">
               🌫️ Inclou Màquina de Fum
@@ -232,7 +232,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="includesMic"
               checked={formData.includesMic}
               onChange={(e) => setFormData({ ...formData, includesMic: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+              className="h-4 w-4 rounded border-slate-300 text-black focus:ring-slate-900"
             />
             <label htmlFor="includesMic" className="text-sm text-slate-700">
               🎤 Inclou Micròfon
@@ -243,7 +243,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
 
       {/* Capacity Section */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">👥 Capacitat</h3>
+        <h3 className="text-lg font-semibold text-black mb-4">👥 Capacitat</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="minGuests" className="block text-sm font-medium text-slate-700 mb-1">
@@ -279,7 +279,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
 
       {/* Status Section */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">⚙️ Estat i Ordre</h3>
+        <h3 className="text-lg font-semibold text-black mb-4">⚙️ Estat i Ordre</h3>
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <input
@@ -287,7 +287,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="isActive"
               checked={formData.isActive}
               onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+              className="h-4 w-4 rounded border-slate-300 text-black focus:ring-slate-900"
             />
             <label htmlFor="isActive" className="text-sm text-slate-700">
               ✅ Pack Actiu (Visible a la web)
@@ -337,7 +337,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-md bg-white px-4 py-2 text-sm font-medium text-black hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Guardant...' : 'Guardar Canvis'}
         </button>

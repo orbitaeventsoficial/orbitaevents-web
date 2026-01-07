@@ -49,7 +49,7 @@ export default async function FAQPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">FAQ</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-black">FAQ</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona les preguntes freqüents del web
           </p>
@@ -57,7 +57,7 @@ export default async function FAQPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/faq/new"
-            className="inline-flex items-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+            className="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-black hover:bg-slate-100"
           >
             + Nova Pregunta
           </Link>
@@ -68,7 +68,7 @@ export default async function FAQPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Preguntes</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">{faqs.length}</p>
+          <p className="mt-2 text-3xl font-bold text-black">{faqs.length}</p>
         </div>
         <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-green-600 uppercase">Actives</p>
@@ -126,7 +126,7 @@ export default async function FAQPage() {
             className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden"
           >
             <div className="bg-slate-50 border-b border-slate-200 p-4">
-              <h2 className="font-semibold text-slate-900 flex items-center gap-2">
+              <h2 className="font-semibold text-black flex items-center gap-2">
                 <span>{config.icon}</span>
                 {config.label}
                 <span className="text-sm font-normal text-slate-500">
@@ -146,7 +146,7 @@ export default async function FAQPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-slate-400">#{faq.order}</span>
-                          <h3 className="font-medium text-slate-900 truncate">
+                          <h3 className="font-medium text-black truncate">
                             {translation?.question || faq.slug}
                           </h3>
                           {!faq.isActive && (

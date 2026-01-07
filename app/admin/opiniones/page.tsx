@@ -177,7 +177,7 @@ export default function AdminOpinionesPage() {
   const isPending = (status: string) => status === 'pending';
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen bg-slate-100 text-black p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
@@ -191,8 +191,8 @@ export default function AdminOpinionesPage() {
           {/* Stats */}
           {stats && (
             <div className="flex gap-4 flex-wrap">
-              <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-white">{stats.total}</p>
+              <div className="bg-white border border-zinc-800 rounded-xl px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-black">{stats.total}</p>
                 <p className="text-xs text-gray-500">Total</p>
               </div>
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 text-center">
@@ -207,8 +207,8 @@ export default function AdminOpinionesPage() {
                 <p className="text-2xl font-bold text-purple-400">{stats.featured || 0}</p>
                 <p className="text-xs text-purple-500/70">Destacades</p>
               </div>
-              <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-white">{stats.avgRating?.toFixed(1) || '0.0'}</p>
+              <div className="bg-white border border-zinc-800 rounded-xl px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-black">{stats.avgRating?.toFixed(1) || '0.0'}</p>
                 <p className="text-xs text-gray-500">Mitjana ★</p>
               </div>
             </div>
@@ -222,7 +222,7 @@ export default function AdminOpinionesPage() {
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               filter === 'pending'
                 ? 'bg-purple-600 text-white'
-                : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700'
+                : 'bg-slate-100 text-gray-400 hover:bg-zinc-700'
             }`}
           >
             Pendents
@@ -232,14 +232,14 @@ export default function AdminOpinionesPage() {
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               filter === 'all'
                 ? 'bg-purple-600 text-white'
-                : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700'
+                : 'bg-slate-100 text-gray-400 hover:bg-zinc-700'
             }`}
           >
             Totes
           </button>
           <button
             onClick={() => fetchTestimonials()}
-            className="px-4 py-2 rounded-lg bg-zinc-800 text-gray-400 hover:bg-zinc-700 transition-all ml-auto"
+            className="px-4 py-2 rounded-lg bg-slate-100 text-gray-400 hover:bg-zinc-700 transition-all ml-auto"
           >
             Refrescar
           </button>
@@ -280,7 +280,7 @@ export default function AdminOpinionesPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -100 }}
-                  className={`bg-zinc-900 border rounded-2xl p-6 ${
+                  className={`bg-white border rounded-2xl p-6 ${
                     isFeatured(t.status)
                       ? 'border-purple-500/50'
                       : isApproved(t.status)
@@ -297,7 +297,7 @@ export default function AdminOpinionesPage() {
                       <div className="flex items-start justify-between mb-4">
                         <div>
                           <div className="flex items-center gap-3 mb-1">
-                            <h3 className="font-semibold text-white">
+                            <h3 className="font-semibold text-black">
                               {t.customer.name || 'Client anònim'}
                             </h3>
                             {renderStars(t.rating)}
@@ -340,7 +340,7 @@ export default function AdminOpinionesPage() {
                       {/* Meta */}
                       <div className="flex flex-wrap gap-3 text-sm text-gray-500">
                         {t.discountCode && (
-                          <span className="bg-zinc-800 px-2 py-1 rounded">
+                          <span className="bg-slate-100 px-2 py-1 rounded">
                             {t.discountCode}
                           </span>
                         )}
@@ -405,7 +405,7 @@ export default function AdminOpinionesPage() {
                       <button
                         onClick={() => handleDelete(t.id)}
                         disabled={actionLoading === t.id}
-                        className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-gray-400 px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50 text-sm"
+                        className="flex-1 bg-slate-100 hover:bg-zinc-700 text-gray-400 px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50 text-sm"
                       >
                         Eliminar
                       </button>

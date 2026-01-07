@@ -40,7 +40,7 @@ function SidebarItem({
         transition-all duration-200 group
         ${isActive
           ? 'bg-orange-100 text-orange-700'
-          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          : 'text-slate-600 hover:text-black hover:bg-slate-100'
         }
       `}
     >
@@ -103,7 +103,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <html lang="ca" suppressHydrationWarning>
-      <body className="bg-slate-100 text-slate-900" style={{ margin: 0 }} suppressHydrationWarning>
+      <body className="bg-slate-100 text-black" style={{ margin: 0 }} suppressHydrationWarning>
         <div className="min-h-screen">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-slate-200 flex-col z-40">
@@ -111,10 +111,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="p-4 border-b border-slate-200">
               <Link href="/admin" className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                  <span className="text-white font-bold text-lg">Ò</span>
+                  <span className="text-black font-bold text-lg">Ò</span>
                 </div>
                 <div>
-                  <span className="text-slate-900 font-semibold">Òrbita</span>
+                  <span className="text-black font-semibold">Òrbita</span>
                   <span className="text-orange-500 font-semibold ml-1">Admin</span>
                 </div>
               </Link>
@@ -140,7 +140,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="p-3 border-t border-slate-200">
               <div className="p-3 rounded-xl bg-orange-50 border border-orange-200">
                 <p className="text-[10px] text-orange-700 uppercase tracking-wider">Sistema</p>
-                <p className="text-sm text-slate-900 font-medium mt-1">Òrbita Admin</p>
+                <p className="text-sm text-black font-medium mt-1">Òrbita Admin</p>
                 <p className="text-xs text-slate-500">Prisma + Supabase</p>
               </div>
             </div>
@@ -156,7 +156,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <span className="text-slate-900 font-semibold">
+            <span className="text-black font-semibold">
               <span className="text-orange-500">Òrbita</span> Admin
             </span>
             <div className="w-10" />
@@ -166,15 +166,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {mounted && sidebarOpen && (
             <>
               <div
-                className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+                className="lg:hidden fixed inset-0 bg-slate-200/60 backdrop-blur-sm z-40"
                 onClick={() => setSidebarOpen(false)}
               />
               <aside className="lg:hidden fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-slate-200 z-50 overflow-y-auto">
                 <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-                  <span className="text-slate-900 font-semibold">
+                  <span className="text-black font-semibold">
                     <span className="text-orange-500">Òrbita</span> Admin
                   </span>
-                  <button onClick={() => setSidebarOpen(false)} className="p-2 text-slate-500 hover:text-slate-900">
+                  <button onClick={() => setSidebarOpen(false)} className="p-2 text-slate-500 hover:text-black">
                     ✕
                   </button>
                 </div>
@@ -201,7 +201,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="flex items-center gap-3 text-sm">
               <span className="text-slate-500">Admin</span>
               <span className="text-slate-300">/</span>
-              <span className="text-slate-900 font-medium">Dashboard</span>
+              <span className="text-black font-medium">Dashboard</span>
             </div>
             <div className="flex items-center gap-4">
               <div className="relative">
@@ -209,12 +209,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <input
                   type="text"
                   placeholder="Buscar... (⌘K)"
-                  className="w-64 pl-9 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-sm transition-all duration-200 hover:border-slate-300 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                  className="w-64 pl-9 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-xl text-black placeholder-slate-400 text-sm transition-all duration-200 hover:border-slate-300 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
                 />
               </div>
               <Link
                 href="/admin/settings/notifications"
-                className="relative p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors"
+                className="relative p-2 text-slate-500 hover:text-black hover:bg-slate-100 rounded-xl transition-colors"
                 aria-label="Notificacions"
               >
                 🔔
@@ -224,7 +224,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-sm font-medium">
                   C
                 </div>
-                <span className="text-slate-900 text-sm font-medium">Carles</span>
+                <span className="text-black text-sm font-medium">Carles</span>
               </button>
             </div>
           </header>

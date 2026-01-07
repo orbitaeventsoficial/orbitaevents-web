@@ -103,7 +103,7 @@ export default function SettingsNotificationsPage() {
           >
             ← Tornar a configuració
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-black">
             📧 Configuració de Notificacions
           </h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -117,7 +117,7 @@ export default function SettingsNotificationsPage() {
         <div className={`rounded-xl border p-6 shadow-sm ${config?.status.emailReady ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
           <div className="flex items-center gap-3 mb-2">
             <span className="text-2xl">{config?.status.emailReady ? '✅' : '❌'}</span>
-            <h2 className="text-lg font-semibold text-slate-900">Email</h2>
+            <h2 className="text-lg font-semibold text-black">Email</h2>
           </div>
           <p className={`text-sm ${config?.status.emailReady ? 'text-green-700' : 'text-red-700'}`}>
             {config?.status.emailReady 
@@ -130,7 +130,7 @@ export default function SettingsNotificationsPage() {
         <div className={`rounded-xl border p-6 shadow-sm ${config?.status.whatsappReady ? 'border-green-200 bg-green-50' : 'border-yellow-200 bg-yellow-50'}`}>
           <div className="flex items-center gap-3 mb-2">
             <span className="text-2xl">{config?.status.whatsappReady ? '✅' : '⚠️'}</span>
-            <h2 className="text-lg font-semibold text-slate-900">WhatsApp</h2>
+            <h2 className="text-lg font-semibold text-black">WhatsApp</h2>
           </div>
           <p className={`text-sm ${config?.status.whatsappReady ? 'text-green-700' : 'text-yellow-700'}`}>
             {config?.status.whatsappReady 
@@ -143,7 +143,7 @@ export default function SettingsNotificationsPage() {
 
       {/* Test Email */}
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">🧪 Test d'Email</h2>
+        <h2 className="text-lg font-semibold text-black mb-4">🧪 Test d'Email</h2>
         
         {testResult && (
           <div className={`mb-4 p-4 rounded-lg ${testResult.success ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
@@ -171,7 +171,7 @@ export default function SettingsNotificationsPage() {
 
       {/* Configuration Details */}
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">⚙️ Configuració Actual</h2>
+        <h2 className="text-lg font-semibold text-black mb-4">⚙️ Configuració Actual</h2>
         
         <div className="space-y-4">
           <div>
@@ -180,7 +180,7 @@ export default function SettingsNotificationsPage() {
               {Object.entries(config?.smtp || {}).map(([key, value]) => (
                 <div key={key} className="flex justify-between py-1 border-b border-slate-100">
                   <span className="text-slate-500 uppercase text-xs">{key}</span>
-                  <span className={value.includes('✅') ? 'text-green-600' : value.includes('❌') ? 'text-red-600' : 'text-slate-900'}>
+                  <span className={value.includes('✅') ? 'text-green-600' : value.includes('❌') ? 'text-red-600' : 'text-black'}>
                     {value}
                   </span>
                 </div>
@@ -194,7 +194,7 @@ export default function SettingsNotificationsPage() {
               {Object.entries(config?.recipients || {}).map(([key, value]) => (
                 <div key={key} className="flex justify-between py-1 border-b border-slate-100">
                   <span className="text-slate-500 uppercase text-xs">{key}</span>
-                  <span className="text-slate-900">{value}</span>
+                  <span className="text-black">{value}</span>
                 </div>
               ))}
             </div>
@@ -208,7 +208,7 @@ export default function SettingsNotificationsPage() {
           <h2 className="text-lg font-semibold text-amber-900 mb-4">📝 Instruccions de Configuració</h2>
           
           {instructions.map((instruction, index) => (
-            <pre key={index} className="bg-slate-900 text-green-400 p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap mb-4">
+            <pre key={index} className="bg-white text-green-400 p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap mb-4">
               {instruction}
             </pre>
           ))}
@@ -217,7 +217,7 @@ export default function SettingsNotificationsPage() {
 
       {/* Quick Reference */}
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">📚 Referència Ràpida</h2>
+        <h2 className="text-lg font-semibold text-black mb-4">📚 Referència Ràpida</h2>
         
         <div className="prose prose-sm max-w-none text-slate-600">
           <h3 className="text-base font-medium text-slate-800">Variables d'entorn necessàries:</h3>

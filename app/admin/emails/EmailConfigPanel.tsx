@@ -50,7 +50,7 @@ export default function EmailConfigPanel() {
   return (
     <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
-        <h2 className="font-semibold text-slate-900">⚙️ Configuracio</h2>
+        <h2 className="font-semibold text-black">⚙️ Configuracio</h2>
       </div>
 
       <div className="p-6 space-y-5">

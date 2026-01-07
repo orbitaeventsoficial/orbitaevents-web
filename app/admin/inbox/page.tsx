@@ -76,7 +76,7 @@ export default async function InboxPage() {
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">📬 Inbox</h1>
+          <h1 className="text-xl font-semibold text-black">📬 Inbox</h1>
           <p className="text-sm text-slate-500">
             {stats.unreadLeads} leads nous · {stats.todayLeads} avui
             {imapConfigured && ' · 📧 Correu connectat'}

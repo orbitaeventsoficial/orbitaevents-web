@@ -155,7 +155,7 @@ function MoreMenu({
         >
           {/* Backdrop */}
           <motion.div 
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-slate-200/70 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -163,7 +163,7 @@ function MoreMenu({
 
           {/* Menu */}
           <motion.div
-            className="absolute bottom-20 left-4 right-4 bg-zinc-900 rounded-2xl p-2 border border-white/10 shadow-2xl"
+            className="absolute bottom-20 left-4 right-4 bg-white rounded-2xl p-2 border border-slate-200 shadow-2xl"
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -184,20 +184,20 @@ function MoreMenu({
                       if ('vibrate' in navigator) navigator.vibrate(5);
                       onClose();
                     }}
-                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-white/5 active:bg-white/10 transition-colors"
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-slate-100 active:bg-slate-200 transition-colors"
                   >
                     <span className="text-2xl">{item.icon}</span>
-                    <span className="text-xs text-white/70 font-medium text-center">{item.label}</span>
+                    <span className="text-xs text-slate-700 font-medium text-center">{item.label}</span>
                   </Link>
                 </motion.div>
               ))}
             </div>
 
             {/* Close indicator */}
-            <div className="mt-2 pt-2 border-t border-white/5">
+            <div className="mt-2 pt-2 border-t border-slate-200">
               <button
                 onClick={onClose}
-                className="w-full py-2 text-center text-white/30 text-sm"
+                className="w-full py-2 text-center text-slate-400 text-sm"
               >
                 Toca fora per tancar
               </button>
@@ -303,7 +303,7 @@ export default function BottomNavPro() {
         style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}
       >
         {/* Glass background */}
-        <div className="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl border-t border-white/[0.08]" />
+        <div className="absolute inset-0 bg-white/90 backdrop-blur-xl border-t border-slate-200" />
 
         {/* Glow effect for active tab */}
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-500/50 to-transparent opacity-0 group-hover:opacity-100" />
@@ -325,13 +325,13 @@ export default function BottomNavPro() {
                   className="relative flex flex-col items-center py-2 px-3 min-w-[60px]"
                 >
                   <motion.div
-                    className={`relative ${isActive ? 'text-orange-400' : 'text-white/50'}`}
+                    className={`relative ${isActive ? 'text-orange-400' : 'text-slate-500'}`}
                     animate={{ rotate: moreMenuOpen ? 90 : 0 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                   >
                     {getIcon(item.id, isActive)}
                   </motion.div>
-                  <span className={`text-[10px] mt-1 font-medium ${isActive ? 'text-orange-400' : 'text-white/40'}`}>
+                  <span className={`text-[10px] mt-1 font-medium ${isActive ? 'text-orange-400' : 'text-slate-400'}`}>
                     {item.label}
                   </span>
                 </button>
@@ -356,7 +356,7 @@ export default function BottomNavPro() {
 
                 {/* Icon container */}
                 <motion.div
-                  className={`relative ${isActive ? 'text-orange-400' : 'text-white/50'}`}
+                  className={`relative ${isActive ? 'text-orange-400' : 'text-slate-500'}`}
                   animate={{
                     y: isActive ? -2 : 0,
                     scale: isActive ? 1.1 : 1,
@@ -368,7 +368,7 @@ export default function BottomNavPro() {
                 </motion.div>
 
                 {/* Label */}
-                <span className={`text-[10px] mt-1 font-medium transition-colors ${isActive ? 'text-orange-400' : 'text-white/40'}`}>
+                <span className={`text-[10px] mt-1 font-medium transition-colors ${isActive ? 'text-orange-400' : 'text-slate-400'}`}>
                   {item.label}
                 </span>
 

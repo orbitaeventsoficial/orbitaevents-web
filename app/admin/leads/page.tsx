@@ -79,7 +79,7 @@ export default async function LeadsPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Leads / Clients</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-black">Leads / Clients</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona tots els contactes que han entrat pel web
           </p>
@@ -96,7 +96,7 @@ export default async function LeadsPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Leads</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">{stats.total}</p>
+          <p className="mt-2 text-3xl font-bold text-black">{stats.total}</p>
         </div>
         <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-blue-600 uppercase">Nous (per contactar)</p>
@@ -149,7 +149,7 @@ export default async function LeadsPage() {
                     <tr key={lead.id} className="hover:bg-slate-50 transition-colors">
                       {/* Client */}
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-900">{lead.name}</div>
+                        <div className="font-medium text-black">{lead.name}</div>
                         {lead.booking && (
                           <div className="text-xs text-green-600">✓ Reserva: {lead.booking.reference}</div>
                         )}
@@ -168,7 +168,7 @@ export default async function LeadsPage() {
                           {lead.phone && (
                             <a
                               href={`tel:${lead.phone}`}
-                              className="block text-slate-600 hover:text-slate-900"
+                              className="block text-slate-600 hover:text-black"
                             >
                               📱 {lead.phone}
                             </a>

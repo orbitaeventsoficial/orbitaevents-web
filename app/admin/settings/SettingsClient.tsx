@@ -151,7 +151,7 @@ export default function SettingsClient({
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>
                 <div>
-                  <h2 className="font-semibold text-slate-900">{config.label}</h2>
+                  <h2 className="font-semibold text-black">{config.label}</h2>
                   <p className="text-sm text-slate-500">{config.description}</p>
                 </div>
               </div>
@@ -189,7 +189,7 @@ export default function SettingsClient({
                           </span>
                         </div>
                         {setting.label && (
-                          <p className="mt-1 font-medium text-slate-900">{setting.label}</p>
+                          <p className="mt-1 font-medium text-black">{setting.label}</p>
                         )}
                         {setting.description && (
                           <p className="text-sm text-slate-500">{setting.description}</p>
@@ -232,7 +232,7 @@ export default function SettingsClient({
                                 Cancelar
                               </button>
                               <button
-                                className="text-xs px-2 py-1 rounded bg-amber-500 text-black"
+                                className="text-xs px-2 py-1 rounded bg-amber-500 text-white"
                                 onClick={() => saveSetting(setting)}
                                 disabled={isSaving}
                               >
@@ -242,7 +242,7 @@ export default function SettingsClient({
                           </div>
                         ) : (
                           <>
-                            <p className="text-lg font-semibold text-slate-900">
+                            <p className="text-lg font-semibold text-black">
                               {formatDisplay(current)}
                             </p>
                             <p className="text-xs text-slate-400">

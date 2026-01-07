@@ -142,14 +142,14 @@ function DashboardHeader({ onRefresh, isRefreshing }: { onRefresh: () => void; i
     <div className="flex items-center justify-between mb-6">
       <div>
         <motion.p 
-          className="text-white/40 text-sm font-medium"
+          className="text-slate-400 text-sm font-medium"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
           {greeting}, Carles · {currentTime}
         </motion.p>
         <motion.h1 
-          className="text-2xl font-bold text-white"
+          className="text-2xl font-bold text-black"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -159,7 +159,7 @@ function DashboardHeader({ onRefresh, isRefreshing }: { onRefresh: () => void; i
       </div>
       <motion.button
         onClick={onRefresh}
-        className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/60 active:bg-white/10"
+        className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:bg-slate-200"
         whileTap={{ scale: 0.9 }}
         animate={{ rotate: isRefreshing ? 360 : 0 }}
         transition={{ duration: isRefreshing ? 1 : 0, repeat: isRefreshing ? Infinity : 0, ease: 'linear' }}
@@ -200,7 +200,7 @@ function MetricCard({
     >
       <Link
         href={href}
-        className={`block p-4 rounded-2xl bg-gradient-to-br ${color} border border-white/5 active:scale-[0.98] transition-transform relative overflow-hidden`}
+        className={`block p-4 rounded-2xl bg-gradient-to-br ${color} border border-slate-200 active:scale-[0.98] transition-transform relative overflow-hidden`}
       >
         {/* Glow effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
@@ -226,7 +226,7 @@ function MetricCard({
           </div>
           
           <motion.p 
-            className="text-3xl font-bold text-white mb-0.5"
+            className="text-3xl font-bold text-black mb-0.5"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: delay + 0.1 }}
@@ -235,9 +235,9 @@ function MetricCard({
           </motion.p>
           
           <div className="flex items-center justify-between">
-            <p className="text-white/50 text-sm">{label}</p>
+            <p className="text-slate-500 text-sm">{label}</p>
             {subValue && (
-              <p className="text-white/30 text-xs">{subValue}</p>
+              <p className="text-slate-400 text-xs">{subValue}</p>
             )}
           </div>
         </div>
@@ -253,12 +253,12 @@ function MiniBarChart({ data, label }: { data: number[]; label: string }) {
 
   return (
     <motion.div
-      className="p-4 bg-white/[0.03] rounded-2xl border border-white/5"
+      className="p-4 bg-white/[0.03] rounded-2xl border border-slate-200"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <h3 className="text-white/70 font-medium text-sm mb-4">{label}</h3>
+      <h3 className="text-slate-700 font-medium text-sm mb-4">{label}</h3>
       <div className="flex items-end justify-between gap-1 h-20">
         {data.map((value, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-1">
@@ -268,7 +268,7 @@ function MiniBarChart({ data, label }: { data: number[]; label: string }) {
               animate={{ height: `${Math.max((value / maxValue) * 100, 8)}%` }}
               transition={{ delay: 0.4 + i * 0.05, type: 'spring', stiffness: 100 }}
             />
-            <span className="text-[10px] text-white/30">{days[i]}</span>
+            <span className="text-[10px] text-slate-400">{days[i]}</span>
           </div>
         ))}
       </div>
@@ -323,16 +323,16 @@ function UpcomingEventCard({
     >
       <Link
         href={`/admin/bookings/${event.id}`}
-        className="flex items-center gap-3 p-3 bg-white/[0.03] rounded-xl border border-white/5 active:bg-white/[0.06] transition-colors"
+        className="flex items-center gap-3 p-3 bg-white/[0.03] rounded-xl border border-slate-200 active:bg-white/[0.06] transition-colors"
       >
         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 flex items-center justify-center text-2xl">
           {typeIcons[event.eventType] || '📅'}
         </div>
         
         <div className="flex-1 min-w-0">
-          <p className="text-white font-medium truncate">{event.eventName}</p>
+          <p className="text-black font-medium truncate">{event.eventName}</p>
           <div className="flex items-center gap-2">
-            <p className="text-white/40 text-sm">{formatDate(event.eventDate)}</p>
+            <p className="text-slate-400 text-sm">{formatDate(event.eventDate)}</p>
             {event.pack?.translations[0] && (
               <span className="text-xs text-amber-400/60">· {event.pack.translations[0].name}</span>
             )}
@@ -389,10 +389,10 @@ function RecentLeadCard({ lead, index }: { lead: Lead; index: number }) {
         className={`block p-3 rounded-xl border-l-4 ${priorityColors[lead.priority] || priorityColors.MEDIUM} active:scale-[0.98] transition-transform`}
       >
         <div className="flex items-center justify-between mb-1">
-          <p className="text-white font-medium truncate flex-1">{lead.name}</p>
-          <span className="text-white/30 text-xs">{timeAgo(lead.createdAt)}</span>
+          <p className="text-black font-medium truncate flex-1">{lead.name}</p>
+          <span className="text-slate-400 text-xs">{timeAgo(lead.createdAt)}</span>
         </div>
-        <p className="text-white/40 text-sm">{typeLabels[lead.eventType] || lead.eventType}</p>
+        <p className="text-slate-400 text-sm">{typeLabels[lead.eventType] || lead.eventType}</p>
       </Link>
     </motion.div>
   );
@@ -413,7 +413,7 @@ function QuickActions() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <h2 className="text-white/60 font-medium text-sm mb-3">Accions ràpides</h2>
+      <h2 className="text-slate-600 font-medium text-sm mb-3">Accions ràpides</h2>
       <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
         {actions.map((action, i) => (
           <motion.div
@@ -425,18 +425,18 @@ function QuickActions() {
             {action.external ? (
               <a
                 href={action.href}
-                className={`flex flex-col items-center gap-2 p-4 rounded-2xl bg-gradient-to-br ${action.color} border border-white/5 min-w-[80px] active:scale-95 transition-transform`}
+                className={`flex flex-col items-center gap-2 p-4 rounded-2xl bg-gradient-to-br ${action.color} border border-slate-200 min-w-[80px] active:scale-95 transition-transform`}
               >
-                <span className="text-white/80">{action.icon}</span>
-                <span className="text-white/60 text-xs font-medium whitespace-nowrap">{action.label}</span>
+                <span className="text-slate-700">{action.icon}</span>
+                <span className="text-slate-600 text-xs font-medium whitespace-nowrap">{action.label}</span>
               </a>
             ) : (
               <Link
                 href={action.href}
-                className={`flex flex-col items-center gap-2 p-4 rounded-2xl bg-gradient-to-br ${action.color} border border-white/5 min-w-[80px] active:scale-95 transition-transform`}
+                className={`flex flex-col items-center gap-2 p-4 rounded-2xl bg-gradient-to-br ${action.color} border border-slate-200 min-w-[80px] active:scale-95 transition-transform`}
               >
-                <span className="text-white/80">{action.icon}</span>
-                <span className="text-white/60 text-xs font-medium whitespace-nowrap">{action.label}</span>
+                <span className="text-slate-700">{action.icon}</span>
+                <span className="text-slate-600 text-xs font-medium whitespace-nowrap">{action.label}</span>
               </Link>
             )}
           </motion.div>
@@ -560,7 +560,7 @@ export default function MobileDashboardPro() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-zinc-950 p-4 pt-6 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-100 p-4 pt-6 flex items-center justify-center">
         <motion.div
           className="w-12 h-12 border-3 border-orange-500/30 border-t-orange-500 rounded-full"
           animate={{ rotate: 360 }}
@@ -573,9 +573,9 @@ export default function MobileDashboardPro() {
   // Error state
   if (error && !data) {
     return (
-      <div className="min-h-screen bg-zinc-950 p-4 pt-6 flex flex-col items-center justify-center gap-4">
+      <div className="min-h-screen bg-slate-100 p-4 pt-6 flex flex-col items-center justify-center gap-4">
         <span className="text-4xl">😕</span>
-        <p className="text-white/60 text-center">{error}</p>
+        <p className="text-slate-600 text-center">{error}</p>
         <button
           onClick={() => fetchData()}
           className="px-6 py-3 bg-orange-500 text-white rounded-xl font-medium"
@@ -587,7 +587,7 @@ export default function MobileDashboardPro() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-4 pt-6 pb-24 lg:hidden">
+    <div className="min-h-screen bg-slate-100 p-4 pt-6 pb-24 lg:hidden">
       <PullToRefreshIndicator progress={pullProgress} />
 
       {/* Header */}
@@ -615,7 +615,7 @@ export default function MobileDashboardPro() {
       {data && data.bookings.upcoming.length > 0 && (
         <div className="mt-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-white/60 font-medium text-sm">Propers events</h2>
+            <h2 className="text-slate-600 font-medium text-sm">Propers events</h2>
             <Link href="/admin/calendario" className="text-orange-400 text-sm flex items-center gap-1">
               Veure tots {Icons.arrowRight}
             </Link>
@@ -632,7 +632,7 @@ export default function MobileDashboardPro() {
       {data && data.leads.recent.length > 0 && (
         <div className="mt-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-white/60 font-medium text-sm">Leads recents</h2>
+            <h2 className="text-slate-600 font-medium text-sm">Leads recents</h2>
             <Link href="/admin/leads" className="text-orange-400 text-sm flex items-center gap-1">
               Veure tots {Icons.arrowRight}
             </Link>
@@ -647,7 +647,7 @@ export default function MobileDashboardPro() {
 
       {/* Last update */}
       <motion.p 
-        className="text-center text-white/20 text-xs mt-8"
+        className="text-center text-slate-300 text-xs mt-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}

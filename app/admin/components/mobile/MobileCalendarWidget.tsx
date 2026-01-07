@@ -148,7 +148,7 @@ function CalendarHeader({
     <div className="flex items-center justify-between mb-4">
       <button
         onClick={onPrev}
-        className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/60 active:bg-white/10"
+        className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:bg-slate-200"
       >
         {Icons.chevronLeft}
       </button>
@@ -156,7 +156,7 @@ function CalendarHeader({
       <div className="text-center">
         <motion.h2
           key={`${year}-${month}`}
-          className="text-lg font-bold text-white"
+          className="text-lg font-bold text-black"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -174,7 +174,7 @@ function CalendarHeader({
 
       <button
         onClick={onNext}
-        className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/60 active:bg-white/10"
+        className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:bg-slate-200"
       >
         {Icons.chevronRight}
       </button>
@@ -208,10 +208,10 @@ function CalendarDay({
         isSelected
           ? 'bg-orange-500 text-white'
           : isToday
-          ? 'bg-white/10 text-white'
+          ? 'bg-slate-200 text-black'
           : isCurrentMonth
-          ? 'text-white/80 active:bg-white/5'
-          : 'text-white/20'
+          ? 'text-slate-700 active:bg-slate-100'
+          : 'text-slate-300'
       }`}
     >
       <span className={`text-sm font-medium ${isSelected ? 'font-bold' : ''}`}>
@@ -261,13 +261,13 @@ function DayEventsPanel({
     <AnimatePresence>
       {date && (
         <motion.div
-          className="mt-4 p-4 bg-white/5 rounded-2xl border border-white/5"
+          className="mt-4 p-4 bg-slate-100 rounded-2xl border border-slate-200"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
         >
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-white font-semibold">
+            <h3 className="text-black font-semibold">
               {date.toLocaleDateString('ca-ES', {
                 weekday: 'long',
                 day: 'numeric',
@@ -276,14 +276,14 @@ function DayEventsPanel({
             </h3>
             <button
               onClick={onClose}
-              className="text-white/40 hover:text-white/60"
+              className="text-slate-400 hover:text-slate-600"
             >
               ✕
             </button>
           </div>
 
           {events.length === 0 ? (
-            <p className="text-white/40 text-sm text-center py-4">
+            <p className="text-slate-400 text-sm text-center py-4">
               Cap event aquest dia
             </p>
           ) : (
@@ -292,18 +292,18 @@ function DayEventsPanel({
                 <Link
                   key={event.id}
                   href={`/admin/bookings/${event.id}`}
-                  className="flex items-center gap-3 p-3 bg-white/5 rounded-xl active:bg-white/10 transition-colors"
+                  className="flex items-center gap-3 p-3 bg-slate-100 rounded-xl active:bg-slate-200 transition-colors"
                 >
                   <div className={`w-10 h-10 rounded-lg ${EVENT_COLORS[event.eventType]}/20 flex items-center justify-center text-lg`}>
                     {EVENT_ICONS[event.eventType] || '📅'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium truncate">{event.eventName}</p>
-                    <p className="text-white/40 text-sm">{event.clientName || 'Sense client'}</p>
+                    <p className="text-black font-medium truncate">{event.eventName}</p>
+                    <p className="text-slate-400 text-sm">{event.clientName || 'Sense client'}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-emerald-400 font-semibold text-sm">{event.total}€</p>
-                    <p className="text-white/30 text-xs">{formatTime(event.eventDate)}</p>
+                    <p className="text-slate-400 text-xs">{formatTime(event.eventDate)}</p>
                   </div>
                 </Link>
               ))}
@@ -420,13 +420,13 @@ export default function MobileCalendarWidget({ fullPage = false }: { fullPage?: 
   }, [selectedDate, events]);
 
   const containerClass = fullPage 
-    ? 'min-h-screen bg-zinc-950 p-4 pt-6 pb-24 lg:hidden'
-    : 'p-4 bg-zinc-900/50 rounded-2xl border border-white/5';
+    ? 'min-h-screen bg-slate-100 p-4 pt-6 pb-24 lg:hidden'
+    : 'p-4 bg-slate-1000 rounded-2xl border border-slate-200';
 
   return (
     <div className={containerClass}>
       {fullPage && (
-        <h1 className="text-2xl font-bold text-white mb-6">Calendari</h1>
+        <h1 className="text-2xl font-bold text-black mb-6">Calendari</h1>
       )}
 
       <CalendarHeader
@@ -442,7 +442,7 @@ export default function MobileCalendarWidget({ fullPage = false }: { fullPage?: 
         {DAYS_SHORT.map((day) => (
           <div
             key={day}
-            className="text-center text-xs text-white/40 font-medium py-2"
+            className="text-center text-xs text-slate-400 font-medium py-2"
           >
             {day}
           </div>
@@ -481,7 +481,7 @@ export default function MobileCalendarWidget({ fullPage = false }: { fullPage?: 
 
       {/* Loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-zinc-950/50 flex items-center justify-center rounded-2xl">
+        <div className="absolute inset-0 bg-slate-200/70 flex items-center justify-center rounded-2xl">
           <motion.div
             className="w-8 h-8 border-2 border-orange-500/30 border-t-orange-500 rounded-full"
             animate={{ rotate: 360 }}
@@ -502,15 +502,15 @@ export default function MobileCalendarWidget({ fullPage = false }: { fullPage?: 
         <div className="mt-4 flex items-center justify-center gap-4 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-pink-500" />
-            <span className="text-white/40">Casaments</span>
+            <span className="text-slate-400">Casaments</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-orange-500" />
-            <span className="text-white/40">Festes</span>
+            <span className="text-slate-400">Festes</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-blue-500" />
-            <span className="text-white/40">Empreses</span>
+            <span className="text-slate-400">Empreses</span>
           </div>
         </div>
       )}

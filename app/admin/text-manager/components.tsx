@@ -23,7 +23,7 @@ export function TextStats({ totalTexts, modifiedCount, sectionCounts }: StatsPro
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-6">
-      <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+      <h3 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
         📊 Estadísticas de Contenido
       </h3>
 
@@ -151,7 +151,7 @@ export function TextTools({ onRefresh, onExport, onImport, onSync }: ToolsProps)
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-6">
-      <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+      <h3 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
         🛠️ Herramientas
       </h3>
 
@@ -512,11 +512,11 @@ export function BulkActions({
 
   return (
     <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40">
-      <div className="bg-slate-900 text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-4">
+      <div className="bg-white text-black px-6 py-3 rounded-full shadow-xl flex items-center gap-4">
         <span className="text-sm">
           <strong>{selectedCount}</strong> seleccionados
         </span>
-        <div className="h-4 w-px bg-slate-700" />
+        <div className="h-4 w-px bg-slate-300" />
         <button
           onClick={onSelectAll}
           className="text-sm hover:text-orange-400 transition-colors"
@@ -529,7 +529,7 @@ export function BulkActions({
         >
           Deseleccionar
         </button>
-        <div className="h-4 w-px bg-slate-700" />
+        <div className="h-4 w-px bg-slate-300" />
         <button
           onClick={onBulkRevert}
           className="text-sm bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded-full transition-colors"

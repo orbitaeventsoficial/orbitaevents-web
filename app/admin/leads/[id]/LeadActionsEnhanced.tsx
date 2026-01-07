@@ -133,7 +133,7 @@ export default function LeadActionsEnhanced({
     <div className="space-y-6">
       {/* Canviar Estat */}
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-slate-900 mb-4">📊 Canviar estat</h3>
+        <h3 className="text-sm font-semibold text-black mb-4">📊 Canviar estat</h3>
 
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
@@ -161,7 +161,7 @@ export default function LeadActionsEnhanced({
             >
               <span className="text-lg">{status.icon}</span>
               <span className={`w-3 h-3 rounded-full ${status.color}`} />
-              <span className={status.value === currentStatus ? 'text-slate-900' : 'text-slate-700'}>
+              <span className={status.value === currentStatus ? 'text-black' : 'text-slate-700'}>
                 {status.label}
               </span>
               {status.value === currentStatus && (
@@ -174,7 +174,7 @@ export default function LeadActionsEnhanced({
 
       {/* Generar Pressupost */}
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-slate-900 mb-4">📄 Pressupost</h3>
+        <h3 className="text-sm font-semibold text-black mb-4">📄 Pressupost</h3>
         
         <div className="space-y-4">
           {/* Selector de Pack */}
@@ -220,7 +220,7 @@ export default function LeadActionsEnhanced({
               <span className="font-medium">{((customPrice || selectedPackInfo?.price || 0) * 0.21).toFixed(2)}€</span>
             </div>
             <div className="flex justify-between text-sm mt-2 pt-2 border-t border-slate-200">
-              <span className="font-semibold text-slate-900">Total:</span>
+              <span className="font-semibold text-black">Total:</span>
               <span className="font-bold text-amber-600">{((customPrice || selectedPackInfo?.price || 0) * 1.21).toFixed(2)}€</span>
             </div>
           </div>
@@ -255,7 +255,7 @@ export default function LeadActionsEnhanced({
 
       {/* Accions Ràpides */}
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-slate-900 mb-4">⚡ Accions ràpides</h3>
+        <h3 className="text-sm font-semibold text-black mb-4">⚡ Accions ràpides</h3>
         
         <div className="space-y-2">
           {clientPhone && (
@@ -290,7 +290,7 @@ export default function LeadActionsEnhanced({
           {clientPhone && (
             <a
               href={`tel:${clientPhone}`}
-              className="flex items-center gap-3 w-full px-4 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors"
+              className="flex items-center gap-3 w-full px-4 py-3 bg-slate-200 text-black rounded-lg hover:bg-slate-300 transition-colors"
             >
               <span className="text-xl">📞</span>
               <div className="text-left">

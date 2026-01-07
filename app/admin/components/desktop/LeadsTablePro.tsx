@@ -63,7 +63,7 @@ const serviceConfig: Record<string, { label: string; icon: string }> = {
 const priorityConfig: Record<string, { label: string; icon: string; color: string }> = {
   high: { label: 'Alta', icon: '🔥', color: 'text-red-400' },
   medium: { label: 'Mitjana', icon: '⚡', color: 'text-amber-400' },
-  low: { label: 'Baixa', icon: '💤', color: 'text-white/40' },
+  low: { label: 'Baixa', icon: '💤', color: 'text-slate-400' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -103,7 +103,7 @@ function StatusBadge({
               initial={{ opacity: 0, y: -10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="absolute top-full left-0 mt-1 w-40 bg-zinc-800 rounded-xl shadow-xl border border-white/10 z-20 overflow-hidden"
+              className="absolute top-full left-0 mt-1 w-40 bg-slate-100 rounded-xl shadow-xl border border-slate-200 z-20 overflow-hidden"
             >
               {Object.entries(statusConfig).map(([key, cfg]) => (
                 <button
@@ -112,8 +112,8 @@ function StatusBadge({
                     onStatusChange(leadId, key);
                     setIsOpen(false);
                   }}
-                  className={`w-full px-3 py-2 text-left text-sm hover:bg-white/5 flex items-center gap-2 ${
-                    status === key ? 'bg-white/10' : ''
+                  className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-100 flex items-center gap-2 ${
+                    status === key ? 'bg-slate-200' : ''
                   }`}
                 >
                   <div className={`w-2 h-2 rounded-full ${cfg.bg}`} />
@@ -189,8 +189,8 @@ function ColumnHeader({
   return (
     <button
       onClick={() => onSort(field)}
-      className={`flex items-center gap-1 text-left hover:text-white transition-colors ${
-        isActive ? 'text-white' : 'text-white/50'
+      className={`flex items-center gap-1 text-left hover:text-black transition-colors ${
+        isActive ? 'text-black' : 'text-slate-500'
       }`}
     >
       {label}
@@ -377,12 +377,12 @@ export default function LeadsTablePro() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Leads</h1>
-          <p className="text-white/50 text-sm">{filteredLeads.length} contactes</p>
+          <h1 className="text-2xl font-bold text-black">Leads</h1>
+          <p className="text-slate-500 text-sm">{filteredLeads.length} contactes</p>
         </div>
         <Link
           href="/admin/leads?new=true"
-          className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-400 text-black font-semibold rounded-xl transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-400 text-white font-semibold rounded-xl transition-colors"
         >
           <span>➕</span> Nou Lead
         </Link>
@@ -392,7 +392,7 @@ export default function LeadsTablePro() {
       <div className="flex flex-wrap items-center gap-4">
         {/* Search */}
         <div className="relative flex-1 min-w-[300px]">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">🔍</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
           <input
             type="text"
             value={searchQuery}
@@ -401,7 +401,7 @@ export default function LeadsTablePro() {
               setCurrentPage(1);
             }}
             placeholder="Buscar per nom, email o telèfon..."
-            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:border-orange-500 focus:outline-none transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-black placeholder:text-slate-400 focus:border-orange-500 focus:outline-none transition-colors"
           />
         </div>
 
@@ -412,7 +412,7 @@ export default function LeadsTablePro() {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:border-orange-500 focus:outline-none cursor-pointer"
+          className="px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-black focus:border-orange-500 focus:outline-none cursor-pointer"
         >
           <option value="all">Tots els estats ({statusCounts.all || 0})</option>
           {Object.entries(statusConfig).map(([key, cfg]) => (
@@ -429,7 +429,7 @@ export default function LeadsTablePro() {
             setServiceFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:border-orange-500 focus:outline-none cursor-pointer"
+          className="px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-black focus:border-orange-500 focus:outline-none cursor-pointer"
         >
           <option value="all">Tots els serveis</option>
           {Object.entries(serviceConfig).map(([key, cfg]) => (
@@ -446,8 +446,8 @@ export default function LeadsTablePro() {
           onClick={() => setStatusFilter('all')}
           className={`px-4 py-2 rounded-xl text-sm whitespace-nowrap transition-colors ${
             statusFilter === 'all'
-              ? 'bg-orange-500 text-black font-medium'
-              : 'bg-white/5 text-white/70 hover:bg-white/10'
+              ? 'bg-orange-500 text-white font-medium'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
           }`}
         >
           Tots ({statusCounts.all || 0})
@@ -459,7 +459,7 @@ export default function LeadsTablePro() {
             className={`px-4 py-2 rounded-xl text-sm whitespace-nowrap transition-colors flex items-center gap-2 ${
               statusFilter === key
                 ? `${cfg.bg} ${cfg.color} font-medium`
-                : 'bg-white/5 text-white/70 hover:bg-white/10'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
             {cfg.label}
@@ -469,23 +469,23 @@ export default function LeadsTablePro() {
       </div>
 
       {/* Table */}
-      <div className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
+      <div className="bg-slate-100 rounded-2xl border border-slate-200 overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-white/10">
+            <tr className="border-b border-slate-200">
               <th className="w-12 p-4">
                 <input
                   type="checkbox"
                   checked={selectedLeads.size === filteredLeads.length && filteredLeads.length > 0}
                   onChange={handleSelectAll}
-                  className="w-4 h-4 rounded border-white/20 bg-white/5 text-orange-500 focus:ring-orange-500"
+                  className="w-4 h-4 rounded border-slate-300 bg-slate-100 text-orange-500 focus:ring-orange-500"
                 />
               </th>
               <th className="p-4 text-left">
                 <ColumnHeader label="Nom" field="name" sortField={sortField} sortDirection={sortDirection} onSort={handleSort} />
               </th>
-              <th className="p-4 text-left text-white/50">Contacte</th>
-              <th className="p-4 text-left text-white/50">Servei</th>
+              <th className="p-4 text-left text-slate-500">Contacte</th>
+              <th className="p-4 text-left text-slate-500">Servei</th>
               <th className="p-4 text-left">
                 <ColumnHeader label="Data Event" field="eventDate" sortField={sortField} sortDirection={sortDirection} onSort={handleSort} />
               </th>
@@ -495,7 +495,7 @@ export default function LeadsTablePro() {
               <th className="p-4 text-left">
                 <ColumnHeader label="Estat" field="status" sortField={sortField} sortDirection={sortDirection} onSort={handleSort} />
               </th>
-              <th className="p-4 text-left text-white/50">Accions</th>
+              <th className="p-4 text-left text-slate-500">Accions</th>
             </tr>
           </thead>
           <tbody>
@@ -505,7 +505,7 @@ export default function LeadsTablePro() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.02 }}
-                className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
+                className={`border-b border-slate-200 hover:bg-slate-100 transition-colors ${
                   selectedLeads.has(lead.id) ? 'bg-orange-500/5' : ''
                 }`}
               >
@@ -514,29 +514,29 @@ export default function LeadsTablePro() {
                     type="checkbox"
                     checked={selectedLeads.has(lead.id)}
                     onChange={() => toggleSelect(lead.id)}
-                    className="w-4 h-4 rounded border-white/20 bg-white/5 text-orange-500 focus:ring-orange-500"
+                    className="w-4 h-4 rounded border-slate-300 bg-slate-100 text-orange-500 focus:ring-orange-500"
                   />
                 </td>
                 <td className="p-4">
                   <Link href={`/admin/leads/${lead.id}`} className="hover:text-orange-400 transition-colors">
-                    <p className="text-white font-medium">{lead.name}</p>
-                    <p className="text-white/40 text-xs">
+                    <p className="text-black font-medium">{lead.name}</p>
+                    <p className="text-slate-400 text-xs">
                       {new Date(lead.createdAt).toLocaleDateString('ca-ES')}
                     </p>
                   </Link>
                 </td>
                 <td className="p-4">
-                  <p className="text-white/70 text-sm">{lead.email}</p>
-                  <p className="text-white/40 text-xs">{lead.phone}</p>
+                  <p className="text-slate-700 text-sm">{lead.email}</p>
+                  <p className="text-slate-400 text-xs">{lead.phone}</p>
                 </td>
                 <td className="p-4">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{serviceConfig[lead.service]?.icon || '📋'}</span>
-                    <span className="text-white/70 text-sm">{serviceConfig[lead.service]?.label || lead.service}</span>
+                    <span className="text-slate-700 text-sm">{serviceConfig[lead.service]?.label || lead.service}</span>
                   </div>
                 </td>
                 <td className="p-4">
-                  <p className="text-white/70">
+                  <p className="text-slate-700">
                     {new Date(lead.eventDate).toLocaleDateString('ca-ES', {
                       day: 'numeric',
                       month: 'short',
@@ -569,7 +569,7 @@ export default function LeadsTablePro() {
         {paginatedLeads.length === 0 && (
           <div className="p-12 text-center">
             <span className="text-4xl mb-4 block">🔍</span>
-            <p className="text-white/60">No s'han trobat leads</p>
+            <p className="text-slate-600">No s'han trobat leads</p>
             <button
               onClick={() => {
                 setSearchQuery('');
@@ -587,14 +587,14 @@ export default function LeadsTablePro() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-white/50 text-sm">
+          <p className="text-slate-500 text-sm">
             Mostrant {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, filteredLeads.length)} de {filteredLeads.length}
           </p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl text-white transition-colors"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl text-black transition-colors"
             >
               ← Anterior
             </button>
@@ -615,8 +615,8 @@ export default function LeadsTablePro() {
                   onClick={() => setCurrentPage(page)}
                   className={`w-10 h-10 rounded-xl transition-colors ${
                     currentPage === page
-                      ? 'bg-orange-500 text-black font-medium'
-                      : 'bg-white/5 hover:bg-white/10 text-white'
+                      ? 'bg-orange-500 text-white font-medium'
+                      : 'bg-slate-100 hover:bg-slate-200 text-black'
                   }`}
                 >
                   {page}
@@ -626,7 +626,7 @@ export default function LeadsTablePro() {
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl text-white transition-colors"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl text-black transition-colors"
             >
               Següent →
             </button>
@@ -641,10 +641,10 @@ export default function LeadsTablePro() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-800 rounded-2xl shadow-2xl border border-white/10 px-6 py-4 flex items-center gap-4"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-100 rounded-2xl shadow-2xl border border-slate-200 px-6 py-4 flex items-center gap-4"
           >
-            <span className="text-white font-medium">{selectedLeads.size} seleccionats</span>
-            <div className="w-px h-6 bg-white/10" />
+            <span className="text-black font-medium">{selectedLeads.size} seleccionats</span>
+            <div className="w-px h-6 bg-slate-200" />
             <button className="px-4 py-2 bg-orange-500/20 text-orange-400 rounded-xl hover:bg-orange-500/30 transition-colors">
               Canviar estat
             </button>
@@ -653,7 +653,7 @@ export default function LeadsTablePro() {
             </button>
             <button
               onClick={() => setSelectedLeads(new Set())}
-              className="text-white/50 hover:text-white transition-colors"
+              className="text-slate-500 hover:text-black transition-colors"
             >
               ✕
             </button>

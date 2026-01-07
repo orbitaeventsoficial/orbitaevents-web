@@ -189,7 +189,7 @@ export default function AdminContactesPage() {
   // ═══════════════════════════════════════════════════════════════════════════
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen bg-slate-100 text-black p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
@@ -203,8 +203,8 @@ export default function AdminContactesPage() {
           {/* Stats */}
           {stats && (
             <div className="flex gap-4 flex-wrap">
-              <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-white">{stats.total}</p>
+              <div className="bg-white border border-zinc-800 rounded-xl px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-black">{stats.total}</p>
                 <p className="text-xs text-gray-500">Total</p>
               </div>
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 text-center">
@@ -222,7 +222,7 @@ export default function AdminContactesPage() {
         {/* Search & Add */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -230,7 +230,7 @@ export default function AdminContactesPage() {
               placeholder="Buscar contacte..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
             />
           </div>
 
@@ -268,40 +268,40 @@ export default function AdminContactesPage() {
 
         {/* Customers List */}
         {!loading && filteredCustomers.length > 0 && (
-          <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+          <div className="bg-slate-100 border border-slate-200 rounded-2xl overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left p-4 text-white/60 font-medium">Nom</th>
-                  <th className="text-left p-4 text-white/60 font-medium hidden md:table-cell">Contacte</th>
-                  <th className="text-left p-4 text-white/60 font-medium hidden lg:table-cell">Font</th>
-                  <th className="text-left p-4 text-white/60 font-medium hidden sm:table-cell">Events</th>
-                  <th className="text-left p-4 text-white/60 font-medium">Accions</th>
+                <tr className="border-b border-slate-200">
+                  <th className="text-left p-4 text-slate-500 font-medium">Nom</th>
+                  <th className="text-left p-4 text-slate-500 font-medium hidden md:table-cell">Contacte</th>
+                  <th className="text-left p-4 text-slate-500 font-medium hidden lg:table-cell">Font</th>
+                  <th className="text-left p-4 text-slate-500 font-medium hidden sm:table-cell">Events</th>
+                  <th className="text-left p-4 text-slate-500 font-medium">Accions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className="border-b border-white/5 hover:bg-white/5">
+                  <tr key={customer.id} className="border-b border-slate-200 hover:bg-slate-100">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-400 font-bold">
                           {customer.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-white font-medium flex items-center gap-2">
+                          <p className="text-black font-medium flex items-center gap-2">
                             {customer.name}
                             {customer.is_vip && (
                               <span className="px-2 py-0.5 bg-amber-400/20 text-amber-400 text-xs rounded-full">VIP</span>
                             )}
                           </p>
-                          {customer.city && <p className="text-white/40 text-sm">{customer.city}</p>}
+                          {customer.city && <p className="text-slate-400 text-sm">{customer.city}</p>}
                         </div>
                       </div>
                     </td>
                     <td className="p-4 hidden md:table-cell">
                       <div className="space-y-1">
                         {customer.email && (
-                          <p className="text-white/60 text-sm flex items-center gap-2">
+                          <p className="text-slate-500 text-sm flex items-center gap-2">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
@@ -309,7 +309,7 @@ export default function AdminContactesPage() {
                           </p>
                         )}
                         {customer.phone && (
-                          <p className="text-white/60 text-sm flex items-center gap-2">
+                          <p className="text-slate-500 text-sm flex items-center gap-2">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
@@ -323,12 +323,12 @@ export default function AdminContactesPage() {
                         customer.source === 'manual' ? 'bg-purple-500/20 text-purple-400' :
                         customer.source === 'web' ? 'bg-green-500/20 text-green-400' :
                         customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-400' :
-                        'bg-white/10 text-white/60'
+                        'bg-slate-200 text-slate-500'
                       }`}>
                         {customer.source || 'desconegut'}
                       </span>
                     </td>
-                    <td className="p-4 hidden sm:table-cell text-white/60">
+                    <td className="p-4 hidden sm:table-cell text-slate-500">
                       {customer.total_events || 0}
                     </td>
                     <td className="p-4">
@@ -347,7 +347,7 @@ export default function AdminContactesPage() {
                           </svg>
                         </button>
                         <button
-                          className="p-2 bg-white/10 text-white/60 rounded-lg hover:bg-white/20 transition-all"
+                          className="p-2 bg-slate-200 text-slate-500 rounded-lg hover:bg-white/20 transition-all"
                           title="Editar"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -370,7 +370,7 @@ export default function AdminContactesPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-slate-200/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
               onClick={() => setShowAddModal(false)}
             >
               <motion.div
@@ -378,73 +378,73 @@ export default function AdminContactesPage() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-zinc-900 border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto"
+                className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto"
               >
-                <h2 className="text-2xl font-bold text-white mb-6">Afegir Contacte</h2>
+                <h2 className="text-2xl font-bold text-black mb-6">Afegir Contacte</h2>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-white/60 mb-2">Nom *</label>
+                    <label className="block text-sm text-slate-500 mb-2">Nom *</label>
                     <input
                       type="text"
                       value={newCustomer.name}
                       onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
+                      className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
                       placeholder="Maria García"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-white/60 mb-2">Email *</label>
+                    <label className="block text-sm text-slate-500 mb-2">Email *</label>
                     <input
                       type="email"
                       value={newCustomer.email}
                       onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
+                      className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
                       placeholder="maria@email.com"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-white/60 mb-2">Telèfon</label>
+                    <label className="block text-sm text-slate-500 mb-2">Telèfon</label>
                     <input
                       type="tel"
                       value={newCustomer.phone}
                       onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
+                      className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
                       placeholder="699 123 456"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-white/60 mb-2">Ciutat</label>
+                      <label className="block text-sm text-slate-500 mb-2">Ciutat</label>
                       <input
                         type="text"
                         value={newCustomer.city}
                         onChange={(e) => setNewCustomer({ ...newCustomer, city: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
+                        className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
                         placeholder="Barcelona"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-white/60 mb-2">Instagram</label>
+                      <label className="block text-sm text-slate-500 mb-2">Instagram</label>
                       <input
                         type="text"
                         value={newCustomer.instagram}
                         onChange={(e) => setNewCustomer({ ...newCustomer, instagram: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all"
+                        className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
                         placeholder="@usuari"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm text-white/60 mb-2">Notes</label>
+                    <label className="block text-sm text-slate-500 mb-2">Notes</label>
                     <textarea
                       value={newCustomer.notes}
                       onChange={(e) => setNewCustomer({ ...newCustomer, notes: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-amber-400 transition-all resize-none"
+                      className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all resize-none"
                       rows={3}
                       placeholder="Notes internes..."
                     />
@@ -454,7 +454,7 @@ export default function AdminContactesPage() {
                 <div className="flex gap-4 mt-8">
                   <button
                     onClick={() => setShowAddModal(false)}
-                    className="flex-1 py-3 border border-white/20 text-white rounded-xl hover:bg-white/5 transition-all"
+                    className="flex-1 py-3 border border-slate-300 text-black rounded-xl hover:bg-slate-100 transition-all"
                   >
                     Cancel·lar
                   </button>
@@ -478,7 +478,7 @@ export default function AdminContactesPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-slate-200/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
               onClick={() => setShowActionModal(false)}
             >
               <motion.div
@@ -486,10 +486,10 @@ export default function AdminContactesPage() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-zinc-900 border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full"
+                className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-md w-full"
               >
-                <h2 className="text-2xl font-bold text-white mb-2">🚀 Iniciar Procés</h2>
-                <p className="text-white/60 mb-6">
+                <h2 className="text-2xl font-bold text-black mb-2">🚀 Iniciar Procés</h2>
+                <p className="text-slate-500 mb-6">
                   Per <span className="text-amber-400">{selectedCustomer.name}</span>
                 </p>
 
@@ -497,13 +497,13 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('review_request')}
                     disabled={actionLoading}
-                    className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-left hover:bg-white/10 hover:border-amber-400/50 transition-all group disabled:opacity-50"
+                    className="w-full p-4 bg-slate-100 border border-slate-200 rounded-xl text-left hover:bg-slate-200 hover:border-amber-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-3xl">⭐</span>
                       <div>
-                        <p className="text-white font-medium group-hover:text-amber-400">Demanar Opinió</p>
-                        <p className="text-white/50 text-sm">Envia email demanant review</p>
+                        <p className="text-black font-medium group-hover:text-amber-400">Demanar Opinió</p>
+                        <p className="text-black/50 text-sm">Envia email demanant review</p>
                       </div>
                     </div>
                   </button>
@@ -511,13 +511,13 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('post_event')}
                     disabled={actionLoading}
-                    className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-left hover:bg-white/10 hover:border-green-400/50 transition-all group disabled:opacity-50"
+                    className="w-full p-4 bg-slate-100 border border-slate-200 rounded-xl text-left hover:bg-slate-200 hover:border-green-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-3xl">🎉</span>
                       <div>
-                        <p className="text-white font-medium group-hover:text-green-400">Post-Event Complet</p>
-                        <p className="text-white/50 text-sm">Canvas 10/10 + Gràcies + Demanar opinió</p>
+                        <p className="text-black font-medium group-hover:text-green-400">Post-Event Complet</p>
+                        <p className="text-black/50 text-sm">Canvas 10/10 + Gràcies + Demanar opinió</p>
                       </div>
                     </div>
                   </button>
@@ -525,13 +525,13 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('welcome')}
                     disabled={actionLoading}
-                    className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-left hover:bg-white/10 hover:border-purple-400/50 transition-all group disabled:opacity-50"
+                    className="w-full p-4 bg-slate-100 border border-slate-200 rounded-xl text-left hover:bg-slate-200 hover:border-purple-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-3xl">👋</span>
                       <div>
-                        <p className="text-white font-medium group-hover:text-purple-400">Benvinguda</p>
-                        <p className="text-white/50 text-sm">Email de benvinguda + Info empresa</p>
+                        <p className="text-black font-medium group-hover:text-purple-400">Benvinguda</p>
+                        <p className="text-black/50 text-sm">Email de benvinguda + Info empresa</p>
                       </div>
                     </div>
                   </button>
@@ -539,13 +539,13 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('promo')}
                     disabled={actionLoading}
-                    className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-left hover:bg-white/10 hover:border-pink-400/50 transition-all group disabled:opacity-50"
+                    className="w-full p-4 bg-slate-100 border border-slate-200 rounded-xl text-left hover:bg-slate-200 hover:border-pink-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-3xl">🎁</span>
                       <div>
-                        <p className="text-white font-medium group-hover:text-pink-400">Promoció</p>
-                        <p className="text-white/50 text-sm">Enviar oferta o descompte especial</p>
+                        <p className="text-black font-medium group-hover:text-pink-400">Promoció</p>
+                        <p className="text-black/50 text-sm">Enviar oferta o descompte especial</p>
                       </div>
                     </div>
                   </button>
@@ -553,7 +553,7 @@ export default function AdminContactesPage() {
 
                 <button
                   onClick={() => setShowActionModal(false)}
-                  className="w-full mt-6 py-3 border border-white/20 text-white/60 rounded-xl hover:bg-white/5 transition-all"
+                  className="w-full mt-6 py-3 border border-slate-300 text-slate-500 rounded-xl hover:bg-slate-100 transition-all"
                 >
                   Cancel·lar
                 </button>

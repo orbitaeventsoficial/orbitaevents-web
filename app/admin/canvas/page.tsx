@@ -72,7 +72,7 @@ export default function CanvasGeneratorPage() {
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">🎨 Generador de Canvas</h1>
+        <h1 className="text-2xl font-bold text-black">🎨 Generador de Canvas</h1>
         <p className="text-slate-500 mt-1">
           Crea imatges promocionals amb foto de l&apos;event i codi de descompte
         </p>
@@ -81,7 +81,7 @@ export default function CanvasGeneratorPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <h2 className="text-lg font-semibold text-slate-900 mb-6">⚙️ Configuració</h2>
+          <h2 className="text-lg font-semibold text-black mb-6">⚙️ Configuració</h2>
 
           <div className="space-y-5">
             {/* Nom client */}
@@ -185,7 +185,7 @@ export default function CanvasGeneratorPage() {
                         : 'border-slate-200 hover:border-slate-300'
                     }`}
                   >
-                    <span className="font-medium text-slate-900">{preset.name}</span>
+                    <span className="font-medium text-black">{preset.name}</span>
                     <span className="block text-xs text-slate-400 mt-0.5">
                       {preset.width}x{preset.height}
                     </span>
@@ -215,7 +215,7 @@ export default function CanvasGeneratorPage() {
         {/* Preview */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-slate-900">👁️ Previsualització</h2>
+            <h2 className="text-lg font-semibold text-black">👁️ Previsualització</h2>
             {selectedPreset && (
               <span className="text-sm text-slate-400">
                 {selectedPreset.width}x{selectedPreset.height}px

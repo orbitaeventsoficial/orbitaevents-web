@@ -23,8 +23,8 @@ export function MetricCard({ icon, label, value, change, changeType, className =
   return (
     <div className={`
       relative overflow-hidden
-      bg-[#141414] rounded-2xl border border-white/5
-      p-6 group hover:border-white/10 
+      bg-[#141414] rounded-2xl border border-slate-200
+      p-6 group hover:border-slate-200 
       transition-all duration-300 hover:shadow-xl hover:shadow-black/20
       ${className}
     `}>
@@ -36,7 +36,7 @@ export function MetricCard({ icon, label, value, change, changeType, className =
           <span className="text-lg">{icon}</span>
           <span>{label}</span>
         </div>
-        <div className="mt-2 text-3xl font-bold text-white">{value}</div>
+        <div className="mt-2 text-3xl font-bold text-black">{value}</div>
         {change && (
           <div className={`
             mt-2 flex items-center gap-1 text-sm
@@ -79,8 +79,8 @@ export function Button({
 }: ButtonProps) {
   const variants = {
     primary: 'bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20',
-    secondary: 'bg-white/5 hover:bg-white/10 text-white border border-white/10',
-    ghost: 'hover:bg-white/5 text-neutral-400 hover:text-white',
+    secondary: 'bg-slate-100 hover:bg-slate-200 text-black border border-slate-200',
+    ghost: 'hover:bg-slate-100 text-neutral-400 hover:text-black',
     danger: 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20',
   };
 
@@ -160,12 +160,12 @@ export function Input({
             w-full px-4 py-3 
             ${icon ? 'pl-11' : ''}
             bg-[#1a1a1a] border rounded-xl
-            text-white placeholder-neutral-600
+            text-black placeholder-neutral-600
             transition-all duration-200
             focus:outline-none focus:ring-2 focus:ring-orange-500/50
             ${error 
               ? 'border-red-500/50 focus:border-red-500' 
-              : 'border-white/10 hover:border-white/20 focus:border-orange-500'
+              : 'border-slate-200 hover:border-slate-300 focus:border-orange-500'
             }
           `}
         />
@@ -203,10 +203,10 @@ export function Select({ label, options, value, onChange, className = '' }: Sele
           onChange={onChange}
           className="
             w-full px-4 py-3 pr-10
-            bg-[#1a1a1a] border border-white/10 rounded-xl
-            text-white appearance-none
+            bg-[#1a1a1a] border border-slate-200 rounded-xl
+            text-black appearance-none
             transition-all duration-200
-            hover:border-white/20 focus:border-orange-500
+            hover:border-slate-300 focus:border-orange-500
             focus:outline-none focus:ring-2 focus:ring-orange-500/50
           "
         >
@@ -241,7 +241,7 @@ export function Badge({ label, color = 'gray', size = 'md', icon }: BadgeProps) 
     red: 'bg-red-500/10 text-red-400 border-red-500/20',
     yellow: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
     purple: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-    gray: 'bg-white/5 text-neutral-400 border-white/10',
+    gray: 'bg-slate-100 text-neutral-400 border-slate-200',
   };
 
   const sizes = {
@@ -309,13 +309,13 @@ interface CardProps {
 export function Card({ children, title, subtitle, action, className = '', noPadding = false }: CardProps) {
   return (
     <div className={`
-      bg-[#141414] rounded-2xl border border-white/5
+      bg-[#141414] rounded-2xl border border-slate-200
       ${className}
     `}>
       {(title || action) && (
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
           <div>
-            {title && <h3 className="text-lg font-semibold text-white">{title}</h3>}
+            {title && <h3 className="text-lg font-semibold text-black">{title}</h3>}
             {subtitle && <p className="text-sm text-neutral-500 mt-0.5">{subtitle}</p>}
           </div>
           {action}
@@ -402,10 +402,10 @@ export function SearchInput({ placeholder = 'Buscar...', value, onChange, classN
         onChange={(e) => onChange?.(e.target.value)}
         className="
           w-full pl-10 pr-4 py-2
-          bg-white/5 border border-white/10 rounded-xl
-          text-white placeholder-neutral-500 text-sm
+          bg-slate-100 border border-slate-200 rounded-xl
+          text-black placeholder-neutral-500 text-sm
           transition-all duration-200
-          hover:border-white/20 focus:border-orange-500
+          hover:border-slate-300 focus:border-orange-500
           focus:outline-none focus:ring-2 focus:ring-orange-500/50
         "
       />
@@ -428,7 +428,7 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
   return (
     <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
       <span className="text-5xl mb-4">{icon}</span>
-      <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
+      <h3 className="text-lg font-semibold text-black mb-2">{title}</h3>
       <p className="text-neutral-500 max-w-sm mb-6">{description}</p>
       {action}
     </div>
@@ -471,8 +471,8 @@ export function Toast({ type, message, onClose }: ToastProps) {
       ${styles[type]}
     `}>
       <span className="text-lg">{icons[type]}</span>
-      <p className="text-white">{message}</p>
-      <button onClick={onClose} className="ml-2 text-neutral-400 hover:text-white transition-colors">
+      <p className="text-black">{message}</p>
+      <button onClick={onClose} className="ml-2 text-neutral-400 hover:text-black transition-colors">
         ✕
       </button>
     </div>
@@ -496,7 +496,7 @@ export function SlideOver({ isOpen, onClose, title, children }: SlideOverProps) 
       {/* Backdrop */}
       <div 
         className={`
-          fixed inset-0 bg-black/60 backdrop-blur-sm z-40
+          fixed inset-0 bg-slate-200/70 backdrop-blur-sm z-40
           transition-opacity duration-300
           ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
         `}
@@ -506,16 +506,16 @@ export function SlideOver({ isOpen, onClose, title, children }: SlideOverProps) 
       {/* Panel */}
       <div className={`
         fixed right-0 top-0 bottom-0 w-full max-w-lg
-        bg-[#141414] border-l border-white/5
+        bg-[#141414] border-l border-slate-200
         z-50 transform transition-transform duration-300 ease-out
         ${isOpen ? 'translate-x-0' : 'translate-x-full'}
       `}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
-          <h2 className="text-lg font-semibold text-white">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+          <h2 className="text-lg font-semibold text-black">{title}</h2>
           <button 
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-white/5 text-neutral-400 transition-colors"
+            className="p-2 rounded-lg hover:bg-slate-100 text-neutral-400 transition-colors"
           >
             ✕
           </button>
@@ -549,7 +549,7 @@ interface TabsProps {
 
 export function Tabs({ tabs, activeTab, onChange }: TabsProps) {
   return (
-    <div className="flex items-center gap-1 p-1 bg-white/5 rounded-xl">
+    <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl">
       {tabs.map(tab => (
         <button
           key={tab.id}
@@ -559,7 +559,7 @@ export function Tabs({ tabs, activeTab, onChange }: TabsProps) {
             transition-all duration-200
             ${activeTab === tab.id 
               ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' 
-              : 'text-neutral-400 hover:text-white hover:bg-white/5'
+              : 'text-neutral-400 hover:text-black hover:bg-slate-100'
             }
           `}
         >
@@ -568,7 +568,7 @@ export function Tabs({ tabs, activeTab, onChange }: TabsProps) {
           {tab.badge && (
             <span className={`
               px-1.5 py-0.5 rounded-full text-xs
-              ${activeTab === tab.id ? 'bg-white/20' : 'bg-white/10'}
+              ${activeTab === tab.id ? 'bg-white/20' : 'bg-slate-200'}
             `}>
               {tab.badge}
             </span>

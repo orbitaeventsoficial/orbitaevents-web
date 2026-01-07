@@ -124,7 +124,7 @@ export default function InboxPanel() {
       {/* Header */}
       <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
         <div>
-          <h2 className="font-semibold text-slate-900 flex items-center gap-2">
+          <h2 className="font-semibold text-black flex items-center gap-2">
             <span>📥</span> Safata d&apos;Entrada
             {unreadCount > 0 && (
               <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
@@ -139,7 +139,7 @@ export default function InboxPanel() {
         <button
           onClick={fetchEmails}
           disabled={loading}
-          className="p-2 rounded-lg hover:bg-white/50 transition-colors disabled:opacity-50"
+          className="p-2 rounded-lg hover:bg-slate-1000 transition-colors disabled:opacity-50"
           title="Refrescar"
         >
           <svg className={`w-5 h-5 text-slate-600 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -187,7 +187,7 @@ export default function InboxPanel() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm truncate ${!email.isRead ? 'font-semibold text-slate-900' : 'text-slate-700'}`}>
+                      <p className={`text-sm truncate ${!email.isRead ? 'font-semibold text-black' : 'text-slate-700'}`}>
                         {email.from.name || email.from.address}
                       </p>
                       <p className={`text-sm truncate ${!email.isRead ? 'font-medium text-slate-800' : 'text-slate-600'}`}>
@@ -221,7 +221,7 @@ export default function InboxPanel() {
               <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-slate-900">{selectedEmail.subject}</h3>
+                    <h3 className="font-semibold text-black">{selectedEmail.subject}</h3>
                     <p className="text-sm text-slate-600 mt-1">
                       De: <span className="font-medium">{selectedEmail.from.name}</span>
                       {selectedEmail.from.address && (

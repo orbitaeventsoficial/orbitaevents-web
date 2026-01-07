@@ -172,7 +172,7 @@ export default function ComposeForm({ leads, packs }: Props) {
         <button
           onClick={() => setMode('email')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'email' ? 'bg-white shadow text-slate-900' : 'text-slate-600'
+            mode === 'email' ? 'bg-white shadow text-black' : 'text-slate-600'
           }`}
         >
           ✉️ Email normal
@@ -180,7 +180,7 @@ export default function ComposeForm({ leads, packs }: Props) {
         <button
           onClick={() => setMode('quote')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'quote' ? 'bg-white shadow text-slate-900' : 'text-slate-600'
+            mode === 'quote' ? 'bg-white shadow text-black' : 'text-slate-600'
           }`}
         >
           💰 Pressupost professional
@@ -213,7 +213,7 @@ export default function ComposeForm({ leads, packs }: Props) {
           {/* Lead details preview */}
           {selectedLead && (
             <div className="bg-slate-50 rounded-lg p-4">
-              <h4 className="font-medium text-slate-900 mb-3">📋 Detalls del lead</h4>
+              <h4 className="font-medium text-black mb-3">📋 Detalls del lead</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <span className="text-slate-500">Tipus:</span>
@@ -266,7 +266,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                             : 'border-slate-200 hover:border-slate-300'
                         }`}
                       >
-                        <p className="font-semibold text-slate-900">{name}</p>
+                        <p className="font-semibold text-black">{name}</p>
                         <p className="text-amber-600 font-bold mt-1">{pack.price.toLocaleString('es-ES')}€</p>
                       </button>
                     );
@@ -404,7 +404,7 @@ export default function ComposeForm({ leads, packs }: Props) {
           <div className="flex gap-3">
             <button
               onClick={() => router.push('/admin/inbox')}
-              className="px-4 py-2 text-slate-600 hover:text-slate-900"
+              className="px-4 py-2 text-slate-600 hover:text-black"
             >
               Cancel·lar
             </button>

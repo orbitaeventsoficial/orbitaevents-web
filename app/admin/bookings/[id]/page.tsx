@@ -98,7 +98,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
               {statusConf.label}
             </span>
           </div>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-black">
             Reserva {booking.reference}
           </h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -116,11 +116,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Client Info */}
       <section className="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">Informació del Client</h2>
+        <h2 className="text-lg font-semibold text-black mb-4">Informació del Client</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <p className="text-xs font-medium text-slate-500 uppercase">Nom</p>
-            <p className="mt-1 text-slate-900 font-medium">{booking.clientName}</p>
+            <p className="mt-1 text-black font-medium">{booking.clientName}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-slate-500 uppercase">Email</p>
@@ -149,34 +149,34 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Event Info */}
       <section className="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">Detalls de l&apos;Event</h2>
+        <h2 className="text-lg font-semibold text-black mb-4">Detalls de l&apos;Event</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className="text-xs font-medium text-slate-500 uppercase">Tipus</p>
-            <p className="mt-1 text-slate-900">{eventType}</p>
+            <p className="mt-1 text-black">{eventType}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-slate-500 uppercase">Data</p>
-            <p className="mt-1 text-slate-900 font-medium">{formatDate(booking.eventDate)}</p>
+            <p className="mt-1 text-black font-medium">{formatDate(booking.eventDate)}</p>
           </div>
           <div>
             <p className="text-xs font-medium text-slate-500 uppercase">Horari</p>
-            <p className="mt-1 text-slate-900">
+            <p className="mt-1 text-black">
               {booking.eventStartTime || '--:--'} - {booking.eventEndTime || '--:--'}
             </p>
           </div>
           <div>
             <p className="text-xs font-medium text-slate-500 uppercase">Convidats</p>
-            <p className="mt-1 text-slate-900 font-medium">{booking.guestCount} persones</p>
+            <p className="mt-1 text-black font-medium">{booking.guestCount} persones</p>
           </div>
           <div className="sm:col-span-2">
             <p className="text-xs font-medium text-slate-500 uppercase">Ubicació</p>
-            <p className="mt-1 text-slate-900">{booking.eventLocation}</p>
+            <p className="mt-1 text-black">{booking.eventLocation}</p>
           </div>
           {booking.eventVenue && (
             <div className="sm:col-span-2">
               <p className="text-xs font-medium text-slate-500 uppercase">Espai</p>
-              <p className="mt-1 text-slate-900">{booking.eventVenue}</p>
+              <p className="mt-1 text-black">{booking.eventVenue}</p>
             </div>
           )}
         </div>
@@ -184,7 +184,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Services */}
       <section className="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">Serveis Contractats</h2>
+        <h2 className="text-lg font-semibold text-black mb-4">Serveis Contractats</h2>
 
         {/* Pack */}
         <div className="p-4 bg-amber-50 rounded-lg border border-amber-200 mb-4">
@@ -216,14 +216,14 @@ export default async function BookingDetailPage({ params }: PageProps) {
               return (
                 <div key={extra.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <div>
-                    <p className="font-medium text-slate-900">
+                    <p className="font-medium text-black">
                       {extraTranslation?.name || extra.extra.slug}
                     </p>
                     {extra.quantity > 1 && (
                       <p className="text-xs text-slate-500">x{extra.quantity}</p>
                     )}
                   </div>
-                  <p className="font-medium text-slate-900">{formatCurrency(extra.price)}</p>
+                  <p className="font-medium text-black">{formatCurrency(extra.price)}</p>
                 </div>
               );
             })}
@@ -243,7 +243,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Pricing */}
       <section className="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">Resum Econòmic</h2>
+        <h2 className="text-lg font-semibold text-black mb-4">Resum Econòmic</h2>
         <div className="space-y-3">
           <div className="flex justify-between text-slate-600">
             <span>Subtotal</span>
@@ -259,7 +259,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
             <span>IVA ({booking.vatRate}%)</span>
             <span>{formatCurrency(booking.vatAmount)}</span>
           </div>
-          <div className="flex justify-between text-xl font-bold text-slate-900 pt-3 border-t">
+          <div className="flex justify-between text-xl font-bold text-black pt-3 border-t">
             <span>Total</span>
             <span>{formatCurrency(booking.total)}</span>
           </div>
@@ -287,7 +287,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       {/* Notes */}
       {booking.notes && (
         <section className="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">Notes</h2>
+          <h2 className="text-lg font-semibold text-black mb-4">Notes</h2>
           <p className="text-slate-700 whitespace-pre-wrap">{booking.notes}</p>
         </section>
       )}
@@ -298,19 +298,19 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <h2 className="text-lg font-semibold text-emerald-900 mb-4">Post-Event</h2>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className={`p-4 rounded-lg border ${booking.postEventReport ? 'bg-green-100 border-green-300' : 'bg-white border-slate-200'}`}>
-              <p className="font-medium text-slate-900">Informe Intern</p>
+              <p className="font-medium text-black">Informe Intern</p>
               <p className="text-sm text-slate-500">
                 {booking.postEventReport ? '✓ Completat' : 'Pendent de completar'}
               </p>
             </div>
             <div className={`p-4 rounded-lg border ${booking.clientSurvey ? 'bg-green-100 border-green-300' : 'bg-white border-slate-200'}`}>
-              <p className="font-medium text-slate-900">Enquesta Client</p>
+              <p className="font-medium text-black">Enquesta Client</p>
               <p className="text-sm text-slate-500">
                 {booking.clientSurvey ? `✓ NPS: ${booking.clientSurvey.npsScore}` : 'Pendent de rebre'}
               </p>
             </div>
             <div className={`p-4 rounded-lg border ${booking.clientFeedback ? 'bg-green-100 border-green-300' : 'bg-white border-slate-200'}`}>
-              <p className="font-medium text-slate-900">Feedback Enviat</p>
+              <p className="font-medium text-black">Feedback Enviat</p>
               <p className="text-sm text-slate-500">
                 {booking.clientFeedback ? `✓ Codi: ${booking.clientFeedback.discountCode}` : 'Pendent d\'enviar'}
               </p>

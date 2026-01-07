@@ -51,7 +51,7 @@ const NavItem = ({ icon, label, href, badge, badgeColor = 'orange' }: NavItemPro
         transition-all duration-200 group
         ${isActive 
           ? 'bg-orange-500/10 text-orange-500' 
-          : 'text-neutral-400 hover:text-white hover:bg-white/5'
+          : 'text-neutral-400 hover:text-black hover:bg-slate-100'
         }
       `}
     >
@@ -75,21 +75,21 @@ export default function AdminSidebar() {
   return (
     <aside className={`
       fixed left-0 top-0 bottom-0
-      bg-[#0a0a0a] border-r border-white/5
+      bg-[#0a0a0a] border-r border-slate-200
       flex flex-col
       transition-all duration-300
       ${collapsed ? 'w-20' : 'w-64'}
       hidden lg:flex
     `}>
       {/* Logo */}
-      <div className="p-4 border-b border-white/5">
+      <div className="p-4 border-b border-slate-200">
         <Link href="/admin" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
-            <span className="text-white font-bold text-lg">Ò</span>
+            <span className="text-black font-bold text-lg">Ò</span>
           </div>
           {!collapsed && (
             <div className="animate-fade-in">
-              <span className="text-white font-semibold">Òrbita</span>
+              <span className="text-black font-semibold">Òrbita</span>
               <span className="text-orange-500 font-semibold ml-1">Admin</span>
             </div>
           )}
@@ -133,13 +133,13 @@ export default function AdminSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-3 border-t border-white/5">
+      <div className="p-3 border-t border-slate-200">
         <NavItem icon="⚙️" label="Configuració" href="/admin/settings" />
         
         {!collapsed && (
           <div className="mt-3 p-3 rounded-xl bg-gradient-to-r from-orange-500/10 to-orange-600/5 border border-orange-500/20">
             <p className="text-[10px] text-orange-400 uppercase tracking-wider">Pròxim event</p>
-            <p className="text-sm text-white font-medium mt-1">Boda - Dissabte 14</p>
+            <p className="text-sm text-black font-medium mt-1">Boda - Dissabte 14</p>
             <p className="text-xs text-neutral-500">Mas Can Ferrer, Granollers</p>
           </div>
         )}
@@ -147,7 +147,7 @@ export default function AdminSidebar() {
         {/* Collapse button */}
         <button 
           onClick={() => setCollapsed(!collapsed)}
-          className="mt-3 w-full p-2 rounded-lg hover:bg-white/5 text-neutral-500 text-sm flex items-center justify-center gap-2"
+          className="mt-3 w-full p-2 rounded-lg hover:bg-slate-100 text-neutral-500 text-sm flex items-center justify-center gap-2"
         >
           {collapsed ? '→' : '← Minimitzar'}
         </button>
@@ -163,7 +163,7 @@ export function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: (
       {/* Backdrop */}
       <div 
         className={`
-          lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40
+          lg:hidden fixed inset-0 bg-slate-200/70 backdrop-blur-sm z-40
           transition-opacity duration-300
           ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
         `}
@@ -173,22 +173,22 @@ export function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: (
       {/* Sidebar */}
       <aside className={`
         lg:hidden fixed left-0 top-0 bottom-0 w-64
-        bg-[#0a0a0a] border-r border-white/5 z-50
+        bg-[#0a0a0a] border-r border-slate-200 z-50
         transform transition-transform duration-300 ease-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Contingut igual que desktop */}
-        <div className="p-4 border-b border-white/5 flex items-center justify-between">
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">Ò</span>
+              <span className="text-black font-bold text-lg">Ò</span>
             </div>
             <div>
-              <span className="text-white font-semibold">Òrbita</span>
+              <span className="text-black font-semibold">Òrbita</span>
               <span className="text-orange-500 font-semibold ml-1">Admin</span>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-neutral-400 hover:text-white">
+          <button onClick={onClose} className="p-2 text-neutral-400 hover:text-black">
             ✕
           </button>
         </div>

@@ -401,7 +401,7 @@ export default function TextManagerPage() {
           <div className="flex items-center justify-between gap-4">
             {/* Título */}
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-black flex items-center gap-2">
                 📝 Text Manager PRO
               </h1>
               <p className="text-sm text-slate-500">
@@ -527,7 +527,7 @@ export default function TextManagerPage() {
                 onClick={() => setActiveSection(null)}
                 className={`w-full p-3 rounded-xl text-left transition-all ${
                   !activeSection
-                    ? 'bg-gradient-to-r from-slate-800 to-slate-900 text-white shadow-lg'
+                    ? 'bg-gradient-to-r from-slate-200 to-slate-300 text-black shadow-lg'
                     : 'bg-white hover:bg-slate-50 text-slate-700'
                 }`}
               >
@@ -581,7 +581,7 @@ export default function TextManagerPage() {
               {/* Historial */}
               {changeHistory.length > 0 && (
                 <div className="mt-6 p-4 bg-white rounded-xl border border-slate-200">
-                  <h3 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                  <h3 className="font-semibold text-black mb-3 flex items-center gap-2">
                     📜 Historial ({changeHistory.length})
                   </h3>
                   <div className="max-h-48 overflow-y-auto space-y-2">
@@ -609,7 +609,7 @@ export default function TextManagerPage() {
             {activeSection && (
               <div className={`mb-6 p-4 rounded-xl bg-gradient-to-r ${
                 SECTIONS.find(s => s.id === activeSection)?.color || 'from-slate-500 to-slate-600'
-              } text-white`}>
+              } text-black`}>
                 <h2 className="text-xl font-bold flex items-center gap-2">
                   {SECTIONS.find(s => s.id === activeSection)?.icon}
                   {SECTIONS.find(s => s.id === activeSection)?.name}

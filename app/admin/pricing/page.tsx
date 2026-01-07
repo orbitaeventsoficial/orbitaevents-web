@@ -222,7 +222,7 @@ export default function PricingAdminPage() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-black flex items-center gap-3">
                 <span className="text-3xl">💰</span>
                 Gestió de Preus i Equipament
               </h1>
@@ -337,7 +337,7 @@ export default function PricingAdminPage() {
             <div className="grid md:grid-cols-2 gap-6">
               {/* Top Extras */}
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
                   <span className="text-2xl">🏆</span>
                   Extras Més Venuts
                 </h3>
@@ -349,15 +349,15 @@ export default function PricingAdminPage() {
                     >
                       <div className="flex items-center gap-3">
                         <span className={`
-                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-white
+                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-black
                           ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-slate-300'}
                         `}>
                           {i + 1}
                         </span>
-                        <span className="font-medium text-slate-900">{extra.name}</span>
+                        <span className="font-medium text-black">{extra.name}</span>
                       </div>
                       <div className="text-right">
-                        <div className="font-bold text-slate-900">{extra.totalSales} vendes</div>
+                        <div className="font-bold text-black">{extra.totalSales} vendes</div>
                         <div className="text-sm text-slate-500">{formatCurrency(extra.revenue)}</div>
                       </div>
                     </div>
@@ -367,7 +367,7 @@ export default function PricingAdminPage() {
 
               {/* Top Packs */}
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
                   <span className="text-2xl">🎯</span>
                   Packs Més Populars
                 </h3>
@@ -379,15 +379,15 @@ export default function PricingAdminPage() {
                     >
                       <div className="flex items-center gap-3">
                         <span className={`
-                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-white
+                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-black
                           ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-slate-300'}
                         `}>
                           {i + 1}
                         </span>
-                        <span className="font-medium text-slate-900">{pack.name}</span>
+                        <span className="font-medium text-black">{pack.name}</span>
                       </div>
                       <div className="text-right">
-                        <div className="font-bold text-slate-900">{pack.totalBookings} reserves</div>
+                        <div className="font-bold text-black">{pack.totalBookings} reserves</div>
                         <div className="text-sm text-slate-500">{formatCurrency(pack.revenue)}</div>
                       </div>
                     </div>
@@ -403,7 +403,7 @@ export default function PricingAdminPage() {
                 Com funciona aquesta pàgina
               </h3>
               <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div className="bg-white/50 rounded-xl p-4">
+                <div className="bg-slate-1000 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-green-700 font-semibold mb-2">
                     <span className="w-3 h-3 bg-green-500 rounded-full"></span>
                     Extras (EDITABLES)
@@ -412,7 +412,7 @@ export default function PricingAdminPage() {
                     Pots canviar els preus dels extras directament. Els canvis s'apliquen a noves reserves.
                   </p>
                 </div>
-                <div className="bg-white/50 rounded-xl p-4">
+                <div className="bg-slate-1000 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-slate-700 font-semibold mb-2">
                     <span className="w-3 h-3 bg-slate-400 rounded-full"></span>
                     Packs (NOMÉS LECTURA)
@@ -421,7 +421,7 @@ export default function PricingAdminPage() {
                     Els packs es gestionen a /admin/packs. Aquí només veus estadístiques.
                   </p>
                 </div>
-                <div className="bg-white/50 rounded-xl p-4">
+                <div className="bg-slate-1000 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-blue-700 font-semibold mb-2">
                     <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
                     Inventari (ESTADÍSTIQUES)
@@ -459,7 +459,7 @@ export default function PricingAdminPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-xl font-bold text-slate-900">{extra.name}</h3>
+                          <h3 className="text-xl font-bold text-black">{extra.name}</h3>
                           {!extra.isActive && (
                             <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
                               Inactiu
@@ -492,7 +492,7 @@ export default function PricingAdminPage() {
                         <div className="flex gap-6 text-sm">
                           <div>
                             <span className="text-slate-500">Vendes:</span>
-                            <span className="font-semibold text-slate-900 ml-1">{extra.salesCount}</span>
+                            <span className="font-semibold text-black ml-1">{extra.salesCount}</span>
                           </div>
                           <div>
                             <span className="text-slate-500">Ingressos:</span>
@@ -540,7 +540,7 @@ export default function PricingAdminPage() {
                             }}
                             className="group"
                           >
-                            <div className="text-3xl font-bold text-slate-900 group-hover:text-orange-500 transition-colors">
+                            <div className="text-3xl font-bold text-black group-hover:text-orange-500 transition-colors">
                               {formatCurrency(extra.price)}
                             </div>
                             <div className="text-xs text-slate-400 group-hover:text-orange-400 mt-1">
@@ -600,7 +600,7 @@ export default function PricingAdminPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-xl font-bold text-slate-900">{pack.name}</h3>
+                          <h3 className="text-xl font-bold text-black">{pack.name}</h3>
                           {pack.isFeatured && (
                             <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
                               ⭐ Destacat
@@ -619,15 +619,15 @@ export default function PricingAdminPage() {
                         {/* Info */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                           <div className="bg-slate-50 rounded-xl p-3 text-center">
-                            <div className="text-2xl font-bold text-slate-900">{pack.djHours}h</div>
+                            <div className="text-2xl font-bold text-black">{pack.djHours}h</div>
                             <div className="text-xs text-slate-500">DJ inclòs</div>
                           </div>
                           <div className="bg-slate-50 rounded-xl p-3 text-center">
-                            <div className="text-2xl font-bold text-slate-900">{pack.soundWatts}W</div>
+                            <div className="text-2xl font-bold text-black">{pack.soundWatts}W</div>
                             <div className="text-xs text-slate-500">Potència</div>
                           </div>
                           <div className="bg-slate-50 rounded-xl p-3 text-center">
-                            <div className="text-2xl font-bold text-slate-900">{formatCurrency(pack.extraHourPrice)}</div>
+                            <div className="text-2xl font-bold text-black">{formatCurrency(pack.extraHourPrice)}</div>
                             <div className="text-xs text-slate-500">Hora extra</div>
                           </div>
                           <div className="bg-slate-50 rounded-xl p-3 text-center">
@@ -658,7 +658,7 @@ export default function PricingAdminPage() {
 
                       {/* Preu (no editable) */}
                       <div className="text-right">
-                        <div className="text-3xl font-bold text-slate-900">
+                        <div className="text-3xl font-bold text-black">
                           {formatCurrency(pack.price)}
                         </div>
                         {pack.originalPrice && pack.originalPrice > pack.price && (
@@ -676,7 +676,7 @@ export default function PricingAdminPage() {
                     <div className="flex gap-6 text-sm">
                       <div>
                         <span className="text-slate-500">Reserves:</span>
-                        <span className="font-semibold text-slate-900 ml-1">{pack.bookingsCount}</span>
+                        <span className="font-semibold text-black ml-1">{pack.bookingsCount}</span>
                       </div>
                       <div>
                         <span className="text-slate-500">Ingressos:</span>
@@ -748,12 +748,12 @@ export default function PricingAdminPage() {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 ${categoryInfo.color} rounded-xl flex items-center justify-center text-2xl text-white`}>
+                        <div className={`w-12 h-12 ${categoryInfo.color} rounded-xl flex items-center justify-center text-2xl text-black`}>
                           {categoryInfo.icon}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-slate-900">{item.name}</h3>
+                            <h3 className="font-semibold text-black">{item.name}</h3>
                             <code className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-500">
                               {item.code}
                             </code>
@@ -772,7 +772,7 @@ export default function PricingAdminPage() {
                       {/* Stats d'ús */}
                       <div className="flex items-center gap-6">
                         <div className="text-center">
-                          <div className="text-xl font-bold text-slate-900">{item.stats.totalEvents}</div>
+                          <div className="text-xl font-bold text-black">{item.stats.totalEvents}</div>
                           <div className="text-xs text-slate-500">Events</div>
                         </div>
                         <div className="text-center">

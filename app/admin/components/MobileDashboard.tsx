@@ -110,7 +110,7 @@ function MetricCard({ metric, index }: { metric: Metric; index: number }) {
     >
       <Link
         href={metric.href || '#'}
-        className={`block p-4 rounded-2xl bg-gradient-to-br ${metric.color} border border-white/5 active:scale-98 transition-transform`}
+        className={`block p-4 rounded-2xl bg-gradient-to-br ${metric.color} border border-slate-200 active:scale-98 transition-transform`}
       >
         <div className="flex items-start justify-between mb-3">
           <span className="text-2xl">{metric.icon}</span>
@@ -122,8 +122,8 @@ function MetricCard({ metric, index }: { metric: Metric; index: number }) {
             </span>
           )}
         </div>
-        <p className="text-2xl font-bold text-white mb-1">{metric.value}</p>
-        <p className="text-white/50 text-sm">{metric.label}</p>
+        <p className="text-2xl font-bold text-black mb-1">{metric.value}</p>
+        <p className="text-slate-500 text-sm">{metric.label}</p>
       </Link>
     </motion.div>
   );
@@ -164,12 +164,12 @@ function EventItem({ event, index }: { event: Event; index: number }) {
     >
       <Link
         href={`/admin/bookings/${event.id}`}
-        className="flex items-center gap-4 p-4 bg-white/5 rounded-xl active:bg-white/10 transition-colors"
+        className="flex items-center gap-4 p-4 bg-slate-100 rounded-xl active:bg-slate-200 transition-colors"
       >
         <span className="text-2xl">{typeIcons[event.type] || '📅'}</span>
         <div className="flex-1 min-w-0">
-          <p className="text-white font-medium truncate">{event.title}</p>
-          <p className="text-white/50 text-sm">{formatDate(event.date)}</p>
+          <p className="text-black font-medium truncate">{event.title}</p>
+          <p className="text-slate-500 text-sm">{formatDate(event.date)}</p>
         </div>
         <div className={`w-2 h-2 rounded-full ${statusColors[event.status]}`} />
       </Link>
@@ -184,8 +184,8 @@ function MiniChart() {
   const maxValue = Math.max(...data);
 
   return (
-    <div className="p-4 bg-white/5 rounded-2xl">
-      <h3 className="text-white font-semibold mb-4">Activitat setmanal</h3>
+    <div className="p-4 bg-slate-100 rounded-2xl">
+      <h3 className="text-black font-semibold mb-4">Activitat setmanal</h3>
       <div className="flex items-end justify-between gap-2 h-24">
         {data.map((value, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-2">
@@ -195,7 +195,7 @@ function MiniChart() {
               animate={{ height: `${(value / maxValue) * 100}%` }}
               transition={{ delay: i * 0.1, type: 'spring' }}
             />
-            <span className="text-[10px] text-white/40">{days[i]}</span>
+            <span className="text-[10px] text-slate-400">{days[i]}</span>
           </div>
         ))}
       </div>
@@ -231,8 +231,8 @@ export default function MobileDashboard() {
     <div className="space-y-6 lg:hidden">
       {/* Header */}
       <div>
-        <p className="text-white/50 text-sm">{greeting}, Carles</p>
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <p className="text-slate-500 text-sm">{greeting}, Carles</p>
+        <h1 className="text-2xl font-bold text-black">Dashboard</h1>
       </div>
 
       {/* Refresh indicator */}
@@ -262,16 +262,16 @@ export default function MobileDashboard() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-white font-semibold mb-3">Accions ràpides</h2>
+        <h2 className="text-black font-semibold mb-3">Accions ràpides</h2>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
           {quickActions.map((action) => (
             <Link
               key={action.id}
               href={action.href}
-              className="flex flex-col items-center gap-2 px-6 py-4 bg-white/5 rounded-2xl flex-shrink-0 active:bg-white/10 transition-colors"
+              className="flex flex-col items-center gap-2 px-6 py-4 bg-slate-100 rounded-2xl flex-shrink-0 active:bg-slate-200 transition-colors"
             >
               <span className="text-2xl">{action.icon}</span>
-              <span className="text-white/70 text-xs whitespace-nowrap">{action.label}</span>
+              <span className="text-slate-700 text-xs whitespace-nowrap">{action.label}</span>
             </Link>
           ))}
         </div>
@@ -283,7 +283,7 @@ export default function MobileDashboard() {
       {/* Upcoming Events */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-white font-semibold">Propers events</h2>
+          <h2 className="text-black font-semibold">Propers events</h2>
           <Link href="/admin/calendario" className="text-orange-400 text-sm">
             Veure tots
           </Link>
@@ -298,7 +298,7 @@ export default function MobileDashboard() {
       {/* Pull to refresh hint */}
       <button
         onClick={handleRefresh}
-        className="w-full py-3 text-center text-white/30 text-sm"
+        className="w-full py-3 text-center text-slate-400 text-sm"
       >
         Toca per actualitzar
       </button>

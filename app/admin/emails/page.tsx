@@ -110,7 +110,7 @@ export default async function EmailsAdminPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-black">
             📧 Emails Automàtics
           </h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -139,7 +139,7 @@ export default async function EmailsAdminPage() {
           <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 bg-amber-50 flex items-center justify-between">
               <div>
-                <h2 className="font-semibold text-slate-900">
+                <h2 className="font-semibold text-black">
                   ⏳ Emails Post-Event Pendents
                 </h2>
                 <p className="text-xs text-slate-500 mt-1">
@@ -161,7 +161,7 @@ export default async function EmailsAdminPage() {
                 {pendingBookings.map((booking) => (
                   <div key={booking.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50">
                     <div>
-                      <p className="font-medium text-slate-900">{booking.clientName}</p>
+                      <p className="font-medium text-black">{booking.clientName}</p>
                       <p className="text-sm text-slate-500">{booking.clientEmail}</p>
                       <p className="text-xs text-slate-400 mt-1">
                         Event: {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · Ref: {booking.reference}
@@ -201,7 +201,7 @@ export default async function EmailsAdminPage() {
 
           {/* Google Reviews Link */}
           <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="font-semibold text-slate-900 mb-4">⭐ Google Reviews</h3>
+            <h3 className="font-semibold text-black mb-4">⭐ Google Reviews</h3>
             <p className="text-sm text-slate-600 mb-4">
               Enllaç directe per als clients que vulguin deixar ressenya a Google:
             </p>

@@ -147,7 +147,7 @@ function SearchBar({
 }) {
   return (
     <div className="relative">
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
         {Icons.search}
       </div>
       <input
@@ -156,12 +156,12 @@ function SearchBar({
         onChange={(e) => onChange(e.target.value)}
         onFocus={onFocus}
         placeholder="Buscar per nom, email o telèfon..."
-        className="w-full pl-10 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-orange-500/50 focus:bg-white/[0.07] transition-colors"
+        className="w-full pl-10 pr-10 py-3 bg-slate-100 border border-slate-200 rounded-xl text-black placeholder:text-slate-400 focus:outline-none focus:border-orange-500/50 focus:bg-white/[0.07] transition-colors"
       />
       {value && (
         <button
           onClick={onClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
         >
           {Icons.close}
         </button>
@@ -207,13 +207,13 @@ function StatusFilters({
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               isActive
                 ? 'bg-orange-500 text-white'
-                : 'bg-white/5 text-white/60 active:bg-white/10'
+                : 'bg-slate-100 text-slate-600 active:bg-slate-200'
             }`}
           >
             {filter.label}
             {count > 0 && (
               <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                isActive ? 'bg-white/20' : 'bg-white/10'
+                isActive ? 'bg-white/20' : 'bg-slate-200'
               }`}>
                 {count}
               </span>
@@ -325,7 +325,7 @@ function LeadCard({
         onDragEnd={handleDragEnd}
         style={{ x }}
         onClick={() => !isDragging && router.push(`/admin/leads/${lead.id}`)}
-        className={`relative p-3 bg-zinc-900/90 rounded-xl border-l-4 ${priority.border} border border-white/5 active:bg-zinc-800/90 transition-colors cursor-pointer`}
+        className={`relative p-3 bg-white/90 rounded-xl border-l-4 ${priority.border} border border-slate-200 active:bg-slate-100/90 transition-colors cursor-pointer`}
       >
         <div className="flex items-start gap-3">
           {/* Avatar */}
@@ -336,20 +336,20 @@ function LeadCard({
           {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <h3 className="text-white font-medium truncate">{lead.name}</h3>
+              <h3 className="text-black font-medium truncate">{lead.name}</h3>
               <span className={`text-xs px-1.5 py-0.5 rounded ${status.bgColor} ${status.color}`}>
                 {status.label}
               </span>
             </div>
             
-            <p className="text-white/40 text-sm truncate">{lead.email}</p>
+            <p className="text-slate-400 text-sm truncate">{lead.email}</p>
             
             <div className="flex items-center gap-2 mt-1.5">
-              <span className="text-xs text-white/30">{eventType.label}</span>
+              <span className="text-xs text-slate-400">{eventType.label}</span>
               {lead.eventDate && (
                 <>
-                  <span className="text-white/20">·</span>
-                  <span className="text-xs text-white/30">
+                  <span className="text-slate-300">·</span>
+                  <span className="text-xs text-slate-400">
                     {new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' })}
                   </span>
                 </>
@@ -359,15 +359,15 @@ function LeadCard({
 
           {/* Time & Arrow */}
           <div className="flex flex-col items-end gap-1">
-            <span className="text-xs text-white/30">{timeAgo(lead.createdAt)}</span>
-            <div className="text-white/20">{Icons.chevronRight}</div>
+            <span className="text-xs text-slate-400">{timeAgo(lead.createdAt)}</span>
+            <div className="text-slate-300">{Icons.chevronRight}</div>
           </div>
         </div>
 
         {/* Notes preview */}
         {lead.notes && lead.notes.length > 0 && (
-          <div className="mt-2 pt-2 border-t border-white/5">
-            <p className="text-xs text-white/30 truncate">
+          <div className="mt-2 pt-2 border-t border-slate-200">
+            <p className="text-xs text-slate-400 truncate">
               💬 {lead.notes[0].content}
             </p>
           </div>
@@ -392,8 +392,8 @@ function EmptyState({ filter, search }: { filter: StatusFilter; search: string }
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <span className="text-4xl mb-4">🔍</span>
-        <p className="text-white/60 mb-2">Cap resultat per "{search}"</p>
-        <p className="text-white/30 text-sm">Prova amb altres paraules clau</p>
+        <p className="text-slate-600 mb-2">Cap resultat per "{search}"</p>
+        <p className="text-slate-400 text-sm">Prova amb altres paraules clau</p>
       </div>
     );
   }
@@ -401,7 +401,7 @@ function EmptyState({ filter, search }: { filter: StatusFilter; search: string }
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <span className="text-4xl mb-4">📭</span>
-      <p className="text-white/60 mb-2">
+      <p className="text-slate-600 mb-2">
         {filter === 'all' ? 'No hi ha leads encara' : `Cap lead ${STATUS_CONFIG[filter]?.label.toLowerCase()}`}
       </p>
       <Link
@@ -419,12 +419,12 @@ function LoadingSkeleton() {
   return (
     <div className="space-y-3">
       {[...Array(5)].map((_, i) => (
-        <div key={i} className="p-4 bg-white/5 rounded-xl animate-pulse">
+        <div key={i} className="p-4 bg-slate-100 rounded-xl animate-pulse">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/10" />
+            <div className="w-10 h-10 rounded-full bg-slate-200" />
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-white/10 rounded w-3/4" />
-              <div className="h-3 bg-white/10 rounded w-1/2" />
+              <div className="h-4 bg-slate-200 rounded w-3/4" />
+              <div className="h-3 bg-slate-200 rounded w-1/2" />
             </div>
           </div>
         </div>
@@ -584,11 +584,11 @@ export default function MobileLeadsPro() {
   , [stats]);
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-4 pt-6 pb-24 lg:hidden">
+    <div className="min-h-screen bg-slate-100 p-4 pt-6 pb-24 lg:hidden">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white mb-1">Leads</h1>
-        <p className="text-white/40 text-sm">
+        <h1 className="text-2xl font-bold text-black mb-1">Leads</h1>
+        <p className="text-slate-400 text-sm">
           {totalLeads} leads · {stats.NEW || 0} nous aquesta setmana
         </p>
       </div>
@@ -636,7 +636,7 @@ export default function MobileLeadsPro() {
             <button
               onClick={handleLoadMore}
               disabled={isRefreshing}
-              className="w-full py-4 text-center text-white/40 text-sm active:text-white/60"
+              className="w-full py-4 text-center text-slate-400 text-sm active:text-slate-600"
             >
               {isRefreshing ? 'Carregant...' : 'Carregar més'}
             </button>

@@ -122,7 +122,7 @@ export default function BottomSheet({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black z-40"
+            className="fixed inset-0 bg-slate-100 z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.6 }}
             exit={{ opacity: 0 }}
@@ -133,7 +133,7 @@ export default function BottomSheet({
           {/* Sheet */}
           <motion.div
             ref={sheetRef}
-            className="fixed left-0 right-0 bottom-0 z-50 bg-zinc-900 rounded-t-3xl shadow-2xl max-h-[95vh] overflow-hidden"
+            className="fixed left-0 right-0 bottom-0 z-50 bg-white rounded-t-3xl shadow-2xl max-h-[95vh] overflow-hidden"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -151,11 +151,11 @@ export default function BottomSheet({
 
             {/* Header */}
             {title && (
-              <div className="flex items-center justify-between px-5 pb-4 border-b border-white/10">
-                <h3 className="text-lg font-semibold text-white">{title}</h3>
+              <div className="flex items-center justify-between px-5 pb-4 border-b border-slate-200">
+                <h3 className="text-lg font-semibold text-black">{title}</h3>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 hover:text-black transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -238,7 +238,7 @@ export function ActionsSheet({
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors ${
               action.variant === 'danger'
                 ? 'text-red-400 hover:bg-red-500/10'
-                : 'text-white hover:bg-white/5'
+                : 'text-black hover:bg-slate-100'
             }`}
           >
             {action.icon && <span className="text-xl">{action.icon}</span>}

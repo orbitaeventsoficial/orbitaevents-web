@@ -80,7 +80,7 @@ export default function ManualActionsPanel() {
   return (
     <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
-        <h2 className="font-semibold text-slate-900">🔧 Accions Manuals</h2>
+        <h2 className="font-semibold text-black">🔧 Accions Manuals</h2>
       </div>
 
       <div className="p-6 space-y-6">
@@ -96,7 +96,7 @@ export default function ManualActionsPanel() {
             className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
               runningCron
                 ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
-                : 'bg-slate-800 text-white hover:bg-slate-700'
+                : 'bg-slate-100 text-black hover:bg-slate-200'
             }`}
           >
             {runningCron ? (

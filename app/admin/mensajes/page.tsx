@@ -100,7 +100,7 @@ export default async function MensajesPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Missatges</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-black">Missatges</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona les comunicacions amb clients
           </p>
@@ -120,7 +120,7 @@ export default async function MensajesPage() {
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Converses</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">{data.recentLeads.length}</p>
+          <p className="mt-2 text-3xl font-bold text-black">{data.recentLeads.length}</p>
         </div>
       </section>
 
@@ -150,31 +150,31 @@ export default async function MensajesPage() {
       {/* Message Templates */}
       <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
         <div className="bg-slate-50 border-b border-slate-200 p-4">
-          <h3 className="font-semibold text-slate-900">📋 Plantilles Ràpides</h3>
+          <h3 className="font-semibold text-black">📋 Plantilles Ràpides</h3>
         </div>
         <div className="p-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <button className="p-3 rounded-lg border border-slate-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-900">Primer Contacte</p>
+            <p className="font-medium text-black">Primer Contacte</p>
             <p className="text-xs text-slate-500 mt-1">Resposta inicial a nou lead</p>
           </button>
           <button className="p-3 rounded-lg border border-slate-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-900">Enviar Pressupost</p>
+            <p className="font-medium text-black">Enviar Pressupost</p>
             <p className="text-xs text-slate-500 mt-1">Acompanyament de pressupost</p>
           </button>
           <button className="p-3 rounded-lg border border-slate-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-900">Seguiment</p>
+            <p className="font-medium text-black">Seguiment</p>
             <p className="text-xs text-slate-500 mt-1">Recordatori després de dies</p>
           </button>
           <button className="p-3 rounded-lg border border-slate-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-900">Confirmació</p>
+            <p className="font-medium text-black">Confirmació</p>
             <p className="text-xs text-slate-500 mt-1">Confirmar reserva</p>
           </button>
           <button className="p-3 rounded-lg border border-slate-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-900">Pre-Event</p>
+            <p className="font-medium text-black">Pre-Event</p>
             <p className="text-xs text-slate-500 mt-1">Detalls abans de l&apos;event</p>
           </button>
           <button className="p-3 rounded-lg border border-slate-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-900">Post-Event</p>
+            <p className="font-medium text-black">Post-Event</p>
             <p className="text-xs text-slate-500 mt-1">Agraïment i enquesta</p>
           </button>
         </div>
@@ -183,7 +183,7 @@ export default async function MensajesPage() {
       {/* Recent Messages */}
       <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
         <div className="bg-slate-50 border-b border-slate-200 p-4">
-          <h3 className="font-semibold text-slate-900">📬 Missatges Recents</h3>
+          <h3 className="font-semibold text-black">📬 Missatges Recents</h3>
         </div>
         <div className="divide-y divide-slate-100">
           {data.recentLeads.map((lead) => {
@@ -203,7 +203,7 @@ export default async function MensajesPage() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-slate-900">{lead.name}</span>
+                      <span className="font-medium text-black">{lead.name}</span>
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusConfig.bg} ${statusConfig.color}`}>
                         {statusConfig.label}
                       </span>

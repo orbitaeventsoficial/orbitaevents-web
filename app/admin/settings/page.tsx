@@ -83,7 +83,7 @@ export default async function SettingsPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Configuració</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-black">Configuració</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona les configuracions del sistema i estadístiques públiques
           </p>
@@ -115,7 +115,7 @@ export default async function SettingsPage() {
           className="rounded-xl border border-slate-200 bg-white p-6 hover:border-slate-300 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">📦</div>
-          <h3 className="font-semibold text-slate-900">Gestionar Packs</h3>
+          <h3 className="font-semibold text-black">Gestionar Packs</h3>
           <p className="text-sm text-slate-500">Edita preus, traduccions i contingut dels packs</p>
         </Link>
 
@@ -124,7 +124,7 @@ export default async function SettingsPage() {
           className="rounded-xl border border-slate-200 bg-white p-6 hover:border-slate-300 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">🌐</div>
-          <h3 className="font-semibold text-slate-900">Traduccions</h3>
+          <h3 className="font-semibold text-black">Traduccions</h3>
           <p className="text-sm text-slate-500">Gestiona el contingut multiidioma</p>
         </Link>
 
@@ -133,7 +133,7 @@ export default async function SettingsPage() {
           className="rounded-xl border border-slate-200 bg-white p-6 hover:border-slate-300 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">❓</div>
-          <h3 className="font-semibold text-slate-900">FAQs</h3>
+          <h3 className="font-semibold text-black">FAQs</h3>
           <p className="text-sm text-slate-500">Edita les preguntes freqüents</p>
         </Link>
       </section>

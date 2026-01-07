@@ -54,7 +54,7 @@ export default async function ComposePage() {
       {/* Header */}
       <header className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">✏️ Nou Email</h1>
+          <h1 className="text-2xl font-semibold text-black">✏️ Nou Email</h1>
           <p className="text-sm text-slate-500 mt-1">
             Envia pressupostos professionals i respon sol·licituds
           </p>
