@@ -52,7 +52,7 @@ export default async function TestimonialsPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">Testimonis</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">Testimonis</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona les ressenyes i opinions dels clients
           </p>
@@ -60,13 +60,13 @@ export default async function TestimonialsPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/ressenyes"
-            className="inline-flex items-center rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center rounded-md border border-stone-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             Ressenyes
           </Link>
           <Link
             href="/admin/testimonios/new"
-            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             + Nou Testimoni
           </Link>
@@ -77,7 +77,7 @@ export default async function TestimonialsPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Testimonis</p>
-          <p className="mt-2 text-3xl font-bold text-slate-800">{testimonials.length}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-700">{testimonials.length}</p>
         </div>
         <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-yellow-600 uppercase">Valoració Mitjana</p>
@@ -153,7 +153,7 @@ export default async function TestimonialsPage() {
                         {testimonial.authorName.charAt(0)}
                       </div>
                       <div>
-                        <h3 className="font-medium text-slate-800">
+                        <h3 className="font-medium text-slate-700">
                           {testimonial.authorName}
                         </h3>
                         <p className="text-xs text-slate-500">

@@ -155,7 +155,7 @@ function MoreMenu({
         >
           {/* Backdrop */}
           <motion.div 
-            className="absolute inset-0 bg-stone-200/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-stone-100/70 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -184,7 +184,7 @@ function MoreMenu({
                       if ('vibrate' in navigator) navigator.vibrate(5);
                       onClose();
                     }}
-                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-stone-100 active:bg-stone-200 transition-colors"
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-stone-100 active:bg-stone-100 transition-colors"
                   >
                     <span className="text-2xl">{item.icon}</span>
                     <span className="text-xs text-slate-700 font-medium text-center">{item.label}</span>

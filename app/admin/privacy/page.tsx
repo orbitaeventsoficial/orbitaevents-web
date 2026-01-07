@@ -161,14 +161,14 @@ export default function AdminPrivacyPage() {
               <Shield className="w-8 h-8 text-purple-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-800">Gestió de Privacitat</h1>
+              <h1 className="text-2xl font-bold text-slate-700">Gestió de Privacitat</h1>
               <p className="text-gray-400">Sol·licituds ARCO i compliment RGPD</p>
             </div>
           </div>
           <button
             onClick={fetchData}
             disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-200 border border-stone-200 rounded-lg text-slate-800 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-100 border border-stone-200 rounded-lg text-slate-700 transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             Actualitzar
@@ -184,7 +184,7 @@ export default function AdminPrivacyPage() {
                   <Clock className="w-5 h-5 text-yellow-400" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-800">{stats.requests.pending}</p>
+                  <p className="text-2xl font-bold text-slate-700">{stats.requests.pending}</p>
                   <p className="text-sm text-gray-400">Pendents</p>
                 </div>
               </div>
@@ -196,7 +196,7 @@ export default function AdminPrivacyPage() {
                   <AlertTriangle className="w-5 h-5 text-red-400" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-800">{stats.requests.urgent}</p>
+                  <p className="text-2xl font-bold text-slate-700">{stats.requests.urgent}</p>
                   <p className="text-sm text-gray-400">Urgents (&lt;5 dies)</p>
                 </div>
               </div>
@@ -208,7 +208,7 @@ export default function AdminPrivacyPage() {
                   <CheckCircle className="w-5 h-5 text-green-400" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-800">{stats.requests.completed}</p>
+                  <p className="text-2xl font-bold text-slate-700">{stats.requests.completed}</p>
                   <p className="text-sm text-gray-400">Completades</p>
                 </div>
               </div>
@@ -220,7 +220,7 @@ export default function AdminPrivacyPage() {
                   <FileText className="w-5 h-5 text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-800">{stats.consents.active}</p>
+                  <p className="text-2xl font-bold text-slate-700">{stats.consents.active}</p>
                   <p className="text-sm text-gray-400">Consentiments actius</p>
                 </div>
               </div>
@@ -239,7 +239,7 @@ export default function AdminPrivacyPage() {
                   placeholder="Cercar per email o nom..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-stone-100 border border-stone-200 rounded-lg text-slate-800 placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
+                  className="w-full pl-10 pr-4 py-2 bg-stone-100 border border-stone-200 rounded-lg text-slate-700 placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
                 />
               </div>
             </div>
@@ -249,7 +249,7 @@ export default function AdminPrivacyPage() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 bg-stone-100 border border-stone-200 rounded-lg text-slate-800 focus:outline-none focus:border-purple-500/50"
+                className="px-3 py-2 bg-stone-100 border border-stone-200 rounded-lg text-slate-700 focus:outline-none focus:border-purple-500/50"
               >
                 <option value="all">Tots els estats</option>
                 {Object.entries(STATUS_CONFIG).map(([key, config]) => (
@@ -260,7 +260,7 @@ export default function AdminPrivacyPage() {
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="px-3 py-2 bg-stone-100 border border-stone-200 rounded-lg text-slate-800 focus:outline-none focus:border-purple-500/50"
+                className="px-3 py-2 bg-stone-100 border border-stone-200 rounded-lg text-slate-700 focus:outline-none focus:border-purple-500/50"
               >
                 <option value="all">Tots els tipus</option>
                 {Object.entries(REQUEST_TYPE_CONFIG).map(([key, config]) => (
@@ -327,7 +327,7 @@ export default function AdminPrivacyPage() {
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-slate-800 truncate">
+                          <span className="font-medium text-slate-700 truncate">
                             {request.requesterName}
                           </span>
                           <span className={`px-2 py-0.5 rounded-full text-xs ${typeColors.bg} ${typeColors.text}`}>
@@ -378,26 +378,26 @@ export default function AdminPrivacyPage() {
 
                   {/* Expanded Content */}
                   {isExpanded && (
-                    <div className="border-t border-stone-200 p-4 bg-stone-200/50">
+                    <div className="border-t border-stone-200 p-4 bg-stone-100/50">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Details */}
                         <div className="space-y-4">
-                          <h4 className="font-medium text-slate-800">Detalls de la sol·licitud</h4>
+                          <h4 className="font-medium text-slate-700">Detalls de la sol·licitud</h4>
 
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
                               <span className="text-gray-400">ID:</span>
-                              <span className="text-slate-800 font-mono text-xs">{request.id}</span>
+                              <span className="text-slate-700 font-mono text-xs">{request.id}</span>
                             </div>
                             {request.requesterPhone && (
                               <div className="flex justify-between">
                                 <span className="text-gray-400">Telèfon:</span>
-                                <span className="text-slate-800">{request.requesterPhone}</span>
+                                <span className="text-slate-700">{request.requesterPhone}</span>
                               </div>
                             )}
                             <div className="flex justify-between">
                               <span className="text-gray-400">Verificat:</span>
-                              <span className="text-slate-800">
+                              <span className="text-slate-700">
                                 {request.verifiedAt
                                   ? new Date(request.verifiedAt).toLocaleString('ca-ES')
                                   : 'No'}
@@ -406,7 +406,7 @@ export default function AdminPrivacyPage() {
                             {request.processedAt && (
                               <div className="flex justify-between">
                                 <span className="text-gray-400">Processat:</span>
-                                <span className="text-slate-800">
+                                <span className="text-slate-700">
                                   {new Date(request.processedAt).toLocaleString('ca-ES')}
                                 </span>
                               </div>
@@ -416,7 +416,7 @@ export default function AdminPrivacyPage() {
                           {request.description && (
                             <div className="mt-4">
                               <h5 className="text-sm font-medium text-gray-400 mb-2">Descripció:</h5>
-                              <p className="text-sm text-slate-800 bg-stone-100 p-3 rounded-lg">
+                              <p className="text-sm text-slate-700 bg-stone-100 p-3 rounded-lg">
                                 {request.description}
                               </p>
                             </div>
@@ -425,7 +425,7 @@ export default function AdminPrivacyPage() {
 
                         {/* Actions */}
                         <div className="space-y-4">
-                          <h4 className="font-medium text-slate-800">Accions</h4>
+                          <h4 className="font-medium text-slate-700">Accions</h4>
 
                           {request.status === 'VERIFIED' && (
                             <div className="space-y-3">
@@ -477,7 +477,7 @@ export default function AdminPrivacyPage() {
                               <h5 className="text-sm font-medium text-gray-400 mb-2">Client vinculat:</h5>
                               <div className="flex items-center gap-2">
                                 <User className="w-4 h-4 text-gray-500" />
-                                <span className="text-slate-800">{request.customer.name}</span>
+                                <span className="text-slate-700">{request.customer.name}</span>
                               </div>
                             </div>
                           )}

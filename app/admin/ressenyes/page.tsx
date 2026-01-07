@@ -166,7 +166,7 @@ export default function AdminReviewsPage() {
           >
             ← Tornar al panell
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">
             ⭐ Gestió de Ressenyes
           </h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -177,14 +177,14 @@ export default function AdminReviewsPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/testimonios"
-            className="inline-flex items-center px-4 py-2 bg-stone-50 border border-stone-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             Testimonis
           </Link>
           <a
             href={SITE_CONFIG.reviews.googleBusinessUrl || '#'}
             target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2 bg-stone-50 border border-stone-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -196,7 +196,7 @@ export default function AdminReviewsPage() {
           </a>
           <a
             href="/api/google/oauth/start?next=/admin/ressenyes?google=connected"
-            className="inline-flex items-center px-4 py-2 bg-stone-50 rounded-lg text-sm font-medium text-slate-800 hover:bg-stone-100"
+            className="inline-flex items-center px-4 py-2 bg-stone-50 rounded-lg text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             {googleConnected ? 'Google connectat' : 'Connectar Google'}
           </a>
@@ -213,7 +213,7 @@ export default function AdminReviewsPage() {
       <div className="grid gap-4 sm:grid-cols-4">
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total</p>
-          <p className="mt-2 text-3xl font-bold text-slate-800">{reviews.length}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-700">{reviews.length}</p>
         </div>
         <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-green-600 uppercase">Aprovades</p>
@@ -259,7 +259,7 @@ export default function AdminReviewsPage() {
       {/* Reviews List */}
       <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-stone-200 bg-slate-50">
-          <h2 className="font-semibold text-slate-800">Ressenyes</h2>
+          <h2 className="font-semibold text-slate-700">Ressenyes</h2>
         </div>
         
         {loading ? (
@@ -288,7 +288,7 @@ export default function AdminReviewsPage() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-slate-800">{review.customerName}</span>
+                      <span className="font-semibold text-slate-700">{review.customerName}</span>
                       {review.eventType && (
                         <span className="text-xs px-2 py-0.5 bg-stone-100 rounded-full text-slate-600">
                           {EVENT_TYPE_LABELS[review.eventType] || review.eventType}
@@ -337,7 +337,7 @@ export default function AdminReviewsPage() {
                     ) : (
                       <button
                         onClick={() => handleApprove(review.id, false)}
-                        className="px-3 py-1.5 bg-yellow-500 text-slate-800 rounded text-sm hover:bg-yellow-600"
+                        className="px-3 py-1.5 bg-yellow-500 text-slate-700 rounded text-sm hover:bg-yellow-600"
                       >
                         ⏸️ Despublicar
                       </button>
@@ -358,10 +358,10 @@ export default function AdminReviewsPage() {
 
       {/* Add Review Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-stone-200/70 flex items-center justify-center z-[80] p-4">
+        <div className="fixed inset-0 bg-stone-100/70 flex items-center justify-center z-[80] p-4">
           <div className="bg-stone-50 rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-stone-200">
-              <h2 className="text-xl font-semibold text-slate-800">Afegir Ressenya</h2>
+              <h2 className="text-xl font-semibold text-slate-700">Afegir Ressenya</h2>
               <p className="text-sm text-slate-500 mt-1">
                 Afegeix una ressenya que hagis rebut per WhatsApp, email o en persona
               </p>
@@ -463,7 +463,7 @@ export default function AdminReviewsPage() {
             <div className="p-6 border-t border-stone-200 flex gap-3 justify-end">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 border border-stone-300 rounded-lg text-slate-700 hover:bg-slate-50"
+                className="px-4 py-2 border border-stone-200 rounded-lg text-slate-700 hover:bg-slate-50"
               >
                 Cancel·lar
               </button>

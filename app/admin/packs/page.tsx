@@ -40,7 +40,7 @@ export default async function PacksPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">Packs</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">Packs</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona els packs de serveis i els seus preus
           </p>
@@ -48,7 +48,7 @@ export default async function PacksPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/packs/new"
-            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             + Nou Pack
           </Link>
@@ -59,7 +59,7 @@ export default async function PacksPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Packs</p>
-          <p className="mt-2 text-3xl font-bold text-slate-800">{packs.length}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-700">{packs.length}</p>
         </div>
         <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-green-600 uppercase">Actius</p>
@@ -96,7 +96,7 @@ export default async function PacksPage() {
               <div className="p-4 border-b border-slate-100">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-slate-800">
+                    <h3 className="font-semibold text-slate-700">
                       {translation?.name || pack.slug}
                     </h3>
                     <p className="text-xs text-slate-500 mt-1">
@@ -123,7 +123,7 @@ export default async function PacksPage() {
                 {/* Preu */}
                 <div className="flex items-baseline justify-between">
                   <div>
-                    <span className="text-2xl font-bold text-slate-800">{pack.price}€</span>
+                    <span className="text-2xl font-bold text-slate-700">{pack.price}€</span>
                     {pack.originalPrice && (
                       <span className="ml-2 text-sm text-slate-400 line-through">
                         {pack.originalPrice}€

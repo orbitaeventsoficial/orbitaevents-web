@@ -124,7 +124,7 @@ export default function InboxPanel() {
       {/* Header */}
       <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
         <div>
-          <h2 className="font-semibold text-slate-800 flex items-center gap-2">
+          <h2 className="font-semibold text-slate-700 flex items-center gap-2">
             <span>📥</span> Safata d&apos;Entrada
             {unreadCount > 0 && (
               <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
@@ -187,10 +187,10 @@ export default function InboxPanel() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm truncate ${!email.isRead ? 'font-semibold text-slate-800' : 'text-slate-700'}`}>
+                      <p className={`text-sm truncate ${!email.isRead ? 'font-semibold text-slate-700' : 'text-slate-700'}`}>
                         {email.from.name || email.from.address}
                       </p>
-                      <p className={`text-sm truncate ${!email.isRead ? 'font-medium text-slate-800' : 'text-slate-600'}`}>
+                      <p className={`text-sm truncate ${!email.isRead ? 'font-medium text-slate-700' : 'text-slate-600'}`}>
                         {email.subject}
                       </p>
                       <p className="text-xs text-slate-400 truncate mt-1">
@@ -221,7 +221,7 @@ export default function InboxPanel() {
               <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-slate-800">{selectedEmail.subject}</h3>
+                    <h3 className="font-semibold text-slate-700">{selectedEmail.subject}</h3>
                     <p className="text-sm text-slate-600 mt-1">
                       De: <span className="font-medium">{selectedEmail.from.name}</span>
                       {selectedEmail.from.address && (

@@ -60,7 +60,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
       )}
       <Link
         href={`/admin/leads/${leadId}`}
-        className="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200"
+        className="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-100"
       >
         Veure
       </Link>

@@ -50,7 +50,7 @@ export default function EmailConfigPanel() {
   return (
     <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
-        <h2 className="font-semibold text-slate-800">⚙️ Configuracio</h2>
+        <h2 className="font-semibold text-slate-700">⚙️ Configuracio</h2>
       </div>
 
       <div className="p-6 space-y-5">
@@ -90,7 +90,7 @@ export default function EmailConfigPanel() {
               type="checkbox"
               checked={config.enablePostEvent}
               onChange={(e) => setConfig({ ...config, enablePostEvent: e.target.checked })}
-              className="w-5 h-5 rounded border-stone-300 text-amber-500 focus:ring-amber-500"
+              className="w-5 h-5 rounded border-stone-200 text-amber-500 focus:ring-amber-500"
             />
             <span className="text-sm text-slate-700">Email post-event automatic</span>
           </label>
@@ -100,7 +100,7 @@ export default function EmailConfigPanel() {
               type="checkbox"
               checked={config.enableCanvas}
               onChange={(e) => setConfig({ ...config, enableCanvas: e.target.checked })}
-              className="w-5 h-5 rounded border-stone-300 text-amber-500 focus:ring-amber-500"
+              className="w-5 h-5 rounded border-stone-200 text-amber-500 focus:ring-amber-500"
             />
             <span className="text-sm text-slate-700">Email canvas + descompte</span>
           </label>
@@ -110,7 +110,7 @@ export default function EmailConfigPanel() {
               type="checkbox"
               checked={config.enableLeadConfirmation}
               onChange={(e) => setConfig({ ...config, enableLeadConfirmation: e.target.checked })}
-              className="w-5 h-5 rounded border-stone-300 text-amber-500 focus:ring-amber-500"
+              className="w-5 h-5 rounded border-stone-200 text-amber-500 focus:ring-amber-500"
             />
             <span className="text-sm text-slate-700">Confirmacio lead (al client)</span>
           </label>
@@ -154,7 +154,7 @@ export default function EmailConfigPanel() {
             saved
               ? 'bg-green-500 text-white'
               : saving
-              ? 'bg-stone-200 text-slate-500'
+              ? 'bg-stone-100 text-slate-500'
               : 'bg-amber-500 text-white hover:bg-amber-600'
           }`}
         >

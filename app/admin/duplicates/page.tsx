@@ -185,7 +185,7 @@ export default function AdminDuplicatesPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-800 flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-slate-700 flex items-center gap-3">
               <Merge className="w-8 h-8 text-purple-400" />
               Unificació de Clients
             </h1>
@@ -196,7 +196,7 @@ export default function AdminDuplicatesPage() {
           <button
             onClick={loadDuplicates}
             disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-200 rounded-xl text-slate-800 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-100 rounded-xl text-slate-700 transition-colors"
           >
             <RefreshCw
               className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}
@@ -208,7 +208,7 @@ export default function AdminDuplicatesPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
-            <div className="text-3xl font-bold text-slate-800">{groups.length}</div>
+            <div className="text-3xl font-bold text-slate-700">{groups.length}</div>
             <div className="text-sm text-gray-400">Grups detectats</div>
           </div>
           <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
@@ -236,7 +236,7 @@ export default function AdminDuplicatesPage() {
           {groups.length === 0 ? (
             <div className="text-center py-16 bg-stone-50 border border-stone-200 rounded-2xl">
               <Check className="w-16 h-16 text-green-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-800 mb-2">
+              <h3 className="text-xl font-semibold text-slate-700 mb-2">
                 Cap duplicat detectat!
               </h3>
               <p className="text-gray-400">
@@ -269,7 +269,7 @@ export default function AdminDuplicatesPage() {
                         <Users className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-slate-800">
+                        <h3 className="font-semibold text-slate-700">
                           {group.primaryCustomer.name ||
                             group.primaryCustomer.email}
                         </h3>
@@ -379,7 +379,7 @@ export default function AdminDuplicatesPage() {
                           </button>
                           <button
                             onClick={() => setExpandedGroup(null)}
-                            className="px-6 py-3 bg-stone-100 hover:bg-stone-200 border border-stone-200 text-slate-800 font-medium rounded-xl transition-colors"
+                            className="px-6 py-3 bg-stone-100 hover:bg-stone-100 border border-stone-200 text-slate-700 font-medium rounded-xl transition-colors"
                           >
                             Ignorar
                           </button>
@@ -400,7 +400,7 @@ export default function AdminDuplicatesPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-stone-200/80 flex items-center justify-center p-4 z-50"
+              className="fixed inset-0 bg-stone-100/80 flex items-center justify-center p-4 z-50"
               onClick={() => setMergeSelection(null)}
             >
               <motion.div
@@ -415,7 +415,7 @@ export default function AdminDuplicatesPage() {
                     <Merge className="w-6 h-6 text-purple-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-800">
+                    <h3 className="text-lg font-semibold text-slate-700">
                       Confirmar fusió
                     </h3>
                     <p className="text-sm text-gray-400">
@@ -435,7 +435,7 @@ export default function AdminDuplicatesPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setMergeSelection(null)}
-                    className="flex-1 py-3 bg-stone-100 hover:bg-stone-200 border border-stone-200 text-slate-800 font-medium rounded-xl transition-colors"
+                    className="flex-1 py-3 bg-stone-100 hover:bg-stone-100 border border-stone-200 text-slate-700 font-medium rounded-xl transition-colors"
                   >
                     Cancel·lar
                   </button>
@@ -477,7 +477,7 @@ function CustomerCard({
   return (
     <div className="flex-1">
       <div className="flex items-center gap-2 mb-2">
-        <span className="font-semibold text-slate-800">
+        <span className="font-semibold text-slate-700">
           {customer.name || 'Sense nom'}
         </span>
         {isPrimary && (

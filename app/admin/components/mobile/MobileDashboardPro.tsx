@@ -149,7 +149,7 @@ function DashboardHeader({ onRefresh, isRefreshing }: { onRefresh: () => void; i
           {greeting}, Carles · {currentTime}
         </motion.p>
         <motion.h1 
-          className="text-2xl font-bold text-slate-800"
+          className="text-2xl font-bold text-slate-700"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -159,7 +159,7 @@ function DashboardHeader({ onRefresh, isRefreshing }: { onRefresh: () => void; i
       </div>
       <motion.button
         onClick={onRefresh}
-        className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-slate-600 active:bg-stone-200"
+        className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-slate-600 active:bg-stone-100"
         whileTap={{ scale: 0.9 }}
         animate={{ rotate: isRefreshing ? 360 : 0 }}
         transition={{ duration: isRefreshing ? 1 : 0, repeat: isRefreshing ? Infinity : 0, ease: 'linear' }}
@@ -226,7 +226,7 @@ function MetricCard({
           </div>
           
           <motion.p 
-            className="text-3xl font-bold text-slate-800 mb-0.5"
+            className="text-3xl font-bold text-slate-700 mb-0.5"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: delay + 0.1 }}
@@ -330,7 +330,7 @@ function UpcomingEventCard({
         </div>
         
         <div className="flex-1 min-w-0">
-          <p className="text-slate-800 font-medium truncate">{event.eventName}</p>
+          <p className="text-slate-700 font-medium truncate">{event.eventName}</p>
           <div className="flex items-center gap-2">
             <p className="text-slate-400 text-sm">{formatDate(event.eventDate)}</p>
             {event.pack?.translations[0] && (
@@ -389,7 +389,7 @@ function RecentLeadCard({ lead, index }: { lead: Lead; index: number }) {
         className={`block p-3 rounded-xl border-l-4 ${priorityColors[lead.priority] || priorityColors.MEDIUM} active:scale-[0.98] transition-transform`}
       >
         <div className="flex items-center justify-between mb-1">
-          <p className="text-slate-800 font-medium truncate flex-1">{lead.name}</p>
+          <p className="text-slate-700 font-medium truncate flex-1">{lead.name}</p>
           <span className="text-slate-400 text-xs">{timeAgo(lead.createdAt)}</span>
         </div>
         <p className="text-slate-400 text-sm">{typeLabels[lead.eventType] || lead.eventType}</p>

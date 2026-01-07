@@ -240,7 +240,7 @@ export default function InboxClient({
           <button
             onClick={() => setFilter('all')}
             className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-              filter === 'all' ? 'bg-stone-200 text-slate-800' : 'text-slate-600 hover:bg-stone-100'
+              filter === 'all' ? 'bg-stone-100 text-slate-700' : 'text-slate-600 hover:bg-stone-100'
             }`}
           >
             Tots
@@ -248,7 +248,7 @@ export default function InboxClient({
           <button
             onClick={() => setFilter('unread')}
             className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-              filter === 'unread' ? 'bg-stone-200 text-slate-800' : 'text-slate-600 hover:bg-stone-100'
+              filter === 'unread' ? 'bg-stone-100 text-slate-700' : 'text-slate-600 hover:bg-stone-100'
             }`}
           >
             🔵 No llegits ({totalUnread})
@@ -320,7 +320,7 @@ export default function InboxClient({
                       }`}>
                         {email.type === 'lead' ? 'Lead' : 'Email'}
                       </span>
-                      <p className={`text-sm truncate ${!email.read ? 'font-semibold text-slate-800' : 'text-slate-700'}`}>
+                      <p className={`text-sm truncate ${!email.read ? 'font-semibold text-slate-700' : 'text-slate-700'}`}>
                         {email.fromName}
                       </p>
                     </div>
@@ -357,13 +357,13 @@ export default function InboxClient({
                       </span>
                     )}
                   </div>
-                  <h2 className="text-xl font-semibold text-slate-800">{selectedEmail.subject}</h2>
+                  <h2 className="text-xl font-semibold text-slate-700">{selectedEmail.subject}</h2>
                   <div className="flex items-center gap-3 mt-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold">
                       {selectedEmail.fromName.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-medium text-slate-800">{selectedEmail.fromName}</p>
+                      <p className="font-medium text-slate-700">{selectedEmail.fromName}</p>
                       <p className="text-sm text-slate-500">{selectedEmail.from}</p>
                     </div>
                   </div>
@@ -379,7 +379,7 @@ export default function InboxClient({
               {/* Lead details */}
               {selectedEmail.leadData && (
                 <div className="bg-slate-50 rounded-xl p-6 mb-6">
-                  <h3 className="font-semibold text-slate-800 mb-4">📋 Detalls de la sol·licitud</h3>
+                  <h3 className="font-semibold text-slate-700 mb-4">📋 Detalls de la sol·licitud</h3>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-slate-500">Tipus d&apos;event:</span>
@@ -538,11 +538,11 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
   }
 
   return (
-    <div className="fixed inset-0 bg-stone-200/70 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-stone-100/70 flex items-center justify-center z-50 p-4">
       <div className="bg-stone-50 rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
-          <h2 className="text-lg font-semibold text-slate-800">
+          <h2 className="text-lg font-semibold text-slate-700">
             {replyTo ? `↩️ Respondre a ${replyTo.fromName}` : '✏️ Nou email'}
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-stone-100 rounded-lg">✕</button>
@@ -589,7 +589,7 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
             disabled={sending || !to || !subject || !body}
             className={`px-6 py-2 rounded-lg font-medium ${
               sent ? 'bg-green-500 text-white' : 
-              sending ? 'bg-stone-300 text-slate-500' : 
+              sending ? 'bg-stone-200 text-slate-500' : 
               'bg-amber-500 text-white hover:bg-amber-600'
             }`}
           >

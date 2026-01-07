@@ -153,7 +153,7 @@ export default function AdminMobileNav() {
       <AnimatePresence>
         {moreMenuOpen && (
           <motion.div
-            className="fixed inset-0 bg-stone-200/70 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-stone-100/70 backdrop-blur-sm z-40 lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

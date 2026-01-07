@@ -95,7 +95,7 @@ function SplashScreen({ isLoading }: { isLoading: boolean }) {
 
           {/* Brand */}
           <motion.h1
-            className="text-2xl font-bold text-slate-800 mb-2"
+            className="text-2xl font-bold text-slate-700 mb-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}

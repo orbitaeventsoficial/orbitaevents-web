@@ -82,7 +82,7 @@ export default function NewTestimonialPage({
           <Link href="/admin/testimonios" className="text-sm text-slate-500 hover:text-slate-700">
             ← Tornar a testimonis
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-800">
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-700">
             Nou testimoni
           </h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -175,11 +175,11 @@ export default function NewTestimonialPage({
 
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" name="isFeatured" className="rounded border-stone-300" />
+            <input type="checkbox" name="isFeatured" className="rounded border-stone-200" />
             Destacat
           </label>
           <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" name="isVerified" defaultChecked className="rounded border-stone-300" />
+            <input type="checkbox" name="isVerified" defaultChecked className="rounded border-stone-200" />
             Verificat
           </label>
         </div>
@@ -193,7 +193,7 @@ export default function NewTestimonialPage({
           </Link>
           <button
             type="submit"
-            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             Guardar
           </button>

@@ -172,7 +172,7 @@ export default function ComposeForm({ leads, packs }: Props) {
         <button
           onClick={() => setMode('email')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'email' ? 'bg-stone-50 shadow text-slate-800' : 'text-slate-600'
+            mode === 'email' ? 'bg-stone-50 shadow text-slate-700' : 'text-slate-600'
           }`}
         >
           ✉️ Email normal
@@ -180,7 +180,7 @@ export default function ComposeForm({ leads, packs }: Props) {
         <button
           onClick={() => setMode('quote')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'quote' ? 'bg-stone-50 shadow text-slate-800' : 'text-slate-600'
+            mode === 'quote' ? 'bg-stone-50 shadow text-slate-700' : 'text-slate-600'
           }`}
         >
           💰 Pressupost professional
@@ -213,7 +213,7 @@ export default function ComposeForm({ leads, packs }: Props) {
           {/* Lead details preview */}
           {selectedLead && (
             <div className="bg-slate-50 rounded-lg p-4">
-              <h4 className="font-medium text-slate-800 mb-3">📋 Detalls del lead</h4>
+              <h4 className="font-medium text-slate-700 mb-3">📋 Detalls del lead</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <span className="text-slate-500">Tipus:</span>
@@ -263,10 +263,10 @@ export default function ComposeForm({ leads, packs }: Props) {
                         className={`p-4 rounded-xl border-2 text-left transition-all ${
                           selectedPackId === pack.id
                             ? 'border-amber-500 bg-amber-50'
-                            : 'border-stone-200 hover:border-stone-300'
+                            : 'border-stone-200 hover:border-stone-200'
                         }`}
                       >
-                        <p className="font-semibold text-slate-800">{name}</p>
+                        <p className="font-semibold text-slate-700">{name}</p>
                         <p className="text-amber-600 font-bold mt-1">{pack.price.toLocaleString('es-ES')}€</p>
                       </button>
                     );
@@ -404,7 +404,7 @@ export default function ComposeForm({ leads, packs }: Props) {
           <div className="flex gap-3">
             <button
               onClick={() => router.push('/admin/inbox')}
-              className="px-4 py-2 text-slate-600 hover:text-slate-800"
+              className="px-4 py-2 text-slate-600 hover:text-slate-700"
             >
               Cancel·lar
             </button>
@@ -415,7 +415,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                 sent
                   ? 'bg-green-500 text-white'
                   : sending
-                  ? 'bg-stone-300 text-slate-500 cursor-not-allowed'
+                  ? 'bg-stone-200 text-slate-500 cursor-not-allowed'
                   : 'bg-amber-500 text-white hover:bg-amber-600'
               }`}
             >

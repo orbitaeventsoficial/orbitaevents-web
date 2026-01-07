@@ -401,7 +401,7 @@ export default function TextManagerPage() {
           <div className="flex items-center justify-between gap-4">
             {/* Título */}
             <div>
-              <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-slate-700 flex items-center gap-2">
                 📝 Text Manager PRO
               </h1>
               <p className="text-sm text-slate-500">
@@ -417,7 +417,7 @@ export default function TextManagerPage() {
                   placeholder="Buscar textos... (path o contenido)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-stone-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
+                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-stone-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                   🔍
@@ -441,7 +441,7 @@ export default function TextManagerPage() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   showOnlyModified
                     ? 'bg-orange-500 text-white'
-                    : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
+                    : 'bg-stone-100 text-slate-600 hover:bg-stone-100'
                 }`}
               >
                 {showOnlyModified ? '✅ Solo modificados' : '📋 Mostrar todos'}
@@ -453,7 +453,7 @@ export default function TextManagerPage() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   showComparison
                     ? 'bg-blue-500 text-white'
-                    : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
+                    : 'bg-stone-100 text-slate-600 hover:bg-stone-100'
                 }`}
               >
                 🌐 ES/CA
@@ -476,7 +476,7 @@ export default function TextManagerPage() {
                 className={`px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 ${
                   modifiedCount > 0
                     ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white hover:shadow-lg hover:scale-105'
-                    : 'bg-stone-200 text-slate-400 cursor-not-allowed'
+                    : 'bg-stone-100 text-slate-400 cursor-not-allowed'
                 }`}
               >
                 {saving ? (
@@ -527,7 +527,7 @@ export default function TextManagerPage() {
                 onClick={() => setActiveSection(null)}
                 className={`w-full p-3 rounded-xl text-left transition-all ${
                   !activeSection
-                    ? 'bg-gradient-to-r from-slate-200 to-slate-300 text-slate-800 shadow-lg'
+                    ? 'bg-gradient-to-r from-slate-200 to-slate-300 text-slate-700 shadow-lg'
                     : 'bg-stone-50 hover:bg-slate-50 text-slate-700'
                 }`}
               >
@@ -581,7 +581,7 @@ export default function TextManagerPage() {
               {/* Historial */}
               {changeHistory.length > 0 && (
                 <div className="mt-6 p-4 bg-stone-50 rounded-xl border border-stone-200">
-                  <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                  <h3 className="font-semibold text-slate-700 mb-3 flex items-center gap-2">
                     📜 Historial ({changeHistory.length})
                   </h3>
                   <div className="max-h-48 overflow-y-auto space-y-2">
@@ -609,7 +609,7 @@ export default function TextManagerPage() {
             {activeSection && (
               <div className={`mb-6 p-4 rounded-xl bg-gradient-to-r ${
                 SECTIONS.find(s => s.id === activeSection)?.color || 'from-slate-500 to-slate-600'
-              } text-slate-800`}>
+              } text-slate-700`}>
                 <h2 className="text-xl font-bold flex items-center gap-2">
                   {SECTIONS.find(s => s.id === activeSection)?.icon}
                   {SECTIONS.find(s => s.id === activeSection)?.name}
@@ -652,7 +652,7 @@ export default function TextManagerPage() {
                       className={`bg-stone-50 rounded-xl border transition-all ${
                         isModified
                           ? 'border-orange-300 shadow-md shadow-orange-100'
-                          : 'border-stone-200 hover:border-stone-300'
+                          : 'border-stone-200 hover:border-stone-200'
                       }`}
                     >
                       <div className="p-4">
@@ -674,7 +674,7 @@ export default function TextManagerPage() {
                             {isModified && (
                               <button
                                 onClick={() => handleRevert(path)}
-                                className="text-xs px-3 py-1 rounded-lg bg-stone-100 text-slate-600 hover:bg-stone-200 transition-colors"
+                                className="text-xs px-3 py-1 rounded-lg bg-stone-100 text-slate-600 hover:bg-stone-100 transition-colors"
                                 title="Revertir cambios"
                               >
                                 ↩️ Revertir

@@ -90,7 +90,7 @@ export default async function BookingsPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">Reserves</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">Reserves</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona totes les reserves i events
           </p>
@@ -98,7 +98,7 @@ export default async function BookingsPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/bookings/new"
-            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             + Nova Reserva
           </Link>
@@ -109,7 +109,7 @@ export default async function BookingsPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total</p>
-          <p className="mt-2 text-3xl font-bold text-slate-800">{bookings.length}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-700">{bookings.length}</p>
           <p className="text-xs text-slate-400">{formatCurrency(totalRevenue)}</p>
         </div>
         <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 shadow-sm">
@@ -197,7 +197,7 @@ export default async function BookingsPage() {
 
                       {/* Client */}
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-800">{booking.clientName}</div>
+                        <div className="font-medium text-slate-700">{booking.clientName}</div>
                         <div className="text-xs text-slate-500">{booking.clientEmail}</div>
                       </td>
 
@@ -206,7 +206,7 @@ export default async function BookingsPage() {
 
                       {/* Data Event */}
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-800">
+                        <div className="font-medium text-slate-700">
                           {formatDate(booking.eventDate)}
                         </div>
                         {booking.eventStartTime && (
@@ -236,7 +236,7 @@ export default async function BookingsPage() {
                       </td>
 
                       {/* Total */}
-                      <td className="px-4 py-3 font-medium text-slate-800">
+                      <td className="px-4 py-3 font-medium text-slate-700">
                         {formatCurrency(booking.total)}
                         {!booking.depositPaid && (
                           <span className="block text-xs text-red-500">Paga pendent</span>

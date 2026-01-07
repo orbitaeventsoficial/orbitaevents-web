@@ -152,10 +152,10 @@ export default function BottomSheet({
             {/* Header */}
             {title && (
               <div className="flex items-center justify-between px-5 pb-4 border-b border-stone-200">
-                <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
+                <h3 className="text-lg font-semibold text-slate-700">{title}</h3>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-slate-600 hover:text-slate-800 transition-colors"
+                  className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-slate-600 hover:text-slate-700 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -238,7 +238,7 @@ export function ActionsSheet({
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors ${
               action.variant === 'danger'
                 ? 'text-red-400 hover:bg-red-500/10'
-                : 'text-slate-800 hover:bg-stone-100'
+                : 'text-slate-700 hover:bg-stone-100'
             }`}
           >
             {action.icon && <span className="text-xl">{action.icon}</span>}

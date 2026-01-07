@@ -217,7 +217,7 @@ export default function AdminEventsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-100 text-slate-800 p-6">
+    <div className="min-h-screen bg-stone-100 text-slate-700 p-6">
       {/* Header */}
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
@@ -232,7 +232,7 @@ export default function AdminEventsPage() {
             <button
               onClick={sendAllPending}
               disabled={filteredBookings.filter((b) => !b.post_event_sent_at).length === 0}
-              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-800 font-semibold rounded-lg hover:from-amber-400 hover:to-amber-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-700 font-semibold rounded-lg hover:from-amber-400 hover:to-amber-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               🚀 Enviar a tots ({filteredBookings.filter((b) => !b.post_event_sent_at).length})
             </button>
@@ -248,7 +248,7 @@ export default function AdminEventsPage() {
               placeholder="Cercar per nom, email o referència..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 bg-stone-100 border border-stone-200 rounded-lg text-slate-800 placeholder-gray-500 focus:outline-none focus:border-amber-500/50"
+              className="w-full px-4 py-3 bg-stone-100 border border-stone-200 rounded-lg text-slate-700 placeholder-gray-500 focus:outline-none focus:border-amber-500/50"
             />
           </div>
 
@@ -257,7 +257,7 @@ export default function AdminEventsPage() {
             <select
               value={daysAgo}
               onChange={(e) => setDaysAgo(Number(e.target.value))}
-              className="w-full px-4 py-3 bg-stone-100 border border-stone-200 rounded-lg text-slate-800 focus:outline-none focus:border-amber-500/50"
+              className="w-full px-4 py-3 bg-stone-100 border border-stone-200 rounded-lg text-slate-700 focus:outline-none focus:border-amber-500/50"
             >
               <option value={3}>Últims 3 dies</option>
               <option value={7}>Última setmana</option>
@@ -280,7 +280,7 @@ export default function AdminEventsPage() {
                 className={`flex-1 px-3 py-2 rounded-lg font-medium transition-all ${
                   filter === f.value
                     ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                    : 'bg-stone-100 text-gray-400 border border-transparent hover:bg-stone-200'
+                    : 'bg-stone-100 text-gray-400 border border-transparent hover:bg-stone-100'
                 }`}
               >
                 {f.icon} {f.label}
@@ -291,7 +291,7 @@ export default function AdminEventsPage() {
           {/* Stats */}
           <div className="flex items-center justify-end gap-4 text-sm">
             <span className="text-gray-400">
-              Total: <span className="text-slate-800 font-semibold">{filteredBookings.length}</span>
+              Total: <span className="text-slate-700 font-semibold">{filteredBookings.length}</span>
             </span>
             <span className="text-amber-400">
               Pendents:{' '}
@@ -378,7 +378,7 @@ export default function AdminEventsPage() {
                       <button
                         onClick={() => sendPostEvent(booking)}
                         disabled={sending === booking.id}
-                        className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-800 font-semibold rounded-lg hover:from-amber-400 hover:to-amber-500 transition-all disabled:opacity-50 flex items-center gap-2"
+                        className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-700 font-semibold rounded-lg hover:from-amber-400 hover:to-amber-500 transition-all disabled:opacity-50 flex items-center gap-2"
                       >
                         {sending === booking.id ? (
                           <>
@@ -393,7 +393,7 @@ export default function AdminEventsPage() {
                       <button
                         onClick={() => sendPostEvent(booking)}
                         disabled={sending === booking.id}
-                        className="px-4 py-2 bg-stone-100 text-gray-400 rounded-lg hover:bg-stone-200 transition-all border border-stone-200"
+                        className="px-4 py-2 bg-stone-100 text-gray-400 rounded-lg hover:bg-stone-100 transition-all border border-stone-200"
                       >
                         🔄 Re-enviar
                       </button>

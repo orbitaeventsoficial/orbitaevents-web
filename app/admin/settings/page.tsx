@@ -83,7 +83,7 @@ export default async function SettingsPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">Configuració</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">Configuració</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona les configuracions del sistema i estadístiques públiques
           </p>
@@ -112,28 +112,28 @@ export default async function SettingsPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           href="/admin/packs"
-          className="rounded-xl border border-stone-200 bg-stone-50 p-6 hover:border-stone-300 hover:shadow-md transition-all"
+          className="rounded-xl border border-stone-200 bg-stone-50 p-6 hover:border-stone-200 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">📦</div>
-          <h3 className="font-semibold text-slate-800">Gestionar Packs</h3>
+          <h3 className="font-semibold text-slate-700">Gestionar Packs</h3>
           <p className="text-sm text-slate-500">Edita preus, traduccions i contingut dels packs</p>
         </Link>
 
         <Link
           href="/admin/translations"
-          className="rounded-xl border border-stone-200 bg-stone-50 p-6 hover:border-stone-300 hover:shadow-md transition-all"
+          className="rounded-xl border border-stone-200 bg-stone-50 p-6 hover:border-stone-200 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">🌐</div>
-          <h3 className="font-semibold text-slate-800">Traduccions</h3>
+          <h3 className="font-semibold text-slate-700">Traduccions</h3>
           <p className="text-sm text-slate-500">Gestiona el contingut multiidioma</p>
         </Link>
 
         <Link
           href="/admin/faqs"
-          className="rounded-xl border border-stone-200 bg-stone-50 p-6 hover:border-stone-300 hover:shadow-md transition-all"
+          className="rounded-xl border border-stone-200 bg-stone-50 p-6 hover:border-stone-200 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">❓</div>
-          <h3 className="font-semibold text-slate-800">FAQs</h3>
+          <h3 className="font-semibold text-slate-700">FAQs</h3>
           <p className="text-sm text-slate-500">Edita les preguntes freqüents</p>
         </Link>
       </section>

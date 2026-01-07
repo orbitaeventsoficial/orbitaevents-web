@@ -100,7 +100,7 @@ export default async function MensajesPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">Missatges</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">Missatges</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona les comunicacions amb clients
           </p>
@@ -120,7 +120,7 @@ export default async function MensajesPage() {
         </div>
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Converses</p>
-          <p className="mt-2 text-3xl font-bold text-slate-800">{data.recentLeads.length}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-700">{data.recentLeads.length}</p>
         </div>
       </section>
 
@@ -141,7 +141,7 @@ export default async function MensajesPage() {
         </a>
         <Link
           href="/admin/leads"
-          className="inline-flex items-center gap-2 rounded-lg bg-stone-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-200"
+          className="inline-flex items-center gap-2 rounded-lg bg-stone-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
         >
           👥 Tots els Leads
         </Link>
@@ -150,31 +150,31 @@ export default async function MensajesPage() {
       {/* Message Templates */}
       <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
         <div className="bg-slate-50 border-b border-stone-200 p-4">
-          <h3 className="font-semibold text-slate-800">📋 Plantilles Ràpides</h3>
+          <h3 className="font-semibold text-slate-700">📋 Plantilles Ràpides</h3>
         </div>
         <div className="p-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-800">Primer Contacte</p>
+            <p className="font-medium text-slate-700">Primer Contacte</p>
             <p className="text-xs text-slate-500 mt-1">Resposta inicial a nou lead</p>
           </button>
           <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-800">Enviar Pressupost</p>
+            <p className="font-medium text-slate-700">Enviar Pressupost</p>
             <p className="text-xs text-slate-500 mt-1">Acompanyament de pressupost</p>
           </button>
           <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-800">Seguiment</p>
+            <p className="font-medium text-slate-700">Seguiment</p>
             <p className="text-xs text-slate-500 mt-1">Recordatori després de dies</p>
           </button>
           <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-800">Confirmació</p>
+            <p className="font-medium text-slate-700">Confirmació</p>
             <p className="text-xs text-slate-500 mt-1">Confirmar reserva</p>
           </button>
           <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-800">Pre-Event</p>
+            <p className="font-medium text-slate-700">Pre-Event</p>
             <p className="text-xs text-slate-500 mt-1">Detalls abans de l&apos;event</p>
           </button>
           <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
-            <p className="font-medium text-slate-800">Post-Event</p>
+            <p className="font-medium text-slate-700">Post-Event</p>
             <p className="text-xs text-slate-500 mt-1">Agraïment i enquesta</p>
           </button>
         </div>
@@ -183,7 +183,7 @@ export default async function MensajesPage() {
       {/* Recent Messages */}
       <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
         <div className="bg-slate-50 border-b border-stone-200 p-4">
-          <h3 className="font-semibold text-slate-800">📬 Missatges Recents</h3>
+          <h3 className="font-semibold text-slate-700">📬 Missatges Recents</h3>
         </div>
         <div className="divide-y divide-slate-100">
           {data.recentLeads.map((lead) => {
@@ -203,7 +203,7 @@ export default async function MensajesPage() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-slate-800">{lead.name}</span>
+                      <span className="font-medium text-slate-700">{lead.name}</span>
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusConfig.bg} ${statusConfig.color}`}>
                         {statusConfig.label}
                       </span>
@@ -233,7 +233,7 @@ export default async function MensajesPage() {
                     )}
                     <Link
                       href={`/admin/leads/${lead.id}`}
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-stone-100 text-slate-700 hover:bg-stone-200"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-stone-100 text-slate-700 hover:bg-stone-100"
                       title="Veure"
                     >
                       👁️

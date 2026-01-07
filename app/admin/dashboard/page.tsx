@@ -195,7 +195,7 @@ export default async function AdminDashboardPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">Dashboard</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">Dashboard</h1>
           <p className="mt-1 text-sm text-slate-500">
             Resum d&apos;activitat i estadístiques en temps real
           </p>
@@ -203,7 +203,7 @@ export default async function AdminDashboardPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/bookings/new"
-            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             + Nova Reserva
           </Link>
@@ -240,14 +240,14 @@ export default async function AdminDashboardPage() {
         {/* Leads Card */}
         <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm">
           <div className="border-b border-stone-200 p-4 flex items-center justify-between">
-            <h3 className="font-semibold text-slate-800">Leads</h3>
+            <h3 className="font-semibold text-slate-700">Leads</h3>
             <Link href="/admin/leads" className="text-sm text-blue-600 hover:underline">
               Veure tots →
             </Link>
           </div>
           <div className="p-4 grid grid-cols-2 gap-4">
             <div className="text-center p-4 bg-slate-50 rounded-lg">
-              <p className="text-3xl font-bold text-slate-800">{data.leads.total}</p>
+              <p className="text-3xl font-bold text-slate-700">{data.leads.total}</p>
               <p className="text-xs text-slate-500 mt-1">Total</p>
             </div>
             <div className="text-center p-4 bg-blue-50 rounded-lg">
@@ -268,14 +268,14 @@ export default async function AdminDashboardPage() {
         {/* Reserves Card */}
         <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm">
           <div className="border-b border-stone-200 p-4 flex items-center justify-between">
-            <h3 className="font-semibold text-slate-800">Reserves</h3>
+            <h3 className="font-semibold text-slate-700">Reserves</h3>
             <Link href="/admin/bookings" className="text-sm text-blue-600 hover:underline">
               Veure totes →
             </Link>
           </div>
           <div className="p-4 grid grid-cols-2 gap-4">
             <div className="text-center p-4 bg-slate-50 rounded-lg">
-              <p className="text-3xl font-bold text-slate-800">{data.bookings.total}</p>
+              <p className="text-3xl font-bold text-slate-700">{data.bookings.total}</p>
               <p className="text-xs text-slate-500 mt-1">Total</p>
             </div>
             <div className="text-center p-4 bg-blue-50 rounded-lg">
@@ -306,7 +306,7 @@ export default async function AdminDashboardPage() {
         {/* Inventari */}
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-slate-800">Inventari</h3>
+            <h3 className="font-semibold text-slate-700">Inventari</h3>
             <Link href="/admin/inventory" className="text-sm text-blue-600 hover:underline">
               Gestionar →
             </Link>
@@ -316,21 +316,21 @@ export default async function AdminDashboardPage() {
               <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 text-xl mb-2">
                 ✓
               </span>
-              <p className="text-2xl font-bold text-slate-800">{data.inventory.available}</p>
+              <p className="text-2xl font-bold text-slate-700">{data.inventory.available}</p>
               <p className="text-xs text-slate-500">Disponibles</p>
             </div>
             <div className="text-center">
               <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 text-xl mb-2">
                 ⚡
               </span>
-              <p className="text-2xl font-bold text-slate-800">{data.inventory.inUse}</p>
+              <p className="text-2xl font-bold text-slate-700">{data.inventory.inUse}</p>
               <p className="text-xs text-slate-500">En ús</p>
             </div>
             <div className="text-center">
               <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-100 text-orange-600 text-xl mb-2">
                 🔧
               </span>
-              <p className="text-2xl font-bold text-slate-800">{data.inventory.maintenance}</p>
+              <p className="text-2xl font-bold text-slate-700">{data.inventory.maintenance}</p>
               <p className="text-xs text-slate-500">Manteniment</p>
             </div>
           </div>
@@ -342,7 +342,7 @@ export default async function AdminDashboardPage() {
         {/* Pròxims Events */}
         <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm">
           <div className="border-b border-stone-200 p-4">
-            <h3 className="font-semibold text-slate-800">Pròxims Events</h3>
+            <h3 className="font-semibold text-slate-700">Pròxims Events</h3>
           </div>
           <div className="divide-y divide-slate-100">
             {data.upcomingBookings.length === 0 ? (
@@ -356,13 +356,13 @@ export default async function AdminDashboardPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-medium text-slate-800">{booking.clientName}</p>
+                      <p className="font-medium text-slate-700">{booking.clientName}</p>
                       <p className="text-sm text-slate-500">
                         {booking.pack.translations[0]?.name || booking.pack.slug}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-slate-800">
+                      <p className="text-sm font-medium text-slate-700">
                         {formatDate(booking.eventDate)}
                       </p>
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -384,7 +384,7 @@ export default async function AdminDashboardPage() {
         {/* Últims Leads */}
         <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm">
           <div className="border-b border-stone-200 p-4">
-            <h3 className="font-semibold text-slate-800">Últims Leads</h3>
+            <h3 className="font-semibold text-slate-700">Últims Leads</h3>
           </div>
           <div className="divide-y divide-slate-100">
             {data.recentLeads.length === 0 ? (
@@ -398,7 +398,7 @@ export default async function AdminDashboardPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-medium text-slate-800">{lead.name}</p>
+                      <p className="font-medium text-slate-700">{lead.name}</p>
                       <p className="text-sm text-slate-500">{lead.email}</p>
                     </div>
                     <div className="text-right">

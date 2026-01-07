@@ -77,7 +77,7 @@ export default async function InventoryPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">Inventari</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">Inventari</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona tot l&apos;equipament tècnic i material
           </p>
@@ -85,7 +85,7 @@ export default async function InventoryPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/inventory/new"
-            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             + Nou Element
           </Link>
@@ -96,7 +96,7 @@ export default async function InventoryPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Elements</p>
-          <p className="mt-2 text-3xl font-bold text-slate-800">{items.length}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-700">{items.length}</p>
         </div>
         <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-green-600 uppercase">Disponibles</p>
@@ -134,7 +134,7 @@ export default async function InventoryPage() {
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>
                 <div>
-                  <p className="font-medium text-slate-800">{config.label}</p>
+                  <p className="font-medium text-slate-700">{config.label}</p>
                   <p className="text-sm text-slate-500">
                     {stat._count} elements · {stat._sum.value?.toLocaleString('ca-ES')}€
                   </p>
@@ -155,7 +155,7 @@ export default async function InventoryPage() {
         return (
           <section key={category} className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
             <div className="bg-slate-50 border-b border-stone-200 p-4">
-              <h2 className="font-semibold text-slate-800 flex items-center gap-2">
+              <h2 className="font-semibold text-slate-700 flex items-center gap-2">
                 <span>{config.icon}</span>
                 {config.label}
                 <span className="text-sm font-normal text-slate-500">
@@ -187,7 +187,7 @@ export default async function InventoryPage() {
                           </code>
                         </td>
                         <td className="px-4 py-3">
-                          <p className="font-medium text-slate-800">{item.name}</p>
+                          <p className="font-medium text-slate-700">{item.name}</p>
                           {item.description && (
                             <p className="text-xs text-slate-500 truncate max-w-[200px]">
                               {item.description}
@@ -226,7 +226,7 @@ export default async function InventoryPage() {
                         <td className="px-4 py-3 text-right">
                           <Link
                             href={`/admin/inventory/${item.id}`}
-                            className="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200"
+                            className="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-100"
                           >
                             Editar
                           </Link>

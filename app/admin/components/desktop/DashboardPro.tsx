@@ -115,7 +115,7 @@ function MetricCard({
       </div>
 
       <div>
-        <p className="text-3xl font-bold text-slate-800 mb-1">{value}</p>
+        <p className="text-3xl font-bold text-slate-700 mb-1">{value}</p>
         <p className="text-sm text-slate-500">{title}</p>
         {subValue && (
           <p className="text-xs text-slate-400 mt-1">{subValue}</p>
@@ -148,7 +148,7 @@ function ActivityChart({ data }: { data: ActivityData[] }) {
     >
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold text-slate-800">Activitat setmanal</h3>
+          <h3 className="text-lg font-semibold text-slate-700">Activitat setmanal</h3>
           <p className="text-sm text-slate-500">Leads i reserves dels últims 7 dies</p>
         </div>
         <div className="flex items-center gap-4 text-xs">
@@ -180,7 +180,7 @@ function ActivityChart({ data }: { data: ActivityData[] }) {
                   exit={{ opacity: 0, y: 10 }}
                   className="absolute -mt-20 px-3 py-2 bg-stone-100 rounded-lg text-xs shadow-xl z-10"
                 >
-                  <p className="text-slate-800 font-medium">{day.day}</p>
+                  <p className="text-slate-700 font-medium">{day.day}</p>
                   <p className="text-orange-400">{day.leads} leads</p>
                   <p className="text-green-400">{day.bookings} reserves</p>
                 </motion.div>
@@ -244,7 +244,7 @@ function RecentLeads({ leads }: { leads: Lead[] }) {
       className="p-6 rounded-2xl bg-stone-100 border border-stone-200"
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-slate-800">Leads recents</h3>
+        <h3 className="text-lg font-semibold text-slate-700">Leads recents</h3>
         <Link href="/admin/leads" className="text-sm text-orange-400 hover:text-orange-300">
           Veure tots →
         </Link>
@@ -260,14 +260,14 @@ function RecentLeads({ leads }: { leads: Lead[] }) {
           >
             <Link
               href={`/admin/leads/${lead.id}`}
-              className="flex items-center gap-4 p-3 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors group"
+              className="flex items-center gap-4 p-3 rounded-xl bg-stone-100 hover:bg-stone-100 transition-colors group"
             >
               <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center text-xl">
                 {serviceIcons[lead.service] || '📋'}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-slate-800 font-medium truncate">{lead.name}</p>
+                  <p className="text-slate-700 font-medium truncate">{lead.name}</p>
                   <span>{priorityIcons[lead.priority]}</span>
                 </div>
                 <p className="text-sm text-slate-500 truncate">{lead.email}</p>
@@ -314,7 +314,7 @@ function UpcomingEvents({ events }: { events: Event[] }) {
       className="p-6 rounded-2xl bg-stone-100 border border-stone-200"
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-slate-800">Propers events</h3>
+        <h3 className="text-lg font-semibold text-slate-700">Propers events</h3>
         <Link href="/admin/calendario" className="text-sm text-orange-400 hover:text-orange-300">
           Calendari →
         </Link>
@@ -332,15 +332,15 @@ function UpcomingEvents({ events }: { events: Event[] }) {
             >
               <Link
                 href={`/admin/bookings/${event.id}`}
-                className={`block p-4 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors border-l-4 ${typeColors[event.type] || 'border-l-white/20'}`}
+                className={`block p-4 rounded-xl bg-stone-100 hover:bg-stone-100 transition-colors border-l-4 ${typeColors[event.type] || 'border-l-white/20'}`}
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-slate-800 font-medium">{event.title}</p>
+                    <p className="text-slate-700 font-medium">{event.title}</p>
                     <p className="text-sm text-slate-500">{event.client}</p>
                   </div>
                   <div className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                    dateInfo.urgent ? 'bg-red-500/20 text-red-400' : 'bg-stone-200 text-slate-600'
+                    dateInfo.urgent ? 'bg-red-500/20 text-red-400' : 'bg-stone-100 text-slate-600'
                   }`}>
                     {dateInfo.label}
                   </div>
@@ -469,14 +469,14 @@ export default function DashboardPro() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-slate-700">Dashboard</h1>
           <p className="text-slate-500 text-sm">
             Última actualització: {lastUpdated.toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
         <button
           onClick={fetchData}
-          className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-200 rounded-xl text-slate-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-100 rounded-xl text-slate-700 transition-colors"
         >
           🔄 Actualitzar
         </button>

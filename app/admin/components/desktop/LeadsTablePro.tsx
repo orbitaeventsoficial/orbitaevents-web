@@ -113,7 +113,7 @@ function StatusBadge({
                     setIsOpen(false);
                   }}
                   className={`w-full px-3 py-2 text-left text-sm hover:bg-stone-100 flex items-center gap-2 ${
-                    status === key ? 'bg-stone-200' : ''
+                    status === key ? 'bg-stone-100' : ''
                   }`}
                 >
                   <div className={`w-2 h-2 rounded-full ${cfg.bg}`} />
@@ -189,8 +189,8 @@ function ColumnHeader({
   return (
     <button
       onClick={() => onSort(field)}
-      className={`flex items-center gap-1 text-left hover:text-slate-800 transition-colors ${
-        isActive ? 'text-slate-800' : 'text-slate-500'
+      className={`flex items-center gap-1 text-left hover:text-slate-700 transition-colors ${
+        isActive ? 'text-slate-700' : 'text-slate-500'
       }`}
     >
       {label}
@@ -377,7 +377,7 @@ export default function LeadsTablePro() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Leads</h1>
+          <h1 className="text-2xl font-bold text-slate-700">Leads</h1>
           <p className="text-slate-500 text-sm">{filteredLeads.length} contactes</p>
         </div>
         <Link
@@ -401,7 +401,7 @@ export default function LeadsTablePro() {
               setCurrentPage(1);
             }}
             placeholder="Buscar per nom, email o telèfon..."
-            className="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-stone-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-orange-500 focus:outline-none transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 placeholder:text-slate-400 focus:border-orange-500 focus:outline-none transition-colors"
           />
         </div>
 
@@ -412,7 +412,7 @@ export default function LeadsTablePro() {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="px-4 py-2.5 bg-stone-100 border border-stone-200 rounded-xl text-slate-800 focus:border-orange-500 focus:outline-none cursor-pointer"
+          className="px-4 py-2.5 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 focus:border-orange-500 focus:outline-none cursor-pointer"
         >
           <option value="all">Tots els estats ({statusCounts.all || 0})</option>
           {Object.entries(statusConfig).map(([key, cfg]) => (
@@ -429,7 +429,7 @@ export default function LeadsTablePro() {
             setServiceFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="px-4 py-2.5 bg-stone-100 border border-stone-200 rounded-xl text-slate-800 focus:border-orange-500 focus:outline-none cursor-pointer"
+          className="px-4 py-2.5 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 focus:border-orange-500 focus:outline-none cursor-pointer"
         >
           <option value="all">Tots els serveis</option>
           {Object.entries(serviceConfig).map(([key, cfg]) => (
@@ -447,7 +447,7 @@ export default function LeadsTablePro() {
           className={`px-4 py-2 rounded-xl text-sm whitespace-nowrap transition-colors ${
             statusFilter === 'all'
               ? 'bg-orange-500 text-white font-medium'
-              : 'bg-stone-100 text-slate-700 hover:bg-stone-200'
+              : 'bg-stone-100 text-slate-700 hover:bg-stone-100'
           }`}
         >
           Tots ({statusCounts.all || 0})
@@ -459,7 +459,7 @@ export default function LeadsTablePro() {
             className={`px-4 py-2 rounded-xl text-sm whitespace-nowrap transition-colors flex items-center gap-2 ${
               statusFilter === key
                 ? `${cfg.bg} ${cfg.color} font-medium`
-                : 'bg-stone-100 text-slate-700 hover:bg-stone-200'
+                : 'bg-stone-100 text-slate-700 hover:bg-stone-100'
             }`}
           >
             {cfg.label}
@@ -478,7 +478,7 @@ export default function LeadsTablePro() {
                   type="checkbox"
                   checked={selectedLeads.size === filteredLeads.length && filteredLeads.length > 0}
                   onChange={handleSelectAll}
-                  className="w-4 h-4 rounded border-stone-300 bg-stone-100 text-orange-500 focus:ring-orange-500"
+                  className="w-4 h-4 rounded border-stone-200 bg-stone-100 text-orange-500 focus:ring-orange-500"
                 />
               </th>
               <th className="p-4 text-left">
@@ -514,12 +514,12 @@ export default function LeadsTablePro() {
                     type="checkbox"
                     checked={selectedLeads.has(lead.id)}
                     onChange={() => toggleSelect(lead.id)}
-                    className="w-4 h-4 rounded border-stone-300 bg-stone-100 text-orange-500 focus:ring-orange-500"
+                    className="w-4 h-4 rounded border-stone-200 bg-stone-100 text-orange-500 focus:ring-orange-500"
                   />
                 </td>
                 <td className="p-4">
                   <Link href={`/admin/leads/${lead.id}`} className="hover:text-orange-400 transition-colors">
-                    <p className="text-slate-800 font-medium">{lead.name}</p>
+                    <p className="text-slate-700 font-medium">{lead.name}</p>
                     <p className="text-slate-400 text-xs">
                       {new Date(lead.createdAt).toLocaleDateString('ca-ES')}
                     </p>
@@ -594,7 +594,7 @@ export default function LeadsTablePro() {
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-stone-100 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl text-slate-800 transition-colors"
+              className="px-4 py-2 bg-stone-100 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl text-slate-700 transition-colors"
             >
               ← Anterior
             </button>
@@ -616,7 +616,7 @@ export default function LeadsTablePro() {
                   className={`w-10 h-10 rounded-xl transition-colors ${
                     currentPage === page
                       ? 'bg-orange-500 text-white font-medium'
-                      : 'bg-stone-100 hover:bg-stone-200 text-slate-800'
+                      : 'bg-stone-100 hover:bg-stone-100 text-slate-700'
                   }`}
                 >
                   {page}
@@ -626,7 +626,7 @@ export default function LeadsTablePro() {
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-stone-100 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl text-slate-800 transition-colors"
+              className="px-4 py-2 bg-stone-100 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl text-slate-700 transition-colors"
             >
               Següent →
             </button>
@@ -643,8 +643,8 @@ export default function LeadsTablePro() {
             exit={{ opacity: 0, y: 20 }}
             className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-stone-100 rounded-2xl shadow-2xl border border-stone-200 px-6 py-4 flex items-center gap-4"
           >
-            <span className="text-slate-800 font-medium">{selectedLeads.size} seleccionats</span>
-            <div className="w-px h-6 bg-stone-200" />
+            <span className="text-slate-700 font-medium">{selectedLeads.size} seleccionats</span>
+            <div className="w-px h-6 bg-stone-100" />
             <button className="px-4 py-2 bg-orange-500/20 text-orange-400 rounded-xl hover:bg-orange-500/30 transition-colors">
               Canviar estat
             </button>
@@ -653,7 +653,7 @@ export default function LeadsTablePro() {
             </button>
             <button
               onClick={() => setSelectedLeads(new Set())}
-              className="text-slate-500 hover:text-slate-800 transition-colors"
+              className="text-slate-500 hover:text-slate-700 transition-colors"
             >
               ✕
             </button>

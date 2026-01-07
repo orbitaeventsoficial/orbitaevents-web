@@ -51,7 +51,7 @@ const NavItem = ({ icon, label, href, badge, badgeColor = 'orange' }: NavItemPro
         transition-all duration-200 group
         ${isActive 
           ? 'bg-orange-500/10 text-orange-500' 
-          : 'text-neutral-400 hover:text-slate-800 hover:bg-stone-100'
+          : 'text-neutral-400 hover:text-slate-700 hover:bg-stone-100'
         }
       `}
     >
@@ -85,11 +85,11 @@ export default function AdminSidebar() {
       <div className="p-4 border-b border-stone-200">
         <Link href="/admin" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
-            <span className="text-slate-800 font-bold text-lg">Ò</span>
+            <span className="text-slate-700 font-bold text-lg">Ò</span>
           </div>
           {!collapsed && (
             <div className="animate-fade-in">
-              <span className="text-slate-800 font-semibold">Òrbita</span>
+              <span className="text-slate-700 font-semibold">Òrbita</span>
               <span className="text-orange-500 font-semibold ml-1">Admin</span>
             </div>
           )}
@@ -139,7 +139,7 @@ export default function AdminSidebar() {
         {!collapsed && (
           <div className="mt-3 p-3 rounded-xl bg-gradient-to-r from-orange-500/10 to-orange-600/5 border border-orange-500/20">
             <p className="text-[10px] text-orange-400 uppercase tracking-wider">Pròxim event</p>
-            <p className="text-sm text-slate-800 font-medium mt-1">Boda - Dissabte 14</p>
+            <p className="text-sm text-slate-700 font-medium mt-1">Boda - Dissabte 14</p>
             <p className="text-xs text-neutral-500">Mas Can Ferrer, Granollers</p>
           </div>
         )}
@@ -163,7 +163,7 @@ export function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: (
       {/* Backdrop */}
       <div 
         className={`
-          lg:hidden fixed inset-0 bg-stone-200/70 backdrop-blur-sm z-40
+          lg:hidden fixed inset-0 bg-stone-100/70 backdrop-blur-sm z-40
           transition-opacity duration-300
           ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
         `}
@@ -181,14 +181,14 @@ export function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: (
         <div className="p-4 border-b border-stone-200 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
-              <span className="text-slate-800 font-bold text-lg">Ò</span>
+              <span className="text-slate-700 font-bold text-lg">Ò</span>
             </div>
             <div>
-              <span className="text-slate-800 font-semibold">Òrbita</span>
+              <span className="text-slate-700 font-semibold">Òrbita</span>
               <span className="text-orange-500 font-semibold ml-1">Admin</span>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-neutral-400 hover:text-slate-800">
+          <button onClick={onClose} className="p-2 text-neutral-400 hover:text-slate-700">
             ✕
           </button>
         </div>

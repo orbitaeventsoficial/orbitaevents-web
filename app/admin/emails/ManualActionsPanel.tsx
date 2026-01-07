@@ -80,7 +80,7 @@ export default function ManualActionsPanel() {
   return (
     <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
-        <h2 className="font-semibold text-slate-800">🔧 Accions Manuals</h2>
+        <h2 className="font-semibold text-slate-700">🔧 Accions Manuals</h2>
       </div>
 
       <div className="p-6 space-y-6">
@@ -95,8 +95,8 @@ export default function ManualActionsPanel() {
             disabled={runningCron}
             className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
               runningCron
-                ? 'bg-stone-200 text-slate-500 cursor-not-allowed'
-                : 'bg-stone-100 text-slate-800 hover:bg-stone-200'
+                ? 'bg-stone-100 text-slate-500 cursor-not-allowed'
+                : 'bg-stone-100 text-slate-700 hover:bg-stone-100'
             }`}
           >
             {runningCron ? (
@@ -139,7 +139,7 @@ export default function ManualActionsPanel() {
               disabled={sendingTest}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 sendingTest
-                  ? 'bg-stone-200 text-slate-500'
+                  ? 'bg-stone-100 text-slate-500'
                   : 'bg-amber-500 text-white hover:bg-amber-600'
               }`}
             >

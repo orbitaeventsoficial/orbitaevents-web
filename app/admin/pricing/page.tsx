@@ -222,7 +222,7 @@ export default function PricingAdminPage() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-slate-700 flex items-center gap-3">
                 <span className="text-3xl">💰</span>
                 Gestió de Preus i Equipament
               </h1>
@@ -232,7 +232,7 @@ export default function PricingAdminPage() {
             </div>
             <Link
               href="/admin"
-              className="px-4 py-2 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 font-medium transition-colors"
+              className="px-4 py-2 bg-stone-100 hover:bg-stone-100 rounded-lg text-slate-700 font-medium transition-colors"
             >
               ← Tornar
             </Link>
@@ -337,7 +337,7 @@ export default function PricingAdminPage() {
             <div className="grid md:grid-cols-2 gap-6">
               {/* Top Extras */}
               <div className="bg-stone-50 rounded-2xl p-6 shadow-sm border border-stone-200">
-                <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
                   <span className="text-2xl">🏆</span>
                   Extras Més Venuts
                 </h3>
@@ -349,15 +349,15 @@ export default function PricingAdminPage() {
                     >
                       <div className="flex items-center gap-3">
                         <span className={`
-                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-slate-800
-                          ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-stone-300'}
+                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-slate-700
+                          ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-stone-200'}
                         `}>
                           {i + 1}
                         </span>
-                        <span className="font-medium text-slate-800">{extra.name}</span>
+                        <span className="font-medium text-slate-700">{extra.name}</span>
                       </div>
                       <div className="text-right">
-                        <div className="font-bold text-slate-800">{extra.totalSales} vendes</div>
+                        <div className="font-bold text-slate-700">{extra.totalSales} vendes</div>
                         <div className="text-sm text-slate-500">{formatCurrency(extra.revenue)}</div>
                       </div>
                     </div>
@@ -367,7 +367,7 @@ export default function PricingAdminPage() {
 
               {/* Top Packs */}
               <div className="bg-stone-50 rounded-2xl p-6 shadow-sm border border-stone-200">
-                <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
                   <span className="text-2xl">🎯</span>
                   Packs Més Populars
                 </h3>
@@ -379,15 +379,15 @@ export default function PricingAdminPage() {
                     >
                       <div className="flex items-center gap-3">
                         <span className={`
-                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-slate-800
-                          ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-stone-300'}
+                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-slate-700
+                          ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-stone-200'}
                         `}>
                           {i + 1}
                         </span>
-                        <span className="font-medium text-slate-800">{pack.name}</span>
+                        <span className="font-medium text-slate-700">{pack.name}</span>
                       </div>
                       <div className="text-right">
-                        <div className="font-bold text-slate-800">{pack.totalBookings} reserves</div>
+                        <div className="font-bold text-slate-700">{pack.totalBookings} reserves</div>
                         <div className="text-sm text-slate-500">{formatCurrency(pack.revenue)}</div>
                       </div>
                     </div>
@@ -452,14 +452,14 @@ export default function PricingAdminPage() {
                   key={extra.id}
                   className={`
                     bg-stone-50 rounded-2xl border-2 overflow-hidden transition-all
-                    ${editingExtra === extra.id ? 'border-orange-500 shadow-lg' : 'border-stone-200 hover:border-stone-300'}
+                    ${editingExtra === extra.id ? 'border-orange-500 shadow-lg' : 'border-stone-200 hover:border-stone-200'}
                   `}
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-xl font-bold text-slate-800">{extra.name}</h3>
+                          <h3 className="text-xl font-bold text-slate-700">{extra.name}</h3>
                           {!extra.isActive && (
                             <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
                               Inactiu
@@ -492,7 +492,7 @@ export default function PricingAdminPage() {
                         <div className="flex gap-6 text-sm">
                           <div>
                             <span className="text-slate-500">Vendes:</span>
-                            <span className="font-semibold text-slate-800 ml-1">{extra.salesCount}</span>
+                            <span className="font-semibold text-slate-700 ml-1">{extra.salesCount}</span>
                           </div>
                           <div>
                             <span className="text-slate-500">Ingressos:</span>
@@ -519,7 +519,7 @@ export default function PricingAdminPage() {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => setEditingExtra(null)}
-                                className="px-3 py-1.5 text-sm bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors"
+                                className="px-3 py-1.5 text-sm bg-stone-100 hover:bg-stone-100 rounded-lg transition-colors"
                               >
                                 Cancel·lar
                               </button>
@@ -540,7 +540,7 @@ export default function PricingAdminPage() {
                             }}
                             className="group"
                           >
-                            <div className="text-3xl font-bold text-slate-800 group-hover:text-orange-500 transition-colors">
+                            <div className="text-3xl font-bold text-slate-700 group-hover:text-orange-500 transition-colors">
                               {formatCurrency(extra.price)}
                             </div>
                             <div className="text-xs text-slate-400 group-hover:text-orange-400 mt-1">
@@ -580,7 +580,7 @@ export default function PricingAdminPage() {
             <div className="bg-stone-100 border border-stone-200 rounded-xl p-4 flex items-center gap-3">
               <span className="text-2xl">🔒</span>
               <div>
-                <p className="font-semibold text-slate-800">Només lectura</p>
+                <p className="font-semibold text-slate-700">Només lectura</p>
                 <p className="text-sm text-slate-600">
                   Per editar packs, ves a{' '}
                   <Link href="/admin/packs" className="text-orange-500 hover:underline font-medium">
@@ -600,7 +600,7 @@ export default function PricingAdminPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-xl font-bold text-slate-800">{pack.name}</h3>
+                          <h3 className="text-xl font-bold text-slate-700">{pack.name}</h3>
                           {pack.isFeatured && (
                             <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
                               ⭐ Destacat
@@ -619,15 +619,15 @@ export default function PricingAdminPage() {
                         {/* Info */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                           <div className="bg-slate-50 rounded-xl p-3 text-center">
-                            <div className="text-2xl font-bold text-slate-800">{pack.djHours}h</div>
+                            <div className="text-2xl font-bold text-slate-700">{pack.djHours}h</div>
                             <div className="text-xs text-slate-500">DJ inclòs</div>
                           </div>
                           <div className="bg-slate-50 rounded-xl p-3 text-center">
-                            <div className="text-2xl font-bold text-slate-800">{pack.soundWatts}W</div>
+                            <div className="text-2xl font-bold text-slate-700">{pack.soundWatts}W</div>
                             <div className="text-xs text-slate-500">Potència</div>
                           </div>
                           <div className="bg-slate-50 rounded-xl p-3 text-center">
-                            <div className="text-2xl font-bold text-slate-800">{formatCurrency(pack.extraHourPrice)}</div>
+                            <div className="text-2xl font-bold text-slate-700">{formatCurrency(pack.extraHourPrice)}</div>
                             <div className="text-xs text-slate-500">Hora extra</div>
                           </div>
                           <div className="bg-slate-50 rounded-xl p-3 text-center">
@@ -658,7 +658,7 @@ export default function PricingAdminPage() {
 
                       {/* Preu (no editable) */}
                       <div className="text-right">
-                        <div className="text-3xl font-bold text-slate-800">
+                        <div className="text-3xl font-bold text-slate-700">
                           {formatCurrency(pack.price)}
                         </div>
                         {pack.originalPrice && pack.originalPrice > pack.price && (
@@ -676,7 +676,7 @@ export default function PricingAdminPage() {
                     <div className="flex gap-6 text-sm">
                       <div>
                         <span className="text-slate-500">Reserves:</span>
-                        <span className="font-semibold text-slate-800 ml-1">{pack.bookingsCount}</span>
+                        <span className="font-semibold text-slate-700 ml-1">{pack.bookingsCount}</span>
                       </div>
                       <div>
                         <span className="text-slate-500">Ingressos:</span>
@@ -719,12 +719,12 @@ export default function PricingAdminPage() {
                 placeholder="Cerca per nom o codi..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="flex-1 px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                className="flex-1 px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               />
               <select
                 value={categoryFilter}
                 onChange={e => setCategoryFilter(e.target.value)}
-                className="px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl focus:border-orange-500"
+                className="px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:border-orange-500"
               >
                 <option value="all">Totes les categories</option>
                 {Object.entries(CATEGORY_LABELS).map(([key, { label, icon }]) => (
@@ -744,16 +744,16 @@ export default function PricingAdminPage() {
                 return (
                   <div
                     key={item.id}
-                    className="bg-stone-50 rounded-xl border border-stone-200 p-4 hover:border-stone-300 transition-colors"
+                    className="bg-stone-50 rounded-xl border border-stone-200 p-4 hover:border-stone-200 transition-colors"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 ${categoryInfo.color} rounded-xl flex items-center justify-center text-2xl text-slate-800`}>
+                        <div className={`w-12 h-12 ${categoryInfo.color} rounded-xl flex items-center justify-center text-2xl text-slate-700`}>
                           {categoryInfo.icon}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-slate-800">{item.name}</h3>
+                            <h3 className="font-semibold text-slate-700">{item.name}</h3>
                             <code className="text-xs bg-stone-100 px-2 py-0.5 rounded text-slate-500">
                               {item.code}
                             </code>
@@ -772,7 +772,7 @@ export default function PricingAdminPage() {
                       {/* Stats d'ús */}
                       <div className="flex items-center gap-6">
                         <div className="text-center">
-                          <div className="text-xl font-bold text-slate-800">{item.stats.totalEvents}</div>
+                          <div className="text-xl font-bold text-slate-700">{item.stats.totalEvents}</div>
                           <div className="text-xs text-slate-500">Events</div>
                         </div>
                         <div className="text-center">

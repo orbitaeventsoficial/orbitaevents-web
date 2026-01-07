@@ -36,7 +36,7 @@ export function MetricCard({ icon, label, value, change, changeType, className =
           <span className="text-lg">{icon}</span>
           <span>{label}</span>
         </div>
-        <div className="mt-2 text-3xl font-bold text-slate-800">{value}</div>
+        <div className="mt-2 text-3xl font-bold text-slate-700">{value}</div>
         {change && (
           <div className={`
             mt-2 flex items-center gap-1 text-sm
@@ -79,8 +79,8 @@ export function Button({
 }: ButtonProps) {
   const variants = {
     primary: 'bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20',
-    secondary: 'bg-stone-100 hover:bg-stone-200 text-slate-800 border border-stone-200',
-    ghost: 'hover:bg-stone-100 text-neutral-400 hover:text-slate-800',
+    secondary: 'bg-stone-100 hover:bg-stone-100 text-slate-700 border border-stone-200',
+    ghost: 'hover:bg-stone-100 text-neutral-400 hover:text-slate-700',
     danger: 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20',
   };
 
@@ -160,12 +160,12 @@ export function Input({
             w-full px-4 py-3 
             ${icon ? 'pl-11' : ''}
             bg-[#1a1a1a] border rounded-xl
-            text-slate-800 placeholder-neutral-600
+            text-slate-700 placeholder-neutral-600
             transition-all duration-200
             focus:outline-none focus:ring-2 focus:ring-orange-500/50
             ${error 
               ? 'border-red-500/50 focus:border-red-500' 
-              : 'border-stone-200 hover:border-stone-300 focus:border-orange-500'
+              : 'border-stone-200 hover:border-stone-200 focus:border-orange-500'
             }
           `}
         />
@@ -204,9 +204,9 @@ export function Select({ label, options, value, onChange, className = '' }: Sele
           className="
             w-full px-4 py-3 pr-10
             bg-[#1a1a1a] border border-stone-200 rounded-xl
-            text-slate-800 appearance-none
+            text-slate-700 appearance-none
             transition-all duration-200
-            hover:border-stone-300 focus:border-orange-500
+            hover:border-stone-200 focus:border-orange-500
             focus:outline-none focus:ring-2 focus:ring-orange-500/50
           "
         >
@@ -315,7 +315,7 @@ export function Card({ children, title, subtitle, action, className = '', noPadd
       {(title || action) && (
         <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between">
           <div>
-            {title && <h3 className="text-lg font-semibold text-slate-800">{title}</h3>}
+            {title && <h3 className="text-lg font-semibold text-slate-700">{title}</h3>}
             {subtitle && <p className="text-sm text-neutral-500 mt-0.5">{subtitle}</p>}
           </div>
           {action}
@@ -403,9 +403,9 @@ export function SearchInput({ placeholder = 'Buscar...', value, onChange, classN
         className="
           w-full pl-10 pr-4 py-2
           bg-stone-100 border border-stone-200 rounded-xl
-          text-slate-800 placeholder-neutral-500 text-sm
+          text-slate-700 placeholder-neutral-500 text-sm
           transition-all duration-200
-          hover:border-stone-300 focus:border-orange-500
+          hover:border-stone-200 focus:border-orange-500
           focus:outline-none focus:ring-2 focus:ring-orange-500/50
         "
       />
@@ -428,7 +428,7 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
   return (
     <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
       <span className="text-5xl mb-4">{icon}</span>
-      <h3 className="text-lg font-semibold text-slate-800 mb-2">{title}</h3>
+      <h3 className="text-lg font-semibold text-slate-700 mb-2">{title}</h3>
       <p className="text-neutral-500 max-w-sm mb-6">{description}</p>
       {action}
     </div>
@@ -471,8 +471,8 @@ export function Toast({ type, message, onClose }: ToastProps) {
       ${styles[type]}
     `}>
       <span className="text-lg">{icons[type]}</span>
-      <p className="text-slate-800">{message}</p>
-      <button onClick={onClose} className="ml-2 text-neutral-400 hover:text-slate-800 transition-colors">
+      <p className="text-slate-700">{message}</p>
+      <button onClick={onClose} className="ml-2 text-neutral-400 hover:text-slate-700 transition-colors">
         ✕
       </button>
     </div>
@@ -496,7 +496,7 @@ export function SlideOver({ isOpen, onClose, title, children }: SlideOverProps) 
       {/* Backdrop */}
       <div 
         className={`
-          fixed inset-0 bg-stone-200/70 backdrop-blur-sm z-40
+          fixed inset-0 bg-stone-100/70 backdrop-blur-sm z-40
           transition-opacity duration-300
           ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
         `}
@@ -512,7 +512,7 @@ export function SlideOver({ isOpen, onClose, title, children }: SlideOverProps) 
       `}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
-          <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
+          <h2 className="text-lg font-semibold text-slate-700">{title}</h2>
           <button 
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-stone-100 text-neutral-400 transition-colors"
@@ -559,7 +559,7 @@ export function Tabs({ tabs, activeTab, onChange }: TabsProps) {
             transition-all duration-200
             ${activeTab === tab.id 
               ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' 
-              : 'text-neutral-400 hover:text-slate-800 hover:bg-stone-100'
+              : 'text-neutral-400 hover:text-slate-700 hover:bg-stone-100'
             }
           `}
         >
@@ -568,7 +568,7 @@ export function Tabs({ tabs, activeTab, onChange }: TabsProps) {
           {tab.badge && (
             <span className={`
               px-1.5 py-0.5 rounded-full text-xs
-              ${activeTab === tab.id ? 'bg-stone-50/20' : 'bg-stone-200'}
+              ${activeTab === tab.id ? 'bg-stone-50/20' : 'bg-stone-100'}
             `}>
               {tab.badge}
             </span>

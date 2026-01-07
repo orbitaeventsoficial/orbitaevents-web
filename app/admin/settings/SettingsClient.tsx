@@ -151,7 +151,7 @@ export default function SettingsClient({
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>
                 <div>
-                  <h2 className="font-semibold text-slate-800">{config.label}</h2>
+                  <h2 className="font-semibold text-slate-700">{config.label}</h2>
                   <p className="text-sm text-slate-500">{config.description}</p>
                 </div>
               </div>
@@ -189,7 +189,7 @@ export default function SettingsClient({
                           </span>
                         </div>
                         {setting.label && (
-                          <p className="mt-1 font-medium text-slate-800">{setting.label}</p>
+                          <p className="mt-1 font-medium text-slate-700">{setting.label}</p>
                         )}
                         {setting.description && (
                           <p className="text-sm text-slate-500">{setting.description}</p>
@@ -242,7 +242,7 @@ export default function SettingsClient({
                           </div>
                         ) : (
                           <>
-                            <p className="text-lg font-semibold text-slate-800">
+                            <p className="text-lg font-semibold text-slate-700">
                               {formatDisplay(current)}
                             </p>
                             <p className="text-xs text-slate-400">

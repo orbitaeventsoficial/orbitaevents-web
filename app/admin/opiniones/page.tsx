@@ -177,7 +177,7 @@ export default function AdminOpinionesPage() {
   const isPending = (status: string) => status === 'pending';
 
   return (
-    <div className="min-h-screen bg-stone-100 text-slate-800 p-6">
+    <div className="min-h-screen bg-stone-100 text-slate-700 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
@@ -192,7 +192,7 @@ export default function AdminOpinionesPage() {
           {stats && (
             <div className="flex gap-4 flex-wrap">
               <div className="bg-stone-50 border border-zinc-800 rounded-xl px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-slate-800">{stats.total}</p>
+                <p className="text-2xl font-bold text-slate-700">{stats.total}</p>
                 <p className="text-xs text-gray-500">Total</p>
               </div>
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 text-center">
@@ -208,7 +208,7 @@ export default function AdminOpinionesPage() {
                 <p className="text-xs text-purple-500/70">Destacades</p>
               </div>
               <div className="bg-stone-50 border border-zinc-800 rounded-xl px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-slate-800">{stats.avgRating?.toFixed(1) || '0.0'}</p>
+                <p className="text-2xl font-bold text-slate-700">{stats.avgRating?.toFixed(1) || '0.0'}</p>
                 <p className="text-xs text-gray-500">Mitjana ★</p>
               </div>
             </div>
@@ -297,7 +297,7 @@ export default function AdminOpinionesPage() {
                       <div className="flex items-start justify-between mb-4">
                         <div>
                           <div className="flex items-center gap-3 mb-1">
-                            <h3 className="font-semibold text-slate-800">
+                            <h3 className="font-semibold text-slate-700">
                               {t.customer.name || 'Client anònim'}
                             </h3>
                             {renderStars(t.rating)}

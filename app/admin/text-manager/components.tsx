@@ -23,7 +23,7 @@ export function TextStats({ totalTexts, modifiedCount, sectionCounts }: StatsPro
 
   return (
     <div className="bg-stone-50 rounded-xl border border-stone-200 p-6">
-      <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+      <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
         📊 Estadísticas de Contenido
       </h3>
 
@@ -151,7 +151,7 @@ export function TextTools({ onRefresh, onExport, onImport, onSync }: ToolsProps)
 
   return (
     <div className="bg-stone-50 rounded-xl border border-stone-200 p-6">
-      <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+      <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
         🛠️ Herramientas
       </h3>
 
@@ -281,7 +281,7 @@ export function AdvancedSearch({
           className={`px-4 py-3 rounded-xl transition-all flex items-center gap-2 ${
             showFilters || Object.values(filters).some(v => v)
               ? 'bg-orange-500 text-white'
-              : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
+              : 'bg-stone-100 text-slate-600 hover:bg-stone-100'
           }`}
         >
           <span>⚙️</span>
@@ -303,7 +303,7 @@ export function AdvancedSearch({
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filters.showModified
                   ? 'bg-orange-500 text-white'
-                  : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
+                  : 'bg-stone-100 text-slate-600 hover:bg-stone-100'
               }`}
             >
               ✏️ Solo modificados
@@ -315,7 +315,7 @@ export function AdvancedSearch({
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filters.showComparison
                   ? 'bg-blue-500 text-white'
-                  : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
+                  : 'bg-stone-100 text-slate-600 hover:bg-stone-100'
               }`}
             >
               🌐 Mostrar ES/CA
@@ -404,7 +404,7 @@ export function TextEditor({
       className={`bg-stone-50 rounded-xl border transition-all ${
         isModified
           ? 'border-orange-300 shadow-md shadow-orange-100'
-          : 'border-stone-200 hover:border-stone-300'
+          : 'border-stone-200 hover:border-stone-200'
       }`}
     >
       <div className="p-4">
@@ -427,14 +427,14 @@ export function TextEditor({
             {isModified && (
               <button
                 onClick={onRevert}
-                className="text-xs px-3 py-1 rounded-lg bg-stone-100 text-slate-600 hover:bg-stone-200 transition-colors"
+                className="text-xs px-3 py-1 rounded-lg bg-stone-100 text-slate-600 hover:bg-stone-100 transition-colors"
               >
                 ↩️ Revertir
               </button>
             )}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-xs px-3 py-1 rounded-lg bg-stone-100 text-slate-600 hover:bg-stone-200 transition-colors"
+              className="text-xs px-3 py-1 rounded-lg bg-stone-100 text-slate-600 hover:bg-stone-100 transition-colors"
             >
               {isExpanded ? '▲ Colapsar' : '▼ Expandir'}
             </button>
@@ -512,11 +512,11 @@ export function BulkActions({
 
   return (
     <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40">
-      <div className="bg-stone-50 text-slate-800 px-6 py-3 rounded-full shadow-xl flex items-center gap-4">
+      <div className="bg-stone-50 text-slate-700 px-6 py-3 rounded-full shadow-xl flex items-center gap-4">
         <span className="text-sm">
           <strong>{selectedCount}</strong> seleccionados
         </span>
-        <div className="h-4 w-px bg-stone-300" />
+        <div className="h-4 w-px bg-stone-200" />
         <button
           onClick={onSelectAll}
           className="text-sm hover:text-orange-400 transition-colors"
@@ -529,7 +529,7 @@ export function BulkActions({
         >
           Deseleccionar
         </button>
-        <div className="h-4 w-px bg-stone-300" />
+        <div className="h-4 w-px bg-stone-200" />
         <button
           onClick={onBulkRevert}
           className="text-sm bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded-full transition-colors"

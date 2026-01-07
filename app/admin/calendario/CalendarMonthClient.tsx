@@ -278,7 +278,7 @@ export default function CalendarMonthClient() {
         </div>
 
         <div className="flex flex-col items-start gap-1 text-xs md:items-end">
-          <div className="text-sm font-semibold tracking-tight text-slate-800">
+          <div className="text-sm font-semibold tracking-tight text-slate-700">
             {monthLabel(monthYear)}
           </div>
           <div className="text-[11px] text-slate-500">
@@ -304,7 +304,7 @@ export default function CalendarMonthClient() {
             <span className="text-[11px] uppercase tracking-wide text-slate-500">
               Reserves
             </span>
-            <span className="text-base font-semibold text-slate-800">
+            <span className="text-base font-semibold text-slate-700">
               {stats.totalReservas}
             </span>
           </div>
@@ -318,7 +318,7 @@ export default function CalendarMonthClient() {
             <span className="text-[11px] uppercase tracking-wide text-slate-500">
               Bloquejos
             </span>
-            <span className="text-base font-semibold text-slate-800">
+            <span className="text-base font-semibold text-slate-700">
               {stats.totalBloqueos}
             </span>
           </div>
@@ -332,7 +332,7 @@ export default function CalendarMonthClient() {
             <span className="text-[11px] uppercase tracking-wide text-slate-500">
               Dies lliures
             </span>
-            <span className="text-base font-semibold text-slate-800">
+            <span className="text-base font-semibold text-slate-700">
               {stats.freeDays}
             </span>
           </div>
@@ -346,7 +346,7 @@ export default function CalendarMonthClient() {
             <span className="text-[11px] uppercase tracking-wide text-slate-500">
               Dies mixtes
             </span>
-            <span className="text-base font-semibold text-slate-800">
+            <span className="text-base font-semibold text-slate-700">
               {stats.mixedDays}
             </span>
           </div>
@@ -360,7 +360,7 @@ export default function CalendarMonthClient() {
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-[11px] text-slate-600 shadow-sm">
         <span className="font-semibold text-slate-700">Llegenda:</span>
         <div className="flex items-center gap-1">
-          <span className="h-3 w-3 rounded border border-stone-300 bg-stone-50" />
+          <span className="h-3 w-3 rounded border border-stone-200 bg-stone-50" />
           <span>Lliure</span>
         </div>
         <div className="flex items-center gap-1">
@@ -387,7 +387,7 @@ export default function CalendarMonthClient() {
       </div>
 
       {/* Graella del calendari */}
-      <div className="grid grid-cols-7 gap-px rounded-xl border border-stone-200 bg-stone-200 shadow-sm">
+      <div className="grid grid-cols-7 gap-px rounded-xl border border-stone-200 bg-stone-100 shadow-sm">
         {cells.map((cell) => {
           const dayData =
             data?.days?.[cell.key] ??
@@ -427,8 +427,8 @@ export default function CalendarMonthClient() {
                   className={[
                     'inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold',
                     isToday(cell.date)
-                      ? 'bg-stone-50 text-slate-800'
-                      : 'text-slate-800',
+                      ? 'bg-stone-50 text-slate-700'
+                      : 'text-slate-700',
                   ].join(' ')}
                 >
                   {cell.date.getDate()}
@@ -447,7 +447,7 @@ export default function CalendarMonthClient() {
 
               <div className="mt-1 space-y-0.5">
                 {hasReservas && (
-                  <div className="line-clamp-2 text-[10px] font-medium text-slate-800">
+                  <div className="line-clamp-2 text-[10px] font-medium text-slate-700">
                     {dayData.reservas
                       .slice(0, 2)
                       .map((r) => r.clienteNombre || 'Client')
@@ -481,7 +481,7 @@ export default function CalendarMonthClient() {
         <div className="mt-4 rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
-              <h2 className="text-sm font-semibold text-slate-800">
+              <h2 className="text-sm font-semibold text-slate-700">
                 Detall del dia{' '}
                 {selectedDayData.date.toLocaleDateString('ca-ES', {
                   weekday: 'long',
@@ -527,7 +527,7 @@ export default function CalendarMonthClient() {
                       className="rounded-md border border-emerald-100 bg-emerald-50 px-2 py-1.5"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <div className="font-medium text-slate-800">
+                        <div className="font-medium text-slate-700">
                           {r.clienteNombre ?? 'Client sense nom'}
                         </div>
                         {r.estado && (
@@ -571,7 +571,7 @@ export default function CalendarMonthClient() {
                       className="rounded-md border border-rose-100 bg-rose-50 px-2 py-1.5"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <div className="font-medium text-slate-800">
+                        <div className="font-medium text-slate-700">
                           Bloqueig
                         </div>
                       </div>

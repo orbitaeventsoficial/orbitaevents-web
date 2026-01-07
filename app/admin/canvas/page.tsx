@@ -72,7 +72,7 @@ export default function CanvasGeneratorPage() {
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800">🎨 Generador de Canvas</h1>
+        <h1 className="text-2xl font-bold text-slate-700">🎨 Generador de Canvas</h1>
         <p className="text-slate-500 mt-1">
           Crea imatges promocionals amb foto de l&apos;event i codi de descompte
         </p>
@@ -81,7 +81,7 @@ export default function CanvasGeneratorPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form */}
         <div className="bg-stone-50 rounded-2xl shadow-sm border border-stone-200 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-6">⚙️ Configuració</h2>
+          <h2 className="text-lg font-semibold text-slate-700 mb-6">⚙️ Configuració</h2>
 
           <div className="space-y-5">
             {/* Nom client */}
@@ -125,7 +125,7 @@ export default function CanvasGeneratorPage() {
                     className={`flex-1 py-2.5 rounded-xl font-medium transition-all ${
                       formData.discount === pct
                         ? 'bg-amber-500 text-white'
-                        : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
+                        : 'bg-stone-100 text-slate-600 hover:bg-stone-100'
                     }`}
                   >
                     {pct}%
@@ -182,10 +182,10 @@ export default function CanvasGeneratorPage() {
                     className={`p-3 rounded-xl border-2 transition-all text-left ${
                       formData.preset === preset.id
                         ? 'border-amber-500 bg-amber-50'
-                        : 'border-stone-200 hover:border-stone-300'
+                        : 'border-stone-200 hover:border-stone-200'
                     }`}
                   >
-                    <span className="font-medium text-slate-800">{preset.name}</span>
+                    <span className="font-medium text-slate-700">{preset.name}</span>
                     <span className="block text-xs text-slate-400 mt-0.5">
                       {preset.width}x{preset.height}
                     </span>
@@ -205,7 +205,7 @@ export default function CanvasGeneratorPage() {
             </button>
             <button
               onClick={handleCopyUrl}
-              className="px-4 py-3 bg-stone-100 text-slate-700 font-medium rounded-xl hover:bg-stone-200 transition-colors"
+              className="px-4 py-3 bg-stone-100 text-slate-700 font-medium rounded-xl hover:bg-stone-100 transition-colors"
             >
               {copied ? '✓ Copiat!' : '🔗 URL'}
             </button>
@@ -215,7 +215,7 @@ export default function CanvasGeneratorPage() {
         {/* Preview */}
         <div className="bg-stone-50 rounded-2xl shadow-sm border border-stone-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-slate-800">👁️ Previsualització</h2>
+            <h2 className="text-lg font-semibold text-slate-700">👁️ Previsualització</h2>
             {selectedPreset && (
               <span className="text-sm text-slate-400">
                 {selectedPreset.width}x{selectedPreset.height}px
