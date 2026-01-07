@@ -569,3 +569,220 @@ export async function sendTestimonialReceivedEmail(params: {
     `,
   });
 }
+
+/**
+ * Send booking confirmation email to client
+ */
+export async function sendBookingConfirmation(booking: any): Promise<void> {
+  const eventDate = new Date(booking.eventDate);
+  const formattedDate = eventDate.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  const packName = booking.pack.translations.find((t: any) => t.locale === booking.preferredLocale)?.name || booking.pack.code;
+
+  let extrasHtml = '';
+  if (booking.extras && booking.extras.length > 0) {
+    extrasHtml = booking.extras
+      .map((extra: any) => {
+        const extraName = extra.extra.translations.find((t: any) => t.locale === booking.preferredLocale)?.name || extra.extra.code;
+        return `<li>${escapeHtml(extraName)} - ${extra.price}€</li>`;
+      })
+      .join('');
+  }
+
+  await sendEmail({
+    to: booking.clientEmail,
+    subject: `Confirmación de Reserva #${booking.reference} - Òrbita Events`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #fff;">
+        <div style="max-width: 600px; margin: 0 auto; background: #111;">
+          <!-- Header -->
+          <div style="padding: 32px 20px; background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%); text-align: center;">
+            <h1 style="margin: 0; font-size: 28px; color: #fff; font-weight: bold;">
+              ¡Reserva Confirmada! 🎉
+            </h1>
+            <p style="margin: 12px 0 0 0; font-size: 14px; color: rgba(255,255,255,0.9);">
+              Referencia: <strong>${escapeHtml(booking.reference)}</strong>
+            </p>
+          </div>
+
+          <!-- Content -->
+          <div style="padding: 32px 20px;">
+            <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #ccc;">
+              Hola <strong>${escapeHtml(booking.clientName)}</strong>,
+            </p>
+
+            <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #ccc;">
+              Tu reserva ha sido confirmada. A continuación encontrarás todos los detalles:
+            </p>
+
+            <!-- Event Details -->
+            <div style="background: #1a1a1a; border-left: 4px solid #7C3AED; padding: 20px; margin-bottom: 24px;">
+              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">📅 Detalles del Evento</h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Fecha:</td>
+                  <td style="padding: 8px 0; color: #fff; font-size: 14px; font-weight: bold; text-align: right;">
+                    ${formattedDate}
+                  </td>
+                </tr>
+                ${booking.eventStartTime ? `
+                <tr>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Horario:</td>
+                  <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
+                    ${escapeHtml(booking.eventStartTime)}${booking.eventEndTime ? ` - ${escapeHtml(booking.eventEndTime)}` : ''}
+                  </td>
+                </tr>
+                ` : ''}
+                <tr>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Ubicación:</td>
+                  <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
+                    ${escapeHtml(booking.eventLocation)}
+                  </td>
+                </tr>
+                ${booking.eventVenue ? `
+                <tr>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Local:</td>
+                  <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
+                    ${escapeHtml(booking.eventVenue)}
+                  </td>
+                </tr>
+                ` : ''}
+                <tr>
+                  <td style="padding: 8px 0; color: #999; font-size: 14px;">Invitados:</td>
+                  <td style="padding: 8px 0; color: #fff; font-size: 14px; text-align: right;">
+                    ${booking.guestCount} personas
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- Services -->
+            <div style="background: #1a1a1a; border-left: 4px solid #EC4899; padding: 20px; margin-bottom: 24px;">
+              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">🎵 Servicios Contratados</h2>
+              <ul style="margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8;">
+                <li><strong>${escapeHtml(packName)}</strong> - ${booking.pack.price}€</li>
+                ${extrasHtml}
+                ${booking.extraHours > 0 ? `<li>Horas extra (${booking.extraHours}h) - ${booking.pack.pricePerExtraHour * booking.extraHours}€</li>` : ''}
+              </ul>
+
+              <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #333;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 18px; color: #999;">Total:</span>
+                  <span style="font-size: 24px; font-weight: bold; color: #7C3AED;">
+                    ${booking.total}€
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div style="background: #1a1a1a; padding: 20px; margin-bottom: 24px;">
+              <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #fff;">📋 Próximos Pasos</h2>
+              <ol style="margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8;">
+                <li>Nos pondremos en contacto contigo en las próximas 24h para confirmar todos los detalles</li>
+                <li>Recibirás un contrato con las condiciones del servicio</li>
+                <li>Te informaremos sobre las modalidades de pago disponibles</li>
+              </ol>
+            </div>
+
+            <p style="margin: 24px 0 0 0; font-size: 14px; line-height: 1.6; color: #999;">
+              Si tienes cualquier pregunta, no dudes en contactarnos:
+            </p>
+            <p style="margin: 8px 0 0 0; font-size: 14px; color: #ccc;">
+              📧 ${SITE_CONFIG.business.email}<br>
+              📱 ${SITE_CONFIG.business.phone}
+            </p>
+          </div>
+
+          <!-- Footer -->
+          <div style="padding: 20px; background: #0a0a0a; text-align: center;">
+            <p style="margin: 0; font-size: 12px; color: #666;">
+              ${new Date().getFullYear()} Òrbita Events - Barcelona y Girona
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
+
+/**
+ * Send booking notification to admin
+ */
+export async function sendBookingNotificationToAdmin(booking: any): Promise<void> {
+  const eventDate = new Date(booking.eventDate);
+  const formattedDate = eventDate.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  const adminEmail = process.env.EMAIL_TO || SITE_CONFIG.business.email;
+
+  await sendEmail({
+    to: adminEmail,
+    subject: `🎉 Nueva Reserva #${booking.reference} - ${booking.clientName}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+      </head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #7C3AED;">Nueva Reserva Recibida</h1>
+
+          <p><strong>Referencia:</strong> ${escapeHtml(booking.reference)}</p>
+
+          <h2>Cliente</h2>
+          <ul>
+            <li><strong>Nombre:</strong> ${escapeHtml(booking.clientName)}</li>
+            <li><strong>Email:</strong> ${escapeHtml(booking.clientEmail)}</li>
+            <li><strong>Teléfono:</strong> ${escapeHtml(booking.clientPhone)}</li>
+          </ul>
+
+          <h2>Evento</h2>
+          <ul>
+            <li><strong>Tipo:</strong> ${escapeHtml(booking.eventType)}</li>
+            <li><strong>Fecha:</strong> ${formattedDate}</li>
+            ${booking.eventStartTime ? `<li><strong>Hora inicio:</strong> ${escapeHtml(booking.eventStartTime)}</li>` : ''}
+            <li><strong>Ubicación:</strong> ${escapeHtml(booking.eventLocation)}</li>
+            ${booking.eventVenue ? `<li><strong>Local:</strong> ${escapeHtml(booking.eventVenue)}</li>` : ''}
+            <li><strong>Invitados:</strong> ${booking.guestCount}</li>
+          </ul>
+
+          <h2>Servicios</h2>
+          <p><strong>Pack:</strong> ${booking.pack.code} - ${booking.pack.price}€</p>
+          ${booking.extras.length > 0 ? `<p><strong>Extras:</strong> ${booking.extras.length}</p>` : ''}
+          ${booking.extraHours > 0 ? `<p><strong>Horas extra:</strong> ${booking.extraHours}h</p>` : ''}
+
+          <p style="font-size: 20px; color: #7C3AED;"><strong>Total: ${booking.total}€</strong></p>
+
+          ${booking.notes ? `
+          <h2>Notas</h2>
+          <p>${escapeHtml(booking.notes)}</p>
+          ` : ''}
+
+          <hr>
+          <p style="color: #666; font-size: 12px;">
+            Ver en admin: ${SITE_CONFIG.url}/admin/bookings/${booking.id}
+          </p>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
