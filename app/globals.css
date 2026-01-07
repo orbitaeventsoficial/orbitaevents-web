@@ -989,6 +989,30 @@ body.admin-mode .header-scrolled {
   background: #f7f5f0 !important;
   border-bottom: 1px solid #e7e1d6 !important;
 }
+
+html.admin-mode {
+  --bg-main: #f7f5f0;
+  --bg-surface: #f4f0e8;
+  --bg-card: #faf7f2;
+  --bg-elevated: #f2ede3;
+  --color-bg-primary: #f7f5f0;
+  --color-bg-secondary: #f4f0e8;
+  --color-bg-card: #faf7f2;
+}
+
+html.admin-mode .card,
+body.admin-mode .card,
+html.admin-mode .card-hover,
+body.admin-mode .card-hover,
+html.admin-mode .card-gold,
+body.admin-mode .card-gold,
+html.admin-mode .card-elegant,
+body.admin-mode .card-elegant,
+html.admin-mode .card-swipe-item,
+body.admin-mode .card-swipe-item {
+  background: #faf7f2 !important;
+  border-color: #e7e1d6 !important;
+}
 html::before {
   content: '';
   position: fixed;
