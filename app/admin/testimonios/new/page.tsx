@@ -1,5 +1,3 @@
-'use server';
-
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
@@ -27,6 +25,7 @@ function getString(value: FormDataEntryValue | null): string {
 }
 
 async function createTestimonial(formData: FormData) {
+  'use server';
   const authorName = getString(formData.get('authorName'));
   const authorLabel = getString(formData.get('authorLabel'));
   const quote = getString(formData.get('quote'));
