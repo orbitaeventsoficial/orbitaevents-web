@@ -189,7 +189,7 @@ export default function AdminContactesPage() {
   // ═══════════════════════════════════════════════════════════════════════════
 
   return (
-    <div className="min-h-screen bg-slate-100 text-black p-6">
+    <div className="min-h-screen bg-stone-100 text-slate-800 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
@@ -203,8 +203,8 @@ export default function AdminContactesPage() {
           {/* Stats */}
           {stats && (
             <div className="flex gap-4 flex-wrap">
-              <div className="bg-white border border-zinc-800 rounded-xl px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-black">{stats.total}</p>
+              <div className="bg-stone-50 border border-zinc-800 rounded-xl px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-slate-800">{stats.total}</p>
                 <p className="text-xs text-gray-500">Total</p>
               </div>
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 text-center">
@@ -230,13 +230,13 @@ export default function AdminContactesPage() {
               placeholder="Buscar contacte..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-stone-100 border border-stone-200 rounded-xl text-slate-800 placeholder-stone-400 focus:border-amber-400 transition-all"
             />
           </div>
 
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-amber-400 text-black font-bold rounded-xl hover:bg-amber-300 transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-amber-400 text-slate-800 font-bold rounded-xl hover:bg-amber-300 transition-all"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -268,10 +268,10 @@ export default function AdminContactesPage() {
 
         {/* Customers List */}
         {!loading && filteredCustomers.length > 0 && (
-          <div className="bg-slate-100 border border-slate-200 rounded-2xl overflow-hidden">
+          <div className="bg-stone-100 border border-stone-200 rounded-2xl overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-200">
+                <tr className="border-b border-stone-200">
                   <th className="text-left p-4 text-slate-500 font-medium">Nom</th>
                   <th className="text-left p-4 text-slate-500 font-medium hidden md:table-cell">Contacte</th>
                   <th className="text-left p-4 text-slate-500 font-medium hidden lg:table-cell">Font</th>
@@ -281,14 +281,14 @@ export default function AdminContactesPage() {
               </thead>
               <tbody>
                 {filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className="border-b border-slate-200 hover:bg-slate-100">
+                  <tr key={customer.id} className="border-b border-stone-200 hover:bg-stone-100">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-400 font-bold">
                           {customer.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-black font-medium flex items-center gap-2">
+                          <p className="text-slate-800 font-medium flex items-center gap-2">
                             {customer.name}
                             {customer.is_vip && (
                               <span className="px-2 py-0.5 bg-amber-400/20 text-amber-400 text-xs rounded-full">VIP</span>
@@ -323,7 +323,7 @@ export default function AdminContactesPage() {
                         customer.source === 'manual' ? 'bg-purple-500/20 text-purple-400' :
                         customer.source === 'web' ? 'bg-green-500/20 text-green-400' :
                         customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-400' :
-                        'bg-slate-200 text-slate-500'
+                        'bg-stone-200 text-slate-500'
                       }`}>
                         {customer.source || 'desconegut'}
                       </span>
@@ -347,7 +347,7 @@ export default function AdminContactesPage() {
                           </svg>
                         </button>
                         <button
-                          className="p-2 bg-slate-200 text-slate-500 rounded-lg hover:bg-white/20 transition-all"
+                          className="p-2 bg-stone-200 text-slate-500 rounded-lg hover:bg-stone-50/20 transition-all"
                           title="Editar"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -370,7 +370,7 @@ export default function AdminContactesPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-200/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-stone-200/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
               onClick={() => setShowAddModal(false)}
             >
               <motion.div
@@ -378,9 +378,9 @@ export default function AdminContactesPage() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto"
+                className="bg-stone-50 border border-stone-200 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto"
               >
-                <h2 className="text-2xl font-bold text-black mb-6">Afegir Contacte</h2>
+                <h2 className="text-2xl font-bold text-slate-800 mb-6">Afegir Contacte</h2>
 
                 <div className="space-y-4">
                   <div>
@@ -389,7 +389,7 @@ export default function AdminContactesPage() {
                       type="text"
                       value={newCustomer.name}
                       onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
+                      className="w-full px-4 py-3 bg-stone-100 border border-stone-300 rounded-xl text-slate-800 placeholder-stone-400 focus:border-amber-400 transition-all"
                       placeholder="Maria García"
                     />
                   </div>
@@ -400,7 +400,7 @@ export default function AdminContactesPage() {
                       type="email"
                       value={newCustomer.email}
                       onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
+                      className="w-full px-4 py-3 bg-stone-100 border border-stone-300 rounded-xl text-slate-800 placeholder-stone-400 focus:border-amber-400 transition-all"
                       placeholder="maria@email.com"
                     />
                   </div>
@@ -411,7 +411,7 @@ export default function AdminContactesPage() {
                       type="tel"
                       value={newCustomer.phone}
                       onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
+                      className="w-full px-4 py-3 bg-stone-100 border border-stone-300 rounded-xl text-slate-800 placeholder-stone-400 focus:border-amber-400 transition-all"
                       placeholder="699 123 456"
                     />
                   </div>
@@ -423,7 +423,7 @@ export default function AdminContactesPage() {
                         type="text"
                         value={newCustomer.city}
                         onChange={(e) => setNewCustomer({ ...newCustomer, city: e.target.value })}
-                        className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
+                        className="w-full px-4 py-3 bg-stone-100 border border-stone-300 rounded-xl text-slate-800 placeholder-stone-400 focus:border-amber-400 transition-all"
                         placeholder="Barcelona"
                       />
                     </div>
@@ -433,7 +433,7 @@ export default function AdminContactesPage() {
                         type="text"
                         value={newCustomer.instagram}
                         onChange={(e) => setNewCustomer({ ...newCustomer, instagram: e.target.value })}
-                        className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all"
+                        className="w-full px-4 py-3 bg-stone-100 border border-stone-300 rounded-xl text-slate-800 placeholder-stone-400 focus:border-amber-400 transition-all"
                         placeholder="@usuari"
                       />
                     </div>
@@ -444,7 +444,7 @@ export default function AdminContactesPage() {
                     <textarea
                       value={newCustomer.notes}
                       onChange={(e) => setNewCustomer({ ...newCustomer, notes: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl text-black placeholder-slate-400 focus:border-amber-400 transition-all resize-none"
+                      className="w-full px-4 py-3 bg-stone-100 border border-stone-300 rounded-xl text-slate-800 placeholder-stone-400 focus:border-amber-400 transition-all resize-none"
                       rows={3}
                       placeholder="Notes internes..."
                     />
@@ -454,14 +454,14 @@ export default function AdminContactesPage() {
                 <div className="flex gap-4 mt-8">
                   <button
                     onClick={() => setShowAddModal(false)}
-                    className="flex-1 py-3 border border-slate-300 text-black rounded-xl hover:bg-slate-100 transition-all"
+                    className="flex-1 py-3 border border-stone-300 text-slate-800 rounded-xl hover:bg-stone-100 transition-all"
                   >
                     Cancel·lar
                   </button>
                   <button
                     onClick={handleAddCustomer}
                     disabled={actionLoading || !newCustomer.name || !newCustomer.email}
-                    className="flex-1 py-3 bg-amber-400 text-black font-bold rounded-xl disabled:opacity-50 hover:bg-amber-300 transition-all"
+                    className="flex-1 py-3 bg-amber-400 text-slate-800 font-bold rounded-xl disabled:opacity-50 hover:bg-amber-300 transition-all"
                   >
                     {actionLoading ? 'Afegint...' : 'Afegir'}
                   </button>
@@ -478,7 +478,7 @@ export default function AdminContactesPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-200/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-stone-200/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
               onClick={() => setShowActionModal(false)}
             >
               <motion.div
@@ -486,9 +486,9 @@ export default function AdminContactesPage() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-md w-full"
+                className="bg-stone-50 border border-stone-200 rounded-3xl p-6 sm:p-8 max-w-md w-full"
               >
-                <h2 className="text-2xl font-bold text-black mb-2">🚀 Iniciar Procés</h2>
+                <h2 className="text-2xl font-bold text-slate-800 mb-2">🚀 Iniciar Procés</h2>
                 <p className="text-slate-500 mb-6">
                   Per <span className="text-amber-400">{selectedCustomer.name}</span>
                 </p>
@@ -497,13 +497,13 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('review_request')}
                     disabled={actionLoading}
-                    className="w-full p-4 bg-slate-100 border border-slate-200 rounded-xl text-left hover:bg-slate-200 hover:border-amber-400/50 transition-all group disabled:opacity-50"
+                    className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-200 hover:border-amber-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-3xl">⭐</span>
                       <div>
-                        <p className="text-black font-medium group-hover:text-amber-400">Demanar Opinió</p>
-                        <p className="text-black/50 text-sm">Envia email demanant review</p>
+                        <p className="text-slate-800 font-medium group-hover:text-amber-400">Demanar Opinió</p>
+                        <p className="text-slate-800/50 text-sm">Envia email demanant review</p>
                       </div>
                     </div>
                   </button>
@@ -511,13 +511,13 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('post_event')}
                     disabled={actionLoading}
-                    className="w-full p-4 bg-slate-100 border border-slate-200 rounded-xl text-left hover:bg-slate-200 hover:border-green-400/50 transition-all group disabled:opacity-50"
+                    className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-200 hover:border-green-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-3xl">🎉</span>
                       <div>
-                        <p className="text-black font-medium group-hover:text-green-400">Post-Event Complet</p>
-                        <p className="text-black/50 text-sm">Canvas 10/10 + Gràcies + Demanar opinió</p>
+                        <p className="text-slate-800 font-medium group-hover:text-green-400">Post-Event Complet</p>
+                        <p className="text-slate-800/50 text-sm">Canvas 10/10 + Gràcies + Demanar opinió</p>
                       </div>
                     </div>
                   </button>
@@ -525,13 +525,13 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('welcome')}
                     disabled={actionLoading}
-                    className="w-full p-4 bg-slate-100 border border-slate-200 rounded-xl text-left hover:bg-slate-200 hover:border-purple-400/50 transition-all group disabled:opacity-50"
+                    className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-200 hover:border-purple-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-3xl">👋</span>
                       <div>
-                        <p className="text-black font-medium group-hover:text-purple-400">Benvinguda</p>
-                        <p className="text-black/50 text-sm">Email de benvinguda + Info empresa</p>
+                        <p className="text-slate-800 font-medium group-hover:text-purple-400">Benvinguda</p>
+                        <p className="text-slate-800/50 text-sm">Email de benvinguda + Info empresa</p>
                       </div>
                     </div>
                   </button>
@@ -539,13 +539,13 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('promo')}
                     disabled={actionLoading}
-                    className="w-full p-4 bg-slate-100 border border-slate-200 rounded-xl text-left hover:bg-slate-200 hover:border-pink-400/50 transition-all group disabled:opacity-50"
+                    className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-200 hover:border-pink-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
                       <span className="text-3xl">🎁</span>
                       <div>
-                        <p className="text-black font-medium group-hover:text-pink-400">Promoció</p>
-                        <p className="text-black/50 text-sm">Enviar oferta o descompte especial</p>
+                        <p className="text-slate-800 font-medium group-hover:text-pink-400">Promoció</p>
+                        <p className="text-slate-800/50 text-sm">Enviar oferta o descompte especial</p>
                       </div>
                     </div>
                   </button>
@@ -553,7 +553,7 @@ export default function AdminContactesPage() {
 
                 <button
                   onClick={() => setShowActionModal(false)}
-                  className="w-full mt-6 py-3 border border-slate-300 text-slate-500 rounded-xl hover:bg-slate-100 transition-all"
+                  className="w-full mt-6 py-3 border border-stone-300 text-slate-500 rounded-xl hover:bg-stone-100 transition-all"
                 >
                   Cancel·lar
                 </button>

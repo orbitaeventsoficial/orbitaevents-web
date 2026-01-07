@@ -77,7 +77,7 @@ export default async function InventoryPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-black">Inventari</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">Inventari</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona tot l&apos;equipament tècnic i material
           </p>
@@ -85,7 +85,7 @@ export default async function InventoryPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/inventory/new"
-            className="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-black hover:bg-slate-100"
+            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-100"
           >
             + Nou Element
           </Link>
@@ -94,9 +94,9 @@ export default async function InventoryPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Elements</p>
-          <p className="mt-2 text-3xl font-bold text-black">{items.length}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-800">{items.length}</p>
         </div>
         <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-green-600 uppercase">Disponibles</p>
@@ -129,12 +129,12 @@ export default async function InventoryPage() {
           return (
             <div
               key={stat.category}
-              className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+              className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm"
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>
                 <div>
-                  <p className="font-medium text-black">{config.label}</p>
+                  <p className="font-medium text-slate-800">{config.label}</p>
                   <p className="text-sm text-slate-500">
                     {stat._count} elements · {stat._sum.value?.toLocaleString('ca-ES')}€
                   </p>
@@ -153,9 +153,9 @@ export default async function InventoryPage() {
           color: 'gray',
         };
         return (
-          <section key={category} className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-            <div className="bg-slate-50 border-b border-slate-200 p-4">
-              <h2 className="font-semibold text-black flex items-center gap-2">
+          <section key={category} className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+            <div className="bg-slate-50 border-b border-stone-200 p-4">
+              <h2 className="font-semibold text-slate-800 flex items-center gap-2">
                 <span>{config.icon}</span>
                 {config.label}
                 <span className="text-sm font-normal text-slate-500">
@@ -165,7 +165,7 @@ export default async function InventoryPage() {
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-slate-50 border-b border-stone-200">
                   <tr>
                     <th className="px-4 py-3 text-left font-medium text-slate-600">Codi</th>
                     <th className="px-4 py-3 text-left font-medium text-slate-600">Nom</th>
@@ -182,12 +182,12 @@ export default async function InventoryPage() {
                     return (
                       <tr key={item.id} className="hover:bg-slate-50 transition-colors">
                         <td className="px-4 py-3">
-                          <code className="text-xs font-mono bg-slate-100 px-2 py-1 rounded">
+                          <code className="text-xs font-mono bg-stone-100 px-2 py-1 rounded">
                             {item.code}
                           </code>
                         </td>
                         <td className="px-4 py-3">
-                          <p className="font-medium text-black">{item.name}</p>
+                          <p className="font-medium text-slate-800">{item.name}</p>
                           {item.description && (
                             <p className="text-xs text-slate-500 truncate max-w-[200px]">
                               {item.description}
@@ -213,7 +213,7 @@ export default async function InventoryPage() {
                               {item.packItems.map((pi) => (
                                 <span
                                   key={pi.id}
-                                  className="text-xs bg-slate-100 px-2 py-0.5 rounded"
+                                  className="text-xs bg-stone-100 px-2 py-0.5 rounded"
                                 >
                                   {pi.pack.slug}
                                 </span>
@@ -226,7 +226,7 @@ export default async function InventoryPage() {
                         <td className="px-4 py-3 text-right">
                           <Link
                             href={`/admin/inventory/${item.id}`}
-                            className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
+                            className="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200"
                           >
                             Editar
                           </Link>
@@ -242,7 +242,7 @@ export default async function InventoryPage() {
       })}
 
       {items.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 p-12 text-center">
           <span className="text-4xl">📦</span>
           <p className="mt-4 text-slate-600">No hi ha elements a l&apos;inventari</p>
           <p className="text-sm text-slate-400">Executa el seed per carregar dades inicials</p>

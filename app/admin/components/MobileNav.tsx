@@ -153,14 +153,14 @@ export default function AdminMobileNav() {
       <AnimatePresence>
         {moreMenuOpen && (
           <motion.div
-            className="fixed inset-0 bg-slate-200/70 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-stone-200/70 backdrop-blur-sm z-40 lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setMoreMenuOpen(false)}
           >
             <motion.div
-              className="absolute bottom-20 right-4 bg-white rounded-2xl p-2 border border-slate-200 shadow-2xl min-w-[200px]"
+              className="absolute bottom-20 right-4 bg-stone-50 rounded-2xl p-2 border border-stone-200 shadow-2xl min-w-[200px]"
               initial={{ scale: 0.8, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.8, opacity: 0, y: 20 }}
@@ -174,7 +174,7 @@ export default function AdminMobileNav() {
                     triggerHaptic();
                     setMoreMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-stone-100 transition-colors"
                 >
                   <span className="text-xl">{item.icon}</span>
                   <span className="font-medium">{item.label}</span>
@@ -191,7 +191,7 @@ export default function AdminMobileNav() {
         style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
       >
         {/* Background */}
-        <div className="absolute inset-0 bg-white/95 backdrop-blur-xl border-t border-slate-200" />
+        <div className="absolute inset-0 bg-stone-50/95 backdrop-blur-xl border-t border-stone-200" />
 
         {/* Nav items */}
         <div className="relative flex items-center justify-around px-2 pt-2">

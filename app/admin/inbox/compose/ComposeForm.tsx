@@ -168,11 +168,11 @@ export default function ComposeForm({ leads, packs }: Props) {
   return (
     <div className="space-y-6">
       {/* Mode selector */}
-      <div className="flex gap-2 p-1 bg-slate-100 rounded-lg w-fit">
+      <div className="flex gap-2 p-1 bg-stone-100 rounded-lg w-fit">
         <button
           onClick={() => setMode('email')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'email' ? 'bg-white shadow text-black' : 'text-slate-600'
+            mode === 'email' ? 'bg-stone-50 shadow text-slate-800' : 'text-slate-600'
           }`}
         >
           ✉️ Email normal
@@ -180,7 +180,7 @@ export default function ComposeForm({ leads, packs }: Props) {
         <button
           onClick={() => setMode('quote')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'quote' ? 'bg-white shadow text-black' : 'text-slate-600'
+            mode === 'quote' ? 'bg-stone-50 shadow text-slate-800' : 'text-slate-600'
           }`}
         >
           💰 Pressupost professional
@@ -188,7 +188,7 @@ export default function ComposeForm({ leads, packs }: Props) {
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-stone-50 rounded-xl border border-stone-200 shadow-sm overflow-hidden">
         <div className="p-6 space-y-6">
           
           {/* Select Lead */}
@@ -199,7 +199,7 @@ export default function ComposeForm({ leads, packs }: Props) {
             <select
               value={selectedLeadId}
               onChange={(e) => setSelectedLeadId(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+              className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
             >
               <option value="">-- Escriu email manualment --</option>
               {leads.map((lead) => (
@@ -213,7 +213,7 @@ export default function ComposeForm({ leads, packs }: Props) {
           {/* Lead details preview */}
           {selectedLead && (
             <div className="bg-slate-50 rounded-lg p-4">
-              <h4 className="font-medium text-black mb-3">📋 Detalls del lead</h4>
+              <h4 className="font-medium text-slate-800 mb-3">📋 Detalls del lead</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <span className="text-slate-500">Tipus:</span>
@@ -237,7 +237,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                 </div>
               </div>
               {selectedLead.message && (
-                <div className="mt-3 pt-3 border-t border-slate-200">
+                <div className="mt-3 pt-3 border-t border-stone-200">
                   <span className="text-slate-500 text-sm">Missatge:</span>
                   <p className="text-sm text-slate-700 mt-1">{selectedLead.message}</p>
                 </div>
@@ -263,10 +263,10 @@ export default function ComposeForm({ leads, packs }: Props) {
                         className={`p-4 rounded-xl border-2 text-left transition-all ${
                           selectedPackId === pack.id
                             ? 'border-amber-500 bg-amber-50'
-                            : 'border-slate-200 hover:border-slate-300'
+                            : 'border-stone-200 hover:border-stone-300'
                         }`}
                       >
-                        <p className="font-semibold text-black">{name}</p>
+                        <p className="font-semibold text-slate-800">{name}</p>
                         <p className="text-amber-600 font-bold mt-1">{pack.price.toLocaleString('es-ES')}€</p>
                       </button>
                     );
@@ -283,7 +283,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                   type="number"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500 text-2xl font-bold"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 text-2xl font-bold"
                   placeholder="0"
                 />
               </div>
@@ -297,7 +297,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                   value={extras.join('\n')}
                   onChange={(e) => setExtras(e.target.value.split('\n').filter(Boolean))}
                   rows={3}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                   placeholder="Un extra per línia..."
                 />
               </div>
@@ -311,7 +311,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                   value={customMessage}
                   onChange={(e) => setCustomMessage(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                   placeholder="Afegeix un missatge personalitzat..."
                 />
               </div>
@@ -325,7 +325,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                   placeholder="Notes que apareixeran al pressupost..."
                 />
               </div>
@@ -346,7 +346,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                         locale === l.code
                           ? 'bg-amber-100 text-amber-700 border-2 border-amber-500'
-                          : 'bg-slate-100 text-slate-700 border-2 border-transparent'
+                          : 'bg-stone-100 text-slate-700 border-2 border-transparent'
                       }`}
                     >
                       {l.label}
@@ -364,7 +364,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                   type="email"
                   value={to}
                   onChange={(e) => setTo(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                   placeholder="email@exemple.com"
                 />
               </div>
@@ -375,7 +375,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                   type="text"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                   placeholder="Assumpte de l'email"
                 />
               </div>
@@ -386,7 +386,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   rows={10}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                   placeholder="Escriu el teu missatge..."
                 />
               </div>
@@ -395,7 +395,7 @@ export default function ComposeForm({ leads, packs }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 bg-slate-50 border-t border-slate-200">
+        <div className="flex items-center justify-between px-6 py-4 bg-slate-50 border-t border-stone-200">
           <div>
             {error && (
               <p className="text-red-600 text-sm">❌ {error}</p>
@@ -404,7 +404,7 @@ export default function ComposeForm({ leads, packs }: Props) {
           <div className="flex gap-3">
             <button
               onClick={() => router.push('/admin/inbox')}
-              className="px-4 py-2 text-slate-600 hover:text-black"
+              className="px-4 py-2 text-slate-600 hover:text-slate-800"
             >
               Cancel·lar
             </button>
@@ -415,7 +415,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                 sent
                   ? 'bg-green-500 text-white'
                   : sending
-                  ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                  ? 'bg-stone-300 text-slate-500 cursor-not-allowed'
                   : 'bg-amber-500 text-white hover:bg-amber-600'
               }`}
             >

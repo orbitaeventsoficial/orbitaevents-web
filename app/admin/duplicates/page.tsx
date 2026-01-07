@@ -173,19 +173,19 @@ export default function AdminDuplicatesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-stone-100 flex items-center justify-center">
         <RefreshCw className="w-8 h-8 text-purple-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 p-4 md:p-8">
+    <div className="min-h-screen bg-stone-100 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-black flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-slate-800 flex items-center gap-3">
               <Merge className="w-8 h-8 text-purple-400" />
               Unificació de Clients
             </h1>
@@ -196,7 +196,7 @@ export default function AdminDuplicatesPage() {
           <button
             onClick={loadDuplicates}
             disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-black transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-200 rounded-xl text-slate-800 transition-colors"
           >
             <RefreshCw
               className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}
@@ -207,23 +207,23 @@ export default function AdminDuplicatesPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white border border-slate-200 rounded-xl p-4">
-            <div className="text-3xl font-bold text-black">{groups.length}</div>
+          <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
+            <div className="text-3xl font-bold text-slate-800">{groups.length}</div>
             <div className="text-sm text-gray-400">Grups detectats</div>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-4">
+          <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
             <div className="text-3xl font-bold text-red-400">
               {totalDuplicates}
             </div>
             <div className="text-sm text-gray-400">Possibles duplicats</div>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-4">
+          <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
             <div className="text-3xl font-bold text-amber-400">
               {groups.filter(g => g.suggestedAction === 'auto_merge').length}
             </div>
             <div className="text-sm text-gray-400">Fusió recomanada</div>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-4">
+          <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
             <div className="text-3xl font-bold text-purple-400">
               {groups.filter(g => g.suggestedAction === 'review').length}
             </div>
@@ -234,9 +234,9 @@ export default function AdminDuplicatesPage() {
         {/* Duplicate Groups */}
         <div className="space-y-4">
           {groups.length === 0 ? (
-            <div className="text-center py-16 bg-white border border-slate-200 rounded-2xl">
+            <div className="text-center py-16 bg-stone-50 border border-stone-200 rounded-2xl">
               <Check className="w-16 h-16 text-green-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-black mb-2">
+              <h3 className="text-xl font-semibold text-slate-800 mb-2">
                 Cap duplicat detectat!
               </h3>
               <p className="text-gray-400">
@@ -250,11 +250,11 @@ export default function AdminDuplicatesPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: groupIndex * 0.05 }}
-                className="bg-white border border-slate-200 rounded-2xl overflow-hidden"
+                className="bg-stone-50 border border-stone-200 rounded-2xl overflow-hidden"
               >
                 {/* Group Header */}
                 <div
-                  className="p-4 cursor-pointer hover:bg-slate-100 transition-colors"
+                  className="p-4 cursor-pointer hover:bg-stone-100 transition-colors"
                   onClick={() =>
                     setExpandedGroup(
                       expandedGroup === groupIndex ? null : groupIndex
@@ -269,7 +269,7 @@ export default function AdminDuplicatesPage() {
                         <Users className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-black">
+                        <h3 className="font-semibold text-slate-800">
                           {group.primaryCustomer.name ||
                             group.primaryCustomer.email}
                         </h3>
@@ -300,7 +300,7 @@ export default function AdminDuplicatesPage() {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="p-4 pt-0 border-t border-slate-200">
+                      <div className="p-4 pt-0 border-t border-stone-200">
                         {/* Primary Customer */}
                         <div className="mb-4">
                           <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">
@@ -323,7 +323,7 @@ export default function AdminDuplicatesPage() {
                             {group.duplicates.map(dup => (
                               <div
                                 key={dup.customer.id}
-                                className="bg-slate-100 border border-slate-200 rounded-xl p-4"
+                                className="bg-stone-100 border border-stone-200 rounded-xl p-4"
                               >
                                 <div className="flex items-start justify-between mb-3">
                                   <CustomerCard customer={dup.customer} />
@@ -335,7 +335,7 @@ export default function AdminDuplicatesPage() {
                                 </div>
 
                                 {/* Match Reasons */}
-                                <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-200">
+                                <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-stone-200">
                                   {dup.matchReasons.map((reason) => (
                                     <div
                                       key={`${reason.field}-${reason.type}`}
@@ -369,7 +369,7 @@ export default function AdminDuplicatesPage() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex gap-3 pt-4 border-t border-slate-200">
+                        <div className="flex gap-3 pt-4 border-t border-stone-200">
                           <button
                             onClick={() => startMerge(groupIndex, group)}
                             className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:opacity-90 text-white font-semibold rounded-xl transition-all"
@@ -379,7 +379,7 @@ export default function AdminDuplicatesPage() {
                           </button>
                           <button
                             onClick={() => setExpandedGroup(null)}
-                            className="px-6 py-3 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-black font-medium rounded-xl transition-colors"
+                            className="px-6 py-3 bg-stone-100 hover:bg-stone-200 border border-stone-200 text-slate-800 font-medium rounded-xl transition-colors"
                           >
                             Ignorar
                           </button>
@@ -400,14 +400,14 @@ export default function AdminDuplicatesPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-200/80 flex items-center justify-center p-4 z-50"
+              className="fixed inset-0 bg-stone-200/80 flex items-center justify-center p-4 z-50"
               onClick={() => setMergeSelection(null)}
             >
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white border border-slate-200 rounded-2xl p-6 max-w-md w-full"
+                className="bg-stone-50 border border-stone-200 rounded-2xl p-6 max-w-md w-full"
                 onClick={e => e.stopPropagation()}
               >
                 <div className="flex items-center gap-3 mb-4">
@@ -415,7 +415,7 @@ export default function AdminDuplicatesPage() {
                     <Merge className="w-6 h-6 text-purple-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-black">
+                    <h3 className="text-lg font-semibold text-slate-800">
                       Confirmar fusió
                     </h3>
                     <p className="text-sm text-gray-400">
@@ -435,7 +435,7 @@ export default function AdminDuplicatesPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setMergeSelection(null)}
-                    className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-black font-medium rounded-xl transition-colors"
+                    className="flex-1 py-3 bg-stone-100 hover:bg-stone-200 border border-stone-200 text-slate-800 font-medium rounded-xl transition-colors"
                   >
                     Cancel·lar
                   </button>
@@ -477,7 +477,7 @@ function CustomerCard({
   return (
     <div className="flex-1">
       <div className="flex items-center gap-2 mb-2">
-        <span className="font-semibold text-black">
+        <span className="font-semibold text-slate-800">
           {customer.name || 'Sense nom'}
         </span>
         {isPrimary && (

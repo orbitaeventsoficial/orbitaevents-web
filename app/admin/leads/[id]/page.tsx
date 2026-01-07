@@ -52,7 +52,7 @@ const SOURCE_LABELS: Record<string, string> = {
 };
 
 const PRIORITY_LABELS: Record<string, { label: string; color: string }> = {
-  LOW: { label: 'Baixa', color: 'bg-slate-100 text-slate-700' },
+  LOW: { label: 'Baixa', color: 'bg-stone-100 text-slate-700' },
   MEDIUM: { label: 'Mitjana', color: 'bg-blue-100 text-blue-700' },
   HIGH: { label: 'Alta', color: 'bg-orange-100 text-orange-700' },
   URGENT: { label: 'Urgent', color: 'bg-red-100 text-red-700' },
@@ -89,7 +89,7 @@ export default async function LeadDetailPage({ params }: Props) {
           >
             ← Tornar a leads
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-black">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">
             {lead.name}
           </h1>
           <div className="mt-2 flex items-center gap-3 flex-wrap">
@@ -127,7 +127,7 @@ export default async function LeadDetailPage({ params }: Props) {
           )}
           <a
             href={`mailto:${lead.email}`}
-            className="inline-flex items-center rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-black hover:bg-slate-300"
+            className="inline-flex items-center rounded-md bg-stone-200 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-300"
           >
             ✉️ Email
           </a>
@@ -138,20 +138,20 @@ export default async function LeadDetailPage({ params }: Props) {
         {/* Columna Principal */}
         <div className="lg:col-span-2 space-y-6">
           {/* Info del client */}
-          <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-black mb-4">Informació del client</h2>
+          <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4">Informació del client</h2>
             <dl className="grid gap-4 sm:grid-cols-2">
               <div>
                 <dt className="text-xs font-medium text-slate-500 uppercase">Email</dt>
-                <dd className="mt-1 text-sm text-black">{lead.email}</dd>
+                <dd className="mt-1 text-sm text-slate-800">{lead.email}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium text-slate-500 uppercase">Telèfon</dt>
-                <dd className="mt-1 text-sm text-black">{lead.phone || '—'}</dd>
+                <dd className="mt-1 text-sm text-slate-800">{lead.phone || '—'}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium text-slate-500 uppercase">Data event</dt>
-                <dd className="mt-1 text-sm text-black">
+                <dd className="mt-1 text-sm text-slate-800">
                   {lead.eventDate
                     ? new Date(lead.eventDate).toLocaleDateString('ca-ES', {
                         weekday: 'long',
@@ -164,27 +164,27 @@ export default async function LeadDetailPage({ params }: Props) {
               </div>
               <div>
                 <dt className="text-xs font-medium text-slate-500 uppercase">Nº invitats</dt>
-                <dd className="mt-1 text-sm text-black">
+                <dd className="mt-1 text-sm text-slate-800">
                   {lead.guestCount ? `${lead.guestCount} persones` : '—'}
                 </dd>
               </div>
               <div>
                 <dt className="text-xs font-medium text-slate-500 uppercase">Pressupost</dt>
-                <dd className="mt-1 text-sm text-black">
+                <dd className="mt-1 text-sm text-slate-800">
                   {lead.budget || '—'}
                 </dd>
               </div>
               <div>
                 <dt className="text-xs font-medium text-slate-500 uppercase">Ubicació</dt>
-                <dd className="mt-1 text-sm text-black">{lead.eventLocation || '—'}</dd>
+                <dd className="mt-1 text-sm text-slate-800">{lead.eventLocation || '—'}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium text-slate-500 uppercase">Origen</dt>
-                <dd className="mt-1 text-sm text-black">{SOURCE_LABELS[lead.source] || lead.source}</dd>
+                <dd className="mt-1 text-sm text-slate-800">{SOURCE_LABELS[lead.source] || lead.source}</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium text-slate-500 uppercase">UTM</dt>
-                <dd className="mt-1 text-sm text-black">
+                <dd className="mt-1 text-sm text-slate-800">
                   {lead.utmSource || lead.utmCampaign
                     ? `${lead.utmSource || ''} / ${lead.utmCampaign || ''}`
                     : '—'}
@@ -193,13 +193,13 @@ export default async function LeadDetailPage({ params }: Props) {
               {lead.interestedPackId && (
                 <div>
                   <dt className="text-xs font-medium text-slate-500 uppercase">Pack interessat</dt>
-                  <dd className="mt-1 text-sm text-black">{lead.interestedPackId}</dd>
+                  <dd className="mt-1 text-sm text-slate-800">{lead.interestedPackId}</dd>
                 </div>
               )}
               {lead.interestedExtras.length > 0 && (
                 <div>
                   <dt className="text-xs font-medium text-slate-500 uppercase">Extras interessat</dt>
-                  <dd className="mt-1 text-sm text-black">{lead.interestedExtras.join(', ')}</dd>
+                  <dd className="mt-1 text-sm text-slate-800">{lead.interestedExtras.join(', ')}</dd>
                 </div>
               )}
             </dl>
@@ -215,8 +215,8 @@ export default async function LeadDetailPage({ params }: Props) {
           </section>
 
           {/* Notes */}
-          <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-black mb-4">
+          <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4">
               Notes ({lead.notes.length})
             </h2>
 
@@ -229,7 +229,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 {lead.notes.map((note) => (
                   <div
                     key={note.id}
-                    className="p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
+                    className="p-3 rounded-lg bg-slate-50 hover:bg-stone-100 transition-colors"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xs text-slate-500">
@@ -256,13 +256,13 @@ export default async function LeadDetailPage({ params }: Props) {
 
           {/* Booking */}
           {lead.booking && (
-            <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-black mb-4">
+            <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-slate-800 mb-4">
                 Reserva associada
               </h2>
-              <div className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors">
+              <div className="flex items-center justify-between p-4 rounded-lg border border-stone-200 hover:border-stone-300 transition-colors">
                 <div>
-                  <p className="font-medium text-black">
+                  <p className="font-medium text-slate-800">
                     📅 {new Date(lead.booking.eventDate).toLocaleDateString('ca-ES', {
                       weekday: 'short',
                       day: '2-digit',
@@ -275,7 +275,7 @@ export default async function LeadDetailPage({ params }: Props) {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-black">
+                  <p className="text-lg font-bold text-slate-800">
                     {lead.booking.total.toLocaleString('ca-ES')}€
                   </p>
                   <p className="text-xs text-slate-500">{lead.booking.status}</p>
@@ -297,8 +297,8 @@ export default async function LeadDetailPage({ params }: Props) {
           />
 
           {/* Metadades */}
-          <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-sm font-semibold text-black mb-4">Detalls del registre</h3>
+          <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+            <h3 className="text-sm font-semibold text-slate-800 mb-4">Detalls del registre</h3>
             <dl className="space-y-3 text-sm">
               <div>
                 <dt className="text-xs text-slate-500">ID</dt>

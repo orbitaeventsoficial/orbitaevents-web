@@ -166,7 +166,7 @@ export default function AdminReviewsPage() {
           >
             ← Tornar al panell
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-black">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">
             ⭐ Gestió de Ressenyes
           </h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -177,14 +177,14 @@ export default function AdminReviewsPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/testimonios"
-            className="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center px-4 py-2 bg-stone-50 border border-stone-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             Testimonis
           </Link>
           <a
             href={SITE_CONFIG.reviews.googleBusinessUrl || '#'}
             target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center px-4 py-2 bg-stone-50 border border-stone-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -196,7 +196,7 @@ export default function AdminReviewsPage() {
           </a>
           <a
             href="/api/google/oauth/start?next=/admin/ressenyes?google=connected"
-            className="inline-flex items-center px-4 py-2 bg-white rounded-lg text-sm font-medium text-black hover:bg-slate-100"
+            className="inline-flex items-center px-4 py-2 bg-stone-50 rounded-lg text-sm font-medium text-slate-800 hover:bg-stone-100"
           >
             {googleConnected ? 'Google connectat' : 'Connectar Google'}
           </a>
@@ -211,9 +211,9 @@ export default function AdminReviewsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total</p>
-          <p className="mt-2 text-3xl font-bold text-black">{reviews.length}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-800">{reviews.length}</p>
         </div>
         <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-green-600 uppercase">Aprovades</p>
@@ -239,7 +239,7 @@ export default function AdminReviewsPage() {
               Envia aquest link als clients després de l'event perquè deixin la seva opinió a Google:
             </p>
             <div className="mt-2 flex items-center gap-2">
-              <code className="flex-1 px-3 py-2 bg-white rounded border border-blue-200 text-sm text-blue-800 break-all">
+              <code className="flex-1 px-3 py-2 bg-stone-50 rounded border border-blue-200 text-sm text-blue-800 break-all">
                 {SITE_CONFIG.reviews.googleReviewUrl}
               </code>
               <button
@@ -257,9 +257,9 @@ export default function AdminReviewsPage() {
       </div>
 
       {/* Reviews List */}
-      <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-200 bg-slate-50">
-          <h2 className="font-semibold text-black">Ressenyes</h2>
+      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-stone-200 bg-slate-50">
+          <h2 className="font-semibold text-slate-800">Ressenyes</h2>
         </div>
         
         {loading ? (
@@ -288,9 +288,9 @@ export default function AdminReviewsPage() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-black">{review.customerName}</span>
+                      <span className="font-semibold text-slate-800">{review.customerName}</span>
                       {review.eventType && (
-                        <span className="text-xs px-2 py-0.5 bg-slate-100 rounded-full text-slate-600">
+                        <span className="text-xs px-2 py-0.5 bg-stone-100 rounded-full text-slate-600">
                           {EVENT_TYPE_LABELS[review.eventType] || review.eventType}
                         </span>
                       )}
@@ -337,7 +337,7 @@ export default function AdminReviewsPage() {
                     ) : (
                       <button
                         onClick={() => handleApprove(review.id, false)}
-                        className="px-3 py-1.5 bg-yellow-500 text-black rounded text-sm hover:bg-yellow-600"
+                        className="px-3 py-1.5 bg-yellow-500 text-slate-800 rounded text-sm hover:bg-yellow-600"
                       >
                         ⏸️ Despublicar
                       </button>
@@ -358,10 +358,10 @@ export default function AdminReviewsPage() {
 
       {/* Add Review Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-slate-200/70 flex items-center justify-center z-[80] p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-slate-200">
-              <h2 className="text-xl font-semibold text-black">Afegir Ressenya</h2>
+        <div className="fixed inset-0 bg-stone-200/70 flex items-center justify-center z-[80] p-4">
+          <div className="bg-stone-50 rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-stone-200">
+              <h2 className="text-xl font-semibold text-slate-800">Afegir Ressenya</h2>
               <p className="text-sm text-slate-500 mt-1">
                 Afegeix una ressenya que hagis rebut per WhatsApp, email o en persona
               </p>
@@ -376,7 +376,7 @@ export default function AdminReviewsPage() {
                   type="text"
                   value={newReview.customerName}
                   onChange={(e) => setNewReview({ ...newReview, customerName: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                   placeholder="Maria García"
                 />
               </div>
@@ -389,7 +389,7 @@ export default function AdminReviewsPage() {
                   type="email"
                   value={newReview.customerEmail}
                   onChange={(e) => setNewReview({ ...newReview, customerEmail: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                   placeholder="maria@email.com"
                 />
               </div>
@@ -421,7 +421,7 @@ export default function AdminReviewsPage() {
                 <select
                   value={newReview.eventType}
                   onChange={(e) => setNewReview({ ...newReview, eventType: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                 >
                   {Object.entries(EVENT_TYPE_LABELS).map(([value, label]) => (
                     <option key={value} value={value}>{label}</option>
@@ -436,7 +436,7 @@ export default function AdminReviewsPage() {
                 <select
                   value={newReview.source}
                   onChange={(e) => setNewReview({ ...newReview, source: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                 >
                   <option value="whatsapp">💬 WhatsApp</option>
                   <option value="email">✉️ Email</option>
@@ -454,16 +454,16 @@ export default function AdminReviewsPage() {
                   value={newReview.text}
                   onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
                   rows={4}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
                   placeholder="El servei va ser excel·lent, la festa va ser increïble..."
                 />
               </div>
             </div>
             
-            <div className="p-6 border-t border-slate-200 flex gap-3 justify-end">
+            <div className="p-6 border-t border-stone-200 flex gap-3 justify-end">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50"
+                className="px-4 py-2 border border-stone-300 rounded-lg text-slate-700 hover:bg-slate-50"
               >
                 Cancel·lar
               </button>

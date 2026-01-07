@@ -49,7 +49,7 @@ export default async function FAQPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-black">FAQ</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">FAQ</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona les preguntes freqüents del web
           </p>
@@ -57,7 +57,7 @@ export default async function FAQPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/faq/new"
-            className="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-black hover:bg-slate-100"
+            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-100"
           >
             + Nova Pregunta
           </Link>
@@ -66,9 +66,9 @@ export default async function FAQPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Preguntes</p>
-          <p className="mt-2 text-3xl font-bold text-black">{faqs.length}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-800">{faqs.length}</p>
         </div>
         <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-green-600 uppercase">Actives</p>
@@ -99,13 +99,13 @@ export default async function FAQPage() {
               key={key}
               className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${
                 count > 0
-                  ? 'bg-slate-100 text-slate-700'
+                  ? 'bg-stone-100 text-slate-700'
                   : 'bg-slate-50 text-slate-400'
               }`}
             >
               <span>{config.icon}</span>
               {config.label}
-              <span className="text-xs bg-white px-1.5 py-0.5 rounded-full">
+              <span className="text-xs bg-stone-50 px-1.5 py-0.5 rounded-full">
                 {count}
               </span>
             </span>
@@ -123,10 +123,10 @@ export default async function FAQPage() {
         return (
           <section
             key={category}
-            className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden"
+            className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden"
           >
-            <div className="bg-slate-50 border-b border-slate-200 p-4">
-              <h2 className="font-semibold text-black flex items-center gap-2">
+            <div className="bg-slate-50 border-b border-stone-200 p-4">
+              <h2 className="font-semibold text-slate-800 flex items-center gap-2">
                 <span>{config.icon}</span>
                 {config.label}
                 <span className="text-sm font-normal text-slate-500">
@@ -146,11 +146,11 @@ export default async function FAQPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-slate-400">#{faq.order}</span>
-                          <h3 className="font-medium text-black truncate">
+                          <h3 className="font-medium text-slate-800 truncate">
                             {translation?.question || faq.slug}
                           </h3>
                           {!faq.isActive && (
-                            <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+                            <span className="inline-flex items-center rounded-full bg-stone-100 px-2 py-0.5 text-xs font-medium text-slate-500">
                               Inactiva
                             </span>
                           )}
@@ -162,7 +162,7 @@ export default async function FAQPage() {
                           {faq.translations.map((t) => (
                             <span
                               key={t.locale}
-                              className="inline-flex items-center rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600"
+                              className="inline-flex items-center rounded bg-stone-100 px-1.5 py-0.5 text-xs text-slate-600"
                             >
                               {t.locale.toUpperCase()}
                             </span>
@@ -172,7 +172,7 @@ export default async function FAQPage() {
                       <div className="flex items-center gap-2 shrink-0">
                         <Link
                           href={`/admin/faq/${faq.id}`}
-                          className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
+                          className="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200"
                         >
                           Editar
                         </Link>
@@ -187,7 +187,7 @@ export default async function FAQPage() {
       })}
 
       {faqs.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 p-12 text-center">
           <span className="text-4xl">❓</span>
           <p className="mt-4 text-slate-600">No hi ha preguntes freqüents</p>
           <p className="text-sm text-slate-400">Crea la primera pregunta per començar</p>

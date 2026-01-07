@@ -72,7 +72,7 @@ export default function CanvasGeneratorPage() {
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-black">🎨 Generador de Canvas</h1>
+        <h1 className="text-2xl font-bold text-slate-800">🎨 Generador de Canvas</h1>
         <p className="text-slate-500 mt-1">
           Crea imatges promocionals amb foto de l&apos;event i codi de descompte
         </p>
@@ -80,8 +80,8 @@ export default function CanvasGeneratorPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <h2 className="text-lg font-semibold text-black mb-6">⚙️ Configuració</h2>
+        <div className="bg-stone-50 rounded-2xl shadow-sm border border-stone-200 p-6">
+          <h2 className="text-lg font-semibold text-slate-800 mb-6">⚙️ Configuració</h2>
 
           <div className="space-y-5">
             {/* Nom client */}
@@ -94,7 +94,7 @@ export default function CanvasGeneratorPage() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Maria i Joan"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               />
             </div>
 
@@ -108,7 +108,7 @@ export default function CanvasGeneratorPage() {
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                 placeholder="MARIA15-ABC"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 uppercase"
+                className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 uppercase"
               />
             </div>
 
@@ -125,7 +125,7 @@ export default function CanvasGeneratorPage() {
                     className={`flex-1 py-2.5 rounded-xl font-medium transition-all ${
                       formData.discount === pct
                         ? 'bg-amber-500 text-white'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
                     }`}
                   >
                     {pct}%
@@ -142,7 +142,7 @@ export default function CanvasGeneratorPage() {
               <select
                 value={formData.eventType}
                 onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               >
                 {EVENT_TYPES.map((type) => (
                   <option key={type.id} value={type.id}>
@@ -162,7 +162,7 @@ export default function CanvasGeneratorPage() {
                 value={formData.photoUrl}
                 onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
                 placeholder="https://..."
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               />
               <p className="text-xs text-slate-400 mt-1">
                 Deixa buit per usar fons gradient daurat
@@ -182,10 +182,10 @@ export default function CanvasGeneratorPage() {
                     className={`p-3 rounded-xl border-2 transition-all text-left ${
                       formData.preset === preset.id
                         ? 'border-amber-500 bg-amber-50'
-                        : 'border-slate-200 hover:border-slate-300'
+                        : 'border-stone-200 hover:border-stone-300'
                     }`}
                   >
-                    <span className="font-medium text-black">{preset.name}</span>
+                    <span className="font-medium text-slate-800">{preset.name}</span>
                     <span className="block text-xs text-slate-400 mt-0.5">
                       {preset.width}x{preset.height}
                     </span>
@@ -205,7 +205,7 @@ export default function CanvasGeneratorPage() {
             </button>
             <button
               onClick={handleCopyUrl}
-              className="px-4 py-3 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition-colors"
+              className="px-4 py-3 bg-stone-100 text-slate-700 font-medium rounded-xl hover:bg-stone-200 transition-colors"
             >
               {copied ? '✓ Copiat!' : '🔗 URL'}
             </button>
@@ -213,9 +213,9 @@ export default function CanvasGeneratorPage() {
         </div>
 
         {/* Preview */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div className="bg-stone-50 rounded-2xl shadow-sm border border-stone-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-black">👁️ Previsualització</h2>
+            <h2 className="text-lg font-semibold text-slate-800">👁️ Previsualització</h2>
             {selectedPreset && (
               <span className="text-sm text-slate-400">
                 {selectedPreset.width}x{selectedPreset.height}px
@@ -224,7 +224,7 @@ export default function CanvasGeneratorPage() {
           </div>
 
           <div 
-            className="bg-slate-100 rounded-xl overflow-hidden flex items-center justify-center"
+            className="bg-stone-100 rounded-xl overflow-hidden flex items-center justify-center"
             style={{ 
               minHeight: '400px',
               aspectRatio: selectedPreset ? `${selectedPreset.width}/${selectedPreset.height}` : 'auto',

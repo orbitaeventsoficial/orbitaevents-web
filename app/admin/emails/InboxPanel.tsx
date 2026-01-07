@@ -120,11 +120,11 @@ export default function InboxPanel() {
   const unreadCount = emails.filter(e => !e.isRead).length;
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
         <div>
-          <h2 className="font-semibold text-black flex items-center gap-2">
+          <h2 className="font-semibold text-slate-800 flex items-center gap-2">
             <span>📥</span> Safata d&apos;Entrada
             {unreadCount > 0 && (
               <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
@@ -139,7 +139,7 @@ export default function InboxPanel() {
         <button
           onClick={fetchEmails}
           disabled={loading}
-          className="p-2 rounded-lg hover:bg-slate-1000 transition-colors disabled:opacity-50"
+          className="p-2 rounded-lg hover:bg-stone-1000 transition-colors disabled:opacity-50"
           title="Refrescar"
         >
           <svg className={`w-5 h-5 text-slate-600 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -187,7 +187,7 @@ export default function InboxPanel() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm truncate ${!email.isRead ? 'font-semibold text-black' : 'text-slate-700'}`}>
+                      <p className={`text-sm truncate ${!email.isRead ? 'font-semibold text-slate-800' : 'text-slate-700'}`}>
                         {email.from.name || email.from.address}
                       </p>
                       <p className={`text-sm truncate ${!email.isRead ? 'font-medium text-slate-800' : 'text-slate-600'}`}>
@@ -221,7 +221,7 @@ export default function InboxPanel() {
               <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-black">{selectedEmail.subject}</h3>
+                    <h3 className="font-semibold text-slate-800">{selectedEmail.subject}</h3>
                     <p className="text-sm text-slate-600 mt-1">
                       De: <span className="font-medium">{selectedEmail.from.name}</span>
                       {selectedEmail.from.address && (
@@ -244,7 +244,7 @@ export default function InboxPanel() {
                     </button>
                     <button
                       onClick={() => setSelectedEmail(null)}
-                      className="p-2 text-slate-400 hover:bg-slate-100 rounded-lg transition-colors"
+                      className="p-2 text-slate-400 hover:bg-stone-100 rounded-lg transition-colors"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -255,7 +255,7 @@ export default function InboxPanel() {
                 {selectedEmail.hasAttachments && (
                   <div className="mt-2 flex flex-wrap gap-2">
                     {selectedEmail.attachments.map((att, idx) => (
-                      <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded text-xs text-slate-600">
+                      <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-stone-100 rounded text-xs text-slate-600">
                         📎 {att.filename}
                         <span className="text-slate-400">({Math.round(att.size / 1024)}KB)</span>
                       </span>
@@ -292,14 +292,14 @@ export default function InboxPanel() {
             <button
               onClick={() => setPage(p => Math.max(0, p - 1))}
               disabled={page === 0}
-              className="px-3 py-1 text-sm border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 text-sm border border-stone-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ← Anterior
             </button>
             <button
               onClick={() => setPage(p => p + 1)}
               disabled={(page + 1) * limit >= total}
-              className="px-3 py-1 text-sm border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 text-sm border border-stone-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Següent →
             </button>

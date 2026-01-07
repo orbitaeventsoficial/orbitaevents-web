@@ -82,7 +82,7 @@ export default function NewTestimonialPage({
           <Link href="/admin/testimonios" className="text-sm text-slate-500 hover:text-slate-700">
             ← Tornar a testimonis
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-black">
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-800">
             Nou testimoni
           </h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -97,13 +97,13 @@ export default function NewTestimonialPage({
         </div>
       )}
 
-      <form action={createTestimonial} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+      <form action={createTestimonial} className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm space-y-5">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Nom del client *</label>
           <input
             name="authorName"
             required
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
+            className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
             placeholder="Laura & Marc"
           />
         </div>
@@ -112,7 +112,7 @@ export default function NewTestimonialPage({
           <label className="block text-sm font-medium text-slate-700 mb-1">Etiqueta (opcional)</label>
           <input
             name="authorLabel"
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
+            className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
             placeholder="Boda a Granollers"
           />
         </div>
@@ -126,7 +126,7 @@ export default function NewTestimonialPage({
             max={5}
             defaultValue={5}
             required
-            className="w-24 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
+            className="w-24 rounded-lg border border-stone-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
           />
         </div>
 
@@ -135,7 +135,7 @@ export default function NewTestimonialPage({
           <select
             name="eventType"
             defaultValue="OTHER"
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
+            className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
           >
             <option value="WEDDING">Boda</option>
             <option value="BIRTHDAY">Aniversari</option>
@@ -154,7 +154,7 @@ export default function NewTestimonialPage({
           <select
             name="locale"
             defaultValue="ca"
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
+            className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
           >
             <option value="ca">Català</option>
             <option value="es">Español</option>
@@ -168,18 +168,18 @@ export default function NewTestimonialPage({
             name="quote"
             rows={4}
             required
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
+            className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500"
             placeholder="El servei va ser increïble..."
           />
         </div>
 
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" name="isFeatured" className="rounded border-slate-300" />
+            <input type="checkbox" name="isFeatured" className="rounded border-stone-300" />
             Destacat
           </label>
           <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" name="isVerified" defaultChecked className="rounded border-slate-300" />
+            <input type="checkbox" name="isVerified" defaultChecked className="rounded border-stone-300" />
             Verificat
           </label>
         </div>
@@ -187,13 +187,13 @@ export default function NewTestimonialPage({
         <div className="flex justify-end gap-2">
           <Link
             href="/admin/testimonios"
-            className="inline-flex items-center rounded-md border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center rounded-md border border-stone-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
           >
             Cancel·lar
           </Link>
           <button
             type="submit"
-            className="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-black hover:bg-slate-100"
+            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-100"
           >
             Guardar
           </button>

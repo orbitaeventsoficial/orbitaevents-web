@@ -74,9 +74,9 @@ export default async function InboxPage() {
   return (
     <div className="h-[calc(100vh-80px)] flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
+      <header className="flex items-center justify-between px-6 py-4 border-b border-stone-200 bg-stone-50">
         <div>
-          <h1 className="text-xl font-semibold text-black">📬 Inbox</h1>
+          <h1 className="text-xl font-semibold text-slate-800">📬 Inbox</h1>
           <p className="text-sm text-slate-500">
             {stats.unreadLeads} leads nous · {stats.todayLeads} avui
             {imapConfigured && ' · 📧 Correu connectat'}
@@ -91,7 +91,7 @@ export default async function InboxPage() {
           </Link>
           <Link
             href="/admin/inbox/settings"
-            className="px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm"
+            className="px-4 py-2 border border-stone-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm"
           >
             ⚙️ Configurar
           </Link>

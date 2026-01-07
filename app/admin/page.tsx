@@ -143,7 +143,7 @@ export default async function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-black">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
           <p className="text-neutral-500">Benvingut, Carles 👋</p>
         </div>
         <div className="flex items-center gap-3">
@@ -205,7 +205,7 @@ export default async function AdminDashboard() {
             {upcomingBookings.length > 0 ? (
               <div className="divide-y divide-white/5">
                 {upcomingBookings.map((booking) => (
-                  <div key={booking.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-100 transition-colors">
+                  <div key={booking.id} className="px-6 py-4 flex items-center justify-between hover:bg-stone-100 transition-colors">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center">
                         <span className="text-orange-400 font-bold">
@@ -213,7 +213,7 @@ export default async function AdminDashboard() {
                         </span>
                       </div>
                       <div>
-                        <p className="text-black font-medium">{booking.clientName || 'Client'}</p>
+                        <p className="text-slate-800 font-medium">{booking.clientName || 'Client'}</p>
                         <p className="text-neutral-500 text-sm">
                           {formatEventDate(new Date(booking.eventDate))} • {booking.eventType || 'Event'}
                         </p>
@@ -270,13 +270,13 @@ export default async function AdminDashboard() {
         {recentLeads.length > 0 ? (
           <div className="divide-y divide-white/5">
             {recentLeads.map((lead) => (
-              <div key={lead.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-100 transition-colors">
+              <div key={lead.id} className="px-6 py-4 flex items-center justify-between hover:bg-stone-100 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500/20 to-orange-600/20 flex items-center justify-center text-orange-400 font-medium">
                     {lead.name?.charAt(0).toUpperCase() || '?'}
                   </div>
                   <div>
-                    <p className="text-black font-medium">{lead.name}</p>
+                    <p className="text-slate-800 font-medium">{lead.name}</p>
                     <p className="text-neutral-500 text-sm">{lead.email}</p>
                   </div>
                 </div>
@@ -307,22 +307,22 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/20">
           <p className="text-green-400 text-sm font-medium">Taxa conversió</p>
-          <p className="text-2xl font-bold text-black mt-1">{conversionRate}%</p>
+          <p className="text-2xl font-bold text-slate-800 mt-1">{conversionRate}%</p>
           <p className="text-xs text-green-400/60 mt-1">{wonLeads} de {leadsCount} leads</p>
         </div>
         <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20">
           <p className="text-blue-400 text-sm font-medium">Testimonis</p>
-          <p className="text-2xl font-bold text-black mt-1">{testimonialsApproved + testimonialsPending}</p>
+          <p className="text-2xl font-bold text-slate-800 mt-1">{testimonialsApproved + testimonialsPending}</p>
           <p className="text-xs text-blue-400/60 mt-1">{testimonialsPending} pendents</p>
         </div>
         <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20">
           <p className="text-purple-400 text-sm font-medium">Valoració</p>
-          <p className="text-2xl font-bold text-black mt-1">⭐ {rating}</p>
+          <p className="text-2xl font-bold text-slate-800 mt-1">⭐ {rating}</p>
           <p className="text-xs text-purple-400/60 mt-1">Mitjana de ressenyes</p>
         </div>
         <div className="p-4 rounded-xl bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/20">
           <p className="text-orange-400 text-sm font-medium">Inventari actiu</p>
-          <p className="text-2xl font-bold text-black mt-1">{inventoryActive}/{inventoryTotal}</p>
+          <p className="text-2xl font-bold text-slate-800 mt-1">{inventoryActive}/{inventoryTotal}</p>
           <p className="text-xs text-orange-400/60 mt-1">{inventoryMaintenance} en manteniment</p>
         </div>
       </div>

@@ -90,7 +90,7 @@ export default async function BookingsPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-black">Reserves</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">Reserves</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona totes les reserves i events
           </p>
@@ -98,7 +98,7 @@ export default async function BookingsPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/bookings/new"
-            className="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-black hover:bg-slate-100"
+            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-100"
           >
             + Nova Reserva
           </Link>
@@ -107,9 +107,9 @@ export default async function BookingsPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total</p>
-          <p className="mt-2 text-3xl font-bold text-black">{bookings.length}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-800">{bookings.length}</p>
           <p className="text-xs text-slate-400">{formatCurrency(totalRevenue)}</p>
         </div>
         <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 shadow-sm">
@@ -150,10 +150,10 @@ export default async function BookingsPage() {
       </div>
 
       {/* Bookings Table */}
-      <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-50 border-b border-stone-200">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Ref.</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Client</th>
@@ -190,14 +190,14 @@ export default async function BookingsPage() {
                     >
                       {/* Referència */}
                       <td className="px-4 py-3">
-                        <code className="text-xs font-mono bg-slate-100 px-2 py-1 rounded">
+                        <code className="text-xs font-mono bg-stone-100 px-2 py-1 rounded">
                           {booking.reference}
                         </code>
                       </td>
 
                       {/* Client */}
                       <td className="px-4 py-3">
-                        <div className="font-medium text-black">{booking.clientName}</div>
+                        <div className="font-medium text-slate-800">{booking.clientName}</div>
                         <div className="text-xs text-slate-500">{booking.clientEmail}</div>
                       </td>
 
@@ -206,7 +206,7 @@ export default async function BookingsPage() {
 
                       {/* Data Event */}
                       <td className="px-4 py-3">
-                        <div className="font-medium text-black">
+                        <div className="font-medium text-slate-800">
                           {formatDate(booking.eventDate)}
                         </div>
                         {booking.eventStartTime && (
@@ -236,7 +236,7 @@ export default async function BookingsPage() {
                       </td>
 
                       {/* Total */}
-                      <td className="px-4 py-3 font-medium text-black">
+                      <td className="px-4 py-3 font-medium text-slate-800">
                         {formatCurrency(booking.total)}
                         {!booking.depositPaid && (
                           <span className="block text-xs text-red-500">Paga pendent</span>

@@ -66,7 +66,7 @@ function useStandalone() {
 function PWAStatusBar() {
   return (
     <div 
-      className="fixed top-0 left-0 right-0 z-[100] bg-slate-100"
+      className="fixed top-0 left-0 right-0 z-[100] bg-stone-100"
       style={{ height: 'env(safe-area-inset-top, 0px)' }}
     />
   );
@@ -78,7 +78,7 @@ function SplashScreen({ isLoading }: { isLoading: boolean }) {
     <AnimatePresence>
       {isLoading && (
         <motion.div
-          className="fixed inset-0 z-[200] bg-slate-100 flex flex-col items-center justify-center"
+          className="fixed inset-0 z-[200] bg-stone-100 flex flex-col items-center justify-center"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
@@ -95,7 +95,7 @@ function SplashScreen({ isLoading }: { isLoading: boolean }) {
 
           {/* Brand */}
           <motion.h1
-            className="text-2xl font-bold text-black mb-2"
+            className="text-2xl font-bold text-slate-800 mb-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -320,7 +320,7 @@ export default function MobileAdminLayout({ children }: MobileAdminLayoutProps) 
 
         {/* Main content */}
         <main
-          className="min-h-screen bg-slate-100"
+          className="min-h-screen bg-stone-100"
           style={{
             paddingTop: isStandalone ? 'env(safe-area-inset-top)' : '0',
           }}

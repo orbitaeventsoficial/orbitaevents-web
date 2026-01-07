@@ -148,7 +148,7 @@ function CalendarHeader({
     <div className="flex items-center justify-between mb-4">
       <button
         onClick={onPrev}
-        className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:bg-slate-200"
+        className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-slate-600 active:bg-stone-200"
       >
         {Icons.chevronLeft}
       </button>
@@ -156,7 +156,7 @@ function CalendarHeader({
       <div className="text-center">
         <motion.h2
           key={`${year}-${month}`}
-          className="text-lg font-bold text-black"
+          className="text-lg font-bold text-slate-800"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -174,7 +174,7 @@ function CalendarHeader({
 
       <button
         onClick={onNext}
-        className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:bg-slate-200"
+        className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-slate-600 active:bg-stone-200"
       >
         {Icons.chevronRight}
       </button>
@@ -208,9 +208,9 @@ function CalendarDay({
         isSelected
           ? 'bg-orange-500 text-white'
           : isToday
-          ? 'bg-slate-200 text-black'
+          ? 'bg-stone-200 text-slate-800'
           : isCurrentMonth
-          ? 'text-slate-700 active:bg-slate-100'
+          ? 'text-slate-700 active:bg-stone-100'
           : 'text-slate-300'
       }`}
     >
@@ -261,13 +261,13 @@ function DayEventsPanel({
     <AnimatePresence>
       {date && (
         <motion.div
-          className="mt-4 p-4 bg-slate-100 rounded-2xl border border-slate-200"
+          className="mt-4 p-4 bg-stone-100 rounded-2xl border border-stone-200"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
         >
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-black font-semibold">
+            <h3 className="text-slate-800 font-semibold">
               {date.toLocaleDateString('ca-ES', {
                 weekday: 'long',
                 day: 'numeric',
@@ -292,13 +292,13 @@ function DayEventsPanel({
                 <Link
                   key={event.id}
                   href={`/admin/bookings/${event.id}`}
-                  className="flex items-center gap-3 p-3 bg-slate-100 rounded-xl active:bg-slate-200 transition-colors"
+                  className="flex items-center gap-3 p-3 bg-stone-100 rounded-xl active:bg-stone-200 transition-colors"
                 >
                   <div className={`w-10 h-10 rounded-lg ${EVENT_COLORS[event.eventType]}/20 flex items-center justify-center text-lg`}>
                     {EVENT_ICONS[event.eventType] || '📅'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-black font-medium truncate">{event.eventName}</p>
+                    <p className="text-slate-800 font-medium truncate">{event.eventName}</p>
                     <p className="text-slate-400 text-sm">{event.clientName || 'Sense client'}</p>
                   </div>
                   <div className="text-right">
@@ -420,13 +420,13 @@ export default function MobileCalendarWidget({ fullPage = false }: { fullPage?: 
   }, [selectedDate, events]);
 
   const containerClass = fullPage 
-    ? 'min-h-screen bg-slate-100 p-4 pt-6 pb-24 lg:hidden'
-    : 'p-4 bg-slate-1000 rounded-2xl border border-slate-200';
+    ? 'min-h-screen bg-stone-100 p-4 pt-6 pb-24 lg:hidden'
+    : 'p-4 bg-stone-1000 rounded-2xl border border-stone-200';
 
   return (
     <div className={containerClass}>
       {fullPage && (
-        <h1 className="text-2xl font-bold text-black mb-6">Calendari</h1>
+        <h1 className="text-2xl font-bold text-slate-800 mb-6">Calendari</h1>
       )}
 
       <CalendarHeader
@@ -481,7 +481,7 @@ export default function MobileCalendarWidget({ fullPage = false }: { fullPage?: 
 
       {/* Loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-slate-200/70 flex items-center justify-center rounded-2xl">
+        <div className="absolute inset-0 bg-stone-200/70 flex items-center justify-center rounded-2xl">
           <motion.div
             className="w-8 h-8 border-2 border-orange-500/30 border-t-orange-500 rounded-full"
             animate={{ rotate: 360 }}

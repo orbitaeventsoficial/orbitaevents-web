@@ -22,8 +22,8 @@ export function TextStats({ totalTexts, modifiedCount, sectionCounts }: StatsPro
   const maxCount = Math.max(...sections.map(([_, c]) => c.total));
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6">
-      <h3 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
+    <div className="bg-stone-50 rounded-xl border border-stone-200 p-6">
+      <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
         📊 Estadísticas de Contenido
       </h3>
 
@@ -56,7 +56,7 @@ export function TextStats({ totalTexts, modifiedCount, sectionCounts }: StatsPro
         {topSections.map(([id, counts]) => (
           <div key={id} className="flex items-center gap-3">
             <div className="w-20 text-sm text-slate-600 truncate">{id}</div>
-            <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
+            <div className="flex-1 bg-stone-100 rounded-full h-4 overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-orange-400 to-rose-400 rounded-full transition-all"
                 style={{ width: `${(counts.total / maxCount) * 100}%` }}
@@ -150,8 +150,8 @@ export function TextTools({ onRefresh, onExport, onImport, onSync }: ToolsProps)
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6">
-      <h3 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
+    <div className="bg-stone-50 rounded-xl border border-stone-200 p-6">
+      <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
         🛠️ Herramientas
       </h3>
 
@@ -159,7 +159,7 @@ export function TextTools({ onRefresh, onExport, onImport, onSync }: ToolsProps)
         {/* Refrescar */}
         <button
           onClick={onRefresh}
-          className="p-4 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all flex flex-col items-center gap-2 text-center"
+          className="p-4 bg-slate-50 hover:bg-stone-100 rounded-xl transition-all flex flex-col items-center gap-2 text-center"
         >
           <span className="text-2xl">🔄</span>
           <span className="text-sm font-medium text-slate-700">Refrescar</span>
@@ -252,7 +252,7 @@ export function AdvancedSearch({
   const [showFilters, setShowFilters] = useState(false);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-4">
+    <div className="bg-stone-50 rounded-xl border border-stone-200 p-4">
       {/* Barra de búsqueda principal */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1">
@@ -261,7 +261,7 @@ export function AdvancedSearch({
             placeholder="Buscar por path o contenido... (ej: hero.title, boda, garantía)"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full px-4 py-3 pl-11 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
+            className="w-full px-4 py-3 pl-11 rounded-xl border border-stone-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
           />
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
             🔍
@@ -281,7 +281,7 @@ export function AdvancedSearch({
           className={`px-4 py-3 rounded-xl transition-all flex items-center gap-2 ${
             showFilters || Object.values(filters).some(v => v)
               ? 'bg-orange-500 text-white'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
           }`}
         >
           <span>⚙️</span>
@@ -303,7 +303,7 @@ export function AdvancedSearch({
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filters.showModified
                   ? 'bg-orange-500 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
               }`}
             >
               ✏️ Solo modificados
@@ -315,7 +315,7 @@ export function AdvancedSearch({
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filters.showComparison
                   ? 'bg-blue-500 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
               }`}
             >
               🌐 Mostrar ES/CA
@@ -344,7 +344,7 @@ export function AdvancedSearch({
             <select
               value={filters.section || ''}
               onChange={(e) => onFilterChange('section', e.target.value || null)}
-              className="w-full md:w-auto px-4 py-2 rounded-lg border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
+              className="w-full md:w-auto px-4 py-2 rounded-lg border border-stone-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
             >
               <option value="">Todas las secciones</option>
               {sections.map(section => (
@@ -401,10 +401,10 @@ export function TextEditor({
 
   return (
     <div
-      className={`bg-white rounded-xl border transition-all ${
+      className={`bg-stone-50 rounded-xl border transition-all ${
         isModified
           ? 'border-orange-300 shadow-md shadow-orange-100'
-          : 'border-slate-200 hover:border-slate-300'
+          : 'border-stone-200 hover:border-stone-300'
       }`}
     >
       <div className="p-4">
@@ -412,7 +412,7 @@ export function TextEditor({
         <div className="flex items-start justify-between gap-4 mb-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <code className="text-sm text-slate-500 break-all font-mono bg-slate-100 px-2 py-1 rounded">
+              <code className="text-sm text-slate-500 break-all font-mono bg-stone-100 px-2 py-1 rounded">
                 {highlightText(path)}
               </code>
               {isModified && (
@@ -427,14 +427,14 @@ export function TextEditor({
             {isModified && (
               <button
                 onClick={onRevert}
-                className="text-xs px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                className="text-xs px-3 py-1 rounded-lg bg-stone-100 text-slate-600 hover:bg-stone-200 transition-colors"
               >
                 ↩️ Revertir
               </button>
             )}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-xs px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+              className="text-xs px-3 py-1 rounded-lg bg-stone-100 text-slate-600 hover:bg-stone-200 transition-colors"
             >
               {isExpanded ? '▲ Colapsar' : '▼ Expandir'}
             </button>
@@ -452,7 +452,7 @@ export function TextEditor({
           className={`w-full px-4 py-3 rounded-lg border transition-all resize-none font-sans ${
             isModified
               ? 'border-orange-300 bg-orange-50/50 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20'
-              : 'border-slate-200 bg-slate-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+              : 'border-stone-200 bg-slate-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
           }`}
           placeholder="Texto vacío..."
         />
@@ -512,11 +512,11 @@ export function BulkActions({
 
   return (
     <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40">
-      <div className="bg-white text-black px-6 py-3 rounded-full shadow-xl flex items-center gap-4">
+      <div className="bg-stone-50 text-slate-800 px-6 py-3 rounded-full shadow-xl flex items-center gap-4">
         <span className="text-sm">
           <strong>{selectedCount}</strong> seleccionados
         </span>
-        <div className="h-4 w-px bg-slate-300" />
+        <div className="h-4 w-px bg-stone-300" />
         <button
           onClick={onSelectAll}
           className="text-sm hover:text-orange-400 transition-colors"
@@ -529,7 +529,7 @@ export function BulkActions({
         >
           Deseleccionar
         </button>
-        <div className="h-4 w-px bg-slate-300" />
+        <div className="h-4 w-px bg-stone-300" />
         <button
           onClick={onBulkRevert}
           className="text-sm bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded-full transition-colors"

@@ -145,13 +145,13 @@ export default function SettingsClient({
         return (
           <section
             key={category}
-            className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden"
+            className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden"
           >
-            <div className="bg-slate-50 border-b border-slate-200 p-4">
+            <div className="bg-slate-50 border-b border-stone-200 p-4">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>
                 <div>
-                  <h2 className="font-semibold text-black">{config.label}</h2>
+                  <h2 className="font-semibold text-slate-800">{config.label}</h2>
                   <p className="text-sm text-slate-500">{config.description}</p>
                 </div>
               </div>
@@ -171,7 +171,7 @@ export default function SettingsClient({
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <code className="text-xs font-mono bg-slate-100 px-2 py-0.5 rounded">
+                          <code className="text-xs font-mono bg-stone-100 px-2 py-0.5 rounded">
                             {setting.key}
                           </code>
                           <span
@@ -182,14 +182,14 @@ export default function SettingsClient({
                                 ? 'bg-purple-100 text-purple-700'
                                 : setting.type === 'JSON'
                                 ? 'bg-orange-100 text-orange-700'
-                                : 'bg-slate-100 text-slate-600'
+                                : 'bg-stone-100 text-slate-600'
                             }`}
                           >
                             {TYPE_LABELS[setting.type]}
                           </span>
                         </div>
                         {setting.label && (
-                          <p className="mt-1 font-medium text-black">{setting.label}</p>
+                          <p className="mt-1 font-medium text-slate-800">{setting.label}</p>
                         )}
                         {setting.description && (
                           <p className="text-sm text-slate-500">{setting.description}</p>
@@ -225,7 +225,7 @@ export default function SettingsClient({
 
                             <div className="flex items-center justify-end gap-2">
                               <button
-                                className="text-xs px-2 py-1 rounded border border-slate-200"
+                                className="text-xs px-2 py-1 rounded border border-stone-200"
                                 onClick={cancelEdit}
                                 disabled={isSaving}
                               >
@@ -242,7 +242,7 @@ export default function SettingsClient({
                           </div>
                         ) : (
                           <>
-                            <p className="text-lg font-semibold text-black">
+                            <p className="text-lg font-semibold text-slate-800">
                               {formatDisplay(current)}
                             </p>
                             <p className="text-xs text-slate-400">
@@ -250,7 +250,7 @@ export default function SettingsClient({
                               {new Date(current.updatedAt).toLocaleDateString('ca-ES')}
                             </p>
                             <button
-                              className="mt-2 text-xs px-2 py-1 rounded border border-slate-200 hover:bg-slate-100"
+                              className="mt-2 text-xs px-2 py-1 rounded border border-stone-200 hover:bg-stone-100"
                               onClick={() => startEdit(current)}
                             >
                               Editar

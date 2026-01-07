@@ -155,7 +155,7 @@ function MoreMenu({
         >
           {/* Backdrop */}
           <motion.div 
-            className="absolute inset-0 bg-slate-200/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-stone-200/70 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -163,7 +163,7 @@ function MoreMenu({
 
           {/* Menu */}
           <motion.div
-            className="absolute bottom-20 left-4 right-4 bg-white rounded-2xl p-2 border border-slate-200 shadow-2xl"
+            className="absolute bottom-20 left-4 right-4 bg-stone-50 rounded-2xl p-2 border border-stone-200 shadow-2xl"
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -184,7 +184,7 @@ function MoreMenu({
                       if ('vibrate' in navigator) navigator.vibrate(5);
                       onClose();
                     }}
-                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-slate-100 active:bg-slate-200 transition-colors"
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-stone-100 active:bg-stone-200 transition-colors"
                   >
                     <span className="text-2xl">{item.icon}</span>
                     <span className="text-xs text-slate-700 font-medium text-center">{item.label}</span>
@@ -194,7 +194,7 @@ function MoreMenu({
             </div>
 
             {/* Close indicator */}
-            <div className="mt-2 pt-2 border-t border-slate-200">
+            <div className="mt-2 pt-2 border-t border-stone-200">
               <button
                 onClick={onClose}
                 className="w-full py-2 text-center text-slate-400 text-sm"
@@ -303,7 +303,7 @@ export default function BottomNavPro() {
         style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}
       >
         {/* Glass background */}
-        <div className="absolute inset-0 bg-white/90 backdrop-blur-xl border-t border-slate-200" />
+        <div className="absolute inset-0 bg-stone-50/90 backdrop-blur-xl border-t border-stone-200" />
 
         {/* Glow effect for active tab */}
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-500/50 to-transparent opacity-0 group-hover:opacity-100" />

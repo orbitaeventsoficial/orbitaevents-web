@@ -78,9 +78,9 @@ export default function ManualActionsPanel() {
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
-        <h2 className="font-semibold text-black">🔧 Accions Manuals</h2>
+        <h2 className="font-semibold text-slate-800">🔧 Accions Manuals</h2>
       </div>
 
       <div className="p-6 space-y-6">
@@ -95,8 +95,8 @@ export default function ManualActionsPanel() {
             disabled={runningCron}
             className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
               runningCron
-                ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
-                : 'bg-slate-100 text-black hover:bg-slate-200'
+                ? 'bg-stone-200 text-slate-500 cursor-not-allowed'
+                : 'bg-stone-100 text-slate-800 hover:bg-stone-200'
             }`}
           >
             {runningCron ? (
@@ -132,14 +132,14 @@ export default function ManualActionsPanel() {
               value={testEmail}
               onChange={(e) => setTestEmail(e.target.value)}
               placeholder="email@exemple.com"
-              className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+              className="flex-1 px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
             />
             <button
               onClick={sendTestEmail}
               disabled={sendingTest}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 sendingTest
-                  ? 'bg-slate-200 text-slate-500'
+                  ? 'bg-stone-200 text-slate-500'
                   : 'bg-amber-500 text-white hover:bg-amber-600'
               }`}
             >
@@ -175,7 +175,7 @@ export default function ManualActionsPanel() {
             </a>
             <a
               href="/admin/ressenyes"
-              className="block w-full text-center px-3 py-2 text-sm bg-slate-50 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
+              className="block w-full text-center px-3 py-2 text-sm bg-slate-50 text-slate-700 rounded-lg hover:bg-stone-100 transition-colors"
             >
               📋 Gestionar ressenyes
             </a>

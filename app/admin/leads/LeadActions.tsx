@@ -60,7 +60,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
       )}
       <Link
         href={`/admin/leads/${leadId}`}
-        className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
+        className="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200"
       >
         Veure
       </Link>
@@ -69,7 +69,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
         disabled={isDeleting || hasBooking}
         className={`inline-flex items-center rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors
           ${hasBooking
-            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+            ? 'bg-stone-100 text-slate-400 cursor-not-allowed'
             : 'bg-red-100 text-red-700 hover:bg-red-200'
           }`}
         title={hasBooking ? 'No es pot eliminar (té reserva)' : 'Eliminar lead'}

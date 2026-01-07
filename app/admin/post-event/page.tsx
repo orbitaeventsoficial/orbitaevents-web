@@ -78,7 +78,7 @@ export default async function PostEventPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-black">Post-Event</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-800">Post-Event</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona informes, enquestes i feedback dels events
           </p>
@@ -110,14 +110,14 @@ export default async function PostEventPage() {
       {/* Workflow Cards */}
       <section className="grid gap-6 lg:grid-cols-3">
         {/* Step 1: Informe Intern */}
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
           <div className="bg-orange-50 border-b border-orange-100 p-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold">
                 1
               </div>
               <div>
-                <h3 className="font-semibold text-black">Informe Intern</h3>
+                <h3 className="font-semibold text-slate-800">Informe Intern</h3>
                 <p className="text-xs text-slate-500">Completa després de l&apos;event</p>
               </div>
             </div>
@@ -150,14 +150,14 @@ export default async function PostEventPage() {
         </div>
 
         {/* Step 2: Enquesta Client */}
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
           <div className="bg-blue-50 border-b border-blue-100 p-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">
                 2
               </div>
               <div>
-                <h3 className="font-semibold text-black">Enquesta Client</h3>
+                <h3 className="font-semibold text-slate-800">Enquesta Client</h3>
                 <p className="text-xs text-slate-500">S&apos;envia automàticament</p>
               </div>
             </div>
@@ -190,14 +190,14 @@ export default async function PostEventPage() {
         </div>
 
         {/* Step 3: Feedback Client */}
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
           <div className="bg-green-50 border-b border-green-100 p-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
                 3
               </div>
               <div>
-                <h3 className="font-semibold text-black">Feedback al Client</h3>
+                <h3 className="font-semibold text-slate-800">Feedback al Client</h3>
                 <p className="text-xs text-slate-500">Envia agraïment</p>
               </div>
             </div>
@@ -228,9 +228,9 @@ export default async function PostEventPage() {
       </section>
 
       {/* Recent Completed Events */}
-      <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="bg-slate-50 border-b border-slate-200 p-4">
-          <h2 className="font-semibold text-black flex items-center gap-2">
+      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+        <div className="bg-slate-50 border-b border-stone-200 p-4">
+          <h2 className="font-semibold text-slate-800 flex items-center gap-2">
             📅 Events Completats Sense Informe
             <span className="text-sm font-normal text-slate-500">
               ({data.recentBookings.length})
@@ -247,7 +247,7 @@ export default async function PostEventPage() {
                 className="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between"
               >
                 <div>
-                  <p className="font-medium text-black">{booking.clientName}</p>
+                  <p className="font-medium text-slate-800">{booking.clientName}</p>
                   <p className="text-sm text-slate-500">
                     {booking.eventDate.toLocaleDateString('ca-ES')} · {packName} · {booking.eventLocation}
                   </p>

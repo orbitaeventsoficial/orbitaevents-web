@@ -160,7 +160,7 @@ export default async function AnalyticsPage() {
     <div className="space-y-6">
       {/* Header */}
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-black">Analytics</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-800">Analytics</h1>
         <p className="mt-1 text-sm text-slate-500">
           Estadístiques i mètriques del negoci
         </p>
@@ -168,29 +168,29 @@ export default async function AnalyticsPage() {
 
       {/* KPI Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Facturació Any</p>
-          <p className="mt-2 text-3xl font-bold text-black">
+          <p className="mt-2 text-3xl font-bold text-slate-800">
             {data.revenue.thisYear.toLocaleString('ca-ES')}€
           </p>
           <p className={`text-xs mt-1 ${Number(yearGrowth) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {Number(yearGrowth) >= 0 ? '↑' : '↓'} {yearGrowth}% vs any anterior
           </p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Reserves Any</p>
-          <p className="mt-2 text-3xl font-bold text-black">{data.bookings.thisYear}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-800">{data.bookings.thisYear}</p>
           <p className="text-xs text-slate-400 mt-1">{data.bookings.total} totals</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Ticket Mitjà</p>
-          <p className="mt-2 text-3xl font-bold text-black">
+          <p className="mt-2 text-3xl font-bold text-slate-800">
             {data.revenue.avgBooking.toLocaleString('ca-ES', { maximumFractionDigits: 0 })}€
           </p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">NPS Score</p>
-          <p className="mt-2 text-3xl font-bold text-black">
+          <p className="mt-2 text-3xl font-bold text-slate-800">
             {data.satisfaction.nps.toFixed(1)}
           </p>
           <p className="text-xs text-slate-400 mt-1">
@@ -202,9 +202,9 @@ export default async function AnalyticsPage() {
       {/* Leads Section */}
       <section className="grid gap-6 lg:grid-cols-2">
         {/* Leads per Font */}
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="bg-slate-50 border-b border-slate-200 p-4">
-            <h3 className="font-semibold text-black">Leads per Font</h3>
+        <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+          <div className="bg-slate-50 border-b border-stone-200 p-4">
+            <h3 className="font-semibold text-slate-800">Leads per Font</h3>
             <p className="text-xs text-slate-500 mt-1">{data.leads.thisYear} leads aquest any</p>
           </div>
           <div className="p-4 space-y-3">
@@ -222,7 +222,7 @@ export default async function AnalyticsPage() {
                       {source._count} ({percentage}%)
                     </span>
                   </div>
-                  <div className="mt-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="mt-1 h-2 bg-stone-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-orange-500 rounded-full"
                       style={{ width: `${percentage}%` }}
@@ -238,9 +238,9 @@ export default async function AnalyticsPage() {
         </div>
 
         {/* Conversió Leads */}
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="bg-slate-50 border-b border-slate-200 p-4">
-            <h3 className="font-semibold text-black">Conversió de Leads</h3>
+        <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+          <div className="bg-slate-50 border-b border-stone-200 p-4">
+            <h3 className="font-semibold text-slate-800">Conversió de Leads</h3>
             <p className="text-xs text-slate-500 mt-1">Estat dels leads</p>
           </div>
           <div className="p-4 space-y-3">
@@ -265,7 +265,7 @@ export default async function AnalyticsPage() {
                       {status._count} ({percentage}%)
                     </span>
                   </div>
-                  <div className="mt-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="mt-1 h-2 bg-stone-100 rounded-full overflow-hidden">
                     <div
                       className={`h-full ${config.color} rounded-full`}
                       style={{ width: `${percentage}%` }}
@@ -282,9 +282,9 @@ export default async function AnalyticsPage() {
       </section>
 
       {/* Events per Tipus */}
-      <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="bg-slate-50 border-b border-slate-200 p-4">
-          <h3 className="font-semibold text-black">Reserves per Tipus d&apos;Event</h3>
+      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+        <div className="bg-slate-50 border-b border-stone-200 p-4">
+          <h3 className="font-semibold text-slate-800">Reserves per Tipus d&apos;Event</h3>
         </div>
         <div className="p-4">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -296,7 +296,7 @@ export default async function AnalyticsPage() {
                   className="p-4 rounded-xl bg-slate-50 text-center"
                 >
                   <span className="text-3xl">{config.icon}</span>
-                  <p className="text-2xl font-bold text-black mt-2">{type._count}</p>
+                  <p className="text-2xl font-bold text-slate-800 mt-2">{type._count}</p>
                   <p className="text-xs text-slate-500">{config.label}</p>
                 </div>
               );

@@ -114,8 +114,8 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       )}
 
       {/* Pricing Section */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-black mb-4">💰 Preus</h3>
+      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-800 mb-4">💰 Preus</h3>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-slate-700 mb-1">
@@ -129,7 +129,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
                 required
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                className="block w-full rounded-md border-slate-300 pr-8 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+                className="block w-full rounded-md border-stone-300 pr-8 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
               />
               <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 text-sm">
                 €
@@ -148,7 +148,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
                 step="0.01"
                 value={formData.originalPrice}
                 onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
-                className="block w-full rounded-md border-slate-300 pr-8 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+                className="block w-full rounded-md border-stone-300 pr-8 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
                 placeholder="Opcional"
               />
               <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 text-sm">
@@ -169,7 +169,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
                 required
                 value={formData.extraHourPrice}
                 onChange={(e) => setFormData({ ...formData, extraHourPrice: parseFloat(e.target.value) || 0 })}
-                className="block w-full rounded-md border-slate-300 pr-8 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+                className="block w-full rounded-md border-stone-300 pr-8 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
               />
               <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 text-sm">
                 €
@@ -180,8 +180,8 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Features Section */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-black mb-4">🎵 Característiques</h3>
+      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-800 mb-4">🎵 Característiques</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="djHours" className="block text-sm font-medium text-slate-700 mb-1">
@@ -194,7 +194,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               min="1"
               value={formData.djHours}
               onChange={(e) => setFormData({ ...formData, djHours: parseInt(e.target.value) || 0 })}
-              className="block w-full rounded-md border-slate-300 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className="block w-full rounded-md border-stone-300 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
             />
           </div>
 
@@ -209,7 +209,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               min="0"
               value={formData.soundWatts}
               onChange={(e) => setFormData({ ...formData, soundWatts: parseInt(e.target.value) || 0 })}
-              className="block w-full rounded-md border-slate-300 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className="block w-full rounded-md border-stone-300 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
             />
           </div>
 
@@ -219,7 +219,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="includesFog"
               checked={formData.includesFog}
               onChange={(e) => setFormData({ ...formData, includesFog: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-300 text-black focus:ring-slate-900"
+              className="h-4 w-4 rounded border-stone-300 text-slate-800 focus:ring-slate-900"
             />
             <label htmlFor="includesFog" className="text-sm text-slate-700">
               🌫️ Inclou Màquina de Fum
@@ -232,7 +232,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="includesMic"
               checked={formData.includesMic}
               onChange={(e) => setFormData({ ...formData, includesMic: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-300 text-black focus:ring-slate-900"
+              className="h-4 w-4 rounded border-stone-300 text-slate-800 focus:ring-slate-900"
             />
             <label htmlFor="includesMic" className="text-sm text-slate-700">
               🎤 Inclou Micròfon
@@ -242,8 +242,8 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Capacity Section */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-black mb-4">👥 Capacitat</h3>
+      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-800 mb-4">👥 Capacitat</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="minGuests" className="block text-sm font-medium text-slate-700 mb-1">
@@ -255,7 +255,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               min="0"
               value={formData.minGuests}
               onChange={(e) => setFormData({ ...formData, minGuests: e.target.value })}
-              className="block w-full rounded-md border-slate-300 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className="block w-full rounded-md border-stone-300 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
               placeholder="Opcional"
             />
           </div>
@@ -270,7 +270,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               min="0"
               value={formData.maxGuests}
               onChange={(e) => setFormData({ ...formData, maxGuests: e.target.value })}
-              className="block w-full rounded-md border-slate-300 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className="block w-full rounded-md border-stone-300 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
               placeholder="Opcional"
             />
           </div>
@@ -278,8 +278,8 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Status Section */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-black mb-4">⚙️ Estat i Ordre</h3>
+      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-800 mb-4">⚙️ Estat i Ordre</h3>
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <input
@@ -287,7 +287,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="isActive"
               checked={formData.isActive}
               onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-300 text-black focus:ring-slate-900"
+              className="h-4 w-4 rounded border-stone-300 text-slate-800 focus:ring-slate-900"
             />
             <label htmlFor="isActive" className="text-sm text-slate-700">
               ✅ Pack Actiu (Visible a la web)
@@ -300,7 +300,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="isFeatured"
               checked={formData.isFeatured}
               onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-600"
+              className="h-4 w-4 rounded border-stone-300 text-orange-600 focus:ring-orange-600"
             />
             <label htmlFor="isFeatured" className="text-sm text-slate-700">
               ⭐ Pack Destacat
@@ -317,7 +317,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               required
               value={formData.order}
               onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-              className="block w-full rounded-md border-slate-300 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className="block w-full rounded-md border-stone-300 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
             />
             <p className="mt-1 text-xs text-slate-500">
               Ordre menor = apareix primer
@@ -330,14 +330,14 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       <div className="flex gap-3 justify-end">
         <Link
           href="/admin/packs"
-          className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="rounded-md border border-stone-300 bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
           Cancel·lar
         </Link>
         <button
           type="submit"
           disabled={loading}
-          className="rounded-md bg-white px-4 py-2 text-sm font-medium text-black hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Guardant...' : 'Guardar Canvis'}
         </button>

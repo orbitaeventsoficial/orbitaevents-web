@@ -152,7 +152,7 @@ function LeadCard({ lead, onCall, onWhatsApp, onStatusChange }: LeadCardProps) {
 
       {/* Card content */}
       <motion.div
-        className="relative bg-white p-4"
+        className="relative bg-stone-50 p-4"
         style={{ x }}
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
@@ -163,14 +163,14 @@ function LeadCard({ lead, onCall, onWhatsApp, onStatusChange }: LeadCardProps) {
         <Link href={`/admin/leads/${lead.id}`} className="block">
           <div className="flex items-start gap-3">
             {/* Avatar / Service Icon */}
-            <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-2xl flex-shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-stone-100 flex items-center justify-center text-2xl flex-shrink-0">
               {serviceIcon}
             </div>
 
             {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-black font-semibold truncate">{lead.name}</h3>
+                <h3 className="text-slate-800 font-semibold truncate">{lead.name}</h3>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${status.bg} ${status.color}`}>
                   {status.label}
                 </span>
@@ -191,7 +191,7 @@ function LeadCard({ lead, onCall, onWhatsApp, onStatusChange }: LeadCardProps) {
         </Link>
 
         {/* Quick action buttons (visible on card) */}
-        <div className="flex gap-2 mt-3 pt-3 border-t border-slate-200">
+        <div className="flex gap-2 mt-3 pt-3 border-t border-stone-200">
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -224,7 +224,7 @@ function LeadCard({ lead, onCall, onWhatsApp, onStatusChange }: LeadCardProps) {
               swipeDirection === 'right' ? 'justify-start pl-4' : 'justify-end pr-4'
             }`}
           >
-            <span className="text-black font-medium text-sm">
+            <span className="text-slate-800 font-medium text-sm">
               {swipeDirection === 'right' ? 'Trucar' : 'Canviar estat'}
             </span>
           </motion.div>
@@ -281,7 +281,7 @@ export default function MobileLeads() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-black">Leads</h1>
+          <h1 className="text-2xl font-bold text-slate-800">Leads</h1>
           <p className="text-slate-500 text-sm">{filteredLeads.length} contactes</p>
         </div>
         <Link
@@ -302,11 +302,11 @@ export default function MobileLeads() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar leads..."
-          className="w-full pl-12 pr-12 py-3 bg-slate-100 border border-slate-200 rounded-xl text-black placeholder:text-slate-400 focus:border-orange-500 focus:outline-none transition-colors"
+          className="w-full pl-12 pr-12 py-3 bg-stone-100 border border-stone-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-orange-500 focus:outline-none transition-colors"
         />
         <button
           onClick={() => setFilterOpen(true)}
-          className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 active:bg-slate-200"
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-slate-500 active:bg-stone-200"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -321,7 +321,7 @@ export default function MobileLeads() {
           className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
             statusFilter === 'all'
               ? 'bg-orange-500 text-white font-medium'
-              : 'bg-slate-100 text-slate-700'
+              : 'bg-stone-100 text-slate-700'
           }`}
         >
           Tots
@@ -333,7 +333,7 @@ export default function MobileLeads() {
             className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
               statusFilter === key
                 ? `${config.bg} ${config.color} font-medium`
-                : 'bg-slate-100 text-slate-700'
+                : 'bg-stone-100 text-slate-700'
             }`}
           >
             {config.label}
@@ -380,7 +380,7 @@ export default function MobileLeads() {
       <FilterSheet isOpen={filterOpen} onClose={() => setFilterOpen(false)}>
         <div className="space-y-4">
           <div>
-            <h4 className="text-black font-medium mb-3">Estat</h4>
+            <h4 className="text-slate-800 font-medium mb-3">Estat</h4>
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(statusConfig).map(([key, config]) => (
                 <button
@@ -390,10 +390,10 @@ export default function MobileLeads() {
                     setFilterOpen(false);
                   }}
                   className={`p-3 rounded-xl text-left ${
-                    statusFilter === key ? config.bg : 'bg-slate-100'
+                    statusFilter === key ? config.bg : 'bg-stone-100'
                   }`}
                 >
-                  <span className={statusFilter === key ? config.color : 'text-black'}>
+                  <span className={statusFilter === key ? config.color : 'text-slate-800'}>
                     {config.label}
                   </span>
                 </button>
@@ -406,7 +406,7 @@ export default function MobileLeads() {
               setStatusFilter('all');
               setFilterOpen(false);
             }}
-            className="w-full py-3 bg-slate-200 text-black rounded-xl font-medium"
+            className="w-full py-3 bg-stone-200 text-slate-800 rounded-xl font-medium"
           >
             Netejar filtres
           </button>

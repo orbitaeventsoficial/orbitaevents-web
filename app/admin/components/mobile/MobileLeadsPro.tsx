@@ -156,7 +156,7 @@ function SearchBar({
         onChange={(e) => onChange(e.target.value)}
         onFocus={onFocus}
         placeholder="Buscar per nom, email o telèfon..."
-        className="w-full pl-10 pr-10 py-3 bg-slate-100 border border-slate-200 rounded-xl text-black placeholder:text-slate-400 focus:outline-none focus:border-orange-500/50 focus:bg-white/[0.07] transition-colors"
+        className="w-full pl-10 pr-10 py-3 bg-stone-100 border border-stone-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-orange-500/50 focus:bg-stone-50/[0.07] transition-colors"
       />
       {value && (
         <button
@@ -207,13 +207,13 @@ function StatusFilters({
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               isActive
                 ? 'bg-orange-500 text-white'
-                : 'bg-slate-100 text-slate-600 active:bg-slate-200'
+                : 'bg-stone-100 text-slate-600 active:bg-stone-200'
             }`}
           >
             {filter.label}
             {count > 0 && (
               <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                isActive ? 'bg-white/20' : 'bg-slate-200'
+                isActive ? 'bg-stone-50/20' : 'bg-stone-200'
               }`}>
                 {count}
               </span>
@@ -325,7 +325,7 @@ function LeadCard({
         onDragEnd={handleDragEnd}
         style={{ x }}
         onClick={() => !isDragging && router.push(`/admin/leads/${lead.id}`)}
-        className={`relative p-3 bg-white/90 rounded-xl border-l-4 ${priority.border} border border-slate-200 active:bg-slate-100/90 transition-colors cursor-pointer`}
+        className={`relative p-3 bg-stone-50/90 rounded-xl border-l-4 ${priority.border} border border-stone-200 active:bg-stone-100/90 transition-colors cursor-pointer`}
       >
         <div className="flex items-start gap-3">
           {/* Avatar */}
@@ -336,7 +336,7 @@ function LeadCard({
           {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <h3 className="text-black font-medium truncate">{lead.name}</h3>
+              <h3 className="text-slate-800 font-medium truncate">{lead.name}</h3>
               <span className={`text-xs px-1.5 py-0.5 rounded ${status.bgColor} ${status.color}`}>
                 {status.label}
               </span>
@@ -366,7 +366,7 @@ function LeadCard({
 
         {/* Notes preview */}
         {lead.notes && lead.notes.length > 0 && (
-          <div className="mt-2 pt-2 border-t border-slate-200">
+          <div className="mt-2 pt-2 border-t border-stone-200">
             <p className="text-xs text-slate-400 truncate">
               💬 {lead.notes[0].content}
             </p>
@@ -419,12 +419,12 @@ function LoadingSkeleton() {
   return (
     <div className="space-y-3">
       {[...Array(5)].map((_, i) => (
-        <div key={i} className="p-4 bg-slate-100 rounded-xl animate-pulse">
+        <div key={i} className="p-4 bg-stone-100 rounded-xl animate-pulse">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-slate-200" />
+            <div className="w-10 h-10 rounded-full bg-stone-200" />
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-slate-200 rounded w-3/4" />
-              <div className="h-3 bg-slate-200 rounded w-1/2" />
+              <div className="h-4 bg-stone-200 rounded w-3/4" />
+              <div className="h-3 bg-stone-200 rounded w-1/2" />
             </div>
           </div>
         </div>
@@ -584,10 +584,10 @@ export default function MobileLeadsPro() {
   , [stats]);
 
   return (
-    <div className="min-h-screen bg-slate-100 p-4 pt-6 pb-24 lg:hidden">
+    <div className="min-h-screen bg-stone-100 p-4 pt-6 pb-24 lg:hidden">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-black mb-1">Leads</h1>
+        <h1 className="text-2xl font-bold text-slate-800 mb-1">Leads</h1>
         <p className="text-slate-400 text-sm">
           {totalLeads} leads · {stats.NEW || 0} nous aquesta setmana
         </p>

@@ -110,7 +110,7 @@ function MetricCard({ metric, index }: { metric: Metric; index: number }) {
     >
       <Link
         href={metric.href || '#'}
-        className={`block p-4 rounded-2xl bg-gradient-to-br ${metric.color} border border-slate-200 active:scale-98 transition-transform`}
+        className={`block p-4 rounded-2xl bg-gradient-to-br ${metric.color} border border-stone-200 active:scale-98 transition-transform`}
       >
         <div className="flex items-start justify-between mb-3">
           <span className="text-2xl">{metric.icon}</span>
@@ -122,7 +122,7 @@ function MetricCard({ metric, index }: { metric: Metric; index: number }) {
             </span>
           )}
         </div>
-        <p className="text-2xl font-bold text-black mb-1">{metric.value}</p>
+        <p className="text-2xl font-bold text-slate-800 mb-1">{metric.value}</p>
         <p className="text-slate-500 text-sm">{metric.label}</p>
       </Link>
     </motion.div>
@@ -164,11 +164,11 @@ function EventItem({ event, index }: { event: Event; index: number }) {
     >
       <Link
         href={`/admin/bookings/${event.id}`}
-        className="flex items-center gap-4 p-4 bg-slate-100 rounded-xl active:bg-slate-200 transition-colors"
+        className="flex items-center gap-4 p-4 bg-stone-100 rounded-xl active:bg-stone-200 transition-colors"
       >
         <span className="text-2xl">{typeIcons[event.type] || '📅'}</span>
         <div className="flex-1 min-w-0">
-          <p className="text-black font-medium truncate">{event.title}</p>
+          <p className="text-slate-800 font-medium truncate">{event.title}</p>
           <p className="text-slate-500 text-sm">{formatDate(event.date)}</p>
         </div>
         <div className={`w-2 h-2 rounded-full ${statusColors[event.status]}`} />
@@ -184,8 +184,8 @@ function MiniChart() {
   const maxValue = Math.max(...data);
 
   return (
-    <div className="p-4 bg-slate-100 rounded-2xl">
-      <h3 className="text-black font-semibold mb-4">Activitat setmanal</h3>
+    <div className="p-4 bg-stone-100 rounded-2xl">
+      <h3 className="text-slate-800 font-semibold mb-4">Activitat setmanal</h3>
       <div className="flex items-end justify-between gap-2 h-24">
         {data.map((value, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-2">
@@ -232,7 +232,7 @@ export default function MobileDashboard() {
       {/* Header */}
       <div>
         <p className="text-slate-500 text-sm">{greeting}, Carles</p>
-        <h1 className="text-2xl font-bold text-black">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
       </div>
 
       {/* Refresh indicator */}
@@ -262,13 +262,13 @@ export default function MobileDashboard() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-black font-semibold mb-3">Accions ràpides</h2>
+        <h2 className="text-slate-800 font-semibold mb-3">Accions ràpides</h2>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
           {quickActions.map((action) => (
             <Link
               key={action.id}
               href={action.href}
-              className="flex flex-col items-center gap-2 px-6 py-4 bg-slate-100 rounded-2xl flex-shrink-0 active:bg-slate-200 transition-colors"
+              className="flex flex-col items-center gap-2 px-6 py-4 bg-stone-100 rounded-2xl flex-shrink-0 active:bg-stone-200 transition-colors"
             >
               <span className="text-2xl">{action.icon}</span>
               <span className="text-slate-700 text-xs whitespace-nowrap">{action.label}</span>
@@ -283,7 +283,7 @@ export default function MobileDashboard() {
       {/* Upcoming Events */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-black font-semibold">Propers events</h2>
+          <h2 className="text-slate-800 font-semibold">Propers events</h2>
           <Link href="/admin/calendario" className="text-orange-400 text-sm">
             Veure tots
           </Link>

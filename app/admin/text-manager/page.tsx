@@ -396,12 +396,12 @@ export default function TextManagerPage() {
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* HEADER FIJO */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-stone-50 border-b border-stone-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Título */}
             <div>
-              <h1 className="text-2xl font-bold text-black flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
                 📝 Text Manager PRO
               </h1>
               <p className="text-sm text-slate-500">
@@ -417,7 +417,7 @@ export default function TextManagerPage() {
                   placeholder="Buscar textos... (path o contenido)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-slate-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
+                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-stone-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                   🔍
@@ -441,7 +441,7 @@ export default function TextManagerPage() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   showOnlyModified
                     ? 'bg-orange-500 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
                 }`}
               >
                 {showOnlyModified ? '✅ Solo modificados' : '📋 Mostrar todos'}
@@ -453,7 +453,7 @@ export default function TextManagerPage() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   showComparison
                     ? 'bg-blue-500 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-stone-100 text-slate-600 hover:bg-stone-200'
                 }`}
               >
                 🌐 ES/CA
@@ -476,7 +476,7 @@ export default function TextManagerPage() {
                 className={`px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 ${
                   modifiedCount > 0
                     ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white hover:shadow-lg hover:scale-105'
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    : 'bg-stone-200 text-slate-400 cursor-not-allowed'
                 }`}
               >
                 {saving ? (
@@ -527,8 +527,8 @@ export default function TextManagerPage() {
                 onClick={() => setActiveSection(null)}
                 className={`w-full p-3 rounded-xl text-left transition-all ${
                   !activeSection
-                    ? 'bg-gradient-to-r from-slate-200 to-slate-300 text-black shadow-lg'
-                    : 'bg-white hover:bg-slate-50 text-slate-700'
+                    ? 'bg-gradient-to-r from-slate-200 to-slate-300 text-slate-800 shadow-lg'
+                    : 'bg-stone-50 hover:bg-slate-50 text-slate-700'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -551,7 +551,7 @@ export default function TextManagerPage() {
                     className={`w-full p-3 rounded-xl text-left transition-all ${
                       isActive
                         ? `bg-gradient-to-r ${section.color} text-white shadow-lg`
-                        : 'bg-white hover:bg-slate-50 text-slate-700'
+                        : 'bg-stone-50 hover:bg-slate-50 text-slate-700'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -561,7 +561,7 @@ export default function TextManagerPage() {
                       <div className="flex items-center gap-2">
                         {counts.modified > 0 && (
                           <span className={`text-xs px-2 py-0.5 rounded-full ${
-                            isActive ? 'bg-white/20' : 'bg-orange-100 text-orange-600'
+                            isActive ? 'bg-stone-50/20' : 'bg-orange-100 text-orange-600'
                           }`}>
                             {counts.modified}
                           </span>
@@ -580,8 +580,8 @@ export default function TextManagerPage() {
 
               {/* Historial */}
               {changeHistory.length > 0 && (
-                <div className="mt-6 p-4 bg-white rounded-xl border border-slate-200">
-                  <h3 className="font-semibold text-black mb-3 flex items-center gap-2">
+                <div className="mt-6 p-4 bg-stone-50 rounded-xl border border-stone-200">
+                  <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
                     📜 Historial ({changeHistory.length})
                   </h3>
                   <div className="max-h-48 overflow-y-auto space-y-2">
@@ -609,7 +609,7 @@ export default function TextManagerPage() {
             {activeSection && (
               <div className={`mb-6 p-4 rounded-xl bg-gradient-to-r ${
                 SECTIONS.find(s => s.id === activeSection)?.color || 'from-slate-500 to-slate-600'
-              } text-black`}>
+              } text-slate-800`}>
                 <h2 className="text-xl font-bold flex items-center gap-2">
                   {SECTIONS.find(s => s.id === activeSection)?.icon}
                   {SECTIONS.find(s => s.id === activeSection)?.name}
@@ -649,17 +649,17 @@ export default function TextManagerPage() {
                   return (
                     <div
                       key={path}
-                      className={`bg-white rounded-xl border transition-all ${
+                      className={`bg-stone-50 rounded-xl border transition-all ${
                         isModified
                           ? 'border-orange-300 shadow-md shadow-orange-100'
-                          : 'border-slate-200 hover:border-slate-300'
+                          : 'border-stone-200 hover:border-stone-300'
                       }`}
                     >
                       <div className="p-4">
                         {/* Header del texto */}
                         <div className="flex items-start justify-between gap-4 mb-3">
                           <div className="flex-1 min-w-0">
-                            <code className="text-sm text-slate-500 break-all font-mono bg-slate-100 px-2 py-1 rounded">
+                            <code className="text-sm text-slate-500 break-all font-mono bg-stone-100 px-2 py-1 rounded">
                               {path}
                             </code>
                             {isModified && (
@@ -674,7 +674,7 @@ export default function TextManagerPage() {
                             {isModified && (
                               <button
                                 onClick={() => handleRevert(path)}
-                                className="text-xs px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                                className="text-xs px-3 py-1 rounded-lg bg-stone-100 text-slate-600 hover:bg-stone-200 transition-colors"
                                 title="Revertir cambios"
                               >
                                 ↩️ Revertir
@@ -694,7 +694,7 @@ export default function TextManagerPage() {
                           className={`w-full px-4 py-3 rounded-lg border transition-all resize-none font-sans ${
                             isModified
                               ? 'border-orange-300 bg-orange-50/50 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20'
-                              : 'border-slate-200 bg-slate-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                              : 'border-stone-200 bg-slate-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
                           }`}
                           placeholder="Texto vacío..."
                         />
