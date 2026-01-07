@@ -1,23 +1,22 @@
 /**
  * API ROUTE: Privacy Verification
- * Verificació de sol·licituds de drets ARCO
- *
- * GET - Verificar token i mostrar pàgina de confirmació
+ * Verificacion de solicitudes de derechos ARCO
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyDataRequest } from '@/lib/services/privacyService';
+import { escapeHtml } from '@/lib/utils/sanitize';
 
 export const dynamic = 'force-dynamic';
 
 const REQUEST_TYPE_LABELS: Record<string, string> = {
-  ACCESS: 'Dret d\'Accés',
-  RECTIFICATION: 'Dret de Rectificació',
-  ERASURE: 'Dret de Supressió',
-  RESTRICTION: 'Dret de Limitació',
-  PORTABILITY: 'Dret de Portabilitat',
-  OBJECTION: 'Dret d\'Oposició',
-  AUTOMATED: 'Decisions Automatitzades',
+  ACCESS: "Derecho de acceso",
+  RECTIFICATION: 'Derecho de rectificacion',
+  ERASURE: 'Derecho de supresion',
+  RESTRICTION: 'Derecho de limitacion',
+  PORTABILITY: 'Derecho de portabilidad',
+  OBJECTION: 'Derecho de oposicion',
+  AUTOMATED: 'Decisiones automatizadas',
 };
 
 export async function GET(req: NextRequest) {
@@ -25,7 +24,7 @@ export async function GET(req: NextRequest) {
   const token = searchParams.get('token');
 
   if (!token) {
-    return new NextResponse(generateErrorPage('Token no proporcionat'), {
+    return new NextResponse(generateErrorPage('Token no proporcionado'), {
       status: 400,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
@@ -46,14 +45,11 @@ export async function GET(req: NextRequest) {
       }
     );
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Error verificant la sol·licitud';
-    return new NextResponse(
-      generateErrorPage(message),
-      {
-        status: 400,
-        headers: { 'Content-Type': 'text/html; charset=utf-8' },
-      }
-    );
+    const message = error instanceof Error ? error.message : 'Error verificando la solicitud';
+    return new NextResponse(generateErrorPage(message), {
+      status: 400,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
   }
 }
 
@@ -64,11 +60,11 @@ function generateSuccessPage(
 ): string {
   return `
     <!DOCTYPE html>
-    <html lang="ca">
+    <html lang="es">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Sol·licitud Verificada - Òrbita Events</title>
+      <title>Solicitud verificada - Orbita Events</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -167,17 +163,17 @@ function generateSuccessPage(
           </svg>
         </div>
 
-        <h1>Sol·licitud Verificada</h1>
+        <h1>Solicitud verificada</h1>
 
-        <p>Hola <span class="highlight">${name}</span>,</p>
+        <p>Hola <span class="highlight">${escapeHtml(name)}</span>,</p>
 
-        <p>La teva sol·licitud de <strong>${requestType}</strong> ha estat verificada correctament.</p>
+        <p>Tu solicitud de <strong>${escapeHtml(requestType)}</strong> ha sido verificada correctamente.</p>
 
-        <p>El nostre equip processarà la teva sol·licitud el més aviat possible.</p>
+        <p>Nuestro equipo procesara tu solicitud lo antes posible.</p>
 
         <div class="deadline">
-          <div class="deadline-label">Data límit de resposta</div>
-          <div class="deadline-date">${new Date(deadline).toLocaleDateString('ca-ES', {
+          <div class="deadline-label">Fecha limite de respuesta</div>
+          <div class="deadline-date">${new Date(deadline).toLocaleDateString('es-ES', {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
@@ -185,14 +181,14 @@ function generateSuccessPage(
         </div>
 
         <p style="font-size: 14px;">
-          Segons el RGPD, tenim fins a 30 dies per respondre a la teva sol·licitud.
-          Si necessitem més temps, et notificarem.
+          Segun el RGPD, tenemos hasta 30 dias para responder a tu solicitud.
+          Si necesitamos mas tiempo, te lo notificaremos.
         </p>
 
-        <a href="/" class="btn">Tornar a l'inici</a>
+        <a href="/" class="btn">Volver al inicio</a>
 
         <div class="footer">
-          © ${new Date().getFullYear()} Òrbita Events. Tots els drets reservats.
+          ${new Date().getFullYear()} Orbita Events. Todos los derechos reservados.
         </div>
       </div>
     </body>
@@ -203,11 +199,11 @@ function generateSuccessPage(
 function generateErrorPage(error: string): string {
   return `
     <!DOCTYPE html>
-    <html lang="ca">
+    <html lang="es">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Error - Òrbita Events</title>
+      <title>Error - Orbita Events</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -285,15 +281,15 @@ function generateErrorPage(error: string): string {
           </svg>
         </div>
 
-        <h1>Error de Verificació</h1>
+        <h1>Error de verificacion</h1>
 
-        <p>No hem pogut verificar la teva sol·licitud.</p>
+        <p>No hemos podido verificar tu solicitud.</p>
 
-        <div class="error-msg">${error}</div>
+        <div class="error-msg">${escapeHtml(error)}</div>
 
-        <p>Si necessites ajuda, contacta'ns a <strong>info@orbitaevents.com</strong></p>
+        <p>Si necesitas ayuda, contactanos en <strong>info@orbitaevents.com</strong></p>
 
-        <a href="/" class="btn">Tornar a l'inici</a>
+        <a href="/" class="btn">Volver al inicio</a>
       </div>
     </body>
     </html>

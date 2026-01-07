@@ -225,6 +225,8 @@ export default function OpinionesClient() {
   const AVG = REVIEWS.length > 0
     ? (REVIEWS.reduce((sum, r) => sum + r.rating, 0) / REVIEWS.length).toFixed(1)
     : "0";
+  const happyClients = SITE_CONFIG.stats.happyClients;
+  const reviewsUrl = SITE_CONFIG.reviews.googleBusinessUrl || SITE_CONFIG.reviews.googleReviewUrl;
 
   const filteredReviews = REVIEWS.filter((r) => {
     if (filter === "all") return true;
@@ -275,7 +277,7 @@ export default function OpinionesClient() {
                 ))}
               </div>
               <div className="text-sm">
-                <span className="text-white font-bold">+150</span>
+                <span className="text-white font-bold">+{happyClients}</span>
                 <span className="text-white/60"> {t('page.stats.clients')}</span>
               </div>
             </div>
@@ -290,11 +292,24 @@ export default function OpinionesClient() {
 
             <div className="h-8 w-px bg-white/10 hidden md:block" />
 
-            <div className="flex items-center gap-3">
-              <Icons.Google />
-              <Icons.BodasNet />
-              <span className="text-white/60 text-sm">{t('page.stats.verified')}</span>
-            </div>
+            {reviewsUrl ? (
+              <a
+                href={reviewsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-white/60 text-sm hover:text-white transition-colors"
+              >
+                <Icons.Google />
+                <Icons.BodasNet />
+                <span>{t('page.stats.verified')}</span>
+              </a>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Icons.Google />
+                <Icons.BodasNet />
+                <span className="text-white/60 text-sm">{t('page.stats.verified')}</span>
+              </div>
+            )}
           </div>
 
           {/* Filters */}

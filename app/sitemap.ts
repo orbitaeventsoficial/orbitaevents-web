@@ -1,7 +1,8 @@
 // app/sitemap.ts
 import type { MetadataRoute } from 'next';
+import { locales, defaultLocale } from '@/i18n';
 
-// Categorías de portfolio para incluir en sitemap
+// Categorias de portfolio para incluir en sitemap
 const PORTFOLIO_SLUGS = [
   'bodas',
   'discomovil',
@@ -18,20 +19,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
   const now = new Date();
 
-  // Páginas estáticas con prioridades estratégicas
+  // Paginas estaticas con prioridades estrategicas
   const staticPages: MetadataRoute.Sitemap = [
-    // Home - máxima prioridad
+    // Home - maxima prioridad
     { url: base, lastModified: now, changeFrequency: 'daily', priority: 1.0 },
-    
-    // Conversión - muy alta prioridad
+
+    // Conversion - muy alta prioridad
     { url: `${base}/configurador`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${base}/contacto`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
-    
+
     // Landing SEO especial (diferenciador)
     { url: `${base}/boda-halloween`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${base}/tematica-mon-magic`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${base}/tematica-halloween`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
-    
+
     // Servicios principales
     { url: `${base}/servicios`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${base}/servicios/bodas`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
@@ -39,6 +40,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/servicios/empresas`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${base}/servicios/fiestas`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${base}/servicios/animacion-infantil`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/servicios/produccion`, lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
+    { url: `${base}/servicios/alquiler`, lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
 
     // Landing pages por zonas - Long-tail SEO
     { url: `${base}/servicios/dj-bodas-maresme`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
@@ -52,7 +55,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/faq`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${base}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${base}/sensorial`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
-    
+
     // Legal
     { url: `${base}/legal/privacidad`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${base}/legal/cookies`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
@@ -60,15 +63,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/legal/aviso-legal`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ];
 
-  // Versiones en otros idiomas - NOMÉS CA i ES
-  const locales = ['ca', 'es'];
+  // Versiones en otros idiomas (solo no-default)
   const localizedPages: MetadataRoute.Sitemap = [];
-  
-  // Solo localizar las páginas principales, no las legales
+  const secondaryLocales = locales.filter((locale) => locale !== defaultLocale);
+
+  // Solo localizar las paginas principales, no las legales
   const pagesToLocalize = staticPages.filter(p => !p.url.includes('/legal/'));
-  
+
   pagesToLocalize.forEach((page) => {
-    locales.forEach((locale) => {
+    secondaryLocales.forEach((locale) => {
       const localizedUrl = page.url.replace(base, `${base}/${locale}`);
       localizedPages.push({
         ...page,
@@ -78,7 +81,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   });
 
-  // Páginas dinámicas de portfolio
+  // Paginas dinamicas de portfolio
   const portfolioPages: MetadataRoute.Sitemap = PORTFOLIO_SLUGS.map(slug => ({
     url: `${base}/portfolio/${slug}`,
     lastModified: now,
@@ -89,7 +92,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Versiones localizadas de portfolio
   const localizedPortfolioPages: MetadataRoute.Sitemap = [];
   PORTFOLIO_SLUGS.forEach(slug => {
-    locales.forEach(locale => {
+    secondaryLocales.forEach(locale => {
       localizedPortfolioPages.push({
         url: `${base}/${locale}/portfolio/${slug}`,
         lastModified: now,

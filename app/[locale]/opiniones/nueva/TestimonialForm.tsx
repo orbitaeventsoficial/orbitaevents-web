@@ -18,7 +18,7 @@ import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-
+import { fetchWithCsrf } from '@/lib/csrf';
 // Esquema de validació actualitzat per nou esquema Supabase
 const testimonialSchema = z.object({
   email: z.string().email('Email no vàlid'),
@@ -123,7 +123,7 @@ export default function TestimonialForm() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('/api/testimonial-upload', {
+      const response = await fetchWithCsrf('/api/testimonial-upload', {
         method: 'POST',
         body: formData,
       });
@@ -157,7 +157,7 @@ export default function TestimonialForm() {
     setSubmitError(null);
 
     try {
-      const response = await fetch('/api/testimonials', {
+      const response = await fetchWithCsrf('/api/testimonials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

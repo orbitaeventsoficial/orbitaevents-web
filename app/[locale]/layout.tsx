@@ -103,7 +103,7 @@ const JSON_LD_ORGANIZATION = {
   name: 'Orbita Events',
   alternateName: ['Orbita Events', 'Orbita Events Barcelona'],
   description:
-    'DJ profesional y tematizacion completa para bodas, fiestas y eventos de empresa en Barcelona y Girona. Experiencias inmersivas con sonido 4000W, iluminacion LED y efectos especiales.',
+    'DJ profesional y tematización completa para bodas, fiestas y eventos de empresa en Barcelona y Girona. Experiencias inmersivas con sonido 4000W, iluminación LED y efectos especiales.',
   url: 'https://orbitaevents.com',
   logo: {
     '@type': 'ImageObject',
@@ -186,7 +186,7 @@ const JSON_LD_ORGANIZATION = {
           '@type': 'Service',
           name: 'DJ bodas Barcelona',
           description:
-            'DJ profesional para bodas con sonido 4000W, iluminacion y efectos especiales. Ceremonia, coctel y baile final.',
+            'DJ profesional para bodas con sonido 4000W, iluminación y efectos especiales. Ceremonia, cóctel y baile final.',
         },
         price: String(BODAS_PRICE),
         priceCurrency: 'EUR',
@@ -198,7 +198,7 @@ const JSON_LD_ORGANIZATION = {
           '@type': 'Service',
           name: 'Discomovil Barcelona',
           description:
-            'Discomovil profesional con DJ, sonido de calidad, luces LED y efectos especiales para cualquier celebracion.',
+            'Discomóvil profesional con DJ, sonido de calidad, luces LED y efectos especiales para cualquier celebración.',
         },
         price: String(DISCO_PRICE),
         priceCurrency: 'EUR',
@@ -210,7 +210,7 @@ const JSON_LD_ORGANIZATION = {
           '@type': 'Service',
           name: 'Fiestas tematicas y privadas',
           description:
-            'Tematizacion completa para fiestas: Halloween, anos 80, mundo magico y mas. Decoracion, efectos y ambientacion.',
+            'Tematización completa para fiestas: Halloween, años 80, mundo mágico y más. Decoración, efectos y ambientación.',
         },
         price: String(FIESTAS_PRICE),
         priceCurrency: 'EUR',
@@ -227,11 +227,11 @@ const JSON_LD_ORGANIZATION = {
 export const metadata: Metadata = {
   title: {
     default:
-      'Experiencias inmersivas para eventos | DJ + tematizacion Barcelona | Orbita Events | Desde 250 EUR',
+      'Experiencias inmersivas para eventos | DJ + tematización Barcelona | Orbita Events | Desde 250 EUR',
     template: '%s | Orbita Events',
   },
   description:
-    'Creamos experiencias unicas: bodas, fiestas tematicas y eventos corporativos. DJ profesional + tematizacion completa. Desde 250 EUR. Barcelona y Girona. Valoracion 5.0/5.',
+    'Creamos experiencias únicas: bodas, fiestas temáticas y eventos corporativos. DJ profesional + tematización completa. Desde 250 EUR. Barcelona y Girona. Valoración 5.0/5.',
   keywords: [
     'DJ bodas Barcelona',
     'DJ bodas Girona',
@@ -255,22 +255,13 @@ export const metadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL('https://orbitaevents.com'),
-  alternates: {
-    canonical: '/',
-    languages: {
-      'ca-ES': 'https://orbitaevents.com/ca',
-      'es-ES': 'https://orbitaevents.com/es',
-    },
-  },
   openGraph: {
     type: 'website',
-    locale: 'ca_ES',
-    alternateLocale: ['es_ES'],
     url: 'https://orbitaevents.com',
     siteName: 'Orbita Events',
-    title: 'Experiencias inmersivas para eventos | DJ + tematizacion Barcelona',
+    title: 'Experiencias inmersivas para eventos | DJ + tematización Barcelona',
     description:
-      'Creamos experiencias unicas: bodas, fiestas tematicas y eventos corporativos. DJ profesional + tematizacion completa. Desde 250 EUR. Valoracion 5.0/5.',
+      'Creamos experiencias únicas: bodas, fiestas temáticas y eventos corporativos. DJ profesional + tematización completa. Desde 250 EUR. Valoración 5.0/5.',
     images: [
       {
         url: '/og-home.jpg',
@@ -285,7 +276,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Experiencias inmersivas para eventos | Orbita Events',
     description:
-      'Bodas, fiestas tematicas y eventos corporativos. DJ + tematizacion completa. Desde 250 EUR. Valoracion 5.0/5.',
+      'Bodas, fiestas temáticas y eventos corporativos. DJ + tematización completa. Desde 250 EUR. Valoración 5.0/5.',
     images: ['/og-home.jpg'],
     creator: '@orbitaevents',
   },

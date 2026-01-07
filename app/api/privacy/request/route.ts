@@ -1,8 +1,6 @@
 /**
  * API ROUTE: Privacy Data Request
- * Sol·licituds de drets ARCO (RGPD)
- *
- * POST - Crear nova sol·licitud de drets
+ * Solicitudes de derechos ARCO (RGPD)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -14,19 +12,19 @@ import {
 } from '@/lib/services/privacyService';
 import { sendPrivacyVerificationEmail } from '@/lib/email';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { verifyCsrf } from '@/lib/csrf';
 
 export const dynamic = 'force-dynamic';
 
-// Esquema de validació
 const dataRequestSchema = z.object({
   requesterEmail: z
     .string()
-    .email('Email no vàlid')
+    .email('Email no valido')
     .max(255)
     .transform((val) => val.toLowerCase().trim()),
   requesterName: z
     .string()
-    .min(2, 'El nom ha de tenir mínim 2 caràcters')
+    .min(2, 'El nombre debe tener minimo 2 caracteres')
     .max(100)
     .transform((val) => val.trim()),
   requesterPhone: z
@@ -51,26 +49,27 @@ const dataRequestSchema = z.object({
   specificData: z.array(z.string()).optional(),
   reason: z.string().max(500).optional(),
   gdprConsent: z.boolean().refine((val) => val === true, {
-    message: "Has d'acceptar la política de privacitat",
+    message: 'Debes aceptar la politica de privacidad',
   }),
 });
 
 export async function POST(req: NextRequest) {
-  // Rate limiting: 3 requests per 30 minuts
-  const rateLimitResult = checkRateLimit(req, RATE_LIMITS.privacy);
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
+
+  const rateLimitResult = await checkRateLimit(req, RATE_LIMITS.privacy);
   if (rateLimitResult) return rateLimitResult;
 
   try {
     const body = await req.json();
 
-    // Validar dades
     const validationResult = dataRequestSchema.safeParse(body);
     if (!validationResult.success) {
       const firstError = validationResult.error.errors[0];
       return NextResponse.json(
         {
           success: false,
-          error: firstError.message || 'Dades invàlides',
+          error: firstError.message || 'Datos invalidos',
         },
         { status: 400 }
       );
@@ -78,7 +77,6 @@ export async function POST(req: NextRequest) {
 
     const data = validationResult.data;
 
-    // Crear sol·licitud a la base de dades
     const request = await createDataRequest({
       requesterEmail: data.requesterEmail,
       requesterName: data.requesterName,
@@ -89,7 +87,6 @@ export async function POST(req: NextRequest) {
       reason: data.reason,
     });
 
-    // Enviar email de verificació
     try {
       await sendPrivacyVerificationEmail({
         to: data.requesterEmail,
@@ -100,16 +97,14 @@ export async function POST(req: NextRequest) {
         legalDeadline: request.legalDeadline,
       });
 
-      // Log de l'enviament
       await logPrivacyAction({
         entityType: 'DataRequest',
         entityId: request.id,
         action: 'CONSENT_GRANTED',
-        reason: 'Email de verificació enviat',
+        reason: 'Email de verificacion enviado',
       });
     } catch (emailError) {
-      log.error('Error enviant email de verificació:', emailError);
-      // Continuem - l'admin pot verificar manualment si cal
+      log.error('Error enviando email de verificacion:', emailError);
     }
 
     return NextResponse.json({
@@ -119,13 +114,13 @@ export async function POST(req: NextRequest) {
         status: request.status,
         legalDeadline: request.legalDeadline,
       },
-      message: 'Sol·licitud creada. Comprova el teu email per verificar-la.',
+      message: 'Solicitud creada. Comprueba tu email para verificarla.',
     });
   } catch (error: unknown) {
     log.error('Error creating data request:', error);
 
     const errorMessage =
-      error instanceof Error ? error.message : 'Error creant la sol·licitud';
+      error instanceof Error ? error.message : 'Error creando la solicitud';
 
     return NextResponse.json(
       { success: false, error: errorMessage },

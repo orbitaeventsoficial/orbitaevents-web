@@ -1,18 +1,17 @@
 /**
  * API ROUTE: File Upload a Supabase Storage
- * ==========================================
- * POST - Pujar fitxer petit directament o generar signed URL per fitxers grans
- * PROTEGIT: Requereix autenticació admin i rate limiting
+ * POST - Subir fichero pequeno o generar signed URL para ficheros grandes
+ * PROTEGIDO: Requiere autenticacion admin y rate limiting
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
-import log from '@/lib/logger';
+import { verifyCsrf } from '@/lib/csrf';
+import { log } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
-// Límit per upload directe (4MB per evitar límit Vercel)
 const DIRECT_UPLOAD_LIMIT = 4 * 1024 * 1024;
 const VALID_UPLOAD_TYPES = [
   'image/jpeg',
@@ -23,7 +22,18 @@ const VALID_UPLOAD_TYPES = [
   'video/quicktime',
 ];
 
-// Verificar autenticació admin
+function normalizeFolder(input: unknown): string | null {
+  const folder = typeof input === 'string' ? input.trim() : '';
+  if (!folder) return 'uploads';
+  if (folder.startsWith('/') || folder.startsWith('\\') || folder.includes('..') || folder.includes(':')) {
+    return null;
+  }
+  if (!/^[a-zA-Z0-9/_-]+$/.test(folder)) {
+    return null;
+  }
+  return folder;
+}
+
 function verifyAuth(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
 
@@ -52,7 +62,6 @@ function verifyAuth(request: NextRequest): boolean {
   }
 }
 
-// Supabase admin client (amb service key)
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -64,22 +73,19 @@ function getSupabaseAdmin() {
   return createClient(url, serviceKey);
 }
 
-/**
- * POST - Pujar fitxer a Supabase Storage
- * Per fitxers > 4MB, retorna signed URL per upload directe
- */
 export async function POST(request: NextRequest) {
-  // 1. Rate limiting
-  const rateLimitResult = checkRateLimit(request, RATE_LIMITS.contact);
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
+
+  const rateLimitResult = await checkRateLimit(request, RATE_LIMITS.uploads);
   if (rateLimitResult) return rateLimitResult;
 
-  // 2. Autenticació
   if (!verifyAuth(request)) {
-    log.warn('Intent de upload sense autenticació', {
+    log.warn('Intento de upload sin autenticacion', {
       ip: request.headers.get('x-forwarded-for') || 'unknown',
     });
     return NextResponse.json(
-      { error: 'No autoritzat' },
+      { error: 'No autorizado' },
       { status: 401, headers: { 'WWW-Authenticate': 'Basic realm="Upload"' } }
     );
   }
@@ -89,49 +95,53 @@ export async function POST(request: NextRequest) {
 
     if (!supabaseAdmin) {
       return NextResponse.json(
-        { error: 'Storage no configurat' },
+        { error: 'Storage no configurado' },
         { status: 500 }
       );
     }
 
     const contentType = request.headers.get('content-type') || '';
 
-    // Si és una petició per obtenir signed URL
     if (contentType.includes('application/json')) {
       const body = await request.json();
-      const { fileName, fileType, folder = 'uploads' } = body;
+      const { fileName, fileType, folder: folderInput } = body;
+      const folder = normalizeFolder(folderInput);
 
       if (!fileName || !fileType) {
         return NextResponse.json(
-          { error: 'Falten paràmetres fileName i fileType' },
+          { error: 'Faltan parametros fileName y fileType' },
+          { status: 400 }
+        );
+      }
+
+      if (!folder) {
+        return NextResponse.json(
+          { error: 'Carpeta invalida' },
           { status: 400 }
         );
       }
 
       if (!VALID_UPLOAD_TYPES.includes(fileType)) {
         return NextResponse.json(
-          { error: 'Tipus de fitxer no permès. Usa JPG, PNG, WebP, GIF o MP4.' },
+          { error: 'Tipo de fichero no permitido. Usa JPG, PNG, WebP, GIF o MP4.' },
           { status: 400 }
         );
       }
 
-      // Generar nom únic
       const timestamp = Date.now();
       const random = Math.random().toString(36).substring(7);
       const ext = fileName.split('.').pop() || 'bin';
       const path = `${folder}/${timestamp}-${random}.${ext}`;
 
-      // Crear signed URL per upload directe (vàlid 1 hora)
       const { data, error } = await supabaseAdmin.storage
         .from('media')
         .createSignedUploadUrl(path);
 
       if (error) {
-        log.error('Error creant signed URL', error);
+        log.error('Error creando signed URL', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
 
-      // Get public URL
       const { data: urlData } = supabaseAdmin.storage
         .from('media')
         .getPublicUrl(path);
@@ -140,53 +150,54 @@ export async function POST(request: NextRequest) {
         success: true,
         signedUrl: data.signedUrl,
         token: data.token,
-        path: path,
+        path,
         publicUrl: urlData.publicUrl,
       });
     }
 
-    // Upload directe per fitxers petits
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-    const folder = (formData.get('folder') as string) || 'uploads';
+    const folder = normalizeFolder(formData.get('folder'));
 
     if (!file) {
       return NextResponse.json(
-        { error: "No s'ha proporcionat cap fitxer" },
+        { error: 'No se ha proporcionado ningun fichero' },
         { status: 400 }
       );
     }
 
-    // Validar tipus
+    if (!folder) {
+      return NextResponse.json(
+        { error: 'Carpeta invalida' },
+        { status: 400 }
+      );
+    }
+
     if (!VALID_UPLOAD_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Tipus de fitxer no permès. Usa JPG, PNG, WebP, GIF o MP4.' },
+        { error: 'Tipo de fichero no permitido. Usa JPG, PNG, WebP, GIF o MP4.' },
         { status: 400 }
       );
     }
 
-    // Si és massa gran, retornar instruccions per usar signed URL
     if (file.size > DIRECT_UPLOAD_LIMIT) {
       return NextResponse.json(
         {
-          error: 'Fitxer massa gran per upload directe. Usa signed URL.',
+          error: 'Fichero demasiado grande para upload directo. Usa signed URL.',
           useSignedUrl: true,
         },
         { status: 413 }
       );
     }
 
-    // Generar nom únic
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(7);
     const ext = file.name.split('.').pop() || 'bin';
     const fileName = `${folder}/${timestamp}-${random}.${ext}`;
 
-    // Convertir a buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Upload a Supabase Storage
     const { data, error } = await supabaseAdmin.storage
       .from('media')
       .upload(fileName, buffer, {
@@ -200,12 +211,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Get public URL
     const { data: urlData } = supabaseAdmin.storage
       .from('media')
       .getPublicUrl(data.path);
 
-    log.info('Fitxer pujat correctament', { path: data.path });
+    log.info('Fichero subido correctamente', { path: data.path });
 
     return NextResponse.json({
       success: true,
@@ -213,9 +223,9 @@ export async function POST(request: NextRequest) {
       path: data.path,
     });
   } catch (error) {
-    log.error('Error pujant fitxer', error);
+    log.error('Error subiendo fichero', error);
     return NextResponse.json(
-      { error: 'Error processant el fitxer' },
+      { error: 'Error procesando el fichero' },
       { status: 500 }
     );
   }

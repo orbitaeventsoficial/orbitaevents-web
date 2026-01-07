@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
+import { fetchWithCsrf } from '@/lib/csrf';
 import {
   Shield, Download, Trash2, Edit3, Eye, Mail,
   CheckCircle, AlertCircle, ArrowRight, Lock,
@@ -172,7 +173,7 @@ export default function PrivacyPortalPage() {
     setError(null);
 
     try {
-      const res = await fetch('/api/privacy/request', {
+      const res = await fetchWithCsrf('/api/privacy/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

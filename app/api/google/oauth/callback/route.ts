@@ -14,7 +14,9 @@ function verifyState(state: string, secret: string): boolean {
   const parts = state.split('.');
   if (parts.length !== 2) return false;
   const [payload, sig] = parts;
-  const ts = Number(payload);
+  const [tsPart, nonce] = payload.split(':');
+  const ts = Number(tsPart);
+  if (!nonce) return false;
   if (!Number.isFinite(ts)) return false;
   const age = Math.floor(Date.now() / 1000) - ts;
   if (age < 0 || age > STATE_TTL_SECONDS) return false;

@@ -1,210 +1,156 @@
-// =============================================================================
-// STATS CONFIG CORREGIT
-// Substitueix app/config/stats-config.ts amb aquest contingut
-// =============================================================================
+import { SITE_CONFIG } from '@/config/site-config';
 
 export interface StatItem {
-  id: string
-  value: number
-  suffix?: string
-  prefix?: string
-  label: string
-  sublabel?: string
-  icon?: string
-  color?: string
-  animate?: boolean
+  id: string;
+  value: number;
+  suffix?: string;
+  prefix?: string;
+  label: string;
+  sublabel?: string;
+  icon?: string;
+  color?: string;
+  animate?: boolean;
 }
 
 export const statsConfig: StatItem[] = [
   {
     id: 'years',
-    value: 2023,
-    prefix: 'Des de ',
+    value: SITE_CONFIG.stats.yearsExperience,
+    prefix: 'Desde ',
     suffix: '',
-    label: 'En el sector events',
-    sublabel: 'Experiència real i passió',
-    icon: '⭐',
+    label: 'En el sector eventos',
+    sublabel: 'Experiencia real y pasion',
+    icon: '*',
     color: 'gold',
-    animate: false
+    animate: false,
   },
   {
     id: 'events',
-    value: 48, // Esdeveniments celebrats - Verifica amb BD real!
+    value: SITE_CONFIG.stats.eventsCompleted,
     suffix: '+',
-    label: "Esdeveniments celebrats",
-    sublabel: "Casaments, festes, corporatius",
-    icon: '🎉',
-    color: 'purple', // from-purple-600 to-purple-800
-    animate: true
+    label: 'Eventos realizados',
+    sublabel: 'Bodas, fiestas y corporativos',
+    icon: '*',
+    color: 'purple',
+    animate: true,
   },
   {
     id: 'response',
     value: 2,
     suffix: 'h',
-    label: "Resposta",
-    sublabel: "Temps màxim de resposta",
-    icon: '⚡',
-    color: 'green', // from-green-600 to-green-800
-    animate: false
+    label: 'Respuesta',
+    sublabel: 'Tiempo maximo de respuesta',
+    icon: '*',
+    color: 'green',
+    animate: false,
   },
   {
     id: 'provinces',
-    value: 2, // ⚠️ CORREGIT: Era 1, ara és 2 (Barcelona + Girona)
+    value: SITE_CONFIG.stats.citiesCovered,
     suffix: '',
-    label: "Províncies",
-    sublabel: "Barcelona i Girona", // ⚠️ CORREGIT: Nom complet
-    icon: '📍',
-    color: 'teal', // from-teal-600 to-teal-800
-    animate: false
-  }
-]
-
-// =============================================================================
-// VERSIÓ EXTESA AMB MÉS DADES
-// =============================================================================
+    label: 'Provincias',
+    sublabel: 'Barcelona y Girona',
+    icon: '*',
+    color: 'teal',
+    animate: false,
+  },
+];
 
 export const statsConfigExtended: StatItem[] = [
   ...statsConfig,
   {
     id: 'rating',
-    value: 5.0,
+    value: SITE_CONFIG.stats.avgRating,
     suffix: '',
-    prefix: '★',
-    label: "Valoració Google",
-    sublabel: "Opinions verificades",
-    icon: '⭐',
+    prefix: '',
+    label: 'Valoracion Google',
+    sublabel: 'Opiniones verificadas',
+    icon: '*',
     color: 'gold',
-    animate: false
+    animate: false,
   },
   {
     id: 'cities',
     value: 25,
     suffix: '+',
-    label: "Ciutats",
-    sublabel: "On hem treballat",
-    icon: '🏙️',
+    label: 'Ciudades',
+    sublabel: 'Donde hemos trabajado',
+    icon: '*',
     color: 'blue',
-    animate: true
+    animate: true,
   },
   {
     id: 'satisfaction',
-    value: 100,
+    value: SITE_CONFIG.stats.recommendRate,
     suffix: '%',
-    label: "Satisfacció",
-    sublabel: "Garantia de qualitat",
-    icon: '✅',
+    label: 'Satisfaccion',
+    sublabel: 'Garantia de calidad',
+    icon: '*',
     color: 'green',
-    animate: true
-  }
-]
-
-// =============================================================================
-// COLORS MAP PER A TAILWIND
-// =============================================================================
+    animate: true,
+  },
+];
 
 export const statColors: Record<string, { bg: string; text: string; border: string }> = {
   gold: {
     bg: 'from-amber-900/60 to-amber-950/80',
     text: 'text-amber-400',
-    border: 'border-amber-500/30'
+    border: 'border-amber-500/30',
   },
   purple: {
     bg: 'from-purple-900/60 to-purple-950/80',
     text: 'text-purple-400',
-    border: 'border-purple-500/30'
+    border: 'border-purple-500/30',
   },
   green: {
     bg: 'from-green-900/60 to-green-950/80',
     text: 'text-green-400',
-    border: 'border-green-500/30'
+    border: 'border-green-500/30',
   },
   teal: {
     bg: 'from-teal-900/60 to-teal-950/80',
     text: 'text-teal-400',
-    border: 'border-teal-500/30'
+    border: 'border-teal-500/30',
   },
   blue: {
     bg: 'from-blue-900/60 to-blue-950/80',
     text: 'text-blue-400',
-    border: 'border-blue-500/30'
+    border: 'border-blue-500/30',
   },
   red: {
     bg: 'from-red-900/60 to-red-950/80',
     text: 'text-red-400',
-    border: 'border-red-500/30'
-  }
-}
-
-// =============================================================================
-// HELPER: Obtenir stats des de BD (per implementar)
-// =============================================================================
+    border: 'border-red-500/30',
+  },
+};
 
 export async function getStatsFromDatabase() {
   try {
-    // Intentar obtenir stats de la BD si Prisma està disponible
     const { prisma } = await import('@/lib/prisma');
     if (!prisma) throw new Error('Prisma not available');
 
     const [eventsCompleted, avgRatingResult] = await Promise.all([
-      prisma.booking.count({ where: { status: 'COMPLETED' } }).catch(() => 48),
+      prisma.booking.count({ where: { status: 'COMPLETED' } }).catch(() => SITE_CONFIG.stats.eventsCompleted),
       prisma.customerTestimonial.aggregate({
         _avg: { rating: true },
-        where: { isApproved: true }
-      }).catch(() => ({ _avg: { rating: 5.0 } })),
+        where: { isApproved: true },
+      }).catch(() => ({ _avg: { rating: SITE_CONFIG.stats.avgRating } })),
     ]);
 
     return {
-      eventsCompleted: eventsCompleted || 48,
-      avgRating: avgRatingResult._avg?.rating || 5.0,
-      yearsActive: Math.floor((Date.now() - new Date('2023-01-01').getTime()) / (365.25 * 24 * 60 * 60 * 1000)),
-      provinces: 2,
-      cities: 25
+      eventsCompleted: eventsCompleted || SITE_CONFIG.stats.eventsCompleted,
+      avgRating: avgRatingResult._avg?.rating || SITE_CONFIG.stats.avgRating,
+      yearsActive: SITE_CONFIG.stats.yearsExperience,
+      provinces: SITE_CONFIG.stats.citiesCovered,
+      cities: 25,
     };
   } catch {
-    // Fallback a valors estàtics
     return {
-      eventsCompleted: 48,
-      avgRating: 5.0,
-      yearsActive: Math.floor((Date.now() - new Date('2023-01-01').getTime()) / (365.25 * 24 * 60 * 60 * 1000)),
-      provinces: 2,
-      cities: 25
+      eventsCompleted: SITE_CONFIG.stats.eventsCompleted,
+      avgRating: SITE_CONFIG.stats.avgRating,
+      yearsActive: SITE_CONFIG.stats.yearsExperience,
+      provinces: SITE_CONFIG.stats.citiesCovered,
+      cities: 25,
     };
   }
 }
-
-// =============================================================================
-// COMPONENT D'EXEMPLE D'ÚS
-// =============================================================================
-
-/*
-import { statsConfig, statColors } from '@/config/stats-config'
-
-export function StatsSection() {
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {statsConfig.map((stat) => {
-        const colors = statColors[stat.color || 'gold']
-        return (
-          <div
-            key={stat.id}
-            className={`
-              rounded-xl p-6
-              bg-gradient-to-br ${colors.bg}
-              border ${colors.border}
-            `}
-          >
-            <span className="text-2xl">{stat.icon}</span>
-            <div className={`text-4xl font-bold font-mono ${colors.text}`}>
-              {stat.prefix}{stat.value}{stat.suffix}
-            </div>
-            <div className="text-white/90 font-medium">{stat.label}</div>
-            {stat.sublabel && (
-              <div className="text-white/50 text-sm">{stat.sublabel}</div>
-            )}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-*/

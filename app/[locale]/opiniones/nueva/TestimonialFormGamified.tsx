@@ -12,9 +12,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import confetti from 'canvas-confetti';
 import { useTranslations } from 'next-intl';
+import { fetchWithCsrf } from '@/lib/csrf';
 import { SITE_CONFIG } from '@/app/config/site-config';
-
-// ═══════════════════════════════════════════════════════════════════════════
 // TIPUS I CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -230,7 +229,7 @@ export default function TestimonialFormGamified() {
 
     try {
       const useSignedUrl = file.size > 4 * 1024 * 1024;
-      const response = await fetch('/api/testimonial-upload', {
+      const response = await fetchWithCsrf('/api/testimonial-upload', {
         method: 'POST',
         headers: useSignedUrl ? { 'Content-Type': 'application/json' } : undefined,
         body: useSignedUrl
@@ -295,7 +294,7 @@ export default function TestimonialFormGamified() {
       // Per vídeos petits (<4MB), upload directe
       // Per vídeos grans, l'API retornarà signed URL
       const useSignedUrl = file.size > 4 * 1024 * 1024;
-      const response = await fetch('/api/testimonial-upload', {
+      const response = await fetchWithCsrf('/api/testimonial-upload', {
         method: 'POST',
         headers: useSignedUrl ? { 'Content-Type': 'application/json' } : undefined,
         body: useSignedUrl
@@ -370,7 +369,7 @@ export default function TestimonialFormGamified() {
     try {
       const totalDiscount = calculateReward();
 
-      const res = await fetch('/api/testimonials', {
+      const res = await fetchWithCsrf('/api/testimonials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -12,6 +12,8 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   return {
     title: t('meta.title'),
     description: t('meta.description'),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    alternates: { canonical: '/about' },
   };
 }
 

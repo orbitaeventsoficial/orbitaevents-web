@@ -2,16 +2,7 @@
 
 /**
  * Sync Google Reviews - Build Script
- * ===================================
- * 
- * S'executa durant el build per obtenir ressenyes de Google.
- * 
- * Configuració a Vercel:
- * - SERPAPI_KEY (recomanat, 100 gratis/mes)
- * - O OUTSCRAPER_KEY (25 gratis/mes)
- * 
- * Ús:
- * - node scripts/sync-reviews.mjs
+ * Se ejecuta durante el build para obtener resenas de Google.
  */
 
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
@@ -20,23 +11,19 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Múltiples noms per buscar el negoci
 const BUSINESS_SEARCH_QUERIES = [
-  'Òrbita events planificador festes',
-  'Òrbita events Granollers',
+  'Orbita events planificador festes',
+  'Orbita events Granollers',
   'Orbita events Catalunya',
 ];
 
-// Nom exacte del negoci a Google
-const EXACT_BUSINESS_NAME = 'òrbita events';
+const EXACT_BUSINESS_NAME = 'Orbita events';
+const BUSINESS_NAME = EXACT_BUSINESS_NAME;
 
-console.log('═══════════════════════════════════════════════════════════════');
-console.log('🔄 Sincronitzant ressenyes de Google...');
-console.log('═══════════════════════════════════════════════════════════════');
+console.log('============================================');
+console.log('Sincronizando resenas de Google...');
+console.log('============================================');
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SERPAPI
-// ═══════════════════════════════════════════════════════════════════════════
 async function fetchFromSerpAPI() {
   const apiKey = process.env.SERPAPI_KEY;
   if (!apiKey) {
@@ -45,12 +32,11 @@ async function fetchFromSerpAPI() {
   }
 
   try {
-    console.log('[SerpAPI] Buscant negoci...');
+    console.log('[SerpAPI] Buscando negocio...');
 
-    // Provar múltiples cerques
     let place = null;
     for (const query of BUSINESS_SEARCH_QUERIES) {
-      console.log(`[SerpAPI] Provant: "${query}"...`);
+      console.log(`[SerpAPI] Probando: "${query}"...`);
       const searchUrl = `https://serpapi.com/search.json?engine=google_maps&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
       const searchRes = await fetch(searchUrl);
       const searchData = await searchRes.json();
@@ -60,45 +46,43 @@ async function fetchFromSerpAPI() {
         continue;
       }
 
-      // Buscar el nom exacte del negoci
       place = searchData.local_results?.find(r =>
-        r.title?.toLowerCase().replace(/[àáäâ]/g, 'a').replace(/[èéëê]/g, 'e').replace(/[ìíïî]/g, 'i').replace(/[òóöô]/g, 'o').replace(/[ùúüû]/g, 'u') === EXACT_BUSINESS_NAME.toLowerCase().replace(/[àáäâ]/g, 'a').replace(/[èéëê]/g, 'e').replace(/[ìíïî]/g, 'i').replace(/[òóöô]/g, 'o').replace(/[ùúüû]/g, 'u')
+        r.title?.toLowerCase() === EXACT_BUSINESS_NAME.toLowerCase()
       );
 
       if (place) {
-        console.log(`[SerpAPI] ✅ Trobat amb "${query}"`);
+        console.log(`[SerpAPI] Encontrado con "${query}"`);
         break;
       }
     }
 
     if (!place) {
-      console.log('[SerpAPI] Negoci no trobat amb cap cerca');
+      console.log('[SerpAPI] Negocio no encontrado con ninguna busqueda');
       return null;
     }
 
-    console.log(`[SerpAPI] Trobat: ${place.title} (${place.rating}⭐, ${place.reviews} reviews)`);
+    console.log(`[SerpAPI] Encontrado: ${place.title} (${place.rating}, ${place.reviews} reviews)`);
 
-    // Obtenir ressenyes
     const reviewsUrl = `https://serpapi.com/search.json?engine=google_maps_reviews&place_id=${place.place_id}&api_key=${apiKey}`;
     const reviewsRes = await fetch(reviewsUrl);
     const reviewsData = await reviewsRes.json();
 
     if (reviewsData.error) {
-      console.log('[SerpAPI] Error obtenint ressenyes:', reviewsData.error);
+      console.log('[SerpAPI] Error obteniendo resenas:', reviewsData.error);
       return null;
     }
 
     const reviews = (reviewsData.reviews || []).map(r => ({
-      author_name: r.user?.name || 'Anònim',
+      author_name: r.user?.name || 'Anonimo',
       rating: r.rating || 5,
       text: r.snippet || '',
       time: r.iso_date ? new Date(r.iso_date).getTime() / 1000 : Date.now() / 1000,
-      relative_time_description: r.date || 'Recentment',
+      relative_time_description: r.date || 'Recientemente',
       profile_photo_url: r.user?.thumbnail,
     }));
 
-    console.log(`[SerpAPI] ✅ ${reviews.length} ressenyes obtingudes`);
-    
+    console.log(`[SerpAPI] ${reviews.length} resenas obtenidas`);
+
     return {
       rating: place.rating || 5,
       total: place.reviews || reviews.length,
@@ -110,9 +94,6 @@ async function fetchFromSerpAPI() {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// OUTSCRAPER
-// ═══════════════════════════════════════════════════════════════════════════
 async function fetchFromOutscraper() {
   const apiKey = process.env.OUTSCRAPER_KEY;
   if (!apiKey) {
@@ -121,34 +102,34 @@ async function fetchFromOutscraper() {
   }
 
   try {
-    console.log('[Outscraper] Obtenint ressenyes...');
-    
+    console.log('[Outscraper] Obteniendo resenas...');
+
     const url = `https://api.outscraper.com/maps/reviews-v3?query=${encodeURIComponent(BUSINESS_NAME)}&reviewsLimit=50&async=false`;
-    
+
     const res = await fetch(url, {
       headers: { 'X-API-KEY': apiKey },
     });
-    
+
     const data = await res.json();
     const place = data.data?.[0];
-    
+
     if (!place) {
-      console.log('[Outscraper] Negoci no trobat');
+      console.log('[Outscraper] Negocio no encontrado');
       return null;
     }
 
-    console.log(`[Outscraper] Trobat: ${place.name} (${place.rating}⭐)`);
+    console.log(`[Outscraper] Encontrado: ${place.name} (${place.rating})`);
 
     const reviews = (place.reviews_data || []).map(r => ({
-      author_name: r.author_title || 'Anònim',
+      author_name: r.author_title || 'Anonimo',
       rating: r.review_rating || 5,
       text: r.review_text || '',
       time: r.review_datetime_utc ? new Date(r.review_datetime_utc).getTime() / 1000 : Date.now() / 1000,
-      relative_time_description: r.review_ago || 'Recentment',
+      relative_time_description: r.review_ago || 'Recientemente',
       profile_photo_url: r.author_image,
     }));
 
-    console.log(`[Outscraper] ✅ ${reviews.length} ressenyes obtingudes`);
+    console.log(`[Outscraper] ${reviews.length} resenas obtenidas`);
 
     return {
       rating: place.rating || 5,
@@ -161,36 +142,30 @@ async function fetchFromOutscraper() {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// MAIN
-// ═══════════════════════════════════════════════════════════════════════════
 async function main() {
   let data = null;
 
-  // Intentar SerpAPI primer
   data = await fetchFromSerpAPI();
-  
-  // Si falla, intentar Outscraper
+
   if (!data) {
     data = await fetchFromOutscraper();
   }
 
-  // Si no tenim res, crear fitxer buit
   if (!data) {
     console.log('');
-    console.log('⚠️  No s\'han pogut obtenir ressenyes automàticament.');
+    console.log('No se han podido obtener resenas automaticamente.');
     console.log('');
-    console.log('📋 Per activar sincronització automàtica:');
+    console.log('Para activar sincronizacion automatica:');
     console.log('');
-    console.log('   1. SerpAPI (100 gratis/mes):');
-    console.log('      → https://serpapi.com');
-    console.log('      → Afegeix SERPAPI_KEY a Vercel');
+    console.log('1. SerpAPI (100 gratis/mes):');
+    console.log('   https://serpapi.com');
+    console.log('   Anade SERPAPI_KEY a Vercel');
     console.log('');
-    console.log('   2. Outscraper (25 gratis/mes):');
-    console.log('      → https://outscraper.com');
-    console.log('      → Afegeix OUTSCRAPER_KEY a Vercel');
+    console.log('2. Outscraper (25 gratis/mes):');
+    console.log('   https://outscraper.com');
+    console.log('   Anade OUTSCRAPER_KEY a Vercel');
     console.log('');
-    
+
     data = {
       rating: 5,
       total: 0,
@@ -198,7 +173,6 @@ async function main() {
     };
   }
 
-  // Guardar a JSON
   const outputDir = join(process.cwd(), 'public', 'data');
   const outputPath = join(outputDir, 'google-reviews.json');
 
@@ -214,14 +188,14 @@ async function main() {
   };
 
   writeFileSync(outputPath, JSON.stringify(output, null, 2));
-  
+
   console.log('');
-  console.log(`💾 Guardat a public/data/google-reviews.json`);
-  console.log(`   Rating: ${data.rating}⭐`);
-  console.log(`   Ressenyes: ${data.reviews.length}`);
+  console.log('Guardado en public/data/google-reviews.json');
+  console.log(`Rating: ${data.rating}`);
+  console.log(`Resenas: ${data.reviews.length}`);
   console.log('');
-  console.log('✅ Sincronització completada!');
-  console.log('═══════════════════════════════════════════════════════════════');
+  console.log('Sincronizacion completada.');
+  console.log('============================================');
 }
 
 main().catch(console.error);

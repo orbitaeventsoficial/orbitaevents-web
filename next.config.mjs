@@ -4,14 +4,14 @@ const nextConfig = {
   swcMinify: true,
 
   eslint: {
-    // Detectar errores durante el build para mantener calidad de código
+    // Detectar errores durante el build para mantener calidad de codigo
     ignoreDuringBuilds: false,
   },
 
   images: {
     formats: ['image/webp', 'image/avif'],
     unoptimized: false,
-    // Dominios permitidos para imágenes externas
+    // Dominios permitidos para imagenes externas
     remotePatterns: [
       {
         protocol: 'https',
@@ -32,9 +32,9 @@ const nextConfig = {
     ],
   },
 
-  // Headers de cache i seguretat
+  // Headers de cache y seguridad
   async headers() {
-    // Security headers comuns
+    // Security headers comunes
     const securityHeaders = [
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'X-Frame-Options', value: 'DENY' },
@@ -45,6 +45,9 @@ const nextConfig = {
         key: 'Content-Security-Policy',
         value: [
           "default-src 'self'",
+          "base-uri 'self'",
+          "object-src 'none'",
+          "frame-ancestors 'none'",
           "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
           "img-src 'self' data: blob: https://orbitaevents.com https://*.supabase.co https://lh3.googleusercontent.com https://maps.googleapis.com",
@@ -57,12 +60,12 @@ const nextConfig = {
     ];
 
     return [
-      // Security headers per totes les pàgines
+      // Security headers para todas las paginas
       {
         source: '/:path*',
         headers: securityHeaders,
       },
-      // Cache agressiu per imatges del portfolio
+      // Cache agresivo para imagenes del portfolio
       {
         source: '/img/portfolio/:path*',
         headers: [
@@ -70,7 +73,7 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
-      // Cache agressiu per vídeos
+      // Cache agresivo para videos
       {
         source: '/video/:path*',
         headers: [
@@ -78,29 +81,30 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
-      // No cache per API routes + CORS restrictiu
+      // No cache para API routes + CORS restrictivo
       {
         source: '/api/:path*',
         headers: [
           ...securityHeaders,
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
-          // CORS: Només permetre requests del propi domini
+          { key: 'Vary', value: 'Origin' },
+          // CORS: permitir solo requests del dominio principal
           { key: 'Access-Control-Allow-Origin', value: 'https://orbitaevents.com' },
           { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
-          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-CSRF-Token' },
           { key: 'Access-Control-Max-Age', value: '86400' },
         ],
       },
     ];
   },
 
-  // Esto evita errores raros con rutas dinámicas grandes
+  // Esto evita errores raros con rutas dinamicas grandes
   experimental: {
     largePageDataBytes: 500 * 1000, // 500KB
   },
 };
 
-// Importar next-intl solo si está instalado (para evitar errores en build)
+// Importar next-intl solo si esta instalado (para evitar errores en build)
 let withNextIntl;
 try {
   const createNextIntlPlugin = (await import('next-intl/plugin')).default;

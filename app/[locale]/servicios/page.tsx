@@ -15,26 +15,26 @@ export async function generateMetadata({ params }: { params: { locale: string } 
     keywords: [
       'servicios eventos Barcelona',
       'DJ bodas Barcelona',
-      'discomóvil Barcelona',
+      'discomovil Barcelona',
       'fiestas privadas Barcelona',
       'eventos corporativos Barcelona',
-      'animación infantil Barcelona',
+      'animacion infantil Barcelona',
       'alquiler sonido Barcelona',
-      'producción técnica eventos',
+      'produccion tecnica eventos',
     ],
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
     alternates: { canonical: '/servicios' },
     openGraph: {
-      title: 'Servicios DJ y Eventos Barcelona | Òrbita Events',
-      description: 'DJ profesional, discomóvil, fiestas privadas, eventos corporativos, animación infantil y más. Desde 250€. Barcelona y Girona.',
+      title: 'Servicios DJ y Eventos Barcelona | Orbita Events',
+      description: 'DJ profesional, discomovil, fiestas privadas, eventos corporativos, animacion infantil y mas. Desde 250 EUR. Barcelona y Girona.',
       url: '/servicios',
-      images: [{ url: '/img/og-image.jpg', alt: 'Servicios Òrbita Events Barcelona' }],
+      images: [{ url: '/img/og-image.jpg', alt: 'Servicios Orbita Events Barcelona' }],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Servicios DJ y Eventos Barcelona | Òrbita Events',
-      description: 'DJ profesional, discomóvil, fiestas privadas y más. Desde 250€.',
+      title: 'Servicios DJ y Eventos Barcelona | Orbita Events',
+      description: 'DJ profesional, discomovil, fiestas privadas y mas. Desde 250 EUR.',
       images: ['/img/og-image.jpg'],
     },
     robots: { index: true, follow: true },
@@ -48,13 +48,13 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
 
   // Get all service data
   const serviciosConfig = [
-    { key: 'bodas', href: '/servicios/bodas', popular: true, icon: 'heart', emoji: '💍' },
-    { key: 'discomovil', href: '/servicios/discomovil', popular: true, icon: 'music', emoji: '🎧' },
-    { key: 'fiestas', href: '/servicios/fiestas', popular: false, icon: 'cake', emoji: '🎉' },
-    { key: 'animacionInfantil', href: '/servicios/animacion-infantil', popular: false, icon: 'party', emoji: '🎈' },
-    { key: 'empresas', href: '/servicios/empresas', popular: false, icon: 'briefcase', emoji: '💼' },
-    { key: 'produccion', href: '/servicios/produccion', popular: false, icon: 'settings', emoji: '🎛️' },
-    { key: 'alquiler', href: '/servicios/alquiler', popular: false, icon: 'package', emoji: '📦' },
+    { key: 'bodas', href: '/servicios/bodas', popular: true, icon: 'heart', emoji: '??' },
+    { key: 'discomovil', href: '/servicios/discomovil', popular: true, icon: 'music', emoji: '??' },
+    { key: 'fiestas', href: '/servicios/fiestas', popular: false, icon: 'cake', emoji: '??' },
+    { key: 'animacionInfantil', href: '/servicios/animacion-infantil', popular: false, icon: 'party', emoji: '??' },
+    { key: 'empresas', href: '/servicios/empresas', popular: false, icon: 'briefcase', emoji: '??' },
+    { key: 'produccion', href: '/servicios/produccion', popular: false, icon: 'settings', emoji: '???' },
+    { key: 'alquiler', href: '/servicios/alquiler', popular: false, icon: 'package', emoji: '??' },
   ];
 
   const servicios = serviciosConfig.map(s => ({

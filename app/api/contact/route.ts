@@ -1,9 +1,9 @@
 // app/api/contact/route.ts
-// API de contacto - Crea Leads al model nou
-import { NextRequest, NextResponse } from "next/server";
+// API de contacto - Crea leads en el modelo nuevo
+import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { SITE_CONFIG } from '@/config/site-config';
-import { z } from "zod";
+import { z } from 'zod';
 import { sendEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
@@ -11,54 +11,51 @@ import { verifyCsrf } from '@/lib/csrf';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import type { EventType, LeadSource } from '@prisma/client';
 
-// Validación de datos con Zod
+// Validacion de datos con Zod
 const contactSchema = z.object({
-  name: z.string().min(2, "Nombre demasiado corto").max(50),
-  contact: z.string().min(3, "Introduce email o teléfono"),
-  event: z.string().min(1, "Selecciona tipo de evento"),
+  name: z.string().min(2, 'Nombre demasiado corto').max(50),
+  contact: z.string().min(3, 'Introduce email o telefono'),
+  event: z.string().min(1, 'Selecciona tipo de evento'),
   message: z.string().optional(),
-  // Campos opcionales del configurador
   packId: z.string().optional(),
   packName: z.string().optional(),
   estimatedPrice: z.number().optional(),
   eventDate: z.string().optional(),
   guests: z.number().optional(),
   extras: z.array(z.string()).optional(),
-  // Locale preferit
   locale: z.string().optional(),
 });
 
-// Mapeo de tipos de evento para emails bonitos
+// Mapeo de tipos de evento para emails
 const EVENT_TYPE_LABELS: Record<string, string> = {
-  boda: "💍 Boda",
-  bodas: "💍 Boda",
-  wedding: "💍 Boda",
-  discomovil: "🎵 Discomóvil",
-  empresa: "🎯 Evento Corporativo",
-  empresas: "🎯 Evento Corporativo",
-  corporate: "🎯 Evento Corporativo",
-  fiesta: "🎊 Fiesta Privada",
-  fiestas: "🎊 Fiesta Privada",
-  cumpleaños: "🎂 Cumpleaños",
-  cumpleanyos: "🎂 Cumpleaños",
-  birthday: "🎂 Cumpleaños",
-  communion: "⛪ Comunión",
-  baptism: "👶 Bautizo",
-  graduation: "🎓 Graduación",
-  anniversary: "🎉 Aniversario",
-  tematizacion: "🎃 Tematización",
-  produccion: "🎬 Producción Técnica",
-  alquiler: "🎤 Alquiler de Equipo",
-  otro: "📋 Otro",
-  other: "📋 Otro",
+  boda: 'Boda',
+  bodas: 'Boda',
+  wedding: 'Boda',
+  discomovil: 'Discomovil',
+  empresa: 'Evento corporativo',
+  empresas: 'Evento corporativo',
+  corporate: 'Evento corporativo',
+  fiesta: 'Fiesta privada',
+  fiestas: 'Fiesta privada',
+  cumpleanos: 'Cumpleanos',
+  cumpleanyos: 'Cumpleanos',
+  birthday: 'Cumpleanos',
+  communion: 'Comunion',
+  baptism: 'Bautizo',
+  graduation: 'Graduacion',
+  anniversary: 'Aniversario',
+  tematizacion: 'Tematizacion',
+  produccion: 'Produccion tecnica',
+  alquiler: 'Alquiler de equipo',
+  otro: 'Otro',
+  other: 'Otro',
 };
 
-// Helper per mapejar string a enum EventType de Prisma
 function mapEventType(eventStr: string): EventType {
   const normalized = eventStr.toLowerCase();
   if (normalized.includes('boda') || normalized.includes('wedding')) return 'WEDDING';
   if (normalized.includes('empresa') || normalized.includes('corporativ') || normalized.includes('corporate')) return 'CORPORATE';
-  if (normalized.includes('cumpleaños') || normalized.includes('cumpleanyos') || normalized.includes('birthday')) return 'BIRTHDAY';
+  if (normalized.includes('cumpleanos') || normalized.includes('cumpleanyos') || normalized.includes('birthday')) return 'BIRTHDAY';
   if (normalized.includes('comunion') || normalized.includes('communion')) return 'COMMUNION';
   if (normalized.includes('bautizo') || normalized.includes('baptism')) return 'BAPTISM';
   if (normalized.includes('graduacion') || normalized.includes('graduation')) return 'GRADUATION';
@@ -67,19 +64,16 @@ function mapEventType(eventStr: string): EventType {
   return 'OTHER';
 }
 
-// Determinar source basant-se en el context
 function determineSource(packId?: string, packName?: string): LeadSource {
   if (packId || packName) return 'CONFIGURATOR';
   return 'WEBSITE';
 }
 
 export async function POST(req: NextRequest) {
-  // CSRF Protection
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
 
-  // Rate limiting: 5 requests per 5 minuts
-  const rateLimitResult = checkRateLimit(req, RATE_LIMITS.contact);
+  const rateLimitResult = await checkRateLimit(req, RATE_LIMITS.contact);
   if (rateLimitResult) return rateLimitResult;
 
   try {
@@ -88,7 +82,7 @@ export async function POST(req: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Datos inválidos", details: parsed.error.format() },
+        { error: 'Datos invalidos', details: parsed.error.format() },
         { status: 400 }
       );
     }
@@ -104,39 +98,30 @@ export async function POST(req: NextRequest) {
       eventDate,
       guests,
       extras,
-      locale
+      locale,
     } = parsed.data;
 
-    // Detectar si és un email o un telèfon
-    const isEmail = contact.includes("@");
+    const isEmail = contact.includes('@');
     const clientEmail: string | undefined = isEmail ? contact : undefined;
     const clientPhone: string | undefined = isEmail ? undefined : contact.replace(/[^\d+]/g, '');
 
-    // Generar ID únic per al lead
     const leadId = `OE-${Date.now().toString(36).toUpperCase()}`;
     const timestamp = new Date().toLocaleString('es-ES', {
       timeZone: 'Europe/Madrid',
       dateStyle: 'full',
-      timeStyle: 'short'
+      timeStyle: 'short',
     });
 
-    // Label bonic del event
     const eventLabel = EVENT_TYPE_LABELS[event.toLowerCase()] || event;
-
-    // ===============================================
-    // GUARDAR EN BASE DE DADES
-    // ===============================================
 
     let _savedLeadId: string | null = null;
 
     try {
-      // Buscar si ja existeix un lead amb el mateix email (només si tenim email)
       const existingLead = clientEmail ? await prisma.lead.findFirst({
-        where: { email: clientEmail }
+        where: { email: clientEmail },
       }) : null;
 
       if (existingLead) {
-        // Actualitzar lead existent
         const updatedLead = await prisma.lead.update({
           where: { id: existingLead.id },
           data: {
@@ -145,7 +130,7 @@ export async function POST(req: NextRequest) {
             eventType: mapEventType(event),
             eventDate: eventDate ? new Date(eventDate) : existingLead.eventDate,
             guestCount: guests || existingLead.guestCount,
-            budget: estimatedPrice ? `${estimatedPrice}€` : existingLead.budget,
+            budget: estimatedPrice ? `${estimatedPrice} EUR` : existingLead.budget,
             message: message || existingLead.message,
             interestedPackId: packId || existingLead.interestedPackId,
             interestedExtras: extras && extras.length > 0 ? extras : existingLead.interestedExtras,
@@ -156,16 +141,13 @@ export async function POST(req: NextRequest) {
         });
         _savedLeadId = updatedLead.id;
 
-        // Afegir nota del nou contacte
         await prisma.leadNote.create({
           data: {
             leadId: updatedLead.id,
-            content: `Nou contacte via web: ${eventLabel}${packName ? ` - Pack: ${packName}` : ''}${message ? `\nMissatge: ${message}` : ''}`,
+            content: `Nuevo contacto via web: ${eventLabel}${packName ? ` - Pack: ${packName}` : ''}${message ? `\nMensaje: ${message}` : ''}`,
           }
         });
       } else {
-        // Crear nou lead - generar email placeholder només per BD si no tenim email
-        // Usem format que indica clarament que és placeholder i inclou el telèfon
         const emailForDb = clientEmail || `phone-${clientPhone}@leads.orbitaevents.local`;
 
         const newLead = await prisma.lead.create({
@@ -176,7 +158,7 @@ export async function POST(req: NextRequest) {
             eventType: mapEventType(event),
             eventDate: eventDate ? new Date(eventDate) : null,
             guestCount: guests,
-            budget: estimatedPrice ? `${estimatedPrice}€` : null,
+            budget: estimatedPrice ? `${estimatedPrice} EUR` : null,
             message,
             interestedPackId: packId,
             interestedExtras: extras || [],
@@ -188,32 +170,25 @@ export async function POST(req: NextRequest) {
         });
         _savedLeadId = newLead.id;
 
-        // Afegir nota inicial
         await prisma.leadNote.create({
           data: {
             leadId: newLead.id,
-            content: `Lead creat via ${packId ? 'configurador' : 'formulari web'}${packName ? ` - Pack interessat: ${packName}` : ''}${!clientEmail ? ` (Contacte per telèfon: ${clientPhone})` : ''}`,
+            content: `Lead creado via ${packId ? 'configurador' : 'formulario web'}${packName ? ` - Pack interesado: ${packName}` : ''}${!clientEmail ? ` (Contacto por telefono: ${clientPhone})` : ''}`,
           }
         });
       }
 
     } catch (dbError) {
-      // Log de l'error i continuar amb enviament d'emails
-      // SECURITY: No registrar PII (name, email, phone) per complir GDPR
-      log.error('Error guardant lead a la base de dades', dbError, {
+      log.error('Error guardando lead en la base de datos', dbError, {
         context: {
           eventType: event,
           source: determineSource(packId, packName),
           hasEmail: !!clientEmail,
-          hasPhone: !!clientPhone
+          hasPhone: !!clientPhone,
         }
       });
     }
 
-    // ===============================================
-    // NOTIFICACIÓ MULTI-CANAL (Email + WhatsApp + Webhook)
-    // ===============================================
-    // Només notifiquem si tenim un lead guardat i email vàlid
     if (_savedLeadId && clientEmail) {
       try {
         const { notifyNewLead } = await import('@/lib/services/notificationService');
@@ -226,24 +201,18 @@ export async function POST(req: NextRequest) {
           eventType: mapEventType(event),
           eventDate: eventDate ? new Date(eventDate) : undefined,
           guestCount: guests,
-          budget: estimatedPrice ? `${estimatedPrice}€` : undefined,
+          budget: estimatedPrice ? `${estimatedPrice} EUR` : undefined,
           message,
           source: determineSource(packId, packName),
           packName,
           createdAt: new Date(),
         }).catch(err => {
-          // No bloquejar si falla la notificació
-          log.error('[Notification] Error enviant notificació multi-canal:', err);
+          log.error('[Notification] Error enviando notificacion multi-canal:', err);
         });
       } catch {
-        // Ignorar errors d'import en entorns sense el servei
+        // Ignorar errores de import en entornos sin el servicio
       }
     }
-
-    // ===============================================
-    // EMAIL AL ADMINISTRADOR (TÚ) - FITXA COMPLETA
-    // ===============================================
-    // CRITICAL FIX: Wrap in try-catch so email failures don't crash the endpoint
 
     try {
       const adminEmailHtml =
@@ -272,50 +241,50 @@ export async function POST(req: NextRequest) {
 <body>
   <div class="container">
     <div class="header">
-      <h1>NOU LEAD</h1>
+      <h1>NUEVO LEAD</h1>
       <div class="lead-id">ID: ${leadId} | ${timestamp}</div>
     </div>
 
     <div class="content">
       <div class="field">
-        <div class="field-label">Client</div>
+        <div class="field-label">Cliente</div>
         <div class="field-value">${escapeHtml(name)}</div>
       </div>
 
       <div class="field">
-        <div class="field-label">${isEmail ? 'Email' : 'Telefon'}</div>
+        <div class="field-label">${isEmail ? 'Email' : 'Telefono'}</div>
         <div class="field-value">${escapeHtml(contact)}</div>
       </div>
 
       <div class="field">
-        <div class="field-label">Tipus d'Esdeveniment</div>
+        <div class="field-label">Tipo de evento</div>
         <div class="field-value">${escapeHtml(eventLabel)}</div>
       </div>
 
       ${eventDate ? `
       <div class="field">
-        <div class="field-label">Data de l'Esdeveniment</div>
+        <div class="field-label">Fecha del evento</div>
         <div class="field-value">${eventDate}</div>
       </div>
       ` : ''}
 
       ${guests ? `
       <div class="field">
-        <div class="field-label">Nombre de Convidats</div>
-        <div class="field-value">${guests} persones</div>
+        <div class="field-label">Numero de invitados</div>
+        <div class="field-value">${guests} personas</div>
       </div>
       ` : ''}
 
       ${message ? `
       <div class="field">
-        <div class="field-label">Missatge</div>
+        <div class="field-label">Mensaje</div>
         <div class="field-value">${escapeHtml(message)}</div>
       </div>
       ` : ''}
 
       ${packName ? `
       <div class="highlight-box">
-        <div class="field-label">Pack Seleccionat</div>
+        <div class="field-label">Pack seleccionado</div>
         <div class="field-value">${escapeHtml(packName)}</div>
         ${estimatedPrice ? `<div class="price">${estimatedPrice.toLocaleString('es-ES')} EUR</div>` : ''}
         ${packId ? `<div style="font-size: 12px; color: #666; margin-top: 8px;">ID: ${escapeHtml(packId)}</div>` : ''}
@@ -324,7 +293,7 @@ export async function POST(req: NextRequest) {
 
       ${extras && Array.isArray(extras) && extras.length > 0 ? `
       <div class="field">
-        <div class="field-label">Extras Sollicitats</div>
+        <div class="field-label">Extras solicitados</div>
         <div class="extras-list">
           ${extras.filter(e => e != null).map(e => `<span class="extra-tag">${String(e).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`).join('')}
         </div>
@@ -332,45 +301,39 @@ export async function POST(req: NextRequest) {
       ` : ''}
 
       ${clientPhone ? `
-      <a href="tel:${escapeHtml(clientPhone)}" class="cta-button">Trucar a ${escapeHtml(name)}</a>
+      <a href="tel:${escapeHtml(clientPhone)}" class="cta-button">Llamar a ${escapeHtml(name)}</a>
       ` : ''}
 
       ${isEmail ? `
-      <a href="mailto:${clientEmail}?subject=${encodeURIComponent('Re: La teva sollicitud a Orbita Events - ' + eventLabel)}" class="cta-button" style="background: #4A90D9;">
-        Respondre per Email
+      <a href="mailto:${clientEmail}?subject=${encodeURIComponent('Re: Tu solicitud en Orbita Events - ' + eventLabel)}" class="cta-button" style="background: #4A90D9;">
+        Responder por email
       </a>
       ` : ''}
     </div>
 
     <div class="footer">
-      Orbita Events | Sistema de Leads Automatitzat<br>
+      Orbita Events | Sistema de leads automatizado<br>
       ${timestamp}
     </div>
   </div>
 </body>
 </html>`;
 
-      // Enviar email al admin (trim per evitar newlines de Vercel env vars)
       const adminEmail = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
       const smtpFrom = (process.env.SMTP_FROM || process.env.SMTP_USER || '').trim();
 
       await sendEmail({
         to: adminEmail,
-        subject: `🎉 NOU LEAD: ${name} - ${eventLabel} ${estimatedPrice ? `(${estimatedPrice}€)` : ''}`,
+        subject: `NUEVO LEAD: ${name} - ${eventLabel} ${estimatedPrice ? `(${estimatedPrice} EUR)` : ''}`,
         html: adminEmailHtml,
         replyTo: clientEmail || undefined,
-        from: `"Òrbita Events Web" <${smtpFrom}>`,
+        from: `"Orbita Events Web" <${smtpFrom}>`,
       });
     } catch (emailError) {
-      // Log email error but don't fail the request - lead is already saved
       log.error('Failed to send admin notification email', emailError, {
         context: { leadId, hasEmail: !!clientEmail }
       });
     }
-
-    // ===============================================
-    // EMAIL DE CONFIRMACIÓ AL CLIENT (si és email)
-    // ===============================================
 
     if (isEmail && clientEmail) {
       try {
@@ -397,32 +360,32 @@ export async function POST(req: NextRequest) {
 <body>
   <div class="container">
     <div class="header">
-      <h1>Missatge Rebut!</h1>
+      <h1>Mensaje recibido</h1>
     </div>
 
     <div class="content">
       <p class="greeting">Hola <strong>${escapeHtml(name)}</strong>,</p>
 
-      <p>Gracies per contactar amb <strong>Orbita Events</strong>. Hem rebut la teva sollicitud per a <strong>${escapeHtml(eventLabel)}</strong>.</p>
+      <p>Gracias por contactar con <strong>Orbita Events</strong>. Hemos recibido tu solicitud para <strong>${escapeHtml(eventLabel)}</strong>.</p>
 
       <div class="info-box">
-        <strong>La teva referencia: ${leadId}</strong><br>
-        <span style="font-size: 14px; color: #666;">Guarda aquest codi per a qualsevol consulta</span>
+        <strong>Tu referencia: ${leadId}</strong><br>
+        <span style="font-size: 14px; color: #666;">Guarda este codigo para cualquier consulta</span>
       </div>
 
-      <div class="step"><strong>Revisem la teva sollicitud</strong><br>En les properes hores analitzem les teves necessitats.</div>
-      <div class="step"><strong>Et contactem en menys de 2 hores</strong><br>Fins i tot caps de setmana.</div>
-      <div class="step"><strong>Pressupost personalitzat</strong><br>T'enviem proposta detallada adaptada al teu event.</div>
+      <div class="step"><strong>Revisamos tu solicitud</strong><br>En las proximas horas analizamos tus necesidades.</div>
+      <div class="step"><strong>Te contactamos en menos de 2 horas</strong><br>Incluso fines de semana.</div>
+      <div class="step"><strong>Presupuesto personalizado</strong><br>Te enviamos una propuesta detallada adaptada a tu evento.</div>
 
       ${estimatedPrice ? `
       <div class="info-box" style="border-left-color: #25D366; background: #f0fff4;">
-        <strong>Pressupost estimat: ${estimatedPrice.toLocaleString('es-ES')} EUR</strong><br>
-        <span style="font-size: 14px; color: #666;">*Preu orientatiu. Et confirmarem el preu final al nostre email.</span>
+        <strong>Presupuesto estimado: ${estimatedPrice.toLocaleString('es-ES')} EUR</strong><br>
+        <span style="font-size: 14px; color: #666;">*Precio orientativo. Confirmaremos el precio final en nuestro email.</span>
       </div>
       ` : ''}
 
       <div class="cta-section">
-        <a href="tel:${SITE_CONFIG.business.phone}" class="cta-button">Trucar ara al ${SITE_CONFIG.business.phoneDisplay}</a>
+        <a href="tel:${SITE_CONFIG.business.phone}" class="cta-button">Llamar ahora al ${SITE_CONFIG.business.phoneDisplay}</a>
       </div>
     </div>
 
@@ -430,7 +393,7 @@ export async function POST(req: NextRequest) {
       <strong>Orbita Events</strong><br>
       <a href="tel:${SITE_CONFIG.business.phone}">${SITE_CONFIG.business.phoneDisplay}</a> |
       <a href="mailto:${SITE_CONFIG.business.email}">${SITE_CONFIG.business.email}</a><br><br>
-      Has rebut aquest email perque vas sollicitar informacio a orbitaevents.com.
+      Has recibido este email porque solicitaste informacion en orbitaevents.com.
     </div>
   </div>
 </body>
@@ -438,38 +401,31 @@ export async function POST(req: NextRequest) {
 
         await sendEmail({
           to: clientEmail,
-          subject: `Rebut! La teva sol·licitud per ${eventLabel} - Òrbita Events`,
+          subject: `Recibido! Tu solicitud para ${eventLabel} - Orbita Events`,
           html: clientEmailHtml,
         });
       } catch (clientEmailError) {
-        // Log but don't fail - lead is saved, admin was notified (or logged)
         log.error('Failed to send client confirmation email', clientEmailError, {
           context: { leadId, clientEmail }
         });
       }
     }
 
-    // ===============================================
-    // RESPOSTA EXITOSA
-    // ===============================================
-
     return NextResponse.json({
       ok: true,
-      message: "Missatge enviat amb èxit",
-      leadId: leadId,
-      estimatedResponse: "2-4 hores"
+      message: 'Mensaje enviado con exito',
+      leadId,
+      estimatedResponse: '2-4 horas',
     });
 
   } catch (error) {
-    // Log error per debugging
     log.error('[Contact API] Error:', error);
 
     return NextResponse.json(
       {
-        error: `Error al enviar el missatge. Si us plau, truca'ns al ${SITE_CONFIG.business.phoneDisplay} o torna a intentar-ho.`,
+        error: `Error al enviar el mensaje. Si lo prefieres, llamanos al ${SITE_CONFIG.business.phoneDisplay} o vuelve a intentarlo.`,
         phone: SITE_CONFIG.business.phone,
-        // En dev, mostrar error real
-        debug: process.env.NODE_ENV === 'development' ? String(error) : undefined
+        debug: process.env.NODE_ENV === 'development' ? String(error) : undefined,
       },
       { status: 500 }
     );

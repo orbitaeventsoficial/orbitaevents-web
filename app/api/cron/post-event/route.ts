@@ -1,35 +1,35 @@
 // app/api/cron/post-event/route.ts
-// CRON JOB: Envia emails post-event automàtics
-// Executar diàriament via Vercel Cron o similar
+// CRON JOB: Envia emails post-event automaticos
+// Ejecutar diariamente via Vercel Cron o similar
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
-import { SITE_CONFIG } from '@/app/config/site-config';
+import { SITE_CONFIG } from '@/config/site-config';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
-// Verificar autorització (Vercel Cron envia CRON_SECRET)
+// Verificar autorizacion (Vercel Cron envia CRON_SECRET)
 function isAuthorized(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
-  // SECURITY: Sempre requerir secret, fins i tot en dev
   if (!cronSecret) {
-    log.error('CRON_SECRET no configurat - cron job no pot executar-se');
+    log.error('CRON_SECRET no configurado - el cron no puede ejecutarse');
     return false;
   }
 
   if (!authHeader) {
-    log.warn('Intent d\'accés a cron job sense authorization header');
+    log.warn('Intento de acceso a cron sin authorization header');
     return false;
   }
 
   const isValid = authHeader === `Bearer ${cronSecret}`;
   if (!isValid) {
-    log.warn('Intent d\'accés a cron job amb credencials invàlides', {
-      context: { ip: request.headers.get('x-forwarded-for') }
+    log.warn('Intento de acceso a cron con credenciales invalidas', {
+      ip: request.headers.get('x-forwarded-for'),
     });
   }
 
@@ -45,7 +45,6 @@ interface ProcessedResult {
 }
 
 export async function GET(request: NextRequest) {
-  // Verificar autorització
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -54,10 +53,6 @@ export async function GET(request: NextRequest) {
   const now = new Date();
 
   try {
-    // ═══════════════════════════════════════════════════════════════════
-    // 1. BUSCAR EVENTS QUE VAN PASSAR FA 1-2 DIES (finestra òptima)
-    // ═══════════════════════════════════════════════════════════════════
-    
     const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
     const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
 
@@ -68,7 +63,6 @@ export async function GET(request: NextRequest) {
           gte: twoDaysAgo,
           lte: oneDayAgo,
         },
-        // No enviar si ja s'ha enviat email post-event
         postEventEmailSent: false,
       },
       include: {
@@ -77,19 +71,14 @@ export async function GET(request: NextRequest) {
           include: { translations: true },
         },
       },
-      take: 50, // Processar en lots
+      take: 50,
     });
-
-    // ═══════════════════════════════════════════════════════════════════
-    // 2. ENVIAR EMAIL D'AGRAÏMENT + SOL·LICITUD DE VALORACIÓ
-    // ═══════════════════════════════════════════════════════════════════
 
     for (const booking of completedBookings) {
       const email = booking.clientEmail;
       const name = booking.clientName;
       const locale = booking.lead?.preferredLocale || 'es';
 
-      // Skip si no tenim email vàlid
       if (!email || email.includes('@leads.orbitaevents.local')) {
         results.push({
           bookingId: booking.id,
@@ -102,19 +91,14 @@ export async function GET(request: NextRequest) {
       }
 
       try {
-        // Generar token únic per a la valoració
-        const reviewToken = Buffer.from(`${booking.id}:${Date.now()}`).toString('base64url');
-
-        // URL del formulari de valoració
+        const reviewToken = crypto.randomBytes(32).toString('base64url');
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
         const reviewUrl = `${baseUrl}/${locale}/valoracio?token=${reviewToken}&ref=${booking.reference}`;
 
-        // Nom del pack
-        const packName = booking.pack?.translations?.find(t => t.locale === locale)?.name 
-          || booking.pack?.translations?.[0]?.name 
-          || 'El teu pack';
+        const packName = booking.pack?.translations?.find(t => t.locale === locale)?.name
+          || booking.pack?.translations?.[0]?.name
+          || 'Tu pack';
 
-        // Email HTML
         const emailHtml = generatePostEventEmail({
           name,
           packName,
@@ -124,23 +108,21 @@ export async function GET(request: NextRequest) {
           locale,
         });
 
-        // Enviar email
         await sendEmail({
           to: email,
           subject: getSubjectLine(locale, name),
           html: emailHtml,
         });
 
-        // Marcar com enviat
         await prisma.booking.update({
           where: { id: booking.id },
-          data: { 
+          data: {
             postEventEmailSent: true,
             postEventEmailSentAt: now,
+            reviewToken,
           },
         });
 
-        // Log activitat si hi ha customer associat
         if (booking.lead?.customerId) {
           await prisma.customerActivity.create({
             data: {
@@ -162,9 +144,8 @@ export async function GET(request: NextRequest) {
         });
 
       } catch (emailError) {
-        // SECURITY: No registrar email del client per complir GDPR
-        log.error('Error enviant email post-event', emailError, {
-          context: { bookingId: booking.id, bookingRef: booking.reference }
+        log.error('Error enviando email post-event', emailError, {
+          context: { bookingId: booking.id, bookingRef: booking.reference },
         });
         results.push({
           bookingId: booking.id,
@@ -175,10 +156,6 @@ export async function GET(request: NextRequest) {
         });
       }
     }
-
-    // ═══════════════════════════════════════════════════════════════════
-    // 3. RESPOSTA AMB RESUM
-    // ═══════════════════════════════════════════════════════════════════
 
     const summary = {
       processed: results.length,
@@ -197,8 +174,8 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     log.error('Error en cron post-event:', error);
     return NextResponse.json(
-      { 
-        error: 'Error processant events', 
+      {
+        error: 'Error procesando eventos',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
@@ -206,15 +183,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════════════════════════
-
 function getSubjectLine(locale: string, name: string): string {
   const subjects: Record<string, string> = {
-    es: `${name}, gracias por confiar en nosotros! Que tal fue tu evento?`,
-    ca: `${name}, gracies per confiar en nosaltres! Com va anar el teu event?`,
-    en: `${name}, thank you for trusting us! How was your event?`,
+    es: `${name}, gracias por confiar en nosotros. Que tal fue tu evento?`,
+    ca: `${name}, gracies per confiar en nosaltres. Com va anar el teu event?`,
+    en: `${name}, thank you for trusting us. How was your event?`,
   };
   return subjects[locale] || subjects.es;
 }
@@ -228,7 +201,7 @@ function generatePostEventEmail(params: {
   locale: string;
 }): string {
   const { name, packName, eventDate, reviewUrl, googleReviewUrl, locale } = params;
-  
+
   const firstName = name.split(' ')[0];
   const formattedDate = eventDate.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', {
     weekday: 'long',
@@ -236,49 +209,48 @@ function generatePostEventEmail(params: {
     month: 'long',
   });
 
-  // Textos segons idioma
   const texts = {
     es: {
-      title: '¡Gracias por tu confianza!',
+      title: 'Gracias por tu confianza',
       greeting: `Hola ${firstName},`,
-      intro: `Esperamos que tu evento del <strong>${formattedDate}</strong> con el <strong>${packName}</strong> haya sido increíble y que tú y tus invitados hayáis disfrutado al máximo.`,
-      question: '¿Nos dejas tu opinión?',
-      explanation: 'Tu feedback nos ayuda a mejorar y además... <strong>¡tenemos un regalo para ti!</strong>',
-      reward: 'Al dejarnos tu valoración recibirás un <strong>código de descuento exclusivo</strong> para tu próximo evento o para compartir con amigos y familiares.',
-      cta: 'Dejar mi valoración',
-      bonus: '¡Cuanto más compartas, mayor descuento!',
+      intro: `Esperamos que tu evento del <strong>${formattedDate}</strong> con el <strong>${packName}</strong> haya sido increible y que tu y tus invitados hayais disfrutado al maximo.`,
+      question: 'Nos dejas tu opinion?',
+      explanation: 'Tu feedback nos ayuda a mejorar y ademas tenemos un regalo para ti.',
+      reward: 'Al dejarnos tu valoracion recibiras un codigo de descuento exclusivo para tu proximo evento o para compartir con amigos y familiares.',
+      cta: 'Dejar mi valoracion',
+      bonus: 'Cuanto mas compartas, mayor descuento',
       bonusDetails: '+5% extra si compartes foto / +10% extra si compartes video',
-      googleText: 'También puedes dejarnos una reseña en Google:',
-      googleCta: 'Reseña en Google',
-      footer: 'Gracias por formar parte de la familia Òrbita Events',
+      googleText: 'Tambien puedes dejarnos una resena en Google:',
+      googleCta: 'Resena en Google',
+      footer: 'Gracias por formar parte de la familia Orbita Events',
     },
     ca: {
-      title: 'Gràcies per la teva confiança!',
+      title: 'Gracies per la teva confiança',
       greeting: `Hola ${firstName},`,
-      intro: `Esperem que el teu event del <strong>${formattedDate}</strong> amb el <strong>${packName}</strong> hagi estat increïble i que tu i els teus convidats hagueu gaudit al màxim.`,
-      question: 'Ens deixes la teva opinió?',
-      explanation: 'El teu feedback ens ajuda a millorar i a més... <strong>tenim un regal per a tu!</strong>',
-      reward: 'En deixar-nos la teva valoració rebràs un <strong>codi de descompte exclusiu</strong> pel teu pròxim event o per compartir amb amics i familiars.',
-      cta: 'Deixar la meva valoració',
-      bonus: 'Com més comparteixis, més descompte!',
+      intro: `Esperem que el teu event del <strong>${formattedDate}</strong> amb el <strong>${packName}</strong> hagi estat increible i que tu i els teus convidats hagueu gaudit al maxim.`,
+      question: 'Ens deixes la teva opinio?',
+      explanation: 'El teu feedback ens ajuda a millorar i a mes tenim un regal per a tu.',
+      reward: 'En deixar-nos la teva valoracio rebras un codi de descompte exclusiu pel teu proxim event o per compartir amb amics i familiars.',
+      cta: 'Deixar la meva valoracio',
+      bonus: 'Com mes comparteixis, mes descompte',
       bonusDetails: '+5% extra si comparteixes foto / +10% extra si comparteixes video',
-      googleText: 'També pots deixar-nos una ressenya a Google:',
+      googleText: 'Tambe pots deixar-nos una ressenya a Google:',
       googleCta: 'Ressenya a Google',
-      footer: 'Gràcies per formar part de la família Òrbita Events',
+      footer: 'Gracies per formar part de la familia Orbita Events',
     },
     en: {
-      title: 'Thank you for your trust!',
+      title: 'Thank you for your trust',
       greeting: `Hi ${firstName},`,
       intro: `We hope your event on <strong>${formattedDate}</strong> with the <strong>${packName}</strong> was amazing and that you and your guests had a great time.`,
       question: 'Would you leave us a review?',
-      explanation: 'Your feedback helps us improve and... <strong>we have a gift for you!</strong>',
-      reward: 'When you leave your review, you\'ll receive an <strong>exclusive discount code</strong> for your next event or to share with friends and family.',
+      explanation: 'Your feedback helps us improve and we have a gift for you.',
+      reward: 'When you leave your review, you will receive an exclusive discount code for your next event or to share with friends and family.',
       cta: 'Leave my review',
-      bonus: 'The more you share, the bigger the discount!',
+      bonus: 'The more you share, the bigger the discount',
       bonusDetails: '+5% extra for a photo / +10% extra for a video',
       googleText: 'You can also leave us a Google review:',
       googleCta: 'Google Review',
-      footer: 'Thank you for being part of the Òrbita Events family',
+      footer: 'Thank you for being part of the Orbita Events family',
     },
   };
 
@@ -293,18 +265,16 @@ function generatePostEventEmail(params: {
 </head>
 <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
   <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
-    
-    <!-- Header -->
+
     <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d1f00 50%, #3d2800 100%); padding: 32px 24px; text-align: center;">
       <h1 style="color: #FFB800; margin: 0; font-size: 26px; font-weight: 300;">
         ${t.title}
       </h1>
       <p style="color: rgba(255,255,255,0.5); margin: 16px 0 0 0; font-size: 14px; letter-spacing: 2px;">
-        ÒRBITA EVENTS
+        ORBITA EVENTS
       </p>
     </div>
 
-    <!-- Content -->
     <div style="padding: 40px 30px; color: #e5e5e5;">
       <p style="font-size: 18px; line-height: 1.6; margin: 0 0 20px 0;">
         ${t.greeting}
@@ -314,7 +284,6 @@ function generatePostEventEmail(params: {
         ${t.intro}
       </p>
 
-      <!-- Question Box -->
       <div style="background: rgba(255,184,0,0.1); border: 2px solid rgba(255,184,0,0.3); border-radius: 16px; padding: 30px; margin: 30px 0; text-align: center;">
         <h2 style="color: #FFB800; margin: 0 0 16px 0; font-size: 24px;">
           ${t.question}
@@ -327,7 +296,6 @@ function generatePostEventEmail(params: {
         </p>
       </div>
 
-      <!-- CTA Button -->
       <div style="text-align: center; margin: 40px 0;">
         <a href="${reviewUrl}"
            style="background: linear-gradient(135deg, #FFB800, #CC9600);
@@ -343,7 +311,6 @@ function generatePostEventEmail(params: {
         </a>
       </div>
 
-      <!-- Bonus info -->
       <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; text-align: center;">
         <p style="margin: 0 0 8px 0; font-size: 16px; color: #FFB800; font-weight: bold;">
           ${t.bonus}
@@ -353,20 +320,18 @@ function generatePostEventEmail(params: {
         </p>
       </div>
 
-      <!-- Google Review -->
       <div style="margin-top: 18px; text-align: center; font-size: 13px; color: rgba(255,255,255,0.7);">
         ${t.googleText} <a href="${googleReviewUrl}" style="color: #8ab4ff; text-decoration: none;">${t.googleCta}</a>
       </div>
 
     </div>
 
-    <!-- Footer -->
     <div style="padding: 30px; background: #0a0a0a; text-align: center;">
       <p style="margin: 0 0 12px 0; font-size: 14px; color: rgba(255,255,255,0.6);">
         ${t.footer}
       </p>
       <p style="margin: 0; font-size: 12px; color: #666;">
-        © ${new Date().getFullYear()} Òrbita Events · ${SITE_CONFIG.business.phone} · ${SITE_CONFIG.business.email}
+        ${new Date().getFullYear()} Orbita Events | ${SITE_CONFIG.business.phone} | ${SITE_CONFIG.business.email}
       </p>
     </div>
   </div>

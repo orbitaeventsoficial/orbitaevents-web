@@ -1,49 +1,20 @@
 /**
- * API ROUTE: Upload públic per testimonis/valoracions
+ * API ROUTE: Upload publico para testimonios/valoraciones
  * ====================================================
- * POST - Pujar foto o vídeo de testimonis
- * PÚBLIC: No requereix autenticació, però té rate limiting estricte
+ * POST - Subir foto o video de testimonios
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { verifyCsrf } from '@/lib/csrf';
 
 export const dynamic = 'force-dynamic';
 
-// Límit per upload directe (5MB)
+// Limite por upload directo (5MB)
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-// Rate limiting simple per IP
-const uploadAttempts = new Map<string, { count: number; timestamp: number }>();
-const MAX_UPLOADS_PER_HOUR = 10;
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const hourAgo = now - 3600000;
-
-  for (const [key, record] of uploadAttempts.entries()) {
-    if (record.timestamp < hourAgo) {
-      uploadAttempts.delete(key);
-    }
-  }
-
-  const record = uploadAttempts.get(ip);
-  
-  if (!record || record.timestamp < hourAgo) {
-    uploadAttempts.set(ip, { count: 1, timestamp: now });
-    return true;
-  }
-  
-  if (record.count >= MAX_UPLOADS_PER_HOUR) {
-    return false;
-  }
-  
-  record.count++;
-  return true;
-}
-
-// Supabase admin client
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -55,25 +26,45 @@ function getSupabaseAdmin() {
   return createClient(url, serviceKey);
 }
 
+function isAllowedOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get('origin');
+  if (!origin) return true;
+
+  if (process.env.NODE_ENV !== 'production') {
+    return true;
+  }
+
+  const allowedOrigins = new Set([
+    'https://orbitaevents.com',
+    'https://www.orbitaevents.com',
+  ]);
+
+  return allowedOrigins.has(origin);
+}
+
 export async function POST(request: NextRequest) {
-  // 1. Rate limiting per IP
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-             request.headers.get('x-real-ip') || 
-             'unknown';
-  
-  if (!checkRateLimit(ip)) {
+  // Origin check
+  if (!isAllowedOrigin(request)) {
     return NextResponse.json(
-      { success: false, error: 'Massa intents. Espera una hora.' },
-      { status: 429 }
+      { success: false, error: 'Origen no permitido' },
+      { status: 403 }
     );
   }
+
+  // CSRF Protection
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
+
+  // Rate limiting
+  const rateLimitResult = await checkRateLimit(request, RATE_LIMITS.uploads);
+  if (rateLimitResult) return rateLimitResult;
 
   try {
     const supabaseAdmin = getSupabaseAdmin();
 
     if (!supabaseAdmin) {
       return NextResponse.json(
-        { success: false, error: 'Storage no configurat' },
+        { success: false, error: 'Storage no configurado' },
         { status: 500 }
       );
     }
@@ -90,21 +81,21 @@ export async function POST(request: NextRequest) {
 
       if (!fileName || !fileType) {
         return NextResponse.json(
-          { success: false, error: 'Falten paràmetres fileName i fileType' },
+          { success: false, error: 'Faltan parametros fileName y fileType' },
           { status: 400 }
         );
       }
 
       if (type === 'photo' && !validPhotoTypes.includes(fileType)) {
         return NextResponse.json(
-          { success: false, error: 'Format no permès. Usa JPG, PNG, WebP o GIF.' },
+          { success: false, error: 'Formato no permitido. Usa JPG, PNG, WebP o GIF.' },
           { status: 400 }
         );
       }
 
       if (type === 'video' && !validVideoTypes.includes(fileType)) {
         return NextResponse.json(
-          { success: false, error: 'Format no permès. Usa MP4, MOV o WebM.' },
+          { success: false, error: 'Formato no permitido. Usa MP4, MOV o WebM.' },
           { status: 400 }
         );
       }
@@ -120,7 +111,7 @@ export async function POST(request: NextRequest) {
         .createSignedUploadUrl(path);
 
       if (error) {
-        log.error('Error creant signed URL:', error);
+        log.error('Error creando signed URL:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
       }
 
@@ -140,60 +131,55 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-    const type = formData.get('type') as string || 'photo'; // 'photo' o 'video'
+    const type = (formData.get('type') as string) || 'photo';
 
     if (!file) {
       return NextResponse.json(
-        { success: false, error: "No s'ha proporcionat cap fitxer" },
+        { success: false, error: 'No se ha proporcionado ningun fichero' },
         { status: 400 }
       );
     }
 
-    // Validar tipus segons si és foto o vídeo
     if (type === 'photo' && !validPhotoTypes.includes(file.type)) {
       return NextResponse.json(
-        { success: false, error: 'Format no permès. Usa JPG, PNG, WebP o GIF.' },
-        { status: 400 }
-      );
-    }
-    
-    if (type === 'video' && !validVideoTypes.includes(file.type)) {
-      return NextResponse.json(
-        { success: false, error: 'Format no permès. Usa MP4, MOV o WebM.' },
+        { success: false, error: 'Formato no permitido. Usa JPG, PNG, WebP o GIF.' },
         { status: 400 }
       );
     }
 
-    // Validar mida
+    if (type === 'video' && !validVideoTypes.includes(file.type)) {
+      return NextResponse.json(
+        { success: false, error: 'Formato no permitido. Usa MP4, MOV o WebM.' },
+        { status: 400 }
+      );
+    }
+
     const maxSize = type === 'video' ? 50 * 1024 * 1024 : MAX_FILE_SIZE;
     if (file.size > maxSize) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: type === 'video' 
-            ? 'Vídeo massa gran. Màxim 50MB.' 
-            : 'Foto massa gran. Màxim 5MB.' 
+        {
+          success: false,
+          error: type === 'video'
+            ? 'Video demasiado grande. Maximo 50MB.'
+            : 'Foto demasiado grande. Maximo 5MB.'
         },
         { status: 413 }
       );
     }
 
-    // Generar nom únic
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(7);
     const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
     const folder = type === 'video' ? 'testimonials/videos' : 'testimonials/photos';
     const fileName = `${folder}/${timestamp}-${random}.${ext}`;
 
-    // Si el fitxer és massa gran per upload directe a Vercel (4MB), usar signed URL
     if (file.size > 4 * 1024 * 1024) {
-      // Per fitxers grans, retornar signed URL
       const { data, error } = await supabaseAdmin.storage
         .from('media')
         .createSignedUploadUrl(fileName);
 
       if (error) {
-        log.error('Error creant signed URL:', error);
+        log.error('Error creando signed URL:', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
       }
 
@@ -211,7 +197,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Upload directe per fitxers petits
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
@@ -228,7 +213,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    // Get public URL
     const { data: urlData } = supabaseAdmin.storage
       .from('media')
       .getPublicUrl(data.path);
@@ -240,9 +224,9 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    log.error('Error pujant fitxer:', error);
+    log.error('Error subiendo fichero:', error);
     return NextResponse.json(
-      { success: false, error: 'Error processant el fitxer' },
+      { success: false, error: 'Error procesando el fichero' },
       { status: 500 }
     );
   }

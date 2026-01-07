@@ -1,29 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 function createState(secret: string): string {
   const ts = Math.floor(Date.now() / 1000);
-  const payload = `${ts}`;
+  const nonce = crypto.randomBytes(16).toString('base64url');
+  const payload = `${ts}:${nonce}`;
   const sig = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
   return `${payload}.${sig}`;
 }
 
 export async function GET(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET || process.env.CSRF_SECRET;
   const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI;
 
-  if (!clientId || !redirectUri) {
+  if (!clientId || !clientSecret || !redirectUri) {
     return NextResponse.json(
       { ok: false, error: 'Missing Google OAuth configuration' },
       { status: 500 }
     );
   }
 
-  const state = createState(clientSecret || '');
+  const state = createState(clientSecret);
   const url = new URL(AUTH_URL);
   url.searchParams.set('client_id', clientId);
   url.searchParams.set('redirect_uri', redirectUri);

@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next';
 
 /**
  * Genera el archivo robots.txt optimizado para SEO.
- * Permite indexación completa y referencia sitemap.
+ * Permite indexacion completa y referencia sitemap.
  */
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
@@ -19,17 +19,17 @@ export default function robots(): MetadataRoute.Robots {
           '/_next/',
           '/admin/',
           '*.json',
-          '/*?*', // URLs con query params (evitar duplicados)
+          '/*?*',
         ],
       },
       {
-        // Reglas específicas para Googlebot
+        // Reglas especificas para Googlebot
         userAgent: 'Googlebot',
         allow: '/',
         disallow: ['/api/', '/admin/'],
       },
       {
-        // Reglas para bots de imágenes
+        // Reglas para bots de imagenes
         userAgent: 'Googlebot-Image',
         allow: '/',
       },
@@ -40,7 +40,7 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
-    // Host principal (ayuda a consolidar señales SEO)
+    // Host principal (ayuda a consolidar senales SEO)
     host: baseUrl,
   };
 }

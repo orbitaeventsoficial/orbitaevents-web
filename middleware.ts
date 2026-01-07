@@ -96,6 +96,27 @@ function tooManyRequests() {
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const host = req.headers.get('host');
+
+  if (host === 'www.orbitaevents.com') {
+    const url = req.nextUrl.clone();
+    url.hostname = 'orbitaevents.com';
+    return NextResponse.redirect(url, 301);
+  }
+
+  // Legacy/unsupported locales: redirect /en/* to default locale paths
+  if (pathname === '/en' || pathname.startsWith('/en/')) {
+    const url = req.nextUrl.clone();
+    url.pathname = pathname.replace(/^\/en(?=\/|$)/, '') || '/';
+    return NextResponse.redirect(url, 301);
+  }
+
+  // Legacy Catalan slug: redirect to current about page
+  if (pathname === '/sobre-nosaltres') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/ca/about';
+    return NextResponse.redirect(url, 301);
+  }
 
   // Rutas protegidas del panel admin (UI + API)
   const protectedPaths = [

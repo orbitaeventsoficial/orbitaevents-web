@@ -1,7 +1,6 @@
 /**
  * API ROUTE: Public Testimonials
- * ==============================
- * POST - Enviar una nova opinió (des del formulari públic o post-event)
+ * POST - Enviar una nueva opinion
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -9,20 +8,63 @@ import { log } from '@/lib/logger';
 import { createTestimonial } from '@/lib/services/testimonialService';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { verifyCsrf } from '@/lib/csrf';
+import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * POST - Crear nou testimoni
- * Supports both public form and post-event review with token validation
- */
+const ratingSchema = z.preprocess(
+  (value) => (typeof value === 'string' ? Number(value) : value),
+  z.number().int().min(1).max(5)
+);
+
+const testimonialSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email().max(255),
+  phone: z.string().max(30).optional(),
+  city: z.string().max(100).optional(),
+  instagram: z.string().max(100).optional(),
+  rating: ratingSchema,
+  comment: z.string().min(5).max(2000),
+  eventType: z.string().max(50).optional(),
+  eventDate: z
+    .string()
+    .optional()
+    .refine((value) => !value || !Number.isNaN(Date.parse(value)), {
+      message: 'Invalid eventDate',
+    }),
+  photoUrl: z.string().url().optional(),
+  videoUrl: z.string().url().optional(),
+  allowGoogleShare: z.boolean().optional(),
+  consentDataProcessing: z.boolean().optional(),
+  consentPhotoPublication: z.boolean().optional(),
+  token: z.string().optional(),
+  bookingRef: z.string().optional(),
+}).refine(
+  (data) => (data.token && data.bookingRef) || (!data.token && !data.bookingRef),
+  {
+    message: 'token and bookingRef must be provided together',
+    path: ['token'],
+  }
+);
+
 export async function POST(request: NextRequest) {
-  // Rate limit: 5 submissions per hour
-  const rateLimitResult = checkRateLimit(request, { ...RATE_LIMITS.testimonials, limit: 5 });
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
+
+  const rateLimitResult = await checkRateLimit(request, { ...RATE_LIMITS.testimonials, limit: 5 });
   if (rateLimitResult) return rateLimitResult;
 
   try {
     const body = await request.json();
+    const parsed = testimonialSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Datos invalidos', details: parsed.error.format() },
+        { status: 400 }
+      );
+    }
 
     const {
       name,
@@ -39,52 +81,46 @@ export async function POST(request: NextRequest) {
       allowGoogleShare,
       consentDataProcessing,
       consentPhotoPublication,
-      // Post-event review fields
       token,
       bookingRef,
-    } = body;
+    } = parsed.data;
 
-    // If token provided, validate against booking
     if (token && bookingRef) {
       const booking = await prisma.booking.findFirst({
         where: {
           reference: bookingRef,
           reviewToken: token,
-          reviewSubmittedAt: null, // Not already submitted
+          reviewSubmittedAt: null,
         },
       });
 
       if (!booking) {
         return NextResponse.json(
-          { error: 'Token de valoració invàlid o ja utilitzat' },
+          { error: 'Token de valoracion invalido o ya utilizado' },
           { status: 400 }
         );
       }
 
-      // Mark review as submitted
       await prisma.booking.update({
         where: { id: booking.id },
         data: { reviewSubmittedAt: new Date() },
       });
     }
 
-    // Validacions bàsiques
     if (!name || !email || !rating || !comment) {
       return NextResponse.json(
-        { error: 'Falten camps obligatoris (nom, email, valoració, comentari)' },
+        { error: 'Faltan campos obligatorios (nombre, email, valoracion, comentario)' },
         { status: 400 }
       );
     }
 
-    // Skip consent check for post-event reviews (implicit consent)
     if (!token && !consentDataProcessing) {
       return NextResponse.json(
-        { error: 'Cal acceptar el consentiment de dades' },
+        { error: 'Debes aceptar el consentimiento de datos' },
         { status: 400 }
       );
     }
 
-    // Crear testimoni
     const result = await createTestimonial({
       name,
       email,
@@ -106,14 +142,14 @@ export async function POST(request: NextRequest) {
       data: {
         id: result.testimonial.id,
         discountCode: result.discountCode,
-        message: 'Gràcies per la teva opinió! La revisarem aviat.',
+        message: 'Gracias por tu opinion. La revisaremos pronto.',
       },
     });
   } catch (error) {
-    log.error('Error creant testimoni:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Error desconegut';
+    log.error('Error creando testimonio:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     return NextResponse.json(
-      { error: 'Error processant la sol·licitud', details: errorMessage },
+      { error: 'Error procesando la solicitud', details: errorMessage },
       { status: 500 }
     );
   }
