@@ -6182,5 +6182,27 @@
         "legal": "Legal"
       }
     }
+  },
+  "availability": {
+    "meta": {
+      "title": "Calendari de Disponibilitat | Òrbita Events",
+      "description": "Consulta les nostres dates disponibles per reservar el teu event. Actualitzat en temps real."
+    },
+    "hero": {
+      "title": "Calendari de Disponibilitat",
+      "description": "Consulta les nostres dates disponibles per al teu event. Les dates en verd estan disponibles, en vermell ja estan reservades."
+    },
+    "legend": {
+      "available": "Disponible",
+      "booked": "Reservat",
+      "blocked": "Bloquejat",
+      "noData": "Sense dades"
+    }
+  },
+  "calendar": {
+    "loading": "Carregant...",
+    "error": "Error al carregar disponibilitat",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes següent"
   }
 }

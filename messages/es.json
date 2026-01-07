@@ -6220,5 +6220,27 @@
         "legal": "Legal"
       }
     }
+  },
+  "availability": {
+    "meta": {
+      "title": "Calendario de Disponibilidad | Òrbita Events",
+      "description": "Consulta nuestras fechas disponibles para reservar tu evento. Actualizado en tiempo real."
+    },
+    "hero": {
+      "title": "Calendario de Disponibilidad",
+      "description": "Consulta nuestras fechas disponibles para tu evento. Las fechas en verde están disponibles, en rojo ya están reservadas."
+    },
+    "legend": {
+      "available": "Disponible",
+      "booked": "Reservado",
+      "blocked": "Bloqueado",
+      "noData": "Sin datos"
+    }
+  },
+  "calendar": {
+    "loading": "Cargando...",
+    "error": "Error al cargar disponibilidad",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente"
   }
 }
