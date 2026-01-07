@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 // Pàgina de gestió de reserves
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import BookingActions from './BookingActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -253,14 +254,7 @@ export default async function BookingsPage() {
 
                       {/* Accions */}
                       <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link
-                            href={`/admin/bookings/${booking.id}`}
-                            className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
-                          >
-                            Veure
-                          </Link>
-                        </div>
+                        <BookingActions id={booking.id} status={booking.status} />
                       </td>
                     </tr>
                   );
