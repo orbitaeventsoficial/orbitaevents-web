@@ -50,3 +50,6 @@ prisma.zip
 
 .env.vercel*
 lib.zip
+
+# Lighthouse CI
+.lighthouseci/

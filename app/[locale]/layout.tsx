@@ -27,6 +27,7 @@ import LayoutWrapper from '@/app/components/layout/LayoutWrapper';
 import { PWAProvider } from '@/app/components/pwa/PWAProvider';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
+import { TawkToChat } from '@/components/chat/TawkToChat';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // GOOGLE TAG MANAGER (GTM) - Gestiona Analytics, Ads, Meta Pixel, etc.
@@ -406,6 +407,14 @@ export default async function LocaleLayout({
         {/* Vercel Analytics */}
         <SpeedInsights />
         <Analytics />
+
+        {/* Tawk.to Live Chat */}
+        <TawkToChat
+          propertyId={process.env.NEXT_PUBLIC_TAWK_PROPERTY_ID || ''}
+          widgetId={process.env.NEXT_PUBLIC_TAWK_WIDGET_ID || 'default'}
+          enabled={process.env.NEXT_PUBLIC_TAWK_ENABLED === 'true'}
+          loadDelay={3000}
+        />
       </body>
     </html>
   );
