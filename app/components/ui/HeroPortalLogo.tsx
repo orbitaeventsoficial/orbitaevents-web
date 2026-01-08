@@ -661,37 +661,24 @@ export default function HeroPortalLogo({
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 0.3, ease: [0.22, 0.61, 0.36, 1] }}
           >
-            {/* Logo animat - MÁS GRANDE Y CLARO */}
+            {/* Logo animat - TAMAÑO ORIGINAL */}
             {svgMarkup && isReady && (
               <motion.div
                 className="relative flex items-center justify-center"
                 style={{
-                  width: "min(80vw, 320px)",
+                  width: "min(75vw, 280px)",
                   height: "auto",
                   aspectRatio: "1 / 1",
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
-                  filter: 'drop-shadow(0 0 20px rgba(245, 158, 11, 0.4)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.2))',
                 }}
                 dangerouslySetInnerHTML={{ __html: svgMarkup }}
-                initial={{
-                  opacity: 0,
-                  scale: 0.90,
-                  filter: prefersReducedMotion ?
-                    "drop-shadow(0 0 20px rgba(245, 158, 11, 0.4))" :
-                    "blur(6px) drop-shadow(0 0 20px rgba(245, 158, 11, 0.4))",
-                  y: 10
-                }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                  filter: "blur(0px) drop-shadow(0 0 20px rgba(245, 158, 11, 0.4)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.2))",
-                  y: 0
-                }}
+                initial={{ opacity: 0, scale: 0.85, filter: "blur(10px)" }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                 transition={{
-                  duration: mobileDuration,
+                  duration: 1.2,
                   ease: [0.22, 0.61, 0.36, 1],
-                  delay: mobileDelay
+                  delay: 0.3
                 }}
               />
             )}
@@ -703,43 +690,34 @@ export default function HeroPortalLogo({
               </div>
             )}
 
-            {/* Text subliminal - TIPOGRAFIA PREMIUM MEJORADA LEGIBILIDAD */}
+            {/* Text subliminal - ESTILO ORIGINAL MÁS ARRIBA */}
             {!prefersReducedMotion && (
-              <motion.div
-                className="absolute bottom-28 flex justify-center px-6"
+              <motion.p
+                className="absolute top-16 flex justify-center px-4"
                 style={{
                   pointerEvents: "none",
                   zIndex: 10,
                   width: "100%",
+                  textAlign: "center",
                 }}
-                initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration: 1.0,
-                  delay: 0.7,
+                  duration: 1.5,
+                  delay: 0.8,
                   ease: [0.22, 0.61, 0.36, 1],
                 }}
               >
-                {/* Fondo oscuro para mejor contraste */}
-                <div
-                  className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-transparent blur-lg"
-                  style={{ margin: '-20px' }}
-                />
                 <span
-                  className={`${jakartaSans.className} relative text-2xl sm:text-3xl font-semibold tracking-[0.25em] uppercase`}
+                  className={`${jakartaSans.className} text-xl sm:text-2xl font-light tracking-[0.3em] uppercase bg-gradient-to-r from-amber-300 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
                   style={{
-                    background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    textShadow: '0 2px 20px rgba(0, 0, 0, 0.9), 0 4px 40px rgba(0, 0, 0, 0.7)',
-                    filter: 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6)) drop-shadow(0 0 24px rgba(245, 158, 11, 0.4))',
+                    textShadow: "0 0 20px rgba(0, 0, 0, 0.7)",
+                    filter: "drop-shadow(0 0 20px rgba(245, 158, 11, 0.3))",
                   }}
                 >
                   La màgia comença
                 </span>
-              </motion.div>
+              </motion.p>
             )}
 
             {/* Hint per saltar - MÉS VISIBLE */}
@@ -852,37 +830,27 @@ export default function HeroPortalLogo({
             }}
           />
 
-          {/* ✨ TEXT SUBLIMINAL - LEGIBILIDAD MEJORADA */}
+          {/* ✨ TEXT SUBLIMINAL - ESTILO ORIGINAL MÁS ARRIBA */}
           <motion.div
-            className="absolute inset-0 flex items-center justify-center"
+            className="absolute top-0 left-0 right-0 flex items-start justify-center pt-20"
             style={{ zIndex: 7, pointerEvents: "none" }}
-            initial={{ opacity: 0, y: 25, scale: 0.96 }}
+            initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
             animate={{
               opacity: [0, 1, 1, 0],
-              y: [25, 0, 0, -12],
-              scale: [0.96, 1, 1, 1.02]
+              y: [30, 0, 0, -15],
+              filter: ["blur(12px)", "blur(0px)", "blur(0px)", "blur(8px)"]
             }}
             transition={{
-              times: [0, 0.2, 0.8, 1],
-              duration: 5.0,
-              delay: (SEQ_TELON_END + 400) / 1000,
+              times: [0, 0.15, 0.85, 1],
+              duration: 5.5,
+              delay: (SEQ_TELON_END + 300) / 1000,
               ease: [0.22, 0.61, 0.36, 1],
             }}
           >
-            {/* Fondo oscuro para contraste */}
-            <div
-              className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-transparent blur-2xl"
-              style={{ margin: '-40px' }}
-            />
             <span
-              className={`${jakartaSans.className} relative text-3xl md:text-4xl lg:text-5xl font-bold tracking-[0.22em] uppercase px-8`}
+              className={`${jakartaSans.className} text-2xl md:text-3xl lg:text-4xl font-light tracking-[0.25em] uppercase bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
               style={{
-                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 40%, #d97706 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                textShadow: '0 3px 25px rgba(0, 0, 0, 0.95), 0 6px 50px rgba(0, 0, 0, 0.8)',
-                filter: 'drop-shadow(0 0 16px rgba(251, 191, 36, 0.7)) drop-shadow(0 0 32px rgba(245, 158, 11, 0.5))',
+                filter: "drop-shadow(0 0 30px rgba(245, 158, 11, 0.5))",
               }}
             >
               La màgia comença
@@ -997,7 +965,7 @@ export default function HeroPortalLogo({
             />
           )}
 
-          {/* 🆕 SVG + MAYOR CLARIDAD Y GLOW */}
+          {/* 🆕 SVG - TAMAÑO ORIGINAL */}
           <div
             className="absolute inset-0 flex items-center justify-center"
             style={{
@@ -1009,19 +977,18 @@ export default function HeroPortalLogo({
               ref={hostRef}
               className="relative overflow-visible"
               style={{
-                width: "clamp(240px, 45vw, 380px)",
+                width: "clamp(200px, 40vw, 320px)",
                 height: "auto",
                 aspectRatio: "1 / 1",
-                maxHeight: "75vh",
-                minHeight: "300px",
+                maxHeight: "70vh",
+                minHeight: "260px",
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
                 transform: 'translateZ(0)',
                 willChange: 'transform, opacity',
-                filter: 'drop-shadow(0 0 24px rgba(245, 158, 11, 0.5)) drop-shadow(0 0 48px rgba(251, 191, 36, 0.3))',
               }}
               dangerouslySetInnerHTML={{ __html: svgMarkup || '' }}
-              initial={{ scale: 0.93, opacity: isReady ? 1 : 0 }}
+              initial={{ scale: 0.92, opacity: isReady ? 1 : 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{
                 delay: isReady ? (SEQ_TELON_END + Math.round(80 * SPEED)) / 1000 : 0,
