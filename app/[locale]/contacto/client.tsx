@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
@@ -34,7 +35,8 @@ const Icons = {
   ),
 };
 
-export default function ContactClient() {
+// Component that uses useSearchParams - must be inside Suspense
+function ContactContent() {
   const searchParams = useSearchParams();
   const t = useTranslations('contact');
 
@@ -144,5 +146,14 @@ export default function ContactClient() {
         </motion.section>
       </div>
     </main>
+  );
+}
+
+// Main component with Suspense boundary
+export default function ContactClient() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-zinc-900 via-zinc-950 to-black" />}>
+      <ContactContent />
+    </Suspense>
   );
 }
