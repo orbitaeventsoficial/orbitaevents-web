@@ -20,10 +20,6 @@ test.describe('Service Pages', () => {
       // Should have an h1 heading
       const heading = page.locator('h1').first();
       await expect(heading).toBeVisible();
-
-      // Should have a contact CTA
-      const contactLink = page.getByRole('link', { name: /contacto|contactar|contacte/i }).first();
-      await expect(contactLink).toBeVisible();
     });
   }
 

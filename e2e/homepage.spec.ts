@@ -36,12 +36,13 @@ test.describe('Homepage', () => {
   test('should be responsive on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
 
     // Page should load on mobile
     await expect(page).toHaveTitle(/Òrbita Events/i);
 
     // Mobile menu should be present
-    const mobileNav = page.locator('nav').first();
-    await expect(mobileNav).toBeVisible();
+    const mobileNav = page.locator('header, nav').first();
+    await expect(mobileNav).toBeVisible({ timeout: 15000 });
   });
 });

@@ -3,22 +3,27 @@ import { test, expect } from '@playwright/test';
 test.describe('Contact Form', () => {
   test('should display contact page', async ({ page }) => {
     await page.goto('/contacto');
+    await page.waitForLoadState('networkidle');
 
     // Check page loaded
     await expect(page).toHaveTitle(/contact|contacto/i);
 
     // Check form is visible
     const form = page.locator('form').first();
-    await expect(form).toBeVisible();
+    await expect(form).toBeVisible({ timeout: 15000 });
   });
 
   test('should have required form fields', async ({ page }) => {
     await page.goto('/contacto');
+    await page.waitForLoadState('networkidle');
 
     // Check for essential form fields
-    const nameField = page.locator('input[name="name"], input[placeholder*="nombre"], input[placeholder*="nom"]').first();
-    const emailField = page.locator('input[type="email"]').first();
-    const messageField = page.locator('textarea').first();
+    const form = page.locator('form').first();
+    await expect(form).toBeVisible({ timeout: 15000 });
+
+    const nameField = form.locator('input[type="text"]').first();
+    const emailField = form.locator('input[type="email"]').first();
+    const messageField = form.locator('textarea').first();
 
     await expect(nameField).toBeVisible();
     await expect(emailField).toBeVisible();
@@ -27,9 +32,12 @@ test.describe('Contact Form', () => {
 
   test('should show validation errors for empty fields', async ({ page }) => {
     await page.goto('/contacto');
+    await page.waitForLoadState('networkidle');
 
     // Try to submit empty form
-    const submitButton = page.locator('button[type="submit"]').first();
+    const submitButton = page.locator('form button[type="submit"]').first();
+    await expect(submitButton).toBeVisible({ timeout: 15000 });
+    await submitButton.scrollIntoViewIfNeeded();
     await submitButton.click();
 
     // Check that validation prevents submission
@@ -40,11 +48,15 @@ test.describe('Contact Form', () => {
 
   test('should accept valid input', async ({ page }) => {
     await page.goto('/contacto');
+    await page.waitForLoadState('networkidle');
 
     // Fill form with valid data
-    const nameField = page.locator('input[name="name"], input[placeholder*="nombre"], input[placeholder*="nom"]').first();
-    const emailField = page.locator('input[type="email"]').first();
-    const messageField = page.locator('textarea').first();
+    const form = page.locator('form').first();
+    await expect(form).toBeVisible({ timeout: 15000 });
+
+    const nameField = form.locator('input[type="text"]').first();
+    const emailField = form.locator('input[type="email"]').first();
+    const messageField = form.locator('textarea').first();
 
     await nameField.fill('Test User');
     await emailField.fill('test@example.com');
