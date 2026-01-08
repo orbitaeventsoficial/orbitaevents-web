@@ -4,6 +4,7 @@ test.describe('Contact Form', () => {
   test('should display contact page', async ({ page }) => {
     await page.goto('/contacto');
     await page.waitForLoadState('networkidle');
+    await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
     // Check page loaded
     await expect(page).toHaveTitle(/contact|contacto/i);
@@ -16,6 +17,7 @@ test.describe('Contact Form', () => {
   test('should have required form fields', async ({ page }) => {
     await page.goto('/contacto');
     await page.waitForLoadState('networkidle');
+    await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
     // Check for essential form fields
     const form = page.locator('form').first();
@@ -33,6 +35,7 @@ test.describe('Contact Form', () => {
   test('should show validation errors for empty fields', async ({ page }) => {
     await page.goto('/contacto');
     await page.waitForLoadState('networkidle');
+    await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
     // Try to submit empty form
     const submitButton = page.locator('form button[type="submit"]').first();
@@ -49,6 +52,7 @@ test.describe('Contact Form', () => {
   test('should accept valid input', async ({ page }) => {
     await page.goto('/contacto');
     await page.waitForLoadState('networkidle');
+    await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
     // Fill form with valid data
     const form = page.locator('form').first();
