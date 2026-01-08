@@ -46,9 +46,19 @@ async function fetchFromSerpAPI() {
         continue;
       }
 
-      place = searchData.local_results?.find(r =>
-        r.title?.toLowerCase() === EXACT_BUSINESS_NAME.toLowerCase()
-      );
+      place = searchData.local_results?.find((r) => {
+        const title = r.title?.toLowerCase() || "";
+        const queryName = EXACT_BUSINESS_NAME.toLowerCase();
+        return (
+          title === queryName ||
+          title.includes(queryName) ||
+          query.toLowerCase().includes(title)
+        );
+      });
+
+      if (!place && searchData.local_results?.length > 0) {
+        place = searchData.local_results[0];
+      }
 
       if (place) {
         console.log(`[SerpAPI] Encontrado con "${query}"`);
