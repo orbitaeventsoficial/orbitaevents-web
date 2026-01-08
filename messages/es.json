@@ -563,10 +563,10 @@
     },
     "bodas": {
       "meta": {
-        "title": "DJ Bodas Barcelona | Precios desde {price}€ | Òrbita Events",
-        "description": "DJ para bodas en Barcelona desde {price}€. Sonido profesional 4000W, iluminación y efectos especiales. Profesionales del sector. Pide presupuesto sin compromiso.",
-        "ogTitle": "DJ Bodas Barcelona | Desde {price}€",
-        "ogDescription": "DJ profesional para tu boda en Barcelona. Sonido EV 4000W + iluminación + efectos. Ceremonia, cóctel y fiesta. Presupuesto gratis."
+        "title": "DJ Bodas Barcelona desde {price}€ ⭐ 5.0/5 ★ +200 bodas | Òrbita Events",
+        "description": "DJ profesional para bodas en Barcelona y Girona. Sonido 4000W, iluminación LED, efectos especiales. +200 bodas realizadas ⭐ 5.0/5. Presupuesto gratis en 2h. Desde {price}€.",
+        "ogTitle": "DJ Bodas Barcelona desde {price}€ ⭐ 5.0/5",
+        "ogDescription": "DJ profesional para bodas. Sonido EV 4000W + iluminación LED + efectos. +200 bodas realizadas. Ceremonia, cóctel y fiesta. Presupuesto gratis en 2h."
       },
       "breadcrumb": "DJ Bodas Barcelona",
       "faq": [
@@ -589,6 +589,10 @@
         {
           "q": "¿Cuánto tiempo antes hay que reservar?",
           "a": "Para bodas, recomendamos reservar con 4-6 meses de antelación. Las fechas de primavera y verano se llenan rápido. Consultad disponibilidad para vuestra fecha específica."
+        },
+        {
+          "q": "¿Qué ocurre si necesitamos cambiar la fecha o el número de invitados?",
+          "a": "Revisamos nuestra agenda y, siempre que haya disponibilidad, trasladamos la reserva; la señal del 30% queda como crédito para la nueva fecha y te enviamos un contrato actualizado. Si finalmente se cancela con menos de 15 días, se aplica la política habitual (señal no reembolsable), pero te ayudamos a encontrar alternativa."
         }
       ]
     },
@@ -629,10 +633,10 @@
     },
     "empresas": {
       "meta": {
-        "title": "Eventos Corporativos Barcelona | DJ Profesional desde {price}€ | Òrbita Events",
-        "description": "DJ eventos corporativos Barcelona. Cenas de empresa, teambuildings, lanzamientos. Sonido e iluminación profesional. Presupuesto personalizado en 24h.",
-        "ogTitle": "Eventos Corporativos Barcelona | Desde {price}€",
-        "ogDescription": "DJ profesional para eventos de empresa. Cenas, team building, presentaciones. Presupuesto gratis."
+        "title": "DJ Eventos Empresa Barcelona | Team Building + Cenas Gala | Desde {price}€ ⭐ 5.0/5",
+        "description": "DJ profesional para eventos de empresa en Barcelona y Girona. Cenas de gala, team building, lanzamientos de producto. Sonido 4000W + iluminación corporativa. +50 empresas confían en nosotros. Presupuesto gratis en 24h.",
+        "ogTitle": "DJ Eventos Empresa Barcelona | Desde {price}€",
+        "ogDescription": "DJ profesional para eventos corporativos. Cenas de empresa, team building, lanzamientos. Sonido 4000W + branding integrado. +50 empresas. Presupuesto gratis."
       },
       "breadcrumb": "Eventos Empresas",
       "faq": [
@@ -652,11 +656,11 @@
           "q": "¿Trabajáis en oficinas, hoteles y espacios corporativos?",
           "a": "Sí, nos adaptamos a cualquier espacio empresarial. Incluye visita previa para revisar accesos, potencia eléctrica y coordinación con el venue. Montaje discreto y profesional."
         },
-        {
-          "q": "¿Coordináis con catering, venue y otros proveedores?",
-          "a": "Totalmente. Nos encargamos de la coordinación técnica completa: tiempos, montaje, desmontaje y sincronización con otros proveedores. Tú te centras en tus invitados."
-        }
-      ]
+    {
+      "q": "¿Coordináis con catering, venue y otros proveedores?",
+      "a": "Totalmente. Nos encargamos de la coordinación técnica completa: tiempos, montaje, desmontaje y sincronización con otros proveedores. Tú te centras en tus invitados."
+    },
+  ]
     },
     "weddings": {
       "name": "DJ Bodas",
@@ -690,10 +694,10 @@
     },
     "discomovil": {
       "meta": {
-        "title": "Discomóvil Barcelona | DJ + Sonido + Luces desde {price}€ | Òrbita",
-        "description": "Discomóvil en Barcelona desde {price}€. DJ + sonido 4000W + luces LED. Bodas, fiestas, eventos. Nos desplazamos a toda Catalunya. Presupuesto en 2 horas.",
-        "ogTitle": "Discomóvil Barcelona | Desde {price}€",
-        "ogDescription": "DJ profesional + Sonido 4000W + Luces LED + Efectos. Barcelona y Girona. Presupuesto gratis."
+        "title": "Discomóvil Barcelona Profesional | DJ + Sonido 4000W + Luces | Desde {price}€ ⭐ 5.0/5",
+        "description": "Discomóvil profesional en Barcelona, Girona, Maresme y Vallès. DJ + sonido EV 4000W + iluminación LED + efectos especiales. +200 eventos realizados ⭐ 5.0/5. Presupuesto gratis en 2h. Desde {price}€.",
+        "ogTitle": "Discomóvil Barcelona | DJ + Sonido + Luces | Desde {price}€",
+        "ogDescription": "DJ profesional + Sonido EV 4000W + Luces LED + Efectos especiales. Barcelona, Girona y Maresme. +200 eventos. Presupuesto gratis en 2h."
       },
       "breadcrumb": "Discomóvil",
       "faq": [
@@ -713,11 +717,15 @@
           "q": "¿Trabajáis fuera de Barcelona?",
           "a": "Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Nos adaptamos a cualquier espacio: locales, jardines, fincas, pabellones. Transporte GRATIS hasta 25km desde Granollers; otras zonas pueden tener pequeño suplemento detallado en presupuesto."
         },
-        {
-          "q": "¿Cuánto tiempo antes hay que reservar?",
-          "a": "Mínimo 2 semanas, pero para viernes y sábados lo normal es reservar con 6-8 semanas de antelación. Son los días que se llenan primero. Consulta disponibilidad para tu fecha específica."
-        }
-      ]
+    {
+      "q": "¿Cuánto tiempo antes hay que reservar?",
+      "a": "Mínimo 2 semanas, pero para viernes y sábados lo normal es reservar con 6-8 semanas de antelación. Son los días que se llenan primero. Consulta disponibilidad para tu fecha específica."
+    },
+    {
+      "q": "¿Podéis llevar la discomóvil a una sala pequeña o un pueblo alejado?",
+      "a": "Sí, disponemos de un kit compacto que se adapta a espacios reducidos y mantenemos la potencia profesional. Barcelona (hasta 25 km) no tiene suplemento; Girona también se sirve, pero calculamos una tarifa de transporte según los kilómetros adicionales y te la enviamos antes de confirmar."
+    }
+  ]
     },
     "animacion-infantil": {
       "faq": [
@@ -1462,8 +1470,8 @@
   },
   "contact": {
     "meta": {
-      "title": "Contacto | Òrbita Events",
-      "description": "Pide presupuesto de discomovil, tematizaciones, eventos. Respondemos en menos de 2 horas."
+      "title": "Contacto DJ Barcelona | Respuesta en 2h | WhatsApp 699 121 023 | Òrbita Events",
+      "description": "Contacta con nosotros para tu boda o evento en Barcelona. Presupuesto gratis en 2h. WhatsApp, email o formulario. DJ bodas, fiestas y eventos corporativos. Tel: 699 121 023."
     },
     "errors": {
       "title": "No hemos podido enviar tu mensaje",
@@ -1980,6 +1988,10 @@
         "events": {
           "value": "2h",
           "label": "Respuesta"
+        },
+        "satisfaction": {
+          "value": "5.0/5",
+          "label": "Satisfacción del público"
         }
       },
       "history": {
@@ -4810,10 +4822,10 @@
   },
   "configuradorPage": {
     "meta": {
-      "title": "Configurador de Eventos | Calcula tu Presupuesto Online | Òrbita Events",
-      "description": "Configura tu evento paso a paso y recibe presupuesto al instante. Elige tipo de evento, opciones de sonido, luces, DJ y extras. Compara packs y personaliza tu experiencia.",
-      "ogTitle": "Configurador de Eventos | Tu Presupuesto en 3 Minutos",
-      "ogDescription": "Calcula el presupuesto de tu evento al instante. Compara opciones y personaliza todo."
+      "title": "Calcula el Precio de tu DJ para Boda | Presupuesto Instantáneo | Òrbita Events",
+      "description": "Calcula el precio de tu DJ + sonido + luces al instante. Configura tu boda o evento paso a paso, compara packs y recibe presupuesto en 1 minuto. Sin registro. Totalmente gratis.",
+      "ogTitle": "Calcula el Precio de tu DJ | Presupuesto en 1 Minuto",
+      "ogDescription": "Configura tu evento y calcula el precio al instante. Compara packs, elige extras y recibe presupuesto personalizado. Sin compromiso."
     },
     "breadcrumbs": {
       "home": "Inicio",

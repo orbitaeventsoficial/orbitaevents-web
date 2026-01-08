@@ -541,10 +541,10 @@
     },
     "bodas": {
       "meta": {
-        "title": "DJ Casaments Barcelona | Preus des de {price}€ | Òrbita Events",
-        "description": "DJ per a casaments a Barcelona des de {price}€. So professional 4000W, il·luminació i efectes especials. Professionals del sector. Demana pressupost sense compromís.",
-        "ogTitle": "DJ Casaments Barcelona | Des de {price}€",
-        "ogDescription": "DJ professional per al teu casament a Barcelona. So EV 4000W + il·luminació + efectes. Cerimònia, còctel i festa. Pressupost gratis."
+        "title": "DJ Casaments Barcelona des de {price}€ ⭐ 5.0/5 ★ +200 casaments | Òrbita Events",
+        "description": "DJ professional per a casaments a Barcelona i Girona. So 4000W, il·luminació LED, efectes especials. +200 casaments realitzats ⭐ 5.0/5. Pressupost gratis en 2h. Des de {price}€.",
+        "ogTitle": "DJ Casaments Barcelona des de {price}€ ⭐ 5.0/5",
+        "ogDescription": "DJ professional per a casaments. So EV 4000W + il·luminació LED + efectes. +200 casaments realitzats. Cerimònia, còctel i festa. Pressupost gratis en 2h."
       },
       "breadcrumb": "DJ Casaments Barcelona",
       "faq": [
@@ -567,6 +567,10 @@
         {
           "q": "Quant temps abans cal reservar?",
           "a": "Per a casaments, recomanem reservar amb 4-6 mesos d'antelació. Les dates de primavera i estiu s'omplen ràpid. Consulteu disponibilitat per a la vostra data específica."
+        },
+        {
+          "q": "Què passa si hem de canviar la data o el nombre de convidats?",
+          "a": "Revisem la nostra agenda i, si hi ha disponibilitat, traslladem la reserva; la senyal del 30% es manté com a crèdit per a la nova data i t'envien un contracte actualitzat. Si finalment es cancel·la amb menys de 15 dies, s'aplica la política habitual (senyal no reemborsable), però t'acompanyem per trobar alternativa."
         }
       ]
     },
@@ -607,10 +611,10 @@
     },
     "empresas": {
       "meta": {
-        "title": "Events Corporatius Barcelona | DJ Professional des de {price}€ | Òrbita Events",
-        "description": "DJ events corporatius Barcelona. Sopars d'empresa, teambuildings, llançaments. So i il·luminació professional. Pressupost personalitzat en 24h.",
-        "ogTitle": "Events Corporatius Barcelona | Des de {price}€",
-        "ogDescription": "DJ professional per a events d'empresa. Sopars, team building, presentacions. Pressupost gratis."
+        "title": "DJ Events Empresa Barcelona | Team Building + Sopars Gala | Des de {price}€ ⭐ 5.0/5",
+        "description": "DJ professional per a events d'empresa a Barcelona i Girona. Sopars de gala, team building, llançaments de producte. So 4000W + il·luminació corporativa. +50 empreses confien en nosaltres. Pressupost gratis en 24h.",
+        "ogTitle": "DJ Events Empresa Barcelona | Des de {price}€",
+        "ogDescription": "DJ professional per a events corporatius. Sopars d'empresa, team building, llançaments. So 4000W + branding integrat. +50 empreses. Pressupost gratis."
       },
       "breadcrumb": "Events Empreses",
       "faq": [
@@ -634,6 +638,7 @@
           "q": "Coordineu amb càtering, venue i altres proveïdors?",
           "a": "Totalment. Ens encarreguem de la coordinació tècnica completa: temps, muntatge, desmuntatge i sincronització amb altres proveïdors. Tu et centres en els teus convidats."
         }
+        ,
       ]
     },
     "weddings": {
@@ -668,10 +673,10 @@
     },
     "discomovil": {
       "meta": {
-        "title": "Discomòbil Barcelona | DJ + So + Llums des de {price}€ | Òrbita",
-        "description": "Discomòbil a Barcelona des de {price}€. DJ + so 4000W + llums LED. Casaments, festes, events. Ens desplacem a tota Catalunya. Pressupost en 2 hores.",
-        "ogTitle": "Discomòbil Barcelona | Des de {price}€",
-        "ogDescription": "DJ professional + So 4000W + Llums LED + Efectes. Barcelona i Girona. Pressupost gratis."
+        "title": "Discomòbil Barcelona Professional | DJ + So 4000W + Llums | Des de {price}€ ⭐ 5.0/5",
+        "description": "Discomòbil professional a Barcelona, Girona, Maresme i Vallès. DJ + so EV 4000W + il·luminació LED + efectes especials. +200 events realitzats ⭐ 5.0/5. Pressupost gratis en 2h. Des de {price}€.",
+        "ogTitle": "Discomòbil Barcelona | DJ + So + Llums | Des de {price}€",
+        "ogDescription": "DJ professional + So EV 4000W + Llums LED + Efectes especials. Barcelona, Girona i Maresme. +200 events. Pressupost gratis en 2h."
       },
       "breadcrumb": "Discomòbil",
       "faq": [
@@ -694,6 +699,11 @@
         {
           "q": "Quant temps abans cal reservar?",
           "a": "Mínim 2 setmanes, però per a divendres i dissabtes el normal és reservar amb 6-8 setmanes d'antelació. Són els dies que s'omplen primer. Consulta disponibilitat per a la teva data específica."
+        }
+        ,
+        {
+          "q": "Puc reservar la discomòbil per a una sala petita o un poble llunyà?",
+          "a": "Sí, el kit compacte s'adapta a espais reduïts i mantenim potència professional. Barcelona (dins dels 25 km) està coberta sense suplement; Girona se serveix però es calcula una tarifa de transport segons els quilòmetres extra, te la passem abans de confirmar."
         }
       ]
     },
@@ -1135,8 +1145,8 @@
   },
   "contact": {
     "meta": {
-      "title": "Contacte | Òrbita Events",
-      "description": "Demana pressupost de discomòbil, tematitzacions, events. Responem en menys de 2 hores."
+      "title": "Contacte DJ Barcelona | Resposta en 2h | WhatsApp 699 121 023 | Òrbita Events",
+      "description": "Contacta amb nosaltres per al teu casament o event a Barcelona. Pressupost gratis en 2h. WhatsApp, email o formulari. DJ casaments, festes i events corporatius. Tel: 699 121 023."
     },
     "errors": {
       "title": "No hem pogut enviar el teu missatge",
@@ -1585,6 +1595,10 @@
         "events": {
           "value": "2h",
           "label": "Resposta"
+        },
+        "satisfaction": {
+          "value": "5.0/5",
+          "label": "Satisfacció del públic"
         }
       },
       "history": {
@@ -4772,10 +4786,10 @@
   },
   "configuradorPage": {
     "meta": {
-      "title": "Configurador d'Events | Calcula el teu Pressupost Online | Òrbita Events",
-      "description": "Configura el teu event pas a pas i rep pressupost a l'instant. Tria tipus d'event, opcions de so, llums, DJ i extres. Compara packs i personalitza la teva experiència.",
-      "ogTitle": "Configurador d'Events | El teu Pressupost en 3 Minuts",
-      "ogDescription": "Calcula el pressupost del teu event a l'instant. Compara opcions i personalitza tot."
+      "title": "Calcula el Preu del teu DJ per Casament | Pressupost Instantani | Òrbita Events",
+      "description": "Calcula el preu del teu DJ + so + llums a l'instant. Configura el teu casament o event pas a pas, compara packs i rep pressupost en 1 minut. Sense registre. Totalment gratis.",
+      "ogTitle": "Calcula el Preu del teu DJ | Pressupost en 1 Minut",
+      "ogDescription": "Configura el teu event i calcula el preu a l'instant. Compara packs, tria extres i rep pressupost personalitzat. Sense compromís."
     },
     "breadcrumbs": {
       "home": "Inici",

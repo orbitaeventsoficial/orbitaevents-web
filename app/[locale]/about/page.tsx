@@ -2,7 +2,7 @@ import { Star, Users, Calendar, Zap, Music, Lightbulb, Sparkles, PartyPopper, Ar
 import { Metadata } from 'next';
 import { Link } from '@/lib/navigation';
 import { getTranslations } from 'next-intl/server';
-import Image from 'next/image';
+import TeamMembersGrid from '@/components/about/TeamMembersGrid';
 
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
@@ -46,6 +46,13 @@ export default async function AboutPage({ params }: { params: { locale: string }
     { key: 'tech', image: '/img/team/tecnic.jpg' },
     { key: 'animator', image: '/img/team/animador.jpg' },
   ];
+
+  const teamMembersData = teamMembers.map((member) => ({
+    ...member,
+    name: t(`team.members.${member.key}.name`),
+    role: t(`team.members.${member.key}.role`),
+    desc: t(`team.members.${member.key}.desc`),
+  }));
 
   return (
     <section className="min-h-screen bg-bg-main py-20">
@@ -189,28 +196,7 @@ export default async function AboutPage({ params }: { params: { locale: string }
           <h2 className="text-3xl font-bold text-center text-white mb-12">
             {t('team.title')}
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {teamMembers.map((member, i) => (
-              <div key={i} className="card p-6 rounded-3xl text-center">
-                <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-oe-gold/20 to-oe-gold/10 relative">
-                  <Image
-                    src={member.image}
-                    alt={t(`team.members.${member.key}.name`)}
-                    fill
-                    className="object-cover"
-                    sizes="96px"
-                    onError={(e) => {
-                      // Fallback si no hi ha imatge
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                </div>
-                <h3 className="text-xl font-bold text-white">{t(`team.members.${member.key}.name`)}</h3>
-                <p className="text-oe-gold text-sm mb-2">{t(`team.members.${member.key}.role`)}</p>
-                <p className="text-sm text-white/70">{t(`team.members.${member.key}.desc`)}</p>
-              </div>
-            ))}
-          </div>
+          <TeamMembersGrid members={teamMembersData} />
         </div>
 
         {/* CTA FINAL SEO */}
