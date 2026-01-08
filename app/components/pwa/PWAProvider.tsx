@@ -64,9 +64,7 @@ export function PWAProvider({ children }: { children: ReactNode }) {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[PWA] Service Worker registered:', registration.scope);
-          }
+          log.debug('PWA Service Worker registered', { scope: registration.scope });
 
           // Escuchar actualizaciones
           registration.addEventListener('updatefound', () => {
@@ -74,19 +72,15 @@ export function PWAProvider({ children }: { children: ReactNode }) {
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // Nueva versión disponible - silencioso en producción
-                  if (process.env.NODE_ENV === 'development') {
-                    console.log('[PWA] New version available');
-                  }
+                  // Nueva versión disponible
+                  log.info('PWA new version available');
                 }
               });
             }
           });
         })
         .catch((error) => {
-          if (process.env.NODE_ENV === 'development') {
-            console.error('[PWA] Service Worker registration failed:', error);
-          }
+          log.error('PWA Service Worker registration failed', error);
         });
     }
   }, []);
@@ -126,7 +120,7 @@ export function PWAProvider({ children }: { children: ReactNode }) {
       setCanInstall(false);
       setDeferredPrompt(null);
       setShowInstallBanner(false);
-      console.log('[PWA] App installed');
+      log.info('PWA app installed');
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);

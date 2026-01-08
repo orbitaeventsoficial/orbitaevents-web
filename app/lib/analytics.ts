@@ -2,9 +2,11 @@
 /**
  * MANOLO'S ANALYTICS TRACKER
  * Sistema centralizado de tracking para Google Analytics 4 y Meta Pixel
- * 
+ *
  * Uso: import { trackEvent, trackLead, trackWhatsAppClick } from '@/lib/analytics';
  */
+
+import { log } from '@/lib/logger';
 
 // Tipos TypeScript para ventana global
 type GtagArgs = [string, ...unknown[]];
@@ -72,7 +74,7 @@ export const trackEvent = ({
   additionalParams = {},
 }: TrackEventParams): void => {
   if (!isClientSide() || !isProduction()) {
-    console.log('📊 [DEV] Track Event:', { eventName, eventCategory, eventLabel, value });
+    log.debug('Track Event (dev)', { eventName, eventCategory, eventLabel, value });
     return;
   }
 

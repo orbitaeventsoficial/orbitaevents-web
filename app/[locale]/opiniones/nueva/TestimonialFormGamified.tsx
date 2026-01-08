@@ -14,6 +14,7 @@ import confetti from 'canvas-confetti';
 import { useTranslations } from 'next-intl';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { log } from '@/lib/logger';
 // TIPUS I CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -200,9 +201,7 @@ export default function TestimonialFormGamified() {
           }, 150);
         } catch (error) {
           // Silenciar error de confetti en producción
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Confetti error:', error);
-          }
+          log.debug('Confetti error', { error: String(error) });
         }
       }, 100);
     }
