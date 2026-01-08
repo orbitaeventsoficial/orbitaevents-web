@@ -671,9 +671,8 @@ export default function HeroPortalLogo({
               style={{
                 pointerEvents: "none",
                 zIndex: 10,
-                maxWidth: "min(65vw, 280px)",
+                width: "min(60vw, 280px)",
                 textAlign: "left",
-                transform: "translate(-6px, -2px)",
               }}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
