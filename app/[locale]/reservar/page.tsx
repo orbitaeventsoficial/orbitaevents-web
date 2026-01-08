@@ -8,6 +8,9 @@ import { getTranslations } from 'next-intl/server';
 import { prisma } from '@/lib/prisma';
 import { BookingForm } from '@/components/booking/BookingForm';
 
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'no-store';
+
 export async function generateMetadata({
   params,
 }: {
