@@ -656,11 +656,11 @@
           "q": "¿Trabajáis en oficinas, hoteles y espacios corporativos?",
           "a": "Sí, nos adaptamos a cualquier espacio empresarial. Incluye visita previa para revisar accesos, potencia eléctrica y coordinación con el venue. Montaje discreto y profesional."
         },
-    {
-      "q": "¿Coordináis con catering, venue y otros proveedores?",
-      "a": "Totalmente. Nos encargamos de la coordinación técnica completa: tiempos, montaje, desmontaje y sincronización con otros proveedores. Tú te centras en tus invitados."
-    },
-  ]
+        {
+          "q": "¿Coordináis con catering, venue y otros proveedores?",
+          "a": "Totalmente. Nos encargamos de la coordinación técnica completa: tiempos, montaje, desmontaje y sincronización con otros proveedores. Tú te centras en tus invitados."
+        }
+      ]
     },
     "weddings": {
       "name": "DJ Bodas",
