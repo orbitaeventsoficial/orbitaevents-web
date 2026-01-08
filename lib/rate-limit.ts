@@ -146,6 +146,86 @@ export async function checkRateLimit(
 }
 
 /**
+ * Get current rate limit status for a client
+ * Useful for adding headers to successful responses
+ */
+export async function getRateLimitStatus(
+  req: NextRequest,
+  config: RateLimitConfig
+): Promise<{
+  limit: number;
+  remaining: number;
+  reset: number;
+}> {
+  const { limit, windowSeconds, prefix = '' } = config;
+  const clientId = getClientId(req);
+  const key = `${prefix}:${clientId}`;
+  const now = Date.now();
+
+  if (USE_UPSTASH) {
+    try {
+      const res = await fetch(`${UPSTASH_REDIS_REST_URL}/get/${key}`, {
+        headers: {
+          Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}`,
+        },
+      });
+
+      if (res.ok) {
+        const data = (await res.json()) as { result?: number };
+        const count = data.result ?? 0;
+        const remaining = Math.max(0, limit - count);
+
+        return {
+          limit,
+          remaining,
+          reset: now + windowSeconds * 1000,
+        };
+      }
+    } catch {
+      // Fall through to in-memory
+    }
+  }
+
+  const entry = rateLimitStore.get(key);
+
+  if (!entry || entry.resetTime < now) {
+    return {
+      limit,
+      remaining: limit,
+      reset: now + windowSeconds * 1000,
+    };
+  }
+
+  return {
+    limit,
+    remaining: Math.max(0, limit - entry.count),
+    reset: entry.resetTime,
+  };
+}
+
+/**
+ * Add rate limit headers to a response
+ * Best practice: inform clients of their rate limit status
+ *
+ * @example
+ * const response = NextResponse.json({ success: true });
+ * return addRateLimitHeaders(response, req, RATE_LIMITS.contact);
+ */
+export async function addRateLimitHeaders(
+  response: NextResponse,
+  req: NextRequest,
+  config: RateLimitConfig
+): Promise<NextResponse> {
+  const status = await getRateLimitStatus(req, config);
+
+  response.headers.set('X-RateLimit-Limit', status.limit.toString());
+  response.headers.set('X-RateLimit-Remaining', status.remaining.toString());
+  response.headers.set('X-RateLimit-Reset', status.reset.toString());
+
+  return response;
+}
+
+/**
  * Configuraciones predefinidas de rate limit
  */
 export const RATE_LIMITS = {
