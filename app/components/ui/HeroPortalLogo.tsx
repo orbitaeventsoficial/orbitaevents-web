@@ -667,7 +667,7 @@ export default function HeroPortalLogo({
 
             {/* Text subliminal - TIPOGRAFIA PREMIUM DAURAT */}
             <motion.p
-            className="absolute inset-x-0 top-4 flex justify-center px-6"
+              className="absolute left-6 top-4 flex justify-start px-6"
               style={{ pointerEvents: "none", zIndex: 10 }}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -906,11 +906,11 @@ export default function HeroPortalLogo({
               ref={hostRef}
               className="relative overflow-visible"
               style={{
-                width: "clamp(280px, 55vw, 420px)",
+                width: "clamp(240px, 45vw, 360px)",
                 height: "auto",
                 aspectRatio: "1 / 1",
-                maxHeight: "80vh",
-                minHeight: "320px",
+                maxHeight: "70vh",
+                minHeight: "260px",
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
                 transform: 'translateZ(0)',
