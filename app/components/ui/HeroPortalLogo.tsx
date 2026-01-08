@@ -667,21 +667,21 @@ export default function HeroPortalLogo({
 
             {/* Text subliminal - TIPOGRAFIA PREMIUM DAURAT */}
             <motion.p
-              className="mt-10 px-6 py-3 rounded-full bg-black/70 border border-white/20 shadow-[0_15px_35px_rgba(0,0,0,0.55)]"
-              style={{ pointerEvents: "none" }}
-              initial={{ opacity: 0, y: 20 }}
+              className="absolute inset-x-0 top-10 flex justify-center px-6"
+              style={{ pointerEvents: "none", zIndex: 10 }}
+              initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
                 duration: 1.5,
-                delay: 1.0,
+                delay: 0.8,
                 ease: [0.22, 0.61, 0.36, 1],
               }}
             >
               <span
-                className={`${jakartaSans.className} text-xl md:text-2xl lg:text-3xl font-semibold tracking-[0.35em] uppercase bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
+                className={`${jakartaSans.className} text-2xl md:text-3xl lg:text-4xl font-semibold tracking-[0.55em] uppercase bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
                 style={{
-                  textShadow: "0 0 25px rgba(0, 0, 0, 0.8)",
-                  filter: "drop-shadow(0 0 25px rgba(0, 0, 0, 0.7))",
+                  textShadow: "0 0 30px rgba(0, 0, 0, 0.85)",
+                  filter: "drop-shadow(0 0 30px rgba(0, 0, 0, 0.75))",
                 }}
               >
                 La màgia comença
