@@ -44,12 +44,12 @@ export default function HeroPortalLogo({
   glowStrength = 0.65,
   onFinish,
   svgUrl = "/img/orbita-glyph-anim.svg",
-  // més temps total perquè el text i el logo respirin
-  totalMs = 7500,
-  // fade final ULTRA llarg i cinematogràfic
-  fadeMs = 3500,
-  introHoldMs = 800,
-  introFadeMs = 900,
+  // timing cinematogràfic optimitzat
+  totalMs = 6000,
+  // fade final dramàtic però àgil
+  fadeMs = 2200,
+  introHoldMs = 600,
+  introFadeMs = 800,
   speedMultiplier = 1,
 }: HeroPortalLogoProps) {
   const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
@@ -93,9 +93,9 @@ export default function HeroPortalLogo({
       setIsMobile(mobile);
 
       if (mobile) {
-        // En mòbil: màxim 4 segons total amb fade suau (más rápido)
-        const MOBILE_TOTAL_MS = prefersReducedMotion ? 2000 : 4000;
-        const MOBILE_FADE_MS = prefersReducedMotion ? 400 : 1000;
+        // En mòbil: màxim 3.5 segons total amb fade dramàtic
+        const MOBILE_TOTAL_MS = prefersReducedMotion ? 2000 : 3500;
+        const MOBILE_FADE_MS = prefersReducedMotion ? 400 : 800;
 
         const tid = window.setTimeout(() => {
           setVisible(false);
@@ -494,6 +494,22 @@ export default function HeroPortalLogo({
               0%, 100% { transform: translateY(0) scale(1); }
               50% { transform: translateY(-8px) scale(1.01); }
             }
+            @keyframes gradient-flow {
+              0%, 100% { background-position: 0% 50%; }
+              50% { background-position: 100% 50%; }
+            }
+            @keyframes text-glow-pulse {
+              0%, 100% {
+                filter: drop-shadow(0 0 36px rgba(245, 158, 11, 0.6))
+                        drop-shadow(0 0 60px rgba(251, 191, 36, 0.35))
+                        drop-shadow(0 6px 24px rgba(0, 0, 0, 0.85));
+              }
+              50% {
+                filter: drop-shadow(0 0 42px rgba(245, 158, 11, 0.75))
+                        drop-shadow(0 0 72px rgba(251, 191, 36, 0.45))
+                        drop-shadow(0 6px 28px rgba(0, 0, 0, 0.9));
+              }
+            }
           `;
           document.head.appendChild(style);
         }
@@ -673,12 +689,18 @@ export default function HeroPortalLogo({
                   WebkitBackfaceVisibility: 'hidden',
                 }}
                 dangerouslySetInnerHTML={{ __html: svgMarkup }}
-                initial={{ opacity: 0, scale: 0.85, filter: "blur(10px)" }}
-                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                initial={{ opacity: 0, scale: 0.8, rotateZ: -4, filter: "blur(12px)" }}
+                animate={{
+                  opacity: 1,
+                  scale: [0.8, 1.03, 1],
+                  rotateZ: [-4, 1, 0],
+                  filter: "blur(0px)"
+                }}
                 transition={{
-                  duration: 1.2,
-                  ease: [0.22, 0.61, 0.36, 1],
-                  delay: 0.3
+                  duration: 1.4,
+                  ease: [0.19, 1, 0.22, 1],
+                  delay: 0.25,
+                  times: [0, 0.65, 1]
                 }}
               />
             )}
@@ -701,20 +723,32 @@ export default function HeroPortalLogo({
                   paddingLeft: "clamp(16px, 3vw, 32px)",
                   paddingRight: "clamp(16px, 3vw, 32px)",
                 }}
-                initial={{ opacity: 0, y: -25, x: 5 }}
-                animate={{ opacity: 1, y: 0, x: 0 }}
+                initial={{ opacity: 0, y: -30, x: 8, scale: 0.92, filter: "blur(12px)" }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  x: 0,
+                  scale: 1,
+                  filter: "blur(0px)"
+                }}
                 transition={{
-                  duration: 1.6,
-                  delay: 0.8,
-                  ease: [0.22, 0.61, 0.36, 1],
+                  duration: 1.4,
+                  delay: 0.6,
+                  ease: [0.19, 1, 0.22, 1],
                 }}
               >
                 <span
-                  className={`${jakartaSans.className} text-xl sm:text-2xl md:text-3xl font-light tracking-[0.28em] uppercase bg-gradient-to-r from-amber-300 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
+                  className={`${jakartaSans.className} text-xl sm:text-2xl md:text-3xl font-light tracking-[0.28em] uppercase`}
                   style={{
-                    textShadow: "0 0 20px rgba(0, 0, 0, 0.8), 0 2px 30px rgba(0, 0, 0, 0.6)",
-                    filter: "drop-shadow(0 0 18px rgba(245, 158, 11, 0.35))",
-                    marginLeft: "clamp(-8px, -1.5vw, 0px)", // Ligero offset intencional
+                    background: "linear-gradient(135deg, #fcd34d 0%, #f59e0b 35%, #fbbf24 55%, #fcd34d 75%, #f59e0b 100%)",
+                    backgroundSize: "200% auto",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    textShadow: "0 0 24px rgba(0, 0, 0, 0.9), 0 4px 40px rgba(0, 0, 0, 0.7)",
+                    filter: "drop-shadow(0 0 20px rgba(245, 158, 11, 0.45)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.25))",
+                    marginLeft: "clamp(-8px, -1.5vw, 0px)",
+                    animation: "gradient-flow 4s ease-in-out infinite",
                   }}
                 >
                   La màgia comença
@@ -752,52 +786,120 @@ export default function HeroPortalLogo({
             {/* Glow subtil y partículas - COMPOSICIÓN COMPLETA */}
             {!prefersReducedMotion && (
               <>
-                {/* Glow principal centrado en logo */}
+                {/* Glow principal centrado en logo - MEJORADO */}
                 <motion.div
-                  className="absolute w-80 h-80 rounded-full pointer-events-none"
+                  className="absolute w-96 h-96 rounded-full pointer-events-none"
                   style={{
-                    background: 'radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.08) 40%, transparent 70%)',
-                    filter: 'blur(60px)',
+                    background: 'radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(251, 191, 36, 0.15) 30%, rgba(245, 158, 11, 0.08) 50%, transparent 75%)',
+                    filter: 'blur(70px)',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                   }}
+                  initial={{ opacity: 0, scale: 0.4 }}
+                  animate={{
+                    opacity: [0, 1, 0.9, 1],
+                    scale: [0.4, 1.2, 1.15, 1.25]
+                  }}
+                  transition={{
+                    duration: 2.2,
+                    delay: 0.25,
+                    ease: [0.19, 1, 0.22, 1],
+                    times: [0, 0.5, 0.75, 1]
+                  }}
+                />
+
+                {/* Partículas equilibradas - MEJORADAS */}
+                <motion.div
+                  className="absolute w-32 h-32 rounded-full pointer-events-none"
+                  style={{
+                    top: '20%',
+                    right: '15%',
+                    background: 'radial-gradient(circle, rgba(251, 191, 36, 0.25) 0%, rgba(245, 158, 11, 0.12) 50%, transparent 100%)',
+                    filter: 'blur(24px)'
+                  }}
                   initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1.15 }}
-                  transition={{ duration: 1.8, delay: 0.3, ease: "easeOut" }}
+                  animate={{
+                    y: [0, -22, 0],
+                    x: [0, 12, 0],
+                    scale: [0.5, 1.15, 1],
+                    opacity: [0, 0.7, 0.45, 0.7]
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: [0.45, 0.05, 0.55, 0.95],
+                    times: [0, 0.5, 0.75, 1],
+                    delay: 0.3
+                  }}
+                />
+                <motion.div
+                  className="absolute w-36 h-36 rounded-full pointer-events-none"
+                  style={{
+                    bottom: '25%',
+                    left: '12%',
+                    background: 'radial-gradient(circle, rgba(192, 132, 252, 0.2) 0%, rgba(167, 139, 250, 0.1) 50%, transparent 100%)',
+                    filter: 'blur(32px)'
+                  }}
+                  initial={{ opacity: 0, scale: 0.4 }}
+                  animate={{
+                    y: [0, 25, 0],
+                    x: [0, -12, 0],
+                    scale: [0.4, 1.25, 1.1],
+                    opacity: [0, 0.55, 0.35, 0.55]
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: [0.45, 0.05, 0.55, 0.95],
+                    times: [0, 0.45, 0.7, 1],
+                    delay: 0.8
+                  }}
                 />
 
-                {/* Partículas equilibradas */}
+                {/* Partícula sutil cerca del texto - MEJORADA */}
                 <motion.div
-                  className="absolute w-24 h-24 rounded-full bg-yellow-300/12 blur-2xl pointer-events-none"
-                  style={{ top: '22%', right: '18%' }}
-                  animate={{
-                    y: [0, -18, 0],
-                    x: [0, 8, 0],
-                    opacity: [0.3, 0.55, 0.3]
+                  className="absolute w-20 h-20 rounded-full pointer-events-none"
+                  style={{
+                    top: '14%',
+                    left: '22%',
+                    background: 'radial-gradient(circle, rgba(252, 211, 77, 0.3) 0%, rgba(245, 158, 11, 0.15) 50%, transparent 100%)',
+                    filter: 'blur(20px)'
                   }}
-                  transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <motion.div
-                  className="absolute w-28 h-28 rounded-full bg-purple-400/10 blur-3xl pointer-events-none"
-                  style={{ bottom: '28%', left: '15%' }}
+                  initial={{ opacity: 0, scale: 0.6 }}
                   animate={{
-                    y: [0, 18, 0],
-                    x: [0, -8, 0],
-                    opacity: [0.25, 0.45, 0.25]
+                    scale: [0.6, 1.35, 1.2],
+                    opacity: [0, 0.6, 0.4, 0.6]
                   }}
-                  transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: [0.45, 0.05, 0.55, 0.95],
+                    times: [0, 0.5, 0.75, 1],
+                    delay: 0.5
+                  }}
                 />
 
-                {/* Partícula sutil cerca del texto */}
+                {/* Lens flare sutil */}
                 <motion.div
-                  className="absolute w-16 h-16 rounded-full bg-amber-300/15 blur-xl pointer-events-none"
-                  style={{ top: '16%', left: '25%' }}
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.2, 0.4, 0.2]
+                  className="absolute w-2 h-2 rounded-full pointer-events-none"
+                  style={{
+                    top: '35%',
+                    right: '30%',
+                    background: 'radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(251, 191, 36, 0.4) 50%, transparent 100%)',
+                    boxShadow: '0 0 20px rgba(251, 191, 36, 0.6)'
                   }}
-                  transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    opacity: [0, 1, 0.7, 0],
+                    scale: [0.5, 1.5, 1, 0.5]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 1.5
+                  }}
                 />
               </>
             )}
@@ -861,27 +963,34 @@ export default function HeroPortalLogo({
               paddingLeft: "clamp(24px, 4vw, 48px)",
               paddingRight: "clamp(24px, 4vw, 48px)",
             }}
-            initial={{ opacity: 0, y: 35, x: 8, filter: "blur(14px)" }}
+            initial={{ opacity: 0, y: 40, x: 12, scale: 0.9, filter: "blur(16px)" }}
             animate={{
               opacity: [0, 1, 1, 0],
-              y: [35, 0, 0, -18],
-              x: [8, 0, 0, -5],
-              filter: ["blur(14px)", "blur(0px)", "blur(0px)", "blur(10px)"]
+              y: [40, 0, 0, -20],
+              x: [12, 0, 0, -8],
+              scale: [0.9, 1, 1, 1.02],
+              filter: ["blur(16px)", "blur(0px)", "blur(0px)", "blur(12px)"]
             }}
             transition={{
-              times: [0, 0.18, 0.82, 1],
-              duration: 5.5,
-              delay: (SEQ_TELON_END + 300) / 1000,
-              ease: [0.22, 0.61, 0.36, 1],
+              times: [0, 0.2, 0.8, 1],
+              duration: 5.0,
+              delay: (SEQ_TELON_END + 250) / 1000,
+              ease: [0.19, 1, 0.22, 1],
             }}
           >
             <span
-              className={`${jakartaSans.className} text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-light tracking-[0.26em] uppercase bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
+              className={`${jakartaSans.className} text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-light tracking-[0.26em] uppercase`}
               style={{
-                filter: "drop-shadow(0 0 32px rgba(245, 158, 11, 0.5)) drop-shadow(0 4px 20px rgba(0, 0, 0, 0.8))",
-                textShadow: "0 0 40px rgba(0, 0, 0, 0.9)",
-                marginLeft: "clamp(-16px, -2vw, 0px)", // Offset expresivo
-                transform: "translateX(-3%)", // Desviación intencional
+                background: "linear-gradient(135deg, #fcd34d 0%, #f59e0b 25%, #fbbf24 45%, #fcd34d 65%, #f59e0b 85%, #fbbf24 100%)",
+                backgroundSize: "250% auto",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                filter: "drop-shadow(0 0 36px rgba(245, 158, 11, 0.6)) drop-shadow(0 0 60px rgba(251, 191, 36, 0.35)) drop-shadow(0 6px 24px rgba(0, 0, 0, 0.85))",
+                textShadow: "0 0 50px rgba(0, 0, 0, 0.95)",
+                marginLeft: "clamp(-16px, -2vw, 0px)",
+                transform: "translateX(-3%)",
+                animation: "gradient-flow 5s ease-in-out infinite, text-glow-pulse 3s ease-in-out infinite",
               }}
             >
               La màgia comença
@@ -953,34 +1062,184 @@ export default function HeroPortalLogo({
               ease: [0.22, 0.61, 0.36, 1],
             }}
           >
-            {/* Partículas grandes con float suave */}
-            <div
-              className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-oe-gold/15 to-yellow-400/10 blur-3xl top-[20%] left-[15%] animate-float"
-              style={{ animationDuration: "6s", animationDelay: "0s" }}
+            {/* Partículas grandes con float suave - MEJORADAS */}
+            <motion.div
+              className="absolute w-40 h-40 rounded-full pointer-events-none"
+              style={{
+                top: '18%',
+                left: '12%',
+                background: 'radial-gradient(circle, rgba(251, 191, 36, 0.28) 0%, rgba(245, 158, 11, 0.15) 40%, transparent 100%)',
+                filter: 'blur(40px)'
+              }}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{
+                y: [0, -25, -10, 0],
+                x: [0, 8, -5, 0],
+                scale: [0.5, 1.2, 1.1, 1],
+                opacity: [0, 0.8, 0.6, 0.8]
+              }}
+              transition={{
+                duration: 7,
+                repeat: Infinity,
+                ease: [0.45, 0.05, 0.55, 0.95],
+                times: [0, 0.4, 0.7, 1],
+                delay: 0.5
+              }}
             />
-            <div
-              className="absolute w-40 h-40 rounded-full bg-gradient-to-br from-oe-gold/12 to-yellow-400/8 blur-3xl bottom-[25%] right-[20%] animate-float"
-              style={{ animationDuration: "7s", animationDelay: "1s" }}
+            <motion.div
+              className="absolute w-48 h-48 rounded-full pointer-events-none"
+              style={{
+                bottom: '22%',
+                right: '15%',
+                background: 'radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(251, 191, 36, 0.12) 40%, transparent 100%)',
+                filter: 'blur(45px)'
+              }}
+              initial={{ opacity: 0, scale: 0.4 }}
+              animate={{
+                y: [0, 30, 15, 0],
+                x: [0, -10, 5, 0],
+                scale: [0.4, 1.3, 1.15, 1.1],
+                opacity: [0, 0.7, 0.5, 0.7]
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: [0.45, 0.05, 0.55, 0.95],
+                times: [0, 0.45, 0.75, 1],
+                delay: 1.2
+              }}
             />
 
-            {/* Partículas medianas con scale-pulse suave */}
-            <div
-              className="absolute w-24 h-24 rounded-full bg-gradient-to-br from-purple-500/12 to-pink-500/8 blur-2xl top-[45%] right-[25%] animate-scale-pulse"
-              style={{ animationDuration: "5s", animationDelay: "0.5s" }}
+            {/* Partículas medianas con scale-pulse suave - MEJORADAS */}
+            <motion.div
+              className="absolute w-32 h-32 rounded-full pointer-events-none"
+              style={{
+                top: '42%',
+                right: '22%',
+                background: 'radial-gradient(circle, rgba(192, 132, 252, 0.22) 0%, rgba(167, 139, 250, 0.12) 40%, transparent 100%)',
+                filter: 'blur(35px)'
+              }}
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{
+                scale: [0.6, 1.4, 1.2, 1.3],
+                opacity: [0, 0.65, 0.45, 0.65],
+                rotate: [0, 180, 360]
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: [0.45, 0.05, 0.55, 0.95],
+                times: [0, 0.5, 0.75, 1],
+                delay: 0.8
+              }}
             />
-            <div
-              className="absolute w-28 h-28 rounded-full bg-gradient-to-br from-purple-600/10 to-pink-600/6 blur-2xl bottom-[40%] left-[30%] animate-scale-pulse"
-              style={{ animationDuration: "6s", animationDelay: "1.5s" }}
+            <motion.div
+              className="absolute w-36 h-36 rounded-full pointer-events-none"
+              style={{
+                bottom: '38%',
+                left: '28%',
+                background: 'radial-gradient(circle, rgba(236, 72, 153, 0.18) 0%, rgba(192, 132, 252, 0.1) 40%, transparent 100%)',
+                filter: 'blur(38px)'
+              }}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{
+                scale: [0.5, 1.35, 1.15, 1.25],
+                opacity: [0, 0.6, 0.4, 0.6],
+                rotate: [0, -180, -360]
+              }}
+              transition={{
+                duration: 7,
+                repeat: Infinity,
+                ease: [0.45, 0.05, 0.55, 0.95],
+                times: [0, 0.45, 0.7, 1],
+                delay: 1.8
+              }}
             />
 
-            {/* Partículas pequeñas brillantes con glow-pulse suave */}
-            <div
-              className="absolute w-16 h-16 rounded-full bg-yellow-300/18 blur-xl top-[35%] left-[40%] animate-glow-pulse"
-              style={{ animationDuration: "4s" }}
+            {/* Partículas pequeñas brillantes con glow-pulse suave - MEJORADAS */}
+            <motion.div
+              className="absolute w-24 h-24 rounded-full pointer-events-none"
+              style={{
+                top: '32%',
+                left: '38%',
+                background: 'radial-gradient(circle, rgba(252, 211, 77, 0.35) 0%, rgba(245, 158, 11, 0.2) 40%, transparent 100%)',
+                filter: 'blur(25px)'
+              }}
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{
+                scale: [0.7, 1.5, 1.3, 1.4],
+                opacity: [0, 0.75, 0.5, 0.75]
+              }}
+              transition={{
+                duration: 4.5,
+                repeat: Infinity,
+                ease: [0.45, 0.05, 0.55, 0.95],
+                times: [0, 0.5, 0.75, 1],
+                delay: 0.3
+              }}
             />
-            <div
-              className="absolute w-20 h-20 rounded-full bg-yellow-300/15 blur-xl bottom-[45%] right-[35%] animate-glow-pulse"
-              style={{ animationDuration: "4.5s", animationDelay: "1s" }}
+            <motion.div
+              className="absolute w-28 h-28 rounded-full pointer-events-none"
+              style={{
+                bottom: '42%',
+                right: '32%',
+                background: 'radial-gradient(circle, rgba(251, 191, 36, 0.32) 0%, rgba(252, 211, 77, 0.18) 40%, transparent 100%)',
+                filter: 'blur(28px)'
+              }}
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{
+                scale: [0.6, 1.45, 1.25, 1.35],
+                opacity: [0, 0.7, 0.48, 0.7]
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: [0.45, 0.05, 0.55, 0.95],
+                times: [0, 0.5, 0.75, 1],
+                delay: 1.3
+              }}
+            />
+
+            {/* Lens flares sutiles - DESKTOP */}
+            <motion.div
+              className="absolute w-3 h-3 rounded-full pointer-events-none"
+              style={{
+                top: '28%',
+                right: '35%',
+                background: 'radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.5) 40%, transparent 100%)',
+                boxShadow: '0 0 30px rgba(251, 191, 36, 0.8), 0 0 60px rgba(245, 158, 11, 0.4)'
+              }}
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: [0, 1, 0.8, 0],
+                scale: [0.4, 2, 1.5, 0.4]
+              }}
+              transition={{
+                duration: 3.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 2
+              }}
+            />
+            <motion.div
+              className="absolute w-2 h-2 rounded-full pointer-events-none"
+              style={{
+                bottom: '35%',
+                left: '40%',
+                background: 'radial-gradient(circle, rgba(255, 255, 255, 0.85) 0%, rgba(252, 211, 77, 0.45) 40%, transparent 100%)',
+                boxShadow: '0 0 25px rgba(252, 211, 77, 0.7)'
+              }}
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: [0, 0.9, 0.7, 0],
+                scale: [0.5, 1.8, 1.3, 0.5]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.8
+              }}
             />
           </motion.div>
 
@@ -1019,12 +1278,17 @@ export default function HeroPortalLogo({
                 willChange: 'transform, opacity',
               }}
               dangerouslySetInnerHTML={{ __html: svgMarkup || '' }}
-              initial={{ scale: 0.92, opacity: isReady ? 1 : 0 }}
-              animate={{ scale: 1, opacity: 1 }}
+              initial={{ scale: 0.85, opacity: isReady ? 1 : 0, rotateZ: -3 }}
+              animate={{
+                scale: [0.85, 1.02, 1],
+                opacity: 1,
+                rotateZ: [-3, 1, 0]
+              }}
               transition={{
                 delay: isReady ? (SEQ_TELON_END + Math.round(80 * SPEED)) / 1000 : 0,
-                duration: Math.max(1.6, DUR_PLANET / 900),
-                ease: [0.22, 0.61, 0.36, 1],
+                duration: Math.max(1.8, DUR_PLANET / 900),
+                ease: [0.19, 1, 0.22, 1],
+                times: [0, 0.6, 1]
               }}
             />
           </div>
