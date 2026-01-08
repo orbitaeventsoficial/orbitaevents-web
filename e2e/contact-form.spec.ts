@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
 
+const CONTACT_PATH = '/es/contacto';
+
 test.describe('Contact Form', () => {
   test('should display contact page', async ({ page }) => {
-    await page.goto('/contacto');
+    await page.goto(CONTACT_PATH);
     await page.waitForLoadState('networkidle');
     await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
@@ -15,7 +17,7 @@ test.describe('Contact Form', () => {
   });
 
   test('should have required form fields', async ({ page }) => {
-    await page.goto('/contacto');
+    await page.goto(CONTACT_PATH);
     await page.waitForLoadState('networkidle');
     await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
@@ -33,7 +35,7 @@ test.describe('Contact Form', () => {
   });
 
   test('should show validation errors for empty fields', async ({ page }) => {
-    await page.goto('/contacto');
+    await page.goto(CONTACT_PATH);
     await page.waitForLoadState('networkidle');
     await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
@@ -50,7 +52,7 @@ test.describe('Contact Form', () => {
   });
 
   test('should accept valid input', async ({ page }) => {
-    await page.goto('/contacto');
+    await page.goto(CONTACT_PATH);
     await page.waitForLoadState('networkidle');
     await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
