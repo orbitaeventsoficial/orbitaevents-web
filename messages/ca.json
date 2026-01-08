@@ -637,6 +637,10 @@
         {
           "q": "Coordineu amb càtering, venue i altres proveïdors?",
           "a": "Totalment. Ens encarreguem de la coordinació tècnica completa: temps, muntatge, desmuntatge i sincronització amb altres proveïdors. Tu et centres en els teus convidats."
+        },
+        {
+          "q": "Quines dades o informes oferiu després de l'esdeveniment?",
+          "a": "Compartim un resum amb la llista de temes tocats, temps del so i qualsevol solució tècnica que hàgim aplicat, perquè el vostre equip comercial o de marketing pugui reportar l'èxit del dia."
         }
       ]
     },

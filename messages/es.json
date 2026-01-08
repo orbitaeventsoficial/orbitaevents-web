@@ -659,6 +659,10 @@
         {
           "q": "¿Coordináis con catering, venue y otros proveedores?",
           "a": "Totalmente. Nos encargamos de la coordinación técnica completa: tiempos, montaje, desmontaje y sincronización con otros proveedores. Tú te centras en tus invitados."
+        },
+        {
+          "q": "¿Qué datos o informes entregáis tras el evento?",
+          "a": "Enviamos un resumen con la lista de temas pinchados, los horarios de sonido y cualquier ajuste técnico realizado para que vuestro equipo de marketing o ventas pueda reportar el éxito del día."
         }
       ]
     },
