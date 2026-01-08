@@ -100,7 +100,6 @@ export default function HeroPortalLogo({
   }, [onFinish]);
 
   const SPEED = speedMultiplier;
-  const planetScale = isMobile ? 0.9 : 0.85;
 
   // Telón negro inicial
   const TELON_HOLD = Math.round(introHoldMs * SPEED);
@@ -382,7 +381,7 @@ export default function HeroPortalLogo({
 
     // PLANETA - CON BRUTAL GLOW
     animateElements(planetEls, {
-      transform: `scale(${planetScale}) translateY(0)`,
+      transform: "scale(1.02) translateY(0)",
       duration: Math.max(400 + TRANSITION_EXTRA_MS, DUR_PLANET),
       delay: PLANET_START,
     });
