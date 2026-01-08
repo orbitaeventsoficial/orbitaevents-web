@@ -378,6 +378,14 @@ export default async function LocaleLayout({
       >
         <GoogleTagManagerBody />
 
+        {/* Skip Navigation - Accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-6 focus:py-3 focus:bg-amber-500 focus:text-black focus:font-semibold focus:rounded-lg focus:shadow-2xl"
+        >
+          Saltar al contenido principal
+        </a>
+
         {/* OVERLAY NEGRE INICIAL - Tapa tot fins que JS el treu */}
         <div
           id="intro-overlay"

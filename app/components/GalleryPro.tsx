@@ -319,10 +319,14 @@ function Lightbox({ items, currentIndex, onClose, onNavigate }: LightboxProps) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Galería de imágenes: ${item.title || 'Imagen'} ${currentIndex + 1} de ${items.length}`}
     >
       {/* Close button */}
       <button
         onClick={onClose}
+        aria-label="Cerrar galería"
         className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
       >
         <Icons.Close />
@@ -337,6 +341,7 @@ function Lightbox({ items, currentIndex, onClose, onNavigate }: LightboxProps) {
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
         <button
           onClick={handleShare}
+          aria-label="Compartir imagen"
           className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-colors"
           title="Compartir"
         >
@@ -346,6 +351,7 @@ function Lightbox({ items, currentIndex, onClose, onNavigate }: LightboxProps) {
           <a
             href={item.src}
             download
+            aria-label="Descargar imagen"
             className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-colors"
             title="Descargar"
           >
@@ -353,23 +359,25 @@ function Lightbox({ items, currentIndex, onClose, onNavigate }: LightboxProps) {
           </a>
         )}
       </div>
-      
+
       {/* Navigation buttons */}
       <button
         onClick={() => {
           onNavigate((currentIndex - 1 + items.length) % items.length);
           setIsZoomed(false);
         }}
+        aria-label="Imagen anterior"
         className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/10 hover:bg-amber-500/80 flex items-center justify-center text-white hover:text-black transition-all"
       >
         <Icons.ChevronLeft />
       </button>
-      
+
       <button
         onClick={() => {
           onNavigate((currentIndex + 1) % items.length);
           setIsZoomed(false);
         }}
+        aria-label="Imagen siguiente"
         className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/10 hover:bg-amber-500/80 flex items-center justify-center text-white hover:text-black transition-all"
       >
         <Icons.ChevronRight />
