@@ -667,8 +667,14 @@ export default function HeroPortalLogo({
 
             {/* Text subliminal - TIPOGRAFIA PREMIUM DAURAT */}
             <motion.p
-              className="absolute left-4 top-2 flex justify-start px-4"
-              style={{ pointerEvents: "none", zIndex: 10 }}
+              className="absolute left-4 top-1 flex justify-start px-2"
+              style={{
+                pointerEvents: "none",
+                zIndex: 10,
+                maxWidth: "min(65vw, 280px)",
+                textAlign: "left",
+                transform: "translate(-6px, -2px)",
+              }}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
