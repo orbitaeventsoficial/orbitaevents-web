@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { sendEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
-import { verifyCsrf } from '@/lib/csrf';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { verifyTurnstileToken } from '@/lib/turnstile';
 import type { EventType, LeadSource } from '@prisma/client';
@@ -72,8 +71,8 @@ function determineSource(packId?: string, packName?: string): LeadSource {
 }
 
 export async function POST(req: NextRequest) {
-  const csrfError = verifyCsrf(req);
-  if (csrfError) return csrfError;
+  // Note: /api/contact is a public route (no CSRF required)
+  // CSRF verification is handled by middleware for admin routes only
 
   const rateLimitResult = await checkRateLimit(req, RATE_LIMITS.contact);
   if (rateLimitResult) return rateLimitResult;
