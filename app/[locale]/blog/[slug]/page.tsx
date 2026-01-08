@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
@@ -89,10 +90,12 @@ export default async function BlogPostPage({ params }: Props) {
       {/* Featured Image */}
       {post.featuredImage && (
         <div className="relative h-[400px] overflow-hidden">
-          <img
+          <Image
             src={post.featuredImage}
             alt={translation.title}
-            className="h-full w-full object-cover"
+            fill
+            className="object-cover"
+            priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         </div>

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { prisma } from '@/lib/prisma';
@@ -83,11 +84,12 @@ export default async function BlogPage({
                     className="group overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-all hover:border-purple-500/50 hover:bg-white/10"
                   >
                     {post.featuredImage && (
-                      <div className="aspect-video overflow-hidden">
-                        <img
+                      <div className="relative aspect-video overflow-hidden">
+                        <Image
                           src={post.featuredImage}
                           alt={translation.title}
-                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                          fill
+                          className="object-cover transition-transform group-hover:scale-105"
                         />
                       </div>
                     )}

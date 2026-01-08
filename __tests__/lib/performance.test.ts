@@ -78,38 +78,52 @@ describe('Performance Utilities', () => {
 
   describe('preloadImage', () => {
     it('should resolve when image loads', async () => {
+      vi.useRealTimers(); // Use real timers for async tests
+
       const mockImage = {
         src: '',
         onload: null as any,
         onerror: null as any,
       };
 
-      vi.stubGlobal('Image', vi.fn(() => mockImage));
+      const ImageMock = vi.fn(function (this: any) {
+        return mockImage;
+      });
+      vi.stubGlobal('Image', ImageMock);
 
       const promise = preloadImage('/test.jpg');
 
-      // Simulate image load
-      setTimeout(() => mockImage.onload?.(), 0);
+      // Simulate image load immediately
+      mockImage.onload?.();
 
       await expect(promise).resolves.toBeUndefined();
       expect(mockImage.src).toBe('/test.jpg');
+
+      vi.useFakeTimers(); // Restore fake timers
     });
 
     it('should reject when image fails to load', async () => {
+      vi.useRealTimers(); // Use real timers for async tests
+
       const mockImage = {
         src: '',
         onload: null as any,
         onerror: null as any,
       };
 
-      vi.stubGlobal('Image', vi.fn(() => mockImage));
+      const ImageMock = vi.fn(function (this: any) {
+        return mockImage;
+      });
+      vi.stubGlobal('Image', ImageMock);
 
       const promise = preloadImage('/invalid.jpg');
 
-      // Simulate image error
-      setTimeout(() => mockImage.onerror?.(new Error('Failed')), 0);
+      // Simulate image error immediately
+      mockImage.onerror?.(new Error('Failed'));
 
       await expect(promise).rejects.toThrow();
+
+      vi.useFakeTimers(); // Restore fake timers
     });
   });
 

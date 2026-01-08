@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 interface BlogPost {
@@ -32,11 +32,7 @@ export default function BlogAdminPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  useEffect(() => {
-    fetchPosts();
-  }, [locale, page]);
-
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/admin/blog?locale=${locale}&page=${page}&limit=20`);
@@ -49,7 +45,11 @@ export default function BlogAdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [locale, page]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('¿Estás seguro de que quieres eliminar este post?')) return;
