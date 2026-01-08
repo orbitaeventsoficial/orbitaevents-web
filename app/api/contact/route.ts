@@ -9,6 +9,7 @@ import { prisma } from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { verifyCsrf } from '@/lib/csrf';
 import { escapeHtml } from '@/lib/utils/sanitize';
+import { verifyTurnstileToken } from '@/lib/turnstile';
 import type { EventType, LeadSource } from '@prisma/client';
 
 // Validacion de datos con Zod
@@ -24,6 +25,7 @@ const contactSchema = z.object({
   guests: z.number().optional(),
   extras: z.array(z.string()).optional(),
   locale: z.string().optional(),
+  turnstileToken: z.string().optional(),
 });
 
 // Mapeo de tipos de evento para emails
@@ -84,6 +86,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'Datos invalidos', details: parsed.error.format() },
         { status: 400 }
+      );
+    }
+
+    // Verify Turnstile token
+    const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+                     req.headers.get('x-real-ip') ||
+                     'unknown';
+    const isValidCaptcha = await verifyTurnstileToken(parsed.data.turnstileToken, clientIp);
+
+    if (!isValidCaptcha) {
+      return NextResponse.json(
+        { error: 'Verificacion de seguridad fallida. Por favor intenta de nuevo.' },
+        { status: 403 }
       );
     }
 

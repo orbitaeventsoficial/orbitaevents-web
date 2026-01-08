@@ -1619,7 +1619,7 @@
       "eventTypeRequired": "Selecciona el tipo de evento",
       "dateFuture": "La fecha debe ser futura",
       "privacyRequired": "Debes aceptar la política de privacidad",
-      "captchaRequired": "Resuelve la verificación"
+      "captchaRequired": "Por favor completa la verificación de seguridad"
     },
     "privacy": {
       "text": "He leído y acepto la",

@@ -1292,7 +1292,7 @@
       "eventTypeRequired": "Selecciona el tipus d'event",
       "dateFuture": "La data ha de ser futura",
       "privacyRequired": "Has d'acceptar la política de privacitat",
-      "captchaRequired": "Resol la verificació"
+      "captchaRequired": "Si us plau completa la verificació de seguretat"
     },
     "privacy": {
       "text": "He llegit i accepto la",

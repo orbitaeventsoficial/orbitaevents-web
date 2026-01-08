@@ -22,6 +22,7 @@ import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/config/site-config';
 import { trackLead } from '@/lib/analytics';
 import { fetchWithCsrf } from '@/lib/csrf';
+import TurnstileWidget from '@/components/security/TurnstileWidget';
 
 // ============================================================
 // TIPUS
@@ -141,6 +142,7 @@ export default function ContactFormComplete({
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
   const [minDate, setMinDate] = useState(''); // Hydration-safe: set in useEffect
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   // Set minDate on client to avoid hydration mismatch
   useEffect(() => {
@@ -192,6 +194,12 @@ export default function ContactFormComplete({
       return;
     }
 
+    // Validate Turnstile token
+    if (!turnstileToken) {
+      setErrors({ ...formErrors, turnstile: t('validation.captchaRequired') });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -212,6 +220,7 @@ export default function ContactFormComplete({
           acceptMarketing: formData.acceptMarketing,
           timestamp: new Date().toISOString(),
           source: 'contact-form-complete',
+          turnstileToken,
         }),
       });
 
@@ -607,6 +616,24 @@ export default function ContactFormComplete({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Turnstile CAPTCHA */}
+      <div className="pt-4">
+        <TurnstileWidget
+          onSuccess={(token) => {
+            setTurnstileToken(token);
+            if (errors.turnstile) {
+              setErrors({ ...errors, turnstile: '' });
+            }
+          }}
+          onError={() => setTurnstileToken(null)}
+          onExpire={() => setTurnstileToken(null)}
+          theme="dark"
+        />
+        {errors.turnstile && touched.turnstile && (
+          <p className="text-red-400 text-sm mt-2 text-center">{errors.turnstile}</p>
+        )}
+      </div>
 
       {/* Boto submit */}
       <motion.button
