@@ -4,7 +4,6 @@ import { getTranslations } from 'next-intl/server';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import ServiciosClient from './client';
 
-export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;

@@ -3,7 +3,6 @@ import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import Client from './client';
 import { getTranslations } from 'next-intl/server';
 
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Recursos i Descàrregues | Òrbita Events',

@@ -10,7 +10,6 @@ import { getMinPriceByService, getPacksByService } from '@/config/packs-config';
 const DISCO_MIN_PRICE = getMinPriceByService('discomovil');
 const DISCO_PACKS = getPacksByService('discomovil');
 
-export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;

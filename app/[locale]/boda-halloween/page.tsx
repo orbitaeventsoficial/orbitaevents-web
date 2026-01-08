@@ -4,7 +4,6 @@ import { SITE_CONFIG, getWhatsAppUrl } from '@/config/site-config';
 import { Ghost, Skull, Moon, Sparkles, Star, CheckCircle, Calendar, MessageCircle, ArrowRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Boda Halloween Barcelona | Especialistes en Bodes Temàtiques | Òrbita Events',

@@ -4,7 +4,6 @@ import { Link } from '@/lib/navigation';
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 
-export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;

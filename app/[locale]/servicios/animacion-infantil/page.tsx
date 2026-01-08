@@ -6,7 +6,6 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import AnimacionInfantilClient from './AnimacionInfantilClient';
 
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Animació Infantil Barcelona | Festes Infantils Professionals | Òrbita Events',

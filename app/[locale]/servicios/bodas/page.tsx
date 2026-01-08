@@ -8,7 +8,6 @@ import nextDynamic from 'next/dynamic';
 
 import { getMinPriceByService, getPacksByService } from '@/config/packs-config';
 
-export const dynamic = 'force-dynamic';
 
 const BodasClient = nextDynamic(() => import('./client'));
 
