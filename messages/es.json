@@ -3566,7 +3566,21 @@
     "loading": "Cargando...",
     "error": "Error al cargar disponibilidad",
     "previousMonth": "Mes anterior",
-    "nextMonth": "Mes siguiente"
+    "nextMonth": "Mes siguiente",
+    "badge": "Calendario activo",
+    "title": "Revisa nuestras fechas libres",
+    "subtitle": "Los días en verde están disponibles; en rojo ya hay eventos cerrados.",
+    "viewFullCalendar": "Ver calendario completo",
+    "cta": {
+      "title": "¿Quieres reservar una fecha?",
+      "subtitle": "Cuéntanos cuándo celebras y te enviamos un presupuesto en menos de 2 horas."
+    },
+    "labels": {
+      "scarce": "Pocos huecos",
+      "limited": "Disponibilidad limitada",
+      "available": "Disponible"
+    },
+    "viewCalendar": "Ver calendario completo"
   },
   "stickyCta": {
     "requestQuote": "Pide tu presupuesto",

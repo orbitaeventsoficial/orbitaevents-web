@@ -2692,7 +2692,21 @@
     "loading": "Carregant...",
     "error": "Error al carregar disponibilitat",
     "previousMonth": "Mes anterior",
-    "nextMonth": "Mes següent"
+    "nextMonth": "Mes següent",
+    "badge": "Calendari actiu",
+    "title": "Consulta les dates disponibles",
+    "subtitle": "Els dies en verd estan lliures; en vermell ja tenim esdeveniments confirmats.",
+    "viewFullCalendar": "Visualitza tot el calendari",
+    "cta": {
+      "title": "Vols reservar una data?",
+      "subtitle": "Digues-nos quan vols festa i t’enviem un pressupost en menys de 2 hores."
+    },
+    "labels": {
+      "scarce": "Pocs dies",
+      "limited": "Disponibilitat limitada",
+      "available": "Disponible"
+    },
+    "viewCalendar": "Veure calendari complet"
   },
   "stickyCta": {
     "requestQuote": "Demana el teu pressupost",
