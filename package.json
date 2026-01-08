@@ -61,7 +61,7 @@
     "imap-simple": "^5.1.0",
     "imapflow": "^1.2.4",
     "js-cookie": "^3.0.5",
-    "jspdf": "^3.0.4",
+    "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.424.0",
     "mailparser": "^3.9.1",
@@ -91,7 +91,6 @@
     "@types/canvas-confetti": "^1.9.0",
     "@types/dompurify": "^3.2.0",
     "@types/imap-simple": "^4.2.10",
-    "@types/jspdf": "^2.0.0",
     "@types/mailparser": "^3.4.6",
     "@types/node": "20.12.12",
     "@types/nodemailer": "^7.0.4",
@@ -106,5 +105,11 @@
     "ts-node": "^10.9.2",
     "typescript": "5.6.3",
     "vitest": "^4.0.16"
+  },
+  "pnpm": {
+    "overrides": {
+      "semver": "5.7.2",
+      "glob": "10.5.0"
+    }
   }
 }
