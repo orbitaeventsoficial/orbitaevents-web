@@ -690,34 +690,36 @@ export default function HeroPortalLogo({
               </div>
             )}
 
-            {/* Text subliminal - ESTILO ORIGINAL MÁS ARRIBA */}
+            {/* Text subliminal - COMPOSICIÓN EQUILIBRADA */}
             {!prefersReducedMotion && (
-              <motion.p
-                className="absolute top-16 flex justify-center px-4"
+              <motion.div
+                className="absolute top-0 left-0 right-0 flex items-start justify-center"
                 style={{
                   pointerEvents: "none",
                   zIndex: 10,
-                  width: "100%",
-                  textAlign: "center",
+                  paddingTop: "clamp(48px, 12vh, 80px)",
+                  paddingLeft: "clamp(16px, 3vw, 32px)",
+                  paddingRight: "clamp(16px, 3vw, 32px)",
                 }}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: -25, x: 5 }}
+                animate={{ opacity: 1, y: 0, x: 0 }}
                 transition={{
-                  duration: 1.5,
+                  duration: 1.6,
                   delay: 0.8,
                   ease: [0.22, 0.61, 0.36, 1],
                 }}
               >
                 <span
-                  className={`${jakartaSans.className} text-xl sm:text-2xl font-light tracking-[0.3em] uppercase bg-gradient-to-r from-amber-300 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
+                  className={`${jakartaSans.className} text-xl sm:text-2xl md:text-3xl font-light tracking-[0.28em] uppercase bg-gradient-to-r from-amber-300 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
                   style={{
-                    textShadow: "0 0 20px rgba(0, 0, 0, 0.7)",
-                    filter: "drop-shadow(0 0 20px rgba(245, 158, 11, 0.3))",
+                    textShadow: "0 0 20px rgba(0, 0, 0, 0.8), 0 2px 30px rgba(0, 0, 0, 0.6)",
+                    filter: "drop-shadow(0 0 18px rgba(245, 158, 11, 0.35))",
+                    marginLeft: "clamp(-8px, -1.5vw, 0px)", // Ligero offset intencional
                   }}
                 >
                   La màgia comença
                 </span>
-              </motion.p>
+              </motion.div>
             )}
 
             {/* Hint per saltar - MÉS VISIBLE */}
@@ -747,36 +749,55 @@ export default function HeroPortalLogo({
               </div>
             </motion.div>
 
-            {/* Glow subtil darrere el logo - NOMÉS SI NO REDUCED MOTION */}
+            {/* Glow subtil y partículas - COMPOSICIÓN COMPLETA */}
             {!prefersReducedMotion && (
               <>
+                {/* Glow principal centrado en logo */}
                 <motion.div
-                  className="absolute w-72 h-72 rounded-full pointer-events-none"
+                  className="absolute w-80 h-80 rounded-full pointer-events-none"
                   style={{
-                    background: 'radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%)',
-                    filter: 'blur(50px)',
+                    background: 'radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.08) 40%, transparent 70%)',
+                    filter: 'blur(60px)',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
                   }}
-                  initial={{ opacity: 0, scale: 0.6 }}
-                  animate={{ opacity: 1, scale: 1.1 }}
-                  transition={{ duration: 1.5, delay: 0.4, ease: "easeOut" }}
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1.15 }}
+                  transition={{ duration: 1.8, delay: 0.3, ease: "easeOut" }}
                 />
 
-                {/* Particulas sutiles (SOLO 2 EN MOVIL) */}
+                {/* Partículas equilibradas */}
                 <motion.div
-                  className="absolute w-20 h-20 rounded-full bg-yellow-300/10 blur-2xl top-1/4 right-1/4 pointer-events-none"
+                  className="absolute w-24 h-24 rounded-full bg-yellow-300/12 blur-2xl pointer-events-none"
+                  style={{ top: '22%', right: '18%' }}
                   animate={{
-                    y: [0, -15, 0],
-                    opacity: [0.3, 0.5, 0.3]
+                    y: [0, -18, 0],
+                    x: [0, 8, 0],
+                    opacity: [0.3, 0.55, 0.3]
                   }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
-                  className="absolute w-24 h-24 rounded-full bg-purple-400/8 blur-2xl bottom-1/3 left-1/4 pointer-events-none"
+                  className="absolute w-28 h-28 rounded-full bg-purple-400/10 blur-3xl pointer-events-none"
+                  style={{ bottom: '28%', left: '15%' }}
                   animate={{
-                    y: [0, 15, 0],
+                    y: [0, 18, 0],
+                    x: [0, -8, 0],
+                    opacity: [0.25, 0.45, 0.25]
+                  }}
+                  transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+                />
+
+                {/* Partícula sutil cerca del texto */}
+                <motion.div
+                  className="absolute w-16 h-16 rounded-full bg-amber-300/15 blur-xl pointer-events-none"
+                  style={{ top: '16%', left: '25%' }}
+                  animate={{
+                    scale: [1, 1.2, 1],
                     opacity: [0.2, 0.4, 0.2]
                   }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                  transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
                 />
               </>
             )}
@@ -830,27 +851,37 @@ export default function HeroPortalLogo({
             }}
           />
 
-          {/* ✨ TEXT SUBLIMINAL - ESTILO ORIGINAL MÁS ARRIBA */}
+          {/* ✨ TEXT SUBLIMINAL - COMPOSICIÓN EQUILIBRADA Y EXPRESIVA */}
           <motion.div
-            className="absolute top-0 left-0 right-0 flex items-start justify-center pt-20"
-            style={{ zIndex: 7, pointerEvents: "none" }}
-            initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
+            className="absolute inset-0 flex items-start justify-center"
+            style={{
+              zIndex: 7,
+              pointerEvents: "none",
+              paddingTop: "clamp(60px, 15vh, 100px)",
+              paddingLeft: "clamp(24px, 4vw, 48px)",
+              paddingRight: "clamp(24px, 4vw, 48px)",
+            }}
+            initial={{ opacity: 0, y: 35, x: 8, filter: "blur(14px)" }}
             animate={{
               opacity: [0, 1, 1, 0],
-              y: [30, 0, 0, -15],
-              filter: ["blur(12px)", "blur(0px)", "blur(0px)", "blur(8px)"]
+              y: [35, 0, 0, -18],
+              x: [8, 0, 0, -5],
+              filter: ["blur(14px)", "blur(0px)", "blur(0px)", "blur(10px)"]
             }}
             transition={{
-              times: [0, 0.15, 0.85, 1],
+              times: [0, 0.18, 0.82, 1],
               duration: 5.5,
               delay: (SEQ_TELON_END + 300) / 1000,
               ease: [0.22, 0.61, 0.36, 1],
             }}
           >
             <span
-              className={`${jakartaSans.className} text-2xl md:text-3xl lg:text-4xl font-light tracking-[0.25em] uppercase bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
+              className={`${jakartaSans.className} text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-light tracking-[0.26em] uppercase bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
               style={{
-                filter: "drop-shadow(0 0 30px rgba(245, 158, 11, 0.5))",
+                filter: "drop-shadow(0 0 32px rgba(245, 158, 11, 0.5)) drop-shadow(0 4px 20px rgba(0, 0, 0, 0.8))",
+                textShadow: "0 0 40px rgba(0, 0, 0, 0.9)",
+                marginLeft: "clamp(-16px, -2vw, 0px)", // Offset expresivo
+                transform: "translateX(-3%)", // Desviación intencional
               }}
             >
               La màgia comença
