@@ -45,9 +45,9 @@ export default function HeroPortalLogo({
   onFinish,
   svgUrl = "/img/orbita-glyph-anim.svg",
   // timing cinematogràfic optimitzat
-  totalMs = 6000,
-  // fade final dramàtic però àgil
-  fadeMs = 2200,
+  totalMs = 6500,
+  // fade final llarg i suau - text i planeta junts
+  fadeMs = 3200,
   introHoldMs = 600,
   introFadeMs = 800,
   speedMultiplier = 1,
@@ -93,9 +93,9 @@ export default function HeroPortalLogo({
       setIsMobile(mobile);
 
       if (mobile) {
-        // En mòbil: màxim 3.5 segons total amb fade dramàtic
-        const MOBILE_TOTAL_MS = prefersReducedMotion ? 2000 : 3500;
-        const MOBILE_FADE_MS = prefersReducedMotion ? 400 : 800;
+        // En mòbil: màxim 4 segons total amb fade llarg i suau
+        const MOBILE_TOTAL_MS = prefersReducedMotion ? 2000 : 4000;
+        const MOBILE_FADE_MS = prefersReducedMotion ? 400 : 1200;
 
         const tid = window.setTimeout(() => {
           setVisible(false);
@@ -674,8 +674,8 @@ export default function HeroPortalLogo({
               WebkitTapHighlightColor: 'transparent',
             }}
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.3, ease: [0.22, 0.61, 0.36, 1] }}
+            exit={{ opacity: 0, scale: 1.02 }}
+            transition={{ duration: 1.2, ease: [0.22, 0.61, 0.36, 1] }}
           >
             {/* Logo animat - TAMAÑO ORIGINAL */}
             {svgMarkup && isReady && (
@@ -732,8 +732,8 @@ export default function HeroPortalLogo({
                   filter: "blur(0px)"
                 }}
                 transition={{
-                  duration: 1.4,
-                  delay: 0.6,
+                  duration: 1.6,
+                  delay: 0.5,
                   ease: [0.19, 1, 0.22, 1],
                 }}
               >
@@ -965,15 +965,15 @@ export default function HeroPortalLogo({
             }}
             initial={{ opacity: 0, y: 40, x: 12, scale: 0.9, filter: "blur(16px)" }}
             animate={{
-              opacity: [0, 1, 1, 0],
-              y: [40, 0, 0, -20],
-              x: [12, 0, 0, -8],
-              scale: [0.9, 1, 1, 1.02],
-              filter: ["blur(16px)", "blur(0px)", "blur(0px)", "blur(12px)"]
+              opacity: [0, 1, 1],
+              y: [40, 0, 0],
+              x: [12, 0, 0],
+              scale: [0.9, 1, 1],
+              filter: ["blur(16px)", "blur(0px)", "blur(0px)"]
             }}
             transition={{
-              times: [0, 0.2, 0.8, 1],
-              duration: 5.0,
+              times: [0, 0.3, 1],
+              duration: 2.2,
               delay: (SEQ_TELON_END + 250) / 1000,
               ease: [0.19, 1, 0.22, 1],
             }}
