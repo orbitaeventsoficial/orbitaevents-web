@@ -100,6 +100,7 @@ export default function HeroPortalLogo({
   }, [onFinish]);
 
   const SPEED = speedMultiplier;
+  const planetScale = isMobile ? 0.9 : 0.85;
 
   // Telón negro inicial
   const TELON_HOLD = Math.round(introHoldMs * SPEED);
@@ -381,7 +382,7 @@ export default function HeroPortalLogo({
 
     // PLANETA - CON BRUTAL GLOW
     animateElements(planetEls, {
-      transform: "scale(1.02) translateY(0)",
+      transform: `scale(${planetScale}) translateY(0)`,
       duration: Math.max(400 + TRANSITION_EXTRA_MS, DUR_PLANET),
       delay: PLANET_START,
     });
@@ -667,20 +668,25 @@ export default function HeroPortalLogo({
 
             {/* Text subliminal - TIPOGRAFIA PREMIUM DAURAT */}
             <motion.p
-              className={`${jakartaSans.className} text-xl font-light tracking-[0.25em] mt-10 uppercase bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
-              style={{
-                textShadow: "0 0 30px rgba(245, 158, 11, 0.5), 0 0 60px rgba(245, 158, 11, 0.3)",
-                filter: "drop-shadow(0 0 20px rgba(217, 119, 6, 0.4))",
-              }}
-              initial={{ opacity: 0, y: 20, letterSpacing: "0.5em" }}
-              animate={{ opacity: 1, y: 0, letterSpacing: "0.25em" }}
+              className="mt-10 px-6 py-3 rounded-full bg-black/70 border border-white/20 shadow-[0_15px_35px_rgba(0,0,0,0.55)]"
+              style={{ pointerEvents: "none" }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{
                 duration: 1.5,
                 delay: 1.0,
                 ease: [0.22, 0.61, 0.36, 1],
               }}
             >
-              La màgia comença
+              <span
+                className={`${jakartaSans.className} text-xl md:text-2xl lg:text-3xl font-semibold tracking-[0.35em] uppercase bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
+                style={{
+                  textShadow: "0 0 25px rgba(0, 0, 0, 0.8)",
+                  filter: "drop-shadow(0 0 25px rgba(0, 0, 0, 0.7))",
+                }}
+              >
+                La màgia comença
+              </span>
             </motion.p>
 
             {/* Hint per saltar */}
@@ -723,6 +729,11 @@ export default function HeroPortalLogo({
             WebkitBackfaceVisibility: 'hidden',
             transform: 'translateZ(0)',
             isolation: "isolate",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'visible',
+            minHeight: '100vh',
           }}
           initial={{ opacity: 1 }}
           exit={{
@@ -896,9 +907,11 @@ export default function HeroPortalLogo({
               ref={hostRef}
               className="relative overflow-visible"
               style={{
-                width: "min(65vw, 380px)",
+                width: "clamp(320px, 65vw, 520px)",
                 height: "auto",
                 aspectRatio: "1 / 1",
+                maxHeight: "80vh",
+                minHeight: "320px",
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
                 transform: 'translateZ(0)',
