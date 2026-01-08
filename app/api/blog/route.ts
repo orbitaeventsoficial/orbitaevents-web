@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
-export const fetchCache = 'no-store';
+export const fetchCache = 'force-no-store';
 
 /**
  * GET /api/blog

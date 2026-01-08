@@ -6,7 +6,7 @@ import { getTranslations } from 'next-intl/server';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
-export const fetchCache = 'no-store';
+export const fetchCache = 'force-no-store';
 
 export async function generateMetadata({
   params: { locale },

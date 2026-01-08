@@ -20,7 +20,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 export const dynamic = 'force-dynamic';
-export const fetchCache = 'no-store';
+export const fetchCache = 'force-no-store';
 
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const LOCATION_API = 'https://businessprofile.googleapis.com/v1';
