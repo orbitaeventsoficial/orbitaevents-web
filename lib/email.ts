@@ -582,13 +582,17 @@ export async function sendBookingConfirmation(booking: any): Promise<void> {
     day: 'numeric',
   });
 
-  const packName = booking.pack.translations.find((t: any) => t.locale === booking.preferredLocale)?.name || booking.pack.code;
+  const packName =
+    booking.pack.translations.find((t: any) => t.locale === booking.preferredLocale)?.name ||
+    booking.pack.slug;
 
   let extrasHtml = '';
   if (booking.extras && booking.extras.length > 0) {
     extrasHtml = booking.extras
       .map((extra: any) => {
-        const extraName = extra.extra.translations.find((t: any) => t.locale === booking.preferredLocale)?.name || extra.extra.code;
+        const extraName =
+          extra.extra.translations.find((t: any) => t.locale === booking.preferredLocale)?.name ||
+          extra.extra.slug;
         return `<li>${escapeHtml(extraName)} - ${extra.price}€</li>`;
       })
       .join('');
@@ -673,7 +677,9 @@ export async function sendBookingConfirmation(booking: any): Promise<void> {
               <ul style="margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8;">
                 <li><strong>${escapeHtml(packName)}</strong> - ${booking.pack.price}€</li>
                 ${extrasHtml}
-                ${booking.extraHours > 0 ? `<li>Horas extra (${booking.extraHours}h) - ${booking.pack.pricePerExtraHour * booking.extraHours}€</li>` : ''}
+                ${booking.extraHours > 0 && booking.pack.extraHourPrice
+                  ? `<li>Horas extra (${booking.extraHours}h) - ${booking.pack.extraHourPrice * booking.extraHours}€</li>`
+                  : ''}
               </ul>
 
               <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #333;">
@@ -765,7 +771,7 @@ export async function sendBookingNotificationToAdmin(booking: any): Promise<void
           </ul>
 
           <h2>Servicios</h2>
-          <p><strong>Pack:</strong> ${booking.pack.code} - ${booking.pack.price}€</p>
+          <p><strong>Pack:</strong> ${booking.pack.slug} - ${booking.pack.price}€</p>
           ${booking.extras.length > 0 ? `<p><strong>Extras:</strong> ${booking.extras.length}</p>` : ''}
           ${booking.extraHours > 0 ? `<p><strong>Horas extra:</strong> ${booking.extraHours}h</p>` : ''}
 
@@ -778,7 +784,7 @@ export async function sendBookingNotificationToAdmin(booking: any): Promise<void
 
           <hr>
           <p style="color: #666; font-size: 12px;">
-            Ver en admin: ${SITE_CONFIG.url}/admin/bookings/${booking.id}
+            Ver en admin: ${SITE_CONFIG.web.url}/admin/bookings/${booking.id}
           </p>
         </div>
       </body>

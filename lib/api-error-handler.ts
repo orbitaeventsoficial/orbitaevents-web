@@ -10,7 +10,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { logError, logWarn } from '@/lib/logger';
+import { log } from '@/lib/logger';
 import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
 
@@ -87,12 +87,14 @@ export function handleApiError(
   const errorInfo = detectErrorType(error);
 
   // Log error with full context
-  logError(context, error, {
-    code: errorInfo.code,
-    statusCode: statusCode || errorInfo.statusCode,
-    ...metadata,
-    timestamp,
-    stack: error instanceof Error ? error.stack : undefined,
+  log.error(context, error, {
+    context: {
+      code: errorInfo.code,
+      statusCode: statusCode || errorInfo.statusCode,
+      ...metadata,
+      timestamp,
+      stack: error instanceof Error ? error.stack : undefined,
+    },
   });
 
   // Build response
@@ -238,7 +240,7 @@ export function validationError(
   message: string,
   details?: unknown
 ): NextResponse<ApiErrorResponse> {
-  logWarn('Validation error', { message, details });
+  log.warn('Validation error', { message, details });
 
   return NextResponse.json(
     {

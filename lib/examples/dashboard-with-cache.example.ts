@@ -14,7 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cachedQuery, CacheKeys, CacheTTL, invalidateCachePattern } from '@/lib/query-cache';
 import { handleApiError } from '@/lib/api-error-handler';
-import { logInfo } from '@/lib/logger';
+import { log } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -124,9 +124,9 @@ export async function GET(req: NextRequest) {
         async () => {
           const result = await prisma.booking.aggregate({
             where: { status: { in: ['CONFIRMED', 'COMPLETED'] } },
-            _sum: { finalPrice: true },
+            _sum: { total: true },
           });
-          return result._sum.finalPrice || 0;
+          return result._sum?.total || 0;
         },
         CacheTTL.MEDIUM
       ),
@@ -139,9 +139,9 @@ export async function GET(req: NextRequest) {
               status: { in: ['CONFIRMED', 'COMPLETED'] },
               createdAt: { gte: startOfMonth },
             },
-            _sum: { finalPrice: true },
+            _sum: { total: true },
           });
-          return result._sum.finalPrice || 0;
+          return result._sum?.total || 0;
         },
         CacheTTL.SHORT
       ),
@@ -154,9 +154,9 @@ export async function GET(req: NextRequest) {
               status: { in: ['CONFIRMED', 'COMPLETED'] },
               createdAt: { gte: startOfYear },
             },
-            _sum: { finalPrice: true },
+            _sum: { total: true },
           });
-          return result._sum.finalPrice || 0;
+          return result._sum?.total || 0;
         },
         CacheTTL.MEDIUM
       ),
@@ -166,9 +166,9 @@ export async function GET(req: NextRequest) {
         async () => {
           const result = await prisma.booking.aggregate({
             where: { status: { in: ['CONFIRMED', 'COMPLETED'] } },
-            _avg: { finalPrice: true },
+            _avg: { total: true },
           });
-          return result._avg.finalPrice || 0;
+          return result._avg?.total || 0;
         },
         CacheTTL.MEDIUM
       ),
@@ -183,7 +183,8 @@ export async function GET(req: NextRequest) {
             select: {
               id: true,
               name: true,
-              contact: true,
+              email: true,
+              phone: true,
               eventType: true,
               eventDate: true,
               createdAt: true,
@@ -209,21 +210,15 @@ export async function GET(req: NextRequest) {
               eventDate: true,
               eventType: true,
               eventLocation: true,
-              finalPrice: true,
+              total: true,
               status: true,
-              customer: {
-                select: {
-                  name: true,
-                  email: true,
-                },
-              },
             },
           }),
         CacheTTL.SHORT
       ),
     ]);
 
-    logInfo('Dashboard stats fetched (with caching)', {
+    log.info('Dashboard stats fetched (with caching)', {
       totalLeads,
       totalBookings,
       totalRevenue,

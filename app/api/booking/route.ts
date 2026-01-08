@@ -43,15 +43,13 @@ interface BookingRequest {
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     // Rate limiting
-    const rateLimitResult = await checkRateLimit(request, 'booking', 3, 3600); // 3 per hour
-    if (!rateLimitResult.success) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Too many booking requests. Please try again later.',
-        },
-        { status: 429 }
-      );
+    const rateLimitResponse = await checkRateLimit(request, {
+      limit: 3,
+      windowSeconds: 3600,
+      prefix: 'booking',
+    });
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
 
     // Parse request body
@@ -177,11 +175,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     });
 
     // Add extra hours cost (if applicable)
-    if (body.extraHours && pack.pricePerExtraHour) {
-      subtotal += pack.pricePerExtraHour * body.extraHours;
+    if (body.extraHours && pack.extraHourPrice) {
+      subtotal += pack.extraHourPrice * body.extraHours;
     }
 
-    const total = subtotal;
+    const discount = 0;
+    const vatRate = 21;
+    const vatAmount = Math.round(subtotal * (vatRate / 100) * 100) / 100;
+    const total = subtotal - discount + vatAmount;
 
     // Generate booking reference
     const year = new Date().getFullYear();
@@ -212,9 +213,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         packId: body.packId,
         extraHours: body.extraHours || 0,
         subtotal,
+        discount,
+        vatRate,
+        vatAmount,
         total,
+        depositAmount: 0,
+        remainingAmount: total,
         status: 'PENDING',
-        paymentStatus: 'PENDING',
         notes: body.notes,
         extras: {
           create: extras.map((extra) => ({
