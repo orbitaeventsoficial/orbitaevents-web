@@ -53,3 +53,8 @@ lib.zip
 
 # Lighthouse CI
 .lighthouseci/
+
+# Playwright test results
+contact.html
+playwright-report/
+test-results/

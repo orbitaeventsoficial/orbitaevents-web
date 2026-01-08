@@ -69,7 +69,6 @@
     "mailparser": "^3.9.1",
     "next": "14.2.35",
     "next-intl": "^4.5.6",
-    "next-recaptcha-v3": "^1.5.3",
     "nodemailer": "^7.0.10",
     "openai": "^4.56.0",
     "postcss": "8.4.38",

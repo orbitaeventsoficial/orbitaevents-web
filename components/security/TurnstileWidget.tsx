@@ -24,9 +24,10 @@ export default function TurnstileWidget({
 
   useEffect(() => {
     // Reset on unmount
+    const ref = turnstileRef.current;
     return () => {
-      if (turnstileRef.current) {
-        turnstileRef.current.reset();
+      if (ref) {
+        ref.reset();
       }
     };
   }, []);
