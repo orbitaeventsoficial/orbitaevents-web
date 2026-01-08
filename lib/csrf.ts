@@ -18,24 +18,55 @@ const CSRF_TOKEN_COOKIE = 'csrf-token';
 const CSRF_TOKEN_HEADER = 'x-csrf-token';
 const TOKEN_MAX_AGE = 3600; // 1 hour in seconds
 
-// Get CSRF secret from environment (required in production)
-// CRITICAL FIX: No fallback secret - fail hard if not configured
-const CSRF_SECRET = process.env.CSRF_SECRET || process.env.NEXTAUTH_SECRET;
+// Get CSRF secret from environment (REQUIRED - no fallbacks)
+const CSRF_SECRET = process.env.CSRF_SECRET;
 
-if (!CSRF_SECRET) {
+// Validate CSRF secret exists and has sufficient entropy
+function validateCsrfSecret(secret: string | undefined): void {
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'CRITICAL: CSRF_SECRET environment variable is not set. ' +
+        'Cannot start application without CSRF protection. ' +
+        'Generate one with: openssl rand -hex 32'
+      );
+    } else {
+      throw new Error(
+        'CSRF_SECRET environment variable is required even in development. ' +
+        'Generate one with: openssl rand -hex 32 or set CSRF_SECRET=dev-only-insecure-secret-DO-NOT-USE-IN-PROD'
+      );
+    }
+  }
+
+  // Validate minimum entropy: 32 characters
+  if (secret.length < 32) {
+    throw new Error(
+      'CRITICAL: CSRF_SECRET must be at least 32 characters long for security. ' +
+      `Current length: ${secret.length}. Generate a strong secret with: openssl rand -hex 32`
+    );
+  }
+
+  // Warn about weak secrets in production
   if (process.env.NODE_ENV === 'production') {
-    // FAIL HARD in production - no default secret allowed
-    throw new Error('CRITICAL: CSRF_SECRET environment variable is not set. Cannot start application without CSRF protection.');
-  } else {
-    // Development only: use a default but log warning
-    log.warn('CSRF: No CSRF_SECRET set - using insecure development default. This would fail in production.', {
-      message: 'Set CSRF_SECRET environment variable for production'
-    });
+    const weakPatterns = ['dev', 'test', 'demo', '123', 'password', 'secret'];
+    const secretLower = secret.toLowerCase();
+
+    for (const pattern of weakPatterns) {
+      if (secretLower.includes(pattern)) {
+        log.error('SECURITY WARNING: CSRF_SECRET appears to be a weak/test value in production!', {
+          pattern: pattern,
+          message: 'Generate a cryptographically secure secret immediately!'
+        });
+      }
+    }
   }
 }
 
-// Development fallback (only used if CSRF_SECRET is not set and we're in development)
-const CSRF_SECRET_SAFE = CSRF_SECRET || 'dev-csrf-secret-CHANGE-ME';
+// Validate on startup
+validateCsrfSecret(CSRF_SECRET);
+
+// TypeScript now knows CSRF_SECRET is defined
+const CSRF_SECRET_SAFE = CSRF_SECRET as string;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TOKEN GENERATION
