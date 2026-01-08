@@ -10,16 +10,16 @@ import { useRouter } from 'next/navigation';
 
 interface Pack {
   id: string;
-  code: string;
+  slug: string;
   name: string;
   price: number;
-  pricePerExtraHour?: number;
-  duration: number;
+  extraHourPrice?: number;
+  djHours: number;
 }
 
 interface Extra {
   id: string;
-  code: string;
+  slug: string;
   name: string;
   price: number;
 }
@@ -67,8 +67,8 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
       total += selectedPack.price;
 
       // Add extra hours
-      if (formData.extraHours > 0 && selectedPack.pricePerExtraHour) {
-        total += formData.extraHours * selectedPack.pricePerExtraHour;
+      if (formData.extraHours > 0 && selectedPack.extraHourPrice) {
+        total += formData.extraHours * selectedPack.extraHourPrice;
       }
     }
 
@@ -355,10 +355,10 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
                 <h4 className="font-semibold text-white">{pack.name}</h4>
                 <span className="text-2xl font-bold text-purple-400">{pack.price}€</span>
               </div>
-              <p className="text-sm text-white/60">{pack.duration}h de servicio</p>
-              {pack.pricePerExtraHour && (
+              <p className="text-sm text-white/60">{pack.djHours}h de servicio</p>
+              {pack.extraHourPrice && (
                 <p className="text-xs text-white/60 mt-2">
-                  +{pack.pricePerExtraHour}€/h extra
+                  +{pack.extraHourPrice}€/h extra
                 </p>
               )}
             </label>
@@ -366,7 +366,7 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
         </div>
 
         {/* Extra Hours */}
-        {packs.find((p) => p.id === formData.packId)?.pricePerExtraHour && (
+        {packs.find((p) => p.id === formData.packId)?.extraHourPrice && (
           <div>
             <label className="block text-sm font-medium text-white/70 mb-2">
               Horas extra (opcional)

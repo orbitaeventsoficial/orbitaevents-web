@@ -25,6 +25,7 @@
         "app/*"
       ],
       "@/components/*": [
+        "components/*",
         "app/components/*"
       ],
       "@/data/*": [

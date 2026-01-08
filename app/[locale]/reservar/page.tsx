@@ -56,17 +56,17 @@ export default async function BookingPage({
   // Transform data for component
   const packsForForm = packs.map((pack) => ({
     id: pack.id,
-    code: pack.code,
-    name: pack.translations[0]?.name || pack.code,
+    slug: pack.slug,
+    name: pack.translations[0]?.name || pack.slug,
     price: pack.price,
-    pricePerExtraHour: pack.pricePerExtraHour || undefined,
-    duration: pack.duration,
+    extraHourPrice: pack.extraHourPrice || undefined,
+    djHours: pack.djHours,
   }));
 
   const extrasForForm = extras.map((extra) => ({
     id: extra.id,
-    code: extra.code,
-    name: extra.translations[0]?.name || extra.code,
+    slug: extra.slug,
+    name: extra.translations[0]?.name || extra.slug,
     price: extra.price,
   }));
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
-import { logInfo, logError } from '@/lib/logger';
+import { log } from '@/lib/logger';
 
 /**
  * GET /api/admin/blog
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
       prisma.blogPost.count({ where }),
     ]);
 
-    logInfo('Blog posts listed', { count: posts.length, total, page, limit });
+    log.info('Blog posts listed', { count: posts.length, total, page, limit });
 
     return NextResponse.json({
       posts,
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    logError('Failed to list blog posts', error);
+    log.error('Failed to list blog posts', error);
     return NextResponse.json(
       { error: 'Failed to list blog posts' },
       { status: 500 }
@@ -126,11 +126,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    logInfo('Blog post created', { postId: post.id, slug: post.slug });
+    log.info('Blog post created', { postId: post.id, slug: post.slug });
 
     return NextResponse.json(post, { status: 201 });
   } catch (error) {
-    logError('Failed to create blog post', error);
+    log.error('Failed to create blog post', error);
     return NextResponse.json(
       { error: 'Failed to create blog post' },
       { status: 500 }
@@ -226,11 +226,11 @@ export async function PUT(req: NextRequest) {
       include: { translations: true },
     });
 
-    logInfo('Blog post updated', { postId: id, slug: post.slug });
+    log.info('Blog post updated', { postId: id, slug: post.slug });
 
     return NextResponse.json(updatedPost);
   } catch (error) {
-    logError('Failed to update blog post', error);
+    log.error('Failed to update blog post', error);
     return NextResponse.json(
       { error: 'Failed to update blog post' },
       { status: 500 }
@@ -271,11 +271,11 @@ export async function DELETE(req: NextRequest) {
       where: { id },
     });
 
-    logInfo('Blog post deleted', { postId: id });
+    log.info('Blog post deleted', { postId: id });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logError('Failed to delete blog post', error);
+    log.error('Failed to delete blog post', error);
     return NextResponse.json(
       { error: 'Failed to delete blog post' },
       { status: 500 }
