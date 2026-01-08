@@ -93,7 +93,7 @@
     "@types/dompurify": "^3.2.0",
     "@types/imap-simple": "^4.2.10",
     "@types/mailparser": "^3.4.6",
-    "@types/node": "20.12.12",
+    "@types/node": "22.12.0",
     "@types/nodemailer": "^7.0.4",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
@@ -105,7 +105,8 @@
     "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
     "typescript": "5.6.3",
-    "vitest": "^4.0.16"
+    "vitest": "^4.0.16",
+    "vite": "^7.3.1"
   },
   "pnpm": {
     "overrides": {
