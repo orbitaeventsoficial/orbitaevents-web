@@ -102,10 +102,24 @@ const JSON_LD_ORGANIZATION = {
   '@type': 'LocalBusiness',
   '@id': 'https://orbitaevents.com/#organization',
   name: 'Orbita Events',
-  alternateName: ['Orbita Events', 'Orbita Events Barcelona'],
+  alternateName: ['Orbita Events', 'Orbita Events Barcelona', 'DJ Bodas Barcelona', 'Discomóvil Barcelona'],
+  slogan: 'Creamos la experiencia completa que imaginas',
   description:
     'DJ profesional y tematización completa para bodas, fiestas y eventos de empresa en Barcelona y Girona. Experiencias inmersivas con sonido 4000W, iluminación LED y efectos especiales.',
   url: 'https://orbitaevents.com',
+  foundingDate: '2023',
+  knowsAbout: [
+    'DJ para bodas',
+    'Discomóvil profesional',
+    'Eventos corporativos',
+    'Fiestas temáticas',
+    'Producción técnica',
+    'Iluminación LED',
+    'Efectos especiales',
+    'Sonido profesional',
+    'Tematización de eventos',
+    'Animación de fiestas',
+  ],
   logo: {
     '@type': 'ImageObject',
     url: 'https://orbitaevents.com/img/logoplanetatextdreta.svg',
@@ -188,10 +202,15 @@ const JSON_LD_ORGANIZATION = {
           name: 'DJ bodas Barcelona',
           description:
             'DJ profesional para bodas con sonido 4000W, iluminación y efectos especiales. Ceremonia, cóctel y baile final.',
+          provider: {
+            '@id': 'https://orbitaevents.com/#organization',
+          },
         },
         price: String(BODAS_PRICE),
         priceCurrency: 'EUR',
-        priceValidUntil: '2025-12-31',
+        priceValidUntil: '2026-12-31',
+        availability: 'https://schema.org/InStock',
+        url: 'https://orbitaevents.com/servicios/bodas',
       },
       {
         '@type': 'Offer',
@@ -200,10 +219,15 @@ const JSON_LD_ORGANIZATION = {
           name: 'Discomovil Barcelona',
           description:
             'Discomóvil profesional con DJ, sonido de calidad, luces LED y efectos especiales para cualquier celebración.',
+          provider: {
+            '@id': 'https://orbitaevents.com/#organization',
+          },
         },
         price: String(DISCO_PRICE),
         priceCurrency: 'EUR',
-        priceValidUntil: '2025-12-31',
+        priceValidUntil: '2026-12-31',
+        availability: 'https://schema.org/InStock',
+        url: 'https://orbitaevents.com/servicios/discomovil',
       },
       {
         '@type': 'Offer',
@@ -212,13 +236,45 @@ const JSON_LD_ORGANIZATION = {
           name: 'Fiestas tematicas y privadas',
           description:
             'Tematización completa para fiestas: Halloween, años 80, mundo mágico y más. Decoración, efectos y ambientación.',
+          provider: {
+            '@id': 'https://orbitaevents.com/#organization',
+          },
         },
         price: String(FIESTAS_PRICE),
         priceCurrency: 'EUR',
-        priceValidUntil: '2025-12-31',
+        priceValidUntil: '2026-12-31',
+        availability: 'https://schema.org/InStock',
+        url: 'https://orbitaevents.com/servicios/fiestas',
       },
     ],
   },
+  potentialAction: [
+    {
+      '@type': 'ReserveAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: 'https://orbitaevents.com/contacto',
+        inLanguage: ['es', 'ca'],
+        actionPlatform: [
+          'http://schema.org/DesktopWebPlatform',
+          'http://schema.org/MobileWebPlatform',
+        ],
+      },
+      result: {
+        '@type': 'Reservation',
+        name: 'Reserva de DJ para eventos',
+      },
+    },
+    {
+      '@type': 'CommunicateAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `https://wa.me/${SITE_CONFIG.business.phone.replace(/\D/g, '')}`,
+        inLanguage: ['es', 'ca'],
+        actionPlatform: ['http://schema.org/MobileWebPlatform'],
+      },
+    },
+  ],
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
