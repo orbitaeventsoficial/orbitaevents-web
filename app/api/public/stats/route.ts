@@ -17,6 +17,7 @@
 import { NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 
 // Cache: revalidar cada hora
 export const revalidate = 3600;
@@ -103,19 +104,24 @@ export async function GET() {
   }
 
   try {
-    // 1. Obtener configuraciones desde Settings
-    const settings = await prisma.setting.findMany({
-      where: {
-        category: 'stats',
-      },
-    });
+    // 1. Obtener configuraciones desde Settings - Cache 15 min (rarament canvia)
+    const settings = await cachedQuery(
+      'public:stats:settings',
+      () =>
+        prisma.setting.findMany({
+          where: {
+            category: 'stats',
+          },
+        }),
+      CacheTTL.LONG
+    );
 
     const settingsMap = settings.reduce((acc, s) => {
       acc[s.key] = s.value;
       return acc;
     }, {} as Record<string, string>);
 
-    // 2. Calcular stats reales de eventos
+    // 2. Calcular stats reales de eventos - Cache 15 min (dades públiques)
     const [
       totalEvents,
       weddingCount,
@@ -123,49 +129,81 @@ export async function GET() {
       partyCount,
       testimonialStats,
     ] = await Promise.all([
-      // Total eventos completados
-      prisma.booking.count({
-        where: {
-          status: 'COMPLETED',
-        },
-      }),
+      // Total eventos completados - Cache 15 min
+      cachedQuery(
+        'public:stats:events:total',
+        () =>
+          prisma.booking.count({
+            where: {
+              status: 'COMPLETED',
+            },
+          }),
+        CacheTTL.LONG
+      ),
 
-      // Bodas
-      prisma.booking.count({
-        where: {
-          status: 'COMPLETED',
-          eventType: 'WEDDING',
-        },
-      }),
+      // Bodas - Cache 15 min
+      cachedQuery(
+        'public:stats:events:weddings',
+        () =>
+          prisma.booking.count({
+            where: {
+              status: 'COMPLETED',
+              eventType: 'WEDDING',
+            },
+          }),
+        CacheTTL.LONG
+      ),
 
-      // Corporativos
-      prisma.booking.count({
-        where: {
-          status: 'COMPLETED',
-          eventType: 'CORPORATE',
-        },
-      }),
+      // Corporativos - Cache 15 min
+      cachedQuery(
+        'public:stats:events:corporate',
+        () =>
+          prisma.booking.count({
+            where: {
+              status: 'COMPLETED',
+              eventType: 'CORPORATE',
+            },
+          }),
+        CacheTTL.LONG
+      ),
 
-      // Fiestas (birthday + private_party + otros)
-      prisma.booking.count({
-        where: {
-          status: 'COMPLETED',
-          eventType: {
-            in: ['BIRTHDAY', 'PRIVATE_PARTY', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY'],
-          },
-        },
-      }),
+      // Fiestas - Cache 15 min
+      cachedQuery(
+        'public:stats:events:parties',
+        () =>
+          prisma.booking.count({
+            where: {
+              status: 'COMPLETED',
+              eventType: {
+                in: [
+                  'BIRTHDAY',
+                  'PRIVATE_PARTY',
+                  'COMMUNION',
+                  'BAPTISM',
+                  'GRADUATION',
+                  'ANNIVERSARY',
+                ],
+              },
+            },
+          }),
+        CacheTTL.LONG
+      ),
 
-      // Testimonios aprobados
-      prisma.customerTestimonial.aggregate({
-        where: {
-          isApproved: true,
-        },
-        _count: true,
-        _avg: {
-          rating: true,
-        },
-      }),
+      // Testimonios aprobados - Cache 15 min
+      cachedQuery(
+        'public:stats:testimonials',
+        () =>
+          prisma.customerTestimonial.aggregate({
+            where: {
+              isApproved: true,
+            },
+            _count: true,
+            _avg: {
+              rating: true,
+            },
+          }),
+        CacheTTL.LONG
+      ),
     ]);
 
     // 3. Valores configurables con minimo y auto-calculo

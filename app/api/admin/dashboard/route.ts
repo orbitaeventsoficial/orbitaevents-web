@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
+import { cachedQuery, CacheTTL } from '@/lib/query-cache';
+import { handleApiError } from '@/lib/api-error-handler';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +19,7 @@ export async function GET(req: NextRequest) {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfYear = new Date(now.getFullYear(), 0, 1);
 
-    // Estadístiques de la BBDD
+    // Estadístiques de la BBDD amb caching
     const [
       totalLeads,
       newLeadsThisMonth,
@@ -34,93 +36,143 @@ export async function GET(req: NextRequest) {
       recentLeads,
       recentBookings,
     ] = await Promise.all([
-      // Total leads
-      prisma.lead.count(),
+      // Total leads - Cache 5 min
+      cachedQuery(
+        'dashboard:leads:total',
+        () => prisma.lead.count(),
+        CacheTTL.MEDIUM
+      ),
 
-      // Nous leads aquest mes
-      prisma.lead.count({
-        where: { createdAt: { gte: startOfMonth } },
-      }),
+      // Nous leads aquest mes - Cache 30s (més dinàmic)
+      cachedQuery(
+        `dashboard:leads:month:${startOfMonth.toISOString()}`,
+        () => prisma.lead.count({ where: { createdAt: { gte: startOfMonth } } }),
+        CacheTTL.VERY_SHORT
+      ),
 
-      // Leads aquest any
-      prisma.lead.count({
-        where: { createdAt: { gte: startOfYear } },
-      }),
+      // Leads aquest any - Cache 5 min
+      cachedQuery(
+        `dashboard:leads:year:${startOfYear.getFullYear()}`,
+        () => prisma.lead.count({ where: { createdAt: { gte: startOfYear } } }),
+        CacheTTL.MEDIUM
+      ),
 
-      // Total reserves
-      prisma.booking.count(),
+      // Total reserves - Cache 5 min
+      cachedQuery(
+        'dashboard:bookings:total',
+        () => prisma.booking.count(),
+        CacheTTL.MEDIUM
+      ),
 
-      // Reserves aquest mes
-      prisma.booking.count({
-        where: { createdAt: { gte: startOfMonth } },
-      }),
+      // Reserves aquest mes - Cache 30s
+      cachedQuery(
+        `dashboard:bookings:month:${startOfMonth.toISOString()}`,
+        () => prisma.booking.count({ where: { createdAt: { gte: startOfMonth } } }),
+        CacheTTL.VERY_SHORT
+      ),
 
-      // Reserves completades
-      prisma.booking.count({
-        where: { status: 'COMPLETED' },
-      }),
+      // Reserves completades - Cache 5 min
+      cachedQuery(
+        'dashboard:bookings:completed',
+        () => prisma.booking.count({ where: { status: 'COMPLETED' } }),
+        CacheTTL.MEDIUM
+      ),
 
-      // Reserves pendents de confirmar
-      prisma.booking.count({
-        where: { status: 'PENDING' },
-      }),
+      // Reserves pendents - Cache 30s
+      cachedQuery(
+        'dashboard:bookings:pending',
+        () => prisma.booking.count({ where: { status: 'PENDING' } }),
+        CacheTTL.VERY_SHORT
+      ),
 
-      // Pròxims events (confirmats)
-      prisma.booking.findMany({
-        where: {
-          eventDate: { gte: now },
-          status: { in: ['CONFIRMED', 'PREPARING'] },
-        },
-        include: {
-          pack: { include: { translations: { where: { locale: 'ca' } } } },
-        },
-        orderBy: { eventDate: 'asc' },
-        take: 5,
-      }),
+      // Pròxims events - Cache 1 min
+      cachedQuery(
+        'dashboard:bookings:upcoming',
+        () =>
+          prisma.booking.findMany({
+            where: {
+              eventDate: { gte: now },
+              status: { in: ['CONFIRMED', 'PREPARING'] },
+            },
+            include: {
+              pack: { include: { translations: { where: { locale: 'ca' } } } },
+            },
+            orderBy: { eventDate: 'asc' },
+            take: 5,
+          }),
+        CacheTTL.SHORT
+      ),
 
-      // Facturació aquest mes
-      prisma.booking.aggregate({
-        where: {
-          status: 'COMPLETED',
-          eventDate: { gte: startOfMonth },
-        },
-        _sum: { total: true },
-      }),
+      // Facturació aquest mes - Cache 1 min
+      cachedQuery(
+        `dashboard:revenue:month:${startOfMonth.toISOString()}`,
+        () =>
+          prisma.booking.aggregate({
+            where: {
+              status: 'COMPLETED',
+              eventDate: { gte: startOfMonth },
+            },
+            _sum: { total: true },
+          }),
+        CacheTTL.SHORT
+      ),
 
-      // Facturació aquest any
-      prisma.booking.aggregate({
-        where: {
-          status: 'COMPLETED',
-          eventDate: { gte: startOfYear },
-        },
-        _sum: { total: true },
-      }),
+      // Facturació aquest any - Cache 5 min
+      cachedQuery(
+        `dashboard:revenue:year:${startOfYear.getFullYear()}`,
+        () =>
+          prisma.booking.aggregate({
+            where: {
+              status: 'COMPLETED',
+              eventDate: { gte: startOfYear },
+            },
+            _sum: { total: true },
+          }),
+        CacheTTL.MEDIUM
+      ),
 
-      // Estadístiques inventari
-      prisma.inventoryItem.groupBy({
-        by: ['status'],
-        _count: true,
-      }),
+      // Estadístiques inventari - Cache 5 min
+      cachedQuery(
+        'dashboard:inventory:stats',
+        () =>
+          prisma.inventoryItem.groupBy({
+            by: ['status'],
+            _count: true,
+          }),
+        CacheTTL.MEDIUM
+      ),
 
-      // Settings (stats públiques)
-      prisma.setting.findMany({
-        where: { category: 'stats' },
-      }),
+      // Settings - Cache 15 min (rarament canvia)
+      cachedQuery(
+        'dashboard:settings:stats',
+        () => prisma.setting.findMany({ where: { category: 'stats' } }),
+        CacheTTL.LONG
+      ),
 
-      // Últims leads
-      prisma.lead.findMany({
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-      }),
+      // Últims leads - Cache 30s
+      cachedQuery(
+        'dashboard:leads:recent',
+        () =>
+          prisma.lead.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+          }),
+        CacheTTL.VERY_SHORT
+      ),
 
-      // Últimes reserves
-      prisma.booking.findMany({
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-        include: {
-          pack: { include: { translations: { where: { locale: 'ca' } } } },
-        },
-      }),
+      // Últimes reserves - Cache 30s
+      cachedQuery(
+        'dashboard:bookings:recent',
+        () =>
+          prisma.booking.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+            include: {
+              pack: { include: { translations: { where: { locale: 'ca' } } } },
+            },
+          }),
+        CacheTTL.VERY_SHORT
+      ),
     ]);
 
     // Transformar settings a objecte
@@ -177,10 +229,9 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    log.error('Error obtenint dashboard:', error);
-    return NextResponse.json(
-      { error: 'Error obtenint dades del dashboard' },
-      { status: 500 }
-    );
+    return handleApiError(error, {
+      context: 'Fetching dashboard stats',
+      userMessage: 'Error al cargar las estadísticas del panel',
+    });
   }
 }
