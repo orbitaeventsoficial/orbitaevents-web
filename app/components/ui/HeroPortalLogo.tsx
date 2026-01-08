@@ -667,7 +667,7 @@ export default function HeroPortalLogo({
 
             {/* Text subliminal - TIPOGRAFIA PREMIUM DAURAT */}
             <motion.p
-              className="absolute left-6 top-4 flex justify-start px-6"
+              className="absolute left-6 top-3 flex justify-start px-6"
               style={{ pointerEvents: "none", zIndex: 10 }}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -678,7 +678,7 @@ export default function HeroPortalLogo({
               }}
             >
               <span
-                className={`${jakartaSans.className} text-2xl md:text-3xl lg:text-4xl font-semibold tracking-[0.55em] uppercase bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent`}
+                className={`${jakartaSans.className} text-3xl md:text-4xl lg:text-5xl font-black tracking-[0.45em] uppercase bg-gradient-to-r from-amber-300 via-amber-500 to-yellow-400 bg-clip-text text-transparent`}
                 style={{
                   textShadow: "0 0 30px rgba(0, 0, 0, 0.85)",
                   filter: "drop-shadow(0 0 30px rgba(0, 0, 0, 0.75))",
