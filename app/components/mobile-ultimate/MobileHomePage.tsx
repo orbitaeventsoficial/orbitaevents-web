@@ -86,8 +86,8 @@ function QuickFeatures() {
             <div className="relative">
               <motion.span
                 className="text-4xl block mb-3"
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+                animate={{ rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 4, repeat: Infinity, delay: i * 0.3, ease: "easeInOut" }}
               >
                 {feature.icon}
               </motion.span>
