@@ -732,9 +732,9 @@ export default function HeroPortalLogo({
                   filter: "blur(0px)"
                 }}
                 transition={{
-                  duration: 1.6,
-                  delay: 0.5,
-                  ease: [0.19, 1, 0.22, 1],
+                  duration: 1.8,
+                  delay: 0.3,
+                  ease: [0.16, 1, 0.3, 1],
                 }}
               >
                 <span
@@ -973,9 +973,9 @@ export default function HeroPortalLogo({
             }}
             transition={{
               times: [0, 0.3, 1],
-              duration: 2.2,
-              delay: (SEQ_TELON_END + 250) / 1000,
-              ease: [0.19, 1, 0.22, 1],
+              duration: 2.4,
+              delay: (SEQ_TELON_END + 80) / 1000,
+              ease: [0.16, 1, 0.3, 1],
             }}
           >
             <span

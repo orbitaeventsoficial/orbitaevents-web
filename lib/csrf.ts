@@ -21,8 +21,10 @@ const TOKEN_MAX_AGE = 3600; // 1 hour in seconds
 // Get CSRF secret from environment (REQUIRED - no fallbacks)
 const CSRF_SECRET = process.env.CSRF_SECRET;
 
-// Validate CSRF secret exists and has sufficient entropy
-function validateCsrfSecret(secret: string | undefined): void {
+// Validate CSRF secret exists and has sufficient entropy (lazy validation)
+function validateCsrfSecret(): string {
+  const secret = CSRF_SECRET;
+
   if (!secret) {
     if (process.env.NODE_ENV === 'production') {
       throw new Error(
@@ -60,13 +62,9 @@ function validateCsrfSecret(secret: string | undefined): void {
       }
     }
   }
+
+  return secret;
 }
-
-// Validate on startup
-validateCsrfSecret(CSRF_SECRET);
-
-// TypeScript now knows CSRF_SECRET is defined
-const CSRF_SECRET_SAFE = CSRF_SECRET as string;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TOKEN GENERATION
@@ -77,12 +75,13 @@ const CSRF_SECRET_SAFE = CSRF_SECRET as string;
  * Format: randomBytes.hmac(randomBytes + secret)
  */
 export function generateCsrfToken(): string {
+  const secret = validateCsrfSecret(); // Lazy validation
   const tokenValue = randomBytes(CSRF_TOKEN_LENGTH).toString('hex');
   const timestamp = Date.now().toString();
   const payload = `${tokenValue}.${timestamp}`;
 
   // Sign with HMAC to prevent tampering
-  const signature = createHmac('sha256', CSRF_SECRET_SAFE)
+  const signature = createHmac('sha256', secret)
     .update(payload)
     .digest('hex');
 
@@ -101,8 +100,10 @@ function verifyCsrfToken(token: string): boolean {
   const [tokenValue, timestamp, signature] = parts;
   const payload = `${tokenValue}.${timestamp}`;
 
+  const secret = validateCsrfSecret(); // Lazy validation
+
   // Verify signature
-  const expectedSignature = createHmac('sha256', CSRF_SECRET_SAFE)
+  const expectedSignature = createHmac('sha256', secret)
     .update(payload)
     .digest('hex');
 
