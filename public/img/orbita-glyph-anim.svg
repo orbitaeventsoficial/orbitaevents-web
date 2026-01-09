@@ -119,15 +119,15 @@
     <circle cx="512" cy="380" r="260" fill="url(#g-planet-spec)" opacity="0.22" id="circle32"/>
   </g>
 
-  <!-- Anillo -->
+  <!-- Anillo - OPACIDADES REDUCIDAS PARA QUE EL PLANETA SE VEA MEJOR -->
   <g id="anillo">
-    <use xlink:href="#ring-shape" mask="url(#mask_outside_planet)" fill="url(#grad_ring_fill)" opacity="0.28" id="use32"/>
-    <use xlink:href="#ring-shape" fill="url(#grad_ring_fill)" opacity="0.82" stroke="#000" stroke-opacity="0.06" stroke-width="0.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" id="use33"/>
-    <use xlink:href="#ring-shape" fill="url(#g-inner-shade)" opacity="0.3" id="use34"/>
-    <use xlink:href="#ring-shape" fill="url(#g-ring-bevel)" opacity="0.5" style="mix-blend-mode:overlay" id="use35"/>
-    <use xlink:href="#ring-shape" fill="none" stroke="url(#g-edge-top)" stroke-width="2.1" opacity="0.55" id="use36"/>
-    <use xlink:href="#ring-shape" fill="none" stroke="url(#g-edge-bottom)" stroke-width="2.4" opacity="0.42" id="use37"/>
-    <use xlink:href="#ring-shape" fill="none" stroke="#000" stroke-width="3.2" opacity="0.1" filter="url(#f-under-blur)" id="use38"/>
+    <use xlink:href="#ring-shape" mask="url(#mask_outside_planet)" fill="url(#grad_ring_fill)" opacity="0.12" id="use32"/>
+    <use xlink:href="#ring-shape" fill="url(#grad_ring_fill)" opacity="0.35" stroke="#000" stroke-opacity="0.03" stroke-width="0.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" id="use33"/>
+    <use xlink:href="#ring-shape" fill="url(#g-inner-shade)" opacity="0.15" id="use34"/>
+    <use xlink:href="#ring-shape" fill="url(#g-ring-bevel)" opacity="0.22" style="mix-blend-mode:overlay" id="use35"/>
+    <use xlink:href="#ring-shape" fill="none" stroke="url(#g-edge-top)" stroke-width="1.8" opacity="0.25" id="use36"/>
+    <use xlink:href="#ring-shape" fill="none" stroke="url(#g-edge-bottom)" stroke-width="2.0" opacity="0.18" id="use37"/>
+    <use xlink:href="#ring-shape" fill="none" stroke="#000" stroke-width="2.8" opacity="0.05" filter="url(#f-under-blur)" id="use38"/>
   </g>
 
   <!-- Satélite -->

@@ -164,18 +164,23 @@ export default function HeroUrgencyBadge() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className={`
-              inline-flex items-center gap-2 px-4 py-2 rounded-full
+            className="relative"
+          >
+            {/* Glow sutil y completo */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/30 to-red-500/30 rounded-full blur-xl" />
+
+            <div className={`
+              relative inline-flex items-center gap-2 px-4 py-2 rounded-full
               bg-gradient-to-r ${urgencyColors[urgencyLevel]}
               text-sm font-medium shadow-lg
-            `}
-          >
-            <span className="text-lg">{availability?.isHalloweenMonth ? '🎃' : '📅'}</span>
-            <span>{getTitle()}</span>
-            <span className="font-bold">{getAvailabilityText()}</span>
-            {urgencyLevel === 'scarce' && (
-              <span className="ml-1 text-yellow-300">⚠️</span>
-            )}
+            `}>
+              <span className="text-lg">{availability?.isHalloweenMonth ? '🎃' : '📅'}</span>
+              <span>{getTitle()}</span>
+              <span className="font-bold">{getAvailabilityText()}</span>
+              {urgencyLevel === 'scarce' && (
+                <span className="ml-1 text-yellow-300">⚠️</span>
+              )}
+            </div>
           </motion.div>
         )}
 
@@ -185,20 +190,25 @@ export default function HeroUrgencyBadge() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className={`
-              inline-flex items-center gap-2 px-4 py-2 rounded-full
+            className="relative"
+          >
+            {/* Glow sutil y completo */}
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/30 to-yellow-500/30 rounded-full blur-xl" />
+
+            <div className={`
+              relative inline-flex items-center gap-2 px-4 py-2 rounded-full
               bg-gradient-to-r ${themeColors.monMagic} backdrop-blur-sm
               text-sm font-medium text-amber-200 shadow-lg
-            `}
-          >
-            <span className="text-lg">🪄</span>
-            <span>{t('monMagic.title')}</span>
-            <span className="font-bold">
-              {availability && availability.freeSaturdays > 0
-                ? t('monMagic.available')
-                : t('monMagic.soldOut', { defaultValue: t('halloween.soldOut') })
-              }
-            </span>
+            `}>
+              <span className="text-lg">🪄</span>
+              <span>{t('monMagic.title')}</span>
+              <span className="font-bold">
+                {availability && availability.freeSaturdays > 0
+                  ? t('monMagic.available')
+                  : t('monMagic.soldOut', { defaultValue: t('halloween.soldOut') })
+                }
+              </span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

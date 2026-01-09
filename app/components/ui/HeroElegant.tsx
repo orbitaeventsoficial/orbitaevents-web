@@ -65,10 +65,10 @@ export default function HeroElegant() {
           </motion.div>
 
           {/* Títol - BRUTAL i curt amb text rotatiu */}
-          <h1 className="text-[2.5rem] leading-[1.05] md:text-6xl lg:text-7xl font-black text-white mb-3 md:mb-4 tracking-tight">
+          <h1 className="text-[2.5rem] leading-[1.05] md:text-6xl lg:text-7xl font-black text-white mb-3 md:mb-4 tracking-tight text-center">
             {t('title1')}
             <br />
-            <span className="relative inline-block min-h-[1.2em]">
+            <span className="relative inline-block min-h-[1.2em] text-center">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={currentIndex}
@@ -76,7 +76,7 @@ export default function HeroElegant() {
                   animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                   exit={{ opacity: 0, y: -20, filter: 'blur(8px)' }}
                   transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
-                  className="relative inline-block"
+                  className="relative inline-block text-center"
                 >
                   {/* Text amb gradient i glow */}
                   <span
@@ -94,7 +94,7 @@ export default function HeroElegant() {
                     initial={{ scaleX: 0, opacity: 0 }}
                     animate={{ scaleX: 1, opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.4 }}
-                    className="absolute -bottom-2 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent origin-center"
+                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent origin-center"
                   />
 
                   {/* Efecte de partícules/brillantor als costats */}
@@ -119,15 +119,36 @@ export default function HeroElegant() {
           {/* CTAs - Configurador + Portfolio */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 mb-6 md:mb-8">
 
-            {/* CTA Principal - El meu event (Configurador) */}
+            {/* CTA Principal - Reserva avui (Configurador) - PREMIUM DESIGN */}
             <Link
               href="/configurador"
-              className="w-full sm:w-auto group relative inline-flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-900 font-bold px-8 py-4 rounded-xl transition-all hover:shadow-[0_8px_30px_rgba(251,191,36,0.4)] order-1"
+              className="w-full sm:w-auto group relative inline-flex items-center justify-center gap-3 overflow-hidden px-8 py-4 rounded-2xl order-1"
             >
-              <span>{t('ctaContact')}</span>
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              {/* Glow de fondo pulsante */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl"
+                animate={{ scale: [1, 1.05, 1], opacity: [0.8, 1, 0.8] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              />
+
+              {/* Efecto de shine */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                animate={{ x: ['-200%', '200%'] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
+              />
+
+              {/* Contenido del botón */}
+              <span className="relative z-10 text-zinc-900 font-black text-lg flex items-center gap-3">
+                <span className="text-2xl">🎃</span>
+                <span>{t('ctaContact')}</span>
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </span>
+
+              {/* Shadow pulsante */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
             </Link>
 
             {/* CTA Secundari - Veure què fem (Portfolio) */}
