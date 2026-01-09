@@ -150,10 +150,10 @@ export default function HeaderChampion() {
               style={{ touchAction: 'manipulation' }}
             >
               <Image
-                src="/img/logosoloplaneta.svg"
+                src="/img/logoplanetatextdreta.svg"
                 alt="Òrbita Events"
-                width={120}
-                height={80}
+                width={200}
+                height={64}
                 className="h-10 md:h-12 w-auto pointer-events-none select-none transition-transform group-hover:scale-105"
                 priority
                 draggable={false}
