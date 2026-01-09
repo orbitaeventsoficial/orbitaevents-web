@@ -4359,6 +4359,215 @@
         "title": "Contacte",
         "intro": "Si tens preguntes sobre la nostra política de cookies, contacta amb nosaltres:"
       }
+    },
+    "avisoLegal": {
+      "title": "Avís Legal",
+      "metadata": {
+        "title": "Avís Legal | Òrbita Events",
+        "description": "Avís legal i informació corporativa d'Òrbita Events."
+      },
+      "section1": {
+        "title": "1. Dades Identificatives",
+        "intro": "En compliment del deure d'informació establert a la Llei 34/2002 de Serveis de la Societat de la Informació i el Comerç Electrònic (LSSI-CE), es faciliten les següents dades:",
+        "titular": "Titular:",
+        "ubicacion": "Ubicació:",
+        "email": "Email:",
+        "telefono": "Telèfon:",
+        "sitioWeb": "Lloc web:",
+        "datosCompletos": "Per a dades fiscals completes (NIF, adreça), contactar per email."
+      },
+      "section2": {
+        "title": "2. Objecte",
+        "content": "El present lloc web té per objecte facilitar informació sobre els serveis de DJ, il·luminació, efectes especials i producció d'esdeveniments que ofereix {businessName}, així com permetre el contacte amb potencials clients."
+      },
+      "section3": {
+        "title": "3. Condicions d'Ús",
+        "intro": "L'accés a aquest lloc web és gratuït i no requereix subscripció o registre previ. No obstant això, l'ús de determinats serveis pot requerir l'emplenament de formularis de contacte.",
+        "compromiso": "L'usuari es compromet a fer un ús adequat dels continguts i serveis oferts, abstenint-se de:",
+        "item1": "Realitzar activitats il·lícites o contràries a la bona fe",
+        "item2": "Difondre continguts delictius, violents, pornogràfics o discriminatoris",
+        "item3": "Intentar accedir a àrees restringides del sistema",
+        "item4": "Introduir virus o programes maliciosos"
+      },
+      "section4": {
+        "title": "4. Propietat Intel·lectual i Industrial",
+        "content1": "Tots els continguts d'aquest lloc web, incloent textos, fotografies, gràfics, imatges, icones, tecnologia, programari, disseny gràfic i codi font, són propietat de {businessName} o de tercers que han autoritzat el seu ús.",
+        "content2": "Queda prohibida la reproducció, distribució, transformació o comunicació pública d'aquests continguts sense autorització expressa del titular."
+      },
+      "section5": {
+        "title": "5. Exclusió de Responsabilitat",
+        "intro": "{businessName} no es fa responsable de:",
+        "item1": "Errors o omissions en els continguts",
+        "item2": "Falta de disponibilitat del lloc web",
+        "item3": "Transmissió de virus o programes maliciosos",
+        "item4": "Ús il·lícit o negligent per part dels usuaris",
+        "item5": "Continguts de llocs web enllaçats"
+      },
+      "section6": {
+        "title": "6. Enllaços",
+        "content": "Aquest lloc web pot contenir enllaços a pàgines externes. {businessName} no es responsabilitza del contingut, polítiques de privadesa o pràctiques d'aquests llocs web de tercers."
+      },
+      "section7": {
+        "title": "7. Legislació Aplicable",
+        "content": "El present avís legal es regeix per la legislació espanyola. Per a qualsevol controvèrsia que pogués derivar-se de l'accés o ús d'aquest lloc web, les parts se sotmeten als Jutjats i Tribunals de {city}."
+      },
+      "section8": {
+        "title": "8. Modificacions",
+        "content": "{businessName} es reserva el dret de modificar el present avís legal en qualsevol moment. Les modificacions entraran en vigor des de la seva publicació al lloc web."
+      },
+      "section9": {
+        "title": "9. Contacte",
+        "intro": "Per a qualsevol consulta relacionada amb aquest avís legal, podeu contactar amb nosaltres a través de:"
+      }
+    },
+    "privacidad": {
+      "title": "Política de Privadesa",
+      "metadata": {
+        "title": "Política de Privadesa | Òrbita Events",
+        "description": "Política de privadesa i protecció de dades d'Òrbita Events segons RGPD i LOPDGDD."
+      },
+      "lastUpdate": "Última actualització:",
+      "portalBanner": {
+        "title": "Gestiona les teves dades personals",
+        "description": "Pots exercir els teus drets RGPD de forma ràpida i senzilla des del nostre Portal de Privadesa.",
+        "button": "Accedir al Portal"
+      },
+      "section1": {
+        "title": "1. Responsable del Tractament",
+        "empresa": "Empresa:",
+        "ubicacion": "Ubicació:",
+        "email": "Email:",
+        "telefono": "Telèfon:",
+        "datosCompletos": "Per a dades fiscals completes, contactar per email."
+      },
+      "section2": {
+        "title": "2. Dades que Recopilem",
+        "intro": "Recopilem la informació que ens proporciones directament:",
+        "identificacion": {
+          "title": "2.1. Dades d'identificació",
+          "item1": "Nom i cognoms",
+          "item2": "Correu electrònic",
+          "item3": "Número de telèfon",
+          "item4": "Ciutat",
+          "item5": "Compte d'Instagram (opcional)"
+        },
+        "evento": {
+          "title": "2.2. Dades de l'esdeveniment",
+          "item1": "Tipus d'esdeveniment",
+          "item2": "Data i ubicació",
+          "item3": "Nombre de convidats",
+          "item4": "Preferències i sol·licituds especials"
+        },
+        "navegacion": {
+          "title": "2.3. Dades de navegació",
+          "item1": "Adreça IP",
+          "item2": "Tipus de navegador",
+          "item3": "Pàgines visitades",
+          "item4": "Temps de navegació"
+        }
+      },
+      "section3": {
+        "title": "3. Finalitat del Tractament",
+        "table": {
+          "finalidad": "Finalitat",
+          "baseLegal": "Base legal",
+          "conservacion": "Conservació",
+          "row1": {
+            "purpose": "Gestió de contractes i serveis",
+            "legal": "Execució contractual",
+            "retention": "5 anys (obligació fiscal)"
+          },
+          "row2": {
+            "purpose": "Facturació",
+            "legal": "Obligació legal",
+            "retention": "5 anys"
+          },
+          "row3": {
+            "purpose": "Comunicacions comercials",
+            "legal": "Consentiment",
+            "retention": "Fins a retirada del consentiment"
+          },
+          "row4": {
+            "purpose": "Publicació de testimonis i fotos",
+            "legal": "Consentiment",
+            "retention": "Fins a retirada del consentiment"
+          },
+          "row5": {
+            "purpose": "Anàlisi i millora del servei",
+            "legal": "Interès legítim",
+            "retention": "2 anys"
+          }
+        }
+      },
+      "section4": {
+        "title": "4. Destinataris de les Dades",
+        "intro": "Les teves dades poden ser comunicades a:",
+        "providers": "Proveïdors de serveis:",
+        "providersDetail": "Hosting (Vercel), Base de dades (PostgreSQL), Email transaccional",
+        "public": "Administracions públiques:",
+        "publicDetail": "Quan sigui legalment obligatori",
+        "noSale": "No venem ni cedim dades a tercers amb finalitats comercials."
+      },
+      "section5": {
+        "title": "5. Transferències Internacionals",
+        "content": "Alguns dels nostres proveïdors poden estar ubicats fora de l'Espai Econòmic Europeu. En aquests casos, garantim que existeixen garanties adequades (Clàusules Contractuals Tipus, adequació de la Comissió Europea, etc.)."
+      },
+      "section6": {
+        "title": "6. Els teus Drets (ARCO-POL)",
+        "intro": "Segons el RGPD i la LOPDGDD, tens dret a:",
+        "acceso": "Accés:",
+        "accesoDesc": "Conèixer quines dades tenim sobre tu",
+        "rectificacion": "Rectificació:",
+        "rectificacionDesc": "Corregir dades inexactes o incompletes",
+        "supresion": "Supressió:",
+        "supresionDesc": "Sol·licitar que eliminem les teves dades (\"dret a l'oblit\")",
+        "oposicion": "Oposició:",
+        "oposicionDesc": "Oposar-te a determinats tractaments",
+        "portabilidad": "Portabilitat:",
+        "portabilidadDesc": "Rebre les teves dades en format estructurat",
+        "limitacion": "Limitació:",
+        "limitacionDesc": "Sol·licitar que limitem el tractament",
+        "plazo": "Termini de resposta:",
+        "plazoDesc": "Respondrem a la teva sol·licitud en un màxim de 30 dies.",
+        "portalButton": "Portal de Privadesa",
+        "emailButton": "Contactar per email"
+      },
+      "section7": {
+        "title": "7. Seguretat",
+        "intro": "Implementem mesures tècniques i organitzatives per protegir les teves dades:",
+        "item1": "Xifratge de dades en trànsit (HTTPS/TLS)",
+        "item2": "Xifratge de dades en repòs",
+        "item3": "Controls d'accés basats en rols",
+        "item4": "Registres d'auditoria",
+        "item5": "Còpies de seguretat regulars"
+      },
+      "section8": {
+        "title": "8. Cookies",
+        "content": "Utilitzem cookies per millorar la teva experiència. Consulta la nostra",
+        "link": "Política de Cookies",
+        "contentEnd": "per a més informació."
+      },
+      "section9": {
+        "title": "9. Menors",
+        "content": "Els nostres serveis no estan dirigits a menors de 14 anys. No recopilem conscientment dades de menors sense consentiment dels tutors legals."
+      },
+      "section10": {
+        "title": "10. Reclamacions",
+        "content": "Si consideres que hem vulnerat els teus drets, pots presentar una reclamació davant l'Agència Espanyola de Protecció de Dades (AEPD):"
+      },
+      "section11": {
+        "title": "11. Contacte",
+        "intro": "Per a qualsevol consulta sobre aquesta política de privadesa:",
+        "email": "Email:",
+        "telefono": "Telèfon:"
+      },
+      "section12": {
+        "title": "12. Actualitzacions",
+        "content": "Podem actualitzar aquesta política periòdicament. T'informarem de canvis significatius a través de la nostra web o per email."
+      },
+      "ctaFinal": {
+        "button": "Gestiona les teves dades personals"
+      }
     }
   },
   "notFound": {
@@ -6036,7 +6245,8 @@
         "badge": "",
         "features": {
           "0": "DJ Pro",
-          "1": "So 4000W"
+          "1": "So 4000W",
+          "2": "Llums LED"
         }
       },
       "fiestas": {
@@ -6160,6 +6370,14 @@
     "guarantees": {
       "sectionLabel": "Tranquil·litat garantida",
       "sectionTitle": "El teu event, sense riscos",
+      "satisfaction": {
+        "title": "100% Satisfacció",
+        "desc": "Garantia de qualitat total o et tornem els diners"
+      },
+      "backup": {
+        "title": "Equip backup",
+        "desc": "Material de reserva per a qualsevol imprevist"
+      },
       "response": {
         "title": "Resposta 2h",
         "desc": "Comunicació directa i sense intermediaris"

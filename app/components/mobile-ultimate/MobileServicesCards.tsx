@@ -100,39 +100,49 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
     >
       <motion.a
         href={`/${locale}${service.href}`}
-        whileTap={{ scale: 0.98 }}
-        onTapStart={() => haptic('light')}
-        className="block relative w-full h-full rounded-3xl overflow-hidden bg-zinc-900 border border-white/10 shadow-2xl"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        whileTap={{ scale: 0.97 }}
+        onTapStart={() => haptic('medium')}
+        className="block relative w-full h-full rounded-3xl overflow-hidden bg-zinc-900 border-2 border-white/20 shadow-2xl"
+        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true }}
-        transition={{ delay: index * 0.1 }}
+        transition={{ delay: index * 0.1, type: 'spring', damping: 20 }}
       >
-        {/* Image with parallax */}
+        {/* Image with enhanced effects */}
         <div className="absolute inset-0">
           <Image
             src={service.image}
             alt={title}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-700"
             sizes="340px"
           />
-          
-          {/* Gradient overlay */}
-          <div className={`absolute inset-0 bg-gradient-to-t ${service.gradient}`} />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
+
+          {/* Enhanced gradient overlays */}
+          <div className={`absolute inset-0 bg-gradient-to-t ${service.gradient} opacity-40`} />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-zinc-950/30" />
+
+          {/* Shimmer effect on hover */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+            initial={{ x: '-100%' }}
+            animate={{ x: '200%' }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+          />
         </div>
 
-        {/* Badge */}
+        {/* Badge - Enhanced */}
         {badge && (
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
+            initial={{ opacity: 0, x: -20, scale: 0.8 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            transition={{ delay: 0.3, type: 'spring' }}
             className="absolute top-4 left-4 z-10"
           >
-            <div className={`px-3 py-1.5 rounded-full bg-gradient-to-r ${service.badgeColor} text-white text-xs font-bold shadow-lg`}>
-              {badge}
+            <div className={`relative px-3 py-1.5 rounded-full bg-gradient-to-r ${service.badgeColor} text-white text-xs font-black shadow-2xl`}>
+              {/* Glow effect */}
+              <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${service.badgeColor} blur-lg opacity-60`} />
+              <span className="relative">{badge}</span>
             </div>
           </motion.div>
         )}
@@ -190,16 +200,25 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
           </div>
         </div>
 
-        {/* Glow effect on active */}
+        {/* Enhanced glow effect on active */}
         {isActive && (
-          <motion.div
-            className="absolute inset-0 rounded-3xl pointer-events-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            style={{
-              boxShadow: `0 0 60px 10px ${service.id === 'halloween' ? 'rgba(249, 115, 22, 0.3)' : 'rgba(251, 191, 36, 0.3)'}`,
-            }}
-          />
+          <>
+            <motion.div
+              className="absolute inset-0 rounded-3xl pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              style={{
+                boxShadow: `0 0 80px 15px ${service.id === 'halloween' ? 'rgba(249, 115, 22, 0.5)' : service.id === 'monmagic' ? 'rgba(168, 85, 247, 0.5)' : 'rgba(251, 191, 36, 0.5)'}`,
+              }}
+            />
+            <motion.div
+              className={`absolute -inset-[2px] rounded-3xl pointer-events-none bg-gradient-to-r ${service.id === 'halloween' ? 'from-orange-500 to-red-500' : service.id === 'monmagic' ? 'from-purple-500 to-pink-500' : 'from-amber-400 to-orange-500'} opacity-50`}
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+              style={{ filter: 'blur(20px)' }}
+            />
+          </>
         )}
       </motion.a>
     </motion.div>

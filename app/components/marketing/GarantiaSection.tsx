@@ -124,7 +124,7 @@ export default function GarantiaSection() {
   const { stats } = usePublicStats();
 
   return (
-    <section className="relative py-20 md:py-32 overflow-hidden">
+    <section className="relative py-6 md:py-10 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-zinc-900" />
 
@@ -158,7 +158,7 @@ export default function GarantiaSection() {
         </motion.div>
 
         {/* Guarantee Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {guaranteesConfig.map((config, index) => (
             <GuaranteeCard key={config.key} config={config} index={index} t={t} />
           ))}

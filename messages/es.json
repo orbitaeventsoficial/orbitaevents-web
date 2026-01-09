@@ -6073,7 +6073,8 @@
         "badge": "",
         "features": {
           "0": "DJ Pro",
-          "1": "Sonido 4000W"
+          "1": "Sonido 4000W",
+          "2": "Luces LED"
         }
       },
       "fiestas": {
@@ -6197,6 +6198,14 @@
     "guarantees": {
       "sectionLabel": "Tranquilidad garantizada",
       "sectionTitle": "Tu evento, sin riesgos",
+      "satisfaction": {
+        "title": "100% Satisfacción",
+        "desc": "Garantía de calidad total o te devolvemos el dinero"
+      },
+      "backup": {
+        "title": "Equipo backup",
+        "desc": "Material de reserva para cualquier imprevisto"
+      },
       "response": {
         "title": "Respuesta 2h",
         "desc": "Comunicación directa y sin intermediarios"

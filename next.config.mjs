@@ -34,6 +34,9 @@ const nextConfig = {
 
   // Headers de cache y seguridad
   async headers() {
+    // Detectar si estamos en desarrollo
+    const isDev = process.env.NODE_ENV === 'development';
+
     // Security headers comunes
     const securityHeaders = [
       { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -48,12 +51,13 @@ const nextConfig = {
           "base-uri 'self'",
           "object-src 'none'",
           "frame-ancestors 'none'",
-          "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live https://*.sentry.io https://challenges.cloudflare.com",
+          // En desarrollo, agregar 'unsafe-eval' para Next.js hot reload
+          `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live https://va.vercel-scripts.com https://*.sentry.io https://challenges.cloudflare.com`,
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com",
           "img-src 'self' data: blob: https://orbitaevents.com https://*.supabase.co https://lh3.googleusercontent.com https://maps.googleapis.com",
           "font-src 'self' https://fonts.gstatic.com",
           "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://vercel.live https://challenges.cloudflare.com",
-          "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://vercel.live wss://ws-us3.pusher.com https://*.sentry.io https://*.ingest.sentry.io https://challenges.cloudflare.com",
+          "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://vercel.live wss://ws-us3.pusher.com https://*.sentry.io https://*.ingest.sentry.io https://challenges.cloudflare.com",
           "worker-src 'self' blob:",
         ].join('; ')
       },

@@ -113,11 +113,11 @@ function ProgressBar({
 // TESTIMONIAL CARD
 // ═══════════════════════════════════════════════════════════════════════════
 
-function TestimonialCard({ 
-  testimonial, 
+function TestimonialCard({
+  testimonial,
   direction,
   t,
-}: { 
+}: {
   testimonial: Testimonial;
   direction: number;
   t: ReturnType<typeof useTranslations>;
@@ -126,17 +126,20 @@ function TestimonialCard({
     enter: (direction: number) => ({
       x: direction > 0 ? '100%' : '-100%',
       opacity: 0,
-      scale: 0.9,
+      scale: 0.8,
+      rotateY: direction > 0 ? 45 : -45,
     }),
     center: {
       x: 0,
       opacity: 1,
       scale: 1,
+      rotateY: 0,
     },
     exit: (direction: number) => ({
       x: direction < 0 ? '100%' : '-100%',
       opacity: 0,
-      scale: 0.9,
+      scale: 0.8,
+      rotateY: direction < 0 ? 45 : -45,
     }),
   };
 
@@ -159,38 +162,61 @@ function TestimonialCard({
       }}
       className="absolute inset-0"
     >
-      {/* Background gradient */}
+      {/* Enhanced background with multiple layers */}
       <div className={`absolute inset-0 bg-gradient-to-br ${testimonial.bgColor}`} />
-      
+      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/40 via-transparent to-zinc-950/40" />
+
+      {/* Animated shine effect */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+        animate={{ x: ['-100%', '200%'] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+      />
+
       {/* Content */}
       <div className="relative h-full flex flex-col justify-center items-center text-center px-8 py-12">
-        {/* Avatar */}
+        {/* Avatar - Enhanced */}
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', damping: 15, delay: 0.1 }}
           className="relative mb-6"
         >
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 p-0.5">
-            <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center overflow-hidden">
-              {/* Placeholder avatar */}
-              <span className="text-3xl">
+          {/* Pulsating glow */}
+          <motion.div
+            className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 blur-xl"
+            animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.8, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+
+          <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 p-1 shadow-2xl">
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center overflow-hidden">
+              {/* Placeholder avatar with gradient text */}
+              <span className="text-4xl font-black bg-gradient-to-br from-amber-400 to-orange-500 bg-clip-text text-transparent">
                 {name.charAt(0)}
               </span>
             </div>
           </div>
-          
-          {/* Verified badge */}
+
+          {/* Verified badge - Enhanced */}
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.3, type: 'spring' }}
-            className="absolute -bottom-1 -right-1 px-2 py-0.5 bg-green-500 rounded-full text-[10px] font-bold text-white flex items-center gap-1"
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.3, type: 'spring', damping: 10 }}
+            className="absolute -bottom-1 -right-1"
           >
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            {testimonial.verified}
+            <div className="relative px-2.5 py-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full text-[10px] font-black text-white flex items-center gap-1 shadow-xl">
+              {/* Glow */}
+              <motion.div
+                className="absolute inset-0 rounded-full bg-green-500 blur-md opacity-60"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <svg className="w-3 h-3 relative z-10" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              <span className="relative z-10">{testimonial.verified}</span>
+            </div>
           </motion.div>
         </motion.div>
 

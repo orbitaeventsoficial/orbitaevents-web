@@ -3,19 +3,17 @@
 // ÒRBITA EVENTS - ELEGANT EDITION v2.0 + MOBILE ULTIMATE
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
+import dynamic from 'next/dynamic';
 
-// ELEGANT Components - Nova versió sofisticada (Desktop)
-import HeroElegant from '@/app/components/ui/HeroElegant';
-import ServicesGridElegant from '@/app/components/ui/ServicesGridElegant';
-import TestimoniosReales from '@/app/components/home/TestimoniosReales';
-import GarantiaSection from '@/app/components/marketing/GarantiaSection';
-import CTAFinal from '@/app/components/marketing/CTAFinal';
-import CalendarioUrgencia from '@/app/components/ui/CalendarioUrgencia';
-
-// Mobile/Desktop Detection Wrapper
-import HomePageWrapper from '@/app/components/HomePageWrapper';
+// Components amb SSR desactivat per evitar errors d'hidratació
+const HeroElegant = dynamic(() => import('@/app/components/ui/HeroElegant'), { ssr: false });
+const ServicesGridElegant = dynamic(() => import('@/app/components/ui/ServicesGridElegant'), { ssr: false });
+const CalendarioUrgencia = dynamic(() => import('@/app/components/ui/CalendarioUrgencia'), { ssr: false });
+const TestimoniosReales = dynamic(() => import('@/app/components/home/TestimoniosReales'), { ssr: false });
+const GarantiaSection = dynamic(() => import('@/app/components/marketing/GarantiaSection'), { ssr: false });
+const CTAFinal = dynamic(() => import('@/app/components/marketing/CTAFinal'), { ssr: false });
+const HomePageWrapper = dynamic(() => import('@/app/components/HomePageWrapper'), { ssr: false });
 
 export const revalidate = 3600;
 
@@ -55,7 +53,7 @@ export default function HomePage() {
         <ServicesGridElegant />
 
         {/* 3. CALENDARIO - Urgència subtil */}
-        <section className="py-20 bg-[#0A0A0A]">
+        <section className="py-6 md:py-10 bg-[#0A0A0A]">
           <div className="container mx-auto px-6">
             <CalendarioUrgencia />
           </div>

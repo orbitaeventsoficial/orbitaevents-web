@@ -4,24 +4,28 @@
  * ═══════════════════════════════════════════════════════════════════════════
  * MOBILE HOME PAGE - Òrbita Events
  * ═══════════════════════════════════════════════════════════════════════════
- * 
+ *
  * Página principal móvil que integra todos los componentes:
+ * - HeroPortalLogo intro (planeta animado)
  * - App Shell con PWA features
  * - Hero inmersivo
  * - Servicios en carrusel 3D
  * - Testimonios tipo Reels
  * - CTA con urgencia
  * - Bottom navigation
- * 
+ *
  * 100% optimizada para móvil
- * 
+ *
  * FIXED:
  * - Año dinámico
  * - Enlaces de redes sociales reales
  * - Textos usando sistema de traducciones
  * - Rutas con locale
+ * - HeroPortalLogo intro en móvil
  */
 
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import MobileAppShell from './MobileAppShell';
 import MobileErrorBoundary from './MobileErrorBoundary';
 import MobileHeroUltimate from './MobileHeroUltimate';
@@ -33,35 +37,63 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
 
+// Lazy load HeroPortalLogo
+const HeroPortalLogo = dynamic(
+  () => import('@/app/components/ui/HeroPortalLogo'),
+  { ssr: false }
+);
+
 // ═══════════════════════════════════════════════════════════════════════════
 // QUICK FEATURES SECTION
 // ═══════════════════════════════════════════════════════════════════════════
 
 function QuickFeatures() {
   const t = useTranslations('mobileHome.quickFeatures');
-  
+
   const features = [
-    { icon: '🎃', titleKey: 'halloween.title', descKey: 'halloween.desc' },
-    { icon: '🪄', titleKey: 'monMagic.title', descKey: 'monMagic.desc' },
-    { icon: '🎵', titleKey: 'djPro.title', descKey: 'djPro.desc' },
-    { icon: '✨', titleKey: 'effects.title', descKey: 'effects.desc' },
+    { icon: '🎃', titleKey: 'halloween.title', descKey: 'halloween.desc', gradient: 'from-orange-500 to-red-500' },
+    { icon: '🪄', titleKey: 'monMagic.title', descKey: 'monMagic.desc', gradient: 'from-purple-500 to-pink-500' },
+    { icon: '🎵', titleKey: 'djPro.title', descKey: 'djPro.desc', gradient: 'from-amber-500 to-orange-500' },
+    { icon: '✨', titleKey: 'effects.title', descKey: 'effects.desc', gradient: 'from-cyan-500 to-blue-500' },
   ];
 
   return (
-    <section className="py-8 px-6">
-      <div className="grid grid-cols-2 gap-3">
+    <section className="py-10 px-6 relative">
+      {/* Background glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/10 rounded-full blur-[100px]" />
+
+      <div className="relative grid grid-cols-2 gap-4">
         {features.map((feature, i) => (
           <motion.div
             key={feature.titleKey}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 30, scale: 0.8 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: i * 0.1 }}
-            className="p-4 rounded-2xl bg-white/5 border border-white/10"
+            transition={{ delay: i * 0.1, type: 'spring', damping: 20 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative group p-5 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 backdrop-blur-sm shadow-xl overflow-hidden"
           >
-            <span className="text-3xl">{feature.icon}</span>
-            <h3 className="text-white font-bold mt-2">{t(feature.titleKey)}</h3>
-            <p className="text-white/50 text-sm">{t(feature.descKey)}</p>
+            {/* Hover glow effect */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-active:opacity-20 transition-opacity`} />
+
+            {/* Shine effect */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+              animate={{ x: ['-100%', '200%'] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'linear', delay: i * 0.5 }}
+            />
+
+            <div className="relative">
+              <motion.span
+                className="text-4xl block mb-3"
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+              >
+                {feature.icon}
+              </motion.span>
+              <h3 className="text-white font-black text-base mb-1">{t(feature.titleKey)}</h3>
+              <p className="text-white/60 text-xs leading-tight">{t(feature.descKey)}</p>
+            </div>
           </motion.div>
         ))}
       </div>
@@ -75,58 +107,112 @@ function QuickFeatures() {
 
 function GuaranteeSection() {
   const t = useTranslations('mobileHome.guarantees');
-  
+
   const guarantees = [
     {
       icon: '🛡️',
       titleKey: 'satisfaction.title',
       descKey: 'satisfaction.desc',
+      gradient: 'from-green-500 to-emerald-500',
     },
     {
       icon: '🔧',
       titleKey: 'backup.title',
       descKey: 'backup.desc',
+      gradient: 'from-blue-500 to-cyan-500',
     },
     {
       icon: '⚡',
       titleKey: 'response.title',
       descKey: 'response.desc',
+      gradient: 'from-amber-500 to-orange-500',
     },
   ];
 
   return (
-    <section className="py-12 px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="text-center mb-8"
-      >
-        <span className="text-amber-500 text-sm font-medium tracking-wider uppercase">
-          {t('sectionLabel')}
-        </span>
-        <h2 className="text-2xl font-black text-white mt-2">
-          {t('sectionTitle')}
-        </h2>
-      </motion.div>
+    <section className="py-14 px-6 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-0 right-0 w-48 h-48 bg-green-500/10 rounded-full blur-[100px]" />
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[100px]" />
 
-      <div className="space-y-4">
-        {guarantees.map((guarantee, i) => (
-          <motion.div
-            key={guarantee.titleKey}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+      <div className="relative">
+        {/* Header - Enhanced */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-10"
+        >
+          <motion.span
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: i * 0.1 }}
-            className="flex items-start gap-4 p-4 rounded-2xl bg-gradient-to-r from-white/5 to-transparent border border-white/10"
+            className="inline-block px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold tracking-wider uppercase mb-3"
           >
-            <span className="text-3xl">{guarantee.icon}</span>
-            <div>
-              <h3 className="text-white font-bold">{t(guarantee.titleKey)}</h3>
-              <p className="text-white/50 text-sm">{t(guarantee.descKey)}</p>
-            </div>
-          </motion.div>
-        ))}
+            {t('sectionLabel')}
+          </motion.span>
+          <h2 className="text-3xl font-black text-white bg-gradient-to-r from-white to-white/80 bg-clip-text">
+            {t('sectionTitle')}
+          </h2>
+        </motion.div>
+
+        {/* Guarantees - Enhanced */}
+        <div className="space-y-4">
+          {guarantees.map((guarantee, i) => (
+            <motion.div
+              key={guarantee.titleKey}
+              initial={{ opacity: 0, x: -30, scale: 0.9 }}
+              whileInView={{ opacity: 1, x: 0, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.15, type: 'spring', damping: 20 }}
+              whileTap={{ scale: 0.98 }}
+              className="relative group"
+            >
+              <div className="relative flex items-start gap-4 p-5 rounded-3xl bg-gradient-to-r from-white/10 to-white/5 border border-white/20 backdrop-blur-sm shadow-xl overflow-hidden">
+                {/* Animated gradient background */}
+                <motion.div
+                  className={`absolute inset-0 bg-gradient-to-r ${guarantee.gradient} opacity-0 group-active:opacity-10 transition-opacity`}
+                />
+
+                {/* Shine effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                  animate={{ x: ['-100%', '200%'] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'linear', delay: i * 1 }}
+                />
+
+                <div className="relative">
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      rotate: [0, 10, -10, 0],
+                    }}
+                    transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
+                    className="text-4xl"
+                  >
+                    {guarantee.icon}
+                  </motion.div>
+                </div>
+
+                <div className="relative flex-1">
+                  <h3 className="text-white font-black text-lg mb-1">
+                    {t(guarantee.titleKey)}
+                  </h3>
+                  <p className="text-white/70 text-sm leading-relaxed">
+                    {t(guarantee.descKey)}
+                  </p>
+                </div>
+
+                {/* Checkmark icon */}
+                <div className={`relative w-8 h-8 rounded-full bg-gradient-to-br ${guarantee.gradient} flex items-center justify-center shadow-lg`}>
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -218,33 +304,68 @@ function MobileFooter() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function MobileHomePage() {
+  const [showIntro, setShowIntro] = useState(false);
+  const [introFinished, setIntroFinished] = useState(false);
+
+  useEffect(() => {
+    // Check if user has seen the intro in this session
+    const hasSeenIntro = sessionStorage.getItem('orbita-mobile-intro-seen');
+
+    if (!hasSeenIntro) {
+      setShowIntro(true);
+    } else {
+      setIntroFinished(true);
+    }
+  }, []);
+
+  const handleIntroFinish = () => {
+    setShowIntro(false);
+    setIntroFinished(true);
+    sessionStorage.setItem('orbita-mobile-intro-seen', 'true');
+  };
+
   return (
     <MobileErrorBoundary>
-      <MobileAppShell showSplash={true}>
-      {/* Hero */}
-      <MobileHeroUltimate />
+      {/* Intro mágica - HeroPortalLogo */}
+      {showIntro && (
+        <HeroPortalLogo
+          onFinish={handleIntroFinish}
+          totalMs={4000}
+          fadeMs={1200}
+          introHoldMs={300}
+          introFadeMs={400}
+          speedMultiplier={1.2}
+        />
+      )}
 
-      {/* Quick Features */}
-      <QuickFeatures />
+      {/* Contenido principal móvil - Solo se muestra después de la intro */}
+      {introFinished && (
+        <MobileAppShell showSplash={false}>
+          {/* Hero */}
+          <MobileHeroUltimate />
 
-      {/* Services */}
-      <MobileServicesCards />
+          {/* Quick Features */}
+          <QuickFeatures />
 
-      {/* Testimonials */}
-      <MobileTestimonialsReels />
+          {/* Services */}
+          <MobileServicesCards />
 
-      {/* Guarantees */}
-      <GuaranteeSection />
+          {/* Testimonials */}
+          <MobileTestimonialsReels />
 
-      {/* Final CTA */}
-      <MobileCTAUrgency />
+          {/* Guarantees */}
+          <GuaranteeSection />
 
-      {/* Footer */}
-      <MobileFooter />
+          {/* Final CTA */}
+          <MobileCTAUrgency />
 
-      {/* Bottom Navigation */}
-      <MobileBottomNav />
-      </MobileAppShell>
+          {/* Footer */}
+          <MobileFooter />
+
+          {/* Bottom Navigation */}
+          <MobileBottomNav />
+        </MobileAppShell>
+      )}
     </MobileErrorBoundary>
   );
 }

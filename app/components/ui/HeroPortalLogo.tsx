@@ -35,8 +35,8 @@ interface HeroPortalLogoProps {
 
 // Extra global per allargar transicions
 const TRANSITION_EXTRA_MS = 500;
-// Offset extra per aguantar una mica més el logo abans del fade
-const FADE_OFFSET_MS = 400;
+// Offset extra per aguantar MOLT MÉS el logo abans del fade - que llueixi!
+const FADE_OFFSET_MS = 1200;
 
 export default function HeroPortalLogo({
   endColor = "#0a0a0a",
@@ -53,7 +53,6 @@ export default function HeroPortalLogo({
   speedMultiplier = 1,
 }: HeroPortalLogoProps) {
   const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(true);
   const [visible, setVisible] = useState(true);
   const [_svgError, setSvgError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -103,7 +102,6 @@ export default function HeroPortalLogo({
         timers.current.push(tid);
 
         const tid2 = window.setTimeout(() => {
-          setMounted(false);
           onFinish?.();
         }, MOBILE_TOTAL_MS);
         timers.current.push(tid2);
@@ -120,15 +118,15 @@ export default function HeroPortalLogo({
   const TELON_FADE = Math.round(introFadeMs * SPEED);
   const SEQ_TELON_END = TELON_HOLD + TELON_FADE;
 
-  // Delays entre elementos - MÁS JUNTOS, aparición progresiva
+  // Delays entre elementos - TEXT APAREIX ABANS! Planeta més suau
   const BUBBLES_DELAY = Math.round(-200 * SPEED); // Aparecen ANTES (negativo)
   const PLANET_DELAY = Math.round(150 * SPEED);
   const RING_DELAY = Math.round(200 * SPEED);
   const SAT_DELAY = Math.round(180 * SPEED);
-  const WORDMARK_DELAY = Math.round(220 * SPEED);
+  const WORDMARK_DELAY = Math.round(50 * SPEED); // TEXT MÉS RÀPID - abans era 220
 
-  // Duraciones de animación (totes +500 ms)
-  const DUR_PLANET = Math.round((800 + TRANSITION_EXTRA_MS) * SPEED);
+  // Duraciones de animación - PLANETA MÉS SUAU (més temps)
+  const DUR_PLANET = Math.round((1400 + TRANSITION_EXTRA_MS) * SPEED); // abans 800, ara 1400
   const DUR_RING = Math.round((900 + TRANSITION_EXTRA_MS) * SPEED);
   const DUR_SAT = Math.round((750 + TRANSITION_EXTRA_MS) * SPEED);
   const DUR_WORDMARK = Math.round((900 + TRANSITION_EXTRA_MS) * SPEED);
@@ -161,7 +159,6 @@ export default function HeroPortalLogo({
     setVisible(false);
 
     const tid = window.setTimeout(() => {
-      setMounted(false);
       onFinish?.();
     }, 400);
     timers.current.push(tid);
@@ -178,7 +175,19 @@ export default function HeroPortalLogo({
       })
       .then((text) => {
         if (alive) {
-          setSvgMarkup(text);
+          // 🆕 Inyectar CSS para ocultar elementos INMEDIATAMENTE y evitar flash
+          const styleTag = `<style>
+            #planet, #planeta, #ring, #anillo, [id*='planet' i], [class*='planet' i],
+            [id*='ring' i], [class*='ring' i], [id*='sat' i], [class*='sat' i],
+            [id*='word' i], [class*='word' i], [id*='logo' i], [class*='logo' i] {
+              opacity: 0;
+            }
+          </style>`;
+
+          // Insertar el style tag justo después de la etiqueta <svg>
+          const modifiedText = text.replace(/<svg([^>]*)>/, `<svg$1>${styleTag}`);
+
+          setSvgMarkup(modifiedText);
           setSvgError(false);
           // 🆕 Pequeño delay para asegurar que el SVG está listo
           requestAnimationFrame(() => {
@@ -393,10 +402,10 @@ export default function HeroPortalLogo({
 
     clearTimers();
 
-    // PLANETA - APARICIÓ LENTA I PROGRESSIVA
+    // PLANETA - APARICIÓ ULTRA SUAU I PROGRESSIVA (més llarga)
     animateElements(planetEls, {
       transform: "scale(1.02) translateY(0)",
-      duration: Math.max(800 + TRANSITION_EXTRA_MS, DUR_PLANET * 1.5),
+      duration: Math.max(1800 + TRANSITION_EXTRA_MS, DUR_PLANET * 1.5),
       delay: PLANET_START,
     });
 
@@ -605,7 +614,6 @@ export default function HeroPortalLogo({
 
     timers.current.push(
       window.setTimeout(() => {
-        setMounted(false);
         clearTimers();
         onFinish?.();
       }, EFFECTIVE_TOTAL_MS + FADE_OFFSET_MS)
@@ -650,8 +658,6 @@ export default function HeroPortalLogo({
           opacity: 0,
         }
       : {};
-
-  if (!mounted) return null;
 
   // 🆕 MÓVIL - Versión optimizada amb tap to skip (4s màx)
   if (isMobile) {

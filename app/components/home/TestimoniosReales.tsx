@@ -335,7 +335,7 @@ export default function TestimoniosReales() {
   const tStats = useTranslations('homeSections.testimonials');
 
   return (
-    <section className="relative py-20 md:py-32 overflow-hidden">
+    <section className="relative py-6 md:py-10 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.05),transparent_70%)]" />

@@ -117,7 +117,7 @@ export default function CTAFinal() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex flex-col gap-3 mb-10"
+            className="flex flex-row flex-wrap justify-center gap-3 mb-10"
           >
             {/* WhatsApp - PRIMARI */}
             <a
