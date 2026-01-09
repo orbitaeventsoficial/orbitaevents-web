@@ -1,5 +1,9 @@
 // instrumentation-client.ts
 import { initBotId } from 'botid/client/core';
+import * as Sentry from '@sentry/nextjs';
+
+// Sentry router instrumentation (required for navigation tracking)
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
 
 // RUTAS A PROTEGER (API + Server Actions)
 initBotId({

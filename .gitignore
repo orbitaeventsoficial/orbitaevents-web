@@ -58,3 +58,4 @@ lib.zip
 contact.html
 playwright-report/
 test-results/
+*.html

@@ -44,12 +44,12 @@ export default function HeroPortalLogo({
   glowStrength = 0.65,
   onFinish,
   svgUrl = "/img/orbita-glyph-anim.svg",
-  // timing cinematogràfic optimitzat
-  totalMs = 6500,
-  // fade final llarg i suau - text i planeta junts
-  fadeMs = 3200,
-  introHoldMs = 600,
-  introFadeMs = 800,
+  // timing cinematogràfic - tot més lent i progressiu
+  totalMs = 7000,
+  // fade final ultra llarg i suau - text i planeta junts
+  fadeMs = 3500,
+  introHoldMs = 700,
+  introFadeMs = 1000,
   speedMultiplier = 1,
 }: HeroPortalLogoProps) {
   const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
@@ -393,10 +393,10 @@ export default function HeroPortalLogo({
 
     clearTimers();
 
-    // PLANETA - CON BRUTAL GLOW
+    // PLANETA - APARICIÓ LENTA I PROGRESSIVA
     animateElements(planetEls, {
       transform: "scale(1.02) translateY(0)",
-      duration: Math.max(400 + TRANSITION_EXTRA_MS, DUR_PLANET),
+      duration: Math.max(800 + TRANSITION_EXTRA_MS, DUR_PLANET * 1.5),
       delay: PLANET_START,
     });
 
@@ -426,10 +426,10 @@ export default function HeroPortalLogo({
       }, PLANET_START + DUR_PLANET)
     );
 
-    // ANILLO - CON SHIMMER BRUTAL
+    // ANILLO - APARICIÓ LENTA I SUAU
     animateElements(ringEls, {
       transform: "translateX(0) rotate(0deg) scale(1)",
-      duration: Math.max(420 + TRANSITION_EXTRA_MS, DUR_RING),
+      duration: Math.max(700 + TRANSITION_EXTRA_MS, DUR_RING * 1.4),
       delay: RING_START,
     });
 
@@ -478,12 +478,12 @@ export default function HeroPortalLogo({
       }, RING_START + DUR_RING)
     );
 
-    // SATÉLITE - BRUTAL CON SCALE-PULSE + GLOW
+    // SATÈL·LIT - APARICIÓ PROGRESSIVA I SUAU
     timers.current.push(
       window.setTimeout(() => {
         animateElements(satEls, {
           transform: "scale(1) translateY(0)",
-          duration: Math.max(360 + TRANSITION_EXTRA_MS, DUR_SAT),
+          duration: Math.max(650 + TRANSITION_EXTRA_MS, DUR_SAT * 1.5),
         });
 
         if (!document.getElementById("__hp_float_kf")) {
@@ -537,10 +537,10 @@ export default function HeroPortalLogo({
       }, SAT_START)
     );
 
-    // WORDMARK / TEXTO - CON GLOW + FADE-IN SUAVE
+    // WORDMARK / TEXTO - APARICIÓ ULTRA SUAU
     animateElements(wmEls, {
       transform: "translateY(0) scale(1)",
-      duration: DUR_WORDMARK,
+      duration: DUR_WORDMARK * 1.3,
       delay: WORDMARK_START,
     });
 
@@ -689,18 +689,18 @@ export default function HeroPortalLogo({
                   WebkitBackfaceVisibility: 'hidden',
                 }}
                 dangerouslySetInnerHTML={{ __html: svgMarkup }}
-                initial={{ opacity: 0, scale: 0.8, rotateZ: -4, filter: "blur(12px)" }}
+                initial={{ opacity: 0, scale: 0.75, rotateZ: -5, filter: "blur(14px)" }}
                 animate={{
                   opacity: 1,
-                  scale: [0.8, 1.03, 1],
-                  rotateZ: [-4, 1, 0],
+                  scale: [0.75, 1.03, 1],
+                  rotateZ: [-5, 1, 0],
                   filter: "blur(0px)"
                 }}
                 transition={{
-                  duration: 1.4,
-                  ease: [0.19, 1, 0.22, 1],
-                  delay: 0.25,
-                  times: [0, 0.65, 1]
+                  duration: 1.8,
+                  ease: [0.16, 1, 0.3, 1],
+                  delay: 0.3,
+                  times: [0, 0.7, 1]
                 }}
               />
             )}
@@ -1278,17 +1278,17 @@ export default function HeroPortalLogo({
                 willChange: 'transform, opacity',
               }}
               dangerouslySetInnerHTML={{ __html: svgMarkup || '' }}
-              initial={{ scale: 0.85, opacity: isReady ? 1 : 0, rotateZ: -3 }}
+              initial={{ scale: 0.8, opacity: isReady ? 1 : 0, rotateZ: -4 }}
               animate={{
-                scale: [0.85, 1.02, 1],
+                scale: [0.8, 1.02, 1],
                 opacity: 1,
-                rotateZ: [-3, 1, 0]
+                rotateZ: [-4, 1, 0]
               }}
               transition={{
                 delay: isReady ? (SEQ_TELON_END + Math.round(80 * SPEED)) / 1000 : 0,
-                duration: Math.max(1.8, DUR_PLANET / 900),
-                ease: [0.19, 1, 0.22, 1],
-                times: [0, 0.6, 1]
+                duration: Math.max(2.4, DUR_PLANET / 700),
+                ease: [0.16, 1, 0.3, 1],
+                times: [0, 0.65, 1]
               }}
             />
           </div>
