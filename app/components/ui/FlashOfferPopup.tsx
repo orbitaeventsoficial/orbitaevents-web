@@ -186,7 +186,7 @@ export default function FlashOfferPopup() {
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed inset-0 flex items-center justify-center z-[101] p-4 pointer-events-none"
           >
-            <div className={`relative w-full max-w-md bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 rounded-3xl border ${accentClasses.border} shadow-2xl ${accentClasses.shadow} overflow-hidden pointer-events-auto`}>
+            <div className={`relative w-full max-w-xs bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 rounded-2xl border ${accentClasses.border} shadow-2xl ${accentClasses.shadow} overflow-hidden pointer-events-auto`}>
 
               {/* Glow effect */}
               <div className={`absolute -top-20 -right-20 w-40 h-40 ${accentClasses.glow1} rounded-full blur-3xl`} />
@@ -204,38 +204,38 @@ export default function FlashOfferPopup() {
               </button>
 
               {/* Content */}
-              <div className="relative p-8 text-center">
+              <div className="relative p-5 text-center">
 
                 {/* Badge */}
-                <div className={`inline-flex items-center gap-2 px-4 py-1.5 ${accentClasses.badge} border rounded-full mb-6`}>
-                  <span className={`w-2 h-2 ${accentClasses.badgeDot} rounded-full animate-pulse`} />
-                  <span className={`${accentClasses.badgeText} text-sm font-medium`}>{OFFER.badge}</span>
+                <div className={`inline-flex items-center gap-1.5 px-3 py-1 ${accentClasses.badge} border rounded-full mb-4`}>
+                  <span className={`w-1.5 h-1.5 ${accentClasses.badgeDot} rounded-full animate-pulse`} />
+                  <span className={`${accentClasses.badgeText} text-xs font-medium`}>{OFFER.badge}</span>
                 </div>
 
                 {/* Title */}
-                <h2 className="text-3xl md:text-4xl font-black text-white mb-2">
+                <h2 className="text-xl md:text-2xl font-black text-white mb-2">
                   {OFFER.title}
                 </h2>
 
                 {/* Description */}
-                <p className="text-zinc-400 mb-6">
+                <p className="text-zinc-400 text-sm mb-4">
                   {OFFER.description}
                 </p>
 
                 {/* Value display */}
-                <div className="mb-6">
-                  <div className="flex items-center justify-center gap-3">
+                <div className="mb-4">
+                  <div className="flex items-center justify-center gap-2">
                     {OFFER.originalValue && (
-                      <span className="text-2xl text-zinc-500 line-through">
+                      <span className="text-lg text-zinc-500 line-through">
                         {OFFER.originalValue}€
                       </span>
                     )}
-                    <span className={`text-5xl md:text-6xl font-black bg-gradient-to-r ${OFFER.gradient} bg-clip-text text-transparent`}>
+                    <span className={`text-4xl md:text-5xl font-black bg-gradient-to-r ${OFFER.gradient} bg-clip-text text-transparent`}>
                       {OFFER.value}€
                     </span>
                   </div>
                   {OFFER.originalValue && (
-                    <span className="text-green-400 text-sm font-medium">
+                    <span className="text-green-400 text-xs font-medium">
                       Estalvia {OFFER.originalValue - OFFER.value}€!
                     </span>
                   )}
@@ -243,10 +243,10 @@ export default function FlashOfferPopup() {
 
                 {/* Features */}
                 {OFFER.features && (
-                  <div className="text-left bg-zinc-800/50 rounded-xl p-4 mb-6 border border-zinc-700/50">
-                    <ul className="space-y-2">
+                  <div className="text-left bg-zinc-800/50 rounded-lg p-3 mb-4 border border-zinc-700/50">
+                    <ul className="space-y-1">
                       {OFFER.features.map((feature, i) => (
-                        <li key={i} className="text-zinc-300 text-sm">
+                        <li key={i} className="text-zinc-300 text-xs">
                           {feature}
                         </li>
                       ))}
@@ -255,18 +255,33 @@ export default function FlashOfferPopup() {
                 )}
 
                 {/* Countdown - Solo minutos y segundos */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  <div className="bg-zinc-800/50 rounded-xl p-3 border border-zinc-700/50">
-                    <span className="block text-3xl md:text-4xl font-bold text-white">
-                      {timeLeft.minutes.toString().padStart(2, '0')}
+                <div className="relative mb-4">
+                  {/* Text d'urgència */}
+                  <div className="text-center mb-2">
+                    <span className="text-red-400 text-sm font-bold uppercase tracking-wide animate-pulse">
+                      ⏰ L'oferta acaba en:
                     </span>
-                    <span className="text-xs text-zinc-500 uppercase">{t('minutes')}</span>
                   </div>
-                  <div className="bg-zinc-800/50 rounded-xl p-3 border border-zinc-700/50">
-                    <span className="block text-3xl md:text-4xl font-bold text-white">
-                      {timeLeft.seconds.toString().padStart(2, '0')}
-                    </span>
-                    <span className="text-xs text-zinc-500 uppercase">{t('seconds')}</span>
+
+                  {/* Countdown amb recuadre vermell */}
+                  <div className="relative p-3 rounded-lg border-2 border-red-500 bg-red-950/30">
+                    {/* Glow vermell */}
+                    <div className="absolute inset-0 bg-red-500/20 blur-xl rounded-lg" />
+
+                    <div className="relative grid grid-cols-2 gap-2">
+                      <div className="bg-black/40 rounded-lg p-2 border border-red-500/30">
+                        <span className="block text-2xl md:text-3xl font-bold text-red-400">
+                          {timeLeft.minutes.toString().padStart(2, '0')}
+                        </span>
+                        <span className="text-[10px] text-red-300/70 uppercase font-semibold">{t('minutes')}</span>
+                      </div>
+                      <div className="bg-black/40 rounded-lg p-2 border border-red-500/30">
+                        <span className="block text-2xl md:text-3xl font-bold text-red-400">
+                          {timeLeft.seconds.toString().padStart(2, '0')}
+                        </span>
+                        <span className="text-[10px] text-red-300/70 uppercase font-semibold">{t('seconds')}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -274,16 +289,16 @@ export default function FlashOfferPopup() {
                 <Link
                   href={OFFER.href}
                   onClick={handleClose}
-                  className={`inline-flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r ${OFFER.gradient} hover:opacity-90 text-white font-bold text-lg rounded-xl transition-all hover:shadow-lg ${accentClasses.buttonHover}`}
+                  className={`inline-flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r ${OFFER.gradient} hover:opacity-90 text-white font-bold text-base rounded-lg transition-all hover:shadow-lg ${accentClasses.buttonHover}`}
                 >
                   {OFFER.cta}
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 </Link>
 
                 {/* Fine print */}
-                <p className="mt-4 text-xs text-zinc-600">
+                <p className="mt-3 text-[10px] text-zinc-600">
                   {OFFER.finePrint}
                 </p>
               </div>

@@ -96,7 +96,7 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
         rotateY: springRotateY,
         transformStyle: 'preserve-3d',
       }}
-      className="relative flex-shrink-0 w-[85vw] max-w-[340px] h-[420px] perspective-1000"
+      className="relative flex-shrink-0 w-[75vw] max-w-[300px] h-[420px] perspective-1000"
     >
       <motion.a
         href={`/${locale}${service.href}`}
@@ -109,13 +109,14 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
         transition={{ delay: index * 0.1, type: 'spring', damping: 20 }}
       >
         {/* Image with enhanced effects */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 pointer-events-none">
           <Image
             src={service.image}
             alt={title}
             fill
-            className="object-cover transition-transform duration-700"
-            sizes="340px"
+            className="object-cover transition-transform duration-700 pointer-events-none"
+            sizes="300px"
+            draggable={false}
           />
 
           {/* Enhanced gradient overlays */}
@@ -320,7 +321,7 @@ export default function MobileServicesCards() {
 
     const handleScroll = () => {
       const scrollLeft = container.scrollLeft;
-      const cardWidth = container.offsetWidth * 0.85 + 16; // width + gap
+      const cardWidth = container.offsetWidth * 0.75 + 16; // width + gap
       const newIndex = Math.round(scrollLeft / cardWidth);
       if (newIndex !== activeIndex && newIndex >= 0 && newIndex < SERVICES.length) {
         setActiveIndex(newIndex);
@@ -335,12 +336,12 @@ export default function MobileServicesCards() {
   return (
     <section id="services-section" className="py-12 overflow-hidden">
       {/* Section Header */}
-      <div className="px-6 mb-6">
+      <div className="px-6 mb-6 text-center">
         <motion.span
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-amber-500 text-sm font-medium tracking-wider uppercase"
+          className="text-amber-500 text-sm font-medium tracking-wider uppercase block"
         >
           {t('sectionLabel')}
         </motion.span>
@@ -349,7 +350,7 @@ export default function MobileServicesCards() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className="text-3xl font-black text-white mt-2"
+          className="text-3xl font-black text-white mt-2 mx-auto"
         >
           {t('sectionTitle')}
         </motion.h2>
@@ -393,7 +394,7 @@ export default function MobileServicesCards() {
               haptic('light');
               const container = scrollRef.current;
               if (container) {
-                const cardWidth = container.offsetWidth * 0.85 + 16;
+                const cardWidth = container.offsetWidth * 0.75 + 16;
                 container.scrollTo({
                   left: index * cardWidth,
                   behavior: 'smooth',

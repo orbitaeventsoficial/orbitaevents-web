@@ -140,7 +140,7 @@ function GuaranteeSection() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10"
+          className="text-center mb-10 px-4"
         >
           <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
@@ -150,7 +150,7 @@ function GuaranteeSection() {
           >
             {t('sectionLabel')}
           </motion.span>
-          <h2 className="text-3xl font-black text-white bg-gradient-to-r from-white to-white/80 bg-clip-text">
+          <h2 className="text-3xl font-black text-white bg-gradient-to-r from-white to-white/80 bg-clip-text mx-auto">
             {t('sectionTitle')}
           </h2>
         </motion.div>
@@ -237,8 +237,12 @@ function MobileFooter() {
       <div className="text-center">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-            <span className="text-black font-black text-lg">Ò</span>
+          <div className="w-10 h-10 rounded-full overflow-hidden">
+            <img
+              src="/img/orbita-glyph.svg"
+              alt="Òrbita Events"
+              className="w-full h-full object-contain"
+            />
           </div>
           <span className="text-white font-bold text-xl">Òrbita Events</span>
         </div>
@@ -325,13 +329,10 @@ export default function MobileHomePage() {
 
   return (
     <MobileErrorBoundary>
-      {/* Intro mágica - HeroPortalLogo */}
+      {/* Intro mágica - HeroPortalLogo - Optimitzada per mòbil */}
       {showIntro && (
         <HeroPortalLogo
           onFinish={handleIntroFinish}
-          totalMs={4000}
-          fadeMs={1200}
-          speedMultiplier={1.2}
         />
       )}
 

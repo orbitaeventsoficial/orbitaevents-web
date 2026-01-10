@@ -37,9 +37,9 @@ export default function HeroPortalLogo({
   glowStrength = 0.7,
   onFinish,
   svgUrl = "/img/orbita-glyph.svg",
-  totalMs = 7500,
-  fadeMs = 3000,
-  speedMultiplier = 1,
+  totalMs = 2000,
+  fadeMs = 500,
+  speedMultiplier = 2,
 }: HeroPortalLogoProps) {
   const [visible, setVisible] = useState(true);
   const [phase, setPhase] = useState<'black' | 'text' | 'logo' | 'together' | 'exit'>('black');
@@ -90,9 +90,9 @@ export default function HeroPortalLogo({
     }
 
     const SPEED = speedMultiplier;
-    const MOBILE_TOTAL = 6000;
+    const MOBILE_TOTAL = 1500;
     const effectiveTotal = isMobile ? MOBILE_TOTAL : totalMs;
-    const effectiveFade = isMobile ? 2200 : fadeMs;
+    const effectiveFade = isMobile ? 400 : fadeMs;
 
     const phases = isMobile ? {
       text: 100 * SPEED,
@@ -150,8 +150,8 @@ export default function HeroPortalLogo({
       paddingTop: isMobile ? '15vh' : 'clamp(100px, 14vh, 140px)',
       letterSpacing: isMobile ? '0.22em' : '0.28em',
     },
-    particles: isMobile ? 25 : 40,
-    stars: isMobile ? 50 : 80,
+    particles: isMobile ? 8 : 15,
+    stars: isMobile ? 15 : 25,
   }), [isMobile]);
 
   return (
@@ -348,12 +348,12 @@ export default function HeroPortalLogo({
             <FloatingParticles count={config.particles} isMobile={isMobile} />
           </motion.div>
 
-          {/* CAPA 5: LENS FLARES */}
-          {showLogo && (
+          {/* CAPA 5: LENS FLARES - NOMÉS DESKTOP */}
+          {showLogo && !isMobile && (
             <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 25 }}>
-              <LensFlare delay={0.8} top={isMobile ? "38%" : "32%"} left={isMobile ? "25%" : "32%"} size={isMobile ? 2.5 : 3.5} />
-              <LensFlare delay={1.8} top={isMobile ? "52%" : "48%"} right={isMobile ? "20%" : "28%"} size={isMobile ? 2 : 2.8} />
-              {!isMobile && <LensFlare delay={2.5} bottom="38%" left="42%" size={2.2} />}
+              <LensFlare delay={0.8} top="32%" left="32%" size={3.5} />
+              <LensFlare delay={1.8} top="48%" right="28%" size={2.8} />
+              <LensFlare delay={2.5} bottom="38%" left="42%" size={2.2} />
             </div>
           )}
 

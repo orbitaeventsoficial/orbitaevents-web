@@ -569,6 +569,65 @@
   animation: float 3s ease-in-out infinite;
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+   WILL-CHANGE OPTIMIZATION - Indica al navegador què s'animarà
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Aplicar a elements que s'animen activament */
+.will-animate {
+  will-change: transform, opacity;
+}
+
+/* Aplicar només durant hover/animació */
+.will-animate-hover {
+  transition: transform 0.3s ease;
+}
+
+.will-animate-hover:hover,
+.will-animate-hover:active {
+  will-change: transform;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   OPTIMIZED CSS ANIMATIONS - Reemplaça framer-motion per millor rendiment
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Fade in up - lightweight */
+@keyframes fadeInUpFast {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up-fast {
+  animation: fadeInUpFast 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scale pulse - lightweight */
+@keyframes scalePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-scale-pulse {
+  animation: scalePulse 2s ease-in-out infinite;
+}
+
+/* Glow pulse - lightweight */
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
 /* Skeleton loading */
 @keyframes skeleton {
   0% { background-position: 200% 0; }
@@ -610,6 +669,62 @@ a,
   touch-action: manipulation;
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+   FIX: PAMPALLUGUES I RATLLES BLANQUES (Mobile Performance)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Force GPU acceleration and prevent flickering on mobile */
+img,
+svg,
+video,
+canvas,
+[class*="logo"],
+[class*="Logo"],
+[class*="card"],
+[class*="Card"] {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+}
+
+/* Prevent white lines/flickering during animations */
+.motion-div,
+[class*="motion-"],
+[data-framer-appear-animation] {
+  will-change: transform, opacity;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Optimize filter rendering on mobile */
+@media (max-width: 768px) {
+  [style*="blur"],
+  [class*="blur"] {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FIX: ELIMINAR EFECTE DE REBOT AL SCROLL (overscroll-behavior)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Prevent bounce/rubber-banding at scroll boundaries */
+html,
+body,
+main,
+section,
+div[class*="container"],
+div[class*="wrapper"] {
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
+  overscroll-behavior-x: none !important;
+}
+
 /* Prevent images from blocking scroll on mobile */
 img,
 picture,
@@ -618,6 +733,7 @@ video,
   touch-action: pan-y pinch-zoom;
   -webkit-user-select: none;
   user-select: none;
+  overscroll-behavior: contain;
 }
 
 /* Touch feedback */

@@ -7,12 +7,50 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
+// LAZY SECTION - Intersection Observer per carregar sota demanda
+// ═══════════════════════════════════════════════════════════════════════════
+
+function LazySection({
+  children,
+  className = '',
+  placeholder = true
+}: {
+  children: React.ReactNode;
+  className?: string;
+  placeholder?: boolean;
+}) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' } // Carregar 200px abans que sigui visible
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className={className}>
+      {isVisible ? children : placeholder && <div className="min-h-[400px] bg-neutral-950/50" />}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // DADES - Les fotos reals d'Òrbita
 // ═══════════════════════════════════════════════════════════════════════════
 
 const HERO_SLIDES = [
   {
-    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
+    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.webp',
     tagKey: 'halloween',
     emoji: '🎃',
   },
@@ -63,23 +101,29 @@ export default function MobileLanding() {
 
   return (
     <main className="bg-black min-h-screen overflow-x-hidden">
-      {/* CAPÍTOL 1: L'IMPACTE */}
+      {/* CAPÍTOL 1: L'IMPACTE - Càrrega immediata */}
       <HeroImpacte t={t} />
 
-      {/* CAPÍTOL 2: LA PROMESA */}
+      {/* CAPÍTOL 2: LA PROMESA - Càrrega immediata */}
       <LaPromesa t={t} />
 
-      {/* CAPÍTOL 3: ELS MONS (Tematitzacions) */}
+      {/* CAPÍTOL 3: ELS MONS (Tematitzacions) - Càrrega immediata */}
       <ElsMons t={t} />
 
-      {/* CAPÍTOL 4: LES PROVES (Galeria) */}
-      <LesProves t={t} />
+      {/* CAPÍTOL 4: LES PROVES (Galeria) - Lazy load */}
+      <LazySection>
+        <LesProves t={t} />
+      </LazySection>
 
-      {/* CAPÍTOL 5: LES VEUS (Testimonis) */}
-      <LesVeus t={t} />
+      {/* CAPÍTOL 5: LES VEUS (Testimonis) - Lazy load */}
+      <LazySection>
+        <LesVeus t={t} />
+      </LazySection>
 
-      {/* CAPÍTOL 6: EL MOMENT (CTA) */}
-      <ElMoment t={t} />
+      {/* CAPÍTOL 6: EL MOMENT (CTA) - Lazy load */}
+      <LazySection>
+        <ElMoment t={t} />
+      </LazySection>
 
       {/* Botó WhatsApp flotant */}
       <WhatsAppFlotant />
