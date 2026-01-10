@@ -122,8 +122,6 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
           onFinish={handleIntroFinish}
           totalMs={4000}
           fadeMs={1200}
-          introHoldMs={300}
-          introFadeMs={400}
           speedMultiplier={1.2}
         />
       )}
