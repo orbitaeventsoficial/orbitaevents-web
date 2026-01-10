@@ -1,0 +1,7 @@
+{
+  "lastUpdated": "2026-01-09T23:45:00.000Z",
+  "rating": 5,
+  "total": 9,
+  "reviews": [],
+  "note": "Añade las reseñas de Google manualmente aquí hasta que SerpAPI funcione correctamente. Formato: { author_name, rating, text, time, relative_time_description, profile_photo_url }"
+}

@@ -258,10 +258,11 @@
   "hero": {
     "elegant": {
       "badge": "DJ · Discomòbil · Temàtics",
-      "badgeEmoji": "🔥",
-      "title1": "CREEM EVENTS",
-      "title2": "INOBLIDABLES.",
+      "badgeEmoji": "✨",
+      "title1": "CREEM ESDEVENIMENTS",
+      "title2": "AMB EFECTES WOW.",
       "rotatingTexts": [
+        "AMB EFECTES WOW.",
         "INOBLIDABLES.",
         "AMB DISCOMÒBIL PRO.",
         "TIPUS TU CARA ME SUENA.",
@@ -271,20 +272,19 @@
         "QUE FAN HISTÒRIA.",
         "PER A BODES DE SOMNI.",
         "CORPORATIUS D'IMPACTE.",
-        "AMB EFECTES WOW.",
         "QUE LA GENT RECORDA.",
         "QUE NINGÚ MÉS FA."
       ],
-      "subtitle": "Discomòbil · Bodes · Halloween · Món Màgic · Tu Cara Me Suena · Corporatius",
+      "subtitle": "Discomòbil · Bodes · Halloween · Món Màgic · Tu Cara Me Suena",
       "subtitleLocation": "Barcelona i Girona.",
-      "ctaContact": "Vull el meu event",
+      "ctaContact": "Vull el meu esdeveniment",
       "ctaPrices": "Veure què fem",
       "rating": "5.0",
-      "socialProof": "50+ events realitzats",
+      "socialProof": "50+ esdeveniments realitzats",
       "recommendedAt": "Recomanats a",
-      "whatsappMessage": "Hola! Vull info per a un event temàtic"
+      "whatsappMessage": "Hola! Vull info per a un esdeveniment temàtic"
     },
-    "badge": "🔥 50+ events sense cap convidat assegut",
+    "badge": "🔥 50+ esdeveniments sense cap convidat assegut",
     "themingSpecialists": "Especialistes en Tematització",
     "location": "Barcelona + Girona",
     "stats": {
@@ -293,7 +293,7 @@
       "repeat": "repeteixen amb nosaltres",
       "years": "anys d'experiència",
       "yearsValue": "2+",
-      "events": "events amb Òrbita",
+      "events": "esdeveniments amb Òrbita",
       "eventsValue": "50+",
       "response": "resposta garantida",
       "responseTime": "resposta garantida",

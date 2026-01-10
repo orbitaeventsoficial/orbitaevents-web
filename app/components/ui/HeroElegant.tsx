@@ -89,12 +89,13 @@ export default function HeroElegant() {
                     {rotatingTexts[currentIndex]}
                   </span>
 
-                  {/* Línia decorativa animada */}
+                  {/* Línia decorativa animada - CENTRADA */}
                   <motion.span
                     initial={{ scaleX: 0, opacity: 0 }}
                     animate={{ scaleX: 1, opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.4 }}
-                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent origin-center"
+                    className="absolute -bottom-2 left-0 right-0 mx-auto w-2/3 h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent"
+                    style={{ transformOrigin: 'center' }}
                   />
 
                   {/* Efecte de partícules/brillantor als costats */}
@@ -139,8 +140,7 @@ export default function HeroElegant() {
               />
 
               {/* Contenido del botón */}
-              <span className="relative z-10 text-zinc-900 font-black text-lg flex items-center gap-3">
-                <span className="text-2xl">🎃</span>
+              <span className="relative z-10 text-zinc-900 font-black text-lg flex items-center gap-2">
                 <span>{t('ctaContact')}</span>
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />

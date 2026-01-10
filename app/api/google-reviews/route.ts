@@ -324,8 +324,9 @@ export async function GET() {
 
     // Ordenar per data i filtrar per rating mínim
     allReviews.sort((a, b) => b.time - a.time);
-    
-    const minRating = SITE_CONFIG.reviews.minRatingToShow || 4;
+
+    // NOMÉS 5 ESTRELLES - tal com sol·licitat
+    const minRating = 5;
     const filteredReviews = allReviews.filter((r) => r.rating >= minRating);
 
     // Calcular rating promig

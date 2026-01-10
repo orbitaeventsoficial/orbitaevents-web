@@ -12,12 +12,13 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const BUSINESS_SEARCH_QUERIES = [
-  'Orbita events planificador festes',
-  'Orbita events Granollers',
-  'Orbita events Catalunya',
+  'Òrbita events DJ Barcelona',
+  'Orbita events discomovil',
+  'Òrbita events fiestas',
+  '@41.392668,2.140189',
 ];
 
-const EXACT_BUSINESS_NAME = 'Orbita events';
+const EXACT_BUSINESS_NAME = 'Òrbita events';
 const BUSINESS_NAME = EXACT_BUSINESS_NAME;
 
 console.log('============================================');
@@ -32,7 +33,51 @@ async function fetchFromSerpAPI() {
   }
 
   try {
-    console.log('[SerpAPI] Buscando negocio...');
+    // Place ID de Òrbita events
+    const PLACE_ID = 'ChIJe39Xr8t/iUcRdyBu8A2xdLM';
+
+    console.log('[SerpAPI] Buscando negocio con Place ID...');
+    console.log(`[SerpAPI] Place ID: ${PLACE_ID}`);
+
+    // Método 1: Búsqueda por knowledge graph
+    const kgUrl = `https://serpapi.com/search.json?engine=google&q=orbita+events+granollers&location=Granollers,Catalonia,Spain&google_domain=google.es&hl=es&gl=es&api_key=${apiKey}`;
+    const kgRes = await fetch(kgUrl);
+    const kgData = await kgRes.json();
+
+    if (kgData.knowledge_graph) {
+      const kg = kgData.knowledge_graph;
+      console.log(`[SerpAPI] Encontrado: ${kg.title} (${kg.rating}, ${kg.review_count} reviews)`);
+
+      // Obtener reseñas usando Google Maps Reviews con place_id
+      const reviewsUrl = `https://serpapi.com/search.json?engine=google_maps_reviews&place_id=${PLACE_ID}&api_key=${apiKey}&hl=es`;
+      const reviewsRes = await fetch(reviewsUrl);
+      const reviewsData = await reviewsRes.json();
+
+      if (reviewsData.error) {
+        console.log('[SerpAPI] Error obteniendo resenas:', reviewsData.error);
+        console.log('[SerpAPI] Intentando método alternativo...');
+      }
+
+      const reviews = (reviewsData.reviews || []).map(r => ({
+        author_name: r.user?.name || 'Anónimo',
+        rating: r.rating || 5,
+        text: r.snippet || r.text || '',
+        time: r.iso_date ? new Date(r.iso_date).getTime() / 1000 : Date.now() / 1000,
+        relative_time_description: r.date || 'Recientemente',
+        profile_photo_url: r.user?.thumbnail,
+      }));
+
+      console.log(`[SerpAPI] ${reviews.length} resenas obtenidas`);
+
+      return {
+        rating: kg.rating || 5,
+        total: kg.review_count || reviews.length,
+        reviews,
+      };
+    }
+
+    // Fallback: búsqueda por queries
+    console.log('[SerpAPI] Fallback: Buscando por queries...');
 
     let place = null;
     for (const query of BUSINESS_SEARCH_QUERIES) {
@@ -48,11 +93,18 @@ async function fetchFromSerpAPI() {
 
       place = searchData.local_results?.find((r) => {
         const title = r.title?.toLowerCase() || "";
+        const type = r.type?.toLowerCase() || "";
         const queryName = EXACT_BUSINESS_NAME.toLowerCase();
-        return (
+
+        // Filtrar inmobiliarias y solo buscar eventos/DJ
+        const isRealEstate = title.includes('real estate') || type.includes('real estate');
+        const isEvents = type.includes('event') || type.includes('dj') ||
+                        r.description?.toLowerCase().includes('event') ||
+                        r.description?.toLowerCase().includes('dj');
+
+        return !isRealEstate && (
           title === queryName ||
-          title.includes(queryName) ||
-          query.toLowerCase().includes(title)
+          (title.includes('òrbita') || title.includes('orbita')) && isEvents
         );
       });
 

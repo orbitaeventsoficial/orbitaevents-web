@@ -35,79 +35,59 @@ interface OfferConfig {
   accentColor: string;
 }
 
-const OFFERS: OfferConfig[] = [
-  {
-    id: 'discount-15',
-    type: 'percentage',
-    value: 15,
-    badge: 'OFERTA LIMITADA',
-    title: 'Reserva ara i estalvia!',
-    description: 'Descompte exclusiu per a nous clients',
-    cta: 'Demana pressupost amb -15%',
-    href: '/contacto',
-    finePrint: '*Vàlid per reserves realitzades abans del 28 de febrer',
-    gradient: 'from-amber-500 to-orange-500',
-    accentColor: 'amber',
-  },
-  {
-    id: 'flash-250',
-    type: 'fixed',
-    value: 250,
-    originalValue: 450,
-    badge: '⚡ OFERTA FLASH',
-    title: 'Festa privada completa',
-    description: 'DJ + So + Llums per a festes de fins a 50 persones',
-    features: [
-      '🎧 DJ professional 2 hores',
-      '🔊 Equip de so 3200W',
-      '💡 Il·luminació LED',
-      '✨ Màquina de fum inclosa',
-    ],
-    cta: 'Reserva per 250€',
-    href: '/contacto?pack=oferta-flash',
-    finePrint: '*Festes de fins a 50 persones. Subjecte a disponibilitat.',
-    gradient: 'from-purple-500 to-pink-500',
-    accentColor: 'purple',
-  },
-];
+// Solo oferta flash de 250€
+const OFFER: OfferConfig = {
+  id: 'flash-250',
+  type: 'fixed',
+  value: 250,
+  originalValue: 450,
+  badge: '⚡ OFERTA FLASH - TEMPS LIMITAT',
+  title: 'Reserva abans que s\'esgoti el temps!',
+  description: 'Festa privada completa: DJ + So + Llums (fins a 50 persones)',
+  features: [
+    '🎧 DJ professional 2 hores',
+    '🔊 Equip de so 3200W',
+    '💡 Il·luminació LED',
+    '✨ Màquina de fum inclosa',
+  ],
+  cta: 'Reserva ara per 250€',
+  href: '/contacto?pack=oferta-flash',
+  finePrint: '*Oferta vàlida durant el temps indicat. Fins a 50 persones. Subjecte a disponibilitat.',
+  gradient: 'from-purple-500 to-pink-500',
+  accentColor: 'purple',
+};
 
 const STORAGE_KEY = 'flashOfferDismissed';
-const OFFER_INDEX_KEY = 'flashOfferIndex';
 const DISMISS_DURATION = 24 * 60 * 60 * 1000; // 24 hores
-
-// Data final de l'oferta
-const OFFER_END_DATE = new Date('2026-02-28T23:59:59');
+const COUNTDOWN_DURATION = 15 * 60 * 1000; // 15 minuts
 
 interface TimeLeft {
-  days: number;
-  hours: number;
   minutes: number;
   seconds: number;
 }
 
-function calculateTimeLeft(): TimeLeft {
-  const now = new Date();
-  const difference = OFFER_END_DATE.getTime() - now.getTime();
+function calculateTimeLeft(startTime: number): TimeLeft {
+  const now = Date.now();
+  const elapsed = now - startTime;
+  const remaining = COUNTDOWN_DURATION - elapsed;
 
-  if (difference <= 0) {
-    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  if (remaining <= 0) {
+    return { minutes: 0, seconds: 0 };
   }
 
   return {
-    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-    minutes: Math.floor((difference / 1000 / 60) % 60),
-    seconds: Math.floor((difference / 1000) % 60),
+    minutes: Math.floor(remaining / 1000 / 60),
+    seconds: Math.floor((remaining / 1000) % 60),
   };
 }
 
 export default function FlashOfferPopup() {
   const t = useTranslations('flashOffer');
   const [isVisible, setIsVisible] = useState(false);
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft());
-  const [currentOffer, setCurrentOffer] = useState<OfferConfig>(OFFERS[0]);
+  const [startTime, setStartTime] = useState<number>(Date.now());
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>({ minutes: 15, seconds: 0 });
 
-  // Seleccionar oferta i comprovar si s'ha de mostrar
+  // Comprovar si s'ha de mostrar
   useEffect(() => {
     // Comprovar si ja s'ha tancat recentment
     const dismissed = localStorage.getItem(STORAGE_KEY);
@@ -118,30 +98,32 @@ export default function FlashOfferPopup() {
       }
     }
 
-    // Alternar oferta (0 -> 1 -> 0 -> 1...)
-    const lastIndex = parseInt(localStorage.getItem(OFFER_INDEX_KEY) || '0', 10);
-    const nextIndex = (lastIndex + 1) % OFFERS.length;
-    setCurrentOffer(OFFERS[nextIndex]);
-    localStorage.setItem(OFFER_INDEX_KEY, nextIndex.toString());
-
-    // Mostrar després de 4 segons
+    // Mostrar després de 5 segons (després de la intro)
     const timer = setTimeout(() => {
+      const now = Date.now();
+      setStartTime(now);
       setIsVisible(true);
-    }, 4000);
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  // Countdown timer
+  // Countdown timer (15 minuts)
   useEffect(() => {
     if (!isVisible) return;
 
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
+      const remaining = calculateTimeLeft(startTime);
+      setTimeLeft(remaining);
+
+      // Tancar automàticament quan s'acabi el temps
+      if (remaining.minutes === 0 && remaining.seconds === 0) {
+        setIsVisible(false);
+      }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isVisible]);
+  }, [isVisible, startTime]);
 
   const handleClose = useCallback(() => {
     setIsVisible(false);
@@ -149,12 +131,11 @@ export default function FlashOfferPopup() {
   }, []);
 
   // No renderitzar si l'oferta ha acabat
-  if (timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) {
+  if (timeLeft.minutes === 0 && timeLeft.seconds === 0 && isVisible) {
     return null;
   }
 
-  const isPercentage = currentOffer.type === 'percentage';
-  const accentClasses = currentOffer.accentColor === 'amber'
+  const accentClasses = OFFER.accentColor === 'amber'
     ? {
         badge: 'bg-amber-500/10 border-amber-500/20',
         badgeText: 'text-amber-400',
@@ -220,51 +201,43 @@ export default function FlashOfferPopup() {
                 {/* Badge */}
                 <div className={`inline-flex items-center gap-2 px-4 py-1.5 ${accentClasses.badge} border rounded-full mb-6`}>
                   <span className={`w-2 h-2 ${accentClasses.badgeDot} rounded-full animate-pulse`} />
-                  <span className={`${accentClasses.badgeText} text-sm font-medium`}>{currentOffer.badge}</span>
+                  <span className={`${accentClasses.badgeText} text-sm font-medium`}>{OFFER.badge}</span>
                 </div>
 
                 {/* Title */}
                 <h2 className="text-3xl md:text-4xl font-black text-white mb-2">
-                  {currentOffer.title}
+                  {OFFER.title}
                 </h2>
 
                 {/* Description */}
                 <p className="text-zinc-400 mb-6">
-                  {currentOffer.description}
+                  {OFFER.description}
                 </p>
 
                 {/* Value display */}
-                {isPercentage ? (
-                  <div className="inline-flex items-baseline gap-1 mb-6">
-                    <span className={`text-6xl md:text-7xl font-black bg-gradient-to-r ${currentOffer.gradient} bg-clip-text text-transparent`}>
-                      -{currentOffer.value}%
-                    </span>
-                  </div>
-                ) : (
-                  <div className="mb-6">
-                    <div className="flex items-center justify-center gap-3">
-                      {currentOffer.originalValue && (
-                        <span className="text-2xl text-zinc-500 line-through">
-                          {currentOffer.originalValue}€
-                        </span>
-                      )}
-                      <span className={`text-5xl md:text-6xl font-black bg-gradient-to-r ${currentOffer.gradient} bg-clip-text text-transparent`}>
-                        {currentOffer.value}€
-                      </span>
-                    </div>
-                    {currentOffer.originalValue && (
-                      <span className="text-green-400 text-sm font-medium">
-                        Estalvia {currentOffer.originalValue - currentOffer.value}€!
+                <div className="mb-6">
+                  <div className="flex items-center justify-center gap-3">
+                    {OFFER.originalValue && (
+                      <span className="text-2xl text-zinc-500 line-through">
+                        {OFFER.originalValue}€
                       </span>
                     )}
+                    <span className={`text-5xl md:text-6xl font-black bg-gradient-to-r ${OFFER.gradient} bg-clip-text text-transparent`}>
+                      {OFFER.value}€
+                    </span>
                   </div>
-                )}
+                  {OFFER.originalValue && (
+                    <span className="text-green-400 text-sm font-medium">
+                      Estalvia {OFFER.originalValue - OFFER.value}€!
+                    </span>
+                  )}
+                </div>
 
-                {/* Features (for fixed price offers) */}
-                {currentOffer.features && (
+                {/* Features */}
+                {OFFER.features && (
                   <div className="text-left bg-zinc-800/50 rounded-xl p-4 mb-6 border border-zinc-700/50">
                     <ul className="space-y-2">
-                      {currentOffer.features.map((feature, i) => (
+                      {OFFER.features.map((feature, i) => (
                         <li key={i} className="text-zinc-300 text-sm">
                           {feature}
                         </li>
@@ -273,41 +246,29 @@ export default function FlashOfferPopup() {
                   </div>
                 )}
 
-                {/* Countdown */}
-                <div className="grid grid-cols-4 gap-2 mb-6">
-                  <div className="bg-zinc-800/50 rounded-xl p-2 border border-zinc-700/50">
-                    <span className="block text-xl md:text-2xl font-bold text-white">
-                      {timeLeft.days}
-                    </span>
-                    <span className="text-[10px] text-zinc-500 uppercase">{t('days')}</span>
-                  </div>
-                  <div className="bg-zinc-800/50 rounded-xl p-2 border border-zinc-700/50">
-                    <span className="block text-xl md:text-2xl font-bold text-white">
-                      {timeLeft.hours.toString().padStart(2, '0')}
-                    </span>
-                    <span className="text-[10px] text-zinc-500 uppercase">{t('hours')}</span>
-                  </div>
-                  <div className="bg-zinc-800/50 rounded-xl p-2 border border-zinc-700/50">
-                    <span className="block text-xl md:text-2xl font-bold text-white">
+                {/* Countdown - Solo minutos y segundos */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="bg-zinc-800/50 rounded-xl p-3 border border-zinc-700/50">
+                    <span className="block text-3xl md:text-4xl font-bold text-white">
                       {timeLeft.minutes.toString().padStart(2, '0')}
                     </span>
-                    <span className="text-[10px] text-zinc-500 uppercase">{t('minutes')}</span>
+                    <span className="text-xs text-zinc-500 uppercase">{t('minutes')}</span>
                   </div>
-                  <div className="bg-zinc-800/50 rounded-xl p-2 border border-zinc-700/50">
-                    <span className="block text-xl md:text-2xl font-bold text-white">
+                  <div className="bg-zinc-800/50 rounded-xl p-3 border border-zinc-700/50">
+                    <span className="block text-3xl md:text-4xl font-bold text-white">
                       {timeLeft.seconds.toString().padStart(2, '0')}
                     </span>
-                    <span className="text-[10px] text-zinc-500 uppercase">{t('seconds')}</span>
+                    <span className="text-xs text-zinc-500 uppercase">{t('seconds')}</span>
                   </div>
                 </div>
 
                 {/* CTA */}
                 <Link
-                  href={currentOffer.href}
+                  href={OFFER.href}
                   onClick={handleClose}
-                  className={`inline-flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r ${currentOffer.gradient} hover:opacity-90 text-white font-bold text-lg rounded-xl transition-all hover:shadow-lg ${accentClasses.buttonHover}`}
+                  className={`inline-flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r ${OFFER.gradient} hover:opacity-90 text-white font-bold text-lg rounded-xl transition-all hover:shadow-lg ${accentClasses.buttonHover}`}
                 >
-                  {currentOffer.cta}
+                  {OFFER.cta}
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
@@ -315,7 +276,7 @@ export default function FlashOfferPopup() {
 
                 {/* Fine print */}
                 <p className="mt-4 text-xs text-zinc-600">
-                  {currentOffer.finePrint}
+                  {OFFER.finePrint}
                 </p>
               </div>
             </div>

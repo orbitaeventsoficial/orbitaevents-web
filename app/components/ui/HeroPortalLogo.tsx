@@ -1,17 +1,17 @@
 /**
  * HeroPortalLogo.tsx
  *
- * ANIMACIÓN PORTAL ÓRBITA EVENTS - VERSIÓN ULTRA CINEMATOGRÁFICA v2.0
- * ✨ Logo compacte - Tipografia premium - Màgia pura
+ * ANIMACIÓN PORTAL ÒRBITA EVENTS - VERSIÓN CINEMATOGRÁFICA ÉPICA v3.0
+ * ✨ Entrada espectacular - Logo protagonista - Texto brillante - Magia pura
+ * 📱 Optimizado para móvil con misma calidad visual
  */
 
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
-// Tipografia premium pel text màgic
 const jakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500"],
@@ -28,1387 +28,448 @@ interface HeroPortalLogoProps {
   svgUrl?: string;
   totalMs?: number;
   fadeMs?: number;
-  introHoldMs?: number;
-  introFadeMs?: number;
   speedMultiplier?: number;
 }
-
-// Extra global per allargar transicions
-const TRANSITION_EXTRA_MS = 500;
-// Offset extra per aguantar MOLT MÉS el logo abans del fade - que llueixi!
-const FADE_OFFSET_MS = 1200;
 
 export default function HeroPortalLogo({
   endColor = "#0a0a0a",
   glowColor = "gold",
-  glowStrength = 0.65,
+  glowStrength = 0.7,
   onFinish,
-  svgUrl = "/img/orbita-glyph-anim.svg",
-  // timing cinematogràfic - tot més lent i progressiu
-  totalMs = 7000,
-  // fade final ultra llarg i suau - text i planeta junts
-  fadeMs = 3500,
-  introHoldMs = 700,
-  introFadeMs = 1000,
+  svgUrl = "/img/orbita-glyph.svg",
+  totalMs = 7500,
+  fadeMs = 3000,
   speedMultiplier = 1,
 }: HeroPortalLogoProps) {
-  const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
   const [visible, setVisible] = useState(true);
-  const [_svgError, setSvgError] = useState(false);
+  const [phase, setPhase] = useState<'black' | 'text' | 'logo' | 'together' | 'exit'>('black');
   const [isMobile, setIsMobile] = useState(false);
-  const [isReady, setIsReady] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState('100vh');
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const timers = useRef<number[]>([]);
 
-  // Detectar prefers-reduced-motion
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
-    };
-
+    const handleChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  // Bloquejar scroll durant intro (el CSS ja oculta contingut amb :not(.intro-done))
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, []);
-
-  const hostRef = useRef<HTMLDivElement | null>(null);
-  const timers = useRef<number[]>([]);
-  const hasAnimated = useRef(false);
-
-  // Detectar móvil i configurar duració més curta (5s màx)
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768 ||
-                     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       setIsMobile(mobile);
-
-      if (mobile) {
-        // En mòbil: màxim 4 segons total amb fade llarg i suau
-        const MOBILE_TOTAL_MS = prefersReducedMotion ? 2000 : 4000;
-        const MOBILE_FADE_MS = prefersReducedMotion ? 400 : 1200;
-
-        const tid = window.setTimeout(() => {
-          setVisible(false);
-        }, MOBILE_TOTAL_MS - MOBILE_FADE_MS);
-        timers.current.push(tid);
-
-        const tid2 = window.setTimeout(() => {
-          onFinish?.();
-        }, MOBILE_TOTAL_MS);
-        timers.current.push(tid2);
-      }
+      setViewportHeight(`${window.innerHeight}px`);
     };
-
     checkMobile();
-  }, [onFinish, prefersReducedMotion]);
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
-  const SPEED = speedMultiplier;
-
-  // Telón negro inicial
-  const TELON_HOLD = Math.round(introHoldMs * SPEED);
-  const TELON_FADE = Math.round(introFadeMs * SPEED);
-  const SEQ_TELON_END = TELON_HOLD + TELON_FADE;
-
-  // Delays entre elementos - TEXT APAREIX ABANS! Planeta més suau
-  const BUBBLES_DELAY = Math.round(-200 * SPEED); // Aparecen ANTES (negativo)
-  const PLANET_DELAY = Math.round(150 * SPEED);
-  const RING_DELAY = Math.round(200 * SPEED);
-  const SAT_DELAY = Math.round(180 * SPEED);
-  const WORDMARK_DELAY = Math.round(50 * SPEED); // TEXT MÉS RÀPID - abans era 220
-
-  // Duraciones de animación - PLANETA MÉS SUAU (més temps)
-  const DUR_PLANET = Math.round((1400 + TRANSITION_EXTRA_MS) * SPEED); // abans 800, ara 1400
-  const DUR_RING = Math.round((900 + TRANSITION_EXTRA_MS) * SPEED);
-  const DUR_SAT = Math.round((750 + TRANSITION_EXTRA_MS) * SPEED);
-  const DUR_WORDMARK = Math.round((900 + TRANSITION_EXTRA_MS) * SPEED);
-
-  // Timestamps absolutos
-  const PLANET_START = SEQ_TELON_END + PLANET_DELAY;
-  const RING_START = PLANET_START + RING_DELAY;
-  const SAT_START = RING_START + SAT_DELAY;
-  const WORDMARK_START = SAT_START + WORDMARK_DELAY;
-
-  const EFFECTIVE_TOTAL_MS = Math.round(totalMs * SPEED);
-  const EFFECTIVE_FADE_MS = Math.round(fadeMs * SPEED);
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, []);
 
   const clearTimers = useCallback(() => {
     timers.current.forEach((id) => window.clearTimeout(id));
     timers.current = [];
   }, []);
 
-  // Tap to skip en mòbil
-  const handleTapToSkip = useCallback(() => {
-    if (!isMobile) return;
-
-    // Vibració hàptica
-    if ('vibrate' in navigator) {
-      navigator.vibrate(15);
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      const tid = window.setTimeout(() => onFinish?.(), 500);
+      timers.current.push(tid);
+      return () => clearTimers();
     }
 
-    // Skip immediat amb fade ràpid
+    const SPEED = speedMultiplier;
+    const MOBILE_TOTAL = 6000;
+    const effectiveTotal = isMobile ? MOBILE_TOTAL : totalMs;
+    const effectiveFade = isMobile ? 2200 : fadeMs;
+
+    const phases = isMobile ? {
+      text: 100 * SPEED,
+      logo: 600 * SPEED,
+      together: 3000 * SPEED,
+      exit: (effectiveTotal - effectiveFade) * SPEED,
+      finish: effectiveTotal * SPEED,
+    } : {
+      text: 150 * SPEED,
+      logo: 800 * SPEED,
+      together: 4000 * SPEED,
+      exit: (effectiveTotal - effectiveFade) * SPEED,
+      finish: effectiveTotal * SPEED,
+    };
+
+    timers.current.push(window.setTimeout(() => setPhase('text'), phases.text));
+    timers.current.push(window.setTimeout(() => setPhase('logo'), phases.logo));
+    timers.current.push(window.setTimeout(() => setPhase('together'), phases.together));
+    timers.current.push(window.setTimeout(() => {
+      setPhase('exit');
+      setVisible(false);
+    }, phases.exit));
+    timers.current.push(window.setTimeout(() => {
+      clearTimers();
+      onFinish?.();
+    }, phases.finish));
+
+    return () => clearTimers();
+  }, [onFinish, totalMs, fadeMs, speedMultiplier, prefersReducedMotion, isMobile, clearTimers]);
+
+  const handleTapToSkip = useCallback(() => {
+    if (!isMobile) return;
+    if ('vibrate' in navigator) navigator.vibrate(15);
     clearTimers();
     setVisible(false);
-
-    const tid = window.setTimeout(() => {
-      onFinish?.();
-    }, 400);
+    const tid = window.setTimeout(() => onFinish?.(), 400);
     timers.current.push(tid);
   }, [isMobile, clearTimers, onFinish]);
 
-  // Fetch SVG
-  useEffect(() => {
-    let alive = true;
+  const showText = phase !== 'black';
+  const showLogo = phase === 'logo' || phase === 'together' || phase === 'exit';
+  const isTogetherPhase = phase === 'together';
 
-    fetch(svgUrl, { cache: "force-cache" })
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.text();
-      })
-      .then((text) => {
-        if (alive) {
-          // 🆕 Inyectar CSS para ocultar elementos INMEDIATAMENTE y evitar flash
-          const styleTag = `<style>
-            #planet, #planeta, #ring, #anillo, [id*='planet' i], [class*='planet' i],
-            [id*='ring' i], [class*='ring' i], [id*='sat' i], [class*='sat' i],
-            [id*='word' i], [class*='word' i], [id*='logo' i], [class*='logo' i] {
-              opacity: 0;
-            }
-          </style>`;
-
-          // Insertar el style tag justo después de la etiqueta <svg>
-          const modifiedText = text.replace(/<svg([^>]*)>/, `<svg$1>${styleTag}`);
-
-          setSvgMarkup(modifiedText);
-          setSvgError(false);
-          // 🆕 Pequeño delay para asegurar que el SVG está listo
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              setIsReady(true);
-            });
-          });
-        }
-      })
-      .catch((err) => {
-        if (process.env.NODE_ENV === 'development') {
-          console.warn(`[HeroPortalLogo] Error loading SVG: ${err.message}`);
-        }
-        if (alive) {
-          setSvgError(true);
-          setSvgMarkup(null);
-          setIsReady(true); // Continuar aunque falle
-        }
-      });
-
-    return () => {
-      alive = false;
-    };
-  }, [svgUrl]);
-
-  // Centrado del SVG en viewport
-  useEffect(() => {
-    if (!svgMarkup || !hostRef.current) return;
-
-    const svg = hostRef.current.querySelector("svg") as SVGSVGElement | null;
-    if (!svg?.viewBox?.baseVal) return;
-
-    svg.removeAttribute("width");
-    svg.removeAttribute("height");
-    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-    (svg.style as any).overflow = "visible";
-
-    let wrap = svg.querySelector("#__wrap_center__") as SVGGElement | null;
-    if (!wrap) {
-      wrap = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      wrap.setAttribute("id", "__wrap_center__");
-      const kids = Array.from(svg.childNodes);
-      for (const k of kids) wrap.appendChild(k);
-      svg.appendChild(wrap);
-    }
-
-    const targetGrp =
-      (svg.querySelector("#planet, #planeta, #ring, #anillo") as SVGGraphicsElement | null) || wrap;
-
-    const centerNow = () => {
-      try {
-        const vb = svg.viewBox.baseVal;
-        const b = targetGrp.getBBox();
-        const cx = b.x + b.width / 2;
-        const cy = b.y + b.height / 2;
-        const desiredX = vb.x + vb.width / 2;
-        const desiredY = vb.y + vb.height / 2;
-        wrap!.setAttribute("transform", `translate(${desiredX - cx}, ${desiredY - cy})`);
-      } catch {
-        // ignore
-      }
-    };
-
-    centerNow();
-    const ro = new ResizeObserver(centerNow);
-    ro.observe(document.documentElement);
-
-    return () => ro.disconnect();
-  }, [svgMarkup]);
-
-  // Secuencia principal
-  useEffect(() => {
-    if (!svgMarkup || !hostRef.current || hasAnimated.current || !isReady) return;
-
-    const svg = hostRef.current.querySelector("svg");
-    if (!svg) return;
-
-    hasAnimated.current = true;
-
-    const findElements = (selectors: string[]): SVGElement[] => {
-      for (const sel of selectors) {
-        const els = Array.from(svg.querySelectorAll<SVGElement>(sel));
-        if (els.length > 0) return els;
-      }
-      return [];
-    };
-
-    let planetEls = findElements([
-      "#planet",
-      "#planeta",
-      "[id*='planet' i]",
-      "[class*='planet' i]",
-    ]);
-    let ringEls = findElements([
-      "#ring",
-      "#anillo",
-      "[id*='ring' i]",
-      "[id*='anillo' i]",
-      "[class*='ring' i]",
-    ]);
-    let satEls = findElements([
-      "#satellite",
-      "#satelite",
-      "[id*='satellite' i]",
-      "[id*='satelite' i]",
-      "[class*='sat' i]",
-    ]);
-    let wmEls = findElements([
-      "#wordmark",
-      "#texto",
-      "#logotype",
-      "[id*='wordmark' i]",
-      "[id*='texto' i]",
-      "[id*='logotype' i]",
-      "text",
-      "tspan",
-    ]);
-
-    if (planetEls.length === 0 || ringEls.length === 0 || satEls.length === 0) {
-      const groups = Array.from(svg.querySelectorAll("g")).filter((g) => {
-        try {
-          const bb = (g as SVGGraphicsElement).getBBox();
-          return bb && bb.width + bb.height > 0;
-        } catch {
-          return false;
-        }
-      });
-
-      if (groups.length >= 3) {
-        if (planetEls.length === 0) planetEls = [groups[0]];
-        if (ringEls.length === 0) ringEls = [groups[1]];
-        if (satEls.length === 0) satEls = [groups[2]];
-      }
-    }
-
-    if (wmEls.length === 0) {
-      const textNodes = Array.from(svg.querySelectorAll("text, tspan"));
-      if (textNodes.length > 0) {
-        wmEls = textNodes as unknown as SVGElement[];
-      } else {
-        const alt = Array.from(
-          svg.querySelectorAll("[class*='logo' i], [id*='logo' i], [class*='word' i]")
-        );
-        if (alt.length > 0) wmEls = alt as unknown as SVGElement[];
-      }
-    }
-
-    const allElements = Array.from(new Set([...planetEls, ...ringEls, ...satEls, ...wmEls]));
-
-    // 🆕 PREPARAR ELEMENTOS SIN FLASH - opacity 0 ANTES de mostrarse
-    for (const el of allElements) {
-      try {
-        el.removeAttribute("style");
-        el.removeAttribute("opacity");
-
-        (el as ElementCSSInlineStyle).style.cssText = `
-          opacity: 0 !important;
-          visibility: visible !important;
-          transform-origin: 50% 50% !important;
-          transform: translateY(8px) scale(0.98) !important;
-          will-change: opacity, transform !important;
-          backface-visibility: hidden !important;
-          -webkit-backface-visibility: hidden !important;
-        `;
-      } catch {
-        // ignore
-      }
-    }
-
-    const animateElements = (
-      elements: Element[],
-      options: {
-        transform?: string;
-        duration?: number;
-        delay?: number;
-      } = {}
-    ) => {
-      const { transform = "none", duration = 400, delay = 0 } = options;
-
-      const animate = () => {
-        for (const el of elements) {
-          try {
-            const htmlEl = el as HTMLElement;
-
-            // 🆕 Transición más suave con cubic-bezier cinematográfico
-            htmlEl.style.transition = `
-              opacity ${duration}ms cubic-bezier(0.22, 0.61, 0.36, 1),
-              transform ${duration}ms cubic-bezier(0.22, 0.61, 0.36, 1)
-            `;
-
-            requestAnimationFrame(() => {
-              htmlEl.style.opacity = "1";
-              htmlEl.style.transform = transform;
-            });
-          } catch {
-            try {
-              (el as HTMLElement).style.opacity = "1";
-            } catch {
-              // ignore
-            }
-          }
-        }
-      };
-
-      if (delay > 0) {
-        const tid = window.setTimeout(animate, delay);
-        timers.current.push(tid);
-      } else {
-        animate();
-      }
-    };
-
-    clearTimers();
-
-    // PLANETA - APARICIÓ ULTRA SUAU I PROGRESSIVA (més llarga)
-    animateElements(planetEls, {
-      transform: "scale(1.02) translateY(0)",
-      duration: Math.max(1800 + TRANSITION_EXTRA_MS, DUR_PLANET * 1.5),
-      delay: PLANET_START,
-    });
-
-    // Añadir glow suave al planeta - PROGRESIVO (amber/carbassa)
-    timers.current.push(
-      window.setTimeout(() => {
-        for (const el of planetEls) {
-          try {
-            const htmlEl = el as any;
-            // Empezar con filter sin intensidad
-            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(245, 158, 11, 0))";
-            htmlEl.style.transition = "filter 1800ms ease-out";
-
-            // Después de un frame, aplicar el glow progresivamente
-            requestAnimationFrame(() => {
-              htmlEl.style.filter = "drop-shadow(0 0 12px rgba(245, 158, 11, 0.3)) drop-shadow(0 0 24px rgba(245, 158, 11, 0.15))";
-
-              // Una vez llegado a intensidad máxima, añadir pulso
-              setTimeout(() => {
-                htmlEl.style.animation = "glow-pulse 4s ease-in-out infinite";
-              }, 1800);
-            });
-          } catch {
-            // ignore
-          }
-        }
-      }, PLANET_START + DUR_PLANET)
-    );
-
-    // ANILLO - APARICIÓ LENTA I SUAU
-    animateElements(ringEls, {
-      transform: "translateX(0) rotate(0deg) scale(1)",
-      duration: Math.max(700 + TRANSITION_EXTRA_MS, DUR_RING * 1.4),
-      delay: RING_START,
-    });
-
-    // Shimmer suave en el anillo - PROGRESIVO (amber/carbassa)
-    timers.current.push(
-      window.setTimeout(() => {
-        for (const el of ringEls) {
-          try {
-            const htmlEl = el as any;
-            // Empezar sin filter
-            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(251, 191, 36, 0))";
-            htmlEl.style.transition = "filter 1500ms ease-out";
-
-            // Aplicar glow progresivamente
-            requestAnimationFrame(() => {
-              htmlEl.style.filter = "drop-shadow(0 0 10px rgba(251, 191, 36, 0.25))";
-            });
-
-            // Crear efecto shimmer con pseudo-elemento usando custom animation
-            const parent = htmlEl.parentElement;
-            if (parent && !parent.querySelector('.ring-shimmer')) {
-              const shimmer = document.createElement('div');
-              shimmer.className = 'ring-shimmer';
-              shimmer.style.cssText = `
-                position: absolute;
-                inset: 0;
-                background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
-                animation: shimmer 4s ease-in-out infinite;
-                pointer-events: none;
-                mix-blend-mode: overlay;
-                opacity: 0;
-                transition: opacity 1500ms ease-out;
-              `;
-              parent.style.position = 'relative';
-              parent.appendChild(shimmer);
-
-              // Hacer aparecer el shimmer progresivamente
-              requestAnimationFrame(() => {
-                shimmer.style.opacity = '1';
-              });
-            }
-          } catch {
-            // ignore
-          }
-        }
-      }, RING_START + DUR_RING)
-    );
-
-    // SATÈL·LIT - APARICIÓ PROGRESSIVA I SUAU
-    timers.current.push(
-      window.setTimeout(() => {
-        animateElements(satEls, {
-          transform: "scale(1) translateY(0)",
-          duration: Math.max(650 + TRANSITION_EXTRA_MS, DUR_SAT * 1.5),
-        });
-
-        if (!document.getElementById("__hp_float_kf")) {
-          const style = document.createElement("style");
-          style.id = "__hp_float_kf";
-          style.textContent = `
-            @keyframes __hp_float {
-              0%, 100% { transform: translateY(0) scale(1); }
-              50% { transform: translateY(-8px) scale(1.01); }
-            }
-            @keyframes gradient-flow {
-              0%, 100% { background-position: 0% 50%; }
-              50% { background-position: 100% 50%; }
-            }
-            @keyframes text-glow-pulse {
-              0%, 100% {
-                filter: drop-shadow(0 0 36px rgba(245, 158, 11, 0.6))
-                        drop-shadow(0 0 60px rgba(251, 191, 36, 0.35))
-                        drop-shadow(0 6px 24px rgba(0, 0, 0, 0.85));
-              }
-              50% {
-                filter: drop-shadow(0 0 42px rgba(245, 158, 11, 0.75))
-                        drop-shadow(0 0 72px rgba(251, 191, 36, 0.45))
-                        drop-shadow(0 6px 28px rgba(0, 0, 0, 0.9));
-              }
-            }
-          `;
-          document.head.appendChild(style);
-        }
-
-        for (const el of satEls) {
-          try {
-            const htmlEl = el as any;
-            // Empezar sin glow (amber/carbassa)
-            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(245, 158, 11, 0))";
-            htmlEl.style.transition = "filter 1600ms ease-out";
-
-            // Aplicar glow progresivamente
-            requestAnimationFrame(() => {
-              htmlEl.style.filter = "drop-shadow(0 0 8px rgba(245, 158, 11, 0.3)) drop-shadow(0 0 16px rgba(245, 158, 11, 0.15))";
-            });
-
-            setTimeout(() => {
-              // Float + scale-pulse combinados suave
-              htmlEl.style.animation = "__hp_float 5s ease-in-out infinite, scale-pulse 4s ease-in-out infinite";
-            }, DUR_SAT);
-          } catch {
-            // ignore
-          }
-        }
-      }, SAT_START)
-    );
-
-    // WORDMARK / TEXTO - APARICIÓ ULTRA SUAU
-    animateElements(wmEls, {
-      transform: "translateY(0) scale(1)",
-      duration: DUR_WORDMARK * 1.3,
-      delay: WORDMARK_START,
-    });
-
-    // Añadir glow amber/carbassa suave al texto - PROGRESIVO
-    timers.current.push(
-      window.setTimeout(() => {
-        for (const el of wmEls) {
-          try {
-            const htmlEl = el as any;
-            // Empezar sin glow (amber/carbassa)
-            htmlEl.style.filter = "drop-shadow(0 0 0px rgba(245, 158, 11, 0))";
-            htmlEl.style.transition = "filter 1400ms ease-out";
-
-            // Aplicar glow progresivamente
-            requestAnimationFrame(() => {
-              htmlEl.style.filter = "drop-shadow(0 0 6px rgba(245, 158, 11, 0.4)) drop-shadow(0 0 12px rgba(245, 158, 11, 0.2))";
-            });
-
-            htmlEl.style.animation = "fade-in-up 1.5s ease-out forwards";
-          } catch {
-            // ignore
-          }
-        }
-      }, WORDMARK_START + DUR_WORDMARK)
-    );
-
-    // Glow - PROGRESIVO DESDE EL INICIO, AL MISMO TIEMPO QUE EL PLANETA
-    if (glowColor !== "none") {
-      timers.current.push(
-        window.setTimeout(() => {
-          const glowEl = document.getElementById("brand-glow");
-          if (glowEl) {
-            try {
-              glowEl.style.opacity = "0";
-              // Transición MUY larga y progresiva (2.5 segundos)
-              glowEl.style.transition = `opacity ${Math.round(
-                2500 * SPEED
-              )}ms ease-out`;
-
-              requestAnimationFrame(() => {
-                // Subir intensidad progresivamente
-                glowEl.style.opacity = String(Math.min(0.6, glowStrength));
-                // Añadir animación de pulso suave al glow después de llegar a intensidad máxima
-                setTimeout(() => {
-                  glowEl.style.animation = "glow-pulse 4s ease-in-out infinite";
-                }, Math.round(2500 * SPEED));
-              });
-            } catch {
-              // ignore
-            }
-          }
-        }, PLANET_START) // Empieza al mismo tiempo que el planeta
-      );
-    }
-
-    // Fade final: aguanta una mica més abans de començar a desaparèixer
-    timers.current.push(
-      window.setTimeout(() => {
-        setVisible(false);
-      }, Math.max(0, EFFECTIVE_TOTAL_MS - EFFECTIVE_FADE_MS + FADE_OFFSET_MS))
-    );
-
-    timers.current.push(
-      window.setTimeout(() => {
-        clearTimers();
-        onFinish?.();
-      }, EFFECTIVE_TOTAL_MS + FADE_OFFSET_MS)
-    );
-
-    return () => {
-      clearTimers();
-    };
-  }, [
-    svgMarkup,
-    isReady,
-    glowColor,
-    glowStrength,
-    SPEED,
-    PLANET_START,
-    DUR_PLANET,
-    RING_START,
-    DUR_RING,
-    SAT_START,
-    DUR_SAT,
-    WORDMARK_START,
-    DUR_WORDMARK,
-    SEQ_TELON_END,
-    EFFECTIVE_TOTAL_MS,
-    EFFECTIVE_FADE_MS,
-    clearTimers,
-    onFinish,
-  ]);
-
-  // Glow ambient styles - Amber/carbassa corporate color
-  const glowStyle =
-    glowColor === "gold"
-      ? {
-          background:
-            "radial-gradient(70% 60% at 50% 45%, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0.08) 40%, transparent 70%)",
-          opacity: 0,
-        }
-      : glowColor === "fuchsia"
-      ? {
-          background:
-            "radial-gradient(70% 60% at 50% 45%, rgba(192, 38, 211, 0.2) 0%, rgba(192, 38, 211, 0.06) 40%, transparent 70%)",
-          opacity: 0,
-        }
-      : {};
-
-  // 🆕 MÓVIL - Versión optimizada amb tap to skip (4s màx)
-  if (isMobile) {
-    const mobileDuration = prefersReducedMotion ? 0.6 : 1.0;
-    const mobileDelay = prefersReducedMotion ? 0.1 : 0.3;
-
-    return (
-      <AnimatePresence mode="wait">
-        {visible && (
-          <motion.div
-            key="mobile-intro"
-            className="fixed inset-0 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-transform"
-            onClick={handleTapToSkip}
-            onTouchStart={handleTapToSkip}
-            style={{
-              zIndex: 9999,
-              background: `linear-gradient(to bottom, #000 0%, ${endColor} 100%)`,
-              backfaceVisibility: 'hidden',
-              WebkitBackfaceVisibility: 'hidden',
-              WebkitTapHighlightColor: 'transparent',
-            }}
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 1.02 }}
-            transition={{ duration: 1.2, ease: [0.22, 0.61, 0.36, 1] }}
-          >
-            {/* Logo animat - TAMAÑO ORIGINAL */}
-            {svgMarkup && isReady && (
-              <motion.div
-                className="relative flex items-center justify-center"
-                style={{
-                  width: "min(75vw, 280px)",
-                  height: "auto",
-                  aspectRatio: "1 / 1",
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                }}
-                dangerouslySetInnerHTML={{ __html: svgMarkup }}
-                initial={{ opacity: 0, scale: 0.75, rotateZ: -5, filter: "blur(14px)" }}
-                animate={{
-                  opacity: 1,
-                  scale: [0.75, 1.03, 1],
-                  rotateZ: [-5, 1, 0],
-                  filter: "blur(0px)"
-                }}
-                transition={{
-                  duration: 1.8,
-                  ease: [0.16, 1, 0.3, 1],
-                  delay: 0.3,
-                  times: [0, 0.7, 1]
-                }}
-              />
-            )}
-
-            {/* Loading state mientras carga SVG */}
-            {!isReady && (
-              <div className="flex items-center justify-center">
-                <div className="w-16 h-16 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-              </div>
-            )}
-
-            {/* Text subliminal - COMPOSICIÓN EQUILIBRADA */}
-            {!prefersReducedMotion && (
-              <motion.div
-                className="absolute top-0 left-0 right-0 flex items-start justify-center"
-                style={{
-                  pointerEvents: "none",
-                  zIndex: 10,
-                  paddingTop: "clamp(48px, 12vh, 80px)",
-                  paddingLeft: "clamp(16px, 3vw, 32px)",
-                  paddingRight: "clamp(16px, 3vw, 32px)",
-                }}
-                initial={{ opacity: 0, y: -30, x: 8, scale: 0.92, filter: "blur(12px)" }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  x: 0,
-                  scale: 1,
-                  filter: "blur(0px)"
-                }}
-                transition={{
-                  duration: 1.8,
-                  delay: 0.3,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-              >
-                <span
-                  className={`${jakartaSans.className} text-xl sm:text-2xl md:text-3xl font-light tracking-[0.28em] uppercase`}
-                  style={{
-                    background: "linear-gradient(135deg, #fcd34d 0%, #f59e0b 35%, #fbbf24 55%, #fcd34d 75%, #f59e0b 100%)",
-                    backgroundSize: "200% auto",
-                    backgroundClip: "text",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    textShadow: "0 0 24px rgba(0, 0, 0, 0.9), 0 4px 40px rgba(0, 0, 0, 0.7)",
-                    filter: "drop-shadow(0 0 20px rgba(245, 158, 11, 0.45)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.25))",
-                    marginLeft: "clamp(-8px, -1.5vw, 0px)",
-                    animation: "gradient-flow 4s ease-in-out infinite",
-                  }}
-                >
-                  La màgia comença
-                </span>
-              </motion.div>
-            )}
-
-            {/* Hint per saltar - MÉS VISIBLE */}
-            <motion.div
-              className="absolute bottom-8 flex flex-col items-center gap-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 0.7, 0.5] }}
-              transition={{ duration: 2, delay: 1.5, repeat: Infinity, repeatType: "reverse" }}
-            >
-              <div className="text-white/60 text-sm font-medium">
-                Toca per saltar
-              </div>
-              <div className="flex gap-1">
-                {[0, 1, 2].map((i) => (
-                  <motion.div
-                    key={i}
-                    className="w-1.5 h-1.5 rounded-full bg-amber-500/50"
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
-                    transition={{
-                      duration: 1.5,
-                      delay: i * 0.2,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  />
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Glow subtil y partículas - COMPOSICIÓN COMPLETA */}
-            {!prefersReducedMotion && (
-              <>
-                {/* Glow principal centrado en logo - MEJORADO */}
-                <motion.div
-                  className="absolute w-96 h-96 rounded-full pointer-events-none"
-                  style={{
-                    background: 'radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(251, 191, 36, 0.15) 30%, rgba(245, 158, 11, 0.08) 50%, transparent 75%)',
-                    filter: 'blur(70px)',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                  initial={{ opacity: 0, scale: 0.4 }}
-                  animate={{
-                    opacity: [0, 1, 0.9, 1],
-                    scale: [0.4, 1.2, 1.15, 1.25]
-                  }}
-                  transition={{
-                    duration: 2.2,
-                    delay: 0.25,
-                    ease: [0.19, 1, 0.22, 1],
-                    times: [0, 0.5, 0.75, 1]
-                  }}
-                />
-
-                {/* Partículas equilibradas - MEJORADAS */}
-                <motion.div
-                  className="absolute w-32 h-32 rounded-full pointer-events-none"
-                  style={{
-                    top: '20%',
-                    right: '15%',
-                    background: 'radial-gradient(circle, rgba(251, 191, 36, 0.25) 0%, rgba(245, 158, 11, 0.12) 50%, transparent 100%)',
-                    filter: 'blur(24px)'
-                  }}
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{
-                    y: [0, -22, 0],
-                    x: [0, 12, 0],
-                    scale: [0.5, 1.15, 1],
-                    opacity: [0, 0.7, 0.45, 0.7]
-                  }}
-                  transition={{
-                    duration: 5,
-                    repeat: Infinity,
-                    ease: [0.45, 0.05, 0.55, 0.95],
-                    times: [0, 0.5, 0.75, 1],
-                    delay: 0.3
-                  }}
-                />
-                <motion.div
-                  className="absolute w-36 h-36 rounded-full pointer-events-none"
-                  style={{
-                    bottom: '25%',
-                    left: '12%',
-                    background: 'radial-gradient(circle, rgba(192, 132, 252, 0.2) 0%, rgba(167, 139, 250, 0.1) 50%, transparent 100%)',
-                    filter: 'blur(32px)'
-                  }}
-                  initial={{ opacity: 0, scale: 0.4 }}
-                  animate={{
-                    y: [0, 25, 0],
-                    x: [0, -12, 0],
-                    scale: [0.4, 1.25, 1.1],
-                    opacity: [0, 0.55, 0.35, 0.55]
-                  }}
-                  transition={{
-                    duration: 6,
-                    repeat: Infinity,
-                    ease: [0.45, 0.05, 0.55, 0.95],
-                    times: [0, 0.45, 0.7, 1],
-                    delay: 0.8
-                  }}
-                />
-
-                {/* Partícula sutil cerca del texto - MEJORADA */}
-                <motion.div
-                  className="absolute w-20 h-20 rounded-full pointer-events-none"
-                  style={{
-                    top: '14%',
-                    left: '22%',
-                    background: 'radial-gradient(circle, rgba(252, 211, 77, 0.3) 0%, rgba(245, 158, 11, 0.15) 50%, transparent 100%)',
-                    filter: 'blur(20px)'
-                  }}
-                  initial={{ opacity: 0, scale: 0.6 }}
-                  animate={{
-                    scale: [0.6, 1.35, 1.2],
-                    opacity: [0, 0.6, 0.4, 0.6]
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: [0.45, 0.05, 0.55, 0.95],
-                    times: [0, 0.5, 0.75, 1],
-                    delay: 0.5
-                  }}
-                />
-
-                {/* Lens flare sutil */}
-                <motion.div
-                  className="absolute w-2 h-2 rounded-full pointer-events-none"
-                  style={{
-                    top: '35%',
-                    right: '30%',
-                    background: 'radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(251, 191, 36, 0.4) 50%, transparent 100%)',
-                    boxShadow: '0 0 20px rgba(251, 191, 36, 0.6)'
-                  }}
-                  initial={{ opacity: 0 }}
-                  animate={{
-                    opacity: [0, 1, 0.7, 0],
-                    scale: [0.5, 1.5, 1, 0.5]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1.5
-                  }}
-                />
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    );
-  }
+  const config = useMemo(() => ({
+    logo: {
+      width: isMobile ? '85vw' : '45vw',
+      maxWidth: isMobile ? '400px' : '550px',
+    },
+    glow: {
+      width: isMobile ? '100vw' : '55vw',
+      maxWidth: isMobile ? '450px' : '650px',
+    },
+    text: {
+      fontSize: isMobile ? 'clamp(1.3rem, 6vw, 2rem)' : 'clamp(2rem, 3.5vw, 3rem)',
+      paddingTop: isMobile ? '15vh' : 'clamp(100px, 14vh, 140px)',
+      letterSpacing: isMobile ? '0.22em' : '0.28em',
+    },
+    particles: isMobile ? 25 : 40,
+    stars: isMobile ? 50 : 80,
+  }), [isMobile]);
 
   return (
     <AnimatePresence mode="wait">
       {visible && (
         <motion.div
-          key="hero-portal"
-          className="fixed inset-0"
+          key="hero-portal-epic"
+          className="fixed inset-0 touch-none"
+          onClick={isMobile ? handleTapToSkip : undefined}
           style={{
             zIndex: 9999,
-            background: `linear-gradient(180deg, #000 0%, #050505 50%, ${endColor} 100%)`,
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
-            transform: 'translateZ(0)',
-            isolation: "isolate",
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'visible',
-            minHeight: '100vh',
+            height: viewportHeight,
+            background: phase === 'exit'
+              ? 'transparent'
+              : `radial-gradient(ellipse 120% 100% at 50% 35%, #0d0d0d 0%, #000 100%)`,
+            cursor: isMobile ? 'pointer' : 'default',
+            WebkitTapHighlightColor: 'transparent',
+            transition: 'background 1.5s ease-out',
           }}
           initial={{ opacity: 1 }}
           exit={{
             opacity: 0,
+            scale: 1.05,
+            filter: 'blur(12px)',
             transition: {
-              duration: EFFECTIVE_FADE_MS / 1000,
-              ease: [0.22, 0.61, 0.36, 1],
+              duration: (isMobile ? 2.2 : fadeMs / 1000),
+              ease: [0.19, 1, 0.22, 1],
             },
           }}
         >
-          {/* Telón negro inicial */}
-          <motion.div
-            className="absolute inset-0 bg-black"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 0 }}
-            transition={{
-              delay: TELON_HOLD / 1000,
-              duration: TELON_FADE / 1000 + 0.5,
-              ease: [0.22, 0.61, 0.36, 1],
-            }}
-            style={{
-              zIndex: 8,
-              pointerEvents: "none",
-            }}
-          />
+          {/* CAPA 0: Estrellas */}
+          <div className="absolute inset-0 overflow-hidden">
+            <StarField count={config.stars} />
+          </div>
 
-          {/* ✨ TEXT SUBLIMINAL - COMPOSICIÓN EQUILIBRADA Y EXPRESIVA */}
-          <motion.div
-            className="absolute inset-0 flex items-start justify-center"
-            style={{
-              zIndex: 7,
-              pointerEvents: "none",
-              paddingTop: "clamp(60px, 15vh, 100px)",
-              paddingLeft: "clamp(24px, 4vw, 48px)",
-              paddingRight: "clamp(24px, 4vw, 48px)",
-            }}
-            initial={{ opacity: 0, y: 40, x: 12, scale: 0.9, filter: "blur(16px)" }}
-            animate={{
-              opacity: [0, 1, 1],
-              y: [40, 0, 0],
-              x: [12, 0, 0],
-              scale: [0.9, 1, 1],
-              filter: ["blur(16px)", "blur(0px)", "blur(0px)"]
-            }}
-            transition={{
-              times: [0, 0.3, 1],
-              duration: 2.4,
-              delay: (SEQ_TELON_END + 80) / 1000,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-          >
-            <span
-              className={`${jakartaSans.className} text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-light tracking-[0.26em] uppercase`}
-              style={{
-                background: "linear-gradient(135deg, #fcd34d 0%, #f59e0b 25%, #fbbf24 45%, #fcd34d 65%, #f59e0b 85%, #fbbf24 100%)",
-                backgroundSize: "250% auto",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                filter: "drop-shadow(0 0 36px rgba(245, 158, 11, 0.6)) drop-shadow(0 0 60px rgba(251, 191, 36, 0.35)) drop-shadow(0 6px 24px rgba(0, 0, 0, 0.85))",
-                textShadow: "0 0 50px rgba(0, 0, 0, 0.95)",
-                marginLeft: "clamp(-16px, -2vw, 0px)",
-                transform: "translateX(-3%)",
-                animation: "gradient-flow 5s ease-in-out infinite, text-glow-pulse 3s ease-in-out infinite",
-              }}
-            >
-              La màgia comença
-            </span>
-          </motion.div>
-
-          {/* Vignette */}
-          <motion.div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(120% 100% at 50% 50%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%)",
-              zIndex: 2,
-              pointerEvents: "none",
-            }}
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 0.25 }}
-            transition={{
-              delay: (TELON_HOLD + TELON_FADE) / 1000,
-              duration: 1.0,
-              ease: [0.22, 0.61, 0.36, 1],
-            }}
-          />
-
-          {/* Burbujas/partículas - MÁS BURBUJAS */}
-          <motion.div
-            className="absolute inset-0"
-            style={{ zIndex: 1, pointerEvents: "none" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-              delay: Math.max(0, SEQ_TELON_END / 1000 + BUBBLES_DELAY / 1000),
-              duration: 1.2,
-              ease: [0.22, 0.61, 0.36, 1],
-            }}
-          >
-            <ChampagneBubbles
-              key="back"
-              count={120}
-              blur={18}
-              speedFactor={0.5}
-              opacity={0.25}
-            />
-            <ChampagneBubbles
-              key="mid"
-              count={80}
-              blur={12}
-              speedFactor={0.7}
-              opacity={0.3}
-            />
-            <ChampagneBubbles
-              key="front"
-              count={150}
-              blur={8}
-              speedFactor={0.95}
-              opacity={0.4}
-            />
-          </motion.div>
-
-          {/* 🌟 PARTÍCULAS SUTILES FLOTANTES */}
+          {/* CAPA 1: Nebulosa */}
           <motion.div
             className="absolute inset-0 pointer-events-none"
-            style={{ zIndex: 2 }}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-              delay: Math.max(0, SEQ_TELON_END / 1000 + 0.5),
-              duration: 2,
-              ease: [0.22, 0.61, 0.36, 1],
-            }}
+            animate={{ opacity: showLogo ? 1 : 0 }}
+            transition={{ duration: 1.8, ease: "easeOut" }}
           >
-            {/* Partículas grandes con float suave - MEJORADAS */}
             <motion.div
-              className="absolute w-40 h-40 rounded-full pointer-events-none"
+              className="absolute"
               style={{
-                top: '18%',
-                left: '12%',
-                background: 'radial-gradient(circle, rgba(251, 191, 36, 0.28) 0%, rgba(245, 158, 11, 0.15) 40%, transparent 100%)',
-                filter: 'blur(40px)'
+                top: isMobile ? '48%' : '45%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: isMobile ? '130vw' : '80vw',
+                height: isMobile ? '130vw' : '80vw',
+                maxWidth: isMobile ? '600px' : '800px',
+                maxHeight: isMobile ? '600px' : '800px',
+                background: `radial-gradient(ellipse 100% 80% at 50% 50%,
+                  rgba(245, 158, 11, ${isMobile ? 0.18 : 0.14}) 0%,
+                  rgba(251, 191, 36, ${isMobile ? 0.1 : 0.07}) 30%,
+                  rgba(245, 158, 11, 0.03) 55%,
+                  transparent 75%)`,
+                filter: `blur(${isMobile ? 50 : 60}px)`,
               }}
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{
-                y: [0, -25, -10, 0],
-                x: [0, 8, -5, 0],
-                scale: [0.5, 1.2, 1.1, 1],
-                opacity: [0, 0.8, 0.6, 0.8]
-              }}
-              transition={{
-                duration: 7,
-                repeat: Infinity,
-                ease: [0.45, 0.05, 0.55, 0.95],
-                times: [0, 0.4, 0.7, 1],
-                delay: 0.5
-              }}
+              animate={isTogetherPhase ? { scale: [1, 1.08, 1], opacity: [0.9, 1, 0.9] } : {}}
+              transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.div
-              className="absolute w-48 h-48 rounded-full pointer-events-none"
+              className="absolute"
               style={{
-                bottom: '22%',
-                right: '15%',
-                background: 'radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(251, 191, 36, 0.12) 40%, transparent 100%)',
-                filter: 'blur(45px)'
+                top: isMobile ? '35%' : '32%',
+                left: isMobile ? '65%' : '62%',
+                transform: 'translate(-50%, -50%)',
+                width: isMobile ? '45vw' : '35vw',
+                height: isMobile ? '45vw' : '35vw',
+                maxWidth: '400px',
+                maxHeight: '400px',
+                background: `radial-gradient(circle,
+                  rgba(236, 72, 153, ${isMobile ? 0.1 : 0.08}) 0%,
+                  rgba(192, 38, 211, 0.04) 50%,
+                  transparent 75%)`,
+                filter: `blur(${isMobile ? 60 : 70}px)`,
               }}
-              initial={{ opacity: 0, scale: 0.4 }}
-              animate={{
-                y: [0, 30, 15, 0],
-                x: [0, -10, 5, 0],
-                scale: [0.4, 1.3, 1.15, 1.1],
-                opacity: [0, 0.7, 0.5, 0.7]
-              }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                ease: [0.45, 0.05, 0.55, 0.95],
-                times: [0, 0.45, 0.75, 1],
-                delay: 1.2
-              }}
-            />
-
-            {/* Partículas medianas con scale-pulse suave - MEJORADAS */}
-            <motion.div
-              className="absolute w-32 h-32 rounded-full pointer-events-none"
-              style={{
-                top: '42%',
-                right: '22%',
-                background: 'radial-gradient(circle, rgba(192, 132, 252, 0.22) 0%, rgba(167, 139, 250, 0.12) 40%, transparent 100%)',
-                filter: 'blur(35px)'
-              }}
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{
-                scale: [0.6, 1.4, 1.2, 1.3],
-                opacity: [0, 0.65, 0.45, 0.65],
-                rotate: [0, 180, 360]
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                ease: [0.45, 0.05, 0.55, 0.95],
-                times: [0, 0.5, 0.75, 1],
-                delay: 0.8
-              }}
-            />
-            <motion.div
-              className="absolute w-36 h-36 rounded-full pointer-events-none"
-              style={{
-                bottom: '38%',
-                left: '28%',
-                background: 'radial-gradient(circle, rgba(236, 72, 153, 0.18) 0%, rgba(192, 132, 252, 0.1) 40%, transparent 100%)',
-                filter: 'blur(38px)'
-              }}
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{
-                scale: [0.5, 1.35, 1.15, 1.25],
-                opacity: [0, 0.6, 0.4, 0.6],
-                rotate: [0, -180, -360]
-              }}
-              transition={{
-                duration: 7,
-                repeat: Infinity,
-                ease: [0.45, 0.05, 0.55, 0.95],
-                times: [0, 0.45, 0.7, 1],
-                delay: 1.8
-              }}
-            />
-
-            {/* Partículas pequeñas brillantes con glow-pulse suave - MEJORADAS */}
-            <motion.div
-              className="absolute w-24 h-24 rounded-full pointer-events-none"
-              style={{
-                top: '32%',
-                left: '38%',
-                background: 'radial-gradient(circle, rgba(252, 211, 77, 0.35) 0%, rgba(245, 158, 11, 0.2) 40%, transparent 100%)',
-                filter: 'blur(25px)'
-              }}
-              initial={{ opacity: 0, scale: 0.7 }}
-              animate={{
-                scale: [0.7, 1.5, 1.3, 1.4],
-                opacity: [0, 0.75, 0.5, 0.75]
-              }}
-              transition={{
-                duration: 4.5,
-                repeat: Infinity,
-                ease: [0.45, 0.05, 0.55, 0.95],
-                times: [0, 0.5, 0.75, 1],
-                delay: 0.3
-              }}
-            />
-            <motion.div
-              className="absolute w-28 h-28 rounded-full pointer-events-none"
-              style={{
-                bottom: '42%',
-                right: '32%',
-                background: 'radial-gradient(circle, rgba(251, 191, 36, 0.32) 0%, rgba(252, 211, 77, 0.18) 40%, transparent 100%)',
-                filter: 'blur(28px)'
-              }}
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{
-                scale: [0.6, 1.45, 1.25, 1.35],
-                opacity: [0, 0.7, 0.48, 0.7]
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: [0.45, 0.05, 0.55, 0.95],
-                times: [0, 0.5, 0.75, 1],
-                delay: 1.3
-              }}
-            />
-
-            {/* Lens flares sutiles - DESKTOP */}
-            <motion.div
-              className="absolute w-3 h-3 rounded-full pointer-events-none"
-              style={{
-                top: '28%',
-                right: '35%',
-                background: 'radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.5) 40%, transparent 100%)',
-                boxShadow: '0 0 30px rgba(251, 191, 36, 0.8), 0 0 60px rgba(245, 158, 11, 0.4)'
-              }}
-              initial={{ opacity: 0 }}
-              animate={{
-                opacity: [0, 1, 0.8, 0],
-                scale: [0.4, 2, 1.5, 0.4]
-              }}
-              transition={{
-                duration: 3.5,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 2
-              }}
-            />
-            <motion.div
-              className="absolute w-2 h-2 rounded-full pointer-events-none"
-              style={{
-                bottom: '35%',
-                left: '40%',
-                background: 'radial-gradient(circle, rgba(255, 255, 255, 0.85) 0%, rgba(252, 211, 77, 0.45) 40%, transparent 100%)',
-                boxShadow: '0 0 25px rgba(252, 211, 77, 0.7)'
-              }}
-              initial={{ opacity: 0 }}
-              animate={{
-                opacity: [0, 0.9, 0.7, 0],
-                scale: [0.5, 1.8, 1.3, 0.5]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.8
-              }}
+              animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0.85, 0.6] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
             />
           </motion.div>
 
-          {/* Glow */}
-          {glowColor !== "none" && (
-            <div
-              id="brand-glow"
-              className="absolute inset-0"
-              style={{
-                zIndex: 3,
-                ...glowStyle,
-              }}
-            />
-          )}
-
-          {/* 🆕 SVG - TAMAÑO ORIGINAL */}
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{
-              zIndex: 4,
-              pointerEvents: "none",
+          {/* CAPA 2: TEXTO "LA MÀGIA COMENÇA" */}
+          <motion.div
+            className="absolute inset-x-0 top-0 flex items-start justify-center pointer-events-none px-6"
+            style={{ paddingTop: config.text.paddingTop, zIndex: 20 }}
+            initial={{ opacity: 0, y: isMobile ? 40 : 50, scale: 0.88, filter: 'blur(16px)' }}
+            animate={{
+              opacity: showText ? 1 : 0,
+              y: showText ? 0 : (isMobile ? 40 : 50),
+              scale: showText ? 1 : 0.88,
+              filter: showText ? 'blur(0px)' : 'blur(16px)',
             }}
+            transition={{ duration: isMobile ? 1.4 : 1.6, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="relative">
+              <motion.div
+                className="absolute inset-0 flex items-center justify-center"
+                style={{ filter: 'blur(20px)', opacity: 0.5 }}
+                animate={isTogetherPhase ? { opacity: [0.4, 0.7, 0.4] } : {}}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <span
+                  className={jakartaSans.className}
+                  style={{
+                    fontSize: config.text.fontSize,
+                    fontWeight: 300,
+                    letterSpacing: config.text.letterSpacing,
+                    textTransform: 'uppercase',
+                    color: '#f59e0b',
+                  }}
+                >
+                  La màgia comença
+                </span>
+              </motion.div>
+              <motion.span
+                className={`${jakartaSans.className} relative block text-center`}
+                style={{
+                  fontSize: config.text.fontSize,
+                  fontWeight: 300,
+                  letterSpacing: config.text.letterSpacing,
+                  textTransform: 'uppercase',
+                  background: `linear-gradient(135deg, #fcd34d 0%, #f59e0b 20%, #fbbf24 40%, #fcd34d 60%, #f59e0b 80%, #fbbf24 100%)`,
+                  backgroundSize: '300% auto',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+                animate={isTogetherPhase ? { backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] } : {}}
+                transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+              >
+                La màgia comença
+              </motion.span>
+            </div>
+          </motion.div>
+
+          {/* CAPA 3: LOGO PLANETA */}
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            style={{ zIndex: 15, marginTop: isMobile ? '5vh' : '2vh' }}
+            initial={{ opacity: 0, scale: isMobile ? 0.3 : 0.35, rotateZ: isMobile ? -10 : -12, filter: 'blur(25px) brightness(0.4)' }}
+            animate={{
+              opacity: showLogo ? 1 : 0,
+              scale: showLogo ? (isTogetherPhase ? 1.02 : 1) : (isMobile ? 0.3 : 0.35),
+              rotateZ: showLogo ? 0 : (isMobile ? -10 : -12),
+              filter: showLogo ? 'blur(0px) brightness(1)' : 'blur(25px) brightness(0.4)',
+            }}
+            transition={{ duration: isMobile ? 1.8 : 2, ease: [0.16, 1, 0.3, 1] }}
           >
             <motion.div
-              ref={hostRef}
-              className="relative overflow-visible"
+              className="absolute"
               style={{
-                width: "clamp(200px, 40vw, 320px)",
-                height: "auto",
-                aspectRatio: "1 / 1",
-                maxHeight: "70vh",
-                minHeight: "260px",
-                backfaceVisibility: 'hidden',
-                WebkitBackfaceVisibility: 'hidden',
-                transform: 'translateZ(0)',
-                willChange: 'transform, opacity',
+                width: config.glow.width,
+                height: config.glow.width,
+                maxWidth: config.glow.maxWidth,
+                maxHeight: config.glow.maxWidth,
+                background: `radial-gradient(circle,
+                  rgba(245, 158, 11, ${glowStrength * 0.35}) 0%,
+                  rgba(251, 191, 36, ${glowStrength * 0.18}) 35%,
+                  rgba(245, 158, 11, 0.06) 55%,
+                  transparent 75%)`,
+                filter: `blur(${isMobile ? 35 : 45}px)`,
               }}
-              dangerouslySetInnerHTML={{ __html: svgMarkup || '' }}
-              initial={{ scale: 0.8, opacity: isReady ? 1 : 0, rotateZ: -4 }}
-              animate={{
-                scale: [0.8, 1.02, 1],
-                opacity: 1,
-                rotateZ: [-4, 1, 0]
-              }}
-              transition={{
-                delay: isReady ? (SEQ_TELON_END + Math.round(80 * SPEED)) / 1000 : 0,
-                duration: Math.max(2.4, DUR_PLANET / 700),
-                ease: [0.16, 1, 0.3, 1],
-                times: [0, 0.65, 1]
-              }}
+              animate={isTogetherPhase ? { scale: [1, 1.12, 1], opacity: [0.85, 1, 0.85] } : {}}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
-          </div>
+            <motion.img
+              src={svgUrl}
+              alt="Òrbita Events"
+              className="relative"
+              style={{
+                width: config.logo.width,
+                height: 'auto',
+                maxWidth: config.logo.maxWidth,
+                filter: `drop-shadow(0 0 ${isMobile ? 15 : 20}px rgba(245, 158, 11, 0.45))
+                  drop-shadow(0 0 ${isMobile ? 30 : 40}px rgba(251, 191, 36, 0.25))
+                  drop-shadow(0 0 ${isMobile ? 50 : 70}px rgba(245, 158, 11, 0.12))`,
+              }}
+              animate={isTogetherPhase ? { scale: [1, 1.018, 1], rotate: [0, 0.8, -0.8, 0] } : {}}
+              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+              draggable={false}
+            />
+          </motion.div>
+
+          {/* CAPA 4: PARTÍCULAS */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none overflow-hidden"
+            style={{ zIndex: 10 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: showLogo ? 1 : 0 }}
+            transition={{ duration: 1.2, delay: 0.3 }}
+          >
+            <FloatingParticles count={config.particles} isMobile={isMobile} />
+          </motion.div>
+
+          {/* CAPA 5: LENS FLARES */}
+          {showLogo && (
+            <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 25 }}>
+              <LensFlare delay={0.8} top={isMobile ? "38%" : "32%"} left={isMobile ? "25%" : "32%"} size={isMobile ? 2.5 : 3.5} />
+              <LensFlare delay={1.8} top={isMobile ? "52%" : "48%"} right={isMobile ? "20%" : "28%"} size={isMobile ? 2 : 2.8} />
+              {!isMobile && <LensFlare delay={2.5} bottom="38%" left="42%" size={2.2} />}
+            </div>
+          )}
+
+          {/* CAPA 6: VIGNETTE */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `radial-gradient(ellipse ${isMobile ? '90% 80%' : '85% 75%'} at 50% ${isMobile ? '48%' : '45%'},
+                transparent 0%, transparent 45%, rgba(0, 0, 0, ${isMobile ? 0.5 : 0.45}) 100%)`,
+              zIndex: 30,
+            }}
+          />
+
+          {/* HINT MÓVIL */}
+          {isMobile && (
+            <motion.div
+              className="absolute bottom-0 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none pb-10"
+              style={{ zIndex: 40, paddingBottom: 'max(2.5rem, env(safe-area-inset-bottom, 0px) + 1.5rem)' }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: phase === 'together' ? 0.7 : 0, y: phase === 'together' ? 0 : 10 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              <span className="text-white/50 text-sm font-light tracking-widest uppercase">Toca per saltar</span>
+              <motion.div className="flex gap-2" animate={{ y: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full bg-amber-500"
+                    initial={{ opacity: 0.4 }}
+                    animate={{ opacity: [0.4, 0.8, 0.4] }}
+                    transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.15 }}
+                  />
+                ))}
+              </motion.div>
+            </motion.div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
 
-interface ChampagneBubblesProps {
-  count?: number;
-  blur?: number;
-  speedFactor?: number;
-  opacity?: number;
-}
-
-function ChampagneBubbles({
-  count = 100,
-  blur = 12,
-  speedFactor = 1,
-  opacity = 0.7,
-}: ChampagneBubblesProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const DPR = window.devicePixelRatio || 1;
-
-    const resize = () => {
-      const w = (canvas.width = Math.floor(window.innerWidth * DPR));
-      const h = (canvas.height = Math.floor(window.innerHeight * DPR));
-      canvas.style.width = `${w / DPR}px`;
-      canvas.style.height = `${h / DPR}px`;
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      return { w: w / DPR, h: h / DPR };
-    };
-
-    let { w, h } = resize();
-
-    const bubbles = Array.from({ length: count }).map(() => {
-      const r = 2 + Math.random() * 8;
-      const baseVy = 0.2 + Math.random() * 1.0;
-      return {
-        x: Math.random() * w,
-        y: h + Math.random() * h * 0.5,
-        r,
-        vy: baseVy * speedFactor,
-        vx: (-0.1 + Math.random() * 0.2) * speedFactor,
-        a: 0.25 + Math.random() * 0.3,
-        blink: Math.random() * Math.PI * 2,
-      };
-    });
-
-    let raf = 0;
-
-    const paint = () => {
-      ctx.clearRect(0, 0, w, h);
-
-      for (const b of bubbles) {
-        b.y -= b.vy;
-        b.x += b.vx;
-        b.blink += 0.01;
-
-        if (b.y < -b.r * 4) {
-          b.y = h + 20;
-          b.x = Math.random() * w;
-        }
-
-        const tw = 0.25 + Math.abs(Math.sin(b.blink)) * 0.35;
-
-        ctx.save();
-        ctx.shadowBlur = blur;
-        ctx.shadowColor = "rgba(251,191,36,0.45)";
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(251,191,36,${b.a * tw * opacity})`;
-        ctx.fill();
-        ctx.restore();
-      }
-
-      raf = requestAnimationFrame(paint);
-    };
-
-    paint();
-
-    const onResize = () => {
-      const s = resize();
-      w = s.w;
-      h = s.h;
-    };
-
-    window.addEventListener("resize", onResize);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", onResize);
-    };
-  }, [count, blur, speedFactor, opacity]);
+function StarField({ count }: { count: number }) {
+  const stars = useMemo(() => Array.from({ length: count }).map((_, i) => ({
+    id: i,
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 100}%`,
+    size: 0.8 + Math.random() * 1.8,
+    delay: Math.random() * 4,
+    duration: 2.5 + Math.random() * 3,
+  })), [count]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="pointer-events-none absolute inset-0"
+    <>
+      {stars.map((star) => (
+        <motion.div
+          key={star.id}
+          className="absolute rounded-full bg-white"
+          style={{ left: star.left, top: star.top, width: star.size, height: star.size }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.7, 0] }}
+          transition={{ duration: star.duration, delay: star.delay, repeat: Infinity, ease: "easeInOut" }}
+        />
+      ))}
+    </>
+  );
+}
+
+function FloatingParticles({ count, isMobile }: { count: number; isMobile: boolean }) {
+  const particles = useMemo(() => Array.from({ length: count }).map((_, i) => ({
+    id: i,
+    initialX: 25 + Math.random() * 50,
+    initialY: 20 + Math.random() * 55,
+    size: isMobile ? (6 + Math.random() * 16) : (8 + Math.random() * 22),
+    blur: isMobile ? (8 + Math.random() * 12) : (10 + Math.random() * 18),
+    duration: 4.5 + Math.random() * 4,
+    delay: Math.random() * 2.5,
+    color: Math.random() > 0.75 ? 'rgba(192, 132, 252, 0.35)' : `rgba(251, 191, 36, ${0.25 + Math.random() * 0.3})`,
+  })), [count, isMobile]);
+
+  return (
+    <>
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            left: `${p.initialX}%`,
+            top: `${p.initialY}%`,
+            width: p.size,
+            height: p.size,
+            background: `radial-gradient(circle, ${p.color} 0%, transparent 70%)`,
+            filter: `blur(${p.blur}px)`,
+          }}
+          animate={{ y: [0, -25 - Math.random() * 15, 0], x: [0, 12 - Math.random() * 24, 0], scale: [0.7, 1.25, 0.7], opacity: [0.25, 0.75, 0.25] }}
+          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
+        />
+      ))}
+    </>
+  );
+}
+
+function LensFlare({ delay, top, left, right, bottom, size }: { delay: number; top?: string; left?: string; right?: string; bottom?: string; size: number }) {
+  return (
+    <motion.div
+      className="absolute rounded-full"
       style={{
-        opacity,
-        width: "100%",
-        height: "100%",
+        top, left, right, bottom,
+        width: size * 5,
+        height: size * 5,
+        background: `radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(251, 191, 36, 0.65) 25%, rgba(245, 158, 11, 0.35) 45%, transparent 70%)`,
+        boxShadow: `0 0 ${size * 10}px rgba(251, 191, 36, 0.5), 0 0 ${size * 20}px rgba(245, 158, 11, 0.25)`,
       }}
-      aria-hidden="true"
+      initial={{ opacity: 0, scale: 0.2 }}
+      animate={{ opacity: [0, 1, 0.75, 0], scale: [0.2, 1.4, 1.1, 0.2] }}
+      transition={{ duration: 3.5, delay, repeat: Infinity, repeatDelay: 2.5, ease: "easeInOut" }}
     />
   );
 }

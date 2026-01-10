@@ -57,7 +57,7 @@ interface TranslatedTestimonial {
   source: 'google' | 'direct';
 }
 
-// 3 testimonis amb dades i claus de traducció
+// Testimonis de Google 5 estrelles (només!)
 const TESTIMONIALS_CONFIG: TranslatedTestimonial[] = [
   {
     id: '1',
@@ -77,7 +77,7 @@ const TESTIMONIALS_CONFIG: TranslatedTestimonial[] = [
     eventType: 'fiesta',
     location: 'Barcelona',
     verified: true,
-    source: 'direct'
+    source: 'google'
   },
   {
     id: '3',
@@ -87,7 +87,7 @@ const TESTIMONIALS_CONFIG: TranslatedTestimonial[] = [
     eventType: 'empresa',
     location: 'Barcelona',
     verified: true,
-    source: 'direct'
+    source: 'google'
   },
 ];
 
