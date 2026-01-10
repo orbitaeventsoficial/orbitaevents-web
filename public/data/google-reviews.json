@@ -1,45 +1,6 @@
 {
-  "lastUpdated": "2026-01-10T04:00:00.000Z",
+  "lastUpdated": "2026-01-10T03:13:03.765Z",
   "rating": 5,
-  "total": 9,
-  "reviews": [
-    {
-      "author_name": "Lorena Carles",
-      "rating": 5,
-      "text": "Increïble experiència per a la nostra festa temàtica! Van transformar el lloc en un autèntic món màgic. Els detalls, la decoració, tot perfecte. El DJ va fer ballar a tothom tota la nit. Totalment recomanable!",
-      "time": 1704067200,
-      "relative_time_description": "fa 2 setmanes",
-      "profile_photo_url": "/img/testimonials/lorena-carles.webp"
-    },
-    {
-      "author_name": "Marc Puig",
-      "rating": 5,
-      "text": "Vaig contractar Òrbita Events per la meva festa de 30 anys i va ser un èxit total. El so increïble, les llums espectaculars i el DJ va saber exactament què posar en cada moment. Gràcies per fer-la inolvidable!",
-      "time": 1703462400,
-      "relative_time_description": "fa 3 setmanes",
-      "profile_photo_url": "/img/testimonials/marc-puig.webp"
-    },
-    {
-      "author_name": "Anna Garcia",
-      "rating": 5,
-      "text": "Professionals de debò. Van organitzar el nostre event corporatiu amb una atenció al detall impressionant. Tot va sortir perfecte, des del so fins a la il·luminació. Els nostres clients van quedar encantats!",
-      "time": 1702857600,
-      "relative_time_description": "fa 1 mes",
-      "profile_photo_url": "/img/testimonials/anna-garcia.webp"
-    },
-    {
-      "author_name": "Carla Martínez",
-      "rating": 5,
-      "text": "El millor servei de DJ que he contractat mai. Van fer que la nostra boda fos màgica. Tots els convidats van estar ballant fins al final. 100% recomanable!",
-      "time": 1701648000,
-      "relative_time_description": "fa 1 mes"
-    },
-    {
-      "author_name": "David Fernández",
-      "rating": 5,
-      "text": "Serveis de primera qualitat. L'equip de so i llums és espectacular i el tracte molt professional. Van fer que la nostra festa infantil fos un èxit!",
-      "time": 1700438400,
-      "relative_time_description": "fa 2 mesos"
-    }
-  ]
+  "total": 0,
+  "reviews": []
 }

@@ -287,7 +287,7 @@ export default function GoogleReviewsRotating() {
           className="text-center mt-16"
         >
           <a
-            href="https://g.page/r/YOUR_GOOGLE_PLACE_ID/review"
+            href="https://g.page/r/CXcgbvANsXSzEBE/review"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white font-semibold transition-colors"

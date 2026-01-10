@@ -3,5 +3,5 @@
 // ÒRBITA EVENTS - Components Home
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Testimonios con opiniones reales de clientes
-export { default as TestimoniosReales } from './TestimoniosReales';
+// Google Reviews - Reseñas reales de 5 estrellas
+export { default as GoogleReviewsRotating } from './GoogleReviewsRotating';

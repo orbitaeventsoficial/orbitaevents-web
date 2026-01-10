@@ -113,7 +113,6 @@ export default function AdminSidebar() {
           <NavItem icon="📦" label="Packs" href="/admin/packs" />
           <NavItem icon="💰" label="Preus" href="/admin/pricing" />
           <NavItem icon="❓" label="FAQ" href="/admin/faq" />
-          <NavItem icon="⭐" label="Testimonis" href="/admin/testimonios" />
           <NavItem icon="🌍" label="Textos" href="/admin/texts" />
           <NavItem icon="📝" label="Textos PRO" href="/admin/text-manager" badge="PRO" badgeColor="green" />
         </NavSection>
@@ -128,7 +127,7 @@ export default function AdminSidebar() {
           <NavItem icon="📬" label="Inbox" href="/admin/inbox" badge="NEW" badgeColor="blue" />
           <NavItem icon="📧" label="Emails" href="/admin/emails" badge="AUTO" badgeColor="green" />
           <NavItem icon="🎨" label="Canvas" href="/admin/canvas" />
-          <NavItem icon="⭐" label="Ressenyes" href="/admin/ressenyes" />
+          <NavItem icon="⭐" label="Google Reviews" href="/admin/google-reviews" badge="5★" badgeColor="green" />
         </NavSection>
       </nav>
 

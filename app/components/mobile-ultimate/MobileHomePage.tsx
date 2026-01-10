@@ -30,7 +30,6 @@ import MobileAppShell from './MobileAppShell';
 import MobileErrorBoundary from './MobileErrorBoundary';
 import MobileHeroUltimate from './MobileHeroUltimate';
 import MobileServicesCards from './MobileServicesCards';
-import MobileTestimonialsReels from './MobileTestimonialsReels';
 import MobileCTAUrgency from './MobileCTAUrgency';
 import MobileBottomNav from './MobileBottomNav';
 import { motion } from 'framer-motion';
@@ -347,9 +346,6 @@ export default function MobileHomePage() {
 
           {/* Services */}
           <MobileServicesCards />
-
-          {/* Testimonials */}
-          <MobileTestimonialsReels />
 
           {/* Guarantees */}
           <GuaranteeSection />
