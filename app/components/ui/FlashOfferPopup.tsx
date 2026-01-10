@@ -84,11 +84,19 @@ function calculateTimeLeft(startTime: number): TimeLeft {
 export default function FlashOfferPopup() {
   const t = useTranslations('flashOffer');
   const [isVisible, setIsVisible] = useState(false);
-  const [startTime, setStartTime] = useState<number>(Date.now());
+  const [startTime, setStartTime] = useState<number>(0);
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ minutes: 15, seconds: 0 });
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Marcar componente como montado (solo cliente)
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Comprovar si s'ha de mostrar
   useEffect(() => {
+    if (!isMounted) return;
+
     // Comprovar si ja s'ha tancat recentment
     const dismissed = localStorage.getItem(STORAGE_KEY);
     if (dismissed) {
@@ -106,7 +114,7 @@ export default function FlashOfferPopup() {
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [isMounted]);
 
   // Countdown timer (15 minuts)
   useEffect(() => {
