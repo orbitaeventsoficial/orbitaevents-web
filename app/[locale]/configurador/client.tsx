@@ -24,6 +24,7 @@ import {
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
 import { generateQuotePDF } from '@/lib/pdf-utils';
 import { fetchWithCsrf } from '@/lib/csrf';
+import TurnstileWidget from '@/components/security/TurnstileWidget';
 
 type EventType = 'bodas' | 'discomovil' | 'fiestas' | 'alquiler' | 'empresas';
 
@@ -537,6 +538,7 @@ export default function ConfiguradorClient() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [formError, setFormError] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   // 🔥 PASO 4 NUEVO: OFERTA DE CIERRE CON FORMULARIO INLINE
   const renderStep4 = () => {
@@ -569,6 +571,11 @@ export default function ConfiguradorClient() {
         return;
       }
 
+      if (!turnstileToken) {
+        setFormError(t('step4.errorCaptcha') || 'Por favor, completa la verificación de seguridad');
+        return;
+      }
+
       setSending(true);
       setFormError('');
 
@@ -591,6 +598,7 @@ export default function ConfiguradorClient() {
             eventDate: config.date,
             guests: config.guests,
             extras: extrasArray,
+            turnstileToken,
           }),
         });
 
@@ -777,9 +785,22 @@ export default function ConfiguradorClient() {
               </div>
             </div>
 
+            {/* Turnstile CAPTCHA */}
+            <div className="pt-2">
+              <TurnstileWidget
+                onSuccess={(token) => {
+                  setTurnstileToken(token);
+                  setFormError('');
+                }}
+                onError={() => setTurnstileToken(null)}
+                onExpire={() => setTurnstileToken(null)}
+                theme="dark"
+              />
+            </div>
+
             <button
               type="submit"
-              disabled={sending}
+              disabled={sending || !turnstileToken}
               className="w-full btn-primary text-xl py-6 flex items-center justify-center gap-3 animate-pulse hover:animate-none disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {sending ? (

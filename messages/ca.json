@@ -1403,6 +1403,7 @@
       "satisfactionGuaranteed": "Satisfacció 100% garantida",
       "errorName": "Introduïu el vostre nom complet",
       "errorContact": "Introduïu el vostre correu electrònic o número de telèfon",
+      "errorCaptcha": "Si us plau, completa la verificació de seguretat",
       "errorSend": "Error en enviar. Si us plau, torna-ho a provar o truca'ns directament.",
       "downloadPDF": "Descarregar Pressupost PDF"
     }

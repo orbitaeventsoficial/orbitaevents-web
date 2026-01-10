@@ -1729,6 +1729,7 @@
       "satisfactionGuaranteed": "Satisfacción 100% garantizada",
       "errorName": "Introduce tu nombre completo",
       "errorContact": "Introduce tu email o número de teléfono",
+      "errorCaptcha": "Por favor, completa la verificación de seguridad",
       "errorSend": "Error al enviar. Por favor, inténtalo de nuevo o llámanos directamente.",
       "downloadPDF": "Descargar Presupuesto PDF"
     }

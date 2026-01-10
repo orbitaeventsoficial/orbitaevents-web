@@ -787,15 +787,6 @@ export const EXTRAS: ExtraDefinition[] = [
     compatibleWith: ["bodas", "empresas"],
   },
   {
-    id: "bola-espejos-grande",
-    name: "Bola de Espejos Gigante",
-    description: "Bola de discoteca de gran tamaño con foco dedicado",
-    price: 80,
-    icon: "🪩",
-    category: "lighting",
-    compatibleWith: ["discomovil", "fiestas", "bodas"],
-  },
-  {
     id: "pantalla-led-gigante",
     name: "Pantalla LED Gigante",
     description: "Pantalla LED profesional para vídeos y visuales",
@@ -814,17 +805,6 @@ export const EXTRAS: ExtraDefinition[] = [
     icon: "🎯",
     category: "lighting",
     compatibleWith: ["bodas", "empresas"],
-  },
-  {
-    id: "videoclip-resumen",
-    name: "Videoclip Resumen del Evento",
-    description: "Vídeo profesional editado con los mejores momentos - precio según duración",
-    price: null,
-    consultarPrecio: true,
-    icon: "🎥",
-    category: "visual",
-    compatibleWith: ["bodas", "fiestas"],
-    popular: true,
   },
 ];
 
