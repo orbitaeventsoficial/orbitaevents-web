@@ -1709,6 +1709,7 @@
       "finalPrice": "Tu precio final:",
       "youSave": "Ahorras {amount}€",
       "normalPrice": "precio normal",
+      "guarantee": "Garantía de Satisfacción",
       "guaranteeText": "Si cambias de opinión en las próximas 48 horas, te reembolsamos el 100% de tu dinero. Sin preguntas. Sin letra pequeña. Riesgo cero.",
       "whyOffer": "¿Por qué esta oferta?",
       "whyOfferText": "Cuando reservas hoy, podemos confirmar tu fecha al instante y empezar a prepararte. Cuanto antes empecemos, mejor será tu evento. Cada día que pasa, perdemos tiempo de personalización.",
@@ -1725,6 +1726,7 @@
       "youSaved": "¡Has ahorrado {amount}€!",
       "checkEmail": "Comprueba tu email/teléfono. Te hemos enviado la confirmación.",
       "responseTime": "Respuesta en menos de 2 horas",
+      "satisfactionGuaranteed": "Satisfacción 100% garantizada",
       "errorName": "Introduce tu nombre completo",
       "errorContact": "Introduce tu email o número de teléfono",
       "errorSend": "Error al enviar. Por favor, inténtalo de nuevo o llámanos directamente.",
@@ -2471,25 +2473,81 @@
           "name": "Hora Extra",
           "description": "Si la fiesta sigue, nosotros también"
         },
+        "humo-bajo": {
+          "name": "Máquina de Humo Bajo",
+          "description": "Efecto 'nube' para el baile nupcial"
+        },
+        "fuego-frio": {
+          "name": "Chispas Frías (2 máquinas)",
+          "description": "Efecto pirotécnico seguro para interior"
+        },
         "burbujas": {
           "name": "Máquina de Burbujas",
           "description": "Toque mágico y divertido"
+        },
+        "co2-gun": {
+          "name": "Pistola/Cañón CO2",
+          "description": "Chorro de aire frío espectacular"
         },
         "confetti": {
           "name": "Cañón de Confeti",
           "description": "Explosión de color para momentos clave"
         },
+        "pantalla": {
+          "name": "Proyector + Pantalla",
+          "description": "Para vídeos sorpresa o presentaciones"
+        },
+        "micros-extra": {
+          "name": "Micrófonos Extra (Pack 2)",
+          "description": "Inalámbricos de mano para discursos"
+        },
         "pulseras-luminosas": {
           "name": "Pulseras Luminosas (Pack 100)",
           "description": "Pulseras de luz química para invitados - efecto mágico en la pista"
+        },
+        "barras-led-personalizadas": {
+          "name": "Barras LED Personalizadas (Pack)",
+          "description": "Iluminación LED adicional personalizable con colores de la boda"
+        },
+        "letras-luminosas-love": {
+          "name": "Letras Luminosas LOVE/Iniciales",
+          "description": "Letras gigantes iluminadas para photocall y decoración"
+        },
+        "alfombra-led-pista": {
+          "name": "Alfombra LED para Pista",
+          "description": "Pista de baile iluminada con efectos LED sincronizados"
+        },
+        "gobo-personalizado": {
+          "name": "Gobo Personalizado (Iniciales/Logo)",
+          "description": "Proyección de iniciales o logo en pared/suelo con iluminación"
+        },
+        "bengalas-frias-invitados": {
+          "name": "Bengalas Frías para Invitados (Pack 50)",
+          "description": "Bengalas de mano para momentos especiales (entrada novios, tarta)"
+        },
+        "cortina-led-backdrop": {
+          "name": "Cortina LED Backdrop",
+          "description": "Telón LED iluminado para ceremonia o presidencia"
+        },
+        "first-dance-special": {
+          "name": "Pack 'First Dance Special'",
+          "description": "Humo bajo + iluminación personalizada + bengalas para el primer baile"
         },
         "subwoofer-refuerzo": {
           "name": "Subwoofer de Refuerzo",
           "description": "Graves potentes para eventos grandes o espacios amplios"
         },
+        "altavoces-adicionales": {
+          "name": "Altavoces Adicionales (Par)",
+          "description": "Cobertura de sonido para espacios muy grandes o distribuidos"
+        },
         "neon-personalizado": {
           "name": "Letrero Neón Personalizado",
           "description": "Neón LED con mensaje personalizado para photocall"
+        },
+        "laser-show": {
+          "name": "Show de Láser",
+          "description": "Efectos láser sincronizados con la música - espectacular"
         },
         "photobooth-360": {
           "name": "Photobooth 360°",
@@ -2502,6 +2560,10 @@
         "efectos-nieve": {
           "name": "Máquina de Nieve Artificial",
           "description": "Efecto nevada para momentos mágicos (bodas invierno)"
+        },
+        "humo-pesado": {
+          "name": "Humo Pesado (Dry Ice)",
+          "description": "Efecto nube densa para entrada o primer baile"
         },
         "sparklers-fountain": {
           "name": "Fuentes de Chispas (4 unidades)",

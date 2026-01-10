@@ -1383,6 +1383,7 @@
       "finalPrice": "El teu preu final:",
       "youSave": "Estalvieu {amount}€",
       "normalPrice": "preu normal",
+      "guarantee": "Garantia de Satisfacció",
       "guaranteeText": "Si canvies d'opinió en les properes 48 hores, et reemborsarem el 100% dels teus diners. Sense preguntes. Sense lletra petita. Risc zero.",
       "whyOffer": "Per què aquesta oferta?",
       "whyOfferText": "Quan reserveu avui, podem confirmar la vostra data a l'instant i començar a preparar-vos. Com més aviat comencem, millor serà el vostre esdeveniment. Cada dia que passa, perdem temps de personalització.",
@@ -1399,6 +1400,7 @@
       "youSaved": "Heu estalviat {amount}€!",
       "checkEmail": "Comproveu el vostre correu electrònic/telèfon. T'hem enviat la confirmació.",
       "responseTime": "Resposta en menys de 2 hores",
+      "satisfactionGuaranteed": "Satisfacció 100% garantida",
       "errorName": "Introduïu el vostre nom complet",
       "errorContact": "Introduïu el vostre correu electrònic o número de telèfon",
       "errorSend": "Error en enviar. Si us plau, torna-ho a provar o truca'ns directament.",
@@ -2080,25 +2082,81 @@
           "name": "Hora Extra",
           "description": "Si la festa segueix, nosaltres també"
         },
+        "humo-bajo": {
+          "name": "Màquina de Fum Baix",
+          "description": "Efecte 'núvol' per al ball nupcial"
+        },
+        "fuego-frio": {
+          "name": "Espurnes Fredes (2 màquines)",
+          "description": "Efecte pirotècnic segur per a interior"
+        },
         "burbujas": {
           "name": "Màquina de Bombolles",
           "description": "Toc màgic i divertit"
+        },
+        "co2-gun": {
+          "name": "Pistola/Canó CO2",
+          "description": "Raig d'aire fred espectacular"
         },
         "confetti": {
           "name": "Canó de Confeti",
           "description": "Explosió de color per a moments clau"
         },
+        "pantalla": {
+          "name": "Projector + Pantalla",
+          "description": "Per a vídeos sorpresa o presentacions"
+        },
+        "micros-extra": {
+          "name": "Micròfons Extra (Pack 2)",
+          "description": "Sense fils de mà per a discursos"
+        },
         "pulseras-luminosas": {
           "name": "Polseres Lluminoses (Pack 100)",
           "description": "Polseres de llum química per a convidats - efecte màgic a la pista"
+        },
+        "barras-led-personalizadas": {
+          "name": "Barres LED Personalitzades (Pack)",
+          "description": "Il·luminació LED addicional personalitzable amb colors del casament"
+        },
+        "letras-luminosas-love": {
+          "name": "Lletres Lluminoses LOVE/Inicials",
+          "description": "Lletres gegants il·luminades per a photocall i decoració"
+        },
+        "alfombra-led-pista": {
+          "name": "Catifa LED per a Pista",
+          "description": "Pista de ball il·luminada amb efectes LED sincronitzats"
+        },
+        "gobo-personalizado": {
+          "name": "Gobo Personalitzat (Inicials/Logo)",
+          "description": "Projecció d'inicials o logo a paret/terra amb il·luminació"
+        },
+        "bengalas-frias-invitados": {
+          "name": "Bengales Fredes per a Convidats (Pack 50)",
+          "description": "Bengales de mà per a moments especials (entrada nuvis, pastís)"
+        },
+        "cortina-led-backdrop": {
+          "name": "Cortina LED Backdrop",
+          "description": "Teló LED il·luminat per a cerimònia o presidència"
+        },
+        "first-dance-special": {
+          "name": "Pack 'First Dance Special'",
+          "description": "Fum baix + il·luminació personalitzada + bengales per al primer ball"
         },
         "subwoofer-refuerzo": {
           "name": "Subwoofer de Reforç",
           "description": "Greus potents per a esdeveniments grans o espais amplis"
         },
+        "altavoces-adicionales": {
+          "name": "Altaveus Addicionals (Parell)",
+          "description": "Cobertura de so per a espais molt grans o distribuïts"
+        },
         "neon-personalizado": {
           "name": "Rètol Neó Personalitzat",
           "description": "Neó LED amb missatge personalitzat per a photocall"
+        },
+        "laser-show": {
+          "name": "Show de Làser",
+          "description": "Efectes làser sincronitzats amb la música - espectacular"
         },
         "photobooth-360": {
           "name": "Photobooth 360°",
@@ -2111,6 +2169,10 @@
         "efectos-nieve": {
           "name": "Màquina de Neu Artificial",
           "description": "Efecte nevada per a moments màgics (casaments hivern)"
+        },
+        "humo-pesado": {
+          "name": "Fum Pesat (Dry Ice)",
+          "description": "Efecte núvol dens per a entrada o primer ball"
         },
         "sparklers-fountain": {
           "name": "Fonts d'Espurnes (4 unitats)",
