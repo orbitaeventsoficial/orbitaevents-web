@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic';
 const HeroElegant = dynamic(() => import('@/app/components/ui/HeroElegant'), { ssr: false });
 const ServicesGridElegant = dynamic(() => import('@/app/components/ui/ServicesGridElegant'), { ssr: false });
 const CalendarioUrgencia = dynamic(() => import('@/app/components/ui/CalendarioUrgencia'), { ssr: false });
-const TestimoniosReales = dynamic(() => import('@/app/components/home/TestimoniosReales'), { ssr: false });
+const GoogleReviewsRotating = dynamic(() => import('@/app/components/home/GoogleReviewsRotating'), { ssr: false });
 const GarantiaSection = dynamic(() => import('@/app/components/marketing/GarantiaSection'), { ssr: false });
 const CTAFinal = dynamic(() => import('@/app/components/marketing/CTAFinal'), { ssr: false });
 const HomePageWrapper = dynamic(() => import('@/app/components/HomePageWrapper'), { ssr: false });
@@ -59,8 +59,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 4. TESTIMONIOS - Prova social */}
-        <TestimoniosReales />
+        {/* 4. RESEÑAS GOOGLE - Prova social */}
+        <GoogleReviewsRotating />
 
         {/* 5. GARANTÍA - Confiança */}
         <GarantiaSection />
