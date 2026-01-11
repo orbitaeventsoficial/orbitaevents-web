@@ -78,18 +78,18 @@ function MetricCard({
   href?: string;
   delay?: number;
 }) {
-  const colorClasses = {
-    orange: 'from-orange-500/10 to-amber-500/10 border-orange-500/20',
-    green: 'from-green-500/10 to-emerald-500/10 border-green-500/20',
-    blue: 'from-blue-500/10 to-cyan-500/10 border-blue-500/20',
-    purple: 'from-purple-500/10 to-pink-500/10 border-purple-500/20',
+  const borderColors = {
+    orange: 'border-orange-500/30',
+    green: 'border-green-500/30',
+    blue: 'border-blue-500/30',
+    purple: 'border-purple-500/30',
   };
 
   const iconBg = {
-    orange: 'bg-orange-500/20 text-orange-400',
-    green: 'bg-green-500/20 text-green-400',
-    blue: 'bg-blue-500/20 text-blue-400',
-    purple: 'bg-purple-500/20 text-purple-400',
+    orange: 'bg-orange-500/10 text-orange-600',
+    green: 'bg-green-500/10 text-green-600',
+    blue: 'bg-blue-500/10 text-blue-600',
+    purple: 'bg-purple-500/10 text-purple-600',
   };
 
   const content = (
@@ -98,7 +98,7 @@ function MetricCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.3 }}
       whileHover={{ scale: 1.02, y: -2 }}
-      className={`relative p-6 rounded-2xl bg-gradient-to-br ${colorClasses[color]} border backdrop-blur-sm cursor-pointer transition-shadow hover:shadow-lg hover:shadow-${color}-500/10`}
+      className={`relative p-6 rounded-2xl bg-white border-2 ${borderColors[color]} cursor-pointer transition-all hover:shadow-xl hover:border-${color}-500/50`}
     >
       <div className="flex items-start justify-between mb-4">
         <div className={`w-12 h-12 rounded-xl ${iconBg[color]} flex items-center justify-center text-2xl`}>
@@ -106,7 +106,7 @@ function MetricCard({
         </div>
         {change !== undefined && (
           <div className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${
-            change >= 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+            change >= 0 ? 'bg-green-50 text-green-600 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'
           }`}>
             <span>{change >= 0 ? '↑' : '↓'}</span>
             <span>{Math.abs(change)}%</span>
@@ -115,15 +115,12 @@ function MetricCard({
       </div>
 
       <div>
-        <p className="text-3xl font-bold text-slate-700 mb-1">{value}</p>
-        <p className="text-sm text-slate-500">{title}</p>
+        <p className="text-3xl font-bold text-slate-800 mb-1">{value}</p>
+        <p className="text-sm text-slate-600 font-medium">{title}</p>
         {subValue && (
-          <p className="text-xs text-slate-400 mt-1">{subValue}</p>
+          <p className="text-xs text-slate-500 mt-1">{subValue}</p>
         )}
       </div>
-
-      {/* Decorative gradient */}
-      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${colorClasses[color]} opacity-50 blur-3xl -z-10`} />
     </motion.div>
   );
 

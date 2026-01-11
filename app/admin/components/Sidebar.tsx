@@ -75,7 +75,7 @@ export default function AdminSidebar() {
   return (
     <aside className={`
       fixed left-0 top-0 bottom-0
-      bg-[#0a0a0a] border-r border-stone-200
+      bg-white border-r border-stone-200
       flex flex-col
       transition-all duration-300
       ${collapsed ? 'w-20' : 'w-64'}
@@ -172,7 +172,7 @@ export function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: (
       {/* Sidebar */}
       <aside className={`
         lg:hidden fixed left-0 top-0 bottom-0 w-64
-        bg-[#0a0a0a] border-r border-stone-200 z-50
+        bg-white border-r border-stone-200 z-50
         transform transition-transform duration-300 ease-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
