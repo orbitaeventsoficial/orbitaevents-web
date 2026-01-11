@@ -116,7 +116,7 @@ export async function GET(req: NextRequest) {
 
     // Construir lista de stats
     const stats = STATS_DEFINITION.map((stat) => {
-      const calculated = calculatedStats[stat.key] || 0;
+      const calculated = (calculatedStats as Record<string, number>)[stat.key] || 0;
       const fallback = settingsMap.get(stat.key) || 0;
       const isManual = fallback > 0;
       const value = isManual ? fallback : calculated;
