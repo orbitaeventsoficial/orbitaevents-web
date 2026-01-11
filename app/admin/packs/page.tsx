@@ -3,6 +3,8 @@ import { log } from '@/lib/logger';
 // Pàgina de gestió de packs
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import SyncButton from './SyncButton';
+import { getAllPacks } from '@/config/packs-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,6 +36,8 @@ async function getPacks() {
 
 export default async function PacksPage() {
   const packs = await getPacks();
+  const configPacks = getAllPacks();
+  const packsInSync = packs.length === configPacks.length;
 
   return (
     <div className="space-y-6">
@@ -44,11 +48,17 @@ export default async function PacksPage() {
           <p className="mt-1 text-sm text-slate-500">
             Gestiona els packs de serveis i els seus preus
           </p>
+          {!packsInSync && (
+            <div className="mt-2 inline-flex items-center gap-2 rounded-md bg-yellow-50 px-3 py-1 text-sm text-yellow-800 border border-yellow-200">
+              ⚠️ Base de dades desincronitzada: {packs.length} packs en BD, {configPacks.length} en config
+            </div>
+          )}
         </div>
         <div className="flex gap-2">
+          <SyncButton />
           <Link
             href="/admin/packs/new"
-            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100 border border-stone-200"
           >
             + Nou Pack
           </Link>
