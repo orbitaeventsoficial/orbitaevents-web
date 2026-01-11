@@ -154,7 +154,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { icon: '📦', label: 'Packs', href: '/admin/packs' },
         { icon: '💰', label: 'Preus', href: '/admin/pricing' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
-        { icon: '⭐', label: 'Testimonis', href: '/admin/testimonios' },
+        { icon: '🌍', label: 'Textos', href: '/admin/texts' },
+        { icon: '📝', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
       ]
     },
     {
@@ -162,7 +163,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       items: [
         { icon: '🎸', label: 'Inventari', href: '/admin/inventory' },
         { icon: '📈', label: 'Analytics', href: '/admin/analytics' },
-        { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
+        { icon: '📝', label: 'Post-Event', href: '/admin/post-event' },
+      ]
+    },
+    {
+      title: 'Automatització',
+      items: [
+        { icon: '📬', label: 'Inbox', href: '/admin/inbox', badge: 'NEW', badgeColor: 'blue' as const },
+        { icon: '📧', label: 'Emails', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
+        { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
+        { icon: '⭐', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
       ]
     },
   ];
@@ -172,7 +182,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <body className="bg-stone-100 text-slate-700" style={{ margin: 0 }} suppressHydrationWarning>
         <div className="min-h-screen">
           {/* Desktop Sidebar */}
-          <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-stone-50 border-r border-stone-200 flex-col z-40">
+          <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-stone-200 flex-col z-40">
             {/* Logo */}
             <div className="p-4 border-b border-stone-200">
               <Link href="/admin" className="flex items-center gap-3">
@@ -235,7 +245,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className="lg:hidden fixed inset-0 bg-stone-100/60 backdrop-blur-sm z-40"
                 onClick={() => setSidebarOpen(false)}
               />
-              <aside className="lg:hidden fixed left-0 top-0 bottom-0 w-64 bg-stone-50 border-r border-stone-200 z-50 overflow-y-auto">
+              <aside className="lg:hidden fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-stone-200 z-50 overflow-y-auto">
                 <div className="p-4 border-b border-stone-200 flex items-center justify-between">
                   <span className="text-slate-700 font-semibold">
                     <span className="text-orange-500">Òrbita</span> Admin
