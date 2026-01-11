@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { Link } from '@/lib/navigation';
-import ContactForm from "@/components/forms/ContactForm.client";
+import ContactForm from "@/components/forms/ContactFormComplete";
 import { Briefcase, Users, Lightbulb, Star, Check, FileText, Shield, TrendingUp, Handshake, Sparkles } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
