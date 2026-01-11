@@ -3,8 +3,8 @@
 ## ⏱️ 2 minuts (3 clics)
 
 Les teves dades ja estan guardades:
-- ✅ GTM: `GTM-P3S2RV7R` (ja funcionant)
-- ✅ Google Analytics: `G-055CNQ1L78`
+- ✅ GTM: `GTM-T4MXCGQM` (ja funcionant)
+- ✅ Google Analytics: `G-2MDT9R7ZBJ`
 - ✅ Google Ads: `AW-17575053409`
 
 ---
@@ -12,11 +12,11 @@ Les teves dades ja estan guardades:
 ## Pas 1: Afegir Google Analytics a GTM
 
 1. **Obre**: https://tagmanager.google.com/
-2. **Selecciona**: Contenedor `GTM-P3S2RV7R`
+2. **Selecciona**: Contenedor `GTM-T4MXCGQM`
 3. **Clic a**: "Etiquetes" (menú esquerra) → Botó "Noves"
 4. **Clic a**: "Configuració de l'etiqueta"
 5. **Tria**: `Google Analytics: GA4 Configuration`
-6. **Enganxa**: `G-055CNQ1L78` al camp "ID de medición"
+6. **Enganxa**: `G-2MDT9R7ZBJ` al camp "ID de medición"
 7. **Activador**: Tria "All Pages" (Totes les pàgines)
 8. **Guarda**: Nom: "GA4 - All Pages"
 

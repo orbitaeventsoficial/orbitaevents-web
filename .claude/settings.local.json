@@ -212,7 +212,13 @@
       "Bash(vercel list:*)",
       "Bash(node scripts/clean-deprecated-texts.js:*)",
       "Bash(node -p:*)",
-      "Bash(node scripts/clean-unused-sections.js:*)"
+      "Bash(node scripts/clean-unused-sections.js:*)",
+      "Bash(node scripts/find-unused-components.js:*)",
+      "Bash(node scripts/delete-unused-components.js:*)",
+      "Bash(node scripts/deep-cleanup.js:*)",
+      "Bash(npx tsx:*)",
+      "Bash(jobs)",
+      "Bash(kill:*)"
     ]
   }
 }
