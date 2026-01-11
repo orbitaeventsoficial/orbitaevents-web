@@ -145,6 +145,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       items: [
         { icon: '👥', label: 'Leads', href: '/admin/leads', badge: 'NEW', badgeColor: 'orange' as const },
         { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
+        { icon: '👤', label: 'Clients', href: '/admin/contactes' },
         { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
       ]
     },
