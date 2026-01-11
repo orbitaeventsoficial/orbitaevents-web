@@ -208,7 +208,9 @@
       "Bash(node scripts/sync-reviews.mjs:*)",
       "Bash(node scripts/debug-serpapi.mjs:*)",
       "Bash(vercel logs:*)",
-      "Bash(vercel inspect:*)"
+      "Bash(vercel inspect:*)",
+      "Bash(vercel list:*)",
+      "Bash(node scripts/clean-deprecated-texts.js:*)"
     ]
   }
 }

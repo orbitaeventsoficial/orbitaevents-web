@@ -1,8 +1,7 @@
 {
   "languages": {
     "ca": "Català",
-    "es": "Español",
-    "en": "English"
+    "es": "Español"
   },
   "halloweenPage": {
     "meta": {
@@ -317,101 +316,6 @@
       "effects": "Efectos Especiales",
       "theming": "Tematización"
     },
-    "simpleCta": {
-      "budget": "Pide presupuesto",
-      "whatsapp": "WhatsApp directo 💬"
-    },
-    "happyClients": "eventos felices",
-    "headline1": "A las 4am tu suegra",
-    "headline2": "BAILABA DESCALZA",
-    "headline3": "Y tú lo viste todo desde la pista",
-    "headlines": [
-      {
-        "line1": "A las 4am tu suegra",
-        "line2": "BAILABA DESCALZA"
-      },
-      {
-        "line1": "El único DJ que te garantiza",
-        "line2": "FIESTAS ÉPICAS"
-      },
-      {
-        "line1": "Convertimos tu evento en",
-        "line2": "LEYENDA"
-      },
-      {
-        "line1": "No contrates un DJ",
-        "line2": "CONTRATA UNA EXPERIENCIA"
-      },
-      {
-        "line1": "Tu boda merece",
-        "line2": "SER INOLVIDABLE"
-      }
-    ],
-    "headlineOld1": "A las 4am tu suegra",
-    "headlineOld2": "bailaba descalza",
-    "countdownPrefix": "Próximo sábado disponible en:",
-    "days": "Días",
-    "hours": "Horas",
-    "mins": "Mins",
-    "secs": "Segs",
-    "urgencyExpired": "¡Consulta disponibilidad ahora!",
-    "scroll": "Descubre más",
-    "trust": {
-      "guarantee": "💯 100% clientes satisfechos (de verdad)",
-      "response": "⚡ Respuesta en 2h (de verdad)",
-      "equipment": "🎧 Equipo profesional de club"
-    },
-    "headline": {
-      "line1": "A las 4am tu suegra",
-      "line2": "bailaba descalza"
-    },
-    "punchline": "Eso hacemos.",
-    "services": "DJ + Sonido + Luces + Efectos + Tematización",
-    "response": "Respuesta en 2h",
-    "cta": {
-      "primary": "RESERVA TU FECHA",
-      "secondary": "Ver eventos reales",
-      "whatsapp": "WhatsApp",
-      "call": "Llamar"
-    },
-    "scarcity": "⚠️ Enero-Marzo 2026: Solo quedan 3 sábados",
-    "mobileCta": "Presupuesto Gratis",
-    "serviceLabels": {
-      "dj": "DJ",
-      "sound": "Sonido",
-      "lights": "Luces",
-      "magic": "Magia"
-    },
-    "socialProof": {
-      "google": "5.0/5 en Google",
-      "events": "+50 eventos",
-      "weddings": "15+ bodas"
-    },
-    "urgency": {
-      "nextDate": "Próxima fecha disponible:",
-      "remaining": "Solo quedan",
-      "saturdays": "sábados",
-      "in": "en"
-    },
-    "scrollMore": "Descubre más",
-    "titleLine1": "TU EVENTO",
-    "titleLine2": "SERÁ LEYENDA",
-    "subtitle": "Creamos fiestas donde TODOS bailan. Garantizado.",
-    "subtitleHighlight": "Todo lo que necesitas. Un solo equipo.",
-    "ctaPrimary": "Pide Presupuesto",
-    "ctaSecondary": "WhatsApp",
-    "title": {
-      "line1": "El día que siempre",
-      "line2": "imaginaste",
-      "line3": "está más cerca"
-    },
-    "subtitleOld": "Ese momento en que miras a tu alrededor",
-    "subtitleBold": "y ves a todos sonriendo.",
-    "subtitleEnd": "La música perfecta. Las luces justas. Y sabes que ese instante quedará para siempre.",
-    "availableSlots": "{count, plural, =1 {sábado disponible} other {sábados disponibles}} este mes",
-    "features": "Música adaptada • Tematización • Animación • Juegos • Efectos especiales",
-    "forEvents": "Para bodas, empresas y fiestas que merecen una atención profesional",
-    "events": "eventos",
     "yearsLabel": "años experiencia",
     "coverage": "cobertura",
     "thisYear": "este año",
@@ -726,15 +630,15 @@
           "q": "¿Trabajáis fuera de Barcelona?",
           "a": "Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Nos adaptamos a cualquier espacio: locales, jardines, fincas, pabellones. Transporte GRATIS hasta 25km desde Granollers; otras zonas pueden tener pequeño suplemento detallado en presupuesto."
         },
-    {
-      "q": "¿Cuánto tiempo antes hay que reservar?",
-      "a": "Mínimo 2 semanas, pero para viernes y sábados lo normal es reservar con 6-8 semanas de antelación. Son los días que se llenan primero. Consulta disponibilidad para tu fecha específica."
-    },
-    {
-      "q": "¿Podéis llevar la discomóvil a una sala pequeña o un pueblo alejado?",
-      "a": "Sí, disponemos de un kit compacto que se adapta a espacios reducidos y mantenemos la potencia profesional. Barcelona (hasta 25 km) no tiene suplemento; Girona también se sirve, pero calculamos una tarifa de transporte según los kilómetros adicionales y te la enviamos antes de confirmar."
-    }
-  ]
+        {
+          "q": "¿Cuánto tiempo antes hay que reservar?",
+          "a": "Mínimo 2 semanas, pero para viernes y sábados lo normal es reservar con 6-8 semanas de antelación. Son los días que se llenan primero. Consulta disponibilidad para tu fecha específica."
+        },
+        {
+          "q": "¿Podéis llevar la discomóvil a una sala pequeña o un pueblo alejado?",
+          "a": "Sí, disponemos de un kit compacto que se adapta a espacios reducidos y mantenemos la potencia profesional. Barcelona (hasta 25 km) no tiene suplemento; Girona también se sirve, pero calculamos una tarifa de transporte según los kilómetros adicionales y te la enviamos antes de confirmar."
+        }
+      ]
     },
     "animacion-infantil": {
       "faq": [
@@ -3704,10 +3608,6 @@
       "6": "MG Medicina Estètica",
       "7": "Zona Motor L'Ametlla Park"
     }
-  },
-  "languages": {
-    "ca": "Català",
-    "es": "Español"
   },
   "gallery": {
     "preparingTitle": "Esta experiencia está en preparación",

@@ -154,7 +154,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { icon: '📦', label: 'Packs', href: '/admin/packs' },
         { icon: '💰', label: 'Preus', href: '/admin/pricing' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
-        { icon: '🌍', label: 'Textos', href: '/admin/texts' },
         { icon: '📝', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
       ]
     },

@@ -1,8 +1,7 @@
 {
   "languages": {
     "ca": "Català",
-    "es": "Español",
-    "en": "English"
+    "es": "Español"
   },
   "halloweenPage": {
     "meta": {
@@ -317,101 +316,6 @@
       "effects": "Efectes Especials",
       "theming": "Tematització"
     },
-    "simpleCta": {
-      "budget": "Demana pressupost",
-      "whatsapp": "WhatsApp directe 💬"
-    },
-    "headlines": [
-      {
-        "line1": "A les 4am la teva sogra",
-        "line2": "BALLAVA DESCALÇA"
-      },
-      {
-        "line1": "L'únic DJ que et garanteix",
-        "line2": "FESTES ÈPIQUES"
-      },
-      {
-        "line1": "Convertim el teu event en",
-        "line2": "LLEGENDA"
-      },
-      {
-        "line1": "No contractes un DJ",
-        "line2": "CONTRACTA UNA EXPERIÈNCIA"
-      },
-      {
-        "line1": "El teu casament mereix",
-        "line2": "SER INOBLIDABLE"
-      }
-    ],
-    "headline1": "A les 4am la teva sogra",
-    "headline2": "BALLAVA DESCALÇA",
-    "headline3": "I tu ho vas veure tot des de la pista",
-    "subtitle": "Creem festes on TOTHOM balla. Garantit.",
-    "countdownPrefix": "Proper dissabte disponible en:",
-    "days": "Dies",
-    "hours": "Hores",
-    "mins": "Mins",
-    "secs": "Segs",
-    "urgencyExpired": "Consulta disponibilitat ara!",
-    "happyClients": "events feliços",
-    "scroll": "Descobreix més",
-    "trust": {
-      "guarantee": "💯 100% clients satisfets (de veritat)",
-      "response": "⚡ Resposta en 2h (de veritat)",
-      "equipment": "🎧 Equip professional de club"
-    },
-    "headlineOld1": "A les 4am la teva sogra",
-    "headlineOld2": "ballava descalça",
-    "headline": {
-      "line1": "A les 4am la teva sogra",
-      "line2": "ballava descalça"
-    },
-    "punchline": "No fem events. Creem records que duren tota la vida.",
-    "services": "DJ + So + Llums + Efectes + Tematització",
-    "response": "Resposta en 2h",
-    "cta": {
-      "primary": "RESERVA LA TEVA DATA",
-      "secondary": "Veure events reals",
-      "whatsapp": "WhatsApp",
-      "call": "Trucar"
-    },
-    "scarcity": "⚠️ Gener-Març 2026: Només queden 3 dissabtes",
-    "mobileCta": "Pressupost Gratis",
-    "serviceLabels": {
-      "dj": "DJ",
-      "sound": "So",
-      "lights": "Llums",
-      "magic": "Màgia"
-    },
-    "socialProof": {
-      "google": "5.0/5 a Google",
-      "events": "+50 esdeveniments",
-      "weddings": "15+ casaments"
-    },
-    "urgency": {
-      "nextDate": "Propera data disponible:",
-      "remaining": "Només queden",
-      "saturdays": "dissabtes",
-      "in": "al"
-    },
-    "scrollMore": "Descobreix més",
-    "titleLine1": "EL TEU EVENT",
-    "titleLine2": "SERÀ LLEGENDA",
-    "subtitleHighlight": "Tot el que necessites. Un sol equip.",
-    "ctaPrimary": "Demana Pressupost",
-    "ctaSecondary": "WhatsApp",
-    "title": {
-      "line1": "El dia que sempre",
-      "line2": "vas imaginar",
-      "line3": "és més a prop"
-    },
-    "subtitleOld": "Aquell moment en què mires al teu voltant",
-    "subtitleBold": "i veus tothom somrient.",
-    "subtitleEnd": "La música perfecta. Les llums justes. I saps que aquest instant quedarà per sempre.",
-    "availableSlots": "{count, plural, =1 {dissabte disponible} other {dissabtes disponibles}} aquest mes",
-    "features": "Música adaptada • Tematització • Animació • Jocs • Efectes especials",
-    "forEvents": "Per a casaments, empreses i festes que mereixen una atenció professional",
-    "events": "esdeveniments",
     "yearsLabel": "anys experiència",
     "coverage": "cobertura",
     "thisYear": "aquest any",
@@ -707,8 +611,7 @@
         {
           "q": "Quant temps abans cal reservar?",
           "a": "Mínim 2 setmanes, però per a divendres i dissabtes el normal és reservar amb 6-8 setmanes d'antelació. Són els dies que s'omplen primer. Consulta disponibilitat per a la teva data específica."
-        }
-        ,
+        },
         {
           "q": "Puc reservar la discomòbil per a una sala petita o un poble llunyà?",
           "a": "Sí, el kit compacte s'adapta a espais reduïts i mantenim potència professional. Barcelona (dins dels 25 km) està coberta sense suplement; Girona se serveix però es calcula una tarifa de transport segons els quilòmetres extra, te la passem abans de confirmar."
@@ -3211,10 +3114,6 @@
       "6": "MG Medicina Estètica",
       "7": "Zona Motor L'Ametlla Park"
     }
-  },
-  "languages": {
-    "ca": "Català",
-    "es": "Español"
   },
   "gallery": {
     "preparingTitle": "Aquesta experiència està en preparació",
