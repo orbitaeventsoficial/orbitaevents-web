@@ -210,7 +210,9 @@
       "Bash(vercel logs:*)",
       "Bash(vercel inspect:*)",
       "Bash(vercel list:*)",
-      "Bash(node scripts/clean-deprecated-texts.js:*)"
+      "Bash(node scripts/clean-deprecated-texts.js:*)",
+      "Bash(node -p:*)",
+      "Bash(node scripts/clean-unused-sections.js:*)"
     ]
   }
 }

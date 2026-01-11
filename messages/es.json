@@ -3367,15 +3367,6 @@
   "clients": {
     "title": "Marcas que confían en Òrbita"
   },
-  "discountPopup": {
-    "title": "¡Espera!",
-    "subtitle": "Tenemos algo especial para ti",
-    "offer": "10% de descuento",
-    "description": "en tu primera reserva si contactas hoy",
-    "cta": "Quiero mi descuento",
-    "dismiss": "No, gracias",
-    "terms": "* Válido para nuevas reservas. No acumulable con otras ofertas."
-  },
   "sticky": {
     "quoteIn3Min": "Presupuesto en 3 min",
     "noCommitmentFree": "Sin compromiso · Gratis"
@@ -3889,18 +3880,6 @@
       }
     }
   },
-  "startCreating": {
-    "title": "¿Qué evento tienes en mente?",
-    "subtitle": "Elige y empieza a crear tu experiencia.",
-    "options": {
-      "wedding": "Una boda",
-      "party": "Una fiesta",
-      "corporate": "Un evento corporativo",
-      "other": "Otra cosa"
-    },
-    "orPrefer": "O si prefieres,",
-    "talkDirectly": "habla directamente con nosotros"
-  },
   "flashOffer": {
     "title": "🎄 Oferta Invierno",
     "description": "Reserva ahora y ahorra",
@@ -4097,120 +4076,6 @@
       "trustYears": "2+ años",
       "trustLocation": "BCN + Girona",
       "trustResponse": "2h respuesta"
-    }
-  },
-  "elViatge": {
-    "portal": {
-      "magicBegins": "La magia comienza...",
-      "skipIntro": "Saltar intro →",
-      "logoText": "ÒRBITA",
-      "logoSubtext": "EVENTS"
-    },
-    "promesa": {
-      "title1": "El día que siempre",
-      "title2": "imaginaste",
-      "subtitle1": "Ese momento en que miras a tu alrededor y ves a todos sonriendo.",
-      "subtitle2": "La música perfecta. Las luces justas. Y sabes que ese instante quedará para siempre.",
-      "cta": "Empieza a crearlo",
-      "stats": {
-        "anys": "años en el sector",
-        "ubicacio": "+ Girona",
-        "resposta": "respuesta"
-      }
-    },
-    "mons": {
-      "halloween": {
-        "nom": "Halloween",
-        "titol": "La Noche de los Muertos",
-        "subtitol": "Terror, humo, luces verdes... Una noche que no olvidarán."
-      },
-      "monmagic": {
-        "nom": "Mundo Mágico",
-        "titol": "Bienvenido a la Escuela de Magia",
-        "subtitol": "Varitas, casas, magia... El sueño de todo fan de la fantasía."
-      },
-      "bodes": {
-        "nom": "Bodas",
-        "titol": "El Amor Celebrado",
-        "subtitol": "El día más importante de vuestra vida, perfecto."
-      },
-      "festes": {
-        "nom": "Fiestas",
-        "titol": "La Alegría Compartida",
-        "subtitol": "Cumpleaños, celebraciones, momentos únicos."
-      },
-      "empreses": {
-        "nom": "Empresas",
-        "titol": "El Impacto Memorable",
-        "subtitol": "Eventos corporativos que tu equipo recordará."
-      }
-    },
-    "testimonis": [
-      {
-        "text": "Estamos preparando nuestra boda temática con Òrbita Events. La planificación está siendo increíble: velas flotantes, decoración mágica... ¡Estamos muy ilusionados!",
-        "nom": "Lorena & Carles",
-        "event": "Boda Mundo Mágico",
-        "lloc": "Cataluña",
-        "data": "Próximamente"
-      },
-      {
-        "text": "La mejor fiesta de Halloween de mi vida. El humo, las luces verdes, las calabazas... Mis amigos aún alucinan.",
-        "nom": "Àngela",
-        "event": "18º Cumpleaños Halloween",
-        "lloc": "Barcelona",
-        "data": "Octubre 2024"
-      },
-      {
-        "text": "Queríamos algo diferente para la empresa. Superaron todas las expectativas. Profesional, creativo, y el equipo aún habla de ello.",
-        "nom": "Marta - Dir. RRHH",
-        "event": "Cena Empresa",
-        "lloc": "Girona",
-        "data": "Diciembre 2024"
-      }
-    ],
-    "elsMons": {
-      "sectionTitle": "Escoge tu universo",
-      "title1": "Cada evento es un",
-      "title2": "mundo",
-      "wantParty": "Quiero una fiesta",
-      "contact": "Contactar →",
-      "swipeHint": "← swipe para ver más →"
-    },
-    "histories": {
-      "sectionTitle": "Historias reales",
-      "title1": "No te lo decimos nosotros.",
-      "title2": "Te lo dicen ellos."
-    },
-    "diferencia": {
-      "title1": "Evento normal",
-      "title2": "vs Evento Òrbita",
-      "comparisons": [
-        {
-          "altres": "Solo música de fondo",
-          "nosaltres": "Música + tematización + animación"
-        },
-        {
-          "altres": "DJ que no se adapta",
-          "nosaltres": "Leemos la sala en tiempo real"
-        },
-        {
-          "altres": "\"Estuvo bien... nada especial\"",
-          "nosaltres": "\"Aún hablan de ello meses después\""
-        }
-      ]
-    },
-    "primerPas": {
-      "title1": "¿Tienes una fecha",
-      "title2": "en mente?",
-      "subtitle1": "Cuéntanos qué imaginas.",
-      "subtitle2": "Te respondemos en menos de 2 horas. Sin compromiso.",
-      "whatsapp": "WhatsApp directo",
-      "contactForm": "Formulario de contacto",
-      "trustYears": "2+ años en el sector",
-      "trustLocation": "BCN + Girona",
-      "trustResponse": "2h respuesta",
-      "miniTestimonial": "\"Transformaron nuestra boda en una experiencia mágica inolvidable.\"",
-      "miniTestimonialAuthor": "— Lorena y Carles"
     }
   },
   "testimonialForm": {
@@ -5223,86 +5088,6 @@
       "title": "¿Cómo Funciona?"
     }
   },
-  "casosExit": {
-    "badge": "Historias Reales",
-    "title": "Casos",
-    "titleHighlight": "de Éxito",
-    "subtitle": "Descubre cómo hemos transformado eventos en experiencias inolvidables.",
-    "filters": {
-      "tots": "Todos",
-      "casament": "Bodas",
-      "festa": "Fiestas",
-      "corporatiu": "Corporativo",
-      "tematica": "Temáticas"
-    },
-    "cta": {
-      "question": "¿Quieres ser el próximo caso de éxito?",
-      "button": "Empieza tu proyecto"
-    },
-    "modal": {
-      "guests": "invitados",
-      "servicesUsed": "Servicios Utilizados",
-      "gallery": "Galería",
-      "wantThis": "Quiero un evento así",
-      "whatsapp": "WhatsApp"
-    },
-    "cases": {
-      "mariaJordi": {
-        "clientName": "Maria & Jordi",
-        "eventType": "Boda",
-        "title": "Boda Harry Potter en Mas Terrats",
-        "location": "Girona",
-        "venue": "Mas Terrats",
-        "date": "Septiembre 2024",
-        "guests": 150,
-        "services": [
-          "DJ 6h",
-          "Tematización HP completa",
-          "Velas flotantes",
-          "Estación pociones",
-          "Efectos FX"
-        ],
-        "story": "Maria y Jordi son fans de Harry Potter desde pequeños. Querían que su boda fuera mágica, literalmente. Transformamos Mas Terrats en el Gran Comedor de Hogwarts con velas flotantes, mesas por casas, y una estación de pociones. El momento del primer baile con Hedwig's Theme hizo llorar a todos.",
-        "quote": "¡Increíble! Hicieron que nuestra boda fuera mágica. La tematización Harry Potter dejó a todos con la boca abierta. ¡Los invitados aún hablan de ello!"
-      },
-      "angela18": {
-        "clientName": "Àngela García",
-        "eventType": "Cumpleaños",
-        "title": "Fiesta de los 18 Halloween",
-        "location": "Barcelona",
-        "venue": "Casa particular",
-        "date": "Octubre 2024",
-        "guests": 80,
-        "services": [
-          "DJ 4h",
-          "Decoración Halloween",
-          "Máquina humo",
-          "Luces LED",
-          "Efectos láser"
-        ],
-        "story": "Àngela quería una fiesta de los 18 que nadie olvidara. Como su cumpleaños es en octubre, hicimos una fiesta temática Halloween brutal. Transformamos el jardín de sus padres en un escenario de terror con humo, luces naranjas, y música que hizo bailar a todos hasta las 3 de la madrugada.",
-        "quote": "Contraté la discomóvil y mis amigos TODAVÍA me preguntan dónde encontré al DJ. Los efectos especiales y la puesta en escena fueron espectaculares. ¡Repetiría 100%!"
-      },
-      "techCorp": {
-        "clientName": "TechCorp Barcelona",
-        "eventType": "Empresa",
-        "title": "Cena de Navidad Corporativa",
-        "location": "Girona",
-        "venue": "Hotel Carlemany",
-        "date": "Diciembre 2024",
-        "guests": 120,
-        "services": [
-          "DJ 5h",
-          "Sonido profesional",
-          "Micro inalámbrico",
-          "Iluminación ambiente",
-          "Coordinación discursos"
-        ],
-        "story": "TechCorp necesitaba una cena de Navidad que combinara momentos formales (discursos, premios) con fiesta. Coordinamos perfectamente los tiempos: música de ambiente durante la cena, silencio para los discursos, y después fiesta hasta que cerraron el hotel. El CEO nos felicitó personalmente.",
-        "quote": "Necesitábamos un evento corporativo profesional pero divertido. Òrbita nos dio exactamente eso: equipamiento top, coordinación perfecta y una animación de la que el equipo todavía habla."
-      }
-    }
-  },
   "faqAmpliat": {
     "badge": "Preguntas Frecuentes",
     "title": "Todo lo que",
@@ -5793,23 +5578,6 @@
         "quote": "Pide Presupuesto Gratis",
         "whatsapp": "WhatsApp Directo"
       }
-    }
-  },
-  "heroNew": {
-    "badge": "🎃 Especialistas en fiestas temáticas",
-    "title": {
-      "line1": "La fiesta que",
-      "line2": "nadie olvidará."
-    },
-    "subtitle": "DJ + tematización + efectos especiales. Barcelona y Girona.",
-    "cta": {
-      "primary": "Pide Presupuesto",
-      "secondary": "WhatsApp Directo"
-    },
-    "social": {
-      "rating": "5.0",
-      "events": "50+ eventos sin incidentes",
-      "recommended": "Recomendados en"
     }
   },
   "ctaFinal": {
