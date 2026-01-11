@@ -139,7 +139,7 @@ export default function InboxPanel() {
         <button
           onClick={fetchEmails}
           disabled={loading}
-          className="p-2 rounded-lg hover:bg-stone-1000 transition-colors disabled:opacity-50"
+          className="p-2 rounded-lg hover:bg-stone-100 transition-colors disabled:opacity-50"
           title="Refrescar"
         >
           <svg className={`w-5 h-5 text-slate-600 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">

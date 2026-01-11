@@ -419,9 +419,9 @@ export default function MobileCalendarWidget({ fullPage = false }: { fullPage?: 
     return events[key] || [];
   }, [selectedDate, events]);
 
-  const containerClass = fullPage 
+  const containerClass = fullPage
     ? 'min-h-screen bg-stone-100 p-4 pt-6 pb-24 lg:hidden'
-    : 'p-4 bg-stone-1000 rounded-2xl border border-stone-200';
+    : 'p-4 bg-stone-50 rounded-2xl border border-stone-200';
 
   return (
     <div className={containerClass}>

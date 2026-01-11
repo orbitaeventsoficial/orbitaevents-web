@@ -403,7 +403,7 @@ export default function PricingAdminPage() {
                 Com funciona aquesta pàgina
               </h3>
               <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div className="bg-stone-1000 rounded-xl p-4">
+                <div className="bg-stone-50 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-green-700 font-semibold mb-2">
                     <span className="w-3 h-3 bg-green-500 rounded-full"></span>
                     Extras (EDITABLES)
@@ -412,7 +412,7 @@ export default function PricingAdminPage() {
                     Pots canviar els preus dels extras directament. Els canvis s'apliquen a noves reserves.
                   </p>
                 </div>
-                <div className="bg-stone-1000 rounded-xl p-4">
+                <div className="bg-stone-50 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-slate-700 font-semibold mb-2">
                     <span className="w-3 h-3 bg-slate-400 rounded-full"></span>
                     Packs (NOMÉS LECTURA)
@@ -421,7 +421,7 @@ export default function PricingAdminPage() {
                     Els packs es gestionen a /admin/packs. Aquí només veus estadístiques.
                   </p>
                 </div>
-                <div className="bg-stone-1000 rounded-xl p-4">
+                <div className="bg-stone-50 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-blue-700 font-semibold mb-2">
                     <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
                     Inventari (ESTADÍSTIQUES)

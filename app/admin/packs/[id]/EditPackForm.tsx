@@ -37,6 +37,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
   const [success, setSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
+    slug: pack.slug,
     price: pack.price,
     originalPrice: pack.originalPrice || '',
     extraHourPrice: pack.extraHourPrice,
@@ -51,6 +52,33 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
     order: pack.order,
   });
 
+  const [translations, setTranslations] = useState<PackTranslation[]>(
+    pack.translations.length > 0
+      ? pack.translations
+      : [
+          { locale: 'es', name: '', description: '', tagline: '', features: [] },
+          { locale: 'ca', name: '', description: '', tagline: '', features: [] }
+        ]
+  );
+
+  const updateTranslation = (locale: string, field: keyof PackTranslation, value: string | string[]) => {
+    setTranslations(prev =>
+      prev.map(t =>
+        t.locale === locale ? { ...t, [field]: value } : t
+      )
+    );
+  };
+
+  const getTranslation = (locale: string) => {
+    return translations.find(t => t.locale === locale) || {
+      locale,
+      name: '',
+      description: '',
+      tagline: '',
+      features: []
+    };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -64,6 +92,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          slug: formData.slug,
           price: parseFloat(formData.price.toString()),
           originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice.toString()) : null,
           extraHourPrice: parseFloat(formData.extraHourPrice.toString()),
@@ -76,6 +105,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
           isActive: formData.isActive,
           isFeatured: formData.isFeatured,
           order: parseInt(formData.order.toString()),
+          translations: translations,
         }),
       });
 
@@ -112,6 +142,154 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
           <p className="text-sm text-green-800">✅ Pack actualitzat correctament!</p>
         </div>
       )}
+
+      {/* Slug Section */}
+      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-700 mb-4">🔗 Slug (URL)</h3>
+        <div>
+          <label htmlFor="slug" className="block text-sm font-medium text-slate-700 mb-1">
+            Slug del Pack *
+          </label>
+          <input
+            type="text"
+            id="slug"
+            required
+            value={formData.slug}
+            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+            className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+            placeholder="pack-basic"
+          />
+          <p className="mt-1 text-xs text-slate-500">
+            URL del pack (sense espais, només lletres, números i guions)
+          </p>
+        </div>
+      </div>
+
+      {/* Translations Section - Spanish */}
+      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-700 mb-4">🇪🇸 Traduccions - Espanyol</h3>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="name-es" className="block text-sm font-medium text-slate-700 mb-1">
+              Nom del Pack *
+            </label>
+            <input
+              type="text"
+              id="name-es"
+              required
+              value={getTranslation('es').name}
+              onChange={(e) => updateTranslation('es', 'name', e.target.value)}
+              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              placeholder="Pack Básico"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="tagline-es" className="block text-sm font-medium text-slate-700 mb-1">
+              Tagline
+            </label>
+            <input
+              type="text"
+              id="tagline-es"
+              value={getTranslation('es').tagline || ''}
+              onChange={(e) => updateTranslation('es', 'tagline', e.target.value)}
+              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              placeholder="Perfecto para eventos pequeños"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="description-es" className="block text-sm font-medium text-slate-700 mb-1">
+              Descripció
+            </label>
+            <textarea
+              id="description-es"
+              rows={3}
+              value={getTranslation('es').description || ''}
+              onChange={(e) => updateTranslation('es', 'description', e.target.value)}
+              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              placeholder="Descripción completa del pack..."
+            />
+          </div>
+
+          <div>
+            <label htmlFor="features-es" className="block text-sm font-medium text-slate-700 mb-1">
+              Característiques (una per línia)
+            </label>
+            <textarea
+              id="features-es"
+              rows={5}
+              value={(getTranslation('es').features || []).join('\n')}
+              onChange={(e) => updateTranslation('es', 'features', e.target.value.split('\n').filter(f => f.trim()))}
+              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm font-mono text-xs"
+              placeholder="DJ profesional&#10;Sistema de sonido&#10;Iluminación básica"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Translations Section - Catalan */}
+      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-700 mb-4">🏴 Traduccions - Català</h3>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="name-ca" className="block text-sm font-medium text-slate-700 mb-1">
+              Nom del Pack *
+            </label>
+            <input
+              type="text"
+              id="name-ca"
+              required
+              value={getTranslation('ca').name}
+              onChange={(e) => updateTranslation('ca', 'name', e.target.value)}
+              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              placeholder="Pack Bàsic"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="tagline-ca" className="block text-sm font-medium text-slate-700 mb-1">
+              Tagline
+            </label>
+            <input
+              type="text"
+              id="tagline-ca"
+              value={getTranslation('ca').tagline || ''}
+              onChange={(e) => updateTranslation('ca', 'tagline', e.target.value)}
+              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              placeholder="Perfecte per a esdeveniments petits"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="description-ca" className="block text-sm font-medium text-slate-700 mb-1">
+              Descripció
+            </label>
+            <textarea
+              id="description-ca"
+              rows={3}
+              value={getTranslation('ca').description || ''}
+              onChange={(e) => updateTranslation('ca', 'description', e.target.value)}
+              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              placeholder="Descripció completa del pack..."
+            />
+          </div>
+
+          <div>
+            <label htmlFor="features-ca" className="block text-sm font-medium text-slate-700 mb-1">
+              Característiques (una per línia)
+            </label>
+            <textarea
+              id="features-ca"
+              rows={5}
+              value={(getTranslation('ca').features || []).join('\n')}
+              onChange={(e) => updateTranslation('ca', 'features', e.target.value.split('\n').filter(f => f.trim()))}
+              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm font-mono text-xs"
+              placeholder="DJ professional&#10;Sistema de so&#10;Il·luminació bàsica"
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Pricing Section */}
       <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">

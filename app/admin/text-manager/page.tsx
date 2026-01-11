@@ -178,7 +178,10 @@ export default function TextManagerPage() {
   // Estados principales
   const [esTexts, setEsTexts] = useState<Record<string, string>>({});
   const [caTexts, setCaTexts] = useState<Record<string, string>>({});
+  const [enTexts, setEnTexts] = useState<Record<string, string>>({});
   const [originalEsTexts, setOriginalEsTexts] = useState<Record<string, string>>({});
+  const [originalCaTexts, setOriginalCaTexts] = useState<Record<string, string>>({});
+  const [originalEnTexts, setOriginalEnTexts] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -191,6 +194,7 @@ export default function TextManagerPage() {
   const [showComparison, setShowComparison] = useState(false);
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<'sections' | 'all' | 'search'>('sections');
+  const [activeLanguage, setActiveLanguage] = useState<'es' | 'ca' | 'en'>('es');
 
   // Historial de cambios
   const [changeHistory, setChangeHistory] = useState<Array<{
@@ -214,11 +218,14 @@ export default function TextManagerPage() {
     try {
       const response = await fetch('/api/admin/text-manager');
       const data = await response.json();
-      
+
       if (data.ok) {
         setEsTexts(data.es);
         setCaTexts(data.ca);
+        setEnTexts(data.en || {});
         setOriginalEsTexts(data.es);
+        setOriginalCaTexts(data.ca);
+        setOriginalEnTexts(data.en || {});
       } else {
         setError(data.error || 'Error cargando textos');
       }
@@ -233,23 +240,28 @@ export default function TextManagerPage() {
   // FUNCIONES DE MODIFICACIÓN
   // ═══════════════════════════════════════════════════════════════════════════
 
-  const handleTextChange = useCallback((path: string, value: string) => {
-    setEsTexts(prev => {
-      const newTexts = { ...prev, [path]: value };
-      
-      // Registrar en historial
-      if (prev[path] !== value) {
-        setChangeHistory(h => [...h, {
-          path,
-          oldValue: prev[path] || '',
-          newValue: value,
-          timestamp: new Date()
-        }]);
-      }
-      
-      return newTexts;
-    });
-  }, []);
+  const handleTextChange = useCallback((path: string, value: string, locale?: 'es' | 'ca' | 'en') => {
+    const targetLocale = locale || activeLanguage;
+
+    if (targetLocale === 'es') {
+      setEsTexts(prev => {
+        const newTexts = { ...prev, [path]: value };
+        if (prev[path] !== value) {
+          setChangeHistory(h => [...h, {
+            path,
+            oldValue: prev[path] || '',
+            newValue: value,
+            timestamp: new Date()
+          }]);
+        }
+        return newTexts;
+      });
+    } else if (targetLocale === 'ca') {
+      setCaTexts(prev => ({ ...prev, [path]: value }));
+    } else if (targetLocale === 'en') {
+      setEnTexts(prev => ({ ...prev, [path]: value }));
+    }
+  }, [activeLanguage]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -257,13 +269,28 @@ export default function TextManagerPage() {
     setSuccess(null);
 
     try {
-      // Encontrar solo los textos modificados
+      // Encontrar textos modificados (solo en el idioma activo)
       const modifications: Record<string, string> = {};
-      Object.entries(esTexts).forEach(([path, value]) => {
-        if (value !== originalEsTexts[path]) {
-          modifications[path] = value;
-        }
-      });
+
+      if (activeLanguage === 'es') {
+        Object.entries(esTexts).forEach(([path, value]) => {
+          if (value !== originalEsTexts[path]) {
+            modifications[path] = value;
+          }
+        });
+      } else if (activeLanguage === 'ca') {
+        Object.entries(caTexts).forEach(([path, value]) => {
+          if (value !== originalCaTexts[path]) {
+            modifications[path] = value;
+          }
+        });
+      } else if (activeLanguage === 'en') {
+        Object.entries(enTexts).forEach(([path, value]) => {
+          if (value !== originalEnTexts[path]) {
+            modifications[path] = value;
+          }
+        });
+      }
 
       if (Object.keys(modifications).length === 0) {
         setError('No hay cambios para guardar');
@@ -271,20 +298,76 @@ export default function TextManagerPage() {
         return;
       }
 
-      const response = await fetch('/api/admin/text-manager', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ modifications, locale: 'es' })
-      });
+      // TRADUCCIÓN AUTOMÁTICA
+      // Para cada texto modificado, traducir a los otros 2 idiomas
+      const allModifications: Record<string, Record<string, string>> = {
+        es: {},
+        ca: {},
+        en: {}
+      };
 
-      const data = await response.json();
+      setSuccess('🔄 Traduciendo automáticamente...');
 
-      if (data.ok) {
-        setSuccess(`✅ ${data.updated} textos guardados correctamente`);
-        setOriginalEsTexts({ ...esTexts });
+      for (const [path, text] of Object.entries(modifications)) {
+        // Traducir el texto a los 3 idiomas
+        const translateResponse = await fetch('/api/admin/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, targetLanguages: ['es', 'ca', 'en'] })
+        });
+
+        const translateData = await translateResponse.json();
+
+        if (translateData.ok && translateData.translations) {
+          allModifications.es[path] = translateData.translations.es;
+          allModifications.ca[path] = translateData.translations.ca;
+          allModifications.en[path] = translateData.translations.en;
+        } else {
+          // Si falla la traducción, usar el texto original para todos
+          allModifications.es[path] = text;
+          allModifications.ca[path] = text;
+          allModifications.en[path] = text;
+        }
+      }
+
+      // Guardar los 3 idiomas en paralelo
+      const savePromises = [
+        fetch('/api/admin/text-manager', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ modifications: allModifications.es, locale: 'es' })
+        }),
+        fetch('/api/admin/text-manager', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ modifications: allModifications.ca, locale: 'ca' })
+        }),
+        fetch('/api/admin/text-manager', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ modifications: allModifications.en, locale: 'en' })
+        })
+      ];
+
+      const responses = await Promise.all(savePromises);
+      const results = await Promise.all(responses.map(r => r.json()));
+
+      const allOk = results.every(r => r.ok);
+
+      if (allOk) {
+        // Actualizar los estados con las traducciones
+        setEsTexts(prev => ({ ...prev, ...allModifications.es }));
+        setCaTexts(prev => ({ ...prev, ...allModifications.ca }));
+        setEnTexts(prev => ({ ...prev, ...allModifications.en }));
+
+        setOriginalEsTexts(prev => ({ ...prev, ...allModifications.es }));
+        setOriginalCaTexts(prev => ({ ...prev, ...allModifications.ca }));
+        setOriginalEnTexts(prev => ({ ...prev, ...allModifications.en }));
+
+        setSuccess(`✅ ${Object.keys(modifications).length} textos guardados y traducidos automáticamente a ES, CA y EN`);
         setChangeHistory([]);
       } else {
-        setError(data.error || 'Error guardando');
+        setError('Error guardando algunos idiomas');
       }
     } catch (err) {
       setError('Error de conexión al guardar');
@@ -295,15 +378,24 @@ export default function TextManagerPage() {
   };
 
   const handleRevert = (path: string) => {
-    setEsTexts(prev => ({
-      ...prev,
-      [path]: originalEsTexts[path]
-    }));
+    if (activeLanguage === 'es') {
+      setEsTexts(prev => ({ ...prev, [path]: originalEsTexts[path] }));
+    } else if (activeLanguage === 'ca') {
+      setCaTexts(prev => ({ ...prev, [path]: originalCaTexts[path] }));
+    } else if (activeLanguage === 'en') {
+      setEnTexts(prev => ({ ...prev, [path]: originalEnTexts[path] }));
+    }
   };
 
   const handleRevertAll = () => {
-    if (confirm('¿Revertir TODOS los cambios?')) {
-      setEsTexts({ ...originalEsTexts });
+    if (confirm('¿Revertir TODOS los cambios en este idioma?')) {
+      if (activeLanguage === 'es') {
+        setEsTexts({ ...originalEsTexts });
+      } else if (activeLanguage === 'ca') {
+        setCaTexts({ ...originalCaTexts });
+      } else if (activeLanguage === 'en') {
+        setEnTexts({ ...originalEnTexts });
+      }
       setChangeHistory([]);
     }
   };
@@ -321,14 +413,26 @@ export default function TextManagerPage() {
     return 'common';
   }, []);
 
+  const currentTexts = useMemo(() => {
+    if (activeLanguage === 'es') return esTexts;
+    if (activeLanguage === 'ca') return caTexts;
+    return enTexts;
+  }, [activeLanguage, esTexts, caTexts, enTexts]);
+
+  const originalTexts = useMemo(() => {
+    if (activeLanguage === 'es') return originalEsTexts;
+    if (activeLanguage === 'ca') return originalCaTexts;
+    return originalEnTexts;
+  }, [activeLanguage, originalEsTexts, originalCaTexts, originalEnTexts]);
+
   const modifiedCount = useMemo(() => {
-    return Object.entries(esTexts).filter(
-      ([path, value]) => value !== originalEsTexts[path]
+    return Object.entries(currentTexts).filter(
+      ([path, value]) => value !== originalTexts[path]
     ).length;
-  }, [esTexts, originalEsTexts]);
+  }, [currentTexts, originalTexts]);
 
   const filteredTexts = useMemo(() => {
-    let texts = Object.entries(esTexts);
+    let texts = Object.entries(currentTexts);
 
     // Filtrar por sección
     if (activeSection) {
@@ -346,34 +450,34 @@ export default function TextManagerPage() {
 
     // Filtrar solo modificados
     if (showOnlyModified) {
-      texts = texts.filter(([path, value]) => value !== originalEsTexts[path]);
+      texts = texts.filter(([path, value]) => value !== originalTexts[path]);
     }
 
     // Ordenar por path
     texts.sort((a, b) => a[0].localeCompare(b[0]));
 
     return texts;
-  }, [esTexts, originalEsTexts, activeSection, searchTerm, showOnlyModified, getSection]);
+  }, [currentTexts, originalTexts, activeSection, searchTerm, showOnlyModified, getSection]);
 
   const sectionCounts = useMemo(() => {
     const counts: Record<string, { total: number; modified: number }> = {};
-    
+
     SECTIONS.forEach(section => {
       counts[section.id] = { total: 0, modified: 0 };
     });
 
-    Object.entries(esTexts).forEach(([path, value]) => {
+    Object.entries(currentTexts).forEach(([path, value]) => {
       const sectionId = getSection(path);
       if (counts[sectionId]) {
         counts[sectionId].total++;
-        if (value !== originalEsTexts[path]) {
+        if (value !== originalTexts[path]) {
           counts[sectionId].modified++;
         }
       }
     });
 
     return counts;
-  }, [esTexts, originalEsTexts, getSection]);
+  }, [currentTexts, originalTexts, getSection]);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // RENDER
@@ -397,6 +501,52 @@ export default function TextManagerPage() {
       {/* HEADER FIJO */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
       <header className="sticky top-0 z-50 bg-stone-50 border-b border-stone-200 shadow-sm">
+        {/* TABS DE IDIOMA */}
+        <div className="bg-gradient-to-r from-orange-50 to-rose-50 border-b border-orange-100">
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-slate-600">🌐 Idioma MASTER (se traduce automáticamente):</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setActiveLanguage('es')}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                      activeLanguage === 'es'
+                        ? 'bg-orange-500 text-white shadow-lg scale-105'
+                        : 'bg-white text-slate-600 hover:bg-orange-50'
+                    }`}
+                  >
+                    🇪🇸 Español
+                  </button>
+                  <button
+                    onClick={() => setActiveLanguage('ca')}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                      activeLanguage === 'ca'
+                        ? 'bg-orange-500 text-white shadow-lg scale-105'
+                        : 'bg-white text-slate-600 hover:bg-orange-50'
+                    }`}
+                  >
+                    🏴 Català
+                  </button>
+                  <button
+                    onClick={() => setActiveLanguage('en')}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                      activeLanguage === 'en'
+                        ? 'bg-orange-500 text-white shadow-lg scale-105'
+                        : 'bg-white text-slate-600 hover:bg-orange-50'
+                    }`}
+                  >
+                    🇬🇧 English
+                  </button>
+                </div>
+              </div>
+              <div className="text-xs text-slate-500 bg-white px-3 py-1.5 rounded-lg border border-orange-200">
+                💡 Escribe en cualquier idioma y se traduce automáticamente a los 3
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Título */}
@@ -405,7 +555,7 @@ export default function TextManagerPage() {
                 📝 Text Manager PRO
               </h1>
               <p className="text-sm text-slate-500">
-                {Object.keys(esTexts).length} textos · {modifiedCount} modificados
+                {Object.keys(currentTexts).length} textos · {modifiedCount} modificados
               </p>
             </div>
 
@@ -643,8 +793,12 @@ export default function TextManagerPage() {
                 </div>
               ) : (
                 filteredTexts.map(([path, value]) => {
-                  const isModified = value !== originalEsTexts[path];
-                  const caValue = caTexts[path];
+                  const isModified = value !== originalTexts[path];
+                  const otherLangValues = {
+                    es: esTexts[path],
+                    ca: caTexts[path],
+                    en: enTexts[path]
+                  };
                   
                   return (
                     <div
@@ -699,13 +853,33 @@ export default function TextManagerPage() {
                           placeholder="Texto vacío..."
                         />
 
-                        {/* Comparación ES/CA */}
-                        {showComparison && caValue && (
-                          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                            <div className="flex items-center gap-2 text-xs text-blue-600 mb-2">
-                              <span className="font-semibold">🇪🇸 Català:</span>
-                            </div>
-                            <p className="text-sm text-blue-800">{caValue}</p>
+                        {/* Comparación con otros idiomas */}
+                        {showComparison && (
+                          <div className="mt-3 space-y-2">
+                            {activeLanguage !== 'es' && otherLangValues.es && (
+                              <div className="p-3 bg-red-50 rounded-lg border border-red-100">
+                                <div className="flex items-center gap-2 text-xs text-red-600 mb-1">
+                                  <span className="font-semibold">🇪🇸 Español:</span>
+                                </div>
+                                <p className="text-sm text-red-800">{otherLangValues.es}</p>
+                              </div>
+                            )}
+                            {activeLanguage !== 'ca' && otherLangValues.ca && (
+                              <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                <div className="flex items-center gap-2 text-xs text-blue-600 mb-1">
+                                  <span className="font-semibold">🏴 Català:</span>
+                                </div>
+                                <p className="text-sm text-blue-800">{otherLangValues.ca}</p>
+                              </div>
+                            )}
+                            {activeLanguage !== 'en' && otherLangValues.en && (
+                              <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+                                <div className="flex items-center gap-2 text-xs text-green-600 mb-1">
+                                  <span className="font-semibold">🇬🇧 English:</span>
+                                </div>
+                                <p className="text-sm text-green-800">{otherLangValues.en}</p>
+                              </div>
+                            )}
                           </div>
                         )}
 
@@ -713,7 +887,7 @@ export default function TextManagerPage() {
                         {isModified && (
                           <div className="mt-2 p-2 bg-slate-50 rounded-lg text-xs text-slate-500 border border-slate-100">
                             <span className="font-medium">Original:</span>{' '}
-                            <span className="italic">{originalEsTexts[path]}</span>
+                            <span className="italic">{originalTexts[path]}</span>
                           </div>
                         )}
                       </div>

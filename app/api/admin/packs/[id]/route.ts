@@ -14,24 +14,67 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
+    // Validar que el slug no estigui duplicat (si s'ha canviat)
+    if (body.slug) {
+      const existingPack = await prisma.pack.findFirst({
+        where: {
+          slug: body.slug,
+          NOT: { id }
+        }
+      });
+
+      if (existingPack) {
+        return NextResponse.json(
+          { error: 'Aquest slug ja està en ús per un altre pack' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Preparar dades d'actualització
+    const updateData: any = {
+      price: body.price,
+      originalPrice: body.originalPrice,
+      extraHourPrice: body.extraHourPrice,
+      djHours: body.djHours,
+      soundWatts: body.soundWatts,
+      includesFog: body.includesFog,
+      includesMic: body.includesMic,
+      minGuests: body.minGuests,
+      maxGuests: body.maxGuests,
+      isActive: body.isActive,
+      isFeatured: body.isFeatured,
+      order: body.order,
+      updatedAt: new Date(),
+    };
+
+    // Afegir slug si s'ha proporcionat
+    if (body.slug) {
+      updateData.slug = body.slug;
+    }
+
+    // Actualitzar traduccions si s'han proporcionat
+    if (body.translations && Array.isArray(body.translations)) {
+      // Esborrar traduccions existents i crear les noves
+      updateData.translations = {
+        deleteMany: {},
+        create: body.translations.map((t: any) => ({
+          locale: t.locale,
+          name: t.name,
+          description: t.description,
+          tagline: t.tagline,
+          features: t.features || [],
+        }))
+      };
+    }
+
     // Actualitzar pack
     const updatedPack = await prisma.pack.update({
       where: { id },
-      data: {
-        price: body.price,
-        originalPrice: body.originalPrice,
-        extraHourPrice: body.extraHourPrice,
-        djHours: body.djHours,
-        soundWatts: body.soundWatts,
-        includesFog: body.includesFog,
-        includesMic: body.includesMic,
-        minGuests: body.minGuests,
-        maxGuests: body.maxGuests,
-        isActive: body.isActive,
-        isFeatured: body.isFeatured,
-        order: body.order,
-        updatedAt: new Date(),
-      },
+      data: updateData,
+      include: {
+        translations: true,
+      }
     });
 
     return NextResponse.json(updatedPack);

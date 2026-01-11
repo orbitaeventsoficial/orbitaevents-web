@@ -3,7 +3,7 @@ import { getRequestConfig } from 'next-intl/server';
 // CONFIGURACION DE IDIOMAS - ORBITA EVENTS
 
 // Idiomas disponibles
-export const locales = ['ca', 'es'] as const;
+export const locales = ['ca', 'es', 'en'] as const;
 export type Locale = (typeof locales)[number];
 
 // Idioma por defecto
@@ -18,14 +18,20 @@ export const localeConfig: Record<Locale, {
 }> = {
   ca: {
     name: 'Catalan',
-    nativeName: 'Catala',
+    nativeName: 'Català',
     flag: 'CA',
     dir: 'ltr'
   },
   es: {
     name: 'Spanish',
-    nativeName: 'Espanol',
+    nativeName: 'Español',
     flag: 'ES',
+    dir: 'ltr'
+  },
+  en: {
+    name: 'English',
+    nativeName: 'English',
+    flag: 'GB',
     dir: 'ltr'
   }
 };

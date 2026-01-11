@@ -14,6 +14,7 @@ export const dynamic = 'force-dynamic';
 const MESSAGES_DIR = path.join(process.cwd(), 'messages');
 const ES_JSON_PATH = path.join(MESSAGES_DIR, 'es.json');
 const CA_JSON_PATH = path.join(MESSAGES_DIR, 'ca.json');
+const EN_JSON_PATH = path.join(MESSAGES_DIR, 'en.json');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // UTILIDADES
@@ -126,24 +127,29 @@ export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
   try {
-    // Leer ambos archivos JSON
-    const [esContent, caContent] = await Promise.all([
+    // Leer los tres archivos JSON
+    const [esContent, caContent, enContent] = await Promise.all([
       fs.readFile(ES_JSON_PATH, 'utf-8'),
-      fs.readFile(CA_JSON_PATH, 'utf-8').catch(() => '{}')
+      fs.readFile(CA_JSON_PATH, 'utf-8').catch(() => '{}'),
+      fs.readFile(EN_JSON_PATH, 'utf-8').catch(() => '{}')
     ]);
 
     const esData = JSON.parse(esContent);
     const caData = JSON.parse(caContent);
+    const enData = JSON.parse(enContent);
 
-    // Aplanar ambos objetos
+    // Aplanar los tres objetos
     const esFlat = flattenObject(esData);
     const caFlat = flattenObject(caData);
+    const enFlat = flattenObject(enData);
 
     // Estadísticas
     const stats = {
       totalTexts: Object.keys(esFlat).length,
       totalCa: Object.keys(caFlat).length,
+      totalEn: Object.keys(enFlat).length,
       missingInCa: Object.keys(esFlat).filter(k => !(k in caFlat)).length,
+      missingInEn: Object.keys(esFlat).filter(k => !(k in enFlat)).length,
       missingInEs: Object.keys(caFlat).filter(k => !(k in esFlat)).length
     };
 
@@ -151,6 +157,7 @@ export async function GET(req: NextRequest) {
       ok: true,
       es: esFlat,
       ca: caFlat,
+      en: enFlat,
       stats
     });
 
@@ -174,7 +181,7 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const { modifications, locale = 'es' } = body as {
       modifications: Record<string, string>;
-      locale: 'es' | 'ca';
+      locale: 'es' | 'ca' | 'en';
     };
 
     if (!modifications || typeof modifications !== 'object') {
@@ -184,7 +191,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const jsonPath = locale === 'es' ? ES_JSON_PATH : CA_JSON_PATH;
+    const jsonPath = locale === 'es' ? ES_JSON_PATH : locale === 'ca' ? CA_JSON_PATH : EN_JSON_PATH;
 
     // Leer archivo actual
     const content = await fs.readFile(jsonPath, 'utf-8');
@@ -234,39 +241,46 @@ export async function POST(req: NextRequest) {
 
     switch (action) {
       case 'sync': {
-        // Sincronizar claves entre ES y CA
-        const [esContent, caContent] = await Promise.all([
+        // Sincronizar claves entre ES, CA y EN
+        const [esContent, caContent, enContent] = await Promise.all([
           fs.readFile(ES_JSON_PATH, 'utf-8'),
-          fs.readFile(CA_JSON_PATH, 'utf-8')
+          fs.readFile(CA_JSON_PATH, 'utf-8'),
+          fs.readFile(EN_JSON_PATH, 'utf-8').catch(() => '{}')
         ]);
 
         const esData = JSON.parse(esContent);
         const caData = JSON.parse(caContent);
+        const enData = JSON.parse(enContent);
 
         const esFlat = flattenObject(esData);
         const caFlat = flattenObject(caData);
+        const enFlat = flattenObject(enData);
 
-        // Encontrar claves faltantes en CA
+        // Encontrar claves faltantes
         const missingInCa = Object.keys(esFlat).filter(k => !(k in caFlat));
+        const missingInEn = Object.keys(esFlat).filter(k => !(k in enFlat));
 
         return NextResponse.json({
           ok: true,
           action: 'sync',
           missingInCa,
+          missingInEn,
           missingInEs: Object.keys(caFlat).filter(k => !(k in esFlat)),
           stats: {
             totalEs: Object.keys(esFlat).length,
             totalCa: Object.keys(caFlat).length,
-            syncNeeded: missingInCa.length
+            totalEn: Object.keys(enFlat).length,
+            syncNeeded: missingInCa.length + missingInEn.length
           }
         });
       }
 
       case 'export': {
         // Exportar textos como JSON descargable
-        const [esContent, caContent] = await Promise.all([
+        const [esContent, caContent, enContent] = await Promise.all([
           fs.readFile(ES_JSON_PATH, 'utf-8'),
-          fs.readFile(CA_JSON_PATH, 'utf-8')
+          fs.readFile(CA_JSON_PATH, 'utf-8'),
+          fs.readFile(EN_JSON_PATH, 'utf-8').catch(() => '{}')
         ]);
 
         return NextResponse.json({
@@ -274,26 +288,29 @@ export async function POST(req: NextRequest) {
           action: 'export',
           es: JSON.parse(esContent),
           ca: JSON.parse(caContent),
+          en: JSON.parse(enContent),
           exportedAt: new Date().toISOString()
         });
       }
 
       case 'validate': {
         // Validar estructura de JSONs
-        const [esContent, caContent] = await Promise.all([
+        const [esContent, caContent, enContent] = await Promise.all([
           fs.readFile(ES_JSON_PATH, 'utf-8'),
-          fs.readFile(CA_JSON_PATH, 'utf-8')
+          fs.readFile(CA_JSON_PATH, 'utf-8'),
+          fs.readFile(EN_JSON_PATH, 'utf-8').catch(() => '{}')
         ]);
 
         try {
           JSON.parse(esContent);
           JSON.parse(caContent);
+          JSON.parse(enContent);
 
           return NextResponse.json({
             ok: true,
             action: 'validate',
             valid: true,
-            message: 'Ambos JSONs son válidos'
+            message: 'Los 3 JSONs son válidos (ES, CA, EN)'
           });
         } catch (parseError) {
           return NextResponse.json({
@@ -307,8 +324,8 @@ export async function POST(req: NextRequest) {
 
       case 'restore': {
         // Restaurar desde backup
-        const { locale = 'es' } = body as { locale: 'es' | 'ca' };
-        const jsonPath = locale === 'es' ? ES_JSON_PATH : CA_JSON_PATH;
+        const { locale = 'es' } = body as { locale: 'es' | 'ca' | 'en' };
+        const jsonPath = locale === 'es' ? ES_JSON_PATH : locale === 'ca' ? CA_JSON_PATH : EN_JSON_PATH;
         const backupPath = path.join(MESSAGES_DIR, `${locale}.backup.json`);
 
         try {

@@ -1,92 +1,82 @@
 // app/api/admin/faq/route.ts
-// API per gestionar FAQs
+// API para CRUD completo de FAQs
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
 import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-const faqSchema = z.object({
-  slug: z.string().min(1),
-  category: z.string().default('general'),
-  order: z.number().default(0),
-  isActive: z.boolean().default(true),
-  translations: z.array(z.object({
-    locale: z.string(),
-    question: z.string().min(1),
-    answer: z.string().min(1),
-  })),
-});
-
-// GET - Llistar FAQs
+// GET - Obtener todas las FAQs
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
-  try {
-    const { searchParams } = new URL(req.url);
-    const category = searchParams.get('category');
-    const locale = searchParams.get('locale');
 
+  try {
     const faqs = await prisma.fAQ.findMany({
-      where: {
-        ...(category && { category }),
-      },
       include: {
-        translations: locale ? { where: { locale } } : true,
+        translations: true,
       },
-      orderBy: [{ category: 'asc' }, { order: 'asc' }],
+      orderBy: [
+        { order: 'asc' },
+        { createdAt: 'asc' },
+      ],
     });
 
     return NextResponse.json({
       ok: true,
       faqs,
-      total: faqs.length,
     });
   } catch (error) {
     log.error('Error obtenint FAQs:', error);
     return NextResponse.json(
-      { error: 'Error obtenint FAQs' },
+      { ok: false, error: 'Error obtenint FAQs' },
       { status: 500 }
     );
   }
 }
 
-// POST - Crear nova FAQ
+// POST - Crear nueva FAQ
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+
   try {
     const body = await req.json();
-    const parsed = faqSchema.safeParse(body);
+    const { slug, category, order, isActive, translations } = body;
 
-    if (!parsed.success) {
+    if (!slug || !translations || translations.length === 0) {
       return NextResponse.json(
-        { error: 'Dades invàlides', details: parsed.error.format() },
+        { ok: false, error: 'Slug y traducciones son requeridos' },
         { status: 400 }
       );
     }
 
-    const { translations, ...faqData } = parsed.data;
-
-    // Verificar slug únic
+    // Verificar que el slug no exista
     const existing = await prisma.fAQ.findUnique({
-      where: { slug: faqData.slug },
+      where: { slug },
     });
 
     if (existing) {
       return NextResponse.json(
-        { error: `El slug ${faqData.slug} ja existeix` },
-        { status: 409 }
+        { ok: false, error: 'Ya existe una FAQ con este slug' },
+        { status: 400 }
       );
     }
 
+    // Crear FAQ con traducciones
     const faq = await prisma.fAQ.create({
       data: {
-        ...faqData,
+        slug,
+        category: category || 'general',
+        order: order || 0,
+        isActive: isActive !== undefined ? isActive : true,
         translations: {
-          create: translations,
+          create: translations.map((t: any) => ({
+            locale: t.locale,
+            question: t.question,
+            answer: t.answer,
+          })),
         },
       },
       include: {
@@ -110,7 +100,47 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     log.error('Error creant FAQ:', error);
     return NextResponse.json(
-      { error: 'Error creant FAQ' },
+      { ok: false, error: 'Error creant FAQ' },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE - Eliminar FAQ
+export async function DELETE(req: NextRequest) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
+
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { ok: false, error: 'ID requerido' },
+        { status: 400 }
+      );
+    }
+
+    await prisma.fAQ.delete({
+      where: { id },
+    });
+
+    await prisma.adminLog.create({
+      data: {
+        action: 'DELETE',
+        entity: 'faq',
+        entityId: id,
+      },
+    });
+
+    return NextResponse.json({
+      ok: true,
+    });
+  } catch (error) {
+    log.error('Error eliminant FAQ:', error);
+    return NextResponse.json(
+      { ok: false, error: 'Error eliminant FAQ' },
       { status: 500 }
     );
   }
