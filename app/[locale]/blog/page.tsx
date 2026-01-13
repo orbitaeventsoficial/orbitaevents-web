@@ -24,6 +24,7 @@ async function getBlogPosts(locale: string) {
   const posts = await prisma.blogPost.findMany({
     where: {
       isPublished: true,
+      translations: { some: { locale } },
     },
     include: {
       translations: {

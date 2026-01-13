@@ -23,9 +23,10 @@ export async function GET(req: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    // Build where clause - only published posts
+    // Build where clause - only published posts with a translation for locale
     const where: Prisma.BlogPostWhereInput = {
       isPublished: true,
+      translations: { some: { locale } },
     };
 
     if (category) where.category = category;

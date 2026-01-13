@@ -28,7 +28,7 @@ export async function GET(
       },
     });
 
-    if (!post) {
+    if (!post || post.translations.length === 0) {
       return NextResponse.json(
         { error: 'Blog post not found' },
         { status: 404 }
