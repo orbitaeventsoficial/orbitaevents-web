@@ -3,8 +3,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
+
+const MAX_TEXT_LENGTH = 2000;
+const TRANSLATE_TIMEOUT_MS = 6000;
+const ALLOWED_LANGUAGES = ['es', 'ca', 'en'] as const;
 
 // Función simple de traducción usando Google Translate (sin API key)
 async function translateText(text: string, targetLang: string): Promise<string> {
@@ -12,7 +17,10 @@ async function translateText(text: string, targetLang: string): Promise<string> 
     // Usar Google Translate vía fetch simple
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
 
-    const response = await fetch(url);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), TRANSLATE_TIMEOUT_MS);
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
     const data = await response.json();
 
     if (data && data[0] && data[0][0] && data[0][0][0]) {
@@ -30,6 +38,12 @@ async function translateText(text: string, targetLang: string): Promise<string> 
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const rateLimit = await checkRateLimit(req, {
+    limit: 30,
+    windowSeconds: 300,
+    prefix: 'admin-translate',
+  });
+  if (rateLimit) return rateLimit;
 
   try {
     const body = await req.json();
@@ -38,9 +52,27 @@ export async function POST(req: NextRequest) {
       targetLanguages?: string[];
     };
 
-    if (!text) {
+    if (!text || typeof text !== 'string') {
       return NextResponse.json(
         { ok: false, error: 'Texto requerido' },
+        { status: 400 }
+      );
+    }
+
+    if (text.length > MAX_TEXT_LENGTH) {
+      return NextResponse.json(
+        { ok: false, error: `Texto demasiado largo (max ${MAX_TEXT_LENGTH})` },
+        { status: 400 }
+      );
+    }
+
+    const filteredTargets = targetLanguages.filter((lang) =>
+      ALLOWED_LANGUAGES.includes(lang as typeof ALLOWED_LANGUAGES[number])
+    );
+
+    if (filteredTargets.length === 0) {
+      return NextResponse.json(
+        { ok: false, error: 'Idiomas no válidos' },
         { status: 400 }
       );
     }
@@ -48,7 +80,7 @@ export async function POST(req: NextRequest) {
     // Traducir a cada idioma objetivo
     const translations: Record<string, string> = {};
 
-    for (const lang of targetLanguages) {
+    for (const lang of filteredTargets) {
       const langCode = lang === 'ca' ? 'ca' : lang === 'en' ? 'en' : 'es';
       translations[lang] = await translateText(text, langCode);
     }
@@ -93,6 +125,12 @@ function detectLanguage(text: string): 'es' | 'ca' | 'en' {
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const rateLimit = await checkRateLimit(req, {
+    limit: 60,
+    windowSeconds: 300,
+    prefix: 'admin-translate-detect',
+  });
+  if (rateLimit) return rateLimit;
 
   try {
     const { searchParams } = new URL(req.url);
@@ -101,6 +139,13 @@ export async function GET(req: NextRequest) {
     if (!text) {
       return NextResponse.json(
         { ok: false, error: 'Texto requerido' },
+        { status: 400 }
+      );
+    }
+
+    if (text.length > MAX_TEXT_LENGTH) {
+      return NextResponse.json(
+        { ok: false, error: `Texto demasiado largo (max ${MAX_TEXT_LENGTH})` },
         { status: 400 }
       );
     }
