@@ -6,6 +6,8 @@ import { useState } from 'react';
 export default function ManualActionsPanel() {
   const [runningCron, setRunningCron] = useState(false);
   const [cronResult, setCronResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [runningReminder, setRunningReminder] = useState(false);
+  const [reminderResult, setReminderResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [testEmail, setTestEmail] = useState('');
   const [sendingTest, setSendingTest] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
@@ -40,6 +42,40 @@ export default function ManualActionsPanel() {
       });
     } finally {
       setRunningCron(false);
+    }
+  }
+
+  async function sendTestimonialsReminder() {
+    setRunningReminder(true);
+    setReminderResult(null);
+
+    try {
+      const res = await fetch('/api/admin/emails/testimonials-reminder', {
+        method: 'POST',
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        const pending = data.pendingCount || 0;
+        setReminderResult({
+          ok: true,
+          message: pending > 0
+            ? `✅ Recordatori enviat (${pending} pendents)`
+            : '✅ No hi ha testimonis pendents',
+        });
+      } else {
+        setReminderResult({
+          ok: false,
+          message: `❌ Error: ${data.error || 'Error desconegut'}`,
+        });
+      }
+    } catch (error) {
+      setReminderResult({
+        ok: false,
+        message: `❌ Error: ${error instanceof Error ? error.message : 'Error'}`,
+      });
+    } finally {
+      setRunningReminder(false);
     }
   }
 
@@ -114,6 +150,32 @@ export default function ManualActionsPanel() {
           {cronResult && (
             <p className={`mt-2 text-xs ${cronResult.ok ? 'text-green-600' : 'text-red-600'}`}>
               {cronResult.message}
+            </p>
+          )}
+        </div>
+
+        <hr className="border-slate-100" />
+
+        {/* Testimonials Reminder */}
+        <div>
+          <h3 className="text-sm font-medium text-slate-700 mb-2">Recordatori de testimonis</h3>
+          <p className="text-xs text-slate-500 mb-3">
+            Envia un resum amb testimonis pendents d'aprovació
+          </p>
+          <button
+            onClick={sendTestimonialsReminder}
+            disabled={runningReminder}
+            className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
+              runningReminder
+                ? 'bg-stone-100 text-slate-500 cursor-not-allowed'
+                : 'bg-stone-100 text-slate-700 hover:bg-stone-100'
+            }`}
+          >
+            {runningReminder ? 'Enviant...' : '⭐ Enviar recordatori'}
+          </button>
+          {reminderResult && (
+            <p className={`mt-2 text-xs ${reminderResult.ok ? 'text-green-600' : 'text-red-600'}`}>
+              {reminderResult.message}
             </p>
           )}
         </div>

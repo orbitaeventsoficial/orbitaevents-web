@@ -476,6 +476,88 @@ export async function sendTestimonialAdminNotification(params: {
   });
 }
 
+export async function sendTestimonialsReminderEmail(params: {
+  to: string;
+  pendingCount: number;
+  testimonials: Array<{
+    name: string;
+    rating: number;
+    comment: string;
+    createdAt: Date;
+  }>;
+  dashboardUrl: string;
+}): Promise<void> {
+  const { to, pendingCount, testimonials, dashboardUrl } = params;
+  const previewRows = testimonials
+    .map((t) => {
+      const date = t.createdAt.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+      });
+      return `
+        <tr>
+          <td style="padding: 8px 0; color: #fff; font-size: 14px;">${escapeHtml(t.name)}</td>
+          <td style="padding: 8px 0; color: #FFB800; font-size: 14px;">⭐ ${t.rating}/5</td>
+          <td style="padding: 8px 0; color: #9ca3af; font-size: 12px;">${date}</td>
+        </tr>
+        <tr>
+          <td colspan="3" style="padding: 0 0 12px 0; color: #d1d5db; font-size: 13px;">
+            "${escapeHtml(t.comment.slice(0, 140))}${t.comment.length > 140 ? '…' : ''}"
+          </td>
+        </tr>
+      `;
+    })
+    .join('');
+
+  await sendEmail({
+    to,
+    subject: sanitizeHeader(
+      `Tienes ${pendingCount} testimonio${pendingCount === 1 ? '' : 's'} pendiente${pendingCount === 1 ? '' : 's'}`
+    ),
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background: #111; border-radius: 16px; overflow: hidden;">
+          <div style="background: linear-gradient(135deg, #1f2937, #111827); padding: 32px; text-align: center;">
+            <h1 style="color: #FFB800; margin: 0; font-size: 24px;">Testimonios pendientes</h1>
+            <p style="color: rgba(255,255,255,0.6); margin: 10px 0 0;">${pendingCount} en espera de revisión</p>
+          </div>
+          <div style="padding: 24px 32px; color: #e5e7eb;">
+            <p style="margin: 0 0 20px;">Aquí tienes un resumen rápido de los últimos testimonios:</p>
+            <table style="width: 100%; border-collapse: collapse;">
+              ${previewRows}
+            </table>
+            <div style="text-align: center; margin: 24px 0;">
+              <a href="${dashboardUrl}"
+                 style="background: linear-gradient(135deg, #FFB800, #CC9600);
+                        color: #000;
+                        padding: 14px 28px;
+                        text-decoration: none;
+                        border-radius: 999px;
+                        font-weight: bold;
+                        font-size: 14px;
+                        display: inline-block;">
+                Revisar testimonios
+              </a>
+            </div>
+          </div>
+          <div style="padding: 16px; background: #0a0a0a; text-align: center;">
+            <p style="margin: 0; font-size: 11px; color: #6b7280;">
+              ${new Date().getFullYear()} Òrbita Events
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
+
 export async function sendTestimonialReceivedEmail(params: {
   to: string;
   name: string;
