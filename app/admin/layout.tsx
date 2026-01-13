@@ -172,6 +172,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { icon: '📬', label: 'Inbox', href: '/admin/inbox', badge: 'NEW', badgeColor: 'blue' as const },
         { icon: '📧', label: 'Emails', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
         { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
+        { icon: '🗣️', label: 'Testimonios', href: '/admin/ressenyes', badge: 'NEW', badgeColor: 'orange' as const },
         { icon: '⭐', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
       ]
     },

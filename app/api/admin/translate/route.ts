@@ -10,6 +10,48 @@ export const dynamic = 'force-dynamic';
 const MAX_TEXT_LENGTH = 2000;
 const TRANSLATE_TIMEOUT_MS = 6000;
 const ALLOWED_LANGUAGES = ['es', 'ca', 'en'] as const;
+const DEEPL_API_KEY = process.env.DEEPL_API_KEY;
+const DEEPL_BASE_URL =
+  process.env.DEEPL_BASE_URL ||
+  (DEEPL_API_KEY?.includes(':fx') ? 'https://api-free.deepl.com' : 'https://api.deepl.com');
+
+function mapDeepLTarget(lang: string): string {
+  if (lang === 'es') return 'ES';
+  if (lang === 'ca') return 'CA';
+  return 'EN-GB';
+}
+
+async function translateWithDeepL(text: string, targetLang: string): Promise<string | null> {
+  if (!DEEPL_API_KEY) return null;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), TRANSLATE_TIMEOUT_MS);
+
+  try {
+    const params = new URLSearchParams();
+    params.append('auth_key', DEEPL_API_KEY);
+    params.append('text', text);
+    params.append('target_lang', mapDeepLTarget(targetLang));
+
+    const response = await fetch(`${DEEPL_BASE_URL}/v2/translate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString(),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    const translated = data?.translations?.[0]?.text;
+    return typeof translated === 'string' ? translated : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 // Función simple de traducción usando Google Translate (sin API key)
 async function translateText(text: string, targetLang: string): Promise<string> {
@@ -82,7 +124,8 @@ export async function POST(req: NextRequest) {
 
     for (const lang of filteredTargets) {
       const langCode = lang === 'ca' ? 'ca' : lang === 'en' ? 'en' : 'es';
-      translations[lang] = await translateText(text, langCode);
+      const deeplTranslation = await translateWithDeepL(text, langCode);
+      translations[lang] = deeplTranslation ?? (await translateText(text, langCode));
     }
 
     return NextResponse.json({
