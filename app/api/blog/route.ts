@@ -13,8 +13,12 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const locale = searchParams.get('locale') || 'es';
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '10', 10);
+    const rawPage = parseInt(searchParams.get('page') || '1', 10);
+    const rawLimit = parseInt(searchParams.get('limit') || '10', 10);
+    const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+    const limit = Number.isFinite(rawLimit)
+      ? Math.min(Math.max(rawLimit, 1), 50)
+      : 10;
     const category = searchParams.get('category');
     const tag = searchParams.get('tag');
 
