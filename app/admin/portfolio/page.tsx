@@ -28,7 +28,8 @@ export default function PortfolioPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');      
+  const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const [formData, setFormData] = useState({
     url: '',
@@ -51,6 +52,7 @@ export default function PortfolioPage() {
       }
     } catch (error) {
       log.error('Error cargando imágenes:', error);
+      setFlashMessage({ type: 'error', text: 'Error cargando imágenes' });
     } finally {
       setLoading(false);
     }
@@ -60,7 +62,7 @@ export default function PortfolioPage() {
     e.preventDefault();
 
     if (!formData.url.trim() || !formData.title.trim()) {
-      alert('URL y título son requeridos');
+      setFlashMessage({ type: 'error', text: 'URL y título son requeridos' });
       return;
     }
 
@@ -80,12 +82,13 @@ export default function PortfolioPage() {
         await loadImages();
         setFormData({ url: '', title: '', category: 'bodas', description: '', order: 0 });
         setShowAddForm(false);
+        setFlashMessage({ type: 'success', text: 'Imagen añadida correctamente' });
       } else {
-        alert(data.error || 'Error añadiendo imagen');
+        setFlashMessage({ type: 'error', text: data.error || 'Error añadiendo imagen' });
       }
     } catch (error) {
       log.error('Error añadiendo imagen:', error);
-      alert('Error añadiendo imagen');
+      setFlashMessage({ type: 'error', text: 'Error añadiendo imagen' });
     } finally {
       setSaving(false);
     }
@@ -108,12 +111,13 @@ export default function PortfolioPage() {
       const data = await res.json();
       if (data.ok) {
         await loadImages();
+        setFlashMessage({ type: 'success', text: 'Imagen eliminada' });
       } else {
-        alert(data.error || 'Error eliminando imagen');
+        setFlashMessage({ type: 'error', text: data.error || 'Error eliminando imagen' });
       }
     } catch (error) {
       log.error('Error eliminando imagen:', error);
-      alert('Error eliminando imagen');
+      setFlashMessage({ type: 'error', text: 'Error eliminando imagen' });
     } finally {
       setSaving(false);
     }
@@ -135,12 +139,13 @@ export default function PortfolioPage() {
       const data = await res.json();
       if (data.ok) {
         await loadImages();
+        setFlashMessage({ type: 'success', text: 'Estado actualizado' });
       } else {
-        alert(data.error || 'Error actualizando imagen');
+        setFlashMessage({ type: 'error', text: data.error || 'Error actualizando imagen' });
       }
     } catch (error) {
       log.error('Error actualizando imagen:', error);
-      alert('Error actualizando imagen');
+      setFlashMessage({ type: 'error', text: 'Error actualizando imagen' });
     } finally {
       setSaving(false);
     }
@@ -179,6 +184,26 @@ export default function PortfolioPage() {
           + Añadir Imagen
         </button>
       </header>
+
+      {flashMessage && (
+        <div
+          className={`rounded-xl border px-4 py-3 text-sm ${
+            flashMessage.type === 'success'
+              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
+              : 'border-red-500/30 bg-red-500/10 text-red-200'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <span>{flashMessage.text}</span>
+            <button
+              onClick={() => setFlashMessage(null)}
+              className="text-xs text-white/60 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-4">
