@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 export default function NewBlogPostPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [formData, setFormData] = useState({
     slug: '',
     author: 'Òrbita Events',
@@ -66,15 +67,17 @@ export default function NewBlogPostPage() {
       });
 
       if (res.ok) {
-        alert('Post creado correctamente');
-        router.push('/admin/blog');
+        router.push('/admin/blog?created=1');
       } else {
         const error = await res.json();
-        alert(`Error: ${error.error || 'Error al crear el post'}`);
+        setFlashMessage({
+          type: 'error',
+          text: error.error || 'Error al crear el post',
+        });
       }
     } catch (error) {
       console.error('Failed to create post:', error);
-      alert('Error al crear el post');
+      setFlashMessage({ type: 'error', text: 'Error al crear el post' });
     } finally {
       setLoading(false);
     }
@@ -108,6 +111,26 @@ export default function NewBlogPostPage() {
         <h1 className="text-3xl font-bold text-white">Nuevo Post</h1>
         <p className="mt-2 text-white/60">Crea un nuevo artículo para el blog</p>
       </div>
+
+      {flashMessage && (
+        <div
+          className={`mb-6 rounded-xl border px-4 py-3 text-sm ${
+            flashMessage.type === 'success'
+              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
+              : 'border-red-500/30 bg-red-500/10 text-red-200'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <span>{flashMessage.text}</span>
+            <button
+              onClick={() => setFlashMessage(null)}
+              className="text-xs text-white/60 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* General Settings */}

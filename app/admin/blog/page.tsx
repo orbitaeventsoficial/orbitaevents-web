@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 interface BlogPost {
@@ -31,6 +32,8 @@ export default function BlogAdminPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const searchParams = useSearchParams();
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -42,6 +45,7 @@ export default function BlogAdminPage() {
       setTotalPages(data.pagination?.totalPages || 0);
     } catch (error) {
       console.error('Failed to fetch posts:', error);
+      setFlashMessage({ type: 'error', text: 'Error cargando posts' });
     } finally {
       setLoading(false);
     }
@@ -50,6 +54,13 @@ export default function BlogAdminPage() {
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
+
+  useEffect(() => {
+    const created = searchParams.get('created');
+    if (created === '1') {
+      setFlashMessage({ type: 'success', text: 'Post creado correctamente' });
+    }
+  }, [searchParams]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('¿Estás seguro de que quieres eliminar este post?')) return;
@@ -60,14 +71,14 @@ export default function BlogAdminPage() {
       });
 
       if (res.ok) {
-        alert('Post eliminado correctamente');
+        setFlashMessage({ type: 'success', text: 'Post eliminado correctamente' });
         fetchPosts();
       } else {
-        alert('Error al eliminar el post');
+        setFlashMessage({ type: 'error', text: 'Error al eliminar el post' });
       }
     } catch (error) {
       console.error('Failed to delete post:', error);
-      alert('Error al eliminar el post');
+      setFlashMessage({ type: 'error', text: 'Error al eliminar el post' });
     }
   };
 
@@ -85,11 +96,11 @@ export default function BlogAdminPage() {
       if (res.ok) {
         fetchPosts();
       } else {
-        alert('Error al actualizar el post');
+        setFlashMessage({ type: 'error', text: 'Error al actualizar el post' });
       }
     } catch (error) {
       console.error('Failed to update post:', error);
-      alert('Error al actualizar el post');
+      setFlashMessage({ type: 'error', text: 'Error al actualizar el post' });
     }
   };
 
@@ -120,6 +131,26 @@ export default function BlogAdminPage() {
           </button>
         </div>
       </div>
+
+      {flashMessage && (
+        <div
+          className={`mb-6 rounded-xl border px-4 py-3 text-sm ${
+            flashMessage.type === 'success'
+              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
+              : 'border-red-500/30 bg-red-500/10 text-red-200'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <span>{flashMessage.text}</span>
+            <button
+              onClick={() => setFlashMessage(null)}
+              className="text-xs text-white/60 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center text-white/60">Cargando...</div>
