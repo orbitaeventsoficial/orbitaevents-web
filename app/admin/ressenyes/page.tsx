@@ -10,6 +10,22 @@ type DiscountInfo = {
   isActive: boolean;
 };
 
+type GoogleReview = {
+  author_name: string;
+  rating: number;
+  text: string;
+  time: number;
+  relative_time_description: string;
+  profile_photo_url?: string;
+};
+
+type GoogleReviewsData = {
+  lastUpdated?: string;
+  rating: number;
+  user_ratings_total?: number;
+  reviews: GoogleReview[];
+};
+
 type Testimonial = {
   id: string;
   name: string;
@@ -53,13 +69,16 @@ const STATUS_TABS = [
   { id: 'pending', label: 'Pendientes' },
   { id: 'approved', label: 'Publicados' },
   { id: 'all', label: 'Todos' },
+  { id: 'google', label: 'Google Reviews' },
 ] as const;
 
 export default function CustomerTestimonialsAdminPage() {
   const [status, setStatus] = useState<(typeof STATUS_TABS)[number]['id']>('pending');
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [googleData, setGoogleData] = useState<GoogleReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [syncingGoogle, setSyncingGoogle] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Testimonial>>({});
   const [discountInputs, setDiscountInputs] = useState<Record<string, string>>({});
@@ -75,18 +94,24 @@ export default function CustomerTestimonialsAdminPage() {
   });
 
   useEffect(() => {
-    loadTestimonials();
+    loadData();
   }, [status]);
 
-  async function loadTestimonials() {
+  async function loadData() {
     setLoading(true);
     try {
-      const response = await fetch(
-        `/api/admin/customer-testimonials?status=${status}&stats=true`
-      );
-      const data = await response.json();
-      setTestimonials(data.data || []);
-      setStats(data.stats || null);
+      if (status === 'google') {
+        const response = await fetch('/api/google-reviews');
+        const data = await response.json();
+        setGoogleData(data);
+      } else {
+        const response = await fetch(
+          `/api/admin/customer-testimonials?status=${status}&stats=true`
+        );
+        const data = await response.json();
+        setTestimonials(data.data || []);
+        setStats(data.stats || null);
+      }
     } catch (error) {
       console.error('Error loading testimonials:', error);
     } finally {
@@ -109,7 +134,7 @@ export default function CustomerTestimonialsAdminPage() {
       throw new Error(data?.error || 'Error actualizando testimonio');
     }
     if (successMessage) alert(successMessage);
-    await loadTestimonials();
+    await loadData();
   }
 
   function startEdit(testimonial: Testimonial) {
@@ -151,7 +176,7 @@ export default function CustomerTestimonialsAdminPage() {
       alert(data?.error || 'Error eliminando testimonio');
       return;
     }
-    await loadTestimonials();
+    await loadData();
   }
 
   async function assignDiscount(id: string) {
@@ -200,7 +225,20 @@ export default function CustomerTestimonialsAdminPage() {
       discountPercent: '',
     });
     setCreating(false);
-    await loadTestimonials();
+    await loadData();
+  }
+
+  async function syncGoogleReviews() {
+    setSyncingGoogle(true);
+    try {
+      const response = await fetch('/api/google-reviews');
+      const data = await response.json();
+      setGoogleData(data);
+    } catch (error) {
+      console.error('Error loading Google reviews:', error);
+    } finally {
+      setSyncingGoogle(false);
+    }
   }
 
   return (
@@ -229,7 +267,8 @@ export default function CustomerTestimonialsAdminPage() {
         </div>
       </div>
 
-      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-4">
+      {status !== 'google' ? (
+        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="rounded-2xl border border-orange-500/20 bg-orange-500/10 p-5">
           <div className="text-sm text-white/60">Pendientes</div>
           <div className="text-2xl font-bold text-orange-300">{stats?.pending ?? '-'}</div>
@@ -246,9 +285,11 @@ export default function CustomerTestimonialsAdminPage() {
           <div className="text-sm text-white/60">Media</div>
           <div className="text-2xl font-bold text-purple-300">{stats?.avgRating ?? '-'}</div>
         </div>
-      </div>
+        </div>
+      ) : null}
 
-      <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-6">
+      {status !== 'google' ? (
+        <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-6">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Añadir testimonio manual</h2>
           <button
@@ -319,10 +360,71 @@ export default function CustomerTestimonialsAdminPage() {
             </div>
           </div>
         )}
-      </div>
+        </div>
+      ) : null}
 
       {loading ? (
         <div className="text-white/60">Cargando testimonios...</div>
+      ) : status === 'google' ? (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-5">
+              <div className="text-sm text-white/60">Rating promedio</div>
+              <div className="text-2xl font-bold text-amber-300">
+                {googleData?.rating?.toFixed(1) || '0.0'}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-5">
+              <div className="text-sm text-white/60">Total reseñas</div>
+              <div className="text-2xl font-bold text-blue-300">
+                {googleData?.user_ratings_total || googleData?.reviews?.length || 0}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
+              <div className="text-sm text-white/60">5 estrellas</div>
+              <div className="text-2xl font-bold text-emerald-300">
+                {googleData?.reviews?.filter((r) => r.rating === 5).length || 0}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-purple-500/20 bg-purple-500/10 p-5">
+              <div className="text-sm text-white/60">Última sync</div>
+              <div className="text-sm font-semibold text-purple-300">
+                {googleData?.lastUpdated
+                  ? new Date(googleData.lastUpdated).toLocaleString('es-ES')
+                  : 'Nunca'}
+              </div>
+              <button
+                onClick={syncGoogleReviews}
+                disabled={syncingGoogle}
+                className="mt-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-3 py-1 text-xs text-purple-200"
+              >
+                {syncingGoogle ? 'Actualizando...' : 'Refrescar'}
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <h2 className="mb-4 text-lg font-semibold text-white">Reseñas de Google</h2>
+            {googleData?.reviews?.length ? (
+              <div className="space-y-3">
+                {googleData.reviews.map((review, index) => (
+                  <div key={`${review.author_name}-${index}`} className="rounded-xl border border-white/10 bg-white/5 p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="font-medium text-white">{review.author_name}</div>
+                        <div className="text-xs text-white/50">{review.relative_time_description}</div>
+                      </div>
+                      <div className="text-xs text-amber-300">⭐ {review.rating}/5</div>
+                    </div>
+                    <p className="mt-2 text-sm text-white/80">{review.text}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-white/60">No hay reseñas todavía.</div>
+            )}
+          </div>
+        </div>
       ) : testimonials.length === 0 ? (
         <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-white/60">
           No hay testimonios en este estado.
