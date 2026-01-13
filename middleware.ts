@@ -204,24 +204,31 @@ export async function middleware(req: NextRequest) {
     }
 
     const authHeader = req.headers.get('authorization');
+    const adminKey = process.env.ADMIN_KEY;
+    const isBearerAuth =
+      Boolean(adminKey) &&
+      Boolean(authHeader?.startsWith('Bearer ')) &&
+      authHeader?.slice(7).trim() === adminKey;
 
-    if (!authHeader || !authHeader.startsWith('Basic ')) {
+    if (!isBearerAuth && (!authHeader || !authHeader.startsWith('Basic '))) {
       return unauthorized();
     }
 
     try {
-      const base64Credentials = authHeader.split(' ')[1]!;
-      const decoded =
-        typeof atob === 'function'
-          ? atob(base64Credentials)
-          : Buffer.from(base64Credentials, 'base64').toString('utf8');
-      const [user, ...passParts] = decoded.split(':');
-      const pass = passParts.join(':');
+      if (!isBearerAuth) {
+        const base64Credentials = authHeader!.split(' ')[1]!;
+        const decoded =
+          typeof atob === 'function'
+            ? atob(base64Credentials)
+            : Buffer.from(base64Credentials, 'base64').toString('utf8');
+        const [user, ...passParts] = decoded.split(':');
+        const pass = passParts.join(':');
 
-      // Verificar credencials
-      if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
-        await recordFailedAttempt(req);
-        return unauthorized();
+        // Verificar credencials
+        if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
+          await recordFailedAttempt(req);
+          return unauthorized();
+        }
       }
 
       // Autenticació correcta - netejar intents fallits
@@ -235,7 +242,7 @@ export async function middleware(req: NextRequest) {
       const method = req.method.toUpperCase();
       const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method);
 
-      if (isMutation) {
+      if (isMutation && !isBearerAuth) {
         const csrfHeader = req.headers.get('x-csrf-token');
         const csrfCookie = req.cookies.get('csrf-token')?.value;
 

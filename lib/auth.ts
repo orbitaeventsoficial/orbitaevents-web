@@ -8,11 +8,13 @@ import { verifyCsrf } from '@/lib/csrf';
 
 const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASS = process.env.ADMIN_PASS;
+const ADMIN_KEY = process.env.ADMIN_KEY;
 
 export interface AuthResult {
   authenticated: boolean;
   user?: string;
   error?: string;
+  method?: 'basic' | 'bearer';
 }
 
 /**
@@ -40,13 +42,31 @@ export function verifyBasicAuth(req: NextRequest): AuthResult {
     }
 
     if (user === ADMIN_USER && pass === ADMIN_PASS) {
-      return { authenticated: true, user };
+      return { authenticated: true, user, method: 'basic' };
     }
 
     return { authenticated: false, error: 'Invalid credentials' };
   } catch {
     return { authenticated: false, error: 'Authentication failed' };
   }
+}
+
+export function verifyBearerAuth(req: NextRequest): AuthResult {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { authenticated: false, error: 'No bearer token' };
+  }
+
+  if (!ADMIN_KEY) {
+    return { authenticated: false, error: 'Server configuration error' };
+  }
+
+  const token = authHeader.slice(7).trim();
+  if (token === ADMIN_KEY) {
+    return { authenticated: true, user: 'admin-key', method: 'bearer' };
+  }
+
+  return { authenticated: false, error: 'Invalid token' };
 }
 
 /**
@@ -69,7 +89,8 @@ export function unauthorizedResponse(message = 'Unauthorized'): NextResponse {
  * Retorna null si autenticat, o NextResponse si no
  */
 export function requireAuth(req: NextRequest): NextResponse | null {
-  const auth = verifyBasicAuth(req);
+  const bearerAuth = verifyBearerAuth(req);
+  const auth = bearerAuth.authenticated ? bearerAuth : verifyBasicAuth(req);
   if (!auth.authenticated) {
     return unauthorizedResponse(auth.error);
   }
@@ -77,7 +98,11 @@ export function requireAuth(req: NextRequest): NextResponse | null {
   const method = req.method.toUpperCase();
   const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method);
 
-  if (isMutation && req.nextUrl.pathname.startsWith('/api/admin')) {
+  if (
+    isMutation &&
+    req.nextUrl.pathname.startsWith('/api/admin') &&
+    auth.method !== 'bearer'
+  ) {
     const csrfError = verifyCsrf(req);
     if (csrfError) return csrfError;
   }

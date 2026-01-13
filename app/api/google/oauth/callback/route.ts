@@ -66,10 +66,10 @@ export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get('code');
   const state = req.nextUrl.searchParams.get('state');
   const error = req.nextUrl.searchParams.get('error');
-  const nextUrl = '/admin/ressenyes?google=connected';
+  const nextUrl = '/admin/google-reviews?google=connected';
 
   if (error) {
-    return NextResponse.redirect(new URL(`/admin/ressenyes?google=error&reason=${encodeURIComponent(error)}`, req.url));
+    return NextResponse.redirect(new URL(`/admin/google-reviews?google=error&reason=${encodeURIComponent(error)}`, req.url));
   }
 
   const secret = process.env.GOOGLE_OAUTH_CLIENT_SECRET || process.env.CSRF_SECRET || '';
@@ -140,6 +140,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL(nextUrl, req.url));
   } catch (err) {
     log.error('Google OAuth callback error:', err);
-    return NextResponse.redirect(new URL('/admin/ressenyes?google=error', req.url));
+    return NextResponse.redirect(new URL('/admin/google-reviews?google=error', req.url));
   }
 }

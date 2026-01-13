@@ -19,9 +19,9 @@ interface GoogleReview {
 }
 
 interface ReviewsData {
-  lastUpdated: string;
+  lastUpdated?: string;
   rating: number;
-  total: number;
+  user_ratings_total?: number;
   reviews: GoogleReview[];
 }
 
@@ -36,7 +36,7 @@ export default function GoogleReviewsAdminPage() {
 
   async function loadReviews() {
     try {
-      const response = await fetch('/data/google-reviews.json');
+      const response = await fetch('/api/google-reviews');
       const reviewsData: ReviewsData = await response.json();
       setData(reviewsData);
     } catch (error) {
@@ -49,11 +49,7 @@ export default function GoogleReviewsAdminPage() {
   async function syncReviews() {
     setSyncing(true);
     try {
-      // Llamar al endpoint que ejecuta el script de sincronización
-      await fetch('/api/admin/sync-google-reviews', { method: 'POST' });
       await loadReviews();
-    } catch (error) {
-      console.error('Error syncing reviews:', error);
     } finally {
       setSyncing(false);
     }
@@ -68,6 +64,7 @@ export default function GoogleReviewsAdminPage() {
   }
 
   const fiveStarReviews = data?.reviews.filter(r => r.rating === 5) || [];
+  const totalReviews = data?.user_ratings_total || data?.reviews.length || 0;
   const lastUpdate = data?.lastUpdated ? new Date(data.lastUpdated).toLocaleString('ca-ES') : 'Never';
 
   return (
@@ -101,7 +98,7 @@ export default function GoogleReviewsAdminPage() {
           className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-2xl p-6"
         >
           <div className="text-sm text-white/60 mb-1">Total Reseñas</div>
-          <div className="text-3xl font-bold text-blue-400">{data?.total || 0}</div>
+          <div className="text-3xl font-bold text-blue-400">{totalReviews}</div>
           <div className="text-xs text-white/40 mt-1">En Google Business</div>
         </motion.div>
 
@@ -129,7 +126,7 @@ export default function GoogleReviewsAdminPage() {
             disabled={syncing}
             className="mt-2 text-xs px-3 py-1 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-lg text-white transition-colors disabled:opacity-50"
           >
-            {syncing ? 'Sincronizando...' : 'Sincronizar Ahora'}
+            {syncing ? 'Actualitzant...' : 'Refrescar'}
           </button>
         </motion.div>
       </div>
@@ -147,7 +144,7 @@ export default function GoogleReviewsAdminPage() {
               onClick={syncReviews}
               className="px-6 py-3 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 rounded-lg text-white font-medium transition-colors"
             >
-              Sincronizar desde Google
+              Refrescar reseñas
             </button>
           </div>
         ) : (

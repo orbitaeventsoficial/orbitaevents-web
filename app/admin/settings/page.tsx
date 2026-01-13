@@ -120,7 +120,7 @@ export default async function SettingsPage() {
         </Link>
 
         <Link
-          href="/admin/translations"
+          href="/admin/text-manager"
           className="rounded-xl border border-stone-200 bg-stone-50 p-6 hover:border-stone-200 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">🌐</div>

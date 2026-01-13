@@ -174,7 +174,7 @@ export default function ManualActionsPanel() {
               ⭐ Veure pàgina valoració
             </a>
             <a
-              href="/admin/ressenyes"
+              href="/admin/google-reviews"
               className="block w-full text-center px-3 py-2 text-sm bg-slate-50 text-slate-700 rounded-lg hover:bg-stone-100 transition-colors"
             >
               📋 Gestionar ressenyes
