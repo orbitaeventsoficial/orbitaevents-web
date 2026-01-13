@@ -449,8 +449,8 @@ export async function sendTestimonialAdminNotification(params: {
             </div>
 
             <div style="text-align: center; margin: 30px 0 10px;">
-              <a href="${baseUrl}/admin/opiniones"
-                 style="background: linear-gradient(135deg, #22c55e, #16a34a);
+              <a href="${baseUrl}/admin/ressenyes"
+                 style="background: linear-gradient(135deg, #22c55e, #16a34a);  
                         color: #fff;
                         padding: 16px 32px;
                         text-decoration: none;
