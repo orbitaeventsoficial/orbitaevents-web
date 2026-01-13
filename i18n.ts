@@ -53,9 +53,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const locale = await requestLocale;
 
   // Si no hay locale valido, usar el por defecto
-  const validLocale = locale && locales.includes(locale as Locale)
+  const validLocale = (locale && locales.includes(locale as Locale)
     ? locale
-    : defaultLocale;
+    : defaultLocale) as Locale;
 
   const baseMessages = (await import(`./messages/${validLocale}.json`)).default;
   const messages = await mergeDbTranslations(baseMessages, validLocale);
