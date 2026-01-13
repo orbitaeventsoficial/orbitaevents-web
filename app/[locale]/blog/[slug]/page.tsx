@@ -4,6 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import BlogViewTracker from '@/app/components/blog/BlogViewTracker';
+
+export const revalidate = 300;
 
 interface Props {
   params: {
@@ -66,12 +69,6 @@ async function getPost(slug: string, locale: string) {
     return null;
   }
 
-  // Increment view count
-  await prisma.blogPost.update({
-    where: { id: post.id },
-    data: { viewCount: { increment: 1 } },
-  });
-
   return post;
 }
 
@@ -87,6 +84,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-purple-950/20 to-black">
+      <BlogViewTracker slug={slug} locale={locale} />
       {/* Featured Image */}
       {post.featuredImage && (
         <div className="relative h-[400px] overflow-hidden">

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const revalidate = 300;
+
 /**
  * GET /api/blog/[slug]
  * Get a single published blog post by slug
@@ -32,12 +34,6 @@ export async function GET(
         { status: 404 }
       );
     }
-
-    // Increment view count
-    await prisma.blogPost.update({
-      where: { id: post.id },
-      data: { viewCount: { increment: 1 } },
-    });
 
     return NextResponse.json(post);
   } catch (error) {

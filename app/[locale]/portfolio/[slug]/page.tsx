@@ -6,7 +6,6 @@ import { PORTFOLIO_IMAGES, PORTFOLIO_CATEGORIES } from "@/config/portfolio-image
 import { SimpleGallery } from "@/app/components/GalleryPro";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 
-export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
   const { slug, locale } = await params;
