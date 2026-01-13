@@ -26,6 +26,23 @@ type GoogleReviewsData = {
   reviews: GoogleReview[];
 };
 
+function csvEscape(value: unknown): string {
+  const str = String(value ?? '');
+  const escaped = str.replace(/"/g, '""');
+  return `"${escaped}"`;
+}
+
+function downloadCsv(filename: string, rows: string[][]) {
+  const content = rows.map((row) => row.map(csvEscape).join(',')).join('\n');
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 type Testimonial = {
   id: string;
   name: string;
@@ -258,6 +275,52 @@ export default function CustomerTestimonialsAdminPage() {
         );
       }) ?? [];
 
+  function exportTestimonials() {
+    const rows = [
+      [
+        'id',
+        'nombre',
+        'email',
+        'rating',
+        'comentario',
+        'evento',
+        'fecha_evento',
+        'aprobado',
+        'descuento_codigo',
+        'descuento_percent',
+        'creado',
+      ],
+      ...testimonials.map((t) => [
+        t.id,
+        t.name,
+        t.customer.email,
+        t.rating,
+        t.comment,
+        t.eventType || '',
+        t.eventDate || '',
+        t.isApproved ? 'true' : 'false',
+        t.discount?.code || '',
+        t.discount?.discountPercent || '',
+        t.createdAt,
+      ]),
+    ];
+    downloadCsv(`testimonios-${status}.csv`, rows);
+  }
+
+  function exportGoogleReviews() {
+    const rows = [
+      ['autor', 'rating', 'texto', 'fecha_relativa', 'timestamp'],
+      ...filteredGoogleReviews.map((review) => [
+        review.author_name,
+        review.rating,
+        review.text,
+        review.relative_time_description,
+        review.time,
+      ]),
+    ];
+    downloadCsv('google-reviews.csv', rows);
+  }
+
   return (
     <div className="p-8">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -267,7 +330,7 @@ export default function CustomerTestimonialsAdminPage() {
             Aprueba, edita y publica testimonios reales en la web
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {STATUS_TABS.map((tab) => (
             <button
               key={tab.id}
@@ -281,6 +344,12 @@ export default function CustomerTestimonialsAdminPage() {
               {tab.label}
             </button>
           ))}
+          <button
+            onClick={status === 'google' ? exportGoogleReviews : exportTestimonials}
+            className="rounded-lg border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white/80 hover:bg-white/20"
+          >
+            Exportar CSV
+          </button>
         </div>
       </div>
 
