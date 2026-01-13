@@ -98,6 +98,7 @@ export default function CustomerTestimonialsAdminPage() {
   const [syncingGoogle, setSyncingGoogle] = useState(false);
   const [googleQuery, setGoogleQuery] = useState('');
   const [googleRatingFilter, setGoogleRatingFilter] = useState('all');
+  const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Testimonial>>({});
   const [discountInputs, setDiscountInputs] = useState<Record<string, string>>({});
@@ -142,7 +143,7 @@ export default function CustomerTestimonialsAdminPage() {
     id: string,
     payload: Record<string, unknown>,
     successMessage?: string
-  ) {
+  ): Promise<boolean> {
     const res = await fetch('/api/admin/customer-testimonials', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -150,10 +151,17 @@ export default function CustomerTestimonialsAdminPage() {
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      throw new Error(data?.error || 'Error actualizando testimonio');
+      setFlashMessage({
+        type: 'error',
+        text: data?.error || 'Error actualizando testimonio',
+      });
+      return false;
     }
-    if (successMessage) alert(successMessage);
+    if (successMessage) {
+      setFlashMessage({ type: 'success', text: successMessage });
+    }
     await loadData();
+    return true;
   }
 
   function startEdit(testimonial: Testimonial) {
@@ -169,7 +177,7 @@ export default function CustomerTestimonialsAdminPage() {
   }
 
   async function saveEdit(id: string) {
-    await runAction(
+    const ok = await runAction(
       id,
       {
         action: 'update',
@@ -182,7 +190,7 @@ export default function CustomerTestimonialsAdminPage() {
       },
       'Testimonio actualizado'
     );
-    setEditingId(null);
+    if (ok) setEditingId(null);
   }
 
   async function deleteTestimonial(id: string) {
@@ -192,9 +200,13 @@ export default function CustomerTestimonialsAdminPage() {
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      alert(data?.error || 'Error eliminando testimonio');
+      setFlashMessage({
+        type: 'error',
+        text: data?.error || 'Error eliminando testimonio',
+      });
       return;
     }
+    setFlashMessage({ type: 'success', text: 'Testimonio eliminado' });
     await loadData();
   }
 
@@ -202,16 +214,22 @@ export default function CustomerTestimonialsAdminPage() {
     const value = discountInputs[id];
     const percent = Number(value);
     if (!percent || percent <= 0) {
-      alert('Introduce un porcentaje válido');
+      setFlashMessage({ type: 'error', text: 'Introduce un porcentaje válido' });
       return;
     }
-    await runAction(id, { action: 'discount', discountPercent: percent }, 'Descuento asignado');
-    setDiscountInputs((prev) => ({ ...prev, [id]: '' }));
+    const ok = await runAction(
+      id,
+      { action: 'discount', discountPercent: percent },
+      'Descuento asignado'
+    );
+    if (ok) {
+      setDiscountInputs((prev) => ({ ...prev, [id]: '' }));
+    }
   }
 
   async function createManualTestimonial() {
     if (!createForm.customerName || !createForm.text) {
-      alert('Nombre y texto son obligatorios');
+      setFlashMessage({ type: 'error', text: 'Nombre y texto son obligatorios' });
       return;
     }
     const res = await fetch('/api/admin/customer-testimonials', {
@@ -231,7 +249,10 @@ export default function CustomerTestimonialsAdminPage() {
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      alert(data?.error || 'Error creando testimonio');
+      setFlashMessage({
+        type: 'error',
+        text: data?.error || 'Error creando testimonio',
+      });
       return;
     }
     setCreateForm({
@@ -244,6 +265,7 @@ export default function CustomerTestimonialsAdminPage() {
       discountPercent: '',
     });
     setCreating(false);
+    setFlashMessage({ type: 'success', text: 'Testimonio creado' });
     await loadData();
   }
 
@@ -255,6 +277,7 @@ export default function CustomerTestimonialsAdminPage() {
       setGoogleData(data);
     } catch (error) {
       console.error('Error loading Google reviews:', error);
+      setFlashMessage({ type: 'error', text: 'Error cargando reseñas de Google' });
     } finally {
       setSyncingGoogle(false);
     }
@@ -352,6 +375,26 @@ export default function CustomerTestimonialsAdminPage() {
           </button>
         </div>
       </div>
+
+      {flashMessage && (
+        <div
+          className={`mb-6 rounded-xl border px-4 py-3 text-sm ${
+            flashMessage.type === 'success'
+              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
+              : 'border-red-500/30 bg-red-500/10 text-red-200'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <span>{flashMessage.text}</span>
+            <button
+              onClick={() => setFlashMessage(null)}
+              className="text-xs text-white/60 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {status !== 'google' ? (
         <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-4">
