@@ -156,6 +156,20 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
+      {testimonialsPending > 0 && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm text-amber-200">Alerta de testimonis</p>
+            <p className="text-lg font-semibold text-amber-100">
+              {testimonialsPending} pendent{testimonialsPending > 1 ? 's' : ''} d'aprovació
+            </p>
+          </div>
+          <Link href="/admin/ressenyes">
+            <Button variant="secondary" icon="⭐" label="Revisar testimonis" />
+          </Link>
+        </div>
+      )}
+
       {/* Mètriques */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
