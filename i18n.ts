@@ -1,4 +1,6 @@
 import { getRequestConfig } from 'next-intl/server';
+import { log } from '@/lib/logger';
+import { prisma } from '@/app/lib/prisma';
 
 // CONFIGURACION DE IDIOMAS - ORBITA EVENTS
 
@@ -55,8 +57,58 @@ export default getRequestConfig(async ({ requestLocale }) => {
     ? locale
     : defaultLocale;
 
+  const baseMessages = (await import(`./messages/${validLocale}.json`)).default;
+  const messages = await mergeDbTranslations(baseMessages, validLocale);
+
   return {
     locale: validLocale,
-    messages: (await import(`./messages/${validLocale}.json`)).default
+    messages
   };
 });
+
+function setValueByPath(
+  obj: Record<string, unknown>,
+  path: string,
+  value: string
+): void {
+  const keys = path.split('.');
+  let current: Record<string, unknown> = obj;
+
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    const nextKey = keys[i + 1];
+    const isNextArray = /^\d+$/.test(nextKey);
+
+    if (!(key in current) || typeof current[key] !== 'object' || current[key] === null) {
+      current[key] = isNextArray ? [] : {};
+    }
+
+    current = current[key] as Record<string, unknown>;
+  }
+
+  current[keys[keys.length - 1]] = value;
+}
+
+async function mergeDbTranslations(
+  baseMessages: Record<string, unknown>,
+  locale: Locale
+): Promise<Record<string, unknown>> {
+  const messages = JSON.parse(JSON.stringify(baseMessages)) as Record<string, unknown>;
+
+  try {
+    const rows = await prisma.translation.findMany({
+      where: { locale },
+      select: { namespace: true, key: true, value: true },
+    });
+
+    for (const row of rows) {
+      const path = row.key ? `${row.namespace}.${row.key}` : row.namespace;
+      if (!path) continue;
+      setValueByPath(messages, path, row.value);
+    }
+  } catch (error) {
+    log.error('Error carregant traduccions desde DB', error);
+  }
+
+  return messages;
+}

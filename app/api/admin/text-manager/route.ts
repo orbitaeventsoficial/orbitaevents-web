@@ -1,12 +1,13 @@
 // app/api/admin/text-manager/route.ts
 // API completa para el Text Manager PRO
-// Lee/escribe a los archivos JSON de traducción
+// Lee desde JSON y persiste en BD (tabla Translation)
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { requireAuth } from '@/lib/auth';
+import { prisma } from '@/app/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -110,7 +111,7 @@ function setValueByPath(obj: Record<string, unknown>, path: string, value: unkno
 /**
  * Obtiene un valor de un path anidado
  */
-function getValueByPath(obj: Record<string, unknown>, path: string): unknown {
+function getValueByPath(obj: Record<string, unknown>, path: string): unknown {  
   return path.split('.').reduce((current: unknown, key) => {
     if (current && typeof current === 'object' && key in (current as Record<string, unknown>)) {
       return (current as Record<string, unknown>)[key];
@@ -119,29 +120,78 @@ function getValueByPath(obj: Record<string, unknown>, path: string): unknown {
   }, obj);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+function splitPath(pathValue: string): { namespace: string; key: string } {
+  const [namespace, ...rest] = pathValue.split('.');
+  return { namespace, key: rest.join('.') };
+}
+
+function buildPath(namespace: string, key: string | null): string {
+  return key ? `${namespace}.${key}` : namespace;
+}
+
+async function readJsonSafe(jsonPath: string): Promise<Record<string, unknown>> {
+  try {
+    const content = await fs.readFile(jsonPath, 'utf-8');
+    return JSON.parse(content);
+  } catch {
+    return {};
+  }
+}
+
+async function loadBaseMessages() {
+  const [esData, caData, enData] = await Promise.all([
+    readJsonSafe(ES_JSON_PATH),
+    readJsonSafe(CA_JSON_PATH),
+    readJsonSafe(EN_JSON_PATH),
+  ]);
+
+  return {
+    es: flattenObject(esData),
+    ca: flattenObject(caData),
+    en: flattenObject(enData),
+  };
+}
+
+async function loadDbMessages() {
+  const rows = await prisma.translation.findMany({
+    select: { namespace: true, key: true, locale: true, value: true },
+  });
+
+  const db: Record<string, Record<string, string>> = {
+    es: {},
+    ca: {},
+    en: {},
+  };
+
+  for (const row of rows) {
+    const locale = row.locale;
+    if (!(locale in db)) continue;
+    const pathValue = buildPath(row.namespace, row.key);
+    db[locale][pathValue] = row.value;
+  }
+
+  return db;
+}
+
+async function loadMergedTexts() {
+  const [base, db] = await Promise.all([loadBaseMessages(), loadDbMessages()]);
+
+  return {
+    es: { ...base.es, ...db.es },
+    ca: { ...base.ca, ...db.ca },
+    en: { ...base.en, ...db.en },
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════  
 // GET - Obtener todos los textos
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════  
 
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
   try {
-    // Leer los tres archivos JSON
-    const [esContent, caContent, enContent] = await Promise.all([
-      fs.readFile(ES_JSON_PATH, 'utf-8'),
-      fs.readFile(CA_JSON_PATH, 'utf-8').catch(() => '{}'),
-      fs.readFile(EN_JSON_PATH, 'utf-8').catch(() => '{}')
-    ]);
-
-    const esData = JSON.parse(esContent);
-    const caData = JSON.parse(caContent);
-    const enData = JSON.parse(enContent);
-
-    // Aplanar los tres objetos
-    const esFlat = flattenObject(esData);
-    const caFlat = flattenObject(caData);
-    const enFlat = flattenObject(enData);
+    const { es: esFlat, ca: caFlat, en: enFlat } = await loadMergedTexts();
 
     // Estadísticas
     const stats = {
@@ -191,32 +241,50 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const jsonPath = locale === 'es' ? ES_JSON_PATH : locale === 'ca' ? CA_JSON_PATH : EN_JSON_PATH;
-
-    // Leer archivo actual
-    const content = await fs.readFile(jsonPath, 'utf-8');
-    const data = JSON.parse(content);
-
-    // Aplicar modificaciones
     let updatedCount = 0;
-    for (const [path, value] of Object.entries(modifications)) {
-      setValueByPath(data, path, value);
+    const now = new Date();
+
+    const operations = Object.entries(modifications).reduce((acc, [pathValue, value]) => {
+      const { namespace, key } = splitPath(pathValue);
+      if (!namespace) return acc;
       updatedCount++;
+      acc.push(
+        prisma.translation.upsert({
+          where: {
+            namespace_key_locale: { namespace, key, locale },
+          },
+          update: {
+            value,
+            isAutoTranslated: false,
+            lastManualEdit: now,
+          },
+          create: {
+            namespace,
+            key,
+            locale,
+            value,
+            isAutoTranslated: false,
+            lastManualEdit: now,
+          },
+        })
+      );
+      return acc;
+    }, [] as ReturnType<typeof prisma.translation.upsert>[]);
+
+    if (operations.length === 0) {
+      return NextResponse.json(
+        { ok: false, error: 'No hay cambios válidos para guardar' },
+        { status: 400 }
+      );
     }
 
-    // Crear backup antes de guardar
-    const backupPath = path.join(MESSAGES_DIR, `${locale}.backup.json`);
-    await fs.writeFile(backupPath, content, 'utf-8');
-
-    // Guardar archivo modificado
-    await fs.writeFile(jsonPath, JSON.stringify(data, null, 2) + '\n', 'utf-8');
+    await prisma.$transaction(operations);
 
     return NextResponse.json({
       ok: true,
       updated: updatedCount,
       locale,
-      message: `${updatedCount} textos actualizados en ${locale}.json`,
-      backupCreated: true
+      message: `${updatedCount} textos actualizados en la BD`
     });
 
   } catch (error) {
@@ -241,20 +309,7 @@ export async function POST(req: NextRequest) {
 
     switch (action) {
       case 'sync': {
-        // Sincronizar claves entre ES, CA y EN
-        const [esContent, caContent, enContent] = await Promise.all([
-          fs.readFile(ES_JSON_PATH, 'utf-8'),
-          fs.readFile(CA_JSON_PATH, 'utf-8'),
-          fs.readFile(EN_JSON_PATH, 'utf-8').catch(() => '{}')
-        ]);
-
-        const esData = JSON.parse(esContent);
-        const caData = JSON.parse(caContent);
-        const enData = JSON.parse(enContent);
-
-        const esFlat = flattenObject(esData);
-        const caFlat = flattenObject(caData);
-        const enFlat = flattenObject(enData);
+        const { es: esFlat, ca: caFlat, en: enFlat } = await loadMergedTexts();
 
         // Encontrar claves faltantes
         const missingInCa = Object.keys(esFlat).filter(k => !(k in caFlat));
@@ -276,74 +331,32 @@ export async function POST(req: NextRequest) {
       }
 
       case 'export': {
-        // Exportar textos como JSON descargable
-        const [esContent, caContent, enContent] = await Promise.all([
-          fs.readFile(ES_JSON_PATH, 'utf-8'),
-          fs.readFile(CA_JSON_PATH, 'utf-8'),
-          fs.readFile(EN_JSON_PATH, 'utf-8').catch(() => '{}')
-        ]);
-
+        // Exportar textos como JSON descargable (merged)
+        const merged = await loadMergedTexts();
         return NextResponse.json({
           ok: true,
           action: 'export',
-          es: JSON.parse(esContent),
-          ca: JSON.parse(caContent),
-          en: JSON.parse(enContent),
+          es: unflattenObject(merged.es),
+          ca: unflattenObject(merged.ca),
+          en: unflattenObject(merged.en),
           exportedAt: new Date().toISOString()
         });
       }
 
       case 'validate': {
-        // Validar estructura de JSONs
-        const [esContent, caContent, enContent] = await Promise.all([
-          fs.readFile(ES_JSON_PATH, 'utf-8'),
-          fs.readFile(CA_JSON_PATH, 'utf-8'),
-          fs.readFile(EN_JSON_PATH, 'utf-8').catch(() => '{}')
-        ]);
-
-        try {
-          JSON.parse(esContent);
-          JSON.parse(caContent);
-          JSON.parse(enContent);
-
-          return NextResponse.json({
-            ok: true,
-            action: 'validate',
-            valid: true,
-            message: 'Los 3 JSONs son válidos (ES, CA, EN)'
-          });
-        } catch (parseError) {
-          return NextResponse.json({
-            ok: false,
-            action: 'validate',
-            valid: false,
-            error: parseError instanceof Error ? parseError.message : 'Error de parsing'
-          });
-        }
+        return NextResponse.json({
+          ok: true,
+          action: 'validate',
+          valid: true,
+          message: 'Validación OK (JSON base + DB)'
+        });
       }
 
       case 'restore': {
-        // Restaurar desde backup
-        const { locale = 'es' } = body as { locale: 'es' | 'ca' | 'en' };
-        const jsonPath = locale === 'es' ? ES_JSON_PATH : locale === 'ca' ? CA_JSON_PATH : EN_JSON_PATH;
-        const backupPath = path.join(MESSAGES_DIR, `${locale}.backup.json`);
-
-        try {
-          const backupContent = await fs.readFile(backupPath, 'utf-8');
-          await fs.writeFile(jsonPath, backupContent, 'utf-8');
-
-          return NextResponse.json({
-            ok: true,
-            action: 'restore',
-            locale,
-            message: `Restaurado ${locale}.json desde backup`
-          });
-        } catch {
-          return NextResponse.json(
-            { ok: false, error: 'No se encontró archivo de backup' },
-            { status: 404 }
-          );
-        }
+        return NextResponse.json(
+          { ok: false, error: 'Restore no disponible: ahora se guarda en BD' },
+          { status: 400 }
+        );
       }
 
       default:

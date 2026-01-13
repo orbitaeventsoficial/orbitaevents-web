@@ -1,7 +1,7 @@
 // app/lib/analytics.ts
 /**
  * MANOLO'S ANALYTICS TRACKER
- * Sistema centralizado de tracking para Google Analytics 4 y Meta Pixel
+ * Sistema centralizado de tracking para Google Analytics 4
  *
  * Uso: import { trackEvent, trackLead, trackWhatsAppClick } from '@/lib/analytics';
  */
@@ -10,13 +10,11 @@ import { log } from '@/lib/logger';
 
 // Tipos TypeScript para ventana global
 type GtagArgs = [string, ...unknown[]];
-type FbqArgs = [string, string, Record<string, unknown>?];
 
 declare global {
   // eslint-disable-next-line no-unused-vars
   interface Window {
     gtag?: (..._args: GtagArgs) => void;
-    fbq?: (..._args: FbqArgs) => void;
     dataLayer?: unknown[];
     gtagConsentUpdate?: () => void;
   }
@@ -64,7 +62,7 @@ const isProduction = (): boolean => process.env.NODE_ENV === 'production';
 
 /**
  * Función universal para trackear cualquier evento
- * Se envía a Google Analytics Y Meta Pixel simultáneamente
+ * Se envía a Google Analytics
  */
 export const trackEvent = ({
   eventName,
@@ -88,27 +86,6 @@ export const trackEvent = ({
     });
   }
 
-  // 📊 META PIXEL
-  if (window.fbq) {
-    const metaEventMap: Record<string, string> = {
-      generate_lead: 'Lead',
-      contact_whatsapp: 'Contact',
-      contact_phone: 'Contact',
-      select_pack: 'InitiateCheckout',
-      calculate_price: 'CustomizeProduct',
-      view_video_testimonial: 'ViewContent',
-    };
-
-    const metaEvent = metaEventMap[eventName] || 'CustomEvent';
-    
-    window.fbq('track', metaEvent, {
-      content_name: eventLabel,
-      content_category: eventCategory,
-      value: value,
-      currency: 'EUR',
-      ...additionalParams,
-    });
-  }
 };
 
 /**
@@ -300,7 +277,6 @@ export const trackPageView = (pagePath: string, pageTitle: string): void => {
     page_path: pagePath,
     page_title: pageTitle,
   });
-  window.fbq?.('track', 'PageView');
 };
 
 /**

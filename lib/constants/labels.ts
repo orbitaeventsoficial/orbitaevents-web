@@ -30,7 +30,6 @@ export const EVENT_TYPE_LABELS: Record<string, string> = {
 export const SOURCE_LABELS: Record<string, string> = {
   website: 'Web',
   instagram: 'Instagram',
-  facebook: 'Facebook',
   whatsapp: 'WhatsApp',
   referral: 'Referència',
   google: 'Google',

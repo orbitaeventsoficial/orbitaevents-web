@@ -77,7 +77,6 @@ export const localBusinessSchema = {
   },
   sameAs: [
     'https://www.instagram.com/orbitaevents',
-    'https://www.facebook.com/orbitaevents',
     'https://g.page/orbitaevents',
   ],
   hasOfferCatalog: {

@@ -60,7 +60,6 @@ export const SITE_CONFIG = {
 
     platforms: {
       google: process.env.NEXT_PUBLIC_GOOGLE_BUSINESS_URL || null,
-      facebook: null,
       bodas: null,
     },
 
@@ -78,11 +77,6 @@ export const SITE_CONFIG = {
     instagram: {
       url: 'https://www.instagram.com/orbitaeventsoficial/',
       handle: '@orbitaeventsoficial',
-      enabled: true,
-    },
-    facebook: {
-      url: 'https://www.facebook.com/profile.php?id=61581625138500',
-      handle: 'Orbita Events',
       enabled: true,
     },
     tiktok: {
@@ -192,10 +186,6 @@ export const SITE_CONFIG = {
     googleAnalytics: {
       id: process.env.NEXT_PUBLIC_GA_ID || '',
       enabled: !!process.env.NEXT_PUBLIC_GA_ID,
-    },
-    facebookPixel: {
-      id: process.env.NEXT_PUBLIC_FB_PIXEL_ID || '',
-      enabled: !!process.env.NEXT_PUBLIC_FB_PIXEL_ID,
     },
     googleAds: {
       id: process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || '',

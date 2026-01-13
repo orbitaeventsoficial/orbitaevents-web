@@ -15,7 +15,6 @@ import {
   MapPin,
   Calculator,
   Instagram,
-  Facebook,
   Linkedin,
   Youtube,
   Sparkles
@@ -55,13 +54,6 @@ const SOCIAL_LINKS = [
     href: SITE_CONFIG.social.tiktok.url || '',
     color: 'hover:text-[#00F2EA] hover:bg-[#00F2EA]/10',
     enabled: SITE_CONFIG.social.tiktok.enabled,
-  },
-  {
-    name: 'Facebook',
-    icon: Facebook,
-    href: SITE_CONFIG.social.facebook.url || '',
-    color: 'hover:text-[#1877F2] hover:bg-[#1877F2]/10',
-    enabled: SITE_CONFIG.social.facebook.enabled,
   },
   {
     name: 'LinkedIn',

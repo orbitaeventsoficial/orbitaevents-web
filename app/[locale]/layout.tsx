@@ -181,7 +181,6 @@ const JSON_LD_ORGANIZATION = {
   ],
   sameAs: [
     'https://www.instagram.com/orbitaevents',
-    'https://www.facebook.com/orbitaevents',
     'https://www.tiktok.com/@orbitaevents',
   ],
   aggregateRating: {
@@ -561,7 +560,6 @@ export default async function LocaleLayout({
     </html>
   );
 }
-
 
 
 

@@ -35,7 +35,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         // Permitir crawlers de redes sociales
-        userAgent: ['Twitterbot', 'facebookexternalhit'],
+        userAgent: ['Twitterbot'],
         allow: '/',
       },
     ],

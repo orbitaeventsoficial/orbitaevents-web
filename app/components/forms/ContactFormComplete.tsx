@@ -511,7 +511,6 @@ export default function ContactFormComplete({
           <option value="" className="bg-black">{t('placeholders.selectHowFound')}</option>
           <option value="google" className="bg-black">{t('howFoundOptions.google')}</option>
           <option value="instagram" className="bg-black">{t('howFoundOptions.instagram')}</option>
-          <option value="facebook" className="bg-black">{t('howFoundOptions.facebook')}</option>
           <option value="tiktok" className="bg-black">{t('howFoundOptions.tiktok')}</option>
           <option value="recomendacion" className="bg-black">{t('howFoundOptions.recomendacion')}</option>
           <option value="evento" className="bg-black">{t('howFoundOptions.evento')}</option>

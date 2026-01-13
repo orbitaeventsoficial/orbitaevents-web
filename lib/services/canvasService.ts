@@ -62,13 +62,6 @@ export const CANVAS_PRESETS = {
     accentColor: '#f97316',
     textColor: '#ffffff',
   },
-  facebookPost: {
-    width: 1200,
-    height: 630,
-    backgroundColor: '#0a0a0a',
-    accentColor: '#f97316',
-    textColor: '#ffffff',
-  },
 } satisfies Record<string, CanvasConfig>;
 
 // ═══════════════════════════════════════════════════════════════════════════

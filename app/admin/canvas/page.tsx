@@ -8,7 +8,6 @@ const PRESETS = [
   { id: 'email', name: 'Email', width: 600, height: 400 },
   { id: 'instagram', name: 'Instagram Post', width: 1080, height: 1080 },
   { id: 'story', name: 'Story (IG/WA)', width: 1080, height: 1920 },
-  { id: 'facebook', name: 'Facebook', width: 1200, height: 630 },
 ];
 
 const EVENT_TYPES = [

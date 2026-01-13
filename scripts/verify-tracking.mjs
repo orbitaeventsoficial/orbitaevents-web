@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Script de verificació de tracking per Òrbita Events
- * Verifica que Google Analytics i Meta Pixel estiguin configurats
+ * Verifica que Google Analytics estigui configurat
  */
 
 import { readFileSync } from 'fs';
@@ -32,17 +32,6 @@ if (gaId && gaId.startsWith('G-')) {
 } else {
   console.log('❌ Google Analytics NO configurat');
   console.log('   Afegeix: NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX');
-}
-
-// Verificar Meta Pixel
-const fbMatch = envContent.match(/NEXT_PUBLIC_FB_PIXEL_ID=(.+)/);
-const fbId = fbMatch ? fbMatch[1].trim() : '';
-
-if (fbId && fbId.length > 0) {
-  console.log('✅ Meta Pixel configurat:', fbId);
-} else {
-  console.log('⚠️  Meta Pixel NO configurat (opcional)');
-  console.log('   Afegeix: NEXT_PUBLIC_FB_PIXEL_ID=XXXXXXXXXXXX');
 }
 
 // Verificar events de tracking al codi

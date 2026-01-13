@@ -21,7 +21,6 @@ export async function GET(req: NextRequest) {
     email: { width: 600, height: 400 },
     instagram: { width: 1080, height: 1080 },
     story: { width: 1080, height: 1920 },
-    facebook: { width: 1200, height: 630 },
   };
 
   const { width, height } = dimensions[preset] || dimensions.email;

@@ -71,7 +71,7 @@ Opció A - Webhook simple (Make/IFTTT/Zapier):
    ADMIN_WHATSAPP=+34612345678
 
 Opció B - WhatsApp Business API:
-   WHATSAPP_API_URL=https://graph.facebook.com/v17.0/PHONE_NUMBER_ID
+   WHATSAPP_API_URL=https://your-whatsapp-api-url
    WHATSAPP_API_TOKEN=el_teu_token
    ADMIN_WHATSAPP=+34612345678
     `);
