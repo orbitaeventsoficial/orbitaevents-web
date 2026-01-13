@@ -41,9 +41,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: translation.metaTitle || translation.title,
     description: translation.metaDescription || translation.excerpt,
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    alternates: { canonical: `/${locale}/blog/${slug}` },
     openGraph: {
       title: translation.metaTitle || translation.title,
       description: translation.metaDescription || translation.excerpt,
+      url: `/${locale}/blog/${slug}`,
       type: 'article',
       publishedTime: post.publishedAt?.toISOString(),
       authors: [post.author],

@@ -17,6 +17,14 @@ export async function generateMetadata({
   return {
     title: t('meta.title'),
     description: t('meta.description'),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
+    alternates: { canonical: `/${locale}/blog` },
+    openGraph: {
+      title: t('meta.title'),
+      description: t('meta.description'),
+      url: `/${locale}/blog`,
+      type: 'website',
+    },
   };
 }
 
