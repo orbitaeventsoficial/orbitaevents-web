@@ -7,8 +7,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
 
 // Cache for 15 minutes
 export const revalidate = 900;

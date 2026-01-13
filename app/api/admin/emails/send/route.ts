@@ -4,6 +4,7 @@ import { sendEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 function escapeHtml(value: string): string {
   return value
@@ -34,11 +35,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const replyTo =
+      process.env.SMTP_REPLY_TO?.trim() || SITE_CONFIG.business.email;
+
     await sendEmail({
       to,
       subject: String(subject),
       html: bodyToHtml(String(messageBody)),
-      replyTo: String(to),
+      replyTo,
     });
 
     const resolvedLeadId = leadId || replyToId;
