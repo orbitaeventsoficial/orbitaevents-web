@@ -199,8 +199,8 @@ export default function HeroPortalLogo({
             scale: 1.05,
             filter: 'blur(12px)',
             transition: {
-              duration: (isMobile ? 2.2 : fadeMs / 1000),
-              ease: [0.19, 1, 0.22, 1],
+              duration: (isMobile ? 2.6 : fadeMs / 1000),
+              ease: [0.12, 0.8, 0.2, 1],
             },
           }}
         >
@@ -448,10 +448,10 @@ export default function HeroPortalLogo({
                 initial={{ opacity: 0, scale: 0.55, rotate: -35 }}
                 animate={showRing ? {
                   opacity: 1,
-                  scale: [0.55, 1.08, 1],
-                  rotate: [-35, 14, -6, 0],
+                  scale: [0.5, 1.12, 0.98, 1],
+                  rotate: [-32, 16, -8, 0],
                 } : { opacity: 0, scale: 0.55, rotate: -35 }}
-                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ type: 'spring', stiffness: 140, damping: 14, mass: 0.8 }}
               >
                 <use xlinkHref="#ring-shape" mask="url(#mask_outside_planet)" fill="url(#grad_ring_fill)" opacity="0.12" />
                 <use xlinkHref="#ring-shape" fill="url(#grad_ring_fill)" opacity="0.35" stroke="#000" strokeOpacity="0.03" strokeWidth="0.6" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />

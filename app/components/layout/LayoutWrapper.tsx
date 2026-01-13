@@ -121,7 +121,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         <HeroPortalLogo
           onFinish={handleIntroFinish}
           totalMs={4000}
-          fadeMs={1200}
+          fadeMs={1800}
           speedMultiplier={1.2}
         />
       )}
