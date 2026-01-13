@@ -55,12 +55,40 @@ function mergeNotes(parts: Array<string | undefined | null>): string | undefined
   return filtered.length ? filtered.join('\n\n') : undefined;
 }
 
-function normalizeExtras(extras: unknown): QuoteExtra[] | undefined {
+async function normalizeExtras(extras: unknown): Promise<QuoteExtra[] | undefined> {
   if (!Array.isArray(extras) || extras.length === 0) return undefined;
-  return extras.map((extra) => ({
-    name: String(extra),
-    description: undefined,
-    price: 0,
+
+  const hasObjectExtras = extras.some(
+    (extra) => typeof extra === 'object' && extra !== null
+  );
+
+  if (hasObjectExtras) {
+    return extras
+      .map((extra) => ({
+        name: String((extra as any).name || ''),
+        description: (extra as any).description ? String((extra as any).description) : undefined,
+        price: Number((extra as any).price || 0),
+        quantity: Number((extra as any).quantity || 1),
+      }))
+      .filter((extra) => extra.name.trim().length > 0);
+  }
+
+  const slugs = extras.map((extra) => String(extra)).filter(Boolean);
+  const dbExtras = await prisma.extra.findMany({
+    where: { slug: { in: slugs } },
+    include: { translations: true },
+  });
+
+  if (dbExtras.length !== slugs.length) {
+    const found = new Set(dbExtras.map((extra) => extra.slug));
+    const missing = slugs.filter((slug) => !found.has(slug));
+    throw new Error(`Missing extras: ${missing.join(', ')}`);
+  }
+
+  return dbExtras.map((extra) => ({
+    name: extra.translations[0]?.name || extra.slug,
+    description: extra.translations[0]?.description || undefined,
+    price: extra.price,
     quantity: 1,
   }));
 }
@@ -99,7 +127,7 @@ export async function POST(req: NextRequest) {
       price,
     };
 
-    const quoteExtras = normalizeExtras(extras);
+    const quoteExtras = await normalizeExtras(extras);
 
     const quoteData = createQuoteFromLead(
       {
@@ -164,6 +192,13 @@ export async function POST(req: NextRequest) {
       total: quoteData.total,
     });
   } catch (error) {
+    if (error instanceof Error && error.message.startsWith('Missing extras:')) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 400 }
+      );
+    }
+
     log.error('Error enviant pressupost:', error);
     return NextResponse.json(
       { error: 'Error enviant pressupost' },

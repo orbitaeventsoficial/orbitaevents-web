@@ -5,7 +5,6 @@ import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import { PORTFOLIO_CATEGORIES } from "@/config/portfolio-images";
 import { getTranslations } from 'next-intl/server';
 
-export const dynamic = 'force-dynamic';
 
 export default async function PortfolioHome({ params }: { params: { locale: string } }) {
   const { locale } = params;
