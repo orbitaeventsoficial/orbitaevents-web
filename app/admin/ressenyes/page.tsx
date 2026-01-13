@@ -79,6 +79,8 @@ export default function CustomerTestimonialsAdminPage() {
   const [googleData, setGoogleData] = useState<GoogleReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncingGoogle, setSyncingGoogle] = useState(false);
+  const [googleQuery, setGoogleQuery] = useState('');
+  const [googleRatingFilter, setGoogleRatingFilter] = useState('all');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Testimonial>>({});
   const [discountInputs, setDiscountInputs] = useState<Record<string, string>>({});
@@ -240,6 +242,21 @@ export default function CustomerTestimonialsAdminPage() {
       setSyncingGoogle(false);
     }
   }
+
+  const filteredGoogleReviews =
+    googleData?.reviews
+      ?.filter((review) => {
+        if (googleRatingFilter === 'all') return true;
+        return String(review.rating) === googleRatingFilter;
+      })
+      .filter((review) => {
+        const query = googleQuery.trim().toLowerCase();
+        if (!query) return true;
+        return (
+          review.author_name.toLowerCase().includes(query) ||
+          review.text.toLowerCase().includes(query)
+        );
+      }) ?? [];
 
   return (
     <div className="p-8">
@@ -405,9 +422,33 @@ export default function CustomerTestimonialsAdminPage() {
 
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <h2 className="mb-4 text-lg font-semibold text-white">Reseñas de Google</h2>
-            {googleData?.reviews?.length ? (
+            <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center">
+              <input
+                value={googleQuery}
+                onChange={(e) => setGoogleQuery(e.target.value)}
+                placeholder="Buscar por autor o texto"
+                className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white md:max-w-sm"
+              />
+              <select
+                value={googleRatingFilter}
+                onChange={(e) => setGoogleRatingFilter(e.target.value)}
+                className="rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
+              >
+                <option value="all">Todas las estrellas</option>
+                <option value="5">5 estrellas</option>
+                <option value="4">4 estrellas</option>
+                <option value="3">3 estrellas</option>
+                <option value="2">2 estrellas</option>
+                <option value="1">1 estrella</option>
+              </select>
+              <div className="text-xs text-white/60">
+                {filteredGoogleReviews.length} resultados
+              </div>
+            </div>
+
+            {filteredGoogleReviews.length ? (
               <div className="space-y-3">
-                {googleData.reviews.map((review, index) => (
+                {filteredGoogleReviews.map((review, index) => (
                   <div key={`${review.author_name}-${index}`} className="rounded-xl border border-white/10 bg-white/5 p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div>
