@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL(`/admin/google-reviews?google=error&reason=${encodeURIComponent(error)}`, req.url));
   }
 
-  const secret = process.env.GOOGLE_OAUTH_CLIENT_SECRET || process.env.CSRF_SECRET || '';
+  const secret = process.env.GOOGLE_OAUTH_CLIENT_SECRET || '';
   if (!code || !state || !secret || !verifyState(state, secret)) {
     return NextResponse.json(
       { ok: false, error: 'Invalid OAuth state' },

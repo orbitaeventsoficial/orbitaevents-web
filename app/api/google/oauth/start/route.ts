@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   if (authError) return authError;
 
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET || process.env.CSRF_SECRET;
+  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
   const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI;
 
   if (!clientId || !clientSecret || !redirectUri) {

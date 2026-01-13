@@ -33,6 +33,9 @@ export default function HeroElegant() {
           muted
           loop
           playsInline
+          preload="metadata"
+          aria-hidden="true"
+          disablePictureInPicture
           poster="/img/hero-poster.webp"
           className="w-full h-full object-cover"
         >
