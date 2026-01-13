@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { log } from '@/lib/logger';
+import { requireAuth } from '@/lib/auth';
 
 /**
  * GET /api/admin/blog
@@ -9,6 +10,9 @@ import { log } from '@/lib/logger';
  */
 export async function GET(req: NextRequest) {
   try {
+    const authError = requireAuth(req);
+    if (authError) return authError;
+
     const { searchParams } = new URL(req.url);
     const locale = searchParams.get('locale') || 'es';
     const page = parseInt(searchParams.get('page') || '1', 10);
@@ -66,6 +70,9 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
+    const authError = requireAuth(req);
+    if (authError) return authError;
+
     const body = await req.json();
     const {
       slug,
@@ -144,6 +151,9 @@ export async function POST(req: NextRequest) {
  */
 export async function PUT(req: NextRequest) {
   try {
+    const authError = requireAuth(req);
+    if (authError) return authError;
+
     const body = await req.json();
     const {
       id,
@@ -178,55 +188,51 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Update post
-    const post = await prisma.blogPost.update({
-      where: { id },
-      data: {
-        slug,
-        author,
-        category,
-        tags,
-        featuredImage,
-        isPublished,
-        publishedAt:
-          isPublished && !existing.isPublished && !publishedAt
-            ? new Date()
-            : publishedAt,
-        readingTime,
-      },
-      include: {
-        translations: true,
-      },
-    });
-
-    // Update translations if provided
-    if (translations && translations.length > 0) {
-      // Delete existing translations
-      await prisma.blogPostTranslation.deleteMany({
-        where: { postId: id },
+    const updatedPost = await prisma.$transaction(async (tx) => {
+      const post = await tx.blogPost.update({
+        where: { id },
+        data: {
+          slug,
+          author,
+          category,
+          tags,
+          featuredImage,
+          isPublished,
+          publishedAt:
+            isPublished && !existing.isPublished && !publishedAt
+              ? new Date()
+              : publishedAt,
+          readingTime,
+        },
       });
 
-      // Create new translations
-      await prisma.blogPostTranslation.createMany({
-        data: translations.map((t: any) => ({
-          postId: id,
-          locale: t.locale,
-          title: t.title,
-          excerpt: t.excerpt,
-          content: t.content,
-          metaTitle: t.metaTitle,
-          metaDescription: t.metaDescription,
-        })),
-      });
-    }
+      if (translations && translations.length > 0) {
+        await tx.blogPostTranslation.deleteMany({
+          where: { postId: id },
+        });
 
-    // Fetch updated post with translations
-    const updatedPost = await prisma.blogPost.findUnique({
-      where: { id },
-      include: { translations: true },
+        await tx.blogPostTranslation.createMany({
+          data: translations.map((t: any) => ({
+            postId: id,
+            locale: t.locale,
+            title: t.title,
+            excerpt: t.excerpt,
+            content: t.content,
+            metaTitle: t.metaTitle,
+            metaDescription: t.metaDescription,
+          })),
+        });
+      }
+
+      const postWithTranslations = await tx.blogPost.findUnique({
+        where: { id },
+        include: { translations: true },
+      });
+
+      return postWithTranslations;
     });
 
-    log.info('Blog post updated', { postId: id, slug: post.slug });
+    log.info('Blog post updated', { postId: id, slug: updatedPost?.slug });
 
     return NextResponse.json(updatedPost);
   } catch (error) {
@@ -244,6 +250,9 @@ export async function PUT(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
   try {
+    const authError = requireAuth(req);
+    if (authError) return authError;
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 

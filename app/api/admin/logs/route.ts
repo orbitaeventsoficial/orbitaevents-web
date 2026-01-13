@@ -5,14 +5,21 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    const authError = requireAuth(request);
+    if (authError) return authError;
+
     const { searchParams } = new URL(request.url);
     const level = searchParams.get('level');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const rawLimit = Number(searchParams.get('limit') || '50');
+    const limit = Number.isFinite(rawLimit)
+      ? Math.min(Math.max(rawLimit, 1), 200)
+      : 50;
 
     let logs = log.getLogs();
 
@@ -40,8 +47,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   try {
+    const authError = requireAuth(request);
+    if (authError) return authError;
+
     log.clearLogs();
     return NextResponse.json({
       success: true,
