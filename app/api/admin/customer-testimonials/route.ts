@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 import { getTestimonialStats } from '@/lib/services/testimonialService';
 
 export const dynamic = 'force-dynamic';
@@ -316,12 +317,17 @@ export async function PATCH(request: NextRequest) {
       data: updates,
     });
 
+    const details: Prisma.InputJsonValue = {
+      action: action || 'update',
+      updates: JSON.parse(JSON.stringify(updates)),
+    };
+
     await prisma.adminLog.create({
       data: {
         action: 'UPDATE',
         entity: 'customer_testimonial',
         entityId: id,
-        details: { action: action || 'update', updates },
+        details,
       },
     });
 
