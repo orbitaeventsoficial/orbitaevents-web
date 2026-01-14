@@ -314,19 +314,19 @@ export default function CustomerTestimonialsAdminPage() {
         'creado',
       ],
       ...testimonials.map((t) => [
-        t.id,
-        t.name,
-        t.customer.email,
-        t.rating,
-        t.comment,
-        t.eventType || '',
-        t.eventDate || '',
+        String(t.id),
+        String(t.name),
+        String(t.customer.email),
+        String(t.rating),
+        String(t.comment),
+        String(t.eventType || ''),
+        String(t.eventDate || ''),
         t.isApproved ? 'true' : 'false',
-        t.discount?.code || '',
-        t.discount?.discountPercent || '',
-        t.createdAt,
+        String(t.discount?.code || ''),
+        String(t.discount?.discountPercent || ''),
+        String(t.createdAt),
       ]),
-    ];
+    ].map((row) => row.map((value) => String(value)));
     downloadCsv(`testimonios-${status}.csv`, rows);
   }
 
@@ -334,13 +334,13 @@ export default function CustomerTestimonialsAdminPage() {
     const rows = [
       ['autor', 'rating', 'texto', 'fecha_relativa', 'timestamp'],
       ...filteredGoogleReviews.map((review) => [
-        review.author_name,
-        review.rating,
-        review.text,
-        review.relative_time_description,
-        review.time,
+        String(review.author_name),
+        String(review.rating),
+        String(review.text),
+        String(review.relative_time_description),
+        String(review.time),
       ]),
-    ];
+    ].map((row) => row.map((value) => String(value)));
     downloadCsv('google-reviews.csv', rows);
   }
 
