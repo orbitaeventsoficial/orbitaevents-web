@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
 export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/blog

@@ -7,6 +7,7 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import BlogViewTracker from '@/app/components/blog/BlogViewTracker';
 
 export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 interface Props {
   params: {

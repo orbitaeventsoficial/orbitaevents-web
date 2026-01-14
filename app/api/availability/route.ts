@@ -10,6 +10,7 @@ import { log } from '@/lib/logger';
 
 // Cache for 15 minutes
 export const revalidate = 900;
+export const dynamic = 'force-dynamic';
 
 interface AvailabilityResponse {
   success: boolean;
