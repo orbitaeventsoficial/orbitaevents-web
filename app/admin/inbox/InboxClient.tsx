@@ -86,6 +86,7 @@ export default function InboxClient({
   const [searchQuery, setSearchQuery] = useState('');
   const [showCompose, setShowCompose] = useState(false);
   const [replyTo, setReplyTo] = useState<UnifiedEmail | null>(null);
+  const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Convertir leads a format unificat
   useEffect(() => {
@@ -135,15 +136,20 @@ export default function InboxClient({
     try {
       const res = await fetch('/api/admin/inbox/messages?limit=50');
       const data = await res.json();
+      const message = data?.error || 'Error carregant emails';
 
-      if (data.ok) {
-        setImapEmails(data.emails || []);
-        setImapUnread(data.unread || 0);
-      } else {
-        setImapError(data.error || 'Error carregant emails');
+      if (!res.ok || !data.ok) {
+        setImapError(message);
+        setFlashMessage({ type: 'error', text: message });
+        return;
       }
+
+      setImapEmails(data.emails || []);
+      setImapUnread(data.unread || 0);
+      setFlashMessage(null);
     } catch (error) {
       setImapError('Error de connexió');
+      setFlashMessage({ type: 'error', text: 'Error carregant emails IMAP' });
     } finally {
       setLoadingImap(false);
     }
@@ -289,6 +295,26 @@ export default function InboxClient({
             />
           </div>
         </div>
+
+        {flashMessage && (
+          <div
+            className={`mx-3 mt-3 rounded-lg border px-3 py-2 text-xs ${
+              flashMessage.type === 'success'
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700'
+                : 'border-red-500/30 bg-red-500/10 text-red-700'
+            }`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <span>{flashMessage.text}</span>
+              <button
+                onClick={() => setFlashMessage(null)}
+                className="text-xs text-slate-500 hover:text-slate-700"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* List */}
         <div className="flex-1 overflow-y-auto">
@@ -507,11 +533,15 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
   const [body, setBody] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   async function handleSend() {
     if (!to || !subject || !body) return;
-    
+
     setSending(true);
+    setError(null);
+    setSuccess(null);
     try {
       const res = await fetch('/api/admin/emails/send', {
         method: 'POST',
@@ -524,14 +554,20 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
         }),
       });
 
-      if (res.ok) {
-        setSent(true);
-        setTimeout(() => {
-          onClose();
-        }, 1500);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data?.error || 'Error enviant email');
+        return;
       }
+
+      setSuccess('Email enviat correctament');
+      setSent(true);
+      setTimeout(() => {
+        onClose();
+      }, 1200);
     } catch (error) {
       console.error('Error enviant email:', error);
+      setError('Error enviant email');
     } finally {
       setSending(false);
     }
@@ -583,6 +619,8 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 bg-slate-50">
+          {error && <span className="text-xs text-red-600 mr-auto">{error}</span>}
+          {success && <span className="text-xs text-green-600 mr-auto">{success}</span>}
           <button onClick={onClose} className="px-4 py-2 text-slate-600">Cancel·lar</button>
           <button
             onClick={handleSend}
