@@ -1,7 +1,7 @@
 // app/admin/ressenyes/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 type DiscountInfo = {
   code: string;
@@ -113,11 +113,7 @@ export default function CustomerTestimonialsAdminPage() {
     discountPercent: '',
   });
 
-  useEffect(() => {
-    loadData();
-  }, [status]);
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       if (status === 'google') {
@@ -137,7 +133,11 @@ export default function CustomerTestimonialsAdminPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [status]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   async function runAction(
     id: string,

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 /**
@@ -188,7 +189,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="p-4 border-b border-stone-200">
               <Link href="/admin" className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20 p-1.5">
-                  <img src="/img/logosoloplaneta.svg" alt="Òrbita" className="w-full h-full object-contain" />
+                  <Image
+                    src="/img/logosoloplaneta.svg"
+                    alt="Òrbita"
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <div>
                   <span className="text-slate-700 font-semibold">Òrbita</span>
