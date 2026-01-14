@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { fetchEmailByUid, markAsRead, markAsUnread } from '@/lib/imap';
+import { deleteEmail, fetchEmailByUid, markAsRead, markAsUnread } from '@/lib/imap';
 import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -78,6 +78,32 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : 'Error processant acció',
+    }, { status: 500 });
+  }
+}
+
+// DELETE - Eliminar email
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  const authError = requireAuth(request);
+  if (authError) return authError;
+  const { uid } = await params;
+  const uidNumber = parseInt(uid);
+
+  if (isNaN(uidNumber)) {
+    return NextResponse.json({ error: 'UID invàlid' }, { status: 400 });
+  }
+
+  try {
+    const success = await deleteEmail(uidNumber);
+    if (!success) {
+      return NextResponse.json({ ok: false, error: 'No s\'ha pogut eliminar' }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    log.error('Error eliminant email:', error);
+    return NextResponse.json({
+      ok: false,
+      error: error instanceof Error ? error.message : 'Error eliminant email',
     }, { status: 500 });
   }
 }

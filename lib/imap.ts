@@ -8,6 +8,7 @@ import { ImapFlow } from 'imapflow';
 import { log } from '@/lib/logger';
 
 // Configuració IMAP - DonDominio
+const IMAP_ALLOW_INSECURE = process.env.IMAP_ALLOW_INSECURE === 'true';
 const IMAP_CONFIG = {
   host: process.env.IMAP_HOST || 'mail.dondominio.com',
   port: parseInt(process.env.IMAP_PORT || '993'),
@@ -18,7 +19,7 @@ const IMAP_CONFIG = {
   },
   logger: false as const,
   tls: {
-    rejectUnauthorized: false, // Per certificats DonDominio
+    rejectUnauthorized: !IMAP_ALLOW_INSECURE, // Permetre desactivar verificació només si cal
   },
 };
 
@@ -273,6 +274,31 @@ export async function markAsUnread(uid: number, folder: string = 'INBOX'): Promi
 }
 
 /**
+ * Eliminar email (moure a paperera)
+ */
+export async function deleteEmail(uid: number, folder: string = 'INBOX'): Promise<boolean> {
+  const client = await connectIMAP();
+
+  try {
+    const mailbox = await client.getMailboxLock(folder);
+
+    try {
+      await client.messageDelete([uid], { uid: true });
+      return true;
+    } finally {
+      mailbox.release();
+    }
+  } catch (error) {
+    log.error('Failed to delete email', error, {
+      context: { uid, folder }
+    });
+    return false;
+  } finally {
+    await client.logout();
+  }
+}
+
+/**
  * Obtenir carpetes disponibles
  */
 export async function listFolders(): Promise<string[]> {
@@ -300,6 +326,20 @@ export async function countUnread(folder: string = 'INBOX'): Promise<number> {
   try {
     const status = await client.status(folder, { unseen: true });
     return status.unseen || 0;
+  } finally {
+    await client.logout();
+  }
+}
+
+/**
+ * Comptar total d'emails a la carpeta
+ */
+export async function countTotal(folder: string = 'INBOX'): Promise<number> {
+  const client = await connectIMAP();
+
+  try {
+    const status = await client.status(folder, { messages: true });
+    return status.messages || 0;
   } finally {
     await client.logout();
   }

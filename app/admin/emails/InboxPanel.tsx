@@ -12,7 +12,10 @@ interface EmailMessage {
     name: string;
     address: string;
   };
-  to: string[];
+  to: {
+    name: string;
+    address: string;
+  }[];
   date: string;
   preview: string;
   body: string;
@@ -27,8 +30,35 @@ interface EmailMessage {
 }
 
 interface InboxResponse {
-  emails: EmailMessage[];
+  ok: boolean;
+  emails: ImapApiEmail[];
   total: number;
+  unread: number;
+  error?: string;
+}
+
+interface ImapApiEmail {
+  id: string;
+  uid: number;
+  subject: string;
+  from: {
+    name: string;
+    address: string;
+  };
+  to: {
+    name: string;
+    address: string;
+  }[];
+  date: string;
+  bodyText: string;
+  bodyHtml: string;
+  isRead: boolean;
+  hasAttachments: boolean;
+  attachments: {
+    filename: string;
+    contentType: string;
+    size: number;
+  }[];
 }
 
 export default function InboxPanel() {
@@ -44,13 +74,30 @@ export default function InboxPanel() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/inbox?limit=${limit}&offset=${page * limit}`);
+      const res = await fetch(`/api/admin/inbox/messages?limit=${limit}&offset=${page * limit}`);
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || 'Error carregant emails');
       }
       const data: InboxResponse = await res.json();
-      setEmails(data.emails);
+      if (!data.ok) {
+        throw new Error(data.error || 'Error carregant emails');
+      }
+      const mapped = data.emails.map((email) => ({
+        id: email.id,
+        uid: email.uid,
+        subject: email.subject,
+        from: email.from,
+        to: email.to || [],
+        date: email.date,
+        preview: (email.bodyText || '').substring(0, 200).replace(/\s+/g, ' ').trim(),
+        body: email.bodyText || '',
+        bodyHtml: email.bodyHtml || null,
+        isRead: email.isRead,
+        hasAttachments: email.hasAttachments,
+        attachments: email.attachments || [],
+      }));
+      setEmails(mapped);
       setTotal(data.total);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error carregant emails');
@@ -69,10 +116,10 @@ export default function InboxPanel() {
     if (!email.isRead) {
       // Marcar com a llegit
       try {
-        await fetch('/api/admin/inbox', {
+        await fetch(`/api/admin/inbox/messages/${email.uid}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uid: email.uid, action: 'markAsRead' }),
+          body: JSON.stringify({ action: 'markRead' }),
         });
         // Actualitzar estat local
         setEmails(prev => prev.map(e =>
@@ -88,11 +135,7 @@ export default function InboxPanel() {
     if (!confirm('Segur que vols eliminar aquest email?')) return;
 
     try {
-      const res = await fetch('/api/admin/inbox', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid }),
-      });
+      const res = await fetch(`/api/admin/inbox/messages/${uid}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Error eliminant');
 
       // Actualitzar llista
