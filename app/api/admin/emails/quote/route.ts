@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
       data: {
         leadId,
         type: 'QUOTE',
-        source: 'ADMIN',
+        source: 'MANUAL',
         title: documentTitle,
         fileUrl: 'email',
         mimeType: 'text/html',
