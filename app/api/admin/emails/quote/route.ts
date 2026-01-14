@@ -129,14 +129,7 @@ export async function POST(req: NextRequest) {
 
     const quoteExtras = await normalizeExtras(extras);
 
-    const quoteData = createQuoteFromLead(
-      {
-        ...lead,
-        preferredLocale: locale || lead.preferredLocale,
-      },
-      packData,
-      quoteExtras
-    );
+    const quoteData = createQuoteFromLead(lead, packData, quoteExtras);
 
     quoteData.quoteNumber = generateQuoteNumber();
     quoteData.notes = mergeNotes([customMessage, notes, lead.message || undefined]);
