@@ -218,7 +218,8 @@
       "Bash(node scripts/deep-cleanup.js:*)",
       "Bash(npx tsx:*)",
       "Bash(jobs)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(timeout 120 npm run build:*)"
     ]
   }
 }

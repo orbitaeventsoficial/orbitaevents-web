@@ -173,8 +173,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { icon: '📬', label: 'Inbox', href: '/admin/inbox', badge: 'NEW', badgeColor: 'blue' as const },
         { icon: '📧', label: 'Emails', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
         { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
-        { icon: '🗣️', label: 'Testimonios', href: '/admin/ressenyes', badge: 'NEW', badgeColor: 'orange' as const },
         { icon: '⭐', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
+      ]
+    },
+    {
+      title: 'Configuració',
+      items: [
+        { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
+        { icon: '🎛️', label: 'Features', href: '/admin/features', badge: 'NEW', badgeColor: 'blue' as const },
+        { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage', badge: 'NEW', badgeColor: 'blue' as const },
+        { icon: '📊', label: 'Estadístiques', href: '/admin/stats', badge: 'NEW', badgeColor: 'blue' as const },
+        { icon: '🎨', label: 'Tema', href: '/admin/theme', badge: 'NEW', badgeColor: 'blue' as const },
+        { icon: '🖼️', label: 'Portfolio', href: '/admin/portfolio' },
+        { icon: '🌐', label: 'Traduccions', href: '/admin/translations' },
+        { icon: '📝', label: 'Blog', href: '/admin/blog' },
       ]
     },
   ];
