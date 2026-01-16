@@ -1,11 +1,18 @@
 /**
- * API: Obtenir emails reals del servidor IMAP
- * ===========================================
+ * API: Obtenir emails via Gmail API
+ * ==================================
+ * Compatible amb Vercel Serverless
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { fetchEmails, countTotal, countUnread, testConnection } from '@/lib/imap';
+import {
+  fetchEmails,
+  countTotal,
+  countUnread,
+  testConnection,
+  isGmailConfigured,
+} from '@/lib/gmail';
 import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -13,21 +20,13 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   const authError = requireAuth(request);
   if (authError) return authError;
+
   const { searchParams } = new URL(request.url);
   const action = searchParams.get('action') || 'list';
-  const folder = searchParams.get('folder') || 'INBOX';
   const limitRaw = parseInt(searchParams.get('limit') || '50');
-  const offsetRaw = parseInt(searchParams.get('offset') || '0');
+  const query = searchParams.get('q') || '';
   const onlyUnread = searchParams.get('unread') === 'true';
   const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(limitRaw, 1), 100) : 50;
-  const offset = Number.isFinite(offsetRaw) ? Math.max(offsetRaw, 0) : 0;
-
-  if (limitRaw <= 0 || offsetRaw < 0 || Number.isNaN(limitRaw) || Number.isNaN(offsetRaw)) {
-    return NextResponse.json(
-      { ok: false, error: 'Paràmetres de paginació invàlids' },
-      { status: 400 }
-    );
-  }
 
   try {
     // Test connexió
@@ -36,52 +35,69 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(result);
     }
 
+    // Verificar si Gmail està configurat
+    const configured = await isGmailConfigured();
+    if (!configured) {
+      return NextResponse.json({
+        ok: false,
+        error: 'Gmail no configurat. Cal autoritzar el compte de Gmail.',
+        needsAuth: true,
+      }, { status: 401 });
+    }
+
     // Comptar no llegits
     if (action === 'count') {
-      const count = await countUnread(folder);
+      const count = await countUnread();
       return NextResponse.json({ unread: count });
     }
 
     // Obtenir emails
+    const labelIds = onlyUnread ? ['INBOX', 'UNREAD'] : ['INBOX'];
     const emails = await fetchEmails({
-      folder,
-      limit,
-      offset,
-      onlyUnread,
+      maxResults: limit,
+      query,
+      labelIds,
     });
 
     const [unreadCount, totalCount] = await Promise.all([
-      countUnread(folder),
-      countTotal(folder),
+      countUnread(),
+      countTotal(),
     ]);
+
+    // Convertir format Gmail a format esperat pel frontend
+    const formattedEmails = emails.map(email => ({
+      id: email.id,
+      uid: email.id, // Gmail usa IDs de string, no UIDs numèrics
+      messageId: email.id,
+      from: email.from,
+      to: email.to,
+      subject: email.subject,
+      date: email.date,
+      bodyText: email.bodyText,
+      bodyHtml: email.bodyHtml,
+      isRead: email.isRead,
+      hasAttachments: email.hasAttachments,
+      attachments: [],
+    }));
 
     return NextResponse.json({
       ok: true,
-      emails,
+      emails: formattedEmails,
       total: totalCount,
       unread: unreadCount,
-      folder,
+      folder: 'INBOX',
     });
 
   } catch (error) {
-    log.error('Error IMAP:', error);
-    
-    // Si és error de connexió, donar missatge clar
-    const errorMessage = error instanceof Error ? error.message : 'Error desconegut';
-    
-    if (errorMessage.includes('ENOTFOUND') || errorMessage.includes('ECONNREFUSED')) {
-      return NextResponse.json({
-        ok: false,
-        error: 'No es pot connectar al servidor de correu. Verifica la configuració IMAP.',
-        details: errorMessage,
-      }, { status: 503 });
-    }
+    log.error('Error Gmail:', error as Error);
 
-    if (errorMessage.includes('AUTHENTICATIONFAILED') || errorMessage.includes('Invalid credentials')) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconegut';
+
+    if (errorMessage.includes('No Gmail access token') || errorMessage.includes('No Gmail autoritzat')) {
       return NextResponse.json({
         ok: false,
-        error: 'Credencials incorrectes. Verifica usuari i contrasenya IMAP.',
-        details: errorMessage,
+        error: 'Cal autoritzar el compte de Gmail.',
+        needsAuth: true,
       }, { status: 401 });
     }
 
