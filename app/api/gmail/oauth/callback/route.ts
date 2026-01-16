@@ -118,7 +118,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.redirect(new URL(successUrl, req.url));
   } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     log.error('Gmail OAuth callback error:', err as Error);
-    return NextResponse.redirect(new URL('/admin/inbox/settings?gmail=error', req.url));
+    return NextResponse.redirect(new URL(`/admin/inbox/settings?gmail=error&reason=${encodeURIComponent(errorMessage)}`, req.url));
   }
 }

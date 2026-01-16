@@ -65,6 +65,11 @@ export default function InboxSettingsClient({
       {gmailStatus === 'error' && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4">
           <p className="text-red-700 font-medium">❌ Error connectant Gmail. Torna-ho a provar.</p>
+          {searchParams.get('reason') && (
+            <p className="text-red-600 text-sm mt-2">
+              Detall: {decodeURIComponent(searchParams.get('reason') || '')}
+            </p>
+          )}
         </div>
       )}
 
