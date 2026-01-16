@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAuth } from '@/lib/admin-auth';
-import { AdminLog } from '@/lib/admin-log';
+import { requireAuth } from '@/lib/auth';
+import { log } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
-  await requireAuth(req);
+  const authError = requireAuth(req);
+  if (authError) return authError;
 
   try {
     const body = await req.json();
@@ -68,16 +69,14 @@ export async function POST(req: NextRequest) {
     });
 
     // Log the action
-    await AdminLog({
-      action: 'CREATE',
-      section: 'post-event-reports',
-      details: `Created post-event report for booking ${bookingId}`,
-      metadata: { reportId: report.id, status: report.status },
+    log.info(`Created post-event report for booking ${bookingId}`, {
+      reportId: report.id,
+      status: report.status,
     });
 
     return NextResponse.json({ ok: true, report });
   } catch (error) {
-    console.error('Error creating post-event report:', error);
+    log.error('Error creating post-event report:', error as Error);
     return NextResponse.json(
       { ok: false, error: 'Error creant informe' },
       { status: 500 }

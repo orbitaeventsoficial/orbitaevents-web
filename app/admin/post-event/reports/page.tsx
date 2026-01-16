@@ -99,9 +99,9 @@ export default async function ReportsPage() {
                     <p className="text-sm text-slate-500">
                       {new Date(report.booking.eventDate).toLocaleDateString('ca-ES')} · {packName} · {report.booking.eventLocation}
                     </p>
-                    {report.eventSummary && (
+                    {report.lessonsLearned && (
                       <p className="text-sm text-slate-600 mt-2 line-clamp-2">
-                        {report.eventSummary}
+                        {report.lessonsLearned}
                       </p>
                     )}
                   </div>

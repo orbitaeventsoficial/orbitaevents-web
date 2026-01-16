@@ -69,7 +69,7 @@ export default async function SurveysPage() {
         <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-4">
           <div className="text-sm text-orange-600 font-medium">Amb Testimoni</div>
           <div className="text-3xl font-bold text-orange-700 mt-1">
-            {surveys.filter(s => s.publicTestimonial).length}
+            {surveys.filter(s => s.testimonialPermission !== 'NO').length}
           </div>
         </div>
       </div>
@@ -109,9 +109,9 @@ export default async function SurveysPage() {
                     <p className="text-sm text-slate-500 mb-2">
                       {new Date(survey.booking.eventDate).toLocaleDateString('ca-ES')} · {packName}
                     </p>
-                    {survey.publicTestimonial && (
+                    {survey.bestMoment && (
                       <p className="text-sm text-slate-600 mt-2 line-clamp-2 italic">
-                        &quot;{survey.publicTestimonial}&quot;
+                        &quot;{survey.bestMoment}&quot;
                       </p>
                     )}
                   </div>
