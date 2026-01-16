@@ -10,7 +10,7 @@ import { log } from '@/lib/logger';
 // Configuració IMAP - DonDominio
 const IMAP_ALLOW_INSECURE = process.env.IMAP_ALLOW_INSECURE === 'true';
 const IMAP_CONFIG = {
-  host: process.env.IMAP_HOST || 'mail.dondominio.com',
+  host: process.env.IMAP_HOST || '31.214.176.11',
   port: parseInt(process.env.IMAP_PORT || '993'),
   secure: true,
   auth: {
