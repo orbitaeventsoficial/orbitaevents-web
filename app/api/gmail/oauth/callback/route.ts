@@ -101,7 +101,8 @@ export async function GET(req: NextRequest) {
     });
 
     if (!profileRes.ok) {
-      throw new Error('Failed to get Gmail profile');
+      const profileError = await profileRes.text();
+      throw new Error(`Failed to get Gmail profile: ${profileRes.status} - ${profileError}`);
     }
 
     const profile = await profileRes.json();
