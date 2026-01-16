@@ -137,10 +137,10 @@ export default function InboxClient({
     try {
       // Filtre per emails d'orbitaevents (to: o from:)
       const query = onlyOrbita ? 'to:orbitaevents.com OR from:orbitaevents.com' : '';
-      const params = new URLSearchParams({ limit: '50' });
+      const params = new URLSearchParams({ limit: '50', _t: String(Date.now()) });
       if (query) params.set('q', query);
 
-      const res = await fetch(`/api/admin/inbox/messages?${params}`);
+      const res = await fetch(`/api/admin/inbox/messages?${params}`, { cache: 'no-store' });
       const data = await res.json();
       const message = data?.error || 'Error carregant emails';
 
