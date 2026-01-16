@@ -97,8 +97,10 @@ export default function ComposeForm({ leads, packs }: Props) {
     setError('');
     
     if (mode === 'quote') {
-      if (!selectedLeadId || !selectedPackId || !price) {
-        setError('Selecciona un lead, pack i preu');
+      // Either need a lead selected OR a manual email
+      const hasRecipient = selectedLeadId || to.trim();
+      if (!hasRecipient || !selectedPackId || !price) {
+        setError('Selecciona un lead o escriu un email, pack i preu');
         return;
       }
       
@@ -108,7 +110,8 @@ export default function ComposeForm({ leads, packs }: Props) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            leadId: selectedLeadId,
+            leadId: selectedLeadId || undefined,
+            to: selectedLeadId ? undefined : to.trim(), // Send manual email if no lead
             packId: selectedPackId,
             price: parseFloat(price),
             extras,
@@ -248,6 +251,22 @@ export default function ComposeForm({ leads, packs }: Props) {
           {mode === 'quote' ? (
             // Quote form
             <>
+              {/* Manual email when no lead selected */}
+              {!selectedLeadId && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Email del client *
+                  </label>
+                  <input
+                    type="email"
+                    value={to}
+                    onChange={(e) => setTo(e.target.value)}
+                    className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    placeholder="email@exemple.com"
+                  />
+                </div>
+              )}
+
               {/* Pack selector */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">

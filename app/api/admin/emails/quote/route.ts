@@ -101,6 +101,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       leadId,
+      to, // Manual email when no lead
       packId,
       price,
       extras,
@@ -109,16 +110,26 @@ export async function POST(req: NextRequest) {
       locale,
     } = body || {};
 
-    if (!leadId || !packId || typeof price !== 'number') {
+    // Need either leadId or manual email
+    if ((!leadId && !to) || !packId || typeof price !== 'number') {
       return NextResponse.json(
-        { error: 'Falten camps obligatoris: leadId, packId, price' },
+        { error: 'Falten camps obligatoris: (leadId o email), packId, price' },
         { status: 400 }
       );
     }
 
-    const lead = await prisma.lead.findUnique({ where: { id: leadId } });
-    if (!lead) {
+    // Get lead if provided, otherwise create minimal data for quote
+    let lead = leadId ? await prisma.lead.findUnique({ where: { id: leadId } }) : null;
+    let recipientEmail = to;
+    let recipientName = 'Client';
+
+    if (leadId && !lead) {
       return NextResponse.json({ error: 'Lead no trobat' }, { status: 404 });
+    }
+
+    if (lead) {
+      recipientEmail = lead.email;
+      recipientName = lead.name;
     }
 
     const packDataBase = resolvePack(String(packId).toLowerCase());
@@ -129,51 +140,72 @@ export async function POST(req: NextRequest) {
 
     const quoteExtras = await normalizeExtras(extras);
 
-    const quoteData = createQuoteFromLead(lead, packData, quoteExtras);
+    // Create quote data - use lead if available, otherwise minimal data
+    const quoteData = lead
+      ? createQuoteFromLead(lead, packData, quoteExtras)
+      : {
+          clientName: recipientName,
+          clientEmail: recipientEmail,
+          eventType: 'Event',
+          eventDate: new Date(),
+          eventLocation: '',
+          guestCount: 0,
+          pack: packData,
+          extras: quoteExtras || [],
+          subtotal: price,
+          iva: price * 0.21,
+          total: price * 1.21,
+          quoteNumber: '',
+          notes: undefined as string | undefined,
+          validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        };
 
     quoteData.quoteNumber = generateQuoteNumber();
-    quoteData.notes = mergeNotes([customMessage, notes, lead.message || undefined]);
+    quoteData.notes = mergeNotes([customMessage, notes, lead?.message || undefined]);
 
-    await prisma.lead.update({
-      where: { id: leadId },
-      data: { status: 'QUOTE_SENT', updatedAt: new Date() },
-    });
+    // Only update lead records if we have a lead
+    if (lead && leadId) {
+      await prisma.lead.update({
+        where: { id: leadId },
+        data: { status: 'QUOTE_SENT', updatedAt: new Date() },
+      });
 
-    await prisma.leadNote.create({
-      data: {
-        leadId,
-        content: `📄 Pressupost enviat: ${quoteData.quoteNumber}\n💰 Total: ${quoteData.total.toFixed(2)}€\n📦 Pack: ${packData.name}`,
-      },
-    });
+      await prisma.leadNote.create({
+        data: {
+          leadId,
+          content: `📄 Pressupost enviat: ${quoteData.quoteNumber}\n💰 Total: ${quoteData.total.toFixed(2)}€\n📦 Pack: ${packData.name}`,
+        },
+      });
 
-    const documentTitle = `Pressupost ${quoteData.quoteNumber}`;
-    await prisma.leadDocument.create({
-      data: {
-        leadId,
-        type: 'QUOTE',
-        source: 'MANUAL',
-        title: documentTitle,
-        fileUrl: 'email',
-        mimeType: 'text/html',
-        createdBy: 'Admin',
-      },
-    });
+      const documentTitle = `Pressupost ${quoteData.quoteNumber}`;
+      await prisma.leadDocument.create({
+        data: {
+          leadId,
+          type: 'QUOTE',
+          source: 'MANUAL',
+          title: documentTitle,
+          fileUrl: 'email',
+          mimeType: 'text/html',
+          createdBy: 'Admin',
+        },
+      });
 
-    await prisma.leadActivity.create({
-      data: {
-        leadId,
-        type: 'EMAIL',
-        title: 'Pressupost enviat',
-        description: documentTitle,
-        metadata: { quoteNumber: quoteData.quoteNumber },
-        createdBy: 'Admin',
-      },
-    });
+      await prisma.leadActivity.create({
+        data: {
+          leadId,
+          type: 'EMAIL',
+          title: 'Pressupost enviat',
+          description: documentTitle,
+          metadata: { quoteNumber: quoteData.quoteNumber },
+          createdBy: 'Admin',
+        },
+      });
+    }
 
     const html = generateQuoteHTML(quoteData);
 
     await sendEmail({
-      to: lead.email,
+      to: recipientEmail,
       subject: `Pressupost ${quoteData.quoteNumber} - Òrbita Events`,
       html,
       replyTo: (process.env.CONTACT_TO || '').trim() || undefined,
