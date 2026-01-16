@@ -84,6 +84,7 @@ export default function InboxClient({
   const [selectedEmail, setSelectedEmail] = useState<UnifiedEmail | null>(null);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [onlyOrbita, setOnlyOrbita] = useState(true); // Default: només emails d'orbitaevents
   const [showCompose, setShowCompose] = useState(false);
   const [replyTo, setReplyTo] = useState<UnifiedEmail | null>(null);
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -127,14 +128,19 @@ export default function InboxClient({
     if (imapConfigured) {
       loadImapEmails();
     }
-  }, [imapConfigured]);
+  }, [imapConfigured, onlyOrbita]);
 
   async function loadImapEmails() {
     setLoadingImap(true);
     setImapError(null);
 
     try {
-      const res = await fetch('/api/admin/inbox/messages?limit=50');
+      // Filtre per emails d'orbitaevents (to: o from:)
+      const query = onlyOrbita ? 'to:orbitaevents.com OR from:orbitaevents.com' : '';
+      const params = new URLSearchParams({ limit: '50' });
+      if (query) params.set('q', query);
+
+      const res = await fetch(`/api/admin/inbox/messages?${params}`);
       const data = await res.json();
       const message = data?.error || 'Error carregant emails';
 
@@ -260,6 +266,24 @@ export default function InboxClient({
             🔵 No llegits ({totalUnread})
           </button>
         </nav>
+
+        {/* Filtre Orbita */}
+        {imapConfigured && (
+          <div className="mt-4 p-3 bg-slate-50 border border-stone-200 rounded-lg">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={onlyOrbita}
+                onChange={(e) => setOnlyOrbita(e.target.checked)}
+                className="w-4 h-4 text-amber-500 rounded focus:ring-amber-500"
+              />
+              <span className="text-sm text-slate-700">Només Òrbita</span>
+            </label>
+            <p className="text-xs text-slate-500 mt-1">
+              {onlyOrbita ? 'Emails de orbitaevents.com' : 'Tots els emails'}
+            </p>
+          </div>
+        )}
 
         {/* Refresh button */}
         {imapConfigured && (
