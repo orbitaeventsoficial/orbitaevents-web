@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Obtenir perfil de Gmail per verificar connexió
-    const profileRes = await fetch('https://gmail.googleapis.com/v1/users/me/profile', {
+    const profileRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/profile', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 

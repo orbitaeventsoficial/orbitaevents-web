@@ -8,7 +8,7 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 
-const GMAIL_API_BASE = 'https://gmail.googleapis.com/v1/users/me';
+const GMAIL_API_BASE = 'https://gmail.googleapis.com/gmail/v1/users/me';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
 export interface GmailMessage {
