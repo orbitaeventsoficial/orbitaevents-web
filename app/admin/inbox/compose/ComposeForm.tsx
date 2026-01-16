@@ -383,7 +383,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                   type="email"
                   value={to}
                   onChange={(e) => setTo(e.target.value)}
-                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white text-slate-700"
                   placeholder="email@exemple.com"
                 />
               </div>
@@ -394,7 +394,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                   type="text"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white text-slate-700"
                   placeholder="Assumpte de l'email"
                 />
               </div>
@@ -405,7 +405,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   rows={10}
-                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white text-slate-700"
                   placeholder="Escriu el teu missatge..."
                 />
               </div>

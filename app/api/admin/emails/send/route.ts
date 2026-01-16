@@ -67,8 +67,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     log.error('Error enviant email admin:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Error desconegut';
     return NextResponse.json(
-      { error: 'Error enviant email' },
+      { error: `Error enviant email: ${errorMessage}` },
       { status: 500 }
     );
   }
