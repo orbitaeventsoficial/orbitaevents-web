@@ -374,8 +374,9 @@ export default function Footer() {
 
         {/* ════════════════════════════════════════════════════════════════ */}
         {/* BOTTOM BAR (Legal & Copyright)                                   */}
+        {/* Padding extra per evitar que el BottomNav mòbil tapi els links   */}
         {/* ════════════════════════════════════════════════════════════════ */}
-        <div className="py-6 border-t border-white/10">
+        <div className="py-6 pb-24 lg:pb-6 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Copyright */}
             {/* HYDRATION FIX: Fixed year to avoid server/client mismatch */}
