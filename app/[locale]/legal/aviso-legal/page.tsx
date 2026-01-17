@@ -16,5 +16,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default function AvisoLegalPage() {
+  // Server Component wrapper for client-side legal notice page
   return <AvisoLegalClient />;
 }

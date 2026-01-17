@@ -16,5 +16,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default function TerminosPage() {
+  // Server Component wrapper for client-side terms page
   return <TerminosClient />;
 }
