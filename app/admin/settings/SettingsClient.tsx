@@ -22,10 +22,28 @@ const TYPE_LABELS: Record<Setting['type'], string> = {
   JSON: 'JSON',
 };
 
+// Keys que contenen dades sensibles que s'han d'amagar
+const SENSITIVE_KEYS = ['refreshToken', 'accessToken', 'secret', 'password', 'apiKey'];
+
+function isSensitiveKey(key: string): boolean {
+  return SENSITIVE_KEYS.some(sensitive =>
+    key.toLowerCase().includes(sensitive.toLowerCase())
+  );
+}
+
 function formatDisplay(setting: Setting): string {
+  // Amagar valors sensibles
+  if (isSensitiveKey(setting.key) && setting.value) {
+    return '••••••••••••••••';
+  }
+
   if (setting.type === 'NUMBER') {
     const num = Number(setting.value);
     if (Number.isNaN(num)) return setting.value;
+    // No aplicar format de milers per a anys (valors entre 1900 i 2100)
+    if (num >= 1900 && num <= 2100) {
+      return String(num);
+    }
     return num.toLocaleString('ca-ES');
   }
   if (setting.type === 'BOOLEAN') {
