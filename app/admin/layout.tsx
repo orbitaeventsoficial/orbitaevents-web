@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -71,13 +71,29 @@ function getCookieValue(name: string): string | null {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [newLeadsCount, setNewLeadsCount] = useState(0);
   const pathname = usePathname();
+
+  // Cargar conteo de leads nuevos
+  const fetchNewLeadsCount = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/leads-new?countOnly=true', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        setNewLeadsCount(data.count || 0);
+      }
+    } catch {
+      // Silently fail
+    }
+  }, []);
 
   useEffect(() => {
     setMounted(true);
     // Tancar sidebar al canviar de pàgina
     setSidebarOpen(false);
-  }, [pathname]);
+    // Cargar conteo de leads nuevos
+    fetchNewLeadsCount();
+  }, [pathname, fetchNewLeadsCount]);
 
   useEffect(() => {
     document.documentElement.classList.add('admin-mode');
@@ -144,7 +160,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     {
       title: 'CRM',
       items: [
-        { icon: '👥', label: 'Leads', href: '/admin/leads', badge: 'NEW', badgeColor: 'orange' as const },
+        { icon: '👥', label: 'Leads', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
         { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
         { icon: '👤', label: 'Clients', href: '/admin/contactes' },
         { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
@@ -170,7 +186,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     {
       title: 'Automatització',
       items: [
-        { icon: '📬', label: 'Inbox', href: '/admin/inbox', badge: 'NEW', badgeColor: 'blue' as const },
+        { icon: '📬', label: 'Inbox', href: '/admin/inbox' },
         { icon: '📧', label: 'Emails', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
         { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
         { icon: '⭐', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
@@ -180,10 +196,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: 'Configuració',
       items: [
         { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
-        { icon: '🎛️', label: 'Features', href: '/admin/features', badge: 'NEW', badgeColor: 'blue' as const },
-        { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage', badge: 'NEW', badgeColor: 'blue' as const },
-        { icon: '📊', label: 'Estadístiques', href: '/admin/stats', badge: 'NEW', badgeColor: 'blue' as const },
-        { icon: '🎨', label: 'Tema', href: '/admin/theme', badge: 'NEW', badgeColor: 'blue' as const },
+        { icon: '🎛️', label: 'Features', href: '/admin/features' },
+        { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
+        { icon: '📊', label: 'Estadístiques', href: '/admin/stats' },
+        { icon: '🎨', label: 'Tema', href: '/admin/theme' },
         { icon: '🖼️', label: 'Portfolio', href: '/admin/portfolio' },
         { icon: '🌐', label: 'Traduccions', href: '/admin/translations' },
         { icon: '📝', label: 'Blog', href: '/admin/blog' },

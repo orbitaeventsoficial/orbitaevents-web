@@ -197,23 +197,23 @@ export default function AdminContactesPage() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-yellow-400 bg-clip-text text-transparent">
               Gestió de Contactes
             </h1>
-            <p className="text-gray-300 mt-1">CRM - Afegeix contactes i inicia processos</p>
+            <p className="text-slate-500 mt-1">CRM - Afegeix contactes i inicia processos</p>
           </div>
 
           {/* Stats */}
           {stats && (
             <div className="flex gap-4 flex-wrap">
-              <div className="bg-stone-50 border border-zinc-800 rounded-xl px-4 py-3 text-center">
+              <div className="bg-white border border-stone-200 rounded-xl px-4 py-3 text-center">
                 <p className="text-2xl font-bold text-slate-700">{stats.total}</p>
-                <p className="text-xs text-gray-300">Total</p>
+                <p className="text-xs text-slate-500">Total</p>
               </div>
-              <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-amber-400">{stats.vip}</p>
-                <p className="text-xs text-amber-500/70">VIP</p>
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-amber-600">{stats.vip}</p>
+                <p className="text-xs text-amber-600">VIP</p>
               </div>
-              <div className="bg-green-500/10 border border-green-500/30 rounded-xl px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-green-400">{stats.withEvents}</p>
-                <p className="text-xs text-green-500/70">Amb events</p>
+              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-green-600">{stats.withEvents}</p>
+                <p className="text-xs text-green-600">Amb events</p>
               </div>
             </div>
           )}
@@ -262,13 +262,13 @@ export default function AdminContactesPage() {
         {/* Empty */}
         {!loading && filteredCustomers.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-gray-300 text-lg">No hi ha contactes</p>
+            <p className="text-slate-500 text-lg">No hi ha contactes</p>
           </div>
         )}
 
         {/* Customers List */}
         {!loading && filteredCustomers.length > 0 && (
-          <div className="bg-stone-100 border border-stone-200 rounded-2xl overflow-hidden">
+          <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-stone-200">
@@ -281,17 +281,17 @@ export default function AdminContactesPage() {
               </thead>
               <tbody>
                 {filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className="border-b border-stone-200 hover:bg-stone-100">
+                  <tr key={customer.id} className="border-b border-stone-200 hover:bg-stone-50">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-400 font-bold">
+                        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold">
                           {customer.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
                           <p className="text-slate-700 font-medium flex items-center gap-2">
                             {customer.name}
                             {customer.is_vip && (
-                              <span className="px-2 py-0.5 bg-amber-400/20 text-amber-400 text-xs rounded-full">VIP</span>
+                              <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full font-medium">VIP</span>
                             )}
                           </p>
                           {customer.city && <p className="text-slate-400 text-sm">{customer.city}</p>}
@@ -320,10 +320,10 @@ export default function AdminContactesPage() {
                     </td>
                     <td className="p-4 hidden lg:table-cell">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        customer.source === 'manual' ? 'bg-purple-500/20 text-purple-400' :
-                        customer.source === 'web' ? 'bg-green-500/20 text-green-400' :
-                        customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-400' :
-                        'bg-stone-100 text-slate-500'
+                        customer.source === 'manual' ? 'bg-purple-100 text-purple-700' :
+                        customer.source === 'web' ? 'bg-green-100 text-green-700' :
+                        customer.source === 'testimonial_form' ? 'bg-amber-100 text-amber-700' :
+                        'bg-stone-100 text-slate-600'
                       }`}>
                         {customer.source || 'desconegut'}
                       </span>
@@ -338,7 +338,7 @@ export default function AdminContactesPage() {
                             setSelectedCustomer(customer);
                             setShowActionModal(true);
                           }}
-                          className="p-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-all"
+                          className="p-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-all"
                           title="Iniciar procés"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -347,7 +347,7 @@ export default function AdminContactesPage() {
                           </svg>
                         </button>
                         <button
-                          className="p-2 bg-stone-100 text-slate-500 rounded-lg hover:bg-stone-50/20 transition-all"
+                          className="p-2 bg-stone-100 text-slate-600 rounded-lg hover:bg-stone-200 transition-all"
                           title="Editar"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -370,7 +370,7 @@ export default function AdminContactesPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-stone-100/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
               onClick={() => setShowAddModal(false)}
             >
               <motion.div
@@ -478,7 +478,7 @@ export default function AdminContactesPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-stone-100/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
               onClick={() => setShowActionModal(false)}
             >
               <motion.div

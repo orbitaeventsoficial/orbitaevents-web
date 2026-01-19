@@ -65,6 +65,14 @@ export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
+
+    // Si només vol el comptador de leads nous
+    const countOnly = searchParams.get('countOnly') === 'true';
+    if (countOnly) {
+      const count = await prisma.lead.count({ where: { status: 'NEW' } });
+      return NextResponse.json({ ok: true, count });
+    }
+
     const statusParam = searchParams.get('status');
     const eventTypeParam = searchParams.get('eventType');
     const priorityParam = searchParams.get('priority');

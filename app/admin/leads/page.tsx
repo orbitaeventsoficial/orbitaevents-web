@@ -15,7 +15,7 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }>
   QUOTE_SENT: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Pressupost enviat' },
   NEGOTIATING: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Negociació' },
   WON: { bg: 'bg-green-100', text: 'text-green-700', label: 'Guanyat!' },
-  LOST: { bg: 'bg-gray-100', text: 'text-gray-300', label: 'Perdut' },
+  LOST: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Perdut' },
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -94,7 +94,7 @@ export default async function LeadsPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Leads</p>
           <p className="mt-2 text-3xl font-bold text-slate-700">{stats.total}</p>
         </div>
@@ -113,7 +113,7 @@ export default async function LeadsPage() {
       </section>
 
       {/* Leads Table */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+      <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-stone-200">

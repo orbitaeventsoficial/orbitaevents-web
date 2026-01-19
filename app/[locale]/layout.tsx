@@ -531,6 +531,20 @@ export default async function LocaleLayout({
           }}
           aria-hidden="true"
         />
+        {/* Failsafe: Si JS falla, amagar overlay després de 5s */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              setTimeout(function() {
+                var o = document.getElementById('intro-overlay');
+                if (o && o.style.display !== 'none') {
+                  o.style.opacity = '0';
+                  setTimeout(function() { o.style.display = 'none'; }, 400);
+                }
+              }, 5000);
+            `,
+          }}
+        />
         {/* Noscript: Si JS desactivat, amagar overlay i mostrar contingut */}
         <noscript>
           <style>{`

@@ -224,7 +224,8 @@
       "Bash(SKIP_ASSET_SCRIPTS=1 npm run build:*)",
       "Bash(npx eslint:*)",
       "WebSearch",
-      "Bash(nslookup:*)"
+      "Bash(nslookup:*)",
+      "Bash(git merge-base:*)"
     ]
   }
 }
