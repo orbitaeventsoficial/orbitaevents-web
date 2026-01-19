@@ -4122,6 +4122,12 @@
       "title": "Termes i Condicions",
       "lastUpdate": "Última actualització"
     },
+    "terminos": {
+      "metadata": {
+        "title": "Termes i Condicions | Òrbita Events",
+        "description": "Termes i condicions d'ús dels serveis d'Òrbita Events."
+      }
+    },
     "cookies": {
       "title": "Política de Cookies",
       "metadata": {
@@ -4879,6 +4885,10 @@
     }
   },
   "privacyPortal": {
+    "metadata": {
+      "title": "Portal de Privacitat | Òrbita Events",
+      "description": "Gestiona les teves dades personals segons el RGPD. Exerceix els teus drets de forma senzilla i segura."
+    },
     "title": "Portal de Privacitat",
     "subtitle": "Gestiona les teves dades personals d'acord amb el RGPD. Exerceix els teus drets de forma senzilla i segura.",
     "requestTypes": {
