@@ -98,7 +98,7 @@ export default async function BookingsPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/bookings/new"
-            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             + Nova Reserva
           </Link>
@@ -107,7 +107,7 @@ export default async function BookingsPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total</p>
           <p className="mt-2 text-3xl font-bold text-slate-700">{bookings.length}</p>
           <p className="text-xs text-slate-400">{formatCurrency(totalRevenue)}</p>
@@ -150,7 +150,7 @@ export default async function BookingsPage() {
       </div>
 
       {/* Bookings Table */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+      <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-stone-200">

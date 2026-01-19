@@ -86,7 +86,7 @@ export default async function LeadsPage() {
         </div>
         <Link
           href="/admin"
-          className="inline-flex items-center rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="inline-flex items-center rounded-md border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
           ← Tornar al panell
         </Link>

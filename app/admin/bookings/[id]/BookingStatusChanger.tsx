@@ -86,7 +86,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
                 px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all
                 ${isActive
                   ? `${conf.bg} ${conf.text} ${conf.border} cursor-default`
-                  : 'bg-stone-50 text-slate-600 border-stone-200 hover:border-stone-200 hover:bg-slate-50'
+                  : 'bg-white text-slate-600 border-stone-200 hover:border-stone-200 hover:bg-slate-50'
                 }
                 ${isLoading ? 'opacity-50 cursor-wait' : ''}
                 disabled:cursor-not-allowed
@@ -109,7 +109,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
       {/* Confirmation Modal for COMPLETED */}
       {showConfirmComplete && (
         <div className="fixed inset-0 bg-stone-100/70 flex items-center justify-center z-50">
-          <div className="bg-stone-50 rounded-xl p-6 max-w-md mx-4 shadow-xl">
+          <div className="bg-white rounded-xl p-6 max-w-md mx-4 shadow-xl">
             <h3 className="text-lg font-semibold text-slate-700 mb-2">
               Marcar com a Completat?
             </h3>

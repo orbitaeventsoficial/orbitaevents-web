@@ -74,7 +74,7 @@ export default async function InboxPage() {
   return (
     <div className="h-[calc(100vh-80px)] flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-stone-200 bg-stone-50">
+      <header className="flex items-center justify-between px-6 py-4 border-b border-stone-200 bg-white">
         <div>
           <h1 className="text-xl font-semibold text-slate-700">📬 Inbox</h1>
           <p className="text-sm text-slate-500">

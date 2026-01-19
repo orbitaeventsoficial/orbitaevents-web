@@ -99,7 +99,7 @@ export default async function SettingsPage() {
         </p>
       </div>
       {Object.keys(settings).length === 0 ? (
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-12 text-center">
+        <div className="rounded-xl border border-stone-200 bg-white p-12 text-center">
           <span className="text-4xl">⚙️</span>
           <p className="mt-4 text-slate-600">No hi ha configuracions</p>
           <p className="text-sm text-slate-400">Executa el seed per carregar dades inicials</p>
@@ -112,7 +112,7 @@ export default async function SettingsPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           href="/admin/packs"
-          className="rounded-xl border border-stone-200 bg-stone-50 p-6 hover:border-stone-200 hover:shadow-md transition-all"
+          className="rounded-xl border border-stone-200 bg-white p-6 hover:border-stone-200 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">📦</div>
           <h3 className="font-semibold text-slate-700">Gestionar Packs</h3>
@@ -121,7 +121,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/text-manager"
-          className="rounded-xl border border-stone-200 bg-stone-50 p-6 hover:border-stone-200 hover:shadow-md transition-all"
+          className="rounded-xl border border-stone-200 bg-white p-6 hover:border-stone-200 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">🌐</div>
           <h3 className="font-semibold text-slate-700">Traduccions</h3>
@@ -130,7 +130,7 @@ export default async function SettingsPage() {
 
         <Link
           href="/admin/faqs"
-          className="rounded-xl border border-stone-200 bg-stone-50 p-6 hover:border-stone-200 hover:shadow-md transition-all"
+          className="rounded-xl border border-stone-200 bg-white p-6 hover:border-stone-200 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">❓</div>
           <h3 className="font-semibold text-slate-700">FAQs</h3>

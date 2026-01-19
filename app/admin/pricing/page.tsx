@@ -218,7 +218,7 @@ export default function PricingAdminPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="bg-stone-50 border-b border-stone-200 sticky top-0 z-40">
+      <div className="bg-white border-b border-stone-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -253,7 +253,7 @@ export default function PricingAdminPage() {
                   px-5 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2
                   ${activeTab === tab.key
                     ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
-                    : 'bg-stone-50 text-slate-600 hover:bg-slate-50 border border-stone-200'
+                    : 'bg-white text-slate-600 hover:bg-slate-50 border border-stone-200'
                   }
                 `}
               >
@@ -262,7 +262,7 @@ export default function PricingAdminPage() {
                 {tab.badge && (
                   <span className={`
                     text-xs px-2 py-0.5 rounded-full
-                    ${activeTab === tab.key ? 'bg-stone-50/20' : 'bg-stone-100'}
+                    ${activeTab === tab.key ? 'bg-white/20' : 'bg-stone-100'}
                   `}>
                     {tab.badge}
                   </span>
@@ -336,7 +336,7 @@ export default function PricingAdminPage() {
             {/* Top Performers */}
             <div className="grid md:grid-cols-2 gap-6">
               {/* Top Extras */}
-              <div className="bg-stone-50 rounded-2xl p-6 shadow-sm border border-stone-200">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
                 <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
                   <span className="text-2xl">🏆</span>
                   Extras Més Venuts
@@ -366,7 +366,7 @@ export default function PricingAdminPage() {
               </div>
 
               {/* Top Packs */}
-              <div className="bg-stone-50 rounded-2xl p-6 shadow-sm border border-stone-200">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
                 <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
                   <span className="text-2xl">🎯</span>
                   Packs Més Populars
@@ -403,7 +403,7 @@ export default function PricingAdminPage() {
                 Com funciona aquesta pàgina
               </h3>
               <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div className="bg-stone-50 rounded-xl p-4">
+                <div className="bg-white rounded-xl p-4">
                   <div className="flex items-center gap-2 text-green-700 font-semibold mb-2">
                     <span className="w-3 h-3 bg-green-500 rounded-full"></span>
                     Extras (EDITABLES)
@@ -412,7 +412,7 @@ export default function PricingAdminPage() {
                     Pots canviar els preus dels extras directament. Els canvis s'apliquen a noves reserves.
                   </p>
                 </div>
-                <div className="bg-stone-50 rounded-xl p-4">
+                <div className="bg-white rounded-xl p-4">
                   <div className="flex items-center gap-2 text-slate-700 font-semibold mb-2">
                     <span className="w-3 h-3 bg-slate-400 rounded-full"></span>
                     Packs (NOMÉS LECTURA)
@@ -421,7 +421,7 @@ export default function PricingAdminPage() {
                     Els packs es gestionen a /admin/packs. Aquí només veus estadístiques.
                   </p>
                 </div>
-                <div className="bg-stone-50 rounded-xl p-4">
+                <div className="bg-white rounded-xl p-4">
                   <div className="flex items-center gap-2 text-blue-700 font-semibold mb-2">
                     <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
                     Inventari (ESTADÍSTIQUES)
@@ -451,7 +451,7 @@ export default function PricingAdminPage() {
                 <div
                   key={extra.id}
                   className={`
-                    bg-stone-50 rounded-2xl border-2 overflow-hidden transition-all
+                    bg-white rounded-2xl border-2 overflow-hidden transition-all
                     ${editingExtra === extra.id ? 'border-orange-500 shadow-lg' : 'border-stone-200 hover:border-stone-200'}
                   `}
                 >
@@ -560,7 +560,7 @@ export default function PricingAdminPage() {
                         {extra.recentSales.map((sale, i) => (
                           <span
                             key={i}
-                            className="px-2 py-1 bg-stone-50 rounded text-xs text-slate-600 whitespace-nowrap border border-stone-200"
+                            className="px-2 py-1 bg-white rounded text-xs text-slate-600 whitespace-nowrap border border-stone-200"
                           >
                             {sale.bookingRef} • {formatDate(sale.date)}
                           </span>
@@ -594,7 +594,7 @@ export default function PricingAdminPage() {
               {packs.map(pack => (
                 <div
                   key={pack.id}
-                  className="bg-stone-50 rounded-2xl border border-stone-200 overflow-hidden"
+                  className="bg-white rounded-2xl border border-stone-200 overflow-hidden"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between">
@@ -719,12 +719,12 @@ export default function PricingAdminPage() {
                 placeholder="Cerca per nom o codi..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="flex-1 px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                className="flex-1 px-4 py-2.5 bg-white border border-stone-200 rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               />
               <select
                 value={categoryFilter}
                 onChange={e => setCategoryFilter(e.target.value)}
-                className="px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:border-orange-500"
+                className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl focus:border-orange-500"
               >
                 <option value="all">Totes les categories</option>
                 {Object.entries(CATEGORY_LABELS).map(([key, { label, icon }]) => (
@@ -744,7 +744,7 @@ export default function PricingAdminPage() {
                 return (
                   <div
                     key={item.id}
-                    className="bg-stone-50 rounded-xl border border-stone-200 p-4 hover:border-stone-200 transition-colors"
+                    className="bg-white rounded-xl border border-stone-200 p-4 hover:border-stone-200 transition-colors"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">

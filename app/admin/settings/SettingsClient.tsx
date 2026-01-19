@@ -145,7 +145,7 @@ export default function SettingsClient({
         return (
           <section
             key={category}
-            className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden"
+            className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden"
           >
             <div className="bg-slate-50 border-b border-stone-200 p-4">
               <div className="flex items-center gap-3">

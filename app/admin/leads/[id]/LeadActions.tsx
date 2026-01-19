@@ -53,7 +53,7 @@ export default function LeadActions({ leadId, currentStatus }: Props) {
   };
 
   return (
-    <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+    <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
       <h3 className="text-sm font-semibold text-slate-700 mb-4">Canviar estat</h3>
 
       {error && (

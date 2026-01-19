@@ -57,7 +57,7 @@ export default async function FAQPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/faq/new"
-            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             + Nova Pregunta
           </Link>
@@ -66,7 +66,7 @@ export default async function FAQPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Preguntes</p>
           <p className="mt-2 text-3xl font-bold text-slate-700">{faqs.length}</p>
         </div>
@@ -105,7 +105,7 @@ export default async function FAQPage() {
             >
               <span>{config.icon}</span>
               {config.label}
-              <span className="text-xs bg-stone-50 px-1.5 py-0.5 rounded-full">
+              <span className="text-xs bg-white px-1.5 py-0.5 rounded-full">
                 {count}
               </span>
             </span>
@@ -123,7 +123,7 @@ export default async function FAQPage() {
         return (
           <section
             key={category}
-            className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden"
+            className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden"
           >
             <div className="bg-slate-50 border-b border-stone-200 p-4">
               <h2 className="font-semibold text-slate-700 flex items-center gap-2">
@@ -187,7 +187,7 @@ export default async function FAQPage() {
       })}
 
       {faqs.length === 0 && (
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-12 text-center">
+        <div className="rounded-xl border border-stone-200 bg-white p-12 text-center">
           <span className="text-4xl">❓</span>
           <p className="mt-4 text-slate-600">No hi ha preguntes freqüents</p>
           <p className="text-sm text-slate-400">Crea la primera pregunta per començar</p>

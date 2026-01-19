@@ -110,7 +110,7 @@ export default async function PostEventPage() {
       {/* Workflow Cards */}
       <section className="grid gap-6 lg:grid-cols-3">
         {/* Step 1: Informe Intern */}
-        <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
           <div className="bg-orange-50 border-b border-orange-100 p-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold">
@@ -150,7 +150,7 @@ export default async function PostEventPage() {
         </div>
 
         {/* Step 2: Enquesta Client */}
-        <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
           <div className="bg-blue-50 border-b border-blue-100 p-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">
@@ -190,7 +190,7 @@ export default async function PostEventPage() {
         </div>
 
         {/* Step 3: Feedback Client */}
-        <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
           <div className="bg-green-50 border-b border-green-100 p-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
@@ -228,7 +228,7 @@ export default async function PostEventPage() {
       </section>
 
       {/* Recent Completed Events */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+      <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
         <div className="bg-slate-50 border-b border-stone-200 p-4">
           <h2 className="font-semibold text-slate-700 flex items-center gap-2">
             📅 Events Completats Sense Informe

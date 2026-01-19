@@ -63,7 +63,7 @@ export default async function ReportsPage() {
 
       {/* Reports List */}
       {reports.length === 0 ? (
-        <div className="bg-stone-50 border border-stone-200 rounded-xl p-12 text-center">
+        <div className="bg-white border border-stone-200 rounded-xl p-12 text-center">
           <div className="text-4xl mb-4">📋</div>
           <p className="text-slate-500 mb-4">No hi ha informes creats encara</p>
           <Link
@@ -80,7 +80,7 @@ export default async function ReportsPage() {
             return (
               <div
                 key={report.id}
-                className="bg-stone-50 border border-stone-200 rounded-xl p-4 hover:bg-stone-100 transition-colors"
+                className="bg-white border border-stone-200 rounded-xl p-4 hover:bg-stone-100 transition-colors"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">

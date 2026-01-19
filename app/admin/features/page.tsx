@@ -95,7 +95,7 @@ export default function FeaturesPage() {
       </div>
 
       {/* Features List */}
-      <div className="bg-stone-50 border border-stone-200 rounded-xl p-6">
+      <div className="bg-white border border-stone-200 rounded-xl p-6">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">Funcionalitats</h2>
         <div className="space-y-3">
           {features.map((feature) => (

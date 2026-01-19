@@ -29,7 +29,7 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }>
   IN_USE: { label: 'En ús', bg: 'bg-blue-100', text: 'text-blue-700' },
   MAINTENANCE: { label: 'Manteniment', bg: 'bg-orange-100', text: 'text-orange-700' },
   BROKEN: { label: 'Avariat', bg: 'bg-red-100', text: 'text-red-700' },
-  RETIRED: { label: 'Retirat', bg: 'bg-gray-100', text: 'text-gray-300' },
+  RETIRED: { label: 'Retirat', bg: 'bg-gray-100', text: 'text-gray-600' },
 };
 
 async function getInventory() {
@@ -85,7 +85,7 @@ export default async function InventoryPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/inventory/new"
-            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             + Nou Element
           </Link>
@@ -94,7 +94,7 @@ export default async function InventoryPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Elements</p>
           <p className="mt-2 text-3xl font-bold text-slate-700">{items.length}</p>
         </div>
@@ -129,7 +129,7 @@ export default async function InventoryPage() {
           return (
             <div
               key={stat.category}
-              className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm"
+              className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm"
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>
@@ -153,7 +153,7 @@ export default async function InventoryPage() {
           color: 'gray',
         };
         return (
-          <section key={category} className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+          <section key={category} className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
             <div className="bg-slate-50 border-b border-stone-200 p-4">
               <h2 className="font-semibold text-slate-700 flex items-center gap-2">
                 <span>{config.icon}</span>
@@ -242,7 +242,7 @@ export default async function InventoryPage() {
       })}
 
       {items.length === 0 && (
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-12 text-center">
+        <div className="rounded-xl border border-stone-200 bg-white p-12 text-center">
           <span className="text-4xl">📦</span>
           <p className="mt-4 text-slate-600">No hi ha elements a l&apos;inventari</p>
           <p className="text-sm text-slate-400">Executa el seed per carregar dades inicials</p>

@@ -166,7 +166,7 @@ export default function ThemePage() {
       </header>
 
       {/* Preset Themes */}
-      <div className="bg-stone-50 border border-stone-200 rounded-xl p-6">
+      <div className="bg-white border border-stone-200 rounded-xl p-6">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">Temes Predefinits</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {Object.entries(PRESET_THEMES).map(([key, theme]) => (
@@ -187,7 +187,7 @@ export default function ThemePage() {
       </div>
 
       {/* Color Editor */}
-      <div className="bg-stone-50 border border-stone-200 rounded-xl p-6">
+      <div className="bg-white border border-stone-200 rounded-xl p-6">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">Colors</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.entries(colors).map(([key, value]) => (
@@ -216,7 +216,7 @@ export default function ThemePage() {
       </div>
 
       {/* Preview */}
-      <div className="bg-stone-50 border border-stone-200 rounded-xl p-6">
+      <div className="bg-white border border-stone-200 rounded-xl p-6">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">Vista Prèvia</h2>
         <div className="space-y-3">
           <div className="flex gap-2">

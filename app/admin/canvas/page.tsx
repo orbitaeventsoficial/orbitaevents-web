@@ -79,7 +79,7 @@ export default function CanvasGeneratorPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form */}
-        <div className="bg-stone-50 rounded-2xl shadow-sm border border-stone-200 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6">
           <h2 className="text-lg font-semibold text-slate-700 mb-6">⚙️ Configuració</h2>
 
           <div className="space-y-5">
@@ -212,7 +212,7 @@ export default function CanvasGeneratorPage() {
         </div>
 
         {/* Preview */}
-        <div className="bg-stone-50 rounded-2xl shadow-sm border border-stone-200 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-slate-700">👁️ Previsualització</h2>
             {selectedPreset && (

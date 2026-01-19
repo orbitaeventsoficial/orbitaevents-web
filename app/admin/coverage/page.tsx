@@ -147,7 +147,7 @@ export default function CoveragePage() {
       </div>
 
       {/* Add Area Form */}
-      <div className="bg-stone-50 border border-stone-200 rounded-xl p-6">
+      <div className="bg-white border border-stone-200 rounded-xl p-6">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">Afegir Ciutat</h2>
         <div className="flex gap-3">
           <input
@@ -179,7 +179,7 @@ export default function CoveragePage() {
       {/* Areas by Province */}
       <div className="space-y-4">
         {provinces.map(province => (
-          <div key={province} className="bg-stone-50 border border-stone-200 rounded-xl p-6">
+          <div key={province} className="bg-white border border-stone-200 rounded-xl p-6">
             <h3 className="font-semibold text-slate-700 mb-3">{province}</h3>
             <div className="space-y-2">
               {areas

@@ -118,7 +118,7 @@ export default async function MensajesPage() {
           <p className="text-xs font-medium text-green-600 uppercase">Rebuts Avui</p>
           <p className="mt-2 text-3xl font-bold text-green-700">{data.todayLeads}</p>
         </div>
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Converses</p>
           <p className="mt-2 text-3xl font-bold text-slate-700">{data.recentLeads.length}</p>
         </div>
@@ -148,7 +148,7 @@ export default async function MensajesPage() {
       </section>
 
       {/* Message Templates */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+      <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
         <div className="bg-slate-50 border-b border-stone-200 p-4">
           <h3 className="font-semibold text-slate-700">📋 Plantilles Ràpides</h3>
         </div>
@@ -181,7 +181,7 @@ export default async function MensajesPage() {
       </section>
 
       {/* Recent Messages */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+      <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
         <div className="bg-slate-50 border-b border-stone-200 p-4">
           <h3 className="font-semibold text-slate-700">📬 Missatges Recents</h3>
         </div>

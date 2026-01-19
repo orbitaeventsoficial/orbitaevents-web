@@ -132,7 +132,7 @@ export default function LeadActionsEnhanced({
   return (
     <div className="space-y-6">
       {/* Canviar Estat */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h3 className="text-sm font-semibold text-slate-700 mb-4">📊 Canviar estat</h3>
 
         {error && (
@@ -173,7 +173,7 @@ export default function LeadActionsEnhanced({
       </section>
 
       {/* Generar Pressupost */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h3 className="text-sm font-semibold text-slate-700 mb-4">📄 Pressupost</h3>
         
         <div className="space-y-4">
@@ -254,7 +254,7 @@ export default function LeadActionsEnhanced({
       </section>
 
       {/* Accions Ràpides */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h3 className="text-sm font-semibold text-slate-700 mb-4">⚡ Accions ràpides</h3>
         
         <div className="space-y-2">

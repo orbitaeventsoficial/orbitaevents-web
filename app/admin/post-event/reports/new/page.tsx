@@ -97,7 +97,7 @@ export default function NewReportPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-stone-50 border border-stone-200 rounded-xl p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white border border-stone-200 rounded-xl p-6 space-y-6">
         {/* Event Summary */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">

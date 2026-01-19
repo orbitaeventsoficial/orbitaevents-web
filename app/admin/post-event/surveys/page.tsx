@@ -76,7 +76,7 @@ export default async function SurveysPage() {
 
       {/* Surveys List */}
       {surveys.length === 0 ? (
-        <div className="bg-stone-50 border border-stone-200 rounded-xl p-12 text-center">
+        <div className="bg-white border border-stone-200 rounded-xl p-12 text-center">
           <div className="text-4xl mb-4">📊</div>
           <p className="text-slate-500">No hi ha enquestes rebudes encara</p>
         </div>
@@ -87,7 +87,7 @@ export default async function SurveysPage() {
             return (
               <div
                 key={survey.id}
-                className="bg-stone-50 border border-stone-200 rounded-xl p-4 hover:bg-stone-100 transition-colors"
+                className="bg-white border border-stone-200 rounded-xl p-4 hover:bg-stone-100 transition-colors"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -97,7 +97,7 @@ export default async function SurveysPage() {
                       </h3>
                       <div className="flex items-center gap-1">
                         {[...Array(5)].map((_, i) => (
-                          <span key={i} className={i < (survey.overallRating || 0) ? 'text-yellow-500' : 'text-gray-300'}>
+                          <span key={i} className={i < (survey.overallRating || 0) ? 'text-yellow-500' : 'text-slate-300'}>
                             ⭐
                           </span>
                         ))}

@@ -144,7 +144,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       )}
 
       {/* Slug Section */}
-      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-slate-700 mb-4">🔗 Slug (URL)</h3>
         <div>
           <label htmlFor="slug" className="block text-sm font-medium text-slate-700 mb-1">
@@ -166,7 +166,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Translations Section - Spanish */}
-      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-slate-700 mb-4">🇪🇸 Traduccions - Espanyol</h3>
         <div className="space-y-4">
           <div>
@@ -229,7 +229,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Translations Section - Catalan */}
-      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-slate-700 mb-4">🏴 Traduccions - Català</h3>
         <div className="space-y-4">
           <div>
@@ -292,7 +292,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Pricing Section */}
-      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-slate-700 mb-4">💰 Preus</h3>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
@@ -358,7 +358,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Features Section */}
-      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-slate-700 mb-4">🎵 Característiques</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -420,7 +420,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Capacity Section */}
-      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-slate-700 mb-4">👥 Capacitat</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -456,7 +456,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Status Section */}
-      <div className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-slate-700 mb-4">⚙️ Estat i Ordre</h3>
         <div className="space-y-4">
           <div className="flex items-center gap-2">
@@ -508,14 +508,14 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       <div className="flex gap-3 justify-end">
         <Link
           href="/admin/packs"
-          className="rounded-md border border-stone-200 bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="rounded-md border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
           Cancel·lar
         </Link>
         <button
           type="submit"
           disabled={loading}
-          className="rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Guardant...' : 'Guardar Canvis'}
         </button>

@@ -290,7 +290,7 @@ export default function InboxClient({
           <button
             onClick={loadImapEmails}
             disabled={loadingImap}
-            className="w-full mt-4 px-3 py-2 bg-stone-50 border border-stone-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
+            className="w-full mt-4 px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
           >
             {loadingImap ? '⏳ Carregant...' : '🔄 Actualitzar'}
           </button>
@@ -305,7 +305,7 @@ export default function InboxClient({
       </aside>
 
       {/* Email list */}
-      <div className="w-96 border-r border-stone-200 flex flex-col bg-stone-50">
+      <div className="w-96 border-r border-stone-200 flex flex-col bg-white">
         {/* Search */}
         <div className="p-3 border-b border-stone-200">
           <div className="relative">
@@ -388,7 +388,7 @@ export default function InboxClient({
       </div>
 
       {/* Email detail */}
-      <div className="flex-1 flex flex-col bg-stone-50">
+      <div className="flex-1 flex flex-col bg-white">
         {selectedEmail ? (
           <>
             {/* Header */}
@@ -479,7 +479,7 @@ export default function InboxClient({
                 {selectedEmail.imapData?.bodyHtml ? (
                   <div
                     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.imapData.bodyHtml) }}
-                    className="text-slate-700 bg-stone-50 p-4 rounded-lg border border-stone-200"
+                    className="text-slate-700 bg-white p-4 rounded-lg border border-stone-200"
                   />
                 ) : (
                   <p className="text-slate-700 whitespace-pre-wrap">
@@ -518,7 +518,7 @@ export default function InboxClient({
                 {selectedEmail.type === 'lead' && (
                   <button
                     onClick={() => router.push(`/admin/leads/${selectedEmail.id}`)}
-                    className="px-4 py-2 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors"
+                    className="px-4 py-2 border border-stone-200 rounded-lg hover:bg-white transition-colors"
                   >
                     📋 Veure lead
                   </button>
@@ -599,7 +599,7 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
 
   return (
     <div className="fixed inset-0 bg-stone-100/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-stone-50 rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
           <h2 className="text-lg font-semibold text-slate-700">

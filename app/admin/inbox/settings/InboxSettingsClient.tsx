@@ -135,7 +135,7 @@ export default function InboxSettingsClient({
 
       {/* Test Connection */}
       {isConnected && (
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-6">
+        <div className="rounded-xl border border-stone-200 bg-white p-6">
           <h2 className="text-sm font-semibold uppercase mb-3 text-slate-700">
             Provar connexió
           </h2>
@@ -195,7 +195,7 @@ export default function InboxSettingsClient({
 
       {/* Reconnect option */}
       {isConnected && (
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-6">
+        <div className="rounded-xl border border-stone-200 bg-white p-6">
           <h2 className="text-sm font-semibold uppercase mb-3 text-slate-700">
             Reconnectar
           </h2>

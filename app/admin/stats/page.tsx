@@ -129,7 +129,7 @@ export default function StatsPage() {
             className={`border rounded-xl p-6 ${
               stat.isManual
                 ? 'bg-orange-50 border-orange-200'
-                : 'bg-stone-50 border-stone-200'
+                : 'bg-white border-stone-200'
             }`}
           >
             <div className="flex items-start justify-between mb-4">

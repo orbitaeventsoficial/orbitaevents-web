@@ -259,7 +259,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </aside>
 
           {/* Mobile Header */}
-          <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-stone-50/90 backdrop-blur-xl border-b border-stone-200 z-50 px-4 flex items-center justify-between">
+          <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-xl border-b border-stone-200 z-50 px-4 flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 text-slate-700 hover:bg-stone-100 rounded-lg"
@@ -309,7 +309,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           )}
 
           {/* Desktop Header */}
-          <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-stone-200 px-6 items-center justify-between bg-stone-50/90 backdrop-blur-xl z-30">
+          <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-stone-200 px-6 items-center justify-between bg-white/90 backdrop-blur-xl z-30">
             <div className="flex items-center gap-3 text-sm">
               <span className="text-slate-500">Admin</span>
               <span className="text-slate-300">/</span>

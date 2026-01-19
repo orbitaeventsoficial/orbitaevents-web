@@ -500,7 +500,7 @@ export default function TextManagerPage() {
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* HEADER FIJO */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      <header className="sticky top-0 z-50 bg-stone-50 border-b border-stone-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white border-b border-stone-200 shadow-sm">
         {/* TABS DE IDIOMA */}
         <div className="bg-gradient-to-r from-orange-50 to-rose-50 border-b border-orange-100">
           <div className="max-w-7xl mx-auto px-4 py-3">
@@ -678,7 +678,7 @@ export default function TextManagerPage() {
                 className={`w-full p-3 rounded-xl text-left transition-all ${
                   !activeSection
                     ? 'bg-gradient-to-r from-slate-200 to-slate-300 text-slate-700 shadow-lg'
-                    : 'bg-stone-50 hover:bg-slate-50 text-slate-700'
+                    : 'bg-white hover:bg-slate-50 text-slate-700'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -701,7 +701,7 @@ export default function TextManagerPage() {
                     className={`w-full p-3 rounded-xl text-left transition-all ${
                       isActive
                         ? `bg-gradient-to-r ${section.color} text-white shadow-lg`
-                        : 'bg-stone-50 hover:bg-slate-50 text-slate-700'
+                        : 'bg-white hover:bg-slate-50 text-slate-700'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -711,7 +711,7 @@ export default function TextManagerPage() {
                       <div className="flex items-center gap-2">
                         {counts.modified > 0 && (
                           <span className={`text-xs px-2 py-0.5 rounded-full ${
-                            isActive ? 'bg-stone-50/20' : 'bg-orange-100 text-orange-600'
+                            isActive ? 'bg-white/20' : 'bg-orange-100 text-orange-600'
                           }`}>
                             {counts.modified}
                           </span>
@@ -730,7 +730,7 @@ export default function TextManagerPage() {
 
               {/* Historial */}
               {changeHistory.length > 0 && (
-                <div className="mt-6 p-4 bg-stone-50 rounded-xl border border-stone-200">
+                <div className="mt-6 p-4 bg-white rounded-xl border border-stone-200">
                   <h3 className="font-semibold text-slate-700 mb-3 flex items-center gap-2">
                     📜 Historial ({changeHistory.length})
                   </h3>
@@ -803,7 +803,7 @@ export default function TextManagerPage() {
                   return (
                     <div
                       key={path}
-                      className={`bg-stone-50 rounded-xl border transition-all ${
+                      className={`bg-white rounded-xl border transition-all ${
                         isModified
                           ? 'border-orange-300 shadow-md shadow-orange-100'
                           : 'border-stone-200 hover:border-stone-200'

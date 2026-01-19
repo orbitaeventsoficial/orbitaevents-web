@@ -281,7 +281,7 @@ export default function AdminContactesPage() {
               </thead>
               <tbody>
                 {filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className="border-b border-stone-200 hover:bg-stone-50">
+                  <tr key={customer.id} className="border-b border-stone-200 hover:bg-white">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold">
@@ -378,7 +378,7 @@ export default function AdminContactesPage() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-stone-50 border border-stone-200 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto"
+                className="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto"
               >
                 <h2 className="text-2xl font-bold text-slate-700 mb-6">Afegir Contacte</h2>
 
@@ -486,7 +486,7 @@ export default function AdminContactesPage() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-stone-50 border border-stone-200 rounded-3xl p-6 sm:p-8 max-w-md w-full"
+                className="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 max-w-md w-full"
               >
                 <h2 className="text-2xl font-bold text-slate-700 mb-2">🚀 Iniciar Procés</h2>
                 <p className="text-slate-500 mb-6">

@@ -115,7 +115,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </header>
 
       {/* Client Info */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm p-6">
+      <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">Informació del Client</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
@@ -148,7 +148,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Event Info */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm p-6">
+      <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">Detalls de l&apos;Event</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -183,7 +183,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Services */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm p-6">
+      <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">Serveis Contractats</h2>
 
         {/* Pack */}
@@ -242,7 +242,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Pricing */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm p-6">
+      <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">Resum Econòmic</h2>
         <div className="space-y-3">
           <div className="flex justify-between text-slate-600">
@@ -286,7 +286,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Notes */}
       {booking.notes && (
-        <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm p-6">
+        <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-6">
           <h2 className="text-lg font-semibold text-slate-700 mb-4">Notes</h2>
           <p className="text-slate-700 whitespace-pre-wrap">{booking.notes}</p>
         </section>
@@ -297,19 +297,19 @@ export default async function BookingDetailPage({ params }: PageProps) {
         <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
           <h2 className="text-lg font-semibold text-emerald-900 mb-4">Post-Event</h2>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className={`p-4 rounded-lg border ${booking.postEventReport ? 'bg-green-100 border-green-300' : 'bg-stone-50 border-stone-200'}`}>
+            <div className={`p-4 rounded-lg border ${booking.postEventReport ? 'bg-green-100 border-green-300' : 'bg-white border-stone-200'}`}>
               <p className="font-medium text-slate-700">Informe Intern</p>
               <p className="text-sm text-slate-500">
                 {booking.postEventReport ? '✓ Completat' : 'Pendent de completar'}
               </p>
             </div>
-            <div className={`p-4 rounded-lg border ${booking.clientSurvey ? 'bg-green-100 border-green-300' : 'bg-stone-50 border-stone-200'}`}>
+            <div className={`p-4 rounded-lg border ${booking.clientSurvey ? 'bg-green-100 border-green-300' : 'bg-white border-stone-200'}`}>
               <p className="font-medium text-slate-700">Enquesta Client</p>
               <p className="text-sm text-slate-500">
                 {booking.clientSurvey ? `✓ NPS: ${booking.clientSurvey.npsScore}` : 'Pendent de rebre'}
               </p>
             </div>
-            <div className={`p-4 rounded-lg border ${booking.clientFeedback ? 'bg-green-100 border-green-300' : 'bg-stone-50 border-stone-200'}`}>
+            <div className={`p-4 rounded-lg border ${booking.clientFeedback ? 'bg-green-100 border-green-300' : 'bg-white border-stone-200'}`}>
               <p className="font-medium text-slate-700">Feedback Enviat</p>
               <p className="text-sm text-slate-500">
                 {booking.clientFeedback ? `✓ Codi: ${booking.clientFeedback.discountCode}` : 'Pendent d\'enviar'}

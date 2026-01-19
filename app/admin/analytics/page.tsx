@@ -168,7 +168,7 @@ export default async function AnalyticsPage() {
 
       {/* KPI Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Facturació Any</p>
           <p className="mt-2 text-3xl font-bold text-slate-700">
             {data.revenue.thisYear.toLocaleString('ca-ES')}€
@@ -177,18 +177,18 @@ export default async function AnalyticsPage() {
             {Number(yearGrowth) >= 0 ? '↑' : '↓'} {yearGrowth}% vs any anterior
           </p>
         </div>
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Reserves Any</p>
           <p className="mt-2 text-3xl font-bold text-slate-700">{data.bookings.thisYear}</p>
           <p className="text-xs text-slate-400 mt-1">{data.bookings.total} totals</p>
         </div>
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Ticket Mitjà</p>
           <p className="mt-2 text-3xl font-bold text-slate-700">
             {data.revenue.avgBooking.toLocaleString('ca-ES', { maximumFractionDigits: 0 })}€
           </p>
         </div>
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">NPS Score</p>
           <p className="mt-2 text-3xl font-bold text-slate-700">
             {data.satisfaction.nps.toFixed(1)}
@@ -202,7 +202,7 @@ export default async function AnalyticsPage() {
       {/* Leads Section */}
       <section className="grid gap-6 lg:grid-cols-2">
         {/* Leads per Font */}
-        <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
           <div className="bg-slate-50 border-b border-stone-200 p-4">
             <h3 className="font-semibold text-slate-700">Leads per Font</h3>
             <p className="text-xs text-slate-500 mt-1">{data.leads.thisYear} leads aquest any</p>
@@ -238,7 +238,7 @@ export default async function AnalyticsPage() {
         </div>
 
         {/* Conversió Leads */}
-        <div className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
           <div className="bg-slate-50 border-b border-stone-200 p-4">
             <h3 className="font-semibold text-slate-700">Conversió de Leads</h3>
             <p className="text-xs text-slate-500 mt-1">Estat dels leads</p>
@@ -282,7 +282,7 @@ export default async function AnalyticsPage() {
       </section>
 
       {/* Events per Tipus */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 shadow-sm overflow-hidden">
+      <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
         <div className="bg-slate-50 border-b border-stone-200 p-4">
           <h3 className="font-semibold text-slate-700">Reserves per Tipus d&apos;Event</h3>
         </div>

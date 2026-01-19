@@ -123,7 +123,7 @@ export default function LeadWorkspace({
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
-      <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm lg:col-span-2">
+      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm lg:col-span-2">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-slate-700">Tasques pendents</h2>
           <span className="text-sm text-slate-500">{tasks.length} tasques</span>
@@ -200,7 +200,7 @@ export default function LeadWorkspace({
         </div>
       </section>
 
-      <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-700">Documents</h2>
         <div className="mt-3 grid gap-2">
           <input
@@ -255,7 +255,7 @@ export default function LeadWorkspace({
         </div>
       </section>
 
-      <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm lg:col-span-3">
+      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm lg:col-span-3">
         <h2 className="text-lg font-semibold text-slate-700">Timeline d'activitat</h2>
         <div className="mt-4 space-y-3">
           {activities.length === 0 ? (

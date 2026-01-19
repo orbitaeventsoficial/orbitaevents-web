@@ -248,12 +248,12 @@ export default function CalendarMonthClient() {
   return (
     <div className="space-y-4">
       {/* Barra superior: selector de mes + meta info */}
-      <div className="flex flex-col gap-3 rounded-xl border border-stone-200 bg-stone-50/60 p-3 shadow-sm md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 rounded-xl border border-stone-200 bg-white/60 p-3 shadow-sm md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setMonthYear((prev) => addMonths(prev, -1))}
-            className="inline-flex items-center rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             ÔÇ╣ Mes anterior
           </button>
@@ -265,14 +265,14 @@ export default function CalendarMonthClient() {
                 month: today.getMonth(),
               })
             }
-            className="inline-flex items-center rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             Avui
           </button>
           <button
             type="button"
             onClick={() => setMonthYear((prev) => addMonths(prev, 1))}
-            className="inline-flex items-center rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
+            className="inline-flex items-center rounded-md border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
           >
             Mes seg├╝ent ÔÇ║
           </button>
@@ -300,7 +300,7 @@ export default function CalendarMonthClient() {
 
       {/* Stats r├ápids del mes visible */}
       <div className="grid gap-3 text-sm text-slate-700 md:grid-cols-4">
-        <div className="flex items-center justify-between rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 shadow-sm">
+        <div className="flex items-center justify-between rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-sm">
           <div className="flex flex-col">
             <span className="text-xs uppercase tracking-wide text-slate-500">
               Reserves
@@ -314,7 +314,7 @@ export default function CalendarMonthClient() {
           </span>
         </div>
 
-        <div className="flex items-center justify-between rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 shadow-sm">
+        <div className="flex items-center justify-between rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-sm">
           <div className="flex flex-col">
             <span className="text-xs uppercase tracking-wide text-slate-500">
               Bloquejos
@@ -328,7 +328,7 @@ export default function CalendarMonthClient() {
           </span>
         </div>
 
-        <div className="flex items-center justify-between rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 shadow-sm">
+        <div className="flex items-center justify-between rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-sm">
           <div className="flex flex-col">
             <span className="text-xs uppercase tracking-wide text-slate-500">
               Dies lliures
@@ -342,7 +342,7 @@ export default function CalendarMonthClient() {
           </span>
         </div>
 
-        <div className="flex items-center justify-between rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 shadow-sm">
+        <div className="flex items-center justify-between rounded-lg border border-stone-200 bg-white px-3 py-2 shadow-sm">
           <div className="flex flex-col">
             <span className="text-xs uppercase tracking-wide text-slate-500">
               Dies mixtes
@@ -358,10 +358,10 @@ export default function CalendarMonthClient() {
       </div>
 
       {/* Llegenda */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-slate-600 shadow-sm">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-600 shadow-sm">
         <span className="font-semibold text-slate-700">Llegenda:</span>
         <div className="flex items-center gap-1">
-          <span className="h-3 w-3 rounded border border-stone-200 bg-stone-50" />
+          <span className="h-3 w-3 rounded border border-stone-200 bg-white" />
           <span>Lliure</span>
         </div>
         <div className="flex items-center gap-1">
@@ -397,7 +397,7 @@ export default function CalendarMonthClient() {
           const hasReservas = dayData.reservas.length > 0;
           const hasBloqueos = dayData.bloqueos.length > 0;
 
-          let bgClass = 'bg-stone-50 border border-transparent';
+          let bgClass = 'bg-white border border-transparent';
           if (hasReservas && !hasBloqueos) {
             bgClass = 'bg-emerald-50 border border-emerald-100';
           } else if (!hasReservas && hasBloqueos) {
@@ -428,7 +428,7 @@ export default function CalendarMonthClient() {
                   className={[
                     'inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold',
                     isToday(cell.date)
-                      ? 'bg-stone-50 text-slate-700'
+                      ? 'bg-white text-slate-700'
                       : 'text-slate-700',
                   ].join(' ')}
                 >
@@ -487,7 +487,7 @@ export default function CalendarMonthClient() {
 
       {/* Panell de detalls (sticky a la part baixa de la vista) */}
       {selectedDayData.date && (
-        <div className="mt-4 rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="mt-4 rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-base font-semibold text-slate-700">
@@ -508,13 +508,13 @@ export default function CalendarMonthClient() {
               <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={`/reservas/new?date=${selectedDayData.key}`}
-                  className="inline-flex items-center rounded-md border border-emerald-600 bg-stone-50 px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
+                  className="inline-flex items-center rounded-md border border-emerald-600 bg-white px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
                 >
                   Nova reserva
                 </Link>
                 <Link
                   href={`/admin/bloqueos/new?date=${selectedDayData.key}`}
-                  className="inline-flex items-center rounded-md border border-rose-600 bg-stone-50 px-3 py-1.5 text-sm font-medium text-rose-700 hover:bg-rose-50"
+                  className="inline-flex items-center rounded-md border border-rose-600 bg-white px-3 py-1.5 text-sm font-medium text-rose-700 hover:bg-rose-50"
                 >
                   Bloquejar dia
                 </Link>

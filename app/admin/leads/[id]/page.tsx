@@ -27,7 +27,7 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }>
   QUOTE_SENT: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Pressupost enviat' },
   NEGOTIATING: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Negociació' },
   WON: { bg: 'bg-green-100', text: 'text-green-700', label: 'Guanyat!' },
-  LOST: { bg: 'bg-gray-100', text: 'text-gray-300', label: 'Perdut' },
+  LOST: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Perdut' },
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -175,7 +175,7 @@ export default async function LeadDetailPage({ params }: Props) {
           />
 
           {/* Notes */}
-          <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+          <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-700 mb-4">
               Notes ({lead.notes.length})
             </h2>
@@ -216,7 +216,7 @@ export default async function LeadDetailPage({ params }: Props) {
 
           {/* Booking */}
           {lead.booking && (
-            <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+            <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
               <h2 className="text-lg font-semibold text-slate-700 mb-4">
                 Reserva associada
               </h2>
@@ -264,7 +264,7 @@ export default async function LeadDetailPage({ params }: Props) {
           />
 
           {/* Metadades */}
-          <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+          <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
             <h3 className="text-sm font-semibold text-slate-700 mb-4">Detalls del registre</h3>
             <dl className="space-y-3 text-sm">
               <div>

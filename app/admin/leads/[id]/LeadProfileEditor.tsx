@@ -107,7 +107,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
   };
 
   return (
-    <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+    <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-slate-700">Fitxa del lead</h2>

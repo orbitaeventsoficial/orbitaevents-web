@@ -207,7 +207,7 @@ export default function PortfolioPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Imágenes</p>
           <p className="mt-2 text-3xl font-bold text-slate-700">{images.length}</p>
         </div>
@@ -259,7 +259,7 @@ export default function PortfolioPage() {
 
       {/* Add Form */}
       {showAddForm && (
-        <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+        <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-700 mb-4">Añadir Nueva Imagen</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -358,7 +358,7 @@ export default function PortfolioPage() {
       {/* Images Grid */}
       <section>
         {filteredImages.length === 0 ? (
-          <div className="rounded-xl border border-stone-200 bg-stone-50 p-12 text-center">
+          <div className="rounded-xl border border-stone-200 bg-white p-12 text-center">
             <span className="text-4xl">🖼️</span>
             <p className="mt-4 text-slate-600">
               {selectedCategory === 'all' ? 'No hay imágenes en el portfolio' : 'No hay imágenes en esta categoría'}
@@ -370,7 +370,7 @@ export default function PortfolioPage() {
             {filteredImages.map(image => (
               <div
                 key={image.id}
-                className={`rounded-xl border bg-stone-50 shadow-sm overflow-hidden ${
+                className={`rounded-xl border bg-white shadow-sm overflow-hidden ${
                   image.isActive ? 'border-stone-200' : 'border-stone-300 opacity-60'
                 }`}
               >

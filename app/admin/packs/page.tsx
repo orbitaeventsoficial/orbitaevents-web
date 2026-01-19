@@ -58,7 +58,7 @@ export default async function PacksPage() {
           <SyncButton />
           <Link
             href="/admin/packs/new"
-            className="inline-flex items-center rounded-md bg-stone-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100 border border-stone-200"
+            className="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100 border border-stone-200"
           >
             + Nou Pack
           </Link>
@@ -67,7 +67,7 @@ export default async function PacksPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 shadow-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase">Total Packs</p>
           <p className="mt-2 text-3xl font-bold text-slate-700">{packs.length}</p>
         </div>
@@ -98,7 +98,7 @@ export default async function PacksPage() {
           return (
             <div
               key={pack.id}
-              className={`rounded-xl border bg-stone-50 shadow-sm overflow-hidden ${
+              className={`rounded-xl border bg-white shadow-sm overflow-hidden ${
                 pack.isFeatured ? 'border-orange-300 ring-2 ring-orange-100' : 'border-stone-200'
               }`}
             >
@@ -187,13 +187,13 @@ export default async function PacksPage() {
               <div className="px-4 py-3 bg-slate-50 border-t border-slate-100 flex gap-2">
                 <Link
                   href={`/admin/packs/${pack.id}`}
-                  className="flex-1 inline-flex items-center justify-center rounded-md bg-stone-50 px-3 py-2 text-sm font-medium text-slate-700 border border-stone-200 hover:bg-slate-50"
+                  className="flex-1 inline-flex items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 border border-stone-200 hover:bg-slate-50"
                 >
                   ✏️ Editar
                 </Link>
                 <Link
                   href={`/admin/packs/${pack.id}/inventory`}
-                  className="flex-1 inline-flex items-center justify-center rounded-md bg-stone-50 px-3 py-2 text-sm font-medium text-slate-700 border border-stone-200 hover:bg-slate-50"
+                  className="flex-1 inline-flex items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 border border-stone-200 hover:bg-slate-50"
                 >
                   📦 Inventari
                 </Link>
@@ -204,7 +204,7 @@ export default async function PacksPage() {
       </section>
 
       {packs.length === 0 && (
-        <div className="rounded-xl border border-stone-200 bg-stone-50 p-12 text-center">
+        <div className="rounded-xl border border-stone-200 bg-white p-12 text-center">
           <span className="text-4xl">📦</span>
           <p className="mt-4 text-slate-600">No hi ha packs configurats</p>
           <p className="text-sm text-slate-400">Executa el seed per carregar dades inicials</p>

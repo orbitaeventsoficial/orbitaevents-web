@@ -142,7 +142,7 @@ export default function SettingsNotificationsPage() {
       </div>
 
       {/* Test Email */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">🧪 Test d'Email</h2>
         
         {testResult && (
@@ -170,7 +170,7 @@ export default function SettingsNotificationsPage() {
       </section>
 
       {/* Configuration Details */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">⚙️ Configuració Actual</h2>
         
         <div className="space-y-4">
@@ -208,7 +208,7 @@ export default function SettingsNotificationsPage() {
           <h2 className="text-lg font-semibold text-amber-900 mb-4">📝 Instruccions de Configuració</h2>
           
           {instructions.map((instruction, index) => (
-            <pre key={index} className="bg-stone-50 text-green-400 p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap mb-4">
+            <pre key={index} className="bg-white text-green-400 p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap mb-4">
               {instruction}
             </pre>
           ))}
@@ -216,7 +216,7 @@ export default function SettingsNotificationsPage() {
       )}
 
       {/* Quick Reference */}
-      <section className="rounded-xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">📚 Referència Ràpida</h2>
         
         <div className="prose prose-sm max-w-none text-slate-600">

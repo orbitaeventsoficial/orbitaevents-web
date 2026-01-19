@@ -175,7 +175,7 @@ export default function ComposeForm({ leads, packs }: Props) {
         <button
           onClick={() => setMode('email')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'email' ? 'bg-stone-50 shadow text-slate-700' : 'text-slate-600'
+            mode === 'email' ? 'bg-white shadow text-slate-700' : 'text-slate-600'
           }`}
         >
           ✉️ Email normal
@@ -183,7 +183,7 @@ export default function ComposeForm({ leads, packs }: Props) {
         <button
           onClick={() => setMode('quote')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'quote' ? 'bg-stone-50 shadow text-slate-700' : 'text-slate-600'
+            mode === 'quote' ? 'bg-white shadow text-slate-700' : 'text-slate-600'
           }`}
         >
           💰 Pressupost professional
@@ -191,7 +191,7 @@ export default function ComposeForm({ leads, packs }: Props) {
       </div>
 
       {/* Form */}
-      <div className="bg-stone-50 rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
         <div className="p-6 space-y-6">
           
           {/* Select Lead */}
