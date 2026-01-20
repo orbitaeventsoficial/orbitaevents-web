@@ -26,94 +26,79 @@ export async function POST(req: NextRequest) {
     let updated = 0;
     const errors: string[] = [];
 
-    for (const pack of configPacks) {
-      try {
-        // Buscar si ya existe en la BD
-        const existing = await prisma.pack.findUnique({
-          where: { slug: pack.slug }
-        });
+    // Obtener todos los packs existentes en una sola query
+    const existingPacks = await prisma.pack.findMany({
+      where: { slug: { in: configPacks.map(p => p.slug) } },
+      select: { id: true, slug: true },
+    });
+    const existingMap = new Map(existingPacks.map(p => [p.slug, p.id]));
 
-        if (existing) {
-          // Actualizar pack existente
-          await prisma.pack.update({
-            where: { slug: pack.slug },
-            data: {
-              price: pack.priceValue,
-              originalPrice: pack.priceOriginalValue || null,
-              djHours: pack.durationHours || 4,
-              isActive: true,
-              isFeatured: pack.popular || pack.isFlash || false,
-              order: configPacks.indexOf(pack),
-            }
-          });
+    // Usar transacción para batch de operaciones
+    await prisma.$transaction(async (tx) => {
+      for (const pack of configPacks) {
+        try {
+          const existingId = existingMap.get(pack.slug);
+          const packData = {
+            price: pack.priceValue,
+            originalPrice: pack.priceOriginalValue || null,
+            djHours: pack.durationHours || 4,
+            isActive: true,
+            isFeatured: pack.popular || pack.isFlash || false,
+            order: configPacks.indexOf(pack),
+          };
 
-          // Actualizar/crear traducciones
-          for (const locale of ['es', 'ca', 'en']) {
-            await prisma.packTranslation.upsert({
-              where: {
-                packId_locale: {
-                  packId: existing.id,
-                  locale: locale
-                }
-              },
-              create: {
-                packId: existing.id,
-                locale: locale,
-                name: pack.name,
-                tagline: pack.tagline || '',
-                description: pack.emotion || pack.tagline || '',
-                features: pack.features || [],
-                badge: pack.badge || '',
-              },
-              update: {
-                name: pack.name,
-                tagline: pack.tagline || '',
-                description: pack.emotion || pack.tagline || '',
-                features: pack.features || [],
-                badge: pack.badge || '',
-              }
+          let packId: string;
+
+          if (existingId) {
+            await tx.pack.update({
+              where: { slug: pack.slug },
+              data: packData,
             });
+            packId = existingId;
+            updated++;
+          } else {
+            const newPack = await tx.pack.create({
+              data: { slug: pack.slug, ...packData },
+            });
+            packId = newPack.id;
+            created++;
           }
 
-          log.info(`Pack actualizado: ${pack.name}`);
-          updated++;
-        } else {
-          // Crear nuevo pack
-          const newPack = await prisma.pack.create({
-            data: {
-              slug: pack.slug,
-              price: pack.priceValue,
-              originalPrice: pack.priceOriginalValue || null,
-              djHours: pack.durationHours || 4,
-              isActive: true,
-              isFeatured: pack.popular || pack.isFlash || false,
-              order: configPacks.indexOf(pack),
-            }
-          });
+          // Batch upsert de traducciones
+          const translationData = ['es', 'ca', 'en'].map(locale => ({
+            packId,
+            locale,
+            name: pack.name,
+            tagline: pack.tagline || '',
+            description: pack.emotion || pack.tagline || '',
+            features: pack.features || [],
+            badge: pack.badge || '',
+          }));
 
-          // Crear traducciones
-          for (const locale of ['es', 'ca', 'en']) {
-            await prisma.packTranslation.create({
-              data: {
-                packId: newPack.id,
-                locale: locale,
-                name: pack.name,
-                tagline: pack.tagline || '',
-                description: pack.emotion || pack.tagline || '',
-                features: pack.features || [],
-                badge: pack.badge || '',
-              }
-            });
-          }
-
-          log.info(`Pack creado: ${pack.name}`);
-          created++;
+          await Promise.all(
+            translationData.map(t =>
+              tx.packTranslation.upsert({
+                where: { packId_locale: { packId: t.packId, locale: t.locale } },
+                create: t,
+                update: {
+                  name: t.name,
+                  tagline: t.tagline,
+                  description: t.description,
+                  features: t.features,
+                  badge: t.badge,
+                },
+              })
+            )
+          );
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : 'Unknown error';
+          log.error(`Error sincronizando pack ${pack.slug}:`, err);
+          errors.push(`${pack.slug}: ${message}`);
         }
-      } catch (err: any) {
-        log.error(`Error sincronizando pack ${pack.slug}:`, err);
-        errors.push(`${pack.slug}: ${err.message}`);
       }
-    }
+    });
+
+    log.info(`Sincronización completada: ${created} creados, ${updated} actualizados`);
 
     return NextResponse.json({
       ok: true,
@@ -127,11 +112,12 @@ export async function POST(req: NextRequest) {
       errors: errors.length > 0 ? errors : undefined
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error sincronizando packs';
     log.error('Error en sincronización de packs:', error);
     return NextResponse.json({
       ok: false,
-      error: error.message || 'Error sincronizando packs'
+      error: message
     }, { status: 500 });
   }
 }

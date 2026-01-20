@@ -225,7 +225,22 @@
       "Bash(npx eslint:*)",
       "WebSearch",
       "Bash(nslookup:*)",
-      "Bash(git merge-base:*)"
+      "Bash(git merge-base:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(railway --version:*)",
+      "Bash(npm install:*)",
+      "Bash(railway login:*)",
+      "Bash(railway link:*)",
+      "Bash(railway whoami:*)",
+      "Bash(railway variables set:*)",
+      "Bash(railway service:*)",
+      "Bash(railway variables:*)",
+      "Bash(railway status:*)",
+      "Bash(railway up:*)",
+      "Bash(railway domain:*)",
+      "Bash(railway open:*)",
+      "Bash(npm test)"
     ]
   }
 }

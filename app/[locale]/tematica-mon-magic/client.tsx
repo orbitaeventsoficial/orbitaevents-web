@@ -11,20 +11,20 @@ import { useTranslations } from 'next-intl';
 // ═══════════════════════════════════════════════════════════════
 
 const IMATGES = {
-  hero: '/images/tematicas/mon-magic/hero/01-taula-panoramica-cartell.jpg',
-  heroAlt: '/images/tematicas/mon-magic/hero/02-taula-veles-nuvols.jpg',
-  sostre: '/images/tematicas/mon-magic/hero/03-sostre-veles-nuvols-led.jpg',
-  sobreComplet: '/images/tematicas/mon-magic/productes/01-sobre-carta-oberta-complet.jpg',
-  sobrePlat: '/images/tematicas/mon-magic/productes/02-sobre-personalitzat-plat.jpg',
-  sobreDetall: '/images/tematicas/mon-magic/productes/03-sobre-detall-text.jpg',
-  provaSocial: '/images/tematicas/mon-magic/productes/04-convidada-llegint-carta.jpg',
-  sobrePergami: '/images/tematicas/mon-magic/productes/05-sobre-pergami-plat.jpg',
-  mussol: '/images/tematicas/mon-magic/pergamins/01-hedwig-pergamins.jpg',
-  pergaminsBilingue: '/images/tematicas/mon-magic/pergamins/02-gabia-cartell-bilingue.jpg',
-  pergaminsCintes: '/images/tematicas/mon-magic/pergamins/03-pergamins-cintes-colors.jpg',
-  veles: '/images/tematicas/mon-magic/decoracio/01-veles-flotants-detall.jpg',
-  botigueta: '/images/tematicas/mon-magic/decoracio/02-honeydukes.jpg',
-  escombres: '/images/tematicas/mon-magic/decoracio/06-escombres-quidditch-copa.jpg',
+  hero: '/img/tematicas/mon-magic/hero/01-taula-panoramica-cartell.jpg',
+  heroAlt: '/img/tematicas/mon-magic/hero/02-taula-veles-nuvols.jpg',
+  sostre: '/img/tematicas/mon-magic/hero/03-sostre-veles-nuvols-led.jpg',
+  sobreComplet: '/img/tematicas/mon-magic/productes/01-sobre-carta-oberta-complet.jpg',
+  sobrePlat: '/img/tematicas/mon-magic/productes/02-sobre-personalitzat-plat.jpg',
+  sobreDetall: '/img/tematicas/mon-magic/productes/03-sobre-detall-text.jpg',
+  provaSocial: '/img/tematicas/mon-magic/productes/04-convidada-llegint-carta.jpg',
+  sobrePergami: '/img/tematicas/mon-magic/productes/05-sobre-pergami-plat.jpg',
+  mussol: '/img/tematicas/mon-magic/pergamins/01-hedwig-pergamins.jpg',
+  pergaminsBilingue: '/img/tematicas/mon-magic/pergamins/02-gabia-cartell-bilingue.jpg',
+  pergaminsCintes: '/img/tematicas/mon-magic/pergamins/03-pergamins-cintes-colors.jpg',
+  veles: '/img/tematicas/mon-magic/decoracio/01-veles-flotants-detall.jpg',
+  botigueta: '/img/tematicas/mon-magic/decoracio/02-honeydukes.jpg',
+  escombres: '/img/tematicas/mon-magic/decoracio/06-escombres-quidditch-copa.jpg',
 };
 
 // ═══════════════════════════════════════════════════════════════

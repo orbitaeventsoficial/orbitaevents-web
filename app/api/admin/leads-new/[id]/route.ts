@@ -46,14 +46,14 @@ export async function GET(req: NextRequest, { params }: Params) {
     const lead = await prisma.lead.findUnique({
       where: { id: params.id },
       include: {
-        notes: { orderBy: { createdAt: 'desc' } },
-        activities: { orderBy: { createdAt: 'desc' } },
-        tasks: { orderBy: { createdAt: 'desc' } },
-        documents: { orderBy: { createdAt: 'desc' } },
+        notes: { orderBy: { createdAt: 'desc' }, take: 10 },
+        activities: { orderBy: { createdAt: 'desc' }, take: 20 },
+        tasks: { orderBy: { createdAt: 'desc' }, take: 10 },
+        documents: { orderBy: { createdAt: 'desc' }, take: 10 },
         booking: {
           include: {
-            pack: { include: { translations: true } },
-            extras: { include: { extra: { include: { translations: true } } } },
+            pack: { include: { translations: { take: 1 } } },
+            extras: { include: { extra: { include: { translations: { take: 1 } } } } },
           },
         },
       },

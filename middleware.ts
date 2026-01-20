@@ -152,9 +152,29 @@ function tooManyRequests() {
   });
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// BOT BLOCKING - Bloqueja bots abusius per reduir requests
+// ═══════════════════════════════════════════════════════════════════════════════
+const BLOCKED_BOTS = [
+  'AhrefsBot', 'SemrushBot', 'DotBot', 'MJ12bot', 'BLEXBot',
+  'DataForSeoBot', 'serpstatbot', 'Bytespider', 'PetalBot',
+  'YandexBot', 'MegaIndex', 'Sogou', 'Baiduspider',
+];
+
+function isBlockedBot(userAgent: string | null): boolean {
+  if (!userAgent) return false;
+  return BLOCKED_BOTS.some(bot => userAgent.includes(bot));
+}
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const host = req.headers.get('host');
+  const userAgent = req.headers.get('user-agent');
+
+  // 🚫 Bloquejar bots abusius immediatament
+  if (isBlockedBot(userAgent)) {
+    return new NextResponse('Forbidden', { status: 403 });
+  }
 
   if (host === 'www.orbitaevents.com') {
     const url = req.nextUrl.clone();

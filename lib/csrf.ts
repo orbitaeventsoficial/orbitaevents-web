@@ -301,7 +301,6 @@ export function shouldEnforceCsrf(request: NextRequest): boolean {
   const publicPaths = [
     '/api/health',
     '/api/contact',
-    '/api/testimonials',
     '/api/google-reviews',
   ];
 

@@ -618,6 +618,7 @@ model Booking {
   @@index([status])
   @@index([packId])
   @@index([createdAt])
+  @@index([reference]) // Per generació de referències
   @@index([status, eventDate]) // Consultes combinades
   @@index([status, eventDate, postEventEmailSent]) // Per cron post-event
   @@map("bookings")
@@ -939,41 +940,6 @@ model FAQTranslation {
 
   @@unique([faqId, locale])
   @@map("faq_translations")
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// TESTIMONIS
-// ═══════════════════════════════════════════════════════════════════════════
-
-model Testimonial {
-  id              String                   @id @default(cuid())
-  isActive        Boolean                  @default(true)
-  isFeatured      Boolean                  @default(false)
-  order           Int                      @default(0)
-  authorName      String
-  authorLabel     String?
-  rating          Int                      @default(5)
-  eventType       EventType?
-  eventDate       DateTime?
-  isVerified      Boolean                  @default(true)
-  sourceBookingId String?
-  sourceSurveyId  String?
-  translations    TestimonialTranslation[]
-  createdAt       DateTime                 @default(now())
-  updatedAt       DateTime                 @updatedAt
-
-  @@map("testimonials")
-}
-
-model TestimonialTranslation {
-  id            String      @id @default(cuid())
-  testimonialId String
-  testimonial   Testimonial @relation(fields: [testimonialId], references: [id], onDelete: Cascade)
-  locale        String
-  quote         String      @db.Text
-
-  @@unique([testimonialId, locale])
-  @@map("testimonial_translations")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

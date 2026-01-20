@@ -200,7 +200,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
         { icon: '📊', label: 'Estadístiques', href: '/admin/stats' },
         { icon: '🎨', label: 'Tema', href: '/admin/theme' },
-        { icon: '🖼️', label: 'Portfolio', href: '/admin/portfolio' },
         { icon: '🌐', label: 'Traduccions', href: '/admin/translations' },
         { icon: '📝', label: 'Blog', href: '/admin/blog' },
       ]

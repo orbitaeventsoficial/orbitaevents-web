@@ -19,7 +19,7 @@ const PRECACHE_ASSETS = [
   '/favicon.ico',
   '/favicon.svg',
   '/img/logoplanetatextdreta.svg',
-  '/img/logoorbitaevents.png',
+  '/img/logosoloplaneta.svg',
 ];
 
 // Patrones para cachear dinámicamente

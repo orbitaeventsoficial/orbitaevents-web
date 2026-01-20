@@ -59,3 +59,5 @@ contact.html
 playwright-report/
 test-results/
 *.html
+.env.railway
+.env.production

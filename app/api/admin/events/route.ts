@@ -24,26 +24,6 @@ function checkSupabase() {
   return null;
 }
 
-// Verificar autenticació admin
-function verifyAdminAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader) return false;
-
-  if (authHeader.startsWith('Basic ')) {
-    const base64 = authHeader.slice(6);
-    const decoded = Buffer.from(base64, 'base64').toString();
-    const [user, pass] = decoded.split(':');
-    return user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASS;
-  }
-
-  if (authHeader.startsWith('Bearer ')) {
-    const key = authHeader.slice(7);
-    return key === process.env.ADMIN_KEY;
-  }
-
-  return false;
-}
-
 /**
  * GET - Obtenir events passats/completats
  */
@@ -52,10 +32,6 @@ export async function GET(request: NextRequest) {
   if (authError) return authError;
   const dbError = checkSupabase();
   if (dbError) return dbError;
-
-  if (!verifyAdminAuth(request)) {
-    return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
-  }
 
   try {
     const { searchParams } = new URL(request.url);
@@ -99,10 +75,6 @@ export async function PATCH(request: NextRequest) {
   if (authError) return authError;
   const dbError = checkSupabase();
   if (dbError) return dbError;
-
-  if (!verifyAdminAuth(request)) {
-    return NextResponse.json({ error: 'No autoritzat' }, { status: 401 });
-  }
 
   try {
     const body = await request.json();

@@ -231,7 +231,6 @@ export async function addRateLimitHeaders(
 export const RATE_LIMITS = {
   contact: { limit: 5, windowSeconds: 300, prefix: 'contact' },
   privacy: { limit: 3, windowSeconds: 1800, prefix: 'privacy' },
-  testimonials: { limit: 3, windowSeconds: 3600, prefix: 'testimonials' },
   uploads: { limit: 10, windowSeconds: 3600, prefix: 'uploads' },
   api: { limit: 100, windowSeconds: 60, prefix: 'api' },
 } as const;

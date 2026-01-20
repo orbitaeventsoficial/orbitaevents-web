@@ -1,155 +1,214 @@
-/**
- * API ROUTE: Public Testimonials
- * POST - Enviar una nueva opinion
- */
-
+// app/api/testimonials/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { log } from '@/lib/logger';
-import { createTestimonial } from '@/lib/services/testimonialService';
 import { prisma } from '@/lib/prisma';
-import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
-import { verifyCsrf } from '@/lib/csrf';
 import { z } from 'zod';
 
-export const dynamic = 'force-dynamic';
-
-const ratingSchema = z.preprocess(
-  (value) => (typeof value === 'string' ? Number(value) : value),
-  z.number().int().min(1).max(5)
-);
-
+// Validation schema
 const testimonialSchema = z.object({
-  name: z.string().min(2).max(100),
-  email: z.string().email().max(255),
-  phone: z.string().max(30).optional(),
-  city: z.string().max(100).optional(),
-  instagram: z.string().max(100).optional(),
-  rating: ratingSchema,
-  comment: z.string().min(5).max(2000),
-  eventType: z.string().max(50).optional(),
-  eventDate: z
-    .string()
-    .optional()
-    .refine((value) => !value || !Number.isNaN(Date.parse(value)), {
-      message: 'Invalid eventDate',
-    }),
-  photoUrl: z.string().url().optional(),
-  videoUrl: z.string().url().optional(),
-  allowGoogleShare: z.boolean().optional(),
-  consentDataProcessing: z.boolean().optional(),
-  consentPhotoPublication: z.boolean().optional(),
+  rating: z.number().min(1).max(5),
+  comment: z.string().min(10),
+  name: z.string().min(2),
+  email: z.string().email(),
+  phone: z.string().optional(),
+  photoUrl: z.string().url().optional().or(z.literal('')),
+  videoUrl: z.string().url().optional().or(z.literal('')),
+  allowGoogleShare: z.boolean().default(false),
+  consentPhotoPublication: z.boolean().default(false),
   token: z.string().optional(),
   bookingRef: z.string().optional(),
-}).refine(
-  (data) => (data.token && data.bookingRef) || (!data.token && !data.bookingRef),
-  {
-    message: 'token and bookingRef must be provided together',
-    path: ['token'],
+});
+
+function generateDiscountCode(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = 'OE-';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-);
+  return code;
+}
+
+function normalizeString(str: string): string {
+  return str
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
 
 export async function POST(request: NextRequest) {
-  const csrfError = verifyCsrf(request);
-  if (csrfError) return csrfError;
-
-  const rateLimitResult = await checkRateLimit(request, { ...RATE_LIMITS.testimonials, limit: 5 });
-  if (rateLimitResult) return rateLimitResult;
-
   try {
     const body = await request.json();
-    const parsed = testimonialSchema.safeParse(body);
+    const data = testimonialSchema.parse(body);
 
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Datos invalidos', details: parsed.error.format() },
-        { status: 400 }
-      );
-    }
+    const emailNormalized = data.email.toLowerCase().trim();
+    const nameNormalized = normalizeString(data.name);
+    const phoneNormalized = data.phone?.replace(/\D/g, '') || null;
 
-    const {
-      name,
-      email,
-      phone,
-      city,
-      instagram,
-      rating,
-      comment,
-      eventType,
-      eventDate,
-      photoUrl,
-      videoUrl,
-      allowGoogleShare,
-      consentDataProcessing,
-      consentPhotoPublication,
-      token,
-      bookingRef,
-    } = parsed.data;
+    // Find or create customer
+    let customer = await prisma.customer.findUnique({
+      where: { emailNormalized },
+    });
 
-    if (token && bookingRef) {
-      const booking = await prisma.booking.findFirst({
-        where: {
-          reference: bookingRef,
-          reviewToken: token,
-          reviewSubmittedAt: null,
+    if (!customer) {
+      customer = await prisma.customer.create({
+        data: {
+          email: data.email,
+          emailNormalized,
+          name: data.name,
+          nameNormalized,
+          phone: data.phone || null,
+          phoneNormalized,
+          gdprConsent: true,
+          gdprConsentDate: new Date(),
         },
       });
+    }
 
-      if (!booking) {
-        return NextResponse.json(
-          { error: 'Token de valoracion invalido o ya utilizado' },
-          { status: 400 }
-        );
-      }
+    // Calculate discount percentage
+    let discountPercent = 5; // Base
+    if (data.photoUrl) discountPercent += 5;
+    if (data.videoUrl) discountPercent += 10;
+    if (data.allowGoogleShare) discountPercent += 5;
 
-      await prisma.booking.update({
-        where: { id: booking.id },
-        data: { reviewSubmittedAt: new Date() },
+    // Generate unique discount code
+    let discountCode = generateDiscountCode();
+    let codeExists = true;
+    let attempts = 0;
+
+    while (codeExists && attempts < 10) {
+      const existing = await prisma.customerDiscountCode.findUnique({
+        where: { code: discountCode },
       });
+      if (!existing) {
+        codeExists = false;
+      } else {
+        discountCode = generateDiscountCode();
+        attempts++;
+      }
     }
 
-    if (!name || !email || !rating || !comment) {
-      return NextResponse.json(
-        { error: 'Faltan campos obligatorios (nombre, email, valoracion, comentario)' },
-        { status: 400 }
-      );
-    }
+    // Create testimonial
+    const testimonial = await prisma.customerTestimonial.create({
+      data: {
+        customerId: customer.id,
+        text: data.comment,
+        rating: data.rating,
+        photoUrl: data.photoUrl || null,
+        showName: true,
+        showPhoto: data.consentPhotoPublication,
+        isApproved: false, // Requires admin approval
+      },
+    });
 
-    if (!token && !consentDataProcessing) {
-      return NextResponse.json(
-        { error: 'Debes aceptar el consentimiento de datos' },
-        { status: 400 }
-      );
-    }
+    // Create discount code
+    const validUntil = new Date();
+    validUntil.setMonth(validUntil.getMonth() + 6);
 
-    const result = await createTestimonial({
-      name,
-      email,
-      phone,
-      city,
-      instagram,
-      rating,
-      comment,
-      eventType,
-      eventDate,
-      photoUrl,
-      videoUrl,
-      allowGoogleShare,
-      consentPhotoPublication,
+    await prisma.customerDiscountCode.create({
+      data: {
+        customerId: customer.id,
+        code: discountCode,
+        discountPercent,
+        validFrom: new Date(),
+        validUntil,
+        maxUses: 1,
+        sourceType: 'TESTIMONIAL',
+        sourceId: testimonial.id,
+        isActive: true,
+      },
+    });
+
+    // Update testimonial with discount code ID
+    await prisma.customerTestimonial.update({
+      where: { id: testimonial.id },
+      data: { discountCodeId: discountCode },
+    });
+
+    // Log activity
+    await prisma.customerActivity.create({
+      data: {
+        customerId: customer.id,
+        action: 'TESTIMONIAL_SUBMITTED',
+        details: {
+          testimonialId: testimonial.id,
+          rating: data.rating,
+          discountCode,
+          discountPercent,
+        },
+      },
     });
 
     return NextResponse.json({
       success: true,
-      data: {
-        id: result.testimonial.id,
-        discountCode: result.discountCode,
-        message: 'Gracias por tu opinion. La revisaremos pronto.',
-      },
+      discountCode,
+      discountPercent,
+      message: 'Testimonial submitted successfully',
     });
   } catch (error) {
-    log.error('Error creando testimonio:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    console.error('Error submitting testimonial:', error);
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid data', details: error.errors },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
-      { error: 'Error procesando la solicitud', details: errorMessage },
+      { error: 'Error processing testimonial' },
+      { status: 500 }
+    );
+  }
+}
+
+// GET: Fetch approved testimonials for public display
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const offset = parseInt(searchParams.get('offset') || '0');
+
+    const testimonials = await prisma.customerTestimonial.findMany({
+      where: {
+        isApproved: true,
+      },
+      include: {
+        customer: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+      skip: offset,
+    });
+
+    const total = await prisma.customerTestimonial.count({
+      where: { isApproved: true },
+    });
+
+    const formattedTestimonials = testimonials.map((t) => ({
+      id: t.id,
+      name: t.showName ? t.customer.name : 'Cliente verificado',
+      text: t.text,
+      rating: t.rating,
+      photoUrl: t.showPhoto ? t.photoUrl : null,
+      eventType: t.eventType,
+      createdAt: t.createdAt,
+    }));
+
+    return NextResponse.json({
+      testimonials: formattedTestimonials,
+      total,
+      hasMore: offset + limit < total,
+    });
+  } catch (error) {
+    console.error('Error fetching testimonials:', error);
+    return NextResponse.json(
+      { error: 'Error fetching testimonials' },
       { status: 500 }
     );
   }

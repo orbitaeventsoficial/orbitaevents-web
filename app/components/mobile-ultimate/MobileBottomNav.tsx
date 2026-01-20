@@ -180,7 +180,7 @@ interface NavItem {
   id: string;
   labelKey: string;
   href: string;
-  icon: React.FC<{ active: boolean }>;
+  icon: React.ComponentType<{ active: boolean }>;
 }
 
 interface NavItemProps {

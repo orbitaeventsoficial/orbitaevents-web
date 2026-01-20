@@ -74,87 +74,96 @@ export async function GET(request: NextRequest) {
       take: 50,
     });
 
-    for (const booking of completedBookings) {
-      const email = booking.clientEmail;
-      const name = booking.clientName;
-      const locale = booking.lead?.preferredLocale || 'es';
+    // Procesar emails en paralelo (batches de 5)
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < completedBookings.length; i += BATCH_SIZE) {
+      const batch = completedBookings.slice(i, i + BATCH_SIZE);
 
-      if (!email || email.includes('@leads.orbitaevents.local')) {
-        results.push({
-          bookingId: booking.id,
-          clientName: name,
-          email: email || 'N/A',
-          status: 'skipped',
-          reason: 'No valid email',
-        });
-        continue;
-      }
+      const batchResults = await Promise.all(
+        batch.map(async (booking): Promise<ProcessedResult> => {
+          const email = booking.clientEmail;
+          const name = booking.clientName;
+          const locale = booking.lead?.preferredLocale || 'es';
 
-      try {
-        const reviewToken = crypto.randomBytes(32).toString('base64url');
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
-        const reviewUrl = `${baseUrl}/${locale}/valoracio?token=${reviewToken}&ref=${booking.reference}`;
+          if (!email || email.includes('@leads.orbitaevents.local')) {
+            return {
+              bookingId: booking.id,
+              clientName: name,
+              email: email || 'N/A',
+              status: 'skipped',
+              reason: 'No valid email',
+            };
+          }
 
-        const packName = booking.pack?.translations?.find(t => t.locale === locale)?.name
-          || booking.pack?.translations?.[0]?.name
-          || 'Tu pack';
+          try {
+            const reviewToken = crypto.randomBytes(32).toString('base64url');
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
+            const reviewUrl = `${baseUrl}/${locale}/valoracio?token=${reviewToken}&ref=${booking.reference}`;
 
-        const emailHtml = generatePostEventEmail({
-          name,
-          packName,
-          eventDate: booking.eventDate,
-          reviewUrl,
-          googleReviewUrl: SITE_CONFIG.reviews.googleReviewUrl,
-          locale,
-        });
+            const packName = booking.pack?.translations?.find(t => t.locale === locale)?.name
+              || booking.pack?.translations?.[0]?.name
+              || 'Tu pack';
 
-        await sendEmail({
-          to: email,
-          subject: getSubjectLine(locale, name),
-          html: emailHtml,
-        });
+            const emailHtml = generatePostEventEmail({
+              name,
+              packName,
+              eventDate: booking.eventDate,
+              reviewUrl,
+              googleReviewUrl: SITE_CONFIG.reviews.googleReviewUrl,
+              locale,
+            });
 
-        await prisma.booking.update({
-          where: { id: booking.id },
-          data: {
-            postEventEmailSent: true,
-            postEventEmailSentAt: now,
-            reviewToken,
-          },
-        });
+            await sendEmail({
+              to: email,
+              subject: getSubjectLine(locale, name),
+              html: emailHtml,
+            });
 
-        if (booking.lead?.customerId) {
-          await prisma.customerActivity.create({
-            data: {
-              customerId: booking.lead.customerId,
-              action: 'POST_EVENT_EMAIL_SENT',
-              details: {
-                bookingId: booking.id,
-                bookingRef: booking.reference,
+            await prisma.booking.update({
+              where: { id: booking.id },
+              data: {
+                postEventEmailSent: true,
+                postEventEmailSentAt: now,
+                reviewToken,
               },
-            },
-          });
-        }
+            });
 
-        results.push({
-          bookingId: booking.id,
-          clientName: name,
-          email,
-          status: 'sent',
-        });
+            if (booking.lead?.customerId) {
+              await prisma.customerActivity.create({
+                data: {
+                  customerId: booking.lead.customerId,
+                  action: 'POST_EVENT_EMAIL_SENT',
+                  details: {
+                    bookingId: booking.id,
+                    bookingRef: booking.reference,
+                  },
+                },
+              });
+            }
 
-      } catch (emailError) {
-        log.error('Error enviando email post-event', emailError, {
-          context: { bookingId: booking.id, bookingRef: booking.reference },
-        });
-        results.push({
-          bookingId: booking.id,
-          clientName: name,
-          email,
-          status: 'error',
-          reason: emailError instanceof Error ? emailError.message : 'Unknown error',
-        });
-      }
+            return {
+              bookingId: booking.id,
+              clientName: name,
+              email,
+              status: 'sent',
+            };
+
+          } catch (emailError) {
+            log.error('Error enviando email post-event', emailError, {
+              context: { bookingId: booking.id, bookingRef: booking.reference },
+            });
+            return {
+              bookingId: booking.id,
+              clientName: name,
+              email,
+              status: 'error',
+              reason: emailError instanceof Error ? emailError.message : 'Unknown error',
+            };
+          }
+        })
+      );
+
+      results.push(...batchResults);
     }
 
     const summary = {

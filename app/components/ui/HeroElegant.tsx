@@ -39,7 +39,7 @@ export default function HeroElegant() {
           poster="/img/hero-poster.webp"
           className="w-full h-full object-cover"
         >
-          <source src="/video/hero.mp4" type="video/mp4" />
+          <source src="/video/Herovideo.mp4" type="video/mp4" />
         </video>
 
         {/* Overlay - Més fosc per llegibilitat */}

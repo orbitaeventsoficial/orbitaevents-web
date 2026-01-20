@@ -24,9 +24,15 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const includeStats = searchParams.get('stats') === 'true';
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '100', 10);
+    const skip = (page - 1) * limit;
 
+    // Query paginada
     const customers = await prisma.customer.findMany({
       orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
       include: {
         _count: {
           select: {
@@ -37,21 +43,19 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    let responseData: Record<string, unknown> = { customers };
+    let responseData: Record<string, unknown> = { customers, page, limit };
 
     if (includeStats) {
-      const total = customers.length;
-      const withEvents = customers.filter(c => c.totalEvents > 0).length;
-
-      // Contactes del últim mes
+      // Stats amb queries a la BD en comptes de filtrar en memòria
       const oneMonthAgo = new Date();
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      const recentMonth = customers.filter(c =>
-        c.createdAt > oneMonthAgo
-      ).length;
 
-      // Amb consentiment GDPR
-      const withGdpr = customers.filter(c => c.gdprConsent).length;
+      const [total, withEvents, recentMonth, withGdpr] = await Promise.all([
+        prisma.customer.count(),
+        prisma.customer.count({ where: { totalEvents: { gt: 0 } } }),
+        prisma.customer.count({ where: { createdAt: { gt: oneMonthAgo } } }),
+        prisma.customer.count({ where: { gdprConsent: true } }),
+      ]);
 
       responseData.stats = {
         total,

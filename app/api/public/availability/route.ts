@@ -15,8 +15,8 @@ import { NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
-// Cache: revalidar cada 5 minutos
-export const revalidate = 300;
+// Cache: revalidar cada hora (les disponibilitats no canvien sovint)
+export const revalidate = 3600;
 
 // Tipos
 interface AvailabilityResponse {
@@ -122,7 +122,7 @@ export async function GET() {
   if (!process.env.DATABASE_URL) {
     return NextResponse.json(generateFallbackAvailability(), {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
       },
     });
   }
@@ -278,7 +278,7 @@ export async function GET() {
 
     return NextResponse.json(response, {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
       },
     });
 
@@ -288,7 +288,7 @@ export async function GET() {
     // En caso de error, devolver datos fallback - return 200
     return NextResponse.json(generateFallbackAvailability(), {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
       },
     });
   }
