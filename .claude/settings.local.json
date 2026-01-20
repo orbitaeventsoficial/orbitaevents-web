@@ -243,7 +243,9 @@
       "Bash(npm test)",
       "Bash(where:*)",
       "Bash(ffmpeg:*)",
-      "Bash(npm run generate:portfolio:*)"
+      "Bash(npm run generate:portfolio:*)",
+      "Bash(npx depcheck:*)",
+      "Bash(npm uninstall:*)"
     ]
   }
 }
