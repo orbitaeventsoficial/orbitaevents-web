@@ -242,7 +242,8 @@
       "Bash(railway open:*)",
       "Bash(npm test)",
       "Bash(where:*)",
-      "Bash(ffmpeg:*)"
+      "Bash(ffmpeg:*)",
+      "Bash(npm run generate:portfolio:*)"
     ]
   }
 }

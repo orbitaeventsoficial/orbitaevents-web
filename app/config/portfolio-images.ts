@@ -9,7 +9,7 @@ export const PORTFOLIO_CATEGORIES = [
   {
     "slug": "discomovil",
     "name": "Discomovil",
-    "cover": "/img/portfolio/discomovil/discomovil-01.png"
+    "cover": "/img/portfolio/discomovil/discomovil-01.webp"
   },
   {
     "slug": "eventos-empresa",
@@ -29,17 +29,17 @@ export const PORTFOLIO_CATEGORIES = [
   {
     "slug": "produccion-tecnica",
     "name": "Produccion tecnica",
-    "cover": "/img/portfolio/produccion-tecnica/produccion-tecnica-01.jpg"
+    "cover": "/img/portfolio/produccion-tecnica/produccion-tecnica-01.webp"
   },
   {
     "slug": "alquiler-equipo",
     "name": "Alquiler equipo",
-    "cover": "/img/portfolio/alquiler-equipo/alquiler-equipo-01.jpg"
+    "cover": "/img/portfolio/alquiler-equipo/alquiler-equipo-01.webp"
   },
   {
     "slug": "fiestas-tematicas-halloween",
     "name": "Fiestas tematicas halloween",
-    "cover": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg"
+    "cover": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.webp"
   },
   {
     "slug": "fiestas-tematicas-mon-magic",
@@ -51,19 +51,19 @@ export const PORTFOLIO_CATEGORIES = [
 export const PORTFOLIO_IMAGES = {
   "alquiler-equipo": [
     {
-      "src": "/img/portfolio/alquiler-equipo/alquiler-equipo-01.jpg",
+      "src": "/img/portfolio/alquiler-equipo/alquiler-equipo-01.webp",
       "alt": "Alquiler equipo – Alquiler equipo  01"
     },
     {
-      "src": "/img/portfolio/alquiler-equipo/alquiler-equipo-02.jpg",
+      "src": "/img/portfolio/alquiler-equipo/alquiler-equipo-02.webp",
       "alt": "Alquiler equipo – Alquiler equipo  02"
     },
     {
-      "src": "/img/portfolio/alquiler-equipo/alquiler-equipo-03.jpg",
+      "src": "/img/portfolio/alquiler-equipo/alquiler-equipo-03.webp",
       "alt": "Alquiler equipo – Alquiler equipo  03"
     },
     {
-      "src": "/img/portfolio/alquiler-equipo/alquiler-equipo-04.jpg",
+      "src": "/img/portfolio/alquiler-equipo/alquiler-equipo-04.webp",
       "alt": "Alquiler equipo – Alquiler equipo  04"
     }
   ],
@@ -115,19 +115,19 @@ export const PORTFOLIO_IMAGES = {
   ],
   "discomovil": [
     {
-      "src": "/img/portfolio/discomovil/discomovil-01.png",
+      "src": "/img/portfolio/discomovil/discomovil-01.webp",
       "alt": "Discomovil – Discomovil  01"
     },
     {
-      "src": "/img/portfolio/discomovil/discomovil-02.jpg",
+      "src": "/img/portfolio/discomovil/discomovil-02.webp",
       "alt": "Discomovil – Discomovil  02"
     },
     {
-      "src": "/img/portfolio/discomovil/discomovil-03.jpg",
+      "src": "/img/portfolio/discomovil/discomovil-03.webp",
       "alt": "Discomovil – Discomovil  03"
     },
     {
-      "src": "/img/portfolio/discomovil/discomovil-04.jpg",
+      "src": "/img/portfolio/discomovil/discomovil-04.webp",
       "alt": "Discomovil – Discomovil  04"
     }
   ],
@@ -149,11 +149,11 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Eventos empresa – Eventos empresa  04"
     },
     {
-      "src": "/img/portfolio/eventos-empresa/eventos-empresa-05.png",
+      "src": "/img/portfolio/eventos-empresa/eventos-empresa-05.webp",
       "alt": "Eventos empresa – Eventos empresa  05"
     },
     {
-      "src": "/img/portfolio/eventos-empresa/eventos-empresa-06.png",
+      "src": "/img/portfolio/eventos-empresa/eventos-empresa-06.webp",
       "alt": "Eventos empresa – Eventos empresa  06"
     }
   ],
@@ -163,11 +163,11 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Fiestas infantiles – Fiestas infantiles  01"
     },
     {
-      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-02.jpg",
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-02.webp",
       "alt": "Fiestas infantiles – Fiestas infantiles  02"
     },
     {
-      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-03.jpg",
+      "src": "/img/portfolio/fiestas-infantiles/fiestas-infantiles-03.webp",
       "alt": "Fiestas infantiles – Fiestas infantiles  03"
     }
   ],
@@ -203,7 +203,7 @@ export const PORTFOLIO_IMAGES = {
   ],
   "fiestas-tematicas-halloween": [
     {
-      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg",
+      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.webp",
       "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  01"
     },
     {
@@ -289,7 +289,7 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  09"
     },
     {
-      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-10.jpg",
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-10.webp",
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  10"
     },
     {
@@ -297,13 +297,13 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  11"
     },
     {
-      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-12.jpg",
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-12.webp",
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  12"
     }
   ],
   "produccion-tecnica": [
     {
-      "src": "/img/portfolio/produccion-tecnica/produccion-tecnica-01.jpg",
+      "src": "/img/portfolio/produccion-tecnica/produccion-tecnica-01.webp",
       "alt": "Produccion tecnica – Produccion tecnica  01"
     },
     {
@@ -311,11 +311,11 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Produccion tecnica – Produccion tecnica  02"
     },
     {
-      "src": "/img/portfolio/produccion-tecnica/produccion-tecnica-03.jpg",
+      "src": "/img/portfolio/produccion-tecnica/produccion-tecnica-03.webp",
       "alt": "Produccion tecnica – Produccion tecnica  03"
     },
     {
-      "src": "/img/portfolio/produccion-tecnica/produccion-tecnica-04.jpg",
+      "src": "/img/portfolio/produccion-tecnica/produccion-tecnica-04.webp",
       "alt": "Produccion tecnica – Produccion tecnica  04"
     }
   ]

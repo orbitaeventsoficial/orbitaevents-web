@@ -51,7 +51,7 @@ export default function RecursosClient() {
     setBrochureStatus((prev) => ({ ...prev, [service]: 'loading' }));
 
     try {
-      const doc = generateServiceBrochure(service, locale);
+      const doc = await generateServiceBrochure(service, locale);
       doc.save(`orbita-events-${service}-${locale}.pdf`);
       setBrochureStatus((prev) => ({ ...prev, [service]: 'success' }));
 

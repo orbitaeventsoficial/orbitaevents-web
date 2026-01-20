@@ -708,12 +708,12 @@ export default function ConfiguradorClient() {
 
             {/* Download PDF Button */}
             <button
-              onClick={() => {
+              onClick={async () => {
                 const extrasNames = config.extras
                   .map((id) => EXTRAS.find((e) => e.id === id)?.name)
                   .filter(Boolean) as string[];
 
-                const doc = generateQuotePDF({
+                const doc = await generateQuotePDF({
                   eventType: config.eventType || 'evento',
                   pack: config.selectedPack,
                   date: config.date,

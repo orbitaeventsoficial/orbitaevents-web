@@ -1,10 +1,21 @@
 /**
  * PDF Generation Utilities for Òrbita Events
  * Uses jsPDF for client-side PDF generation
+ * NOTE: jsPDF is loaded dynamically to reduce initial bundle size
  */
 
-import jsPDF from 'jspdf';
 import { getPacksByService, EXTRAS, type ServiceSlug, type PackDefinition } from '@/app/config/packs-config';
+
+// Dynamic import for jsPDF - only loads when needed
+type jsPDFType = import('jspdf').jsPDF;
+let jsPDFModule: typeof import('jspdf') | null = null;
+
+async function getJsPDF(): Promise<typeof import('jspdf')> {
+  if (!jsPDFModule) {
+    jsPDFModule = await import('jspdf');
+  }
+  return jsPDFModule;
+}
 
 // Brand colors - Enhanced palette
 const COLORS = {
@@ -44,7 +55,7 @@ const SERVICE_NAMES: Record<ServiceSlug, { ca: string; es: string; en: string }>
 /**
  * Add modern header with logo and branding to PDF
  */
-function addHeader(doc: jsPDF, title: string) {
+function addHeader(doc: jsPDFType, title: string) {
   // Modern gradient background (simulated with rectangles)
   doc.setFillColor(...COLORS.blackSoft);
   doc.rect(0, 0, 210, 50, 'F');
@@ -86,7 +97,7 @@ function addHeader(doc: jsPDF, title: string) {
 /**
  * Add modern footer with contact info
  */
-function addFooter(doc: jsPDF, pageNum: number, totalPages: number) {
+function addFooter(doc: jsPDFType, pageNum: number, totalPages: number) {
   const pageHeight = doc.internal.pageSize.height;
 
   // Top border line
@@ -127,10 +138,11 @@ function addFooter(doc: jsPDF, pageNum: number, totalPages: number) {
 /**
  * Generate service brochure PDF
  */
-export function generateServiceBrochure(
+export async function generateServiceBrochure(
   service: ServiceSlug,
   locale: 'ca' | 'es' | 'en' = 'ca'
-): jsPDF {
+): Promise<jsPDFType> {
+  const { default: jsPDF } = await getJsPDF();
   const doc = new jsPDF();
   const packs = getPacksByService(service);
   const serviceName = SERVICE_NAMES[service][locale];
@@ -350,10 +362,11 @@ export interface QuoteData {
   clientEmail?: string;
 }
 
-export function generateQuotePDF(
+export async function generateQuotePDF(
   data: QuoteData,
   locale: 'ca' | 'es' | 'en' = 'ca'
-): jsPDF {
+): Promise<jsPDFType> {
+  const { default: jsPDF } = await getJsPDF();
   const doc = new jsPDF();
 
   const t = {
