@@ -6,7 +6,45 @@ import nextDynamic from 'next/dynamic';
 
 export const dynamic = 'force-dynamic';
 
-const ConfiguradorClient = nextDynamic(() => import('./client'));
+// Loading skeleton mentre carrega el client
+function LoadingSkeleton() {
+  return (
+    <div className="min-h-screen bg-bg-main py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Progress Steps skeleton */}
+        <div className="mb-16 flex justify-center">
+          <div className="flex items-center gap-2 sm:gap-4">
+            {[1, 2, 3, 4].map((s) => (
+              <div key={s} className="flex items-center gap-2 sm:gap-4">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-bg-surface animate-pulse" />
+                {s < 4 && <div className="h-0.5 w-6 sm:w-12 bg-bg-surface" />}
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Content skeleton */}
+        <div className="text-center mb-12">
+          <div className="h-12 w-96 mx-auto bg-bg-surface rounded-lg animate-pulse mb-4" />
+          <div className="h-6 w-64 mx-auto bg-bg-surface rounded animate-pulse" />
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="p-8 rounded-2xl bg-bg-surface border border-border animate-pulse">
+              <div className="w-12 h-12 bg-zinc-800 rounded-full mb-4" />
+              <div className="h-6 w-32 bg-zinc-800 rounded mb-2" />
+              <div className="h-4 w-24 bg-zinc-800 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const ConfiguradorClient = nextDynamic(() => import('./client'), {
+  loading: () => <LoadingSkeleton />,
+  ssr: false,
+});
 
 export const metadata: Metadata = {
   title: 'Configurador de Eventos | Calcula tu Presupuesto Online | Òrbita Events',
