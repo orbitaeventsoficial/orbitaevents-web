@@ -611,7 +611,6 @@ async function main() {
   console.log('   • 3 packs (Flash 250€, Party Starter 400€, Corporate 450€)');
   console.log(`   • ${extras.length} extras`);
   console.log(`   • ${faqs.length} FAQs`);
-  console.log(`   • ${testimonials.length} testimonis`);
   console.log(`   • ${translations.length} traduccions`);
   console.log('');
   console.log('📈 ESTADÍSTIQUES INICIALS:');
