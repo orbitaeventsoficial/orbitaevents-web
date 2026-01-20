@@ -180,7 +180,10 @@ export function AvailabilityCalendar({
   };
 
   const days = getDaysInMonth();
-  const weekDays = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date(2021, 0, 4 + i);
+    return new Intl.DateTimeFormat(locale, { weekday: 'narrow' }).format(date);
+  });
 
   const monthName = currentMonth.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
 
@@ -191,7 +194,7 @@ export function AvailabilityCalendar({
         <button
           onClick={previousMonth}
           className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-          aria-label="Previous month"
+          aria-label={t('previousMonth')}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -203,7 +206,7 @@ export function AvailabilityCalendar({
         <button
           onClick={nextMonth}
           className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-          aria-label="Next month"
+          aria-label={t('nextMonth')}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -214,13 +217,13 @@ export function AvailabilityCalendar({
       {/* Loading/Error */}
       {loading && (
         <div className="text-center py-8 text-white/60">
-          <div className="animate-pulse">Cargando...</div>
+          <div className="animate-pulse">{t('loading')}</div>
         </div>
       )}
 
       {error && (
         <div className="text-center py-8 text-red-400">
-          Error: {error}
+          {t('error')}: {error}
         </div>
       )}
 
@@ -273,19 +276,19 @@ export function AvailabilityCalendar({
         <div className="mt-6 flex flex-wrap gap-4 justify-center text-sm">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded border bg-green-500/20 border-green-500"></div>
-            <span>Disponible</span>
+            <span>{t('legend.available')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded border bg-red-500/20 border-red-500"></div>
-            <span>Reservado</span>
+            <span>{t('legend.booked')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded border bg-gray-500/20 border-gray-500"></div>
-            <span>Bloqueado</span>
+            <span>{t('legend.blocked')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded border bg-white/5 border-white/10"></div>
-            <span>Sin datos</span>
+            <span>{t('legend.noData')}</span>
           </div>
         </div>
       )}

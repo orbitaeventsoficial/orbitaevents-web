@@ -34,23 +34,27 @@ const Icons = {
   ),
 };
 
+const MONTH_KEYS = [
+  'january', 'february', 'march', 'april', 'may', 'june',
+  'july', 'august', 'september', 'october', 'november', 'december',
+] as const;
+
 function useAvailability() {
   const locale = useLocale();
+  const tCommon = useTranslations('common');
   const [data, setData] = useState<{ month: string; saturdays: number; status: 'scarce' | 'limited' | 'available' }>({ month: '', saturdays: 0, status: 'available' });
 
   useEffect(() => {
-    const monthNamesCa = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
-    const monthNamesEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    const monthNames = locale === 'es' ? monthNamesEs : monthNamesCa;
     const mockAvailability: Record<number, number> = { 0: 3, 1: 4, 2: 3, 3: 2, 4: 1, 5: 2, 6: 3, 7: 4, 8: 2, 9: 3, 10: 2, 11: 1 };
     const month = new Date().getMonth();
     const sats = mockAvailability[month] || 2;
+    const monthKey = MONTH_KEYS[month];
     setData({
-      month: monthNames[month],
+      month: tCommon(`months.${monthKey}`),
       saturdays: sats,
       status: sats <= 1 ? 'scarce' : sats <= 2 ? 'limited' : 'available'
     });
-  }, [locale]);
+  }, [locale, tCommon]);
 
   return data;
 }

@@ -20,11 +20,12 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/navigation';
 
 // Tipus per traduccions
 type CalendarTranslations = ReturnType<typeof useTranslations<'calendar'>>;
+type CalendarLocale = 'es' | 'ca' | 'en';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -58,21 +59,25 @@ interface MonthData {
 // CONFIGURACIÓN
 // ═══════════════════════════════════════════════════════════════════════════
 
-const MONTH_NAMES = {
-  es: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+const MONTH_NAMES: Record<CalendarLocale, string[]> = {
+  es: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
   ca: ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny',
-       'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre']
+       'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'],
+  en: ['January', 'February', 'March', 'April', 'May', 'June',
+       'July', 'August', 'September', 'October', 'November', 'December'],
 };
 
-const MONTH_SHORT = {
+const MONTH_SHORT: Record<CalendarLocale, string[]> = {
   es: ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'],
-  ca: ['GEN', 'FEB', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DES']
+  ca: ['GEN', 'FEB', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DES'],
+  en: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
 };
 
-const DAYS_SHORT = {
+const DAYS_SHORT: Record<CalendarLocale, string[]> = {
   es: ['L', 'M', 'X', 'J', 'V', 'S', 'D'],
-  ca: ['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg']
+  ca: ['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'],
+  en: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
 };
 
 // Simular disponibilidad (reemplazar con API real)
@@ -97,7 +102,7 @@ const getReasonText = (reason: string | undefined, t: CalendarTranslations): str
 // UTILIDADES
 // ═══════════════════════════════════════════════════════════════════════════
 
-function generateMonthData(month: number, year: number, locale: 'es' | 'ca' = 'es'): MonthData {
+function generateMonthData(month: number, year: number, locale: CalendarLocale = 'es'): MonthData {
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const today = new Date();
@@ -159,7 +164,7 @@ function generateMonthData(month: number, year: number, locale: 'es' | 'ca' = 'e
 interface MiniMonthProps {
   data: MonthData;
   onDayClick: (day: DayStatus) => void;
-  locale: 'es' | 'ca';
+  locale: CalendarLocale;
   t: CalendarTranslations;
 }
 
@@ -405,13 +410,13 @@ interface DayModalProps {
   monthName: string;
   onClose: () => void;
   t: CalendarTranslations;
-  locale: 'es' | 'ca';
+  locale: CalendarLocale;
 }
 
 function DayModal({ day, monthName, onClose, t, locale }: DayModalProps) {
   if (!day) return null;
 
-  const dateLocale = locale === 'ca' ? 'ca-ES' : 'es-ES';
+  const dateLocale = locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES';
   const formattedDate = new Date(day.date).toLocaleDateString(dateLocale, {
     weekday: 'long',
     day: 'numeric',
@@ -500,7 +505,8 @@ export default function CalendarioUrgencia({
 }: CalendarioUrgenciaProps) {
   const t = useTranslations('calendar');
   const tCommon = useTranslations('common');
-  const locale = (tCommon('language') === 'ca' ? 'ca' : 'es') as 'es' | 'ca';
+  const intlLocale = useLocale();
+  const locale = (intlLocale === 'en' ? 'en' : intlLocale === 'ca' ? 'ca' : 'es') as CalendarLocale;
 
   const [months, setMonths] = useState<MonthData[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
@@ -656,7 +662,8 @@ export default function CalendarioUrgencia({
 export function CalendarioCompacto() {
   const t = useTranslations('calendar');
   const tCommon = useTranslations('common');
-  const locale = (tCommon('language') === 'ca' ? 'ca' : 'es') as 'es' | 'ca';
+  const intlLocale = useLocale();
+  const locale = (intlLocale === 'en' ? 'en' : intlLocale === 'ca' ? 'ca' : 'es') as CalendarLocale;
 
   const [months, setMonths] = useState<MonthData[]>([]);
   const [isClient, setIsClient] = useState(false);

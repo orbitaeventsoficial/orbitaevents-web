@@ -257,17 +257,15 @@ const PACKS: PackDefinition[] = [
     price: "550€",
     priceValue: 550,
     features: [
-      "DJ profesional 3 horas (Solo baile final)", // ← CORRECCIÓN: 3h para solo baile
+      "DJ profesional 3 horas (Solo baile final)",
       `Sonido PRO ${INVENTARIO.altavoces.potenciaTotal}W (${INVENTARIO.altavoces.nombre}) + ${INVENTARIO.controladora.nombre}`,
       `Iluminación de pista (${getDescripcionIluminacionBasica()})`,
       INVENTARIO.efectos.maquinaHumo.nombre,
-      "Micrófono inalámbrico (Discursos)",
-      "1 Reunión de coordinación",
     ],
     ideal: "Bodas íntimas que solo necesitan fiesta",
     duration: "3 horas",
     durationHours: 3,
-    badge: "Básico",
+    badge: null,
   },
   {
     id: "bodas-premium",
@@ -281,18 +279,15 @@ const PACKS: PackDefinition[] = [
     features: [
       "DJ profesional 5 horas (Ceremonia, Cóctel, Baile)",
       `Sonido PRO ${INVENTARIO.altavoces.potenciaTotal}W + ${INVENTARIO.controladora.nombre}`,
-      `Iluminación PRO: ${getDescripcionIluminacionPRO()}`, // ← Cabezas móviles
+      "Iluminación PRO: 4 Cabezas Móviles 150W LED",
       "Iluminación ambiental (Bolas LED)",
-      `${INVENTARIO.efectos.maquinaHumo.nombre} ligero`,
-      "2 Micrófonos inalámbricos (Lecturas/Discursos)",
-      "Coordinación total con Wedding Planner",
-      "Música personalizada para cada momento",
+      INVENTARIO.efectos.maquinaHumo.nombre,
     ],
     ideal: "Bodas estándar 80-150 invitados",
     duration: "5 horas",
     durationHours: 5,
     popular: true,
-    badge: "Más popular",
+    badge: "BEST SELLER",
   },
   {
     id: "bodas-luxury",
@@ -306,17 +301,13 @@ const PACKS: PackDefinition[] = [
     features: [
       "DJ + TÉCNICO DE LUCES (2 Personas, 6 horas)",
       `Sonido Audiófilo ${INVENTARIO.altavoces.potenciaTotal}W ${INVENTARIO.altavoces.nombre.replace('2x ', '')}`,
-      `Show de luces sincronizado (${getDescripcionIluminacionPRO()})`, // ← Cabezas móviles
-      `Efecto ${INVENTARIO.extras.humoBajo.nombre} (Baile en las nubes)`,
-      `Pack ${INVENTARIO.extras.chispasFrias.nombre}`,
-      INVENTARIO.extras.burbujas.nombre,
-      "Grabación de audio de la ceremonia",
-      "Montaje estético premium (Cabina retroiluminada)",
+      "Show de luces sincronizado (4 Cabezas Móviles 150W LED)",
+      "Efecto Máquina de Humo Bajo (Baile en las nubes)",
     ],
     ideal: "Bodas que buscan impacto visual",
     duration: "6 horas",
     durationHours: 6,
-    badge: "Premium",
+    badge: null,
   },
 
   // =============================================

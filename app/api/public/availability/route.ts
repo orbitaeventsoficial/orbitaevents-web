@@ -11,7 +11,7 @@
 // NO requiere autenticación - es pública pero con cache
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
@@ -67,19 +67,79 @@ function formatDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-// Helper: Nombre del mes en español
-function getMonthName(month: number): string {
-  const months = [
+type Locale = 'es' | 'ca' | 'en';
+
+const MONTH_NAMES: Record<Locale, string[]> = {
+  es: [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-  ];
-  return months[month];
+  ],
+  ca: [
+    'Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny',
+    'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'
+  ],
+  en: [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ],
+};
+
+function getRequestLocale(req: NextRequest): Locale {
+  const queryLocale = req.nextUrl.searchParams.get('locale');
+  if (queryLocale === 'es' || queryLocale === 'ca' || queryLocale === 'en') {
+    return queryLocale;
+  }
+
+  const cookieLocale = req.cookies.get('NEXT_LOCALE')?.value;
+  if (cookieLocale === 'es' || cookieLocale === 'ca' || cookieLocale === 'en') {
+    return cookieLocale;
+  }
+
+  const acceptLanguage = req.headers.get('accept-language') || '';
+  const languages = acceptLanguage.split(',').map((lang) => lang.trim().toLowerCase());
+  for (const lang of languages) {
+    if (lang.startsWith('ca')) return 'ca';
+    if (lang.startsWith('en')) return 'en';
+    if (lang.startsWith('es')) return 'es';
+  }
+
+  return 'es';
+}
+
+function getMonthName(month: number, locale: Locale): string {
+  return MONTH_NAMES[locale][month];
+}
+
+function getScarcityMessage(
+  locale: Locale,
+  monthName: string,
+  urgencyLevel: 'low' | 'medium' | 'high' | 'critical',
+  availableSaturdays: number
+): string {
+  if (locale === 'en') {
+    if (urgencyLevel === 'critical') return `${monthName}: SOLD OUT!`;
+    if (urgencyLevel === 'high') return `${monthName}: Last date!`;
+    if (urgencyLevel === 'medium') return `${monthName}: ${availableSaturdays} Saturdays left`;
+    return `${monthName}: ${availableSaturdays} Saturdays available`;
+  }
+
+  if (locale === 'ca') {
+    if (urgencyLevel === 'critical') return `${monthName}: COMPLET!`;
+    if (urgencyLevel === 'high') return `${monthName}: Darrera data!`;
+    if (urgencyLevel === 'medium') return `${monthName}: queden ${availableSaturdays} dissabtes`;
+    return `${monthName}: ${availableSaturdays} dissabtes disponibles`;
+  }
+
+  if (urgencyLevel === 'critical') return `${monthName}: ¡COMPLETO!`;
+  if (urgencyLevel === 'high') return `${monthName}: ¡Última fecha!`;
+  if (urgencyLevel === 'medium') return `${monthName}: quedan ${availableSaturdays} sábados`;
+  return `${monthName}: ${availableSaturdays} sábados disponibles`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FALLBACK AVAILABILITY - Dades creïbles quan la BD no està disponible
 // ═══════════════════════════════════════════════════════════════════════════
-function generateFallbackAvailability() {
+function generateFallbackAvailability(locale: Locale) {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
@@ -90,9 +150,7 @@ function generateFallbackAvailability() {
   nextSaturday.setDate(now.getDate() + Math.max(daysUntilSaturday, 7));
 
   // Missatge d'escassetat creïble (no "COMPLETO!" que sembla fake)
-  const monthNames = ['gener', 'febrer', 'març', 'abril', 'maig', 'juny', 
-                      'juliol', 'agost', 'setembre', 'octubre', 'novembre', 'desembre'];
-  const currentMonthName = monthNames[currentMonth];
+  const currentMonthName = getMonthName(currentMonth, locale);
 
   return {
     ok: true,
@@ -101,7 +159,7 @@ function generateFallbackAvailability() {
       nextAvailableSaturday: nextSaturday.toISOString().slice(0, 10),
       monthlyAvailability: [{
         month: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`,
-        monthName: getMonthName(currentMonth),
+        monthName: getMonthName(currentMonth, locale),
         year: currentYear,
         totalSaturdays: 4,
         availableSaturdays: 2, // Creïble: alguns reservats, alguns lliures
@@ -109,7 +167,7 @@ function generateFallbackAvailability() {
         blockedSaturdays: 0,
         saturdayDates: [],
       }],
-      scarcityMessage: `${currentMonthName}: queden 2 dissabtes disponibles`,
+      scarcityMessage: getScarcityMessage(locale, currentMonthName, 'medium', 2),
       urgencyLevel: 'medium' as const, // No 'critical' que sembla manipulatiu
     },
     generatedAt: new Date().toISOString(),
@@ -117,10 +175,11 @@ function generateFallbackAvailability() {
   };
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const locale = getRequestLocale(req);
   // Check if DATABASE_URL is configured
   if (!process.env.DATABASE_URL) {
-    return NextResponse.json(generateFallbackAvailability(), {
+    return NextResponse.json(generateFallbackAvailability(locale), {
       headers: {
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
       },
@@ -215,7 +274,7 @@ export async function GET() {
 
       monthlyAvailability.push({
         month: `${checkYear}-${String(normalizedMonth + 1).padStart(2, '0')}`,
-        monthName: getMonthName(normalizedMonth),
+        monthName: getMonthName(normalizedMonth, locale),
         year: checkYear,
         totalSaturdays: futureSaturdays.length,
         availableSaturdays,
@@ -239,17 +298,13 @@ export async function GET() {
 
     // Generar mensaje de escasez
     let scarcityMessage = '';
-    const currentMonthName = getMonthName(currentMonth);
-
-    if (urgencyLevel === 'critical') {
-      scarcityMessage = `${currentMonthName}: ¡COMPLETO!`;
-    } else if (urgencyLevel === 'high') {
-      scarcityMessage = `${currentMonthName}: ¡Última fecha!`;
-    } else if (urgencyLevel === 'medium') {
-      scarcityMessage = `${currentMonthName}: quedan ${firstMonthAvailable} sábados`;
-    } else {
-      scarcityMessage = `${currentMonthName}: ${firstMonthAvailable} sábados disponibles`;
-    }
+    const currentMonthName = getMonthName(currentMonth, locale);
+    scarcityMessage = getScarcityMessage(
+      locale,
+      currentMonthName,
+      urgencyLevel,
+      firstMonthAvailable
+    );
 
     // Próxima fecha disponible (cualquier día, no solo sábados)
     let nextAvailableDate: string | null = null;
@@ -286,7 +341,7 @@ export async function GET() {
     log.error('Error obteniendo disponibilidad:', error);
 
     // En caso de error, devolver datos fallback - return 200
-    return NextResponse.json(generateFallbackAvailability(), {
+    return NextResponse.json(generateFallbackAvailability(locale), {
       headers: {
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
       },

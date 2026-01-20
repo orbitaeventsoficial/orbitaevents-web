@@ -2638,7 +2638,13 @@
         ]
       }
     },
-    "ctaButton": "Contacta'ns"
+    "ctaButton": "Contacta'ns",
+    "mobileCta": {
+      "ready": "A punt per al teu esdeveniment?",
+      "response": "Resposta en <2h - Pressupost gratis",
+      "whatsapp": "WhatsApp",
+      "prices": "Veure preus"
+    }
   },
   "offerModal": {
     "ariaLabel": "Oferta d'última hora",
@@ -2668,6 +2674,12 @@
       "scarce": "Pocs dies",
       "limited": "Disponibilitat limitada",
       "available": "Disponible"
+    },
+    "legend": {
+      "available": "Disponible",
+      "booked": "Reservat",
+      "blocked": "Bloquejat",
+      "noData": "Sense dades"
     },
     "viewCalendar": "Veure calendari complet"
   },
@@ -4883,6 +4895,12 @@
       "description": "Creem experiències úniques: casaments Harry Potter, festes Halloween, esdeveniments corporatius. DJ professional + tematització completa. Des de 250€. Barcelona i Girona. ★★★★★ 5.0/5",
       "ogTitle": "Experiències Immersives per Events | Òrbita Events | Des de 250€",
       "ogDescription": "Casaments Harry Potter, festes Halloween, esdeveniments corporatius. DJ + tematització completa. Barcelona i Girona."
+    },
+    "skeleton": {
+      "badge": "No només música, creem experiències",
+      "titleLine1": "Que el teu esdeveniment sigui",
+      "titleHighlight": "inoblidable",
+      "description": "DJ professional + tematització completa per a casaments, festes i esdeveniments."
     }
   },
   "privacyPortal": {
@@ -6154,6 +6172,36 @@
       "booked": "Reservat",
       "blocked": "Bloquejat",
       "noData": "Sense dades"
+    },
+    "howItWorks": {
+      "title": "Com funciona?",
+      "items": {
+        "available": "Verd: Data disponible per reservar",
+        "booked": "Vermell: Data ja reservada",
+        "blocked": "Gris: Data bloquejada (festius, manteniment)"
+      }
+    },
+    "reserve": {
+      "title": "Vols reservar?",
+      "description": "Si has trobat una data disponible, no esperis més. Contacta'ns per fer la reserva.",
+      "cta": "Reservar ara"
+    },
+    "faq": {
+      "title": "Preguntes Freqüents",
+      "items": {
+        "1": {
+          "question": "Amb quanta antelació he de reservar?",
+          "answer": "Recomanem reservar amb almenys 2-3 mesos d'antelació, especialment per a casaments i esdeveniments importants. Tot i això, també acceptem reserves d'última hora si tenim disponibilitat."
+        },
+        "2": {
+          "question": "Què passa si la meva data està reservada?",
+          "answer": "Si la data que busques està ocupada, podem recomanar-te dates alternatives properes. També pots contactar-nos per consultar possibles cancel·lacions o canvis."
+        },
+        "3": {
+          "question": "S'actualitza en temps real?",
+          "answer": "El calendari s'actualitza cada 15 minuts. Si acabes de fer una consulta i no veus la teva reserva reflectida, és normal. Rebràs una confirmació per email."
+        }
+      }
     }
   },
   "booking": {
@@ -6164,6 +6212,27 @@
     "hero": {
       "title": "Reserva el teu Event",
       "description": "Completa el formulari i reserva la teva data. Et contactarem en les properes 24 hores per confirmar tots els detalls."
+    },
+    "trust": {
+      "items": {
+        "1": {
+          "title": "Resposta ràpida",
+          "description": "Et responem en menys de 2h"
+        },
+        "2": {
+          "title": "Sense compromís",
+          "description": "Cancel·la sense cost si canvies d'idea"
+        },
+        "3": {
+          "title": "Valoració 5.0",
+          "description": "Esdeveniments realitzats amb èxit"
+        }
+      }
+    },
+    "help": {
+      "title": "Necessites ajuda per decidir?",
+      "contact": "Contacta'ns",
+      "availability": "Veure disponibilitat"
     }
   },
   "blog": {

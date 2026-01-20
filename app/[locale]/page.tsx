@@ -4,6 +4,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // OPTIMIZADO: SSR habilitado para above-the-fold, lazy loading below-the-fold
 
+import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
@@ -13,6 +14,8 @@ import { Suspense } from 'react';
 // ═══════════════════════════════════════════════════════════════════════════
 
 function HeroSkeleton() {
+  const t = useTranslations('homePage');
+
   return (
     <section className="relative min-h-[100svh] flex items-center justify-center bg-[#0A0A0A]">
       <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/80 via-[#0A0A0A]/60 to-[#0A0A0A]" />
@@ -20,17 +23,17 @@ function HeroSkeleton() {
         <div className="max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20">
             <span className="text-amber-500 text-lg">✨</span>
-            <span className="text-amber-400 text-sm font-medium">No solo música, creamos experiencias</span>
+            <span className="text-amber-400 text-sm font-medium">{t('skeleton.badge')}</span>
           </div>
           <h1 className="text-[2.5rem] leading-[1.05] md:text-6xl lg:text-7xl font-black text-white mb-3 tracking-tight">
-            Que tu evento sea
+            {t('skeleton.titleLine1')}
             <br />
             <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent">
-              inolvidable
+              {t('skeleton.titleHighlight')}
             </span>
           </h1>
           <p className="text-lg md:text-xl text-white/70 mb-6 max-w-xl mx-auto">
-            DJ profesional + tematización completa para bodas, fiestas y eventos.
+            {t('skeleton.description')}
           </p>
         </div>
       </div>

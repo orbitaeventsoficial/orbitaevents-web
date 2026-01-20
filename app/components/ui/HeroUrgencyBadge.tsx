@@ -20,27 +20,28 @@ interface ProcessedAvailability {
   isHalloweenMonth: boolean;
 }
 
-// Noms dels mesos en català
-const MONTH_NAMES_CA: Record<number, string> = {
-  1: 'gen.', 2: 'feb.', 3: 'març', 4: 'abr.', 5: 'maig', 6: 'juny',
-  7: 'jul.', 8: 'ago.', 9: 'set.', 10: 'oct.', 11: 'nov.', 12: 'des.'
-};
+const MONTH_KEYS = [
+  'january', 'february', 'march', 'april', 'may', 'june',
+  'july', 'august', 'september', 'october', 'november', 'december',
+] as const;
 
 export default function HeroUrgencyBadge() {
   const t = useTranslations('heroUrgency');
+  const tCommon = useTranslations('common');
   const { data, isLoading } = useAvailability();
   const [currentTheme, setCurrentTheme] = useState<'halloween' | 'monMagic'>('halloween');
 
   // Process availability data from shared hook
   const availability = useMemo<ProcessedAvailability | null>(() => {
-    if (!data.monthlyAvailability || data.monthlyAvailability.length === 0) {
+    if (!data.monthlyAvailability || data.monthlyAvailability.length === 0) {   
       const now = new Date();
+      const monthKey = MONTH_KEYS[now.getMonth()];
       return {
         freeSaturdays: 0,
         totalSaturdays: 0,
         month: now.getMonth() + 1,
         year: now.getFullYear(),
-        monthName: MONTH_NAMES_CA[now.getMonth() + 1],
+        monthName: tCommon(`months.${monthKey}`),
         isHalloweenMonth: false
       };
     }
@@ -58,15 +59,16 @@ export default function HeroUrgencyBadge() {
     const monthNum = parseInt(monthStr, 10);
     const yearNum = parseInt(yearStr, 10);
 
+    const monthKey = MONTH_KEYS[monthNum - 1];
     return {
       freeSaturdays: monthData.availableSaturdays || 0,
       totalSaturdays: monthData.totalSaturdays || 0,
       month: monthNum,
       year: yearNum,
-      monthName: MONTH_NAMES_CA[monthNum] || monthData.monthName,
+      monthName: monthKey ? tCommon(`months.${monthKey}`) : monthData.monthName,
       isHalloweenMonth: monthNum === 10
     };
-  }, [data.monthlyAvailability]);
+  }, [data.monthlyAvailability, tCommon]);
 
   // Rotar entre Halloween i Món Màgic cada 5 segons
   useEffect(() => {
@@ -220,6 +222,8 @@ export default function HeroUrgencyBadge() {
 // ═══════════════════════════════════════════════════════════════
 
 export function HeroUrgencyBadgeCompact() {
+  const t = useTranslations('heroUrgency');
+  const tCommon = useTranslations('common');
   const { data, isLoading } = useAvailability();
 
   // Process availability data from shared hook
@@ -235,13 +239,14 @@ export function HeroUrgencyBadgeCompact() {
     const [yearStr, monthStr] = monthData.month.split('-');
     const monthNum = parseInt(monthStr, 10);
 
+    const monthKey = MONTH_KEYS[monthNum - 1];
     return {
       freeSaturdays: monthData.availableSaturdays || 0,
-      monthName: MONTH_NAMES_CA[monthNum] || monthData.monthName,
+      monthName: monthKey ? tCommon(`months.${monthKey}`) : monthData.monthName,
       year: parseInt(yearStr, 10),
       isHalloweenMonth: monthNum === 10
     };
-  }, [data.monthlyAvailability]);
+  }, [data.monthlyAvailability, tCommon]);
 
   if (isLoading || !availability) return null;
 
@@ -262,8 +267,13 @@ export function HeroUrgencyBadgeCompact() {
       <span>{availability.isHalloweenMonth ? '🎃' : '📅'}</span>
       <span>
         {availability.freeSaturdays === 0
-          ? `${availability.monthName} ${availability.year} esgotat`
-          : `${availability.freeSaturdays} dissabtes lliures ${availability.monthName}`
+          ? t('halloween.soldOut')
+          : t(
+              availability.isHalloweenMonth
+                ? 'halloween.saturdaysFree'
+                : 'nextDates.saturdaysFree',
+              { count: availability.freeSaturdays, month: availability.monthName }
+            )
         }
       </span>
       {isUrgent && availability.freeSaturdays > 0 && <span>⚠️</span>}

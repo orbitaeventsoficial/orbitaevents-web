@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════
 // IMATGES - Fotos reals del casament
@@ -203,6 +203,7 @@ function FloatingCandles() {
 
 export default function ProductesMonMagic() {
   const t = useTranslations('monMagic');
+  const locale = useLocale();
 
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [quantitat, setQuantitat] = useState<50 | 80 | 100>(80);
@@ -767,7 +768,7 @@ export default function ProductesMonMagic() {
                       className="px-6 pb-4"
                     >
                       <p className="text-white/70">
-                        {t(`faqs.${faqKey}.resposta`)}
+                        {t(`faqs.${faqKey}.${locale === 'ca' ? 'resposta' : 'respuesta'}`)}
                       </p>
                     </motion.div>
                   )}

@@ -50,8 +50,10 @@ export async function GET() {
       orderBy: { order: 'asc' },
     });
 
+    const filteredPacks = packs.filter(pack => pack.slug !== 'flash');
+
     // Transform to public format (only expose safe fields)
-    const publicPacks: PublicPack[] = packs.map(pack => {
+    const publicPacks: PublicPack[] = filteredPacks.map(pack => {
       // Get Spanish translation as default, fallback to first available
       const translation = pack.translations.find(t => t.locale === 'es')
         || pack.translations[0];

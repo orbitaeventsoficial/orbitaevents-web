@@ -2792,9 +2792,87 @@
       "lastUpdate": "Última actualización"
     },
     "terminos": {
+      "title": "Términos y Condiciones",
       "metadata": {
         "title": "Términos y Condiciones | Òrbita Events",
         "description": "Términos y condiciones de uso de los servicios de Òrbita Events."
+      },
+      "lastUpdate": "Última actualización:",
+      "section1": {
+        "title": "1. Identificación",
+        "intro": "Estos términos y condiciones regulan el uso de los servicios ofrecidos por:",
+        "empresa": "Empresa:",
+        "ubicacion": "Ubicación:",
+        "contacto": "Contacto:",
+        "datosCompletos": "Para datos fiscales completos, contactar por email."
+      },
+      "section2": {
+        "title": "2. Servicios",
+        "content": "Òrbita Events ofrece servicios de DJ, iluminación, efectos especiales, tematización y producción técnica para eventos como bodas, fiestas privadas, eventos corporativos y celebraciones."
+      },
+      "section3": {
+        "title": "3. Reservas y Pagos",
+        "proceso": {
+          "title": "3.1 Proceso de Reserva",
+          "item1": "Solicitud de presupuesto personalizado",
+          "item2": "Aceptación del presupuesto por parte del cliente",
+          "item3": "Pago de la señal para confirmar la reserva",
+          "item4": "Firma del contrato de servicios"
+        },
+        "condiciones": {
+          "title": "3.2 Condiciones de Pago",
+          "senal": "Señal:",
+          "senalDesc": "30% del total para confirmar la reserva",
+          "resto": "Resto:",
+          "restoDesc": "El día del evento o según acuerdo",
+          "metodos": "Métodos:",
+          "metodosDesc": "Transferencia bancaria, Bizum, efectivo"
+        }
+      },
+      "section4": {
+        "title": "4. Cancelaciones",
+        "item1": "Más de 30 días antes:",
+        "item2": "Entre 15-30 días:",
+        "item3": "Menos de 15 días:",
+        "item3Desc": "Cobro del 100% del servicio",
+        "item4": "Fuerza mayor:",
+        "item4Desc": "Se acordarán condiciones especiales"
+      },
+      "section5": {
+        "title": "5. Obligaciones del Cliente",
+        "item1": "Proporcionar información veraz sobre el evento",
+        "item2": "Garantizar acceso al lugar del evento para montaje",
+        "item3": "Disponer de suministro eléctrico adecuado",
+        "item4": "Informar de cualquier cambio con antelación",
+        "item5": "Cumplir con los pagos acordados"
+      },
+      "section6": {
+        "title": "6. Obligaciones de Òrbita Events",
+        "item1": "Prestar los servicios contratados con profesionalidad",
+        "item2": "Disponer de equipo técnico en perfecto estado",
+        "item3": "Contar con equipamiento de respaldo",
+        "item4": "Cumplir con los horarios acordados",
+        "item5": "Disponer de seguro de responsabilidad civil"
+      },
+      "section7": {
+        "title": "7. Limitación de Responsabilidad",
+        "intro": "Òrbita Events no será responsable de:",
+        "item1": "Cortes de suministro eléctrico ajenos a nuestro control",
+        "item2": "Daños causados por condiciones meteorológicas adversas",
+        "item3": "Incidencias causadas por terceros",
+        "item4": "Eventos de fuerza mayor"
+      },
+      "section8": {
+        "title": "8. Propiedad Intelectual",
+        "content": "Las fotografías y vídeos realizados durante los eventos podrán ser utilizados por Òrbita Events con fines promocionales, salvo indicación expresa en contrario por parte del cliente."
+      },
+      "section9": {
+        "title": "9. Resolución de Conflictos",
+        "content": "Para cualquier controversia derivada de estos términos, las partes se someten a los Juzgados y Tribunales de {city}, renunciando a cualquier otro fuero que pudiera corresponderles."
+      },
+      "section10": {
+        "title": "10. Contacto",
+        "intro": "Para consultas sobre estos términos:"
       }
     },
     "cookies": {
@@ -3074,90 +3152,6 @@
       },
       "ctaFinal": {
         "button": "Gestiona tus datos personales"
-      }
-    },
-    "terminos": {
-      "title": "Términos y Condiciones",
-      "metadata": {
-        "title": "Términos y Condiciones | Òrbita Events",
-        "description": "Términos y condiciones de uso de los servicios de Òrbita Events."
-      },
-      "lastUpdate": "Última actualización:",
-      "section1": {
-        "title": "1. Identificación",
-        "intro": "Estos términos y condiciones regulan el uso de los servicios ofrecidos por:",
-        "empresa": "Empresa:",
-        "ubicacion": "Ubicación:",
-        "contacto": "Contacto:",
-        "datosCompletos": "Para datos fiscales completos, contactar por email."
-      },
-      "section2": {
-        "title": "2. Servicios",
-        "content": "Òrbita Events ofrece servicios de DJ, iluminación, efectos especiales, tematización y producción técnica para eventos como bodas, fiestas privadas, eventos corporativos y celebraciones."
-      },
-      "section3": {
-        "title": "3. Reservas y Pagos",
-        "proceso": {
-          "title": "3.1 Proceso de Reserva",
-          "item1": "Solicitud de presupuesto personalizado",
-          "item2": "Aceptación del presupuesto por parte del cliente",
-          "item3": "Pago de la señal para confirmar la reserva",
-          "item4": "Firma del contrato de servicios"
-        },
-        "condiciones": {
-          "title": "3.2 Condiciones de Pago",
-          "senal": "Señal:",
-          "senalDesc": "30% del total para confirmar la reserva",
-          "resto": "Resto:",
-          "restoDesc": "El día del evento o según acuerdo",
-          "metodos": "Métodos:",
-          "metodosDesc": "Transferencia bancaria, Bizum, efectivo"
-        }
-      },
-      "section4": {
-        "title": "4. Cancelaciones",
-        "item1": "Más de 30 días antes:",
-        "item2": "Entre 15-30 días:",
-        "item3": "Menos de 15 días:",
-        "item3Desc": "Cobro del 100% del servicio",
-        "item4": "Fuerza mayor:",
-        "item4Desc": "Se acordarán condiciones especiales"
-      },
-      "section5": {
-        "title": "5. Obligaciones del Cliente",
-        "item1": "Proporcionar información veraz sobre el evento",
-        "item2": "Garantizar acceso al lugar del evento para montaje",
-        "item3": "Disponer de suministro eléctrico adecuado",
-        "item4": "Informar de cualquier cambio con antelación",
-        "item5": "Cumplir con los pagos acordados"
-      },
-      "section6": {
-        "title": "6. Obligaciones de Òrbita Events",
-        "item1": "Prestar los servicios contratados con profesionalidad",
-        "item2": "Disponer de equipo técnico en perfecto estado",
-        "item3": "Contar con equipamiento de respaldo",
-        "item4": "Cumplir con los horarios acordados",
-        "item5": "Disponer de seguro de responsabilidad civil"
-      },
-      "section7": {
-        "title": "7. Limitación de Responsabilidad",
-        "intro": "Òrbita Events no será responsable de:",
-        "item1": "Cortes de suministro eléctrico ajenos a nuestro control",
-        "item2": "Daños causados por condiciones meteorológicas adversas",
-        "item3": "Incidencias causadas por terceros",
-        "item4": "Eventos de fuerza mayor"
-      },
-      "section8": {
-        "title": "8. Propiedad Intelectual",
-        "content": "Las fotografías y vídeos realizados durante los eventos podrán ser utilizados por Òrbita Events con fines promocionales, salvo indicación expresa en contrario por parte del cliente."
-      },
-      "section9": {
-        "title": "9. Resolución de Conflictos",
-        "content": "Para cualquier controversia derivada de estos términos, las partes se someten a los Juzgados y Tribunales de {city}, renunciando a cualquier otro fuero que pudiera corresponderles."
-      },
-      "section10": {
-        "title": "10. Contacto",
-        "intro": "Para consultas sobre estos términos:"
       }
     }
   },
@@ -3519,7 +3513,13 @@
         ]
       }
     },
-    "ctaButton": "Contáctanos"
+    "ctaButton": "Contáctanos",
+    "mobileCta": {
+      "ready": "¿Listo para tu evento?",
+      "response": "Respuesta en <2h - Presupuesto gratis",
+      "whatsapp": "WhatsApp",
+      "prices": "Ver precios"
+    }
   },
   "offerModal": {
     "ariaLabel": "Oferta de última hora",
@@ -3549,6 +3549,12 @@
       "scarce": "Pocos huecos",
       "limited": "Disponibilidad limitada",
       "available": "Disponible"
+    },
+    "legend": {
+      "available": "Disponible",
+      "booked": "Reservado",
+      "blocked": "Bloqueado",
+      "noData": "Sin datos"
     },
     "viewCalendar": "Ver calendario completo"
   },
@@ -4654,27 +4660,33 @@
     "faqs": {
       "q1": {
         "pregunta": "¿Qué incluye el \"Sobre Completo\"?",
-        "respuesta": "Incluye todo lo que necesitas: sobre de papel pergamino con el nombre del invitado, carta de la Directora de la Escuela, un frame personalizado según el rol del invitado (novio, padre, amigo...), y lacre de cera artesanal con el sello de la casa que elijas."
+        "respuesta": "Incluye todo lo que necesitas: sobre de papel pergamino con el nombre del invitado, carta de la Directora de la Escuela, un frame personalizado según el rol del invitado (novio, padre, amigo...), y lacre de cera artesanal con el sello de la casa que elijas.",
+        "resposta": "Incluye todo lo que necesitas: sobre de papel pergamino con el nombre del invitado, carta de la Directora de la Escuela, un frame personalizado según el rol del invitado (novio, padre, amigo...), y lacre de cera artesanal con el sello de la casa que elijas."
       },
       "q2": {
         "pregunta": "¿Puedo tener sobres con diferentes sellos?",
-        "respuesta": "Por defecto, todos los sobres llevan el mismo sello (la casa que elijas). Si quieres que cada invitado tenga el sello de su casa asignada, puedes añadir la opción Multi-Sello por un suplemento de 75-120€ según la cantidad."
+        "respuesta": "Por defecto, todos los sobres llevan el mismo sello (la casa que elijas). Si quieres que cada invitado tenga el sello de su casa asignada, puedes añadir la opción Multi-Sello por un suplemento de 75-120€ según la cantidad.",
+        "resposta": "Por defecto, todos los sobres llevan el mismo sello (la casa que elijas). Si quieres que cada invitado tenga el sello de su casa asignada, puedes añadir la opción Multi-Sello por un suplemento de 75-120€ según la cantidad."
       },
       "q3": {
         "pregunta": "¿Cómo son los pergaminos de amor?",
-        "respuesta": "Cada pergamino es un poema original de amor con temática mágica. Vienen enrollados individualmente y atados con una cinta elegante. Son perfectos para dejar en cada asiento o como detalle de mesa."
+        "respuesta": "Cada pergamino es un poema original de amor con temática mágica. Vienen enrollados individualmente y atados con una cinta elegante. Son perfectos para dejar en cada asiento o como detalle de mesa.",
+        "resposta": "Cada pergamino es un poema original de amor con temática mágica. Vienen enrollados individualmente y atados con una cinta elegante. Son perfectos para dejar en cada asiento o como detalle de mesa."
       },
       "q4": {
         "pregunta": "¿Cuánto tiempo tardan?",
-        "respuesta": "El tiempo de producción es de 10-14 días laborables una vez aprobada la prueba digital. El Pack Premium incluye entrega prioritaria en 7-10 días. Para pedidos urgentes (+30%), podemos entregar en 5-7 días."
+        "respuesta": "El tiempo de producción es de 10-14 días laborables una vez aprobada la prueba digital. El Pack Premium incluye entrega prioritaria en 7-10 días. Para pedidos urgentes (+30%), podemos entregar en 5-7 días.",
+        "resposta": "El tiempo de producción es de 10-14 días laborables una vez aprobada la prueba digital. El Pack Premium incluye entrega prioritaria en 7-10 días. Para pedidos urgentes (+30%), podemos entregar en 5-7 días."
       },
       "q5": {
         "pregunta": "¿Puedo ver una prueba antes?",
-        "respuesta": "Sí. Antes de imprimir, te enviamos una prueba digital en PDF con 3-4 sobres de ejemplo. El Pack Premium incluye una prueba física real antes de la producción completa."
+        "respuesta": "Sí. Antes de imprimir, te enviamos una prueba digital en PDF con 3-4 sobres de ejemplo. El Pack Premium incluye una prueba física real antes de la producción completa.",
+        "resposta": "Sí. Antes de imprimir, te enviamos una prueba digital en PDF con 3-4 sobres de ejemplo. El Pack Premium incluye una prueba física real antes de la producción completa."
       },
       "q6": {
         "pregunta": "¿Hacéis envíos a toda España?",
-        "respuesta": "Sí. Envío a todo el territorio nacional con embalaje especial para proteger los lacres. Recogida gratuita en Granollers. Envío por mensajero: 10-18€ según peso."
+        "respuesta": "Sí. Envío a todo el territorio nacional con embalaje especial para proteger los lacres. Recogida gratuita en Granollers. Envío por mensajero: 10-18€ según peso.",
+        "resposta": "Sí. Envío a todo el territorio nacional con embalaje especial para proteger los lacres. Recogida gratuita en Granollers. Envío por mensajero: 10-18€ según peso."
       }
     }
   },
@@ -4712,6 +4724,12 @@
       "description": "Creamos experiencias únicas: bodas Harry Potter, fiestas Halloween, eventos corporativos. DJ profesional + tematización completa. Desde 250€. Barcelona y Girona. ★★★★★ 5.0/5",
       "ogTitle": "Experiencias Inmersivas para Eventos | Òrbita Events | Desde 250€",
       "ogDescription": "Bodas Harry Potter, fiestas Halloween, eventos corporativos. DJ + tematización completa. Barcelona y Girona."
+    },
+    "skeleton": {
+      "badge": "No solo música, creamos experiencias",
+      "titleLine1": "Que tu evento sea",
+      "titleHighlight": "inolvidable",
+      "description": "DJ profesional + tematización completa para bodas, fiestas y eventos."
     }
   },
   "privacyPortal": {
@@ -5983,6 +6001,36 @@
       "booked": "Reservado",
       "blocked": "Bloqueado",
       "noData": "Sin datos"
+    },
+    "howItWorks": {
+      "title": "¿Cómo funciona?",
+      "items": {
+        "available": "Verde: Fecha disponible para reservar",
+        "booked": "Rojo: Fecha ya reservada",
+        "blocked": "Gris: Fecha bloqueada (festivos, mantenimiento)"
+      }
+    },
+    "reserve": {
+      "title": "¿Quieres reservar?",
+      "description": "Si has encontrado una fecha disponible, no esperes más. Contáctanos para hacer tu reserva.",
+      "cta": "Reservar ahora"
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "items": {
+        "1": {
+          "question": "¿Con cuánta antelación debo reservar?",
+          "answer": "Recomendamos reservar con al menos 2-3 meses de antelación, especialmente para bodas y eventos importantes. Sin embargo, también aceptamos reservas de última hora si tenemos disponibilidad."
+        },
+        "2": {
+          "question": "¿Qué pasa si mi fecha está reservada?",
+          "answer": "Si la fecha que buscas está ocupada, podemos recomendarte fechas alternativas cercanas. También puedes contactarnos para consultar posibles cancelaciones o cambios."
+        },
+        "3": {
+          "question": "¿Se actualiza en tiempo real?",
+          "answer": "El calendario se actualiza cada 15 minutos. Si acabas de hacer una consulta y no ves tu reserva reflejada, es normal. Recibirás una confirmación por email."
+        }
+      }
     }
   },
   "booking": {
@@ -5993,6 +6041,27 @@
     "hero": {
       "title": "Reserva tu Evento",
       "description": "Completa el formulario y reserva tu fecha. Te contactaremos en las próximas 24 horas para confirmar todos los detalles."
+    },
+    "trust": {
+      "items": {
+        "1": {
+          "title": "Respuesta rápida",
+          "description": "Te respondemos en menos de 2h"
+        },
+        "2": {
+          "title": "Sin compromiso",
+          "description": "Cancela sin coste si cambias de idea"
+        },
+        "3": {
+          "title": "Valoración 5.0",
+          "description": "Eventos realizados con éxito"
+        }
+      }
+    },
+    "help": {
+      "title": "¿Necesitas ayuda para decidir?",
+      "contact": "Contáctanos",
+      "availability": "Ver disponibilidad"
     }
   },
   "blog": {

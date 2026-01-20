@@ -26,24 +26,25 @@ export async function generateMetadata({
   };
 }
 
-export default function AvailabilityPage() {
+export default function AvailabilityPage({ params }: { params: { locale: string } }) {
+  const t = useTranslations('availability');
+
   return (
     <main className="min-h-screen pt-24 pb-16 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Calendario de Disponibilidad
+            {t('hero.title')}
           </h1>
           <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            Consulta nuestras fechas disponibles para tu evento. Las fechas en verde están
-            disponibles, en rojo ya están reservadas.
+            {t('hero.description')}
           </p>
         </div>
 
         {/* Calendar */}
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/10">
-          <AvailabilityCalendar locale="es" showLegend={true} />
+          <AvailabilityCalendar locale={params.locale} showLegend={true} />
         </div>
 
         {/* Info Section */}
@@ -53,20 +54,20 @@ export default function AvailabilityPage() {
               <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              ¿Cómo funciona?
+              {t('howItWorks.title')}
             </h2>
             <ul className="space-y-2 text-white/70">
               <li className="flex items-start gap-2">
                 <span className="text-green-400 mt-1">✓</span>
-                <span>Verde: Fecha disponible para reservar</span>
+                <span>{t('howItWorks.items.available')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-red-400 mt-1">×</span>
-                <span>Rojo: Fecha ya reservada</span>
+                <span>{t('howItWorks.items.booked')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-gray-200 mt-1">•</span>
-                <span>Gris: Fecha bloqueada (festivos, mantenimiento)</span>
+                <span>{t('howItWorks.items.blocked')}</span>
               </li>
             </ul>
           </div>
@@ -76,17 +77,16 @@ export default function AvailabilityPage() {
               <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              ¿Quieres reservar?
+              {t('reserve.title')}
             </h2>
             <p className="text-white/70 mb-4">
-              Si has encontrado una fecha disponible, no esperes más. Contáctanos para hacer tu
-              reserva.
+              {t('reserve.description')}
             </p>
             <a
               href="/contacto"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 py-3 rounded-lg font-semibold transition-all"
             >
-              Reservar ahora
+              {t('reserve.cta')}
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -96,46 +96,41 @@ export default function AvailabilityPage() {
 
         {/* FAQ */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6">Preguntas Frecuentes</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('faq.title')}</h2>
           <div className="space-y-4">
             <details className="group bg-white/5 rounded-xl p-6 border border-white/10">
               <summary className="font-semibold cursor-pointer flex items-center justify-between">
-                ¿Con cuánta antelación debo reservar?
+                {t('faq.items.1.question')}
                 <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <p className="mt-4 text-white/70">
-                Recomendamos reservar con al menos 2-3 meses de antelación, especialmente para
-                bodas y eventos importantes. Sin embargo, también aceptamos reservas de última hora
-                si tenemos disponibilidad.
+                {t('faq.items.1.answer')}
               </p>
             </details>
 
             <details className="group bg-white/5 rounded-xl p-6 border border-white/10">
               <summary className="font-semibold cursor-pointer flex items-center justify-between">
-                ¿Qué pasa si mi fecha está reservada?
+                {t('faq.items.2.question')}
                 <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <p className="mt-4 text-white/70">
-                Si la fecha que buscas está ocupada, podemos recomendarte fechas alternativas
-                cercanas. También puedes contactarnos para consultar posibles cancelaciones o
-                cambios.
+                {t('faq.items.2.answer')}
               </p>
             </details>
 
             <details className="group bg-white/5 rounded-xl p-6 border border-white/10">
               <summary className="font-semibold cursor-pointer flex items-center justify-between">
-                ¿Se actualiza en tiempo real?
+                {t('faq.items.3.question')}
                 <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <p className="mt-4 text-white/70">
-                El calendario se actualiza cada 15 minutos. Si acabas de hacer una consulta y no
-                ves tu reserva reflejada, es normal. Recibirás una confirmación por email.
+                {t('faq.items.3.answer')}
               </p>
             </details>
           </div>

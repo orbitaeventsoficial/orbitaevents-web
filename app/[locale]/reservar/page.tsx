@@ -33,6 +33,7 @@ export default async function BookingPage({
   searchParams: { fecha?: string };
 }) {
   const { locale } = params;
+  const t = await getTranslations({ locale, namespace: 'booking' });
 
   // Fetch available packs
   const packs = await prisma.pack.findMany({
@@ -79,11 +80,10 @@ export default async function BookingPage({
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Reserva tu Evento
+            {t('hero.title')}
           </h1>
           <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            Completa el formulario y reserva tu fecha. Te contactaremos en las próximas 24 horas
-            para confirmar todos los detalles.
+            {t('hero.description')}
           </p>
         </div>
 
@@ -95,8 +95,8 @@ export default async function BookingPage({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-white mb-2">Respuesta Rápida</h3>
-            <p className="text-sm text-white/60">Te contestamos en menos de 24h</p>
+            <h3 className="font-semibold text-white mb-2">{t('trust.items.1.title')}</h3>
+            <p className="text-sm text-white/60">{t('trust.items.1.description')}</p>
           </div>
 
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 text-center">
@@ -105,8 +105,8 @@ export default async function BookingPage({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-white mb-2">Sin Compromiso</h3>
-            <p className="text-sm text-white/60">Cancela sin coste si cambias de idea</p>
+            <h3 className="font-semibold text-white mb-2">{t('trust.items.2.title')}</h3>
+            <p className="text-sm text-white/60">{t('trust.items.2.description')}</p>
           </div>
 
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 text-center">
@@ -115,8 +115,8 @@ export default async function BookingPage({
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-white mb-2">Valoración 5.0</h3>
-            <p className="text-sm text-white/60">Más de 100 eventos exitosos</p>
+            <h3 className="font-semibold text-white mb-2">{t('trust.items.3.title')}</h3>
+            <p className="text-sm text-white/60">{t('trust.items.3.description')}</p>
           </div>
         </div>
 
@@ -132,7 +132,7 @@ export default async function BookingPage({
 
         {/* Help Section */}
         <div className="mt-12 text-center">
-          <p className="text-white/60 mb-4">¿Necesitas ayuda para decidir?</p>
+          <p className="text-white/60 mb-4">{t('help.title')}</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href="/contacto"
@@ -141,7 +141,7 @@ export default async function BookingPage({
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              Contáctanos
+              {t('help.contact')}
             </a>
             <a
               href="/disponibilidad"
@@ -150,7 +150,7 @@ export default async function BookingPage({
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              Ver Disponibilidad
+              {t('help.availability')}
             </a>
           </div>
         </div>

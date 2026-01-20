@@ -13,6 +13,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useLocale } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -105,11 +106,12 @@ const defaultAvailability: AvailabilityData = {
   nextAvailableDate: null, // Es calcula al client dins useEffect
   nextAvailableSaturday: null, // Es calcula al client dins useEffect
   monthlyAvailability: [],
-  scarcityMessage: 'Només queden 2 dissabtes aquest mes',
+  scarcityMessage: '',
   urgencyLevel: 'high',
 };
 
 export function useAvailability(): UseAvailabilityReturn {
+  const locale = useLocale();
   const [data, setData] = useState<AvailabilityData>(defaultAvailability);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -127,8 +129,9 @@ export function useAvailability(): UseAvailabilityReturn {
   }, []);
 
   const fetchData = useCallback(async () => {
+    const cacheKey = `availability:${locale}`;
     // Check cache first
-    const cached = getCachedData<AvailabilityData>('availability');
+    const cached = getCachedData<AvailabilityData>(cacheKey);
     if (cached) {
       setData(cached);
       setIsLoading(false);
@@ -137,13 +140,13 @@ export function useAvailability(): UseAvailabilityReturn {
 
     try {
       setIsLoading(true);
-      const response = await fetch('/api/public/availability');
+      const response = await fetch(`/api/public/availability?locale=${locale}`);
       const json = await response.json();
 
       if (json.ok) {
         const availabilityData = json.data as AvailabilityData;
         setData(availabilityData);
-        setCachedData('availability', availabilityData);
+        setCachedData(cacheKey, availabilityData);
         setError(null);
       } else {
         setError(json.error || 'Error desconocido');
@@ -154,7 +157,7 @@ export function useAvailability(): UseAvailabilityReturn {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     fetchData();
