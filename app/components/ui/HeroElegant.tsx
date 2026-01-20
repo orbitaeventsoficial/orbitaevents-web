@@ -33,13 +33,13 @@ export default function HeroElegant() {
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
           aria-hidden="true"
           disablePictureInPicture
           poster="/img/hero-poster.webp"
           className="w-full h-full object-cover"
         >
-          <source src="/videos/hero-orbita.mp4" type="video/mp4" />
+          <source src="/video/hero.mp4" type="video/mp4" />
         </video>
 
         {/* Overlay - Més fosc per llegibilitat */}

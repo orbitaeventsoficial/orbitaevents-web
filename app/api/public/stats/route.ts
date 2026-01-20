@@ -21,8 +21,6 @@ import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 
 // Cache: revalidar cada hora
 export const revalidate = 3600;
-// Evita que el build intente pre-renderizar esta ruta y use la DB sin credenciales
-export const dynamic = 'force-dynamic';
 
 interface StatsResponse {
   ok: boolean;
@@ -41,8 +39,7 @@ interface StatsResponse {
     totalCorporate: number;
     totalParties: number;
 
-    // Testimonios
-    totalTestimonials: number;
+    // Rating (desde Google Reviews)
     averageRating: number;
 
     // Google Reviews (si está configurado)
@@ -82,8 +79,7 @@ const FALLBACK_STATS = {
   totalWeddings: 15,               // ~7 per any
   totalCorporate: 10,              // Events corporatius
   totalParties: 23,                // Festes privades
-  totalTestimonials: 1,            // Opinions verificables reals
-  averageRating: 5.0,              // Rating verificable
+  averageRating: 5.0,              // Rating des de Google Reviews
   googleRating: 5.0,               // Rating Google verificable
   googleReviewsCount: 1,           // Reviews verificables reals
 };
@@ -127,7 +123,6 @@ export async function GET() {
       weddingCount,
       corporateCount,
       partyCount,
-      testimonialStats,
     ] = await Promise.all([
       // Total eventos completados - Cache 15 min
       cachedQuery(
@@ -188,22 +183,6 @@ export async function GET() {
           }),
         CacheTTL.LONG
       ),
-
-      // Testimonios aprobados - Cache 15 min
-      cachedQuery(
-        'public:stats:testimonials',
-        () =>
-          prisma.customerTestimonial.aggregate({
-            where: {
-              isApproved: true,
-            },
-            _count: true,
-            _avg: {
-              rating: true,
-            },
-          }),
-        CacheTTL.LONG
-      ),
     ]);
 
     // 3. Valores configurables con minimo y auto-calculo
@@ -220,8 +199,8 @@ export async function GET() {
     const peopleEntertainedSetting = parseInt(settingsMap['stats.peopleEntertained'] || String(FALLBACK_STATS.peopleEntertained), 10);
     const technicalIncidentsSetting = parseInt(settingsMap['stats.technicalIncidents'] || String(FALLBACK_STATS.technicalIncidents), 10);
 
-    // 4. Calcular rating promedio de testimonios
-    const averageRating = testimonialStats._avg.rating || 5;
+    // 4. Use Google rating as average rating
+    const averageRating = googleRating;
 
     const response: StatsResponse = {
       ok: true,
@@ -240,8 +219,7 @@ export async function GET() {
         totalCorporate: corporateCount || FALLBACK_STATS.totalCorporate,
         totalParties: partyCount || FALLBACK_STATS.totalParties,
 
-        // Testimonios
-        totalTestimonials: testimonialStats._count || FALLBACK_STATS.totalTestimonials,
+        // Rating (from Google)
         averageRating: Math.round(averageRating * 10) / 10,
 
         // Google

@@ -1,15 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { useAvailability } from '@/hooks/usePublicData';
 
 // ═══════════════════════════════════════════════════════════════
 // HERO URGENCY BADGE - Badge dinàmic de disponibilitat
 // Mostra dissabtes lliures basats en dades reals de la BBDD
+// Utilitza useAvailability hook amb cache de 30 minuts
 // ═══════════════════════════════════════════════════════════════
 
-interface AvailabilityData {
+interface ProcessedAvailability {
   month: number;
   year: number;
   monthName: string;
@@ -26,63 +28,45 @@ const MONTH_NAMES_CA: Record<number, string> = {
 
 export default function HeroUrgencyBadge() {
   const t = useTranslations('heroUrgency');
-  const [availability, setAvailability] = useState<AvailabilityData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useAvailability();
   const [currentTheme, setCurrentTheme] = useState<'halloween' | 'monMagic'>('halloween');
 
-  // Fetch disponibilitat real de la BBDD
-  useEffect(() => {
-    async function fetchAvailability() {
-      try {
-        const res = await fetch('/api/public/availability');
-        if (res.ok) {
-          const json = await res.json();
-          if (json.ok && json.data && json.data.monthlyAvailability && json.data.monthlyAvailability.length > 0) {
-            // Primer busquem octubre (mes de Halloween)
-            const octoberData = json.data.monthlyAvailability.find(
-              (m: { month: string }) => m.month && m.month.includes('-10')
-            );
-
-            // Si hi ha octubre, l'usem; si no, agafem el primer mes disponible
-            const monthData = octoberData || json.data.monthlyAvailability[0];
-
-            // Extreure mes i any del format "YYYY-MM"
-            const [yearStr, monthStr] = monthData.month.split('-');
-            const monthNum = parseInt(monthStr, 10);
-            const yearNum = parseInt(yearStr, 10);
-
-            setAvailability({
-              freeSaturdays: monthData.availableSaturdays || 0,
-              totalSaturdays: monthData.totalSaturdays || 0,
-              month: monthNum,
-              year: yearNum,
-              monthName: MONTH_NAMES_CA[monthNum] || monthData.monthName,
-              isHalloweenMonth: monthNum === 10
-            });
-          } else {
-            // Fallback sense dades
-            const now = new Date();
-            setAvailability({
-              freeSaturdays: 0,
-              totalSaturdays: 0,
-              month: now.getMonth() + 1,
-              year: now.getFullYear(),
-              monthName: MONTH_NAMES_CA[now.getMonth() + 1],
-              isHalloweenMonth: false
-            });
-          }
-        } else {
-          setAvailability(null);
-        }
-      } catch (error) {
-        console.error('Error fetching availability:', error);
-        setAvailability(null);
-      } finally {
-        setLoading(false);
-      }
+  // Process availability data from shared hook
+  const availability = useMemo<ProcessedAvailability | null>(() => {
+    if (!data.monthlyAvailability || data.monthlyAvailability.length === 0) {
+      const now = new Date();
+      return {
+        freeSaturdays: 0,
+        totalSaturdays: 0,
+        month: now.getMonth() + 1,
+        year: now.getFullYear(),
+        monthName: MONTH_NAMES_CA[now.getMonth() + 1],
+        isHalloweenMonth: false
+      };
     }
-    fetchAvailability();
-  }, []);
+
+    // Primer busquem octubre (mes de Halloween)
+    const octoberData = data.monthlyAvailability.find(
+      (m) => m.month && m.month.includes('-10')
+    );
+
+    // Si hi ha octubre, l'usem; si no, agafem el primer mes disponible
+    const monthData = octoberData || data.monthlyAvailability[0];
+
+    // Extreure mes i any del format "YYYY-MM"
+    const [yearStr, monthStr] = monthData.month.split('-');
+    const monthNum = parseInt(monthStr, 10);
+    const yearNum = parseInt(yearStr, 10);
+
+    return {
+      freeSaturdays: monthData.availableSaturdays || 0,
+      totalSaturdays: monthData.totalSaturdays || 0,
+      month: monthNum,
+      year: yearNum,
+      monthName: MONTH_NAMES_CA[monthNum] || monthData.monthName,
+      isHalloweenMonth: monthNum === 10
+    };
+  }, [data.monthlyAvailability]);
 
   // Rotar entre Halloween i Món Màgic cada 5 segons
   useEffect(() => {
@@ -119,7 +103,7 @@ export default function HeroUrgencyBadge() {
     monMagic: 'from-white/10 to-white/5 border border-amber-500/30',
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="h-8 w-48 bg-white/10 rounded-full animate-pulse" />
     );
@@ -235,46 +219,31 @@ export default function HeroUrgencyBadge() {
 // VERSIÓ COMPACTA - Per a mobile o espais reduïts
 // ═══════════════════════════════════════════════════════════════
 
-interface CompactAvailability {
-  freeSaturdays: number;
-  monthName: string;
-  year: number;
-  isHalloweenMonth: boolean;
-}
-
 export function HeroUrgencyBadgeCompact() {
-  const [availability, setAvailability] = useState<CompactAvailability | null>(null);
+  const { data, isLoading } = useAvailability();
 
-  useEffect(() => {
-    async function fetchAvailability() {
-      try {
-        const res = await fetch('/api/public/availability');
-        if (res.ok) {
-          const json = await res.json();
-          if (json.ok && json.data && json.data.monthlyAvailability && json.data.monthlyAvailability.length > 0) {
-            const octoberData = json.data.monthlyAvailability.find(
-              (m: { month: string }) => m.month && m.month.includes('-10')
-            );
-            const monthData = octoberData || json.data.monthlyAvailability[0];
-            const [yearStr, monthStr] = monthData.month.split('-');
-            const monthNum = parseInt(monthStr, 10);
-
-            setAvailability({
-              freeSaturdays: monthData.availableSaturdays || 0,
-              monthName: MONTH_NAMES_CA[monthNum] || monthData.monthName,
-              year: parseInt(yearStr, 10),
-              isHalloweenMonth: monthNum === 10
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
+  // Process availability data from shared hook
+  const availability = useMemo(() => {
+    if (!data.monthlyAvailability || data.monthlyAvailability.length === 0) {
+      return null;
     }
-    fetchAvailability();
-  }, []);
 
-  if (!availability) return null;
+    const octoberData = data.monthlyAvailability.find(
+      (m) => m.month && m.month.includes('-10')
+    );
+    const monthData = octoberData || data.monthlyAvailability[0];
+    const [yearStr, monthStr] = monthData.month.split('-');
+    const monthNum = parseInt(monthStr, 10);
+
+    return {
+      freeSaturdays: monthData.availableSaturdays || 0,
+      monthName: MONTH_NAMES_CA[monthNum] || monthData.monthName,
+      year: parseInt(yearStr, 10),
+      isHalloweenMonth: monthNum === 10
+    };
+  }, [data.monthlyAvailability]);
+
+  if (isLoading || !availability) return null;
 
   const isUrgent = availability.freeSaturdays <= 2;
 

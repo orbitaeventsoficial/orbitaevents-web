@@ -51,7 +51,6 @@ interface StatsData {
   totalWeddings: number;
   totalCorporate: number;
   totalParties: number;
-  totalTestimonials: number;
   averageRating: number;
   googleRating: number | null;
   googleReviewsCount: number | null;
@@ -62,7 +61,7 @@ interface StatsData {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const cache: Record<string, { data: unknown; timestamp: number }> = {};
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutos - reduït per estalviar requests
 
 function getCachedData<T>(key: string): T | null {
   const cached = cache[key];
@@ -213,7 +212,6 @@ const defaultStats: StatsData = {
   totalWeddings: 15,
   totalCorporate: 10,
   totalParties: 20,
-  totalTestimonials: 0,
   averageRating: 5.0,
   googleRating: 5.0,
   googleReviewsCount: 1,
@@ -341,102 +339,6 @@ export function useCountdown(targetDate: Date | null): UseCountdownReturn {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HOOK: useTestimonials
-// ═══════════════════════════════════════════════════════════════════════════
-
-interface TestimonialPublic {
-  id: string;
-  text: string;
-  rating: number;
-  eventType: string | null;
-  eventDate: string | null;
-  authorName: string;
-  authorPhoto: string | null;
-  showPhoto: boolean;
-  createdAt: string;
-}
-
-interface TestimonialsData {
-  testimonials: TestimonialPublic[];
-  stats: {
-    total: number;
-    averageRating: number;
-    fiveStarCount: number;
-  };
-}
-
-interface UseTestimonialsReturn {
-  data: TestimonialsData;
-  isLoading: boolean;
-  error: string | null;
-  refetch: () => void;
-}
-
-const defaultTestimonials: TestimonialsData = {
-  testimonials: [],
-  stats: {
-    total: 0,
-    averageRating: 5,
-    fiveStarCount: 0,
-  },
-};
-
-export function useTestimonials(limit: number = 10, eventType?: string): UseTestimonialsReturn {
-  const [data, setData] = useState<TestimonialsData>(defaultTestimonials);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchData = useCallback(async () => {
-    const cacheKey = `testimonials-${limit}-${eventType || 'all'}`;
-
-    // Check cache first
-    const cached = getCachedData<TestimonialsData>(cacheKey);
-    if (cached) {
-      setData(cached);
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const params = new URLSearchParams({ limit: String(limit) });
-      if (eventType) params.set('eventType', eventType);
-
-      const response = await fetch(`/api/public/testimonials?${params}`);
-      const json = await response.json();
-
-      if (json.ok) {
-        const testimonialsData = {
-          testimonials: json.testimonials,
-          stats: json.stats,
-        };
-        setData(testimonialsData);
-        setCachedData(cacheKey, testimonialsData);
-        setError(null);
-      } else {
-        setError(json.error || 'Error desconocido');
-      }
-    } catch (err) {
-      console.error('Error fetching testimonials:', err);
-      setError('Error de conexión');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [limit, eventType]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  return {
-    data,
-    isLoading,
-    error,
-    refetch: fetchData,
-  };
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
 // HOOK: useOffer (para FlashOffer dinámico)
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -481,18 +383,17 @@ export function useOffer(): UseOfferReturn {
 
     try {
       setIsLoading(true);
-      const response = await fetch('/api/admin/settings?category=offer');
+      const response = await fetch('/api/public/offer');
       const json = await response.json();
 
-      if (json.ok && json.settings) {
-        const s = json.settings;
+      if (json.ok && json.offer) {
         const offerData: OfferData = {
-          isActive: s.offer_active === 'true' || s.offer_active === true,
-          endDate: s.offer_end_date || null,
-          discount: parseInt(s.offer_discount) || 0,
-          ctaLink: s.offer_cta_link || '/contacto',
-          title: s.offer_title || '',
-          description: s.offer_description || '',
+          isActive: json.offer.isActive,
+          endDate: json.offer.endDate || null,
+          discount: json.offer.discount || 0,
+          ctaLink: json.offer.ctaLink || '/contacto',
+          title: json.offer.title || '',
+          description: json.offer.description || '',
         };
         setOffer(offerData);
         setCachedData('offer', offerData);
@@ -552,17 +453,17 @@ export function usePrices(): UsePricesReturn {
 
     try {
       setIsLoading(true);
-      const response = await fetch('/api/admin/packs');
+      const response = await fetch('/api/public/packs');
       const json = await response.json();
 
-      if (json.packs && Array.isArray(json.packs)) {
+      if (json.ok && json.packs && Array.isArray(json.packs)) {
         const pricesMap: Record<string, PackPrice> = {};
-        json.packs.forEach((pack: { slug: string; price: number; originalPrice?: number; translations?: Array<{ locale: string; name: string }> }) => {
+        json.packs.forEach((pack: { slug: string; price: number; originalPrice?: number | null; name: string }) => {
           pricesMap[pack.slug] = {
             slug: pack.slug,
             price: pack.price,
             originalPrice: pack.originalPrice || null,
-            name: pack.translations?.find((t: { locale: string }) => t.locale === 'es')?.name || pack.slug,
+            name: pack.name || pack.slug,
           };
         });
         setPrices(pricesMap);
@@ -607,9 +508,6 @@ export type {
   UseAvailabilityReturn,
   UseStatsReturn,
   UseCountdownReturn,
-  TestimonialPublic,
-  TestimonialsData,
-  UseTestimonialsReturn,
   OfferData,
   UseOfferReturn,
   PackPrice,

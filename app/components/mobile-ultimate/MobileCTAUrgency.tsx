@@ -4,24 +4,25 @@
  * ═══════════════════════════════════════════════════════════════════════════
  * MOBILE CTA URGENCY - Òrbita Events
  * ═══════════════════════════════════════════════════════════════════════════
- * 
+ *
  * Call to Action final con:
  * - Contador de disponibilidad en tiempo real
  * - Animaciones de urgencia
  * - Social proof
  * - Múltiples CTAs
  * - Garantía visible
- * 
+ *
  * FIXED:
- * - Removed unused useScroll, useTransform imports
+ * - Uses shared useAvailability hook with 30-min cache
  * - Rutas con locale
  * - Textos usando sistema de traducciones
  */
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
+import { useAvailability } from '@/hooks/usePublicData';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // AVAILABILITY COUNTER
@@ -29,34 +30,21 @@ import { useTranslations } from 'next-intl';
 
 function AvailabilityCounter() {
   const t = useTranslations('mobileCTA');
-  const [availability, setAvailability] = useState({
-    saturdays: 3,
-    month: 'octubre',
-    loading: true,
-  });
+  const { data, isLoading } = useAvailability();
 
-  useEffect(() => {
-    // Simular fetch de disponibilidad
-    const fetchAvailability = async () => {
-      try {
-        const res = await fetch('/api/public/availability?month=10&year=2025');
-        if (res.ok) {
-          const data = await res.json();
-          setAvailability({
-            saturdays: data.freeSaturdays || 3,
-            month: t('months.october'),
-            loading: false,
-          });
-        } else {
-          setAvailability(prev => ({ ...prev, loading: false }));
-        }
-      } catch {
-        setAvailability(prev => ({ ...prev, loading: false }));
-      }
+  // Process availability data from shared hook
+  const availability = useMemo(() => {
+    if (!data.monthlyAvailability || data.monthlyAvailability.length === 0) {
+      return { saturdays: 3, month: t('months.october') };
+    }
+
+    // Get first month with availability data
+    const monthData = data.monthlyAvailability[0];
+    return {
+      saturdays: monthData.availableSaturdays || 3,
+      month: monthData.monthName || t('months.october'),
     };
-
-    fetchAvailability();
-  }, [t]);
+  }, [data.monthlyAvailability, t]);
 
   const getUrgencyLevel = () => {
     if (availability.saturdays <= 1) return 'critical';
@@ -89,7 +77,7 @@ function AvailabilityCounter() {
 
   const style = colors[urgencyLevel];
 
-  if (availability.loading) {
+  if (isLoading) {
     return (
       <div className="h-16 w-full bg-white/5 rounded-2xl animate-pulse" />
     );

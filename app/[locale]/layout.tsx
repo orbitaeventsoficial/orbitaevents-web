@@ -415,6 +415,9 @@ export default async function LocaleLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
+        {/* Preload critical resources for LCP */}
+        <link rel="preload" href="/img/hero-poster.webp" as="image" type="image/webp" fetchPriority="high" />
+
         {/* Favicons */}
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -511,13 +514,27 @@ export default async function LocaleLayout({
       >
         <GoogleTagManagerBody />
 
-        {/* Skip Navigation - Accessibility */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-6 focus:py-3 focus:bg-amber-500 focus:text-black focus:font-semibold focus:rounded-lg focus:shadow-2xl"
-        >
-          Saltar al contenido principal
-        </a>
+        {/* Skip Navigation - Accessibility (WCAG 2.1 AA - 2.4.1) */}
+        <nav aria-label="Skip links" className="skip-links">
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-amber-500 focus:text-black focus:font-semibold focus:rounded-lg focus:shadow-2xl focus:outline-none focus:ring-2 focus:ring-amber-300"
+          >
+            Saltar al contingut principal
+          </a>
+          <a
+            href="#main-nav"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-56 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-amber-500 focus:text-black focus:font-semibold focus:rounded-lg focus:shadow-2xl focus:outline-none focus:ring-2 focus:ring-amber-300"
+          >
+            Saltar a la navegació
+          </a>
+          <a
+            href="#contact-form"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-[26rem] focus:z-[9999] focus:px-4 focus:py-2 focus:bg-amber-500 focus:text-black focus:font-semibold focus:rounded-lg focus:shadow-2xl focus:outline-none focus:ring-2 focus:ring-amber-300"
+          >
+            Saltar al formulari
+          </a>
+        </nav>
 
         {/* OVERLAY NEGRE INICIAL - Tapa tot fins que JS el treu */}
         <div

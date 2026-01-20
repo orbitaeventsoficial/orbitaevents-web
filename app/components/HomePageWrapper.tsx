@@ -4,9 +4,12 @@
  * HomePageWrapper - Detecta mòbil i mostra la versió corresponent
  * Mobile: MobileHomePage (experiència PWA completa)
  * Desktop: Contingut normal de la home
+ *
+ * OPTIMIZADO: SSR muestra contenido desktop (mejor FCP/LCP)
+ * El cambio a mobile solo ocurre client-side si es necesario
  */
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 
 // Lazy load MobileHomePage per no afectar el bundle desktop
@@ -20,14 +23,10 @@ interface HomePageWrapperProps {
 }
 
 export default function HomePageWrapper({ children }: HomePageWrapperProps) {
-  const [isMobile, setIsMobile] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
-    setMounted(true);
-
     const checkMobile = () => {
-      // Detecta mòbil per viewport < 1024px
       setIsMobile(window.innerWidth < 1024);
     };
 
@@ -36,8 +35,9 @@ export default function HomePageWrapper({ children }: HomePageWrapperProps) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // SSR: Mostra el contingut desktop mentre es carrega
-  if (!mounted) {
+  // SSR + Initial render: Muestra contenido desktop (mejor FCP)
+  // Una vez hidratado, si es móvil cambiará automáticamente
+  if (isMobile === null) {
     return <>{children}</>;
   }
 
