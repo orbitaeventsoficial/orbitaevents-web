@@ -240,7 +240,9 @@
       "Bash(railway up:*)",
       "Bash(railway domain:*)",
       "Bash(railway open:*)",
-      "Bash(npm test)"
+      "Bash(npm test)",
+      "Bash(where:*)",
+      "Bash(ffmpeg:*)"
     ]
   }
 }
