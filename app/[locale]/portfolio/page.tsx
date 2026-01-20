@@ -47,8 +47,10 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
           </p>
         ) : (
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((cat) => {
+            {categories.map((cat, index) => {
               const translatedName = getCategoryName(cat.slug);
+              // Primeres 3 imatges carreguen amb prioritat (above the fold)
+              const isPriority = index < 3;
               return (
                 <Link
                   key={cat.slug}
@@ -60,6 +62,9 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                     alt={translatedName}
                     width={800}
                     height={600}
+                    priority={isPriority}
+                    loading={isPriority ? 'eager' : 'lazy'}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="h-80 w-full object-cover transition group-hover:scale-110 duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />

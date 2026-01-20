@@ -411,12 +411,16 @@ export default async function LocaleLayout({
       <head>
         <GoogleTagManager />
 
-        {/* Preconnects per performance */}
+        {/* Preconnects per performance - recursos externs */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://va.vercel-scripts.com" />
+        <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
 
-        {/* Preload critical resources for LCP */}
+        {/* Preload critical resources for LCP - Hero */}
         <link rel="preload" href="/img/hero-poster.webp" as="image" type="image/webp" fetchPriority="high" />
+        <link rel="preload" href="/video/Herovideo.mp4" as="video" type="video/mp4" />
 
         {/* Favicons */}
         <link rel="icon" href="/favicon.ico" sizes="48x48" />

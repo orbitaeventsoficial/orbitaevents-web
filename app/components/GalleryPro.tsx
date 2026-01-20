@@ -20,21 +20,27 @@ export function SimpleGallery({ images }: { images: GalleryImage[] }) {
     <>
       {/* Grid de imágenes */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className="relative aspect-[4/3] rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity bg-stone-900"
-            onClick={() => setSelectedImage(index)}
-          >
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            />
-          </div>
-        ))}
+        {images.map((image, index) => {
+          // Primeres 6 imatges carreguen amb prioritat (2 files above the fold)
+          const isPriority = index < 6;
+          return (
+            <div
+              key={index}
+              className="relative aspect-[4/3] rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity bg-stone-900"
+              onClick={() => setSelectedImage(index)}
+            >
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                priority={isPriority}
+                loading={isPriority ? 'eager' : 'lazy'}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Modal de imagen ampliada */}
