@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useDeferredValue } from 'react';
+import { useState, useEffect, useMemo, useDeferredValue, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import DOMPurify from 'dompurify';
 import { EVENT_TYPE_LABELS } from '@/lib/constants/labels';
@@ -119,14 +119,7 @@ export default function InboxClient({
     );
   }, [initialLeads, imapEmails]);
 
-  // Carregar emails IMAP
-  useEffect(() => {
-    if (imapConfigured) {
-      loadImapEmails();
-    }
-  }, [imapConfigured, onlyOrbita]);
-
-  async function loadImapEmails() {
+  const loadImapEmails = useCallback(async () => {
     setLoadingImap(true);
     setImapError(null);
 
@@ -155,7 +148,14 @@ export default function InboxClient({
     } finally {
       setLoadingImap(false);
     }
-  }
+  }, [onlyOrbita]);
+
+  // Carregar emails IMAP
+  useEffect(() => {
+    if (imapConfigured) {
+      loadImapEmails();
+    }
+  }, [imapConfigured, loadImapEmails]);
 
   // Filtrar emails
   const deferredQuery = useDeferredValue(searchQuery);

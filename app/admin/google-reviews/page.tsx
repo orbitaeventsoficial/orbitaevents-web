@@ -56,6 +56,13 @@ export default function GoogleReviewsAdminPage() {
     }
   }
 
+  const fiveStarReviews = useMemo(
+    () => data?.reviews.filter((review) => review.rating === 5) || [],
+    [data]
+  );
+  const totalReviews = data?.user_ratings_total || data?.reviews.length || 0;
+  const lastUpdate = data?.lastUpdated ? new Date(data.lastUpdated).toLocaleString('ca-ES') : 'Never';
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen" role="status" aria-live="polite">
@@ -63,13 +70,6 @@ export default function GoogleReviewsAdminPage() {
       </div>
     );
   }
-
-  const fiveStarReviews = useMemo(
-    () => data?.reviews.filter((review) => review.rating === 5) || [],
-    [data]
-  );
-  const totalReviews = data?.user_ratings_total || data?.reviews.length || 0;
-  const lastUpdate = data?.lastUpdated ? new Date(data.lastUpdated).toLocaleString('ca-ES') : 'Never';
 
   return (
     <div className="p-8">
