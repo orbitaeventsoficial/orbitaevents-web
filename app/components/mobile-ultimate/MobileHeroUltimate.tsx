@@ -401,7 +401,7 @@ export default function MobileHeroUltimate() {
           preload="metadata"
           aria-hidden="true"
           disablePictureInPicture
-          poster="/img/hero-poster.webp"
+          poster="/img/hero-poster-mobile.webp"
           className="w-full h-full object-cover"
         >
           <source src="/videos/hero-orbita.mp4" type="video/mp4" />
