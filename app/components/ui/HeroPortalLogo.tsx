@@ -97,6 +97,7 @@ export default function HeroPortalLogo({
   const config = useMemo(() => ({
     logoSize: isMobile ? 320 : 520,
     textSize: isMobile ? '1.1rem' : '1.5rem',
+    wordmarkWidth: isMobile ? 220 : 320,
   }), [isMobile]);
 
   return (
@@ -219,40 +220,17 @@ export default function HeroPortalLogo({
                 transition={{ duration: 0.5, delay: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
               />
 
-              {/* Wordmark ÒRBITA EVENTS */}
-              <motion.g
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: showLogo ? 1 : 0, y: showLogo ? 0 : 20 }}
-                transition={{ duration: 0.5, delay: 0.15 }}
-              >
-                <text
-                  x="512"
-                  y="780"
-                  textAnchor="middle"
-                  fill="#F8F3EE"
-                  fontFamily="'Montserrat', 'Helvetica Neue', Arial, sans-serif"
-                  fontWeight="800"
-                  fontSize="72"
-                  letterSpacing="0.15em"
-                  style={{ textTransform: 'uppercase' }}
-                >
-                  ÒRBITA
-                </text>
-                <text
-                  x="512"
-                  y="860"
-                  textAnchor="middle"
-                  fill="#F8F3EE"
-                  fontFamily="'Montserrat', 'Helvetica Neue', Arial, sans-serif"
-                  fontWeight="800"
-                  fontSize="72"
-                  letterSpacing="0.15em"
-                  style={{ textTransform: 'uppercase' }}
-                >
-                  EVENTS
-                </text>
-              </motion.g>
             </svg>
+            <motion.img
+              src="/img/orbitawordmark.svg"
+              alt="Òrbita Events"
+              width={config.wordmarkWidth}
+              height={config.wordmarkWidth * 0.2}
+              className="mx-auto -mt-10"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: showText ? 1 : 0, y: showText ? 0 : 12 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+            />
           </motion.div>
 
           {/* Texto "LA MÀGIA COMENÇA" */}
