@@ -85,8 +85,8 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
             alt={title}
             fill
             className="object-cover transition-transform duration-700 pointer-events-none"
-            sizes="70vw"
-            quality={60}
+            sizes="60vw"
+            quality={55}
             draggable={false}
           />
 
