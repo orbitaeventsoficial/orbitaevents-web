@@ -2,6 +2,6 @@
   "buildCommand": "pnpm build",
   "installCommand": "pnpm install",
   "env": {
-    "BUILD_CACHE_BUST": "2026-01-17-fix-legal-pages"
+    "BUILD_CACHE_BUST": "2026-01-17-mobile-refresh"
   }
 }
