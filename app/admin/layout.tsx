@@ -221,6 +221,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     alt="Òrbita"
                     width={40}
                     height={40}
+                    sizes="40px"
+                    quality={80}
                     className="w-full h-full object-contain"
                   />
                 </div>

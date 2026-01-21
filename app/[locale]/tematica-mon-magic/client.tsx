@@ -323,6 +323,8 @@ export default function ProductesMonMagic() {
                 src={IMATGES.sobreComplet}
                 alt={t('altSobreObert')}
                 fill
+                sizes="(min-width: 768px) 50vw, 100vw"
+                quality={70}
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -348,6 +350,8 @@ export default function ProductesMonMagic() {
                 src={IMATGES.sobrePlat}
                 alt={t('altSobrePlat')}
                 fill
+                sizes="(min-width: 768px) 25vw, 50vw"
+                quality={70}
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </motion.div>
@@ -364,6 +368,8 @@ export default function ProductesMonMagic() {
                 src={IMATGES.provaSocial}
                 alt={t('altConvidada')}
                 fill
+                sizes="(min-width: 768px) 25vw, 50vw"
+                quality={70}
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -386,6 +392,8 @@ export default function ProductesMonMagic() {
                 src={IMATGES.mussol}
                 alt={t('altMussol')}
                 fill
+                sizes="(min-width: 768px) 25vw, 50vw"
+                quality={70}
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </motion.div>
@@ -402,6 +410,8 @@ export default function ProductesMonMagic() {
                 src={IMATGES.escombres}
                 alt={t('altEscombres')}
                 fill
+                sizes="(min-width: 768px) 25vw, 50vw"
+                quality={70}
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </motion.div>
