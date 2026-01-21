@@ -404,7 +404,7 @@ export default function MobileHeroUltimate() {
           poster="/img/hero-poster-mobile.webp"
           className="w-full h-full object-cover"
         >
-          <source src="/videos/hero-orbita.mp4" type="video/mp4" />
+          <source src="/videos/hero-orbita-mobile.mp4" type="video/mp4" />
         </video>
 
         {/* Enhanced gradient overlays */}
