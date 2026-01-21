@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
           errors.push(`${pack.slug}: ${message}`);
         }
       }
-    });
+    }, { timeout: 20000 });
 
     log.info(`Sincronización completada: ${created} creados, ${updated} actualizados`);
 

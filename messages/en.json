@@ -2308,7 +2308,8 @@
           "text": "Complete technical production, integrated branding and special effects to impact your guests."
         },
         "institutional": {
-          "title": "Institutional Events"
+          "title": "Institutional Events",
+          "text": "Professional sound, elegant lighting, and impeccable coordination for institutional events."
         }
       },
       "valueTitle": "Professionalism that Strengthens your Brand",
@@ -2332,6 +2333,7 @@
       "techProduction": "Technical Production",
       "techFeatures": {
         "sound": "Pioneer + EV professional sound (perfect coverage)",
+        "setup": "Complete setup and teardown",
         "lighting": "Corporate LED lighting synchronized with branding",
         "mics": "Wireless microphones for speakers/presenters",
         "screens": "Optional LED screens for corporate projection"
