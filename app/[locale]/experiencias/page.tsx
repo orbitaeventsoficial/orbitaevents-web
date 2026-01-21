@@ -26,7 +26,7 @@ const EXPERIENCES = [
     titleKey: 'monMagic.title',
     subtitleKey: 'monMagic.subtitle',
     descriptionKey: 'monMagic.description',
-    image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
+    image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01-mobile.webp',
     gradient: 'from-purple-600 to-blue-600',
     bgGradient: 'from-purple-900/40 to-blue-900/40',
     badgeKey: 'badges.popular',
@@ -40,7 +40,7 @@ const EXPERIENCES = [
     titleKey: 'halloween.title',
     subtitleKey: 'halloween.subtitle',
     descriptionKey: 'halloween.description',
-    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
+    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01-mobile.webp',
     gradient: 'from-orange-600 to-red-700',
     bgGradient: 'from-orange-900/40 to-red-900/40',
     badgeKey: 'badges.terrific',
@@ -68,7 +68,7 @@ const EXPERIENCES = [
     titleKey: 'disco80s.title',
     subtitleKey: 'disco80s.subtitle',
     descriptionKey: 'disco80s.description',
-    image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
+    image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01-mobile.webp',
     gradient: 'from-pink-600 to-purple-600',
     bgGradient: 'from-pink-900/40 to-purple-900/40',
     badgeKey: 'badges.retro',
@@ -83,7 +83,7 @@ const EXPERIENCES = [
     titleKey: 'tropical.title',
     subtitleKey: 'tropical.subtitle',
     descriptionKey: 'tropical.description',
-    image: '/img/portfolio/fiestas-privadas/fiestas-privadas-02.webp',
+    image: '/img/portfolio/fiestas-privadas/fiestas-privadas-02-mobile.webp',
     gradient: 'from-green-500 to-teal-600',
     bgGradient: 'from-green-900/40 to-teal-900/40',
     badgeKey: 'badges.summer',
@@ -98,7 +98,7 @@ const EXPERIENCES = [
     titleKey: 'elegant.title',
     subtitleKey: 'elegant.subtitle',
     descriptionKey: 'elegant.description',
-    image: '/img/portfolio/bodas/bodas-01.webp',
+    image: '/img/portfolio/bodas/bodas-01-mobile.webp',
     gradient: 'from-amber-500 to-yellow-600',
     bgGradient: 'from-amber-900/40 to-yellow-900/40',
     badgeKey: 'badges.premium',
@@ -199,6 +199,8 @@ export default async function ExperienciasPage() {
                     src={exp.image}
                     alt={t(exp.titleKey)}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    quality={70}
                     className="object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className={`absolute inset-0 bg-gradient-to-t ${exp.bgGradient}`} />

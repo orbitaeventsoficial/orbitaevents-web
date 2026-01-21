@@ -156,6 +156,8 @@ export default function HeaderChampion() {
                 alt="Òrbita Events"
                 width={200}
                 height={64}
+                sizes="200px"
+                quality={80}
                 className="h-10 md:h-12 w-auto pointer-events-none select-none transition-transform group-hover:scale-105"
                 priority
                 draggable={false}

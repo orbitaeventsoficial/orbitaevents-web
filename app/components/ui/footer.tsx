@@ -207,6 +207,8 @@ export default function Footer() {
                     alt="Òrbita Events"
                     width={200}
                     height={60}
+                    sizes="200px"
+                    quality={80}
                     className="h-14 w-auto relative z-10 group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>

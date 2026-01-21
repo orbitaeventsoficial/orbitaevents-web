@@ -38,6 +38,7 @@ export default function EmpresasClient() {
             fill
             priority
             sizes="100vw"
+            quality={70}
             className="object-cover animate-slow-zoom"
           />
         </div>

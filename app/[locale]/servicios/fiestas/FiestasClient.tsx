@@ -89,6 +89,7 @@ export default function FiestasClient() {
             fill
             priority
             sizes="100vw"
+            quality={70}
             className="object-cover"
           />
         </div>

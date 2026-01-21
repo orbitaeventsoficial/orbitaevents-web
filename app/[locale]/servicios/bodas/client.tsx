@@ -149,6 +149,7 @@ export default function BodasClientV2() {
             fill
             priority
             sizes="100vw"
+            quality={70}
             className="object-cover"
           />
         </div>
@@ -553,4 +554,3 @@ export default function BodasClientV2() {
     </div>
   );
 }
-
