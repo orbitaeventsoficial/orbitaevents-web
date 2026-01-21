@@ -95,9 +95,9 @@ export default function HeroPortalLogo({
 
   // Configuración responsive - logo más grande
   const config = useMemo(() => ({
-    logoSize: isMobile ? 320 : 520,
-    textSize: isMobile ? '1.1rem' : '1.5rem',
-    wordmarkWidth: isMobile ? 220 : 320,
+    logoSize: isMobile ? 280 : 520,
+    textSize: isMobile ? '1rem' : '1.5rem',
+    wordmarkWidth: isMobile ? 200 : 320,
   }), [isMobile]);
 
   return (
@@ -222,11 +222,11 @@ export default function HeroPortalLogo({
 
             </svg>
             <motion.img
-              src="/img/orbitawordmark.svg"
+              src="/img/orbitalockupwhite.svg"
               alt="Òrbita Events"
               width={config.wordmarkWidth}
               height={config.wordmarkWidth * 0.2}
-              className="mx-auto -mt-10"
+              className="mx-auto -mt-6"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: showText ? 1 : 0, y: showText ? 0 : 12 }}
               transition={{ duration: 0.5, delay: 0.15 }}
@@ -238,7 +238,7 @@ export default function HeroPortalLogo({
             className="absolute font-light tracking-[0.3em] uppercase text-center"
             style={{
               fontSize: config.textSize,
-              top: isMobile ? '18%' : '15%',
+              top: isMobile ? '10%' : '15%',
               background: 'linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #fbbf24 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
