@@ -66,6 +66,16 @@ export default getRequestConfig(async ({ requestLocale }) => {
   };
 });
 
+const translationCache = new Map<Locale, Promise<Record<string, unknown>>>();
+
+function shouldSkipDbTranslations(): boolean {
+  return (
+    process.env.SKIP_DB_TRANSLATIONS === '1' ||
+    process.env.CI === 'true' ||
+    process.env.NEXT_PHASE === 'phase-production-build'
+  );
+}
+
 function setValueByPath(
   obj: Record<string, unknown>,
   path: string,
@@ -93,22 +103,36 @@ async function mergeDbTranslations(
   baseMessages: Record<string, unknown>,
   locale: Locale
 ): Promise<Record<string, unknown>> {
-  const messages = JSON.parse(JSON.stringify(baseMessages)) as Record<string, unknown>;
-
-  try {
-    const rows = await prisma.translation.findMany({
-      where: { locale },
-      select: { namespace: true, key: true, value: true },
-    });
-
-    for (const row of rows) {
-      const path = row.key ? `${row.namespace}.${row.key}` : row.namespace;
-      if (!path) continue;
-      setValueByPath(messages, path, row.value);
-    }
-  } catch (error) {
-    log.error('Error carregant traduccions desde DB', error);
+  if (shouldSkipDbTranslations()) {
+    return baseMessages;
   }
 
-  return messages;
+  const cached = translationCache.get(locale);
+  if (cached) {
+    return cached;
+  }
+
+  const loadPromise = (async () => {
+    const messages = JSON.parse(JSON.stringify(baseMessages)) as Record<string, unknown>;
+
+    try {
+      const rows = await prisma.translation.findMany({
+        where: { locale },
+        select: { namespace: true, key: true, value: true },
+      });
+
+      for (const row of rows) {
+        const path = row.key ? `${row.namespace}.${row.key}` : row.namespace;
+        if (!path) continue;
+        setValueByPath(messages, path, row.value);
+      }
+    } catch (error) {
+      log.error('Error carregant traduccions desde DB', error);
+    }
+
+    return messages;
+  })();
+
+  translationCache.set(locale, loadPromise);
+  return loadPromise;
 }
