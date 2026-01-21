@@ -65,6 +65,7 @@ export default async function PortfolioHome({ params }: { params: { locale: stri
                     priority={isPriority}
                     loading={isPriority ? 'eager' : 'lazy'}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    quality={70}
                     className="h-80 w-full object-cover transition group-hover:scale-110 duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />

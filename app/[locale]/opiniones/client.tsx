@@ -113,6 +113,8 @@ function GoogleReviewCard({ review }: { review: GoogleReview }) {
               src={review.profile_photo_url}
               alt={review.author_name}
               fill
+              sizes="48px"
+              quality={60}
               className="object-cover"
             />
           ) : (
@@ -157,6 +159,8 @@ function WebTestimonialCard({ testimonial }: { testimonial: WebTestimonial }) {
               src={testimonial.photoUrl}
               alt={testimonial.name}
               fill
+              sizes="48px"
+              quality={60}
               className="object-cover"
             />
           ) : (

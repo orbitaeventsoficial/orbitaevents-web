@@ -35,6 +35,7 @@ export function SimpleGallery({ images }: { images: GalleryImage[] }) {
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                quality={70}
                 priority={isPriority}
                 loading={isPriority ? 'eager' : 'lazy'}
               />
@@ -79,6 +80,7 @@ export function SimpleGallery({ images }: { images: GalleryImage[] }) {
               fill
               className="object-contain"
               sizes="100vw"
+              quality={80}
               priority
             />
           </div>

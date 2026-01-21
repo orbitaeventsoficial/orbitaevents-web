@@ -96,6 +96,8 @@ export default async function BlogPostPage({ params }: Props) {
             src={post.featuredImage}
             alt={translation.title}
             fill
+            sizes="100vw"
+            quality={80}
             className="object-cover"
             priority
           />

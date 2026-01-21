@@ -25,6 +25,7 @@ export default function TeamMembersGrid({ members }: TeamMembersGridProps) {
               fill
               className="object-cover"
               sizes="96px"
+              quality={70}
               onError={(event) => {
                 event.currentTarget.style.display = 'none';
               }}
