@@ -115,6 +115,8 @@ function ReviewCard({ review }: { review: GoogleReview }) {
               src={profile_photo_url}
               alt={author_name}
               fill
+              sizes="64px"
+              quality={60}
               className="object-cover"
             />
           ) : (

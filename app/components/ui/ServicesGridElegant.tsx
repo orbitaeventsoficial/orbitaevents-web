@@ -102,6 +102,8 @@ export default function ServicesGridElegant() {
                       src={image}
                       alt={t(`items.${key}.title`)}
                       fill
+                      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 90vw"
+                      quality={70}
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
 
