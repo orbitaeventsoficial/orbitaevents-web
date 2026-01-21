@@ -1916,7 +1916,8 @@
           "text": "Producció tècnica completa, branding integrat i efectes especials per impactar els teus convidats."
         },
         "institutional": {
-          "title": "Esdeveniments Institucionals"
+          "title": "Esdeveniments Institucionals",
+          "text": "So professional, il·luminació elegant i coordinació impecable per a actes institucionals."
         }
       },
       "valueTitle": "Professionalisme que Reforça la Teva Marca",
@@ -1940,6 +1941,7 @@
       "techProduction": "Producció Tècnica",
       "techFeatures": {
         "sound": "So professional Pioneer + EV (cobertura perfecta)",
+        "setup": "Muntatge i desmuntatge complet",
         "lighting": "Il·luminació LED corporativa sincronitzada amb branding",
         "mics": "Micròfons sense fils per a speakers/presentadors",
         "screens": "Pantalles LED opcionals per a projecció corporativa"
@@ -1992,6 +1994,18 @@
         "backup": "Equip de recanvi disponible"
       },
       "discoPacks": {
+        "oferta-flash": {
+          "name": "Oferta Flash",
+          "tagline": "Descompte exclusiu per a festes de fins a 50 convidats",
+          "ideal": "Festes privades de fins a 50 convidats",
+          "features": [
+            "So PRO 4000W EV",
+            "Il·luminació bàsica (multiefectes LED + focus LED)",
+            "DJ professional 2 hores",
+            "Màquina de fum",
+            "Muntatge i desmuntatge inclosos"
+          ]
+        },
         "disco-basico": {
           "name": "Party Starter",
           "tagline": "La teva festa, el teu estil. Nosaltres la fem realitat",

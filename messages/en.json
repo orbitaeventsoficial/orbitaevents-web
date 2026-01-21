@@ -2384,6 +2384,18 @@
         "backup": "Backup equipment on hand"
       },
       "discoPacks": {
+        "oferta-flash": {
+          "name": "Flash Offer",
+          "tagline": "Exclusive discount for parties up to 50 guests",
+          "ideal": "Private parties up to 50 guests",
+          "features": [
+            "Pro sound 4000W EV",
+            "Basic lighting (multieffect LED + LED wash)",
+            "Professional DJ for 2 hours",
+            "Smoke machine",
+            "Assembly and disassembly included"
+          ]
+        },
         "disco-basico": {
           "name": "Party Starter",
           "tagline": "Your party, your style. We make it happen",

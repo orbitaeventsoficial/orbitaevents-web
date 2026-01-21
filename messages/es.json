@@ -2384,6 +2384,18 @@
         "backup": "Equipo de respaldo disponible"
       },
       "discoPacks": {
+        "oferta-flash": {
+          "name": "Oferta Flash",
+          "tagline": "Descuento exclusivo para fiestas de hasta 50 invitados",
+          "ideal": "Fiestas privadas de hasta 50 invitados",
+          "features": [
+            "Sonido PRO 4000W EV",
+            "Iluminación básica (multiefectos LED + focos LED)",
+            "DJ profesional 2 horas",
+            "Máquina de humo",
+            "Montaje y desmontaje incluido"
+          ]
+        },
         "disco-basico": {
           "name": "Party Starter",
           "tagline": "Tu fiesta, tu estilo. Nosotros la hacemos realidad",
