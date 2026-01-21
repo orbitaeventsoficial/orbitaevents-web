@@ -18,11 +18,11 @@
  * - Rutas con locale
  * - Textos usando sistema de traducciones
  * - Scroll usando container ref
- * - Dependencias de useEffect
+ * - Animaciones optimizadas para evitar parpadeos
  */
 
-import { useRef, useEffect, useState, useMemo } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { useRef, useMemo } from 'react';
+import { motion, useScroll, useTransform, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
 
@@ -31,8 +31,9 @@ import { useTranslations } from 'next-intl';
 // ═══════════════════════════════════════════════════════════════════════════
 
 function ParticlesBackground() {
+  const reduceMotion = useReducedMotion();
   const particles = useMemo(() =>
-    Array.from({ length: 14 }, (_, i) => ({
+    Array.from({ length: reduceMotion ? 6 : 10 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -41,7 +42,7 @@ function ParticlesBackground() {
       delay: Math.random() * 2,
       xOffset: Math.random() * 30 - 15,
       color: i % 3 === 0 ? 'bg-amber-400/40' : i % 3 === 1 ? 'bg-orange-500/40' : 'bg-yellow-400/40',
-    })), []
+    })), [reduceMotion]
   );
 
   return (
@@ -55,18 +56,7 @@ function ParticlesBackground() {
             height: p.size,
             left: `${p.x}%`,
             top: `${p.y}%`,
-          }}
-          animate={{
-            y: [0, -80, 0],
-            x: [0, p.xOffset, 0],
-            opacity: [0, 0.7, 0],
-            scale: [0, 1.5, 0],
-          }}
-          transition={{
-            duration: p.duration,
-            delay: p.delay,
-            repeat: Infinity,
-            ease: 'easeInOut',
+            opacity: 0.35,
           }}
         />
       ))}
@@ -90,38 +80,21 @@ function AnimatedBadge() {
     { emoji: '⭐', text: t('badges.rating'), gradient: 'from-amber-400 to-yellow-500' },
   ], [t]);
 
-  const [currentBadge, setCurrentBadge] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBadge((prev) => (prev + 1) % badges.length);
-    }, 3500);
-    return () => clearInterval(interval);
-  }, [badges.length]);
+  const badge = badges[0];
 
   return (
     <div className="relative h-12 overflow-hidden">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentBadge}
-          initial={{ y: 40, opacity: 0, scale: 0.8 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: -40, opacity: 0, scale: 0.8 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-0 flex items-center justify-center"
-        >
-          <div className={`relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r ${badges[currentBadge].gradient} shadow-2xl`}>
-            {/* Glow effect */}
-            <div
-              className={`absolute inset-0 rounded-full bg-gradient-to-r ${badges[currentBadge].gradient} opacity-40 blur-lg`}
-            />
-            <span className="relative text-2xl drop-shadow-lg">{badges[currentBadge].emoji}</span>
-            <span className="relative text-white text-sm font-bold tracking-wide drop-shadow-md">
-              {badges[currentBadge].text}
-            </span>
-          </div>
-        </motion.div>
-      </AnimatePresence>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className={`relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r ${badge.gradient} shadow-2xl`}>
+          <div
+            className={`absolute inset-0 rounded-full bg-gradient-to-r ${badge.gradient} opacity-40 blur-lg`}
+          />
+          <span className="relative text-2xl drop-shadow-lg">{badge.emoji}</span>
+          <span className="relative text-white text-sm font-bold tracking-wide drop-shadow-md">
+            {badge.text}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -140,98 +113,34 @@ function MorphingText() {
     t('morphingTexts.yours'),
   ], [t]);
 
-  const [currentText, setCurrentText] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentText((prev) => (prev + 1) % texts.length);
-    }, 2500);
-    return () => clearInterval(interval);
-  }, [texts.length]);
+  const text = texts[0];
 
   return (
     <span className="relative inline-block min-w-[200px]">
-      {/* Background glow - pulsating */}
-      <motion.div
-        className="absolute -inset-4 bg-gradient-to-r from-amber-500/30 via-orange-500/30 to-amber-500/30 rounded-2xl blur-3xl"
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.6, 0.3],
+      <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 rounded-2xl blur-3xl" />
+
+      <span
+        className="relative inline-block bg-gradient-to-r from-amber-200 via-orange-400 to-amber-400 bg-clip-text text-transparent font-black"
+        style={{
+          filter: 'drop-shadow(0 0 30px rgba(251, 191, 36, 0.7)) drop-shadow(0 0 60px rgba(251, 146, 60, 0.35))',
         }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-      />
+      >
+        {text}
 
-      <AnimatePresence mode="wait">
-        <motion.span
-          key={currentText}
-          initial={{
-            opacity: 0,
-            y: 50,
-            rotateX: -90,
-            scale: 0.8,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            rotateX: 0,
-            scale: 1,
-          }}
-          exit={{
-            opacity: 0,
-            y: -50,
-            rotateX: 90,
-            scale: 0.8,
-          }}
-          transition={{
-            duration: 0.7,
-            ease: [0.22, 1, 0.36, 1]
-          }}
-          className="relative inline-block bg-gradient-to-r from-amber-200 via-orange-400 to-amber-400 bg-clip-text text-transparent font-black"
-          style={{
-            filter: 'drop-shadow(0 0 30px rgba(251, 191, 36, 0.8)) drop-shadow(0 0 60px rgba(251, 146, 60, 0.4))',
-          }}
-        >
-          {texts[currentText]}
-
-          {/* Sparkle particles around text */}
-          <motion.span
-            className="absolute -left-3 top-0 w-2 h-2 bg-amber-400 rounded-full"
-            animate={{
-              scale: [0, 1.5, 0],
-              opacity: [0, 1, 0],
-              rotate: [0, 180, 360],
-            }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-          />
-          <motion.span
-            className="absolute -right-3 bottom-0 w-2 h-2 bg-orange-400 rounded-full"
-            animate={{
-              scale: [0, 1.5, 0],
-              opacity: [0, 1, 0],
-              rotate: [360, 180, 0],
-            }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
-          />
-        </motion.span>
-      </AnimatePresence>
+        <span className="absolute -left-3 top-0 w-2 h-2 bg-amber-400/60 rounded-full" />
+        <span className="absolute -right-3 bottom-0 w-2 h-2 bg-orange-400/60 rounded-full" />
+      </span>
 
       {/* Animated underline with shimmer effect */}
-      <motion.div
+      <div
         className="absolute -bottom-3 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent rounded-full"
-        animate={{
-          opacity: [0.5, 1, 0.5],
-          scaleX: [0.9, 1, 0.9],
-        }}
-        transition={{ duration: 2, repeat: Infinity }}
+        style={{ opacity: 0.75 }}
       />
 
       {/* Shimmer effect moving across */}
-      <motion.div
+      <div
         className="absolute -bottom-3 left-0 h-[3px] w-1/3 bg-gradient-to-r from-transparent via-white to-transparent rounded-full"
-        animate={{
-          x: ['-100%', '300%'],
-        }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+        style={{ opacity: 0 }}
       />
     </span>
   );
@@ -244,6 +153,7 @@ function MorphingText() {
 function ScrollIndicator() {
   const { haptic, scrollToSection } = useMobile();
   const t = useTranslations('mobileHero');
+  const reduceMotion = useReducedMotion();
   
   const handleClick = () => {
     haptic('light');
@@ -254,32 +164,21 @@ function ScrollIndicator() {
     <motion.button
       onClick={handleClick}
       className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-      initial={{ opacity: 0 }}
+      initial={reduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ delay: 2 }}
+      transition={reduceMotion ? undefined : { delay: 2 }}
     >
-      <motion.span 
-        className="text-white/50 text-xs font-medium tracking-wider"
-        animate={{ opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 2, repeat: Infinity }}
+      <span 
+        className="text-white/60 text-xs font-medium tracking-wider"
       >
         {t('scroll')}
-      </motion.span>
+      </span>
       
-      <motion.div
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+      <div
         className="w-6 h-10 rounded-full border-2 border-white/30 flex justify-center pt-2"
       >
-        <motion.div
-          animate={{ 
-            y: [0, 12, 0],
-            opacity: [1, 0, 1]
-          }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-1.5 h-1.5 rounded-full bg-amber-500"
-        />
-      </motion.div>
+        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80" />
+      </div>
     </motion.button>
   );
 }
@@ -291,9 +190,10 @@ function ScrollIndicator() {
 function FloatingCTAs() {
   const { haptic, locale } = useMobile();
   const t = useTranslations('common');
+  const reduceMotion = useReducedMotion();
 
   return (
-    <div className="flex flex-col gap-4 w-full px-6">
+    <div className="flex flex-col gap-3 w-full px-5">
       {/* Primary CTA - ULTRA ENHANCED */}
       <motion.a
         href={`/${locale}/contacto`}
@@ -307,30 +207,23 @@ function FloatingCTAs() {
         {/* Animated glow effect */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 rounded-2xl blur-2xl opacity-60"
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.6, 0.8, 0.6],
-          }}
-          transition={{ duration: 2, repeat: Infinity }}
+          animate={{ opacity: reduceMotion ? 0.65 : 0.7, scale: 1 }}
         />
 
         {/* Shine effect */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-          animate={{ x: ['-200%', '200%'] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+          animate={{ x: 0, opacity: 0 }}
         />
 
-        <div className="relative flex items-center justify-center gap-3 py-5 px-6 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl font-black text-black text-lg shadow-2xl">
+        <div className="relative flex items-center justify-center gap-2 py-3.5 px-4 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl font-black text-black text-sm shadow-2xl">
           <span className="relative z-10">{t('buttons.requestQuote')}</span>
           <motion.svg
-            className="w-6 h-6 relative z-10"
+            className="w-4 h-4 relative z-10"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
             strokeWidth={3}
-            animate={{ x: [0, 5, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </motion.svg>
@@ -342,7 +235,7 @@ function FloatingCTAs() {
         href="https://wa.me/34699121023?text=Hola!%20Vull%20info%20sobre%20events%20temàtics"
         whileTap={{ scale: 0.96 }}
         onTapStart={() => haptic('light')}
-        className="relative group flex items-center justify-center gap-3 py-5 px-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-md rounded-2xl border-2 border-green-500/30 font-bold text-white shadow-xl overflow-hidden"
+        className="relative group flex items-center justify-center gap-2.5 py-4 px-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-md rounded-2xl border-2 border-green-500/30 font-bold text-white text-sm shadow-xl overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.4, duration: 0.8 }}
@@ -354,8 +247,6 @@ function FloatingCTAs() {
           className="w-6 h-6 text-green-400 relative z-10"
           fill="currentColor"
           viewBox="0 0 24 24"
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
         >
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
         </motion.svg>

@@ -17,7 +17,7 @@ import { usePathname } from 'next/navigation';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { Home, Briefcase, Image, MessageCircle, Calculator } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVIGATION ITEMS
@@ -64,6 +64,7 @@ const NAV_ITEMS = [
 export default function BottomNav() {
   const pathname = usePathname();
   const t = useTranslations('bottomNav');
+  const reduceMotion = useReducedMotion();
 
   // Comprovar si un link és actiu
   const isActive = (href: string, exactMatch: boolean) => {
@@ -136,11 +137,15 @@ export default function BottomNav() {
                 <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} />
                 {/* Indicador actiu */}
                 {active && (
-                  <motion.div
-                    layoutId="bottomNavIndicator"
-                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-400"
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
+                  reduceMotion ? (
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-400" />
+                  ) : (
+                    <motion.div
+                      layoutId="bottomNavIndicator"
+                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-400"
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    />
+                  )
                 )}
               </motion.div>
               <span className={`text-xs mt-1 font-medium ${active ? 'text-amber-400' : ''}`}>

@@ -83,7 +83,7 @@ export default function SettingsNotificationsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
         <div className="text-center">
           <div className="animate-spin h-8 w-8 border-4 border-amber-500 border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-slate-500">Carregant configuració...</p>
@@ -145,8 +145,8 @@ export default function SettingsNotificationsPage() {
       <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-700 mb-4">🧪 Test d'Email</h2>
         
-        {testResult && (
-          <div className={`mb-4 p-4 rounded-lg ${testResult.success ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
+      {testResult && (
+          <div className={`mb-4 p-4 rounded-lg ${testResult.success ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`} role={testResult.success ? 'status' : 'alert'}>
             <div className="flex items-center gap-2">
               <span className="text-xl">{testResult.success ? '✅' : '❌'}</span>
               <span>{testResult.message}</span>
@@ -157,6 +157,8 @@ export default function SettingsNotificationsPage() {
         <button
           onClick={handleTestEmail}
           disabled={testing || !config?.status.emailReady}
+          type="button"
+          aria-busy={testing}
           className="px-6 py-3 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {testing ? '📤 Enviant...' : '📧 Enviar Email de Test'}

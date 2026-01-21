@@ -67,6 +67,8 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
       <button
         onClick={handleDelete}
         disabled={isDeleting || hasBooking}
+        type="button"
+        aria-busy={isDeleting}
         className={`inline-flex items-center rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors
           ${hasBooking
             ? 'bg-stone-100 text-slate-400 cursor-not-allowed'

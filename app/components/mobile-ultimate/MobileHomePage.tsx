@@ -33,7 +33,7 @@ import MobileHeroUltimate from './MobileHeroUltimate';
 import MobileServicesCards from './MobileServicesCards';
 import MobileCTAUrgency from './MobileCTAUrgency';
 import MobileBottomNav from './MobileBottomNav';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
 
@@ -49,6 +49,7 @@ const HeroPortalLogo = dynamic(
 
 function QuickFeatures() {
   const t = useTranslations('mobileHome.quickFeatures');
+  const reduceMotion = useReducedMotion();
 
   const features = [
     { icon: '🎃', titleKey: 'halloween.title', descKey: 'halloween.desc', gradient: 'from-orange-500 to-red-500' },
@@ -66,10 +67,10 @@ function QuickFeatures() {
         {features.map((feature, i) => (
           <motion.div
             key={feature.titleKey}
-            initial={{ opacity: 0, y: 30, scale: 0.8 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 30, scale: 0.8 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: i * 0.1, type: 'spring', damping: 20 }}
+            transition={reduceMotion ? { duration: 0 } : { delay: i * 0.1, type: 'spring', damping: 20 }}
             whileTap={{ scale: 0.95 }}
             className="relative group p-5 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 backdrop-blur-sm shadow-xl overflow-hidden"
           >
@@ -79,15 +80,15 @@ function QuickFeatures() {
             {/* Shine effect */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-              animate={{ x: ['-100%', '200%'] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'linear', delay: i * 0.5 }}
+              animate={reduceMotion ? { x: 0, opacity: 0 } : { x: ['-100%', '200%'] }}
+              transition={reduceMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'linear', delay: i * 0.5 }}
             />
 
             <div className="relative">
               <motion.span
                 className="text-4xl block mb-3"
-                animate={{ rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 4, repeat: Infinity, delay: i * 0.3, ease: "easeInOut" }}
+                animate={reduceMotion ? { rotate: 0 } : { rotate: [0, 5, -5, 0] }}
+                transition={reduceMotion ? { duration: 0 } : { duration: 4, repeat: Infinity, delay: i * 0.3, ease: "easeInOut" }}
               >
                 {feature.icon}
               </motion.span>
@@ -107,6 +108,7 @@ function QuickFeatures() {
 
 function GuaranteeSection() {
   const t = useTranslations('mobileHome.guarantees');
+  const reduceMotion = useReducedMotion();
 
   const guarantees = [
     {
@@ -138,7 +140,7 @@ function GuaranteeSection() {
       <div className="relative">
         {/* Header - Enhanced */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mb-10 px-4"
@@ -161,10 +163,10 @@ function GuaranteeSection() {
           {guarantees.map((guarantee, i) => (
             <motion.div
               key={guarantee.titleKey}
-              initial={{ opacity: 0, x: -30, scale: 0.9 }}
+              initial={reduceMotion ? false : { opacity: 0, x: -30, scale: 0.9 }}
               whileInView={{ opacity: 1, x: 0, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.15, type: 'spring', damping: 20 }}
+              transition={reduceMotion ? { duration: 0 } : { delay: i * 0.15, type: 'spring', damping: 20 }}
               whileTap={{ scale: 0.98 }}
               className="relative group"
             >
@@ -177,17 +179,17 @@ function GuaranteeSection() {
                 {/* Shine effect */}
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
-                  animate={{ x: ['-100%', '200%'] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: 'linear', delay: i * 1 }}
+                  animate={reduceMotion ? { x: 0, opacity: 0 } : { x: ['-100%', '200%'] }}
+                  transition={reduceMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'linear', delay: i * 1 }}
                 />
 
                 <div className="relative">
                   <motion.div
-                    animate={{
+                    animate={reduceMotion ? { scale: 1, rotate: 0 } : {
                       scale: [1, 1.2, 1],
                       rotate: [0, 10, -10, 0],
                     }}
-                    transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
+                    transition={reduceMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, delay: i * 0.5 }}
                     className="text-4xl"
                   >
                     {guarantee.icon}
@@ -311,6 +313,18 @@ export default function MobileHomePage() {
       setIntroFinished(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (!showIntro) return;
+
+    const fallbackTimer = window.setTimeout(() => {
+      setShowIntro(false);
+      setIntroFinished(true);
+      sessionStorage.setItem('orbita-mobile-intro-seen', 'true');
+    }, 2200);
+
+    return () => window.clearTimeout(fallbackTimer);
+  }, [showIntro]);
 
   const handleIntroFinish = () => {
     setShowIntro(false);

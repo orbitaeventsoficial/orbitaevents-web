@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -23,33 +23,48 @@ export default function BottomCTABar({
   hideOnScroll = true,
 }: BottomCTABarProps) {
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const reduceMotion = useReducedMotion();
+  const lastScrollYRef = useRef(0);
+  const scrollRaf = useRef<number | null>(null);
+  const isVisibleRef = useRef(isVisible);
+
+  useEffect(() => {
+    isVisibleRef.current = isVisible;
+  }, [isVisible]);
 
   useEffect(() => {
     if (!hideOnScroll) return;
 
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Mostrar sempre a dalt de tot
-      if (currentScrollY < 100) {
-        setIsVisible(true);
-        return;
-      }
-      
-      // Amagar quan scroll cap avall, mostrar quan scroll cap amunt
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      
-      setLastScrollY(currentScrollY);
+      if (scrollRaf.current !== null) return;
+      scrollRaf.current = window.requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        
+        // Mostrar sempre a dalt de tot
+        if (currentScrollY < 100) {
+          if (!isVisibleRef.current) setIsVisible(true);
+        } else if (currentScrollY > lastScrollYRef.current) {
+          // Amagar quan scroll cap avall, mostrar quan scroll cap amunt
+          if (isVisibleRef.current) setIsVisible(false);
+        } else if (!isVisibleRef.current) {
+          setIsVisible(true);
+        }
+        
+        lastScrollYRef.current = currentScrollY;
+        scrollRaf.current = null;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, hideOnScroll]);
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollRaf.current !== null) {
+        window.cancelAnimationFrame(scrollRaf.current);
+        scrollRaf.current = null;
+      }
+    };
+  }, [hideOnScroll]);
 
   return (
     <>
@@ -60,10 +75,10 @@ export default function BottomCTABar({
       <AnimatePresence>
         {isVisible && (
           <motion.div
-            initial={{ y: 100 }}
+            initial={reduceMotion ? false : { y: 100 }}
             animate={{ y: 0 }}
             exit={{ y: 100 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            transition={reduceMotion ? { duration: 0 } : { type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           >

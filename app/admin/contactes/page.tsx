@@ -9,8 +9,8 @@
  * - Veure historial d'events
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -47,6 +47,7 @@ export default function AdminContactesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const reduceMotion = useReducedMotion();
 
   // Modals
   const [showAddModal, setShowAddModal] = useState(false);
@@ -123,7 +124,7 @@ export default function AdminContactesPage() {
       const result = await response.json();
 
       // Afegir a la llista
-      setCustomers([result.data, ...customers]);
+      setCustomers((prev) => [result.data, ...prev]);
       setShowAddModal(false);
 
       // Reset form
@@ -178,11 +179,15 @@ export default function AdminContactesPage() {
   };
 
   // Filter customers
-  const filteredCustomers = customers.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.email?.toLowerCase().includes(search.toLowerCase()) ||
-    c.phone?.includes(search)
-  );
+  const searchLower = search.trim().toLowerCase();
+  const filteredCustomers = useMemo(() => {
+    if (!searchLower) return customers;
+    return customers.filter((customer) =>
+      customer.name.toLowerCase().includes(searchLower) ||
+      customer.email?.toLowerCase().includes(searchLower) ||
+      customer.phone?.includes(search)
+    );
+  }, [customers, searchLower, search]);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // RENDER
@@ -226,16 +231,18 @@ export default function AdminContactesPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
-              type="text"
+              type="search"
               placeholder="Buscar contacte..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              aria-label="Buscar contacte"
               className="w-full pl-10 pr-4 py-3 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 placeholder-stone-400 focus:border-amber-400 transition-all"
             />
           </div>
 
           <button
             onClick={() => setShowAddModal(true)}
+            type="button"
             className="flex items-center gap-2 px-6 py-3 bg-amber-400 text-slate-700 font-bold rounded-xl hover:bg-amber-300 transition-all"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -247,21 +254,21 @@ export default function AdminContactesPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 mb-6">
+          <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 mb-6" role="alert">
             <p className="text-red-400">{error}</p>
           </div>
         )}
 
         {/* Loading */}
         {loading && (
-          <div className="flex items-center justify-center py-20">
+          <div className="flex items-center justify-center py-20" role="status" aria-live="polite">
             <div className="animate-spin w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full" />
           </div>
         )}
 
         {/* Empty */}
         {!loading && filteredCustomers.length === 0 && (
-          <div className="text-center py-20">
+          <div className="text-center py-20" role="status" aria-live="polite">
             <p className="text-slate-500 text-lg">No hi ha contactes</p>
           </div>
         )}
@@ -272,11 +279,11 @@ export default function AdminContactesPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-stone-200">
-                  <th className="text-left p-4 text-slate-500 font-medium">Nom</th>
-                  <th className="text-left p-4 text-slate-500 font-medium hidden md:table-cell">Contacte</th>
-                  <th className="text-left p-4 text-slate-500 font-medium hidden lg:table-cell">Font</th>
-                  <th className="text-left p-4 text-slate-500 font-medium hidden sm:table-cell">Events</th>
-                  <th className="text-left p-4 text-slate-500 font-medium">Accions</th>
+                  <th scope="col" className="text-left p-4 text-slate-500 font-medium">Nom</th>
+                  <th scope="col" className="text-left p-4 text-slate-500 font-medium hidden md:table-cell">Contacte</th>
+                  <th scope="col" className="text-left p-4 text-slate-500 font-medium hidden lg:table-cell">Font</th>
+                  <th scope="col" className="text-left p-4 text-slate-500 font-medium hidden sm:table-cell">Events</th>
+                  <th scope="col" className="text-left p-4 text-slate-500 font-medium">Accions</th>
                 </tr>
               </thead>
               <tbody>
@@ -338,6 +345,7 @@ export default function AdminContactesPage() {
                             setSelectedCustomer(customer);
                             setShowActionModal(true);
                           }}
+                          type="button"
                           className="p-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-all"
                           title="Iniciar procés"
                         >
@@ -347,6 +355,7 @@ export default function AdminContactesPage() {
                           </svg>
                         </button>
                         <button
+                          type="button"
                           className="p-2 bg-stone-100 text-slate-600 rounded-lg hover:bg-stone-200 transition-all"
                           title="Editar"
                         >
@@ -367,20 +376,24 @@ export default function AdminContactesPage() {
         <AnimatePresence>
           {showAddModal && (
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
               onClick={() => setShowAddModal(false)}
+              role="presentation"
             >
               <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
+                initial={reduceMotion ? false : { scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="add-contact-title"
                 className="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto"
               >
-                <h2 className="text-2xl font-bold text-slate-700 mb-6">Afegir Contacte</h2>
+                <h2 id="add-contact-title" className="text-2xl font-bold text-slate-700 mb-6">Afegir Contacte</h2>
 
                 <div className="space-y-4">
                   <div>
@@ -454,6 +467,7 @@ export default function AdminContactesPage() {
                 <div className="flex gap-4 mt-8">
                   <button
                     onClick={() => setShowAddModal(false)}
+                    type="button"
                     className="flex-1 py-3 border border-stone-200 text-slate-700 rounded-xl hover:bg-stone-100 transition-all"
                   >
                     Cancel·lar
@@ -461,6 +475,8 @@ export default function AdminContactesPage() {
                   <button
                     onClick={handleAddCustomer}
                     disabled={actionLoading || !newCustomer.name || !newCustomer.email}
+                    type="button"
+                    aria-busy={actionLoading}
                     className="flex-1 py-3 bg-amber-400 text-slate-700 font-bold rounded-xl disabled:opacity-50 hover:bg-amber-300 transition-all"
                   >
                     {actionLoading ? 'Afegint...' : 'Afegir'}
@@ -475,20 +491,24 @@ export default function AdminContactesPage() {
         <AnimatePresence>
           {showActionModal && selectedCustomer && (
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
               onClick={() => setShowActionModal(false)}
+              role="presentation"
             >
               <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
+                initial={reduceMotion ? false : { scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="start-process-title"
                 className="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 max-w-md w-full"
               >
-                <h2 className="text-2xl font-bold text-slate-700 mb-2">🚀 Iniciar Procés</h2>
+                <h2 id="start-process-title" className="text-2xl font-bold text-slate-700 mb-2">🚀 Iniciar Procés</h2>
                 <p className="text-slate-500 mb-6">
                   Per <span className="text-amber-400">{selectedCustomer.name}</span>
                 </p>
@@ -497,6 +517,8 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('review_request')}
                     disabled={actionLoading}
+                    type="button"
+                    aria-busy={actionLoading}
                     className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-100 hover:border-amber-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
@@ -511,6 +533,8 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('post_event')}
                     disabled={actionLoading}
+                    type="button"
+                    aria-busy={actionLoading}
                     className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-100 hover:border-green-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
@@ -525,6 +549,8 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('welcome')}
                     disabled={actionLoading}
+                    type="button"
+                    aria-busy={actionLoading}
                     className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-100 hover:border-purple-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
@@ -539,6 +565,8 @@ export default function AdminContactesPage() {
                   <button
                     onClick={() => startProcess('promo')}
                     disabled={actionLoading}
+                    type="button"
+                    aria-busy={actionLoading}
                     className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-100 hover:border-pink-400/50 transition-all group disabled:opacity-50"
                   >
                     <div className="flex items-center gap-4">
@@ -553,6 +581,7 @@ export default function AdminContactesPage() {
 
                 <button
                   onClick={() => setShowActionModal(false)}
+                  type="button"
                   className="w-full mt-6 py-3 border border-stone-200 text-slate-500 rounded-xl hover:bg-stone-100 transition-all"
                 >
                   Cancel·lar

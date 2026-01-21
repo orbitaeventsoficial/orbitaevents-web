@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useDeferredValue } from 'react';
 import { useRouter } from 'next/navigation';
 import DOMPurify from 'dompurify';
 import { EVENT_TYPE_LABELS } from '@/lib/constants/labels';
@@ -76,7 +76,6 @@ export default function InboxClient({
   
   // State
   const [activeTab, setActiveTab] = useState<'all' | 'leads' | 'emails'>('all');
-  const [emails, setEmails] = useState<UnifiedEmail[]>([]);
   const [imapEmails, setImapEmails] = useState<ImapEmail[]>([]);
   const [imapUnread, setImapUnread] = useState(0);
   const [loadingImap, setLoadingImap] = useState(false);
@@ -90,8 +89,8 @@ export default function InboxClient({
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Convertir leads a format unificat
-  useEffect(() => {
-    const leadEmails: UnifiedEmail[] = initialLeads.map(lead => ({
+  const emails = useMemo(() => {
+    const leadEmails: UnifiedEmail[] = initialLeads.map((lead) => ({
       id: lead.id,
       type: 'lead' as const,
       from: lead.email,
@@ -103,7 +102,7 @@ export default function InboxClient({
       leadData: lead,
     }));
 
-    const imapUnified: UnifiedEmail[] = imapEmails.map(email => ({
+    const imapUnified: UnifiedEmail[] = imapEmails.map((email) => ({
       id: email.id,
       type: 'imap' as const,
       from: email.from.address,
@@ -115,12 +114,9 @@ export default function InboxClient({
       imapData: email,
     }));
 
-    // Combinar i ordenar per data
-    const combined = [...leadEmails, ...imapUnified].sort(
+    return [...leadEmails, ...imapUnified].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
-
-    setEmails(combined);
   }, [initialLeads, imapEmails]);
 
   // Carregar emails IMAP
@@ -162,26 +158,29 @@ export default function InboxClient({
   }
 
   // Filtrar emails
-  const filteredEmails = emails.filter(email => {
-    // Filtre per tab
-    if (activeTab === 'leads' && email.type !== 'lead') return false;
-    if (activeTab === 'emails' && email.type !== 'imap') return false;
+  const deferredQuery = useDeferredValue(searchQuery);
+  const queryLower = deferredQuery.trim().toLowerCase();
+  const filteredEmails = useMemo(() => {
+    return emails.filter((email) => {
+      // Filtre per tab
+      if (activeTab === 'leads' && email.type !== 'lead') return false;
+      if (activeTab === 'emails' && email.type !== 'imap') return false;
 
-    // Filtre per llegit/no llegit
-    if (filter === 'unread' && email.read) return false;
+      // Filtre per llegit/no llegit
+      if (filter === 'unread' && email.read) return false;
 
-    // Filtre per cerca
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        email.from.toLowerCase().includes(query) ||
-        email.fromName.toLowerCase().includes(query) ||
-        email.subject.toLowerCase().includes(query) ||
-        email.preview.toLowerCase().includes(query)
-      );
-    }
-    return true;
-  });
+      // Filtre per cerca
+      if (queryLower) {
+        return (
+          email.from.toLowerCase().includes(queryLower) ||
+          email.fromName.toLowerCase().includes(queryLower) ||
+          email.subject.toLowerCase().includes(queryLower) ||
+          email.preview.toLowerCase().includes(queryLower)
+        );
+      }
+      return true;
+    });
+  }, [emails, activeTab, filter, queryLower]);
 
   function handleReply(email: UnifiedEmail) {
     setReplyTo(email);
@@ -214,6 +213,7 @@ export default function InboxClient({
         <div className="space-y-1 mb-6">
           <button
             onClick={() => setActiveTab('all')}
+            type="button"
             className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'all' ? 'bg-amber-100 text-amber-700' : 'text-slate-600 hover:bg-stone-100'
             }`}
@@ -222,6 +222,7 @@ export default function InboxClient({
           </button>
           <button
             onClick={() => setActiveTab('leads')}
+            type="button"
             className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'leads' ? 'bg-amber-100 text-amber-700' : 'text-slate-600 hover:bg-stone-100'
             }`}
@@ -231,6 +232,7 @@ export default function InboxClient({
           {imapConfigured && (
             <button
               onClick={() => setActiveTab('emails')}
+              type="button"
               className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === 'emails' ? 'bg-amber-100 text-amber-700' : 'text-slate-600 hover:bg-stone-100'
               }`}
@@ -251,6 +253,7 @@ export default function InboxClient({
         <nav className="space-y-1">
           <button
             onClick={() => setFilter('all')}
+            type="button"
             className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
               filter === 'all' ? 'bg-stone-100 text-slate-700' : 'text-slate-600 hover:bg-stone-100'
             }`}
@@ -259,6 +262,7 @@ export default function InboxClient({
           </button>
           <button
             onClick={() => setFilter('unread')}
+            type="button"
             className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
               filter === 'unread' ? 'bg-stone-100 text-slate-700' : 'text-slate-600 hover:bg-stone-100'
             }`}
@@ -290,6 +294,7 @@ export default function InboxClient({
           <button
             onClick={loadImapEmails}
             disabled={loadingImap}
+            type="button"
             className="w-full mt-4 px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
           >
             {loadingImap ? '⏳ Carregant...' : '🔄 Actualitzar'}
@@ -311,10 +316,11 @@ export default function InboxClient({
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
             <input
-              type="text"
+              type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cercar..."
+              aria-label="Cercar emails"
               className="w-full pl-10 pr-4 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
             />
           </div>
@@ -327,11 +333,15 @@ export default function InboxClient({
                 ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700'
                 : 'border-red-500/30 bg-red-500/10 text-red-700'
             }`}
+            role={flashMessage.type === 'error' ? 'alert' : 'status'}
+            aria-live="polite"
           >
             <div className="flex items-center justify-between gap-3">
               <span>{flashMessage.text}</span>
               <button
                 onClick={() => setFlashMessage(null)}
+                type="button"
+                aria-label="Tancar missatge"
                 className="text-xs text-slate-500 hover:text-slate-700"
               >
                 ✕
@@ -357,6 +367,7 @@ export default function InboxClient({
               <button
                 key={email.id}
                 onClick={() => setSelectedEmail(email)}
+                type="button"
                 className={`w-full text-left p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors ${
                   selectedEmail?.id === email.id ? 'bg-amber-50 border-l-4 border-l-amber-500' : ''
                 } ${!email.read ? 'bg-blue-50/50' : ''}`}
@@ -494,6 +505,7 @@ export default function InboxClient({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleReply(selectedEmail)}
+                  type="button"
                   className="flex-1 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-medium"
                 >
                   ↩️ Respondre
@@ -518,6 +530,7 @@ export default function InboxClient({
                 {selectedEmail.type === 'lead' && (
                   <button
                     onClick={() => router.push(`/admin/leads/${selectedEmail.id}`)}
+                    type="button"
                     className="px-4 py-2 border border-stone-200 rounded-lg hover:bg-white transition-colors"
                   >
                     📋 Veure lead
@@ -598,14 +611,26 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
   }
 
   return (
-    <div className="fixed inset-0 bg-stone-100/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+    <div className="fixed inset-0 bg-stone-100/70 flex items-center justify-center z-50 p-4" role="presentation">
+      <div
+        className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="compose-title"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
-          <h2 className="text-lg font-semibold text-slate-700">
+          <h2 id="compose-title" className="text-lg font-semibold text-slate-700">
             {replyTo ? `↩️ Respondre a ${replyTo.fromName}` : '✏️ Nou email'}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-stone-100 rounded-lg">✕</button>
+          <button
+            onClick={onClose}
+            type="button"
+            aria-label="Tancar modal"
+            className="p-2 hover:bg-stone-100 rounded-lg"
+          >
+            ✕
+          </button>
         </div>
 
         {/* Content */}
@@ -642,13 +667,15 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 bg-slate-50">
-          {error && <span className="text-xs text-red-600 mr-auto">{error}</span>}
-          {success && <span className="text-xs text-green-600 mr-auto">{success}</span>}
-          <button onClick={onClose} className="px-4 py-2 text-slate-600">Cancel·lar</button>
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 bg-slate-50" aria-live="polite">
+          {error && <span className="text-xs text-red-600 mr-auto" role="alert">{error}</span>}
+          {success && <span className="text-xs text-green-600 mr-auto" role="status">{success}</span>}
+          <button onClick={onClose} type="button" className="px-4 py-2 text-slate-600">Cancel·lar</button>
           <button
             onClick={handleSend}
             disabled={sending || !to || !subject || !body}
+            type="button"
+            aria-busy={sending}
             className={`px-6 py-2 rounded-lg font-medium ${
               sent ? 'bg-green-500 text-white' : 
               sending ? 'bg-stone-200 text-slate-500' : 

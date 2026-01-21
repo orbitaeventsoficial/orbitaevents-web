@@ -167,13 +167,13 @@ export default async function InventoryPage() {
               <table className="w-full text-sm">
                 <thead className="bg-slate-50 border-b border-stone-200">
                   <tr>
-                    <th className="px-4 py-3 text-left font-medium text-slate-600">Codi</th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-600">Nom</th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-600">Watts</th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-600">Valor</th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-600">Estat</th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-600">Packs</th>
-                    <th className="px-4 py-3 text-right font-medium text-slate-600">Accions</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Codi</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Nom</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Watts</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Valor</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Estat</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Packs</th>
+                    <th scope="col" className="px-4 py-3 text-right font-medium text-slate-600">Accions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">

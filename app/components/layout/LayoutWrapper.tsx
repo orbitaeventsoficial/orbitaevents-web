@@ -99,6 +99,15 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     const isHomePage = INTRO_PAGES.some(page => pathname === page);
     const hasSeenIntro = sessionStorage.getItem('orbita-intro-seen');
     const isBotUser = isBot();
+    const isMobileViewport = window.innerWidth < 1024;
+
+    // En móvil usamos la intro específica del MobileHomePage
+    if (isMobileViewport) {
+      setShowIntro(false);
+      sessionStorage.setItem('orbita-intro-seen', 'true');
+      removeOverlay();
+      return;
+    }
 
     // No mostrar intro a bots (Lighthouse, Googlebot, etc.) para mejores métricas
     if (isHomePage && !hasSeenIntro && !isBotUser) {

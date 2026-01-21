@@ -153,27 +153,27 @@ export default async function MensajesPage() {
           <h3 className="font-semibold text-slate-700">📋 Plantilles Ràpides</h3>
         </div>
         <div className="p-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
+          <button type="button" className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
             <p className="font-medium text-slate-700">Primer Contacte</p>
             <p className="text-xs text-slate-500 mt-1">Resposta inicial a nou lead</p>
           </button>
-          <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
+          <button type="button" className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
             <p className="font-medium text-slate-700">Enviar Pressupost</p>
             <p className="text-xs text-slate-500 mt-1">Acompanyament de pressupost</p>
           </button>
-          <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
+          <button type="button" className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
             <p className="font-medium text-slate-700">Seguiment</p>
             <p className="text-xs text-slate-500 mt-1">Recordatori després de dies</p>
           </button>
-          <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
+          <button type="button" className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
             <p className="font-medium text-slate-700">Confirmació</p>
             <p className="text-xs text-slate-500 mt-1">Confirmar reserva</p>
           </button>
-          <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
+          <button type="button" className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
             <p className="font-medium text-slate-700">Pre-Event</p>
             <p className="text-xs text-slate-500 mt-1">Detalls abans de l&apos;event</p>
           </button>
-          <button className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
+          <button type="button" className="p-3 rounded-lg border border-stone-200 text-left hover:bg-slate-50 transition-colors">
             <p className="font-medium text-slate-700">Post-Event</p>
             <p className="text-xs text-slate-500 mt-1">Agraïment i enquesta</p>
           </button>

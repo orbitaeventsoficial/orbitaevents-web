@@ -132,13 +132,13 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Alerts */}
       {error && (
-        <div className="rounded-md bg-red-50 p-4 border border-red-200">
+        <div className="rounded-md bg-red-50 p-4 border border-red-200" role="alert">
           <p className="text-sm text-red-800">❌ {error}</p>
         </div>
       )}
 
       {success && (
-        <div className="rounded-md bg-green-50 p-4 border border-green-200">
+        <div className="rounded-md bg-green-50 p-4 border border-green-200" role="status" aria-live="polite">
           <p className="text-sm text-green-800">✅ Pack actualitzat correctament!</p>
         </div>
       )}
@@ -515,6 +515,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
         <button
           type="submit"
           disabled={loading}
+          aria-busy={loading}
           className="rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Guardant...' : 'Guardar Canvis'}

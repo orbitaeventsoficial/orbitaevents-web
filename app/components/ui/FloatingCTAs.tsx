@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -99,42 +99,55 @@ export function ContactDesktop() {
 export function BottomBarMobile() {
   const t = useTranslations('common');
   const [isVisible, setIsVisible] = useState(false); // CANVI: Comença OCULT
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const reduceMotion = useReducedMotion();
+  const lastScrollYRef = useRef(0);
+  const scrollRaf = useRef<number | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const viewportHeight = window.innerHeight;
+      if (scrollRaf.current !== null) return;
+      scrollRaf.current = window.requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        const viewportHeight = window.innerHeight;
 
-      // LÒGICA MILLORADA:
-      // - NO mostrar mentre estem al Hero (primer viewport)
-      // - SÍ mostrar quan hem passat el 70% del viewport (el Hero ja no es veu)
-      const heroPassed = currentScrollY > viewportHeight * 0.7;
+        // LÒGICA MILLORADA:
+        // - NO mostrar mentre estem al Hero (primer viewport)
+        // - SÍ mostrar quan hem passat el 70% del viewport (el Hero ja no es veu)
+        const heroPassed = currentScrollY > viewportHeight * 0.7;
 
-      if (!heroPassed) {
-        // Encara veiem el Hero - AMAGAR la barra sticky
-        setIsVisible(false);
-        setLastScrollY(currentScrollY);
-        return;
-      }
+        if (!heroPassed) {
+          // Encara veiem el Hero - AMAGAR la barra sticky
+          setIsVisible(false);
+          lastScrollYRef.current = currentScrollY;
+          scrollRaf.current = null;
+          return;
+        }
 
-      // Ja hem passat el Hero - mostrar/amagar segons direcció scroll
-      if (currentScrollY > lastScrollY && currentScrollY > viewportHeight) {
-        // Scroll down - amagar
-        setIsVisible(false);
-      } else {
-        // Scroll up - mostrar
-        setIsVisible(true);
-      }
+        // Ja hem passat el Hero - mostrar/amagar segons direcció scroll
+        if (currentScrollY > lastScrollYRef.current && currentScrollY > viewportHeight) {
+          // Scroll down - amagar
+          setIsVisible(false);
+        } else {
+          // Scroll up - mostrar
+          setIsVisible(true);
+        }
 
-      setLastScrollY(currentScrollY);
+        lastScrollYRef.current = currentScrollY;
+        scrollRaf.current = null;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     // Comprovar estat inicial
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollRaf.current !== null) {
+        window.cancelAnimationFrame(scrollRaf.current);
+        scrollRaf.current = null;
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -145,10 +158,10 @@ export function BottomBarMobile() {
       <AnimatePresence>
         {isVisible && (
           <motion.div
-            initial={{ y: 100 }}
+            initial={reduceMotion ? false : { y: 100 }}
             animate={{ y: 0 }}
             exit={{ y: 100 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            transition={reduceMotion ? { duration: 0 } : { type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           >

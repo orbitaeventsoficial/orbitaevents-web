@@ -1,7 +1,7 @@
 'use client';
 import { log } from '@/lib/logger';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -196,13 +196,16 @@ export default function PricingAdminPage() {
   }
 
   // Filtrar inventari
-  const filteredInventory = inventory.filter(item => {
-    const matchesSearch =
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.code.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  const searchLower = searchTerm.trim().toLowerCase();
+  const filteredInventory = useMemo(() => {
+    return inventory.filter((item) => {
+      const matchesSearch =
+        item.name.toLowerCase().includes(searchLower) ||
+        item.code.toLowerCase().includes(searchLower);
+      const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+  }, [inventory, searchLower, categoryFilter]);
 
   if (loading) {
     return (
@@ -249,6 +252,8 @@ export default function PricingAdminPage() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
+                type="button"
+                aria-pressed={activeTab === tab.key}
                 className={`
                   px-5 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2
                   ${activeTab === tab.key
@@ -284,12 +289,19 @@ export default function PricingAdminPage() {
                 : 'bg-red-50 text-red-700 border border-red-200'
               }
             `}
+            role={message.type === 'success' ? 'status' : 'alert'}
+            aria-live="polite"
           >
             <span className="flex items-center gap-2">
               {message.type === 'success' ? '✅' : '❌'}
               {message.text}
             </span>
-            <button onClick={() => setMessage(null)} className="text-xl font-bold hover:opacity-70">
+            <button
+              onClick={() => setMessage(null)}
+              type="button"
+              aria-label="Tancar missatge"
+              className="text-xl font-bold hover:opacity-70"
+            >
               ×
             </button>
           </div>

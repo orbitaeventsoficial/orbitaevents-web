@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -14,18 +14,17 @@ function SidebarItem({
   icon,
   label,
   href,
+  isActive,
   badge,
   badgeColor = 'orange'
 }: {
   icon: string;
   label: string;
   href: string;
+  isActive: boolean;
   badge?: string;
   badgeColor?: 'orange' | 'blue' | 'green' | 'red';
 }) {
-  const pathname = usePathname();
-  const isActive = href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href);
-
   const badgeStyles = {
     orange: 'bg-orange-100 text-orange-700',
     blue: 'bg-blue-100 text-blue-700',
@@ -36,6 +35,7 @@ function SidebarItem({
   return (
     <Link
       href={href}
+      aria-current={isActive ? 'page' : undefined}
       className={`
         flex items-center gap-3 px-3 py-2.5 rounded-xl
         transition-all duration-200 group
@@ -149,7 +149,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
   }, []);
 
-  const navSections = [
+  const navSections = useMemo(() => ([
     {
       title: 'General',
       items: [
@@ -204,7 +204,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { icon: '📝', label: 'Blog', href: '/admin/blog' },
       ]
     },
-  ];
+  ]), [newLeadsCount]);
+
+  const isActive = useCallback((href: string) => {
+    return href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href);
+  }, [pathname]);
 
   return (
     <html lang="ca" suppressHydrationWarning>
@@ -242,7 +246,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </p>
                   <div className="space-y-1">
                     {section.items.map((item) => (
-                      <SidebarItem key={item.href} {...item} />
+                      <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} />
                     ))}
                   </div>
                 </div>
@@ -263,6 +267,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-xl border-b border-stone-200 z-50 px-4 flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
+              type="button"
+              aria-label="Obrir menú admin"
+              aria-expanded={sidebarOpen}
+              aria-controls="admin-mobile-sidebar"
               className="p-2 text-slate-700 hover:bg-stone-100 rounded-lg"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -281,13 +289,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <div
                 className="lg:hidden fixed inset-0 bg-stone-100/60 backdrop-blur-sm z-40"
                 onClick={() => setSidebarOpen(false)}
+                role="presentation"
               />
-              <aside className="lg:hidden fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-stone-200 z-50 overflow-y-auto">
+              <aside
+                id="admin-mobile-sidebar"
+                aria-label="Menú admin"
+                className="lg:hidden fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-stone-200 z-50 overflow-y-auto"
+              >
                 <div className="p-4 border-b border-stone-200 flex items-center justify-between">
                   <span className="text-slate-700 font-semibold">
                     <span className="text-orange-500">Òrbita</span> Admin
                   </span>
-                  <button onClick={() => setSidebarOpen(false)} className="p-2 text-slate-500 hover:text-slate-700">
+                  <button
+                    type="button"
+                    aria-label="Tancar menú admin"
+                    onClick={() => setSidebarOpen(false)}
+                    className="p-2 text-slate-500 hover:text-slate-700"
+                  >
                     ✕
                   </button>
                 </div>
@@ -299,7 +317,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       </p>
                       <div className="space-y-1">
                         {section.items.map((item) => (
-                          <SidebarItem key={item.href} {...item} />
+                          <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} />
                         ))}
                       </div>
                     </div>
@@ -320,8 +338,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔍</span>
                 <input
-                  type="text"
+                  type="search"
                   placeholder="Buscar... (⌘K)"
+                  aria-label="Buscar"
                   className="w-64 pl-9 pr-4 py-2 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 placeholder-stone-400 text-sm transition-all duration-200 hover:border-stone-200 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
                 />
               </div>
@@ -333,7 +352,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 🔔
                 <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full" />
               </Link>
-              <button className="flex items-center gap-3 px-3 py-1.5 hover:bg-stone-100 rounded-xl transition-colors">
+              <button
+                type="button"
+                className="flex items-center gap-3 px-3 py-1.5 hover:bg-stone-100 rounded-xl transition-colors"
+              >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-sm font-medium">
                   C
                 </div>

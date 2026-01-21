@@ -119,11 +119,15 @@ export default function NewBlogPostPage() {
               ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
               : 'border-red-500/30 bg-red-500/10 text-red-200'
           }`}
+          role={flashMessage.type === 'success' ? 'status' : 'alert'}
+          aria-live="polite"
         >
           <div className="flex items-center justify-between gap-4">
             <span>{flashMessage.text}</span>
             <button
               onClick={() => setFlashMessage(null)}
+              type="button"
+              aria-label="Tancar missatge"
               className="text-xs text-white/60 hover:text-white"
             >
               ✕
@@ -245,6 +249,7 @@ export default function NewBlogPostPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, isPublished: e.target.checked })
                     }
+                    aria-label="Publicar ahora"
                     className="h-5 w-5 rounded"
                   />
                   <span className="text-sm font-medium text-white">Publicar ahora</span>
@@ -361,6 +366,7 @@ export default function NewBlogPostPage() {
           <button
             type="submit"
             disabled={loading}
+            aria-busy={loading}
             className="rounded-lg bg-purple-600 px-6 py-3 text-white hover:bg-purple-700 disabled:opacity-50"
           >
             {loading ? 'Guardando...' : 'Crear Post'}

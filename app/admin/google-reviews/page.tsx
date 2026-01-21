@@ -6,8 +6,8 @@
  * Read-only - No permite editar ni añadir testimonios
  */
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useMemo } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface GoogleReview {
   author_name: string;
@@ -29,6 +29,7 @@ export default function GoogleReviewsAdminPage() {
   const [data, setData] = useState<ReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     loadReviews();
@@ -57,13 +58,16 @@ export default function GoogleReviewsAdminPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" role="status" aria-live="polite">
         <div className="text-white">Cargando reseñas...</div>
       </div>
     );
   }
 
-  const fiveStarReviews = data?.reviews.filter(r => r.rating === 5) || [];
+  const fiveStarReviews = useMemo(
+    () => data?.reviews.filter((review) => review.rating === 5) || [],
+    [data]
+  );
   const totalReviews = data?.user_ratings_total || data?.reviews.length || 0;
   const lastUpdate = data?.lastUpdated ? new Date(data.lastUpdated).toLocaleString('ca-ES') : 'Never';
 
@@ -82,7 +86,7 @@ export default function GoogleReviewsAdminPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-2xl p-6"
         >
@@ -92,9 +96,9 @@ export default function GoogleReviewsAdminPage() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={reduceMotion ? { duration: 0 } : { delay: 0.1 }}
           className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-2xl p-6"
         >
           <div className="text-sm text-white/60 mb-1">Total Reseñas</div>
@@ -103,9 +107,9 @@ export default function GoogleReviewsAdminPage() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={reduceMotion ? { duration: 0 } : { delay: 0.2 }}
           className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 border border-emerald-500/20 rounded-2xl p-6"
         >
           <div className="text-sm text-white/60 mb-1">5 Estrellas</div>
@@ -114,9 +118,9 @@ export default function GoogleReviewsAdminPage() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={reduceMotion ? { duration: 0 } : { delay: 0.3 }}
           className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-6"
         >
           <div className="text-sm text-white/60 mb-1">Última Sync</div>
@@ -152,9 +156,9 @@ export default function GoogleReviewsAdminPage() {
             {fiveStarReviews.map((review, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 10 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
+                transition={reduceMotion ? { duration: 0 } : { delay: index * 0.05 }}
                 className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/[0.07] transition-colors"
               >
                 <div className="flex items-start gap-4">

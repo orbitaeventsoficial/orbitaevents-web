@@ -174,6 +174,8 @@ export default function ComposeForm({ leads, packs }: Props) {
       <div className="flex gap-2 p-1 bg-stone-100 rounded-lg w-fit">
         <button
           onClick={() => setMode('email')}
+          type="button"
+          aria-pressed={mode === 'email'}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             mode === 'email' ? 'bg-white shadow text-slate-700' : 'text-slate-600'
           }`}
@@ -182,6 +184,8 @@ export default function ComposeForm({ leads, packs }: Props) {
         </button>
         <button
           onClick={() => setMode('quote')}
+          type="button"
+          aria-pressed={mode === 'quote'}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             mode === 'quote' ? 'bg-white shadow text-slate-700' : 'text-slate-600'
           }`}
@@ -202,6 +206,7 @@ export default function ComposeForm({ leads, packs }: Props) {
             <select
               value={selectedLeadId}
               onChange={(e) => setSelectedLeadId(e.target.value)}
+              aria-label="Selecciona lead"
               className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
             >
               <option value="">-- Escriu email manualment --</option>
@@ -276,15 +281,17 @@ export default function ComposeForm({ leads, packs }: Props) {
                   {packs.map((pack) => {
                     const name = pack.translations.find(t => t.locale === locale)?.name || pack.translations[0]?.name;
                     return (
-                      <button
-                        key={pack.id}
-                        onClick={() => setSelectedPackId(pack.id)}
-                        className={`p-4 rounded-xl border-2 text-left transition-all ${
-                          selectedPackId === pack.id
-                            ? 'border-amber-500 bg-amber-50'
-                            : 'border-stone-200 hover:border-stone-200'
-                        }`}
-                      >
+                    <button
+                      key={pack.id}
+                      onClick={() => setSelectedPackId(pack.id)}
+                      type="button"
+                      aria-pressed={selectedPackId === pack.id}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${
+                        selectedPackId === pack.id
+                          ? 'border-amber-500 bg-amber-50'
+                          : 'border-stone-200 hover:border-stone-200'
+                      }`}
+                    >
                         <p className="font-semibold text-slate-700">{name}</p>
                         <p className="text-amber-600 font-bold mt-1">{pack.price.toLocaleString('es-ES')}€</p>
                       </button>
@@ -362,6 +369,8 @@ export default function ComposeForm({ leads, packs }: Props) {
                     <button
                       key={l.code}
                       onClick={() => setLocale(l.code)}
+                      type="button"
+                      aria-pressed={locale === l.code}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                         locale === l.code
                           ? 'bg-amber-100 text-amber-700 border-2 border-amber-500'
@@ -417,12 +426,13 @@ export default function ComposeForm({ leads, packs }: Props) {
         <div className="flex items-center justify-between px-6 py-4 bg-slate-50 border-t border-stone-200">
           <div>
             {error && (
-              <p className="text-red-600 text-sm">❌ {error}</p>
+              <p className="text-red-600 text-sm" role="alert">❌ {error}</p>
             )}
           </div>
           <div className="flex gap-3">
             <button
               onClick={() => router.push('/admin/inbox')}
+              type="button"
               className="px-4 py-2 text-slate-600 hover:text-slate-700"
             >
               Cancel·lar
@@ -430,6 +440,8 @@ export default function ComposeForm({ leads, packs }: Props) {
             <button
               onClick={handleSend}
               disabled={sending}
+              type="button"
+              aria-busy={sending}
               className={`px-6 py-2 rounded-lg font-medium transition-colors ${
                 sent
                   ? 'bg-green-500 text-white'

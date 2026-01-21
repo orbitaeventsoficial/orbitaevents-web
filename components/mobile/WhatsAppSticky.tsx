@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // WHATSAPP STICKY PREMIUM
@@ -28,6 +28,13 @@ export default function WhatsAppSticky({
   const [isHovered, setIsHovered] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const scrollRaf = useRef<number | null>(null);
+  const hasScrolledRef = useRef(hasScrolled);
+
+  useEffect(() => {
+    hasScrolledRef.current = hasScrolled;
+  }, [hasScrolled]);
 
   // Mostrar tooltip automàticament després de 5 segons
   useEffect(() => {
@@ -48,11 +55,26 @@ export default function WhatsAppSticky({
   // Detectar scroll per mostrar
   useEffect(() => {
     const handleScroll = () => {
-      setHasScrolled(window.scrollY > 300);
+      if (scrollRaf.current !== null) return;
+      scrollRaf.current = window.requestAnimationFrame(() => {
+        const nextValue = window.scrollY > 300;
+        if (nextValue !== hasScrolledRef.current) {
+          hasScrolledRef.current = nextValue;
+          setHasScrolled(nextValue);
+        }
+        scrollRaf.current = null;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollRaf.current !== null) {
+        window.cancelAnimationFrame(scrollRaf.current);
+        scrollRaf.current = null;
+      }
+    };
   }, []);
 
   const positionClasses = position === 'bottom-right' 
@@ -65,7 +87,7 @@ export default function WhatsAppSticky({
     <AnimatePresence>
       {hasScrolled && (
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
+          initial={reduceMotion ? false : { scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
           className={`
@@ -77,7 +99,7 @@ export default function WhatsAppSticky({
           <AnimatePresence>
             {(showTooltip || isHovered) && showBadge && (
               <motion.div
-                initial={{ opacity: 0, x: position === 'bottom-right' ? 20 : -20 }}
+                initial={reduceMotion ? false : { opacity: 0, x: position === 'bottom-right' ? 20 : -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: position === 'bottom-right' ? 20 : -20 }}
                 className={`
@@ -91,7 +113,7 @@ export default function WhatsAppSticky({
                 `}
               >
                 <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className={`w-2 h-2 bg-green-500 rounded-full ${reduceMotion ? '' : 'animate-pulse'}`} />
                   {badgeText}
                 </span>
                 
@@ -123,7 +145,7 @@ export default function WhatsAppSticky({
             className="relative block"
           >
             {/* Ping animation */}
-            <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-30" />
+            <span className={`absolute inset-0 rounded-full bg-green-500 ${reduceMotion ? '' : 'animate-ping'} opacity-30`} />
             
             {/* Button */}
             <motion.div

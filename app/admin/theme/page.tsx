@@ -148,7 +148,7 @@ export default function ThemePage() {
 
   if (loading || !colors) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
         <div className="animate-spin w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full" />
       </div>
     );
@@ -173,6 +173,7 @@ export default function ThemePage() {
             <button
               key={key}
               onClick={() => applyPreset(key)}
+              type="button"
               className="p-4 border-2 border-stone-200 rounded-lg hover:border-amber-500 transition-colors"
             >
               <div className="font-medium text-slate-700 mb-2 capitalize">{key}</div>
@@ -249,6 +250,8 @@ export default function ThemePage() {
         <button
           onClick={saveTheme}
           disabled={saving}
+          type="button"
+          aria-busy={saving}
           className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-rose-500 text-white rounded-lg font-medium hover:from-amber-600 hover:to-rose-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving ? 'Guardant...' : '💾 Guardar Tema'}
@@ -256,6 +259,7 @@ export default function ThemePage() {
         <button
           onClick={resetTheme}
           disabled={saving}
+          type="button"
           className="px-6 py-3 bg-stone-100 border border-stone-200 text-slate-700 rounded-lg font-medium hover:bg-stone-200 disabled:opacity-50"
         >
           🔄 Resetar

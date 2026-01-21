@@ -136,13 +136,13 @@ export default function LeadActionsEnhanced({
         <h3 className="text-sm font-semibold text-slate-700 mb-4">📊 Canviar estat</h3>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+          <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-4 p-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm">
+          <div className="mb-4 p-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm" role="status">
             {success}
           </div>
         )}
@@ -153,6 +153,8 @@ export default function LeadActionsEnhanced({
               key={status.value}
               onClick={() => handleStatusChange(status.value)}
               disabled={isPending || status.value === currentStatus}
+              type="button"
+              aria-pressed={status.value === currentStatus}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left text-sm transition-colors ${
                 status.value === currentStatus
                   ? 'bg-stone-100 border-2 border-slate-400 font-medium'
@@ -229,6 +231,7 @@ export default function LeadActionsEnhanced({
           <div className="flex gap-2">
             <button
               onClick={handlePreviewQuote}
+              type="button"
               className="flex-1 px-4 py-2 border border-stone-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
             >
               👁️ Preview
@@ -236,6 +239,8 @@ export default function LeadActionsEnhanced({
             <button
               onClick={handleGenerateQuote}
               disabled={isGenerating}
+              type="button"
+              aria-busy={isGenerating}
               className="flex-1 px-4 py-2 bg-amber-500 rounded-lg text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-50"
             >
               {isGenerating ? '⏳ Generant...' : '📤 Generar'}
@@ -245,6 +250,7 @@ export default function LeadActionsEnhanced({
           {quoteHtml && (
             <button
               onClick={handlePrintQuote}
+              type="button"
               className="w-full px-4 py-2 border border-amber-500 rounded-lg text-sm font-medium text-amber-600 hover:bg-amber-50"
             >
               🖨️ Imprimir / Descarregar PDF

@@ -44,11 +44,16 @@ export default function SendPostEventButton({ bookingId }: { bookingId: string }
         type="button"
         onClick={handleClick}
         disabled={loading}
+        aria-busy={loading}
         className="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {loading ? 'Sending...' : 'Enviar ahora'}
       </button>
-      {error && <span className="text-xs text-red-600">{error}</span>}
+      {error && (
+        <span className="text-xs text-red-600" role="alert">
+          {error}
+        </span>
+      )}
     </div>
   );
 }

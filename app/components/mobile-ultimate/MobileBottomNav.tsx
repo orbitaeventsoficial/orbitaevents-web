@@ -19,7 +19,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
@@ -60,6 +60,7 @@ function FABMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { haptic, locale } = useMobile();
   const t = useTranslations('mobileNav');
+  const reduceMotion = useReducedMotion();
 
   const actions = useMemo(() => [
     {
@@ -93,7 +94,7 @@ function FABMenu() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
@@ -106,7 +107,7 @@ function FABMenu() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col gap-3 z-50"
@@ -115,18 +116,18 @@ function FABMenu() {
               <motion.a
                 key={action.labelKey}
                 href={action.href}
-                initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 20, scale: 0.8 }}
                 animate={{ 
                   opacity: 1, 
                   y: 0, 
                   scale: 1,
-                  transition: { delay: i * 0.1 }
+                  transition: reduceMotion ? { duration: 0 } : { delay: i * 0.1 }
                 }}
                 exit={{ 
                   opacity: 0, 
                   y: 20, 
                   scale: 0.8,
-                  transition: { delay: (actions.length - i) * 0.05 }
+                  transition: reduceMotion ? { duration: 0 } : { delay: (actions.length - i) * 0.05 }
                 }}
                 whileTap={{ scale: 0.95 }}
                 onTapStart={() => haptic('light')}
@@ -150,8 +151,8 @@ function FABMenu() {
         }}
       >
         <motion.div
-          animate={{ rotate: isOpen ? 45 : 0 }}
-          transition={{ type: 'spring', stiffness: 300 }}
+          animate={reduceMotion ? { rotate: 0 } : { rotate: isOpen ? 45 : 0 }}
+          transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 300 }}
         >
           <svg className="w-8 h-8 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -161,11 +162,11 @@ function FABMenu() {
         {/* Glow effect */}
         <motion.div
           className="absolute inset-0 rounded-full bg-amber-400"
-          animate={{ 
+          animate={reduceMotion ? { opacity: 0.4 } : { 
             scale: [1, 1.2, 1],
             opacity: [0.5, 0, 0.5]
           }}
-          transition={{ duration: 2, repeat: Infinity }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 2, repeat: Infinity }}
         />
       </motion.button>
     </div>
@@ -195,6 +196,7 @@ function NavItemComponent({ item, isActive, onClick, locale, t }: NavItemProps) 
   const { haptic } = useMobile();
   const router = useRouter();
   const Icon = item.icon;
+  const reduceMotion = useReducedMotion();
 
   // Build href with locale
   const href = item.href === '/' ? `/${locale}` : `/${locale}${item.href}`;
@@ -218,11 +220,15 @@ function NavItemComponent({ item, isActive, onClick, locale, t }: NavItemProps) 
         
         {/* Active indicator glow */}
         {isActive && (
-          <motion.div
-            layoutId="navGlow"
-            className="absolute inset-0 bg-amber-400/30 rounded-full blur-md"
-            initial={false}
-          />
+          reduceMotion ? (
+            <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-md" />
+          ) : (
+            <motion.div
+              layoutId="navGlow"
+              className="absolute inset-0 bg-amber-400/30 rounded-full blur-md"
+              initial={false}
+            />
+          )
         )}
       </div>
 
@@ -233,11 +239,15 @@ function NavItemComponent({ item, isActive, onClick, locale, t }: NavItemProps) 
 
       {/* Active dot */}
       {isActive && (
-        <motion.div
-          layoutId="navDot"
-          className="absolute -top-1 w-1 h-1 rounded-full bg-amber-400"
-          initial={false}
-        />
+        reduceMotion ? (
+          <div className="absolute -top-1 w-1 h-1 rounded-full bg-amber-400" />
+        ) : (
+          <motion.div
+            layoutId="navDot"
+            className="absolute -top-1 w-1 h-1 rounded-full bg-amber-400"
+            initial={false}
+          />
+        )
       )}
     </motion.a>
   );
@@ -251,6 +261,7 @@ export default function MobileBottomNav() {
   const [activeId, setActiveId] = useState('home');
   const { locale } = useMobile();
   const t = useTranslations('mobileNav');
+  const reduceMotion = useReducedMotion();
 
   const NAV_ITEMS: NavItem[] = useMemo(() => [
     { id: 'home', labelKey: 'items.home', href: '/', icon: HomeIcon },
@@ -262,9 +273,9 @@ export default function MobileBottomNav() {
 
   return (
     <motion.nav
-      initial={{ y: 100 }}
+      initial={reduceMotion ? false : { y: 100 }}
       animate={{ y: 0 }}
-      transition={{ type: 'spring', damping: 25, delay: 0.5 }}
+      transition={reduceMotion ? { duration: 0 } : { type: 'spring', damping: 25, delay: 0.5 }}
       className="fixed bottom-0 left-0 right-0 z-50 safe-bottom"
     >
       {/* Background with blur */}

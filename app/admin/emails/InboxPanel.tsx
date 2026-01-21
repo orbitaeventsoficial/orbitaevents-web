@@ -182,6 +182,9 @@ export default function InboxPanel() {
         <button
           onClick={fetchEmails}
           disabled={loading}
+          type="button"
+          aria-label="Refrescar emails"
+          aria-busy={loading}
           className="p-2 rounded-lg hover:bg-stone-100 transition-colors disabled:opacity-50"
           title="Refrescar"
         >
@@ -193,7 +196,7 @@ export default function InboxPanel() {
 
       {/* Error state */}
       {error && (
-        <div className="p-4 bg-red-50 border-b border-red-100">
+        <div className="p-4 bg-red-50 border-b border-red-100" role="alert">
           <p className="text-sm text-red-600">{error}</p>
           <p className="text-xs text-red-500 mt-1">
             Verifica que les variables IMAP_HOST, IMAP_PORT, IMAP_USER i IMAP_PASS estan configurades.
@@ -203,7 +206,7 @@ export default function InboxPanel() {
 
       {/* Loading state */}
       {loading && !error && (
-        <div className="p-8 text-center">
+        <div className="p-8 text-center" role="status" aria-live="polite">
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
           <p className="text-sm text-slate-500 mt-3">Carregant emails...</p>
         </div>
@@ -221,10 +224,12 @@ export default function InboxPanel() {
               </div>
             ) : (
               emails.map((email) => (
-                <div
+                <button
                   key={email.uid}
                   onClick={() => handleEmailClick(email)}
-                  className={`px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors ${
+                  type="button"
+                  aria-pressed={selectedEmail?.uid === email.uid}
+                  className={`w-full text-left px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors ${
                     selectedEmail?.uid === email.uid ? 'bg-blue-50' : ''
                   } ${!email.isRead ? 'bg-blue-50/50' : ''}`}
                 >
@@ -252,7 +257,7 @@ export default function InboxPanel() {
                       )}
                     </div>
                   </div>
-                </div>
+                </button>
               ))
             )}
           </div>
@@ -278,6 +283,7 @@ export default function InboxPanel() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleDelete(selectedEmail.uid)}
+                      type="button"
                       className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                       title="Eliminar"
                     >
@@ -287,6 +293,8 @@ export default function InboxPanel() {
                     </button>
                     <button
                       onClick={() => setSelectedEmail(null)}
+                      type="button"
+                      aria-label="Tancar detall"
                       className="p-2 text-slate-400 hover:bg-stone-100 rounded-lg transition-colors"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -335,6 +343,7 @@ export default function InboxPanel() {
             <button
               onClick={() => setPage(p => Math.max(0, p - 1))}
               disabled={page === 0}
+              type="button"
               className="px-3 py-1 text-sm border border-stone-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ← Anterior
@@ -342,6 +351,7 @@ export default function InboxPanel() {
             <button
               onClick={() => setPage(p => p + 1)}
               disabled={(page + 1) * limit >= total}
+              type="button"
               className="px-3 py-1 text-sm border border-stone-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Següent →

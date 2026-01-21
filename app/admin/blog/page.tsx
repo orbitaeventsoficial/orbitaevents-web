@@ -116,6 +116,7 @@ export default function BlogAdminPage() {
           <select
             value={locale}
             onChange={(e) => setLocale(e.target.value)}
+            aria-label="Idioma"
             className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white"
           >
             <option value="es">Español</option>
@@ -124,6 +125,7 @@ export default function BlogAdminPage() {
 
           <button
             onClick={() => (window.location.href = '/admin/blog/new')}
+            type="button"
             className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
           >
             <PlusIcon className="h-5 w-5" />
@@ -139,11 +141,15 @@ export default function BlogAdminPage() {
               ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
               : 'border-red-500/30 bg-red-500/10 text-red-200'
           }`}
+          role={flashMessage.type === 'success' ? 'status' : 'alert'}
+          aria-live="polite"
         >
           <div className="flex items-center justify-between gap-4">
             <span>{flashMessage.text}</span>
             <button
               onClick={() => setFlashMessage(null)}
+              type="button"
+              aria-label="Tancar missatge"
               className="text-xs text-white/60 hover:text-white"
             >
               ✕
@@ -153,12 +159,13 @@ export default function BlogAdminPage() {
       )}
 
       {loading ? (
-        <div className="text-center text-white/60">Cargando...</div>
+        <div className="text-center text-white/60" role="status" aria-live="polite">Cargando...</div>
       ) : posts.length === 0 ? (
         <div className="rounded-lg border border-white/10 bg-white/5 p-12 text-center">
           <p className="text-white/60">No hay posts todavía</p>
           <button
             onClick={() => (window.location.href = '/admin/blog/new')}
+            type="button"
             className="mt-4 text-purple-400 hover:text-purple-300"
           >
             Crear el primero
@@ -170,22 +177,22 @@ export default function BlogAdminPage() {
             <table className="w-full">
               <thead className="border-b border-white/10 bg-white/5">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-white">
+                  <th scope="col" className="px-6 py-3 text-left text-sm font-semibold text-white">
                     Título
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-white">
+                  <th scope="col" className="px-6 py-3 text-left text-sm font-semibold text-white">
                     Categoría
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-white">
+                  <th scope="col" className="px-6 py-3 text-left text-sm font-semibold text-white">
                     Estado
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-white">
+                  <th scope="col" className="px-6 py-3 text-left text-sm font-semibold text-white">
                     Visitas
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-white">
+                  <th scope="col" className="px-6 py-3 text-left text-sm font-semibold text-white">
                     Fecha
                   </th>
-                  <th className="px-6 py-3 text-right text-sm font-semibold text-white">
+                  <th scope="col" className="px-6 py-3 text-right text-sm font-semibold text-white">
                     Acciones
                   </th>
                 </tr>
@@ -211,6 +218,8 @@ export default function BlogAdminPage() {
                       <td className="px-6 py-4">
                         <button
                           onClick={() => handleTogglePublish(post)}
+                          type="button"
+                          aria-pressed={post.isPublished}
                           className={`rounded-full px-3 py-1 text-xs ${
                             post.isPublished
                               ? 'bg-green-500/20 text-green-300'
@@ -230,6 +239,7 @@ export default function BlogAdminPage() {
                             onClick={() =>
                               (window.location.href = `/admin/blog/edit/${post.id}`)
                             }
+                            type="button"
                             className="rounded p-2 text-blue-400 hover:bg-white/5"
                             title="Editar"
                           >
@@ -237,6 +247,7 @@ export default function BlogAdminPage() {
                           </button>
                           <button
                             onClick={() => handleDelete(post.id)}
+                            type="button"
                             className="rounded p-2 text-red-400 hover:bg-white/5"
                             title="Eliminar"
                           >
@@ -256,6 +267,7 @@ export default function BlogAdminPage() {
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
+                type="button"
                 className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white disabled:opacity-50"
               >
                 Anterior
@@ -266,6 +278,7 @@ export default function BlogAdminPage() {
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page === totalPages}
+                type="button"
                 className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white disabled:opacity-50"
               >
                 Siguiente

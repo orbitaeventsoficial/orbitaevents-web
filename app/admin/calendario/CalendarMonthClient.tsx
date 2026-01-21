@@ -286,12 +286,12 @@ export default function CalendarMonthClient() {
             Dies visibles: <span className="font-medium">{visibleRangeLabel}</span>
           </div>
           {loading && (
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-slate-500" role="status" aria-live="polite">
               Carregant ocupaci├│...
             </div>
           )}
           {error && (
-            <div className="text-sm font-medium text-red-600">
+            <div className="text-sm font-medium text-red-600" role="alert">
               {error}
             </div>
           )}

@@ -117,6 +117,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           type="button"
           onClick={handleSave}
           disabled={saving}
+          aria-busy={saving}
           className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-60"
         >
           {saving ? 'Guardant...' : 'Guardar canvis'}
@@ -307,7 +308,11 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         </label>
       </div>
 
-      {status && <p className="mt-3 text-sm text-slate-500">{status}</p>}
+      {status && (
+        <p className="mt-3 text-sm text-slate-500" role="status" aria-live="polite">
+          {status}
+        </p>
+      )}
     </section>
   );
 }

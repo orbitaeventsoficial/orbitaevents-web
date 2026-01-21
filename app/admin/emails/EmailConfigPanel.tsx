@@ -141,7 +141,7 @@ export default function EmailConfigPanel() {
 
         {/* Error Message */}
         {error && (
-          <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+          <div className="p-3 rounded-lg bg-red-50 border border-red-200" role="alert">
             <p className="text-sm text-red-700">❌ {error}</p>
           </div>
         )}
@@ -150,6 +150,8 @@ export default function EmailConfigPanel() {
         <button
           onClick={handleSave}
           disabled={saving}
+          type="button"
+          aria-busy={saving}
           className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
             saved
               ? 'bg-green-500 text-white'

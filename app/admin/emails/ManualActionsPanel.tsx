@@ -129,6 +129,8 @@ export default function ManualActionsPanel() {
           <button
             onClick={runCronManually}
             disabled={runningCron}
+            type="button"
+            aria-busy={runningCron}
             className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
               runningCron
                 ? 'bg-stone-100 text-slate-500 cursor-not-allowed'
@@ -148,7 +150,10 @@ export default function ManualActionsPanel() {
             )}
           </button>
           {cronResult && (
-            <p className={`mt-2 text-xs ${cronResult.ok ? 'text-green-600' : 'text-red-600'}`}>
+            <p
+              className={`mt-2 text-xs ${cronResult.ok ? 'text-green-600' : 'text-red-600'}`}
+              role={cronResult.ok ? 'status' : 'alert'}
+            >
               {cronResult.message}
             </p>
           )}
@@ -165,6 +170,8 @@ export default function ManualActionsPanel() {
           <button
             onClick={sendTestimonialsReminder}
             disabled={runningReminder}
+            type="button"
+            aria-busy={runningReminder}
             className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
               runningReminder
                 ? 'bg-stone-100 text-slate-500 cursor-not-allowed'
@@ -174,7 +181,10 @@ export default function ManualActionsPanel() {
             {runningReminder ? 'Enviant...' : '⭐ Enviar recordatori'}
           </button>
           {reminderResult && (
-            <p className={`mt-2 text-xs ${reminderResult.ok ? 'text-green-600' : 'text-red-600'}`}>
+            <p
+              className={`mt-2 text-xs ${reminderResult.ok ? 'text-green-600' : 'text-red-600'}`}
+              role={reminderResult.ok ? 'status' : 'alert'}
+            >
               {reminderResult.message}
             </p>
           )}
@@ -194,11 +204,14 @@ export default function ManualActionsPanel() {
               value={testEmail}
               onChange={(e) => setTestEmail(e.target.value)}
               placeholder="email@exemple.com"
+              aria-label="Email de prova"
               className="flex-1 px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
             />
             <button
               onClick={sendTestEmail}
               disabled={sendingTest}
+              type="button"
+              aria-busy={sendingTest}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 sendingTest
                   ? 'bg-stone-100 text-slate-500'
@@ -209,7 +222,10 @@ export default function ManualActionsPanel() {
             </button>
           </div>
           {testResult && (
-            <p className={`mt-2 text-xs ${testResult.ok ? 'text-green-600' : 'text-red-600'}`}>
+            <p
+              className={`mt-2 text-xs ${testResult.ok ? 'text-green-600' : 'text-red-600'}`}
+              role={testResult.ok ? 'status' : 'alert'}
+            >
               {testResult.message}
             </p>
           )}

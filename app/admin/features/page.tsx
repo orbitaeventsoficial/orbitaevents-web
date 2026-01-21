@@ -59,7 +59,7 @@ export default function FeaturesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
         <div className="animate-spin w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full" />
       </div>
     );
@@ -113,6 +113,10 @@ export default function FeaturesPage() {
               <button
                 onClick={() => toggleFeature(feature.key, !feature.enabled)}
                 disabled={saving === feature.key}
+                type="button"
+                role="switch"
+                aria-checked={feature.enabled}
+                aria-busy={saving === feature.key}
                 className={`relative w-14 h-8 rounded-full transition-colors ${
                   feature.enabled ? 'bg-green-500' : 'bg-gray-300'
                 } ${saving === feature.key ? 'opacity-50' : ''}`}

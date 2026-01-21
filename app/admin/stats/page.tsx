@@ -88,7 +88,7 @@ export default function StatsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
         <div className="animate-spin w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full" />
       </div>
     );
@@ -176,12 +176,15 @@ export default function StatsPage() {
                 <button
                   onClick={() => saveStat(stat.key)}
                   disabled={saving}
+                  type="button"
+                  aria-busy={saving}
                   className="px-6 py-2 bg-gradient-to-r from-amber-500 to-rose-500 text-white rounded-lg font-medium hover:from-amber-600 hover:to-rose-600 disabled:opacity-50"
                 >
                   {saving ? 'Guardant...' : 'Guardar'}
                 </button>
                 <button
                   onClick={() => setEditingStat(null)}
+                  type="button"
                   className="px-4 py-2 bg-stone-100 text-slate-600 rounded-lg font-medium hover:bg-stone-200"
                 >
                   Cancel·lar
@@ -191,6 +194,7 @@ export default function StatsPage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => startEdit(stat)}
+                  type="button"
                   className="flex-1 px-4 py-2 bg-stone-100 border border-stone-200 text-slate-700 rounded-lg font-medium hover:bg-stone-200"
                 >
                   ✏️ Editar Valor Manual
@@ -199,6 +203,8 @@ export default function StatsPage() {
                   <button
                     onClick={() => resetStat(stat.key)}
                     disabled={saving}
+                    type="button"
+                    aria-busy={saving}
                     className="px-4 py-2 bg-blue-100 border border-blue-200 text-blue-700 rounded-lg font-medium hover:bg-blue-200 disabled:opacity-50"
                   >
                     🔄 Usar Valor Automàtic

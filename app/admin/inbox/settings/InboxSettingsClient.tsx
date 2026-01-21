@@ -58,12 +58,12 @@ export default function InboxSettingsClient({
 
       {/* Status message from OAuth */}
       {gmailStatus === 'connected' && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4" role="status" aria-live="polite">
           <p className="text-green-700 font-medium">✅ Gmail connectat correctament!</p>
         </div>
       )}
       {gmailStatus === 'error' && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4" role="alert">
           <p className="text-red-700 font-medium">❌ Error connectant Gmail. Torna-ho a provar.</p>
           {searchParams.get('reason') && (
             <p className="text-red-600 text-sm mt-2">
@@ -119,6 +119,7 @@ export default function InboxSettingsClient({
             </div>
             <button
               onClick={connectGmail}
+              type="button"
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -143,6 +144,8 @@ export default function InboxSettingsClient({
           <button
             onClick={testConnection}
             disabled={testing}
+            type="button"
+            aria-busy={testing}
             className="px-6 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             {testing ? '⏳ Provant connexió...' : '🔌 Provar connexió Gmail'}
@@ -153,7 +156,7 @@ export default function InboxSettingsClient({
               testResult.ok
                 ? 'bg-green-50 border-green-200'
                 : 'bg-red-50 border-red-200'
-            }`}>
+            }`} role={testResult.ok ? 'status' : 'alert'}>
               {testResult.ok ? (
                 <div className="flex items-start gap-3">
                   <span className="text-2xl">✅</span>
@@ -204,6 +207,7 @@ export default function InboxSettingsClient({
           </p>
           <button
             onClick={connectGmail}
+            type="button"
             className="px-4 py-2 bg-stone-200 text-slate-700 rounded-lg hover:bg-stone-300 transition-colors text-sm font-medium"
           >
             🔄 Reconnectar Gmail

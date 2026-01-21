@@ -148,7 +148,7 @@ export default function SettingsClient({
   return (
     <div className="space-y-8">
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
           {error}
         </div>
       )}
@@ -246,6 +246,7 @@ export default function SettingsClient({
                                 className="text-xs px-2 py-1 rounded border border-stone-200"
                                 onClick={cancelEdit}
                                 disabled={isSaving}
+                                type="button"
                               >
                                 Cancelar
                               </button>
@@ -253,6 +254,8 @@ export default function SettingsClient({
                                 className="text-xs px-2 py-1 rounded bg-amber-500 text-white"
                                 onClick={() => saveSetting(setting)}
                                 disabled={isSaving}
+                                type="button"
+                                aria-busy={isSaving}
                               >
                                 {isSaving ? 'Guardant...' : 'Guardar'}
                               </button>
@@ -270,6 +273,7 @@ export default function SettingsClient({
                             <button
                               className="mt-2 text-xs px-2 py-1 rounded border border-stone-200 hover:bg-stone-100"
                               onClick={() => startEdit(current)}
+                              type="button"
                             >
                               Editar
                             </button>

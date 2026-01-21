@@ -110,7 +110,7 @@ export default function CoveragePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
         <div className="animate-spin w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full" />
       </div>
     );
@@ -155,11 +155,13 @@ export default function CoveragePage() {
             value={newCity}
             onChange={(e) => setNewCity(e.target.value)}
             placeholder="Nom de la ciutat"
+            aria-label="Nom de la ciutat"
             className="flex-1 px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           />
           <select
             value={newProvince}
             onChange={(e) => setNewProvince(e.target.value)}
+            aria-label="Província"
             className="px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           >
             {PROVINCES.map(p => (
@@ -169,6 +171,8 @@ export default function CoveragePage() {
           <button
             onClick={addArea}
             disabled={adding || !newCity.trim()}
+            type="button"
+            aria-busy={adding}
             className="px-6 py-2 bg-gradient-to-r from-amber-500 to-rose-500 text-white rounded-lg font-medium hover:from-amber-600 hover:to-rose-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {adding ? 'Afegint...' : '+ Afegir'}
@@ -195,6 +199,7 @@ export default function CoveragePage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => toggleArea(area.city, !area.enabled)}
+                        type="button"
                         className={`px-3 py-1 rounded text-xs font-medium ${
                           area.enabled
                             ? 'bg-green-100 text-green-700'
@@ -205,6 +210,7 @@ export default function CoveragePage() {
                       </button>
                       <button
                         onClick={() => removeArea(area.city)}
+                        type="button"
                         className="px-3 py-1 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200"
                       >
                         Eliminar

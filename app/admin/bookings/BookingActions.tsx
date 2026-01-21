@@ -49,6 +49,8 @@ export default function BookingActions({
         <button
           onClick={handleDelete}
           disabled={isDeleting}
+          type="button"
+          aria-busy={isDeleting}
           className="inline-flex items-center rounded-md bg-red-100 px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200 disabled:opacity-50"
         >
           {isDeleting ? 'Eliminant...' : 'Eliminar'}

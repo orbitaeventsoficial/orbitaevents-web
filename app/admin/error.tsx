@@ -60,6 +60,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
         <div className="flex gap-3 justify-center">
           <button
             onClick={reset}
+            type="button"
             className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-medium rounded-lg transition-colors"
           >
             Reintentar

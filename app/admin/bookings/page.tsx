@@ -155,15 +155,15 @@ export default async function BookingsPage() {
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-stone-200">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Ref.</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Client</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Tipus</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Data Event</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Ubicació</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Pack</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Total</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Estat</th>
-                <th className="px-4 py-3 text-right font-medium text-slate-600">Accions</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Ref.</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Client</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Tipus</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Data Event</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Ubicació</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Pack</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Total</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Estat</th>
+                <th scope="col" className="px-4 py-3 text-right font-medium text-slate-600">Accions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">

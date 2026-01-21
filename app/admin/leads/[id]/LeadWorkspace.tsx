@@ -135,17 +135,20 @@ export default function LeadWorkspace({
             placeholder="Nova tasca"
             value={taskTitle}
             onChange={(e) => setTaskTitle(e.target.value)}
+            aria-label="Nova tasca"
           />
           <input
             type="date"
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-700"
             value={taskDueDate}
             onChange={(e) => setTaskDueDate(e.target.value)}
+            aria-label="Data de venciment"
           />
           <select
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-700"
             value={taskPriority}
             onChange={(e) => setTaskPriority(e.target.value)}
+            aria-label="Prioritat"
           >
             <option value="LOW">Baixa</option>
             <option value="MEDIUM">Mitjana</option>
@@ -156,6 +159,7 @@ export default function LeadWorkspace({
         <button
           type="button"
           onClick={addTask}
+          aria-label="Afegir tasca"
           className="mt-3 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600"
         >
           Afegir tasca
@@ -181,6 +185,7 @@ export default function LeadWorkspace({
                     <button
                       type="button"
                       onClick={() => updateTask(task.id, 'DONE')}
+                      aria-label={`Marcar tasca ${task.title} com feta`}
                       className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700"
                     >
                       Marcar feta
@@ -189,6 +194,7 @@ export default function LeadWorkspace({
                   <button
                     type="button"
                     onClick={() => deleteTask(task.id)}
+                    aria-label={`Eliminar tasca ${task.title}`}
                     className="rounded-md border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700"
                   >
                     Eliminar
@@ -208,11 +214,13 @@ export default function LeadWorkspace({
             placeholder="Títol del document"
             value={docTitle}
             onChange={(e) => setDocTitle(e.target.value)}
+            aria-label="Títol del document"
           />
           <select
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-700"
             value={docType}
             onChange={(e) => setDocType(e.target.value)}
+            aria-label="Tipus de document"
           >
             <option value="QUOTE">Pressupost</option>
             <option value="CONTRACT">Contracte</option>
@@ -225,10 +233,12 @@ export default function LeadWorkspace({
             type="file"
             className="text-sm text-slate-600"
             onChange={(e) => setDocFile(e.target.files?.[0] || null)}
+            aria-label="Arxiu del document"
           />
           <button
             type="button"
             onClick={uploadDocument}
+            aria-label="Pujar document"
             className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600"
           >
             Pujar document

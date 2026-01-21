@@ -19,7 +19,7 @@
  */
 
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
 import { useAvailability } from '@/hooks/usePublicData';
@@ -31,6 +31,7 @@ import { useAvailability } from '@/hooks/usePublicData';
 function AvailabilityCounter() {
   const t = useTranslations('mobileCTA');
   const { data, isLoading } = useAvailability();
+  const reduceMotion = useReducedMotion();
 
   // Process availability data from shared hook
   const availability = useMemo(() => {
@@ -106,8 +107,8 @@ function AvailabilityCounter() {
 
         {urgencyLevel !== 'normal' && (
           <motion.div
-            animate={{ scale: [1, 1.1, 1] }}
-            transition={{ duration: 1, repeat: Infinity }}
+            animate={reduceMotion ? { scale: 1 } : { scale: [1, 1.1, 1] }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 1, repeat: Infinity }}
             className={`px-3 py-1.5 rounded-full ${
               urgencyLevel === 'critical' 
                 ? 'bg-red-500 text-white' 
@@ -128,6 +129,7 @@ function AvailabilityCounter() {
 
 function TrustBadges() {
   const t = useTranslations('mobileCTA');
+  const reduceMotion = useReducedMotion();
 
   const badges = [
     { icon: '⭐', value: '5.0', labelKey: 'badges.rating' },
@@ -140,10 +142,10 @@ function TrustBadges() {
       {badges.map((badge, i) => (
         <motion.div
           key={badge.labelKey}
-          initial={{ opacity: 0, y: 20 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: i * 0.1 }}
+          transition={reduceMotion ? { duration: 0 } : { delay: i * 0.1 }}
           className="text-center"
         >
           <span className="text-xl">{badge.icon}</span>
@@ -163,6 +165,7 @@ export default function MobileCTAUrgency() {
   const { haptic, locale } = useMobile();
   const t = useTranslations('mobileCTA');
   const tCommon = useTranslations('common');
+  const reduceMotion = useReducedMotion();
 
   return (
     <section className="py-16 px-6">
@@ -174,7 +177,7 @@ export default function MobileCTAUrgency() {
         <div className="relative">
           {/* Header */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-8"

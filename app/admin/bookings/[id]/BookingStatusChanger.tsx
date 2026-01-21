@@ -82,6 +82,8 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
               key={status}
               onClick={() => handleStatusChange(status)}
               disabled={isLoading || isActive}
+              type="button"
+              aria-pressed={isActive}
               className={`
                 px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all
                 ${isActive
@@ -101,16 +103,21 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
 
       {/* Error */}
       {error && (
-        <div className="mt-2 p-2 bg-red-50 text-red-600 text-sm rounded-lg">
+        <div className="mt-2 p-2 bg-red-50 text-red-600 text-sm rounded-lg" role="alert">
           {error}
         </div>
       )}
 
       {/* Confirmation Modal for COMPLETED */}
       {showConfirmComplete && (
-        <div className="fixed inset-0 bg-stone-100/70 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md mx-4 shadow-xl">
-            <h3 className="text-lg font-semibold text-slate-700 mb-2">
+        <div className="fixed inset-0 bg-stone-100/70 flex items-center justify-center z-50" role="presentation">
+          <div
+            className="bg-white rounded-xl p-6 max-w-md mx-4 shadow-xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-complete-title"
+          >
+            <h3 id="confirm-complete-title" className="text-lg font-semibold text-slate-700 mb-2">
               Marcar com a Completat?
             </h3>
             <p className="text-slate-600 mb-4">
@@ -130,12 +137,15 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
                 onClick={() => setShowConfirmComplete(false)}
                 className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-700"
                 disabled={isLoading}
+                type="button"
               >
                 Cancel·lar
               </button>
               <button
                 onClick={() => updateStatus('COMPLETED')}
                 disabled={isLoading}
+                type="button"
+                aria-busy={isLoading}
                 className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50"
               >
                 {isLoading ? 'Actualitzant...' : 'Sí, Completar Event'}

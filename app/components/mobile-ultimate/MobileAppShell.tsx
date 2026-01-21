@@ -21,7 +21,7 @@
  */
 
 import { useState, useEffect, useRef, createContext, useContext, ReactNode, useCallback } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValue } from 'framer-motion';
+import { motion, AnimatePresence, useTransform, useMotionValue } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 import { log } from '@/lib/logger';
 
@@ -290,9 +290,17 @@ export default function MobileAppShell({
   const lastScrollY = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRaf = useRef<number | null>(null);
-  
-  const { scrollYProgress } = useScroll({ container: containerRef });
 
+  useEffect(() => {
+    document.body.classList.add('mobile-experience-active');
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+
+    return () => {
+      document.body.classList.remove('mobile-experience-active');
+    };
+  }, []);
+  
   // Scroll to section helper
   const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);

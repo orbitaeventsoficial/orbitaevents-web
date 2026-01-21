@@ -651,15 +651,29 @@ export default function TextManagerPage() {
       {(error || success) && (
         <div className="max-w-7xl mx-auto px-4 mt-4">
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 flex items-center justify-between">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 flex items-center justify-between" role="alert">
               <span>❌ {error}</span>
-              <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">✕</button>
+              <button
+                onClick={() => setError(null)}
+                type="button"
+                aria-label="Tancar error"
+                className="text-red-400 hover:text-red-600"
+              >
+                ✕
+              </button>
             </div>
           )}
           {success && (
-            <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 flex items-center justify-between">
+            <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 flex items-center justify-between" role="status" aria-live="polite">
               <span>{success}</span>
-              <button onClick={() => setSuccess(null)} className="text-green-400 hover:text-green-600">✕</button>
+              <button
+                onClick={() => setSuccess(null)}
+                type="button"
+                aria-label="Tancar confirmacio"
+                className="text-green-400 hover:text-green-600"
+              >
+                ✕
+              </button>
             </div>
           )}
         </div>
@@ -675,6 +689,7 @@ export default function TextManagerPage() {
               {/* Mostrar todo */}
               <button
                 onClick={() => setActiveSection(null)}
+                type="button"
                 className={`w-full p-3 rounded-xl text-left transition-all ${
                   !activeSection
                     ? 'bg-gradient-to-r from-slate-200 to-slate-300 text-slate-700 shadow-lg'
@@ -698,6 +713,7 @@ export default function TextManagerPage() {
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
+                    type="button"
                     className={`w-full p-3 rounded-xl text-left transition-all ${
                       isActive
                         ? `bg-gradient-to-r ${section.color} text-white shadow-lg`

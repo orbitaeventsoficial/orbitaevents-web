@@ -108,7 +108,7 @@ export function Button({
   }
 
   return (
-    <button onClick={onClick} className={className}>
+    <button type="button" onClick={onClick} className={className}>
       {icon && <span>{icon}</span>}
       {label}
     </button>

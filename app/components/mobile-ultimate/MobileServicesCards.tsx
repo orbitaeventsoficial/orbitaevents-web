@@ -20,7 +20,7 @@
  */
 
 import { useRef, useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
@@ -54,6 +54,7 @@ interface ServiceCardProps {
 
 function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps) {
   const { haptic } = useMobile();
+  const reduceMotion = useReducedMotion();
 
   const title = t(`services.${service.id}.title`);
   const subtitle = t(`services.${service.id}.subtitle`);
@@ -152,16 +153,16 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
             <motion.div
               className="absolute inset-0 rounded-3xl pointer-events-none"
               initial={{ opacity: 0 }}
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              animate={reduceMotion ? { opacity: 0.7 } : { opacity: [0.5, 1, 0.5] }}
+              transition={reduceMotion ? { duration: 0 } : { duration: 2, repeat: Infinity }}
               style={{
                 boxShadow: `0 0 80px 15px ${service.id === 'halloween' ? 'rgba(249, 115, 22, 0.5)' : service.id === 'monmagic' ? 'rgba(168, 85, 247, 0.5)' : 'rgba(251, 191, 36, 0.5)'}`,
               }}
             />
             <motion.div
               className={`absolute -inset-[2px] rounded-3xl pointer-events-none bg-gradient-to-r ${service.id === 'halloween' ? 'from-orange-500 to-red-500' : service.id === 'monmagic' ? 'from-purple-500 to-pink-500' : 'from-amber-400 to-orange-500'} opacity-50`}
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+              animate={reduceMotion ? { opacity: 0.5 } : { rotate: [0, 360] }}
+              transition={reduceMotion ? { duration: 0 } : { duration: 8, repeat: Infinity, ease: 'linear' }}
               style={{ filter: 'blur(20px)' }}
             />
           </>
@@ -177,9 +178,11 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
 
 export default function MobileServicesCards() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRaf = useRef<number | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const { haptic, locale } = useMobile();
   const t = useTranslations('mobileServices');
+  const reduceMotion = useReducedMotion();
 
   // Services data with translation keys
   const SERVICES: Service[] = useMemo(() => [
@@ -255,9 +258,11 @@ export default function MobileServicesCards() {
     },
   ], []);
 
-  // Ref para haptic (evitar re-ejecuciones del useEffect)
+  // Refs to avoid re-binding scroll handlers
   const hapticRef = useRef(haptic);
   hapticRef.current = haptic;
+  const activeIndexRef = useRef(activeIndex);
+  activeIndexRef.current = activeIndex;
 
   // Detectar card activa basándose en scroll position
   useEffect(() => {
@@ -265,18 +270,28 @@ export default function MobileServicesCards() {
     if (!container) return;
 
     const handleScroll = () => {
-      const scrollLeft = container.scrollLeft;
-      const cardWidth = container.offsetWidth * 0.75 + 16; // width + gap
-      const newIndex = Math.round(scrollLeft / cardWidth);
-      if (newIndex !== activeIndex && newIndex >= 0 && newIndex < SERVICES.length) {
-        setActiveIndex(newIndex);
-        hapticRef.current('light');
-      }
+      if (scrollRaf.current !== null) return;
+      scrollRaf.current = window.requestAnimationFrame(() => {
+        const scrollLeft = container.scrollLeft;
+        const cardWidth = container.offsetWidth * 0.75 + 16; // width + gap
+        const newIndex = Math.round(scrollLeft / cardWidth);
+        if (newIndex !== activeIndexRef.current && newIndex >= 0 && newIndex < SERVICES.length) {
+          setActiveIndex(newIndex);
+          hapticRef.current('light');
+        }
+        scrollRaf.current = null;
+      });
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [activeIndex, SERVICES.length]);
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      if (scrollRaf.current !== null) {
+        window.cancelAnimationFrame(scrollRaf.current);
+        scrollRaf.current = null;
+      }
+    };
+  }, [SERVICES.length]);
 
   return (
     <section id="services-section" className="py-12 overflow-hidden">
@@ -358,9 +373,9 @@ export default function MobileServicesCards() {
 
       {/* Swipe hint */}
       <motion.p
-        initial={{ opacity: 0 }}
+        initial={reduceMotion ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
+        transition={reduceMotion ? { duration: 0 } : { delay: 1 }}
         className="text-center text-white/50 text-xs mt-4"
       >
         {t('swipeHint')}
