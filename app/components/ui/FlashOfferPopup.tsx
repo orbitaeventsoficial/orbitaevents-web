@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
@@ -36,26 +36,15 @@ interface OfferConfig {
 }
 
 // Solo oferta flash de 250€
-const OFFER: OfferConfig = {
+const OFFER_BASE = {
   id: 'flash-250',
   type: 'fixed',
   value: 250,
   originalValue: 450,
-  badge: '⚡ OFERTA FLASH - TEMPS LIMITAT',
-  title: 'Reserva abans que s\'esgoti el temps!',
-  description: 'Festa privada completa: DJ + So + Llums (fins a 50 persones)',
-  features: [
-    '🎧 DJ professional 2 hores',
-    '🔊 Equip de so 3200W',
-    '💡 Il·luminació LED',
-    '✨ Màquina de fum inclosa',
-  ],
-  cta: 'Reserva ara per 250€',
   href: '/contacto?pack=oferta-flash',
-  finePrint: '*Oferta vàlida durant el temps indicat. Fins a 50 persones. Subjecte a disponibilitat.',
   gradient: 'from-purple-500 to-pink-500',
   accentColor: 'purple',
-};
+} as const;
 
 const STORAGE_KEY = 'flashOfferDismissed';
 const DISMISS_DURATION = 24 * 60 * 60 * 1000; // 24 hores
@@ -83,6 +72,19 @@ function calculateTimeLeft(startTime: number): TimeLeft {
 
 export default function FlashOfferPopup() {
   const t = useTranslations('flashOffer');
+  const offer = useMemo<OfferConfig>(() => {
+    const rawFeatures = t.raw('features');
+    const features = Array.isArray(rawFeatures) ? rawFeatures : [];
+    return {
+      ...OFFER_BASE,
+      badge: t('badge'),
+      title: t('title'),
+      description: t('description'),
+      features,
+      cta: t('cta', { price: OFFER_BASE.value }),
+      finePrint: t('finePrint'),
+    };
+  }, [t]);
   const [isVisible, setIsVisible] = useState(false);
   const [startTime, setStartTime] = useState<number>(0);
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ minutes: 15, seconds: 0 });
@@ -143,7 +145,7 @@ export default function FlashOfferPopup() {
     return null;
   }
 
-  const accentClasses = OFFER.accentColor === 'amber'
+  const accentClasses = offer.accentColor === 'amber'
     ? {
         badge: 'bg-amber-500/10 border-amber-500/20',
         badgeText: 'text-amber-400',
@@ -209,43 +211,43 @@ export default function FlashOfferPopup() {
                 {/* Badge */}
                 <div className={`inline-flex items-center gap-1.5 px-3 py-1 ${accentClasses.badge} border rounded-full mb-4`}>
                   <span className={`w-1.5 h-1.5 ${accentClasses.badgeDot} rounded-full animate-pulse`} />
-                  <span className={`${accentClasses.badgeText} text-xs font-medium`}>{OFFER.badge}</span>
+                  <span className={`${accentClasses.badgeText} text-xs font-medium`}>{offer.badge}</span>
                 </div>
 
                 {/* Title */}
                 <h2 className="text-xl md:text-2xl font-black text-white mb-2">
-                  {OFFER.title}
+                  {offer.title}
                 </h2>
 
                 {/* Description */}
                 <p className="text-zinc-400 text-sm mb-4">
-                  {OFFER.description}
+                  {offer.description}
                 </p>
 
                 {/* Value display */}
                 <div className="mb-4">
                   <div className="flex items-center justify-center gap-2">
-                    {OFFER.originalValue && (
+                    {offer.originalValue && (
                       <span className="text-lg text-zinc-500 line-through">
-                        {OFFER.originalValue}€
+                        {offer.originalValue}€
                       </span>
                     )}
-                    <span className={`text-4xl md:text-5xl font-black bg-gradient-to-r ${OFFER.gradient} bg-clip-text text-transparent`}>
-                      {OFFER.value}€
+                    <span className={`text-4xl md:text-5xl font-black bg-gradient-to-r ${offer.gradient} bg-clip-text text-transparent`}>
+                      {offer.value}€
                     </span>
                   </div>
-                  {OFFER.originalValue && (
+                  {offer.originalValue && (
                     <span className="text-green-400 text-xs font-medium">
-                      Estalvia {OFFER.originalValue - OFFER.value}€!
+                      {t('save', { amount: offer.originalValue - offer.value })}
                     </span>
                   )}
                 </div>
 
                 {/* Features */}
-                {OFFER.features && (
+                {offer.features && (
                   <div className="text-left bg-zinc-800/50 rounded-lg p-3 mb-4 border border-zinc-700/50">
                     <ul className="space-y-1">
-                      {OFFER.features.map((feature, i) => (
+                      {offer.features.map((feature, i) => (
                         <li key={i} className="text-zinc-300 text-xs">
                           {feature}
                         </li>
@@ -259,7 +261,7 @@ export default function FlashOfferPopup() {
                   {/* Text d'urgència */}
                   <div className="text-center mb-2">
                     <span className="text-red-400 text-sm font-bold uppercase tracking-wide animate-pulse">
-                      ⏰ L'oferta acaba en:
+                      ⏰ {t('countdown')}
                     </span>
                   </div>
 
@@ -287,11 +289,11 @@ export default function FlashOfferPopup() {
 
                 {/* CTA */}
                 <Link
-                  href={OFFER.href}
+                  href={offer.href}
                   onClick={handleClose}
-                  className={`inline-flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r ${OFFER.gradient} hover:opacity-90 text-white font-bold text-base rounded-lg transition-all hover:shadow-lg ${accentClasses.buttonHover}`}
+                  className={`inline-flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r ${offer.gradient} hover:opacity-90 text-white font-bold text-base rounded-lg transition-all hover:shadow-lg ${accentClasses.buttonHover}`}
                 >
-                  {OFFER.cta}
+                  {offer.cta}
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
@@ -299,7 +301,7 @@ export default function FlashOfferPopup() {
 
                 {/* Fine print */}
                 <p className="mt-3 text-[10px] text-zinc-600">
-                  {OFFER.finePrint}
+                  {offer.finePrint}
                 </p>
               </div>
             </div>

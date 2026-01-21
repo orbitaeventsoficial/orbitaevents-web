@@ -544,7 +544,7 @@
     "empresas": {
       "meta": {
         "title": "DJ Eventos Empresa Barcelona | Team Building + Cenas Gala | Desde {price}€ ⭐ 5.0/5",
-        "description": "DJ profesional para eventos de empresa en Barcelona y Girona. Cenas de gala, team building, lanzamientos de producto. Sonido 4000W + iluminación corporativa. +50 empresas confían en nosotros. Presupuesto gratis en 24h.",
+        "description": "DJ profesional para eventos de empresa en Barcelona y Girona. Cenas de gala, team building, lanzamientos de producto. Sonido 4000W + iluminación corporativa. +50 empresas confían en nosotros. Presupuesto gratis en menos de 2h.",
         "ogTitle": "DJ Eventos Empresa Barcelona | Desde {price}€",
         "ogDescription": "DJ profesional para eventos corporativos. Cenas de empresa, team building, lanzamientos. Sonido 4000W + branding integrado. +50 empresas. Presupuesto gratis."
       },
@@ -1218,8 +1218,17 @@
     "trust": {
       "experience": "Años de experiencia",
       "events": "Eventos celebrados",
-      "response": "Respuesta rápida"
+      "response": "Respuesta rápida",
+      "coverage": "Zona de cobertura"
     },
+    "location": "Granollers, Barcelona",
+    "coverageAreas": [
+      "Barcelona",
+      "Girona",
+      "Costa Brava",
+      "Maresme",
+      "Vallès"
+    ],
     "sections": {
       "about": "Sobre nosotros",
       "services": "Servicios",
@@ -3856,7 +3865,7 @@
     "trust": {
       "noCommitment": "Sin compromiso",
       "freeQuote": "Presupuesto gratis",
-      "response24h": "Respuesta en 24h"
+    "response24h": "Respuesta en 2h"
     }
   },
   "seo": {
@@ -3894,13 +3903,21 @@
     }
   },
   "flashOffer": {
-    "title": "🎄 Oferta Invierno",
-    "description": "Reserva ahora y ahorra",
-    "cta": "Reserva con -{discount}%",
-    "days": "días",
-    "hours": "h",
-    "minutes": "m",
-    "seconds": "s",
+    "badge": "⚡ OFERTA FLASH - TIEMPO LIMITADO",
+    "title": "¡Reserva antes de que se acabe el tiempo!",
+    "description": "Fiesta privada completa: DJ + Sonido + Luces (hasta 50 personas)",
+    "features": [
+      "🎧 DJ profesional 2 horas",
+      "🔊 Equipo de sonido 3200W",
+      "💡 Iluminación LED",
+      "✨ Máquina de humo incluida"
+    ],
+    "cta": "Reserva ahora por {price}€",
+    "finePrint": "*Oferta válida durante el tiempo indicado. Hasta 50 personas. Sujeto a disponibilidad.",
+    "save": "Ahorra {amount}€!",
+    "countdown": "La oferta termina en:",
+    "minutes": "min",
+    "seconds": "seg",
     "close": "Cerrar oferta"
   },
   "diferencia": {
@@ -5721,6 +5738,7 @@
       "whatsappMsg": "Hola! Quiero información para mi evento.",
       "events": "eventos",
       "rating": "valoración",
+      "response": "respuesta",
       "status": {
         "scarce": "⚠️ ¡Casi lleno!",
         "limited": "🔥 ¡Se acaba!",
@@ -6040,7 +6058,7 @@
     },
     "hero": {
       "title": "Reserva tu Evento",
-      "description": "Completa el formulario y reserva tu fecha. Te contactaremos en las próximas 24 horas para confirmar todos los detalles."
+      "description": "Completa el formulario y reserva tu fecha. Te contactaremos en menos de 2 horas para confirmar todos los detalles."
     },
     "trust": {
       "items": {

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Link } from '@/lib/navigation';
-import { SITE_CONFIG, getWhatsAppUrl } from '@/config/site-config';
+import { SITE_CONFIG } from '@/config/site-config';
 import { Ghost, Skull, Moon, Sparkles, Star, CheckCircle, Calendar, MessageCircle, ArrowRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
@@ -30,7 +30,8 @@ const FEATURE_ICONS = {
 
 export default async function BodaHalloweenPage() {
   const t = await getTranslations('bodaHalloween');
-  const whatsappUrl = getWhatsAppUrl('bodas');
+  const tWhatsapp = await getTranslations('whatsappMessages');
+  const whatsappUrl = `https://wa.me/${SITE_CONFIG.business.phone.replace(/\D/g, '')}?text=${encodeURIComponent(tWhatsapp('bodas'))}`;
 
   const features = ['theming', 'effects', 'dj', 'experience'] as const;
   const faqItems = ['q1', 'q2', 'q3', 'q4'] as const;

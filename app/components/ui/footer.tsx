@@ -32,12 +32,7 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 // CONSTANTS
 // ========================================
 
-const CONTACT_INFO = {
-  phone: SITE_CONFIG.business.phone,
-  email: SITE_CONFIG.business.email,
-  location: 'Granollers, Barcelona',
-  coverage: ['Barcelona', 'Girona', 'Costa Brava', 'Maresme', 'Vallès'],
-};
+const DEFAULT_COVERAGE = ['Barcelona', 'Girona', 'Costa Brava', 'Maresme', 'Vallès'];
 
 // Social links des de site-config
 const SOCIAL_LINKS = [
@@ -118,6 +113,35 @@ export default function Footer() {
   const tStats = useTranslations('stats');
   const tFooterLinks = useTranslations('footerLinks');
   const { track } = useAnalytics();
+  const rawCoverage = t.raw('coverageAreas');
+  const coverageAreas = Array.isArray(rawCoverage) ? rawCoverage : DEFAULT_COVERAGE;
+
+  const trustSignals = [
+    {
+      metric: tStats('years.value'),
+      label: t('trust.experience'),
+      icon: '⭐',
+      color: 'from-amber-500/20 to-orange-500/20',
+    },
+    {
+      metric: `+${SITE_CONFIG.stats.eventsCompleted}`,
+      label: t('trust.events'),
+      icon: '🎉',
+      color: 'from-purple-500/20 to-pink-500/20',
+    },
+    {
+      metric: SITE_CONFIG.stats.responseTime,
+      label: t('trust.response'),
+      icon: '⚡',
+      color: 'from-green-500/20 to-emerald-500/20',
+    },
+    {
+      metric: tStats('coverage'),
+      label: t('trust.coverage'),
+      icon: '📍',
+      color: 'from-blue-500/20 to-cyan-500/20',
+    },
+  ];
 
   const handleLinkClick = (category: string, linkName: string) => {
     track('Footer_Link_Click', { category, link: linkName });
@@ -156,12 +180,7 @@ export default function Footer() {
         {/* ════════════════════════════════════════════════════════════════ */}
         <div className="py-10 border-b border-white/10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { metric: 'Des de 2023', labelKey: 'yearsExperience', icon: '⭐', color: 'from-amber-500/20 to-orange-500/20' },
-              { metric: '50+', labelKey: 'eventsCompleted', icon: '🎉', color: 'from-purple-500/20 to-pink-500/20' },
-              { metric: '2h', labelKey: 'response', icon: '⚡', color: 'from-green-500/20 to-emerald-500/20' },
-              { metric: '', labelKey: 'coverage', icon: '📍', color: 'from-blue-500/20 to-cyan-500/20' },
-            ].map((signal, idx) => (
+            {trustSignals.map((signal, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 20 }}
@@ -177,7 +196,7 @@ export default function Footer() {
                   {signal.metric}
                 </span>
                 <span className="text-sm text-white/60 text-center">
-                  {tStats(signal.labelKey)}
+                  {signal.label}
                 </span>
               </motion.div>
             ))}
@@ -220,7 +239,7 @@ export default function Footer() {
 
               {/* Coverage areas amb badges */}
               <div className="flex flex-wrap gap-2 mb-8">
-                {CONTACT_INFO.coverage.map((city) => (
+                {coverageAreas.map((city) => (
                   <span
                     key={city}
                     className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/70 text-sm font-medium hover:bg-white/10 hover:border-amber-500/30 transition-colors cursor-default"
@@ -317,7 +336,7 @@ export default function Footer() {
               <ul className="space-y-4 mb-8">
                 <li>
                   <a
-                    href={`tel:${CONTACT_INFO.phone}`}
+                    href={`tel:${SITE_CONFIG.business.phone}`}
                     onClick={() => handleLinkClick('contact', 'phone')}
                     className="flex items-center gap-3 text-white/60 hover:text-green-400 text-sm transition-colors group"
                   >
@@ -330,14 +349,14 @@ export default function Footer() {
 
                 <li>
                   <a
-                    href={`mailto:${CONTACT_INFO.email}`}
+                    href={`mailto:${SITE_CONFIG.business.email}`}
                     onClick={() => handleLinkClick('contact', 'email')}
                     className="flex items-center gap-3 text-white/60 hover:text-amber-400 text-sm transition-colors group"
                   >
                     <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
                       <Mail className="w-4 h-4 text-amber-400" />
                     </div>
-                    <span className="font-medium break-all">{CONTACT_INFO.email}</span>
+                    <span className="font-medium break-all">{SITE_CONFIG.business.email}</span>
                   </a>
                 </li>
 
@@ -345,7 +364,7 @@ export default function Footer() {
                   <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
                     <MapPin className="w-4 h-4 text-blue-400" />
                   </div>
-                  <span className="font-medium">{CONTACT_INFO.location}</span>
+                  <span className="font-medium">{t('location')}</span>
                 </li>
               </ul>
 

@@ -33,7 +33,7 @@ export default function HeroElegant() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           aria-hidden="true"
           disablePictureInPicture
           poster="/img/hero-poster.webp"

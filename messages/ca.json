@@ -1015,8 +1015,17 @@
     "trust": {
       "experience": "Anys d'experiència",
       "events": "Esdeveniments celebrats",
-      "response": "Resposta ràpida"
+      "response": "Resposta ràpida",
+      "coverage": "Zona de cobertura"
     },
+    "location": "Granollers, Barcelona",
+    "coverageAreas": [
+      "Barcelona",
+      "Girona",
+      "Costa Brava",
+      "Maresme",
+      "Vallès"
+    ],
     "sections": {
       "about": "Sobre nosaltres",
       "services": "Serveis",
@@ -3362,7 +3371,7 @@
     "trust": {
       "noCommitment": "Sense compromís",
       "freeQuote": "Pressupost gratuït",
-      "response24h": "Resposta en 24h"
+    "response24h": "Resposta en 2h"
     }
   },
   "seo": {
@@ -3400,13 +3409,21 @@
     }
   },
   "flashOffer": {
-    "title": "🎄 Oferta Hivern",
-    "description": "Reserva ara i estalvia",
-    "cta": "Reserva amb -{discount}%",
-    "days": "dies",
-    "hours": "h",
-    "minutes": "m",
-    "seconds": "s",
+    "badge": "⚡ OFERTA FLASH - TEMPS LIMITAT",
+    "title": "Reserva abans que s'acabi el temps!",
+    "description": "Festa privada completa: DJ + So + Llums (fins a 50 persones)",
+    "features": [
+      "🎧 DJ professional 2 hores",
+      "🔊 Equip de so 3200W",
+      "💡 Il·luminació LED",
+      "✨ Màquina de fum inclosa"
+    ],
+    "cta": "Reserva ara per {price}€",
+    "finePrint": "*Oferta vàlida durant el temps indicat. Fins a 50 persones. Subjecte a disponibilitat.",
+    "save": "Estalvia {amount}€!",
+    "countdown": "L'oferta acaba en:",
+    "minutes": "min",
+    "seconds": "seg",
     "close": "Tancar oferta"
   },
   "mobileHeader": {
@@ -5892,6 +5909,7 @@
       "whatsappMsg": "Hola! Vull informació per al meu event.",
       "events": "events",
       "rating": "valoració",
+      "response": "resposta",
       "status": {
         "scarce": "⚠️ Gairebé ple!",
         "limited": "🔥 S'acaba!",
@@ -6211,7 +6229,7 @@
     },
     "hero": {
       "title": "Reserva el teu Event",
-      "description": "Completa el formulari i reserva la teva data. Et contactarem en les properes 24 hores per confirmar tots els detalls."
+      "description": "Completa el formulari i reserva la teva data. Et contactarem en menys de 2 hores per confirmar tots els detalls."
     },
     "trust": {
       "items": {

@@ -13,7 +13,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -204,9 +204,7 @@ interface UseStatsReturn {
 // VALORS MÍNIMS GARANTITS
 // Aquests són els valors mínims que mostrarem. Si la BD té més, es mostrarà el real.
 // ═══════════════════════════════════════════════════════════════════════════
-const defaultStats: StatsData = {
-  yearsExperience: 'Des de 2023',     // Empresa fundada Agost 2023
-  coverage: '2 Prov.',  // 2 províncies de cobertura
+const DEFAULT_STATS_NUMBERS = {
   responseTime: '2h',
   yearStarted: 2023,
   peopleEntertained: 2000,
@@ -218,16 +216,35 @@ const defaultStats: StatsData = {
   averageRating: 5.0,
   googleRating: 5.0,
   googleReviewsCount: 1,
-};
+} as const;
 
 export function usePublicStats(): UseStatsReturn {
+  const locale = useLocale();
+  const tStats = useTranslations('stats');
+  const defaultStats = useMemo<StatsData>(() => ({
+    yearsExperience: tStats('years.value'),
+    coverage: tStats('coverage'),
+    responseTime: DEFAULT_STATS_NUMBERS.responseTime,
+    yearStarted: DEFAULT_STATS_NUMBERS.yearStarted,
+    peopleEntertained: DEFAULT_STATS_NUMBERS.peopleEntertained,
+    technicalIncidents: DEFAULT_STATS_NUMBERS.technicalIncidents,
+    totalEvents: DEFAULT_STATS_NUMBERS.totalEvents,
+    totalWeddings: DEFAULT_STATS_NUMBERS.totalWeddings,
+    totalCorporate: DEFAULT_STATS_NUMBERS.totalCorporate,
+    totalParties: DEFAULT_STATS_NUMBERS.totalParties,
+    averageRating: DEFAULT_STATS_NUMBERS.averageRating,
+    googleRating: DEFAULT_STATS_NUMBERS.googleRating,
+    googleReviewsCount: DEFAULT_STATS_NUMBERS.googleReviewsCount,
+  }), [tStats]);
+
   const [stats, setStats] = useState<StatsData>(defaultStats);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     // Check cache first
-    const cached = getCachedData<StatsData>('stats');
+    const cacheKey = `stats:${locale}`;
+    const cached = getCachedData<StatsData>(cacheKey);
     if (cached) {
       setStats(cached);
       setIsLoading(false);
@@ -236,13 +253,13 @@ export function usePublicStats(): UseStatsReturn {
 
     try {
       setIsLoading(true);
-      const response = await fetch('/api/public/stats');
+      const response = await fetch(`/api/public/stats?locale=${locale}`);
       const json = await response.json();
 
       if (json.ok) {
         const statsData = json.stats as StatsData;
         setStats(statsData);
-        setCachedData('stats', statsData);
+        setCachedData(cacheKey, statsData);
         setError(null);
       } else {
         setError(json.error || 'Error desconocido');
@@ -253,11 +270,15 @@ export function usePublicStats(): UseStatsReturn {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    setStats(defaultStats);
+  }, [defaultStats]);
 
   return {
     stats,

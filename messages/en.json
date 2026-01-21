@@ -544,7 +544,7 @@
     "empresas": {
       "meta": {
         "title": "DJ Events Company Barcelona | Team Building + Gala Dinners | From {price}€ ⭐ 5.0/5",
-        "description": "Professional DJ for company events in Barcelona and Girona. Gala dinners, team building, product launches. 4000W sound + corporate lighting. +50 companies trust us. Free quote in 24 hours.",
+        "description": "Professional DJ for company events in Barcelona and Girona. Gala dinners, team building, product launches. 4000W sound + corporate lighting. +50 companies trust us. Free quote in under 2 hours.",
         "ogTitle": "DJ Events Company Barcelona | From {price}€",
         "ogDescription": "Professional DJ for corporate events. Company dinners, team building, launches. 4000W sound + integrated branding. +50 companies. Free quote."
       },
@@ -1218,8 +1218,17 @@
     "trust": {
       "experience": "Years of experience",
       "events": "Events held",
-      "response": "Quick response"
+      "response": "Quick response",
+      "coverage": "Coverage area"
     },
+    "location": "Granollers, Barcelona",
+    "coverageAreas": [
+      "Barcelona",
+      "Girona",
+      "Costa Brava",
+      "Maresme",
+      "Vallès"
+    ],
     "sections": {
       "about": "About us",
       "services": "Services",
@@ -3856,7 +3865,7 @@
     "trust": {
       "noCommitment": "No commitment",
       "freeQuote": "Free quote",
-      "response24h": "Response in 24 hours"
+    "response24h": "Response in 2 hours"
     }
   },
   "seo": {
@@ -3894,13 +3903,21 @@
     }
   },
   "flashOffer": {
-    "title": "🎄 Winter Offer",
-    "description": "Book now and save",
-    "cta": "Reserve with -{discount}%",
-    "days": "days",
-    "hours": "h",
-    "minutes": "m",
-    "seconds": "yes",
+    "badge": "⚡ FLASH OFFER - LIMITED TIME",
+    "title": "Book before time runs out!",
+    "description": "Complete private party: DJ + Sound + Lights (up to 50 people)",
+    "features": [
+      "🎧 Professional DJ 2 hours",
+      "🔊 3200W sound system",
+      "💡 LED lighting",
+      "✨ Smoke machine included"
+    ],
+    "cta": "Book now for {price}€",
+    "finePrint": "*Offer valid for the indicated time. Up to 50 people. Subject to availability.",
+    "save": "Save {amount}€!",
+    "countdown": "Offer ends in:",
+    "minutes": "min",
+    "seconds": "sec",
     "close": "Close offer"
   },
   "diferencia": {
@@ -5721,6 +5738,7 @@
       "whatsappMsg": "Hello! I want information for my event.",
       "events": "events",
       "rating": "assessment",
+      "response": "response",
       "status": {
         "scarce": "⚠️Almost full!",
         "limited": "🔥 It's over!",
@@ -6040,7 +6058,7 @@
     },
     "hero": {
       "title": "Reserve your Event",
-      "description": "Complete the form and reserve your date. We will contact you within the next 24 hours to confirm all the details."
+      "description": "Complete the form and reserve your date. We'll contact you in under 2 hours to confirm all the details."
     },
     "trust": {
       "items": {

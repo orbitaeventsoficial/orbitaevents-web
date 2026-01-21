@@ -63,6 +63,7 @@ export default function CTAFinal() {
   const t = useTranslations('homeSections.ctaFinal');
   const availability = useAvailability();
   const { stats } = usePublicStats();
+  const responseValue = stats.responseTime ? `<${stats.responseTime}` : '<2h';
 
   const statusColors = {
     scarce: 'from-red-500 to-rose-500',
@@ -184,7 +185,7 @@ export default function CTAFinal() {
             <span className="hidden sm:block w-px h-4 bg-white/20" />
             <span className="flex items-center gap-1 justify-center">
               <Icons.Clock />
-              <span><strong className="text-white">&lt;2h</strong> resposta</span>
+              <span><strong className="text-white">{responseValue}</strong> {t('response')}</span>
             </span>
           </motion.div>
 
