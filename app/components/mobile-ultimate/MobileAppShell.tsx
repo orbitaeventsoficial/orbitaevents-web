@@ -289,6 +289,7 @@ export default function MobileAppShell({
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRaf = useRef<number | null>(null);
   
   const { scrollYProgress } = useScroll({ container: containerRef });
 
@@ -330,23 +331,33 @@ export default function MobileAppShell({
   // Scroll handling para header
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = containerRef.current?.scrollTop || 0;
-      setScrollY(currentScrollY);
-      
-      // Mostrar header al hacer scroll up, ocultar al scroll down
-      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
-        setIsHeaderVisible(false);
-      } else {
-        setIsHeaderVisible(true);
-      }
-      
-      lastScrollY.current = currentScrollY;
+      if (scrollRaf.current !== null) return;
+      scrollRaf.current = window.requestAnimationFrame(() => {
+        const currentScrollY = containerRef.current?.scrollTop || 0;
+        setScrollY(currentScrollY);
+
+        // Mostrar header al hacer scroll up, ocultar al scroll down
+        if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+          setIsHeaderVisible(false);
+        } else {
+          setIsHeaderVisible(true);
+        }
+
+        lastScrollY.current = currentScrollY;
+        scrollRaf.current = null;
+      });
     };
 
     const container = containerRef.current;
     container?.addEventListener('scroll', handleScroll, { passive: true });
     
-    return () => container?.removeEventListener('scroll', handleScroll);
+    return () => {
+      container?.removeEventListener('scroll', handleScroll);
+      if (scrollRaf.current !== null) {
+        window.cancelAnimationFrame(scrollRaf.current);
+        scrollRaf.current = null;
+      }
+    };
   }, []);
 
   // Configurar viewport per a safe areas (sense bloquejar zoom per accessibilitat)

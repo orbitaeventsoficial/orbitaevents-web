@@ -20,7 +20,7 @@
  */
 
 import { useRef, useState, useEffect, useMemo } from 'react';
-import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
@@ -54,32 +54,6 @@ interface ServiceCardProps {
 
 function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps) {
   const { haptic } = useMobile();
-  const cardRef = useRef<HTMLDivElement>(null);
-  
-  // 3D tilt effect
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  
-  const rotateX = useTransform(y, [-100, 100], [10, -10]);
-  const rotateY = useTransform(x, [-100, 100], [-10, 10]);
-  
-  const springConfig = { damping: 20, stiffness: 300 };
-  const springRotateX = useSpring(rotateX, springConfig);
-  const springRotateY = useSpring(rotateY, springConfig);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    x.set(e.clientX - centerX);
-    y.set(e.clientY - centerY);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
 
   const title = t(`services.${service.id}.title`);
   const subtitle = t(`services.${service.id}.subtitle`);
@@ -88,21 +62,17 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
 
   return (
     <motion.div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX: springRotateX,
-        rotateY: springRotateY,
-        transformStyle: 'preserve-3d',
-      }}
-      className="relative flex-shrink-0 w-[75vw] max-w-[300px] h-[420px] perspective-1000"
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.08 }}
+      className="relative flex-shrink-0 w-[75vw] max-w-[300px] h-[420px]"
     >
       <motion.a
         href={`/${locale}${service.href}`}
         whileTap={{ scale: 0.97 }}
         onTapStart={() => haptic('medium')}
-        className="block relative w-full h-full rounded-3xl overflow-hidden bg-zinc-900 border-2 border-white/20 shadow-2xl"
+        className="block relative w-full h-full rounded-3xl overflow-hidden bg-zinc-900 border border-white/15 shadow-lg"
         initial={{ opacity: 0, y: 50, scale: 0.9 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true }}
@@ -115,7 +85,8 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
             alt={title}
             fill
             className="object-cover transition-transform duration-700 pointer-events-none"
-            sizes="300px"
+            sizes="70vw"
+            quality={60}
             draggable={false}
           />
 
@@ -123,47 +94,21 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
           <div className={`absolute inset-0 bg-gradient-to-t ${service.gradient} opacity-40`} />
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-zinc-950/30" />
 
-          {/* Shimmer effect on hover */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-            initial={{ x: '-100%' }}
-            animate={{ x: '200%' }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-          />
         </div>
 
         {/* Badge - Enhanced */}
         {badge && (
-          <motion.div
-            initial={{ opacity: 0, x: -20, scale: 0.8 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            transition={{ delay: 0.3, type: 'spring' }}
-            className="absolute top-4 left-4 z-10"
-          >
-            <div className={`relative px-3 py-1.5 rounded-full bg-gradient-to-r ${service.badgeColor} text-white text-xs font-black shadow-2xl`}>
-              {/* Glow effect */}
-              <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${service.badgeColor} blur-lg opacity-60`} />
+          <div className="absolute top-4 left-4 z-10">
+            <div className={`relative px-3 py-1.5 rounded-full bg-gradient-to-r ${service.badgeColor} text-white text-xs font-black shadow-lg`}>
               <span className="relative">{badge}</span>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Content */}
-        <div 
-          className="absolute bottom-0 left-0 right-0 p-6"
-          style={{ transform: 'translateZ(20px)' }}
-        >
+        <div className="absolute bottom-0 left-0 right-0 p-6">
           {/* Emoji */}
-          <motion.span 
-            className="text-5xl block mb-3"
-            animate={isActive ? { 
-              scale: [1, 1.2, 1],
-              rotate: [0, 10, -10, 0]
-            } : {}}
-            transition={{ duration: 0.5 }}
-          >
-            {service.emoji}
-          </motion.span>
+          <span className="text-5xl block mb-3">{service.emoji}</span>
 
           {/* Title */}
           <h3 className="text-2xl font-black text-white mb-1">

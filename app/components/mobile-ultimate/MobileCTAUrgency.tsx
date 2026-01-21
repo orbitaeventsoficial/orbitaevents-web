@@ -92,11 +92,7 @@ function AvailabilityCounter() {
     >
       {/* Animated background for critical */}
       {urgencyLevel === 'critical' && (
-        <motion.div
-          className="absolute inset-0 bg-red-500/10"
-          animate={{ opacity: [0.1, 0.3, 0.1] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        />
+        <div className="absolute inset-0 bg-red-500/10" />
       )}
 
       <div className="relative flex items-center justify-between">
@@ -209,21 +205,16 @@ export default function MobileCTAUrgency() {
               onTapStart={() => haptic('medium')}
               className="relative block w-full group"
             >
-              {/* Glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl blur-xl opacity-50 group-active:opacity-70 transition-opacity" />
-              
               <div className="relative flex items-center justify-center gap-3 py-4 px-6 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl font-bold text-black text-lg shadow-2xl">
                 <span>{tCommon('buttons.requestQuoteFree')}</span>
-                <motion.svg 
-                  className="w-5 h-5" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </motion.svg>
+                </svg>
               </div>
             </motion.a>
 

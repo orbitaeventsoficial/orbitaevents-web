@@ -32,14 +32,14 @@ import { useTranslations } from 'next-intl';
 
 function ParticlesBackground() {
   const particles = useMemo(() =>
-    Array.from({ length: 30 }, (_, i) => ({
+    Array.from({ length: 14 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      size: Math.random() * 6 + 3,
-      duration: Math.random() * 15 + 10,
-      delay: Math.random() * 3,
-      xOffset: Math.random() * 60 - 30,
+      size: Math.random() * 4 + 2,
+      duration: Math.random() * 10 + 8,
+      delay: Math.random() * 2,
+      xOffset: Math.random() * 30 - 15,
       color: i % 3 === 0 ? 'bg-amber-400/40' : i % 3 === 1 ? 'bg-orange-500/40' : 'bg-yellow-400/40',
     })), []
   );
@@ -55,14 +55,12 @@ function ParticlesBackground() {
             height: p.size,
             left: `${p.x}%`,
             top: `${p.y}%`,
-            filter: 'blur(2px)',
-            boxShadow: '0 0 20px currentColor',
           }}
           animate={{
-            y: [0, -120, 0],
+            y: [0, -80, 0],
             x: [0, p.xOffset, 0],
-            opacity: [0, 0.8, 0],
-            scale: [0, 2, 0],
+            opacity: [0, 0.7, 0],
+            scale: [0, 1.5, 0],
           }}
           transition={{
             duration: p.duration,
@@ -106,18 +104,16 @@ function AnimatedBadge() {
       <AnimatePresence mode="wait">
         <motion.div
           key={currentBadge}
-          initial={{ y: 40, opacity: 0, filter: 'blur(10px)', scale: 0.8 }}
-          animate={{ y: 0, opacity: 1, filter: 'blur(0px)', scale: 1 }}
-          exit={{ y: -40, opacity: 0, filter: 'blur(10px)', scale: 0.8 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ y: 40, opacity: 0, scale: 0.8 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: -40, opacity: 0, scale: 0.8 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0 flex items-center justify-center"
         >
           <div className={`relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r ${badges[currentBadge].gradient} shadow-2xl`}>
             {/* Glow effect */}
-            <motion.div
-              className={`absolute inset-0 rounded-full bg-gradient-to-r ${badges[currentBadge].gradient} opacity-50 blur-xl`}
-              animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.7, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
+            <div
+              className={`absolute inset-0 rounded-full bg-gradient-to-r ${badges[currentBadge].gradient} opacity-40 blur-lg`}
             />
             <span className="relative text-2xl drop-shadow-lg">{badges[currentBadge].emoji}</span>
             <span className="relative text-white text-sm font-bold tracking-wide drop-shadow-md">
@@ -172,21 +168,18 @@ function MorphingText() {
             opacity: 0,
             y: 50,
             rotateX: -90,
-            filter: 'blur(20px)',
             scale: 0.8,
           }}
           animate={{
             opacity: 1,
             y: 0,
             rotateX: 0,
-            filter: 'blur(0px)',
             scale: 1,
           }}
           exit={{
             opacity: 0,
             y: -50,
             rotateX: 90,
-            filter: 'blur(20px)',
             scale: 0.8,
           }}
           transition={{
