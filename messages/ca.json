@@ -1988,7 +1988,46 @@
       "packFeatures": {
         "dj": "DJ professional que llegeix la pista",
         "setup": "Muntatge i desmuntatge inclosos",
-        "playlist": "Playlist personalitzada prèvia"
+        "playlist": "Playlist personalitzada prèvia",
+        "backup": "Equip de recanvi disponible"
+      },
+      "discoPacks": {
+        "disco-basico": {
+          "name": "Party Starter",
+          "tagline": "La teva festa, el teu estil. Nosaltres la fem realitat",
+          "ideal": "Festes privades, aniversaris, celebracions",
+          "features": [
+            "DJ professional 3 hores",
+            "So 4000W EV + controladora Pioneer",
+            "Il·luminació bàsica (multiefectes LED + focus LED)",
+            "Màquina de fum",
+            "Música variada (Open format)"
+          ]
+        },
+        "disco-completo": {
+          "name": "Party Machine",
+          "tagline": "Més durada i efectes per a festes que no paren",
+          "ideal": "Festes mitjanes amb ganes de ballar",
+          "features": [
+            "DJ professional 4 hores",
+            "So 4000W EV + controladora Pioneer",
+            "Il·luminació bàsica (multiefectes LED + focus LED)",
+            "Màquina de fum + bombolles",
+            "Peticions de cançons en directe"
+          ]
+        },
+        "disco-premium": {
+          "name": "VIP Experience",
+          "tagline": "Màxima durada, efectes espectaculars i potència professional",
+          "ideal": "Esdeveniments llargs o espais grans",
+          "features": [
+            "DJ professional 6 hores",
+            "So Club (4000W + subwoofer de reforç)",
+            "Show de llums complet (caps mòbils)",
+            "Efectes VIP (fum, bombolles, espurnes fredes, confeti)",
+            "Cabina DJ Pro il·luminada"
+          ]
+        }
       },
       "flexiblePayment": "Pagament flexible:",
       "paymentFeatures": {

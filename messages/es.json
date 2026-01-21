@@ -2380,7 +2380,46 @@
       "packFeatures": {
         "dj": "DJ profesional que lee la pista",
         "setup": "Montaje y desmontaje incluidos",
-        "playlist": "Playlist personalizada previa"
+        "playlist": "Playlist personalizada previa",
+        "backup": "Equipo de respaldo disponible"
+      },
+      "discoPacks": {
+        "disco-basico": {
+          "name": "Party Starter",
+          "tagline": "Tu fiesta, tu estilo. Nosotros la hacemos realidad",
+          "ideal": "Fiestas privadas, cumpleaños, aniversarios",
+          "features": [
+            "DJ profesional 3 horas",
+            "Sonido 4000W EV + controladora Pioneer",
+            "Iluminación básica (multiefectos LED + focos LED)",
+            "Máquina de humo",
+            "Música variada (Open format)"
+          ]
+        },
+        "disco-completo": {
+          "name": "Party Machine",
+          "tagline": "Más duración y efectos para fiestas que no paran",
+          "ideal": "Fiestas medianas con ganas de bailar",
+          "features": [
+            "DJ profesional 4 horas",
+            "Sonido 4000W EV + controladora Pioneer",
+            "Iluminación básica (multiefectos LED + focos LED)",
+            "Máquina de humo + burbujas",
+            "Peticiones de canciones en directo"
+          ]
+        },
+        "disco-premium": {
+          "name": "VIP Experience",
+          "tagline": "Máxima duración, efectos espectaculares y potencia profesional",
+          "ideal": "Eventos largos o espacios grandes",
+          "features": [
+            "DJ profesional 6 horas",
+            "Sonido Club (4000W + subwoofer de refuerzo)",
+            "Show de luces completo (cabezas móviles)",
+            "Efectos VIP (humo, burbujas, chispas frías, confeti)",
+            "Cabina DJ Pro iluminada"
+          ]
+        }
       },
       "flexiblePayment": "Pago flexible:",
       "paymentFeatures": {

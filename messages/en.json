@@ -2380,7 +2380,46 @@
       "packFeatures": {
         "dj": "Professional DJ reading the track",
         "setup": "Assembly and disassembly included",
-        "playlist": "Previous Custom Playlist"
+        "playlist": "Previous Custom Playlist",
+        "backup": "Backup equipment on hand"
+      },
+      "discoPacks": {
+        "disco-basico": {
+          "name": "Party Starter",
+          "tagline": "Your party, your style. We make it happen",
+          "ideal": "Private parties, birthdays, anniversaries",
+          "features": [
+            "Professional DJ for 3 hours",
+            "Sound 4000W EV + Pioneer controller",
+            "Basic lighting (multieffect LED + LED wash)",
+            "Smoke machine",
+            "Open format music"
+          ]
+        },
+        "disco-completo": {
+          "name": "Party Machine",
+          "tagline": "More time and effects for non-stop parties",
+          "ideal": "Medium parties with a big dance floor",
+          "features": [
+            "Professional DJ for 4 hours",
+            "Sound 4000W EV + Pioneer controller",
+            "Basic lighting (multieffect LED + LED wash)",
+            "Smoke machine + bubble machine",
+            "Live song requests"
+          ]
+        },
+        "disco-premium": {
+          "name": "VIP Experience",
+          "tagline": "Maximum time, spectacular effects and pro power",
+          "ideal": "Long events or large venues",
+          "features": [
+            "Professional DJ for 6 hours",
+            "Club sound (4000W + subwoofer reinforcement)",
+            "Full light show (moving heads)",
+            "VIP effects (smoke, bubbles, cold sparks, confetti)",
+            "Pro illuminated DJ booth"
+          ]
+        }
       },
       "flexiblePayment": "Flexible payment:",
       "paymentFeatures": {
