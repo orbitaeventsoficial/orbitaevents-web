@@ -557,13 +557,17 @@ export default function OpinionesClient() {
   useEffect(() => {
     async function loadData() {
       try {
+        let googleCount = 0;
+        let googleSource: string | null = null;
+        let webCount = 0;
         // Load Google reviews
         const googleRes = await fetch('/api/google-reviews');
         if (googleRes.ok) {
           const googleData = await googleRes.json();
           setGoogleReviews(googleData.reviews || []);
           setAverageRating(googleData.rating || 5);
-          setTotalReviews(googleData.user_ratings_total || 0);
+          googleCount = googleData.user_ratings_total || 0;
+          googleSource = googleData.source || null;
         }
 
         // Load web testimonials
@@ -571,6 +575,15 @@ export default function OpinionesClient() {
         if (testimonialsRes.ok) {
           const testimonialsData = await testimonialsRes.json();
           setWebTestimonials(testimonialsData.testimonials || []);
+          webCount = (testimonialsData.testimonials || []).length;
+        }
+
+        if (!googleSource) {
+          setTotalReviews(webCount);
+        } else if (googleSource === 'google' || googleSource === 'json') {
+          setTotalReviews(googleCount + webCount);
+        } else {
+          setTotalReviews(googleCount);
         }
       } catch (error) {
         console.error('Error loading reviews:', error);
@@ -697,9 +710,32 @@ export default function OpinionesClient() {
         )}
       </AnimatePresence>
 
+      {/* Web Testimonials */}
+      {webTestimonials.length > 0 && (
+        <section className="py-16 border-t border-white/10">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-2xl font-bold text-white mb-2">Opiniones de nuestra web</h2>
+              <p className="text-white/60">Testimonios verificados de clientes</p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {webTestimonials.map((testimonial) => (
+                <WebTestimonialCard key={testimonial.id} testimonial={testimonial} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Google Reviews */}
       {googleReviews.length > 0 && (
-        <section className="py-16">
+        <section className="py-16 border-t border-white/10">
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -730,29 +766,6 @@ export default function OpinionesClient() {
                 <Icons.Google />
                 <span>Ver todas en Google</span>
               </a>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Web Testimonials */}
-      {webTestimonials.length > 0 && (
-        <section className="py-16 border-t border-white/10">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-2xl font-bold text-white mb-2">Opiniones de nuestra web</h2>
-              <p className="text-white/60">Testimonios verificados de clientes</p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {webTestimonials.map((testimonial) => (
-                <WebTestimonialCard key={testimonial.id} testimonial={testimonial} />
-              ))}
             </div>
           </div>
         </section>

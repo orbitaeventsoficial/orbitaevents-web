@@ -164,6 +164,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
         { icon: '👤', label: 'Clients', href: '/admin/contactes' },
         { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
+        { icon: '⭐', label: 'Ressenyes', href: '/admin/ressenyes' },
       ]
     },
     {
