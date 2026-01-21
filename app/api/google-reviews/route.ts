@@ -24,6 +24,13 @@ export const revalidate = 1800;
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const LOCATION_API = 'https://businessprofile.googleapis.com/v1';
 
+function shouldSkipDb(): boolean {
+  return (
+    process.env.SKIP_DB_QUERIES === '1' ||
+    process.env.CI === 'true' ||
+    process.env.NEXT_PHASE === 'phase-production-build'
+  );
+}
 
 export interface GoogleReview {
   author_name: string;
@@ -46,6 +53,7 @@ type GoogleIntegrationConfig = {
 };
 
 async function getGoogleIntegrationConfig(): Promise<GoogleIntegrationConfig | null> {
+  if (shouldSkipDb()) return null;
   if (!process.env.DATABASE_URL) return null;
   const settings = await prisma.setting.findMany({
     where: {
@@ -205,6 +213,7 @@ async function getReviewsFromJson(): Promise<{ reviews: GoogleReview[]; lastUpda
 // OBTENIR RESSENYES DE LA BASE DE DADES
 // ═══════════════════════════════════════════════════════════════════════════
 async function getReviewsFromDatabase(): Promise<GoogleReview[]> {
+  if (shouldSkipDb()) return [];
   try {
     const testimonials = await prisma.customerTestimonial.findMany({
       where: {
