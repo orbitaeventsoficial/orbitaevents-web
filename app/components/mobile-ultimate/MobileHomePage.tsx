@@ -338,6 +338,7 @@ export default function MobileHomePage() {
       {showIntro && (
         <HeroPortalLogo
           onFinish={handleIntroFinish}
+          holdMs={1000}
         />
       )}
 

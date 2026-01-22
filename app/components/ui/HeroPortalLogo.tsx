@@ -14,6 +14,7 @@ interface HeroPortalLogoProps {
   totalMs?: number;
   fadeMs?: number;
   speedMultiplier?: number;
+  holdMs?: number;
 }
 
 export default function HeroPortalLogo({
@@ -21,6 +22,7 @@ export default function HeroPortalLogo({
   totalMs = 1800,
   fadeMs = 400,
   speedMultiplier = 1,
+  holdMs = 0,
 }: HeroPortalLogoProps) {
   const [visible, setVisible] = useState(true);
   const [phase, setPhase] = useState<'initial' | 'logo' | 'text' | 'exit'>('initial');
@@ -55,7 +57,6 @@ export default function HeroPortalLogo({
 
   // Secuencia de animación ultra rápida
   useEffect(() => {
-    const total = totalMs;
     const speed = speedMultiplier;
 
     const timeline = {
@@ -65,21 +66,23 @@ export default function HeroPortalLogo({
       finish: 1,       // Termina
     };
 
-    const ms = (ratio: number) => Math.round(total * ratio / speed);
+    const ms = (ratio: number) => Math.round(totalMs * ratio / speed);
+    const exitAt = Math.round((totalMs * timeline.exit + holdMs) / speed);
+    const finishAt = Math.round((totalMs * timeline.finish + holdMs) / speed);
 
     timers.current.push(window.setTimeout(() => setPhase('logo'), ms(timeline.logo)));
     timers.current.push(window.setTimeout(() => setPhase('text'), ms(timeline.text)));
     timers.current.push(window.setTimeout(() => {
       setPhase('exit');
       setVisible(false);
-    }, ms(timeline.exit)));
+    }, exitAt));
     timers.current.push(window.setTimeout(() => {
       clearTimers();
       onFinish?.();
-    }, ms(timeline.finish)));
+    }, finishAt));
 
     return clearTimers;
-  }, [onFinish, totalMs, speedMultiplier, isMobile, clearTimers]);
+  }, [onFinish, totalMs, speedMultiplier, isMobile, clearTimers, holdMs]);
 
   // Skip en móvil con tap
   const handleSkip = useCallback(() => {
@@ -95,7 +98,7 @@ export default function HeroPortalLogo({
   // Configuración responsive - logo más grande
   const config = useMemo(() => ({
     logoSize: isMobile ? 280 : 520,
-    textSize: isMobile ? '1rem' : '1.5rem',
+    textSize: isMobile ? '1.25rem' : '1.85rem',
     wordmarkWidth: isMobile ? 200 : 320,
   }), [isMobile]);
 

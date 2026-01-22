@@ -180,6 +180,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
           totalMs={4000}
           fadeMs={1800}
           speedMultiplier={1.2}
+          holdMs={1000}
         />
       )}
 
