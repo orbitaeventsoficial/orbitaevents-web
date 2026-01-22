@@ -119,7 +119,7 @@ export default function HeroPortalLogo({
             opacity: 0,
             scale: 1.1,
             filter: 'blur(20px)',
-            transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+            transition: { duration: fadeMs / 1000, ease: [0.22, 1, 0.36, 1] },
           }}
         >
           {/* Glow de fondo */}
