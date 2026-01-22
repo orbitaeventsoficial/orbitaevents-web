@@ -55,8 +55,7 @@ export default function HeroPortalLogo({
 
   // Secuencia de animación ultra rápida
   useEffect(() => {
-    const MOBILE_TOTAL = 1200;
-    const total = isMobile ? MOBILE_TOTAL : totalMs;
+    const total = totalMs;
     const speed = speedMultiplier;
 
     const timeline = {
@@ -223,7 +222,7 @@ export default function HeroPortalLogo({
               />
 
             </svg>
-            <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2 translate-y-[13.75rem] md:translate-y-[17.75rem] flex flex-col items-center text-center">
+            <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2 translate-y-[11.5rem] md:translate-y-[17.75rem] flex flex-col items-center text-center">
               <motion.img
                 src="/img/orbitawordmark.svg"
                 alt="Òrbita Events"
@@ -244,7 +243,7 @@ export default function HeroPortalLogo({
             className="absolute font-light tracking-[0.3em] uppercase text-center"
             style={{
               fontSize: config.textSize,
-              top: isMobile ? '10%' : '15%',
+              top: isMobile ? '18%' : '15%',
               background: 'linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #fbbf24 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
