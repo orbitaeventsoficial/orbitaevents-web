@@ -221,15 +221,16 @@ export default function HeroPortalLogo({
               />
 
             </svg>
-            <motion.span
-              className="mx-auto -mt-2 block text-white font-semibold tracking-[0.08em]"
-              style={{ fontSize: isMobile ? '0.95rem' : '1.1rem' }}
+            <motion.img
+              src="/img/orbitalockupwhite.svg"
+              alt="Òrbita Events"
+              width={config.wordmarkWidth}
+              height={config.wordmarkWidth * 0.2}
+              className="mx-auto -mt-2"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: showText ? 1 : 0, y: showText ? 0 : 12 }}
               transition={{ duration: 0.5, delay: 0.15 }}
-            >
-              Òrbita Events
-            </motion.span>
+            />
           </motion.div>
 
           {/* Texto "LA MÀGIA COMENÇA" */}
