@@ -79,6 +79,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const [showIntro, setShowIntro] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [hideHeaderOnMobileIntro, setHideHeaderOnMobileIntro] = useState(false);
 
   // Funció per treure l'overlay negre
   const removeOverlay = useCallback(() => {
@@ -119,6 +120,36 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     }
   }, [pathname, removeOverlay]);
 
+  useEffect(() => {
+    const isHomePage = INTRO_PAGES.some(page => pathname === page);
+    if (!isHomePage) {
+      setHideHeaderOnMobileIntro(false);
+      return;
+    }
+
+    const isMobileViewport = window.innerWidth < 1024;
+    if (!isMobileViewport) {
+      setHideHeaderOnMobileIntro(false);
+      return;
+    }
+
+    const hasSeenMobileIntro = sessionStorage.getItem('orbita-mobile-intro-seen');
+    if (hasSeenMobileIntro) {
+      setHideHeaderOnMobileIntro(false);
+      return;
+    }
+
+    setHideHeaderOnMobileIntro(true);
+    const poll = window.setInterval(() => {
+      if (sessionStorage.getItem('orbita-mobile-intro-seen')) {
+        setHideHeaderOnMobileIntro(false);
+        window.clearInterval(poll);
+      }
+    }, 200);
+
+    return () => window.clearInterval(poll);
+  }, [pathname]);
+
   // Handler per quan acaba la intro
   const handleIntroFinish = useCallback(() => {
     setShowIntro(false);
@@ -153,7 +184,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       )}
 
       {/* Header unificat (desktop + mòbil) - dynamic amb ssr:false */}
-      <Header />
+      {!hideHeaderOnMobileIntro && <Header />}
 
       {/* Contingut principal */}
       <main
