@@ -39,7 +39,7 @@ export const PORTFOLIO_CATEGORIES = [
   {
     "slug": "fiestas-tematicas-halloween",
     "name": "Fiestas tematicas halloween",
-    "cover": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.webp"
+    "cover": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg"
   },
   {
     "slug": "fiestas-tematicas-mon-magic",
@@ -71,46 +71,6 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/bodas/bodas-01.webp",
       "alt": "Bodas – Bodas  01"
-    },
-    {
-      "src": "/img/portfolio/bodas/bodas-02.webp",
-      "alt": "Bodas – Bodas  02"
-    },
-    {
-      "src": "/img/portfolio/bodas/bodas-03.webp",
-      "alt": "Bodas – Bodas  03"
-    },
-    {
-      "src": "/img/portfolio/bodas/bodas-04.webp",
-      "alt": "Bodas – Bodas  04"
-    },
-    {
-      "src": "/img/portfolio/bodas/bodas-05.webp",
-      "alt": "Bodas – Bodas  05"
-    },
-    {
-      "src": "/img/portfolio/bodas/bodas-06.webp",
-      "alt": "Bodas – Bodas  06"
-    },
-    {
-      "src": "/img/portfolio/bodas/bodas-07.webp",
-      "alt": "Bodas – Bodas  07"
-    },
-    {
-      "src": "/img/portfolio/bodas/bodas-08.webp",
-      "alt": "Bodas – Bodas  08"
-    },
-    {
-      "src": "/img/portfolio/bodas/bodas-09.webp",
-      "alt": "Bodas – Bodas  09"
-    },
-    {
-      "src": "/img/portfolio/bodas/bodas-10.webp",
-      "alt": "Bodas – Bodas  10"
-    },
-    {
-      "src": "/img/portfolio/bodas/bodas-11.webp",
-      "alt": "Bodas – Bodas  11"
     }
   ],
   "discomovil": [
@@ -135,26 +95,6 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/eventos-empresa/eventos-empresa-01.webp",
       "alt": "Eventos empresa – Eventos empresa  01"
-    },
-    {
-      "src": "/img/portfolio/eventos-empresa/eventos-empresa-02.webp",
-      "alt": "Eventos empresa – Eventos empresa  02"
-    },
-    {
-      "src": "/img/portfolio/eventos-empresa/eventos-empresa-03.webp",
-      "alt": "Eventos empresa – Eventos empresa  03"
-    },
-    {
-      "src": "/img/portfolio/eventos-empresa/eventos-empresa-04.webp",
-      "alt": "Eventos empresa – Eventos empresa  04"
-    },
-    {
-      "src": "/img/portfolio/eventos-empresa/eventos-empresa-05.webp",
-      "alt": "Eventos empresa – Eventos empresa  05"
-    },
-    {
-      "src": "/img/portfolio/eventos-empresa/eventos-empresa-06.webp",
-      "alt": "Eventos empresa – Eventos empresa  06"
     }
   ],
   "fiestas-infantiles": [
@@ -179,31 +119,11 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-02.webp",
       "alt": "Fiestas privadas – Fiestas privadas  02"
-    },
-    {
-      "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-03.webp",
-      "alt": "Fiestas privadas – Fiestas privadas  03"
-    },
-    {
-      "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-04.webp",
-      "alt": "Fiestas privadas – Fiestas privadas  04"
-    },
-    {
-      "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-05.webp",
-      "alt": "Fiestas privadas – Fiestas privadas  05"
-    },
-    {
-      "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-06.webp",
-      "alt": "Fiestas privadas – Fiestas privadas  06"
-    },
-    {
-      "src": "/img/portfolio/fiestas-privadas/fiestas-privadas-07.webp",
-      "alt": "Fiestas privadas – Fiestas privadas  07"
     }
   ],
   "fiestas-tematicas-halloween": [
     {
-      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.webp",
+      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg",
       "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  01"
     },
     {
@@ -213,42 +133,6 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-03.webp",
       "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  03"
-    },
-    {
-      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-04.webp",
-      "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  04"
-    },
-    {
-      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-05.webp",
-      "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  05"
-    },
-    {
-      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-06.webp",
-      "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  06"
-    },
-    {
-      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-07.webp",
-      "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  07"
-    },
-    {
-      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-08.webp",
-      "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  08"
-    },
-    {
-      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-09.webp",
-      "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  09"
-    },
-    {
-      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-10.webp",
-      "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  10"
-    },
-    {
-      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-11.webp",
-      "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  11"
-    },
-    {
-      "src": "/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-12.webp",
-      "alt": "Fiestas tematicas halloween – Fiestas tematicas halloween  12"
     }
   ],
   "fiestas-tematicas-mon-magic": [
@@ -285,7 +169,7 @@ export const PORTFOLIO_IMAGES = {
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  08"
     },
     {
-      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-09.webp",
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-09.jpg",
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  09"
     },
     {
@@ -299,6 +183,38 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-12.webp",
       "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  12"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-13.jpg",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  13"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-14.jpg",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  14"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-15.jpg",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  15"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-16.jpg",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  16"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-17.jpg",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  17"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-18.jpg",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  18"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-19.png",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  19"
+    },
+    {
+      "src": "/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-20.png",
+      "alt": "Fiestas tematicas mon magic – Fiestas tematicas mon magic  20"
     }
   ],
   "produccion-tecnica": [

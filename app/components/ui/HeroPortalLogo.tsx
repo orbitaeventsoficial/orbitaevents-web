@@ -139,7 +139,8 @@ export default function HeroPortalLogo({
 
           {/* Logo SVG - Planeta Òrbita */}
           <motion.div
-            className="relative translate-y-6"
+            className="relative"
+            style={{ marginTop: isMobile ? '0rem' : '3.75rem' }}
             initial={{ opacity: 0, scale: 0.3, rotate: -15 }}
             animate={{
               opacity: showLogo ? 1 : 0,
@@ -153,6 +154,7 @@ export default function HeroPortalLogo({
             }}
           >
             <svg
+              className="relative z-10"
               width={config.logoSize}
               height={config.logoSize}
               viewBox="0 0 1024 1024"
@@ -221,15 +223,20 @@ export default function HeroPortalLogo({
               />
 
             </svg>
-            <motion.span
-              className="mx-auto -mt-2 block text-white font-semibold tracking-[0.08em]"
-              style={{ fontSize: isMobile ? '0.95rem' : '1.1rem' }}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: showText ? 1 : 0, y: showText ? 0 : 12 }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-            >
-              Òrbita Events
-            </motion.span>
+            <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2 translate-y-[13.75rem] md:translate-y-[17.75rem] flex flex-col items-center text-center">
+              <motion.img
+                src="/img/orbitawordmark.svg"
+                alt="Òrbita Events"
+                width={config.wordmarkWidth}
+                height={Math.round(config.wordmarkWidth * 0.25)}
+                style={{
+                  filter: 'invert(1) brightness(1.05) drop-shadow(0 0 18px rgba(255,255,255,0.2))',
+                }}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: showText ? 1 : 0, y: showText ? 0 : 12 }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
           </motion.div>
 
           {/* Texto "LA MÀGIA COMENÇA" */}
