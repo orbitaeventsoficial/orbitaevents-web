@@ -186,7 +186,7 @@ export const harryPotterServiceSchema = {
     '@type': 'Offer',
     price: '850',
     priceCurrency: 'EUR',
-    priceValidUntil: '2025-12-31',
+    priceValidUntil: '2026-12-31',
     availability: 'https://schema.org/InStock',
   },
 };

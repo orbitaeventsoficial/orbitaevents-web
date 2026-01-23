@@ -75,10 +75,14 @@ export default function ServiceJsonLD({
     '@type': 'Service',
     name,
     description,
-    serviceType,
+    // Schema.org espera Text, no array - usem el primer o join
+    serviceType: Array.isArray(serviceType) ? serviceType[0] : serviceType,
+    // Afegim category per SEO addicional
+    category: Array.isArray(serviceType) ? serviceType.join(', ') : serviceType,
     url,
     image: `${base}/api/og?title=${encodeURIComponent(name)}`,
-    areaServed: areaServed.map(a => ({ '@type': 'Place', name: a })),
+    // areaServed ha de ser AdministrativeArea, no Place genèric
+    areaServed: areaServed.map(a => ({ '@type': 'AdministrativeArea', name: a })),
     offers: offersData,
     provider: {
       '@type': 'Organization',
