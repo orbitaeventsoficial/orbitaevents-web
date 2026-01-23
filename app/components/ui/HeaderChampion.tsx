@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import LanguageSelector, { LanguageSelectorMobile } from './LanguageSelector';
+import { WHATSAPP_URL } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVEGACIÓ - Configuració amb claus de traducció
@@ -374,25 +375,41 @@ export default function HeaderChampion() {
 
                     return (
                       <div key={item.href}>
-                        <Link
-                          href={item.dropdown ? '#' : item.href}
-                          onClick={() => !item.dropdown && setIsMobileMenuOpen(false)}
-                          className="flex items-center justify-between px-4 py-3 text-lg text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg"
-                        >
-                          <span className="flex items-center gap-2">
-                            {tNav(item.labelKey)}
-                            {item.badge && (
-                              <span className="bg-amber-500 text-[10px] text-black font-bold px-1.5 py-0.5 rounded">
-                                {item.badge}
-                              </span>
-                            )}
-                          </span>
-                          {item.dropdown && (
+                        {item.dropdown ? (
+                          <div
+                            className="flex items-center justify-between px-4 py-3 text-lg text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg cursor-pointer"
+                            role="button"
+                            tabIndex={0}
+                            aria-expanded="true"
+                          >
+                            <span className="flex items-center gap-2">
+                              {tNav(item.labelKey)}
+                              {item.badge && (
+                                <span className="bg-amber-500 text-[10px] text-black font-bold px-1.5 py-0.5 rounded">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </span>
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
-                          )}
-                        </Link>
+                          </div>
+                        ) : (
+                          <Link
+                            href={item.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center justify-between px-4 py-3 text-lg text-zinc-300 hover:text-white hover:bg-zinc-800/50 rounded-lg"
+                          >
+                            <span className="flex items-center gap-2">
+                              {tNav(item.labelKey)}
+                              {item.badge && (
+                                <span className="bg-amber-500 text-[10px] text-black font-bold px-1.5 py-0.5 rounded">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </span>
+                          </Link>
+                        )}
 
                         {/* Subitems mòbil */}
                         {item.dropdown && (
@@ -435,7 +452,7 @@ export default function HeaderChampion() {
                     {tHeader('cta')}
                   </Link>
                   <a
-                    href="https://wa.me/34699121023"
+                    href={WHATSAPP_URL}
                     target="_blank" rel="noopener noreferrer"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center justify-center gap-2 w-full py-3 bg-zinc-800 text-white font-semibold rounded-lg border border-zinc-700"

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
+import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // BOTTOM CTA BAR - SEMPRE VISIBLE AL MÒBIL
@@ -68,8 +69,8 @@ export default function BottomCTABar({
 
   return (
     <>
-      {/* Spacer per evitar que el contingut quedi tapat */}
-      <div className="h-20 md:hidden" />
+      {/* Spacer dinàmic per evitar que el contingut quedi tapat - considera safe-area */}
+      <div className="md:hidden" style={{ height: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }} />
       
       {/* Bottom Bar */}
       <AnimatePresence>
@@ -99,7 +100,7 @@ export default function BottomCTABar({
                 {/* WhatsApp */}
                 {showWhatsApp && (
                   <a
-                    href="https://wa.me/34699121023?text=Hola! M'agradaria informació"
+                    href={WHATSAPP_URL_WITH_MESSAGE("Hola! M'agradaria informació")}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-green-600 text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform"

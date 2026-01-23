@@ -5,6 +5,7 @@ import { Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { usePublicStats } from '@/hooks/usePublicData';
+import { WHATSAPP_NUMBER } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CTA FINAL BRUTAL v2.1 - i18n complet
@@ -126,7 +127,7 @@ export default function CTAFinal() {
           >
             {/* WhatsApp - PRIMARI - con hover verde premium */}
             <a
-              href={`https://wa.me/34699121023?text=${encodeURIComponent(t('whatsappMsg'))}`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('whatsappMsg'))}`}
               target="_blank" rel="noopener noreferrer"
               className="group relative inline-flex items-center justify-center gap-3 px-8 py-5 bg-[#25D366] rounded-2xl transition-all overflow-hidden"
             >

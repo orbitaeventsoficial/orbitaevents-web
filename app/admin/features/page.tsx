@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { log } from '@/lib/logger';
 
 // Metadata se afegirà via layout o cal exportar-ho manualment
 
@@ -29,7 +30,7 @@ export default function FeaturesPage() {
         setFeatures(data.features);
       }
     } catch (error) {
-      console.error('Error loading features:', error);
+      log.error('Error loading features:', error);
     } finally {
       setLoading(false);
     }
@@ -51,7 +52,7 @@ export default function FeaturesPage() {
         ));
       }
     } catch (error) {
-      console.error('Error toggling feature:', error);
+      log.error('Error toggling feature:', error);
     } finally {
       setSaving(null);
     }

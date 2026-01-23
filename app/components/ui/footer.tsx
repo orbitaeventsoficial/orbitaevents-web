@@ -20,6 +20,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { WHATSAPP_URL } from '@/lib/constants';
 
 // TikTok icon custom
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -380,7 +381,7 @@ export default function Footer() {
                 </Link>
 
                 <a
-                  href="https://wa.me/34699121023"
+                  href={WHATSAPP_URL}
                   target="_blank" rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full px-4 py-3.5 rounded-xl bg-green-600 hover:bg-green-500 text-white font-bold text-sm transition-colors"
                 >

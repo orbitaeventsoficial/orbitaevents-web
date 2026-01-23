@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 
 export const revalidate = 300;
 export const dynamic = 'force-dynamic';
@@ -38,7 +39,7 @@ export async function GET(
 
     return NextResponse.json(post);
   } catch (error) {
-    console.error('Failed to fetch blog post:', error);
+    log.error('Failed to fetch blog post', error, { context: { slug: params.slug } });
     return NextResponse.json(
       { error: 'Failed to fetch blog post' },
       { status: 500 }

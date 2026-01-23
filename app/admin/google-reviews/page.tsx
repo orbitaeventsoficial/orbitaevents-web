@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { log } from '@/lib/logger';
 
 interface GoogleReview {
   author_name: string;
@@ -41,7 +42,7 @@ export default function GoogleReviewsAdminPage() {
       const reviewsData: ReviewsData = await response.json();
       setData(reviewsData);
     } catch (error) {
-      console.error('Error loading reviews:', error);
+      log.error('Error loading reviews:', error);
     } finally {
       setLoading(false);
     }

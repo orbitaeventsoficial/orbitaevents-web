@@ -500,15 +500,25 @@
   }
 
   /* ─────────────────────────────────────────────────────────────────────────
-     RESPONSIVE DISPLAY
+     RESPONSIVE DISPLAY - Unified breakpoint (768px = Tailwind md:)
      ───────────────────────────────────────────────────────────────────────── */
 
-  @media (max-width: 1023px) {
+  @media (max-width: 767px) {
     .desktop-only { display: none !important; }
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 768px) {
     .mobile-only { display: none !important; }
+  }
+
+  /* Scrollbar hide unified class */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -1269,15 +1279,7 @@ input, select, textarea {
   perspective: 1000px;
 }
 
-/* Hide scrollbar */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
+/* Note: .hide-scrollbar i .scrollbar-hide unificats a @layer utilities */
 
 /* Respectar preferències d'usuari */
 @media (prefers-reduced-motion: reduce) {
@@ -1289,18 +1291,9 @@ input, select, textarea {
   }
 }
 
-/* Mobile/Desktop visibility */
-@media (min-width: 768px) {
-  .mobile-only {
-    display: none !important;
-  }
-}
-
-@media (max-width: 767px) {
-  .desktop-only {
-    display: none !important;
-  }
-}
+/* Mobile/Desktop visibility - UNIFIED (768px = Tailwind md:) */
+/* Note: .desktop-only i .mobile-only ja estan definits a @layer utilities amb 1024px
+   Aquí usem 768px per coherència amb Tailwind md: breakpoint */
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    ELEGANT THEME - Paleta sofisticada

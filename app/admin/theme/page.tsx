@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { log } from '@/lib/logger';
 
 interface ThemeColors {
   primary: string;
@@ -84,7 +85,7 @@ export default function ThemePage() {
         setColors(data.colors);
       }
     } catch (error) {
-      console.error('Error loading theme:', error);
+      log.error('Error loading theme:', error);
     } finally {
       setLoading(false);
     }
@@ -104,7 +105,7 @@ export default function ThemePage() {
         alert('Tema guardat correctament!');
       }
     } catch (error) {
-      console.error('Error saving theme:', error);
+      log.error('Error saving theme:', error);
       alert('Error guardant el tema');
     } finally {
       setSaving(false);
@@ -128,7 +129,7 @@ export default function ThemePage() {
         alert('Tema resetejat!');
       }
     } catch (error) {
-      console.error('Error resetting theme:', error);
+      log.error('Error resetting theme:', error);
     } finally {
       setSaving(false);
     }

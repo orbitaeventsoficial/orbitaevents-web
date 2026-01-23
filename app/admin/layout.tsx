@@ -358,9 +358,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className="flex items-center gap-3 px-3 py-1.5 hover:bg-stone-100 rounded-xl transition-colors"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-sm font-medium">
-                  C
+                  A
                 </div>
-                <span className="text-slate-700 text-sm font-medium">Carles</span>
+                <span className="text-slate-700 text-sm font-medium">Admin</span>
               </button>
             </div>
           </header>

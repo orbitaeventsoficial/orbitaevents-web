@@ -24,6 +24,7 @@ import { useState, useEffect, useRef, createContext, useContext, ReactNode, useC
 import { motion, AnimatePresence, useTransform, useMotionValue } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 import { log } from '@/lib/logger';
+import { WHATSAPP_URL } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONTEXT - Estado global del móvil
@@ -106,7 +107,7 @@ function FloatingHeader({
               
               {/* Quick CTA */}
               <motion.a
-                href="https://wa.me/34699121023"
+                href={WHATSAPP_URL}
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
               >
@@ -423,7 +424,7 @@ export default function MobileAppShell({
         className={`
           min-h-[100dvh] w-full overflow-x-hidden overflow-y-auto
           bg-zinc-950 text-white
-          ${isPWA ? 'safe-top safe-bottom' : ''}
+          safe-top safe-bottom
         `}
         style={{
           WebkitOverflowScrolling: 'touch',
@@ -435,52 +436,7 @@ export default function MobileAppShell({
         </PullToRefresh>
       </div>
 
-      {/* Global Styles */}
-      <style jsx global>{`
-        /* Safe areas */
-        .safe-top { padding-top: env(safe-area-inset-top); }
-        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-        .safe-left { padding-left: env(safe-area-inset-left); }
-        .safe-right { padding-right: env(safe-area-inset-right); }
-        
-        /* Prevent overscroll */
-        html, body {
-          overscroll-behavior: none;
-          -webkit-overflow-scrolling: touch;
-        }
-        
-        /* Hide scrollbar but keep functionality */
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        
-        /* Smooth scroll */
-        * {
-          scroll-behavior: smooth;
-        }
-        
-        /* Disable text selection on interactive elements */
-        button, a, .no-select {
-          -webkit-user-select: none;
-          user-select: none;
-          -webkit-touch-callout: none;
-        }
-        
-        /* Tap highlight */
-        * {
-          -webkit-tap-highlight-color: transparent;
-        }
-        
-        /* Active states */
-        .tap-scale:active {
-          transform: scale(0.97);
-          transition: transform 0.1s ease;
-        }
-      `}</style>
+      {/* Note: Global styles moved to globals.css for better caching and deduplication */}
     </MobileContext.Provider>
   );
 }

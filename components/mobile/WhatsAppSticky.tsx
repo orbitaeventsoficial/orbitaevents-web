@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { WHATSAPP_NUMBER } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // WHATSAPP STICKY PREMIUM
@@ -18,7 +19,7 @@ interface WhatsAppStickyProps {
 }
 
 export default function WhatsAppSticky({
-  phoneNumber = '34699121023',
+  phoneNumber = WHATSAPP_NUMBER,
   message = "Hola! M'agradaria informació sobre els vostres serveis",
   showBadge = true,
   badgeText = 'Respon en <2h',
@@ -54,9 +55,15 @@ export default function WhatsAppSticky({
 
   // Detectar scroll per mostrar
   useEffect(() => {
+    let isMounted = true;
+
     const handleScroll = () => {
-      if (scrollRaf.current !== null) return;
+      if (scrollRaf.current !== null || !isMounted) return;
       scrollRaf.current = window.requestAnimationFrame(() => {
+        if (!isMounted) {
+          scrollRaf.current = null;
+          return;
+        }
         const nextValue = window.scrollY > 300;
         if (nextValue !== hasScrolledRef.current) {
           hasScrolledRef.current = nextValue;
@@ -68,7 +75,9 @@ export default function WhatsAppSticky({
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
+
     return () => {
+      isMounted = false;
       window.removeEventListener('scroll', handleScroll);
       if (scrollRaf.current !== null) {
         window.cancelAnimationFrame(scrollRaf.current);

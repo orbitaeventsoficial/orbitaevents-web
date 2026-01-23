@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import { Prisma } from '@prisma/client';
 
 export const revalidate = 300;
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Failed to fetch blog posts:', error);
+    log.error('Failed to fetch blog posts', error);
     return NextResponse.json(
       { error: 'Failed to fetch blog posts' },
       { status: 500 }

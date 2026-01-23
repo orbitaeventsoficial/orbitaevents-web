@@ -321,6 +321,7 @@ export default function MobileHomePage() {
       setShowIntro(false);
       setIntroFinished(true);
       sessionStorage.setItem('orbita-mobile-intro-seen', 'true');
+      window.dispatchEvent(new Event('orbita-mobile-intro-complete'));
     }, 2200);
 
     return () => window.clearTimeout(fallbackTimer);
@@ -330,6 +331,7 @@ export default function MobileHomePage() {
     setShowIntro(false);
     setIntroFinished(true);
     sessionStorage.setItem('orbita-mobile-intro-seen', 'true');
+    window.dispatchEvent(new Event('orbita-mobile-intro-complete'));
   };
 
   return (

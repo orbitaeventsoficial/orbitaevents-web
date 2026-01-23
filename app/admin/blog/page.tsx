@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { log } from '@/lib/logger';
 
 interface BlogPost {
   id: string;
@@ -44,7 +45,7 @@ export default function BlogAdminPage() {
       setTotal(data.pagination?.total || 0);
       setTotalPages(data.pagination?.totalPages || 0);
     } catch (error) {
-      console.error('Failed to fetch posts:', error);
+      log.error('Failed to fetch posts:', error);
       setFlashMessage({ type: 'error', text: 'Error cargando posts' });
     } finally {
       setLoading(false);
@@ -77,7 +78,7 @@ export default function BlogAdminPage() {
         setFlashMessage({ type: 'error', text: 'Error al eliminar el post' });
       }
     } catch (error) {
-      console.error('Failed to delete post:', error);
+      log.error('Failed to delete post:', error);
       setFlashMessage({ type: 'error', text: 'Error al eliminar el post' });
     }
   };
@@ -99,7 +100,7 @@ export default function BlogAdminPage() {
         setFlashMessage({ type: 'error', text: 'Error al actualizar el post' });
       }
     } catch (error) {
-      console.error('Failed to update post:', error);
+      log.error('Failed to update post:', error);
       setFlashMessage({ type: 'error', text: 'Error al actualizar el post' });
     }
   };

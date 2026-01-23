@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
+import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FLOATING CTAs - Focus en FORMULARI DE CONTACTE (no WhatsApp)
@@ -181,7 +182,7 @@ export function BottomBarMobile() {
 
                 {/* WhatsApp - Secundari, més discret */}
                 <a
-                  href="https://wa.me/34699121023?text=Hola! M'agradaria informació"
+                  href={WHATSAPP_URL_WITH_MESSAGE("Hola! M'agradaria informació")}
                   target="_blank" rel="noopener noreferrer"
                   className="bg-zinc-800 text-white font-semibold py-3.5 px-4 rounded-xl flex items-center justify-center active:scale-[0.98] transition-transform border border-zinc-700"
                 >

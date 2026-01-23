@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { log } from '@/lib/logger';
 
 export default function NewBlogPostPage() {
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function NewBlogPostPage() {
         });
       }
     } catch (error) {
-      console.error('Failed to create post:', error);
+      log.error('Failed to create post:', error);
       setFlashMessage({ type: 'error', text: 'Error al crear el post' });
     } finally {
       setLoading(false);

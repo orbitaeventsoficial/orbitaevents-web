@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { log } from '@/lib/logger';
 
 interface Stat {
   key: string;
@@ -32,7 +33,7 @@ export default function StatsPage() {
         setStats(data.stats);
       }
     } catch (error) {
-      console.error('Error loading stats:', error);
+      log.error('Error loading stats:', error);
     } finally {
       setLoading(false);
     }
@@ -58,7 +59,7 @@ export default function StatsPage() {
         setEditingStat(null);
       }
     } catch (error) {
-      console.error('Error saving stat:', error);
+      log.error('Error saving stat:', error);
     } finally {
       setSaving(false);
     }
@@ -80,7 +81,7 @@ export default function StatsPage() {
         await loadStats();
       }
     } catch (error) {
-      console.error('Error resetting stat:', error);
+      log.error('Error resetting stat:', error);
     } finally {
       setSaving(false);
     }

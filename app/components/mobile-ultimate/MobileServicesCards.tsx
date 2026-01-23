@@ -345,8 +345,8 @@ export default function MobileServicesCards() {
         <div className="flex-shrink-0 w-6" />
       </div>
 
-      {/* Pagination Dots */}
-      <div className="flex justify-center gap-2 mt-6">
+      {/* Pagination Dots - Touch targets min 44x44px per a11y */}
+      <div className="flex justify-center gap-0 mt-4">
         {SERVICES.map((_, index) => (
           <motion.button
             key={index}
@@ -361,13 +361,19 @@ export default function MobileServicesCards() {
                 });
               }
             }}
-            className={`h-2 rounded-full transition-all ${
-              index === activeIndex 
-                ? 'w-8 bg-amber-500' 
-                : 'w-2 bg-white/20'
-            }`}
+            className="p-3 flex items-center justify-center"
             whileTap={{ scale: 0.9 }}
-          />
+            aria-label={`Ir a servicio ${index + 1}`}
+            aria-current={index === activeIndex ? 'true' : undefined}
+          >
+            <span
+              className={`block h-2 rounded-full transition-all ${
+                index === activeIndex
+                  ? 'w-8 bg-amber-500'
+                  : 'w-2 bg-white/20'
+              }`}
+            />
+          </motion.button>
         ))}
       </div>
 

@@ -140,14 +140,26 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     }
 
     setHideHeaderOnMobileIntro(true);
-    const poll = window.setInterval(() => {
-      if (sessionStorage.getItem('orbita-mobile-intro-seen')) {
-        setHideHeaderOnMobileIntro(false);
-        window.clearInterval(poll);
-      }
-    }, 200);
 
-    return () => window.clearInterval(poll);
+    // Use storage event listener instead of polling for better performance
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'orbita-mobile-intro-seen' && e.newValue) {
+        setHideHeaderOnMobileIntro(false);
+      }
+    };
+
+    // Also listen for custom event from same window (storage events only fire cross-window)
+    const handleIntroComplete = () => {
+      setHideHeaderOnMobileIntro(false);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('orbita-mobile-intro-complete', handleIntroComplete);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('orbita-mobile-intro-complete', handleIntroComplete);
+    };
   }, [pathname]);
 
   // Handler per quan acaba la intro

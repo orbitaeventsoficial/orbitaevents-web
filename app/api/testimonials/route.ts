@@ -1,6 +1,7 @@
 // app/api/testimonials/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import { z } from 'zod';
 
 // Validation schema
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
       message: 'Testimonial submitted successfully',
     });
   } catch (error) {
-    console.error('Error submitting testimonial:', error);
+    log.error('Error submitting testimonial', error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -206,7 +207,7 @@ export async function GET(request: NextRequest) {
       hasMore: offset + limit < total,
     });
   } catch (error) {
-    console.error('Error fetching testimonials:', error);
+    log.error('Error fetching testimonials', error);
     return NextResponse.json(
       { error: 'Error fetching testimonials' },
       { status: 500 }

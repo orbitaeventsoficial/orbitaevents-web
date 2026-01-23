@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 
 // Solo tres puertas principales: Bodas / Fiestas / Empresas
 const SERVICE_KEYS = ['casaments', 'festes', 'empreses'] as const;
@@ -186,7 +187,7 @@ export default function ServicesGridElegant() {
             </div>
             <div className="flex gap-2">
               <a
-                href="https://wa.me/34699121023?text=Hola!%20Quiero%20informacion%20para%20mi%20evento."
+                href={WHATSAPP_URL_WITH_MESSAGE('Hola! Quiero informacion para mi evento.')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-4 py-2 bg-[#25D366] text-white text-xs font-semibold rounded-xl"

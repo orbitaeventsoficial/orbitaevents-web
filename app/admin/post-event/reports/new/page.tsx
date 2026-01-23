@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { log } from '@/lib/logger';
 
 export default function NewReportPage() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function NewReportPage() {
             setBooking(data.booking);
           }
         })
-        .catch(console.error);
+        .catch(err => log.error('Error loading booking', err));
     }
   }, [bookingId]);
 
@@ -57,7 +58,7 @@ export default function NewReportPage() {
         alert('Error creant informe');
       }
     } catch (error) {
-      console.error(error);
+      log.error('Error creating report', error);
       alert('Error creant informe');
     } finally {
       setLoading(false);

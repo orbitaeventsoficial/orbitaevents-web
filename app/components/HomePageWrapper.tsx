@@ -26,13 +26,19 @@ export default function HomePageWrapper({ children }: HomePageWrapperProps) {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
+    // Usar 768px para consistencia con Tailwind md: breakpoint
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+
+    const checkMobile = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsMobile(e.matches);
     };
 
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    // Initial check
+    checkMobile(mediaQuery);
+
+    // Listen for changes (más eficiente que resize)
+    mediaQuery.addEventListener('change', checkMobile);
+    return () => mediaQuery.removeEventListener('change', checkMobile);
   }, []);
 
   // SSR + Initial render: Muestra contenido desktop (mejor FCP)

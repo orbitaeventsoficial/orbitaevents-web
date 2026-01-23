@@ -603,7 +603,7 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
         onClose();
       }, 1200);
     } catch (error) {
-      console.error('Error enviant email:', error);
+      log.error('Error sending email', error);
       setError('Error enviant email');
     } finally {
       setSending(false);

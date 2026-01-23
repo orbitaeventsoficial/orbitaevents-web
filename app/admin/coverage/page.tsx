@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { log } from '@/lib/logger';
 
 interface CoverageArea {
   city: string;
@@ -39,7 +40,7 @@ export default function CoveragePage() {
         setAreas(data.areas);
       }
     } catch (error) {
-      console.error('Error loading areas:', error);
+      log.error('Error loading areas:', error);
     } finally {
       setLoading(false);
     }
@@ -66,7 +67,7 @@ export default function CoveragePage() {
         setNewCity('');
       }
     } catch (error) {
-      console.error('Error adding area:', error);
+      log.error('Error adding area:', error);
     } finally {
       setAdding(false);
     }
@@ -87,7 +88,7 @@ export default function CoveragePage() {
         setAreas(data.areas);
       }
     } catch (error) {
-      console.error('Error removing area:', error);
+      log.error('Error removing area:', error);
     }
   }
 
@@ -104,7 +105,7 @@ export default function CoveragePage() {
         setAreas(data.areas);
       }
     } catch (error) {
-      console.error('Error toggling area:', error);
+      log.error('Error toggling area:', error);
     }
   }
 

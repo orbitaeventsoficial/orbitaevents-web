@@ -23,6 +23,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
 import { useAvailability } from '@/hooks/usePublicData';
+import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // AVAILABILITY COUNTER
@@ -223,7 +224,7 @@ export default function MobileCTAUrgency() {
 
             {/* Secondary CTA */}
             <motion.a
-              href="https://wa.me/34699121023?text=Hola!%20Vull%20info%20sobre%20events%20temàtics"
+              href={WHATSAPP_URL_WITH_MESSAGE('Hola! Vull info sobre events temàtics')}
               whileTap={{ scale: 0.98 }}
               onTapStart={() => haptic('light')}
               className="flex items-center justify-center gap-3 py-4 px-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 font-semibold text-white"

@@ -22,9 +22,10 @@
  */
 
 import { useRef, useMemo } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
+import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PARTICLES BACKGROUND - ULTRA ENHANCED
@@ -51,12 +52,26 @@ function ParticlesBackground() {
         <motion.div
           key={p.id}
           className={`absolute rounded-full ${p.color}`}
+          initial={{
+            x: `${p.x}%`,
+            y: `${p.y}%`,
+            opacity: 0
+          }}
+          animate={reduceMotion ? { opacity: 0.35 } : {
+            x: [`${p.x}%`, `${p.x + p.xOffset}%`, `${p.x}%`],
+            y: [`${p.y}%`, `${p.y - 10}%`, `${p.y}%`],
+            opacity: [0.2, 0.5, 0.2],
+          }}
+          transition={reduceMotion ? { duration: 0 } : {
+            duration: p.duration,
+            repeat: Infinity,
+            delay: p.delay,
+            ease: 'easeInOut',
+          }}
           style={{
             width: p.size,
             height: p.size,
-            left: `${p.x}%`,
-            top: `${p.y}%`,
-            opacity: 0.35,
+            position: 'absolute',
           }}
         />
       ))}
@@ -232,7 +247,7 @@ function FloatingCTAs() {
 
       {/* Secondary CTA - WhatsApp ENHANCED */}
       <motion.a
-        href="https://wa.me/34699121023?text=Hola!%20Vull%20info%20sobre%20events%20temàtics"
+        href={WHATSAPP_URL_WITH_MESSAGE('Hola! Vull info sobre events temàtics')}
         whileTap={{ scale: 0.96 }}
         onTapStart={() => haptic('light')}
         className="relative group flex items-center justify-center gap-2.5 py-4 px-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-md rounded-2xl border-2 border-green-500/30 font-bold text-white text-sm shadow-xl overflow-hidden"

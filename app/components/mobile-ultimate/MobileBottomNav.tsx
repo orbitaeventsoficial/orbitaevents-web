@@ -23,6 +23,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
+import { WHATSAPP_NUMBER, WHATSAPP_URL } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ICONS
@@ -66,13 +67,13 @@ function FABMenu() {
     {
       icon: '📞',
       labelKey: 'fab.call',
-      href: 'tel:+34699121023',
+      href: `tel:+${WHATSAPP_NUMBER}`,
       color: 'from-green-500 to-emerald-500'
     },
     {
       icon: '💬',
       labelKey: 'fab.whatsapp',
-      href: 'https://wa.me/34699121023',
+      href: WHATSAPP_URL,
       color: 'from-green-400 to-green-600'
     },
     { 
