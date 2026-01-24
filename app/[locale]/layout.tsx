@@ -25,8 +25,6 @@ import '@/app/globals.css';
 // Components
 import LayoutWrapper from '@/app/components/layout/LayoutWrapper';
 import { PWAProvider } from '@/app/components/pwa/PWAProvider';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import { Analytics } from '@vercel/analytics/next';
 import { TawkToChat } from '@/components/chat/TawkToChat';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -415,8 +413,6 @@ export default async function LocaleLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://va.vercel-scripts.com" />
-        <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
 
         {/* Preload critical resources for LCP - Hero */}
         <link rel="preload" href="/img/hero-poster.webp" as="image" type="image/webp" fetchPriority="high" />
@@ -520,10 +516,6 @@ export default async function LocaleLayout({
             </LayoutWrapper>
           </PWAProvider>
         </NextIntlClientProvider>
-        
-        {/* Vercel Analytics */}
-        <SpeedInsights />
-        <Analytics />
 
         {/* Tawk.to Live Chat */}
         <TawkToChat
