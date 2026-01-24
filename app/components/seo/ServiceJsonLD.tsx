@@ -102,8 +102,10 @@ export default function ServiceJsonLD({
       },
       address: {
         '@type': 'PostalAddress',
-        addressLocality: 'Barcelona',
-        addressRegion: 'Catalunya',
+        streetAddress: 'Granollers',
+        addressLocality: 'Granollers',
+        addressRegion: 'Barcelona',
+        postalCode: '08400',
         addressCountry: 'ES',
       },
       openingHoursSpecification: [
