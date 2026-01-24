@@ -181,13 +181,10 @@ const JSON_LD_ORGANIZATION = {
     'https://www.instagram.com/orbitaevents',
     'https://www.tiktok.com/@orbitaevents',
   ],
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: String(SITE_CONFIG.stats.avgRating ?? 5),
-    ratingCount: String(SITE_CONFIG.stats.reviewCount ?? 1),
-    bestRating: '5',
-    worstRating: '1',
-  },
+  // NOTE: aggregateRating removed to fix Google Rich Results error
+  // "La ressenya té diverses puntuacions agregades" (multiple aggregate ratings)
+  // Google detects LocalBusiness schema multiple times due to RSC hydration
+  // Only add aggregateRating on a dedicated reviews page with linked reviews
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Servicios DJ y Eventos Barcelona',

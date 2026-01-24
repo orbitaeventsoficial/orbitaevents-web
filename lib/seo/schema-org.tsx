@@ -67,14 +67,8 @@ export const localBusinessSchema = {
       closes: '14:00',
     },
   ],
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '5.0',
-    bestRating: '5',
-    worstRating: '1',
-    ratingCount: '1',
-    reviewCount: '1',
-  },
+  // NOTE: aggregateRating removed to fix Google Rich Results error
+  // Only add aggregateRating on a dedicated reviews page with linked reviews
   sameAs: [
     'https://www.instagram.com/orbitaevents',
     'https://g.page/orbitaevents',
