@@ -76,7 +76,6 @@ export default async function DiscomovilPage({ params }: PageProps) {
         priceFrom={String(DISCO_MIN_PRICE)}
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
-        aggregateRating={{ ratingValue: 5.0, reviewCount: 203 }}
         offers={DISCO_PACKS.map((pack) => ({
           '@type': 'Offer',
           name: pack.name,

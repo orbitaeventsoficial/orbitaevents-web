@@ -97,10 +97,6 @@ export default async function AnimacionInfantilPage({ params }: PageProps) {
         priceFrom="150"
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
-        aggregateRating={{
-          ratingValue: 5.0,
-          reviewCount: 45,
-        }}
       />
 
       <AnimacionInfantilClient />

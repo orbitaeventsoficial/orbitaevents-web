@@ -100,10 +100,6 @@ export default async function EmpresasPage({ params }: PageProps) {
         priceFrom={String(EMP_MIN_PRICE)}
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
-        aggregateRating={{
-          ratingValue: 5.0,
-          reviewCount: 47,
-        }}
         offers={EMP_PACKS.map((pack) => ({
           '@type': 'Offer',
           name: pack.name,

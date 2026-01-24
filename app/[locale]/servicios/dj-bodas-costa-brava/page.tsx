@@ -80,7 +80,6 @@ export default async function DJBodasCostaBravaPage({ params }: PageProps) {
         areaServed={costaBravaTowns.slice(0, 8)}
         priceFrom={String(MIN_PRICE)}
         priceCurrency="EUR"
-        aggregateRating={{ ratingValue: 5.0, reviewCount: 12 }}
       />
       <ZoneLandingPage config={zoneConfig} />
       <FAQ items={faqItems} />

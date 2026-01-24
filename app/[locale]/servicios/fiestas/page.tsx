@@ -115,10 +115,6 @@ export default async function FiestasPage({ params }: PageProps) {
         priceFrom={String(FIESTAS_MIN_PRICE)}
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
-        aggregateRating={{
-          ratingValue: 5.0,
-          reviewCount: 167,
-        }}
         offers={FIESTAS_PACKS.map((pack) => ({
           '@type': 'Offer',
           price: String(pack.priceValue),

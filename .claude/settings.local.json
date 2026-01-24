@@ -245,7 +245,10 @@
       "Bash(ffmpeg:*)",
       "Bash(npm run generate:portfolio:*)",
       "Bash(npx depcheck:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(git diff:*)",
+      "Bash(railway logs:*)",
+      "Bash(railway redeploy:*)"
     ]
   }
 }
