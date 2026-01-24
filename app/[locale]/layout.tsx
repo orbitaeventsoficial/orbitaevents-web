@@ -428,15 +428,19 @@ export default async function LocaleLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
 
-        {/* JSON-LD Structured Data - Organization & LocalBusiness */}
+        {/* JSON-LD moved to body to prevent Next.js head duplication issue */}
+      </head>
+      <body
+        className="font-sans antialiased bg-[var(--bg-main)] text-white overflow-x-hidden"
+        suppressHydrationWarning
+      >
+        <GoogleTagManagerBody />
+
+        {/* JSON-LD Structured Data - In body to prevent Next.js head duplication */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_ORGANIZATION) }}
         />
-
-        {/* FAQPage Schema removed - individual pages use FAQ component which adds its own schema */}
-
-        {/* JSON-LD WebSite Schema with SearchAction */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
@@ -454,12 +458,6 @@ export default async function LocaleLayout({
             }
           }) }}
         />
-      </head>
-      <body
-        className="font-sans antialiased bg-[var(--bg-main)] text-white overflow-x-hidden"
-        suppressHydrationWarning
-      >
-        <GoogleTagManagerBody />
 
         {/* Skip Navigation - Accessibility (WCAG 2.1 AA - 2.4.1) */}
         <nav aria-label="Skip links" className="skip-links">
