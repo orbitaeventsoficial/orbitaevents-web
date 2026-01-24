@@ -2308,7 +2308,8 @@
           "text": "Producción técnica completa, branding integrado y efectos especiales para impactar a tus invitados."
         },
         "institutional": {
-          "title": "Eventos Institucionales"
+          "title": "Eventos Institucionales",
+          "text": "Actos oficiales, ceremonias y eventos formales con protocolo impecable y producción técnica de alto nivel."
         }
       },
       "valueTitle": "Profesionalismo que Refuerza tu Marca",
@@ -2334,7 +2335,8 @@
         "sound": "Sonido profesional Pioneer + EV (cobertura perfecta)",
         "lighting": "Iluminación LED corporativa sincronizada con branding",
         "mics": "Micrófonos inalámbricos para speakers/presentadores",
-        "screens": "Pantallas LED opcionales para proyección corporativa"
+        "screens": "Pantallas LED opcionales para proyección corporativa",
+        "setup": "Montaje y desmontaje profesional incluido"
       },
       "ambientTitle": "Ambiente Profesional",
       "ambientFeatures": {
