@@ -434,64 +434,7 @@ export default async function LocaleLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_ORGANIZATION) }}
         />
 
-        {/* JSON-LD FAQPage Schema - Google Rich Results */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: [
-              {
-                '@type': 'Question',
-                name: '¿Qué hace diferente a Òrbita de otros DJ/proveedores de eventos?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'Creamos experiencias completas personalizadas. No solo música: tematización + animación + música adaptada en tiempo real + juegos + efectos. Nuestro DJ lee el ambiente y ajusta sobre la marcha.'
-                }
-              },
-              {
-                '@type': 'Question',
-                name: '¿Cuánto cuesta contratar Òrbita para mi boda/fiesta/evento?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'Trabajamos con packs claros desde 250€. Los precios se calculan automáticamente según horas, equipo y tipo de evento en nuestro configurador.'
-                }
-              },
-              {
-                '@type': 'Question',
-                name: '¿Trabajáis fuera de Barcelona? ¿Cubrís Girona y Costa Brava?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'Sí, cubrimos Barcelona provincia y Girona provincia (incluyendo Costa Brava). Transporte GRATIS hasta 25km desde Granollers. Más allá, se añade según distancia.'
-                }
-              },
-              {
-                '@type': 'Question',
-                name: '¿Qué equipo de sonido e iluminación utilizáis?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'Utilizamos equipos profesionales Pioneer DJ, sistemas de sonido JBL/EV con potencia adaptada al espacio, y cabezas móviles LED con control DMX para efectos sincronizados.'
-                }
-              },
-              {
-                '@type': 'Question',
-                name: '¿Con cuánta antelación debo reservar?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'Recomendamos reservar con 2-3 meses de antelación para bodas y eventos grandes. Para fiestas privadas, 2-4 semanas suele ser suficiente. Las fechas populares (sábados de verano) se agotan rápido.'
-                }
-              },
-              {
-                '@type': 'Question',
-                name: '¿Puedo elegir la música de mi evento?',
-                acceptedAnswer: {
-                  '@type': 'Answer',
-                  text: 'Sí, te enviamos un formulario previo para conocer tus gustos y peticiones especiales. Durante el evento, nuestro DJ adapta la música en tiempo real según la respuesta del público.'
-                }
-              }
-            ]
-          }) }}
-        />
+        {/* FAQPage Schema removed - individual pages use FAQ component which adds its own schema */}
 
         {/* JSON-LD WebSite Schema with SearchAction */}
         <script
