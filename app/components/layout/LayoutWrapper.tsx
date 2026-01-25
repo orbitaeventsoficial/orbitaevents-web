@@ -137,6 +137,20 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   }, [pathname, removeOverlay]);
 
   useEffect(() => {
+    if (showIntro) {
+      document.body.style.overflow = 'hidden';
+      return;
+    }
+
+    const id = window.setTimeout(() => {
+      document.body.style.overflow = '';
+      document.body.classList.remove('hero-loading');
+    }, 0);
+
+    return () => window.clearTimeout(id);
+  }, [showIntro]);
+
+  useEffect(() => {
     const isHomePage = INTRO_PAGES.some(page => pathname === page);
     if (!isHomePage) {
       setHideHeaderOnMobileIntro(false);

@@ -44,12 +44,6 @@ export default function HeroPortalLogo({
     return () => window.removeEventListener('resize', checkMobile);
   }, [onFinish]);
 
-  // Bloquear scroll durante la animación
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
-  }, []);
-
   const clearTimers = useCallback(() => {
     timers.current.forEach(id => window.clearTimeout(id));
     timers.current = [];
