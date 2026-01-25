@@ -56,7 +56,7 @@ const nextConfig = {
           // En desarrollo, agregar 'unsafe-eval' para Next.js hot reload
           `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com`,
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com",
-          "img-src 'self' data: blob: https://orbitaevents.com https://*.supabase.co https://lh3.googleusercontent.com https://maps.googleapis.com https://www.googletagmanager.com https://www.google-analytics.com https://stats.g.doubleclick.net",
+          "img-src 'self' data: blob: https://orbitaevents.com https://*.supabase.co https://lh3.googleusercontent.com https://maps.googleapis.com https://*.googletagmanager.com https://*.google-analytics.com https://stats.g.doubleclick.net https://ssl.google-analytics.com",
           "font-src 'self' https://fonts.gstatic.com",
           "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://challenges.cloudflare.com",
           "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com wss://ws-us3.pusher.com https://challenges.cloudflare.com",
