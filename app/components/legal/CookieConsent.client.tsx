@@ -20,7 +20,13 @@ export default function CookieConsent() {
   });
 
   const triggerPageView = () => {
-    if (typeof window === 'undefined' || !window.gtag) return;
+    if (typeof window === 'undefined') return;
+    if (!window.gtag) {
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = (...args) => {
+        window.dataLayer?.push(args);
+      };
+    }
     window.gtag('event', 'page_view', {
       page_location: window.location.href,
       page_path: window.location.pathname,
@@ -48,14 +54,19 @@ export default function CookieConsent() {
       });
 
       if (typeof window !== 'undefined') {
-        if (window.gtag) {
-          window.gtag('consent', 'update', {
-            analytics_storage: parsed.analytics ? 'granted' : 'denied',
-            ad_storage: parsed.marketing ? 'granted' : 'denied',
-            ad_user_data: parsed.marketing ? 'granted' : 'denied',
-            ad_personalization: parsed.marketing ? 'granted' : 'denied',
-          });
+        if (!window.gtag) {
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = (...args) => {
+            window.dataLayer?.push(args);
+          };
         }
+
+        window.gtag('consent', 'update', {
+          analytics_storage: parsed.analytics ? 'granted' : 'denied',
+          ad_storage: parsed.marketing ? 'granted' : 'denied',
+          ad_user_data: parsed.marketing ? 'granted' : 'denied',
+          ad_personalization: parsed.marketing ? 'granted' : 'denied',
+        });
 
         if (parsed.analytics) {
           window.gtagConsentUpdate?.();
@@ -80,17 +91,21 @@ export default function CookieConsent() {
     setShowBanner(false);
 
     if (typeof window !== 'undefined') {
-      window.gtagConsentUpdate?.();
-
-      if (window.gtag) {
-        window.gtag('consent', 'update', {
-          analytics_storage: 'granted',
-          ad_storage: 'granted',
-          ad_user_data: 'granted',
-          ad_personalization: 'granted',
-        });
-        triggerPageView();
+      if (!window.gtag) {
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = (...args) => {
+          window.dataLayer?.push(args);
+        };
       }
+
+      window.gtagConsentUpdate?.();
+      window.gtag('consent', 'update', {
+        analytics_storage: 'granted',
+        ad_storage: 'granted',
+        ad_user_data: 'granted',
+        ad_personalization: 'granted',
+      });
+      triggerPageView();
     }
   };
 
@@ -104,7 +119,13 @@ export default function CookieConsent() {
     localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(consent));
     setShowBanner(false);
 
-    if (typeof window !== 'undefined' && window.gtag) {
+    if (typeof window !== 'undefined') {
+      if (!window.gtag) {
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = (...args) => {
+          window.dataLayer?.push(args);
+        };
+      }
       window.gtag('consent', 'update', {
         analytics_storage: 'denied',
         ad_storage: 'denied',
@@ -122,20 +143,25 @@ export default function CookieConsent() {
     setShowSettings(false);
 
     if (typeof window !== 'undefined') {
+      if (!window.gtag) {
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = (...args) => {
+          window.dataLayer?.push(args);
+        };
+      }
+
       // Dispara GA4 cuando aceptas analíticas
       if (preferences.analytics) {
         window.gtagConsentUpdate?.();
         triggerPageView();
       }
 
-      if (window.gtag) {
-        window.gtag('consent', 'update', {
-          analytics_storage: preferences.analytics ? 'granted' : 'denied',
-          ad_storage: preferences.marketing ? 'granted' : 'denied',
-          ad_user_data: preferences.marketing ? 'granted' : 'denied',
-          ad_personalization: preferences.marketing ? 'granted' : 'denied',
-        });
-      }
+      window.gtag('consent', 'update', {
+        analytics_storage: preferences.analytics ? 'granted' : 'denied',
+        ad_storage: preferences.marketing ? 'granted' : 'denied',
+        ad_user_data: preferences.marketing ? 'granted' : 'denied',
+        ad_personalization: preferences.marketing ? 'granted' : 'denied',
+      });
     }
   };
 
