@@ -61,3 +61,4 @@ test-results/
 *.html
 .env.railway
 .env.production
+secrets/
