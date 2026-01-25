@@ -32,6 +32,9 @@ type MetricRow = {
   label?: string;
 };
 
+const DEFAULT_TIMEOUT_MS = 6000;
+const DEFAULT_REVALIDATE_SECONDS = 120;
+
 function toNumber(value: unknown): number {
   if (typeof value === 'number') return value;
   const parsed = Number(value);
@@ -55,14 +58,23 @@ function buildUrl(baseUrl: string, path: string, params: Record<string, string |
 }
 
 async function fetchJson<T>(url: string, token: string): Promise<T | null> {
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-  });
-  if (!res.ok) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: controller.signal,
+      next: { revalidate: DEFAULT_REVALIDATE_SECONDS },
+    });
+    if (!res.ok) {
+      return null;
+    }
+    return res.json() as Promise<T>;
+  } catch {
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
-  return res.json() as Promise<T>;
 }
 
 export async function getUmamiReport(websiteId: string): Promise<UmamiReport | null> {

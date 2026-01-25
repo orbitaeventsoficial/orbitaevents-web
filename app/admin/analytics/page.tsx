@@ -156,13 +156,13 @@ export default async function AnalyticsPage() {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID || 'No configurat';
   const umamiDashboardUrl =
     process.env.NEXT_PUBLIC_UMAMI_DASHBOARD_URL || 'https://analytics.orbitaevents.com';
-  const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID || 'No configurat';
-  const umamiApiReady = Boolean(process.env.UMAMI_API_KEY) && umamiWebsiteId !== 'No configurat';
+  const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? '';
+  const umamiApiReady = Boolean(process.env.UMAMI_API_KEY) && Boolean(umamiWebsiteId);
   const yearGrowth = data.revenue.lastYear > 0
     ? ((data.revenue.thisYear - data.revenue.lastYear) / data.revenue.lastYear * 100).toFixed(1)
     : '100.0';
   const gtmReady = gtmId !== 'No configurat';
-  const umamiReady = umamiWebsiteId !== 'No configurat';
+  const umamiReady = Boolean(umamiWebsiteId);
   const umami = umamiApiReady ? await getUmamiReport(umamiWebsiteId) : null;
   const avgVisitMinutes = umami?.totals.totalTime
     ? Math.max(1, Math.round(umami.totals.totalTime / 60 / Math.max(umami.totals.visits, 1)))
@@ -425,7 +425,7 @@ export default async function AnalyticsPage() {
             </div>
             <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-[0_10px_22px_-18px_rgba(15,23,42,0.4)]">
               <p className="text-xs font-medium uppercase text-slate-500">Website ID</p>
-              <p className="mt-2 text-sm font-semibold text-slate-700">{umamiWebsiteId}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{umamiWebsiteId || 'No configurat'}</p>
             </div>
             <div className="flex flex-col justify-between rounded-xl border border-stone-200 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 p-4 text-white shadow-[0_18px_32px_-20px_rgba(15,23,42,0.8)]">
               <p className="text-xs uppercase text-slate-300">Estat</p>
@@ -435,6 +435,11 @@ export default async function AnalyticsPage() {
               </p>
             </div>
           </div>
+          {umamiApiReady && !umami && (
+            <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+              No hem pogut carregar Umami. Revisa el token o torna-ho a provar mes tard.
+            </div>
+          )}
           {umami && (
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-[0_10px_22px_-18px_rgba(15,23,42,0.4)]">
