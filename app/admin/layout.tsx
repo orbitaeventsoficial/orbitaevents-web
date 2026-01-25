@@ -98,9 +98,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     document.documentElement.classList.add('admin-mode');
     document.body.classList.add('admin-mode');
+    document.documentElement.classList.add('scroll-unlocked');
+    document.body.classList.add('scroll-unlocked');
     return () => {
       document.documentElement.classList.remove('admin-mode');
       document.body.classList.remove('admin-mode');
+      document.documentElement.classList.remove('scroll-unlocked');
+      document.body.classList.remove('scroll-unlocked');
     };
   }, []);
 
