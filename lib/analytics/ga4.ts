@@ -65,7 +65,7 @@ function createClient(config: Ga4Config): BetaAnalyticsDataClient {
   });
 }
 
-function toNumber(value?: string): number {
+function toNumber(value?: string | null): number {
   const parsed = Number(value || 0);
   return Number.isFinite(parsed) ? parsed : 0;
 }
