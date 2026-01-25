@@ -28,8 +28,42 @@ export default function CookieConsent() {
   };
 
   useEffect(() => {
-    const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
-    if (!consent) {
+    const stored = localStorage.getItem(COOKIE_CONSENT_KEY);
+    if (!stored) {
+      const timer = setTimeout(() => setShowBanner(true), 2000);
+      return () => clearTimeout(timer);
+    }
+
+    try {
+      const parsed = JSON.parse(stored) as {
+        necessary?: boolean;
+        analytics?: boolean;
+        marketing?: boolean;
+      };
+
+      setPreferences({
+        necessary: true,
+        analytics: Boolean(parsed.analytics),
+        marketing: Boolean(parsed.marketing),
+      });
+
+      if (typeof window !== 'undefined') {
+        if (window.gtag) {
+          window.gtag('consent', 'update', {
+            analytics_storage: parsed.analytics ? 'granted' : 'denied',
+            ad_storage: parsed.marketing ? 'granted' : 'denied',
+            ad_user_data: parsed.marketing ? 'granted' : 'denied',
+            ad_personalization: parsed.marketing ? 'granted' : 'denied',
+          });
+        }
+
+        if (parsed.analytics) {
+          window.gtagConsentUpdate?.();
+          triggerPageView();
+        }
+      }
+    } catch {
+      localStorage.removeItem(COOKIE_CONSENT_KEY);
       const timer = setTimeout(() => setShowBanner(true), 2000);
       return () => clearTimeout(timer);
     }
