@@ -2,6 +2,7 @@
 import { log } from '@/lib/logger';
 // Pàgina d'analytics i estadístiques
 import { prisma } from '@/lib/prisma';
+import { getGa4Report } from '@/lib/analytics/ga4';
 
 export const dynamic = 'force-dynamic';
 
@@ -152,6 +153,7 @@ const EVENT_TYPE_LABELS: Record<string, { label: string; icon: string }> = {
 
 export default async function AnalyticsPage() {
   const data = await getAnalyticsData();
+  const ga4 = await getGa4Report();
   const yearGrowth = data.revenue.lastYear > 0
     ? ((data.revenue.thisYear - data.revenue.lastYear) / data.revenue.lastYear * 100).toFixed(1)
     : '100.0';
@@ -311,8 +313,139 @@ export default async function AnalyticsPage() {
       {/* Nota */}
       <section className="rounded-xl border border-blue-200 bg-blue-50 p-4">
         <p className="text-sm text-blue-700">
-          💡 <strong>Consell:</strong> Connecta Google Analytics per obtenir mètriques més detallades del tràfic web i comportament dels usuaris.
+          💡 <strong>Consell:</strong> Google Analytics es mostra a continuació si la integració GA4 està activa.
         </p>
+      </section>
+
+      {/* GA4 Web Analytics */}
+      <section className="space-y-4">
+        <header className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-700">Web Analytics (GA4)</h2>
+            <p className="text-xs text-slate-500">Últims 30 dies</p>
+          </div>
+          {!ga4 && (
+            <span className="text-xs text-red-600">
+              GA4 no configurat (revisa GA4_PROPERTY_ID/CLIENT_EMAIL/PRIVATE_KEY)
+            </span>
+          )}
+        </header>
+
+        {ga4 && (
+          <>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+                <p className="text-xs font-medium text-slate-500 uppercase">Usuaris actius</p>
+                <p className="mt-2 text-3xl font-bold text-slate-700">{ga4.totals.activeUsers}</p>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+                <p className="text-xs font-medium text-slate-500 uppercase">Sessions</p>
+                <p className="mt-2 text-3xl font-bold text-slate-700">{ga4.totals.sessions}</p>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+                <p className="text-xs font-medium text-slate-500 uppercase">Page Views</p>
+                <p className="mt-2 text-3xl font-bold text-slate-700">{ga4.totals.pageViews}</p>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+                <p className="text-xs font-medium text-slate-500 uppercase">Events</p>
+                <p className="mt-2 text-3xl font-bold text-slate-700">{ga4.totals.eventCount}</p>
+              </div>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+                <div className="bg-slate-50 border-b border-stone-200 p-4">
+                  <h3 className="font-semibold text-slate-700">Pàgines top</h3>
+                </div>
+                <div className="p-4 space-y-3 text-sm">
+                  {ga4.pages.map((row) => (
+                    <div key={row.dimension} className="flex items-center justify-between">
+                      <span className="text-slate-700 truncate max-w-[70%]">{row.dimension}</span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+                <div className="bg-slate-50 border-b border-stone-200 p-4">
+                  <h3 className="font-semibold text-slate-700">Fonts (channel)</h3>
+                </div>
+                <div className="p-4 space-y-3 text-sm">
+                  {ga4.sources.map((row) => (
+                    <div key={row.dimension} className="flex items-center justify-between">
+                      <span className="text-slate-700">{row.dimension}</span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+                <div className="bg-slate-50 border-b border-stone-200 p-4">
+                  <h3 className="font-semibold text-slate-700">Events top</h3>
+                </div>
+                <div className="p-4 space-y-2 text-sm">
+                  {ga4.events.map((row) => (
+                    <div key={row.dimension} className="flex items-center justify-between">
+                      <span className="text-slate-700">{row.dimension}</span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+                <div className="bg-slate-50 border-b border-stone-200 p-4">
+                  <h3 className="font-semibold text-slate-700">Dispositius</h3>
+                </div>
+                <div className="p-4 space-y-2 text-sm">
+                  {ga4.devices.map((row) => (
+                    <div key={row.dimension} className="flex items-center justify-between">
+                      <span className="text-slate-700">{row.dimension}</span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+                <div className="bg-slate-50 border-b border-stone-200 p-4">
+                  <h3 className="font-semibold text-slate-700">Ubicació</h3>
+                </div>
+                <div className="p-4 space-y-2 text-sm">
+                  {ga4.locations.map((row) => (
+                    <div key={`${row.dimension}-${row.secondary}`} className="flex items-center justify-between">
+                      <span className="text-slate-700">
+                        {row.dimension}{row.secondary ? ` · ${row.secondary}` : ''}
+                      </span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+              <div className="bg-slate-50 border-b border-stone-200 p-4">
+                <h3 className="font-semibold text-slate-700">Temps real</h3>
+              </div>
+              <div className="p-4 text-sm text-slate-600">
+                <p className="mb-3">Usuaris actius ara mateix: <strong>{ga4.realtime.activeUsers}</strong></p>
+                <div className="space-y-2">
+                  {ga4.realtime.pages.map((row) => (
+                    <div key={row.dimension} className="flex items-center justify-between">
+                      <span className="text-slate-700">{row.dimension}</span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </section>
     </div>
   );

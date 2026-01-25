@@ -45,6 +45,11 @@ const serverSchema = z.object({
   OUTSCRAPER_API_KEY: z.string().optional(),
   DEEPL_API_KEY: z.string().optional(),
 
+  // GA4 Admin Analytics (Optional)
+  GA4_PROPERTY_ID: z.string().optional(),
+  GA4_CLIENT_EMAIL: z.string().optional(),
+  GA4_PRIVATE_KEY: z.string().optional(),
+
   // Node environment
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 });
