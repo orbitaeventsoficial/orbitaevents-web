@@ -59,7 +59,7 @@ const nextConfig = {
           "img-src 'self' data: blob: https://orbitaevents.com https://*.supabase.co https://lh3.googleusercontent.com https://maps.googleapis.com https://*.googletagmanager.com https://*.google-analytics.com https://stats.g.doubleclick.net https://ssl.google-analytics.com https://www.google.es",
           "font-src 'self' https://fonts.gstatic.com",
           "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://challenges.cloudflare.com",
-          "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://*.googletagmanager.com https://stats.g.doubleclick.net wss://ws-us3.pusher.com https://challenges.cloudflare.com",
+          "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com https://*.googletagmanager.com https://stats.g.doubleclick.net wss://ws-us3.pusher.com https://challenges.cloudflare.com",
           "worker-src 'self' blob:",
         ].join('; ')
       },
