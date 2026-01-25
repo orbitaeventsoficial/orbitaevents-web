@@ -8,6 +8,7 @@
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { trackPageView } from '@/app/lib/analytics';
 
 // Detectar bots para no mostrarles la intro (mejor métricas Lighthouse)
 function isBot(): boolean {
@@ -166,6 +167,19 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
     return () => window.clearTimeout(id);
   }, [showIntro]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = window.localStorage.getItem('orbita_cookie_consent');
+    if (!stored) return;
+    try {
+      const parsed = JSON.parse(stored) as { analytics?: boolean };
+      if (!parsed.analytics) return;
+      trackPageView(window.location.pathname, document.title);
+    } catch {
+      // Ignore malformed consent values.
+    }
+  }, [pathname]);
 
   useEffect(() => {
     const isHomePage = INTRO_PAGES.some(page => pathname === page);
