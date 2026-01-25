@@ -3693,12 +3693,13 @@
     "comingSoon": "Pròximament",
     "viewExperience": "Descobrir experiència",
     "notifyMe": "Avisar-me",
-    "cta": {
-      "title": "No trobes la teva temàtica?",
-      "subtitle": "Creem experiències personalitzades. Explica'ns la teva idea i la fem realitat.",
-      "custom": "Crear experiència personalitzada",
-      "note": "Resposta en menys de 2 hores · Pressupost sense compromís"
-    }
+      "cta": {
+        "badge": "Experiencia a mida",
+        "title": "No trobes la teva temàtica?",
+        "subtitle": "Creem experiències personalitzades. Explica'ns la teva idea i la fem realitat.",
+        "custom": "Crear experiència personalitzada",
+        "note": "Resposta en menys de 2 hores · Pressupost sense compromís"
+      }
   },
   "mobileExperience": {
     "hero": {
