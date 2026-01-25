@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 
 /**
  * 🎨 ADMIN LAYOUT - Òrbita Events
- * Amb estructura HTML completa per evitar errors d'hidratació
+ * Estil càlid i acollidor amb tons beige/taronja suau
  */
 
 function SidebarItem({
@@ -27,9 +27,9 @@ function SidebarItem({
 }) {
   const badgeStyles = {
     orange: 'bg-orange-100 text-orange-700',
-    blue: 'bg-blue-100 text-blue-700',
-    green: 'bg-green-100 text-green-700',
-    red: 'bg-red-100 text-red-700',
+    blue: 'bg-sky-100 text-sky-700',
+    green: 'bg-emerald-100 text-emerald-700',
+    red: 'bg-rose-100 text-rose-700',
   };
 
   return (
@@ -40,8 +40,8 @@ function SidebarItem({
         flex items-center gap-3 px-3 py-2.5 rounded-xl
         transition-all duration-200 group
         ${isActive
-          ? 'bg-orange-100 text-orange-700'
-          : 'text-slate-600 hover:text-slate-700 hover:bg-stone-100'
+          ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 shadow-sm'
+          : 'text-stone-600 hover:text-stone-800 hover:bg-amber-50/50'
         }
       `}
     >
@@ -215,38 +215,142 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href);
   }, [pathname]);
 
-  return (
-    <html lang="ca" suppressHydrationWarning>
-      <body className="bg-stone-100 text-slate-700" style={{ margin: 0 }} suppressHydrationWarning>
-        <div className="min-h-screen">
-          {/* Desktop Sidebar */}
-          <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-stone-200 flex-col z-40">
-            {/* Logo */}
-            <div className="p-4 border-b border-stone-200">
-              <Link href="/admin" className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20 p-1.5">
-                  <Image
-                    src="/img/logosoloplaneta.svg"
-                    alt="Òrbita"
-                    width={40}
-                    height={40}
-                    sizes="40px"
-                    quality={80}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div>
-                  <span className="text-slate-700 font-semibold">Òrbita</span>
-                  <span className="text-orange-500 font-semibold ml-1">Admin</span>
-                </div>
-              </Link>
-            </div>
+  // Obtenir nom de la pàgina actual per al breadcrumb
+  const getPageName = useCallback(() => {
+    if (!pathname) return 'Dashboard';
+    const segments = pathname.split('/').filter(Boolean);
+    if (segments.length <= 1) return 'Dashboard';
+    const page = segments[segments.length - 1];
+    const pageNames: Record<string, string> = {
+      leads: 'Leads',
+      bookings: 'Reserves',
+      packs: 'Packs',
+      analytics: 'Analytics',
+      emails: 'Emails',
+      inbox: 'Inbox',
+      calendario: 'Calendari',
+      settings: 'Configuració',
+      inventory: 'Inventari',
+      contactes: 'Clients',
+      mensajes: 'Missatges',
+      ressenyes: 'Ressenyes',
+      faq: 'FAQ',
+      pricing: 'Preus',
+      coverage: 'Cobertura',
+      features: 'Features',
+      theme: 'Tema',
+      stats: 'Estadístiques',
+      blog: 'Blog',
+      canvas: 'Canvas',
+      translations: 'Traduccions',
+      'text-manager': 'Textos PRO',
+      'post-event': 'Post-Event',
+      'google-reviews': 'Google Reviews',
+    };
+    return pageNames[page] || page.charAt(0).toUpperCase() + page.slice(1);
+  }, [pathname]);
 
-            {/* Nav */}
-            <nav className="flex-1 p-3 overflow-y-auto">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-amber-50/80 via-orange-50/30 to-stone-50">
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/95 backdrop-blur-sm border-r border-amber-100 flex-col z-40">
+        {/* Logo */}
+        <div className="p-4 border-b border-amber-100">
+          <Link href="/admin" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-300/30 p-1.5">
+              <Image
+                src="/img/logosoloplaneta.svg"
+                alt="Òrbita"
+                width={40}
+                height={40}
+                sizes="40px"
+                quality={80}
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div>
+              <span className="text-stone-700 font-semibold">Òrbita</span>
+              <span className="text-orange-500 font-semibold ml-1">Admin</span>
+            </div>
+          </Link>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 p-3 overflow-y-auto">
+          {navSections.map((section) => (
+            <div key={section.title} className="mb-6">
+              <p className="px-3 mb-2 text-[10px] font-semibold text-stone-400 uppercase tracking-wider">
+                {section.title}
+              </p>
+              <div className="space-y-1">
+                {section.items.map((item) => (
+                  <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        {/* Footer */}
+        <div className="p-3 border-t border-amber-100">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/50">
+            <p className="text-[10px] text-amber-600 uppercase tracking-wider">Sistema</p>
+            <p className="text-sm text-stone-700 font-medium mt-1">Òrbita Admin</p>
+            <p className="text-xs text-stone-500">v2.0 · Prisma + Supabase</p>
+          </div>
+        </div>
+      </aside>
+
+      {/* Mobile Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-xl border-b border-amber-100 z-50 px-4 flex items-center justify-between">
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          type="button"
+          aria-label="Obrir menú admin"
+          aria-expanded={sidebarOpen}
+          aria-controls="admin-mobile-sidebar"
+          className="p-2 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors"
+        >
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <span className="text-stone-700 font-semibold">
+          <span className="text-orange-500">Òrbita</span> Admin
+        </span>
+        <div className="w-10" />
+      </header>
+
+      {/* Mobile Sidebar Overlay */}
+      {mounted && sidebarOpen && (
+        <>
+          <div
+            className="lg:hidden fixed inset-0 bg-amber-900/20 backdrop-blur-sm z-40"
+            onClick={() => setSidebarOpen(false)}
+            role="presentation"
+          />
+          <aside
+            id="admin-mobile-sidebar"
+            aria-label="Menú admin"
+            className="lg:hidden fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-amber-100 z-50 overflow-y-auto"
+          >
+            <div className="p-4 border-b border-amber-100 flex items-center justify-between">
+              <span className="text-stone-700 font-semibold">
+                <span className="text-orange-500">Òrbita</span> Admin
+              </span>
+              <button
+                type="button"
+                aria-label="Tancar menú admin"
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 text-stone-400 hover:text-stone-700 hover:bg-amber-50 rounded-lg transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <nav className="p-3">
               {navSections.map((section) => (
                 <div key={section.title} className="mb-6">
-                  <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                  <p className="px-3 mb-2 text-[10px] font-semibold text-stone-400 uppercase tracking-wider">
                     {section.title}
                   </p>
                   <div className="space-y-1">
@@ -257,126 +361,45 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
               ))}
             </nav>
-
-            {/* Footer */}
-            <div className="p-3 border-t border-stone-200">
-              <div className="p-3 rounded-xl bg-orange-50 border border-orange-200">
-                <p className="text-[10px] text-orange-700 uppercase tracking-wider">Sistema</p>
-                <p className="text-sm text-slate-700 font-medium mt-1">Òrbita Admin</p>
-                <p className="text-xs text-slate-500">Prisma + Supabase</p>
-              </div>
-            </div>
           </aside>
+        </>
+      )}
 
-          {/* Mobile Header */}
-          <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-xl border-b border-stone-200 z-50 px-4 flex items-center justify-between">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              type="button"
-              aria-label="Obrir menú admin"
-              aria-expanded={sidebarOpen}
-              aria-controls="admin-mobile-sidebar"
-              className="p-2 text-slate-700 hover:bg-stone-100 rounded-lg"
-            >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <span className="text-slate-700 font-semibold">
-              <span className="text-orange-500">Òrbita</span> Admin
-            </span>
-            <div className="w-10" />
-          </header>
-
-          {/* Mobile Sidebar Overlay */}
-          {mounted && sidebarOpen && (
-            <>
-              <div
-                className="lg:hidden fixed inset-0 bg-stone-100/60 backdrop-blur-sm z-40"
-                onClick={() => setSidebarOpen(false)}
-                role="presentation"
-              />
-              <aside
-                id="admin-mobile-sidebar"
-                aria-label="Menú admin"
-                className="lg:hidden fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-stone-200 z-50 overflow-y-auto"
-              >
-                <div className="p-4 border-b border-stone-200 flex items-center justify-between">
-                  <span className="text-slate-700 font-semibold">
-                    <span className="text-orange-500">Òrbita</span> Admin
-                  </span>
-                  <button
-                    type="button"
-                    aria-label="Tancar menú admin"
-                    onClick={() => setSidebarOpen(false)}
-                    className="p-2 text-slate-500 hover:text-slate-700"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <nav className="p-3">
-                  {navSections.map((section) => (
-                    <div key={section.title} className="mb-6">
-                      <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-                        {section.title}
-                      </p>
-                      <div className="space-y-1">
-                        {section.items.map((item) => (
-                          <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </nav>
-              </aside>
-            </>
-          )}
-
-          {/* Desktop Header */}
-          <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-stone-200 px-6 items-center justify-between bg-white/90 backdrop-blur-xl z-30">
-            <div className="flex items-center gap-3 text-sm">
-              <span className="text-slate-500">Admin</span>
-              <span className="text-slate-300">/</span>
-              <span className="text-slate-700 font-medium">Dashboard</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔍</span>
-                <input
-                  type="search"
-                  placeholder="Buscar... (⌘K)"
-                  aria-label="Buscar"
-                  className="w-64 pl-9 pr-4 py-2 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 placeholder-stone-400 text-sm transition-all duration-200 hover:border-stone-200 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
-                />
-              </div>
-              <Link
-                href="/admin/settings/notifications"
-                className="relative p-2 text-slate-500 hover:text-slate-700 hover:bg-stone-100 rounded-xl transition-colors"
-                aria-label="Notificacions"
-              >
-                🔔
-                <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full" />
-              </Link>
-              <button
-                type="button"
-                className="flex items-center gap-3 px-3 py-1.5 hover:bg-stone-100 rounded-xl transition-colors"
-              >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-sm font-medium">
-                  A
-                </div>
-                <span className="text-slate-700 text-sm font-medium">Admin</span>
-              </button>
-            </div>
-          </header>
-
-          {/* Main Content */}
-          <main className="lg:pl-64 pt-16 min-h-screen">
-            <div className="p-4 lg:p-6">
-              {children}
-            </div>
-          </main>
+      {/* Desktop Header */}
+      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-amber-100 px-6 items-center justify-between bg-white/95 backdrop-blur-xl z-30">
+        <div className="flex items-center gap-3 text-sm">
+          <Link href="/admin" className="text-stone-400 hover:text-stone-600 transition-colors">Admin</Link>
+          <span className="text-stone-300">/</span>
+          <span className="text-stone-700 font-medium">{getPageName()}</span>
         </div>
-      </body>
-    </html>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/settings/notifications"
+            className="relative p-2.5 text-stone-500 hover:text-stone-700 hover:bg-amber-50 rounded-xl transition-colors"
+            aria-label="Notificacions"
+          >
+            🔔
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
+          </Link>
+          <div className="h-6 w-px bg-amber-200" />
+          <Link
+            href="/admin/settings"
+            className="flex items-center gap-3 px-3 py-1.5 hover:bg-amber-50 rounded-xl transition-colors"
+          >
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white text-sm font-medium shadow-sm">
+              A
+            </div>
+            <span className="text-stone-700 text-sm font-medium">Admin</span>
+          </Link>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="lg:pl-64 pt-16 min-h-screen">
+        <div className="p-4 lg:p-6">
+          {children}
+        </div>
+      </main>
+    </div>
   );
 }

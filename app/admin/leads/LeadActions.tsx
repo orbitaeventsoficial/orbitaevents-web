@@ -52,7 +52,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
             `Hola ${leadName}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`
           )}`}
           target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center rounded-md bg-green-500 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-green-600"
+          className="inline-flex items-center rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-600 transition-colors shadow-sm"
           title="Enviar WhatsApp"
         >
           💬 WA
@@ -60,7 +60,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
       )}
       <Link
         href={`/admin/leads/${leadId}`}
-        className="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-100"
+        className="inline-flex items-center rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-amber-100 border border-amber-200 transition-colors"
       >
         Veure
       </Link>
@@ -69,10 +69,10 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
         disabled={isDeleting || hasBooking}
         type="button"
         aria-busy={isDeleting}
-        className={`inline-flex items-center rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors
+        className={`inline-flex items-center rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors
           ${hasBooking
-            ? 'bg-stone-100 text-slate-400 cursor-not-allowed'
-            : 'bg-red-100 text-red-700 hover:bg-red-200'
+            ? 'bg-stone-100 text-stone-400 cursor-not-allowed border border-stone-200'
+            : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200'
           }`}
         title={hasBooking ? 'No es pot eliminar (té reserva)' : 'Eliminar lead'}
       >

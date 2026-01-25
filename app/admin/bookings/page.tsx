@@ -107,73 +107,73 @@ export default async function BookingsPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium text-slate-500 uppercase">Total</p>
-          <p className="mt-2 text-3xl font-bold text-slate-700">{bookings.length}</p>
-          <p className="text-xs text-slate-400">{formatCurrency(totalRevenue)}</p>
+        <div className="rounded-2xl border border-amber-100 bg-white p-5 shadow-sm">
+          <p className="text-xs font-medium text-stone-500 uppercase">Total</p>
+          <p className="mt-2 text-3xl font-bold text-stone-800">{bookings.length}</p>
+          <p className="text-xs text-stone-400">{formatCurrency(totalRevenue)}</p>
         </div>
-        <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 shadow-sm">
-          <p className="text-xs font-medium text-yellow-600 uppercase">Pendents</p>
-          <p className="mt-2 text-3xl font-bold text-yellow-700">
+        <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 shadow-sm">
+          <p className="text-xs font-medium text-amber-600 uppercase">Pendents</p>
+          <p className="mt-2 text-3xl font-bold text-amber-700">
             {statsMap.PENDING?.count || 0}
           </p>
-          <p className="text-xs text-yellow-600">{formatCurrency(statsMap.PENDING?.revenue || 0)}</p>
+          <p className="text-xs text-amber-500">{formatCurrency(statsMap.PENDING?.revenue || 0)}</p>
         </div>
-        <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm">
-          <p className="text-xs font-medium text-green-600 uppercase">Confirmades</p>
-          <p className="mt-2 text-3xl font-bold text-green-700">
+        <div className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 p-5 shadow-sm">
+          <p className="text-xs font-medium text-emerald-600 uppercase">Confirmades</p>
+          <p className="mt-2 text-3xl font-bold text-emerald-700">
             {statsMap.CONFIRMED?.count || 0}
           </p>
-          <p className="text-xs text-green-600">{formatCurrency(statsMap.CONFIRMED?.revenue || 0)}</p>
+          <p className="text-xs text-emerald-500">{formatCurrency(statsMap.CONFIRMED?.revenue || 0)}</p>
         </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
-          <p className="text-xs font-medium text-emerald-600 uppercase">Completades</p>
-          <p className="mt-2 text-3xl font-bold text-emerald-700">
+        <div className="rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 p-5 shadow-sm">
+          <p className="text-xs font-medium text-teal-600 uppercase">Completades</p>
+          <p className="mt-2 text-3xl font-bold text-teal-700">
             {statsMap.COMPLETED?.count || 0}
           </p>
-          <p className="text-xs text-emerald-600">{formatCurrency(statsMap.COMPLETED?.revenue || 0)}</p>
+          <p className="text-xs text-teal-500">{formatCurrency(statsMap.COMPLETED?.revenue || 0)}</p>
         </div>
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm">
-          <p className="text-xs font-medium text-red-600 uppercase">Cancel·lades</p>
-          <p className="mt-2 text-3xl font-bold text-red-700">
+        <div className="rounded-2xl border border-rose-200 bg-gradient-to-br from-rose-50 to-red-50 p-5 shadow-sm">
+          <p className="text-xs font-medium text-rose-600 uppercase">Cancel·lades</p>
+          <p className="mt-2 text-3xl font-bold text-rose-700">
             {statsMap.CANCELLED?.count || 0}
           </p>
         </div>
       </section>
 
       {/* Info Alert */}
-      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-        <p className="text-sm text-blue-800">
+      <div className="rounded-2xl border border-sky-200 bg-gradient-to-r from-sky-50 to-blue-50 p-4">
+        <p className="text-sm text-sky-800">
           <strong>Auto-increment:</strong> Quan una reserva passa a <span className="font-semibold">COMPLETED</span>,
           les estadístiques públiques (events + persones) s&apos;actualitzen automàticament.
         </p>
       </div>
 
       {/* Bookings Table */}
-      <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+      <section className="rounded-2xl border border-amber-100 bg-white shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 border-b border-stone-200">
+            <thead className="bg-gradient-to-r from-amber-50/50 to-transparent border-b border-amber-100">
               <tr>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Ref.</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Client</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Tipus</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Data Event</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Ubicació</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Pack</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Total</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Estat</th>
-                <th scope="col" className="px-4 py-3 text-right font-medium text-slate-600">Accions</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Ref.</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Client</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Tipus</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Data Event</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Ubicació</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Pack</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Total</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Estat</th>
+                <th scope="col" className="px-4 py-3 text-right font-medium text-stone-600">Accions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-amber-100">
               {bookings.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center text-slate-500">
+                  <td colSpan={9} className="px-4 py-12 text-center text-stone-500">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-4xl">📅</span>
                       <p>Encara no hi ha reserves</p>
-                      <p className="text-xs text-slate-400">Les reserves creades apareixeran aquí</p>
+                      <p className="text-xs text-stone-400">Les reserves creades apareixeran aquí</p>
                     </div>
                   </td>
                 </tr>
@@ -186,7 +186,7 @@ export default async function BookingsPage() {
                   return (
                     <tr
                       key={booking.id}
-                      className={`hover:bg-slate-50 transition-colors ${isPast && booking.status !== 'COMPLETED' ? 'bg-amber-50/50' : ''}`}
+                      className={`hover:bg-amber-50/50 transition-colors ${isPast && booking.status !== 'COMPLETED' ? 'bg-orange-50/30' : ''}`}
                     >
                       {/* Referència */}
                       <td className="px-4 py-3">

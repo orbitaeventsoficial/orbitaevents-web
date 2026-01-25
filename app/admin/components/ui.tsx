@@ -1,12 +1,12 @@
 /**
  * UI Components for Admin Dashboard
- * Minimal components required by admin/page.tsx
+ * Estil càlid i acollidor - Òrbita Events
  */
 
 import React from 'react';
 import Link from 'next/link';
 
-// MetricCard - Simple metric display card
+// MetricCard - Tarjeta de métrica con estilo cálido
 export function MetricCard({
   label,
   value,
@@ -21,19 +21,19 @@ export function MetricCard({
   icon?: string;
 }) {
   const changeColors = {
-    up: 'text-green-600',
-    down: 'text-red-600',
-    neutral: 'text-slate-600',
+    up: 'text-emerald-600',
+    down: 'text-rose-600',
+    neutral: 'text-stone-500',
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 border border-stone-200">
-      <div className="flex items-start justify-between mb-4">
+    <div className="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between mb-3">
         <div>
-          <p className="text-sm text-slate-500 font-medium">{label}</p>
-          <p className="text-3xl font-bold text-slate-900 mt-1">{value}</p>
+          <p className="text-sm text-stone-500 font-medium">{label}</p>
+          <p className="text-3xl font-bold text-stone-800 mt-1">{value}</p>
         </div>
-        {icon && <span className="text-3xl">{icon}</span>}
+        {icon && <span className="text-2xl opacity-80">{icon}</span>}
       </div>
       {change && (
         <p className={`text-xs font-medium ${changeColors[changeType || 'neutral']}`}>
@@ -44,7 +44,7 @@ export function MetricCard({
   );
 }
 
-// Card - Generic card container
+// Card - Contenedor genérico con estilo cálido
 export function Card({
   title,
   subtitle,
@@ -59,12 +59,12 @@ export function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-amber-100 overflow-hidden shadow-sm">
       {(title || subtitle || action) && (
-        <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-amber-100 flex items-center justify-between bg-gradient-to-r from-amber-50/50 to-transparent">
           <div>
-            {title && <h3 className="text-lg font-bold text-slate-900">{title}</h3>}
-            {subtitle && <p className="text-sm text-slate-600 mt-1">{subtitle}</p>}
+            {title && <h3 className="text-lg font-semibold text-stone-800">{title}</h3>}
+            {subtitle && <p className="text-sm text-stone-500 mt-0.5">{subtitle}</p>}
           </div>
           {action && <div>{action}</div>}
         </div>
@@ -74,26 +74,28 @@ export function Card({
   );
 }
 
-// Button - Simple button component
+// Button - Botón con estilo cálido
 export function Button({
   variant = 'primary',
   icon,
   label,
   href,
   onClick,
+  disabled,
 }: {
   variant?: 'primary' | 'secondary' | 'ghost';
   icon?: string;
   label: string;
   href?: string;
   onClick?: () => void;
+  disabled?: boolean;
 }) {
-  const baseClasses = 'inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors text-sm';
+  const baseClasses = 'inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantClasses = {
-    primary: 'bg-orange-500 text-white hover:bg-orange-600',
-    secondary: 'bg-stone-100 text-slate-700 hover:bg-stone-200',
-    ghost: 'bg-transparent text-slate-600 hover:bg-stone-100',
+    primary: 'bg-gradient-to-r from-orange-400 to-amber-500 text-white hover:from-orange-500 hover:to-amber-600 shadow-sm hover:shadow',
+    secondary: 'bg-amber-50 text-stone-700 hover:bg-amber-100 border border-amber-200',
+    ghost: 'bg-transparent text-stone-600 hover:bg-amber-50 hover:text-stone-800',
   };
 
   const className = `${baseClasses} ${variantClasses[variant]}`;
@@ -108,7 +110,7 @@ export function Button({
   }
 
   return (
-    <button type="button" onClick={onClick} className={className}>
+    <button type="button" onClick={onClick} disabled={disabled} className={className}>
       {icon && <span>{icon}</span>}
       {label}
     </button>

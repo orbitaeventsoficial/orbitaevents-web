@@ -34,7 +34,8 @@ export function verifyBasicAuth(req: NextRequest): AuthResult {
     }
 
     const decoded = Buffer.from(base64Credentials, 'base64').toString('utf8');
-    const [user, pass] = decoded.split(':');
+    const [user, ...passParts] = decoded.split(':');
+    const pass = passParts.join(':'); // Handle passwords containing ':'
 
     if (!ADMIN_USER || !ADMIN_PASS) {
       // No logging - evitar exposar info de configuració

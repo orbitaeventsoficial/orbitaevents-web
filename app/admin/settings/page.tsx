@@ -19,7 +19,7 @@ const CATEGORY_CONFIG: Record<string, { label: string; icon: string; description
   },
   company: {
     label: 'Empresa',
-    icon: '??',
+    icon: '🏢',
     description: 'Dades legals i nom comercial',
   },
   contact: {
@@ -38,9 +38,9 @@ const CATEGORY_CONFIG: Record<string, { label: string; icon: string; description
     description: 'Altres configuracions del sistema',
   },
   social: {
-    label: 'Social',
-    icon: '??',
-    description: 'Perfils socials',
+    label: 'Xarxes Socials',
+    icon: '📱',
+    description: 'Perfils socials i enllaços',
   },
 };
 
@@ -112,29 +112,29 @@ export default async function SettingsPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           href="/admin/packs"
-          className="rounded-xl border border-stone-200 bg-white p-6 hover:border-stone-200 hover:shadow-md transition-all"
+          className="rounded-xl border border-amber-100 bg-white p-6 hover:border-amber-200 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">📦</div>
-          <h3 className="font-semibold text-slate-700">Gestionar Packs</h3>
-          <p className="text-sm text-slate-500">Edita preus, traduccions i contingut dels packs</p>
+          <h3 className="font-semibold text-stone-700">Gestionar Packs</h3>
+          <p className="text-sm text-stone-500">Edita preus, traduccions i contingut dels packs</p>
         </Link>
 
         <Link
           href="/admin/text-manager"
-          className="rounded-xl border border-stone-200 bg-white p-6 hover:border-stone-200 hover:shadow-md transition-all"
+          className="rounded-xl border border-amber-100 bg-white p-6 hover:border-amber-200 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">🌐</div>
-          <h3 className="font-semibold text-slate-700">Traduccions</h3>
-          <p className="text-sm text-slate-500">Gestiona el contingut multiidioma</p>
+          <h3 className="font-semibold text-stone-700">Traduccions</h3>
+          <p className="text-sm text-stone-500">Gestiona el contingut multiidioma</p>
         </Link>
 
         <Link
-          href="/admin/faqs"
-          className="rounded-xl border border-stone-200 bg-white p-6 hover:border-stone-200 hover:shadow-md transition-all"
+          href="/admin/faq"
+          className="rounded-xl border border-amber-100 bg-white p-6 hover:border-amber-200 hover:shadow-md transition-all"
         >
           <div className="text-2xl mb-2">❓</div>
-          <h3 className="font-semibold text-slate-700">FAQs</h3>
-          <p className="text-sm text-slate-500">Edita les preguntes freqüents</p>
+          <h3 className="font-semibold text-stone-700">FAQs</h3>
+          <p className="text-sm text-stone-500">Edita les preguntes freqüents</p>
         </Link>
       </section>
     </div>

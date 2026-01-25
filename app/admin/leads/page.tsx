@@ -94,48 +94,48 @@ export default async function LeadsPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium text-slate-500 uppercase">Total Leads</p>
-          <p className="mt-2 text-3xl font-bold text-slate-700">{stats.total}</p>
+        <div className="rounded-2xl border border-amber-100 bg-white p-5 shadow-sm">
+          <p className="text-xs font-medium text-stone-500 uppercase">Total Leads</p>
+          <p className="mt-2 text-3xl font-bold text-stone-800">{stats.total}</p>
         </div>
-        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 shadow-sm">
-          <p className="text-xs font-medium text-blue-600 uppercase">Nous (per contactar)</p>
-          <p className="mt-2 text-3xl font-bold text-blue-700">{stats.nous}</p>
+        <div className="rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50 to-blue-50 p-5 shadow-sm">
+          <p className="text-xs font-medium text-sky-600 uppercase">Nous (per contactar)</p>
+          <p className="mt-2 text-3xl font-bold text-sky-700">{stats.nous}</p>
         </div>
-        <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 shadow-sm">
-          <p className="text-xs font-medium text-yellow-600 uppercase">En negociació</p>
-          <p className="mt-2 text-3xl font-bold text-yellow-700">{stats.enNegociacio}</p>
+        <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-5 shadow-sm">
+          <p className="text-xs font-medium text-amber-600 uppercase">En negociació</p>
+          <p className="mt-2 text-3xl font-bold text-amber-700">{stats.enNegociacio}</p>
         </div>
-        <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm">
-          <p className="text-xs font-medium text-green-600 uppercase">Convertits</p>
-          <p className="mt-2 text-3xl font-bold text-green-700">{stats.convertits}</p>
+        <div className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 p-5 shadow-sm">
+          <p className="text-xs font-medium text-emerald-600 uppercase">Convertits</p>
+          <p className="mt-2 text-3xl font-bold text-emerald-700">{stats.convertits}</p>
         </div>
       </section>
 
       {/* Leads Table */}
-      <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+      <section className="rounded-2xl border border-amber-100 bg-white shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 border-b border-stone-200">
+            <thead className="bg-gradient-to-r from-amber-50/50 to-transparent border-b border-amber-100">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Client</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Contacte</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Tipus Event</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Data Event</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Estat</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Prioritat</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-600">Creat</th>
-                <th className="px-4 py-3 text-right font-medium text-slate-600">Accions</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-600">Client</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-600">Contacte</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-600">Tipus Event</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-600">Data Event</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-600">Estat</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-600">Prioritat</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-600">Creat</th>
+                <th className="px-4 py-3 text-right font-medium text-stone-600">Accions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-amber-100">
               {leads.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-slate-500">
+                  <td colSpan={8} className="px-4 py-12 text-center text-stone-500">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-4xl">📭</span>
                       <p>Encara no hi ha leads</p>
-                      <p className="text-xs text-slate-400">Els contactes del formulari web apareixeran aquí</p>
+                      <p className="text-xs text-stone-400">Els contactes del formulari web apareixeran aquí</p>
                     </div>
                   </td>
                 </tr>
@@ -146,7 +146,7 @@ export default async function LeadsPage() {
                   const priorityColor = PRIORITY_COLORS[lead.priority] || PRIORITY_COLORS.MEDIUM;
 
                   return (
-                    <tr key={lead.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={lead.id} className="hover:bg-amber-50/50 transition-colors">
                       {/* Client */}
                       <td className="px-4 py-3">
                         <Link href={`/admin/leads/${lead.id}`} className="font-medium text-slate-700 hover:text-amber-600">
