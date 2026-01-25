@@ -3150,7 +3150,7 @@
         "title": "4. Data Recipients",
         "intro": "Your data may be communicated to:",
         "providers": "Service providers:",
-        "providersDetail": "Hosting (Vercel), Database (PostgreSQL), Transactional Email",
+        "providersDetail": "Hosting (Railway), Database (PostgreSQL), Transactional Email",
         "public": "Public administrations:",
         "publicDetail": "When legally required",
         "noSale": "We do not sell or transfer data to third parties for commercial purposes."

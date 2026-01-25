@@ -46,9 +46,9 @@ export async function GET(req: NextRequest) {
   
   if (!process.env.SMTP_HOST) {
     instructions.push(`
-🔧 CONFIGURAR EMAIL A VERCEL:
+🔧 CONFIGURAR EMAIL A RAILWAY:
     
-1. Ves a Vercel Dashboard → El teu projecte → Settings → Environment Variables
+1. Ves al panell de Railway → El teu servei → Variables
 2. Afegeix les següents variables:
 
    SMTP_HOST=smtp.dondominio.com
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
    SMTP_FROM=info@orbitaevents.com
    CONTACT_TO=info@orbitaevents.com
 
-3. Redesplega el projecte (o fes un commit buit)
+3. Redeploy del servei (o fes un commit buit)
     `);
   }
 
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: false,
         error: 'SMTP no configurat',
-        message: 'Falta configurar les variables SMTP_HOST, SMTP_USER i SMTP_PASS a Vercel',
+        message: 'Falta configurar les variables SMTP_HOST, SMTP_USER i SMTP_PASS a Railway',
         help: 'Fes GET a /api/admin/test-notifications per veure instruccions',
       }, { status: 400 });
     }

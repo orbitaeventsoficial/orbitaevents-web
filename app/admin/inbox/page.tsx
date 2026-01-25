@@ -106,7 +106,7 @@ export default async function InboxPage() {
             <div>
               <h3 className="font-semibold text-amber-800">Correu no configurat</h3>
               <p className="text-sm text-amber-700 mt-1">
-                Per veure emails reals del teu domini, configura les variables IMAP a Vercel:
+                Per veure emails reals del teu domini, configura les variables IMAP a Railway:
               </p>
               <code className="block mt-2 p-2 bg-amber-100 rounded text-xs text-amber-900">
                 IMAP_HOST, IMAP_PORT, IMAP_USER, IMAP_PASS

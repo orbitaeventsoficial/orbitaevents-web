@@ -10,7 +10,7 @@
     "postinstall": "prisma generate",
     "dev": "next dev",
     "sync:reviews": "node scripts/sync-reviews.mjs",
-    "build:assets": "node -e \"const {execSync}=require('child_process');const skip=process.env.SKIP_ASSET_SCRIPTS==='1'||process.env.VERCEL==='1'||process.env.CI==='true';if(skip){console.log('SKIP_ASSET_SCRIPTS=1 - skipping asset sync');process.exit(0);}execSync('npm run normalize:filenames && npm run rename:portfolio && npm run generate:portfolio && npm run sync:reviews',{stdio:'inherit'});\"",
+    "build:assets": "node -e \"const {execSync}=require('child_process');const skip=process.env.SKIP_ASSET_SCRIPTS==='1'||process.env.RAILWAY_ENVIRONMENT||process.env.CI==='true';if(skip){console.log('SKIP_ASSET_SCRIPTS=1 - skipping asset sync');process.exit(0);}execSync('npm run normalize:filenames && npm run rename:portfolio && npm run generate:portfolio && npm run sync:reviews',{stdio:'inherit'});\"",
     "build": "npm run build:assets && next build",
     "start": "next start",
     "lint": "next lint",
@@ -44,9 +44,7 @@
     "@react-email/components": "1.0.1",
     "@react-email/render": "2.0.0",
     "@sendgrid/mail": "^8.1.0",
-    "@sentry/nextjs": "^10.32.1",
     "@supabase/supabase-js": "^2.86.0",
-    "@vercel/og": "^0.8.5",
     "autoprefixer": "10.4.19",
     "botid": "^1.5.10",
     "class-variance-authority": "^0.7.0",
@@ -78,7 +76,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.57.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",

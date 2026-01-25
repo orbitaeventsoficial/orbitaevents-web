@@ -84,8 +84,18 @@ export const trackEvent = ({
       value: value,
       ...additionalParams,
     });
+    return;
   }
 
+  if (window.dataLayer) {
+    window.dataLayer.push({
+      event: eventName,
+      event_category: eventCategory,
+      event_label: eventLabel,
+      value: value,
+      ...additionalParams,
+    });
+  }
 };
 
 /**
@@ -273,10 +283,21 @@ export const trackCTAClick = (ctaLabel: string, ctaLocation: string): void => {
 export const trackPageView = (pagePath: string, pageTitle: string): void => {
   if (!isClientSide() || !isProduction()) return;
 
-  window.gtag?.('event', 'page_view', {
-    page_path: pagePath,
-    page_title: pageTitle,
-  });
+  if (window.gtag) {
+    window.gtag('event', 'page_view', {
+      page_path: pagePath,
+      page_title: pageTitle,
+    });
+    return;
+  }
+
+  if (window.dataLayer) {
+    window.dataLayer.push({
+      event: 'page_view',
+      page_path: pagePath,
+      page_title: pageTitle,
+    });
+  }
 };
 
 /**

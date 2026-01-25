@@ -4,7 +4,7 @@
  *
  * Generació d'imatges de testimonis per compartir a xarxes socials
  *
- * Utilitza @vercel/og per generar imatges a Vercel Edge Runtime
+ * Utilitza next/og per generar imatges a Next.js Edge Runtime
  * Compatible amb Instagram stories (1080x1920) i posts (1080x1080)
  */
 
@@ -70,7 +70,7 @@ export const CANVAS_PRESETS = {
 
 /**
  * Genera l'HTML per al canvas de testimoni
- * Aquest HTML s'utilitzarà amb @vercel/og per generar la imatge
+ * Aquest HTML s'utilitzarà amb next/og per generar la imatge
  */
 export function generateTestimonialCanvasHTML(
   data: TestimonialCanvasData,

@@ -1,22 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
-import * as Sentry from '@sentry/nextjs';
-
 interface AdminErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
 }
 
 export default function AdminError({ error, reset }: AdminErrorProps) {
-  useEffect(() => {
-    // Log error to Sentry
-    Sentry.captureException(error, {
-      tags: { section: 'admin' },
-      extra: { digest: error.digest },
-    });
-  }, [error]);
-
   return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-xl p-8 text-center">

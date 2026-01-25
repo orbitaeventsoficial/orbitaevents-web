@@ -89,35 +89,34 @@ NEXT_PUBLIC_META_PIXEL_ID=1234567890123456
 
 ---
 
-## 5️⃣ CONFIGURAR EN VERCEL (Producción) - 2 minutos
+## 5️⃣ CONFIGURAR EN RAILWAY (Producción) - 2 minutos
 
-1. **Abre**: https://vercel.com/orbitaeventsoficial/orbitaevents-web/settings/environment-variables
-   *(o busca tu proyecto en Vercel → Settings → Environment Variables)*
+1. **Abre**: https://railway.app
+   *(tu proyecto → servicio web → Variables)*
 
 2. **Añade CADA variable**:
 
    **Variable 1:**
    - Key: `NEXT_PUBLIC_GTM_ID`
    - Value: `GTM-XXXXXXX` (tu ID)
-   - Environments: ✅ Production, ✅ Preview, ✅ Development
 
    **Variable 2:**
    - Key: `NEXT_PUBLIC_GA_MEASUREMENT_ID`
    - Value: `G-XXXXXXXXXX` (tu ID)
-   - Environments: ✅ Production, ✅ Preview, ✅ Development
 
    **Variable 3 (opcional):**
    - Key: `NEXT_PUBLIC_META_PIXEL_ID`
    - Value: `1234567890123456` (tu ID)
-   - Environments: ✅ Production, ✅ Preview, ✅ Development
 
-3. **Clic en** "Save" en cada una
-
-4. **Redeploy**: Deployments → Clic en los 3 puntos del último deploy → "Redeploy"
+3. **Redeploy** el servicio
 
 ---
 
 ## 6️⃣ CONFIGURAR TAGS EN GTM - 5 minutos *(Importante!)*
+
+> ⚠️ **Nota**: La web ya carga GA4 directamente cuando `NEXT_PUBLIC_GA_MEASUREMENT_ID` está definido.  
+> Si usas GTM para GA4 también, tendrás **doble conteo**.  
+> Opción recomendada: **deja GA4 directo** y usa GTM solo para Ads/Meta.
 
 Vuelve a Google Tag Manager y añade estos tags:
 

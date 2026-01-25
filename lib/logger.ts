@@ -59,31 +59,7 @@ function createLogEntry(
 const logStore: LogEntry[] = [];
 const MAX_LOGS = 100;
 
-// Send to external monitoring services
-async function sendToExternalService(entry: LogEntry): Promise<void> {
-  // Send to Sentry if configured
-  if (process.env.NEXT_PUBLIC_SENTRY_DSN && typeof window !== 'undefined') {
-    try {
-      const Sentry = await import('@sentry/nextjs');
-
-      if (entry.error) {
-        Sentry.captureException(new Error(entry.error.message), {
-          extra: entry.context,
-          level: entry.level as 'error' | 'warning' | 'info' | 'debug',
-        });
-      } else if (entry.level === 'error' || entry.level === 'warn') {
-        // Only send errors and warnings to Sentry, not info/debug
-        Sentry.captureMessage(entry.message, {
-          level: entry.level === 'warn' ? 'warning' : 'error',
-          extra: entry.context,
-        });
-      }
-    } catch {
-      // Silently fail if Sentry not available
-    }
-  }
-
-  // Almacenar en memoria para debugging
+function storeLog(entry: LogEntry): void {
   logStore.push(entry);
   if (logStore.length > MAX_LOGS) logStore.shift();
 }
@@ -113,12 +89,7 @@ export const log = {
     // Siempre mostrar en consola
     console.error(formatForConsole(entry), options?.context || '', err || '');
 
-    // En producción, enviar a servicio externo
-    if (process.env.NODE_ENV === 'production') {
-      sendToExternalService(entry).catch(() => {
-        // Silenciar error del logger
-      });
-    }
+    storeLog(entry);
   },
 
   /**
@@ -129,9 +100,7 @@ export const log = {
     const entry = createLogEntry('warn', message, undefined, context);
     console.warn(formatForConsole(entry), context || '');
 
-    if (process.env.NODE_ENV === 'production') {
-      sendToExternalService(entry).catch(() => {});
-    }
+    storeLog(entry);
   },
 
   /**
@@ -141,6 +110,7 @@ export const log = {
   info: (message: string, context?: Record<string, unknown>): void => {
     const entry = createLogEntry('info', message, undefined, context);
     console.info(formatForConsole(entry), context || '');
+    storeLog(entry);
   },
 
   /**

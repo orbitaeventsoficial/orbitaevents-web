@@ -54,12 +54,12 @@ const nextConfig = {
           "object-src 'none'",
           "frame-ancestors 'none'",
           // En desarrollo, agregar 'unsafe-eval' para Next.js hot reload
-          `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://*.sentry.io https://challenges.cloudflare.com`,
+          `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com`,
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com",
           "img-src 'self' data: blob: https://orbitaevents.com https://*.supabase.co https://lh3.googleusercontent.com https://maps.googleapis.com",
           "font-src 'self' https://fonts.gstatic.com",
           "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://challenges.cloudflare.com",
-          "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com wss://ws-us3.pusher.com https://*.sentry.io https://*.ingest.sentry.io https://challenges.cloudflare.com",
+          "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com wss://ws-us3.pusher.com https://challenges.cloudflare.com",
           "worker-src 'self' blob:",
         ].join('; ')
       },
@@ -120,45 +120,7 @@ try {
   withNextIntl = (config) => config;
 }
 
-// Importar Sentry
-const { withSentryConfig } = await import('@sentry/nextjs');
-
-// Aplicar plugins en orden: next-intl → Sentry
+// Aplicar plugins en orden: next-intl
 const configWithIntl = withNextIntl(nextConfig);
 
-export default withSentryConfig(configWithIntl, {
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options
-
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  dryRun: !process.env.SENTRY_AUTH_TOKEN,
-
-  // Only print logs for uploading source maps in CI
-  silent: !process.env.CI,
-
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-
-  // Upload a larger set of source maps for prettier stack traces (increases build time)
-  widenClientFileUpload: true,
-
-  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-  // This can increase your server load as well as your hosting bill.
-  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-  // side errors will fail.
-  tunnelRoute: "/monitoring",
-
-  // Hides source maps from generated client bundles
-  hideSourceMaps: true,
-
-  webpack: {
-    treeshake: {
-      removeDebugLogging: true,
-    },
-    reactComponentAnnotation: {
-      enabled: true,
-    },
-  },
-});
+export default configWithIntl;

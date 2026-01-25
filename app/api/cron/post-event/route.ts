@@ -1,6 +1,6 @@
 // app/api/cron/post-event/route.ts
 // CRON JOB: Envia emails post-event automaticos
-// Ejecutar diariamente via Vercel Cron o similar
+// Ejecutar diariamente via Railway Cron o similar
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { log } from '@/lib/logger';
@@ -11,7 +11,7 @@ import { SITE_CONFIG } from '@/config/site-config';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
-// Verificar autorizacion (Vercel Cron envia CRON_SECRET)
+// Verificar autorizacion (el cron envia CRON_SECRET)
 function isAuthorized(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;

@@ -184,8 +184,8 @@ export const SITE_CONFIG = {
   // ============================================
   tracking: {
     googleAnalytics: {
-      id: process.env.NEXT_PUBLIC_GA_ID || '',
-      enabled: !!process.env.NEXT_PUBLIC_GA_ID,
+      id: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || process.env.NEXT_PUBLIC_GA_ID || '',
+      enabled: !!(process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || process.env.NEXT_PUBLIC_GA_ID),
     },
     googleAds: {
       id: process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || '',

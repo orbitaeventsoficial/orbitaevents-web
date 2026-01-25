@@ -34,7 +34,11 @@ export async function GET() {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: Math.floor((Date.now() - serverStartTime) / 1000),
-    version: exposeDetails ? process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'local' : undefined,
+    version: exposeDetails
+      ? process.env.RAILWAY_GIT_COMMIT_SHA?.slice(0, 7) ||
+        process.env.GIT_COMMIT_SHA?.slice(0, 7) ||
+        'local'
+      : undefined,
     environment: exposeDetails ? process.env.NODE_ENV || 'development' : undefined,
     checks: {
       server: { status: 'pass', message: 'Server responding' },

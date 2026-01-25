@@ -24,14 +24,23 @@ try {
 }
 
 // Verificar Google Analytics
-const gaMatch = envContent.match(/NEXT_PUBLIC_GA_ID=(.+)/);
+const gaMatch = envContent.match(/NEXT_PUBLIC_GA_MEASUREMENT_ID=(.+)/);
 const gaId = gaMatch ? gaMatch[1].trim() : '';
+const gtmMatch = envContent.match(/NEXT_PUBLIC_GTM_ID=(.+)/);
+const gtmId = gtmMatch ? gtmMatch[1].trim() : '';
 
 if (gaId && gaId.startsWith('G-')) {
   console.log('✅ Google Analytics configurat:', gaId);
 } else {
   console.log('❌ Google Analytics NO configurat');
-  console.log('   Afegeix: NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX');
+  console.log('   Afegeix: NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX');
+}
+
+if (gtmId && gtmId.startsWith('GTM-')) {
+  console.log('✅ Google Tag Manager configurat:', gtmId);
+} else {
+  console.log('⚠️  Google Tag Manager no trobat');
+  console.log('   Afegeix: NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX');
 }
 
 // Verificar events de tracking al codi
@@ -65,14 +74,14 @@ console.log('\n═════════════════════�
 if (gaId && gaId.startsWith('G-')) {
   console.log('🎉 TRACKING ACTIVAT! Google Ads pot començar a funcionar.\n');
   console.log('SEGÜENTS PASSOS:');
-  console.log('1. Afegir les mateixes variables a Vercel');
+  console.log('1. Afegir les mateixes variables a Railway');
   console.log('2. Fer redeploy');
   console.log('3. Configurar conversions a Google Ads');
 } else {
   console.log('⚠️  TRACKING NO ACTIU - Google Ads NO funcionarà\n');
   console.log('SEGÜENTS PASSOS:');
   console.log('1. Obtenir Google Analytics ID: https://analytics.google.com');
-  console.log('2. Afegir a .env.local: NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX');
+  console.log('2. Afegir a .env.local: NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX');
   console.log('3. Tornar a executar aquest script');
 }
 

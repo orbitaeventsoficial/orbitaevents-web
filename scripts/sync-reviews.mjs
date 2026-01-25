@@ -221,11 +221,11 @@ async function main() {
     console.log('');
     console.log('1. SerpAPI (100 gratis/mes):');
     console.log('   https://serpapi.com');
-    console.log('   Anade SERPAPI_KEY a Vercel');
+    console.log('   Anade SERPAPI_KEY a Railway');
     console.log('');
     console.log('2. Outscraper (25 gratis/mes):');
     console.log('   https://outscraper.com');
-    console.log('   Anade OUTSCRAPER_KEY a Vercel');
+    console.log('   Anade OUTSCRAPER_KEY a Railway');
     console.log('');
 
     data = {

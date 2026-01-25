@@ -3150,7 +3150,7 @@
         "title": "4. Destinatarios de los Datos",
         "intro": "Tus datos pueden ser comunicados a:",
         "providers": "Proveedores de servicios:",
-        "providersDetail": "Hosting (Vercel), Base de datos (PostgreSQL), Email transaccional",
+        "providersDetail": "Hosting (Railway), Base de datos (PostgreSQL), Email transaccional",
         "public": "Administraciones públicas:",
         "publicDetail": "Cuando sea legalmente obligatorio",
         "noSale": "No vendemos ni cedemos datos a terceros con finalidades comerciales."

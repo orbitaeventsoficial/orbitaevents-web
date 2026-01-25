@@ -36,10 +36,6 @@ const serverSchema = z.object({
   KV_REST_API_URL: z.string().url().optional(),
   KV_REST_API_TOKEN: z.string().optional(),
 
-  // Sentry (Optional)
-  SENTRY_ORG: z.string().optional(),
-  SENTRY_PROJECT: z.string().optional(),
-  SENTRY_AUTH_TOKEN: z.string().optional(),
 
   // Cron (Optional)
   CRON_SECRET: z.string().optional(),
@@ -63,7 +59,6 @@ const clientSchema = z.object({
   NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string().optional(),
   NEXT_PUBLIC_GOOGLE_PLACE_ID: z.string().optional(),
   NEXT_PUBLIC_FB_PIXEL_ID: z.string().optional(),
-  NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
   NEXT_PUBLIC_TAWK_ENABLED: z.string().optional(),
   NEXT_PUBLIC_TAWK_PROPERTY_ID: z.string().optional(),
   NEXT_PUBLIC_TAWK_WIDGET_ID: z.string().optional(),

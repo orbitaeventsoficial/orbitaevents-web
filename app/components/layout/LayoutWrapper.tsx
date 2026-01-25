@@ -90,12 +90,26 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         overlay.style.display = 'none';
       }, 400);
     }
+    document.body.classList.remove('hero-loading');
+    document.body.style.overflow = '';
     document.body.classList.add('intro-done');
   }, []);
 
   // Evitar hydration mismatch + gestionar intro
   useEffect(() => {
     setIsMounted(true);
+    const failsafeId = window.setTimeout(() => {
+      const overlay = document.getElementById('intro-overlay');
+      if (overlay && overlay.style.display !== 'none') {
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+        }, 400);
+      }
+      document.body.classList.remove('hero-loading');
+      document.body.style.overflow = '';
+      document.body.classList.add('intro-done');
+    }, 6000);
 
     const isHomePage = INTRO_PAGES.some(page => pathname === page);
     const hasSeenIntro = sessionStorage.getItem('orbita-intro-seen');
@@ -107,6 +121,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       setShowIntro(false);
       sessionStorage.setItem('orbita-intro-seen', 'true');
       removeOverlay();
+      window.clearTimeout(failsafeId);
       return;
     }
 
@@ -117,6 +132,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     } else {
       // No mostrar intro - treure overlay immediatament
       removeOverlay();
+      window.clearTimeout(failsafeId);
     }
   }, [pathname, removeOverlay]);
 

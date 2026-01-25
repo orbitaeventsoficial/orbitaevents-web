@@ -143,11 +143,11 @@ Archivos renombrados: [32m0[0m
 
    1. SerpAPI (100 gratis/mes):
       → https://serpapi.com
-      → Afegeix SERPAPI_KEY a Vercel
+      → Afegeix SERPAPI_KEY a Railway
 
    2. Outscraper (25 gratis/mes):
       → https://outscraper.com
-      → Afegeix OUTSCRAPER_KEY a Vercel
+      → Afegeix OUTSCRAPER_KEY a Railway
 
 
 💾 Guardat a public/data/google-reviews.json
@@ -403,4 +403,3 @@ Route (app)                                   Size     First Load JS
 ○  (Static)   prerendered as static content
 ●  (SSG)      prerendered as static HTML (uses getStaticProps)
 ƒ  (Dynamic)  server-rendered on demand
-

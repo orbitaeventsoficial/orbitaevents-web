@@ -2,10 +2,10 @@
  * API ROUTE: Canvas Generator
  * Genera imatges de testimonis per compartir a xarxes socials
  *
- * Utilitza @vercel/og (Vercel OG Image Generation)
+ * Utilitza next/og (Next.js OG Image Generation)
  */
 
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import { CANVAS_PRESETS, translateEventType } from '@/lib/services/canvasService';
 import { getInitials, getFirstName } from '@/lib/utils/normalize';

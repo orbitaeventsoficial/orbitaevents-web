@@ -2,7 +2,7 @@
  * CLIENT GMAIL API - Connexió amb Gmail via API REST
  * ===================================================
  * Llegeix emails reals del servidor Gmail usant OAuth2
- * Compatible amb Vercel Serverless (no usa connexions TCP persistents)
+ * Compatible amb entorns serverless (no usa connexions TCP persistents)
  */
 
 import { prisma } from '@/lib/prisma';

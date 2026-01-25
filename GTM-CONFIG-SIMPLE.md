@@ -11,6 +11,9 @@ Les teves dades ja estan guardades:
 
 ## Pas 1: Afegir Google Analytics a GTM
 
+> ⚠️ Si `NEXT_PUBLIC_GA_MEASUREMENT_ID` està definit, la web ja envia GA4 directament.  
+> Evita crear aquest tag per no duplicar conversions.
+
 1. **Obre**: https://tagmanager.google.com/
 2. **Selecciona**: Contenedor `GTM-T4MXCGQM`
 3. **Clic a**: "Etiquetes" (menú esquerra) → Botó "Noves"

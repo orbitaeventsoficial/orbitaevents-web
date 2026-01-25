@@ -196,7 +196,7 @@ export default function GoogleReviewsAdminPage() {
       <div className="mt-8 bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
         <h3 className="font-semibold text-blue-400 mb-2">ℹ️ Información</h3>
         <ul className="text-sm text-white/70 space-y-1">
-          <li>• Las reseñas se sincronizan automáticamente durante el build de Vercel</li>
+          <li>• Las reseñas se sincronizan automáticamente durante el build de Railway</li>
           <li>• Solo se muestran reseñas de 5 estrellas en la web</li>
           <li>• La sincronización usa SerpAPI configurado en las variables de entorno</li>
           <li>• No es posible editar ni eliminar reseñas (son de Google Business)</li>

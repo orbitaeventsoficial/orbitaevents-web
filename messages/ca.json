@@ -2983,7 +2983,7 @@
           "title": "4. Destinataris de les Dades",
           "intro": "Les teves dades poden ser comunicades a:",
           "providers": "Proveïdors de serveis:",
-          "providersDetail": "Hosting (Vercel), Base de dades (PostgreSQL), Email transaccional",
+          "providersDetail": "Hosting (Railway), Base de dades (PostgreSQL), Email transaccional",
           "public": "Administracions públiques:",
           "publicDetail": "Quan sigui legalment obligatori",
           "noSale": "No venem ni cedim dades a tercers amb finalitats comercials."
@@ -4424,7 +4424,7 @@
         "title": "4. Destinataris de les Dades",
         "intro": "Les teves dades poden ser comunicades a:",
         "providers": "Proveïdors de serveis:",
-        "providersDetail": "Hosting (Vercel), Base de dades (PostgreSQL), Email transaccional",
+        "providersDetail": "Hosting (Railway), Base de dades (PostgreSQL), Email transaccional",
         "public": "Administracions públiques:",
         "publicDetail": "Quan sigui legalment obligatori",
         "noSale": "No venem ni cedim dades a tercers amb finalitats comercials."

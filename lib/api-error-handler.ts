@@ -6,7 +6,6 @@
  * - User-friendly error messages
  * - Error codes for client-side handling
  * - Stack traces in development
- * - Sentry integration
  */
 
 import { NextResponse } from 'next/server';

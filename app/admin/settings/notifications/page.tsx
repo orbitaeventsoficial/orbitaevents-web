@@ -238,7 +238,7 @@ export default function SettingsNotificationsPage() {
           
           <h3 className="text-base font-medium text-slate-700 mt-6">On configurar:</h3>
           <ol className="list-decimal pl-4 space-y-1">
-            <li>Ves a <a href="https://vercel.com" target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:underline">Vercel Dashboard</a></li>
+            <li>Ves al <a href="https://railway.app" target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:underline">Railway Dashboard</a></li>
             <li>Selecciona el projecte <code className="bg-stone-100 px-1 rounded">orbitaevents-web</code></li>
             <li>Settings → Environment Variables</li>
             <li>Afegeix cada variable amb el seu valor</li>

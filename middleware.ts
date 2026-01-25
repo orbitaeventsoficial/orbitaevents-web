@@ -5,7 +5,7 @@ import { locales, defaultLocale, type Locale } from './i18n';
 // ═══════════════════════════════════════════════════════════════════════════════
 // ADMIN SECURITY - Credencials des de variables d'entorn
 // ═══════════════════════════════════════════════════════════════════════════════
-// IMPORTANT: Configura aquestes variables a Vercel Dashboard:
+// IMPORTANT: Configura aquestes variables al panell de Railway:
 // - ADMIN_USER: nom d'usuari per l'admin
 // - ADMIN_PASS: contrasenya segura (mínim 16 caràcters)
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -170,6 +170,19 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const host = req.headers.get('host');
   const userAgent = req.headers.get('user-agent');
+  const normalizedPath =
+    pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+
+  const legacyRedirects: Record<string, string> = {
+    '/contacte': '/ca/contacto',
+  };
+
+  const redirectTarget = legacyRedirects[normalizedPath];
+  if (redirectTarget) {
+    const url = req.nextUrl.clone();
+    url.pathname = redirectTarget;
+    return NextResponse.redirect(url, 301);
+  }
 
   // 🚫 Bloquejar bots abusius immediatament
   if (isBlockedBot(userAgent)) {
@@ -328,5 +341,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next|_vercel|.*\\..*).*)', '/admin/:path*', '/api/admin/:path*'],
+  matcher: ['/((?!_next|.*\\..*).*)', '/admin/:path*', '/api/admin/:path*'],
 };

@@ -31,6 +31,40 @@ import { TawkToChat } from '@/components/chat/TawkToChat';
 // GOOGLE TAG MANAGER (GTM) - Gestiona Analytics, Ads, Meta Pixel, etc.
 // ═══════════════════════════════════════════════════════════════════════════
 
+function GoogleAnalytics() {
+  if (process.env.NODE_ENV !== 'production') return null;
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || process.env.NEXT_PUBLIC_GA_ID;
+  if (!gaId) return null;
+
+  return (
+    <>
+      <Script id="ga-loader" strategy="afterInteractive" src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
+      <Script
+        id="ga-init"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = window.gtag || gtag;
+            window.gtagConsentUpdate = window.gtagConsentUpdate || function() {
+              gtag('config', '${gaId}', { send_page_view: false });
+            };
+            gtag('js', new Date());
+            gtag('consent', 'default', {
+              analytics_storage: 'denied',
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied'
+            });
+            gtag('config', '${gaId}', { send_page_view: false });
+          `,
+        }}
+      />
+    </>
+  );
+}
+
 function GoogleTagManager() {
   if (process.env.NODE_ENV !== 'production') return null;
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
@@ -404,6 +438,7 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <head>
+        <GoogleAnalytics />
         <GoogleTagManager />
 
         {/* Preconnects per performance - recursos externs */}
@@ -525,8 +560,6 @@ export default async function LocaleLayout({
     </html>
   );
 }
-
-
 
 
 

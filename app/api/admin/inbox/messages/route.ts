@@ -1,7 +1,7 @@
 /**
  * API: Obtenir emails via Gmail API
  * ==================================
- * Compatible amb Vercel Serverless
+ * Compatible amb entorns serverless
  */
 
 import { NextRequest, NextResponse } from 'next/server';
