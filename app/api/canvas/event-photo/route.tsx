@@ -167,11 +167,10 @@ export async function GET(req: NextRequest) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              background: 'rgba(218,165,32,0.15)',
-              border: '2px solid rgba(218,165,32,0.5)',
+              background: 'rgba(30,25,10,0.85)',
+              border: '2px solid rgba(218,165,32,0.6)',
               borderRadius: '24px',
               padding: isStory ? '40px 60px' : '30px 50px',
-              backdropFilter: 'blur(10px)',
             }}
           >
             <span
@@ -230,40 +229,19 @@ export async function GET(req: NextRequest) {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '12px',
+              justifyContent: 'center',
               marginTop: isStory ? '60px' : '30px',
             }}
           >
-            <div
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://orbitaevents.com/img/orbitalockupwhitetransparent.png"
+              alt="Òrbita Events"
               style={{
-                width: isStory ? '50px' : '40px',
-                height: isStory ? '50px' : '40px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #DAA520, #B8860B)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                height: isStory ? '60px' : isSquare ? '50px' : '40px',
+                width: 'auto',
               }}
-            >
-              <span
-                style={{
-                  color: '#000',
-                  fontSize: isStory ? '28px' : '22px',
-                  fontWeight: 800,
-                }}
-              >
-                Ò
-              </span>
-            </div>
-            <span
-              style={{
-                color: '#ffffff',
-                fontSize: isStory ? '24px' : '18px',
-                fontWeight: 600,
-              }}
-            >
-              Òrbita Events
-            </span>
+            />
           </div>
         </div>
       </div>

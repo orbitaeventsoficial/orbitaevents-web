@@ -153,7 +153,12 @@ const EVENT_TYPE_LABELS: Record<string, { label: string; icon: string }> = {
 
 export default async function AnalyticsPage() {
   const data = await getAnalyticsData();
-  const ga4 = await getGa4Report();
+  let ga4 = null;
+  try {
+    ga4 = await getGa4Report();
+  } catch (error) {
+    log.error('Error obtenint GA4 report:', error);
+  }
   const yearGrowth = data.revenue.lastYear > 0
     ? ((data.revenue.thisYear - data.revenue.lastYear) / data.revenue.lastYear * 100).toFixed(1)
     : '100.0';

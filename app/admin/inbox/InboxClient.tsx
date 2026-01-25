@@ -580,6 +580,9 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
     setError(null);
     setSuccess(null);
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
       const res = await fetch('/api/admin/emails/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -589,23 +592,31 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
           body,
           replyToId: replyTo?.leadData?.id,
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data?.error || 'Error enviant email');
+        setSending(false);
         return;
       }
 
       setSuccess('Email enviat correctament');
       setSent(true);
+      setSending(false);
       setTimeout(() => {
         onClose();
       }, 1200);
     } catch (error) {
       log.error('Error sending email', error);
-      setError('Error enviant email');
-    } finally {
+      if (error instanceof Error && error.name === 'AbortError') {
+        setError('Temps d\'espera esgotat. Intenta-ho de nou.');
+      } else {
+        setError('Error enviant email');
+      }
       setSending(false);
     }
   }

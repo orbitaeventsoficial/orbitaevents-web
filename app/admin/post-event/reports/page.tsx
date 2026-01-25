@@ -20,8 +20,25 @@ async function getReports() {
   });
 }
 
+async function getAvailableBookings() {
+  return prisma.booking.findMany({
+    where: {
+      status: 'COMPLETED',
+      postEventReport: null,
+    },
+    orderBy: { eventDate: 'desc' },
+    take: 5,
+    include: {
+      pack: { include: { translations: { where: { locale: 'es' } } } },
+    },
+  });
+}
+
 export default async function ReportsPage() {
-  const reports = await getReports();
+  const [reports, availableBookings] = await Promise.all([
+    getReports(),
+    getAvailableBookings(),
+  ]);
 
   const draftReports = reports.filter(r => r.status === 'DRAFT');
   const completedReports = reports.filter(r => r.status === 'COMPLETED');
@@ -61,17 +78,46 @@ export default async function ReportsPage() {
         </div>
       </div>
 
+      {/* Available Bookings for New Report */}
+      {availableBookings.length > 0 && (
+        <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
+          <div className="bg-orange-50 border-b border-orange-100 p-4">
+            <h3 className="font-semibold text-orange-700">📝 Events sense informe ({availableBookings.length})</h3>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {availableBookings.map((booking) => {
+              const packName = booking.pack.translations[0]?.name || booking.pack.slug;
+              return (
+                <div key={booking.id} className="p-4 flex items-center justify-between hover:bg-slate-50">
+                  <div>
+                    <p className="font-medium text-slate-700">{booking.clientName}</p>
+                    <p className="text-sm text-slate-500">
+                      {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · {packName}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/admin/post-event/reports/new?bookingId=${booking.id}`}
+                    className="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600"
+                  >
+                    Crear Informe
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Reports List */}
       {reports.length === 0 ? (
         <div className="bg-white border border-stone-200 rounded-xl p-12 text-center">
           <div className="text-4xl mb-4">📋</div>
           <p className="text-slate-500 mb-4">No hi ha informes creats encara</p>
-          <Link
-            href="/admin/post-event"
-            className="inline-flex px-6 py-2 bg-gradient-to-r from-amber-500 to-rose-500 text-white rounded-lg font-medium hover:from-amber-600 hover:to-rose-600"
-          >
-            Crear Primer Informe
-          </Link>
+          {availableBookings.length === 0 ? (
+            <p className="text-sm text-slate-400">No hi ha events completats pendents d&apos;informe</p>
+          ) : (
+            <p className="text-sm text-slate-400">Selecciona un event de la llista superior per crear un informe</p>
+          )}
         </div>
       ) : (
         <div className="space-y-3">

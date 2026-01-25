@@ -157,10 +157,10 @@ export default async function AdminDashboard() {
       </div>
 
       {testimonialsPending > 0 && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-2xl border border-amber-500/50 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-amber-200">Alerta de testimonis</p>
-            <p className="text-lg font-semibold text-amber-100">
+            <p className="text-sm text-amber-600">Alerta de testimonis</p>
+            <p className="text-lg font-semibold text-amber-700">
               {testimonialsPending} pendent{testimonialsPending > 1 ? 's' : ''} d'aprovació
             </p>
           </div>
