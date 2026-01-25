@@ -10,7 +10,8 @@ import {
   generateQuoteNumber,
   type QuoteExtra,
 } from '@/lib/services/documentService';
-import { getPackById, getPacksByService, type PackDefinition } from '@/config/packs-config';
+import { getDbPackByCode, getDbPacks } from '@/lib/packs-db';
+import type { PackDefinition } from '@/config/packs-config';
 
 type QuotePack = {
   name: string;
@@ -42,12 +43,12 @@ function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
   };
 }
 
-function resolvePack(packKey: string): QuotePack {
-  const pack =
-    getPackById(packKey) ||
-    getPacksByService('fiestas').find((p) => p.slug === packKey) ||
-    getPacksByService('fiestas')[0];
-  return packToQuotePack(pack);
+async function resolvePack(packKey: string, locale?: string): Promise<QuotePack> {
+  const pack = await getDbPackByCode(packKey, locale || 'es');
+  if (pack) return packToQuotePack(pack);
+
+  const fallback = await getDbPacks({ service: 'fiestas', locale: locale || 'es' });
+  return packToQuotePack(fallback[0]);
 }
 
 function mergeNotes(parts: Array<string | undefined | null>): string | undefined {
@@ -132,7 +133,7 @@ export async function POST(req: NextRequest) {
       recipientName = lead.name;
     }
 
-    const packDataBase = resolvePack(String(packId).toLowerCase());
+    const packDataBase = await resolvePack(String(packId).toLowerCase(), locale);
     const packData = {
       ...packDataBase,
       price,

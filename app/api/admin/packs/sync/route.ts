@@ -39,12 +39,16 @@ export async function POST(req: NextRequest) {
         try {
           const existingId = existingMap.get(pack.slug);
           const packData = {
+            code: pack.id,
+            service: pack.service,
             price: pack.priceValue,
             originalPrice: pack.priceOriginalValue || null,
             djHours: pack.durationHours || 4,
             isActive: true,
             isFeatured: pack.popular || pack.isFlash || false,
             order: configPacks.indexOf(pack),
+            minGuests: pack.capacidadMinima ?? null,
+            maxGuests: pack.capacidadMaxima ?? null,
           };
 
           let packId: string;

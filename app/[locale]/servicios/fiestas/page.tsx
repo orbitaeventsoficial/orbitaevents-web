@@ -5,16 +5,13 @@ import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import Client from './FiestasClient';
-import {
-  getMinPriceByService,
-  getPacksByService,
-} from '@/config/packs-config';
+import { getDbPacks } from '@/lib/packs-db';
 
 // ===============================
-// DATOS CENTRALIZADOS DESDE packs-config
+// DATOS CENTRALIZADOS DESDE DB (con fallback a config)
 // ===============================
-const FIESTAS_MIN_PRICE = getMinPriceByService('fiestas');
-const FIESTAS_PACKS = getPacksByService('fiestas');
+const getMinPrice = (packs: { priceValue: number }[]) =>
+  packs.length ? Math.min(...packs.map((p) => p.priceValue)) : 0;
 
 // ===============================
 // METADATA SEO (USANDO CONFIG)
@@ -22,16 +19,18 @@ const FIESTAS_PACKS = getPacksByService('fiestas');
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
+  const packs = await getDbPacks({ service: 'fiestas', locale });
+  const minPrice = getMinPrice(packs);
   const t = await getTranslations({ locale, namespace: 'services.fiestas' });
 
   return {
-    title: t('meta.title', { price: FIESTAS_MIN_PRICE }),
-    description: t('meta.description', { price: FIESTAS_MIN_PRICE }),
+    title: t('meta.title', { price: minPrice }),
+    description: t('meta.description', { price: minPrice }),
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
     alternates: { canonical: '/servicios/fiestas' },
     openGraph: {
-      title: t('meta.ogTitle', { price: FIESTAS_MIN_PRICE }),
-      description: t('meta.ogDescription', { price: FIESTAS_MIN_PRICE }),
+      title: t('meta.ogTitle', { price: minPrice }),
+      description: t('meta.ogDescription', { price: minPrice }),
       url: '/servicios/fiestas',
       images: [
         {
@@ -43,8 +42,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     twitter: {
       card: 'summary_large_image',
-      title: t('meta.ogTitle', { price: FIESTAS_MIN_PRICE }),
-      description: t('meta.description', { price: FIESTAS_MIN_PRICE }),
+      title: t('meta.ogTitle', { price: minPrice }),
+      description: t('meta.description', { price: minPrice }),
       images: ['/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp'],
     },
     robots: { index: true, follow: true },
@@ -72,6 +71,8 @@ export default async function FiestasPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.fiestas' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const packs = await getDbPacks({ service: 'fiestas', locale });
+  const minPrice = getMinPrice(packs);
 
   // Obtener FAQs del archivo de traducciones
   const faqItems = [];
@@ -101,7 +102,7 @@ export default async function FiestasPage({ params }: PageProps) {
       <ServiceJsonLD
         name="Fiestas Privadas Completas y Personalizadas"
         slugPath="/servicios/fiestas"
-        description={`Experiencias completas para fiestas privadas: desde cumpleaños temáticos hasta celebraciones familiares. DJ profesional, sonido 4.000W, iluminación LED, animación y juegos adaptados a todos los invitados. Tematización completa disponible (Halloween, años 80, mundo mágico, tropical). Desde ${FIESTAS_MIN_PRICE}€.`}
+        description={`Experiencias completas para fiestas privadas: desde cumpleaños temáticos hasta celebraciones familiares. DJ profesional, sonido 4.000W, iluminación LED, animación y juegos adaptados a todos los invitados. Tematización completa disponible (Halloween, años 80, mundo mágico, tropical). Desde ${minPrice}€.`}
         serviceType={[
           'DJ para fiestas',
           'Fiestas privadas',
@@ -112,10 +113,10 @@ export default async function FiestasPage({ params }: PageProps) {
           'Iluminación LED',
         ]}
         areaServed={['Barcelona', 'Girona', 'Costa Brava', 'Maresme']}
-        priceFrom={String(FIESTAS_MIN_PRICE)}
+        priceFrom={String(minPrice)}
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
-        offers={FIESTAS_PACKS.map((pack) => ({
+        offers={packs.map((pack) => ({
           '@type': 'Offer',
           price: String(pack.priceValue),
           priceCurrency: 'EUR',

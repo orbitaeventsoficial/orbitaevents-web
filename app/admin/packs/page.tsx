@@ -49,8 +49,8 @@ export default async function PacksPage() {
             Gestiona els packs de serveis i els seus preus
           </p>
           {!packsInSync && (
-            <div className="mt-2 inline-flex items-center gap-2 rounded-md bg-yellow-50 px-3 py-1 text-sm text-yellow-800 border border-yellow-200">
-              ⚠️ Base de dades desincronitzada: {packs.length} packs en BD, {configPacks.length} en config
+            <div className="mt-2 inline-flex items-center gap-2 rounded-md bg-slate-50 px-3 py-1 text-sm text-slate-600 border border-slate-200">
+              ℹ️ Packs en BD: {packs.length} · Packs al config (seed): {configPacks.length}
             </div>
           )}
         </div>

@@ -1,8 +1,8 @@
 "use client";
 
 // app/configurador/client.tsx
-import { EXTRAS, OFFERS, getPacksByService, type ServiceSlug } from '@/config/packs-config';
-import { useState, useEffect } from 'react';
+import { EXTRAS, OFFERS, getAllPacks, type ServiceSlug } from '@/config/packs-config';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import {
@@ -22,6 +22,7 @@ import {
   Download,
 } from 'lucide-react';
 import { useAnalytics } from '@/lib/hooks/useAnalytics';
+import { usePacks } from '@/lib/hooks/usePacks';
 import { generateQuotePDF } from '@/lib/pdf-utils';
 import { fetchWithCsrf } from '@/lib/csrf';
 import TurnstileWidget from '@/components/security/TurnstileWidget';
@@ -54,6 +55,11 @@ export default function ConfiguradorClient() {
   const tMobile = useTranslations('pages.mobile'); // Per traduccions d'extres
   const locale = useLocale() as 'ca' | 'es' | 'en';
   const { track } = useAnalytics();
+  const fallbackPacks = useMemo(() => getAllPacks(), []);
+  const { packs: allPacks } = usePacks({
+    locale,
+    fallback: fallbackPacks,
+  });
   const [step, setStep] = useState(1);
   const [config, setConfig] = useState<ConfigState>({
     eventType: null,
@@ -80,7 +86,7 @@ export default function ConfiguradorClient() {
 
     if (service && packId) {
       // Cargar el pack seleccionado
-      const packs = getPacksByService(service as ServiceSlug);
+      const packs = allPacks.filter((pack) => pack.service === service);
       const selectedPack = packs.find(p => p.id === packId);
 
       if (selectedPack) {
@@ -109,7 +115,7 @@ export default function ConfiguradorClient() {
     } else {
       track('View_Configurador');
     }
-  }, [track]);
+  }, [allPacks, track]);
 
   // Scroll to top cuando cambias de paso o seleccionas pack
   useEffect(() => {
@@ -219,7 +225,7 @@ export default function ConfiguradorClient() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service) => {
-            const packs = getPacksByService(service.slug as ServiceSlug);
+            const packs = allPacks.filter((pack) => pack.service === service.slug);
             const minPrice = packs.length > 0 ? Math.min(...packs.map((p) => p.priceValue)) : 0;
 
             return (
@@ -250,7 +256,7 @@ export default function ConfiguradorClient() {
 
   // PASO 2: Selección de pack
   const renderStep2 = () => {
-    const packs = getPacksByService(config.eventType as ServiceSlug);
+    const packs = allPacks.filter((pack) => pack.service === config.eventType);
     if (!packs || packs.length === 0) return null;
 
     const serviceName = t(`step1.eventTypes.${config.eventType || 'bodas'}`);

@@ -8,7 +8,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { generateQuoteHTML, createQuoteFromLead, generateQuoteNumber } from "@/lib/services/documentService";
-import { getPackById, getPacksByService, type PackDefinition } from "@/config/packs-config";
+import { getDbPackByCode, getDbPacks } from '@/lib/packs-db';
+import type { PackDefinition } from "@/config/packs-config";
 import { requireAuth } from '@/lib/auth';
 
 type QuotePack = {
@@ -40,12 +41,12 @@ function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
   };
 }
 
-function resolvePack(packKey: string): QuotePack {
-  const pack =
-    getPackById(packKey) ||
-    getPacksByService('fiestas').find((p) => p.slug === packKey) ||
-    getPacksByService('fiestas')[0];
-  return packToQuotePack(pack);
+async function resolvePack(packKey: string, locale?: string): Promise<QuotePack> {
+  const pack = await getDbPackByCode(packKey, locale || 'es');
+  if (pack) return packToQuotePack(pack);
+
+  const fallback = await getDbPacks({ service: 'fiestas', locale: locale || 'es' });
+  return packToQuotePack(fallback[0]);
 }
 
 interface RouteContext {
@@ -67,7 +68,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
 
     // Determinar pack des de config centralitzada
     const packKey = lead.interestedPackId?.toLowerCase() || 'default';
-    const packData = resolvePack(packKey);
+    const packData = await resolvePack(packKey, lead.preferredLocale || 'es');
 
     // Crear dades del pressupost
     const quoteData = createQuoteFromLead(lead, packData);
@@ -108,7 +109,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
     // Determinar pack (del body o del lead) des de config centralitzada
     const packKey = body.packId?.toLowerCase() || lead.interestedPackId?.toLowerCase() || 'default';
-    const basePack = resolvePack(packKey);
+    const basePack = await resolvePack(packKey, lead.preferredLocale || 'es');
 
     // Override amb dades del body si existeixen
     const packData = {

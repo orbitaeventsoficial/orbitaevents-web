@@ -4,90 +4,41 @@
 // ═══════════════════════════════════════════════════════════════════════════
 //
 // Devuelve información de packs y precios para el frontend.
-// NO requiere autenticación - es pública pero con cache.
+// NO requiere autenticación - es pública y sin cache.
 // Solo devuelve packs activos y datos públicos (sin info sensible).
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { NextResponse } from 'next/server';
-import { log } from '@/lib/logger';
-import { prisma } from '@/lib/prisma';
+import { getDbPacks } from '@/lib/packs-db';
 
-// Cache: revalidar cada hora (los precios no cambian frecuentemente)
-export const revalidate = 3600;
-
-interface PublicPack {
-  slug: string;
-  price: number;
-  originalPrice: number | null;
-  name: string;
-  description: string | null;
-}
+// No cache to reflect admin changes immediately.
+export const revalidate = 0;
 
 interface PacksResponse {
   ok: boolean;
-  packs: PublicPack[];
+  packs: unknown[];
 }
 
-export async function GET() {
-  // Check if DATABASE_URL is configured
-  if (!process.env.DATABASE_URL) {
-    return NextResponse.json({
-      ok: true,
-      packs: [],
-    }, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
-      },
-    });
-  }
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const serviceParam = searchParams.get('service');
+  const allowedServices = new Set(['bodas', 'fiestas', 'discomovil', 'empresas', 'alquiler', 'produccion']);
+  const service = serviceParam && allowedServices.has(serviceParam) ? serviceParam : undefined;
+  const locale = searchParams.get('locale') || 'es';
 
-  try {
-    const packs = await prisma.pack.findMany({
-      where: { isActive: true },
-      include: {
-        translations: true,
-      },
-      orderBy: { order: 'asc' },
-    });
+  const packs = await getDbPacks({
+    service: service as any,
+    locale,
+  });
 
-    const filteredPacks = packs.filter(pack => pack.slug !== 'flash');
+  const response: PacksResponse = {
+    ok: true,
+    packs,
+  };
 
-    // Transform to public format (only expose safe fields)
-    const publicPacks: PublicPack[] = filteredPacks.map(pack => {
-      // Get Spanish translation as default, fallback to first available
-      const translation = pack.translations.find(t => t.locale === 'es')
-        || pack.translations[0];
-
-      return {
-        slug: pack.slug,
-        price: pack.price,
-        originalPrice: pack.originalPrice,
-        name: translation?.name || pack.slug,
-        description: translation?.description || null,
-      };
-    });
-
-    const response: PacksResponse = {
-      ok: true,
-      packs: publicPacks,
-    };
-
-    return NextResponse.json(response, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
-      },
-    });
-
-  } catch (error) {
-    log.error('Error obtenint packs:', error);
-
-    return NextResponse.json({
-      ok: true,
-      packs: [],
-    }, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
-      },
-    });
-  }
+  return NextResponse.json(response, {
+    headers: {
+      'Cache-Control': 'no-store',
+    },
+  });
 }

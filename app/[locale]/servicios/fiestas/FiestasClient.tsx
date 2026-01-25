@@ -11,33 +11,43 @@
  * @author Manolo - Arquitecto Digital
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Zap, FileText, Star, TrendingUp, ArrowRight, Check, PartyPopper } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import {
   getPacksByService,
-  getRecommendedPack,
-  getOfertaFlash,
   OFERTA_FLASH,
   type PackDefinition
 } from '@/config/packs-config';
+import { usePacks } from '@/lib/hooks/usePacks';
 
 export default function FiestasClient() {
   const t = useTranslations('pages.parties');
+  const locale = useLocale();
+  const fallbackPacks = useMemo(() => getPacksByService('fiestas'), []);
+  const { packs: allPacks } = usePacks({
+    service: 'fiestas',
+    locale,
+    fallback: fallbackPacks,
+  });
   const [numGuests, setNumGuests] = useState(60);
   const [selectedPack, setSelectedPack] = useState<string | null>(null);
   const [showRecommendation, setShowRecommendation] = useState(false);
 
-  // Obtener packs desde config
-  const allPacks = getPacksByService('fiestas');
-  const flashPack = getOfertaFlash();
+  const flashPack = allPacks.find((pack) => pack.isFlash);
   const regularPacks = allPacks.filter(p => !p.isFlash);
 
-  // Obtener pack recomendado
-  const recommendedPack = getRecommendedPack(numGuests, 'fiestas');
+  const recommendedPack = (() => {
+    const eligible = regularPacks.filter((pack) => {
+      const min = pack.capacidadMinima ?? 0;
+      const max = pack.capacidadMaxima ?? Infinity;
+      return numGuests >= min && numGuests <= max;
+    });
+    return eligible.find((pack) => pack.popular) || eligible[0] || regularPacks[0] || null;
+  })();
 
   // Actualizar recomendación cuando cambian los invitados
   useEffect(() => {
@@ -75,7 +85,8 @@ export default function FiestasClient() {
   };
 
   // ¿El usuario puede acceder a la oferta flash?
-  const canUseFlashOffer = numGuests <= OFERTA_FLASH.maxInvitados;
+  const flashMaxGuests = flashPack?.capacidadMaxima ?? OFERTA_FLASH.maxInvitados;
+  const canUseFlashOffer = numGuests <= flashMaxGuests;
 
   return (
     <div className="min-h-screen bg-bg-main">
@@ -151,10 +162,10 @@ export default function FiestasClient() {
           >
             <div className="flex items-center gap-2 text-oe-gold-light font-bold">
               <Zap className="w-5 h-5" fill="currentColor" />
-              {t('flashAccess')} {OFERTA_FLASH.nombre}!
+              {t('flashAccess')} {flashPack?.name || OFERTA_FLASH.nombre}!
             </div>
             <p className="text-sm text-text-muted mt-1">
-              {t('upToGuests', { max: OFERTA_FLASH.maxInvitados })} {OFERTA_FLASH.descuentoPorcentaje}% {t('discount')}
+              {t('upToGuests', { max: flashMaxGuests })} {flashPack?.flashDiscount ?? OFERTA_FLASH.descuentoPorcentaje}% {t('discount')}
             </p>
           </motion.div>
         )}

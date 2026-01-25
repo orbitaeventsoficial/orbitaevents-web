@@ -1,16 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Check, Star, FileText, Zap,
   Users, Clock, TrendingUp, ChevronRight, Flame
 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { getPacksByService, EXTRAS, type PackDefinition } from '@/config/packs-config';
-
-// Obtener packs de discomóvil
-const DISCO_PACKS = getPacksByService('discomovil');
+import { usePacks } from '@/lib/hooks/usePacks';
 
 // Extras específicos para discomóvil (más fiesta)
 const DISCO_EXTRAS = EXTRAS.filter(e => 
@@ -64,6 +62,13 @@ function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, fi
 
 export default function DiscomovilClientV2() {
   const t = useTranslations('pages.mobile');
+  const locale = useLocale();
+  const fallbackPacks = useMemo(() => getPacksByService('discomovil'), []);
+  const { packs: discoPacks } = usePacks({
+    service: 'discomovil',
+    locale,
+    fallback: fallbackPacks,
+  });
   const [config, setConfig] = useState<ConfigState>({
     selectedPack: null,
     selectedExtras: new Set(),
@@ -94,9 +99,10 @@ export default function DiscomovilClientV2() {
 
   // Recomendación según personas
   const getRecommendedPack = (): PackDefinition | null => {
-    if (config.numGuests <= 80) return DISCO_PACKS[0]; // Básica
-    if (config.numGuests <= 150) return DISCO_PACKS[1]; // Premium
-    return DISCO_PACKS[2]; // VIP
+    if (!discoPacks.length) return null;
+    if (config.numGuests <= 80) return discoPacks[0] || null; // Básica
+    if (config.numGuests <= 150) return discoPacks[1] || discoPacks[0] || null; // Premium
+    return discoPacks[2] || discoPacks[discoPacks.length - 1] || null; // VIP
   };
 
   const recommendedPack = getRecommendedPack();
@@ -236,7 +242,7 @@ export default function DiscomovilClientV2() {
         </h2>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {DISCO_PACKS.map(pack => {
+          {discoPacks.map(pack => {
             const isSelected = config.selectedPack?.id === pack.id;
             const isRecommended = recommendedPack?.id === pack.id;
 
@@ -559,4 +565,3 @@ export default function DiscomovilClientV2() {
     </div>
   );
 }
-

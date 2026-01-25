@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -9,10 +9,8 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { getPacksByService, EXTRAS, type PackDefinition } from '@/config/packs-config';
-import { useTranslations } from 'next-intl';
-
-// Obtener packs de bodas
-const WEDDING_PACKS = getPacksByService('bodas');
+import { useLocale, useTranslations } from 'next-intl';
+import { usePacks } from '@/lib/hooks/usePacks';
 
 // Extras específicos para bodas
 const WEDDING_EXTRAS = EXTRAS.filter(e => 
@@ -40,6 +38,13 @@ function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, fi
 export default function BodasClientV2() {
   const t = useTranslations('pages.weddings');
   const tMobile = useTranslations('pages.mobile'); // Per traduccions d'extres
+  const locale = useLocale();
+  const fallbackPacks = useMemo(() => getPacksByService('bodas'), []);
+  const { packs: weddingPacks } = usePacks({
+    service: 'bodas',
+    locale,
+    fallback: fallbackPacks,
+  });
   const [config, setConfig] = useState<ConfigState>({
     selectedPack: null,
     selectedExtras: new Set(),
@@ -68,9 +73,10 @@ export default function BodasClientV2() {
 
   // Recomendación según invitados
   const getRecommendedPack = (): PackDefinition | null => {
-    if (config.numGuests <= 80) return WEDDING_PACKS[0]; // Esencial
-    if (config.numGuests <= 150) return WEDDING_PACKS[1]; // Premium
-    return WEDDING_PACKS[2]; // VIP
+    if (!weddingPacks.length) return null;
+    if (config.numGuests <= 80) return weddingPacks[0] || null; // Esencial
+    if (config.numGuests <= 150) return weddingPacks[1] || weddingPacks[0] || null; // Premium
+    return weddingPacks[2] || weddingPacks[weddingPacks.length - 1] || null; // VIP
   };
 
   const recommendedPack = getRecommendedPack();
@@ -225,7 +231,7 @@ export default function BodasClientV2() {
         </h2>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {WEDDING_PACKS.map(pack => {
+          {weddingPacks.map(pack => {
             const isSelected = config.selectedPack?.id === pack.id;
             const isRecommended = recommendedPack?.id === pack.id;
 

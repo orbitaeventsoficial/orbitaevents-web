@@ -116,7 +116,9 @@ model InventoryUsage {
 
 model Pack {
   id             String            @id @default(cuid())
+  code           String?           @unique
   slug           String            @unique // "flash", "party-starter", "corporate"
+  service        String?
   isActive       Boolean           @default(true)
   isFeatured     Boolean           @default(false)
   order          Int               @default(0)

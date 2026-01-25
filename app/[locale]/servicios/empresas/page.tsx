@@ -5,24 +5,26 @@ import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import Client from './client';
-import { getMinPriceByService, getPacksByService } from '@/config/packs-config';
+import { getDbPacks } from '@/lib/packs-db';
 
-const EMP_MIN_PRICE = getMinPriceByService('empresas');
-const EMP_PACKS = getPacksByService('empresas');
+const getMinPrice = (packs: { priceValue: number }[]) =>
+  packs.length ? Math.min(...packs.map((p) => p.priceValue)) : 0;
 
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
+  const packs = await getDbPacks({ service: 'empresas', locale });
+  const minPrice = getMinPrice(packs);
   const t = await getTranslations({ locale, namespace: 'services.empresas' });
 
   return {
-    title: t('meta.title', { price: EMP_MIN_PRICE }),
-    description: t('meta.description', { price: EMP_MIN_PRICE }),
+    title: t('meta.title', { price: minPrice }),
+    description: t('meta.description', { price: minPrice }),
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
     alternates: { canonical: '/servicios/empresas' },
     openGraph: {
-      title: t('meta.ogTitle', { price: EMP_MIN_PRICE }),
-      description: t('meta.ogDescription', { price: EMP_MIN_PRICE }),
+      title: t('meta.ogTitle', { price: minPrice }),
+      description: t('meta.ogDescription', { price: minPrice }),
       url: '/servicios/empresas',
       images: [
         {
@@ -34,8 +36,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     twitter: {
       card: 'summary_large_image',
-      title: t('meta.ogTitle', { price: EMP_MIN_PRICE }),
-      description: t('meta.description', { price: EMP_MIN_PRICE }),
+      title: t('meta.ogTitle', { price: minPrice }),
+      description: t('meta.description', { price: minPrice }),
       images: ['/img/portfolio/eventos-empresa/eventos-empresa-01.webp'],
     },
     robots: { index: true, follow: true },
@@ -59,6 +61,8 @@ export default async function EmpresasPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.empresas' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const packs = await getDbPacks({ service: 'empresas', locale });
+  const minPrice = getMinPrice(packs);
 
   // Obtener FAQs del archivo de traducciones
   const faqItems = [];
@@ -97,10 +101,10 @@ export default async function EmpresasPage({ params }: PageProps) {
           'Presentaciones corporativas',
         ]}
         areaServed={['Barcelona', 'Girona', 'Costa Brava', 'Maresme']}
-        priceFrom={String(EMP_MIN_PRICE)}
+        priceFrom={String(minPrice)}
         priceCurrency="EUR"
         availability="https://schema.org/InStock"
-        offers={EMP_PACKS.map((pack) => ({
+        offers={packs.map((pack) => ({
           '@type': 'Offer',
           name: pack.name,
           price: String(pack.priceValue),

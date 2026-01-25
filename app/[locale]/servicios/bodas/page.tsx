@@ -6,36 +6,38 @@ import ServiceJsonLD from '@/components/seo/ServiceJsonLD';
 import FAQ from '@/components/seo/FAQ';
 import nextDynamic from 'next/dynamic';
 
-import { getMinPriceByService, getPacksByService } from '@/config/packs-config';
+import { getDbPacks } from '@/lib/packs-db';
 
 
 const BodasClient = nextDynamic(() => import('./client'));
 
-const MIN_PRICE = getMinPriceByService('bodas');
-const PACKS = getPacksByService('bodas');
+const getMinPrice = (packs: { priceValue: number }[]) =>
+  packs.length ? Math.min(...packs.map((p) => p.priceValue)) : 0;
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
+  const packs = await getDbPacks({ service: 'bodas', locale });
+  const minPrice = getMinPrice(packs);
   const t = await getTranslations({ locale, namespace: 'services.bodas' });
 
   return {
-    title: t('meta.title', { price: MIN_PRICE }),
-    description: t('meta.description', { price: MIN_PRICE }),
+    title: t('meta.title', { price: minPrice }),
+    description: t('meta.description', { price: minPrice }),
     keywords:
       'dj bodas barcelona, dj boda girona, dj bodas maresme, dj bodas costa brava, sonido bodas, musica boda, efectos especiales bodas',
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
     alternates: { canonical: '/servicios/bodas' },
     openGraph: {
-      title: t('meta.ogTitle', { price: MIN_PRICE }),
-      description: t('meta.ogDescription', { price: MIN_PRICE }),
+      title: t('meta.ogTitle', { price: minPrice }),
+      description: t('meta.ogDescription', { price: minPrice }),
       url: '/servicios/bodas',
       images: [{ url: '/img/portfolio/bodas/bodas-01.webp', alt: t('breadcrumb') }],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: t('meta.ogTitle', { price: MIN_PRICE }),
-      description: t('meta.description', { price: MIN_PRICE }),
+      title: t('meta.ogTitle', { price: minPrice }),
+      description: t('meta.description', { price: minPrice }),
       images: ['/img/portfolio/bodas/bodas-01.webp'],
     },
     robots: { index: true, follow: true },
@@ -50,6 +52,8 @@ export default async function BodasPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'services.bodas' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const packs = await getDbPacks({ service: 'bodas', locale });
+  const minPrice = getMinPrice(packs);
 
   // Obtener FAQs del archivo de traducciones
   const faqItems = [];
@@ -78,7 +82,7 @@ export default async function BodasPage({ params }: PageProps) {
       <ServiceJsonLD
         name="Experiencia Completa para Bodas"
         slugPath="/servicios/bodas"
-        description={`Experiencia completa personalizada para bodas: DJ profesional, sonido EV 4.000W, iluminación de ambiente y efectos especiales adaptados a vuestra historia. Packs desde ${MIN_PRICE}€.`}
+        description={`Experiencia completa personalizada para bodas: DJ profesional, sonido EV 4.000W, iluminación de ambiente y efectos especiales adaptados a vuestra historia. Packs desde ${minPrice}€.`}
         serviceType={[
           'DJ para bodas',
           'Sonido e iluminación bodas',
@@ -87,9 +91,9 @@ export default async function BodasPage({ params }: PageProps) {
           'Animación bodas',
         ]}
         areaServed={['Barcelona', 'Girona', 'Costa Brava', 'Maresme']}
-        priceFrom={String(MIN_PRICE)}
+        priceFrom={String(minPrice)}
         priceCurrency="EUR"
-        offers={PACKS.map((p) => ({
+        offers={packs.map((p) => ({
           '@type': 'Offer',
           name: p.name,
           price: String(p.priceValue),
