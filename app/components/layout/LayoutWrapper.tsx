@@ -90,6 +90,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         overlay.style.display = 'none';
       }, 400);
     }
+    document.documentElement.classList.add('scroll-unlocked');
+    document.body.classList.add('scroll-unlocked');
     document.body.classList.remove('hero-loading');
     document.body.style.overflow = '';
     document.body.classList.add('intro-done');
@@ -138,11 +140,15 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (showIntro) {
+      document.documentElement.classList.remove('scroll-unlocked');
+      document.body.classList.remove('scroll-unlocked');
       document.body.style.overflow = 'hidden';
       return;
     }
 
     const id = window.setTimeout(() => {
+      document.documentElement.classList.add('scroll-unlocked');
+      document.body.classList.add('scroll-unlocked');
       document.body.style.overflow = '';
       document.body.classList.remove('hero-loading');
     }, 0);

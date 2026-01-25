@@ -1089,8 +1089,14 @@ textarea::placeholder {
    TELON NEGRE INICIAL - EVITAR FLASH BLANC
    ============================================================================= */
 html, body {
-  background-color: #000000 !important;
-}
+    background-color: #000000 !important;
+  }
+
+  html.scroll-unlocked,
+  body.scroll-unlocked {
+    overflow: auto !important;
+    overscroll-behavior: auto !important;
+  }
 
 html.admin-mode,
 body.admin-mode,
