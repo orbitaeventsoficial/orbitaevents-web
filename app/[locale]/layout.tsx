@@ -74,6 +74,29 @@ function GoogleTagManagerBody() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// UMAMI ANALYTICS (SELF-HOSTED)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function UmamiAnalytics() {
+  if (process.env.NODE_ENV !== 'production') return null;
+  const websiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+  if (!websiteId) return null;
+
+  const scriptUrl =
+    process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL ||
+    'https://analytics.orbitaevents.com/script.js';
+
+  return (
+    <Script
+      id="umami-analytics"
+      src={scriptUrl}
+      strategy="afterInteractive"
+      data-website-id={websiteId}
+    />
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // JSON-LD STRUCTURED DATA - SEO MILLORAT
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -405,6 +428,7 @@ export default async function LocaleLayout({
     >
       <head>
         <GoogleTagManager />
+        <UmamiAnalytics />
 
         {/* Preconnects per performance - recursos externs */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -525,5 +549,4 @@ export default async function LocaleLayout({
     </html>
   );
 }
-
 

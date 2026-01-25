@@ -153,6 +153,9 @@ const EVENT_TYPE_LABELS: Record<string, { label: string; icon: string }> = {
 export default async function AnalyticsPage() {
   const data = await getAnalyticsData();
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID || 'No configurat';
+  const umamiDashboardUrl =
+    process.env.NEXT_PUBLIC_UMAMI_DASHBOARD_URL || 'https://analytics.orbitaevents.com';
+  const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID || 'No configurat';
   const yearGrowth = data.revenue.lastYear > 0
     ? ((data.revenue.thisYear - data.revenue.lastYear) / data.revenue.lastYear * 100).toFixed(1)
     : '100.0';
@@ -360,6 +363,38 @@ export default async function AnalyticsPage() {
             Les metrics de traffic i clicks depenen del desti de Google Tag Manager (per exemple GA4).
             Si vols veure analytics dins del panell, connecta un desti compatible o digues-me
             quin proveidor vols usar.
+          </div>
+        </div>
+      </section>
+
+      {/* Umami Analytics */}
+      <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+        <div className="bg-slate-50 border-b border-stone-200 p-4">
+          <h2 className="text-lg font-semibold text-slate-700">Umami · Analytics</h2>
+          <p className="text-xs text-slate-500">Panell principal i estat de configuracio</p>
+        </div>
+        <div className="p-4 space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-lg border border-stone-200 bg-white p-4">
+              <p className="text-xs font-medium text-slate-500 uppercase">Dashboard</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{umamiDashboardUrl}</p>
+            </div>
+            <div className="rounded-lg border border-stone-200 bg-white p-4">
+              <p className="text-xs font-medium text-slate-500 uppercase">Website ID</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{umamiWebsiteId}</p>
+            </div>
+          </div>
+          <a
+            href={umamiDashboardUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-orange-300 hover:text-orange-700 transition"
+          >
+            Obrir panel Umami
+          </a>
+          <div className="rounded-lg border border-stone-200 bg-stone-50 p-4 text-sm text-slate-600">
+            Aquesta es la font principal d&apos;analytics (traffic, pagines, events i conversions) per a la web.
+            Si el Website ID no esta configurat, revisa les variables d&apos;entorn.
           </div>
         </div>
       </section>
