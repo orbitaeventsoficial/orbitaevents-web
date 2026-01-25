@@ -1,6 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Homepage', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      sessionStorage.setItem('orbita-intro-seen', 'true');
+      sessionStorage.setItem('orbita-mobile-intro-seen', 'true');
+    });
+  });
+
   test('should load homepage successfully', async ({ page }) => {
     await page.goto('/');
 
@@ -41,8 +48,8 @@ test.describe('Homepage', () => {
     // Page should load on mobile
     await expect(page).toHaveTitle(/Òrbita Events/i);
 
-    // Mobile menu should be present
-    const mobileNav = page.locator('header, nav').first();
-    await expect(mobileNav).toBeVisible({ timeout: 15000 });
+    // Mobile header should be present
+    const mobileHeader = page.locator('header').first();
+    await expect(mobileHeader).toBeVisible({ timeout: 15000 });
   });
 });

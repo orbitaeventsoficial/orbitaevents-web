@@ -42,7 +42,8 @@ test.describe('API Endpoints', () => {
     expect(response.status()).toBe(200);
 
     const data = await response.json();
-    expect(data.success).toBe(true);
+    expect(data.rating).toBeDefined();
+    expect(data.reviews).toBeDefined();
   });
 
   test('admin endpoints should require authentication', async ({ request }) => {
