@@ -90,6 +90,11 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         overlay.style.display = 'none';
       }, 400);
     }
+    document.documentElement.style.overflowY = 'auto';
+    document.body.style.overflowY = 'auto';
+    document.documentElement.style.height = 'auto';
+    document.body.style.height = 'auto';
+    document.body.style.position = 'relative';
     document.documentElement.classList.add('scroll-unlocked');
     document.body.classList.add('scroll-unlocked');
     document.body.classList.remove('hero-loading');
@@ -143,10 +148,16 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       document.documentElement.classList.remove('scroll-unlocked');
       document.body.classList.remove('scroll-unlocked');
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflowY = 'hidden';
       return;
     }
 
     const id = window.setTimeout(() => {
+      document.documentElement.style.overflowY = 'auto';
+      document.body.style.overflowY = 'auto';
+      document.documentElement.style.height = 'auto';
+      document.body.style.height = 'auto';
+      document.body.style.position = 'relative';
       document.documentElement.classList.add('scroll-unlocked');
       document.body.classList.add('scroll-unlocked');
       document.body.style.overflow = '';
