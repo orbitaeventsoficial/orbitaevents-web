@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 /**
  * 🎨 ADMIN LAYOUT - Òrbita Events
  * Estil càlid i acollidor amb tons beige/taronja suau
+ * Mobile-first design amb bottom navigation
  */
 
 function SidebarItem({
@@ -16,7 +17,8 @@ function SidebarItem({
   href,
   isActive,
   badge,
-  badgeColor = 'orange'
+  badgeColor = 'orange',
+  onClick
 }: {
   icon: string;
   label: string;
@@ -24,6 +26,7 @@ function SidebarItem({
   isActive: boolean;
   badge?: string;
   badgeColor?: 'orange' | 'blue' | 'green' | 'red';
+  onClick?: () => void;
 }) {
   const badgeStyles = {
     orange: 'bg-orange-100 text-orange-700',
@@ -35,10 +38,11 @@ function SidebarItem({
   return (
     <Link
       href={href}
+      onClick={onClick}
       aria-current={isActive ? 'page' : undefined}
       className={`
-        flex items-center gap-3 px-3 py-2.5 rounded-xl
-        transition-all duration-200 group
+        flex items-center gap-3 px-3 py-3 rounded-xl
+        transition-all duration-200 group active:scale-[0.98]
         ${isActive
           ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 shadow-sm'
           : 'text-stone-600 hover:text-stone-800 hover:bg-amber-50/50'
@@ -51,6 +55,50 @@ function SidebarItem({
         <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${badgeStyles[badgeColor]}`}>
           {badge}
         </span>
+      )}
+    </Link>
+  );
+}
+
+// Bottom Navigation Item para móvil
+function BottomNavItem({
+  icon,
+  label,
+  href,
+  isActive,
+  badge
+}: {
+  icon: string;
+  label: string;
+  href: string;
+  isActive: boolean;
+  badge?: number;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`
+        flex flex-col items-center justify-center gap-0.5 py-2 px-1 rounded-xl
+        transition-all duration-200 active:scale-95 relative min-w-[60px]
+        ${isActive
+          ? 'text-orange-600'
+          : 'text-stone-400'
+        }
+      `}
+    >
+      <span className="text-xl relative">
+        {icon}
+        {badge && badge > 0 && (
+          <span className="absolute -top-1 -right-2 min-w-[16px] h-4 bg-orange-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+            {badge > 99 ? '99+' : badge}
+          </span>
+        )}
+      </span>
+      <span className={`text-[10px] font-medium ${isActive ? 'text-orange-600' : 'text-stone-500'}`}>
+        {label}
+      </span>
+      {isActive && (
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-orange-500 rounded-full" />
       )}
     </Link>
   );
@@ -301,66 +349,127 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-xl border-b border-amber-100 z-50 px-4 flex items-center justify-between">
+      {/* Mobile Header - Mejorado */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-white/95 backdrop-blur-xl border-b border-amber-100 z-50 px-3 flex items-center justify-between safe-area-top">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
           aria-label="Obrir menú admin"
           aria-expanded={sidebarOpen}
           aria-controls="admin-mobile-sidebar"
-          className="p-2 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors"
+          className="p-2.5 -ml-1 text-stone-600 hover:bg-amber-50 active:bg-amber-100 rounded-xl transition-colors"
         >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <span className="text-stone-700 font-semibold">
-          <span className="text-orange-500">Òrbita</span> Admin
-        </span>
-        <div className="w-10" />
+
+        <div className="flex flex-col items-center">
+          <span className="text-stone-700 font-semibold text-sm">
+            <span className="text-orange-500">Òrbita</span> Admin
+          </span>
+          <span className="text-[10px] text-stone-400 font-medium">{getPageName()}</span>
+        </div>
+
+        <Link
+          href="/admin/settings/notifications"
+          className="p-2.5 -mr-1 text-stone-500 hover:bg-amber-50 active:bg-amber-100 rounded-xl transition-colors relative"
+          aria-label="Notificacions"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          <span className="absolute top-2 right-2 w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+        </Link>
       </header>
 
-      {/* Mobile Sidebar Overlay */}
-      {mounted && sidebarOpen && (
+      {/* Mobile Sidebar Overlay - Con animación */}
+      {mounted && (
         <>
+          {/* Backdrop */}
           <div
-            className="lg:hidden fixed inset-0 bg-amber-900/20 backdrop-blur-sm z-40"
+            className={`lg:hidden fixed inset-0 bg-stone-900/30 backdrop-blur-sm z-40 transition-opacity duration-300
+              ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             onClick={() => setSidebarOpen(false)}
             role="presentation"
           />
+          {/* Sidebar */}
           <aside
             id="admin-mobile-sidebar"
             aria-label="Menú admin"
-            className="lg:hidden fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-amber-100 z-50 overflow-y-auto"
+            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-white border-r border-amber-100 z-50 overflow-hidden
+              transform transition-transform duration-300 ease-out
+              ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
           >
-            <div className="p-4 border-b border-amber-100 flex items-center justify-between">
-              <span className="text-stone-700 font-semibold">
-                <span className="text-orange-500">Òrbita</span> Admin
-              </span>
+            {/* Header del sidebar */}
+            <div className="p-4 border-b border-amber-100 flex items-center justify-between bg-gradient-to-r from-amber-50 to-white">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-md p-1.5">
+                  <Image
+                    src="/img/logosoloplaneta.svg"
+                    alt="Òrbita"
+                    width={36}
+                    height={36}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div>
+                  <span className="text-stone-700 font-semibold text-sm">Òrbita Admin</span>
+                  <p className="text-[10px] text-stone-400">Panel de gestió</p>
+                </div>
+              </div>
               <button
                 type="button"
                 aria-label="Tancar menú admin"
                 onClick={() => setSidebarOpen(false)}
-                className="p-2 text-stone-400 hover:text-stone-700 hover:bg-amber-50 rounded-lg transition-colors"
+                className="p-2.5 text-stone-400 hover:text-stone-700 hover:bg-amber-100 active:bg-amber-200 rounded-xl transition-colors"
               >
-                ✕
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
-            <nav className="p-3">
+
+            {/* Navegación */}
+            <nav className="p-3 overflow-y-auto h-[calc(100%-140px)]">
               {navSections.map((section) => (
-                <div key={section.title} className="mb-6">
+                <div key={section.title} className="mb-5">
                   <p className="px-3 mb-2 text-[10px] font-semibold text-stone-400 uppercase tracking-wider">
                     {section.title}
                   </p>
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     {section.items.map((item) => (
-                      <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} />
+                      <SidebarItem
+                        key={item.href}
+                        {...item}
+                        isActive={isActive(item.href)}
+                        onClick={() => setSidebarOpen(false)}
+                      />
                     ))}
                   </div>
                 </div>
               ))}
             </nav>
+
+            {/* Footer del sidebar móvil */}
+            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-amber-100 bg-gradient-to-t from-white via-white to-transparent">
+              <Link
+                href="/admin/settings"
+                onClick={() => setSidebarOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/50 active:scale-[0.98] transition-transform"
+              >
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white font-semibold shadow-sm">
+                  A
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-stone-700">Admin</p>
+                  <p className="text-xs text-stone-500">Configuració del compte</p>
+                </div>
+                <svg className="w-5 h-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
           </aside>
         </>
       )}
@@ -395,11 +504,48 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </header>
 
       {/* Main Content */}
-      <main className="lg:pl-64 pt-16 min-h-screen">
-        <div className="p-4 lg:p-6">
+      <main className="lg:pl-64 pt-14 lg:pt-16 pb-20 lg:pb-0 min-h-screen">
+        <div className="p-3 sm:p-4 lg:p-6">
           {children}
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-xl border-t border-amber-100 z-50 safe-area-bottom">
+        <div className="flex items-center justify-around h-full px-2 max-w-lg mx-auto">
+          <BottomNavItem
+            icon="📊"
+            label="Dashboard"
+            href="/admin"
+            isActive={pathname === '/admin'}
+          />
+          <BottomNavItem
+            icon="👥"
+            label="Leads"
+            href="/admin/leads"
+            isActive={pathname?.startsWith('/admin/leads') || false}
+            badge={newLeadsCount}
+          />
+          <BottomNavItem
+            icon="📋"
+            label="Reserves"
+            href="/admin/bookings"
+            isActive={pathname?.startsWith('/admin/bookings') || false}
+          />
+          <BottomNavItem
+            icon="📅"
+            label="Calendari"
+            href="/admin/calendario"
+            isActive={pathname?.startsWith('/admin/calendario') || false}
+          />
+          <BottomNavItem
+            icon="⚙️"
+            label="Config"
+            href="/admin/settings"
+            isActive={pathname?.startsWith('/admin/settings') || false}
+          />
+        </div>
+      </nav>
     </div>
   );
 }

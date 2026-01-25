@@ -139,14 +139,19 @@ export default async function AdminDashboard() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-700">Dashboard</h1>
-          <p className="text-neutral-500">Benvingut al panell d&apos;administració 👋</p>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header - Optimizado para móvil */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-stone-800">Dashboard</h1>
+            <p className="text-stone-500 text-sm">Benvingut 👋</p>
+          </div>
+          <Link href="/admin/leads" className="sm:hidden">
+            <Button variant="primary" icon="+" label="Nou" />
+          </Link>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-3">
           <Link href="/admin/bookings">
             <Button variant="secondary" icon="📅" label="Reserves" />
           </Link>
@@ -157,21 +162,21 @@ export default async function AdminDashboard() {
       </div>
 
       {testimonialsPending > 0 && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 p-4 sm:flex-row sm:items-center sm:justify-between shadow-sm">
+        <div className="flex flex-col gap-2 rounded-2xl border border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between shadow-sm">
           <div>
-            <p className="text-sm text-amber-600 font-medium">Testimonis pendents</p>
-            <p className="text-lg font-semibold text-stone-700">
+            <p className="text-xs sm:text-sm text-amber-600 font-medium">Testimonis pendents</p>
+            <p className="text-base sm:text-lg font-semibold text-stone-700">
               {testimonialsPending} pendent{testimonialsPending > 1 ? 's' : ''} d&apos;aprovació
             </p>
           </div>
-          <Link href="/admin/ressenyes">
-            <Button variant="secondary" icon="⭐" label="Revisar testimonis" />
+          <Link href="/admin/ressenyes" className="self-start sm:self-auto">
+            <Button variant="secondary" icon="⭐" label="Revisar" />
           </Link>
         </div>
       )}
 
-      {/* Mètriques */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Mètriques - 2x2 en móvil */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <MetricCard
           icon="💰"
           label="Reserves confirmades"
@@ -202,16 +207,16 @@ export default async function AdminDashboard() {
         />
       </div>
 
-      {/* Contingut principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Contingut principal - Responsive */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Pròxims events */}
         <div className="lg:col-span-2">
           <Card
             title="Pròxims events"
-            subtitle={`${upcomingBookings.length} events programats`}
+            subtitle={`${upcomingBookings.length} programats`}
             action={
               <Link href="/admin/calendario">
-                <Button variant="ghost" icon="📅" label="Veure calendari" />
+                <Button variant="ghost" icon="📅" label="Calendari" />
               </Link>
             }
             noPadding
@@ -219,29 +224,31 @@ export default async function AdminDashboard() {
             {upcomingBookings.length > 0 ? (
               <div className="divide-y divide-amber-100">
                 {upcomingBookings.map((booking) => (
-                  <div key={booking.id} className="px-6 py-4 flex items-center justify-between hover:bg-amber-50/50 transition-colors">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center">
-                        <span className="text-orange-600 font-bold">
-                          {new Date(booking.eventDate).getDate()}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-stone-700 font-medium">{booking.clientName || 'Client'}</p>
-                        <p className="text-stone-500 text-sm">
-                          {formatEventDate(new Date(booking.eventDate))} · {booking.eventType || 'Event'}
-                        </p>
-                      </div>
+                  <Link
+                    key={booking.id}
+                    href={`/admin/bookings/${booking.id}`}
+                    className="px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4 hover:bg-amber-50/50 active:bg-amber-100/50 transition-colors"
+                  >
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center shrink-0">
+                      <span className="text-orange-600 font-bold text-sm sm:text-base">
+                        {new Date(booking.eventDate).getDate()}
+                      </span>
                     </div>
-                    <Link href={`/admin/bookings/${booking.id}`}>
-                      <Button variant="ghost" label="Veure" />
-                    </Link>
-                  </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-stone-700 font-medium text-sm sm:text-base truncate">{booking.clientName || 'Client'}</p>
+                      <p className="text-stone-500 text-xs sm:text-sm truncate">
+                        {formatEventDate(new Date(booking.eventDate))} · {booking.eventType || 'Event'}
+                      </p>
+                    </div>
+                    <svg className="w-4 h-4 text-stone-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
                 ))}
               </div>
             ) : (
-              <div className="px-6 py-12 text-center">
-                <p className="text-stone-500">No hi ha events programats</p>
+              <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
+                <p className="text-stone-500 text-sm">No hi ha events programats</p>
                 <Link href="/admin/bookings" className="text-orange-500 hover:text-orange-600 text-sm mt-2 inline-block font-medium">
                   Crear nova reserva →
                 </Link>
@@ -250,17 +257,17 @@ export default async function AdminDashboard() {
           </Card>
         </div>
 
-        {/* Activitat recent */}
-        <div>
-          <Card title="Activitat recent" subtitle="Últimes accions">
-            <div className="space-y-4">
+        {/* Activitat recent - Oculto en móvil muy pequeño */}
+        <div className="hidden sm:block">
+          <Card title="Activitat" subtitle="Últimes accions">
+            <div className="space-y-3 sm:space-y-4">
               {activities.map((activity, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <span className="text-lg mt-0.5">{activity.icon}</span>
+                  <span className="text-base sm:text-lg mt-0.5">{activity.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-stone-600">{activity.text}</p>
+                    <p className="text-xs sm:text-sm text-stone-600">{activity.text}</p>
                     {activity.time && (
-                      <p className="text-xs text-stone-400 mt-0.5">{activity.time}</p>
+                      <p className="text-[10px] sm:text-xs text-stone-400 mt-0.5">{activity.time}</p>
                     )}
                   </div>
                 </div>
@@ -270,13 +277,13 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* Leads recents */}
+      {/* Leads recents - Optimizado para móvil */}
       <Card
         title="Leads recents"
-        subtitle={`${leadsCount} leads totals`}
+        subtitle={`${leadsCount} totals`}
         action={
           <Link href="/admin/leads">
-            <Button variant="secondary" icon="👥" label="Veure tots" />
+            <Button variant="secondary" icon="👥" label="Tots" />
           </Link>
         }
         noPadding
@@ -284,60 +291,68 @@ export default async function AdminDashboard() {
         {recentLeads.length > 0 ? (
           <div className="divide-y divide-amber-100">
             {recentLeads.map((lead) => (
-              <div key={lead.id} className="px-6 py-4 flex items-center justify-between hover:bg-amber-50/50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center text-orange-600 font-medium">
+              <Link
+                key={lead.id}
+                href={`/admin/leads/${lead.id}`}
+                className="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-amber-50/50 active:bg-amber-100/50 transition-colors"
+              >
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center text-orange-600 font-medium text-sm sm:text-base shrink-0">
                     {lead.name?.charAt(0).toUpperCase() || '?'}
                   </div>
-                  <div>
-                    <p className="text-stone-700 font-medium">{lead.name}</p>
-                    <p className="text-stone-500 text-sm">{lead.email}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-stone-700 font-medium text-sm sm:text-base truncate">{lead.name}</p>
+                    <p className="text-stone-500 text-xs sm:text-sm truncate hidden sm:block">{lead.email}</p>
+                    <p className="text-stone-400 text-xs sm:hidden">{timeAgo(new Date(lead.createdAt))}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-2">
+                  <span className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium ${
                     lead.status === 'NEW' ? 'bg-sky-100 text-sky-700' :
                     lead.status === 'WON' ? 'bg-emerald-100 text-emerald-700' :
                     'bg-amber-100 text-amber-700'
                   }`}>
                     {lead.status}
                   </span>
-                  <span className="text-stone-400 text-sm">
+                  <span className="text-stone-400 text-sm hidden sm:block">
                     {timeAgo(new Date(lead.createdAt))}
                   </span>
+                  <svg className="w-4 h-4 text-stone-300 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
-          <div className="px-6 py-12 text-center">
-            <p className="text-stone-500">No hi ha leads encara</p>
-            <p className="text-stone-400 text-sm mt-1">Els leads del formulari de contacte apareixeran aquí</p>
+          <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
+            <p className="text-stone-500 text-sm">No hi ha leads encara</p>
+            <p className="text-stone-400 text-xs mt-1">Els leads apareixeran aquí</p>
           </div>
         )}
       </Card>
 
-      {/* Quick stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200">
-          <p className="text-emerald-600 text-sm font-medium">Taxa conversió</p>
-          <p className="text-2xl font-bold text-stone-800 mt-1">{conversionRate}%</p>
-          <p className="text-xs text-emerald-500 mt-1">{wonLeads} de {leadsCount} leads</p>
+      {/* Quick stats - Compacto en móvil */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="p-3 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200">
+          <p className="text-emerald-600 text-xs sm:text-sm font-medium">Conversió</p>
+          <p className="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5 sm:mt-1">{conversionRate}%</p>
+          <p className="text-[10px] sm:text-xs text-emerald-500 mt-0.5 sm:mt-1">{wonLeads}/{leadsCount} leads</p>
         </div>
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200">
-          <p className="text-sky-600 text-sm font-medium">Testimonis</p>
-          <p className="text-2xl font-bold text-stone-800 mt-1">{testimonialsApproved + testimonialsPending}</p>
-          <p className="text-xs text-sky-500 mt-1">{testimonialsPending} pendents</p>
+        <div className="p-3 sm:p-5 rounded-2xl bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200">
+          <p className="text-sky-600 text-xs sm:text-sm font-medium">Testimonis</p>
+          <p className="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5 sm:mt-1">{testimonialsApproved + testimonialsPending}</p>
+          <p className="text-[10px] sm:text-xs text-sky-500 mt-0.5 sm:mt-1">{testimonialsPending} pendents</p>
         </div>
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200">
-          <p className="text-violet-600 text-sm font-medium">Valoració</p>
-          <p className="text-2xl font-bold text-stone-800 mt-1">⭐ {rating}</p>
-          <p className="text-xs text-violet-500 mt-1">Mitjana de ressenyes</p>
+        <div className="p-3 sm:p-5 rounded-2xl bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200">
+          <p className="text-violet-600 text-xs sm:text-sm font-medium">Valoració</p>
+          <p className="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5 sm:mt-1">⭐ {rating}</p>
+          <p className="text-[10px] sm:text-xs text-violet-500 mt-0.5 sm:mt-1">Mitjana</p>
         </div>
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200">
-          <p className="text-orange-600 text-sm font-medium">Inventari actiu</p>
-          <p className="text-2xl font-bold text-stone-800 mt-1">{inventoryActive}/{inventoryTotal}</p>
-          <p className="text-xs text-orange-500 mt-1">{inventoryMaintenance} en manteniment</p>
+        <div className="p-3 sm:p-5 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200">
+          <p className="text-orange-600 text-xs sm:text-sm font-medium">Inventari</p>
+          <p className="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5 sm:mt-1">{inventoryActive}/{inventoryTotal}</p>
+          <p className="text-[10px] sm:text-xs text-orange-500 mt-0.5 sm:mt-1">{inventoryMaintenance} mant.</p>
         </div>
       </div>
     </div>
