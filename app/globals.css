@@ -1098,6 +1098,13 @@ html, body {
     overscroll-behavior: auto !important;
   }
 
+  html.scroll-unlocked main,
+  html.scroll-unlocked section,
+  html.scroll-unlocked div[class*="container"],
+  html.scroll-unlocked div[class*="wrapper"] {
+    overscroll-behavior: auto !important;
+  }
+
 html.admin-mode,
 body.admin-mode,
 body.admin-mode.hero-loading,
