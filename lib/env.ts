@@ -49,6 +49,8 @@ const serverSchema = z.object({
   GA4_PROPERTY_ID: z.string().optional(),
   GA4_CLIENT_EMAIL: z.string().optional(),
   GA4_PRIVATE_KEY: z.string().optional(),
+  UMAMI_API_KEY: z.string().optional(),
+  UMAMI_BASE_URL: z.string().url().optional(),
 
   // Node environment
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),

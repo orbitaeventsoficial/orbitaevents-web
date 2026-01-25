@@ -2,6 +2,7 @@
 import { log } from '@/lib/logger';
 // Pàgina d'analytics i estadístiques
 import { prisma } from '@/lib/prisma';
+import { getUmamiReport } from '@/lib/analytics/umami';
 
 export const dynamic = 'force-dynamic';
 
@@ -156,11 +157,16 @@ export default async function AnalyticsPage() {
   const umamiDashboardUrl =
     process.env.NEXT_PUBLIC_UMAMI_DASHBOARD_URL || 'https://analytics.orbitaevents.com';
   const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID || 'No configurat';
+  const umamiApiReady = Boolean(process.env.UMAMI_API_KEY) && umamiWebsiteId !== 'No configurat';
   const yearGrowth = data.revenue.lastYear > 0
     ? ((data.revenue.thisYear - data.revenue.lastYear) / data.revenue.lastYear * 100).toFixed(1)
     : '100.0';
   const gtmReady = gtmId !== 'No configurat';
   const umamiReady = umamiWebsiteId !== 'No configurat';
+  const umami = umamiApiReady ? await getUmamiReport(umamiWebsiteId) : null;
+  const avgVisitMinutes = umami?.totals.totalTime
+    ? Math.max(1, Math.round(umami.totals.totalTime / 60 / Math.max(umami.totals.visits, 1)))
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -425,10 +431,112 @@ export default async function AnalyticsPage() {
               <p className="text-xs uppercase text-slate-300">Estat</p>
               <p className="mt-2 text-lg font-semibold">{umamiReady ? 'Actiu' : 'Pendent'}</p>
               <p className="mt-2 text-xs text-slate-300">
-                {umamiReady ? 'Recollint dades' : 'Revisa les variables'}
+                {umamiApiReady ? 'Recollint dades' : 'Falta API Key'}
               </p>
             </div>
           </div>
+          {umami && (
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-[0_10px_22px_-18px_rgba(15,23,42,0.4)]">
+                <p className="text-xs font-medium uppercase text-slate-500">Pageviews</p>
+                <p className="mt-2 text-2xl font-semibold text-slate-800">{umami.totals.pageviews}</p>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-[0_10px_22px_-18px_rgba(15,23,42,0.4)]">
+                <p className="text-xs font-medium uppercase text-slate-500">Visitors</p>
+                <p className="mt-2 text-2xl font-semibold text-slate-800">{umami.totals.visitors}</p>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-[0_10px_22px_-18px_rgba(15,23,42,0.4)]">
+                <p className="text-xs font-medium uppercase text-slate-500">Visits</p>
+                <p className="mt-2 text-2xl font-semibold text-slate-800">{umami.totals.visits}</p>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-[0_10px_22px_-18px_rgba(15,23,42,0.4)]">
+                <p className="text-xs font-medium uppercase text-slate-500">Avg. visit (min)</p>
+                <p className="mt-2 text-2xl font-semibold text-slate-800">{avgVisitMinutes}</p>
+              </div>
+            </div>
+          )}
+          {umami && (
+            <div className="grid gap-4 lg:grid-cols-3">
+              <div className="rounded-2xl border border-stone-200 bg-white shadow-[0_12px_26px_-18px_rgba(15,23,42,0.35)]">
+                <div className="border-b border-stone-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                  Top Pages
+                </div>
+                <div className="space-y-2 p-4 text-sm">
+                  {umami.topPages.slice(0, 6).map((row) => (
+                    <div key={row.label} className="flex items-center justify-between">
+                      <span className="truncate text-slate-700">{row.label}</span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-stone-200 bg-white shadow-[0_12px_26px_-18px_rgba(15,23,42,0.35)]">
+                <div className="border-b border-stone-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                  Referrers
+                </div>
+                <div className="space-y-2 p-4 text-sm">
+                  {umami.referrers.slice(0, 6).map((row) => (
+                    <div key={row.label} className="flex items-center justify-between">
+                      <span className="truncate text-slate-700">{row.label}</span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-stone-200 bg-white shadow-[0_12px_26px_-18px_rgba(15,23,42,0.35)]">
+                <div className="border-b border-stone-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                  Countries
+                </div>
+                <div className="space-y-2 p-4 text-sm">
+                  {umami.countries.slice(0, 6).map((row) => (
+                    <div key={row.label} className="flex items-center justify-between">
+                      <span className="truncate text-slate-700">{row.label}</span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-stone-200 bg-white shadow-[0_12px_26px_-18px_rgba(15,23,42,0.35)]">
+                <div className="border-b border-stone-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                  Devices
+                </div>
+                <div className="space-y-2 p-4 text-sm">
+                  {umami.devices.slice(0, 6).map((row) => (
+                    <div key={row.label} className="flex items-center justify-between">
+                      <span className="truncate text-slate-700">{row.label}</span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-stone-200 bg-white shadow-[0_12px_26px_-18px_rgba(15,23,42,0.35)]">
+                <div className="border-b border-stone-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                  Browsers
+                </div>
+                <div className="space-y-2 p-4 text-sm">
+                  {umami.browsers.slice(0, 6).map((row) => (
+                    <div key={row.label} className="flex items-center justify-between">
+                      <span className="truncate text-slate-700">{row.label}</span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-stone-200 bg-white shadow-[0_12px_26px_-18px_rgba(15,23,42,0.35)]">
+                <div className="border-b border-stone-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                  Events
+                </div>
+                <div className="space-y-2 p-4 text-sm">
+                  {umami.events.slice(0, 6).map((row) => (
+                    <div key={row.label} className="flex items-center justify-between">
+                      <span className="truncate text-slate-700">{row.label}</span>
+                      <span className="text-slate-500">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
           <div className="flex flex-wrap items-center gap-3">
             <a
               href={umamiDashboardUrl}
