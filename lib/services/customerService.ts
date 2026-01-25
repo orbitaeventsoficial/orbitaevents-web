@@ -43,13 +43,16 @@ export interface UpsertCustomerResult {
 /**
  * Buscar client per email
  */
+// Camps essencials per a consultes de customers
+const CUSTOMER_SELECT_FIELDS = 'id, email, name, name_normalized, phone, phone_normalized, city, instagram, how_found_us, is_vip, consent_marketing, consent_marketing_date, consent_data_processing, consent_data_processing_date, total_events, first_contact_date, last_contact_date, created_at, updated_at';
+
 export async function findCustomerByEmail(email: string): Promise<Customer | null> {
   if (!supabaseAdmin) return null;
   const normalizedEmail = normalizeEmail(email);
 
   const { data, error } = await supabaseAdmin
     .from('customers')
-    .select('*')
+    .select(CUSTOMER_SELECT_FIELDS)
     .eq('email', normalizedEmail)
     .single();
 

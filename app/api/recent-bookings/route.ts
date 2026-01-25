@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma';
 
 // Forçar ruta dinàmica (no s'executa durant el build)
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 60; // Cache 1 minut per reduir egress
 
 export async function GET() {
   try {

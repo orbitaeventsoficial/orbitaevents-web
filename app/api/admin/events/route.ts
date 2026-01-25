@@ -44,11 +44,12 @@ export async function GET(request: NextRequest) {
 
     const { data: bookings, error } = await supabaseAdmin!
       .from('bookings')
-      .select('*')
+      .select('id, event_date, status, client_name, client_email, event_type, post_event_sent_at, review_requested_at, created_at, updated_at')
       .eq('status', status)
       .gte('event_date', cutoffDate.toISOString())
       .lte('event_date', new Date().toISOString())
-      .order('event_date', { ascending: false });
+      .order('event_date', { ascending: false })
+      .limit(100);
 
     if (error) throw error;
 

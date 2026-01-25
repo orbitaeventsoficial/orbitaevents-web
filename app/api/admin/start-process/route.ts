@@ -69,10 +69,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Obtenir client
+    // Obtenir client (només camps necessaris)
     const { data: customer, error: customerError } = await supabaseAdmin!
       .from('customers')
-      .select('*')
+      .select('id, email, name')
       .eq('id', customerId)
       .single();
 
