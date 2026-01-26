@@ -99,32 +99,30 @@ function AvailabilityCounter() {
 
       <div className="relative flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-white/60 text-xs mb-1">{t('availability.badge')}</p>
-          <p className={`font-black text-2xl ${style.text}`}>
-            {availability.saturdays} {t('availability.saturdaysFree')}
+          <p className="text-white/60 text-xs uppercase tracking-wider mb-2">
+            {t('availability.badge')}
           </p>
-          <p className="text-white/50 text-xs">{availability.month}</p>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            <span className={`text-2xl font-black ${style.text}`}>{availability.saturdays}</span>
+            <span className="text-white/80 text-sm font-semibold">
+              {availability.saturdays === 1
+                ? t('availability.saturdayFree')
+                : t('availability.saturdaysFree')}
+            </span>
+          </div>
+          <p className="text-white/50 text-xs mt-2">{availability.month}</p>
         </div>
 
         {urgencyLevel !== 'normal' && (
           <motion.div
-            animate={reduceMotion ? { scale: 1 } : { scale: [1, 1.05, 1] }}
-            transition={reduceMotion ? { duration: 0 } : { duration: 1.2, repeat: Infinity }}
-            className="shrink-0 px-3 py-1.5 rounded-full bg-white/5 border border-amber-400/40 text-amber-200 text-[11px] font-semibold shadow-[0_0_20px_rgba(245,158,11,0.25)]"
+            animate={reduceMotion ? { opacity: 1 } : { opacity: [0.8, 1, 0.8] }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 2, repeat: Infinity }}
+            className="shrink-0 px-3 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-200 text-[11px] font-semibold"
           >
             {urgencyLevel === 'critical' ? t('availability.lastOne') : t('availability.lastOnes')}
           </motion.div>
         )}
       </div>
-      {urgencyLevel !== 'normal' && (
-        <motion.div
-          animate={reduceMotion ? { opacity: 1 } : { opacity: [0.8, 1, 0.8] }}
-          transition={reduceMotion ? { duration: 0 } : { duration: 2, repeat: Infinity }}
-          className="mt-2 text-[11px] text-amber-200/80"
-        >
-          {urgencyLevel === 'critical' ? t('availability.lastOne') : t('availability.lastOnes')}
-        </motion.div>
-      )}
     </motion.div>
   );
 }

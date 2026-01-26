@@ -293,14 +293,12 @@
   }
 }
 
-/* Hide custom scrollbars (no golden bars) */
-html,
-body {
+/* Hide scrollbars globally (remove golden bars) */
+* {
   scrollbar-width: none;
 }
 
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
@@ -1218,6 +1216,11 @@ html::before {
   main {
     padding-bottom: calc(6rem + env(safe-area-inset-bottom));
   }
+}
+
+/* Allow native pull-to-refresh on mobile experience */
+body.mobile-experience-active {
+  overscroll-behavior: auto !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════

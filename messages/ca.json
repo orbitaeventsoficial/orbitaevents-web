@@ -6168,6 +6168,7 @@
     "guarantee": "Garantia 100% satisfacció",
     "availability": {
       "badge": "Disponibilitat aquest mes",
+      "saturdayFree": "dissabte lliure",
       "saturdaysFree": "dissabtes lliures",
       "lastOne": "Últim cap de setmana disponible",
       "lastOnes": "Últims caps de setmana disponibles"

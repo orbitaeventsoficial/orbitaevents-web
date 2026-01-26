@@ -413,13 +413,6 @@ export default function MobileAppShell({
       {/* Offline Banner */}
       <OfflineBanner isOnline={isOnline} />
 
-      {/* Floating Header */}
-      <FloatingHeader
-        isVisible={isHeaderVisible}
-        scrollProgress={scrollY / 100}
-        locale={locale}
-      />
-
       {/* Main Content */}
       <div
         ref={containerRef}
@@ -431,7 +424,7 @@ export default function MobileAppShell({
         style={{
           touchAction: 'pan-y',
           WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
+          overscrollBehavior: 'auto',
         }}
       >
         <PullToRefresh onRefresh={handleRefresh}>

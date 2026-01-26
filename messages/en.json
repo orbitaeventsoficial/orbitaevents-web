@@ -5996,6 +5996,7 @@
     "guarantee": "100% satisfaction guarantee",
     "availability": {
       "badge": "Availability this month",
+      "saturdayFree": "free saturday",
       "saturdaysFree": "free saturdays",
       "lastOne": "Last weekend available",
       "lastOnes": "Last weekends available"
