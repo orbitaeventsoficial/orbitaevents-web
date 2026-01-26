@@ -87,6 +87,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     const overlay = document.getElementById('intro-overlay');
     if (overlay) {
       overlay.style.opacity = '0';
+      overlay.style.pointerEvents = 'none'; // Allow touch through immediately
       setTimeout(() => {
         overlay.style.display = 'none';
       }, 400);
@@ -110,6 +111,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       const overlay = document.getElementById('intro-overlay');
       if (overlay && overlay.style.display !== 'none') {
         overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
         setTimeout(() => {
           overlay.style.display = 'none';
         }, 400);

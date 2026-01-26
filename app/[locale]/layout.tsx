@@ -518,6 +518,7 @@ export default async function LocaleLayout({
                 var o = document.getElementById('intro-overlay');
                 if (o && o.style.display !== 'none') {
                   o.style.opacity = '0';
+                  o.style.pointerEvents = 'none';
                   setTimeout(function() { o.style.display = 'none'; }, 400);
                 }
               }, 5000);
