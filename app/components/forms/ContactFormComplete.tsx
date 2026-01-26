@@ -289,7 +289,7 @@ export default function ContactFormComplete({
             onChange={(e) => updateField('fullName', e.target.value)}
             onBlur={() => { touchField('fullName'); validateField('fullName'); }}
             placeholder={t('placeholders.fullName')}
-            className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
+            className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base
                      placeholder:text-white/50 outline-none transition-all
                      ${errors.fullName && touched.fullName
                        ? 'border-red-500 focus:ring-red-500'
@@ -314,7 +314,7 @@ export default function ContactFormComplete({
               onChange={(e) => updateField('email', e.target.value)}
               onBlur={() => { touchField('email'); validateField('email'); }}
               placeholder={t('placeholders.email')}
-              className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
+              className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base
                        placeholder:text-white/50 outline-none transition-all
                        ${errors.email && touched.email
                          ? 'border-red-500'
@@ -337,7 +337,7 @@ export default function ContactFormComplete({
               onChange={(e) => updateField('phone', e.target.value)}
               onBlur={() => { touchField('phone'); validateField('phone'); }}
               placeholder={t('placeholders.phone')}
-              className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
+              className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base
                        placeholder:text-white/50 outline-none transition-all
                        ${errors.phone && touched.phone
                          ? 'border-red-500'
@@ -366,7 +366,7 @@ export default function ContactFormComplete({
             value={formData.eventType}
             onChange={(e) => updateField('eventType', e.target.value)}
             onBlur={() => { touchField('eventType'); validateField('eventType'); }}
-            className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white
+            className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base
                      outline-none transition-all appearance-none cursor-pointer
                      ${errors.eventType && touched.eventType
                        ? 'border-red-500'
@@ -400,7 +400,7 @@ export default function ContactFormComplete({
               onChange={(e) => updateField('eventDate', e.target.value)}
               min={minDate}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                       text-white outline-none focus:border-amber-500 focus:ring-2
+                       text-white text-base outline-none focus:border-amber-500 focus:ring-2
                        focus:ring-amber-500 transition-all"
             />
             {errors.eventDate && (
@@ -417,7 +417,7 @@ export default function ContactFormComplete({
               value={formData.guestCount}
               onChange={(e) => updateField('guestCount', e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                       text-white outline-none focus:border-amber-500 focus:ring-2
+                       text-white text-base outline-none focus:border-amber-500 focus:ring-2
                        focus:ring-amber-500 transition-all appearance-none cursor-pointer"
             >
               <option value="" className="bg-black">{t('placeholders.selectGuests')}</option>
@@ -443,7 +443,7 @@ export default function ContactFormComplete({
               onChange={(e) => updateField('location', e.target.value)}
               placeholder={t('placeholders.location')}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                       text-white placeholder:text-white/50 outline-none
+                       text-white text-base placeholder:text-white/50 outline-none
                        focus:border-amber-500 focus:ring-2 focus:ring-amber-500 transition-all"
             />
           </div>
@@ -457,7 +457,7 @@ export default function ContactFormComplete({
               value={formData.budget}
               onChange={(e) => updateField('budget', e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                       text-white outline-none focus:border-amber-500 focus:ring-2
+                       text-white text-base outline-none focus:border-amber-500 focus:ring-2
                        focus:ring-amber-500 transition-all appearance-none cursor-pointer"
             >
               <option value="" className="bg-black">{t('placeholders.selectBudget')}</option>
@@ -489,7 +489,7 @@ export default function ContactFormComplete({
             placeholder={t('placeholders.message')}
             rows={4}
             className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                     text-white placeholder:text-white/50 outline-none resize-none
+                     text-white text-base placeholder:text-white/50 outline-none resize-none
                      focus:border-amber-500 focus:ring-2 focus:ring-amber-500 transition-all"
           />
         </div>
@@ -505,7 +505,7 @@ export default function ContactFormComplete({
           value={formData.howFound}
           onChange={(e) => updateField('howFound', e.target.value)}
           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                   text-white outline-none focus:border-amber-500 focus:ring-2
+                   text-white text-base outline-none focus:border-amber-500 focus:ring-2
                    focus:ring-amber-500 transition-all appearance-none cursor-pointer"
         >
           <option value="" className="bg-black">{t('placeholders.selectHowFound')}</option>

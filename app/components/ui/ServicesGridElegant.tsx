@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 
 // Solo tres puertas principales: Bodas / Fiestas / Empresas
 const SERVICE_KEYS = ['casaments', 'festes', 'empreses'] as const;
@@ -178,31 +177,7 @@ export default function ServicesGridElegant() {
           </Link>
         </motion.div>
 
-        {/* CTA pegajoso movil */}
-        <div className="md:hidden fixed bottom-4 left-0 right-0 z-30 px-4">
-          <div className="rounded-2xl bg-white/10 border border-white/10 backdrop-blur-lg p-3 shadow-lg shadow-orange-500/10 flex items-center gap-3">
-            <div className="flex-1">
-              <p className="text-white font-semibold text-sm">{t('mobileCta.ready')}</p>
-              <p className="text-white/60 text-xs">{t('mobileCta.response')}</p>
-            </div>
-            <div className="flex gap-2">
-              <a
-                href={WHATSAPP_URL_WITH_MESSAGE('Hola! Quiero informacion para mi evento.')}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 bg-[#25D366] text-white text-xs font-semibold rounded-xl"
-              >
-                {t('mobileCta.whatsapp')}
-              </a>
-              <Link
-                href="/configurador"
-                className="px-4 py-2 bg-white text-black text-xs font-semibold rounded-xl"
-              >
-                {t('mobileCta.prices')}
-              </Link>
-            </div>
-          </div>
-        </div>
+        {/* CTA móvil eliminado - ya existe BottomNav + FloatingCTAs globales */}
       </div>
     </section>
   );
