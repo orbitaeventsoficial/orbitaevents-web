@@ -92,8 +92,8 @@ export default function HeroPortalLogo({
   // Configuración responsive - logo más grande
   const config = useMemo(() => ({
     logoSize: isMobile ? 280 : 520,
-    textSize: isMobile ? '1.6rem' : '2.2rem',
-    wordmarkWidth: isMobile ? 260 : 360,
+    textSize: isMobile ? '1.25rem' : '1.85rem',
+    wordmarkWidth: isMobile ? 290 : 390,
   }), [isMobile]);
 
   return (

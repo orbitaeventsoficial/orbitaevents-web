@@ -59,6 +59,18 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
   const subtitle = t(`services.${service.id}.subtitle`);
   const price = t(`services.${service.id}.price`);
   const badge = service.badgeKey ? t(`services.${service.id}.badge`) : '';
+  const veilGradient = useMemo(() => {
+    switch (service.id) {
+      case 'halloween':
+        return 'conic-gradient(from 90deg, rgba(249,115,22,0.35), rgba(239,68,68,0.35), rgba(251,191,36,0.3), rgba(249,115,22,0.35))';
+      case 'monmagic':
+        return 'conic-gradient(from 90deg, rgba(168,85,247,0.35), rgba(236,72,153,0.35), rgba(56,189,248,0.25), rgba(168,85,247,0.35))';
+      case 'bodas':
+        return 'conic-gradient(from 90deg, rgba(251,191,36,0.35), rgba(251,146,60,0.35), rgba(248,250,252,0.2), rgba(251,191,36,0.35))';
+      default:
+        return 'conic-gradient(from 90deg, rgba(59,130,246,0.3), rgba(139,92,246,0.3), rgba(16,185,129,0.25), rgba(59,130,246,0.3))';
+    }
+  }, [service.id]);
 
   return (
     <motion.div
@@ -94,6 +106,18 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 via-zinc-950/35 to-zinc-950/10" />
 
         </div>
+
+        {/* Rotating color veil between image and text */}
+        <motion.div
+          className="absolute inset-0 z-[5] pointer-events-none opacity-45"
+          style={{
+            backgroundImage: veilGradient,
+            filter: 'blur(22px)',
+            mixBlendMode: 'screen',
+          }}
+          animate={reduceMotion ? { rotate: 0 } : { rotate: 360 }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 14, repeat: Infinity, ease: 'linear' }}
+        />
 
         {/* Badge - Enhanced */}
         {badge && (
