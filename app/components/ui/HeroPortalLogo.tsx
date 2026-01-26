@@ -80,7 +80,6 @@ export default function HeroPortalLogo({
 
   // Skip en móvil con tap
   const handleSkip = useCallback(() => {
-    if ('vibrate' in navigator) navigator.vibrate(10);
     clearTimers();
     setVisible(false);
     window.setTimeout(() => onFinish?.(), 300);

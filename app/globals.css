@@ -293,6 +293,18 @@
   }
 }
 
+/* Hide custom scrollbars (no golden bars) */
+html,
+body {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
    COMPONENT LAYER
    ════════════════════════════════════════════════════════════════════════════ */

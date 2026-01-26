@@ -57,17 +57,7 @@ export const useMobile = () => useContext(MobileContext);
 // ═══════════════════════════════════════════════════════════════════════════
 
 const triggerHaptic = (type: 'light' | 'medium' | 'heavy') => {
-  if (typeof window === 'undefined') return;
-  
-  // iOS Haptic
-  if ('vibrate' in navigator) {
-    const patterns = {
-      light: 10,
-      medium: 25,
-      heavy: 50,
-    };
-    navigator.vibrate(patterns[type]);
-  }
+  void type;
 };
 
 // ═══════════════════════════════════════════════════════════════════════════

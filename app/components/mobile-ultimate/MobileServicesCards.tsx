@@ -109,10 +109,10 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
 
         {/* Rotating color veil between image and text */}
         <motion.div
-          className="absolute inset-0 z-[5] pointer-events-none opacity-45"
+          className="absolute inset-0 z-[5] pointer-events-none opacity-70"
           style={{
             backgroundImage: veilGradient,
-            filter: 'blur(22px)',
+            filter: 'blur(26px)',
             mixBlendMode: 'screen',
           }}
           animate={reduceMotion ? { rotate: 0 } : { rotate: 360 }}
