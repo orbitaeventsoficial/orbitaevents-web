@@ -24,17 +24,17 @@ export function MetricCard({
   const changeColors = {
     up: 'text-emerald-600',
     down: 'text-rose-600',
-    neutral: 'text-stone-500',
+    neutral: 'text-slate-500',
   };
 
   return (
-    <div className="bg-white rounded-2xl p-3 sm:p-5 border border-amber-100 shadow-sm hover:shadow-md active:shadow-sm transition-shadow">
+    <div className="bg-white rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-[0_8px_24px_-18px_rgba(15,23,42,0.6)] hover:shadow-[0_12px_30px_-18px_rgba(15,23,42,0.7)] transition-shadow">
       <div className="flex items-start justify-between mb-2 sm:mb-3">
         <div className="min-w-0 flex-1">
-          <p className="text-xs sm:text-sm text-stone-500 font-medium truncate">{label}</p>
-          <p className="text-2xl sm:text-3xl font-bold text-stone-800 mt-0.5 sm:mt-1">{value}</p>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium truncate">{label}</p>
+          <p className="text-2xl sm:text-3xl font-semibold text-slate-900 mt-0.5 sm:mt-1">{value}</p>
         </div>
-        {icon && <span className="text-xl sm:text-2xl opacity-80 shrink-0 ml-2">{icon}</span>}
+        {icon && <span className="text-xl sm:text-2xl opacity-80 shrink-0 ml-2 text-slate-500">{icon}</span>}
       </div>
       {change && (
         <p className={`text-[10px] sm:text-xs font-medium truncate ${changeColors[changeType || 'neutral']}`}>
@@ -60,12 +60,12 @@ export function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-amber-100 overflow-hidden shadow-sm">
+    <div className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-[0_10px_28px_-20px_rgba(15,23,42,0.6)]">
       {(title || subtitle || action) && (
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-amber-100 flex items-center justify-between gap-3 bg-gradient-to-r from-amber-50/50 to-transparent">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200/60 flex items-center justify-between gap-3 bg-slate-50">
           <div className="min-w-0 flex-1">
-            {title && <h3 className="text-base sm:text-lg font-semibold text-stone-800 truncate">{title}</h3>}
-            {subtitle && <p className="text-xs sm:text-sm text-stone-500 mt-0.5 truncate">{subtitle}</p>}
+            {title && <h3 className="text-sm sm:text-base font-semibold text-slate-800 truncate">{title}</h3>}
+            {subtitle && <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 truncate">{subtitle}</p>}
           </div>
           {action && <div className="shrink-0">{action}</div>}
         </div>
@@ -98,9 +98,9 @@ export function Button({
     ${size === 'sm' ? 'px-2.5 sm:px-3 py-1.5 text-xs' : 'px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm'}`;
 
   const variantClasses = {
-    primary: 'bg-gradient-to-r from-orange-400 to-amber-500 text-white hover:from-orange-500 hover:to-amber-600 active:from-orange-600 active:to-amber-700 shadow-sm hover:shadow',
-    secondary: 'bg-amber-50 text-stone-700 hover:bg-amber-100 active:bg-amber-200 border border-amber-200',
-    ghost: 'bg-transparent text-stone-600 hover:bg-amber-50 active:bg-amber-100 hover:text-stone-800',
+    primary: 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-400 hover:to-blue-500 active:from-cyan-600 active:to-blue-700 shadow-sm hover:shadow',
+    secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200 active:bg-slate-300 border border-slate-200',
+    ghost: 'bg-transparent text-slate-500 hover:bg-slate-100 active:bg-slate-200 hover:text-slate-700',
   };
 
   const className = `${baseClasses} ${variantClasses[variant]}`;

@@ -181,6 +181,9 @@ export default async function AnalyticsPage() {
   const avgVisitMinutes = umami?.totals.totalTime
     ? Math.max(1, Math.round(umami.totals.totalTime / 60 / Math.max(umami.totals.visits, 1)))
     : 0;
+  const avgSessionMinutes = ga4?.totals.avgSessionDuration
+    ? Math.max(1, Math.round(ga4.totals.avgSessionDuration / 60))
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -278,6 +281,10 @@ export default async function AnalyticsPage() {
               <p className="text-xs uppercase text-slate-300">Events</p>
               <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.eventCount}</p>
             </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs uppercase text-slate-300">Temps mitja (min)</p>
+              <p className="mt-2 text-3xl font-semibold text-white">{avgSessionMinutes}</p>
+            </div>
           </div>
         )}
 
@@ -321,6 +328,28 @@ export default async function AnalyticsPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {ga4 && (
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/5">
+            <div className="border-b border-white/10 px-4 py-3 text-sm font-semibold text-slate-200">
+              Paraules de cerca (GA4)
+            </div>
+            <div className="space-y-2 p-4 text-sm text-slate-200">
+              {ga4.searchTerms.length === 0 && (
+                <p className="text-slate-300">Sense dades de cerca interna.</p>
+              )}
+              {ga4.searchTerms.map((row) => (
+                <div key={`${row.dimension}-${row.value}`} className="flex items-center justify-between">
+                  <span className="truncate">{row.dimension || '—'}</span>
+                  <span className="text-slate-300">{row.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-white/10 px-4 py-2 text-xs text-slate-400">
+              GA4 mostra cerques internes (si existeixen). Per paraules SEO cal Search Console.
             </div>
           </div>
         )}

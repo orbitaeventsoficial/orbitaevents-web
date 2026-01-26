@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { getGa4Report } from '@/lib/analytics/ga4';
 import { MetricCard, Card, Button } from './components/ui';
 import Link from 'next/link';
 
@@ -33,6 +34,12 @@ function formatEventDate(date: Date): string {
 export default async function AdminDashboard() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  let ga4 = null;
+  try {
+    ga4 = await getGa4Report();
+  } catch {
+    ga4 = null;
+  }
 
   // Obtenir totes les dades en paral·lel (optimitzat)
   const [
@@ -122,6 +129,12 @@ export default async function AdminDashboard() {
 
   const rating = avgRating._avg.rating ? avgRating._avg.rating.toFixed(1) : '5.0';
   const conversionRate = leadsCount > 0 ? Math.round((wonLeads / leadsCount) * 100) : 0;
+  const ga4Sessions = ga4?.totals.sessions || 0;
+  const ga4Users = ga4?.totals.activeUsers || 0;
+  const ga4PageViews = ga4?.totals.pageViews || 0;
+  const ga4AvgSessionMin = ga4?.totals.avgSessionDuration
+    ? Math.max(1, Math.round(ga4.totals.avgSessionDuration / 60))
+    : 0;
 
   // Activitat recent
   const activities = [
@@ -140,20 +153,20 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Header - Optimizado para móvil */}
+      {/* Header */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-800">Dashboard</h1>
-            <p className="text-stone-500 text-sm">Benvingut 👋</p>
+            <h1 className="text-lg sm:text-xl font-semibold text-slate-100">Resum rapid</h1>
+            <p className="text-slate-400 text-xs">Visio general del negoci</p>
           </div>
           <Link href="/admin/leads" className="sm:hidden">
             <Button variant="primary" icon="+" label="Nou" />
           </Link>
         </div>
         <div className="hidden sm:flex items-center gap-3">
-          <Link href="/admin/bookings">
-            <Button variant="secondary" icon="📅" label="Reserves" />
+          <Link href="/admin/analytics">
+            <Button variant="secondary" icon="📈" label="Analytics" />
           </Link>
           <Link href="/admin/leads">
             <Button variant="primary" icon="+" label="Nou lead" />
@@ -162,11 +175,11 @@ export default async function AdminDashboard() {
       </div>
 
       {testimonialsPending > 0 && (
-        <div className="flex flex-col gap-2 rounded-2xl border border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between shadow-sm">
+        <div className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between shadow-[0_8px_24px_-18px_rgba(15,23,42,0.5)]">
           <div>
-            <p className="text-xs sm:text-sm text-amber-600 font-medium">Testimonis pendents</p>
-            <p className="text-base sm:text-lg font-semibold text-stone-700">
-              {testimonialsPending} pendent{testimonialsPending > 1 ? 's' : ''} d&apos;aprovació
+            <p className="text-xs sm:text-sm text-slate-500 font-medium">Testimonis pendents</p>
+            <p className="text-base sm:text-lg font-semibold text-slate-900">
+              {testimonialsPending} pendent{testimonialsPending > 1 ? 's' : ''} d&apos;aprovacio
             </p>
           </div>
           <Link href="/admin/ressenyes" className="self-start sm:self-auto">
@@ -175,20 +188,20 @@ export default async function AdminDashboard() {
         </div>
       )}
 
-      {/* Mètriques - 2x2 en móvil */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {/* Mètriques essencials */}
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
         <MetricCard
-          icon="💰"
+          icon="📋"
           label="Reserves confirmades"
           value={bookingsConfirmed.toString()}
           change={bookingsThisMonth > 0 ? `+${bookingsThisMonth} aquest mes` : '-'}
           changeType="up"
         />
         <MetricCard
-          icon="👥"
-          label="Leads totals"
-          value={leadsCount.toString()}
-          change={leadsThisMonth > 0 ? `+${leadsThisMonth} aquest mes` : '-'}
+          icon="📨"
+          label="Consultes mes"
+          value={leadsThisMonth.toString()}
+          change={`${leadsCount} totals`}
           changeType="up"
         />
         <MetricCard
@@ -204,6 +217,20 @@ export default async function AdminDashboard() {
           value={rating}
           change={`${testimonialsApproved} ressenyes`}
           changeType="up"
+        />
+        <MetricCard
+          icon="🌐"
+          label="Sessions web (30d)"
+          value={ga4Sessions || '-'}
+          change={ga4Users ? `${ga4Users} usuaris` : 'GA4 pendent'}
+          changeType="neutral"
+        />
+        <MetricCard
+          icon="⏱️"
+          label="Temps mitja web"
+          value={ga4AvgSessionMin ? `${ga4AvgSessionMin} min` : '-'}
+          change={ga4PageViews ? `${ga4PageViews} pagines` : 'GA4 pendent'}
+          changeType="neutral"
         />
       </div>
 
@@ -222,21 +249,21 @@ export default async function AdminDashboard() {
             noPadding
           >
             {upcomingBookings.length > 0 ? (
-              <div className="divide-y divide-amber-100">
+              <div className="divide-y divide-slate-200">
                 {upcomingBookings.map((booking) => (
                   <Link
                     key={booking.id}
                     href={`/admin/bookings/${booking.id}`}
-                    className="px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4 hover:bg-amber-50/50 active:bg-amber-100/50 transition-colors"
+                    className="px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4 hover:bg-slate-50 active:bg-slate-100 transition-colors"
                   >
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center shrink-0">
-                      <span className="text-orange-600 font-bold text-sm sm:text-base">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center shrink-0">
+                      <span className="text-slate-700 font-bold text-sm sm:text-base">
                         {new Date(booking.eventDate).getDate()}
                       </span>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-stone-700 font-medium text-sm sm:text-base truncate">{booking.clientName || 'Client'}</p>
-                      <p className="text-stone-500 text-xs sm:text-sm truncate">
+                      <p className="text-slate-900 font-medium text-sm sm:text-base truncate">{booking.clientName || 'Client'}</p>
+                      <p className="text-slate-500 text-xs sm:text-sm truncate">
                         {formatEventDate(new Date(booking.eventDate))} · {booking.eventType || 'Event'}
                       </p>
                     </div>
@@ -248,8 +275,8 @@ export default async function AdminDashboard() {
               </div>
             ) : (
               <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-                <p className="text-stone-500 text-sm">No hi ha events programats</p>
-                <Link href="/admin/bookings" className="text-orange-500 hover:text-orange-600 text-sm mt-2 inline-block font-medium">
+                <p className="text-slate-500 text-sm">No hi ha events programats</p>
+                <Link href="/admin/bookings" className="text-cyan-600 hover:text-cyan-500 text-sm mt-2 inline-block font-medium">
                   Crear nova reserva →
                 </Link>
               </div>
@@ -289,32 +316,32 @@ export default async function AdminDashboard() {
         noPadding
       >
         {recentLeads.length > 0 ? (
-          <div className="divide-y divide-amber-100">
+          <div className="divide-y divide-slate-200">
             {recentLeads.map((lead) => (
               <Link
                 key={lead.id}
                 href={`/admin/leads/${lead.id}`}
-                className="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-amber-50/50 active:bg-amber-100/50 transition-colors"
+                className="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-slate-50 active:bg-slate-100 transition-colors"
               >
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center text-orange-600 font-medium text-sm sm:text-base shrink-0">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-700 font-medium text-sm sm:text-base shrink-0">
                     {lead.name?.charAt(0).toUpperCase() || '?'}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-stone-700 font-medium text-sm sm:text-base truncate">{lead.name}</p>
-                    <p className="text-stone-500 text-xs sm:text-sm truncate hidden sm:block">{lead.email}</p>
-                    <p className="text-stone-400 text-xs sm:hidden">{timeAgo(new Date(lead.createdAt))}</p>
+                    <p className="text-slate-900 font-medium text-sm sm:text-base truncate">{lead.name}</p>
+                    <p className="text-slate-500 text-xs sm:text-sm truncate hidden sm:block">{lead.email}</p>
+                    <p className="text-slate-400 text-xs sm:hidden">{timeAgo(new Date(lead.createdAt))}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-2">
                   <span className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium ${
                     lead.status === 'NEW' ? 'bg-sky-100 text-sky-700' :
                     lead.status === 'WON' ? 'bg-emerald-100 text-emerald-700' :
-                    'bg-amber-100 text-amber-700'
+                    'bg-slate-100 text-slate-600'
                   }`}>
                     {lead.status}
                   </span>
-                  <span className="text-stone-400 text-sm hidden sm:block">
+                  <span className="text-slate-400 text-sm hidden sm:block">
                     {timeAgo(new Date(lead.createdAt))}
                   </span>
                   <svg className="w-4 h-4 text-stone-300 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -332,27 +359,27 @@ export default async function AdminDashboard() {
         )}
       </Card>
 
-      {/* Quick stats - Compacto en móvil */}
+      {/* Quick stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-3 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200">
-          <p className="text-emerald-600 text-xs sm:text-sm font-medium">Conversió</p>
-          <p className="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5 sm:mt-1">{conversionRate}%</p>
-          <p className="text-[10px] sm:text-xs text-emerald-500 mt-0.5 sm:mt-1">{wonLeads}/{leadsCount} leads</p>
+        <div className="p-3 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-[0_8px_20px_-18px_rgba(15,23,42,0.5)]">
+          <p className="text-slate-500 text-xs sm:text-sm font-medium">Conversio</p>
+          <p className="text-xl sm:text-2xl font-semibold text-slate-900 mt-0.5 sm:mt-1">{conversionRate}%</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{wonLeads}/{leadsCount} leads</p>
         </div>
-        <div className="p-3 sm:p-5 rounded-2xl bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200">
-          <p className="text-sky-600 text-xs sm:text-sm font-medium">Testimonis</p>
-          <p className="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5 sm:mt-1">{testimonialsApproved + testimonialsPending}</p>
-          <p className="text-[10px] sm:text-xs text-sky-500 mt-0.5 sm:mt-1">{testimonialsPending} pendents</p>
+        <div className="p-3 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-[0_8px_20px_-18px_rgba(15,23,42,0.5)]">
+          <p className="text-slate-500 text-xs sm:text-sm font-medium">Testimonis</p>
+          <p className="text-xl sm:text-2xl font-semibold text-slate-900 mt-0.5 sm:mt-1">{testimonialsApproved + testimonialsPending}</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{testimonialsPending} pendents</p>
         </div>
-        <div className="p-3 sm:p-5 rounded-2xl bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200">
-          <p className="text-violet-600 text-xs sm:text-sm font-medium">Valoració</p>
-          <p className="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5 sm:mt-1">⭐ {rating}</p>
-          <p className="text-[10px] sm:text-xs text-violet-500 mt-0.5 sm:mt-1">Mitjana</p>
+        <div className="p-3 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-[0_8px_20px_-18px_rgba(15,23,42,0.5)]">
+          <p className="text-slate-500 text-xs sm:text-sm font-medium">Valoracio</p>
+          <p className="text-xl sm:text-2xl font-semibold text-slate-900 mt-0.5 sm:mt-1">⭐ {rating}</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">Mitjana</p>
         </div>
-        <div className="p-3 sm:p-5 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200">
-          <p className="text-orange-600 text-xs sm:text-sm font-medium">Inventari</p>
-          <p className="text-xl sm:text-2xl font-bold text-stone-800 mt-0.5 sm:mt-1">{inventoryActive}/{inventoryTotal}</p>
-          <p className="text-[10px] sm:text-xs text-orange-500 mt-0.5 sm:mt-1">{inventoryMaintenance} mant.</p>
+        <div className="p-3 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-[0_8px_20px_-18px_rgba(15,23,42,0.5)]">
+          <p className="text-slate-500 text-xs sm:text-sm font-medium">Inventari</p>
+          <p className="text-xl sm:text-2xl font-semibold text-slate-900 mt-0.5 sm:mt-1">{inventoryActive}/{inventoryTotal}</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{inventoryMaintenance} mant.</p>
         </div>
       </div>
     </div>

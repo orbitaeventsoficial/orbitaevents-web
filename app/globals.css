@@ -1128,12 +1128,12 @@ html.admin-mode,
 body.admin-mode,
 body.admin-mode.hero-loading,
 body.admin-mode:not(.intro-done) {
-  background-color: #f7f5f0 !important;
-  background: #f7f5f0 !important;
+  background-color: #0b1120 !important;
+  background: #0b1120 !important;
 }
 
 html.admin-mode::before {
-  background: #f7f5f0 !important;
+  background: #0b1120 !important;
 }
 
 html.admin-mode header,
@@ -1144,18 +1144,18 @@ body.admin-mode .header,
 body.admin-mode [class*="Header"],
 body.admin-mode header.scrolled,
 body.admin-mode .header-scrolled {
-  background: #f7f5f0 !important;
-  border-bottom: 1px solid #e7e1d6 !important;
+  background: #0f172a !important;
+  border-bottom: 1px solid #1e293b !important;
 }
 
 html.admin-mode {
-  --bg-main: #f7f5f0;
-  --bg-surface: #f4f0e8;
-  --bg-card: #faf7f2;
-  --bg-elevated: #f2ede3;
-  --color-bg-primary: #f7f5f0;
-  --color-bg-secondary: #f4f0e8;
-  --color-bg-card: #faf7f2;
+  --bg-main: #0b1120;
+  --bg-surface: #0f172a;
+  --bg-card: #ffffff;
+  --bg-elevated: #e2e8f0;
+  --color-bg-primary: #0b1120;
+  --color-bg-secondary: #0f172a;
+  --color-bg-card: #ffffff;
 }
 
 html.admin-mode .card,
@@ -1168,31 +1168,31 @@ html.admin-mode .card-elegant,
 body.admin-mode .card-elegant,
 html.admin-mode .card-swipe-item,
 body.admin-mode .card-swipe-item {
-  background: #faf7f2 !important;
-  border-color: #e7e1d6 !important;
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
 }
 
 html.admin-mode body {
-  color: #6b6660;
-  font-size: 15px;
+  color: #e2e8f0;
+  font-size: 14.5px;
 }
 
 html.admin-mode h1 {
-  font-size: 1.9rem;
+  font-size: 1.35rem;
   font-weight: 600;
-  color: #5b5650;
+  color: #e2e8f0;
 }
 
 html.admin-mode h2 {
-  font-size: 1.35rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  color: #5b5650;
+  color: #e2e8f0;
 }
 
 html.admin-mode h3 {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #5b5650;
+  color: #e2e8f0;
 }
 html::before {
   content: '';

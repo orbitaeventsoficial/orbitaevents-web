@@ -14,6 +14,7 @@ type Ga4Totals = {
   sessions: number;
   pageViews: number;
   eventCount: number;
+  avgSessionDuration: number;
 };
 
 type Ga4Row = {
@@ -32,6 +33,7 @@ type Ga4Report = {
   pages: Ga4Row[];
   sources: Ga4Row[];
   events: Ga4Row[];
+  searchTerms: Ga4Row[];
   devices: Ga4Row[];
   locations: Ga4Row[];
   realtime: {
@@ -154,7 +156,16 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
   const client = createClient(config);
   const property = `properties/${config.propertyId}`;
 
-  const [totalsRes, pagesRes, sourcesRes, eventsRes, devicesRes, locationsRes, realtimeRes] =
+  const [
+    totalsRes,
+    pagesRes,
+    sourcesRes,
+    eventsRes,
+    searchTermsRes,
+    devicesRes,
+    locationsRes,
+    realtimeRes
+  ] =
     await Promise.all([
       client.runReport({
         property,
@@ -164,6 +175,7 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
           { name: 'sessions' },
           { name: 'screenPageViews' },
           { name: 'eventCount' },
+          { name: 'averageSessionDuration' },
         ],
       }),
       client.runReport({
@@ -189,6 +201,14 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
         metrics: [{ name: 'eventCount' }],
         orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
         limit: 10,
+      }),
+      client.runReport({
+        property,
+        dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+        dimensions: [{ name: 'searchTerm' }],
+        metrics: [{ name: 'eventCount' }],
+        orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
+        limit: 12,
       }),
       client.runReport({
         property,
@@ -222,10 +242,12 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
       sessions: toNumber(totalRow?.metricValues?.[1]?.value),
       pageViews: toNumber(totalRow?.metricValues?.[2]?.value),
       eventCount: toNumber(totalRow?.metricValues?.[3]?.value),
+      avgSessionDuration: toNumber(totalRow?.metricValues?.[4]?.value),
     },
     pages: mapRows(pagesRes[0]?.rows || []),
     sources: mapRows(sourcesRes[0]?.rows || []),
     events: mapRows(eventsRes[0]?.rows || []),
+    searchTerms: mapRows(searchTermsRes[0]?.rows || []),
     devices: mapRows(devicesRes[0]?.rows || []),
     locations: mapRows(locationsRes[0]?.rows || [], 0, 0),
     realtime: {

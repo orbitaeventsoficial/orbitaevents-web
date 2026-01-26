@@ -29,10 +29,10 @@ function SidebarItem({
   onClick?: () => void;
 }) {
   const badgeStyles = {
-    orange: 'bg-orange-100 text-orange-700',
-    blue: 'bg-sky-100 text-sky-700',
-    green: 'bg-emerald-100 text-emerald-700',
-    red: 'bg-rose-100 text-rose-700',
+    orange: 'bg-orange-500/20 text-orange-200',
+    blue: 'bg-sky-500/20 text-sky-200',
+    green: 'bg-emerald-500/20 text-emerald-200',
+    red: 'bg-rose-500/20 text-rose-200',
   };
 
   return (
@@ -44,8 +44,8 @@ function SidebarItem({
         flex items-center gap-3 px-3 py-3 rounded-xl
         transition-all duration-200 group active:scale-[0.98]
         ${isActive
-          ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 shadow-sm'
-          : 'text-stone-600 hover:text-stone-800 hover:bg-amber-50/50'
+          ? 'bg-slate-800 text-white shadow-sm'
+          : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
         }
       `}
     >
@@ -81,24 +81,24 @@ function BottomNavItem({
         flex flex-col items-center justify-center gap-0.5 py-2 px-1 rounded-xl
         transition-all duration-200 active:scale-95 relative min-w-[60px]
         ${isActive
-          ? 'text-orange-600'
-          : 'text-stone-400'
+          ? 'text-cyan-300'
+          : 'text-slate-500'
         }
       `}
     >
       <span className="text-xl relative">
         {icon}
         {badge && badge > 0 && (
-          <span className="absolute -top-1 -right-2 min-w-[16px] h-4 bg-orange-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+          <span className="absolute -top-1 -right-2 min-w-[16px] h-4 bg-cyan-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
             {badge > 99 ? '99+' : badge}
           </span>
         )}
       </span>
-      <span className={`text-[10px] font-medium ${isActive ? 'text-orange-600' : 'text-stone-500'}`}>
+      <span className={`text-[10px] font-medium ${isActive ? 'text-cyan-300' : 'text-slate-500'}`}>
         {label}
       </span>
       {isActive && (
-        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-orange-500 rounded-full" />
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-cyan-400 rounded-full" />
       )}
     </Link>
   );
@@ -299,14 +299,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <html lang="ca" suppressHydrationWarning>
-      <body className="bg-gradient-to-br from-amber-50/80 via-orange-50/30 to-stone-50 text-stone-700 antialiased" suppressHydrationWarning>
+      <body className="bg-slate-950 text-slate-200 antialiased" suppressHydrationWarning>
         <div className="min-h-screen">
           {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/95 backdrop-blur-sm border-r border-amber-100 flex-col z-40">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-slate-900/95 backdrop-blur-sm border-r border-slate-800 flex-col z-40">
         {/* Logo */}
-        <div className="p-4 border-b border-amber-100">
+        <div className="p-4 border-b border-slate-800">
           <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-300/30 p-1.5">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30 p-1.5">
               <Image
                 src="/img/logosoloplaneta.svg"
                 alt="Òrbita"
@@ -318,8 +318,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               />
             </div>
             <div>
-              <span className="text-stone-700 font-semibold">Òrbita</span>
-              <span className="text-orange-500 font-semibold ml-1">Admin</span>
+              <span className="text-slate-200 font-semibold">Òrbita</span>
+              <span className="text-cyan-300 font-semibold ml-1">Admin</span>
             </div>
           </Link>
         </div>
@@ -328,7 +328,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="flex-1 p-3 overflow-y-auto">
           {navSections.map((section) => (
             <div key={section.title} className="mb-6">
-              <p className="px-3 mb-2 text-[10px] font-semibold text-stone-400 uppercase tracking-wider">
+              <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
                 {section.title}
               </p>
               <div className="space-y-1">
@@ -341,24 +341,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         {/* Footer */}
-        <div className="p-3 border-t border-amber-100">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/50">
-            <p className="text-[10px] text-amber-600 uppercase tracking-wider">Sistema</p>
-            <p className="text-sm text-stone-700 font-medium mt-1">Òrbita Admin</p>
-            <p className="text-xs text-stone-500">v2.0 · Prisma + Supabase</p>
+        <div className="p-3 border-t border-slate-800">
+          <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700">
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider">Sistema</p>
+            <p className="text-sm text-slate-200 font-medium mt-1">Òrbita Admin</p>
+            <p className="text-xs text-slate-400">v2.0 · Prisma + Supabase</p>
           </div>
         </div>
       </aside>
 
       {/* Mobile Header - Mejorado */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-white/95 backdrop-blur-xl border-b border-amber-100 z-50 px-3 flex items-center justify-between safe-area-top">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-slate-900/95 backdrop-blur-xl border-b border-slate-800 z-50 px-3 flex items-center justify-between safe-area-top">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
           aria-label="Obrir menú admin"
           aria-expanded={sidebarOpen}
           aria-controls="admin-mobile-sidebar"
-          className="p-2.5 -ml-1 text-stone-600 hover:bg-amber-50 active:bg-amber-100 rounded-xl transition-colors"
+          className="p-2.5 -ml-1 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -366,21 +366,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </button>
 
         <div className="flex flex-col items-center">
-          <span className="text-stone-700 font-semibold text-sm">
-            <span className="text-orange-500">Òrbita</span> Admin
+          <span className="text-slate-200 font-semibold text-sm">
+            <span className="text-cyan-300">Òrbita</span> Admin
           </span>
-          <span className="text-[10px] text-stone-400 font-medium">{getPageName()}</span>
+          <span className="text-[10px] text-slate-400 font-medium">{getPageName()}</span>
         </div>
 
         <Link
           href="/admin/settings/notifications"
-          className="p-2.5 -mr-1 text-stone-500 hover:bg-amber-50 active:bg-amber-100 rounded-xl transition-colors relative"
+          className="p-2.5 -mr-1 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors relative"
           aria-label="Notificacions"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
-          <span className="absolute top-2 right-2 w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+          <span className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
         </Link>
       </header>
 
@@ -389,7 +389,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <>
           {/* Backdrop */}
           <div
-            className={`lg:hidden fixed inset-0 bg-stone-900/30 backdrop-blur-sm z-40 transition-opacity duration-300
+            className={`lg:hidden fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-40 transition-opacity duration-300
               ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             onClick={() => setSidebarOpen(false)}
             role="presentation"
@@ -398,14 +398,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <aside
             id="admin-mobile-sidebar"
             aria-label="Menú admin"
-            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-white border-r border-amber-100 z-50 overflow-hidden
+            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-slate-900 border-r border-slate-800 z-50 overflow-hidden
               transform transition-transform duration-300 ease-out
               ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
           >
             {/* Header del sidebar */}
-            <div className="p-4 border-b border-amber-100 flex items-center justify-between bg-gradient-to-r from-amber-50 to-white">
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-md p-1.5">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-md p-1.5">
                   <Image
                     src="/img/logosoloplaneta.svg"
                     alt="Òrbita"
@@ -415,15 +415,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   />
                 </div>
                 <div>
-                  <span className="text-stone-700 font-semibold text-sm">Òrbita Admin</span>
-                  <p className="text-[10px] text-stone-400">Panel de gestió</p>
+                  <span className="text-slate-100 font-semibold text-sm">Òrbita Admin</span>
+                  <p className="text-[10px] text-slate-400">Panel de gestio</p>
                 </div>
               </div>
               <button
                 type="button"
                 aria-label="Tancar menú admin"
                 onClick={() => setSidebarOpen(false)}
-                className="p-2.5 text-stone-400 hover:text-stone-700 hover:bg-amber-100 active:bg-amber-200 rounded-xl transition-colors"
+                className="p-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -435,7 +435,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <nav className="p-3 overflow-y-auto h-[calc(100%-140px)]">
               {navSections.map((section) => (
                 <div key={section.title} className="mb-5">
-                  <p className="px-3 mb-2 text-[10px] font-semibold text-stone-400 uppercase tracking-wider">
+                  <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
                     {section.title}
                   </p>
                   <div className="space-y-0.5">
@@ -453,18 +453,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </nav>
 
             {/* Footer del sidebar móvil */}
-            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-amber-100 bg-gradient-to-t from-white via-white to-transparent">
+            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-slate-800 bg-slate-900">
               <Link
                 href="/admin/settings"
                 onClick={() => setSidebarOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/50 active:scale-[0.98] transition-transform"
+                className="flex items-center gap-3 p-3 rounded-xl bg-slate-800 border border-slate-700 active:scale-[0.98] transition-transform"
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white font-semibold shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-semibold shadow-sm">
                   A
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-stone-700">Admin</p>
-                  <p className="text-xs text-stone-500">Configuració del compte</p>
+                  <p className="text-sm font-medium text-slate-100">Admin</p>
+                  <p className="text-xs text-slate-400">Configuracio del compte</p>
                 </div>
                 <svg className="w-5 h-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -476,30 +476,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       {/* Desktop Header */}
-      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-amber-100 px-6 items-center justify-between bg-white/95 backdrop-blur-xl z-30">
+      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-slate-800 px-6 items-center justify-between bg-slate-900/95 backdrop-blur-xl z-30">
         <div className="flex items-center gap-3 text-sm">
-          <Link href="/admin" className="text-stone-400 hover:text-stone-600 transition-colors">Admin</Link>
-          <span className="text-stone-300">/</span>
-          <span className="text-stone-700 font-medium">{getPageName()}</span>
+          <Link href="/admin" className="text-slate-400 hover:text-slate-200 transition-colors">Admin</Link>
+          <span className="text-slate-600">/</span>
+          <span className="text-slate-100 font-medium">{getPageName()}</span>
         </div>
         <div className="flex items-center gap-3">
           <Link
             href="/admin/settings/notifications"
-            className="relative p-2.5 text-stone-500 hover:text-stone-700 hover:bg-amber-50 rounded-xl transition-colors"
+            className="relative p-2.5 text-slate-300 hover:text-slate-100 hover:bg-slate-800 rounded-xl transition-colors"
             aria-label="Notificacions"
           >
             🔔
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
           </Link>
-          <div className="h-6 w-px bg-amber-200" />
+          <div className="h-6 w-px bg-slate-800" />
           <Link
             href="/admin/settings"
-            className="flex items-center gap-3 px-3 py-1.5 hover:bg-amber-50 rounded-xl transition-colors"
+            className="flex items-center gap-3 px-3 py-1.5 hover:bg-slate-800 rounded-xl transition-colors"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white text-sm font-medium shadow-sm">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-sm font-medium shadow-sm">
               A
             </div>
-            <span className="text-stone-700 text-sm font-medium">Admin</span>
+            <span className="text-slate-100 text-sm font-medium">Admin</span>
           </Link>
         </div>
       </header>
@@ -512,7 +512,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-xl border-t border-amber-100 z-50 safe-area-bottom">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 z-50 safe-area-bottom">
         <div className="flex items-center justify-around h-full px-2 max-w-lg mx-auto">
           <BottomNavItem
             icon="📊"
