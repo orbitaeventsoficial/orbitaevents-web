@@ -6178,10 +6178,12 @@
       "portfolio": "Portfolio",
       "contact": "Contacte"
     },
+    "cta": "Demana pressupost",
     "fab": {
       "call": "Trucar",
       "whatsapp": "WhatsApp",
-      "quote": "Pressupost"
+      "quote": "Pressupost",
+      "configurator": "Configurador"
     }
   },
   "mobileHome": {

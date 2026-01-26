@@ -80,7 +80,7 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
         transition={{ delay: index * 0.1, type: 'spring', damping: 20 }}
       >
         {/* Image with enhanced effects */}
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none z-0">
           <Image
             src={service.image}
             alt={title}
@@ -92,8 +92,8 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
           />
 
           {/* Enhanced gradient overlays */}
-          <div className={`absolute inset-0 bg-gradient-to-t ${service.gradient} opacity-40`} />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-zinc-950/30" />
+          <div className={`absolute inset-0 bg-gradient-to-t ${service.gradient} opacity-30`} />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 via-zinc-950/35 to-zinc-950/10" />
 
         </div>
 
@@ -107,7 +107,7 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
         )}
 
         {/* Content */}
-        <div className="absolute bottom-0 left-0 right-0 p-6">
+        <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
           {/* Emoji */}
           <span className="text-5xl block mb-3">{service.emoji}</span>
 
@@ -151,7 +151,7 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
         {isActive && (
           <>
             <motion.div
-              className="absolute inset-0 rounded-3xl pointer-events-none"
+              className="absolute inset-0 rounded-3xl pointer-events-none z-0"
               initial={{ opacity: 0 }}
               animate={reduceMotion ? { opacity: 0.7 } : { opacity: [0.5, 1, 0.5] }}
               transition={reduceMotion ? { duration: 0 } : { duration: 2, repeat: Infinity }}
@@ -160,10 +160,10 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
               }}
             />
             <motion.div
-              className={`absolute -inset-[2px] rounded-3xl pointer-events-none bg-gradient-to-r ${service.id === 'halloween' ? 'from-orange-500 to-red-500' : service.id === 'monmagic' ? 'from-purple-500 to-pink-500' : 'from-amber-400 to-orange-500'} opacity-50`}
+              className={`absolute -inset-6 rounded-3xl pointer-events-none bg-gradient-to-r ${service.id === 'halloween' ? 'from-orange-500 to-red-500' : service.id === 'monmagic' ? 'from-purple-500 to-pink-500' : 'from-amber-400 to-orange-500'} opacity-35 z-0`}
               animate={reduceMotion ? { opacity: 0.5 } : { rotate: [0, 360] }}
               transition={reduceMotion ? { duration: 0 } : { duration: 8, repeat: Infinity, ease: 'linear' }}
-              style={{ filter: 'blur(20px)' }}
+              style={{ filter: 'blur(28px)' }}
             />
           </>
         )}
@@ -196,7 +196,7 @@ export default function MobileServicesCards() {
       badgeKey: 'halloween.badge',
       badgeColor: 'from-orange-500 to-red-500',
       image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
-      gradient: 'from-orange-500/20 via-red-500/10 to-transparent',
+      gradient: 'from-orange-500/14 via-red-500/6 to-transparent',
       href: '/tematica-halloween',
       features: ['feature1', 'feature2', 'feature3'],
     },
@@ -210,7 +210,7 @@ export default function MobileServicesCards() {
       badgeKey: 'monmagic.badge',
       badgeColor: 'from-amber-500 to-yellow-500',
       image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
-      gradient: 'from-amber-500/20 via-purple-500/10 to-transparent',
+      gradient: 'from-amber-500/14 via-purple-500/6 to-transparent',
       href: '/tematica-mon-magic',
       features: ['feature1', 'feature2', 'feature3'],
     },
@@ -224,7 +224,7 @@ export default function MobileServicesCards() {
       badgeKey: '',
       badgeColor: '',
       image: '/img/portfolio/bodas/bodas-01.webp',
-      gradient: 'from-pink-500/20 via-rose-500/10 to-transparent',
+      gradient: 'from-pink-500/14 via-rose-500/6 to-transparent',
       href: '/servicios/bodas',
       features: ['feature1', 'feature2', 'feature3'],
     },
@@ -238,7 +238,7 @@ export default function MobileServicesCards() {
       badgeKey: '',
       badgeColor: '',
       image: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
-      gradient: 'from-purple-500/20 via-violet-500/10 to-transparent',
+      gradient: 'from-purple-500/14 via-violet-500/6 to-transparent',
       href: '/servicios/fiestas',
       features: ['feature1', 'feature2', 'feature3'],
     },
@@ -252,7 +252,7 @@ export default function MobileServicesCards() {
       badgeKey: '',
       badgeColor: '',
       image: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
-      gradient: 'from-blue-500/20 via-cyan-500/10 to-transparent',
+      gradient: 'from-blue-500/14 via-cyan-500/6 to-transparent',
       href: '/servicios/empresas',
       features: ['feature1', 'feature2', 'feature3'],
     },

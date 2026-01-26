@@ -371,7 +371,7 @@
        xlink:href="#ring-shape"
        fill="url(#g-ring-bevel)"
        opacity="0.5"
-       style="mix-blend-mode:overlay;fill:url(#g-ring-bevel)"
+       style="fill:url(#g-ring-bevel)"
        id="use35"
        transform="translate(-125.02204,-83.410153)" />
     <use

@@ -22,7 +22,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useMobile } from './MobileAppShell';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { WHATSAPP_NUMBER, WHATSAPP_URL } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -57,30 +57,31 @@ const ContactIcon = ({ active }: { active: boolean }) => (
 // FAB MENU (Botón central con acciones)
 // ═══════════════════════════════════════════════════════════════════════════
 
-function FABMenu() {
+function QuoteMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const { haptic, locale } = useMobile();
+  const { haptic } = useMobile();
+  const locale = useLocale();
   const t = useTranslations('mobileNav');
   const reduceMotion = useReducedMotion();
 
   const actions = useMemo(() => [
     {
-      icon: '📞',
-      labelKey: 'fab.call',
-      href: `tel:+${WHATSAPP_NUMBER}`,
-      color: 'from-green-500 to-emerald-500'
+      icon: '🧮',
+      labelKey: 'fab.configurator',
+      href: `/${locale}/configurador`,
+      color: 'from-amber-500 to-orange-500'
     },
-    {
+    { 
       icon: '💬',
       labelKey: 'fab.whatsapp',
       href: WHATSAPP_URL,
       color: 'from-green-400 to-green-600'
     },
-    { 
-      icon: '📝', 
-      labelKey: 'fab.quote', 
-      href: `/${locale}/contacto`,
-      color: 'from-amber-500 to-orange-500'
+    {
+      icon: '📞',
+      labelKey: 'fab.call',
+      href: `tel:+${WHATSAPP_NUMBER}`,
+      color: 'from-green-500 to-emerald-500'
     },
   ], [locale]);
 
@@ -111,7 +112,7 @@ function FABMenu() {
             initial={reduceMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col gap-3 z-50"
+            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 flex flex-col gap-3 z-50"
           >
             {actions.map((action, i) => (
               <motion.a
@@ -142,33 +143,22 @@ function FABMenu() {
         )}
       </AnimatePresence>
 
-      {/* Main FAB button */}
+      {/* Main CTA button */}
       <motion.button
         onClick={toggleMenu}
-        whileTap={{ scale: 0.9 }}
-        className="relative -top-6 w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-2xl flex items-center justify-center z-50"
-        style={{
-          boxShadow: '0 10px 40px rgba(251, 191, 36, 0.4)',
-        }}
+        whileTap={{ scale: 0.98 }}
+        className="relative z-50 flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-400 px-4 py-2 text-xs font-bold text-zinc-900 shadow-lg"
       >
-        <motion.div
+        <motion.span
           animate={reduceMotion ? { rotate: 0 } : { rotate: isOpen ? 45 : 0 }}
           transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 300 }}
+          className="inline-flex"
         >
-          <svg className="w-8 h-8 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
-        </motion.div>
-
-        {/* Glow effect */}
-        <motion.div
-          className="absolute inset-0 rounded-full bg-amber-400"
-          animate={reduceMotion ? { opacity: 0.4 } : { 
-            scale: [1, 1.2, 1],
-            opacity: [0.5, 0, 0.5]
-          }}
-          transition={reduceMotion ? { duration: 0 } : { duration: 2, repeat: Infinity }}
-        />
+        </motion.span>
+        <span>{t('cta')}</span>
       </motion.button>
     </div>
   );
@@ -260,7 +250,7 @@ function NavItemComponent({ item, isActive, onClick, locale, t }: NavItemProps) 
 
 export default function MobileBottomNav() {
   const [activeId, setActiveId] = useState('home');
-  const { locale } = useMobile();
+  const locale = useLocale();
   const t = useTranslations('mobileNav');
   const reduceMotion = useReducedMotion();
 
@@ -296,8 +286,8 @@ export default function MobileBottomNav() {
           />
         ))}
 
-        {/* Center FAB */}
-        <FABMenu />
+        {/* Center CTA */}
+        <QuoteMenu />
 
         {/* Right items */}
         {NAV_ITEMS.slice(2).map((item) => (

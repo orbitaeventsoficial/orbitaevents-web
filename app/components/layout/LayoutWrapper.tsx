@@ -35,6 +35,10 @@ const BottomNav = dynamic(
   () => import('@/app/components/ui/BottomNav'),
   { ssr: false }
 );
+const MobileBottomNav = dynamic(
+  () => import('@/app/components/mobile-ultimate/MobileBottomNav'),
+  { ssr: false }
+);
 
 // FloatingCTAs - FIX SOLAPAMENT BOTONS (WhatsApp desktop + Bottom bar mòbil)
 const FloatingCTAs = dynamic(
@@ -249,6 +253,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const isImmersive = IMMERSIVE_PAGES.some(page => pathname?.includes(page));
   const isHomePage = INTRO_PAGES.some(page => pathname === page);
   const hideChromeForMobileHome = isMobileViewport && isHomePage;
+  const showMobileBottomNav = isMobileViewport && !hideChromeForMobileHome;
+  const showDesktopBottomNav = !isMobileViewport;
 
   // ─────────────────────────────────────────────────────────────────────────
   // RENDER: Pàgina immersiva (sense header/footer)
@@ -289,7 +295,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       {!hideChromeForMobileHome && <Footer />}
 
       {/* Bottom Navigation - Mobile only */}
-      {!hideChromeForMobileHome && <BottomNav />}
+      {showDesktopBottomNav && <BottomNav />}
+      {showMobileBottomNav && <MobileBottomNav />}
 
       {/* FloatingCTAs - WhatsApp desktop + Bottom bar mòbil (FIX SOLAPAMENT) */}
       {!hideChromeForMobileHome && <FloatingCTAs />}

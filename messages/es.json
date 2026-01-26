@@ -6006,10 +6006,12 @@
       "portfolio": "Portfolio",
       "contact": "Contacto"
     },
+    "cta": "Pedir presupuesto",
     "fab": {
       "call": "Llamar",
       "whatsapp": "WhatsApp",
-      "quote": "Presupuesto"
+      "quote": "Presupuesto",
+      "configurator": "Configurador"
     }
   },
   "mobileHome": {
