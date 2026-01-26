@@ -58,16 +58,16 @@ function AvailabilityCounter() {
   
   const colors = {
     critical: {
-      bg: 'from-red-500/20 to-red-600/10',
-      border: 'border-red-500/50',
-      text: 'text-red-400',
-      glow: 'shadow-red-500/20',
+      bg: 'from-amber-500/25 to-amber-600/10',
+      border: 'border-amber-500/50',
+      text: 'text-amber-300',
+      glow: 'shadow-amber-500/25',
     },
     high: {
-      bg: 'from-orange-500/20 to-orange-600/10',
-      border: 'border-orange-500/50',
-      text: 'text-orange-400',
-      glow: 'shadow-orange-500/20',
+      bg: 'from-amber-400/20 to-amber-500/10',
+      border: 'border-amber-400/40',
+      text: 'text-amber-300',
+      glow: 'shadow-amber-400/20',
     },
     normal: {
       bg: 'from-amber-500/20 to-amber-600/10',
@@ -94,7 +94,7 @@ function AvailabilityCounter() {
     >
       {/* Animated background for critical */}
       {urgencyLevel === 'critical' && (
-        <div className="absolute inset-0 bg-red-500/10" />
+        <div className="absolute inset-0 bg-amber-400/10" />
       )}
 
       <div className="relative flex items-center justify-between">
@@ -108,13 +108,9 @@ function AvailabilityCounter() {
 
         {urgencyLevel !== 'normal' && (
           <motion.div
-            animate={reduceMotion ? { scale: 1 } : { scale: [1, 1.1, 1] }}
-            transition={reduceMotion ? { duration: 0 } : { duration: 1, repeat: Infinity }}
-            className={`px-3 py-1.5 rounded-full ${
-              urgencyLevel === 'critical' 
-                ? 'bg-red-500 text-white' 
-                : 'bg-orange-500 text-black'
-            } text-xs font-bold`}
+            animate={reduceMotion ? { scale: 1 } : { scale: [1, 1.05, 1] }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 1.2, repeat: Infinity }}
+            className="px-3 py-1.5 rounded-full bg-white/5 border border-amber-400/40 text-amber-200 text-xs font-semibold shadow-[0_0_20px_rgba(245,158,11,0.25)]"
           >
             {urgencyLevel === 'critical' ? t('availability.lastOne') : t('availability.lastOnes')}
           </motion.div>
@@ -209,10 +205,14 @@ export default function MobileCTAUrgency() {
               onTapStart={() => haptic('medium')}
               className="relative block w-full group"
             >
-              <div className="relative flex items-center justify-center gap-3 py-4 px-6 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl font-bold text-black text-lg shadow-2xl">
-                <span>{tCommon('buttons.requestQuoteFree')}</span>
+              <div className="relative flex items-center justify-center gap-3 py-4 px-6 rounded-2xl font-bold text-black text-lg bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 shadow-[0_12px_30px_rgba(245,158,11,0.35)] ring-1 ring-amber-300/40 overflow-hidden">
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_55%)] opacity-70"
+                />
+                <span className="relative">{tCommon('buttons.requestQuoteFree')}</span>
                 <svg
-                  className="w-5 h-5"
+                  className="relative w-5 h-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

@@ -6026,13 +6026,13 @@
     }
   },
   "mobileHero": {
-    "title": "CREEM ESDEVENIMENTS",
+    "title": "CREEM EVENTS",
     "subtitle": "Casaments · Discomòbil · Festes privades · Esdeveniments temàtics",
     "location": "Barcelona i Girona.",
     "scroll": "DESCOBREIX",
     "socialProof": "5.0 · Opinions verificades",
     "badges": {
-      "halloween": "Halloween 2025",
+      "halloween": "Agenda 2026 oberta",
       "monMagic": "Món Màgic",
       "rating": "5.0/5 · 50+ events"
     },
@@ -6171,10 +6171,10 @@
     "subtitle": "Resposta garantida en menys de 2 hores",
     "guarantee": "Garantia 100% satisfacció",
     "availability": {
-      "badge": "Agenda de bodes 2026 oberta",
+      "badge": "Disponibilitat aquest mes",
       "saturdaysFree": "dissabtes lliures",
-      "lastOne": "⚠️ Últim cap de setmana disponible!",
-      "lastOnes": "🔥 Últims caps de setmana disponibles!"
+      "lastOne": "Últim cap de setmana disponible",
+      "lastOnes": "Últims caps de setmana disponibles"
     },
     "badges": {
       "rating": "Rating",

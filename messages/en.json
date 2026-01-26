@@ -5860,7 +5860,7 @@
     "scroll": "DISCOVER",
     "socialProof": "5.0 · Verified opinions",
     "badges": {
-      "halloween": "Halloween 2025",
+      "halloween": "Calendar 2026 open",
       "monMagic": "Magic World",
       "rating": "5.0/5 · 50+ events"
     },
@@ -5999,10 +5999,10 @@
     "subtitle": "Guaranteed response in less than 2 hours",
     "guarantee": "100% satisfaction guarantee",
     "availability": {
-      "badge": "Wedding calendar 2026 open",
+      "badge": "Availability this month",
       "saturdaysFree": "free saturdays",
-      "lastOne": "⚠️ Last weekend available!",
-      "lastOnes": "🔥 Last weekends available!"
+      "lastOne": "Last weekend available",
+      "lastOnes": "Last weekends available"
     },
     "badges": {
       "rating": "Rating",

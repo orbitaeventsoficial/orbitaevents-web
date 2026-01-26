@@ -255,6 +255,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const hideChromeForMobileHome = false;
   const showMobileBottomNav = isMobileViewport && !isHomePage ? true : isMobileViewport;
   const showDesktopBottomNav = !isMobileViewport;
+  const isIntroActive = showIntro || hideHeaderOnMobileIntro;
 
   // ─────────────────────────────────────────────────────────────────────────
   // RENDER: Pàgina immersiva (sense header/footer)
@@ -280,7 +281,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       )}
 
       {/* Header unificat (desktop + mòbil) - dynamic amb ssr:false */}
-      {!hideHeaderOnMobileIntro && <Header />}
+      {!isIntroActive && <Header />}
 
       {/* Contingut principal */}
       <main
@@ -292,20 +293,20 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       </main>
 
       {/* Footer */}
-      <Footer />
+      {!isIntroActive && <Footer />}
 
       {/* Bottom Navigation - Mobile only */}
-      {showDesktopBottomNav && <BottomNav />}
-      {showMobileBottomNav && <MobileBottomNav />}
+      {!isIntroActive && showDesktopBottomNav && <BottomNav />}
+      {!isIntroActive && showMobileBottomNav && <MobileBottomNav />}
 
       {/* FloatingCTAs - WhatsApp desktop + Bottom bar mòbil (FIX SOLAPAMENT) */}
-      <FloatingCTAs />
+      {!isIntroActive && <FloatingCTAs />}
 
       {/* Consentiment cookies */}
-      <CookieConsent />
+      {!isIntroActive && <CookieConsent />}
 
       {/* Popup oferta flash */}
-      <FlashOfferPopup />
+      {!isIntroActive && <FlashOfferPopup />}
     </>
   );
 }

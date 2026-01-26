@@ -19,7 +19,7 @@
  * - Rutas con locale
  */
 
-import { useRef, useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { useMobile } from './MobileAppShell';
@@ -66,7 +66,7 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.08 }}
-      className="relative flex-shrink-0 w-[75vw] max-w-[300px] h-[420px]"
+      className="relative w-full max-w-[420px] h-[420px] mx-auto"
     >
       <motion.a
         href={`/${locale}${service.href}`}
@@ -175,11 +175,8 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function MobileServicesCards() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
   const { locale } = useMobile();
   const t = useTranslations('mobileServices');
-  const reduceMotion = useReducedMotion();
 
   // Services data with translation keys
   const SERVICES: Service[] = useMemo(() => [
@@ -255,11 +252,6 @@ export default function MobileServicesCards() {
     },
   ], []);
 
-  // Refs to avoid re-binding scroll handlers
-  useEffect(() => {
-    setActiveIndex(0);
-  }, []);
-
   return (
     <section id="services-section" className="py-12 overflow-hidden">
       {/* Section Header */}
@@ -283,77 +275,19 @@ export default function MobileServicesCards() {
         </motion.h2>
       </div>
 
-      {/* Horizontal Scroll Container */}
-      <div
-        ref={scrollRef}
-        className="flex gap-4 overflow-x-hidden px-6 pb-4 hide-scrollbar snap-x snap-mandatory"
-        style={{
-          scrollSnapType: 'x mandatory',
-          WebkitOverflowScrolling: 'touch',
-          touchAction: 'pan-y',
-        }}
-      >
+      {/* Vertical list to keep page scroll */}
+      <div className="px-6 pb-4 space-y-6">
         {SERVICES.map((service, index) => (
-          <div 
-            key={service.id} 
-            className="snap-center"
-            style={{ scrollSnapAlign: 'center' }}
-          >
-            <ServiceCard3D
-              service={service}
-              isActive={index === activeIndex}
-              index={index}
-              locale={locale}
-              t={t}
-            />
-          </div>
-        ))}
-        
-        {/* Spacer al final */}
-        <div className="flex-shrink-0 w-6" />
-      </div>
-
-      {/* Pagination Dots - Touch targets min 44x44px per a11y */}
-      <div className="flex justify-center gap-0 mt-4">
-        {SERVICES.map((_, index) => (
-          <motion.button
-            key={index}
-            onClick={() => {
-              const container = scrollRef.current;
-              if (container) {
-                const cardWidth = container.offsetWidth * 0.75 + 16;
-                container.scrollTo({
-                  left: index * cardWidth,
-                  behavior: 'smooth',
-                });
-              }
-              setActiveIndex(index);
-            }}
-            className="p-3 flex items-center justify-center"
-            whileTap={{ scale: 0.9 }}
-            aria-label={`Ir a servicio ${index + 1}`}
-            aria-current={index === activeIndex ? 'true' : undefined}
-          >
-            <span
-              className={`block h-2 rounded-full transition-all ${
-                index === activeIndex
-                  ? 'w-8 bg-amber-500'
-                  : 'w-2 bg-white/20'
-              }`}
-            />
-          </motion.button>
+          <ServiceCard3D
+            key={service.id}
+            service={service}
+            isActive={false}
+            index={index}
+            locale={locale}
+            t={t}
+          />
         ))}
       </div>
-
-      {/* Swipe hint */}
-      <motion.p
-        initial={reduceMotion ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={reduceMotion ? { duration: 0 } : { delay: 1 }}
-        className="text-center text-white/50 text-xs mt-4"
-      >
-        {t('swipeHint')}
-      </motion.p>
     </section>
   );
 }
