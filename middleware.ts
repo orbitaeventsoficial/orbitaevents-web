@@ -289,6 +289,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/admin') ||
+    pathname.startsWith('/umami') ||
     pathname.includes('.')
   ) {
     return NextResponse.next();
