@@ -87,6 +87,7 @@ function UmamiAnalytics() {
       src={scriptUrl}
       strategy="afterInteractive"
       data-website-id={websiteId}
+      data-host-url="/umami"
     />
   );
 }
