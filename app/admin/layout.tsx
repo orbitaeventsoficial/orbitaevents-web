@@ -206,6 +206,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: 'General',
       items: [
         { icon: '📊', label: 'Dashboard', href: '/admin' },
+        { icon: '📈', label: 'Analytics', href: '/admin/analytics' },
         { icon: '📅', label: 'Calendari', href: '/admin/calendario' },
       ]
     },
@@ -232,7 +233,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: 'Operacions',
       items: [
         { icon: '🎸', label: 'Inventari', href: '/admin/inventory' },
-        { icon: '📈', label: 'Analytics', href: '/admin/analytics' },
         { icon: '📝', label: 'Post-Event', href: '/admin/post-event' },
       ]
     },
@@ -251,7 +251,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
         { icon: '🎛️', label: 'Features', href: '/admin/features' },
         { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
-        { icon: '📊', label: 'Estadístiques', href: '/admin/stats' },
         { icon: '🎨', label: 'Tema', href: '/admin/theme' },
         { icon: '🌐', label: 'Traduccions', href: '/admin/translations' },
         { icon: '📝', label: 'Blog', href: '/admin/blog' },
@@ -522,6 +521,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             isActive={pathname === '/admin'}
           />
           <BottomNavItem
+            icon="📈"
+            label="Analytics"
+            href="/admin/analytics"
+            isActive={pathname?.startsWith('/admin/analytics') || false}
+          />
+          <BottomNavItem
             icon="👥"
             label="Leads"
             href="/admin/leads"
@@ -533,12 +538,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             label="Reserves"
             href="/admin/bookings"
             isActive={pathname?.startsWith('/admin/bookings') || false}
-          />
-          <BottomNavItem
-            icon="📅"
-            label="Calendari"
-            href="/admin/calendario"
-            isActive={pathname?.startsWith('/admin/calendario') || false}
           />
           <BottomNavItem
             icon="⚙️"
