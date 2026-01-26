@@ -3,7 +3,7 @@ import { log } from '@/lib/logger';
 // Pàgina d'analytics i estadístiques
 import { prisma } from '@/lib/prisma';
 import { getUmamiReport } from '@/lib/analytics/umami';
-import { getGa4Report } from '@/lib/analytics/ga4';
+import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 
 export const dynamic = 'force-dynamic';
 
@@ -160,15 +160,14 @@ export default async function AnalyticsPage() {
   const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? '';
   const umamiApiReady = Boolean(process.env.UMAMI_API_KEY) && Boolean(umamiWebsiteId);
   const ga4PropertyId = process.env.GA4_PROPERTY_ID || '';
-  const ga4ClientEmail = process.env.GA4_CLIENT_EMAIL || '';
-  const ga4PrivateKey = process.env.GA4_PRIVATE_KEY || '';
+  const ga4Status = getGa4ConfigStatus();
   const yearGrowth = data.revenue.lastYear > 0
     ? ((data.revenue.thisYear - data.revenue.lastYear) / data.revenue.lastYear * 100).toFixed(1)
     : '100.0';
   const gtmReady = gtmId !== 'No configurat';
   const umamiReady = Boolean(umamiWebsiteId);
   const umami = umamiApiReady ? await getUmamiReport(umamiWebsiteId) : null;
-  const ga4Ready = Boolean(ga4PropertyId && ga4ClientEmail && ga4PrivateKey);
+  const ga4Ready = ga4Status.ready;
   let ga4 = null;
   let ga4Error: string | null = null;
   if (ga4Ready) {
@@ -245,8 +244,7 @@ export default async function AnalyticsPage() {
 
         {!ga4Ready && (
           <div className="mt-6 rounded-xl border border-rose-400/30 bg-rose-500/10 p-4 text-sm text-rose-100">
-            Configuracio incompleta. Falten variables d&apos;entorn: GA4_PROPERTY_ID, GA4_CLIENT_EMAIL,
-            GA4_PRIVATE_KEY.
+            Configuracio incompleta. {ga4Status.reason || 'Revisa variables GA4 a Railway.'}
           </div>
         )}
 

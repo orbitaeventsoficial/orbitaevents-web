@@ -40,15 +40,57 @@ type Ga4Report = {
   };
 };
 
-function getGa4Config(): Ga4Config | null {
+type Ga4ConfigStatus = {
+  ready: boolean;
+  reason?: string;
+};
+
+export function getGa4ConfigStatus(): Ga4ConfigStatus {
   const propertyId = process.env.GA4_PROPERTY_ID;
   const clientEmail = process.env.GA4_CLIENT_EMAIL;
   const privateKeyRaw = process.env.GA4_PRIVATE_KEY;
   const privateKeyB64 = process.env.GA4_PRIVATE_KEY_B64;
 
-  if (!propertyId || !clientEmail || (!privateKeyRaw && !privateKeyB64)) {
-    return null;
+  if (!propertyId || !clientEmail) {
+    return { ready: false, reason: 'Falten GA4_PROPERTY_ID o GA4_CLIENT_EMAIL' };
   }
+
+  if (!privateKeyRaw && !privateKeyB64) {
+    return { ready: false, reason: 'Falta GA4_PRIVATE_KEY' };
+  }
+
+  let privateKey = privateKeyRaw || '';
+  if (!privateKey && privateKeyB64) {
+    try {
+      privateKey = Buffer.from(privateKeyB64, 'base64').toString('utf8');
+    } catch {
+      return { ready: false, reason: 'GA4_PRIVATE_KEY_B64 invalid' };
+    }
+  }
+
+  privateKey = privateKey.trim();
+  if ((privateKey.startsWith('"') && privateKey.endsWith('"')) || (privateKey.startsWith("'") && privateKey.endsWith("'"))) {
+    privateKey = privateKey.slice(1, -1);
+  }
+  privateKey = privateKey.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n').replace(/\r\n/g, '\n');
+
+  if (!privateKey.includes('BEGIN PRIVATE KEY')) {
+    return { ready: false, reason: 'GA4_PRIVATE_KEY sense BEGIN PRIVATE KEY' };
+  }
+
+  return { ready: true };
+}
+
+function getGa4Config(): Ga4Config | null {
+  const status = getGa4ConfigStatus();
+  if (!status.ready) return null;
+
+  const propertyId = process.env.GA4_PROPERTY_ID;
+  const clientEmail = process.env.GA4_CLIENT_EMAIL;
+  const privateKeyRaw = process.env.GA4_PRIVATE_KEY;
+  const privateKeyB64 = process.env.GA4_PRIVATE_KEY_B64;
+
+  if (!propertyId || !clientEmail || (!privateKeyRaw && !privateKeyB64)) return null;
 
   let privateKey = privateKeyRaw || '';
   if (!privateKey && privateKeyB64) {
