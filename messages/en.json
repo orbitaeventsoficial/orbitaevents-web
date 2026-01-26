@@ -6027,6 +6027,10 @@
   },
   "mobileHome": {
     "quickFeatures": {
+      "bodas": {
+        "title": "Weddings",
+        "desc": "Ceremony + party"
+      },
       "halloween": {
         "title": "halloween",
         "desc": "Complete decoration"
@@ -6036,12 +6040,8 @@
         "desc": "Unique experiences"
       },
       "djPro": {
-        "title": "DJPro",
+        "title": "DJ Pro",
         "desc": "Pioneer + 4000W"
-      },
-      "effects": {
-        "title": "FX Effects",
-        "desc": "Smoke, lights, sparks"
       }
     },
     "guarantees": {

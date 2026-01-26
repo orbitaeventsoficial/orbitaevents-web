@@ -92,7 +92,7 @@ export default function HeroPortalLogo({
   const config = useMemo(() => ({
     logoSize: isMobile ? 280 : 520,
     textSize: isMobile ? '1.25rem' : '1.85rem',
-    wordmarkWidth: isMobile ? 290 : 390,
+    wordmarkWidth: isMobile ? 340 : 460,
   }), [isMobile]);
 
   return (

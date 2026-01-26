@@ -51,10 +51,10 @@ function QuickFeatures() {
   const reduceMotion = useReducedMotion();
 
   const features = [
+    { icon: '💍', titleKey: 'bodas.title', descKey: 'bodas.desc', gradient: 'from-amber-400 to-orange-500' },
     { icon: '🎃', titleKey: 'halloween.title', descKey: 'halloween.desc', gradient: 'from-orange-500 to-red-500' },
     { icon: '🪄', titleKey: 'monMagic.title', descKey: 'monMagic.desc', gradient: 'from-purple-500 to-pink-500' },
     { icon: '🎵', titleKey: 'djPro.title', descKey: 'djPro.desc', gradient: 'from-amber-500 to-orange-500' },
-    { icon: '✨', titleKey: 'effects.title', descKey: 'effects.desc', gradient: 'from-cyan-500 to-blue-500' },
   ];
 
   return (
