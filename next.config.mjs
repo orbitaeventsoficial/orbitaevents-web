@@ -104,6 +104,13 @@ const nextConfig = {
     ];
   },
 
+  async rewrites() {
+    return [
+      { source: '/umami/script.js', destination: 'https://cloud.umami.is/script.js' },
+      { source: '/umami/api/send', destination: 'https://cloud.umami.is/api/send' },
+    ];
+  },
+
   // Esto evita errores raros con rutas dinamicas grandes
   experimental: {
     largePageDataBytes: 500 * 1000, // 500KB
