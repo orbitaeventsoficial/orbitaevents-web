@@ -121,12 +121,18 @@ function AnimatedBadge() {
 function MorphingText() {
   const t = useTranslations('mobileHero');
 
-  const texts = useMemo(() => [
-    t('morphingTexts.unique'),
-    t('morphingTexts.magical'),
-    t('morphingTexts.brutal'),
-    t('morphingTexts.yours'),
-  ], [t]);
+  const texts = useMemo(() => {
+    const extended = t.raw('morphingTextsExtended') as string[] | undefined;
+    if (Array.isArray(extended) && extended.length > 0) {
+      return extended;
+    }
+    return [
+      t('morphingTexts.unique'),
+      t('morphingTexts.magical'),
+      t('morphingTexts.brutal'),
+      t('morphingTexts.yours'),
+    ];
+  }, [t]);
 
   const [index, setIndex] = useState(0);
   useEffect(() => {

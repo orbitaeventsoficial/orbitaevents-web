@@ -5854,8 +5854,8 @@
     }
   },
   "mobileHero": {
-    "title": "THEMATIC EVENTS",
-    "subtitle": "Halloween · Magic World · Whatever you imagine.",
+    "title": "WE CREATE EVENTS",
+    "subtitle": "Weddings · Mobile DJ · Private parties · Themed events",
     "location": "Barcelona and Girona.",
     "scroll": "DISCOVER",
     "socialProof": "5.0 · Verified opinions",
@@ -5865,10 +5865,24 @@
       "rating": "5.0/5 · 50+ events"
     },
     "morphingTexts": {
-      "unique": "UNIQUE.",
-      "magical": "MAGICAL.",
-      "brutal": "BRUTAL.",
-      "yours": "YOURS."
+      "unique": "UNFORGETTABLE.",
+      "magical": "WITH PRO MOBILE DJ.",
+      "brutal": "BRUTAL HALLOWEEN.",
+      "yours": "REAL MAGIC WORLD."
+    },
+    "morphingTextsExtended": [
+      "UNFORGETTABLE.",
+      "WITH PRO MOBILE DJ.",
+      "LIKE TU CARA ME SUENA.",
+      "BRUTAL HALLOWEEN.",
+      "REAL MAGIC WORLD.",
+      "WITH EPIC KARAOKE.",
+      "MADE TO BE LEGENDARY.",
+      "FOR DREAM WEDDINGS.",
+      "IMPACTFUL CORPORATE.",
+      "WITH WOW EFFECTS.",
+      "PEOPLE REMEMBER THEM.",
+      "LIKE NO ONE ELSE."
     }
   },
   "mobileServices": {
@@ -5985,7 +5999,7 @@
     "subtitle": "Guaranteed response in less than 2 hours",
     "guarantee": "100% satisfaction guarantee",
     "availability": {
-      "badge": "📅 Weekends 2025",
+      "badge": "Wedding calendar 2026 open",
       "saturdaysFree": "free saturdays",
       "lastOne": "⚠️ Last weekend available!",
       "lastOnes": "🔥 Last weekends available!"

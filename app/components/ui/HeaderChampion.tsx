@@ -153,24 +153,13 @@ export default function HeaderChampion() {
               style={{ touchAction: 'manipulation' }}
             >
               <Image
-                src="/img/orbita-glyph.svg"
-                alt="Òrbita Events"
-                width={44}
-                height={44}
-                sizes="44px"
-                quality={90}
-                className="h-10 w-10 md:hidden pointer-events-none select-none transition-transform group-hover:scale-105"
-                priority
-                draggable={false}
-              />
-              <Image
                 src="/img/logoplanetatextdreta.svg"
                 alt="Òrbita Events"
-                width={200}
-                height={64}
-                sizes="200px"
-                quality={80}
-                className="hidden md:block h-10 md:h-12 w-auto pointer-events-none select-none transition-transform group-hover:scale-105"
+                width={260}
+                height={80}
+                sizes="260px"
+                quality={85}
+                className="h-14 md:h-16 w-auto pointer-events-none select-none transition-transform group-hover:scale-105"
                 priority
                 draggable={false}
               />

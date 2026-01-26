@@ -5854,8 +5854,8 @@
     }
   },
   "mobileHero": {
-    "title": "EVENTOS TEMÁTICOS",
-    "subtitle": "Halloween · Mundo Mágico · Lo que imagines.",
+    "title": "CREAMOS EVENTOS",
+    "subtitle": "Bodas · Discomóvil · Fiestas privadas · Eventos temáticos",
     "location": "Barcelona y Girona.",
     "scroll": "DESCUBRE",
     "socialProof": "5.0 · Opiniones verificadas",
@@ -5865,10 +5865,24 @@
       "rating": "5.0/5 · 50+ eventos"
     },
     "morphingTexts": {
-      "unique": "ÚNICOS.",
-      "magical": "MÁGICOS.",
-      "brutal": "BRUTALES.",
-      "yours": "TUYOS."
+      "unique": "INOLVIDABLES.",
+      "magical": "CON DISCOMÓVIL PRO.",
+      "brutal": "DE HALLOWEEN BRUTAL.",
+      "yours": "DE MUNDO MÁGICO REAL."
+    },
+    "morphingTextsExtended": [
+      "INOLVIDABLES.",
+      "CON DISCOMÓVIL PRO.",
+      "TIPO TU CARA ME SUENA.",
+      "DE HALLOWEEN BRUTAL.",
+      "DE MUNDO MÁGICO REAL.",
+      "CON KARAOKE ÉPICO.",
+      "QUE HACEN HISTORIA.",
+      "PARA BODAS DE ENSUEÑO.",
+      "CORPORATIVOS DE IMPACTO.",
+      "CON EFECTOS WOW.",
+      "QUE LA GENTE RECUERDA.",
+      "QUE NADIE MÁS HACE."
     }
   },
   "mobileServices": {
@@ -5985,7 +5999,7 @@
     "subtitle": "Respuesta garantizada en menos de 2 horas",
     "guarantee": "Garantía 100% satisfacción",
     "availability": {
-      "badge": "📅 Fines de semana 2025",
+      "badge": "Agenda de bodas 2026 abierta",
       "saturdaysFree": "sábados libres",
       "lastOne": "⚠️ ¡Último fin de semana disponible!",
       "lastOnes": "🔥 ¡Últimos fines de semana disponibles!"

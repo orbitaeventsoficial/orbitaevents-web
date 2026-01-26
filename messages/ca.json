@@ -6026,8 +6026,8 @@
     }
   },
   "mobileHero": {
-    "title": "EVENTS TEMÀTICS",
-    "subtitle": "Halloween · Món Màgic · El que imaginis.",
+    "title": "CREEM ESDEVENIMENTS",
+    "subtitle": "Casaments · Discomòbil · Festes privades · Esdeveniments temàtics",
     "location": "Barcelona i Girona.",
     "scroll": "DESCOBREIX",
     "socialProof": "5.0 · Opinions verificades",
@@ -6037,10 +6037,24 @@
       "rating": "5.0/5 · 50+ events"
     },
     "morphingTexts": {
-      "unique": "ÚNICS.",
-      "magical": "MÀGICS.",
-      "brutal": "BRUTALS.",
-      "yours": "TEUS."
+      "unique": "INOLVIDABLES.",
+      "magical": "AMB DISCOMÒBIL PRO.",
+      "brutal": "DE HALLOWEEN BRUTAL.",
+      "yours": "DE MÓN MÀGIC REAL."
+    },
+    "morphingTextsExtended": [
+      "INOLVIDABLES.",
+      "AMB DISCOMÒBIL PRO.",
+      "TIPO TU CARA ME SUENA.",
+      "DE HALLOWEEN BRUTAL.",
+      "DE MÓN MÀGIC REAL.",
+      "AMB KARAOKE ÈPIC.",
+      "QUE FAN HISTÒRIA.",
+      "PER A CASAMENTS DE SOMNI.",
+      "CORPORATIUS D'IMPACTE.",
+      "AMB EFECTES WOW.",
+      "QUE LA GENT RECORDA.",
+      "QUE NINGÚ MÉS FA."
     }
   },
   "mobileServices": {
@@ -6157,7 +6171,7 @@
     "subtitle": "Resposta garantida en menys de 2 hores",
     "guarantee": "Garantia 100% satisfacció",
     "availability": {
-      "badge": "📅 Caps de setmana 2025",
+      "badge": "Agenda de bodes 2026 oberta",
       "saturdaysFree": "dissabtes lliures",
       "lastOne": "⚠️ Últim cap de setmana disponible!",
       "lastOnes": "🔥 Últims caps de setmana disponibles!"
