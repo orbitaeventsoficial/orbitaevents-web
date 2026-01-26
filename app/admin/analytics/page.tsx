@@ -169,7 +169,16 @@ export default async function AnalyticsPage() {
   const umamiReady = Boolean(umamiWebsiteId);
   const umami = umamiApiReady ? await getUmamiReport(umamiWebsiteId) : null;
   const ga4Ready = Boolean(ga4PropertyId && ga4ClientEmail && ga4PrivateKey);
-  const ga4 = ga4Ready ? await getGa4Report() : null;
+  let ga4 = null;
+  let ga4Error: string | null = null;
+  if (ga4Ready) {
+    try {
+      ga4 = await getGa4Report();
+    } catch (error) {
+      ga4Error = error instanceof Error ? error.message : 'GA4 error desconegut';
+      log.error('GA4 report failed', error);
+    }
+  }
   const avgVisitMinutes = umami?.totals.totalTime
     ? Math.max(1, Math.round(umami.totals.totalTime / 60 / Math.max(umami.totals.visits, 1)))
     : 0;
@@ -241,7 +250,13 @@ export default async function AnalyticsPage() {
           </div>
         )}
 
-        {ga4Ready && !ga4 && (
+        {ga4Ready && ga4Error && (
+          <div className="mt-6 rounded-xl border border-amber-300/30 bg-amber-400/10 p-4 text-sm text-amber-100">
+            Error GA4: {ga4Error}
+          </div>
+        )}
+
+        {ga4Ready && !ga4 && !ga4Error && (
           <div className="mt-6 rounded-xl border border-amber-300/30 bg-amber-400/10 p-4 text-sm text-amber-100">
             GA4 actiu pero sense dades. Revisa permisos del service account o quota de l&apos;API.
           </div>
