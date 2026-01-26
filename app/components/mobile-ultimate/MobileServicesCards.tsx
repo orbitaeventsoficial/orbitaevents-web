@@ -53,7 +53,6 @@ interface ServiceCardProps {
 }
 
 function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps) {
-  const { locale } = useMobile();
   const reduceMotion = useReducedMotion();
 
   const title = t(`services.${service.id}.title`);
