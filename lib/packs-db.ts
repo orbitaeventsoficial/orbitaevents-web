@@ -10,9 +10,9 @@ const fallbackPacks = getAllPacks();
 
 type DbPack = {
   id: string;
-  code: string | null;
+  code?: string | null;
   slug: string;
-  service: string | null;
+  service?: string | null;
   price: number;
   originalPrice: number | null;
   djHours: number;

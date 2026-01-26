@@ -299,8 +299,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50/80 via-orange-50/30 to-stone-50">
-      {/* Desktop Sidebar */}
+    <html lang="ca" suppressHydrationWarning>
+      <body className="bg-gradient-to-br from-amber-50/80 via-orange-50/30 to-stone-50 text-stone-700 antialiased" suppressHydrationWarning>
+        <div className="min-h-screen">
+          {/* Desktop Sidebar */}
       <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/95 backdrop-blur-sm border-r border-amber-100 flex-col z-40">
         {/* Logo */}
         <div className="p-4 border-b border-amber-100">
@@ -546,6 +548,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           />
         </div>
       </nav>
-    </div>
+        </div>
+      </body>
+    </html>
   );
 }
