@@ -30,11 +30,28 @@ function buildPoints(values: number[], height: number, width: number) {
     .join(' ');
 }
 
-export function MiniLineChart({ series, height = 42 }: { series: Series[]; height?: number }) {
+function buildAreaPath(values: number[], height: number, width: number) {
+  const step = values.length > 1 ? width / (values.length - 1) : width;
+  const points = values.map((v, i) => {
+    const x = i * step;
+    const y = height - v * height;
+    return [x, y] as const;
+  });
+  const line = points.map((p) => `${p[0]},${p[1]}`).join(' ');
+  const first = points[0];
+  const last = points[points.length - 1];
+  return `M ${first[0]} ${height} L ${line} L ${last[0]} ${height} Z`;
+}
+
+function strokeToFill(stroke: string) {
+  return stroke.replace(')', ', 0.22)').replace('rgb', 'rgba');
+}
+
+export function MiniLineChart({ series, height = 56 }: { series: Series[]; height?: number }) {
   const width = 100;
   return (
     <div className="w-full">
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-12">
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-14">
         <defs>
           <linearGradient id="grid-fade" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="rgba(148,163,184,0.35)" />
@@ -46,16 +63,19 @@ export function MiniLineChart({ series, height = 42 }: { series: Series[]; heigh
         {series.map((s, idx) => {
           const normalized = normalizeSeries(s.data);
           const points = buildPoints(normalized, height - 2, width);
+          const areaPath = buildAreaPath(normalized, height - 2, width);
           return (
-            <polyline
-              key={`${s.label || 'series'}-${idx}`}
-              fill="none"
-              stroke={s.stroke}
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              points={points}
-            />
+            <g key={`${s.label || 'series'}-${idx}`}>
+              <path d={areaPath} fill={strokeToFill(s.stroke)} />
+              <polyline
+                fill="none"
+                stroke={s.stroke}
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={points}
+              />
+            </g>
           );
         })}
       </svg>
