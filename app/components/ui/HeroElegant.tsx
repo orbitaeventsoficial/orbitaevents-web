@@ -71,7 +71,7 @@ export default function HeroElegant() {
           <h1 className="text-[2.5rem] leading-[1.05] md:text-6xl lg:text-7xl font-black text-white mb-3 md:mb-4 tracking-tight text-center">
             {t('title1')}
             <br />
-            <span className="relative inline-block min-h-[1.2em] text-center">
+            <span className="relative block w-full min-h-[1.2em]">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={currentIndex}
@@ -79,7 +79,7 @@ export default function HeroElegant() {
                   animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                   exit={{ opacity: 0, y: -20, filter: 'blur(8px)' }}
                   transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
-                  className="relative inline-block text-center"
+                  className="relative block w-full text-center"
                 >
                   {/* Text amb gradient i glow */}
                   <span
@@ -97,13 +97,8 @@ export default function HeroElegant() {
                     initial={{ scaleX: 0, opacity: 0 }}
                     animate={{ scaleX: 1, opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.4 }}
-                    className="absolute -bottom-2 left-0 right-0 mx-auto w-2/3 h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent"
-                    style={{ transformOrigin: 'center' }}
+                    className="block mx-auto mt-2 w-1/2 max-w-[200px] h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent"
                   />
-
-                  {/* Efecte de partícules/brillantor als costats */}
-                  <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" style={{ animationDelay: '0s' }} />
-                  <span className="absolute -right-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
                 </motion.span>
               </AnimatePresence>
             </span>
