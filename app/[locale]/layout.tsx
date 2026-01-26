@@ -76,12 +76,10 @@ function GoogleTagManagerBody() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function UmamiAnalytics() {
-  const websiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
-  if (!websiteId) return null;
-
+  const websiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID || '907ca326-ffa3-401f-ae1e-3c9fe383b695';
   const scriptUrl =
     process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL ||
-    'https://analytics.orbitaevents.com/script.js';
+    'https://cloud.umami.is/script.js';
 
   return (
     <Script
