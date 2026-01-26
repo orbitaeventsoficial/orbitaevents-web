@@ -142,7 +142,7 @@ export default function HeaderChampion() {
         }}
       >
         <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-[76px] md:h-28 pt-2">
+        <div className="flex items-center justify-between h-[84px] md:h-28 pt-3">
 
             {/* ════════════════════════════════════════════════════════════ */}
             {/* LOGO */}
@@ -470,7 +470,7 @@ export default function HeaderChampion() {
       </AnimatePresence>
 
       {/* Spacer - header height */}
-      <div className="h-[76px] md:h-28" />
+      <div className="h-[84px] md:h-28" />
     </>
   );
 }

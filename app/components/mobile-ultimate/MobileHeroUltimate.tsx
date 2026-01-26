@@ -100,12 +100,12 @@ function AnimatedBadge() {
   return (
     <div className="relative h-12 overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className={`relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r ${badge.gradient} shadow-2xl`}>
+        <div className={`relative inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r ${badge.gradient} shadow-2xl`}>
           <div
             className={`absolute inset-0 rounded-full bg-gradient-to-r ${badge.gradient} opacity-40 blur-lg`}
           />
           <span className="relative text-2xl drop-shadow-lg">{badge.emoji}</span>
-          <span className="relative text-white text-sm font-bold tracking-wide drop-shadow-md">
+          <span className="relative text-white text-base font-bold tracking-wide drop-shadow-md">
             {badge.text}
           </span>
         </div>
@@ -349,8 +349,12 @@ export default function MobileHeroUltimate() {
 
       {/* Content with Parallax */}
       <motion.div 
-        className="relative z-10 h-full flex flex-col items-center justify-end pt-16 pb-36 text-center"
-        style={{ y: contentY, opacity: contentOpacity }}
+        className="relative z-10 h-full flex flex-col items-center justify-start pb-28 text-center"
+        style={{
+          y: contentY,
+          opacity: contentOpacity,
+          paddingTop: 'calc(var(--header-height) + 1.5rem)',
+        }}
       >
         <div className="w-full max-w-md px-6 mx-auto text-center">
           {/* Badge */}
