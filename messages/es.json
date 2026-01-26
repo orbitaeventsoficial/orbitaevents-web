@@ -5985,10 +5985,10 @@
     "subtitle": "Respuesta garantizada en menos de 2 horas",
     "guarantee": "Garantía 100% satisfacción",
     "availability": {
-      "badge": "🎃 Halloween 2025",
+      "badge": "📅 Fines de semana 2025",
       "saturdaysFree": "sábados libres",
-      "lastOne": "⚠️ ¡Último!",
-      "lastOnes": "🔥 ¡Últimos!"
+      "lastOne": "⚠️ ¡Último fin de semana disponible!",
+      "lastOnes": "🔥 ¡Últimos fines de semana disponibles!"
     },
     "badges": {
       "rating": "Rating",

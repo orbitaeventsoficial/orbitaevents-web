@@ -47,13 +47,13 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
 
   // Get all service data
   const serviciosConfig = [
-    { key: 'bodas', href: '/servicios/bodas', popular: true, icon: 'heart', emoji: '??' },
-    { key: 'discomovil', href: '/servicios/discomovil', popular: true, icon: 'music', emoji: '??' },
-    { key: 'fiestas', href: '/servicios/fiestas', popular: false, icon: 'cake', emoji: '??' },
-    { key: 'animacionInfantil', href: '/servicios/animacion-infantil', popular: false, icon: 'party', emoji: '??' },
-    { key: 'empresas', href: '/servicios/empresas', popular: false, icon: 'briefcase', emoji: '??' },
-    { key: 'produccion', href: '/servicios/produccion', popular: false, icon: 'settings', emoji: '???' },
-    { key: 'alquiler', href: '/servicios/alquiler', popular: false, icon: 'package', emoji: '??' },
+    { key: 'bodas', href: '/servicios/bodas', popular: true, icon: 'heart', emoji: '💍' },
+    { key: 'discomovil', href: '/servicios/discomovil', popular: true, icon: 'music', emoji: '🎧' },
+    { key: 'fiestas', href: '/servicios/fiestas', popular: false, icon: 'cake', emoji: '🎉' },
+    { key: 'animacionInfantil', href: '/servicios/animacion-infantil', popular: false, icon: 'party', emoji: '🧒' },
+    { key: 'empresas', href: '/servicios/empresas', popular: false, icon: 'briefcase', emoji: '💼' },
+    { key: 'produccion', href: '/servicios/produccion', popular: false, icon: 'settings', emoji: '🎛️' },
+    { key: 'alquiler', href: '/servicios/alquiler', popular: false, icon: 'package', emoji: '📦' },
   ];
 
   const servicios = serviciosConfig.map(s => ({

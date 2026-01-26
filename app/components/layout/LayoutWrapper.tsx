@@ -252,8 +252,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   // Comprovar si és pàgina immersiva
   const isImmersive = IMMERSIVE_PAGES.some(page => pathname?.includes(page));
   const isHomePage = INTRO_PAGES.some(page => pathname === page);
-  const hideChromeForMobileHome = isMobileViewport && isHomePage;
-  const showMobileBottomNav = isMobileViewport && !hideChromeForMobileHome;
+  const hideChromeForMobileHome = false;
+  const showMobileBottomNav = isMobileViewport && !isHomePage ? true : isMobileViewport;
   const showDesktopBottomNav = !isMobileViewport;
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -280,7 +280,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       )}
 
       {/* Header unificat (desktop + mòbil) - dynamic amb ssr:false */}
-      {!hideHeaderOnMobileIntro && !hideChromeForMobileHome && <Header />}
+      {!hideHeaderOnMobileIntro && <Header />}
 
       {/* Contingut principal */}
       <main
@@ -292,14 +292,14 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       </main>
 
       {/* Footer */}
-      {!hideChromeForMobileHome && <Footer />}
+      <Footer />
 
       {/* Bottom Navigation - Mobile only */}
       {showDesktopBottomNav && <BottomNav />}
       {showMobileBottomNav && <MobileBottomNav />}
 
       {/* FloatingCTAs - WhatsApp desktop + Bottom bar mòbil (FIX SOLAPAMENT) */}
-      {!hideChromeForMobileHome && <FloatingCTAs />}
+      <FloatingCTAs />
 
       {/* Consentiment cookies */}
       <CookieConsent />

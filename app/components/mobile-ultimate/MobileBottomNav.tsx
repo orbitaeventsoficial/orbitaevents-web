@@ -143,22 +143,23 @@ function QuoteMenu() {
         )}
       </AnimatePresence>
 
-      {/* Main CTA button */}
+      {/* Main orb button */}
       <motion.button
         onClick={toggleMenu}
-        whileTap={{ scale: 0.98 }}
-        className="relative z-50 flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-400 px-4 py-2 text-xs font-bold text-zinc-900 shadow-lg"
+        whileTap={{ scale: 0.94 }}
+        className="relative z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-500 shadow-[0_10px_30px_rgba(251,191,36,0.45)]"
       >
         <motion.span
           animate={reduceMotion ? { rotate: 0 } : { rotate: isOpen ? 45 : 0 }}
           transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 300 }}
-          className="inline-flex"
+          className="inline-flex text-black"
         >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
         </motion.span>
-        <span>{t('cta')}</span>
+        <span className="pointer-events-none absolute -inset-2 rounded-full bg-amber-400/30 blur-xl" />
+        <span className="pointer-events-none absolute inset-1 rounded-full bg-white/10" />
       </motion.button>
     </div>
   );

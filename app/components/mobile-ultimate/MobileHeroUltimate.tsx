@@ -21,7 +21,7 @@
  * - Animaciones optimizadas para evitar parpadeos
  */
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
@@ -128,35 +128,27 @@ function MorphingText() {
     t('morphingTexts.yours'),
   ], [t]);
 
-  const text = texts[0];
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % texts.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [texts.length]);
 
   return (
     <span className="relative inline-block min-w-[200px]">
-      <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 rounded-2xl blur-3xl" />
-
       <span
-        className="relative inline-block bg-gradient-to-r from-amber-200 via-orange-400 to-amber-400 bg-clip-text text-transparent font-black"
+        className="relative inline-block bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent font-black"
         style={{
-          filter: 'drop-shadow(0 0 30px rgba(251, 191, 36, 0.7)) drop-shadow(0 0 60px rgba(251, 146, 60, 0.35))',
+          textShadow: '0 0 40px rgba(251, 191, 36, 0.4), 0 0 80px rgba(251, 191, 36, 0.2)',
+          filter: 'drop-shadow(0 0 20px rgba(251, 191, 36, 0.3))',
         }}
       >
-        {text}
-
-        <span className="absolute -left-3 top-0 w-2 h-2 bg-amber-400/60 rounded-full" />
-        <span className="absolute -right-3 bottom-0 w-2 h-2 bg-orange-400/60 rounded-full" />
+        {texts[index]}
       </span>
 
-      {/* Animated underline with shimmer effect */}
-      <div
-        className="absolute -bottom-3 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent rounded-full"
-        style={{ opacity: 0.75 }}
-      />
-
-      {/* Shimmer effect moving across */}
-      <div
-        className="absolute -bottom-3 left-0 h-[3px] w-1/3 bg-gradient-to-r from-transparent via-white to-transparent rounded-full"
-        style={{ opacity: 0 }}
-      />
+      <span className="block mx-auto mt-2 w-1/2 max-w-[200px] h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
     </span>
   );
 }
@@ -278,6 +270,8 @@ function FloatingCTAs() {
 export default function MobileHeroUltimate() {
   const t = useTranslations('mobileHero');
   const containerRef = useRef<HTMLDivElement>(null);
+  const [videoReady, setVideoReady] = useState(false);
+  const videoReadyTimeout = useRef<number | null>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end start'],
@@ -288,6 +282,15 @@ export default function MobileHeroUltimate() {
   const videoOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, 150]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  
+  useEffect(() => {
+    return () => {
+      if (videoReadyTimeout.current !== null) {
+        window.clearTimeout(videoReadyTimeout.current);
+        videoReadyTimeout.current = null;
+      }
+    };
+  }, []);
 
   return (
     <section 
@@ -300,6 +303,10 @@ export default function MobileHeroUltimate() {
         className="absolute inset-0 pointer-events-none"
         style={{ scale: videoScale, opacity: videoOpacity }}
       >
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/img/hero-poster-mobile.webp')" }}
+        />
         <video
           autoPlay
           muted
@@ -309,7 +316,16 @@ export default function MobileHeroUltimate() {
           aria-hidden="true"
           disablePictureInPicture
           poster="/img/hero-poster-mobile.webp"
-          className="w-full h-full object-cover"
+          className={`w-full h-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+          onCanPlay={() => {
+            if (videoReadyTimeout.current !== null) {
+              window.clearTimeout(videoReadyTimeout.current);
+            }
+            videoReadyTimeout.current = window.setTimeout(() => {
+              setVideoReady(true);
+              videoReadyTimeout.current = null;
+            }, 1200);
+          }}
         >
           <source src="/videos/hero-orbita-mobile.mp4" type="video/mp4" />
         </video>

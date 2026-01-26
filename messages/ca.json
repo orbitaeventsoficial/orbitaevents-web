@@ -6157,10 +6157,10 @@
     "subtitle": "Resposta garantida en menys de 2 hores",
     "guarantee": "Garantia 100% satisfacció",
     "availability": {
-      "badge": "🎃 Halloween 2025",
+      "badge": "📅 Caps de setmana 2025",
       "saturdaysFree": "dissabtes lliures",
-      "lastOne": "⚠️ Últim!",
-      "lastOnes": "🔥 Últimes!"
+      "lastOne": "⚠️ Últim cap de setmana disponible!",
+      "lastOnes": "🔥 Últims caps de setmana disponibles!"
     },
     "badges": {
       "rating": "Rating",

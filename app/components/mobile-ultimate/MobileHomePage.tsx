@@ -32,7 +32,6 @@ import MobileErrorBoundary from './MobileErrorBoundary';
 import MobileHeroUltimate from './MobileHeroUltimate';
 import MobileServicesCards from './MobileServicesCards';
 import MobileCTAUrgency from './MobileCTAUrgency';
-import MobileBottomNav from './MobileBottomNav';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
@@ -366,8 +365,6 @@ export default function MobileHomePage() {
           {/* Footer */}
           <MobileFooter />
 
-          {/* Bottom Navigation */}
-          <MobileBottomNav />
         </MobileAppShell>
       )}
     </MobileErrorBoundary>

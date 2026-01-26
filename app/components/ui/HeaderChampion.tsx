@@ -153,13 +153,24 @@ export default function HeaderChampion() {
               style={{ touchAction: 'manipulation' }}
             >
               <Image
+                src="/img/orbita-glyph.svg"
+                alt="Òrbita Events"
+                width={44}
+                height={44}
+                sizes="44px"
+                quality={90}
+                className="h-10 w-10 md:hidden pointer-events-none select-none transition-transform group-hover:scale-105"
+                priority
+                draggable={false}
+              />
+              <Image
                 src="/img/logoplanetatextdreta.svg"
                 alt="Òrbita Events"
                 width={200}
                 height={64}
                 sizes="200px"
                 quality={80}
-                className="h-10 md:h-12 w-auto pointer-events-none select-none transition-transform group-hover:scale-105"
+                className="hidden md:block h-10 md:h-12 w-auto pointer-events-none select-none transition-transform group-hover:scale-105"
                 priority
                 draggable={false}
               />
@@ -310,7 +321,7 @@ export default function HeaderChampion() {
                 href="/contacto"
                 className="
                   relative overflow-hidden
-                  flex items-center justify-center gap-2
+                  hidden md:flex items-center justify-center gap-2
                   px-3 py-2 md:px-6 md:py-3
                   bg-gradient-to-r from-amber-500 to-amber-400
                   text-zinc-900 text-sm md:text-base font-bold
@@ -333,7 +344,7 @@ export default function HeaderChampion() {
               {/* Mobile menu button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden flex flex-col justify-center items-center w-9 h-9 gap-1.5"
+                className="hidden"
                 aria-label="Menú"
               >
                 <span className={`w-5 h-0.5 bg-white transition-all ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />

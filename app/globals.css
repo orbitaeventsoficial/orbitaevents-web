@@ -1197,10 +1197,14 @@ html::before {
    ============================================================================= */
 @media (max-width: 767px) {
   /* Ocultar header/footer desktop en mòbil quan MobileExperience actiu */
-  body.mobile-experience-active header,
   body.mobile-experience-active footer,
   body.mobile-experience-active .bottom-nav {
     display: none !important;
+  }
+
+  /* Avoid fixed bottom nav overlapping last content */
+  main {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom));
   }
 }
 

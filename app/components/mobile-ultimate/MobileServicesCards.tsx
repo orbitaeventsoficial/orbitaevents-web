@@ -53,7 +53,7 @@ interface ServiceCardProps {
 }
 
 function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps) {
-  const { haptic } = useMobile();
+  const { locale } = useMobile();
   const reduceMotion = useReducedMotion();
 
   const title = t(`services.${service.id}.title`);
@@ -72,7 +72,6 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
       <motion.a
         href={`/${locale}${service.href}`}
         whileTap={{ scale: 0.97 }}
-        onTapStart={() => haptic('medium')}
         className="block relative w-full h-full rounded-3xl overflow-hidden bg-zinc-900 border border-white/15 shadow-lg"
         initial={{ opacity: 0, y: 50, scale: 0.9 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -178,14 +177,27 @@ function ServiceCard3D({ service, isActive, index, locale, t }: ServiceCardProps
 
 export default function MobileServicesCards() {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollRaf = useRef<number | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const { haptic, locale } = useMobile();
+  const { locale } = useMobile();
   const t = useTranslations('mobileServices');
   const reduceMotion = useReducedMotion();
 
   // Services data with translation keys
   const SERVICES: Service[] = useMemo(() => [
+    {
+      id: 'bodas',
+      emoji: '💒',
+      titleKey: 'bodas.title',
+      subtitleKey: 'bodas.subtitle',
+      descriptionKey: 'bodas.description',
+      priceKey: 'bodas.price',
+      badgeKey: '',
+      badgeColor: '',
+      image: '/img/portfolio/bodas/bodas-01.webp',
+      gradient: 'from-pink-500/14 via-rose-500/6 to-transparent',
+      href: '/servicios/bodas',
+      features: ['feature1', 'feature2', 'feature3'],
+    },
     {
       id: 'halloween',
       emoji: '🎃',
@@ -212,20 +224,6 @@ export default function MobileServicesCards() {
       image: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
       gradient: 'from-amber-500/14 via-purple-500/6 to-transparent',
       href: '/tematica-mon-magic',
-      features: ['feature1', 'feature2', 'feature3'],
-    },
-    {
-      id: 'bodas',
-      emoji: '💒',
-      titleKey: 'bodas.title',
-      subtitleKey: 'bodas.subtitle',
-      descriptionKey: 'bodas.description',
-      priceKey: 'bodas.price',
-      badgeKey: '',
-      badgeColor: '',
-      image: '/img/portfolio/bodas/bodas-01.webp',
-      gradient: 'from-pink-500/14 via-rose-500/6 to-transparent',
-      href: '/servicios/bodas',
       features: ['feature1', 'feature2', 'feature3'],
     },
     {
@@ -259,39 +257,9 @@ export default function MobileServicesCards() {
   ], []);
 
   // Refs to avoid re-binding scroll handlers
-  const hapticRef = useRef(haptic);
-  hapticRef.current = haptic;
-  const activeIndexRef = useRef(activeIndex);
-  activeIndexRef.current = activeIndex;
-
-  // Detectar card activa basándose en scroll position
   useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    const handleScroll = () => {
-      if (scrollRaf.current !== null) return;
-      scrollRaf.current = window.requestAnimationFrame(() => {
-        const scrollLeft = container.scrollLeft;
-        const cardWidth = container.offsetWidth * 0.75 + 16; // width + gap
-        const newIndex = Math.round(scrollLeft / cardWidth);
-        if (newIndex !== activeIndexRef.current && newIndex >= 0 && newIndex < SERVICES.length) {
-          setActiveIndex(newIndex);
-          hapticRef.current('light');
-        }
-        scrollRaf.current = null;
-      });
-    };
-
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      container.removeEventListener('scroll', handleScroll);
-      if (scrollRaf.current !== null) {
-        window.cancelAnimationFrame(scrollRaf.current);
-        scrollRaf.current = null;
-      }
-    };
-  }, [SERVICES.length]);
+    setActiveIndex(0);
+  }, []);
 
   return (
     <section id="services-section" className="py-12 overflow-hidden">
@@ -319,10 +287,11 @@ export default function MobileServicesCards() {
       {/* Horizontal Scroll Container */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto px-6 pb-4 hide-scrollbar snap-x snap-mandatory"
+        className="flex gap-4 overflow-x-hidden px-6 pb-4 hide-scrollbar snap-x snap-mandatory"
         style={{
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-y',
         }}
       >
         {SERVICES.map((service, index) => (
@@ -351,7 +320,6 @@ export default function MobileServicesCards() {
           <motion.button
             key={index}
             onClick={() => {
-              haptic('light');
               const container = scrollRef.current;
               if (container) {
                 const cardWidth = container.offsetWidth * 0.75 + 16;
@@ -360,6 +328,7 @@ export default function MobileServicesCards() {
                   behavior: 'smooth',
                 });
               }
+              setActiveIndex(index);
             }}
             className="p-3 flex items-center justify-center"
             whileTap={{ scale: 0.9 }}
