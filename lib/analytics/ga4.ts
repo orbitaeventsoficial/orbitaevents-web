@@ -36,6 +36,11 @@ type Ga4Report = {
   searchTerms: Ga4Row[];
   devices: Ga4Row[];
   locations: Ga4Row[];
+  timeseries: {
+    date: string;
+    sessions: number;
+    activeUsers: number;
+  }[];
   realtime: {
     activeUsers: number;
     pages: Ga4RealtimeRow[];
@@ -164,6 +169,7 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
     searchTermsRes,
     devicesRes,
     locationsRes,
+    timeseriesRes,
     realtimeRes
   ] =
     await Promise.all([
@@ -226,6 +232,14 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
         orderBys: [{ metric: { metricName: 'activeUsers' }, desc: true }],
         limit: 10,
       }),
+      client.runReport({
+        property,
+        dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+        dimensions: [{ name: 'date' }],
+        metrics: [{ name: 'sessions' }, { name: 'activeUsers' }],
+        orderBys: [{ dimension: { dimensionName: 'date' }, desc: false }],
+        limit: 31,
+      }),
       client.runRealtimeReport({
         property,
         metrics: [{ name: 'activeUsers' }],
@@ -250,6 +264,11 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
     searchTerms: mapRows(searchTermsRes[0]?.rows || []),
     devices: mapRows(devicesRes[0]?.rows || []),
     locations: mapRows(locationsRes[0]?.rows || [], 0, 0),
+    timeseries: (timeseriesRes[0]?.rows || []).map((row) => ({
+      date: row.dimensionValues?.[0]?.value || '',
+      sessions: toNumber(row.metricValues?.[0]?.value),
+      activeUsers: toNumber(row.metricValues?.[1]?.value),
+    })),
     realtime: {
       activeUsers: toNumber(realtimeRes[0]?.rows?.[0]?.metricValues?.[0]?.value),
       pages: mapRealtimeRows(realtimeRes[0]?.rows || []),

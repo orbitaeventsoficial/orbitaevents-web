@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { getGa4Report } from '@/lib/analytics/ga4';
 import { MetricCard, Card, Button } from './components/ui';
+import { MiniLineChart } from './components/Charts';
 import Link from 'next/link';
 
 /**
@@ -31,9 +32,31 @@ function formatEventDate(date: Date): string {
   return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]}`;
 }
 
+function buildDateBuckets(days: number) {
+  const dates: Date[] = [];
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  for (let i = days - 1; i >= 0; i -= 1) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    dates.push(d);
+  }
+  return dates;
+}
+
+function toDateKey(date: Date) {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 export default async function AdminDashboard() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const seriesStart = new Date(now);
+  seriesStart.setDate(now.getDate() - 30);
+  seriesStart.setHours(0, 0, 0, 0);
   let ga4 = null;
   try {
     ga4 = await getGa4Report();
@@ -55,6 +78,8 @@ export default async function AdminDashboard() {
     inventoryStats,
     avgRating,
     wonLeads,
+    leadsRecent30,
+    bookingsRecent30,
   ] = await Promise.all([
     // Total leads
     prisma.lead.count().catch(() => 0),
@@ -120,6 +145,14 @@ export default async function AdminDashboard() {
     }).catch(() => ({ _avg: { rating: null } })),
     // Leads guanyats (ara dins del Promise.all)
     prisma.lead.count({ where: { status: 'WON' } }).catch(() => 0),
+    prisma.lead.findMany({
+      where: { createdAt: { gte: seriesStart } },
+      select: { createdAt: true, status: true },
+    }).catch(() => []),
+    prisma.booking.findMany({
+      where: { eventDate: { gte: seriesStart } },
+      select: { eventDate: true, status: true, total: true },
+    }).catch(() => []),
   ]);
 
   // Calcular estadístiques inventari
@@ -135,6 +168,46 @@ export default async function AdminDashboard() {
   const ga4AvgSessionMin = ga4?.totals.avgSessionDuration
     ? Math.max(1, Math.round(ga4.totals.avgSessionDuration / 60))
     : 0;
+
+  const buckets = buildDateBuckets(30);
+  const leadTotals = new Map<string, { total: number; won: number }>();
+  leadsRecent30.forEach((lead) => {
+    const key = toDateKey(new Date(lead.createdAt));
+    const current = leadTotals.get(key) || { total: 0, won: 0 };
+    current.total += 1;
+    if (lead.status === 'WON') current.won += 1;
+    leadTotals.set(key, current);
+  });
+
+  const bookingTotals = new Map<string, { count: number; revenue: number }>();
+  bookingsRecent30.forEach((booking) => {
+    const key = toDateKey(new Date(booking.eventDate));
+    const current = bookingTotals.get(key) || { count: 0, revenue: 0 };
+    if (booking.status === 'CONFIRMED' || booking.status === 'COMPLETED') {
+      current.count += 1;
+      current.revenue += Number(booking.total || 0);
+    }
+    bookingTotals.set(key, current);
+  });
+
+  const leadsSeries = buckets.map((d) => leadTotals.get(toDateKey(d))?.total || 0);
+  const leadsWonSeries = buckets.map((d) => leadTotals.get(toDateKey(d))?.won || 0);
+  const bookingsSeries = buckets.map((d) => bookingTotals.get(toDateKey(d))?.count || 0);
+  const revenueSeries = buckets.map((d) => bookingTotals.get(toDateKey(d))?.revenue || 0);
+  const revenueTotal30 = Math.round(revenueSeries.reduce((acc, v) => acc + v, 0));
+
+  const ga4Series = ga4?.timeseries || [];
+  const ga4ByDate = new Map<string, { sessions: number; users: number }>();
+  ga4Series.forEach((row) => {
+    if (!row.date) return;
+    const yyyy = row.date.slice(0, 4);
+    const mm = row.date.slice(4, 6);
+    const dd = row.date.slice(6, 8);
+    const key = `${yyyy}-${mm}-${dd}`;
+    ga4ByDate.set(key, { sessions: row.sessions, users: row.activeUsers });
+  });
+  const ga4SessionsSeries = buckets.map((d) => ga4ByDate.get(toDateKey(d))?.sessions || 0);
+  const ga4UsersSeries = buckets.map((d) => ga4ByDate.get(toDateKey(d))?.users || 0);
 
   // Activitat recent
   const activities = [
@@ -232,6 +305,42 @@ export default async function AdminDashboard() {
           change={ga4PageViews ? `${ga4PageViews} pagines` : 'GA4 pendent'}
           changeType="neutral"
         />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <Card title="Transit web (30 dies)" subtitle="Sessions i usuaris" noPadding>
+          <div className="p-4 sm:p-6">
+            <MiniLineChart
+              series={[
+                { data: ga4SessionsSeries, stroke: '#22d3ee', label: 'Sessions', value: ga4Sessions || '-' },
+                { data: ga4UsersSeries, stroke: '#60a5fa', label: 'Usuaris', value: ga4Users || '-' },
+              ]}
+            />
+            {!ga4 && (
+              <p className="mt-2 text-xs text-slate-400">GA4 pendent o sense dades.</p>
+            )}
+          </div>
+        </Card>
+        <Card title="Leads i conversio" subtitle="Consultes i tancaments" noPadding>
+          <div className="p-4 sm:p-6">
+            <MiniLineChart
+              series={[
+                { data: leadsSeries, stroke: '#34d399', label: 'Leads', value: leadsThisMonth },
+                { data: leadsWonSeries, stroke: '#fbbf24', label: 'Guanyats', value: wonLeads },
+              ]}
+            />
+          </div>
+        </Card>
+        <Card title="Reserves i facturacio" subtitle="Events confirmats" noPadding>
+          <div className="p-4 sm:p-6">
+            <MiniLineChart
+              series={[
+                { data: bookingsSeries, stroke: '#f472b6', label: 'Reserves', value: bookingsConfirmed },
+                { data: revenueSeries, stroke: '#a78bfa', label: '€', value: revenueTotal30 },
+              ]}
+            />
+          </div>
+        </Card>
       </div>
 
       {/* Contingut principal - Responsive */}
