@@ -272,6 +272,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       {/* Footer */}
       <Footer />
 
+      {/* Bottom Navigation - Mobile only */}
+      <BottomNav />
+
       {/* FloatingCTAs - WhatsApp desktop + Bottom bar mòbil (FIX SOLAPAMENT) */}
       <FloatingCTAs />
 
