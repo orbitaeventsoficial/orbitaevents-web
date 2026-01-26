@@ -293,10 +293,11 @@ export default function MobileHeroUltimate() {
     <section 
       ref={containerRef}
       className="relative h-[100dvh] w-full overflow-hidden"
+      style={{ touchAction: 'pan-y' }}
     >
       {/* Video Background with Parallax */}
       <motion.div
-        className="absolute inset-0"
+        className="absolute inset-0 pointer-events-none"
         style={{ scale: videoScale, opacity: videoOpacity }}
       >
         <video
@@ -326,10 +327,10 @@ export default function MobileHeroUltimate() {
 
       {/* Content with Parallax */}
       <motion.div 
-        className="relative z-10 h-full flex flex-col justify-end pb-32"
+        className="relative z-10 h-full flex flex-col items-center justify-end pb-32 text-center"
         style={{ y: contentY, opacity: contentOpacity }}
       >
-        <div className="px-6">
+        <div className="w-full max-w-md px-6 mx-auto text-center">
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -344,7 +345,7 @@ export default function MobileHeroUltimate() {
             initial={{ opacity: 0, y: 40, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.7, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[3rem] leading-[1.05] font-black text-white mt-6 mb-6"
+            className="text-[3rem] leading-[1.05] font-black text-white mt-6 mb-6 text-center"
             style={{
               textShadow: '0 4px 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(251, 191, 36, 0.2)',
             }}
@@ -359,7 +360,7 @@ export default function MobileHeroUltimate() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9, duration: 0.8 }}
-            className="mb-8 max-w-sm"
+            className="mb-8 max-w-sm mx-auto"
           >
             <p className="text-lg text-white/80 mb-2 font-medium">
               {t('subtitle')}

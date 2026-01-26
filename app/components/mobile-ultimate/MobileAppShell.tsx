@@ -294,11 +294,21 @@ export default function MobileAppShell({
 
   useEffect(() => {
     document.body.classList.add('mobile-experience-active');
-    document.body.style.overflow = '';
-    document.documentElement.style.overflow = '';
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    const previousBodyHeight = document.body.style.height;
+    const previousHtmlHeight = document.documentElement.style.height;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.height = '100dvh';
+    document.documentElement.style.height = '100dvh';
 
     return () => {
       document.body.classList.remove('mobile-experience-active');
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.height = previousBodyHeight;
+      document.documentElement.style.height = previousHtmlHeight;
     };
   }, []);
   
@@ -306,7 +316,9 @@ export default function MobileAppShell({
   const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element && containerRef.current) {
-      const offsetTop = element.offsetTop;
+      const containerTop = containerRef.current.getBoundingClientRect().top;
+      const elementTop = element.getBoundingClientRect().top;
+      const offsetTop = containerRef.current.scrollTop + (elementTop - containerTop);
       containerRef.current.scrollTo({
         top: offsetTop,
         behavior: 'smooth'
@@ -422,11 +434,12 @@ export default function MobileAppShell({
       <div
         ref={containerRef}
         className={`
-          min-h-[100dvh] w-full overflow-x-hidden overflow-y-auto
+          h-[100dvh] w-full overflow-x-hidden overflow-y-auto
           bg-zinc-950 text-white
           safe-top safe-bottom
         `}
         style={{
+          touchAction: 'pan-y',
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
         }}

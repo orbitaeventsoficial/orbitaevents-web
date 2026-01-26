@@ -81,6 +81,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const [showIntro, setShowIntro] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [hideHeaderOnMobileIntro, setHideHeaderOnMobileIntro] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
 
   // Funció per treure l'overlay negre
   const removeOverlay = useCallback(() => {
@@ -145,6 +146,17 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       window.clearTimeout(failsafeId);
     }
   }, [pathname, removeOverlay]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const updateMobile = (event: MediaQueryListEvent | MediaQueryList) => {
+      setIsMobileViewport(event.matches);
+    };
+    updateMobile(mediaQuery);
+    mediaQuery.addEventListener('change', updateMobile);
+    return () => mediaQuery.removeEventListener('change', updateMobile);
+  }, []);
 
   useEffect(() => {
     if (showIntro) {
@@ -235,6 +247,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
   // Comprovar si és pàgina immersiva
   const isImmersive = IMMERSIVE_PAGES.some(page => pathname?.includes(page));
+  const isHomePage = INTRO_PAGES.some(page => pathname === page);
+  const hideChromeForMobileHome = isMobileViewport && isHomePage;
 
   // ─────────────────────────────────────────────────────────────────────────
   // RENDER: Pàgina immersiva (sense header/footer)
@@ -260,7 +274,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       )}
 
       {/* Header unificat (desktop + mòbil) - dynamic amb ssr:false */}
-      {!hideHeaderOnMobileIntro && <Header />}
+      {!hideHeaderOnMobileIntro && !hideChromeForMobileHome && <Header />}
 
       {/* Contingut principal */}
       <main
@@ -272,13 +286,13 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       </main>
 
       {/* Footer */}
-      <Footer />
+      {!hideChromeForMobileHome && <Footer />}
 
       {/* Bottom Navigation - Mobile only */}
-      <BottomNav />
+      {!hideChromeForMobileHome && <BottomNav />}
 
       {/* FloatingCTAs - WhatsApp desktop + Bottom bar mòbil (FIX SOLAPAMENT) */}
-      <FloatingCTAs />
+      {!hideChromeForMobileHome && <FloatingCTAs />}
 
       {/* Consentiment cookies */}
       <CookieConsent />
