@@ -188,15 +188,15 @@ export default function Footer() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className={`flex flex-col items-center gap-2 p-6 rounded-2xl bg-gradient-to-br ${signal.color} border border-white/5 hover:border-white/20 transition-all duration-300 group hover:scale-105`}
+                className={`flex flex-col items-center gap-1.5 p-3 sm:p-5 rounded-2xl bg-gradient-to-br ${signal.color} border border-white/5 hover:border-white/20 transition-all duration-300 group hover:scale-105`}
               >
-                <span className="text-3xl group-hover:scale-125 transition-transform duration-300">
+                <span className="text-xl sm:text-2xl group-hover:scale-125 transition-transform duration-300">
                   {signal.icon}
                 </span>
-                <span className="text-2xl md:text-3xl font-bold text-white">
+                <span className="text-lg sm:text-xl md:text-2xl font-bold text-white">
                   {signal.metric}
                 </span>
-                <span className="text-sm text-white/60 text-center">
+                <span className="text-[11px] sm:text-xs text-white/60 text-center">
                   {signal.label}
                 </span>
               </motion.div>

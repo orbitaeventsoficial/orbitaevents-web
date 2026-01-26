@@ -92,8 +92,8 @@ export default function HeroPortalLogo({
   // Configuración responsive - logo más grande
   const config = useMemo(() => ({
     logoSize: isMobile ? 280 : 520,
-    textSize: isMobile ? '1.25rem' : '1.85rem',
-    wordmarkWidth: isMobile ? 200 : 320,
+    textSize: isMobile ? '1.6rem' : '2.2rem',
+    wordmarkWidth: isMobile ? 260 : 360,
   }), [isMobile]);
 
   return (
@@ -219,7 +219,7 @@ export default function HeroPortalLogo({
               />
 
             </svg>
-            <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2 translate-y-[9.5rem] md:translate-y-[17.75rem] flex flex-col items-center text-center">
+            <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2 translate-y-[10.5rem] md:translate-y-[19rem] flex flex-col items-center text-center">
               <motion.img
                 src="/img/orbitawordmark.svg"
                 alt="Òrbita Events"

@@ -433,13 +433,13 @@ export default function ConfiguradorClient() {
               .map((extra) => (
               <label
                 key={extra.id}
-                className={`relative flex items-start justify-between p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                className={`relative flex items-start justify-between w-full max-w-full p-4 rounded-lg border-2 cursor-pointer transition-all overflow-hidden ${
                   config.extras.includes(extra.id)
                     ? 'border-fuchsia-500 bg-gradient-to-br from-fuchsia-500/10 to-purple-500/5 shadow-[0_0_20px_rgba(217,70,239,0.2)]'
                     : 'border-border hover:border-fuchsia-500/50'
                 }`}
               >
-                <div className="flex items-start gap-3 flex-1">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
                   <input
                     type="checkbox"
                     checked={config.extras.includes(extra.id)}
@@ -455,7 +455,7 @@ export default function ConfiguradorClient() {
                     }}
                     className="w-5 h-5 mt-0.5"
                   />
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="text-white font-semibold flex items-center gap-2">
                       <span>{extra.icon}</span>
                       {getExtraText(tMobile, extra.id, 'name', extra.name)}
@@ -469,12 +469,12 @@ export default function ConfiguradorClient() {
                   </div>
                 </div>
                 {extra.popular && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                  <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
                     {t('step3.popular')}
                   </span>
                 )}
                 {extra.premium && (
-                  <span className="absolute -top-2 -right-2 bg-oe-gold text-white text-xs px-2 py-0.5 rounded-full">
+                  <span className="absolute top-2 right-2 bg-oe-gold text-white text-xs px-2 py-0.5 rounded-full">
                     {t('step3.premiumExtra')}
                   </span>
                 )}
