@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 // Pàgina d'analytics i estadístiques
 import { prisma } from '@/lib/prisma';
 import { getUmamiReport } from '@/lib/analytics/umami';
+import { getGa4Report } from '@/lib/analytics/ga4';
 
 export const dynamic = 'force-dynamic';
 
@@ -158,12 +159,17 @@ export default async function AnalyticsPage() {
     process.env.NEXT_PUBLIC_UMAMI_DASHBOARD_URL || 'https://analytics.orbitaevents.com';
   const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? '';
   const umamiApiReady = Boolean(process.env.UMAMI_API_KEY) && Boolean(umamiWebsiteId);
+  const ga4PropertyId = process.env.GA4_PROPERTY_ID || '';
+  const ga4ClientEmail = process.env.GA4_CLIENT_EMAIL || '';
+  const ga4PrivateKey = process.env.GA4_PRIVATE_KEY || '';
   const yearGrowth = data.revenue.lastYear > 0
     ? ((data.revenue.thisYear - data.revenue.lastYear) / data.revenue.lastYear * 100).toFixed(1)
     : '100.0';
   const gtmReady = gtmId !== 'No configurat';
   const umamiReady = Boolean(umamiWebsiteId);
   const umami = umamiApiReady ? await getUmamiReport(umamiWebsiteId) : null;
+  const ga4Ready = Boolean(ga4PropertyId && ga4ClientEmail && ga4PrivateKey);
+  const ga4 = ga4Ready ? await getGa4Report() : null;
   const avgVisitMinutes = umami?.totals.totalTime
     ? Math.max(1, Math.round(umami.totals.totalTime / 60 / Math.max(umami.totals.visits, 1)))
     : 0;
@@ -191,6 +197,120 @@ export default async function AnalyticsPage() {
             </span>
           </div>
         </div>
+      </section>
+
+      {/* GA4 Starfleet Control */}
+      <section className="relative overflow-hidden rounded-2xl border border-slate-800/60 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 text-white shadow-[0_30px_80px_-40px_rgba(2,6,23,0.9)]">
+        <div
+          className="absolute inset-0 opacity-50"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 15% 20%, rgba(255,255,255,0.2) 0 2px, transparent 2px),' +
+              'radial-gradient(circle at 85% 30%, rgba(255,255,255,0.18) 0 1.5px, transparent 1.5px),' +
+              'radial-gradient(circle at 55% 70%, rgba(255,255,255,0.12) 0 1px, transparent 1px)',
+          }}
+        />
+        <div className="absolute -left-24 -top-32 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl" />
+        <div className="absolute -right-24 -bottom-28 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl" />
+        <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-cyan-200">GA4 · Enterprise Bridge</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight">Panell de control galactic</h2>
+            <p className="mt-2 max-w-xl text-sm text-slate-200">
+              Dades en temps real, trafic, pagines i events. Alimentat per GA4 Data API.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs">
+              Property ID {ga4PropertyId || '—'}
+            </span>
+            <span
+              className={`rounded-full border border-white/20 px-3 py-1 text-xs ${
+                ga4Ready ? 'bg-emerald-400/20 text-emerald-100' : 'bg-rose-400/20 text-rose-100'
+              }`}
+            >
+              {ga4Ready ? '● Actiu' : '● Pendent'}
+            </span>
+          </div>
+        </div>
+
+        {!ga4Ready && (
+          <div className="mt-6 rounded-xl border border-rose-400/30 bg-rose-500/10 p-4 text-sm text-rose-100">
+            Configuracio incompleta. Falten variables d&apos;entorn: GA4_PROPERTY_ID, GA4_CLIENT_EMAIL,
+            GA4_PRIVATE_KEY.
+          </div>
+        )}
+
+        {ga4Ready && !ga4 && (
+          <div className="mt-6 rounded-xl border border-amber-300/30 bg-amber-400/10 p-4 text-sm text-amber-100">
+            GA4 actiu pero sense dades. Revisa permisos del service account o quota de l&apos;API.
+          </div>
+        )}
+
+        {ga4 && (
+          <div className="mt-6 grid gap-4 lg:grid-cols-4">
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs uppercase text-slate-300">Usuaris actius</p>
+              <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.activeUsers}</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs uppercase text-slate-300">Sessions</p>
+              <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.sessions}</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs uppercase text-slate-300">Pageviews</p>
+              <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.pageViews}</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs uppercase text-slate-300">Events</p>
+              <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.eventCount}</p>
+            </div>
+          </div>
+        )}
+
+        {ga4 && (
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-white/5">
+              <div className="border-b border-white/10 px-4 py-3 text-sm font-semibold text-slate-200">Top Pages</div>
+              <div className="space-y-2 p-4 text-sm text-slate-200">
+                {ga4.pages.map((row) => (
+                  <div key={row.dimension} className="flex items-center justify-between">
+                    <span className="truncate">{row.dimension}</span>
+                    <span className="text-slate-300">{row.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5">
+              <div className="border-b border-white/10 px-4 py-3 text-sm font-semibold text-slate-200">Sources</div>
+              <div className="space-y-2 p-4 text-sm text-slate-200">
+                {ga4.sources.map((row) => (
+                  <div key={row.dimension} className="flex items-center justify-between">
+                    <span className="truncate">{row.dimension}</span>
+                    <span className="text-slate-300">{row.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5">
+              <div className="border-b border-white/10 px-4 py-3 text-sm font-semibold text-slate-200">
+                Realtime (top)
+              </div>
+              <div className="space-y-2 p-4 text-sm text-slate-200">
+                <div className="flex items-center justify-between">
+                  <span>Actius ara</span>
+                  <span className="text-cyan-200">{ga4.realtime.activeUsers}</span>
+                </div>
+                {ga4.realtime.pages.map((row) => (
+                  <div key={row.dimension} className="flex items-center justify-between">
+                    <span className="truncate">{row.dimension}</span>
+                    <span className="text-slate-300">{row.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* KPI Cards */}
