@@ -43,16 +43,36 @@ type Ga4Report = {
 function getGa4Config(): Ga4Config | null {
   const propertyId = process.env.GA4_PROPERTY_ID;
   const clientEmail = process.env.GA4_CLIENT_EMAIL;
-  const privateKey = process.env.GA4_PRIVATE_KEY;
+  const privateKeyRaw = process.env.GA4_PRIVATE_KEY;
+  const privateKeyB64 = process.env.GA4_PRIVATE_KEY_B64;
 
-  if (!propertyId || !clientEmail || !privateKey) {
+  if (!propertyId || !clientEmail || (!privateKeyRaw && !privateKeyB64)) {
+    return null;
+  }
+
+  let privateKey = privateKeyRaw || '';
+  if (!privateKey && privateKeyB64) {
+    try {
+      privateKey = Buffer.from(privateKeyB64, 'base64').toString('utf8');
+    } catch {
+      privateKey = '';
+    }
+  }
+
+  privateKey = privateKey.trim();
+  if ((privateKey.startsWith('"') && privateKey.endsWith('"')) || (privateKey.startsWith("'") && privateKey.endsWith("'"))) {
+    privateKey = privateKey.slice(1, -1);
+  }
+  privateKey = privateKey.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n').replace(/\r\n/g, '\n');
+
+  if (!privateKey.includes('BEGIN PRIVATE KEY')) {
     return null;
   }
 
   return {
     propertyId,
     clientEmail,
-    privateKey: privateKey.replace(/\\n/g, '\n'),
+    privateKey,
   };
 }
 
