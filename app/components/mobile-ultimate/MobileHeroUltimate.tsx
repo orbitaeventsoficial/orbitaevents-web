@@ -349,7 +349,7 @@ export default function MobileHeroUltimate() {
 
       {/* Content with Parallax */}
       <motion.div 
-        className="relative z-10 h-full flex flex-col items-center justify-end pb-32 text-center"
+        className="relative z-10 h-full flex flex-col items-center justify-end pt-16 pb-36 text-center"
         style={{ y: contentY, opacity: contentOpacity }}
       >
         <div className="w-full max-w-md px-6 mx-auto text-center">

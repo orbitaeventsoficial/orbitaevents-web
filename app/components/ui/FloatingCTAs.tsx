@@ -213,7 +213,6 @@ export default function FloatingCTAs() {
   return (
     <>
       <ContactDesktop />
-      <BottomBarMobile />
     </>
   );
 }

@@ -6,7 +6,7 @@
  */
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface GalleryImage {
   src: string;
@@ -15,6 +15,22 @@ interface GalleryImage {
 
 export function SimpleGallery({ images }: { images: GalleryImage[] }) {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const blurDataURL =
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiMxMTEyMTQiLz48L3N2Zz4=";
+
+  const prefetchImage = useCallback((src: string) => {
+    if (typeof window === 'undefined') return;
+    const img = new window.Image();
+    img.src = src;
+  }, []);
+
+  useEffect(() => {
+    if (selectedImage === null) return;
+    const next = images[selectedImage + 1]?.src;
+    const prev = images[selectedImage - 1]?.src;
+    if (next) prefetchImage(next);
+    if (prev) prefetchImage(prev);
+  }, [selectedImage, images, prefetchImage]);
 
   return (
     <>
@@ -28,6 +44,8 @@ export function SimpleGallery({ images }: { images: GalleryImage[] }) {
               key={index}
               className="relative aspect-[4/3] rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity bg-stone-900"
               onClick={() => setSelectedImage(index)}
+              onMouseEnter={() => prefetchImage(image.src)}
+              onFocus={() => prefetchImage(image.src)}
             >
               <Image
                 src={image.src}
@@ -35,9 +53,11 @@ export function SimpleGallery({ images }: { images: GalleryImage[] }) {
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                quality={70}
+                quality={60}
                 priority={isPriority}
                 loading={isPriority ? 'eager' : 'lazy'}
+                placeholder="blur"
+                blurDataURL={blurDataURL}
               />
             </div>
           );
@@ -80,8 +100,11 @@ export function SimpleGallery({ images }: { images: GalleryImage[] }) {
               fill
               className="object-contain"
               sizes="100vw"
-              quality={80}
+              quality={65}
               priority
+              loading="eager"
+              placeholder="blur"
+              blurDataURL={blurDataURL}
             />
           </div>
 
