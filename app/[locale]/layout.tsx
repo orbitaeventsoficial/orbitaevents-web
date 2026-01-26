@@ -32,7 +32,6 @@ import { TawkToChat } from '@/components/chat/TawkToChat';
 // ═══════════════════════════════════════════════════════════════════════════
 
 function GoogleTagManager() {
-  if (process.env.NODE_ENV !== 'production') return null;
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   if (!gtmId) return null;
 
@@ -57,7 +56,6 @@ function GoogleTagManager() {
 }
 
 function GoogleTagManagerBody() {
-  if (process.env.NODE_ENV !== 'production') return null;
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   if (!gtmId) return null;
 
@@ -78,7 +76,6 @@ function GoogleTagManagerBody() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function UmamiAnalytics() {
-  if (process.env.NODE_ENV !== 'production') return null;
   const websiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
   if (!websiteId) return null;
 
@@ -550,4 +547,3 @@ export default async function LocaleLayout({
     </html>
   );
 }
-

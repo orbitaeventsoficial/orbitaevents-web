@@ -55,10 +55,9 @@ interface TrackEventParams {
 }
 
 /**
- * Verifica si estamos en el lado del cliente y en producción
+ * Verifica si estamos en el lado del cliente
  */
 const isClientSide = (): boolean => typeof window !== 'undefined';
-const isProduction = (): boolean => process.env.NODE_ENV === 'production';
 
 /**
  * Función universal para trackear cualquier evento
@@ -71,10 +70,7 @@ export const trackEvent = ({
   value,
   additionalParams = {},
 }: TrackEventParams): void => {
-  if (!isClientSide() || !isProduction()) {
-    log.debug('Track Event (dev)', { eventName, eventCategory, eventLabel, value });
-    return;
-  }
+  if (!isClientSide()) return;
 
   // 📊 GOOGLE ANALYTICS 4
   if (window.gtag) {
@@ -95,7 +91,10 @@ export const trackEvent = ({
       value: value,
       ...additionalParams,
     });
+    return;
   }
+
+  log.debug('Track Event (no analytics)', { eventName, eventCategory, eventLabel, value });
 };
 
 /**
@@ -281,7 +280,7 @@ export const trackCTAClick = (ctaLabel: string, ctaLocation: string): void => {
  * TRACKEAR PAGE VIEW (útil para SPAs con navegación dinámica)
  */
 export const trackPageView = (pagePath: string, pageTitle: string): void => {
-  if (!isClientSide() || !isProduction()) return;
+  if (!isClientSide()) return;
 
   if (window.gtag) {
     window.gtag('event', 'page_view', {
