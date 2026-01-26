@@ -279,40 +279,22 @@ export default function MobileAppShell({
   const [scrollY, setScrollY] = useState(0);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
-  const containerRef = useRef<HTMLDivElement>(null);
   const scrollRaf = useRef<number | null>(null);
 
   useEffect(() => {
     document.body.classList.add('mobile-experience-active');
-    const previousBodyOverflow = document.body.style.overflow;
-    const previousHtmlOverflow = document.documentElement.style.overflow;
-    const previousBodyHeight = document.body.style.height;
-    const previousHtmlHeight = document.documentElement.style.height;
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.height = '100dvh';
-    document.documentElement.style.height = '100dvh';
 
     return () => {
       document.body.classList.remove('mobile-experience-active');
-      document.body.style.overflow = previousBodyOverflow;
-      document.documentElement.style.overflow = previousHtmlOverflow;
-      document.body.style.height = previousBodyHeight;
-      document.documentElement.style.height = previousHtmlHeight;
     };
   }, []);
   
   // Scroll to section helper
   const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);
-    if (element && containerRef.current) {
-      const containerTop = containerRef.current.getBoundingClientRect().top;
-      const elementTop = element.getBoundingClientRect().top;
-      const offsetTop = containerRef.current.scrollTop + (elementTop - containerTop);
-      containerRef.current.scrollTo({
-        top: offsetTop,
-        behavior: 'smooth'
-      });
+    if (element) {
+      const top = element.getBoundingClientRect().top + window.scrollY - 16;
+      window.scrollTo({ top, behavior: 'smooth' });
     }
   }, []);
 
@@ -344,7 +326,7 @@ export default function MobileAppShell({
     const handleScroll = () => {
       if (scrollRaf.current !== null) return;
       scrollRaf.current = window.requestAnimationFrame(() => {
-        const currentScrollY = containerRef.current?.scrollTop || 0;
+        const currentScrollY = window.scrollY || 0;
         setScrollY(currentScrollY);
 
         // Mostrar header al hacer scroll up, ocultar al scroll down
@@ -359,11 +341,10 @@ export default function MobileAppShell({
       });
     };
 
-    const container = containerRef.current;
-    container?.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true });
     
     return () => {
-      container?.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleScroll);
       if (scrollRaf.current !== null) {
         window.cancelAnimationFrame(scrollRaf.current);
         scrollRaf.current = null;
@@ -415,21 +396,10 @@ export default function MobileAppShell({
 
       {/* Main Content */}
       <div
-        ref={containerRef}
-        className={`
-          h-[100dvh] w-full overflow-x-hidden overflow-y-auto
-          bg-zinc-950 text-white
-          safe-top safe-bottom
-        `}
-        style={{
-          touchAction: 'pan-y',
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'auto',
-        }}
+        className="min-h-screen w-full overflow-x-hidden bg-zinc-950 text-white safe-top safe-bottom"
+        style={{ touchAction: 'pan-y' }}
       >
-        <PullToRefresh onRefresh={handleRefresh}>
-          {children}
-        </PullToRefresh>
+        {children}
       </div>
 
       {/* Note: Global styles moved to globals.css for better caching and deduplication */}
