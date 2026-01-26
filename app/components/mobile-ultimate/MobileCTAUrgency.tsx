@@ -209,17 +209,12 @@ export default function MobileCTAUrgency() {
               href={`/${locale}/contacto`}
               whileTap={{ scale: 0.98 }}
               onTapStart={() => haptic('medium')}
-              className="relative block w-full group"
+              className="relative block w-full"
             >
-              <div className="relative flex items-center justify-center gap-2.5 py-3 px-5 rounded-xl font-bold text-black text-base bg-[linear-gradient(135deg,#f8d574_0%,#f59e0b_55%,#f97316_100%)] shadow-[0_12px_24px_rgba(245,158,11,0.35)] ring-1 ring-amber-300/50 overflow-hidden">
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_55%)] opacity-70"
-                />
-                <span className="absolute inset-0 bg-[linear-gradient(110deg,transparent_20%,rgba(255,255,255,0.35)_45%,transparent_70%)] opacity-60 animate-[shine_2.4s_ease-in-out_infinite]" />
-                <span className="relative">{tCommon('buttons.requestQuoteFree')}</span>
+              <div className="relative flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full shadow-lg shadow-amber-500/30 transition-all">
+                <span>{tCommon('buttons.requestQuoteFree')}</span>
                 <svg
-                  className="relative w-4.5 h-4.5"
+                  className="w-4 h-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
