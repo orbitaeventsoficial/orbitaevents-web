@@ -334,6 +334,7 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
           {packs.map((pack) => (
             <label
               key={pack.id}
+              htmlFor={`pack-${pack.id}`}
               className={`
                 relative p-6 rounded-xl border-2 cursor-pointer transition-all
                 ${formData.packId === pack.id
@@ -344,6 +345,7 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
             >
               <input
                 type="radio"
+                id={`pack-${pack.id}`}
                 name="pack"
                 value={pack.id}
                 checked={formData.packId === pack.id}
@@ -368,11 +370,13 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
         {/* Extra Hours */}
         {packs.find((p) => p.id === formData.packId)?.extraHourPrice && (
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-2">
+            <label htmlFor="extra-hours" className="block text-sm font-medium text-white/70 mb-2">
               Horas extra (opcional)
             </label>
             <input
               type="number"
+              id="extra-hours"
+              name="extraHours"
               min="0"
               max="10"
               value={formData.extraHours}
@@ -397,6 +401,7 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
             {extras.map((extra) => (
               <label
                 key={extra.id}
+                htmlFor={`booking-extra-${extra.id}`}
                 className={`
                   relative p-4 rounded-lg border cursor-pointer transition-all
                   ${formData.extraIds.includes(extra.id)
@@ -407,6 +412,8 @@ export function BookingForm({ packs, extras, preselectedDate, locale = 'es' }: B
               >
                 <input
                   type="checkbox"
+                  id={`booking-extra-${extra.id}`}
+                  name={`booking-extra-${extra.id}`}
                   checked={formData.extraIds.includes(extra.id)}
                   onChange={() => handleExtraToggle(extra.id)}
                   className="sr-only"

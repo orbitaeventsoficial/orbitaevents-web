@@ -280,11 +280,13 @@ export default function ContactFormComplete({
 
         {/* Nom complet */}
         <div className={errors.fullName && touched.fullName ? 'error-field' : ''}>
-          <label className="block text-white/70 text-sm mb-2">
+          <label htmlFor="fullName" className="block text-white/70 text-sm mb-2">
             {t('labels.fullName')} <span className="text-red-400">*</span>
           </label>
           <input
             type="text"
+            id="fullName"
+            name="fullName"
             value={formData.fullName}
             onChange={(e) => updateField('fullName', e.target.value)}
             onBlur={() => { touchField('fullName'); validateField('fullName'); }}
@@ -305,11 +307,13 @@ export default function ContactFormComplete({
         <div className="grid sm:grid-cols-2 gap-4">
           {/* Email */}
           <div className={errors.email && touched.email ? 'error-field' : ''}>
-            <label className="block text-white/70 text-sm mb-2">
+            <label htmlFor="email" className="block text-white/70 text-sm mb-2">
               {t('labels.email')} <span className="text-red-400">*</span>
             </label>
             <input
               type="email"
+              id="email"
+              name="email"
               value={formData.email}
               onChange={(e) => updateField('email', e.target.value)}
               onBlur={() => { touchField('email'); validateField('email'); }}
@@ -328,11 +332,13 @@ export default function ContactFormComplete({
 
           {/* Telefon */}
           <div className={errors.phone && touched.phone ? 'error-field' : ''}>
-            <label className="block text-white/70 text-sm mb-2">
+            <label htmlFor="phone" className="block text-white/70 text-sm mb-2">
               {t('labels.phone')} <span className="text-red-400">*</span>
             </label>
             <input
               type="tel"
+              id="phone"
+              name="phone"
               value={formData.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               onBlur={() => { touchField('phone'); validateField('phone'); }}
@@ -359,10 +365,12 @@ export default function ContactFormComplete({
 
         {/* Tipus event */}
         <div className={errors.eventType && touched.eventType ? 'error-field' : ''}>
-          <label className="block text-white/70 text-sm mb-2">
+          <label htmlFor="eventType" className="block text-white/70 text-sm mb-2">
             {t('labels.eventType')} <span className="text-red-400">*</span>
           </label>
           <select
+            id="eventType"
+            name="eventType"
             value={formData.eventType}
             onChange={(e) => updateField('eventType', e.target.value)}
             onBlur={() => { touchField('eventType'); validateField('eventType'); }}
@@ -391,11 +399,13 @@ export default function ContactFormComplete({
         <div className="grid sm:grid-cols-2 gap-4">
           {/* Data */}
           <div>
-            <label className="block text-white/70 text-sm mb-2">
+            <label htmlFor="eventDate" className="block text-white/70 text-sm mb-2">
               {t('labels.eventDate')}
             </label>
             <input
               type="date"
+              id="eventDate"
+              name="eventDate"
               value={formData.eventDate}
               onChange={(e) => updateField('eventDate', e.target.value)}
               min={minDate}
@@ -410,10 +420,12 @@ export default function ContactFormComplete({
 
           {/* Convidats */}
           <div>
-            <label className="block text-white/70 text-sm mb-2">
+            <label htmlFor="guestCount" className="block text-white/70 text-sm mb-2">
               {t('labels.guestCount')}
             </label>
             <select
+              id="guestCount"
+              name="guestCount"
               value={formData.guestCount}
               onChange={(e) => updateField('guestCount', e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
@@ -434,11 +446,13 @@ export default function ContactFormComplete({
         <div className="grid sm:grid-cols-2 gap-4">
           {/* Ubicacio */}
           <div>
-            <label className="block text-white/70 text-sm mb-2">
+            <label htmlFor="location" className="block text-white/70 text-sm mb-2">
               {t('labels.location')}
             </label>
             <input
               type="text"
+              id="location"
+              name="location"
               value={formData.location}
               onChange={(e) => updateField('location', e.target.value)}
               placeholder={t('placeholders.location')}
@@ -450,10 +464,12 @@ export default function ContactFormComplete({
 
           {/* Pressupost */}
           <div>
-            <label className="block text-white/70 text-sm mb-2">
+            <label htmlFor="budget" className="block text-white/70 text-sm mb-2">
               {t('labels.budget')}
             </label>
             <select
+              id="budget"
+              name="budget"
               value={formData.budget}
               onChange={(e) => updateField('budget', e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
@@ -480,10 +496,12 @@ export default function ContactFormComplete({
 
         {/* Missatge */}
         <div>
-          <label className="block text-white/70 text-sm mb-2">
+          <label htmlFor="message" className="block text-white/70 text-sm mb-2">
             {t('labels.message')}
           </label>
           <textarea
+            id="message"
+            name="message"
             value={formData.message}
             onChange={(e) => updateField('message', e.target.value)}
             placeholder={t('placeholders.message')}
@@ -498,10 +516,12 @@ export default function ContactFormComplete({
 
       {/* Com ens has trobat (opcional - al final) */}
       <div className="pt-4">
-        <label className="block text-white/50 text-sm mb-2">
+        <label htmlFor="howFound" className="block text-white/50 text-sm mb-2">
           {t('labels.howFound')} <span className="text-white/50">(opcional)</span>
         </label>
         <select
+          id="howFound"
+          name="howFound"
           value={formData.howFound}
           onChange={(e) => updateField('howFound', e.target.value)}
           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
@@ -522,10 +542,12 @@ export default function ContactFormComplete({
       <div className="space-y-4 pt-4 border-t border-white/10">
         {/* Checkbox privacitat */}
         <div className={`${errors.acceptPrivacy && touched.acceptPrivacy ? 'error-field' : ''}`}>
-          <label className="flex items-start gap-3 cursor-pointer group">
+          <label htmlFor="acceptPrivacy" className="flex items-start gap-3 cursor-pointer group">
             <div className="relative mt-1">
               <input
                 type="checkbox"
+                id="acceptPrivacy"
+                name="acceptPrivacy"
                 checked={formData.acceptPrivacy}
                 onChange={(e) => updateField('acceptPrivacy', e.target.checked)}
                 onBlur={() => touchField('acceptPrivacy')}
@@ -562,10 +584,12 @@ export default function ContactFormComplete({
         </div>
 
         {/* Checkbox marketing */}
-        <label className="flex items-start gap-3 cursor-pointer group">
+        <label htmlFor="acceptMarketing" className="flex items-start gap-3 cursor-pointer group">
           <div className="relative mt-1">
             <input
               type="checkbox"
+              id="acceptMarketing"
+              name="acceptMarketing"
               checked={formData.acceptMarketing}
               onChange={(e) => updateField('acceptMarketing', e.target.checked)}
               className="sr-only peer"

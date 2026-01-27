@@ -433,6 +433,7 @@ export default function ConfiguradorClient() {
               .map((extra) => (
               <label
                 key={extra.id}
+                htmlFor={`extra-${extra.id}`}
                 className={`relative flex items-start justify-between w-full max-w-full p-4 rounded-lg border-2 cursor-pointer transition-all overflow-hidden ${
                   config.extras.includes(extra.id)
                     ? 'border-fuchsia-500 bg-gradient-to-br from-fuchsia-500/10 to-purple-500/5 shadow-[0_0_20px_rgba(217,70,239,0.2)]'
@@ -442,6 +443,8 @@ export default function ConfiguradorClient() {
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <input
                     type="checkbox"
+                    id={`extra-${extra.id}`}
+                    name={`extra-${extra.id}`}
                     checked={config.extras.includes(extra.id)}
                     onChange={(e) => {
                       if (e.target.checked) {
