@@ -54,7 +54,8 @@ const nextConfig = {
           "object-src 'none'",
           "frame-ancestors 'none'",
           // En desarrollo, agregar 'unsafe-eval' para Next.js hot reload
-          `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com https://cloud.umami.is`,
+          // También necesario para Cloudflare Turnstile CAPTCHA
+          `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com https://cloud.umami.is`,
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com",
           "img-src 'self' data: blob: https://orbitaevents.com https://*.supabase.co https://lh3.googleusercontent.com https://maps.googleapis.com https://*.googletagmanager.com https://*.google-analytics.com https://stats.g.doubleclick.net https://ssl.google-analytics.com https://www.google.es",
           "font-src 'self' https://fonts.gstatic.com",
