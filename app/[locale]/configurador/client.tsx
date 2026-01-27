@@ -365,7 +365,9 @@ export default function ConfiguradorClient() {
             </label>
             <input
               id="event-date"
+              name="eventDate"
               type="date"
+              autoComplete="off"
               value={config.date}
               onChange={(e) => setConfig({ ...config, date: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border border-border focus:border-oe-gold outline-none"
@@ -389,7 +391,9 @@ export default function ConfiguradorClient() {
             </label>
             <input
               id="guests"
+              name="guests"
               type="number"
+              autoComplete="off"
               value={config.guests}
               onChange={(e) => setConfig({ ...config, guests: parseInt(e.target.value) || 0 })}
               min="10"
@@ -767,6 +771,8 @@ export default function ConfiguradorClient() {
                   <input
                     type="text"
                     id="name"
+                    name="name"
+                    autoComplete="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border-2 border-border focus:border-oe-gold outline-none transition-colors"
@@ -783,6 +789,8 @@ export default function ConfiguradorClient() {
                   <input
                     type="text"
                     id="contact"
+                    name="contact"
+                    autoComplete="email tel"
                     value={formData.contact}
                     onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-bg-main text-white border-2 border-border focus:border-oe-gold outline-none transition-colors"
