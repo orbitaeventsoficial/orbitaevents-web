@@ -43,24 +43,24 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
 
 export default function ComposeForm({ leads, packs }: Props) {
   const router = useRouter();
-  
+
   // Mode: 'email' o 'quote'
   const [mode, setMode] = useState<'email' | 'quote'>('email');
-  
+
   // Common fields
   const [selectedLeadId, setSelectedLeadId] = useState('');
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [locale, setLocale] = useState('ca');
-  
+
   // Quote fields
   const [selectedPackId, setSelectedPackId] = useState('');
   const [price, setPrice] = useState('');
   const [extras, setExtras] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
   const [customMessage, setCustomMessage] = useState('');
-  
+
   // UI state
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -95,7 +95,7 @@ export default function ComposeForm({ leads, packs }: Props) {
 
   async function handleSend() {
     setError('');
-    
+
     if (mode === 'quote') {
       // Either need a lead selected OR a manual email
       const hasRecipient = selectedLeadId || to.trim();
@@ -103,7 +103,7 @@ export default function ComposeForm({ leads, packs }: Props) {
         setError('Selecciona un lead o escriu un email, pack i preu');
         return;
       }
-      
+
       setSending(true);
       try {
         const res = await fetch('/api/admin/emails/quote', {
@@ -168,16 +168,18 @@ export default function ComposeForm({ leads, packs }: Props) {
     }
   }
 
+  const inputClasses = "w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500";
+
   return (
     <div className="space-y-6">
       {/* Mode selector */}
-      <div className="flex gap-2 p-1 bg-stone-100 rounded-lg w-fit">
+      <div className="flex gap-2 p-1 bg-slate-800/60 rounded-xl w-fit border border-slate-700/50">
         <button
           onClick={() => setMode('email')}
           type="button"
           aria-pressed={mode === 'email'}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'email' ? 'bg-white shadow text-slate-700' : 'text-slate-600'
+            mode === 'email' ? 'bg-slate-700/80 text-slate-100 shadow' : 'text-slate-400 hover:text-slate-300'
           }`}
         >
           ✉️ Email normal
@@ -187,7 +189,7 @@ export default function ComposeForm({ leads, packs }: Props) {
           type="button"
           aria-pressed={mode === 'quote'}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            mode === 'quote' ? 'bg-white shadow text-slate-700' : 'text-slate-600'
+            mode === 'quote' ? 'bg-slate-700/80 text-slate-100 shadow' : 'text-slate-400 hover:text-slate-300'
           }`}
         >
           💰 Pressupost professional
@@ -195,19 +197,19 @@ export default function ComposeForm({ leads, packs }: Props) {
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
         <div className="p-6 space-y-6">
-          
+
           {/* Select Lead */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               Selecciona Lead (opcional)
             </label>
             <select
               value={selectedLeadId}
               onChange={(e) => setSelectedLeadId(e.target.value)}
               aria-label="Selecciona lead"
-              className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+              className={inputClasses}
             >
               <option value="">-- Escriu email manualment --</option>
               {leads.map((lead) => (
@@ -220,34 +222,34 @@ export default function ComposeForm({ leads, packs }: Props) {
 
           {/* Lead details preview */}
           {selectedLead && (
-            <div className="bg-slate-50 rounded-lg p-4">
-              <h4 className="font-medium text-slate-700 mb-3">📋 Detalls del lead</h4>
+            <div className="bg-slate-700/30 rounded-xl p-4 border border-slate-700/50">
+              <h4 className="font-medium text-slate-200 mb-3">📋 Detalls del lead</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
-                  <span className="text-slate-500">Tipus:</span>
-                  <p className="font-medium">{EVENT_TYPE_LABELS[selectedLead.eventType || ''] || 'No especificat'}</p>
+                  <span className="text-slate-400">Tipus:</span>
+                  <p className="font-medium text-slate-200">{EVENT_TYPE_LABELS[selectedLead.eventType || ''] || 'No especificat'}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Data:</span>
-                  <p className="font-medium">
-                    {selectedLead.eventDate 
+                  <span className="text-slate-400">Data:</span>
+                  <p className="font-medium text-slate-200">
+                    {selectedLead.eventDate
                       ? new Date(selectedLead.eventDate).toLocaleDateString('ca-ES')
                       : 'No especificat'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Ubicació:</span>
-                  <p className="font-medium">{selectedLead.eventLocation || 'No especificat'}</p>
+                  <span className="text-slate-400">Ubicació:</span>
+                  <p className="font-medium text-slate-200">{selectedLead.eventLocation || 'No especificat'}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500">Convidats:</span>
-                  <p className="font-medium">{selectedLead.guestCount || 'No especificat'}</p>
+                  <span className="text-slate-400">Convidats:</span>
+                  <p className="font-medium text-slate-200">{selectedLead.guestCount || 'No especificat'}</p>
                 </div>
               </div>
               {selectedLead.message && (
-                <div className="mt-3 pt-3 border-t border-stone-200">
-                  <span className="text-slate-500 text-sm">Missatge:</span>
-                  <p className="text-sm text-slate-700 mt-1">{selectedLead.message}</p>
+                <div className="mt-3 pt-3 border-t border-slate-700/50">
+                  <span className="text-slate-400 text-sm">Missatge:</span>
+                  <p className="text-sm text-slate-300 mt-1">{selectedLead.message}</p>
                 </div>
               )}
             </div>
@@ -259,14 +261,14 @@ export default function ComposeForm({ leads, packs }: Props) {
               {/* Manual email when no lead selected */}
               {!selectedLeadId && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
                     Email del client *
                   </label>
                   <input
                     type="email"
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
-                    className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    className={inputClasses}
                     placeholder="email@exemple.com"
                   />
                 </div>
@@ -274,7 +276,7 @@ export default function ComposeForm({ leads, packs }: Props) {
 
               {/* Pack selector */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Pack recomanat *
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -288,12 +290,12 @@ export default function ComposeForm({ leads, packs }: Props) {
                       aria-pressed={selectedPackId === pack.id}
                       className={`p-4 rounded-xl border-2 text-left transition-all ${
                         selectedPackId === pack.id
-                          ? 'border-amber-500 bg-amber-50'
-                          : 'border-stone-200 hover:border-stone-200'
+                          ? 'border-cyan-500 bg-cyan-500/10'
+                          : 'border-slate-600/50 hover:border-slate-500/50 bg-slate-700/30'
                       }`}
                     >
-                        <p className="font-semibold text-slate-700">{name}</p>
-                        <p className="text-amber-600 font-bold mt-1">{pack.price.toLocaleString('es-ES')}€</p>
+                        <p className="font-semibold text-slate-100">{name}</p>
+                        <p className="text-cyan-400 font-bold mt-1">{pack.price.toLocaleString('es-ES')}€</p>
                       </button>
                     );
                   })}
@@ -302,63 +304,63 @@ export default function ComposeForm({ leads, packs }: Props) {
 
               {/* Price */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Preu total (€) *
                 </label>
                 <input
                   type="number"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 text-2xl font-bold"
+                  className={`${inputClasses} text-2xl font-bold`}
                   placeholder="0"
                 />
               </div>
 
               {/* Extras */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Extras inclosos
                 </label>
                 <textarea
                   value={extras.join('\n')}
                   onChange={(e) => setExtras(e.target.value.split('\n').filter(Boolean))}
                   rows={3}
-                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className={inputClasses}
                   placeholder="Un extra per línia..."
                 />
               </div>
 
               {/* Custom message */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Missatge personalitzat (opcional)
                 </label>
                 <textarea
                   value={customMessage}
                   onChange={(e) => setCustomMessage(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className={inputClasses}
                   placeholder="Afegeix un missatge personalitzat..."
                 />
               </div>
 
               {/* Notes */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Notes addicionals
                 </label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className={inputClasses}
                   placeholder="Notes que apareixeran al pressupost..."
                 />
               </div>
 
               {/* Locale */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Idioma del pressupost
                 </label>
                 <div className="flex gap-2">
@@ -371,10 +373,10 @@ export default function ComposeForm({ leads, packs }: Props) {
                       onClick={() => setLocale(l.code)}
                       type="button"
                       aria-pressed={locale === l.code}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                         locale === l.code
-                          ? 'bg-amber-100 text-amber-700 border-2 border-amber-500'
-                          : 'bg-stone-100 text-slate-700 border-2 border-transparent'
+                          ? 'bg-cyan-500/20 text-cyan-300 border-2 border-cyan-500/50'
+                          : 'bg-slate-700/50 text-slate-300 border-2 border-transparent hover:bg-slate-600/50'
                       }`}
                     >
                       {l.label}
@@ -387,34 +389,34 @@ export default function ComposeForm({ leads, packs }: Props) {
             // Normal email form
             <>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Per a *</label>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Per a *</label>
                 <input
                   type="email"
                   value={to}
                   onChange={(e) => setTo(e.target.value)}
-                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white text-slate-700"
+                  className={inputClasses}
                   placeholder="email@exemple.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Assumpte *</label>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Assumpte *</label>
                 <input
                   type="text"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white text-slate-700"
+                  className={inputClasses}
                   placeholder="Assumpte de l'email"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Missatge *</label>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Missatge *</label>
                 <textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   rows={10}
-                  className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white text-slate-700"
+                  className={inputClasses}
                   placeholder="Escriu el teu missatge..."
                 />
               </div>
@@ -423,17 +425,17 @@ export default function ComposeForm({ leads, packs }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 bg-slate-50 border-t border-stone-200">
+        <div className="flex items-center justify-between px-6 py-4 bg-slate-700/30 border-t border-slate-700/50">
           <div>
             {error && (
-              <p className="text-red-600 text-sm" role="alert">❌ {error}</p>
+              <p className="text-rose-400 text-sm" role="alert">❌ {error}</p>
             )}
           </div>
           <div className="flex gap-3">
             <button
               onClick={() => router.push('/admin/inbox')}
               type="button"
-              className="px-4 py-2 text-slate-600 hover:text-slate-700"
+              className="px-4 py-2 text-slate-400 hover:text-slate-300 transition-colors"
             >
               Cancel·lar
             </button>
@@ -442,12 +444,12 @@ export default function ComposeForm({ leads, packs }: Props) {
               disabled={sending}
               type="button"
               aria-busy={sending}
-              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-6 py-2 rounded-xl font-medium transition-colors ${
                 sent
-                  ? 'bg-green-500 text-white'
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                   : sending
-                  ? 'bg-stone-200 text-slate-500 cursor-not-allowed'
-                  : 'bg-amber-500 text-white hover:bg-amber-600'
+                  ? 'bg-slate-700/50 text-slate-500 border border-slate-600/50 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
               }`}
             >
               {sent ? '✓ Enviat!' : sending ? 'Enviant...' : mode === 'quote' ? '📤 Enviar pressupost' : '📤 Enviar email'}

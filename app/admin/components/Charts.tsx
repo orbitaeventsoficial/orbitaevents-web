@@ -53,13 +53,13 @@ export function MiniLineChart({ series, height = 56 }: { series: Series[]; heigh
     <div className="w-full">
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-14">
         <defs>
-          <linearGradient id="grid-fade" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(148,163,184,0.35)" />
-            <stop offset="100%" stopColor="rgba(148,163,184,0)" />
+          <linearGradient id="grid-fade-dark" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(71,85,105,0.35)" />
+            <stop offset="100%" stopColor="rgba(71,85,105,0)" />
           </linearGradient>
         </defs>
-        <rect x="0" y="0" width={width} height={height} fill="url(#grid-fade)" opacity="0.2" />
-        <line x1="0" y1={height - 1} x2={width} y2={height - 1} stroke="rgba(148,163,184,0.35)" strokeWidth="0.5" />
+        <rect x="0" y="0" width={width} height={height} fill="url(#grid-fade-dark)" opacity="0.3" />
+        <line x1="0" y1={height - 1} x2={width} y2={height - 1} stroke="rgba(71,85,105,0.4)" strokeWidth="0.5" />
         {series.map((s, idx) => {
           const normalized = normalizeSeries(s.data);
           const points = buildPoints(normalized, height - 2, width);
@@ -79,12 +79,12 @@ export function MiniLineChart({ series, height = 56 }: { series: Series[]; heigh
           );
         })}
       </svg>
-      <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-slate-500">
+      <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-slate-400">
         {series.map((s, idx) => (
           <div key={`${s.label || 'legend'}-${idx}`} className="flex items-center gap-2">
             <span className="inline-flex h-2 w-2 rounded-full" style={{ background: s.stroke }} />
-            <span className="uppercase tracking-wide text-[10px] text-slate-400">{s.label}</span>
-            {s.value !== undefined && <span className="text-slate-700 font-medium">{s.value}</span>}
+            <span className="uppercase tracking-wide text-[10px] text-slate-500">{s.label}</span>
+            {s.value !== undefined && <span className="text-slate-200 font-medium">{s.value}</span>}
           </div>
         ))}
       </div>

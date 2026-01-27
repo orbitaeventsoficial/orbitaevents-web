@@ -12,11 +12,11 @@ export const metadata = {
 };
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  PENDING: { label: 'Pendent', bg: 'bg-yellow-100', text: 'text-yellow-700' },
-  CONFIRMED: { label: 'Confirmada', bg: 'bg-green-100', text: 'text-green-700' },
-  PREPARING: { label: 'Preparant', bg: 'bg-blue-100', text: 'text-blue-700' },
-  COMPLETED: { label: 'Completada', bg: 'bg-emerald-100', text: 'text-emerald-700' },
-  CANCELLED: { label: 'Cancel·lada', bg: 'bg-red-100', text: 'text-red-700' },
+  PENDING: { label: 'Pendent', bg: 'bg-yellow-500/20', text: 'text-yellow-300' },
+  CONFIRMED: { label: 'Confirmada', bg: 'bg-emerald-500/20', text: 'text-emerald-300' },
+  PREPARING: { label: 'Preparant', bg: 'bg-blue-500/20', text: 'text-blue-300' },
+  COMPLETED: { label: 'Completada', bg: 'bg-teal-500/20', text: 'text-teal-300' },
+  CANCELLED: { label: 'Cancel·lada', bg: 'bg-rose-500/20', text: 'text-rose-300' },
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -90,14 +90,14 @@ export default async function BookingsPage() {
       {/* Header - Mobile optimized */}
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-stone-800">Reserves</h1>
-          <p className="text-xs sm:text-sm text-stone-500">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">Reserves</h1>
+          <p className="text-xs sm:text-sm text-slate-400">
             {bookings.length} events · {formatCurrency(totalRevenue)}
           </p>
         </div>
         <Link
           href="/admin/bookings/new"
-          className="inline-flex items-center rounded-xl bg-gradient-to-r from-orange-400 to-amber-500 px-3 py-2 text-xs sm:text-sm font-medium text-white hover:from-orange-500 hover:to-amber-600 active:scale-[0.98] transition-all shadow-sm"
+          className="inline-flex items-center rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-3 py-2 text-xs sm:text-sm font-medium text-white hover:from-cyan-400 hover:to-blue-500 active:scale-[0.98] transition-all shadow-lg shadow-cyan-500/20"
         >
           + Nova
         </Link>
@@ -105,43 +105,43 @@ export default async function BookingsPage() {
 
       {/* Stats Cards - Scrollable horizontal en móvil */}
       <section className="flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-amber-100 bg-white p-3 sm:p-5 shadow-sm">
-          <p className="text-[10px] sm:text-xs font-medium text-stone-500 uppercase">Total</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-stone-800">{bookings.length}</p>
-          <p className="text-[10px] sm:text-xs text-stone-400 truncate">{formatCurrency(totalRevenue)}</p>
+        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-3 sm:p-5">
+          <p className="text-[10px] sm:text-xs font-medium text-slate-400 uppercase">Total</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{bookings.length}</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 truncate">{formatCurrency(totalRevenue)}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-3 sm:p-5 shadow-sm">
-          <p className="text-[10px] sm:text-xs font-medium text-amber-600 uppercase">Pendents</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-amber-700">{statsMap.PENDING?.count || 0}</p>
+        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm p-3 sm:p-5">
+          <p className="text-[10px] sm:text-xs font-medium text-amber-400 uppercase">Pendents</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{statsMap.PENDING?.count || 0}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 p-3 sm:p-5 shadow-sm">
-          <p className="text-[10px] sm:text-xs font-medium text-emerald-600 uppercase">Confirmades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-emerald-700">{statsMap.CONFIRMED?.count || 0}</p>
+        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-3 sm:p-5">
+          <p className="text-[10px] sm:text-xs font-medium text-emerald-400 uppercase">Confirmades</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{statsMap.CONFIRMED?.count || 0}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 p-3 sm:p-5 shadow-sm">
-          <p className="text-[10px] sm:text-xs font-medium text-teal-600 uppercase">Completades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-teal-700">{statsMap.COMPLETED?.count || 0}</p>
+        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-teal-500/20 bg-gradient-to-br from-teal-500/10 to-teal-600/5 backdrop-blur-sm p-3 sm:p-5">
+          <p className="text-[10px] sm:text-xs font-medium text-teal-400 uppercase">Completades</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{statsMap.COMPLETED?.count || 0}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-rose-200 bg-gradient-to-br from-rose-50 to-red-50 p-3 sm:p-5 shadow-sm">
-          <p className="text-[10px] sm:text-xs font-medium text-rose-600 uppercase">Cancel·lades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-rose-700">{statsMap.CANCELLED?.count || 0}</p>
+        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-rose-500/20 bg-gradient-to-br from-rose-500/10 to-rose-600/5 backdrop-blur-sm p-3 sm:p-5">
+          <p className="text-[10px] sm:text-xs font-medium text-rose-400 uppercase">Cancel·lades</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{statsMap.CANCELLED?.count || 0}</p>
         </div>
       </section>
 
       {/* Info Alert - Compacto en móvil */}
-      <div className="rounded-2xl border border-sky-200 bg-gradient-to-r from-sky-50 to-blue-50 p-3 sm:p-4">
-        <p className="text-xs sm:text-sm text-sky-800">
-          <strong>Auto:</strong> Quan passa a <span className="font-semibold">COMPLETED</span>, les stats públiques s&apos;actualitzen.
+      <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 to-blue-600/5 backdrop-blur-sm p-3 sm:p-4">
+        <p className="text-xs sm:text-sm text-slate-200">
+          <strong>Auto:</strong> Quan passa a <span className="font-semibold text-cyan-400">COMPLETED</span>, les stats públiques s&apos;actualitzen.
         </p>
       </div>
 
       {/* Mobile Card View */}
       <section className="lg:hidden space-y-3">
         {bookings.length === 0 ? (
-          <div className="rounded-2xl border border-amber-100 bg-white p-8 text-center">
+          <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-8 text-center">
             <span className="text-4xl">📅</span>
-            <p className="mt-2 text-stone-500">Encara no hi ha reserves</p>
-            <Link href="/admin/bookings/new" className="text-orange-500 hover:text-orange-600 text-sm mt-2 inline-block font-medium">
+            <p className="mt-2 text-slate-300">Encara no hi ha reserves</p>
+            <Link href="/admin/bookings/new" className="text-cyan-400 hover:text-cyan-300 text-sm mt-2 inline-block font-medium">
               Crear primera reserva →
             </Link>
           </div>
@@ -155,34 +155,38 @@ export default async function BookingsPage() {
               <Link
                 key={booking.id}
                 href={`/admin/bookings/${booking.id}`}
-                className={`block rounded-2xl border border-amber-100 bg-white p-4 shadow-sm hover:bg-amber-50/50 active:bg-amber-100/50 transition-colors ${isPast && booking.status !== 'COMPLETED' ? 'border-orange-200 bg-orange-50/30' : ''}`}
+                className={`block rounded-2xl border backdrop-blur-sm p-4 transition-colors ${
+                  isPast && booking.status !== 'COMPLETED'
+                    ? 'border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-orange-600/5'
+                    : 'border-slate-700/50 bg-slate-800/60 hover:bg-slate-700/40'
+                }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <code className="text-[10px] font-mono bg-stone-100 px-1.5 py-0.5 rounded">{booking.reference}</code>
+                      <code className="text-[10px] font-mono bg-slate-700/50 text-slate-300 px-1.5 py-0.5 rounded">{booking.reference}</code>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConf.bg} ${statusConf.text}`}>
                         {statusConf.label}
                       </span>
                     </div>
-                    <p className="font-medium text-stone-800 mt-2 truncate">{booking.clientName}</p>
-                    <p className="text-xs text-stone-500 truncate">{booking.eventLocation}</p>
+                    <p className="font-medium text-slate-100 mt-2 truncate">{booking.clientName}</p>
+                    <p className="text-xs text-slate-400 truncate">{booking.eventLocation}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="font-bold text-stone-800">{formatCurrency(booking.total)}</p>
+                    <p className="font-bold text-slate-100">{formatCurrency(booking.total)}</p>
                     {!booking.depositPaid && (
-                      <p className="text-[10px] text-rose-500 font-medium">Paga pendent</p>
+                      <p className="text-[10px] text-rose-400 font-medium">Paga pendent</p>
                     )}
                   </div>
                 </div>
-                <div className="mt-3 pt-3 border-t border-amber-100 flex items-center justify-between text-xs">
+                <div className="mt-3 pt-3 border-t border-slate-700/30 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="text-stone-600">{eventType}</span>
-                    <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-medium">
+                    <span className="text-slate-300">{eventType}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-medium">
                       {booking.pack.translations[0]?.name || booking.pack.slug}
                     </span>
                   </div>
-                  <span className="text-stone-500 font-medium">
+                  <span className="text-slate-400 font-medium">
                     {new Date(booking.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
                   </span>
                 </div>
@@ -193,25 +197,25 @@ export default async function BookingsPage() {
       </section>
 
       {/* Desktop Table View */}
-      <section className="hidden lg:block rounded-2xl border border-amber-100 bg-white shadow-sm overflow-hidden">
+      <section className="hidden lg:block rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gradient-to-r from-amber-50/50 to-transparent border-b border-amber-100">
+            <thead className="bg-slate-700/30 border-b border-slate-700/50">
               <tr>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Ref.</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Client</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Tipus</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Data</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Pack</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Total</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-stone-600">Estat</th>
-                <th scope="col" className="px-4 py-3 text-right font-medium text-stone-600">Accions</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Ref.</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Client</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Tipus</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Data</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Pack</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Total</th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Estat</th>
+                <th scope="col" className="px-4 py-3 text-right font-medium text-slate-300">Accions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-amber-100">
+            <tbody className="divide-y divide-slate-700/30">
               {bookings.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-stone-500">
+                  <td colSpan={8} className="px-4 py-12 text-center text-slate-400">
                     <span className="text-4xl">📅</span>
                     <p className="mt-2">Encara no hi ha reserves</p>
                   </td>
@@ -225,34 +229,38 @@ export default async function BookingsPage() {
                   return (
                     <tr
                       key={booking.id}
-                      className={`hover:bg-amber-50/50 transition-colors ${isPast && booking.status !== 'COMPLETED' ? 'bg-orange-50/30' : ''}`}
+                      className={`transition-colors ${
+                        isPast && booking.status !== 'COMPLETED'
+                          ? 'bg-orange-500/5'
+                          : 'hover:bg-slate-700/30'
+                      }`}
                     >
                       <td className="px-4 py-3">
-                        <code className="text-xs font-mono bg-stone-100 px-2 py-1 rounded">{booking.reference}</code>
+                        <code className="text-xs font-mono bg-slate-700/50 text-slate-300 px-2 py-1 rounded">{booking.reference}</code>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-stone-700">{booking.clientName}</div>
-                        <div className="text-xs text-stone-500 truncate max-w-[150px]">{booking.eventLocation}</div>
+                        <div className="font-medium text-slate-100">{booking.clientName}</div>
+                        <div className="text-xs text-slate-400 truncate max-w-[150px]">{booking.eventLocation}</div>
                       </td>
-                      <td className="px-4 py-3 text-stone-600 text-xs">{eventType}</td>
+                      <td className="px-4 py-3 text-slate-300 text-xs">{eventType}</td>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-stone-700 text-xs">{formatDate(booking.eventDate)}</div>
+                        <div className="font-medium text-slate-200 text-xs">{formatDate(booking.eventDate)}</div>
                         {booking.eventStartTime && (
-                          <div className="text-xs text-stone-400">{booking.eventStartTime}</div>
+                          <div className="text-xs text-slate-500">{booking.eventStartTime}</div>
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                        <span className="inline-flex rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs font-medium text-cyan-300">
                           {booking.pack.translations[0]?.name || booking.pack.slug}
                         </span>
                         {booking._count.extras > 0 && (
-                          <span className="ml-1 text-xs text-stone-400">+{booking._count.extras}</span>
+                          <span className="ml-1 text-xs text-slate-500">+{booking._count.extras}</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 font-medium text-stone-700">
+                      <td className="px-4 py-3 font-medium text-slate-100">
                         {formatCurrency(booking.total)}
                         {!booking.depositPaid && (
-                          <span className="block text-xs text-rose-500">Paga pendent</span>
+                          <span className="block text-xs text-rose-400">Paga pendent</span>
                         )}
                       </td>
                       <td className="px-4 py-3">

@@ -194,403 +194,401 @@ export default function AdminContactesPage() {
   // ═══════════════════════════════════════════════════════════════════════════
 
   return (
-    <div className="min-h-screen bg-stone-100 text-slate-700 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-yellow-400 bg-clip-text text-transparent">
-              Gestió de Contactes
-            </h1>
-            <p className="text-slate-500 mt-1">CRM - Afegeix contactes i inicia processos</p>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
+            Gestió de Contactes
+          </h1>
+          <p className="text-sm text-slate-400 mt-1">CRM - Afegeix contactes i inicia processos</p>
+        </div>
 
-          {/* Stats */}
-          {stats && (
-            <div className="flex gap-4 flex-wrap">
-              <div className="bg-white border border-stone-200 rounded-xl px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-slate-700">{stats.total}</p>
-                <p className="text-xs text-slate-500">Total</p>
-              </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-amber-600">{stats.vip}</p>
-                <p className="text-xs text-amber-600">VIP</p>
-              </div>
-              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-green-600">{stats.withEvents}</p>
-                <p className="text-xs text-green-600">Amb events</p>
-              </div>
+        {/* Stats */}
+        {stats && (
+          <div className="flex gap-3 flex-wrap">
+            <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-slate-100">{stats.total}</p>
+              <p className="text-xs text-slate-400">Total</p>
             </div>
-          )}
+            <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-slate-100">{stats.vip}</p>
+              <p className="text-xs text-amber-400">VIP</p>
+            </div>
+            <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-slate-100">{stats.withEvents}</p>
+              <p className="text-xs text-emerald-400">Amb events</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Search & Add */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="search"
+            placeholder="Buscar contacte..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            aria-label="Buscar contacte"
+            className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+          />
         </div>
 
-        {/* Search & Add */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="search"
-              placeholder="Buscar contacte..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              aria-label="Buscar contacte"
-              className="w-full pl-10 pr-4 py-3 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 placeholder-stone-400 focus:border-amber-400 transition-all"
-            />
-          </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          type="button"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-all"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Afegir Contacte
+        </button>
+      </div>
 
-          <button
-            onClick={() => setShowAddModal(true)}
-            type="button"
-            className="flex items-center gap-2 px-6 py-3 bg-amber-400 text-slate-700 font-bold rounded-xl hover:bg-amber-300 transition-all"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Afegir Contacte
-          </button>
+      {/* Error */}
+      {error && (
+        <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4" role="alert">
+          <p className="text-rose-300">{error}</p>
         </div>
+      )}
 
-        {/* Error */}
-        {error && (
-          <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 mb-6" role="alert">
-            <p className="text-red-400">{error}</p>
-          </div>
-        )}
+      {/* Loading */}
+      {loading && (
+        <div className="flex items-center justify-center py-20" role="status" aria-live="polite">
+          <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full" />
+        </div>
+      )}
 
-        {/* Loading */}
-        {loading && (
-          <div className="flex items-center justify-center py-20" role="status" aria-live="polite">
-            <div className="animate-spin w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full" />
-          </div>
-        )}
+      {/* Empty */}
+      {!loading && filteredCustomers.length === 0 && (
+        <div className="text-center py-20" role="status" aria-live="polite">
+          <p className="text-slate-400 text-lg">No hi ha contactes</p>
+        </div>
+      )}
 
-        {/* Empty */}
-        {!loading && filteredCustomers.length === 0 && (
-          <div className="text-center py-20" role="status" aria-live="polite">
-            <p className="text-slate-500 text-lg">No hi ha contactes</p>
-          </div>
-        )}
-
-        {/* Customers List */}
-        {!loading && filteredCustomers.length > 0 && (
-          <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-stone-200">
-                  <th scope="col" className="text-left p-4 text-slate-500 font-medium">Nom</th>
-                  <th scope="col" className="text-left p-4 text-slate-500 font-medium hidden md:table-cell">Contacte</th>
-                  <th scope="col" className="text-left p-4 text-slate-500 font-medium hidden lg:table-cell">Font</th>
-                  <th scope="col" className="text-left p-4 text-slate-500 font-medium hidden sm:table-cell">Events</th>
-                  <th scope="col" className="text-left p-4 text-slate-500 font-medium">Accions</th>
+      {/* Customers List */}
+      {!loading && filteredCustomers.length > 0 && (
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-slate-700/30 border-b border-slate-700/50">
+                <th scope="col" className="text-left p-4 text-slate-300 font-medium">Nom</th>
+                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden md:table-cell">Contacte</th>
+                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden lg:table-cell">Font</th>
+                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden sm:table-cell">Events</th>
+                <th scope="col" className="text-left p-4 text-slate-300 font-medium">Accions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCustomers.map((customer) => (
+                <tr key={customer.id} className="border-b border-slate-700/30 hover:bg-slate-700/30 transition-colors">
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center text-cyan-300 font-bold">
+                        {customer.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-slate-100 font-medium flex items-center gap-2">
+                          {customer.name}
+                          {customer.is_vip && (
+                            <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-xs rounded-full font-medium">VIP</span>
+                          )}
+                        </p>
+                        {customer.city && <p className="text-slate-500 text-sm">{customer.city}</p>}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-4 hidden md:table-cell">
+                    <div className="space-y-1">
+                      {customer.email && (
+                        <p className="text-slate-400 text-sm flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          {customer.email}
+                        </p>
+                      )}
+                      {customer.phone && (
+                        <p className="text-slate-400 text-sm flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                          {customer.phone}
+                        </p>
+                      )}
+                    </div>
+                  </td>
+                  <td className="p-4 hidden lg:table-cell">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      customer.source === 'manual' ? 'bg-purple-500/20 text-purple-300' :
+                      customer.source === 'web' ? 'bg-emerald-500/20 text-emerald-300' :
+                      customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300' :
+                      'bg-slate-500/20 text-slate-400'
+                    }`}>
+                      {customer.source || 'desconegut'}
+                    </span>
+                  </td>
+                  <td className="p-4 hidden sm:table-cell text-slate-400">
+                    {customer.total_events || 0}
+                  </td>
+                  <td className="p-4">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setSelectedCustomer(customer);
+                          setShowActionModal(true);
+                        }}
+                        type="button"
+                        className="p-2 bg-emerald-500/20 text-emerald-300 rounded-lg hover:bg-emerald-500/30 transition-all"
+                        title="Iniciar procés"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        className="p-2 bg-slate-700/50 text-slate-300 rounded-lg hover:bg-slate-600/50 transition-all"
+                        title="Editar"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className="border-b border-stone-200 hover:bg-white">
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold">
-                          {customer.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="text-slate-700 font-medium flex items-center gap-2">
-                            {customer.name}
-                            {customer.is_vip && (
-                              <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full font-medium">VIP</span>
-                            )}
-                          </p>
-                          {customer.city && <p className="text-slate-400 text-sm">{customer.city}</p>}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4 hidden md:table-cell">
-                      <div className="space-y-1">
-                        {customer.email && (
-                          <p className="text-slate-500 text-sm flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                            {customer.email}
-                          </p>
-                        )}
-                        {customer.phone && (
-                          <p className="text-slate-500 text-sm flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                            </svg>
-                            {customer.phone}
-                          </p>
-                        )}
-                      </div>
-                    </td>
-                    <td className="p-4 hidden lg:table-cell">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        customer.source === 'manual' ? 'bg-purple-100 text-purple-700' :
-                        customer.source === 'web' ? 'bg-green-100 text-green-700' :
-                        customer.source === 'testimonial_form' ? 'bg-amber-100 text-amber-700' :
-                        'bg-stone-100 text-slate-600'
-                      }`}>
-                        {customer.source || 'desconegut'}
-                      </span>
-                    </td>
-                    <td className="p-4 hidden sm:table-cell text-slate-500">
-                      {customer.total_events || 0}
-                    </td>
-                    <td className="p-4">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => {
-                            setSelectedCustomer(customer);
-                            setShowActionModal(true);
-                          }}
-                          type="button"
-                          className="p-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-all"
-                          title="Iniciar procés"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </button>
-                        <button
-                          type="button"
-                          className="p-2 bg-stone-100 text-slate-600 rounded-lg hover:bg-stone-200 transition-all"
-                          title="Editar"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-        {/* MODAL: Afegir Contacte */}
-        <AnimatePresence>
-          {showAddModal && (
+      {/* MODAL: Afegir Contacte */}
+      <AnimatePresence>
+        {showAddModal && (
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={() => setShowAddModal(false)}
+            role="presentation"
+          >
             <motion.div
-              initial={reduceMotion ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-              onClick={() => setShowAddModal(false)}
-              role="presentation"
+              initial={reduceMotion ? false : { scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="add-contact-title"
+              className="bg-slate-800 border border-slate-700/50 rounded-2xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto"
             >
-              <motion.div
-                initial={reduceMotion ? false : { scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                onClick={(e) => e.stopPropagation()}
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="add-contact-title"
-                className="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto"
-              >
-                <h2 id="add-contact-title" className="text-2xl font-bold text-slate-700 mb-6">Afegir Contacte</h2>
+              <h2 id="add-contact-title" className="text-2xl font-bold text-slate-100 mb-6">Afegir Contacte</h2>
 
-                <div className="space-y-4">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm text-slate-400 mb-2">Nom *</label>
+                  <input
+                    type="text"
+                    value={newCustomer.name}
+                    onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                    placeholder="Maria García"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-slate-400 mb-2">Email *</label>
+                  <input
+                    type="email"
+                    value={newCustomer.email}
+                    onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                    placeholder="maria@email.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-slate-400 mb-2">Telèfon</label>
+                  <input
+                    type="tel"
+                    value={newCustomer.phone}
+                    onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                    placeholder="699 123 456"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm text-slate-500 mb-2">Nom *</label>
+                    <label className="block text-sm text-slate-400 mb-2">Ciutat</label>
                     <input
                       type="text"
-                      value={newCustomer.name}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 placeholder-stone-400 focus:border-amber-400 transition-all"
-                      placeholder="Maria García"
+                      value={newCustomer.city}
+                      onChange={(e) => setNewCustomer({ ...newCustomer, city: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                      placeholder="Barcelona"
                     />
                   </div>
-
                   <div>
-                    <label className="block text-sm text-slate-500 mb-2">Email *</label>
+                    <label className="block text-sm text-slate-400 mb-2">Instagram</label>
                     <input
-                      type="email"
-                      value={newCustomer.email}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                      className="w-full px-4 py-3 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 placeholder-stone-400 focus:border-amber-400 transition-all"
-                      placeholder="maria@email.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-slate-500 mb-2">Telèfon</label>
-                    <input
-                      type="tel"
-                      value={newCustomer.phone}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 placeholder-stone-400 focus:border-amber-400 transition-all"
-                      placeholder="699 123 456"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm text-slate-500 mb-2">Ciutat</label>
-                      <input
-                        type="text"
-                        value={newCustomer.city}
-                        onChange={(e) => setNewCustomer({ ...newCustomer, city: e.target.value })}
-                        className="w-full px-4 py-3 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 placeholder-stone-400 focus:border-amber-400 transition-all"
-                        placeholder="Barcelona"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-slate-500 mb-2">Instagram</label>
-                      <input
-                        type="text"
-                        value={newCustomer.instagram}
-                        onChange={(e) => setNewCustomer({ ...newCustomer, instagram: e.target.value })}
-                        className="w-full px-4 py-3 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 placeholder-stone-400 focus:border-amber-400 transition-all"
-                        placeholder="@usuari"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-slate-500 mb-2">Notes</label>
-                    <textarea
-                      value={newCustomer.notes}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, notes: e.target.value })}
-                      className="w-full px-4 py-3 bg-stone-100 border border-stone-200 rounded-xl text-slate-700 placeholder-stone-400 focus:border-amber-400 transition-all resize-none"
-                      rows={3}
-                      placeholder="Notes internes..."
+                      type="text"
+                      value={newCustomer.instagram}
+                      onChange={(e) => setNewCustomer({ ...newCustomer, instagram: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                      placeholder="@usuari"
                     />
                   </div>
                 </div>
 
-                <div className="flex gap-4 mt-8">
-                  <button
-                    onClick={() => setShowAddModal(false)}
-                    type="button"
-                    className="flex-1 py-3 border border-stone-200 text-slate-700 rounded-xl hover:bg-stone-100 transition-all"
-                  >
-                    Cancel·lar
-                  </button>
-                  <button
-                    onClick={handleAddCustomer}
-                    disabled={actionLoading || !newCustomer.name || !newCustomer.email}
-                    type="button"
-                    aria-busy={actionLoading}
-                    className="flex-1 py-3 bg-amber-400 text-slate-700 font-bold rounded-xl disabled:opacity-50 hover:bg-amber-300 transition-all"
-                  >
-                    {actionLoading ? 'Afegint...' : 'Afegir'}
-                  </button>
+                <div>
+                  <label className="block text-sm text-slate-400 mb-2">Notes</label>
+                  <textarea
+                    value={newCustomer.notes}
+                    onChange={(e) => setNewCustomer({ ...newCustomer, notes: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all resize-none"
+                    rows={3}
+                    placeholder="Notes internes..."
+                  />
                 </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </div>
 
-        {/* MODAL: Iniciar Procés */}
-        <AnimatePresence>
-          {showActionModal && selectedCustomer && (
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-              onClick={() => setShowActionModal(false)}
-              role="presentation"
-            >
-              <motion.div
-                initial={reduceMotion ? false : { scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                onClick={(e) => e.stopPropagation()}
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="start-process-title"
-                className="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 max-w-md w-full"
-              >
-                <h2 id="start-process-title" className="text-2xl font-bold text-slate-700 mb-2">🚀 Iniciar Procés</h2>
-                <p className="text-slate-500 mb-6">
-                  Per <span className="text-amber-400">{selectedCustomer.name}</span>
-                </p>
-
-                <div className="space-y-3">
-                  <button
-                    onClick={() => startProcess('review_request')}
-                    disabled={actionLoading}
-                    type="button"
-                    aria-busy={actionLoading}
-                    className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-100 hover:border-amber-400/50 transition-all group disabled:opacity-50"
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="text-3xl">⭐</span>
-                      <div>
-                        <p className="text-slate-700 font-medium group-hover:text-amber-400">Demanar Opinió</p>
-                        <p className="text-slate-700/50 text-sm">Envia email demanant review</p>
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => startProcess('post_event')}
-                    disabled={actionLoading}
-                    type="button"
-                    aria-busy={actionLoading}
-                    className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-100 hover:border-green-400/50 transition-all group disabled:opacity-50"
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="text-3xl">🎉</span>
-                      <div>
-                        <p className="text-slate-700 font-medium group-hover:text-green-400">Post-Event Complet</p>
-                        <p className="text-slate-700/50 text-sm">Canvas 10/10 + Gràcies + Demanar opinió</p>
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => startProcess('welcome')}
-                    disabled={actionLoading}
-                    type="button"
-                    aria-busy={actionLoading}
-                    className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-100 hover:border-purple-400/50 transition-all group disabled:opacity-50"
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="text-3xl">👋</span>
-                      <div>
-                        <p className="text-slate-700 font-medium group-hover:text-purple-400">Benvinguda</p>
-                        <p className="text-slate-700/50 text-sm">Email de benvinguda + Info empresa</p>
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => startProcess('promo')}
-                    disabled={actionLoading}
-                    type="button"
-                    aria-busy={actionLoading}
-                    className="w-full p-4 bg-stone-100 border border-stone-200 rounded-xl text-left hover:bg-stone-100 hover:border-pink-400/50 transition-all group disabled:opacity-50"
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="text-3xl">🎁</span>
-                      <div>
-                        <p className="text-slate-700 font-medium group-hover:text-pink-400">Promoció</p>
-                        <p className="text-slate-700/50 text-sm">Enviar oferta o descompte especial</p>
-                      </div>
-                    </div>
-                  </button>
-                </div>
-
+              <div className="flex gap-4 mt-8">
                 <button
-                  onClick={() => setShowActionModal(false)}
+                  onClick={() => setShowAddModal(false)}
                   type="button"
-                  className="w-full mt-6 py-3 border border-stone-200 text-slate-500 rounded-xl hover:bg-stone-100 transition-all"
+                  className="flex-1 py-3 border border-slate-600/50 text-slate-300 rounded-xl hover:bg-slate-700/50 transition-all"
                 >
                   Cancel·lar
                 </button>
-              </motion.div>
+                <button
+                  onClick={handleAddCustomer}
+                  disabled={actionLoading || !newCustomer.name || !newCustomer.email}
+                  type="button"
+                  aria-busy={actionLoading}
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold shadow-lg shadow-cyan-500/20 disabled:opacity-50 hover:from-cyan-400 hover:to-blue-500 transition-all"
+                >
+                  {actionLoading ? 'Afegint...' : 'Afegir'}
+                </button>
+              </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL: Iniciar Procés */}
+      <AnimatePresence>
+        {showActionModal && selectedCustomer && (
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={() => setShowActionModal(false)}
+            role="presentation"
+          >
+            <motion.div
+              initial={reduceMotion ? false : { scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="start-process-title"
+              className="bg-slate-800 border border-slate-700/50 rounded-2xl p-6 sm:p-8 max-w-md w-full"
+            >
+              <h2 id="start-process-title" className="text-2xl font-bold text-slate-100 mb-2">🚀 Iniciar Procés</h2>
+              <p className="text-slate-400 mb-6">
+                Per <span className="text-cyan-400">{selectedCustomer.name}</span>
+              </p>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => startProcess('review_request')}
+                  disabled={actionLoading}
+                  type="button"
+                  aria-busy={actionLoading}
+                  className="w-full p-4 bg-slate-700/30 border border-slate-700/50 rounded-xl text-left hover:border-amber-500/30 transition-all group disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-3xl">⭐</span>
+                    <div>
+                      <p className="text-slate-100 font-medium group-hover:text-amber-400">Demanar Opinió</p>
+                      <p className="text-slate-500 text-sm">Envia email demanant review</p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => startProcess('post_event')}
+                  disabled={actionLoading}
+                  type="button"
+                  aria-busy={actionLoading}
+                  className="w-full p-4 bg-slate-700/30 border border-slate-700/50 rounded-xl text-left hover:border-emerald-500/30 transition-all group disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-3xl">🎉</span>
+                    <div>
+                      <p className="text-slate-100 font-medium group-hover:text-emerald-400">Post-Event Complet</p>
+                      <p className="text-slate-500 text-sm">Canvas 10/10 + Gràcies + Demanar opinió</p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => startProcess('welcome')}
+                  disabled={actionLoading}
+                  type="button"
+                  aria-busy={actionLoading}
+                  className="w-full p-4 bg-slate-700/30 border border-slate-700/50 rounded-xl text-left hover:border-purple-500/30 transition-all group disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-3xl">👋</span>
+                    <div>
+                      <p className="text-slate-100 font-medium group-hover:text-purple-400">Benvinguda</p>
+                      <p className="text-slate-500 text-sm">Email de benvinguda + Info empresa</p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => startProcess('promo')}
+                  disabled={actionLoading}
+                  type="button"
+                  aria-busy={actionLoading}
+                  className="w-full p-4 bg-slate-700/30 border border-slate-700/50 rounded-xl text-left hover:border-pink-500/30 transition-all group disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-3xl">🎁</span>
+                    <div>
+                      <p className="text-slate-100 font-medium group-hover:text-pink-400">Promoció</p>
+                      <p className="text-slate-500 text-sm">Enviar oferta o descompte especial</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              <button
+                onClick={() => setShowActionModal(false)}
+                type="button"
+                className="w-full mt-6 py-3 border border-slate-600/50 text-slate-400 rounded-xl hover:bg-slate-700/50 transition-all"
+              >
+                Cancel·lar
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

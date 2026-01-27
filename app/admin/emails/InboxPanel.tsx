@@ -163,19 +163,19 @@ export default function InboxPanel() {
   const unreadCount = emails.filter(e => !e.isRead).length;
 
   return (
-    <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+    <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-700/30 flex items-center justify-between">
         <div>
-          <h2 className="font-semibold text-slate-700 flex items-center gap-2">
+          <h2 className="font-semibold text-slate-100 flex items-center gap-2">
             <span>📥</span> Safata d&apos;Entrada
             {unreadCount > 0 && (
-              <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-cyan-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                 {unreadCount} nous
               </span>
             )}
           </h2>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-400 mt-1">
             {total} emails totals · info@orbitaevents.com
           </p>
         </div>
@@ -185,10 +185,10 @@ export default function InboxPanel() {
           type="button"
           aria-label="Refrescar emails"
           aria-busy={loading}
-          className="p-2 rounded-lg hover:bg-stone-100 transition-colors disabled:opacity-50"
+          className="p-2 rounded-lg hover:bg-slate-600/50 transition-colors disabled:opacity-50"
           title="Refrescar"
         >
-          <svg className={`w-5 h-5 text-slate-600 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className={`w-5 h-5 text-slate-400 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         </button>
@@ -196,9 +196,9 @@ export default function InboxPanel() {
 
       {/* Error state */}
       {error && (
-        <div className="p-4 bg-red-50 border-b border-red-100" role="alert">
-          <p className="text-sm text-red-600">{error}</p>
-          <p className="text-xs text-red-500 mt-1">
+        <div className="p-4 bg-rose-500/10 border-b border-rose-500/20" role="alert">
+          <p className="text-sm text-rose-300">{error}</p>
+          <p className="text-xs text-rose-400/70 mt-1">
             Verifica que les variables IMAP_HOST, IMAP_PORT, IMAP_USER i IMAP_PASS estan configurades.
           </p>
         </div>
@@ -207,8 +207,8 @@ export default function InboxPanel() {
       {/* Loading state */}
       {loading && !error && (
         <div className="p-8 text-center" role="status" aria-live="polite">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
-          <p className="text-sm text-slate-500 mt-3">Carregant emails...</p>
+          <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-sm text-slate-400 mt-3">Carregant emails...</p>
         </div>
       )}
 
@@ -216,9 +216,9 @@ export default function InboxPanel() {
       {!loading && !error && (
         <div className="flex">
           {/* Email List */}
-          <div className={`${selectedEmail ? 'w-1/3 border-r border-slate-100' : 'w-full'} divide-y divide-slate-100 max-h-[500px] overflow-y-auto`}>
+          <div className={`${selectedEmail ? 'w-1/3 border-r border-slate-700/50' : 'w-full'} divide-y divide-slate-700/30 max-h-[500px] overflow-y-auto`}>
             {emails.length === 0 ? (
-              <div className="p-8 text-center text-slate-500">
+              <div className="p-8 text-center text-slate-400">
                 <span className="text-4xl">📭</span>
                 <p className="mt-2">No hi ha emails</p>
               </div>
@@ -229,31 +229,31 @@ export default function InboxPanel() {
                   onClick={() => handleEmailClick(email)}
                   type="button"
                   aria-pressed={selectedEmail?.uid === email.uid}
-                  className={`w-full text-left px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors ${
-                    selectedEmail?.uid === email.uid ? 'bg-blue-50' : ''
-                  } ${!email.isRead ? 'bg-blue-50/50' : ''}`}
+                  className={`w-full text-left px-4 py-3 cursor-pointer hover:bg-slate-700/30 transition-colors ${
+                    selectedEmail?.uid === email.uid ? 'bg-cyan-500/10 border-l-2 border-l-cyan-500' : ''
+                  } ${!email.isRead ? 'bg-slate-700/20' : ''}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm truncate ${!email.isRead ? 'font-semibold text-slate-700' : 'text-slate-700'}`}>
+                      <p className={`text-sm truncate ${!email.isRead ? 'font-semibold text-slate-100' : 'text-slate-300'}`}>
                         {email.from.name || email.from.address}
                       </p>
-                      <p className={`text-sm truncate ${!email.isRead ? 'font-medium text-slate-700' : 'text-slate-600'}`}>
+                      <p className={`text-sm truncate ${!email.isRead ? 'font-medium text-slate-200' : 'text-slate-400'}`}>
                         {email.subject}
                       </p>
-                      <p className="text-xs text-slate-400 truncate mt-1">
+                      <p className="text-xs text-slate-500 truncate mt-1">
                         {email.preview}
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-slate-500">
                         {formatDate(email.date)}
                       </span>
                       {email.hasAttachments && (
-                        <span className="text-slate-400">📎</span>
+                        <span className="text-slate-500">📎</span>
                       )}
                       {!email.isRead && (
-                        <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        <span className="w-2 h-2 bg-cyan-500 rounded-full"></span>
                       )}
                     </div>
                   </div>
@@ -266,17 +266,17 @@ export default function InboxPanel() {
           {selectedEmail && (
             <div className="w-2/3 flex flex-col max-h-[500px]">
               {/* Email Header */}
-              <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
+              <div className="px-4 py-3 border-b border-slate-700/50 bg-slate-700/30">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-slate-700">{selectedEmail.subject}</h3>
-                    <p className="text-sm text-slate-600 mt-1">
+                    <h3 className="font-semibold text-slate-100">{selectedEmail.subject}</h3>
+                    <p className="text-sm text-slate-300 mt-1">
                       De: <span className="font-medium">{selectedEmail.from.name}</span>
                       {selectedEmail.from.address && (
                         <span className="text-slate-400"> &lt;{selectedEmail.from.address}&gt;</span>
                       )}
                     </p>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       {new Date(selectedEmail.date).toLocaleString('ca-ES')}
                     </p>
                   </div>
@@ -284,7 +284,7 @@ export default function InboxPanel() {
                     <button
                       onClick={() => handleDelete(selectedEmail.uid)}
                       type="button"
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
                       title="Eliminar"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -295,7 +295,7 @@ export default function InboxPanel() {
                       onClick={() => setSelectedEmail(null)}
                       type="button"
                       aria-label="Tancar detall"
-                      className="p-2 text-slate-400 hover:bg-stone-100 rounded-lg transition-colors"
+                      className="p-2 text-slate-400 hover:bg-slate-600/50 rounded-lg transition-colors"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -306,9 +306,9 @@ export default function InboxPanel() {
                 {selectedEmail.hasAttachments && (
                   <div className="mt-2 flex flex-wrap gap-2">
                     {selectedEmail.attachments.map((att, idx) => (
-                      <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-stone-100 rounded text-xs text-slate-600">
+                      <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-slate-700/50 rounded text-xs text-slate-300">
                         📎 {att.filename}
-                        <span className="text-slate-400">({Math.round(att.size / 1024)}KB)</span>
+                        <span className="text-slate-500">({Math.round(att.size / 1024)}KB)</span>
                       </span>
                     ))}
                   </div>
@@ -319,11 +319,11 @@ export default function InboxPanel() {
               <div className="flex-1 overflow-y-auto p-4">
                 {selectedEmail.bodyHtml ? (
                   <div
-                    className="prose prose-sm max-w-none"
+                    className="prose prose-sm prose-invert max-w-none"
                     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.bodyHtml) }}
                   />
                 ) : (
-                  <pre className="whitespace-pre-wrap text-sm text-slate-700 font-sans">
+                  <pre className="whitespace-pre-wrap text-sm text-slate-300 font-sans">
                     {selectedEmail.body}
                   </pre>
                 )}
@@ -335,8 +335,8 @@ export default function InboxPanel() {
 
       {/* Pagination */}
       {!loading && !error && total > limit && (
-        <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between">
-          <span className="text-sm text-slate-500">
+        <div className="px-4 py-3 border-t border-slate-700/50 flex items-center justify-between">
+          <span className="text-sm text-slate-400">
             Mostrant {page * limit + 1}-{Math.min((page + 1) * limit, total)} de {total}
           </span>
           <div className="flex gap-2">
@@ -344,7 +344,7 @@ export default function InboxPanel() {
               onClick={() => setPage(p => Math.max(0, p - 1))}
               disabled={page === 0}
               type="button"
-              className="px-3 py-1 text-sm border border-stone-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-sm border border-slate-600/50 bg-slate-700/50 text-slate-300 rounded-lg hover:bg-slate-600/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               ← Anterior
             </button>
@@ -352,7 +352,7 @@ export default function InboxPanel() {
               onClick={() => setPage(p => p + 1)}
               disabled={(page + 1) * limit >= total}
               type="button"
-              className="px-3 py-1 text-sm border border-stone-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-sm border border-slate-600/50 bg-slate-700/50 text-slate-300 rounded-lg hover:bg-slate-600/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Següent →
             </button>

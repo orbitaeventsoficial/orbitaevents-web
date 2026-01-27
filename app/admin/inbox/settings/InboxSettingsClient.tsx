@@ -48,25 +48,25 @@ export default function InboxSettingsClient({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-700">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
           Configurar Inbox (Gmail)
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-400">
           Connecta el teu compte de Gmail per veure els emails al panel d&apos;administració.
         </p>
       </header>
 
       {/* Status message from OAuth */}
       {gmailStatus === 'connected' && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4" role="status" aria-live="polite">
-          <p className="text-green-700 font-medium">✅ Gmail connectat correctament!</p>
+        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4" role="status" aria-live="polite">
+          <p className="text-emerald-300 font-medium">✅ Gmail connectat correctament!</p>
         </div>
       )}
       {gmailStatus === 'error' && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4" role="alert">
-          <p className="text-red-700 font-medium">❌ Error connectant Gmail. Torna-ho a provar.</p>
+        <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4" role="alert">
+          <p className="text-rose-300 font-medium">❌ Error connectant Gmail. Torna-ho a provar.</p>
           {searchParams.get('reason') && (
-            <p className="text-red-600 text-sm mt-2">
+            <p className="text-rose-400 text-sm mt-2">
               Detall: {decodeURIComponent(searchParams.get('reason') || '')}
             </p>
           )}
@@ -74,28 +74,28 @@ export default function InboxSettingsClient({
       )}
 
       {/* Connection Status */}
-      <div className={`rounded-xl border p-6 ${
+      <div className={`rounded-2xl border p-6 ${
         isConnected
-          ? 'border-green-200 bg-green-50'
-          : 'border-amber-200 bg-amber-50'
+          ? 'border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5'
+          : 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-600/5'
       }`}>
-        <h2 className="text-sm font-semibold uppercase mb-3 text-slate-700">
+        <h2 className="text-sm font-semibold uppercase mb-3 text-slate-300">
           Estat de la connexió
         </h2>
 
         {isConnected ? (
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-lg">
+              <span className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-lg">
                 ✓
               </span>
               <div>
-                <p className="font-semibold text-green-700">Gmail connectat</p>
-                <p className="text-sm text-green-600">{connectedEmail}</p>
+                <p className="font-semibold text-emerald-300">Gmail connectat</p>
+                <p className="text-sm text-emerald-400">{connectedEmail}</p>
               </div>
             </div>
             {connectedAt && (
-              <p className="text-xs text-green-600">
+              <p className="text-xs text-emerald-400/70">
                 Connectat el {new Date(connectedAt).toLocaleDateString('ca-ES', {
                   day: 'numeric',
                   month: 'long',
@@ -113,14 +113,14 @@ export default function InboxSettingsClient({
                 !
               </span>
               <div>
-                <p className="font-semibold text-amber-700">Gmail no connectat</p>
-                <p className="text-sm text-amber-600">Cal autoritzar l&apos;accés al teu compte de Gmail</p>
+                <p className="font-semibold text-amber-300">Gmail no connectat</p>
+                <p className="text-sm text-amber-400">Cal autoritzar l&apos;accés al teu compte de Gmail</p>
               </div>
             </div>
             <button
               onClick={connectGmail}
               type="button"
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+              className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors font-medium flex items-center gap-2"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -136,8 +136,8 @@ export default function InboxSettingsClient({
 
       {/* Test Connection */}
       {isConnected && (
-        <div className="rounded-xl border border-stone-200 bg-white p-6">
-          <h2 className="text-sm font-semibold uppercase mb-3 text-slate-700">
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+          <h2 className="text-sm font-semibold uppercase mb-3 text-slate-300">
             Provar connexió
           </h2>
 
@@ -146,23 +146,23 @@ export default function InboxSettingsClient({
             disabled={testing}
             type="button"
             aria-busy={testing}
-            className="px-6 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             {testing ? '⏳ Provant connexió...' : '🔌 Provar connexió Gmail'}
           </button>
 
           {testResult && (
-            <div className={`mt-4 p-4 rounded-lg border ${
+            <div className={`mt-4 p-4 rounded-xl border ${
               testResult.ok
-                ? 'bg-green-50 border-green-200'
-                : 'bg-red-50 border-red-200'
+                ? 'bg-emerald-500/10 border-emerald-500/30'
+                : 'bg-rose-500/10 border-rose-500/30'
             }`} role={testResult.ok ? 'status' : 'alert'}>
               {testResult.ok ? (
                 <div className="flex items-start gap-3">
                   <span className="text-2xl">✅</span>
                   <div>
-                    <p className="font-semibold text-green-700">Connexió exitosa!</p>
-                    <p className="text-sm text-green-600 mt-1">
+                    <p className="font-semibold text-emerald-300">Connexió exitosa!</p>
+                    <p className="text-sm text-emerald-400 mt-1">
                       Connectat a: {testResult.email}
                     </p>
                   </div>
@@ -171,8 +171,8 @@ export default function InboxSettingsClient({
                 <div className="flex items-start gap-3">
                   <span className="text-2xl">❌</span>
                   <div>
-                    <p className="font-semibold text-red-700">Error de connexió</p>
-                    <p className="text-sm text-red-600 mt-1">
+                    <p className="font-semibold text-rose-300">Error de connexió</p>
+                    <p className="text-sm text-rose-400 mt-1">
                       {testResult.error || 'No es pot connectar a Gmail'}
                     </p>
                   </div>
@@ -184,11 +184,11 @@ export default function InboxSettingsClient({
       )}
 
       {/* Info */}
-      <div className="rounded-xl border border-blue-200 bg-blue-50 p-6">
-        <h2 className="text-sm font-semibold uppercase mb-2 text-blue-900">
+      <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-blue-600/5 p-6">
+        <h2 className="text-sm font-semibold uppercase mb-2 text-cyan-300">
           ℹ️ Com funciona
         </h2>
-        <ul className="text-sm text-blue-700 space-y-2">
+        <ul className="text-sm text-cyan-400/80 space-y-2">
           <li>• L&apos;inbox del panel mostra els emails del teu Gmail</li>
           <li>• Pots veure, marcar com llegit i eliminar emails</li>
           <li>• Els emails reenviats des d&apos;info@orbitaevents.com també apareixeran</li>
@@ -198,17 +198,17 @@ export default function InboxSettingsClient({
 
       {/* Reconnect option */}
       {isConnected && (
-        <div className="rounded-xl border border-stone-200 bg-white p-6">
-          <h2 className="text-sm font-semibold uppercase mb-3 text-slate-700">
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+          <h2 className="text-sm font-semibold uppercase mb-3 text-slate-300">
             Reconnectar
           </h2>
-          <p className="text-sm text-slate-600 mb-3">
+          <p className="text-sm text-slate-400 mb-3">
             Si tens problemes amb la connexió, pots tornar a autoritzar Gmail.
           </p>
           <button
             onClick={connectGmail}
             type="button"
-            className="px-4 py-2 bg-stone-200 text-slate-700 rounded-lg hover:bg-stone-300 transition-colors text-sm font-medium"
+            className="px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 transition-colors text-sm font-medium"
           >
             🔄 Reconnectar Gmail
           </button>

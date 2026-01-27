@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
 
-// Metadata se afegirà via layout o cal exportar-ho manualment
-
 interface Feature {
   key: string;
   label: string;
@@ -61,7 +59,7 @@ export default function FeaturesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
-        <div className="animate-spin w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -71,44 +69,44 @@ export default function FeaturesPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-700">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
           🎛️ Features Toggle
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-400">
           Activa o desactiva funcionalitats del lloc web
         </p>
       </header>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4">
-          <div className="text-sm text-blue-600 font-medium">Total Features</div>
-          <div className="text-3xl font-bold text-blue-700 mt-1">{features.length}</div>
+        <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-blue-600/5 backdrop-blur-sm p-4">
+          <div className="text-xs font-medium text-cyan-400 uppercase">Total Features</div>
+          <div className="text-3xl font-bold text-slate-100 mt-2">{features.length}</div>
         </div>
-        <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-4">
-          <div className="text-sm text-green-600 font-medium">Actives</div>
-          <div className="text-3xl font-bold text-green-700 mt-1">{activeCount}</div>
+        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-4">
+          <div className="text-xs font-medium text-emerald-400 uppercase">Actives</div>
+          <div className="text-3xl font-bold text-slate-100 mt-2">{activeCount}</div>
         </div>
-        <div className="bg-gradient-to-br from-stone-50 to-stone-100 border border-stone-200 rounded-xl p-4">
-          <div className="text-sm text-slate-600 font-medium">Desactivades</div>
-          <div className="text-3xl font-bold text-slate-700 mt-1">{features.length - activeCount}</div>
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
+          <div className="text-xs font-medium text-slate-400 uppercase">Desactivades</div>
+          <div className="text-3xl font-bold text-slate-100 mt-2">{features.length - activeCount}</div>
         </div>
       </div>
 
       {/* Features List */}
-      <div className="bg-white border border-stone-200 rounded-xl p-6">
-        <h2 className="text-lg font-semibold text-slate-700 mb-4">Funcionalitats</h2>
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+        <h2 className="text-lg font-semibold text-slate-100 mb-4">Funcionalitats</h2>
         <div className="space-y-3">
           {features.map((feature) => (
             <div
               key={feature.key}
-              className="bg-stone-100 border border-stone-200 rounded-lg p-4 flex items-center justify-between"
+              className="bg-slate-700/30 border border-slate-700/50 rounded-xl p-4 flex items-center justify-between"
             >
               <div className="flex items-start gap-3 flex-1">
                 <span className="text-2xl">{feature.icon}</span>
                 <div className="flex-1">
-                  <h3 className="font-medium text-slate-700">{feature.label}</h3>
-                  <p className="text-sm text-slate-500 mt-0.5">{feature.description}</p>
+                  <h3 className="font-medium text-slate-100">{feature.label}</h3>
+                  <p className="text-sm text-slate-400 mt-0.5">{feature.description}</p>
                 </div>
               </div>
               <button
@@ -119,7 +117,7 @@ export default function FeaturesPage() {
                 aria-checked={feature.enabled}
                 aria-busy={saving === feature.key}
                 className={`relative w-14 h-8 rounded-full transition-colors ${
-                  feature.enabled ? 'bg-green-500' : 'bg-gray-300'
+                  feature.enabled ? 'bg-emerald-500' : 'bg-slate-600'
                 } ${saving === feature.key ? 'opacity-50' : ''}`}
               >
                 <div

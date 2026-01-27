@@ -41,7 +41,7 @@ export default function BookingActions({
     <div className="flex items-center justify-end gap-2">
       <Link
         href={`/admin/bookings/${id}`}
-        className="inline-flex items-center rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-amber-100 border border-amber-200 transition-colors"
+        className="inline-flex items-center rounded-lg bg-slate-700/50 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-600/50 border border-slate-600/50 transition-colors"
       >
         Veure
       </Link>
@@ -51,7 +51,7 @@ export default function BookingActions({
           disabled={isDeleting}
           type="button"
           aria-busy={isDeleting}
-          className="inline-flex items-center rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-100 border border-rose-200 transition-colors disabled:opacity-50"
+          className="inline-flex items-center rounded-lg bg-rose-500/20 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/30 border border-rose-500/30 transition-colors disabled:opacity-50"
         >
           {isDeleting ? 'Eliminant...' : 'Eliminar'}
         </button>

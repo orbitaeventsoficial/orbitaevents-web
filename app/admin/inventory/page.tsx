@@ -25,11 +25,11 @@ const CATEGORY_CONFIG: Record<string, { label: string; icon: string; color: stri
 };
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  AVAILABLE: { label: 'Disponible', bg: 'bg-green-100', text: 'text-green-700' },
-  IN_USE: { label: 'En ús', bg: 'bg-blue-100', text: 'text-blue-700' },
-  MAINTENANCE: { label: 'Manteniment', bg: 'bg-orange-100', text: 'text-orange-700' },
-  BROKEN: { label: 'Avariat', bg: 'bg-red-100', text: 'text-red-700' },
-  RETIRED: { label: 'Retirat', bg: 'bg-gray-100', text: 'text-gray-600' },
+  AVAILABLE: { label: 'Disponible', bg: 'bg-emerald-500/20', text: 'text-emerald-300' },
+  IN_USE: { label: 'En ús', bg: 'bg-blue-500/20', text: 'text-blue-300' },
+  MAINTENANCE: { label: 'Manteniment', bg: 'bg-orange-500/20', text: 'text-orange-300' },
+  BROKEN: { label: 'Avariat', bg: 'bg-rose-500/20', text: 'text-rose-300' },
+  RETIRED: { label: 'Retirat', bg: 'bg-slate-500/20', text: 'text-slate-400' },
 };
 
 async function getInventory() {
@@ -77,15 +77,15 @@ export default async function InventoryPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">Inventari</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">Inventari</h1>
+          <p className="mt-1 text-sm text-slate-400">
             Gestiona tot l&apos;equipament tècnic i material
           </p>
         </div>
         <div className="flex gap-2">
           <Link
             href="/admin/inventory/new"
-            className="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100"
+            className="inline-flex items-center rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
           >
             + Nou Element
           </Link>
@@ -94,25 +94,25 @@ export default async function InventoryPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium text-slate-500 uppercase">Total Elements</p>
-          <p className="mt-2 text-3xl font-bold text-slate-700">{items.length}</p>
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
+          <p className="text-xs font-medium text-slate-400 uppercase">Total Elements</p>
+          <p className="mt-2 text-3xl font-bold text-slate-100">{items.length}</p>
         </div>
-        <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm">
-          <p className="text-xs font-medium text-green-600 uppercase">Disponibles</p>
-          <p className="mt-2 text-3xl font-bold text-green-700">
+        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-4">
+          <p className="text-xs font-medium text-emerald-400 uppercase">Disponibles</p>
+          <p className="mt-2 text-3xl font-bold text-slate-100">
             {items.filter((i) => i.status === 'AVAILABLE').length}
           </p>
         </div>
-        <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 shadow-sm">
-          <p className="text-xs font-medium text-orange-600 uppercase">En Manteniment</p>
-          <p className="mt-2 text-3xl font-bold text-orange-700">
+        <div className="rounded-2xl border border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-orange-600/5 backdrop-blur-sm p-4">
+          <p className="text-xs font-medium text-orange-400 uppercase">En Manteniment</p>
+          <p className="mt-2 text-3xl font-bold text-slate-100">
             {items.filter((i) => i.status === 'MAINTENANCE').length}
           </p>
         </div>
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
-          <p className="text-xs font-medium text-amber-600 uppercase">Valor Total</p>
-          <p className="mt-2 text-3xl font-bold text-amber-700">
+        <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm p-4">
+          <p className="text-xs font-medium text-amber-400 uppercase">Valor Total</p>
+          <p className="mt-2 text-3xl font-bold text-slate-100">
             {totalValue.toLocaleString('ca-ES')}€
           </p>
         </div>
@@ -129,13 +129,13 @@ export default async function InventoryPage() {
           return (
             <div
               key={stat.category}
-              className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm"
+              className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4"
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>
                 <div>
-                  <p className="font-medium text-slate-700">{config.label}</p>
-                  <p className="text-sm text-slate-500">
+                  <p className="font-medium text-slate-100">{config.label}</p>
+                  <p className="text-sm text-slate-400">
                     {stat._count} elements · {stat._sum.value?.toLocaleString('ca-ES')}€
                   </p>
                 </div>
@@ -153,51 +153,51 @@ export default async function InventoryPage() {
           color: 'gray',
         };
         return (
-          <section key={category} className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
-            <div className="bg-slate-50 border-b border-stone-200 p-4">
-              <h2 className="font-semibold text-slate-700 flex items-center gap-2">
+          <section key={category} className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+            <div className="bg-slate-700/30 border-b border-slate-700/50 p-4">
+              <h2 className="font-semibold text-slate-100 flex items-center gap-2">
                 <span>{config.icon}</span>
                 {config.label}
-                <span className="text-sm font-normal text-slate-500">
+                <span className="text-sm font-normal text-slate-400">
                   ({categoryItems.length} elements)
                 </span>
               </h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50 border-b border-stone-200">
+                <thead className="bg-slate-700/30 border-b border-slate-700/50">
                   <tr>
-                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Codi</th>
-                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Nom</th>
-                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Watts</th>
-                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Valor</th>
-                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Estat</th>
-                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-600">Packs</th>
-                    <th scope="col" className="px-4 py-3 text-right font-medium text-slate-600">Accions</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Codi</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Nom</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Watts</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Valor</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Estat</th>
+                    <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Packs</th>
+                    <th scope="col" className="px-4 py-3 text-right font-medium text-slate-300">Accions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-700/30">
                   {categoryItems.map((item) => {
                     const statusConf = STATUS_CONFIG[item.status] || STATUS_CONFIG.AVAILABLE;
                     return (
-                      <tr key={item.id} className="hover:bg-slate-50 transition-colors">
+                      <tr key={item.id} className="hover:bg-slate-700/30 transition-colors">
                         <td className="px-4 py-3">
-                          <code className="text-xs font-mono bg-stone-100 px-2 py-1 rounded">
+                          <code className="text-xs font-mono bg-slate-700/50 text-slate-300 px-2 py-1 rounded">
                             {item.code}
                           </code>
                         </td>
                         <td className="px-4 py-3">
-                          <p className="font-medium text-slate-700">{item.name}</p>
+                          <p className="font-medium text-slate-100">{item.name}</p>
                           {item.description && (
-                            <p className="text-xs text-slate-500 truncate max-w-[200px]">
+                            <p className="text-xs text-slate-400 truncate max-w-[200px]">
                               {item.description}
                             </p>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-slate-700">
+                        <td className="px-4 py-3 text-slate-300">
                           {item.watts ? `${item.watts}W` : '—'}
                         </td>
-                        <td className="px-4 py-3 text-slate-700">
+                        <td className="px-4 py-3 text-slate-300">
                           {item.value.toLocaleString('ca-ES')}€
                         </td>
                         <td className="px-4 py-3">
@@ -207,13 +207,13 @@ export default async function InventoryPage() {
                             {statusConf.label}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-slate-500">
+                        <td className="px-4 py-3 text-slate-400">
                           {item.packItems.length > 0 ? (
                             <div className="flex flex-wrap gap-1">
                               {item.packItems.map((pi) => (
                                 <span
                                   key={pi.id}
-                                  className="text-xs bg-stone-100 px-2 py-0.5 rounded"
+                                  className="text-xs bg-slate-700/50 text-slate-300 px-2 py-0.5 rounded"
                                 >
                                   {pi.pack.slug}
                                 </span>
@@ -226,7 +226,7 @@ export default async function InventoryPage() {
                         <td className="px-4 py-3 text-right">
                           <Link
                             href={`/admin/inventory/${item.id}`}
-                            className="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-100"
+                            className="inline-flex items-center rounded-lg bg-slate-700/50 px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
                           >
                             Editar
                           </Link>
@@ -242,10 +242,10 @@ export default async function InventoryPage() {
       })}
 
       {items.length === 0 && (
-        <div className="rounded-xl border border-stone-200 bg-white p-12 text-center">
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-12 text-center">
           <span className="text-4xl">📦</span>
-          <p className="mt-4 text-slate-600">No hi ha elements a l&apos;inventari</p>
-          <p className="text-sm text-slate-400">Executa el seed per carregar dades inicials</p>
+          <p className="mt-4 text-slate-300">No hi ha elements a l&apos;inventari</p>
+          <p className="text-sm text-slate-500">Executa el seed per carregar dades inicials</p>
         </div>
       )}
     </div>

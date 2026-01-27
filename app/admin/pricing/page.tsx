@@ -96,24 +96,24 @@ interface StatsData {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: string; color: string }> = {
-  SOUND: { label: 'So', icon: '🔊', color: 'bg-blue-500' },
-  LIGHTING: { label: 'Il·luminació', icon: '💡', color: 'bg-yellow-500' },
-  EFFECTS: { label: 'Efectes', icon: '✨', color: 'bg-purple-500' },
-  STRUCTURE: { label: 'Estructura', icon: '🏗️', color: 'bg-gray-500' },
-  CABLING: { label: 'Cablejat', icon: '🔌', color: 'bg-green-500' },
-  TECH: { label: 'Tècnic', icon: '💻', color: 'bg-indigo-500' },
-  DECORATION_HP: { label: 'Deco HP', icon: '🎃', color: 'bg-orange-500' },
-  DECORATION_HW: { label: 'Deco HW', icon: '🎃', color: 'bg-orange-400' },
-  DECORATION_GEN: { label: 'Deco General', icon: '🎨', color: 'bg-pink-500' },
-  CONSUMABLE: { label: 'Consumible', icon: '📦', color: 'bg-red-500' },
+  SOUND: { label: 'So', icon: '🔊', color: 'bg-blue-500/20' },
+  LIGHTING: { label: 'Il·luminació', icon: '💡', color: 'bg-yellow-500/20' },
+  EFFECTS: { label: 'Efectes', icon: '✨', color: 'bg-purple-500/20' },
+  STRUCTURE: { label: 'Estructura', icon: '🏗️', color: 'bg-slate-500/20' },
+  CABLING: { label: 'Cablejat', icon: '🔌', color: 'bg-green-500/20' },
+  TECH: { label: 'Tècnic', icon: '💻', color: 'bg-indigo-500/20' },
+  DECORATION_HP: { label: 'Deco HP', icon: '🎃', color: 'bg-orange-500/20' },
+  DECORATION_HW: { label: 'Deco HW', icon: '🎃', color: 'bg-orange-500/20' },
+  DECORATION_GEN: { label: 'Deco General', icon: '🎨', color: 'bg-pink-500/20' },
+  CONSUMABLE: { label: 'Consumible', icon: '📦', color: 'bg-red-500/20' },
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  AVAILABLE: { label: 'Disponible', color: 'bg-green-100 text-green-700' },
-  IN_USE: { label: 'En ús', color: 'bg-blue-100 text-blue-700' },
-  MAINTENANCE: { label: 'Manteniment', color: 'bg-yellow-100 text-yellow-700' },
-  BROKEN: { label: 'Avariat', color: 'bg-red-100 text-red-700' },
-  RETIRED: { label: 'Retirat', color: 'bg-gray-100 text-gray-700' },
+  AVAILABLE: { label: 'Disponible', color: 'bg-emerald-500/20 text-emerald-300' },
+  IN_USE: { label: 'En ús', color: 'bg-blue-500/20 text-blue-300' },
+  MAINTENANCE: { label: 'Manteniment', color: 'bg-yellow-500/20 text-yellow-300' },
+  BROKEN: { label: 'Avariat', color: 'bg-rose-500/20 text-rose-300' },
+  RETIRED: { label: 'Retirat', color: 'bg-slate-500/20 text-slate-400' },
 };
 
 function formatCurrency(amount: number): string {
@@ -209,624 +209,492 @@ export default function PricingAdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-slate-600 font-medium">Carregant dades...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-cyan-500 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-slate-400 font-medium">Carregant dades...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white border-b border-stone-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-700 flex items-center gap-3">
-                <span className="text-3xl">💰</span>
-                Gestió de Preus i Equipament
-              </h1>
-              <p className="text-slate-500 mt-1">
-                Edita preus dels extras • Consulta packs i inventari
-              </p>
-            </div>
-            <Link
-              href="/admin"
-              className="px-4 py-2 bg-stone-100 hover:bg-stone-100 rounded-lg text-slate-700 font-medium transition-colors"
-            >
-              ← Tornar
-            </Link>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-2 mt-6">
-            {[
-              { key: 'overview', label: 'Resum', icon: '📊' },
-              { key: 'extras', label: 'Extras', icon: '✨', badge: extras.length },
-              { key: 'packs', label: 'Packs', icon: '📦', badge: packs.length },
-              { key: 'inventory', label: 'Inventari', icon: '🔧', badge: inventory.length },
-            ].map(tab => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                type="button"
-                aria-pressed={activeTab === tab.key}
-                className={`
-                  px-5 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2
-                  ${activeTab === tab.key
-                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
-                    : 'bg-white text-slate-600 hover:bg-slate-50 border border-stone-200'
-                  }
-                `}
-              >
-                <span>{tab.icon}</span>
-                {tab.label}
-                {tab.badge && (
-                  <span className={`
-                    text-xs px-2 py-0.5 rounded-full
-                    ${activeTab === tab.key ? 'bg-white/20' : 'bg-stone-100'}
-                  `}>
-                    {tab.badge}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-100 flex items-center gap-3">
+            <span className="text-3xl">💰</span>
+            Gestió de Preus i Equipament
+          </h1>
+          <p className="text-slate-400 mt-1">
+            Edita preus dels extras · Consulta packs i inventari
+          </p>
         </div>
+      </header>
+
+      {/* Tabs */}
+      <div className="flex gap-2 flex-wrap">
+        {[
+          { key: 'overview', label: 'Resum', icon: '📊' },
+          { key: 'extras', label: 'Extras', icon: '✨', badge: extras.length },
+          { key: 'packs', label: 'Packs', icon: '📦', badge: packs.length },
+          { key: 'inventory', label: 'Inventari', icon: '🔧', badge: inventory.length },
+        ].map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key as typeof activeTab)}
+            type="button"
+            aria-pressed={activeTab === tab.key}
+            className={`
+              px-5 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2
+              ${activeTab === tab.key
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20'
+                : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 border border-slate-600/50'
+              }
+            `}
+          >
+            <span>{tab.icon}</span>
+            {tab.label}
+            {tab.badge && (
+              <span className={`
+                text-xs px-2 py-0.5 rounded-full
+                ${activeTab === tab.key ? 'bg-white/20' : 'bg-slate-600/50'}
+              `}>
+                {tab.badge}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
       {/* Missatge */}
       {message && (
-        <div className="max-w-7xl mx-auto px-6 mt-4">
-          <div
-            className={`
-              p-4 rounded-xl flex items-center justify-between
-              ${message.type === 'success'
-                ? 'bg-green-50 text-green-700 border border-green-200'
-                : 'bg-red-50 text-red-700 border border-red-200'
-              }
-            `}
-            role={message.type === 'success' ? 'status' : 'alert'}
-            aria-live="polite"
+        <div
+          className={`
+            p-4 rounded-xl flex items-center justify-between
+            ${message.type === 'success'
+              ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+              : 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
+            }
+          `}
+          role={message.type === 'success' ? 'status' : 'alert'}
+          aria-live="polite"
+        >
+          <span className="flex items-center gap-2">
+            {message.type === 'success' ? '✅' : '❌'}
+            {message.text}
+          </span>
+          <button
+            onClick={() => setMessage(null)}
+            type="button"
+            aria-label="Tancar missatge"
+            className="text-xl font-bold hover:opacity-70"
           >
-            <span className="flex items-center gap-2">
-              {message.type === 'success' ? '✅' : '❌'}
-              {message.text}
-            </span>
-            <button
-              onClick={() => setMessage(null)}
-              type="button"
-              aria-label="Tancar missatge"
-              className="text-xl font-bold hover:opacity-70"
-            >
-              ×
-            </button>
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* TAB: OVERVIEW */}
+      {activeTab === 'overview' && stats && (
+        <div className="space-y-8">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatCard icon="💰" label="Ingressos Totals" value={formatCurrency(stats.totalRevenue._sum.total || 0)} sublabel={`${stats.completedBookings} events completats`} color="emerald" />
+            <StatCard icon="📦" label="Total Packs" value={stats.totalPacks.toString()} sublabel={`${stats.totalBookings} reserves totals`} color="cyan" />
+            <StatCard icon="✨" label="Total Extras" value={stats.totalExtras.toString()} sublabel="disponibles" color="purple" />
+            <StatCard icon="🔧" label="Inventari" value={stats.totalInventory.toString()} sublabel="ítems registrats" color="amber" />
+          </div>
+
+          {/* Top Performers */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+              <h3 className="text-lg font-bold text-slate-100 mb-4 flex items-center gap-2">
+                <span className="text-2xl">🏆</span>
+                Extras Més Venuts
+              </h3>
+              <div className="space-y-3">
+                {stats.topExtras.map((extra, i) => (
+                  <div key={extra.slug} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-slate-600'}`}>
+                        {i + 1}
+                      </span>
+                      <span className="font-medium text-slate-100">{extra.name}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-slate-100">{extra.totalSales} vendes</div>
+                      <div className="text-sm text-slate-400">{formatCurrency(extra.revenue)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+              <h3 className="text-lg font-bold text-slate-100 mb-4 flex items-center gap-2">
+                <span className="text-2xl">🎯</span>
+                Packs Més Populars
+              </h3>
+              <div className="space-y-3">
+                {stats.topPacks.map((pack, i) => (
+                  <div key={pack.slug} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-slate-600'}`}>
+                        {i + 1}
+                      </span>
+                      <span className="font-medium text-slate-100">{pack.name}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-slate-100">{pack.totalBookings} reserves</div>
+                      <div className="text-sm text-slate-400">{formatCurrency(pack.revenue)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Llegenda */}
+          <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/5 to-blue-600/5 backdrop-blur-sm p-6">
+            <h3 className="font-bold text-slate-100 mb-3 flex items-center gap-2">
+              <span className="text-xl">💡</span>
+              Com funciona aquesta pàgina
+            </h3>
+            <div className="grid md:grid-cols-3 gap-4 text-sm">
+              <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
+                <div className="flex items-center gap-2 text-emerald-300 font-semibold mb-2">
+                  <span className="w-3 h-3 bg-emerald-500 rounded-full"></span>
+                  Extras (EDITABLES)
+                </div>
+                <p className="text-slate-400">
+                  Pots canviar els preus dels extras directament. Els canvis s'apliquen a noves reserves.
+                </p>
+              </div>
+              <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
+                <div className="flex items-center gap-2 text-slate-300 font-semibold mb-2">
+                  <span className="w-3 h-3 bg-slate-400 rounded-full"></span>
+                  Packs (NOMÉS LECTURA)
+                </div>
+                <p className="text-slate-400">
+                  Els packs es gestionen a /admin/packs. Aquí només veus estadístiques.
+                </p>
+              </div>
+              <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
+                <div className="flex items-center gap-2 text-cyan-300 font-semibold mb-2">
+                  <span className="w-3 h-3 bg-cyan-500 rounded-full"></span>
+                  Inventari (ESTADÍSTIQUES)
+                </div>
+                <p className="text-slate-400">
+                  Veus hores d'ús i historial. L'inventari es gestiona a /admin/inventory.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Contingut */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* TAB: OVERVIEW */}
-        {activeTab === 'overview' && stats && (
-          <div className="space-y-8">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatCard
-                icon="💰"
-                label="Ingressos Totals"
-                value={formatCurrency(stats.totalRevenue._sum.total || 0)}
-                sublabel={`${stats.completedBookings} events completats`}
-                color="green"
-              />
-              <StatCard
-                icon="📦"
-                label="Total Packs"
-                value={stats.totalPacks.toString()}
-                sublabel={`${stats.totalBookings} reserves totals`}
-                color="blue"
-              />
-              <StatCard
-                icon="✨"
-                label="Total Extras"
-                value={stats.totalExtras.toString()}
-                sublabel="disponibles"
-                color="purple"
-              />
-              <StatCard
-                icon="🔧"
-                label="Inventari"
-                value={stats.totalInventory.toString()}
-                sublabel="ítems registrats"
-                color="orange"
-              />
-            </div>
-
-            {/* Top Performers */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Top Extras */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
-                <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
-                  <span className="text-2xl">🏆</span>
-                  Extras Més Venuts
-                </h3>
-                <div className="space-y-3">
-                  {stats.topExtras.map((extra, i) => (
-                    <div
-                      key={extra.slug}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-xl"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={`
-                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-slate-700
-                          ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-stone-200'}
-                        `}>
-                          {i + 1}
-                        </span>
-                        <span className="font-medium text-slate-700">{extra.name}</span>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold text-slate-700">{extra.totalSales} vendes</div>
-                        <div className="text-sm text-slate-500">{formatCurrency(extra.revenue)}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Top Packs */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-stone-200">
-                <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
-                  <span className="text-2xl">🎯</span>
-                  Packs Més Populars
-                </h3>
-                <div className="space-y-3">
-                  {stats.topPacks.map((pack, i) => (
-                    <div
-                      key={pack.slug}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-xl"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={`
-                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-slate-700
-                          ${i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : i === 2 ? 'bg-amber-600' : 'bg-stone-200'}
-                        `}>
-                          {i + 1}
-                        </span>
-                        <span className="font-medium text-slate-700">{pack.name}</span>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold text-slate-700">{pack.totalBookings} reserves</div>
-                        <div className="text-sm text-slate-500">{formatCurrency(pack.revenue)}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Llegenda */}
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200">
-              <h3 className="font-bold text-amber-900 mb-3 flex items-center gap-2">
-                <span className="text-xl">💡</span>
-                Com funciona aquesta pàgina
-              </h3>
-              <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div className="bg-white rounded-xl p-4">
-                  <div className="flex items-center gap-2 text-green-700 font-semibold mb-2">
-                    <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-                    Extras (EDITABLES)
-                  </div>
-                  <p className="text-amber-800">
-                    Pots canviar els preus dels extras directament. Els canvis s'apliquen a noves reserves.
-                  </p>
-                </div>
-                <div className="bg-white rounded-xl p-4">
-                  <div className="flex items-center gap-2 text-slate-700 font-semibold mb-2">
-                    <span className="w-3 h-3 bg-slate-400 rounded-full"></span>
-                    Packs (NOMÉS LECTURA)
-                  </div>
-                  <p className="text-amber-800">
-                    Els packs es gestionen a /admin/packs. Aquí només veus estadístiques.
-                  </p>
-                </div>
-                <div className="bg-white rounded-xl p-4">
-                  <div className="flex items-center gap-2 text-blue-700 font-semibold mb-2">
-                    <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
-                    Inventari (ESTADÍSTIQUES)
-                  </div>
-                  <p className="text-amber-800">
-                    Veus hores d'ús i historial. L'inventari es gestiona a /admin/inventory.
-                  </p>
-                </div>
-              </div>
+      {/* TAB: EXTRAS */}
+      {activeTab === 'extras' && (
+        <div className="space-y-4">
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 flex items-center gap-3">
+            <span className="text-2xl">✅</span>
+            <div>
+              <p className="font-semibold text-emerald-300">Pots editar els preus!</p>
+              <p className="text-sm text-emerald-400/80">Fes clic al preu per modificar-lo. Els canvis s'apliquen a noves reserves.</p>
             </div>
           </div>
-        )}
 
-        {/* TAB: EXTRAS */}
-        {activeTab === 'extras' && (
-          <div className="space-y-4">
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-              <span className="text-2xl">✅</span>
-              <div>
-                <p className="font-semibold text-green-800">Pots editar els preus!</p>
-                <p className="text-sm text-green-700">Fes clic al preu per modificar-lo. Els canvis s'apliquen a noves reserves.</p>
-              </div>
-            </div>
-
-            <div className="grid gap-4">
-              {extras.map(extra => (
-                <div
-                  key={extra.id}
-                  className={`
-                    bg-white rounded-2xl border-2 overflow-hidden transition-all
-                    ${editingExtra === extra.id ? 'border-orange-500 shadow-lg' : 'border-stone-200 hover:border-stone-200'}
-                  `}
-                >
-                  <div className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-xl font-bold text-slate-700">{extra.name}</h3>
-                          {!extra.isActive && (
-                            <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
-                              Inactiu
+          <div className="grid gap-4">
+            {extras.map(extra => (
+              <div
+                key={extra.id}
+                className={`rounded-2xl border-2 overflow-hidden transition-all ${editingExtra === extra.id ? 'border-cyan-500 shadow-lg shadow-cyan-500/10' : 'border-slate-700/50 bg-slate-800/60 backdrop-blur-sm'}`}
+              >
+                <div className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-xl font-bold text-slate-100">{extra.name}</h3>
+                        {!extra.isActive && (
+                          <span className="px-2 py-0.5 bg-rose-500/20 text-rose-300 text-xs rounded-full">Inactiu</span>
+                        )}
+                        <span className="px-2 py-0.5 bg-slate-700/50 text-slate-400 text-xs rounded-full">{extra.priceType}</span>
+                      </div>
+                      {extra.description && (
+                        <p className="text-slate-400 text-sm mb-4">{extra.description}</p>
+                      )}
+                      {extra.linkedInventory.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {extra.linkedInventory.map(item => (
+                            <span key={item.itemCode} className="px-3 py-1 bg-cyan-500/10 text-cyan-300 text-sm rounded-lg flex items-center gap-1 border border-cyan-500/20">
+                              🔧 {item.itemName}
+                              {item.quantity > 1 && <span className="text-cyan-400/70">×{item.quantity}</span>}
                             </span>
-                          )}
-                          <span className="px-2 py-0.5 bg-stone-100 text-slate-600 text-xs rounded-full">
-                            {extra.priceType}
-                          </span>
+                          ))}
                         </div>
-                        {extra.description && (
-                          <p className="text-slate-500 text-sm mb-4">{extra.description}</p>
-                        )}
-
-                        {/* Equipament vinculat */}
-                        {extra.linkedInventory.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {extra.linkedInventory.map(item => (
-                              <span
-                                key={item.itemCode}
-                                className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-lg flex items-center gap-1"
-                              >
-                                🔧 {item.itemName}
-                                {item.quantity > 1 && <span className="text-blue-500">×{item.quantity}</span>}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Stats */}
-                        <div className="flex gap-6 text-sm">
-                          <div>
-                            <span className="text-slate-500">Vendes:</span>
-                            <span className="font-semibold text-slate-700 ml-1">{extra.salesCount}</span>
-                          </div>
-                          <div>
-                            <span className="text-slate-500">Ingressos:</span>
-                            <span className="font-semibold text-green-600 ml-1">{formatCurrency(extra.totalRevenue)}</span>
-                          </div>
+                      )}
+                      <div className="flex gap-6 text-sm">
+                        <div>
+                          <span className="text-slate-400">Vendes:</span>
+                          <span className="font-semibold text-slate-100 ml-1">{extra.salesCount}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-400">Ingressos:</span>
+                          <span className="font-semibold text-emerald-300 ml-1">{formatCurrency(extra.totalRevenue)}</span>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Preu (editable) */}
-                      <div className="text-right">
-                        {editingExtra === extra.id ? (
-                          <div className="flex flex-col items-end gap-2">
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="number"
-                                value={editPrice}
-                                onChange={e => setEditPrice(Number(e.target.value))}
-                                className="w-28 px-3 py-2 border-2 border-orange-500 rounded-lg text-right text-xl font-bold focus:outline-none"
-                                /* eslint-disable-next-line jsx-a11y/no-autofocus */
+                    <div className="text-right">
+                      {editingExtra === extra.id ? (
+                        <div className="flex flex-col items-end gap-2">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              value={editPrice}
+                              onChange={e => setEditPrice(Number(e.target.value))}
+                              className="w-28 px-3 py-2 border-2 border-cyan-500 rounded-lg text-right text-xl font-bold bg-slate-800 text-slate-100 focus:outline-none"
+                              /* eslint-disable-next-line jsx-a11y/no-autofocus */
                               autoFocus
-                              />
-                              <span className="text-slate-500 text-xl">€</span>
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => setEditingExtra(null)}
-                                className="px-3 py-1.5 text-sm bg-stone-100 hover:bg-stone-100 rounded-lg transition-colors"
-                              >
-                                Cancel·lar
-                              </button>
-                              <button
-                                onClick={() => savePrice(extra.id)}
-                                disabled={saving}
-                                className="px-4 py-1.5 text-sm bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
-                              >
-                                {saving ? '...' : '✓ Guardar'}
-                              </button>
-                            </div>
+                            />
+                            <span className="text-slate-400 text-xl">€</span>
                           </div>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setEditingExtra(extra.id);
-                              setEditPrice(extra.price);
-                            }}
-                            className="group"
-                          >
-                            <div className="text-3xl font-bold text-slate-700 group-hover:text-orange-500 transition-colors">
-                              {formatCurrency(extra.price)}
-                            </div>
-                            <div className="text-xs text-slate-400 group-hover:text-orange-400 mt-1">
-                              Clic per editar ✏️
-                            </div>
-                          </button>
+                          <div className="flex gap-2">
+                            <button onClick={() => setEditingExtra(null)} className="px-3 py-1.5 text-sm bg-slate-700/50 hover:bg-slate-600/50 rounded-lg transition-colors text-slate-300">Cancel·lar</button>
+                            <button onClick={() => savePrice(extra.id)} disabled={saving} className="px-4 py-1.5 text-sm bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50">
+                              {saving ? '...' : '✓ Guardar'}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button onClick={() => { setEditingExtra(extra.id); setEditPrice(extra.price); }} className="group">
+                          <div className="text-3xl font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">{formatCurrency(extra.price)}</div>
+                          <div className="text-xs text-slate-500 group-hover:text-cyan-400/70 mt-1">Clic per editar ✏️</div>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {extra.recentSales.length > 0 && (
+                  <div className="bg-slate-700/30 px-6 py-3 border-t border-slate-700/50">
+                    <p className="text-xs text-slate-500 mb-2">Últimes vendes:</p>
+                    <div className="flex gap-2 overflow-x-auto pb-1">
+                      {extra.recentSales.map((sale, i) => (
+                        <span key={i} className="px-2 py-1 bg-slate-800/60 rounded text-xs text-slate-400 whitespace-nowrap border border-slate-700/50">
+                          {sale.bookingRef} · {formatDate(sale.date)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB: PACKS */}
+      {activeTab === 'packs' && (
+        <div className="space-y-4">
+          <div className="bg-slate-700/30 border border-slate-700/50 rounded-xl p-4 flex items-center gap-3">
+            <span className="text-2xl">🔒</span>
+            <div>
+              <p className="font-semibold text-slate-200">Només lectura</p>
+              <p className="text-sm text-slate-400">
+                Per editar packs, ves a{' '}
+                <Link href="/admin/packs" className="text-cyan-400 hover:underline font-medium">
+                  /admin/packs
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            {packs.map(pack => (
+              <div key={pack.id} className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+                <div className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-xl font-bold text-slate-100">{pack.name}</h3>
+                        {pack.isFeatured && (
+                          <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-xs rounded-full font-medium">⭐ Destacat</span>
                         )}
+                        {!pack.isActive && (
+                          <span className="px-2 py-0.5 bg-rose-500/20 text-rose-300 text-xs rounded-full">Inactiu</span>
+                        )}
+                      </div>
+                      {pack.tagline && (
+                        <p className="text-slate-400 text-sm mb-4">{pack.tagline}</p>
+                      )}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div className="bg-slate-700/30 rounded-xl p-3 text-center">
+                          <div className="text-2xl font-bold text-slate-100">{pack.djHours}h</div>
+                          <div className="text-xs text-slate-400">DJ inclòs</div>
+                        </div>
+                        <div className="bg-slate-700/30 rounded-xl p-3 text-center">
+                          <div className="text-2xl font-bold text-slate-100">{pack.soundWatts}W</div>
+                          <div className="text-xs text-slate-400">Potència</div>
+                        </div>
+                        <div className="bg-slate-700/30 rounded-xl p-3 text-center">
+                          <div className="text-2xl font-bold text-slate-100">{formatCurrency(pack.extraHourPrice)}</div>
+                          <div className="text-xs text-slate-400">Hora extra</div>
+                        </div>
+                        <div className="bg-slate-700/30 rounded-xl p-3 text-center">
+                          <div className="text-2xl font-bold text-cyan-300">{formatCurrency(pack.totalInventoryValue)}</div>
+                          <div className="text-xs text-slate-400">Valor equip</div>
+                        </div>
+                      </div>
+                      {pack.includedInventory.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {pack.includedInventory.slice(0, 6).map(item => (
+                            <span key={item.itemCode} className="px-2 py-1 bg-cyan-500/10 text-cyan-300 text-xs rounded-lg border border-cyan-500/20">
+                              {item.itemName}
+                            </span>
+                          ))}
+                          {pack.includedInventory.length > 6 && (
+                            <span className="px-2 py-1 bg-slate-700/50 text-slate-400 text-xs rounded-lg">
+                              +{pack.includedInventory.length - 6} més
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-slate-100">{formatCurrency(pack.price)}</div>
+                      {pack.originalPrice && pack.originalPrice > pack.price && (
+                        <div className="text-sm text-slate-500 line-through">{formatCurrency(pack.originalPrice)}</div>
+                      )}
+                      <div className="text-xs text-slate-500 mt-2">🔒 No editable aquí</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-slate-700/30 px-6 py-3 border-t border-slate-700/50 flex items-center justify-between">
+                  <div className="flex gap-6 text-sm">
+                    <div>
+                      <span className="text-slate-400">Reserves:</span>
+                      <span className="font-semibold text-slate-100 ml-1">{pack.bookingsCount}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400">Ingressos:</span>
+                      <span className="font-semibold text-emerald-300 ml-1">{formatCurrency(pack.totalRevenue)}</span>
+                    </div>
+                  </div>
+                  <Link href="/admin/packs" className="text-cyan-400 hover:text-cyan-300 text-sm font-medium">
+                    Editar →
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB: INVENTORY */}
+      {activeTab === 'inventory' && (
+        <div className="space-y-4">
+          <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4 flex items-center gap-3">
+            <span className="text-2xl">📊</span>
+            <div>
+              <p className="font-semibold text-cyan-300">Estadístiques d'ús</p>
+              <p className="text-sm text-cyan-400/80">
+                Veus hores d'ús i historial. Per editar l'inventari, ves a{' '}
+                <Link href="/admin/inventory" className="text-cyan-300 hover:underline font-medium">
+                  /admin/inventory
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          {/* Filtres */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <input
+              type="text"
+              placeholder="Cerca per nom o codi..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="flex-1 px-4 py-2.5 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            />
+            <select
+              value={categoryFilter}
+              onChange={e => setCategoryFilter(e.target.value)}
+              className="px-4 py-2.5 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            >
+              <option value="all">Totes les categories</option>
+              {Object.entries(CATEGORY_LABELS).map(([key, { label, icon }]) => (
+                <option key={key} value={key}>{icon} {label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Llista */}
+          <div className="grid gap-3">
+            {filteredInventory.map(item => {
+              const categoryInfo = CATEGORY_LABELS[item.category] || { label: item.category, icon: '📦', color: 'bg-slate-500/20' };
+              const statusInfo = STATUS_LABELS[item.status] || { label: item.status, color: 'bg-slate-500/20 text-slate-400' };
+
+              return (
+                <div key={item.id} className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4 hover:border-slate-600/50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 ${categoryInfo.color} rounded-xl flex items-center justify-center text-2xl`}>
+                        {categoryInfo.icon}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-slate-100">{item.name}</h3>
+                          <code className="text-xs bg-slate-700/50 px-2 py-0.5 rounded text-slate-400">{item.code}</code>
+                        </div>
+                        <div className="flex items-center gap-3 mt-1">
+                          <span className={`px-2 py-0.5 text-xs rounded-full ${statusInfo.color}`}>{statusInfo.label}</span>
+                          <span className="text-sm text-slate-400">Valor: {formatCurrency(item.value)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-6">
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-slate-100">{item.stats.totalEvents}</div>
+                        <div className="text-xs text-slate-400">Events</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-cyan-300">{item.stats.totalHours.toFixed(1)}h</div>
+                        <div className="text-xs text-slate-400">Hores ús</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-purple-300">{item.stats.avgHoursPerEvent.toFixed(1)}h</div>
+                        <div className="text-xs text-slate-400">Mitjana/event</div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Recent sales */}
-                  {extra.recentSales.length > 0 && (
-                    <div className="bg-slate-50 px-6 py-3 border-t border-slate-100">
-                      <p className="text-xs text-slate-500 mb-2">Últimes vendes:</p>
-                      <div className="flex gap-2 overflow-x-auto pb-1">
-                        {extra.recentSales.map((sale, i) => (
-                          <span
-                            key={i}
-                            className="px-2 py-1 bg-white rounded text-xs text-slate-600 whitespace-nowrap border border-stone-200"
-                          >
-                            {sale.bookingRef} • {formatDate(sale.date)}
+                  {item.recentUsage.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-slate-700/30">
+                      <p className="text-xs text-slate-500 mb-2">Últims events:</p>
+                      <div className="flex gap-2 overflow-x-auto">
+                        {item.recentUsage.map((usage, i) => (
+                          <span key={i} className="px-2 py-1 bg-slate-700/30 rounded text-xs text-slate-400 whitespace-nowrap border border-slate-700/50">
+                            {usage.bookingRef} · {formatDate(usage.date)}
                           </span>
                         ))}
                       </div>
                     </div>
                   )}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              );
+            })}
 
-        {/* TAB: PACKS */}
-        {activeTab === 'packs' && (
-          <div className="space-y-4">
-            <div className="bg-stone-100 border border-stone-200 rounded-xl p-4 flex items-center gap-3">
-              <span className="text-2xl">🔒</span>
-              <div>
-                <p className="font-semibold text-slate-700">Només lectura</p>
-                <p className="text-sm text-slate-600">
-                  Per editar packs, ves a{' '}
-                  <Link href="/admin/packs" className="text-orange-500 hover:underline font-medium">
-                    /admin/packs
-                  </Link>
-                </p>
+            {filteredInventory.length === 0 && (
+              <div className="text-center py-12 text-slate-400">
+                No s'han trobat resultats
               </div>
-            </div>
-
-            <div className="grid gap-4">
-              {packs.map(pack => (
-                <div
-                  key={pack.id}
-                  className="bg-white rounded-2xl border border-stone-200 overflow-hidden"
-                >
-                  <div className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-xl font-bold text-slate-700">{pack.name}</h3>
-                          {pack.isFeatured && (
-                            <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
-                              ⭐ Destacat
-                            </span>
-                          )}
-                          {!pack.isActive && (
-                            <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
-                              Inactiu
-                            </span>
-                          )}
-                        </div>
-                        {pack.tagline && (
-                          <p className="text-slate-500 text-sm mb-4">{pack.tagline}</p>
-                        )}
-
-                        {/* Info */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                          <div className="bg-slate-50 rounded-xl p-3 text-center">
-                            <div className="text-2xl font-bold text-slate-700">{pack.djHours}h</div>
-                            <div className="text-xs text-slate-500">DJ inclòs</div>
-                          </div>
-                          <div className="bg-slate-50 rounded-xl p-3 text-center">
-                            <div className="text-2xl font-bold text-slate-700">{pack.soundWatts}W</div>
-                            <div className="text-xs text-slate-500">Potència</div>
-                          </div>
-                          <div className="bg-slate-50 rounded-xl p-3 text-center">
-                            <div className="text-2xl font-bold text-slate-700">{formatCurrency(pack.extraHourPrice)}</div>
-                            <div className="text-xs text-slate-500">Hora extra</div>
-                          </div>
-                          <div className="bg-slate-50 rounded-xl p-3 text-center">
-                            <div className="text-2xl font-bold text-blue-600">{formatCurrency(pack.totalInventoryValue)}</div>
-                            <div className="text-xs text-slate-500">Valor equip</div>
-                          </div>
-                        </div>
-
-                        {/* Equipament inclòs */}
-                        {pack.includedInventory.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {pack.includedInventory.slice(0, 6).map(item => (
-                              <span
-                                key={item.itemCode}
-                                className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-lg"
-                              >
-                                {item.itemName}
-                              </span>
-                            ))}
-                            {pack.includedInventory.length > 6 && (
-                              <span className="px-2 py-1 bg-stone-100 text-slate-500 text-xs rounded-lg">
-                                +{pack.includedInventory.length - 6} més
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Preu (no editable) */}
-                      <div className="text-right">
-                        <div className="text-3xl font-bold text-slate-700">
-                          {formatCurrency(pack.price)}
-                        </div>
-                        {pack.originalPrice && pack.originalPrice > pack.price && (
-                          <div className="text-sm text-slate-400 line-through">
-                            {formatCurrency(pack.originalPrice)}
-                          </div>
-                        )}
-                        <div className="text-xs text-slate-400 mt-2">🔒 No editable aquí</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="bg-slate-50 px-6 py-3 border-t border-slate-100 flex items-center justify-between">
-                    <div className="flex gap-6 text-sm">
-                      <div>
-                        <span className="text-slate-500">Reserves:</span>
-                        <span className="font-semibold text-slate-700 ml-1">{pack.bookingsCount}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500">Ingressos:</span>
-                        <span className="font-semibold text-green-600 ml-1">{formatCurrency(pack.totalRevenue)}</span>
-                      </div>
-                    </div>
-                    <Link
-                      href="/admin/packs"
-                      className="text-orange-500 hover:text-orange-600 text-sm font-medium"
-                    >
-                      Editar →
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
+            )}
           </div>
-        )}
-
-        {/* TAB: INVENTORY */}
-        {activeTab === 'inventory' && (
-          <div className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3">
-              <span className="text-2xl">📊</span>
-              <div>
-                <p className="font-semibold text-blue-800">Estadístiques d'ús</p>
-                <p className="text-sm text-blue-700">
-                  Veus hores d'ús i historial. Per editar l'inventari, ves a{' '}
-                  <Link href="/admin/inventory" className="text-orange-500 hover:underline font-medium">
-                    /admin/inventory
-                  </Link>
-                </p>
-              </div>
-            </div>
-
-            {/* Filtres */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <input
-                type="text"
-                placeholder="Cerca per nom o codi..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="flex-1 px-4 py-2.5 bg-white border border-stone-200 rounded-xl focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
-              />
-              <select
-                value={categoryFilter}
-                onChange={e => setCategoryFilter(e.target.value)}
-                className="px-4 py-2.5 bg-white border border-stone-200 rounded-xl focus:border-orange-500"
-              >
-                <option value="all">Totes les categories</option>
-                {Object.entries(CATEGORY_LABELS).map(([key, { label, icon }]) => (
-                  <option key={key} value={key}>
-                    {icon} {label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Llista */}
-            <div className="grid gap-3">
-              {filteredInventory.map(item => {
-                const categoryInfo = CATEGORY_LABELS[item.category] || { label: item.category, icon: '📦', color: 'bg-slate-500' };
-                const statusInfo = STATUS_LABELS[item.status] || { label: item.status, color: 'bg-stone-100 text-slate-700' };
-
-                return (
-                  <div
-                    key={item.id}
-                    className="bg-white rounded-xl border border-stone-200 p-4 hover:border-stone-200 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 ${categoryInfo.color} rounded-xl flex items-center justify-center text-2xl text-slate-700`}>
-                          {categoryInfo.icon}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-slate-700">{item.name}</h3>
-                            <code className="text-xs bg-stone-100 px-2 py-0.5 rounded text-slate-500">
-                              {item.code}
-                            </code>
-                          </div>
-                          <div className="flex items-center gap-3 mt-1">
-                            <span className={`px-2 py-0.5 text-xs rounded-full ${statusInfo.color}`}>
-                              {statusInfo.label}
-                            </span>
-                            <span className="text-sm text-slate-500">
-                              Valor: {formatCurrency(item.value)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Stats d'ús */}
-                      <div className="flex items-center gap-6">
-                        <div className="text-center">
-                          <div className="text-xl font-bold text-slate-700">{item.stats.totalEvents}</div>
-                          <div className="text-xs text-slate-500">Events</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xl font-bold text-blue-600">{item.stats.totalHours.toFixed(1)}h</div>
-                          <div className="text-xs text-slate-500">Hores ús</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xl font-bold text-purple-600">{item.stats.avgHoursPerEvent.toFixed(1)}h</div>
-                          <div className="text-xs text-slate-500">Mitjana/event</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Últims events */}
-                    {item.recentUsage.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-slate-100">
-                        <p className="text-xs text-slate-500 mb-2">Últims events:</p>
-                        <div className="flex gap-2 overflow-x-auto">
-                          {item.recentUsage.map((usage, i) => (
-                            <span
-                              key={i}
-                              className="px-2 py-1 bg-slate-50 rounded text-xs text-slate-600 whitespace-nowrap border border-stone-200"
-                            >
-                              {usage.bookingRef} • {formatDate(usage.date)}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-
-              {filteredInventory.length === 0 && (
-                <div className="text-center py-12 text-slate-500">
-                  No s'han trobat resultats
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -846,23 +714,25 @@ function StatCard({
   label: string;
   value: string;
   sublabel: string;
-  color: 'green' | 'blue' | 'purple' | 'orange';
+  color: 'emerald' | 'cyan' | 'purple' | 'amber';
 }) {
-  const colors = {
-    green: 'from-green-500 to-emerald-600',
-    blue: 'from-blue-500 to-indigo-600',
-    purple: 'from-purple-500 to-violet-600',
-    orange: 'from-orange-500 to-red-500',
+  const styles = {
+    emerald: 'border-emerald-500/20 from-emerald-500/10 to-emerald-600/5 text-emerald-400',
+    cyan: 'border-cyan-500/20 from-cyan-500/10 to-blue-600/5 text-cyan-400',
+    purple: 'border-purple-500/20 from-purple-500/10 to-purple-600/5 text-purple-400',
+    amber: 'border-amber-500/20 from-amber-500/10 to-amber-600/5 text-amber-400',
   };
 
+  const style = styles[color];
+
   return (
-    <div className={`bg-gradient-to-br ${colors[color]} rounded-2xl p-6 text-white shadow-lg`}>
+    <div className={`rounded-2xl border bg-gradient-to-br backdrop-blur-sm p-4 sm:p-5 ${style}`}>
       <div className="flex items-center justify-between mb-3">
         <span className="text-3xl">{icon}</span>
       </div>
-      <div className="text-3xl font-bold mb-1">{value}</div>
-      <div className="text-sm opacity-90">{label}</div>
-      <div className="text-xs opacity-75 mt-1">{sublabel}</div>
+      <div className="text-3xl font-bold text-slate-100 mb-1">{value}</div>
+      <div className={`text-xs font-medium uppercase ${style.split(' ').pop()}`}>{label}</div>
+      <div className="text-xs text-slate-500 mt-1">{sublabel}</div>
     </div>
   );
 }

@@ -5,8 +5,8 @@ import { MiniLineChart } from './components/Charts';
 import Link from 'next/link';
 
 /**
- * 📊 DASHBOARD - Òrbita Admin
- * Vista principal amb dades reals de Prisma + Supabase
+ * Dashboard - Òrbita Admin
+ * Dark elegant theme
  */
 
 export const dynamic = 'force-dynamic';
@@ -248,10 +248,10 @@ export default async function AdminDashboard() {
       </div>
 
       {testimonialsPending > 0 && (
-        <div className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between shadow-[0_8px_24px_-18px_rgba(15,23,42,0.5)]">
+        <div className="flex flex-col gap-2 rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between backdrop-blur-sm">
           <div>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium">Testimonis pendents</p>
-            <p className="text-base sm:text-lg font-semibold text-slate-900">
+            <p className="text-xs sm:text-sm text-slate-400 font-medium">Testimonis pendents</p>
+            <p className="text-base sm:text-lg font-semibold text-slate-100">
               {testimonialsPending} pendent{testimonialsPending > 1 ? 's' : ''} d&apos;aprovacio
             </p>
           </div>
@@ -261,7 +261,7 @@ export default async function AdminDashboard() {
         </div>
       )}
 
-      {/* Mètriques essencials */}
+      {/* Metriques essencials */}
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
         <MetricCard
           icon="📋"
@@ -269,6 +269,7 @@ export default async function AdminDashboard() {
           value={bookingsConfirmed.toString()}
           change={bookingsThisMonth > 0 ? `+${bookingsThisMonth} aquest mes` : '-'}
           changeType="up"
+          accent="emerald"
         />
         <MetricCard
           icon="📨"
@@ -276,6 +277,7 @@ export default async function AdminDashboard() {
           value={leadsThisMonth.toString()}
           change={`${leadsCount} totals`}
           changeType="up"
+          accent="sky"
         />
         <MetricCard
           icon="🏆"
@@ -283,6 +285,7 @@ export default async function AdminDashboard() {
           value={customersCount.toString()}
           change={`${conversionRate}% conversió`}
           changeType="up"
+          accent="purple"
         />
         <MetricCard
           icon="⭐"
@@ -290,6 +293,7 @@ export default async function AdminDashboard() {
           value={rating}
           change={`${testimonialsApproved} ressenyes`}
           changeType="up"
+          accent="amber"
         />
         <MetricCard
           icon="🌐"
@@ -297,6 +301,7 @@ export default async function AdminDashboard() {
           value={ga4Sessions || '-'}
           change={ga4Users ? `${ga4Users} usuaris` : 'GA4 pendent'}
           changeType="neutral"
+          accent="cyan"
         />
         <MetricCard
           icon="⏱️"
@@ -304,6 +309,7 @@ export default async function AdminDashboard() {
           value={ga4AvgSessionMin ? `${ga4AvgSessionMin} min` : '-'}
           change={ga4PageViews ? `${ga4PageViews} pagines` : 'GA4 pendent'}
           changeType="neutral"
+          accent="rose"
         />
       </div>
 
@@ -317,7 +323,7 @@ export default async function AdminDashboard() {
               ]}
             />
             {!ga4 && (
-              <p className="mt-2 text-xs text-slate-400">GA4 pendent o sense dades.</p>
+              <p className="mt-2 text-xs text-slate-500">GA4 pendent o sense dades.</p>
             )}
           </div>
         </Card>
@@ -345,10 +351,10 @@ export default async function AdminDashboard() {
 
       {/* Contingut principal - Responsive */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Pròxims events */}
+        {/* Proxims events */}
         <div className="lg:col-span-2">
           <Card
-            title="Pròxims events"
+            title="Proxims events"
             subtitle={`${upcomingBookings.length} programats`}
             action={
               <Link href="/admin/calendario">
@@ -358,25 +364,25 @@ export default async function AdminDashboard() {
             noPadding
           >
             {upcomingBookings.length > 0 ? (
-              <div className="divide-y divide-slate-200">
+              <div className="divide-y divide-slate-700/30">
                 {upcomingBookings.map((booking) => (
                   <Link
                     key={booking.id}
                     href={`/admin/bookings/${booking.id}`}
-                    className="px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+                    className="px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4 hover:bg-slate-700/30 active:bg-slate-700/50 transition-colors"
                   >
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center shrink-0">
-                      <span className="text-slate-700 font-bold text-sm sm:text-base">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center shrink-0">
+                      <span className="text-slate-100 font-bold text-sm sm:text-base">
                         {new Date(booking.eventDate).getDate()}
                       </span>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-slate-900 font-medium text-sm sm:text-base truncate">{booking.clientName || 'Client'}</p>
-                      <p className="text-slate-500 text-xs sm:text-sm truncate">
+                      <p className="text-slate-100 font-medium text-sm sm:text-base truncate">{booking.clientName || 'Client'}</p>
+                      <p className="text-slate-400 text-xs sm:text-sm truncate">
                         {formatEventDate(new Date(booking.eventDate))} · {booking.eventType || 'Event'}
                       </p>
                     </div>
-                    <svg className="w-4 h-4 text-stone-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
@@ -384,8 +390,8 @@ export default async function AdminDashboard() {
               </div>
             ) : (
               <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-                <p className="text-slate-500 text-sm">No hi ha events programats</p>
-                <Link href="/admin/bookings" className="text-cyan-600 hover:text-cyan-500 text-sm mt-2 inline-block font-medium">
+                <p className="text-slate-400 text-sm">No hi ha events programats</p>
+                <Link href="/admin/bookings" className="text-cyan-400 hover:text-cyan-300 text-sm mt-2 inline-block font-medium">
                   Crear nova reserva →
                 </Link>
               </div>
@@ -393,17 +399,17 @@ export default async function AdminDashboard() {
           </Card>
         </div>
 
-        {/* Activitat recent - Oculto en móvil muy pequeño */}
+        {/* Activitat recent - Oculto en movil muy pequeño */}
         <div className="hidden sm:block">
-          <Card title="Activitat" subtitle="Últimes accions">
+          <Card title="Activitat" subtitle="Ultimes accions">
             <div className="space-y-3 sm:space-y-4">
               {activities.map((activity, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <span className="text-base sm:text-lg mt-0.5">{activity.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm text-stone-600">{activity.text}</p>
+                    <p className="text-xs sm:text-sm text-slate-300">{activity.text}</p>
                     {activity.time && (
-                      <p className="text-[10px] sm:text-xs text-stone-400 mt-0.5">{activity.time}</p>
+                      <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5">{activity.time}</p>
                     )}
                   </div>
                 </div>
@@ -413,7 +419,7 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* Leads recents - Optimizado para móvil */}
+      {/* Leads recents - Optimizado para movil */}
       <Card
         title="Leads recents"
         subtitle={`${leadsCount} totals`}
@@ -425,35 +431,35 @@ export default async function AdminDashboard() {
         noPadding
       >
         {recentLeads.length > 0 ? (
-          <div className="divide-y divide-slate-200">
+          <div className="divide-y divide-slate-700/30">
             {recentLeads.map((lead) => (
               <Link
                 key={lead.id}
                 href={`/admin/leads/${lead.id}`}
-                className="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-slate-50 active:bg-slate-100 transition-colors"
+                className="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-slate-700/30 active:bg-slate-700/50 transition-colors"
               >
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-700 font-medium text-sm sm:text-base shrink-0">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-slate-600/50 to-slate-700/50 border border-slate-600/50 flex items-center justify-center text-slate-200 font-medium text-sm sm:text-base shrink-0">
                     {lead.name?.charAt(0).toUpperCase() || '?'}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-slate-900 font-medium text-sm sm:text-base truncate">{lead.name}</p>
-                    <p className="text-slate-500 text-xs sm:text-sm truncate hidden sm:block">{lead.email}</p>
-                    <p className="text-slate-400 text-xs sm:hidden">{timeAgo(new Date(lead.createdAt))}</p>
+                    <p className="text-slate-100 font-medium text-sm sm:text-base truncate">{lead.name}</p>
+                    <p className="text-slate-400 text-xs sm:text-sm truncate hidden sm:block">{lead.email}</p>
+                    <p className="text-slate-500 text-xs sm:hidden">{timeAgo(new Date(lead.createdAt))}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-2">
                   <span className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium ${
-                    lead.status === 'NEW' ? 'bg-sky-100 text-sky-700' :
-                    lead.status === 'WON' ? 'bg-emerald-100 text-emerald-700' :
-                    'bg-slate-100 text-slate-600'
+                    lead.status === 'NEW' ? 'bg-sky-500/20 text-sky-300' :
+                    lead.status === 'WON' ? 'bg-emerald-500/20 text-emerald-300' :
+                    'bg-slate-500/20 text-slate-300'
                   }`}>
                     {lead.status}
                   </span>
-                  <span className="text-slate-400 text-sm hidden sm:block">
+                  <span className="text-slate-500 text-sm hidden sm:block">
                     {timeAgo(new Date(lead.createdAt))}
                   </span>
-                  <svg className="w-4 h-4 text-stone-300 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-slate-500 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
@@ -462,32 +468,32 @@ export default async function AdminDashboard() {
           </div>
         ) : (
           <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-            <p className="text-stone-500 text-sm">No hi ha leads encara</p>
-            <p className="text-stone-400 text-xs mt-1">Els leads apareixeran aquí</p>
+            <p className="text-slate-400 text-sm">No hi ha leads encara</p>
+            <p className="text-slate-500 text-xs mt-1">Els leads apareixeran aquí</p>
           </div>
         )}
       </Card>
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-3 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-[0_8px_20px_-18px_rgba(15,23,42,0.5)]">
-          <p className="text-slate-500 text-xs sm:text-sm font-medium">Conversio</p>
-          <p className="text-xl sm:text-2xl font-semibold text-slate-900 mt-0.5 sm:mt-1">{conversionRate}%</p>
+        <div className="p-3 sm:p-5 rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-purple-600/5 backdrop-blur-sm">
+          <p className="text-slate-400 text-xs sm:text-sm font-medium">Conversio</p>
+          <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">{conversionRate}%</p>
           <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{wonLeads}/{leadsCount} leads</p>
         </div>
-        <div className="p-3 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-[0_8px_20px_-18px_rgba(15,23,42,0.5)]">
-          <p className="text-slate-500 text-xs sm:text-sm font-medium">Testimonis</p>
-          <p className="text-xl sm:text-2xl font-semibold text-slate-900 mt-0.5 sm:mt-1">{testimonialsApproved + testimonialsPending}</p>
+        <div className="p-3 sm:p-5 rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm">
+          <p className="text-slate-400 text-xs sm:text-sm font-medium">Testimonis</p>
+          <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">{testimonialsApproved + testimonialsPending}</p>
           <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{testimonialsPending} pendents</p>
         </div>
-        <div className="p-3 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-[0_8px_20px_-18px_rgba(15,23,42,0.5)]">
-          <p className="text-slate-500 text-xs sm:text-sm font-medium">Valoracio</p>
-          <p className="text-xl sm:text-2xl font-semibold text-slate-900 mt-0.5 sm:mt-1">⭐ {rating}</p>
+        <div className="p-3 sm:p-5 rounded-2xl border border-rose-500/20 bg-gradient-to-br from-rose-500/10 to-rose-600/5 backdrop-blur-sm">
+          <p className="text-slate-400 text-xs sm:text-sm font-medium">Valoracio</p>
+          <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">⭐ {rating}</p>
           <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">Mitjana</p>
         </div>
-        <div className="p-3 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-[0_8px_20px_-18px_rgba(15,23,42,0.5)]">
-          <p className="text-slate-500 text-xs sm:text-sm font-medium">Inventari</p>
-          <p className="text-xl sm:text-2xl font-semibold text-slate-900 mt-0.5 sm:mt-1">{inventoryActive}/{inventoryTotal}</p>
+        <div className="p-3 sm:p-5 rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 backdrop-blur-sm">
+          <p className="text-slate-400 text-xs sm:text-sm font-medium">Inventari</p>
+          <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">{inventoryActive}/{inventoryTotal}</p>
           <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{inventoryMaintenance} mant.</p>
         </div>
       </div>

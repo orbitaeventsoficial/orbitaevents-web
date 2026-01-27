@@ -112,7 +112,7 @@ export default function CoveragePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
-        <div className="animate-spin w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -123,33 +123,33 @@ export default function CoveragePage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-700">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
           🗺️ Àrees de Cobertura
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-400">
           Ciutats i províncies on opera Òrbita Events
         </p>
       </header>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4">
-          <div className="text-sm text-blue-600 font-medium">Total Ciutats</div>
-          <div className="text-3xl font-bold text-blue-700 mt-1">{areas.length}</div>
+        <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-blue-600/5 backdrop-blur-sm p-4">
+          <div className="text-xs font-medium text-cyan-400 uppercase">Total Ciutats</div>
+          <div className="text-3xl font-bold text-slate-100 mt-2">{areas.length}</div>
         </div>
-        <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-4">
-          <div className="text-sm text-green-600 font-medium">Actives</div>
-          <div className="text-3xl font-bold text-green-700 mt-1">{activeAreas}</div>
+        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-4">
+          <div className="text-xs font-medium text-emerald-400 uppercase">Actives</div>
+          <div className="text-3xl font-bold text-slate-100 mt-2">{activeAreas}</div>
         </div>
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-4">
-          <div className="text-sm text-orange-600 font-medium">Províncies</div>
-          <div className="text-3xl font-bold text-orange-700 mt-1">{provinces.length}</div>
+        <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm p-4">
+          <div className="text-xs font-medium text-amber-400 uppercase">Províncies</div>
+          <div className="text-3xl font-bold text-slate-100 mt-2">{provinces.length}</div>
         </div>
       </div>
 
       {/* Add Area Form */}
-      <div className="bg-white border border-stone-200 rounded-xl p-6">
-        <h2 className="text-lg font-semibold text-slate-700 mb-4">Afegir Ciutat</h2>
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+        <h2 className="text-lg font-semibold text-slate-100 mb-4">Afegir Ciutat</h2>
         <div className="flex gap-3">
           <input
             type="text"
@@ -157,13 +157,13 @@ export default function CoveragePage() {
             onChange={(e) => setNewCity(e.target.value)}
             placeholder="Nom de la ciutat"
             aria-label="Nom de la ciutat"
-            className="flex-1 px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            className="flex-1 px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
           />
           <select
             value={newProvince}
             onChange={(e) => setNewProvince(e.target.value)}
             aria-label="Província"
-            className="px-4 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            className="px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
           >
             {PROVINCES.map(p => (
               <option key={p} value={p}>{p}</option>
@@ -174,7 +174,7 @@ export default function CoveragePage() {
             disabled={adding || !newCity.trim()}
             type="button"
             aria-busy={adding}
-            className="px-6 py-2 bg-gradient-to-r from-amber-500 to-rose-500 text-white rounded-lg font-medium hover:from-amber-600 hover:to-rose-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {adding ? 'Afegint...' : '+ Afegir'}
           </button>
@@ -184,27 +184,27 @@ export default function CoveragePage() {
       {/* Areas by Province */}
       <div className="space-y-4">
         {provinces.map(province => (
-          <div key={province} className="bg-white border border-stone-200 rounded-xl p-6">
-            <h3 className="font-semibold text-slate-700 mb-3">{province}</h3>
+          <div key={province} className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+            <h3 className="font-semibold text-slate-100 mb-3">{province}</h3>
             <div className="space-y-2">
               {areas
                 .filter(a => a.province === province)
                 .map(area => (
                   <div
                     key={area.city}
-                    className="bg-stone-100 border border-stone-200 rounded-lg p-3 flex items-center justify-between"
+                    className="bg-slate-700/30 border border-slate-700/50 rounded-xl p-3 flex items-center justify-between"
                   >
-                    <span className={`font-medium ${area.enabled ? 'text-slate-700' : 'text-slate-400'}`}>
+                    <span className={`font-medium ${area.enabled ? 'text-slate-100' : 'text-slate-500'}`}>
                       {area.city}
                     </span>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => toggleArea(area.city, !area.enabled)}
                         type="button"
-                        className={`px-3 py-1 rounded text-xs font-medium ${
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
                           area.enabled
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-100 text-gray-500'
+                            ? 'bg-emerald-500/20 text-emerald-300'
+                            : 'bg-slate-500/20 text-slate-400'
                         }`}
                       >
                         {area.enabled ? '✓ Activa' : '✕ Desactivada'}
@@ -212,7 +212,7 @@ export default function CoveragePage() {
                       <button
                         onClick={() => removeArea(area.city)}
                         type="button"
-                        className="px-3 py-1 bg-red-100 text-red-700 rounded text-xs font-medium hover:bg-red-200"
+                        className="px-3 py-1 bg-rose-500/20 text-rose-300 rounded-full text-xs font-medium hover:bg-rose-500/30 transition-colors"
                       >
                         Eliminar
                       </button>

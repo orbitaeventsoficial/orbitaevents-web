@@ -121,17 +121,19 @@ export default function LeadWorkspace({
     setDocFile(null);
   };
 
+  const inputClasses = "rounded-xl border border-slate-600/50 bg-slate-800/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500";
+
   return (
     <div className="grid gap-6 lg:grid-cols-3">
-      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm lg:col-span-2">
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6 lg:col-span-2">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-slate-700">Tasques pendents</h2>
-          <span className="text-sm text-slate-500">{tasks.length} tasques</span>
+          <h2 className="text-lg font-semibold text-slate-100">Tasques pendents</h2>
+          <span className="text-sm text-slate-400">{tasks.length} tasques</span>
         </div>
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-700"
+            className={inputClasses}
             placeholder="Nova tasca"
             value={taskTitle}
             onChange={(e) => setTaskTitle(e.target.value)}
@@ -139,13 +141,13 @@ export default function LeadWorkspace({
           />
           <input
             type="date"
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-700"
+            className={inputClasses}
             value={taskDueDate}
             onChange={(e) => setTaskDueDate(e.target.value)}
             aria-label="Data de venciment"
           />
           <select
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-700"
+            className={inputClasses}
             value={taskPriority}
             onChange={(e) => setTaskPriority(e.target.value)}
             aria-label="Prioritat"
@@ -160,7 +162,7 @@ export default function LeadWorkspace({
           type="button"
           onClick={addTask}
           aria-label="Afegir tasca"
-          className="mt-3 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600"
+          className="mt-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors"
         >
           Afegir tasca
         </button>
@@ -172,10 +174,10 @@ export default function LeadWorkspace({
             tasks.map((task) => (
               <div
                 key={task.id}
-                className="flex items-center justify-between gap-3 rounded-lg border border-stone-200 bg-white px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-xl border border-slate-700/50 bg-slate-700/30 px-4 py-3"
               >
                 <div>
-                  <p className="text-sm font-medium text-slate-700">{task.title}</p>
+                  <p className="text-sm font-medium text-slate-200">{task.title}</p>
                   <p className="text-xs text-slate-500">
                     {task.dueDate ? `Venciment: ${task.dueDate.slice(0, 10)}` : 'Sense data'} · {task.priority}
                   </p>
@@ -186,7 +188,7 @@ export default function LeadWorkspace({
                       type="button"
                       onClick={() => updateTask(task.id, 'DONE')}
                       aria-label={`Marcar tasca ${task.title} com feta`}
-                      className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700"
+                      className="rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/30 transition-colors"
                     >
                       Marcar feta
                     </button>
@@ -195,7 +197,7 @@ export default function LeadWorkspace({
                     type="button"
                     onClick={() => deleteTask(task.id)}
                     aria-label={`Eliminar tasca ${task.title}`}
-                    className="rounded-md border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700"
+                    className="rounded-lg border border-rose-500/30 bg-rose-500/20 px-3 py-1 text-xs font-semibold text-rose-300 hover:bg-rose-500/30 transition-colors"
                   >
                     Eliminar
                   </button>
@@ -206,18 +208,18 @@ export default function LeadWorkspace({
         </div>
       </section>
 
-      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-700">Documents</h2>
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+        <h2 className="text-lg font-semibold text-slate-100">Documents</h2>
         <div className="mt-3 grid gap-2">
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-700"
+            className={inputClasses}
             placeholder="Títol del document"
             value={docTitle}
             onChange={(e) => setDocTitle(e.target.value)}
             aria-label="Títol del document"
           />
           <select
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-700"
+            className={inputClasses}
             value={docType}
             onChange={(e) => setDocType(e.target.value)}
             aria-label="Tipus de document"
@@ -231,7 +233,7 @@ export default function LeadWorkspace({
           </select>
           <input
             type="file"
-            className="text-sm text-slate-600"
+            className="text-sm text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-700/50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-slate-300 hover:file:bg-slate-600/50"
             onChange={(e) => setDocFile(e.target.files?.[0] || null)}
             aria-label="Arxiu del document"
           />
@@ -239,7 +241,7 @@ export default function LeadWorkspace({
             type="button"
             onClick={uploadDocument}
             aria-label="Pujar document"
-            className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600"
+            className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors"
           >
             Pujar document
           </button>
@@ -255,7 +257,7 @@ export default function LeadWorkspace({
                 href={doc.fileUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="block rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-slate-700 hover:border-stone-300"
+                className="block rounded-xl border border-slate-700/50 bg-slate-700/30 px-3 py-2 text-sm text-slate-200 hover:bg-slate-700/50 transition-colors"
               >
                 <div className="font-medium">{doc.title}</div>
                 <div className="text-xs text-slate-500">{doc.type} · {doc.source}</div>
@@ -265,8 +267,8 @@ export default function LeadWorkspace({
         </div>
       </section>
 
-      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm lg:col-span-3">
-        <h2 className="text-lg font-semibold text-slate-700">Timeline d'activitat</h2>
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6 lg:col-span-3">
+        <h2 className="text-lg font-semibold text-slate-100">Timeline d'activitat</h2>
         <div className="mt-4 space-y-3">
           {activities.length === 0 ? (
             <p className="text-sm text-slate-500">Sense activitat registrada.</p>
@@ -274,10 +276,10 @@ export default function LeadWorkspace({
             activities.map((activity) => (
               <div
                 key={activity.id}
-                className="flex items-start justify-between gap-3 rounded-lg border border-stone-200 bg-white px-4 py-3"
+                className="flex items-start justify-between gap-3 rounded-xl border border-slate-700/50 bg-slate-700/30 px-4 py-3"
               >
                 <div>
-                  <p className="text-sm font-medium text-slate-700">{activity.title || activity.type}</p>
+                  <p className="text-sm font-medium text-slate-200">{activity.title || activity.type}</p>
                   {activity.description && (
                     <p className="text-xs text-slate-500">{activity.description}</p>
                   )}

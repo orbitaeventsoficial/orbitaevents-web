@@ -128,26 +128,28 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
     }
   };
 
+  const inputClasses = "block w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2.5 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 sm:text-sm";
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Alerts */}
       {error && (
-        <div className="rounded-md bg-red-50 p-4 border border-red-200" role="alert">
-          <p className="text-sm text-red-800">❌ {error}</p>
+        <div className="rounded-xl bg-rose-500/10 p-4 border border-rose-500/30" role="alert">
+          <p className="text-sm text-rose-300">❌ {error}</p>
         </div>
       )}
 
       {success && (
-        <div className="rounded-md bg-green-50 p-4 border border-green-200" role="status" aria-live="polite">
-          <p className="text-sm text-green-800">✅ Pack actualitzat correctament!</p>
+        <div className="rounded-xl bg-emerald-500/10 p-4 border border-emerald-500/30" role="status" aria-live="polite">
+          <p className="text-sm text-emerald-300">✅ Pack actualitzat correctament!</p>
         </div>
       )}
 
       {/* Slug Section */}
-      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-700 mb-4">🔗 Slug (URL)</h3>
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-4">🔗 Slug (URL)</h3>
         <div>
-          <label htmlFor="slug" className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor="slug" className="block text-sm font-medium text-slate-300 mb-1">
             Slug del Pack *
           </label>
           <input
@@ -156,7 +158,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
             required
             value={formData.slug}
             onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-            className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+            className={inputClasses}
             placeholder="pack-basic"
           />
           <p className="mt-1 text-xs text-slate-500">
@@ -166,11 +168,11 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Translations Section - Spanish */}
-      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-700 mb-4">🇪🇸 Traduccions - Espanyol</h3>
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-4">🇪🇸 Traduccions - Espanyol</h3>
         <div className="space-y-4">
           <div>
-            <label htmlFor="name-es" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="name-es" className="block text-sm font-medium text-slate-300 mb-1">
               Nom del Pack *
             </label>
             <input
@@ -179,13 +181,13 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               required
               value={getTranslation('es').name}
               onChange={(e) => updateTranslation('es', 'name', e.target.value)}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className={inputClasses}
               placeholder="Pack Básico"
             />
           </div>
 
           <div>
-            <label htmlFor="tagline-es" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="tagline-es" className="block text-sm font-medium text-slate-300 mb-1">
               Tagline
             </label>
             <input
@@ -193,13 +195,13 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="tagline-es"
               value={getTranslation('es').tagline || ''}
               onChange={(e) => updateTranslation('es', 'tagline', e.target.value)}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className={inputClasses}
               placeholder="Perfecto para eventos pequeños"
             />
           </div>
 
           <div>
-            <label htmlFor="description-es" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="description-es" className="block text-sm font-medium text-slate-300 mb-1">
               Descripció
             </label>
             <textarea
@@ -207,13 +209,13 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               rows={3}
               value={getTranslation('es').description || ''}
               onChange={(e) => updateTranslation('es', 'description', e.target.value)}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className={inputClasses}
               placeholder="Descripción completa del pack..."
             />
           </div>
 
           <div>
-            <label htmlFor="features-es" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="features-es" className="block text-sm font-medium text-slate-300 mb-1">
               Característiques (una per línia)
             </label>
             <textarea
@@ -221,7 +223,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               rows={5}
               value={(getTranslation('es').features || []).join('\n')}
               onChange={(e) => updateTranslation('es', 'features', e.target.value.split('\n').filter(f => f.trim()))}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm font-mono text-xs"
+              className={`${inputClasses} font-mono text-xs`}
               placeholder="DJ profesional&#10;Sistema de sonido&#10;Iluminación básica"
             />
           </div>
@@ -229,11 +231,11 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Translations Section - Catalan */}
-      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-700 mb-4">🏴 Traduccions - Català</h3>
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-4">🏴 Traduccions - Català</h3>
         <div className="space-y-4">
           <div>
-            <label htmlFor="name-ca" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="name-ca" className="block text-sm font-medium text-slate-300 mb-1">
               Nom del Pack *
             </label>
             <input
@@ -242,13 +244,13 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               required
               value={getTranslation('ca').name}
               onChange={(e) => updateTranslation('ca', 'name', e.target.value)}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className={inputClasses}
               placeholder="Pack Bàsic"
             />
           </div>
 
           <div>
-            <label htmlFor="tagline-ca" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="tagline-ca" className="block text-sm font-medium text-slate-300 mb-1">
               Tagline
             </label>
             <input
@@ -256,13 +258,13 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="tagline-ca"
               value={getTranslation('ca').tagline || ''}
               onChange={(e) => updateTranslation('ca', 'tagline', e.target.value)}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className={inputClasses}
               placeholder="Perfecte per a esdeveniments petits"
             />
           </div>
 
           <div>
-            <label htmlFor="description-ca" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="description-ca" className="block text-sm font-medium text-slate-300 mb-1">
               Descripció
             </label>
             <textarea
@@ -270,13 +272,13 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               rows={3}
               value={getTranslation('ca').description || ''}
               onChange={(e) => updateTranslation('ca', 'description', e.target.value)}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className={inputClasses}
               placeholder="Descripció completa del pack..."
             />
           </div>
 
           <div>
-            <label htmlFor="features-ca" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="features-ca" className="block text-sm font-medium text-slate-300 mb-1">
               Característiques (una per línia)
             </label>
             <textarea
@@ -284,7 +286,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               rows={5}
               value={(getTranslation('ca').features || []).join('\n')}
               onChange={(e) => updateTranslation('ca', 'features', e.target.value.split('\n').filter(f => f.trim()))}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm font-mono text-xs"
+              className={`${inputClasses} font-mono text-xs`}
               placeholder="DJ professional&#10;Sistema de so&#10;Il·luminació bàsica"
             />
           </div>
@@ -292,11 +294,11 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Pricing Section */}
-      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-700 mb-4">💰 Preus</h3>
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-4">💰 Preus</h3>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="price" className="block text-sm font-medium text-slate-300 mb-1">
               Preu Base *
             </label>
             <div className="relative">
@@ -307,16 +309,16 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
                 required
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                className="block w-full rounded-md border-stone-200 pr-8 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+                className={`${inputClasses} pr-8`}
               />
-              <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 text-sm">
+              <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 text-sm">
                 €
               </span>
             </div>
           </div>
 
           <div>
-            <label htmlFor="originalPrice" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="originalPrice" className="block text-sm font-medium text-slate-300 mb-1">
               Preu Original
             </label>
             <div className="relative">
@@ -326,17 +328,17 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
                 step="0.01"
                 value={formData.originalPrice}
                 onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
-                className="block w-full rounded-md border-stone-200 pr-8 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+                className={`${inputClasses} pr-8`}
                 placeholder="Opcional"
               />
-              <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 text-sm">
+              <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 text-sm">
                 €
               </span>
             </div>
           </div>
 
           <div>
-            <label htmlFor="extraHourPrice" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="extraHourPrice" className="block text-sm font-medium text-slate-300 mb-1">
               Preu Hora Extra *
             </label>
             <div className="relative">
@@ -347,9 +349,9 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
                 required
                 value={formData.extraHourPrice}
                 onChange={(e) => setFormData({ ...formData, extraHourPrice: parseFloat(e.target.value) || 0 })}
-                className="block w-full rounded-md border-stone-200 pr-8 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+                className={`${inputClasses} pr-8`}
               />
-              <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 text-sm">
+              <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 text-sm">
                 €
               </span>
             </div>
@@ -358,11 +360,11 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Features Section */}
-      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-700 mb-4">🎵 Característiques</h3>
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-4">🎵 Característiques</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="djHours" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="djHours" className="block text-sm font-medium text-slate-300 mb-1">
               Hores de DJ *
             </label>
             <input
@@ -372,12 +374,12 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               min="1"
               value={formData.djHours}
               onChange={(e) => setFormData({ ...formData, djHours: parseInt(e.target.value) || 0 })}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className={inputClasses}
             />
           </div>
 
           <div>
-            <label htmlFor="soundWatts" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="soundWatts" className="block text-sm font-medium text-slate-300 mb-1">
               Potència So (W) *
             </label>
             <input
@@ -387,7 +389,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               min="0"
               value={formData.soundWatts}
               onChange={(e) => setFormData({ ...formData, soundWatts: parseInt(e.target.value) || 0 })}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className={inputClasses}
             />
           </div>
 
@@ -397,9 +399,9 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="includesFog"
               checked={formData.includesFog}
               onChange={(e) => setFormData({ ...formData, includesFog: e.target.checked })}
-              className="h-4 w-4 rounded border-stone-200 text-slate-700 focus:ring-slate-900"
+              className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
             />
-            <label htmlFor="includesFog" className="text-sm text-slate-700">
+            <label htmlFor="includesFog" className="text-sm text-slate-300">
               🌫️ Inclou Màquina de Fum
             </label>
           </div>
@@ -410,9 +412,9 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="includesMic"
               checked={formData.includesMic}
               onChange={(e) => setFormData({ ...formData, includesMic: e.target.checked })}
-              className="h-4 w-4 rounded border-stone-200 text-slate-700 focus:ring-slate-900"
+              className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
             />
-            <label htmlFor="includesMic" className="text-sm text-slate-700">
+            <label htmlFor="includesMic" className="text-sm text-slate-300">
               🎤 Inclou Micròfon
             </label>
           </div>
@@ -420,11 +422,11 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Capacity Section */}
-      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-700 mb-4">👥 Capacitat</h3>
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-4">👥 Capacitat</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="minGuests" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="minGuests" className="block text-sm font-medium text-slate-300 mb-1">
               Mínim Convidats
             </label>
             <input
@@ -433,13 +435,13 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               min="0"
               value={formData.minGuests}
               onChange={(e) => setFormData({ ...formData, minGuests: e.target.value })}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className={inputClasses}
               placeholder="Opcional"
             />
           </div>
 
           <div>
-            <label htmlFor="maxGuests" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="maxGuests" className="block text-sm font-medium text-slate-300 mb-1">
               Màxim Convidats
             </label>
             <input
@@ -448,7 +450,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               min="0"
               value={formData.maxGuests}
               onChange={(e) => setFormData({ ...formData, maxGuests: e.target.value })}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className={inputClasses}
               placeholder="Opcional"
             />
           </div>
@@ -456,8 +458,8 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       </div>
 
       {/* Status Section */}
-      <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-700 mb-4">⚙️ Estat i Ordre</h3>
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-4">⚙️ Estat i Ordre</h3>
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <input
@@ -465,9 +467,9 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="isActive"
               checked={formData.isActive}
               onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-              className="h-4 w-4 rounded border-stone-200 text-slate-700 focus:ring-slate-900"
+              className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
             />
-            <label htmlFor="isActive" className="text-sm text-slate-700">
+            <label htmlFor="isActive" className="text-sm text-slate-300">
               ✅ Pack Actiu (Visible a la web)
             </label>
           </div>
@@ -478,15 +480,15 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               id="isFeatured"
               checked={formData.isFeatured}
               onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-              className="h-4 w-4 rounded border-stone-200 text-orange-600 focus:ring-orange-600"
+              className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-amber-500 focus:ring-amber-500"
             />
-            <label htmlFor="isFeatured" className="text-sm text-slate-700">
+            <label htmlFor="isFeatured" className="text-sm text-slate-300">
               ⭐ Pack Destacat
             </label>
           </div>
 
           <div className="max-w-xs">
-            <label htmlFor="order" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="order" className="block text-sm font-medium text-slate-300 mb-1">
               Ordre de Visualització
             </label>
             <input
@@ -495,7 +497,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
               required
               value={formData.order}
               onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-              className="block w-full rounded-md border-stone-200 focus:border-slate-900 focus:ring-slate-900 sm:text-sm"
+              className={inputClasses}
             />
             <p className="mt-1 text-xs text-slate-500">
               Ordre menor = apareix primer
@@ -508,7 +510,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       <div className="flex gap-3 justify-end">
         <Link
           href="/admin/packs"
-          className="rounded-md border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-600/50 transition-colors"
         >
           Cancel·lar
         </Link>
@@ -516,7 +518,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
           type="submit"
           disabled={loading}
           aria-busy={loading}
-          className="rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-2 text-sm font-medium text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? 'Guardant...' : 'Guardar Canvis'}
         </button>

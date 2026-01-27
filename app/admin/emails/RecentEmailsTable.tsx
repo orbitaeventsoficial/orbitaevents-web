@@ -13,26 +13,30 @@ interface Activity {
 }
 
 export default function RecentEmailsTable({ activities }: { activities: Activity[] }) {
-  const actionLabels: Record<string, { label: string; icon: string; color: string }> = {
+  const actionLabels: Record<string, { label: string; icon: string; bg: string; text: string }> = {
     POST_EVENT_EMAIL_SENT: {
       label: 'Email post-event enviat',
       icon: '📧',
-      color: 'text-blue-600 bg-blue-50',
+      bg: 'bg-blue-500/20',
+      text: 'text-blue-300',
     },
     TESTIMONIAL_SUBMITTED: {
       label: 'Valoracio rebuda',
       icon: '⭐',
-      color: 'text-amber-600 bg-amber-50',
+      bg: 'bg-amber-500/20',
+      text: 'text-amber-300',
     },
     DISCOUNT_CODE_GENERATED: {
       label: 'Codi descompte generat',
       icon: '🎁',
-      color: 'text-green-600 bg-green-50',
+      bg: 'bg-emerald-500/20',
+      text: 'text-emerald-300',
     },
     LEAD_EMAIL_SENT: {
       label: 'Confirmacio lead enviada',
       icon: '✉️',
-      color: 'text-purple-600 bg-purple-50',
+      bg: 'bg-purple-500/20',
+      text: 'text-purple-300',
     },
   };
 
@@ -50,43 +54,44 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
   };
 
   return (
-    <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-100">
-        <h2 className="font-semibold text-slate-700">📊 Activitat Recent</h2>
-        <p className="text-xs text-slate-500 mt-1">Ultims 7 dies</p>
+    <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+      <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-700/30">
+        <h2 className="font-semibold text-slate-100">📊 Activitat Recent</h2>
+        <p className="text-xs text-slate-400 mt-1">Ultims 7 dies</p>
       </div>
 
       {activities.length === 0 ? (
-        <div className="p-8 text-center text-slate-500">
+        <div className="p-8 text-center text-slate-400">
           <span className="text-4xl">📭</span>
           <p className="mt-2">Cap activitat recent</p>
         </div>
       ) : (
-        <div className="divide-y divide-slate-100 max-h-96 overflow-y-auto">
+        <div className="divide-y divide-slate-700/30 max-h-96 overflow-y-auto">
           {activities.map((activity) => {
             const actionInfo = actionLabels[activity.action] || {
               label: activity.action,
               icon: '📋',
-              color: 'text-slate-600 bg-slate-50',
+              bg: 'bg-slate-500/20',
+              text: 'text-slate-300',
             };
 
             return (
               <div
                 key={activity.id}
-                className="px-6 py-3 flex items-center gap-4 hover:bg-slate-50"
+                className="px-6 py-3 flex items-center gap-4 hover:bg-slate-700/20 transition-colors"
               >
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${actionInfo.color}`}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${actionInfo.bg}`}
                 >
                   {actionInfo.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-700 truncate">
+                  <p className="text-sm font-medium text-slate-200 truncate">
                     {activity.customer?.name || 'Usuari desconegut'}
                   </p>
-                  <p className="text-xs text-slate-500">{actionInfo.label}</p>
+                  <p className={`text-xs ${actionInfo.text}`}>{actionInfo.label}</p>
                 </div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-slate-500">
                   {formatDate(activity.createdAt)}
                 </div>
               </div>

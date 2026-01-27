@@ -148,7 +148,7 @@ export default function SettingsClient({
   return (
     <div className="space-y-8">
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
+        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300" role="alert">
           {error}
         </div>
       )}
@@ -163,19 +163,19 @@ export default function SettingsClient({
         return (
           <section
             key={category}
-            className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden"
+            className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden"
           >
-            <div className="bg-slate-50 border-b border-stone-200 p-4">
+            <div className="bg-slate-700/30 border-b border-slate-700/50 p-4">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>
                 <div>
-                  <h2 className="font-semibold text-slate-700">{config.label}</h2>
-                  <p className="text-sm text-slate-500">{config.description}</p>
+                  <h2 className="font-semibold text-slate-100">{config.label}</h2>
+                  <p className="text-sm text-slate-400">{config.description}</p>
                 </div>
               </div>
             </div>
 
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-700/30">
               {categorySettings.map((setting) => {
                 const isEditing = editingKey === setting.key;
                 const isSaving = savingKey === setting.key;
@@ -184,33 +184,33 @@ export default function SettingsClient({
                 return (
                   <div
                     key={setting.id}
-                    className="p-4 hover:bg-slate-50 transition-colors"
+                    className="p-4 hover:bg-slate-700/20 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <code className="text-xs font-mono bg-stone-100 px-2 py-0.5 rounded">
+                          <code className="text-xs font-mono bg-slate-700/50 text-slate-300 px-2 py-0.5 rounded">
                             {setting.key}
                           </code>
                           <span
                             className={`text-xs px-2 py-0.5 rounded ${
                               setting.type === 'NUMBER'
-                                ? 'bg-blue-100 text-blue-700'
+                                ? 'bg-blue-500/20 text-blue-300'
                                 : setting.type === 'BOOLEAN'
-                                ? 'bg-purple-100 text-purple-700'
+                                ? 'bg-purple-500/20 text-purple-300'
                                 : setting.type === 'JSON'
-                                ? 'bg-orange-100 text-orange-700'
-                                : 'bg-stone-100 text-slate-600'
+                                ? 'bg-orange-500/20 text-orange-300'
+                                : 'bg-slate-500/20 text-slate-300'
                             }`}
                           >
                             {TYPE_LABELS[setting.type]}
                           </span>
                         </div>
                         {setting.label && (
-                          <p className="mt-1 font-medium text-slate-700">{setting.label}</p>
+                          <p className="mt-1 font-medium text-slate-200">{setting.label}</p>
                         )}
                         {setting.description && (
-                          <p className="text-sm text-slate-500">{setting.description}</p>
+                          <p className="text-sm text-slate-400">{setting.description}</p>
                         )}
                       </div>
 
@@ -219,7 +219,7 @@ export default function SettingsClient({
                           <div className="space-y-2">
                             {setting.type === 'BOOLEAN' ? (
                               <select
-                                className="border rounded px-2 py-1 text-sm"
+                                className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-3 py-1.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
                                 value={draftValue || 'false'}
                                 onChange={(e) => setDraftValue(e.target.value)}
                               >
@@ -228,13 +228,13 @@ export default function SettingsClient({
                               </select>
                             ) : setting.type === 'JSON' ? (
                               <textarea
-                                className="border rounded px-2 py-1 text-sm w-64 h-24"
+                                className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-3 py-1.5 text-sm text-slate-100 w-64 h-24 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
                                 value={draftValue}
                                 onChange={(e) => setDraftValue(e.target.value)}
                               />
                             ) : (
                               <input
-                                className="border rounded px-2 py-1 text-sm"
+                                className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-3 py-1.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
                                 type={setting.type === 'NUMBER' ? 'number' : 'text'}
                                 value={draftValue}
                                 onChange={(e) => setDraftValue(e.target.value)}
@@ -243,7 +243,7 @@ export default function SettingsClient({
 
                             <div className="flex items-center justify-end gap-2">
                               <button
-                                className="text-xs px-2 py-1 rounded border border-stone-200"
+                                className="text-xs px-3 py-1.5 rounded-lg border border-slate-600/50 bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 transition-colors"
                                 onClick={cancelEdit}
                                 disabled={isSaving}
                                 type="button"
@@ -251,7 +251,7 @@ export default function SettingsClient({
                                 Cancelar
                               </button>
                               <button
-                                className="text-xs px-2 py-1 rounded bg-amber-500 text-white"
+                                className="text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors"
                                 onClick={() => saveSetting(setting)}
                                 disabled={isSaving}
                                 type="button"
@@ -263,15 +263,15 @@ export default function SettingsClient({
                           </div>
                         ) : (
                           <>
-                            <p className="text-lg font-semibold text-slate-700">
+                            <p className="text-lg font-semibold text-slate-100">
                               {formatDisplay(current)}
                             </p>
-                            <p className="text-xs text-slate-400">
+                            <p className="text-xs text-slate-500">
                               Actualitzat:{' '}
                               {new Date(current.updatedAt).toLocaleDateString('ca-ES')}
                             </p>
                             <button
-                              className="mt-2 text-xs px-2 py-1 rounded border border-stone-200 hover:bg-stone-100"
+                              className="mt-2 text-xs px-3 py-1.5 rounded-lg border border-slate-600/50 bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 transition-colors"
                               onClick={() => startEdit(current)}
                               type="button"
                             >

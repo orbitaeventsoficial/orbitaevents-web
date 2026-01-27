@@ -82,7 +82,7 @@ async function getPendingPostEventBookings() {
   return prisma.booking.findMany({
     where: {
       status: 'COMPLETED',
-      eventDate: { 
+      eventDate: {
         gte: sevenDaysAgo,
         lte: twoDaysAgo,
       },
@@ -111,16 +111,16 @@ export default async function EmailsAdminPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
             📧 Emails Automàtics
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-400">
             Control i configuració del sistema d&apos;emails automàtics
           </p>
         </div>
         <Link
           href="/admin"
-          className="inline-flex items-center rounded-md border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="inline-flex items-center rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
         >
           ← Tornar al panell
         </Link>
@@ -137,34 +137,34 @@ export default async function EmailsAdminPage() {
         {/* Columna Principal (2/3) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Pending Post-Event Emails */}
-          <section className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 bg-amber-50 flex items-center justify-between">
+          <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-700/50 bg-amber-500/10 flex items-center justify-between">
               <div>
-                <h2 className="font-semibold text-slate-700">
+                <h2 className="font-semibold text-slate-100">
                   ⏳ Emails Post-Event Pendents
                 </h2>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Events completats fa 1-7 dies sense email enviat
                 </p>
               </div>
-              <span className="bg-amber-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+              <span className="bg-amber-500/20 text-amber-300 text-sm font-bold px-3 py-1 rounded-full">
                 {pendingBookings.length}
               </span>
             </div>
-            
+
             {pendingBookings.length === 0 ? (
-              <div className="p-8 text-center text-slate-500">
+              <div className="p-8 text-center text-slate-400">
                 <span className="text-4xl">✅</span>
                 <p className="mt-2">Tots els emails post-event estan enviats!</p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-700/30">
                 {pendingBookings.map((booking) => (
-                  <div key={booking.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50">
+                  <div key={booking.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-700/30 transition-colors">
                     <div>
-                      <p className="font-medium text-slate-700">{booking.clientName}</p>
-                      <p className="text-sm text-slate-500">{booking.clientEmail}</p>
-                      <p className="text-xs text-slate-400 mt-1">
+                      <p className="font-medium text-slate-100">{booking.clientName}</p>
+                      <p className="text-sm text-slate-400">{booking.clientEmail}</p>
+                      <p className="text-xs text-slate-500 mt-1">
                         Event: {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · Ref: {booking.reference}
                       </p>
                     </div>
@@ -193,20 +193,20 @@ export default async function EmailsAdminPage() {
           <ManualActionsPanel />
 
           {/* Google Reviews Link */}
-          <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h3 className="font-semibold text-slate-700 mb-4">⭐ Google Reviews</h3>
-            <p className="text-sm text-slate-600 mb-4">
+          <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
+            <h3 className="font-semibold text-slate-100 mb-4">⭐ Google Reviews</h3>
+            <p className="text-sm text-slate-400 mb-4">
               Enllaç directe per als clients que vulguin deixar ressenya a Google:
             </p>
-            <div className="bg-slate-50 rounded-lg p-3 break-all">
-              <code className="text-xs text-slate-700">
+            <div className="bg-slate-700/30 rounded-xl p-3 break-all">
+              <code className="text-xs text-slate-300">
                 https://g.page/r/CXcgbvANsXSzEBI/review
               </code>
             </div>
             <a
               href="https://g.page/r/CXcgbvANsXSzEBI/review"
               target="_blank" rel="noopener noreferrer"
-              className="mt-4 block w-full text-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+              className="mt-4 block w-full text-center px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors text-sm font-medium"
             >
               🔗 Obrir enllaç Google
             </a>

@@ -49,11 +49,11 @@ export default function SyncButton() {
         disabled={syncing}
         type="button"
         aria-busy={syncing}
-        className="inline-flex items-center gap-2 rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {syncing ? (
           <>
-            <span className="animate-spin">⚙️</span>
+            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             Sincronitzant...
           </>
         ) : (
@@ -65,30 +65,30 @@ export default function SyncButton() {
 
       {result && (
         <div
-          className={`mt-4 rounded-lg p-4 ${
+          className={`mt-4 rounded-xl p-4 ${
             result.ok
-              ? 'bg-green-50 border border-green-200'
-              : 'bg-red-50 border border-red-200'
+              ? 'bg-emerald-500/10 border border-emerald-500/30'
+              : 'bg-rose-500/10 border border-rose-500/30'
           }`}
           role={result.ok ? 'status' : 'alert'}
         >
-          <p className={`text-sm font-medium ${result.ok ? 'text-green-800' : 'text-red-800'}`}>
+          <p className={`text-sm font-medium ${result.ok ? 'text-emerald-300' : 'text-rose-300'}`}>
             {result.message || (result.ok ? '✓ Sincronització completada' : '✗ Error')}
           </p>
 
           {result.stats && (
-            <div className="mt-2 text-sm text-slate-600 space-y-1">
+            <div className="mt-2 text-sm text-slate-400 space-y-1">
               <p>📦 Total: {result.stats.total}</p>
               <p>✓ Creats: {result.stats.created}</p>
               <p>🔄 Actualitzats: {result.stats.updated}</p>
               {result.stats.errors > 0 && (
-                <p className="text-red-600">✗ Errors: {result.stats.errors}</p>
+                <p className="text-rose-400">✗ Errors: {result.stats.errors}</p>
               )}
             </div>
           )}
 
           {result.errors && result.errors.length > 0 && (
-            <div className="mt-2 text-xs text-red-600 max-h-32 overflow-y-auto">
+            <div className="mt-2 text-xs text-rose-400 max-h-32 overflow-y-auto">
               {result.errors.map((err, i) => (
                 <p key={i}>• {err}</p>
               ))}
