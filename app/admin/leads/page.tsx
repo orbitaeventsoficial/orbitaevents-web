@@ -37,47 +37,135 @@ const PRIORITY_COLORS: Record<string, string> = {
   URGENT: 'bg-rose-500/20 text-rose-300',
 };
 
-async function getLeads() {
+const VALID_STATUS = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'];
+const VALID_PRIORITY = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
+const VALID_EVENT_TYPE = Object.keys(EVENT_TYPE_LABELS);
+
+function toArray(value?: string | string[]) {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function parseDate(value?: string) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+async function getLeads(filters: {
+  status?: string | string[];
+  priority?: string | string[];
+  eventType?: string | string[];
+  q?: string;
+  from?: string;
+  to?: string;
+}) {
   try {
-    const leads = await prisma.lead.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-      include: {
-        _count: {
-          select: {
-            notes: true,
+    const status = toArray(filters.status).filter((value) => VALID_STATUS.includes(value));
+    const priority = toArray(filters.priority).filter((value) => VALID_PRIORITY.includes(value));
+    const eventType = toArray(filters.eventType).filter((value) => VALID_EVENT_TYPE.includes(value));
+    const from = parseDate(filters.from);
+    const to = parseDate(filters.to);
+
+    const where = {
+      ...(status.length ? { status: { in: status } } : {}),
+      ...(priority.length ? { priority: { in: priority } } : {}),
+      ...(eventType.length ? { eventType: { in: eventType } } : {}),
+      ...(filters.q
+        ? {
+            OR: [
+              { name: { contains: filters.q, mode: 'insensitive' as const } },
+              { email: { contains: filters.q, mode: 'insensitive' as const } },
+              { phone: { contains: filters.q } },
+            ],
+          }
+        : {}),
+      ...(from || to
+        ? {
+            eventDate: {
+              ...(from ? { gte: from } : {}),
+              ...(to ? { lte: to } : {}),
+            },
+          }
+        : {}),
+    };
+
+    const [
+      leads,
+      filteredCount,
+      totalCount,
+      newCount,
+      negotiationCount,
+      wonCount,
+    ] = await Promise.all([
+      prisma.lead.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: 200,
+        include: {
+          _count: {
+            select: {
+              notes: true,
+            },
+          },
+          booking: {
+            select: {
+              id: true,
+              reference: true,
+            },
           },
         },
-        booking: {
-          select: {
-            id: true,
-            reference: true,
-          },
-        },
+      }),
+      prisma.lead.count({ where }),
+      prisma.lead.count(),
+      prisma.lead.count({ where: { status: 'NEW' } }),
+      prisma.lead.count({ where: { status: { in: ['CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } } }),
+      prisma.lead.count({ where: { status: 'WON' } }),
+    ]);
+
+    return {
+      leads,
+      counts: {
+        filtered: filteredCount,
+        total: totalCount,
+        new: newCount,
+        negotiation: negotiationCount,
+        won: wonCount,
       },
-    });
-    return leads;
+      filters: { status, priority, eventType, q: filters.q || '', from, to },
+    };
   } catch (e) {
     log.error('Error obtenint leads:', e);
-    return [];
+    return {
+      leads: [],
+      counts: { filtered: 0, total: 0, new: 0, negotiation: 0, won: 0 },
+      filters: { status: [], priority: [], eventType: [], q: '', from: null, to: null },
+    };
   }
 }
 
-export default async function LeadsPage({ searchParams }: { searchParams?: { status?: string; priority?: string } }) {
-  const { status, priority } = searchParams || {};
-  const leads = await getLeads();
-  const filteredLeads = leads.filter((lead) => {
-    if (status && lead.status !== status) return false;
-    if (priority && lead.priority !== priority) return false;
-    return true;
-  });
+export default async function LeadsPage({
+  searchParams,
+}: {
+  searchParams?: {
+    status?: string | string[];
+    priority?: string | string[];
+    eventType?: string | string[];
+    q?: string;
+    from?: string;
+    to?: string;
+  };
+}) {
+  const { status, priority, eventType, q, from, to } = searchParams || {};
+  const data = await getLeads({ status, priority, eventType, q, from, to });
+  const leads = data.leads;
 
   // Estadístiques ràpides
   const stats = {
-    total: leads.length,
-    nous: leads.filter((l) => l.status === 'NEW').length,
-    enNegociacio: leads.filter((l) => ['CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'].includes(l.status)).length,
-    convertits: leads.filter((l) => l.status === 'WON').length,
+    total: data.counts.total,
+    nous: data.counts.new,
+    enNegociacio: data.counts.negotiation,
+    convertits: data.counts.won,
   };
 
   return (
@@ -87,7 +175,7 @@ export default async function LeadsPage({ searchParams }: { searchParams?: { sta
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">Leads</h1>
           <p className="text-xs sm:text-sm text-slate-400">
-            {stats.total} contactes
+            {data.counts.filtered} de {stats.total} contactes
           </p>
         </div>
         <Link
@@ -118,11 +206,104 @@ export default async function LeadsPage({ searchParams }: { searchParams?: { sta
         </div>
       </section>
 
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
+        <form method="get" className="grid gap-3 lg:grid-cols-6">
+          <div className="lg:col-span-2">
+            <label className="text-xs text-slate-400">Cerca</label>
+            <input
+              name="q"
+              defaultValue={data.filters.q}
+              placeholder="Nom, email o telèfon"
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-slate-400">Tipus event</label>
+            <select
+              name="eventType"
+              defaultValue={data.filters.eventType[0] || ''}
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            >
+              <option value="">Tots</option>
+              {VALID_EVENT_TYPE.map((value) => (
+                <option key={value} value={value}>{EVENT_TYPE_LABELS[value]}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-slate-400">Data inici</label>
+            <input
+              type="date"
+              name="from"
+              defaultValue={data.filters.from ? data.filters.from.toISOString().slice(0, 10) : ''}
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-slate-400">Data fi</label>
+            <input
+              type="date"
+              name="to"
+              defaultValue={data.filters.to ? data.filters.to.toISOString().slice(0, 10) : ''}
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            />
+          </div>
+          <div className="flex items-end gap-2">
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-cyan-500/20 px-3 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/30"
+            >
+              Aplicar
+            </button>
+            <Link
+              href="/admin/leads"
+              className="w-full rounded-xl border border-slate-700 px-3 py-2 text-xs text-slate-400 hover:text-slate-200"
+            >
+              Netejar
+            </Link>
+          </div>
+          <div className="lg:col-span-3">
+            <p className="text-[10px] uppercase text-slate-500">Estat</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {VALID_STATUS.map((value) => (
+                <label key={value} className="flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300">
+                  <input
+                    type="checkbox"
+                    name="status"
+                    value={value}
+                    defaultChecked={data.filters.status.includes(value)}
+                    className="accent-cyan-500"
+                  />
+                  {value}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="lg:col-span-3">
+            <p className="text-[10px] uppercase text-slate-500">Prioritat</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {VALID_PRIORITY.map((value) => (
+                <label key={value} className="flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300">
+                  <input
+                    type="checkbox"
+                    name="priority"
+                    value={value}
+                    defaultChecked={data.filters.priority.includes(value)}
+                    className="accent-amber-500"
+                  />
+                  {value}
+                </label>
+              ))}
+            </div>
+          </div>
+        </form>
+      </section>
+
       <section className="flex flex-wrap items-center gap-2 text-xs">
         <Link
           href="/admin/leads"
           className={`rounded-full border px-3 py-1 ${
-            !status && !priority ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+            data.filters.status.length === 0 && data.filters.priority.length === 0 ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
           }`}
         >
           Tots
@@ -132,7 +313,7 @@ export default async function LeadsPage({ searchParams }: { searchParams?: { sta
             key={value}
             href={`/admin/leads?status=${value}`}
             className={`rounded-full border px-3 py-1 ${
-              status === value ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+              data.filters.status.includes(value) ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
             }`}
           >
             {value}
@@ -143,7 +324,7 @@ export default async function LeadsPage({ searchParams }: { searchParams?: { sta
             key={value}
             href={`/admin/leads?priority=${value}`}
             className={`rounded-full border px-3 py-1 ${
-              priority === value ? 'border-amber-500/40 bg-amber-500/10 text-amber-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+              data.filters.priority.includes(value) ? 'border-amber-500/40 bg-amber-500/10 text-amber-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
             }`}
           >
             {value}
@@ -153,14 +334,14 @@ export default async function LeadsPage({ searchParams }: { searchParams?: { sta
 
       {/* Mobile Card View */}
       <section className="lg:hidden space-y-3">
-        {filteredLeads.length === 0 ? (
+        {leads.length === 0 ? (
           <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-8 text-center">
             <span className="text-4xl">📭</span>
             <p className="mt-2 text-slate-300">Encara no hi ha leads</p>
             <p className="text-xs text-slate-500">Els contactes apareixeran aquí</p>
           </div>
         ) : (
-          filteredLeads.map((lead) => {
+          leads.map((lead) => {
             const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
             const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
 
@@ -217,7 +398,7 @@ export default async function LeadsPage({ searchParams }: { searchParams?: { sta
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/30">
-              {filteredLeads.length === 0 ? (
+              {leads.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-12 text-center text-slate-400">
                     <div className="flex flex-col items-center gap-2">
@@ -227,7 +408,7 @@ export default async function LeadsPage({ searchParams }: { searchParams?: { sta
                   </td>
                 </tr>
               ) : (
-                filteredLeads.map((lead) => {
+                leads.map((lead) => {
                   const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
                   const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
                   const priorityColor = PRIORITY_COLORS[lead.priority] || PRIORITY_COLORS.MEDIUM;

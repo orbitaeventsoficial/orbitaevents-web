@@ -79,6 +79,15 @@ async function getEmailStats() {
     },
   });
 
+  const cronSettings = await prisma.setting.findMany({
+    where: { key: { in: ['emails.cron.lastRun', 'emails.cron.lastStatus', 'emails.cron.lastSummary', 'emails.cron.lastMessage'] } },
+  });
+
+  const cronMap = cronSettings.reduce((acc, setting) => {
+    acc[setting.key] = setting.value;
+    return acc;
+  }, {} as Record<string, string>);
+
   return {
     leadsWithEmail,
     postEventSent,
@@ -88,6 +97,10 @@ async function getEmailStats() {
     recentActivity,
     recentEmailActions,
     recentTestimonials,
+    cronLastRun: cronMap['emails.cron.lastRun'] || null,
+    cronLastStatus: cronMap['emails.cron.lastStatus'] || null,
+    cronLastMessage: cronMap['emails.cron.lastMessage'] || null,
+    cronLastSummary: cronMap['emails.cron.lastSummary'] || null,
   };
 }
 
@@ -165,8 +178,19 @@ export default async function EmailsAdminPage() {
         </div>
         <div className="rounded-2xl border border-slate-600/50 bg-slate-800/60 p-5">
           <p className="text-xs uppercase text-slate-400">Últim cron</p>
-          <p className="mt-2 text-sm text-slate-300">Veure logs del servidor</p>
-          <p className="text-xs text-slate-500 mt-1">Si cal, executa manualment</p>
+          <p className="mt-2 text-sm text-slate-300">
+            {stats.cronLastRun
+              ? new Date(stats.cronLastRun).toLocaleString('ca-ES', { dateStyle: 'medium', timeStyle: 'short' })
+              : 'Mai executat'}
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            Estat: {stats.cronLastStatus || '—'}
+          </p>
+          {stats.cronLastMessage && (
+            <p className="text-[10px] text-rose-300 mt-1">
+              {stats.cronLastMessage}
+            </p>
+          )}
         </div>
       </section>
 

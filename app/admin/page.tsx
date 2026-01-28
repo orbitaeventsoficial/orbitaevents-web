@@ -3,6 +3,7 @@ import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { MetricCard, Card, Button } from './components/ui';
 import { MiniLineChart } from './components/Charts';
 import Link from 'next/link';
+import QuickActions from './components/QuickActions';
 
 /**
  * Dashboard - Òrbita Admin
@@ -349,6 +350,8 @@ export default async function AdminDashboard() {
           })}
         </div>
       )}
+
+      <QuickActions />
 
       {/* Metriques essencials */}
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">

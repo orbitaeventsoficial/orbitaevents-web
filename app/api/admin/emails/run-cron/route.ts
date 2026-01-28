@@ -20,6 +20,39 @@ interface ProcessedResult {
   reason?: string;
 }
 
+async function saveCronStatus(payload: {
+  status: 'ok' | 'error';
+  summary?: Record<string, number>;
+  message?: string;
+  timestamp: string;
+}) {
+  const { status, summary, message, timestamp } = payload;
+  await prisma.setting.upsert({
+    where: { key: 'emails.cron.lastRun' },
+    update: { value: timestamp, type: 'STRING', category: 'config' },
+    create: { key: 'emails.cron.lastRun', value: timestamp, type: 'STRING', category: 'config' },
+  });
+  await prisma.setting.upsert({
+    where: { key: 'emails.cron.lastStatus' },
+    update: { value: status, type: 'STRING', category: 'config' },
+    create: { key: 'emails.cron.lastStatus', value: status, type: 'STRING', category: 'config' },
+  });
+  if (summary) {
+    await prisma.setting.upsert({
+      where: { key: 'emails.cron.lastSummary' },
+      update: { value: JSON.stringify(summary), type: 'JSON', category: 'config' },
+      create: { key: 'emails.cron.lastSummary', value: JSON.stringify(summary), type: 'JSON', category: 'config' },
+    });
+  }
+  if (message) {
+    await prisma.setting.upsert({
+      where: { key: 'emails.cron.lastMessage' },
+      update: { value: message, type: 'STRING', category: 'config' },
+      create: { key: 'emails.cron.lastMessage', value: message, type: 'STRING', category: 'config' },
+    });
+  }
+}
+
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
@@ -140,6 +173,12 @@ export async function POST(req: NextRequest) {
       errors: results.filter(r => r.status === 'error').length,
     };
 
+    await saveCronStatus({
+      status: 'ok',
+      summary,
+      timestamp: now.toISOString(),
+    });
+
     return NextResponse.json({
       ok: true,
       timestamp: now.toISOString(),
@@ -149,6 +188,11 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     log.error('Error en cron post-event:', error);
+    await saveCronStatus({
+      status: 'error',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: now.toISOString(),
+    });
     return NextResponse.json(
       {
         error: 'Error processant events',
