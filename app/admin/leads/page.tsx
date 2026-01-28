@@ -73,7 +73,7 @@ function isEventType(value: string): value is EventType {
   return (VALID_EVENT_TYPE as readonly string[]).includes(value);
 }
 
-function toArray(value?: string | string[]) {
+function toArray(value?: string | string[]): string[] {
   if (!value) return [];
   return Array.isArray(value) ? value : [value];
 }
