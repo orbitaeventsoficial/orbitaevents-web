@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 import Link from 'next/link';
 import LeadActions from './LeadActions';
 import LeadSavedViews from './LeadSavedViews';
+import type { EventType, LeadStatus, Priority, Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,9 +57,21 @@ function buildQuery(filters: {
   return params.toString();
 }
 
-const VALID_STATUS = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'];
-const VALID_PRIORITY = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
-const VALID_EVENT_TYPE = Object.keys(EVENT_TYPE_LABELS);
+const VALID_STATUS = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'] as const satisfies readonly LeadStatus[];
+const VALID_PRIORITY = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'] as const satisfies readonly Priority[];
+const VALID_EVENT_TYPE = Object.keys(EVENT_TYPE_LABELS) as EventType[];
+
+function isLeadStatus(value: string): value is LeadStatus {
+  return (VALID_STATUS as readonly string[]).includes(value);
+}
+
+function isPriority(value: string): value is Priority {
+  return (VALID_PRIORITY as readonly string[]).includes(value);
+}
+
+function isEventType(value: string): value is EventType {
+  return (VALID_EVENT_TYPE as readonly string[]).includes(value);
+}
 
 function toArray(value?: string | string[]) {
   if (!value) return [];
@@ -80,13 +93,13 @@ async function getLeads(filters: {
   to?: string;
 }) {
   try {
-    const status = toArray(filters.status).filter((value) => VALID_STATUS.includes(value));
-    const priority = toArray(filters.priority).filter((value) => VALID_PRIORITY.includes(value));
-    const eventType = toArray(filters.eventType).filter((value) => VALID_EVENT_TYPE.includes(value));
+    const status = toArray(filters.status).filter(isLeadStatus);
+    const priority = toArray(filters.priority).filter(isPriority);
+    const eventType = toArray(filters.eventType).filter(isEventType);
     const from = parseDate(filters.from);
     const to = parseDate(filters.to);
 
-    const where = {
+    const where: Prisma.LeadWhereInput = {
       ...(status.length ? { status: { in: status } } : {}),
       ...(priority.length ? { priority: { in: priority } } : {}),
       ...(eventType.length ? { eventType: { in: eventType } } : {}),
