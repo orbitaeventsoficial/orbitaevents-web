@@ -161,6 +161,14 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
   const client = createClient(config);
   const property = `properties/${config.propertyId}`;
 
+  const safe = async <T>(promise: Promise<T>): Promise<T | null> => {
+    try {
+      return await promise;
+    } catch {
+      return null;
+    }
+  };
+
   const [
     totalsRes,
     pagesRes,
@@ -173,7 +181,7 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
     realtimeRes
   ] =
     await Promise.all([
-      client.runReport({
+      safe(client.runReport({
         property,
         dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
         metrics: [
@@ -183,72 +191,70 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
           { name: 'eventCount' },
           { name: 'averageSessionDuration' },
         ],
-      }),
-      client.runReport({
+      })),
+      safe(client.runReport({
         property,
         dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
         dimensions: [{ name: 'pagePath' }, { name: 'pageTitle' }],
         metrics: [{ name: 'screenPageViews' }],
         orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
         limit: 10,
-      }),
-      client.runReport({
+      })),
+      safe(client.runReport({
         property,
         dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
         dimensions: [{ name: 'sessionDefaultChannelGroup' }],
         metrics: [{ name: 'sessions' }],
         orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
         limit: 8,
-      }),
-      client.runReport({
+      })),
+      safe(client.runReport({
         property,
         dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
         dimensions: [{ name: 'eventName' }],
         metrics: [{ name: 'eventCount' }],
         orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
         limit: 10,
-      }),
-      client.runReport({
+      })),
+      safe(client.runReport({
         property,
         dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
         dimensions: [{ name: 'searchTerm' }],
         metrics: [{ name: 'eventCount' }],
         orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
         limit: 12,
-      }),
-      client.runReport({
+      })),
+      safe(client.runReport({
         property,
         dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
         dimensions: [{ name: 'deviceCategory' }],
         metrics: [{ name: 'activeUsers' }],
         orderBys: [{ metric: { metricName: 'activeUsers' }, desc: true }],
         limit: 5,
-      }),
-      client.runReport({
+      })),
+      safe(client.runReport({
         property,
         dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
         dimensions: [{ name: 'country' }, { name: 'city' }],
         metrics: [{ name: 'activeUsers' }],
         orderBys: [{ metric: { metricName: 'activeUsers' }, desc: true }],
         limit: 10,
-      }),
-      client.runReport({
+      })),
+      safe(client.runReport({
         property,
         dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
         dimensions: [{ name: 'date' }],
         metrics: [{ name: 'sessions' }, { name: 'activeUsers' }],
         orderBys: [{ dimension: { dimensionName: 'date' }, desc: false }],
         limit: 31,
-      }),
-      client.runRealtimeReport({
+      })),
+      safe(client.runRealtimeReport({
         property,
         metrics: [{ name: 'activeUsers' }],
-        dimensions: [{ name: 'pagePath' }],
-        limit: 8,
-      }),
+      })),
     ]);
 
-  const totalRow = totalsRes[0]?.rows?.[0];
+  const totalRow = totalsRes?.[0]?.rows?.[0];
 
   return {
     totals: {
@@ -258,20 +264,20 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
       eventCount: toNumber(totalRow?.metricValues?.[3]?.value),
       avgSessionDuration: toNumber(totalRow?.metricValues?.[4]?.value),
     },
-    pages: mapRows(pagesRes[0]?.rows || []),
-    sources: mapRows(sourcesRes[0]?.rows || []),
-    events: mapRows(eventsRes[0]?.rows || []),
-    searchTerms: mapRows(searchTermsRes[0]?.rows || []),
-    devices: mapRows(devicesRes[0]?.rows || []),
-    locations: mapRows(locationsRes[0]?.rows || [], 0, 0),
-    timeseries: (timeseriesRes[0]?.rows || []).map((row) => ({
+    pages: mapRows(pagesRes?.[0]?.rows || []),
+    sources: mapRows(sourcesRes?.[0]?.rows || []),
+    events: mapRows(eventsRes?.[0]?.rows || []),
+    searchTerms: mapRows(searchTermsRes?.[0]?.rows || []),
+    devices: mapRows(devicesRes?.[0]?.rows || []),
+    locations: mapRows(locationsRes?.[0]?.rows || [], 0, 0),
+    timeseries: (timeseriesRes?.[0]?.rows || []).map((row) => ({
       date: row.dimensionValues?.[0]?.value || '',
       sessions: toNumber(row.metricValues?.[0]?.value),
       activeUsers: toNumber(row.metricValues?.[1]?.value),
     })),
     realtime: {
-      activeUsers: toNumber(realtimeRes[0]?.rows?.[0]?.metricValues?.[0]?.value),
-      pages: mapRealtimeRows(realtimeRes[0]?.rows || []),
+      activeUsers: toNumber(realtimeRes?.[0]?.rows?.[0]?.metricValues?.[0]?.value),
+      pages: mapRealtimeRows(realtimeRes?.[0]?.rows || []),
     },
   };
 }
