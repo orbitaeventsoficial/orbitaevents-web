@@ -1,5 +1,5 @@
 /**
- * API: Obtenir emails via Gmail API
+ * API: Obtenir emails via IMAP
  * ==================================
  * Compatible amb entorns serverless
  */
@@ -8,11 +8,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import {
   fetchEmails,
-  countTotal,
   countUnread,
   testConnection,
-  isGmailConfigured,
-} from '@/lib/gmail';
+} from '@/lib/imap';
 import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -24,25 +22,16 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const action = searchParams.get('action') || 'list';
   const limitRaw = parseInt(searchParams.get('limit') || '50');
-  const query = searchParams.get('q') || '';
+  const offsetRaw = parseInt(searchParams.get('offset') || '0');
   const onlyUnread = searchParams.get('unread') === 'true';
   const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(limitRaw, 1), 100) : 50;
+  const offset = Number.isFinite(offsetRaw) ? Math.max(offsetRaw, 0) : 0;
 
   try {
     // Test connexió
     if (action === 'test') {
       const result = await testConnection();
       return NextResponse.json(result);
-    }
-
-    // Verificar si Gmail està configurat
-    const configured = await isGmailConfigured();
-    if (!configured) {
-      return NextResponse.json({
-        ok: false,
-        error: 'Gmail no configurat. Cal autoritzar el compte de Gmail.',
-        needsAuth: true,
-      }, { status: 401 });
     }
 
     // Comptar no llegits
@@ -52,23 +41,27 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtenir emails
-    const labelIds = onlyUnread ? ['INBOX', 'UNREAD'] : ['INBOX'];
     const emails = await fetchEmails({
-      maxResults: limit,
-      query,
-      labelIds,
+      limit,
+      offset,
+      onlyUnread,
     });
 
-    const [unreadCount, totalCount] = await Promise.all([
-      countUnread(),
-      countTotal(),
-    ]);
+    const filterDomain = 'orbitaevents.com';
+    const filteredEmails = emails.filter((email) => {
+      const from = email.from?.address?.toLowerCase() || '';
+      const to = email.to?.map((t) => t.address.toLowerCase()) || [];
+      return from.includes(filterDomain) || to.some((addr) => addr.includes(filterDomain));
+    });
+
+    const totalCount = filteredEmails.length;
+    const unreadCount = filteredEmails.filter((email) => !email.isRead).length;
 
     // Convertir format Gmail a format esperat pel frontend
-    const formattedEmails = emails.map(email => ({
+    const formattedEmails = filteredEmails.map(email => ({
       id: email.id,
-      uid: email.id, // Gmail usa IDs de string, no UIDs numèrics
-      messageId: email.id,
+      uid: email.uid,
+      messageId: email.messageId,
       from: email.from,
       to: email.to,
       subject: email.subject,
@@ -89,16 +82,15 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    log.error('Error Gmail:', error as Error);
+    log.error('Error IMAP:', error as Error);
 
     const errorMessage = error instanceof Error ? error.message : 'Error desconegut';
 
-    if (errorMessage.includes('No Gmail access token') || errorMessage.includes('No Gmail autoritzat')) {
+    if (errorMessage.includes('IMAP not configured')) {
       return NextResponse.json({
         ok: false,
-        error: 'Cal autoritzar el compte de Gmail.',
-        needsAuth: true,
-      }, { status: 401 });
+        error: 'IMAP no configurat. Cal definir les variables IMAP.',
+      }, { status: 400 });
     }
 
     return NextResponse.json({

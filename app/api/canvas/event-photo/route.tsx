@@ -235,7 +235,7 @@ export async function GET(req: NextRequest) {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://orbitaevents.com/img/orbitalockupwhitetransparent.png"
+              src="https://orbitaevents.com/img/orbitalockupwhitetransparent.webp"
               alt="Òrbita Events"
               style={{
                 height: isStory ? '60px' : isSquare ? '50px' : '40px',

@@ -8,14 +8,9 @@ import {
   Users, Zap, TrendingUp, ChevronRight, MapPin
 } from 'lucide-react';
 import Image from 'next/image';
-import { getPacksByService, EXTRAS, type PackDefinition } from '@/config/packs-config';
+import { getPacksByService, EXTRAS, type ExtraDefinition, type PackDefinition } from '@/config/packs-config';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePacks } from '@/lib/hooks/usePacks';
-
-// Extras específicos para bodas
-const WEDDING_EXTRAS = EXTRAS.filter(e => 
-  ['confeti', 'co2', 'humo-bajo', 'pantalla', 'photocall', 'dj-extra'].includes(e.id)
-);
 
 interface ConfigState {
   selectedPack: PackDefinition | null;
@@ -24,12 +19,21 @@ interface ConfigState {
 }
 
 // Helper per obtenir text traduït de l'extra
+function isI18nKey(value: string): boolean {
+  return value.startsWith('pages.') || value.startsWith('extras.');
+}
+
 function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, field: 'name' | 'description', fallback: string): string {
   try {
     const key = `extras.${extraId}.${field}`;
     const translated = t(key);
     // Si retorna la clau, usar fallback
-    return translated === key ? fallback : translated;
+    if (translated !== key) return translated;
+    if (isI18nKey(fallback)) {
+      const nested = t(fallback);
+      if (nested !== fallback) return nested;
+    }
+    return fallback;
   } catch {
     return fallback;
   }
@@ -50,13 +54,52 @@ export default function BodasClientV2() {
     selectedExtras: new Set(),
     numGuests: 100,
   });
+  const [extrasCatalog, setExtrasCatalog] = useState<ExtraDefinition[]>(EXTRAS);
 
   const [showSummary, setShowSummary] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadExtras() {
+      try {
+        const res = await fetch('/api/public/extras', { cache: 'no-store' });
+        const data = await res.json();
+        if (!active) return;
+        if (Array.isArray(data?.extras)) {
+          const normalized = (data.extras as ExtraDefinition[]).map((extra) => {
+            const fallback = EXTRAS.find((item) => item.id === extra.id);
+            return {
+              ...extra,
+              name: isI18nKey(extra.name) && fallback ? fallback.name : extra.name,
+              description: isI18nKey(extra.description) && fallback ? fallback.description : extra.description,
+            };
+          });
+          setExtrasCatalog(normalized);
+        }
+      } catch {
+        // Fallback a EXTRAS del config
+      }
+    }
+
+    loadExtras();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const weddingExtras = useMemo(() => {
+    return extrasCatalog.filter((extra) => {
+      if (!extra.compatibleWith) return true;
+      if (extra.compatibleWith.length === 0) return false;
+      return extra.compatibleWith.includes('bodas');
+    });
+  }, [extrasCatalog]);
 
   // Calcular total
   const packPrice = config.selectedPack?.priceValue || 0;
   const extrasPrice = Array.from(config.selectedExtras).reduce((sum, id) => {
-    const extra = WEDDING_EXTRAS.find(e => e.id === id);
+    const extra = weddingExtras.find(e => e.id === id);
     return sum + (extra?.price || 0);
   }, 0);
   const totalPrice = packPrice + extrasPrice;
@@ -109,7 +152,7 @@ export default function BodasClientV2() {
 
     // Analytics
     if (typeof window !== 'undefined' && (window as any).gtag) {
-      const extra = WEDDING_EXTRAS.find(e => e.id === extraId);
+      const extra = weddingExtras.find(e => e.id === extraId);
       (window as any).gtag('event', 'bodas_extra_toggle', {
         extra_id: extraId,
         extra_name: extra?.name,
@@ -330,7 +373,7 @@ export default function BodasClientV2() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {WEDDING_EXTRAS.map(extra => {
+            {weddingExtras.map(extra => {
               const isSelected = config.selectedExtras.has(extra.id);
 
               return (

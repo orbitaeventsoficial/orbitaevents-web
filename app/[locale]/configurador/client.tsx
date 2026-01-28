@@ -1,7 +1,7 @@
 "use client";
 
 // app/configurador/client.tsx
-import { EXTRAS, OFFERS, getAllPacks, type ServiceSlug } from '@/config/packs-config';
+import { EXTRAS, OFFERS, getAllPacks, type ExtraDefinition, type ServiceSlug } from '@/config/packs-config';
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
@@ -39,12 +39,21 @@ interface ConfigState {
 }
 
 // Helper per obtenir text traduït de l'extra
+function isI18nKey(value: string): boolean {
+  return value.startsWith('pages.') || value.startsWith('extras.');
+}
+
 function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, field: 'name' | 'description', fallback: string): string {
   try {
     const key = `extras.${extraId}.${field}`;
     const translated = t(key);
     // Si retorna la clau, usar fallback
-    return translated === key ? fallback : translated;
+    if (translated !== key) return translated;
+    if (isI18nKey(fallback)) {
+      const nested = t(fallback);
+      if (nested !== fallback) return nested;
+    }
+    return fallback;
   } catch {
     return fallback;
   }
@@ -69,11 +78,42 @@ export default function ConfiguradorClient() {
     extras: [],
     appliedOffer: null,
   });
+  const [extrasCatalog, setExtrasCatalog] = useState<ExtraDefinition[]>(EXTRAS);
   const [minDate, setMinDate] = useState(''); // Hydration-safe
 
   // Set minDate on client to avoid hydration mismatch
   useEffect(() => {
     setMinDate(new Date().toISOString().split('T')[0]);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadExtras() {
+      try {
+        const res = await fetch('/api/public/extras', { cache: 'no-store' });
+        const data = await res.json();
+        if (!active) return;
+        if (Array.isArray(data?.extras)) {
+          const normalized = (data.extras as ExtraDefinition[]).map((extra) => {
+            const fallback = EXTRAS.find((item) => item.id === extra.id);
+            return {
+              ...extra,
+              name: isI18nKey(extra.name) && fallback ? fallback.name : extra.name,
+              description: isI18nKey(extra.description) && fallback ? fallback.description : extra.description,
+            };
+          });
+          setExtrasCatalog(normalized);
+        }
+      } catch {
+        // Fallback a EXTRAS del config
+      }
+    }
+
+    loadExtras();
+    return () => {
+      active = false;
+    };
   }, []);
 
   // Detectar pack pre-seleccionado desde URL (viene de páginas de servicios)
@@ -122,6 +162,26 @@ export default function ConfiguradorClient() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [step, config.selectedPack, config.eventType]);
 
+  const availableExtras = useMemo(() => {
+    if (!config.eventType) return [];
+    return extrasCatalog.filter((extra) => {
+      if (!extra.compatibleWith) return true;
+      if (extra.compatibleWith.length === 0) return false;
+      return extra.compatibleWith.includes(config.eventType as ServiceSlug);
+    });
+  }, [extrasCatalog, config.eventType]);
+
+  useEffect(() => {
+    if (!config.eventType) return;
+    const allowed = new Set(availableExtras.map((extra) => extra.id));
+    if (config.extras.some((id) => !allowed.has(id))) {
+      setConfig((prev) => ({
+        ...prev,
+        extras: prev.extras.filter((id) => allowed.has(id)),
+      }));
+    }
+  }, [availableExtras, config.eventType, config.extras]);
+
   // 💰 CÁLCULO DE PRECIO CON DESCUENTOS
   const calculatePricing = () => {
     let basePrice = config.selectedPack?.priceValue || 0;
@@ -131,7 +191,7 @@ export default function ConfiguradorClient() {
 
     // Calcular extras
     config.extras.forEach((extraId) => {
-      const extra = EXTRAS.find((e) => e.id === extraId);
+      const extra = extrasCatalog.find((e) => e.id === extraId);
       if (extra?.price) extrasPrice += extra.price;
     });
 
@@ -187,7 +247,7 @@ export default function ConfiguradorClient() {
   const _getContactUrl = (): string => {
     const pricing = calculatePricing();
     const extrasNames = config.extras
-      .map((id) => EXTRAS.find((e) => e.id === id)?.name)
+      .map((id) => extrasCatalog.find((e) => e.id === id)?.name)
       .filter(Boolean)
       .join(', ');
 
@@ -417,33 +477,17 @@ export default function ConfiguradorClient() {
             )}
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {EXTRAS
-              .filter((extra) => {
-                // Si el extra no tiene compatibleWith, está disponible para todos
-                if (!extra.compatibleWith) return true;
-
-                // Si no hay pack seleccionado, mostrar todos
-                if (!config.selectedPack) return true;
-
-                // Verificar si el pack actual está en la lista de compatibles
-                const packService = config.eventType;
-
-                // Si no hay eventType seleccionado, mostrar todos
-                if (!packService) return true;
-
-                return extra.compatibleWith.includes(packService);
-              })
-              .map((extra) => (
-              <label
-                key={extra.id}
-                htmlFor={`extra-${extra.id}`}
-                className={`relative flex items-start justify-between w-full max-w-full p-4 rounded-lg border-2 cursor-pointer transition-all overflow-hidden ${
-                  config.extras.includes(extra.id)
-                    ? 'border-fuchsia-500 bg-gradient-to-br from-fuchsia-500/10 to-purple-500/5 shadow-[0_0_20px_rgba(217,70,239,0.2)]'
-                    : 'border-border hover:border-fuchsia-500/50'
-                }`}
-              >
+            <div className="grid md:grid-cols-2 gap-4">
+              {availableExtras.map((extra) => (
+                <label
+                  key={extra.id}
+                  htmlFor={`extra-${extra.id}`}
+                  className={`relative flex items-start justify-between w-full max-w-full p-4 rounded-lg border-2 cursor-pointer transition-all overflow-hidden ${
+                    config.extras.includes(extra.id)
+                      ? 'border-fuchsia-500 bg-gradient-to-br from-fuchsia-500/10 to-purple-500/5 shadow-[0_0_20px_rgba(217,70,239,0.2)]'
+                      : 'border-border hover:border-fuchsia-500/50'
+                  }`}
+                >
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <input
                     type="checkbox"
@@ -485,20 +529,14 @@ export default function ConfiguradorClient() {
                     {t('step3.premiumExtra')}
                   </span>
                 )}
-              </label>
-            ))}
-            {EXTRAS.filter((extra) => {
-              if (!extra.compatibleWith) return true;
-              if (!config.selectedPack) return true;
-              const packService = config.eventType;
-              if (!packService) return true;
-              return extra.compatibleWith.includes(packService);
-            }).length === 0 && (
-              <div className="col-span-full text-center py-8 text-white/60">
-                {t('step3.noExtras')}
-              </div>
-            )}
-          </div>
+                </label>
+              ))}
+            {availableExtras.length === 0 && (
+                <div className="col-span-full text-center py-8 text-white/60">
+                  {t('step3.noExtras')}
+                </div>
+              )}
+            </div>
         </div>
 
         {/* Resumen Precio */}
@@ -592,14 +630,22 @@ export default function ConfiguradorClient() {
       setSending(true);
       setFormError('');
 
+      let timeoutId: ReturnType<typeof setTimeout> | null = null;
+      const controller = new AbortController();
+
+      timeoutId = setTimeout(() => {
+        controller.abort();
+      }, 15000);
+
       try {
         const extrasArray = config.extras
-          .map((id) => EXTRAS.find((e) => e.id === id)?.name)
+          .map((id) => extrasCatalog.find((e) => e.id === id)?.name)
           .filter(Boolean) as string[];
 
         const response = await fetchWithCsrf('/api/contact', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
           body: JSON.stringify({
             name: formData.name,
             contact: formData.contact,
@@ -628,6 +674,8 @@ export default function ConfiguradorClient() {
       } catch (error) {
         setFormError(t('step4.errorSend'));
         setSending(false);
+      } finally {
+        if (timeoutId) clearTimeout(timeoutId);
       }
     };
 
@@ -723,18 +771,19 @@ export default function ConfiguradorClient() {
             <button
               onClick={async () => {
                 const extrasNames = config.extras
-                  .map((id) => EXTRAS.find((e) => e.id === id)?.name)
+                  .map((id) => extrasCatalog.find((e) => e.id === id)?.name)
                   .filter(Boolean) as string[];
 
-                const doc = await generateQuotePDF({
-                  eventType: config.eventType || 'evento',
-                  pack: config.selectedPack,
-                  date: config.date,
-                  guests: config.guests,
-                  extras: extrasNames,
-                  basePrice: pricing.basePrice,
-                  extrasPrice: pricing.extrasPrice,
-                  discount: earlyBirdDiscount,
+                  const doc = await generateQuotePDF({
+                    eventType: config.eventType || 'evento',
+                    pack: config.selectedPack,
+                    date: config.date,
+                    guests: config.guests,
+                    extras: extrasNames,
+                    extrasCatalog,
+                    basePrice: pricing.basePrice,
+                    extrasPrice: pricing.extrasPrice,
+                    discount: earlyBirdDiscount,
                   discountReason: pricing.discountReason || t('step4.bookToday'),
                   total: finalPrice,
                   clientName: formData.name,

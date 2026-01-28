@@ -4,7 +4,7 @@
  * NOTE: jsPDF is loaded dynamically to reduce initial bundle size
  */
 
-import { getPacksByService, EXTRAS, type ServiceSlug, type PackDefinition } from '@/app/config/packs-config';
+import { getPacksByService, EXTRAS, type ExtraDefinition, type ServiceSlug, type PackDefinition } from '@/app/config/packs-config';
 
 // Dynamic import for jsPDF - only loads when needed
 type jsPDFType = import('jspdf').jsPDF;
@@ -353,6 +353,7 @@ export interface QuoteData {
   date: string;
   guests: number;
   extras: string[];
+  extrasCatalog?: ExtraDefinition[];
   basePrice: number;
   extrasPrice: number;
   discount: number;
@@ -368,6 +369,7 @@ export async function generateQuotePDF(
 ): Promise<jsPDFType> {
   const { default: jsPDF } = await getJsPDF();
   const doc = new jsPDF();
+  const extrasCatalog = data.extrasCatalog ?? EXTRAS;
 
   const t = {
     ca: {
@@ -597,7 +599,7 @@ export async function generateQuotePDF(
     doc.setTextColor(...COLORS.blackSoft);
 
     data.extras.forEach((extraName) => {
-      const extra = EXTRAS.find((e) => e.name === extraName || e.id === extraName);
+      const extra = extrasCatalog.find((e) => e.name === extraName || e.id === extraName);
       const price = extra?.price ? `+${extra.price}€` : '';
 
       // Extra bullet

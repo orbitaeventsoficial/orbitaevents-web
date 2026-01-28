@@ -227,7 +227,7 @@ export default function MobileServicesCards() {
       priceKey: 'halloween.price',
       badgeKey: 'halloween.badge',
       badgeColor: 'from-orange-500 to-red-500',
-      image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
+      image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.webp',
       gradient: 'from-orange-500/14 via-red-500/6 to-transparent',
       href: '/tematica-halloween',
       features: ['feature1', 'feature2', 'feature3'],

@@ -9,13 +9,23 @@ import { log } from '@/lib/logger';
 
 // Configuració IMAP - DonDominio
 const IMAP_ALLOW_INSECURE = process.env.IMAP_ALLOW_INSECURE === 'true';
+const IMAP_HOST = (process.env.IMAP_HOST || '').trim();
+const IMAP_PORT_RAW = (process.env.IMAP_PORT || '').trim();
+const IMAP_USER = (process.env.IMAP_USER || '').trim();
+const IMAP_PASS = (process.env.IMAP_PASS || '').trim();
+const IMAP_SECURE =
+  process.env.IMAP_SECURE === 'true' ||
+  (!process.env.IMAP_SECURE && IMAP_PORT_RAW === '993');
+
+const IMAP_PORT = parseInt(IMAP_PORT_RAW, 10);
+
 const IMAP_CONFIG = {
-  host: process.env.IMAP_HOST || 'imap.gmail.com',
-  port: parseInt(process.env.IMAP_PORT || '993'),
-  secure: true,
+  host: IMAP_HOST,
+  port: IMAP_PORT,
+  secure: IMAP_SECURE,
   auth: {
-    user: process.env.IMAP_USER || process.env.SMTP_USER || '',
-    pass: process.env.IMAP_PASS || process.env.SMTP_PASS || '',
+    user: IMAP_USER,
+    pass: IMAP_PASS,
   },
   logger: false as const,
   tls: {
@@ -52,6 +62,9 @@ export interface EmailMessage {
  * Connectar al servidor IMAP
  */
 export async function connectIMAP(): Promise<ImapFlow> {
+  if (!IMAP_HOST || !IMAP_PORT || Number.isNaN(IMAP_PORT) || !IMAP_USER || !IMAP_PASS) {
+    throw new Error('IMAP not configured');
+  }
   const client = new ImapFlow(IMAP_CONFIG);
   await client.connect();
   return client;

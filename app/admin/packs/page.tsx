@@ -12,6 +12,16 @@ export const metadata = {
   title: 'Packs | Òrbita Admin',
 };
 
+const SERVICE_ORDER = ['bodas', 'fiestas', 'discomovil', 'empresas', 'produccion', 'alquiler'];
+const SERVICE_LABELS: Record<string, string> = {
+  bodas: 'Bodes',
+  fiestas: 'Festes',
+  discomovil: 'Discomòbil',
+  empresas: 'Empreses',
+  produccion: 'Producció',
+  alquiler: 'Lloguer',
+};
+
 async function getPacks() {
   try {
     const packs = await prisma.pack.findMany({
@@ -38,6 +48,12 @@ export default async function PacksPage() {
   const packs = await getPacks();
   const configPacks = getAllPacks();
   const packsInSync = packs.length === configPacks.length;
+  const packsByService = SERVICE_ORDER.map((service) => ({
+    service,
+    label: SERVICE_LABELS[service] || service,
+    packs: packs.filter((pack) => pack.service === service),
+  })).filter((group) => group.packs.length > 0);
+  const otherPacks = packs.filter((pack) => !pack.service || !SERVICE_ORDER.includes(pack.service));
 
   return (
     <div className="space-y-6">
@@ -65,6 +81,21 @@ export default async function PacksPage() {
         </div>
       </header>
 
+      <nav className="flex flex-wrap gap-2">
+        <Link
+          href="/admin/packs"
+          className="inline-flex items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-200"
+        >
+          Packs
+        </Link>
+        <Link
+          href="/admin/packs/extras"
+          className="inline-flex items-center rounded-full border border-slate-600/50 bg-slate-700/40 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-600/50"
+        >
+          Extres
+        </Link>
+      </nav>
+
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
@@ -91,119 +122,234 @@ export default async function PacksPage() {
         </div>
       </section>
 
-      {/* Packs Grid */}
-      <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {packs.map((pack) => {
-          const translation = pack.translations.find((t) => t.locale === 'es') || pack.translations[0];
-          return (
-            <div
-              key={pack.id}
-              className={`rounded-2xl border backdrop-blur-sm overflow-hidden ${
-                pack.isFeatured
-                  ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-600/5'
-                  : 'border-slate-700/50 bg-slate-800/60'
-              }`}
-            >
-              {/* Header */}
-              <div className="p-4 border-b border-slate-700/30">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold text-slate-100">
-                      {translation?.name || pack.slug}
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1">
-                      {pack.slug}
-                    </p>
-                  </div>
-                  <div className="flex gap-1">
-                    {pack.isFeatured && (
-                      <span className="inline-flex items-center rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-medium text-amber-300">
-                        ⭐ Destacat
-                      </span>
-                    )}
-                    {!pack.isActive && (
-                      <span className="inline-flex items-center rounded-full bg-slate-500/20 px-2 py-0.5 text-xs font-medium text-slate-400">
-                        Inactiu
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-4 space-y-3">
-                {/* Preu */}
-                <div className="flex items-baseline justify-between">
-                  <div>
-                    <span className="text-2xl font-bold text-slate-100">{pack.price}€</span>
-                    {pack.originalPrice && (
-                      <span className="ml-2 text-sm text-slate-500 line-through">
-                        {pack.originalPrice}€
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-sm text-slate-400">
-                    +{pack.extraHourPrice}€/hora extra
-                  </span>
-                </div>
-
-                {/* Característiques */}
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <span>🎵</span>
-                    <span>{pack.djHours}h DJ</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <span>🔊</span>
-                    <span>{pack.soundWatts}W</span>
-                  </div>
-                  {pack.includesFog && (
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <span>🌫️</span>
-                      <span>Fum inclòs</span>
-                    </div>
-                  )}
-                  {pack.includesMic && (
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <span>🎤</span>
-                      <span>Micro inclòs</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Guests */}
-                {(pack.minGuests || pack.maxGuests) && (
-                  <div className="text-sm text-slate-400">
-                    👥 {pack.minGuests || '?'} - {pack.maxGuests || '∞'} convidats
-                  </div>
-                )}
-
-                {/* Stats */}
-                <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-700/30">
-                  <span>{pack._count.bookings} reserves</span>
-                  <span>{pack.inventory.length} elements inventari</span>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="px-4 py-3 bg-slate-700/30 border-t border-slate-700/30 flex gap-2">
-                <Link
-                  href={`/admin/packs/${pack.id}`}
-                  className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-slate-500/50 transition-colors"
+      {/* Packs per categoria */}
+      {packsByService.map((group) => (
+        <section key={group.service} className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-slate-100">{group.label}</h2>
+            <span className="text-xs text-slate-400">{group.packs.length} packs</span>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {group.packs.map((pack) => {
+              const translation = pack.translations.find((t) => t.locale === 'es') || pack.translations[0];
+              return (
+                <div
+                  key={pack.id}
+                  className={`rounded-2xl border backdrop-blur-sm overflow-hidden ${
+                    pack.isFeatured
+                      ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-600/5'
+                      : 'border-slate-700/50 bg-slate-800/60'
+                  }`}
                 >
-                  ✏️ Editar
-                </Link>
-                <Link
-                  href={`/admin/packs/${pack.id}/inventory`}
-                  className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-slate-500/50 transition-colors"
+                  <div className="p-4 border-b border-slate-700/30">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-semibold text-slate-100">
+                          {translation?.name || pack.slug}
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-1">
+                          {pack.slug}
+                        </p>
+                      </div>
+                      <div className="flex gap-1">
+                        {pack.isFeatured && (
+                          <span className="inline-flex items-center rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-medium text-amber-300">
+                            ⭐ Destacat
+                          </span>
+                        )}
+                        {!pack.isActive && (
+                          <span className="inline-flex items-center rounded-full bg-slate-500/20 px-2 py-0.5 text-xs font-medium text-slate-400">
+                            Inactiu
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 space-y-3">
+                    <div className="flex items-baseline justify-between">
+                      <div>
+                        <span className="text-2xl font-bold text-slate-100">{pack.price}€</span>
+                        {pack.originalPrice && (
+                          <span className="ml-2 text-sm text-slate-500 line-through">
+                            {pack.originalPrice}€
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-sm text-slate-400">
+                        +{pack.extraHourPrice}€/hora extra
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <span>🎵</span>
+                        <span>{pack.djHours}h DJ</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <span>🔊</span>
+                        <span>{pack.soundWatts}W</span>
+                      </div>
+                      {pack.includesFog && (
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <span>🌫️</span>
+                          <span>Fum inclòs</span>
+                        </div>
+                      )}
+                      {pack.includesMic && (
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <span>🎤</span>
+                          <span>Micro inclòs</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {(pack.minGuests || pack.maxGuests) && (
+                      <div className="text-sm text-slate-400">
+                        👥 {pack.minGuests || '?'} - {pack.maxGuests || '∞'} convidats
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-700/30">
+                      <span>{pack._count.bookings} reserves</span>
+                      <span>{pack.inventory.length} elements inventari</span>
+                    </div>
+                  </div>
+
+                  <div className="px-4 py-3 bg-slate-700/30 border-t border-slate-700/30 flex gap-2">
+                    <Link
+                      href={`/admin/packs/${pack.id}`}
+                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-slate-500/50 transition-colors"
+                    >
+                      ✏️ Editar
+                    </Link>
+                    <Link
+                      href={`/admin/packs/${pack.id}/inventory`}
+                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-slate-500/50 transition-colors"
+                    >
+                      📦 Inventari
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+
+      {otherPacks.length > 0 && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-slate-100">Altres</h2>
+            <span className="text-xs text-slate-400">{otherPacks.length} packs</span>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {otherPacks.map((pack) => {
+              const translation = pack.translations.find((t) => t.locale === 'es') || pack.translations[0];
+              return (
+                <div
+                  key={pack.id}
+                  className={`rounded-2xl border backdrop-blur-sm overflow-hidden ${
+                    pack.isFeatured
+                      ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-600/5'
+                      : 'border-slate-700/50 bg-slate-800/60'
+                  }`}
                 >
-                  📦 Inventari
-                </Link>
-              </div>
-            </div>
-          );
-        })}
-      </section>
+                  <div className="p-4 border-b border-slate-700/30">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-semibold text-slate-100">
+                          {translation?.name || pack.slug}
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-1">
+                          {pack.slug}
+                        </p>
+                      </div>
+                      <div className="flex gap-1">
+                        {pack.isFeatured && (
+                          <span className="inline-flex items-center rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-medium text-amber-300">
+                            ⭐ Destacat
+                          </span>
+                        )}
+                        {!pack.isActive && (
+                          <span className="inline-flex items-center rounded-full bg-slate-500/20 px-2 py-0.5 text-xs font-medium text-slate-400">
+                            Inactiu
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 space-y-3">
+                    <div className="flex items-baseline justify-between">
+                      <div>
+                        <span className="text-2xl font-bold text-slate-100">{pack.price}€</span>
+                        {pack.originalPrice && (
+                          <span className="ml-2 text-sm text-slate-500 line-through">
+                            {pack.originalPrice}€
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-sm text-slate-400">
+                        +{pack.extraHourPrice}€/hora extra
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <span>🎵</span>
+                        <span>{pack.djHours}h DJ</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <span>🔊</span>
+                        <span>{pack.soundWatts}W</span>
+                      </div>
+                      {pack.includesFog && (
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <span>🌫️</span>
+                          <span>Fum inclòs</span>
+                        </div>
+                      )}
+                      {pack.includesMic && (
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <span>🎤</span>
+                          <span>Micro inclòs</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {(pack.minGuests || pack.maxGuests) && (
+                      <div className="text-sm text-slate-400">
+                        👥 {pack.minGuests || '?'} - {pack.maxGuests || '∞'} convidats
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-700/30">
+                      <span>{pack._count.bookings} reserves</span>
+                      <span>{pack.inventory.length} elements inventari</span>
+                    </div>
+                  </div>
+
+                  <div className="px-4 py-3 bg-slate-700/30 border-t border-slate-700/30 flex gap-2">
+                    <Link
+                      href={`/admin/packs/${pack.id}`}
+                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-slate-500/50 transition-colors"
+                    >
+                      ✏️ Editar
+                    </Link>
+                    <Link
+                      href={`/admin/packs/${pack.id}/inventory`}
+                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-slate-500/50 transition-colors"
+                    >
+                      📦 Inventari
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {packs.length === 0 && (
         <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-12 text-center">

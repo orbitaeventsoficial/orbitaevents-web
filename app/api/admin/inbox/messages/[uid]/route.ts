@@ -1,11 +1,11 @@
 /**
- * API: Obtenir email individual i accions (Gmail)
+ * API: Obtenir email individual i accions (IMAP)
  * ================================================
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { deleteEmail, fetchEmailById, markAsRead, markAsUnread } from '@/lib/gmail';
+import { deleteEmail, fetchEmailByUid, markAsRead, markAsUnread } from '@/lib/imap';
 import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -25,20 +25,25 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 
   try {
-    const email = await fetchEmailById(uid);
+    const uidNum = Number.parseInt(uid, 10);
+    if (!Number.isFinite(uidNum)) {
+      return NextResponse.json({ error: 'ID invàlid' }, { status: 400 });
+    }
+
+    const email = await fetchEmailByUid(uidNum);
 
     if (!email) {
       return NextResponse.json({ error: 'Email no trobat' }, { status: 404 });
     }
 
     // Marcar automàticament com llegit
-    await markAsRead(uid);
+    await markAsRead(uidNum);
 
     // Convertir al format esperat
     const formattedEmail = {
       id: email.id,
-      uid: email.id,
-      messageId: email.id,
+      uid: email.uid,
+      messageId: email.messageId,
       from: email.from,
       to: email.to,
       subject: email.subject,
@@ -74,14 +79,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const body = await request.json();
     const { action } = body;
+    const uidNum = Number.parseInt(uid, 10);
+
+    if (!Number.isFinite(uidNum)) {
+      return NextResponse.json({ error: 'ID invàlid' }, { status: 400 });
+    }
 
     if (action === 'markRead') {
-      const success = await markAsRead(uid);
+      const success = await markAsRead(uidNum);
       return NextResponse.json({ ok: success });
     }
 
     if (action === 'markUnread') {
-      const success = await markAsUnread(uid);
+      const success = await markAsUnread(uidNum);
       return NextResponse.json({ ok: success });
     }
 
@@ -107,7 +117,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   }
 
   try {
-    const success = await deleteEmail(uid);
+    const uidNum = Number.parseInt(uid, 10);
+    if (!Number.isFinite(uidNum)) {
+      return NextResponse.json({ error: 'ID invàlid' }, { status: 400 });
+    }
+
+    const success = await deleteEmail(uidNum);
     if (!success) {
       return NextResponse.json({ ok: false, error: 'No s\'ha pogut eliminar' }, { status: 500 });
     }

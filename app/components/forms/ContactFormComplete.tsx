@@ -202,10 +202,15 @@ export default function ContactFormComplete({
 
     setIsSubmitting(true);
 
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    const controller = new AbortController();
+    timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
       const response = await fetchWithCsrf('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           name: formData.fullName,
           contact: formData.email,
@@ -243,6 +248,7 @@ export default function ContactFormComplete({
     } catch {
       setSubmitStatus('error');
     } finally {
+      if (timeoutId) clearTimeout(timeoutId);
       setIsSubmitting(false);
     }
   };

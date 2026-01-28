@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { SITE_CONFIG } from '@/config/site-config';
 import { z } from 'zod';
-import { sendEmail } from '@/lib/email';
+import { sendEmailWithTimeout } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { escapeHtml } from '@/lib/utils/sanitize';
@@ -207,20 +207,22 @@ export async function POST(req: NextRequest) {
       try {
         const { notifyNewLead } = await import('@/lib/services/notificationService');
 
-        notifyNewLead({
-          id: _savedLeadId,
-          name,
-          email: clientEmail,
-          phone: clientPhone,
-          eventType: mapEventType(event),
-          eventDate: eventDate ? new Date(eventDate) : undefined,
-          guestCount: guests,
-          budget: estimatedPrice ? `${estimatedPrice} EUR` : undefined,
-          message,
-          source: determineSource(packId, packName),
-          packName,
-          createdAt: new Date(),
-        }).catch(err => {
+        Promise.resolve(
+          notifyNewLead({
+            id: _savedLeadId,
+            name,
+            email: clientEmail,
+            phone: clientPhone,
+            eventType: mapEventType(event),
+            eventDate: eventDate ? new Date(eventDate) : undefined,
+            guestCount: guests,
+            budget: estimatedPrice ? `${estimatedPrice} EUR` : undefined,
+            message,
+            source: determineSource(packId, packName),
+            packName,
+            createdAt: new Date(),
+          })
+        ).catch((err) => {
           log.error('[Notification] Error enviando notificacion multi-canal:', err);
         });
       } catch {
@@ -336,12 +338,19 @@ export async function POST(req: NextRequest) {
       const adminEmail = (process.env.CONTACT_TO || SITE_CONFIG.business.email).trim();
       const smtpFrom = (process.env.SMTP_FROM || process.env.SMTP_USER || '').trim();
 
-      await sendEmail({
-        to: adminEmail,
-        subject: `NUEVO LEAD: ${name} - ${eventLabel} ${estimatedPrice ? `(${estimatedPrice} EUR)` : ''}`,
-        html: adminEmailHtml,
-        replyTo: clientEmail || undefined,
-        from: `"Orbita Events Web" <${smtpFrom}>`,
+      sendEmailWithTimeout(
+        {
+          to: adminEmail,
+          subject: `NUEVO LEAD: ${name} - ${eventLabel} ${estimatedPrice ? `(${estimatedPrice} EUR)` : ''}`,
+          html: adminEmailHtml,
+          replyTo: clientEmail || undefined,
+          from: `"Orbita Events Web" <${smtpFrom}>`,
+        },
+        8000
+      ).catch((emailError) => {
+        log.error('Failed to send admin notification email', emailError, {
+          context: { leadId, hasEmail: !!clientEmail }
+        });
       });
     } catch (emailError) {
       log.error('Failed to send admin notification email', emailError, {
@@ -413,10 +422,17 @@ export async function POST(req: NextRequest) {
 </body>
 </html>`;
 
-        await sendEmail({
-          to: clientEmail,
-          subject: `Recibido! Tu solicitud para ${eventLabel} - Orbita Events`,
-          html: clientEmailHtml,
+        sendEmailWithTimeout(
+          {
+            to: clientEmail,
+            subject: `Recibido! Tu solicitud para ${eventLabel} - Orbita Events`,
+            html: clientEmailHtml,
+          },
+          8000
+        ).catch((clientEmailError) => {
+          log.error('Failed to send client confirmation email', clientEmailError, {
+            context: { leadId, clientEmail }
+          });
         });
       } catch (clientEmailError) {
         log.error('Failed to send client confirmation email', clientEmailError, {

@@ -46,16 +46,41 @@ function sanitizeHeader(value: string): string {
   return value.replace(/[\r\n]+/g, ' ').trim();
 }
 
+let cachedTransporter: nodemailer.Transporter | null = null;
+let cachedTransporterKey = '';
+
 function createTransporter() {
-  const smtpHost = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
-  const smtpPort = parseInt((process.env.SMTP_PORT || '587').trim());
+  const smtpHost = (process.env.SMTP_HOST || '').trim();
+  const smtpPort = parseInt((process.env.SMTP_PORT || '').trim(), 10);
   const smtpUser = (process.env.SMTP_USER || '').trim();
   const smtpPass = (process.env.SMTP_PASS || '').trim();
 
-  return nodemailer.createTransport({
+  if (!smtpHost) {
+    throw new Error('SMTP_HOST is required');
+  }
+  if (!smtpPort || Number.isNaN(smtpPort)) {
+    throw new Error('SMTP_PORT is required');
+  }
+  if (!smtpUser || !smtpPass) {
+    throw new Error('SMTP_USER and SMTP_PASS are required');
+  }
+  const smtpSecure = process.env.SMTP_SECURE === 'true' || smtpPort === 465;
+
+  const cacheKey = `${smtpHost}|${smtpPort}|${smtpUser}|${smtpSecure}`;
+  if (cachedTransporter && cachedTransporterKey === cacheKey) {
+    return cachedTransporter;
+  }
+
+  cachedTransporter = nodemailer.createTransport({
     host: smtpHost,
     port: smtpPort,
-    secure: process.env.SMTP_SECURE === 'true' || smtpPort === 465,
+    secure: smtpSecure,
+    pool: true,
+    maxConnections: 3,
+    maxMessages: 100,
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 10000,
     auth: {
       user: smtpUser,
       pass: smtpPass,
@@ -64,12 +89,18 @@ function createTransporter() {
       rejectUnauthorized: true,
     },
   });
+
+  cachedTransporterKey = cacheKey;
+  return cachedTransporter;
 }
 
 export async function sendEmail(options: SendEmailOptions): Promise<void> {
   const transporter = createTransporter();
 
-  const smtpFrom = (process.env.SMTP_FROM || process.env.SMTP_USER || '').trim();
+  const smtpFrom = (process.env.SMTP_FROM || '').trim();
+  if (!smtpFrom) {
+    throw new Error('SMTP_FROM is required');
+  }
   const fromAddress = options.from?.trim() || `"Orbita Events" <${smtpFrom}>`;
   const toAddress = options.to.trim();
 
@@ -81,6 +112,27 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
     text: options.text?.trim() || htmlToText(options.html),
     replyTo: options.replyTo?.trim(),
   });
+}
+
+export async function sendEmailWithTimeout(
+  options: SendEmailOptions,
+  timeoutMs = 8000
+): Promise<void> {
+  let timeoutId: NodeJS.Timeout | null = null;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`Email send timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+  });
+
+  try {
+    await Promise.race([sendEmail(options), timeoutPromise]);
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
 }
 
 export async function sendPrivacyVerificationEmail(params: {

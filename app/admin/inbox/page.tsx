@@ -64,7 +64,7 @@ async function getStats() {
 
 // Verificar si IMAP està configurat
 function isImapConfigured(): boolean {
-  return !!(process.env.IMAP_HOST && process.env.IMAP_USER && process.env.IMAP_PASS);
+  return !!(process.env.IMAP_HOST && process.env.IMAP_PORT && process.env.IMAP_USER && process.env.IMAP_PASS);
 }
 
 export default async function InboxPage() {

@@ -38,13 +38,13 @@ export default async function AboutPage({ params }: { params: { locale: string }
 
   // Membres de l'equip amb les seves imatges
   // IMPORTANT: Puja les fotos a /public/img/team/ amb aquests noms:
-  // - carles.jpg (DJ principal)
-  // - tecnic.jpg (Tècnic de so i llums)
-  // - animador.jpg (Animador infantil)
+  // - carles.webp (DJ principal)
+  // - tecnic.webp (Tècnic de so i llums)
+  // - animador.webp (Animador infantil)
   const teamMembers = [
-    { key: 'dj', image: '/img/team/carles.jpg' },
-    { key: 'tech', image: '/img/team/tecnic.jpg' },
-    { key: 'animator', image: '/img/team/animador.jpg' },
+    { key: 'dj', image: '/img/team/carles.webp' },
+    { key: 'tech', image: '/img/team/tecnic.webp' },
+    { key: 'animator', image: '/img/team/animador.webp' },
   ];
 
   const teamMembersData = teamMembers.map((member) => ({

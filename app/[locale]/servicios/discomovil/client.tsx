@@ -7,13 +7,8 @@ import {
   Users, Clock, TrendingUp, ChevronRight, Flame
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { getPacksByService, EXTRAS, type PackDefinition } from '@/config/packs-config';
+import { getPacksByService, EXTRAS, type ExtraDefinition, type PackDefinition } from '@/config/packs-config';
 import { usePacks } from '@/lib/hooks/usePacks';
-
-// Extras específicos para discomóvil (más fiesta)
-const DISCO_EXTRAS = EXTRAS.filter(e => 
-  ['confeti', 'co2', 'humo-bajo', 'dj-extra'].includes(e.id)
-);
 
 interface ConfigState {
   selectedPack: PackDefinition | null;
@@ -49,12 +44,21 @@ function getPackFeatures(t: ReturnType<typeof useTranslations>, packId: string, 
 }
 
 // Helper per obtenir text traduït de l'extra
+function isI18nKey(value: string): boolean {
+  return value.startsWith('pages.') || value.startsWith('extras.');
+}
+
 function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, field: 'name' | 'description', fallback: string): string {
   try {
     const key = `extras.${extraId}.${field}`;
     const translated = t(key);
     // Si retorna la clau, usar fallback
-    return translated === key ? fallback : translated;
+    if (translated !== key) return translated;
+    if (isI18nKey(fallback)) {
+      const nested = t(fallback);
+      if (nested !== fallback) return nested;
+    }
+    return fallback;
   } catch {
     return fallback;
   }
@@ -75,13 +79,52 @@ export default function DiscomovilClientV2() {
     numGuests: 80,
     extraHours: 0,
   });
+  const [extrasCatalog, setExtrasCatalog] = useState<ExtraDefinition[]>(EXTRAS);
 
   const [showSummary, setShowSummary] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadExtras() {
+      try {
+        const res = await fetch('/api/public/extras', { cache: 'no-store' });
+        const data = await res.json();
+        if (!active) return;
+        if (Array.isArray(data?.extras)) {
+          const normalized = (data.extras as ExtraDefinition[]).map((extra) => {
+            const fallback = EXTRAS.find((item) => item.id === extra.id);
+            return {
+              ...extra,
+              name: isI18nKey(extra.name) && fallback ? fallback.name : extra.name,
+              description: isI18nKey(extra.description) && fallback ? fallback.description : extra.description,
+            };
+          });
+          setExtrasCatalog(normalized);
+        }
+      } catch {
+        // Fallback a EXTRAS del config
+      }
+    }
+
+    loadExtras();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const discoExtras = useMemo(() => {
+    return extrasCatalog.filter((extra) => {
+      if (!extra.compatibleWith) return true;
+      if (extra.compatibleWith.length === 0) return false;
+      return extra.compatibleWith.includes('discomovil');
+    });
+  }, [extrasCatalog]);
 
   // Calcular total
   const packPrice = config.selectedPack?.priceValue || 0;
   const extrasPrice = Array.from(config.selectedExtras).reduce((sum, id) => {
-    const extra = DISCO_EXTRAS.find(e => e.id === id);
+    const extra = discoExtras.find(e => e.id === id);
     return sum + (extra?.price || 0);
   }, 0);
   const extraHoursPrice = config.extraHours * 100; // 100€/hora
@@ -135,7 +178,7 @@ export default function DiscomovilClientV2() {
 
     // Analytics
     if (typeof window !== 'undefined' && (window as any).gtag) {
-      const extra = DISCO_EXTRAS.find(e => e.id === extraId);
+      const extra = discoExtras.find(e => e.id === extraId);
       (window as any).gtag('event', 'discomovil_extra_toggle', {
         extra_id: extraId,
         extra_name: extra?.name,
@@ -388,7 +431,7 @@ export default function DiscomovilClientV2() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {DISCO_EXTRAS.map(extra => {
+            {discoExtras.map(extra => {
               const isSelected = config.selectedExtras.has(extra.id);
 
               return (

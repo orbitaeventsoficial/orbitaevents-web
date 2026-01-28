@@ -63,7 +63,7 @@ export const CONTROLLERS: Equipment[] = [
     description: "Controladora profesional Pioneer DJ de nivel club con motorized platters",
     condition: "excellent",
     images: [
-      "/img/equipment/ddj-rev7.jpg"
+      "/img/equipment/ddj-rev7.webp"
     ],
   },
 ];
@@ -87,7 +87,7 @@ export const SPEAKERS: Equipment[] = [
     description: "Sistema de altavoces profesional Electro-Voice, sonido cristalino y potente para cualquier evento",
     condition: "excellent",
     images: [
-      "/img/equipment/ev-etx.jpg"
+      "/img/equipment/ev-etx.webp"
     ],
   },
 ];

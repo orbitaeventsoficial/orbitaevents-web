@@ -40,7 +40,7 @@ const EXPERIENCES = [
     titleKey: 'halloween.title',
     subtitleKey: 'halloween.subtitle',
     descriptionKey: 'halloween.description',
-    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.jpg',
+    image: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.webp',
     gradient: 'from-orange-600 to-red-700',
     bgGradient: 'from-orange-900/40 to-red-900/40',
     badgeKey: 'badges.terrific',
