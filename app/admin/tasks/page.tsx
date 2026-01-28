@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import type { LeadTaskStatus, Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,12 +8,19 @@ export const metadata = {
   title: 'Tasques | Òrbita Admin',
 };
 
-const STATUS_LABELS: Record<string, string> = {
+const STATUS_LABELS: Record<LeadTaskStatus, string> = {
   OPEN: 'Oberta',
   IN_PROGRESS: 'En curs',
   DONE: 'Feta',
   CANCELLED: 'Cancel·lada',
 };
+
+const VALID_STATUS = ['OPEN', 'IN_PROGRESS', 'DONE', 'CANCELLED'] as const satisfies readonly LeadTaskStatus[];
+
+function isTaskStatus(value?: string): value is LeadTaskStatus {
+  if (!value) return false;
+  return (VALID_STATUS as readonly string[]).includes(value);
+}
 
 function parsePage(value?: string) {
   const parsed = Number.parseInt(value || '1', 10);
@@ -20,10 +28,10 @@ function parsePage(value?: string) {
 }
 
 export default async function TasksPage({ searchParams }: { searchParams?: { status?: string; page?: string } }) {
-  const status = searchParams?.status;
+  const status = isTaskStatus(searchParams?.status) ? searchParams?.status : undefined;
   const page = parsePage(searchParams?.page);
   const limit = 30;
-  const where = status ? { status } : undefined;
+  const where: Prisma.LeadTaskWhereInput | undefined = status ? { status } : undefined;
   const [tasks, total] = await Promise.all([
     prisma.leadTask.findMany({
       where,
@@ -62,7 +70,7 @@ export default async function TasksPage({ searchParams }: { searchParams?: { sta
       </header>
 
       <section className="flex flex-wrap items-center gap-2 text-xs">
-        {['OPEN', 'IN_PROGRESS', 'DONE', 'CANCELLED'].map((value) => (
+        {VALID_STATUS.map((value) => (
           <Link
             key={value}
             href={`/admin/tasks?status=${value}`}
