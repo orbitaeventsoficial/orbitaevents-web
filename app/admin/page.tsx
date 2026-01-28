@@ -61,6 +61,9 @@ export default async function AdminDashboard() {
   const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
   const ga4Status = getGa4ConfigStatus();
   const imapConfigured = Boolean(process.env.IMAP_HOST && process.env.IMAP_PORT && process.env.IMAP_USER && process.env.IMAP_PASS);
+  const smtpConfigured = Boolean(
+    process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.SMTP_FROM
+  );
   let ga4 = null;
   try {
     ga4 = await getGa4Report();
@@ -85,6 +88,13 @@ export default async function AdminDashboard() {
     leadsRecent30,
     bookingsRecent30,
     postEventPending,
+    cronSettings,
+    dbHealthy,
+    recentLeadsTimeline,
+    recentBookingsTimeline,
+    recentCustomerActivity,
+    recentAdminLogs,
+    upcomingTasks,
   ] = await Promise.all([
     // Total leads
     prisma.lead.count().catch(() => 0),
@@ -166,6 +176,42 @@ export default async function AdminDashboard() {
         clientEmail: { not: { contains: '@leads.orbitaevents.local' } },
       },
     }).catch(() => 0),
+    prisma.setting.findMany({
+      where: { key: { in: ['emails.cron.lastRun', 'emails.cron.lastStatus', 'emails.cron.lastSummary', 'emails.cron.lastMessage'] } },
+    }).catch(() => []),
+    prisma.$queryRaw`SELECT 1`.then(() => true).catch(() => false),
+    prisma.lead.findMany({
+      take: 6,
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, name: true, createdAt: true, status: true },
+    }).catch(() => []),
+    prisma.booking.findMany({
+      take: 6,
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, clientName: true, reference: true, createdAt: true, status: true },
+    }).catch(() => []),
+    prisma.customerActivity.findMany({
+      take: 6,
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, action: true, createdAt: true, customer: { select: { name: true } } },
+    }).catch(() => []),
+    prisma.adminLog.findMany({
+      take: 6,
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, action: true, entity: true, createdAt: true },
+    }).catch(() => []),
+    prisma.leadTask.findMany({
+      where: { status: { in: ['OPEN', 'IN_PROGRESS'] } },
+      take: 6,
+      orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
+      select: {
+        id: true,
+        title: true,
+        dueDate: true,
+        status: true,
+        lead: { select: { id: true, name: true } },
+      },
+    }).catch(() => []),
   ]);
 
   // Calcular estadístiques inventari
@@ -221,6 +267,55 @@ export default async function AdminDashboard() {
   });
   const ga4SessionsSeries = buckets.map((d) => ga4ByDate.get(toDateKey(d))?.sessions || 0);
   const ga4UsersSeries = buckets.map((d) => ga4ByDate.get(toDateKey(d))?.users || 0);
+  const cronMap = (cronSettings || []).reduce((acc: Record<string, string>, setting: { key: string; value: string }) => {
+    acc[setting.key] = setting.value;
+    return acc;
+  }, {});
+
+  const healthItems = [
+    { label: 'DB', status: dbHealthy ? 'OK' : 'ERROR' },
+    { label: 'SMTP', status: smtpConfigured ? 'OK' : 'PENDENT' },
+    { label: 'IMAP', status: imapConfigured ? 'OK' : 'PENDENT' },
+    { label: 'GA4', status: ga4Status.ready ? 'OK' : 'PENDENT' },
+    { label: 'Cron', status: cronMap['emails.cron.lastStatus'] || '—' },
+  ];
+
+  const timeline = [
+    ...recentLeadsTimeline.map((lead) => ({
+      id: `lead-${lead.id}`,
+      icon: '👥',
+      text: `Nou lead: ${lead.name}`,
+      time: timeAgo(new Date(lead.createdAt)),
+      ts: new Date(lead.createdAt).getTime(),
+      href: `/admin/leads/${lead.id}`,
+    })),
+    ...recentBookingsTimeline.map((booking) => ({
+      id: `booking-${booking.id}`,
+      icon: '📋',
+      text: `Reserva ${booking.reference} · ${booking.clientName}`,
+      time: timeAgo(new Date(booking.createdAt)),
+      ts: new Date(booking.createdAt).getTime(),
+      href: `/admin/bookings/${booking.id}`,
+    })),
+    ...recentCustomerActivity.map((activity) => ({
+      id: `activity-${activity.id}`,
+      icon: '⭐',
+      text: `${activity.action} · ${activity.customer?.name || 'Client'}`,
+      time: timeAgo(new Date(activity.createdAt)),
+      ts: new Date(activity.createdAt).getTime(),
+      href: '/admin/emails',
+    })),
+    ...recentAdminLogs.map((logItem) => ({
+      id: `adminlog-${logItem.id}`,
+      icon: '🛠️',
+      text: `${logItem.action} · ${logItem.entity}`,
+      time: timeAgo(new Date(logItem.createdAt)),
+      ts: new Date(logItem.createdAt).getTime(),
+      href: '/admin/settings',
+    })),
+  ]
+    .sort((a, b) => b.ts - a.ts)
+    .slice(0, 10);
 
   const alerts = [
     ...(!ga4Status.ready ? [{
@@ -352,6 +447,56 @@ export default async function AdminDashboard() {
       )}
 
       <QuickActions />
+
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-4">
+          <p className="text-xs uppercase text-slate-400">Salut sistema</p>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+            {healthItems.map((item) => (
+              <div key={item.label} className="rounded-lg border border-slate-700/50 bg-slate-900/50 px-2 py-2 text-center">
+                <p className="text-[10px] text-slate-500">{item.label}</p>
+                <p className={`text-xs font-semibold ${item.status === 'OK' ? 'text-emerald-300' : item.status === 'ERROR' ? 'text-rose-300' : 'text-amber-300'}`}>
+                  {item.status}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[10px] text-slate-500">
+            Últim cron: {cronMap['emails.cron.lastRun'] ? new Date(cronMap['emails.cron.lastRun']).toLocaleString('ca-ES') : 'Mai'}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-4">
+          <p className="text-xs uppercase text-slate-400">Tasques pendents</p>
+          <div className="mt-3 space-y-2 text-xs">
+            {upcomingTasks.length === 0 ? (
+              <p className="text-slate-500">Sense tasques pendents</p>
+            ) : (
+              upcomingTasks.map((task) => (
+                <Link key={task.id} href={`/admin/leads/${task.lead.id}`} className="flex items-center justify-between rounded-lg border border-slate-700/50 bg-slate-900/50 px-2 py-2 text-slate-200 hover:border-cyan-500/40">
+                  <span className="truncate">{task.title}</span>
+                  <span className="text-[10px] text-slate-500">{task.lead.name}</span>
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
+        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-4">
+          <p className="text-xs uppercase text-slate-400">Timeline</p>
+          <div className="mt-3 space-y-2 text-xs">
+            {timeline.length === 0 ? (
+              <p className="text-slate-500">Cap activitat recent</p>
+            ) : (
+              timeline.map((item) => (
+                <Link key={item.id} href={item.href} className="flex items-center gap-2 rounded-lg border border-slate-700/50 bg-slate-900/50 px-2 py-2 text-slate-200 hover:border-cyan-500/40">
+                  <span>{item.icon}</span>
+                  <span className="flex-1 truncate">{item.text}</span>
+                  <span className="text-[10px] text-slate-500">{item.time}</span>
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* Metriques essencials */}
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
@@ -589,6 +734,25 @@ export default async function AdminDashboard() {
           <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{inventoryMaintenance} mant.</p>
         </div>
       </div>
+
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-slate-700/50 bg-slate-700/30">
+          <h3 className="text-sm font-semibold text-slate-100">🧾 Auditoria recent</h3>
+          <p className="text-xs text-slate-400">Últimes accions d'admin</p>
+        </div>
+        {recentAdminLogs.length === 0 ? (
+          <div className="p-6 text-center text-slate-500 text-sm">Sense activitat recent</div>
+        ) : (
+          <div className="divide-y divide-slate-700/30">
+            {recentAdminLogs.map((logItem) => (
+              <div key={logItem.id} className="px-4 py-3 flex items-center justify-between text-xs text-slate-300">
+                <span className="truncate">{logItem.action} · {logItem.entity}</span>
+                <span className="text-slate-500">{timeAgo(new Date(logItem.createdAt))}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

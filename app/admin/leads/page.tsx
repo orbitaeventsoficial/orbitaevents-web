@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import Link from 'next/link';
 import LeadActions from './LeadActions';
+import LeadSavedViews from './LeadSavedViews';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,6 +37,24 @@ const PRIORITY_COLORS: Record<string, string> = {
   HIGH: 'bg-orange-500/20 text-orange-300',
   URGENT: 'bg-rose-500/20 text-rose-300',
 };
+
+function buildQuery(filters: {
+  status: string[];
+  priority: string[];
+  eventType: string[];
+  q: string;
+  from: Date | null;
+  to: Date | null;
+}) {
+  const params = new URLSearchParams();
+  filters.status.forEach((value) => params.append('status', value));
+  filters.priority.forEach((value) => params.append('priority', value));
+  filters.eventType.forEach((value) => params.append('eventType', value));
+  if (filters.q) params.set('q', filters.q);
+  if (filters.from) params.set('from', filters.from.toISOString().slice(0, 10));
+  if (filters.to) params.set('to', filters.to.toISOString().slice(0, 10));
+  return params.toString();
+}
 
 const VALID_STATUS = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'];
 const VALID_PRIORITY = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
@@ -167,6 +186,7 @@ export default async function LeadsPage({
     enNegociacio: data.counts.negotiation,
     convertits: data.counts.won,
   };
+  const currentQuery = buildQuery(data.filters);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -298,6 +318,8 @@ export default async function LeadsPage({
           </div>
         </form>
       </section>
+
+      <LeadSavedViews currentQuery={currentQuery} />
 
       <section className="flex flex-wrap items-center gap-2 text-xs">
         <Link

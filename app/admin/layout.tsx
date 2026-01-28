@@ -229,6 +229,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       items: [
         { icon: '👥', label: 'Leads', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
         { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
+        { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
         { icon: '👤', label: 'Clients', href: '/admin/contactes' },
         { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
         { icon: '⭐', label: 'Ressenyes', href: '/admin/ressenyes' },
@@ -285,6 +286,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const pageNames: Record<string, string> = {
       leads: 'Leads',
       bookings: 'Reserves',
+      tasks: 'Tasques',
       packs: 'Packs',
       analytics: 'Analytics',
       emails: 'Emails Auto',
