@@ -1,7 +1,8 @@
 // app/api/admin/leads/views/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, unauthorizedResponse, verifyBasicAuth, verifyBearerAuth } from '@/lib/auth';
+import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -15,8 +16,14 @@ type SavedView = {
 
 const KEY = 'leads.views';
 
-async function getViews(): Promise<SavedView[]> {
-  const setting = await prisma.setting.findUnique({ where: { key: KEY } });
+function getUserKey(req: NextRequest): string {
+  const bearer = verifyBearerAuth(req);
+  const auth = bearer.authenticated ? bearer : verifyBasicAuth(req);
+  return auth.user ? `${KEY}.${auth.user}` : KEY;
+}
+
+async function getViews(key: string): Promise<SavedView[]> {
+  const setting = await prisma.setting.findUnique({ where: { key } });
   if (!setting?.value) return [];
   try {
     const parsed = JSON.parse(setting.value);
@@ -26,12 +33,12 @@ async function getViews(): Promise<SavedView[]> {
   }
 }
 
-async function saveViews(views: SavedView[]) {
+async function saveViews(key: string, views: SavedView[]) {
   const value = JSON.stringify(views.slice(0, 50));
   await prisma.setting.upsert({
-    where: { key: KEY },
+    where: { key },
     update: { value, type: 'JSON', category: 'config' },
-    create: { key: KEY, value, type: 'JSON', category: 'config' },
+    create: { key, value, type: 'JSON', category: 'config' },
   });
 }
 
@@ -40,7 +47,11 @@ export async function GET(req: NextRequest) {
   if (authError) return authError;
 
   try {
-    const views = await getViews();
+    const userKey = getUserKey(req);
+    let views = await getViews(userKey);
+    if (views.length === 0 && userKey !== KEY) {
+      views = await getViews(KEY);
+    }
     return NextResponse.json({ ok: true, views });
   } catch (error) {
     log.error('Error obtenint vistes leads', error);
@@ -49,8 +60,11 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const authError = requireAuth(req);
-  if (authError) return authError;
+  const bearer = verifyBearerAuth(req);
+  const auth = bearer.authenticated ? bearer : verifyBasicAuth(req);
+  if (!auth.authenticated) return unauthorizedResponse(auth.error);
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const body = await req.json();
@@ -59,14 +73,15 @@ export async function POST(req: NextRequest) {
     if (!name || !query) {
       return NextResponse.json({ error: 'Nom i query requerits' }, { status: 400 });
     }
-    const views = await getViews();
+    const userKey = getUserKey(req);
+    const views = await getViews(userKey);
     const next: SavedView = {
       id: `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
       name,
       query,
       createdAt: new Date().toISOString(),
     };
-    await saveViews([next, ...views]);
+    await saveViews(userKey, [next, ...views]);
     return NextResponse.json({ ok: true, view: next });
   } catch (error) {
     log.error('Error guardant vista leads', error);
@@ -75,8 +90,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const authError = requireAuth(req);
-  if (authError) return authError;
+  const bearer = verifyBearerAuth(req);
+  const auth = bearer.authenticated ? bearer : verifyBasicAuth(req);
+  if (!auth.authenticated) return unauthorizedResponse(auth.error);
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return csrfError;
 
   try {
     const { searchParams } = new URL(req.url);
@@ -84,9 +102,10 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: 'ID requerit' }, { status: 400 });
     }
-    const views = await getViews();
+    const userKey = getUserKey(req);
+    const views = await getViews(userKey);
     const filtered = views.filter((view) => view.id !== id);
-    await saveViews(filtered);
+    await saveViews(userKey, filtered);
     return NextResponse.json({ ok: true });
   } catch (error) {
     log.error('Error esborrant vista leads', error);

@@ -14,16 +14,35 @@ const STATUS_LABELS: Record<string, string> = {
   CANCELLED: 'Cancel·lada',
 };
 
-export default async function TasksPage({ searchParams }: { searchParams?: { status?: string } }) {
+function parsePage(value?: string) {
+  const parsed = Number.parseInt(value || '1', 10);
+  return Number.isNaN(parsed) || parsed < 1 ? 1 : parsed;
+}
+
+export default async function TasksPage({ searchParams }: { searchParams?: { status?: string; page?: string } }) {
   const status = searchParams?.status;
-  const tasks = await prisma.leadTask.findMany({
-    where: status ? { status } : undefined,
-    orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
-    take: 200,
-    include: {
-      lead: { select: { id: true, name: true } },
-    },
-  });
+  const page = parsePage(searchParams?.page);
+  const limit = 30;
+  const where = status ? { status } : undefined;
+  const [tasks, total] = await Promise.all([
+    prisma.leadTask.findMany({
+      where,
+      orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
+      take: limit,
+      skip: (page - 1) * limit,
+      include: {
+        lead: { select: { id: true, name: true } },
+      },
+    }),
+    prisma.leadTask.count({ where }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const buildHref = (targetPage: number) => {
+    const params = new URLSearchParams();
+    if (status) params.set('status', status);
+    params.set('page', String(targetPage));
+    return `/admin/tasks?${params.toString()}`;
+  };
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -31,7 +50,7 @@ export default async function TasksPage({ searchParams }: { searchParams?: { sta
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">Tasques</h1>
           <p className="text-xs sm:text-sm text-slate-400">
-            {tasks.length} tasques
+            {total} tasques
           </p>
         </div>
         <Link
@@ -92,6 +111,26 @@ export default async function TasksPage({ searchParams }: { searchParams?: { sta
           </div>
         )}
       </section>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between text-xs text-slate-400">
+          <span>Pàgina {page} de {totalPages}</span>
+          <div className="flex gap-2">
+            <Link
+              href={buildHref(Math.max(1, page - 1))}
+              className={`rounded-lg border px-3 py-1 ${page === 1 ? 'border-slate-800 text-slate-600 pointer-events-none' : 'border-slate-700 hover:text-slate-200'}`}
+            >
+              ← Anterior
+            </Link>
+            <Link
+              href={buildHref(Math.min(totalPages, page + 1))}
+              className={`rounded-lg border px-3 py-1 ${page === totalPages ? 'border-slate-800 text-slate-600 pointer-events-none' : 'border-slate-700 hover:text-slate-200'}`}
+            >
+              Següent →
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
