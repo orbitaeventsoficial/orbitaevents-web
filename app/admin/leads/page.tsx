@@ -63,8 +63,14 @@ async function getLeads() {
   }
 }
 
-export default async function LeadsPage() {
+export default async function LeadsPage({ searchParams }: { searchParams?: { status?: string; priority?: string } }) {
+  const { status, priority } = searchParams || {};
   const leads = await getLeads();
+  const filteredLeads = leads.filter((lead) => {
+    if (status && lead.status !== status) return false;
+    if (priority && lead.priority !== priority) return false;
+    return true;
+  });
 
   // Estadístiques ràpides
   const stats = {
@@ -112,16 +118,49 @@ export default async function LeadsPage() {
         </div>
       </section>
 
+      <section className="flex flex-wrap items-center gap-2 text-xs">
+        <Link
+          href="/admin/leads"
+          className={`rounded-full border px-3 py-1 ${
+            !status && !priority ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          Tots
+        </Link>
+        {['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'].map((value) => (
+          <Link
+            key={value}
+            href={`/admin/leads?status=${value}`}
+            className={`rounded-full border px-3 py-1 ${
+              status === value ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            {value}
+          </Link>
+        ))}
+        {['LOW', 'MEDIUM', 'HIGH', 'URGENT'].map((value) => (
+          <Link
+            key={value}
+            href={`/admin/leads?priority=${value}`}
+            className={`rounded-full border px-3 py-1 ${
+              priority === value ? 'border-amber-500/40 bg-amber-500/10 text-amber-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            {value}
+          </Link>
+        ))}
+      </section>
+
       {/* Mobile Card View */}
       <section className="lg:hidden space-y-3">
-        {leads.length === 0 ? (
+        {filteredLeads.length === 0 ? (
           <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-8 text-center">
             <span className="text-4xl">📭</span>
             <p className="mt-2 text-slate-300">Encara no hi ha leads</p>
             <p className="text-xs text-slate-500">Els contactes apareixeran aquí</p>
           </div>
         ) : (
-          leads.map((lead) => {
+          filteredLeads.map((lead) => {
             const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
             const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
 
@@ -178,7 +217,7 @@ export default async function LeadsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/30">
-              {leads.length === 0 ? (
+              {filteredLeads.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-12 text-center text-slate-400">
                     <div className="flex flex-col items-center gap-2">
@@ -188,7 +227,7 @@ export default async function LeadsPage() {
                   </td>
                 </tr>
               ) : (
-                leads.map((lead) => {
+                filteredLeads.map((lead) => {
                   const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
                   const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
                   const priorityColor = PRIORITY_COLORS[lead.priority] || PRIORITY_COLORS.MEDIUM;

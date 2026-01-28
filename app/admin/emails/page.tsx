@@ -18,6 +18,7 @@ async function getEmailStats() {
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   // Leads amb email enviat
   const leadsWithEmail = await prisma.lead.count({
@@ -53,15 +54,29 @@ async function getEmailStats() {
     where: { createdAt: { gte: thirtyDaysAgo } },
   });
 
-  // Últims emails (simulat via activitat)
+  // Últims emails (via activitat)
   const recentActivity = await prisma.customerActivity.findMany({
     where: {
-      action: { in: ['POST_EVENT_EMAIL_SENT', 'TESTIMONIAL_SUBMITTED'] },
+      action: { in: ['POST_EVENT_EMAIL_SENT', 'TESTIMONIAL_SUBMITTED', 'DISCOUNT_CODE_GENERATED', 'LEAD_EMAIL_SENT'] },
       createdAt: { gte: sevenDaysAgo },
     },
     include: { customer: true },
     orderBy: { createdAt: 'desc' },
     take: 20,
+  });
+
+  const recentEmailActions = await prisma.customerActivity.count({
+    where: {
+      action: { in: ['POST_EVENT_EMAIL_SENT', 'LEAD_EMAIL_SENT'] },
+      createdAt: { gte: twentyFourHoursAgo },
+    },
+  });
+
+  const recentTestimonials = await prisma.customerActivity.count({
+    where: {
+      action: { in: ['TESTIMONIAL_SUBMITTED'] },
+      createdAt: { gte: sevenDaysAgo },
+    },
   });
 
   return {
@@ -71,6 +86,8 @@ async function getEmailStats() {
     testimonials,
     discountCodes,
     recentActivity,
+    recentEmailActions,
+    recentTestimonials,
   };
 }
 
@@ -128,6 +145,30 @@ export default async function EmailsAdminPage() {
 
       {/* Stats Cards */}
       <EmailStatsCards stats={stats} />
+
+      {/* Logs / Automatitzacions */}
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 p-5">
+          <p className="text-xs uppercase text-slate-400">Emails 24h</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-100">{stats.recentEmailActions}</p>
+          <p className="text-xs text-slate-500 mt-1">Enviats automàticament</p>
+        </div>
+        <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 p-5">
+          <p className="text-xs uppercase text-slate-400">Testimonis 7d</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-100">{stats.recentTestimonials}</p>
+          <p className="text-xs text-slate-500 mt-1">Respostes rebudes</p>
+        </div>
+        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-5">
+          <p className="text-xs uppercase text-slate-400">Post-event pendents</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-100">{stats.postEventPending}</p>
+          <p className="text-xs text-slate-500 mt-1">Per enviar</p>
+        </div>
+        <div className="rounded-2xl border border-slate-600/50 bg-slate-800/60 p-5">
+          <p className="text-xs uppercase text-slate-400">Últim cron</p>
+          <p className="mt-2 text-sm text-slate-300">Veure logs del servidor</p>
+          <p className="text-xs text-slate-500 mt-1">Si cal, executa manualment</p>
+        </div>
+      </section>
 
       {/* Inbox Panel - Lectura d'emails IMAP */}
       <InboxPanel />

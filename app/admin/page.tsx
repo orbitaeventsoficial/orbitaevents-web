@@ -295,6 +295,20 @@ export default async function AdminDashboard() {
             <Button variant="primary" icon="+" label="Nou lead" />
           </Link>
         </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <Link href="/admin/inbox" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+            📥 Inbox (IMAP)
+          </Link>
+          <Link href="/admin/emails" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+            🤖 Emails Auto
+          </Link>
+          <Link href="/admin/bookings" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+            📋 Reserves
+          </Link>
+          <Link href="/admin/calendario" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+            📅 Calendari
+          </Link>
+        </div>
       </div>
 
       {testimonialsPending > 0 && (
