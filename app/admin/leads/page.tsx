@@ -84,6 +84,15 @@ function parseDate(value?: string) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+type LeadFilters = {
+  status: LeadStatus[];
+  priority: Priority[];
+  eventType: EventType[];
+  q: string;
+  from: Date | null;
+  to: Date | null;
+};
+
 async function getLeads(filters: {
   status?: string | string[];
   priority?: string | string[];
@@ -155,6 +164,7 @@ async function getLeads(filters: {
       prisma.lead.count({ where: { status: 'WON' } }),
     ]);
 
+    const normalizedFilters: LeadFilters = { status, priority, eventType, q: filters.q || '', from, to };
     return {
       leads,
       counts: {
@@ -164,14 +174,14 @@ async function getLeads(filters: {
         negotiation: negotiationCount,
         won: wonCount,
       },
-      filters: { status, priority, eventType, q: filters.q || '', from, to },
+      filters: normalizedFilters,
     };
   } catch (e) {
     log.error('Error obtenint leads:', e);
     return {
       leads: [],
       counts: { filtered: 0, total: 0, new: 0, negotiation: 0, won: 0 },
-      filters: { status: [], priority: [], eventType: [], q: '', from: null, to: null },
+      filters: { status: [], priority: [], eventType: [], q: '', from: null, to: null } as LeadFilters,
     };
   }
 }
