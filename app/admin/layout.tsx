@@ -239,8 +239,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     {
       title: 'Automatització',
       items: [
-        { icon: '📬', label: 'Inbox', href: '/admin/inbox' },
-        { icon: '📧', label: 'Emails', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
+        { icon: '📥', label: 'Inbox (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' as const },
+        { icon: '🤖', label: 'Emails Auto', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
         { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
         { icon: '⭐', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
       ]
@@ -273,8 +273,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       bookings: 'Reserves',
       packs: 'Packs',
       analytics: 'Analytics',
-      emails: 'Emails',
-      inbox: 'Inbox',
+      emails: 'Emails Auto',
+      inbox: 'Inbox (IMAP)',
       calendario: 'Calendari',
       settings: 'Configuració',
       inventory: 'Inventari',

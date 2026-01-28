@@ -45,6 +45,7 @@ type Ga4Report = {
     activeUsers: number;
     pages: Ga4RealtimeRow[];
   };
+  realtimeFallback: boolean;
 };
 
 type Ga4ConfigStatus = {
@@ -249,6 +250,7 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
       })),
     ]);
 
+  let realtimeFallback = false;
   let realtimeRes = await safe(client.runRealtimeReport({
     property,
     metrics: [{ name: 'activeUsers' }],
@@ -257,6 +259,7 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
   }));
 
   if (!realtimeRes) {
+    realtimeFallback = true;
     realtimeRes = await safe(client.runRealtimeReport({
       property,
       metrics: [{ name: 'activeUsers' }],
@@ -288,5 +291,6 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
       activeUsers: toNumber(realtimeRes?.[0]?.rows?.[0]?.metricValues?.[0]?.value),
       pages: mapRealtimeRows(realtimeRes?.[0]?.rows || []),
     },
+    realtimeFallback,
   };
 }

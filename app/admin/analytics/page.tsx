@@ -327,6 +327,11 @@ export default async function AnalyticsPage() {
                     <span className="text-slate-400">{row.value}</span>
                   </div>
                 ))}
+                {ga4.realtimeFallback && (
+                  <p className="pt-2 text-xs text-amber-300">
+                    Realtime parcial: solo usuarios activos disponibles.
+                  </p>
+                )}
               </div>
             </div>
           </div>
