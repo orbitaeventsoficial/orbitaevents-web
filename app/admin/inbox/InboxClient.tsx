@@ -351,10 +351,15 @@ export default function InboxClient({
                     <div className="flex items-center gap-2">
                       {!email.read && <span className="w-2 h-2 bg-cyan-500 rounded-full flex-shrink-0" />}
                       <span className={`text-xs px-1.5 py-0.5 rounded ${
-                        email.type === 'lead' ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700/50 text-slate-400'
+                        email.type === 'lead' ? 'bg-purple-500/20 text-purple-300' : 'bg-emerald-500/20 text-emerald-300'
                       }`}>
-                        {email.type === 'lead' ? 'Lead' : 'Email'}
+                        {email.type === 'lead' ? 'Lead web' : 'Email IMAP'}
                       </span>
+                      {!email.read && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">
+                          Nou
+                        </span>
+                      )}
                       <p className={`text-sm truncate ${!email.read ? 'font-semibold text-slate-100' : 'text-slate-300'}`}>
                         {email.fromName}
                       </p>
@@ -381,9 +386,9 @@ export default function InboxClient({
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`text-xs px-2 py-1 rounded ${
-                      selectedEmail.type === 'lead' ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700/50 text-slate-400'
+                      selectedEmail.type === 'lead' ? 'bg-purple-500/20 text-purple-300' : 'bg-emerald-500/20 text-emerald-300'
                     }`}>
-                      {selectedEmail.type === 'lead' ? '📋 Lead del formulari' : '📧 Email rebut'}
+                      {selectedEmail.type === 'lead' ? '📋 Lead web' : '📧 Email IMAP'}
                     </span>
                     {selectedEmail.leadData?.status && (
                       <span className={`px-2 py-1 rounded text-xs font-medium ${STATUS_COLORS[selectedEmail.leadData.status] || 'bg-slate-700/50 text-slate-400'}`}>

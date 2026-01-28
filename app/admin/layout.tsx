@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import AdminSearchModal from './components/AdminSearchModal';
 
 /**
  * 🎨 ADMIN LAYOUT - Òrbita Events
@@ -120,6 +121,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [newLeadsCount, setNewLeadsCount] = useState(0);
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
 
   // Cargar conteo de leads nuevos
@@ -154,6 +156,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       document.documentElement.classList.remove('scroll-unlocked');
       document.body.classList.remove('scroll-unlocked');
     };
+  }, []);
+
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      const isK = event.key.toLowerCase() === 'k';
+      if ((event.metaKey || event.ctrlKey) && isK) {
+        event.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleShortcut);
+    return () => window.removeEventListener('keydown', handleShortcut);
   }, []);
 
   useEffect(() => {
@@ -372,16 +386,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <span className="text-[10px] text-slate-400 font-medium">{getPageName()}</span>
         </div>
 
-        <Link
-          href="/admin/settings/notifications"
-          className="p-2.5 -mr-1 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors relative"
-          aria-label="Notificacions"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-          <span className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-        </Link>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            className="p-2.5 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
+            aria-label="Cercar (Ctrl+K)"
+          >
+            🔍
+          </button>
+          <Link
+            href="/admin/settings/notifications"
+            className="p-2.5 -mr-1 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors relative"
+            aria-label="Notificacions"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <span className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+          </Link>
+        </div>
       </header>
 
       {/* Mobile Sidebar Overlay - Con animación */}
@@ -483,6 +507,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <span className="text-slate-100 font-medium">{getPageName()}</span>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            className="hidden md:flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-800/60 px-3 py-2 text-xs text-slate-300 hover:border-cyan-500/30 hover:text-slate-100 transition-colors"
+            aria-label="Cercar (Ctrl+K)"
+          >
+            🔍 Cercar
+            <span className="rounded-md border border-slate-700 px-2 py-0.5 text-[10px] text-slate-500">Ctrl/⌘K</span>
+          </button>
           <Link
             href="/admin/settings/notifications"
             className="relative p-2.5 text-slate-300 hover:text-slate-100 hover:bg-slate-800 rounded-xl transition-colors"
@@ -547,6 +580,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           />
         </div>
       </nav>
+      <AdminSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
         </div>
       </body>
     </html>

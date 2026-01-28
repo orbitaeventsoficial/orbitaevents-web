@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { getGa4Report } from '@/lib/analytics/ga4';
+import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { MetricCard, Card, Button } from './components/ui';
 import { MiniLineChart } from './components/Charts';
 import Link from 'next/link';
@@ -57,6 +57,9 @@ export default async function AdminDashboard() {
   const seriesStart = new Date(now);
   seriesStart.setDate(now.getDate() - 30);
   seriesStart.setHours(0, 0, 0, 0);
+  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+  const ga4Status = getGa4ConfigStatus();
+  const imapConfigured = Boolean(process.env.IMAP_HOST && process.env.IMAP_PORT && process.env.IMAP_USER && process.env.IMAP_PASS);
   let ga4 = null;
   try {
     ga4 = await getGa4Report();
@@ -80,6 +83,7 @@ export default async function AdminDashboard() {
     wonLeads,
     leadsRecent30,
     bookingsRecent30,
+    postEventPending,
   ] = await Promise.all([
     // Total leads
     prisma.lead.count().catch(() => 0),
@@ -153,6 +157,14 @@ export default async function AdminDashboard() {
       where: { eventDate: { gte: seriesStart } },
       select: { eventDate: true, status: true, total: true },
     }).catch(() => []),
+    prisma.booking.count({
+      where: {
+        status: 'COMPLETED',
+        eventDate: { lte: twoDaysAgo },
+        postEventEmailSent: false,
+        clientEmail: { not: { contains: '@leads.orbitaevents.local' } },
+      },
+    }).catch(() => 0),
   ]);
 
   // Calcular estadístiques inventari
@@ -209,6 +221,44 @@ export default async function AdminDashboard() {
   const ga4SessionsSeries = buckets.map((d) => ga4ByDate.get(toDateKey(d))?.sessions || 0);
   const ga4UsersSeries = buckets.map((d) => ga4ByDate.get(toDateKey(d))?.users || 0);
 
+  const alerts = [
+    ...(!ga4Status.ready ? [{
+      type: 'error',
+      title: 'GA4 pendent',
+      description: ga4Status.reason || 'Configura GA4 al panell Analytics',
+      href: '/admin/analytics',
+      action: 'Configurar',
+    }] : []),
+    ...(ga4Status.ready && !ga4 ? [{
+      type: 'warning',
+      title: 'GA4 sense dades',
+      description: 'No podem carregar mètriques. Revisa permisos o quota.',
+      href: '/admin/analytics',
+      action: 'Revisar',
+    }] : []),
+    ...(ga4?.realtimeFallback ? [{
+      type: 'warning',
+      title: 'Realtime parcial',
+      description: 'Algunes mètriques realtime no estan disponibles.',
+      href: '/admin/analytics',
+      action: 'Veure',
+    }] : []),
+    ...(!imapConfigured ? [{
+      type: 'info',
+      title: 'IMAP no configurat',
+      description: 'L’inbox encara no està connectat.',
+      href: '/admin/inbox/settings',
+      action: 'Configurar',
+    }] : []),
+    ...(postEventPending > 0 ? [{
+      type: 'warning',
+      title: 'Emails post-event pendents',
+      description: `${postEventPending} events sense email enviat.`,
+      href: '/admin/emails',
+      action: 'Gestionar',
+    }] : []),
+  ];
+
   // Activitat recent
   const activities = [
     { icon: '👋', text: "Benvingut al panell d'administració!", time: 'Ara' },
@@ -258,6 +308,31 @@ export default async function AdminDashboard() {
           <Link href="/admin/ressenyes" className="self-start sm:self-auto">
             <Button variant="secondary" icon="⭐" label="Revisar" />
           </Link>
+        </div>
+      )}
+
+      {alerts.length > 0 && (
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {alerts.map((alert, index) => {
+            const palette = alert.type === 'error'
+              ? 'border-rose-500/30 bg-rose-500/10 text-rose-200'
+              : alert.type === 'warning'
+                ? 'border-amber-500/30 bg-amber-500/10 text-amber-200'
+                : 'border-sky-500/30 bg-sky-500/10 text-sky-200';
+            return (
+              <div key={`${alert.title}-${index}`} className={`rounded-2xl border p-4 ${palette}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold">{alert.title}</p>
+                    <p className="text-xs text-slate-300 mt-1">{alert.description}</p>
+                  </div>
+                  <Link href={alert.href} className="text-xs text-slate-100 underline decoration-dotted hover:text-white">
+                    {alert.action}
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
