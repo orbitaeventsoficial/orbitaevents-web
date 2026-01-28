@@ -251,6 +251,8 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
       safe(client.runRealtimeReport({
         property,
         metrics: [{ name: 'activeUsers' }],
+        dimensions: [{ name: 'unifiedPagePathScreen' }],
+        limit: 8,
       })),
     ]);
 
