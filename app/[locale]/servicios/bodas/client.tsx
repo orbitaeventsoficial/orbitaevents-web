@@ -193,7 +193,7 @@ export default function BodasClientV2() {
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-bg-main z-10" />
           <Image
-            src="/img/portfolio/bodas/bodas-01.webp"
+            src="/img/portfolio/bodas/bodas-01.avif"
             alt="DJ para bodas Òrbita Events"
             fill
             priority

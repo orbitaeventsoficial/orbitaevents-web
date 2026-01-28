@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       url: '/servicios/empresas',
       images: [
         {
-          url: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
+          url: '/img/portfolio/eventos-empresa/eventos-empresa-01.avif',
           alt: t('breadcrumb'),
         },
       ],
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       card: 'summary_large_image',
       title: t('meta.ogTitle', { price: minPrice }),
       description: t('meta.description', { price: minPrice }),
-      images: ['/img/portfolio/eventos-empresa/eventos-empresa-01.webp'],
+      images: ['/img/portfolio/eventos-empresa/eventos-empresa-01.avif'],
     },
     robots: { index: true, follow: true },
     keywords: [

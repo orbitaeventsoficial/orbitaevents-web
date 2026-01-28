@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: `DJ Bodas Vallès | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional local para bodas en el Vallès. Oriental y Occidental con desplazamiento incluido.',
     url: '/servicios/dj-bodas-valles',
-    images: [{ url: '/img/portfolio/bodas/bodas-05.webp', alt: 'DJ Bodas Vallès - Òrbita Events' }],
+    images: [{ url: '/img/portfolio/bodas/bodas-05.avif', alt: 'DJ Bodas Vallès - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },

@@ -147,8 +147,8 @@ const JSON_LD_ORGANIZATION = {
   },
   image: [
     'https://orbitaevents.com/og-home.jpg',
-    'https://orbitaevents.com/img/portfolio/bodas/bodas-01.webp',
-    'https://orbitaevents.com/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
+    'https://orbitaevents.com/img/portfolio/bodas/bodas-01.avif',
+    'https://orbitaevents.com/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
   ],
   telephone: SITE_CONFIG.business.phone,
   email: SITE_CONFIG.business.email,

@@ -19,9 +19,9 @@ export const localBusinessSchema = {
   url: 'https://orbitaevents.com',
   logo: 'https://orbitaevents.com/img/logoplanetatextdreta.svg',
   image: [
-    'https://orbitaevents.com/img/portfolio/bodas/bodas-01.webp',
-    'https://orbitaevents.com/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
-    'https://orbitaevents.com/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
+    'https://orbitaevents.com/img/portfolio/bodas/bodas-01.avif',
+    'https://orbitaevents.com/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
+    'https://orbitaevents.com/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif',
   ],
   telephone: '+34699121023',
   email: 'info@orbitaevents.com',

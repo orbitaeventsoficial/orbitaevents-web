@@ -10,9 +10,9 @@ const SERVICE_KEYS = ['casaments', 'festes', 'empreses'] as const;
 
 // Imagenes de fondo por servicio (portfolio)
 const SERVICE_IMAGES: Record<string, string> = {
-  casaments: '/img/portfolio/bodas/bodas-01.webp',
-  festes: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp',
-  empreses: '/img/portfolio/eventos-empresa/eventos-empresa-01.webp',
+  casaments: '/img/portfolio/bodas/bodas-01.avif',
+  festes: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
+  empreses: '/img/portfolio/eventos-empresa/eventos-empresa-01.avif',
 };
 
 // Estilos por servicio

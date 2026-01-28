@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title = category?.name ?? slug;
   }
 
-  const firstImage = images[0]?.src || '/img/portfolio/bodas/bodas-01.webp';
+  const firstImage = images[0]?.src || '/img/portfolio/bodas/bodas-01.avif';
   const isEs = locale === 'es';
 
   const metaTitle = isEs

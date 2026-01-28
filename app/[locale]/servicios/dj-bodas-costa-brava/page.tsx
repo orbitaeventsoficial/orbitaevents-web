@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: `DJ Bodas Costa Brava | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en la Costa Brava. Especialistas en bodas de costa y exteriores.',
     url: '/servicios/dj-bodas-costa-brava',
-    images: [{ url: '/img/portfolio/bodas/bodas-03.webp', alt: 'DJ Bodas Costa Brava - Òrbita Events' }],
+    images: [{ url: '/img/portfolio/bodas/bodas-03.avif', alt: 'DJ Bodas Costa Brava - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },

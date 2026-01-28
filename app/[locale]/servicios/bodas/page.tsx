@@ -31,14 +31,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       title: t('meta.ogTitle', { price: minPrice }),
       description: t('meta.ogDescription', { price: minPrice }),
       url: '/servicios/bodas',
-      images: [{ url: '/img/portfolio/bodas/bodas-01.webp', alt: t('breadcrumb') }],
+      images: [{ url: '/img/portfolio/bodas/bodas-01.avif', alt: t('breadcrumb') }],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title: t('meta.ogTitle', { price: minPrice }),
       description: t('meta.description', { price: minPrice }),
-      images: ['/img/portfolio/bodas/bodas-01.webp'],
+      images: ['/img/portfolio/bodas/bodas-01.avif'],
     },
     robots: { index: true, follow: true },
   };

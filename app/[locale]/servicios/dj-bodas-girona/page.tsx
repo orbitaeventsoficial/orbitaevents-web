@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: `DJ Bodas Girona | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en Girona. Ciudad, Figueres, Olot, Banyoles y toda la provincia.',
     url: '/servicios/dj-bodas-girona',
-    images: [{ url: '/img/portfolio/bodas/bodas-02.webp', alt: 'DJ Bodas Girona - Òrbita Events' }],
+    images: [{ url: '/img/portfolio/bodas/bodas-02.avif', alt: 'DJ Bodas Girona - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },

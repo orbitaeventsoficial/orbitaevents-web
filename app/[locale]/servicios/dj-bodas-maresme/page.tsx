@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: `DJ Bodas Maresme | Desde ${MIN_PRICE}€`,
     description: 'DJ profesional para bodas en el Maresme. Toda la comarca con desplazamiento incluido.',
     url: '/servicios/dj-bodas-maresme',
-    images: [{ url: '/img/portfolio/bodas/bodas-04.webp', alt: 'DJ Bodas Maresme - Òrbita Events' }],
+    images: [{ url: '/img/portfolio/bodas/bodas-04.avif', alt: 'DJ Bodas Maresme - Òrbita Events' }],
     type: 'website',
   },
   robots: { index: true, follow: true },

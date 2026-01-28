@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp',
+        url: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif',
         width: 1200,
         height: 630,
         alt: 'Boda Món Màgic amb lacre artesanal',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Boda Món Màgic amb Lacre Artesanal',
     description: 'Sobres amb lacre real + Cartes màgiques personalitzades',
-    images: ['/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.webp'],
+    images: ['/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif'],
   },
   alternates: {
     canonical: '/tematica-mon-magic',

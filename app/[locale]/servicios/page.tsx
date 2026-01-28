@@ -27,14 +27,14 @@ export async function generateMetadata({ params }: { params: { locale: string } 
       title: 'Servicios DJ y Eventos Barcelona | Orbita Events',
       description: 'DJ profesional, discomovil, fiestas privadas, eventos corporativos, animacion infantil y mas. Desde 250 EUR. Barcelona y Girona.',
       url: '/servicios',
-      images: [{ url: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp', alt: 'Servicios Orbita Events Barcelona' }],
+      images: [{ url: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif', alt: 'Servicios Orbita Events Barcelona' }],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title: 'Servicios DJ y Eventos Barcelona | Orbita Events',
       description: 'DJ profesional, discomovil, fiestas privadas y mas. Desde 250 EUR.',
-      images: ['/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp'],
+      images: ['/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif'],
     },
     robots: { index: true, follow: true },
   };

@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 const ROOT = path.join(process.cwd(), 'public', 'img', 'portfolio');
-const VALID = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+const VALID = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif'];
 
 function slugify(str) {
   return str

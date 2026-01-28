@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: t('meta.title'),
       description: t('meta.description'),
-      images: [{ url: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.webp', alt: 'Festa Halloween Barcelona' }],
+      images: [{ url: '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif', alt: 'Festa Halloween Barcelona' }],
     },
   };
 }
@@ -53,7 +53,7 @@ export default async function HalloweenPage() {
           ======================================== */}
       <section className="relative h-[80vh] overflow-hidden" style={{ touchAction: 'pan-y' }}>
         <Image
-          src="/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.webp"
+          src="/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif"
           alt="Festa Halloween Òrbita Events"
           fill
           sizes="100vw"

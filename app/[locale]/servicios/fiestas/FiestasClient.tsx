@@ -95,7 +95,7 @@ export default function FiestasClient() {
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-bg-main z-10" />
           <Image
-            src="/img/portfolio/fiestas-privadas/fiestas-privadas-01.webp"
+            src="/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif"
             alt="DJ para fiestas privadas Òrbita Events"
             fill
             priority

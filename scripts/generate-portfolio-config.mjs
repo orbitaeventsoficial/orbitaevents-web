@@ -7,7 +7,7 @@ import path from "path";
 const BASE = path.join(process.cwd(), "public", "img", "portfolio");
 const OUTPUT = path.join(process.cwd(), "app", "config", "portfolio-images.ts");
 
-const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
+const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"];
 
 // -----------------------------------------------------------------------------
 // Helpers
