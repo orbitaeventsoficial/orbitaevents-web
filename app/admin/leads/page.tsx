@@ -353,23 +353,23 @@ export default async function LeadsPage({
         >
           Tots
         </Link>
-        {['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'].map((value) => (
+        {VALID_STATUS.map((value) => (
           <Link
             key={value}
             href={`/admin/leads?status=${value}`}
             className={`rounded-full border px-3 py-1 ${
-              data.filters.status.includes(value) ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+              data.filters.status.includes(value as LeadStatus) ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
             }`}
           >
             {value}
           </Link>
         ))}
-        {['LOW', 'MEDIUM', 'HIGH', 'URGENT'].map((value) => (
+        {VALID_PRIORITY.map((value) => (
           <Link
             key={value}
             href={`/admin/leads?priority=${value}`}
             className={`rounded-full border px-3 py-1 ${
-              data.filters.priority.includes(value) ? 'border-amber-500/40 bg-amber-500/10 text-amber-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+              data.filters.priority.includes(value as Priority) ? 'border-amber-500/40 bg-amber-500/10 text-amber-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
             }`}
           >
             {value}
