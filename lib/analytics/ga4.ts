@@ -177,8 +177,7 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
     searchTermsRes,
     devicesRes,
     locationsRes,
-    timeseriesRes,
-    realtimeRes
+    timeseriesRes
   ] =
     await Promise.all([
       safe(client.runReport({
@@ -248,13 +247,21 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
         orderBys: [{ dimension: { dimensionName: 'date' }, desc: false }],
         limit: 31,
       })),
-      safe(client.runRealtimeReport({
-        property,
-        metrics: [{ name: 'activeUsers' }],
-        dimensions: [{ name: 'unifiedPagePathScreen' }],
-        limit: 8,
-      })),
     ]);
+
+  let realtimeRes = await safe(client.runRealtimeReport({
+    property,
+    metrics: [{ name: 'activeUsers' }],
+    dimensions: [{ name: 'unifiedPagePathScreen' }],
+    limit: 8,
+  }));
+
+  if (!realtimeRes) {
+    realtimeRes = await safe(client.runRealtimeReport({
+      property,
+      metrics: [{ name: 'activeUsers' }],
+    }));
+  }
 
   const totalRow = totalsRes?.[0]?.rows?.[0];
 
