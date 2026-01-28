@@ -27,11 +27,19 @@ function parsePage(value?: string) {
   return Number.isNaN(parsed) || parsed < 1 ? 1 : parsed;
 }
 
-export default async function TasksPage({ searchParams }: { searchParams?: { status?: string; page?: string } }) {
-  const status = isTaskStatus(searchParams?.status) ? searchParams?.status : undefined;
-  const page = parsePage(searchParams?.page);
+export default async function TasksPage({
+  searchParams,
+}: {
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
+  const statusParam = Array.isArray(searchParams?.status) ? searchParams?.status[0] : searchParams?.status;
+  const status: LeadTaskStatus | undefined = isTaskStatus(statusParam) ? statusParam : undefined;
+  const pageParam = Array.isArray(searchParams?.page) ? searchParams?.page[0] : searchParams?.page;
+  const page = parsePage(pageParam);
   const limit = 30;
-  const where: Prisma.LeadTaskWhereInput | undefined = status ? { status } : undefined;
+  const where: Prisma.LeadTaskWhereInput | undefined = status
+    ? { status: { equals: status as LeadTaskStatus } }
+    : undefined;
   const [tasks, total] = await Promise.all([
     prisma.leadTask.findMany({
       where,
