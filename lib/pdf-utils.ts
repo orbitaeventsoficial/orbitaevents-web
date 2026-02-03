@@ -1,12 +1,16 @@
 /**
  * PDF Generation Utilities for Òrbita Events
  * Uses jsPDF for client-side PDF generation
- * NOTE: jsPDF is loaded dynamically to reduce initial bundle size
+ *
+ * MEJORAS v2.0:
+ * - Logo de Orbita incluido en el header
+ * - Paginación correcta con saltos de página automáticos
+ * - Mejor espaciado y tipografía
  */
 
 import { getPacksByService, EXTRAS, type ExtraDefinition, type ServiceSlug, type PackDefinition } from '@/app/config/packs-config';
+import { ORBITA_LOGO_BASE64 } from './logo-base64';
 
-// Dynamic import for jsPDF - only loads when needed
 type jsPDFType = import('jspdf').jsPDF;
 let jsPDFModule: typeof import('jspdf') | null = null;
 
@@ -17,32 +21,32 @@ async function getJsPDF(): Promise<typeof import('jspdf')> {
   return jsPDFModule;
 }
 
-// Brand colors - Enhanced palette
 const COLORS = {
-  // Primary brand colors
-  gold: [218, 165, 32] as [number, number, number],      // #DAA520 - Gold
-  goldLight: [255, 215, 0] as [number, number, number],  // #FFD700 - Light gold
-  goldDark: [184, 134, 11] as [number, number, number],  // #B8860B - Dark gold
-
-  // Neutrals
+  gold: [218, 165, 32] as [number, number, number],
+  goldLight: [255, 215, 0] as [number, number, number],
+  goldDark: [184, 134, 11] as [number, number, number],
   black: [0, 0, 0] as [number, number, number],
-  blackSoft: [26, 26, 26] as [number, number, number],    // #1a1a1a
+  blackSoft: [26, 26, 26] as [number, number, number],
   white: [255, 255, 255] as [number, number, number],
-
-  // Grays
   gray: [128, 128, 128] as [number, number, number],
-  grayLight: [229, 229, 229] as [number, number, number], // #e5e5e5
-  grayDark: [74, 74, 74] as [number, number, number],     // #4a4a4a
-
-  // Backgrounds
-  bgLight: [250, 250, 250] as [number, number, number],   // #fafafa
-  bgDark: [245, 245, 245] as [number, number, number],    // #f5f5f5
-
-  // Accent
-  success: [34, 197, 94] as [number, number, number],     // #22c55e - Green
+  grayLight: [229, 229, 229] as [number, number, number],
+  grayDark: [74, 74, 74] as [number, number, number],
+  bgLight: [250, 250, 250] as [number, number, number],
+  bgDark: [245, 245, 245] as [number, number, number],
+  success: [34, 197, 94] as [number, number, number],
 };
 
-// Service display names
+const PAGE = {
+  width: 210,
+  height: 297,
+  marginTop: 60,
+  marginBottom: 40,
+  marginLeft: 20,
+  marginRight: 20,
+  contentWidth: 170,
+  safeBottom: 257,
+};
+
 const SERVICE_NAMES: Record<ServiceSlug, { ca: string; es: string; en: string }> = {
   bodas: { ca: 'Casaments', es: 'Bodas', en: 'Weddings' },
   fiestas: { ca: 'Festes', es: 'Fiestas', en: 'Parties' },
@@ -52,92 +56,94 @@ const SERVICE_NAMES: Record<ServiceSlug, { ca: string; es: string; en: string }>
   alquiler: { ca: 'Lloguer d\'Equip', es: 'Alquiler de Equipo', en: 'Equipment Rental' },
 };
 
-/**
- * Add modern header with logo and branding to PDF
- */
-function addHeader(doc: jsPDFType, title: string) {
-  // Modern gradient background (simulated with rectangles)
-  doc.setFillColor(...COLORS.blackSoft);
-  doc.rect(0, 0, 210, 50, 'F');
 
-  // Gold accent bar on the left
+function checkPageBreak(doc: jsPDFType, currentY: number, neededSpace: number, title: string): number {
+  if (currentY + neededSpace > PAGE.safeBottom) {
+    doc.addPage();
+    return addHeader(doc, title);
+  }
+  return currentY;
+}
+
+function addHeader(doc: jsPDFType, title: string): number {
+  doc.setFillColor(...COLORS.blackSoft);
+  doc.rect(0, 0, PAGE.width, 50, 'F');
   doc.setFillColor(...COLORS.gold);
   doc.rect(0, 0, 6, 50, 'F');
-
-  // Subtle bottom border
   doc.setFillColor(...COLORS.gold);
-  doc.rect(0, 48, 210, 2, 'F');
+  doc.rect(0, 48, PAGE.width, 2, 'F');
 
-  // Company name - Bold and modern
+  let textStartX = 22;
+  if (ORBITA_LOGO_BASE64 && ORBITA_LOGO_BASE64.length > 100) {
+    try {
+      doc.addImage(ORBITA_LOGO_BASE64, 'PNG', 12, 6, 38, 38);
+      textStartX = 55;
+    } catch { /* fallback to text */ }
+  }
+
   doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(28);
+  doc.setFontSize(26);
   doc.setFont('helvetica', 'bold');
-  doc.text('ÒRBITA', 22, 22);
-
-  // "EVENTS" lighter
-  doc.setFontSize(28);
+  doc.text('ÒRBITA', textStartX, 24);
+  const orbitaWidth = doc.getTextWidth('ÒRBITA') + 3;
   doc.setFont('helvetica', 'normal');
-  doc.text('EVENTS', 68, 22);
-
-  // Subtitle/Title
+  doc.text('EVENTS', textStartX + orbitaWidth, 24);
   doc.setTextColor(...COLORS.grayLight);
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
-  doc.text(title.toUpperCase(), 22, 38);
+  doc.setFontSize(10);
+  doc.text(title.toUpperCase(), textStartX, 38);
 
-  // Decorative element - Small gold box
   doc.setFillColor(...COLORS.gold);
-  doc.rect(180, 15, 20, 3, 'F');
+  doc.rect(175, 15, 22, 3, 'F');
   doc.setFillColor(...COLORS.goldLight);
-  doc.rect(180, 20, 20, 3, 'F');
+  doc.rect(175, 20, 22, 3, 'F');
+  doc.setFillColor(...COLORS.goldDark);
+  doc.rect(175, 25, 22, 3, 'F');
 
-  return 60; // Return Y position after header (more space)
+  return PAGE.marginTop;
 }
 
-/**
- * Add modern footer with contact info
- */
 function addFooter(doc: jsPDFType, pageNum: number, totalPages: number) {
-  const pageHeight = doc.internal.pageSize.height;
-
-  // Top border line
+  const footerY = PAGE.height - 35;
+  doc.setFillColor(...COLORS.bgLight);
+  doc.rect(0, footerY - 5, PAGE.width, 40, 'F');
   doc.setDrawColor(...COLORS.gold);
-  doc.setLineWidth(0.5);
-  doc.line(20, pageHeight - 30, 190, pageHeight - 30);
+  doc.setLineWidth(0.8);
+  doc.line(PAGE.marginLeft, footerY, PAGE.width - PAGE.marginRight, footerY);
 
-  // Left side - Contact info
   doc.setTextColor(...COLORS.grayDark);
   doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.text('orbitaevents.com', 20, pageHeight - 22);
-  doc.text('info@orbitaevents.com', 20, pageHeight - 17);
-  doc.text('+34 674 23 85 76', 20, pageHeight - 12);
-
-  // Center - Location
-  doc.setTextColor(...COLORS.gray);
-  doc.setFontSize(8);
-  doc.text('Barcelona • Girona • Catalunya', 105, pageHeight - 17, { align: 'center' });
-
-  // Right side - Page number with modern style
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text(`${pageNum}`, 185, pageHeight - 17, { align: 'right' });
+  doc.text('orbitaevents.com', PAGE.marginLeft, footerY + 10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('info@orbitaevents.com', PAGE.marginLeft, footerY + 16);
+  doc.text('+34 674 23 85 76', PAGE.marginLeft, footerY + 22);
+
+  doc.setTextColor(...COLORS.gray);
+  doc.text('Barcelona · Girona · Catalunya', PAGE.width / 2, footerY + 16, { align: 'center' });
+
+  doc.setTextColor(...COLORS.gold);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${pageNum}`, PAGE.width - PAGE.marginRight - 10, footerY + 13, { align: 'right' });
   doc.setTextColor(...COLORS.gray);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text(`/ ${totalPages}`, 190, pageHeight - 17, { align: 'right' });
+  doc.text(`/ ${totalPages}`, PAGE.width - PAGE.marginRight, footerY + 13, { align: 'right' });
 
-  // Bottom tagline
-  doc.setTextColor(...COLORS.grayLight);
+  doc.setTextColor(...COLORS.grayDark);
   doc.setFontSize(7);
   doc.setFont('helvetica', 'italic');
-  doc.text('L\'Esdeveniment Que La Teva Gent NO Oblidarà', 105, pageHeight - 8, { align: 'center' });
+  doc.text("L'Esdeveniment Que La Teva Gent NO Oblidarà", PAGE.width / 2, footerY + 28, { align: 'center' });
 }
 
-/**
- * Generate service brochure PDF
- */
+function addAllFooters(doc: jsPDFType) {
+  const totalPages = doc.internal.pages.length - 1;
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    addFooter(doc, i, totalPages);
+  }
+}
+
 export async function generateServiceBrochure(
   service: ServiceSlug,
   locale: 'ca' | 'es' | 'en' = 'ca'
@@ -147,88 +153,38 @@ export async function generateServiceBrochure(
   const packs = getPacksByService(service);
   const serviceName = SERVICE_NAMES[service][locale];
 
-  // Translations
   const t = {
-    ca: {
-      brochure: 'Catàleg de Serveis',
-      ourPacks: 'Els Nostres Packs',
-      duration: 'Durada',
-      hours: 'hores',
-      includes: 'Inclou',
-      idealFor: 'Ideal per',
-      popular: 'MÉS POPULAR',
-      premium: 'PREMIUM',
-      extras: 'Extres Disponibles',
-      contactUs: 'Contacta\'ns',
-      contactText: 'Tens dubtes? Escriu-nos sense compromís!',
-    },
-    es: {
-      brochure: 'Catálogo de Servicios',
-      ourPacks: 'Nuestros Packs',
-      duration: 'Duración',
-      hours: 'horas',
-      includes: 'Incluye',
-      idealFor: 'Ideal para',
-      popular: 'MÁS POPULAR',
-      premium: 'PREMIUM',
-      extras: 'Extras Disponibles',
-      contactUs: 'Contáctanos',
-      contactText: '¿Tienes dudas? ¡Escríbenos sin compromiso!',
-    },
-    en: {
-      brochure: 'Service Catalog',
-      ourPacks: 'Our Packages',
-      duration: 'Duration',
-      hours: 'hours',
-      includes: 'Includes',
-      idealFor: 'Ideal for',
-      popular: 'MOST POPULAR',
-      premium: 'PREMIUM',
-      extras: 'Available Extras',
-      contactUs: 'Contact Us',
-      contactText: 'Have questions? Contact us with no obligation!',
-    },
+    ca: { brochure: 'Catàleg de Serveis', ourPacks: 'Els Nostres Packs', duration: 'Durada', hours: 'hores', idealFor: 'Ideal per', popular: 'MÉS POPULAR', premium: 'PREMIUM', extras: 'Extres Disponibles', contactUs: 'Contacta\'ns', contactText: 'Tens dubtes? Escriu-nos sense compromís!' },
+    es: { brochure: 'Catálogo de Servicios', ourPacks: 'Nuestros Packs', duration: 'Duración', hours: 'horas', idealFor: 'Ideal para', popular: 'MÁS POPULAR', premium: 'PREMIUM', extras: 'Extras Disponibles', contactUs: 'Contáctanos', contactText: '¿Tienes dudas? ¡Escríbenos sin compromiso!' },
+    en: { brochure: 'Service Catalog', ourPacks: 'Our Packages', duration: 'Duration', hours: 'hours', idealFor: 'Ideal for', popular: 'MOST POPULAR', premium: 'PREMIUM', extras: 'Available Extras', contactUs: 'Contact Us', contactText: 'Have questions? Contact us with no obligation!' },
   }[locale];
 
-  // Page 1: Cover
-  let y = addHeader(doc, `${t.brochure} - ${serviceName}`);
+  const headerTitle = `${t.brochure} - ${serviceName}`;
+  let y = addHeader(doc, headerTitle);
 
-  // Service title
   doc.setTextColor(...COLORS.black);
   doc.setFontSize(32);
   doc.setFont('helvetica', 'bold');
-  doc.text(serviceName.toUpperCase(), 105, y + 30, { align: 'center' });
-
-  // Decorative line
+  doc.text(serviceName.toUpperCase(), PAGE.width / 2, y + 30, { align: 'center' });
   doc.setDrawColor(...COLORS.gold);
   doc.setLineWidth(2);
   doc.line(60, y + 40, 150, y + 40);
 
-  // Section: Our Packs
   y = y + 60;
   doc.setTextColor(...COLORS.gold);
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.ourPacks, 20, y);
+  doc.text(t.ourPacks, PAGE.marginLeft, y);
   y += 15;
 
-  // List each pack
-  packs.forEach((pack, index) => {
-    // Check if we need a new page
-    if (y > 230) {
-      doc.addPage();
-      y = addHeader(doc, `${t.brochure} - ${serviceName}`);
-      y += 10;
-    }
-
-    // Pack card background
+  const packCardHeight = 60;
+  packs.forEach((pack) => {
+    y = checkPageBreak(doc, y, packCardHeight + 10, headerTitle);
     doc.setFillColor(245, 245, 245);
-    doc.roundedRect(15, y - 5, 180, 55, 3, 3, 'F');
-    // Left accent bar
+    doc.roundedRect(15, y - 5, PAGE.contentWidth + 10, packCardHeight, 3, 3, 'F');
     doc.setFillColor(...COLORS.gold);
-    doc.rect(15, y - 5, 2, 55, 'F');
+    doc.rect(15, y - 5, 2, packCardHeight, 'F');
 
-    // Badge
     if (pack.popular) {
       doc.setFillColor(...COLORS.gold);
       doc.roundedRect(150, y - 3, 40, 8, 2, 2, 'F');
@@ -245,108 +201,81 @@ export async function generateServiceBrochure(
       doc.text(t.premium, 172, y + 3, { align: 'center' });
     }
 
-    // Pack name with icon
     doc.setFillColor(...COLORS.gold);
     doc.circle(20, y + 8, 1.2, 'F');
     doc.setTextColor(...COLORS.black);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.text(pack.name, 24, y + 8);
-
-    // Price
     doc.setTextColor(...COLORS.gold);
     doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
     doc.text(pack.price, 24, y + 20);
-
-    // Duration
     doc.setTextColor(...COLORS.gray);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`${t.duration}: ${pack.durationHours} ${t.hours}`, 60, y + 20);
 
-    // Features (first 3)
     doc.setTextColor(...COLORS.black);
     doc.setFontSize(9);
     pack.features.slice(0, 3).forEach((feature, i) => {
-      // Clean emoji from feature text for PDF
       const cleanFeature = feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim();
-      const featureY = y + 30 + i * 5;
+      const featureY = y + 30 + i * 6;
       doc.setFillColor(...COLORS.gold);
       doc.circle(20, featureY - 1.3, 1, 'F');
       doc.setTextColor(...COLORS.black);
       doc.text(cleanFeature.substring(0, 60), 24, featureY);
     });
-    // Ideal for
+
     if (pack.ideal) {
       doc.setTextColor(...COLORS.gray);
       doc.setFontSize(8);
-      doc.text(`${t.idealFor}: ${pack.ideal}`, 24, y + 48);
+      doc.text(`${t.idealFor}: ${pack.ideal}`, 24, y + 52);
     }
-
-    y += 65;
+    y += packCardHeight + 10;
   });
 
-  // Add extras section if space, otherwise new page
-  if (y > 180) {
-    doc.addPage();
-    y = addHeader(doc, `${t.brochure} - ${serviceName}`);
-    y += 10;
-  }
-
-  // Extras section
-  const compatibleExtras = EXTRAS.filter(
-    (e) => !e.compatibleWith || e.compatibleWith.includes(service)
-  ).slice(0, 8);
+  y = checkPageBreak(doc, y, 80, headerTitle);
+  const compatibleExtras = EXTRAS.filter((e) => !e.compatibleWith || e.compatibleWith.includes(service)).slice(0, 8);
 
   if (compatibleExtras.length > 0) {
     doc.setTextColor(...COLORS.gold);
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.text(t.extras, 20, y + 10);
-    y += 20;
-
+    doc.text(t.extras, PAGE.marginLeft, y + 10);
+    y += 25;
     doc.setTextColor(...COLORS.black);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
 
     compatibleExtras.forEach((extra, i) => {
-      const col = i % 2 === 0 ? 20 : 110;
-      const textCol = col + 4;
-      const row = Math.floor(i / 2) * 12;
-      const priceText = extra.price ? `${extra.price}?` : 'Consultar';
+      if (i > 0 && i % 4 === 0) y = checkPageBreak(doc, y, 30, headerTitle);
+      const col = i % 2 === 0 ? PAGE.marginLeft : 110;
+      const row = Math.floor((i % 4) / 2) * 14;
+      const priceText = extra.price ? `${extra.price}€` : 'Consultar';
       doc.setFillColor(...COLORS.gold);
       doc.circle(col, y + row - 1.3, 1, 'F');
       doc.setTextColor(...COLORS.black);
-      doc.text(`${extra.name} (${priceText})`, textCol, y + row);
+      doc.text(`${extra.name} (${priceText})`, col + 4, y + row);
     });
+    y += Math.ceil(compatibleExtras.length / 2) * 14 + 10;
   }
 
-  // Contact section
-  y = 250;
+  y = checkPageBreak(doc, y, 40, headerTitle);
+  const contactY = Math.min(y + 10, PAGE.safeBottom - 35);
   doc.setFillColor(...COLORS.gold);
-  doc.roundedRect(15, y, 180, 25, 3, 3, 'F');
+  doc.roundedRect(15, contactY, PAGE.contentWidth + 10, 28, 3, 3, 'F');
   doc.setTextColor(...COLORS.black);
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.contactUs, 105, y + 10, { align: 'center' });
+  doc.text(t.contactUs, PAGE.width / 2, contactY + 11, { align: 'center' });
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.text(t.contactText, 105, y + 18, { align: 'center' });
+  doc.text(t.contactText, PAGE.width / 2, contactY + 20, { align: 'center' });
 
-  // Add footer
-  const totalPages = doc.internal.pages.length - 1;
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i);
-    addFooter(doc, i, totalPages);
-  }
-
+  addAllFooters(doc);
   return doc;
 }
 
-/**
- * Generate quote PDF from configurator
- */
 export interface QuoteData {
   eventType: string;
   pack: PackDefinition;
@@ -372,240 +301,130 @@ export async function generateQuotePDF(
   const extrasCatalog = data.extrasCatalog ?? EXTRAS;
 
   const t = {
-    ca: {
-      quote: 'Pressupost',
-      eventDetails: 'Detalls de l\'Event',
-      eventType: 'Tipus d\'event',
-      date: 'Data',
-      guests: 'Convidats',
-      selectedPack: 'Pack Seleccionat',
-      duration: 'Durada',
-      hours: 'hores',
-      features: 'Característiques Incloses',
-      extras: 'Extres Seleccionats',
-      priceSummary: 'Resum de Preus',
-      basePack: 'Pack base',
-      extrasTotal: 'Total extres',
-      discount: 'Descompte',
-      total: 'TOTAL',
-      validUntil: 'Pressupost vàlid durant 15 dies',
-      disclaimer: 'Els preus no inclouen IVA. Consulta condicions.',
-      toConfirm: 'Per confirmar el teu event',
-      contact: 'Contacta amb nosaltres per confirmar disponibilitat.',
-      nextSteps: 'PRÒXIMS PASSOS',
-      step1: 'Confirma disponibilitat contactant-nos',
-      step2: 'Reserva amb un senyal del 30%',
-      step3: 'Gaudeix del teu event perfecte',
-    },
-    es: {
-      quote: 'Presupuesto',
-      eventDetails: 'Detalles del Evento',
-      eventType: 'Tipo de evento',
-      date: 'Fecha',
-      guests: 'Invitados',
-      selectedPack: 'Pack Seleccionado',
-      duration: 'Duración',
-      hours: 'horas',
-      features: 'Características Incluidas',
-      extras: 'Extras Seleccionados',
-      priceSummary: 'Resumen de Precios',
-      basePack: 'Pack base',
-      extrasTotal: 'Total extras',
-      discount: 'Descuento',
-      total: 'TOTAL',
-      validUntil: 'Presupuesto válido durante 15 días',
-      disclaimer: 'Los precios no incluyen IVA. Consulta condiciones.',
-      toConfirm: 'Para confirmar tu evento',
-      contact: 'Contáctanos para confirmar disponibilidad.',
-      nextSteps: 'PRÓXIMOS PASOS',
-      step1: 'Confirma disponibilidad contactándonos',
-      step2: 'Reserva con una señal del 30%',
-      step3: 'Disfruta de tu evento perfecto',
-    },
-    en: {
-      quote: 'Quote',
-      eventDetails: 'Event Details',
-      eventType: 'Event type',
-      date: 'Date',
-      guests: 'Guests',
-      selectedPack: 'Selected Package',
-      duration: 'Duration',
-      hours: 'hours',
-      features: 'Included Features',
-      extras: 'Selected Extras',
-      priceSummary: 'Price Summary',
-      basePack: 'Base package',
-      extrasTotal: 'Extras total',
-      discount: 'Discount',
-      total: 'TOTAL',
-      validUntil: 'Quote valid for 15 days',
-      disclaimer: 'Prices do not include VAT. See conditions.',
-      toConfirm: 'To confirm your event',
-      contact: 'Contact us to confirm availability.',
-      nextSteps: 'NEXT STEPS',
-      step1: 'Confirm availability by contacting us',
-      step2: 'Book with a 30% deposit',
-      step3: 'Enjoy your perfect event',
-    },
+    ca: { quote: 'Pressupost', eventDetails: 'Detalls de l\'Event', guests: 'Convidats', selectedPack: 'Pack Seleccionat', hours: 'hores', features: 'Característiques Incloses', extras: 'Extres Seleccionats', priceSummary: 'Resum de Preus', basePack: 'Pack base', extrasTotal: 'Total extres', discount: 'Descompte', total: 'TOTAL', validUntil: 'Pressupost vàlid durant 15 dies', disclaimer: 'Els preus no inclouen IVA. Consulta condicions.', nextSteps: 'PRÒXIMS PASSOS', step1: 'Confirma disponibilitat contactant-nos', step2: 'Reserva amb un senyal del 30%', step3: 'Gaudeix del teu event perfecte' },
+    es: { quote: 'Presupuesto', eventDetails: 'Detalles del Evento', guests: 'Invitados', selectedPack: 'Pack Seleccionado', hours: 'horas', features: 'Características Incluidas', extras: 'Extras Seleccionados', priceSummary: 'Resumen de Precios', basePack: 'Pack base', extrasTotal: 'Total extras', discount: 'Descuento', total: 'TOTAL', validUntil: 'Presupuesto válido durante 15 días', disclaimer: 'Los precios no incluyen IVA. Consulta condiciones.', nextSteps: 'PRÓXIMOS PASOS', step1: 'Confirma disponibilidad contactándonos', step2: 'Reserva con una señal del 30%', step3: 'Disfruta de tu evento perfecto' },
+    en: { quote: 'Quote', eventDetails: 'Event Details', guests: 'Guests', selectedPack: 'Selected Package', hours: 'hours', features: 'Included Features', extras: 'Selected Extras', priceSummary: 'Price Summary', basePack: 'Base package', extrasTotal: 'Extras total', discount: 'Discount', total: 'TOTAL', validUntil: 'Quote valid for 15 days', disclaimer: 'Prices do not include VAT. See conditions.', nextSteps: 'NEXT STEPS', step1: 'Confirm availability by contacting us', step2: 'Book with a 30% deposit', step3: 'Enjoy your perfect event' },
   }[locale];
 
-  // Header
-  let y = addHeader(doc, t.quote);
+  const headerTitle = t.quote;
+  let y = addHeader(doc, headerTitle);
 
-  // Quote number and date - Modern style
   const quoteNum = `OE-${Date.now().toString(36).toUpperCase()}`;
   doc.setTextColor(...COLORS.gold);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text(`REF: ${quoteNum}`, 190, y, { align: 'right' });
+  doc.text(`REF: ${quoteNum}`, PAGE.width - PAGE.marginRight, y, { align: 'right' });
   doc.setTextColor(...COLORS.grayDark);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text(`${new Date().toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB')}`, 190, y + 5, { align: 'right' });
+  doc.text(`${new Date().toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB')}`, PAGE.width - PAGE.marginRight, y + 5, { align: 'right' });
 
-  // Client name if provided - Modern style
   if (data.clientName) {
     doc.setTextColor(...COLORS.blackSoft);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text(data.clientName, 20, y);
+    doc.text(data.clientName, PAGE.marginLeft, y);
     y += 8;
   }
+  y += 12;
 
-  y += 10;
-
-  // Event Details Section - Modern card
+  const eventCardHeight = 32;
+  y = checkPageBreak(doc, y, eventCardHeight + 10, headerTitle);
   doc.setFillColor(...COLORS.bgLight);
   doc.setDrawColor(...COLORS.grayLight);
   doc.setLineWidth(0.3);
-  doc.roundedRect(15, y, 180, 30, 4, 4, 'FD');
-
-  // Left accent bar
+  doc.roundedRect(15, y, PAGE.contentWidth + 10, eventCardHeight, 4, 4, 'FD');
   doc.setFillColor(...COLORS.gold);
-  doc.rect(15, y, 3, 30, 'F');
-
+  doc.rect(15, y, 3, eventCardHeight, 'F');
   doc.setTextColor(...COLORS.gold);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.eventDetails.toUpperCase(), 23, y + 8);
-
+  doc.text(t.eventDetails.toUpperCase(), 23, y + 9);
   doc.setTextColor(...COLORS.blackSoft);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-
   const eventTypeName = SERVICE_NAMES[data.eventType as ServiceSlug]?.[locale] || data.eventType;
-  doc.text(`${eventTypeName}`, 23, y + 17);
-
+  doc.text(`${eventTypeName}`, 23, y + 18);
+  doc.setTextColor(...COLORS.grayDark);
+  doc.setFontSize(8);
   if (data.date && data.date !== '-') {
-    doc.setTextColor(...COLORS.grayDark);
-    doc.setFontSize(8);
-    doc.text(`📅 ${data.date}`, 23, y + 23);
-    doc.text(`👥 ${data.guests} ${t.guests.toLowerCase()}`, 95, y + 23);
+    doc.text(`${data.date}`, 23, y + 26);
+    doc.text(`${data.guests} ${t.guests.toLowerCase()}`, 95, y + 26);
   } else {
-    doc.setTextColor(...COLORS.grayDark);
-    doc.setFontSize(8);
-    doc.text(`👥 ${data.guests} ${t.guests.toLowerCase()}`, 23, y + 23);
+    doc.text(`${data.guests} ${t.guests.toLowerCase()}`, 23, y + 26);
   }
+  y += eventCardHeight + 12;
 
-  y += 40;
-
-  // Selected Pack Section - Hero card with gradient effect
-  // Background layers for gradient effect
-  doc.setFillColor(218, 165, 32); // Gold
-  doc.roundedRect(15, y, 180, 50, 4, 4, 'F');
-
-  doc.setFillColor(235, 185, 52); // Lighter gold overlay
-  doc.roundedRect(15, y, 180, 25, 4, 4, 'F');
-
-  // Left accent
-  doc.setFillColor(255, 215, 0); // Bright gold
-  doc.rect(15, y, 4, 50, 'F');
-
-  // Pack label
+  const packCardHeight = 55;
+  y = checkPageBreak(doc, y, packCardHeight + 10, headerTitle);
+  doc.setFillColor(218, 165, 32);
+  doc.roundedRect(15, y, PAGE.contentWidth + 10, packCardHeight, 4, 4, 'F');
+  doc.setFillColor(235, 185, 52);
+  doc.roundedRect(15, y, PAGE.contentWidth + 10, 28, 4, 4, 'F');
+  doc.setFillColor(255, 215, 0);
+  doc.rect(15, y, 4, packCardHeight, 'F');
   doc.setTextColor(...COLORS.blackSoft);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.selectedPack.toUpperCase(), 24, y + 8);
-
-  // Pack name - Large and bold
+  doc.text(t.selectedPack.toUpperCase(), 24, y + 9);
   doc.setFontSize(15);
-  doc.setFont('helvetica', 'bold');
-  doc.text(data.pack.name.toUpperCase(), 24, y + 20);
-
-  // Duration
+  doc.text(data.pack.name.toUpperCase(), 24, y + 22);
   doc.setTextColor(26, 26, 26);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
-  doc.text(`⏱ ${data.pack.durationHours} ${t.hours}`, 24, y + 30);
-
-  // Price - Large and prominent
+  doc.text(`${data.pack.durationHours} ${t.hours}`, 24, y + 32);
   doc.setTextColor(...COLORS.blackSoft);
   doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
-  doc.text(data.pack.price, 175, y + 30, { align: 'right' });
-
-  // "desde" indicator if price has "desde"
+  doc.text(data.pack.price, PAGE.width - PAGE.marginRight - 5, y + 32, { align: 'right' });
   if (data.pack.price.toLowerCase().includes('desde')) {
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
-    doc.text('*precio aproximado', 175, y + 38, { align: 'right' });
+    doc.text('*precio aproximado', PAGE.width - PAGE.marginRight - 5, y + 40, { align: 'right' });
   }
-
-  y += 60;
-
-  // Features Section - Modern list with icons
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.features.toUpperCase(), 20, y);
-  y += 8;
-
-  // Features in modern boxes
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...COLORS.blackSoft);
+  y += packCardHeight + 12;
 
   const maxFeatures = Math.min(data.pack.features.length, 8);
   const featuresPerColumn = Math.ceil(maxFeatures / 2);
-
+  const featuresHeight = (featuresPerColumn * 8) + 20;
+  y = checkPageBreak(doc, y, featuresHeight, headerTitle);
+  doc.setTextColor(...COLORS.gold);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text(t.features.toUpperCase(), PAGE.marginLeft, y);
+  y += 10;
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...COLORS.blackSoft);
   data.pack.features.slice(0, maxFeatures).forEach((feature, index) => {
     const cleanFeature = feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim();
     const column = index < featuresPerColumn ? 0 : 1;
     const rowInColumn = index % featuresPerColumn;
-    const x = column === 0 ? 20 : 110;
-    const featureY = y + (rowInColumn * 7);
-
-    // Feature bullet point - gold circle
+    const x = column === 0 ? PAGE.marginLeft : 110;
+    const featureY = y + (rowInColumn * 8);
     doc.setFillColor(...COLORS.gold);
     doc.circle(x + 1, featureY - 1.5, 1, 'F');
-
-    // Feature text
     doc.setTextColor(...COLORS.blackSoft);
     doc.text(cleanFeature.substring(0, 45), x + 4, featureY);
   });
+  y += (featuresPerColumn * 8) + 12;
 
-  y += (featuresPerColumn * 7) + 10;
-
-  // Extras Section (if any)
   if (data.extras.length > 0) {
+    const extrasHeight = (data.extras.length * 7) + 20;
+    y = checkPageBreak(doc, y, extrasHeight, headerTitle);
     doc.setTextColor(...COLORS.gold);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text(t.extras.toUpperCase(), 20, y);
-    y += 8;
-
+    doc.text(t.extras.toUpperCase(), PAGE.marginLeft, y);
+    y += 10;
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...COLORS.blackSoft);
-
     data.extras.forEach((extraName) => {
       const extra = extrasCatalog.find((e) => e.name === extraName || e.id === extraName);
       const price = extra?.price ? `+${extra.price}€` : '';
-
-      // Extra bullet
       doc.setFillColor(...COLORS.goldLight);
       doc.circle(21, y - 1.5, 1, 'F');
-
       doc.text(`${extraName}`, 24, y);
       if (price) {
         doc.setTextColor(...COLORS.gold);
@@ -614,43 +433,81 @@ export async function generateQuotePDF(
         doc.setTextColor(...COLORS.blackSoft);
         doc.setFont('helvetica', 'normal');
       }
-      y += 6;
+      y += 7;
     });
-    y += 8;
+    y += 10;
   }
 
-  // Price Summary - Modern card
-  y = Math.max(y, 195);
+  const summaryHeight = 60;
+  y = checkPageBreak(doc, y, summaryHeight + 25, headerTitle);
+  y = Math.max(y, PAGE.safeBottom - summaryHeight - 20);
 
-  // Summary box with shadow effect
-  doc.setFillColor(248, 248, 248);
-  doc.roundedRect(112, y + 2, 82, 50, 4, 4, 'F'); // Shadow
-  doc.setFillColor(...COLORS.white);
-  doc.setDrawColor(...COLORS.grayLight);
-  doc.setLineWidth(0.5);
-  doc.roundedRect(110, y, 82, 50, 4, 4, 'FD');
-
-  // Left gold accent
+  const stepsY = y;
+  doc.setFillColor(...COLORS.bgDark);
+  doc.setDrawColor(...COLORS.gold);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(15, stepsY, 90, 55, 4, 4, 'FD');
   doc.setFillColor(...COLORS.gold);
-  doc.rect(110, y, 2, 50, 'F');
-
+  doc.rect(15, stepsY, 90, 2, 'F');
   doc.setTextColor(...COLORS.gold);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.priceSummary.toUpperCase(), 117, y + 7);
+  doc.text(t.nextSteps, 20, stepsY + 12);
+  doc.setTextColor(...COLORS.grayDark);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
 
+  doc.setFillColor(...COLORS.gold);
+  doc.circle(21, stepsY + 21, 2, 'F');
+  doc.setTextColor(...COLORS.white);
+  doc.setFontSize(6);
+  doc.text('1', 21, stepsY + 22.5, { align: 'center' });
+  doc.setTextColor(...COLORS.grayDark);
+  doc.setFontSize(7);
+  doc.text(t.step1.substring(0, 35), 26, stepsY + 22);
+
+  doc.setFillColor(...COLORS.gold);
+  doc.circle(21, stepsY + 33, 2, 'F');
+  doc.setTextColor(...COLORS.white);
+  doc.setFontSize(6);
+  doc.text('2', 21, stepsY + 34.5, { align: 'center' });
+  doc.setTextColor(...COLORS.grayDark);
+  doc.setFontSize(7);
+  doc.text(t.step2.substring(0, 35), 26, stepsY + 34);
+
+  doc.setFillColor(...COLORS.gold);
+  doc.circle(21, stepsY + 45, 2, 'F');
+  doc.setTextColor(...COLORS.white);
+  doc.setFontSize(6);
+  doc.text('3', 21, stepsY + 46.5, { align: 'center' });
+  doc.setTextColor(...COLORS.grayDark);
+  doc.setFontSize(7);
+  doc.text(t.step3.substring(0, 35), 26, stepsY + 46);
+
+  doc.setFillColor(248, 248, 248);
+  doc.roundedRect(112, stepsY + 2, 82, 53, 4, 4, 'F');
+  doc.setFillColor(...COLORS.white);
+  doc.setDrawColor(...COLORS.grayLight);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(110, stepsY, 82, 53, 4, 4, 'FD');
+  doc.setFillColor(...COLORS.gold);
+  doc.rect(110, stepsY, 2, 53, 'F');
+  doc.setTextColor(...COLORS.gold);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text(t.priceSummary.toUpperCase(), 117, stepsY + 9);
   doc.setTextColor(...COLORS.blackSoft);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
 
-  let priceY = y + 15;
+  let priceY = stepsY + 18;
   doc.text(t.basePack, 117, priceY);
   doc.setFont('helvetica', 'bold');
   doc.text(`${data.basePrice}€`, 185, priceY, { align: 'right' });
   doc.setFont('helvetica', 'normal');
 
   if (data.extrasPrice > 0) {
-    priceY += 6;
+    priceY += 7;
     doc.text(t.extrasTotal, 117, priceY);
     doc.setFont('helvetica', 'bold');
     doc.text(`${data.extrasPrice}€`, 185, priceY, { align: 'right' });
@@ -658,7 +515,7 @@ export async function generateQuotePDF(
   }
 
   if (data.discount > 0) {
-    priceY += 6;
+    priceY += 7;
     doc.setTextColor(...COLORS.success);
     doc.text(`${t.discount}`, 117, priceY);
     doc.setFont('helvetica', 'bold');
@@ -667,89 +524,33 @@ export async function generateQuotePDF(
     doc.setFont('helvetica', 'normal');
   }
 
-  // Total line
-  priceY += 8;
+  priceY += 10;
   doc.setDrawColor(...COLORS.gold);
   doc.setLineWidth(1);
-  doc.line(117, priceY - 2, 185, priceY - 2);
-
-  // Total amount - Large and bold
+  doc.line(117, priceY - 3, 185, priceY - 3);
   doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(12);
+  doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.text(t.total, 117, priceY + 5);
   doc.setFontSize(16);
   doc.text(`${data.total}€`, 185, priceY + 5, { align: 'right' });
 
-  // Next steps - Left side modern box
-  const stepsY = y;
-  doc.setFillColor(...COLORS.bgDark);
-  doc.setDrawColor(...COLORS.gold);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(15, stepsY, 90, 50, 4, 4, 'FD');
-
-  // Top gold bar
-  doc.setFillColor(...COLORS.gold);
-  doc.rect(15, stepsY, 90, 2, 'F');
-
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.nextSteps, 20, stepsY + 9);
-
-  doc.setTextColor(...COLORS.grayDark);
-  doc.setFontSize(7);
-  doc.setFont('helvetica', 'normal');
-
-  // Step 1
-  doc.setFillColor(...COLORS.gold);
-  doc.circle(21, stepsY + 16, 1.5, 'F');
-  doc.setTextColor(...COLORS.blackSoft);
-  doc.text('1', 21, stepsY + 17, { align: 'center' });
-  doc.setTextColor(...COLORS.grayDark);
-  doc.text(t.step1, 25, stepsY + 17);
-
-  // Step 2
-  doc.setFillColor(...COLORS.gold);
-  doc.circle(21, stepsY + 27, 1.5, 'F');
-  doc.setTextColor(...COLORS.blackSoft);
-  doc.text('2', 21, stepsY + 28, { align: 'center' });
-  doc.setTextColor(...COLORS.grayDark);
-  doc.text(t.step2, 25, stepsY + 28);
-
-  // Step 3
-  doc.setFillColor(...COLORS.gold);
-  doc.circle(21, stepsY + 38, 1.5, 'F');
-  doc.setTextColor(...COLORS.blackSoft);
-  doc.text('3', 21, stepsY + 39, { align: 'center' });
-  doc.setTextColor(...COLORS.grayDark);
-  doc.text(t.step3, 25, stepsY + 39);
-
-  // Footer info - Modern disclaimer
-  y = 255;
+  const disclaimerY = stepsY + 60;
   doc.setFillColor(...COLORS.bgLight);
-  doc.roundedRect(15, y, 180, 12, 2, 2, 'F');
-
+  doc.roundedRect(15, disclaimerY, PAGE.contentWidth + 10, 14, 2, 2, 'F');
   doc.setTextColor(...COLORS.gold);
   doc.setFontSize(7);
   doc.setFont('helvetica', 'bold');
-  doc.text('⏰', 20, y + 6);
-  doc.text(t.validUntil, 25, y + 6);
-
+  doc.text(t.validUntil, 25, disclaimerY + 6);
   doc.setTextColor(...COLORS.grayDark);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
-  doc.text(t.disclaimer, 25, y + 10);
+  doc.text(t.disclaimer, 25, disclaimerY + 11);
 
-  // Add footer
-  addFooter(doc, 1, 1);
-
+  addAllFooters(doc);
   return doc;
 }
 
-/**
- * Download a single image from URL
- */
 export async function downloadImage(imageUrl: string, filename: string): Promise<void> {
   try {
     const response = await fetch(imageUrl);
@@ -768,9 +569,6 @@ export async function downloadImage(imageUrl: string, filename: string): Promise
   }
 }
 
-/**
- * Download multiple images as individual files
- */
 export async function downloadImages(
   images: { src: string; alt: string }[],
   prefix: string = 'orbita'
@@ -780,7 +578,6 @@ export async function downloadImages(
     const ext = img.src.split('.').pop() || 'jpg';
     const filename = `${prefix}-${String(i + 1).padStart(2, '0')}.${ext}`;
     await downloadImage(img.src, filename);
-    // Small delay between downloads
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
 }

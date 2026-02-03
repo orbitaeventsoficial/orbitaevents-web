@@ -764,6 +764,174 @@
           "a": "Yes, being local we make prior visits without problem. It is important to know the space, check access, electrical power and plan the setup with the venue coordinator."
         }
       ]
+    },
+    "dj-bodas-barcelona-ciudad": {
+      "faq": [
+        {
+          "q": "How much does a DJ cost for weddings in Barcelona city?",
+          "a": "The price of a DJ for weddings in Barcelona city starts from €590. This price includes professional DJ, 4000W sound, LED lighting and travel to any district in Barcelona."
+        },
+        {
+          "q": "Do you cover all districts of Barcelona?",
+          "a": "Yes, we cover all districts: Eixample, Gràcia, Sarrià-Sant Gervasi, Ciutat Vella, Sant Martí, Les Corts, Sants-Montjuïc and all others. Travel is included."
+        },
+        {
+          "q": "Do you know the wedding venues in Barcelona city?",
+          "a": "Yes, we have worked in boutique hotels, restaurants with terraces, rooftops, industrial spaces and private gardens. We know the particularities of each type of urban venue."
+        },
+        {
+          "q": "Do you have experience with weddings in Barcelona hotels?",
+          "a": "Yes, we have extensive experience in Barcelona hotels: W Hotel, Hotel Arts, Mandarin Oriental, Majestic and many more. We know the protocols and coordinate with their teams."
+        },
+        {
+          "q": "What about noise and neighbors in Barcelona city?",
+          "a": "We know Barcelona's noise regulations and adapt the volume according to the space. We work with directional systems and schedules that respect municipal ordinances."
+        }
+      ]
+    },
+    "dj-bodas-baix-llobregat": {
+      "faq": [
+        {
+          "q": "How much does a DJ cost for weddings in Baix Llobregat?",
+          "a": "The price of a DJ for weddings in Baix Llobregat starts from €590. It includes professional DJ, 4000W sound, LED lighting and travel to any town in the region."
+        },
+        {
+          "q": "Do you cover the entire Baix Llobregat region?",
+          "a": "Yes, we cover the entire region: L'Hospitalet, Cornellà, Sant Boi, El Prat, Viladecans, Gavà, Castelldefels, Esplugues, Sant Joan Despí and all other towns."
+        },
+        {
+          "q": "Do you know the venues and spaces in Baix Llobregat?",
+          "a": "Yes, we have worked in farmhouses of the Llobregat Delta, restaurants with gardens, hotels near the airport and rural spaces in the region."
+        },
+        {
+          "q": "Do you do weddings near Barcelona airport?",
+          "a": "Yes, there are several wedding venues near the airport in El Prat, Viladecans and Gavà. We know these venues and their logistical particularities."
+        },
+        {
+          "q": "Is Baix Llobregat easy to access?",
+          "a": "Yes, Baix Llobregat has excellent connections to Barcelona. We can easily reach any point in the region without additional travel costs."
+        }
+      ]
+    },
+    "dj-bodas-penedes": {
+      "faq": [
+        {
+          "q": "How much does a DJ cost for weddings in Penedès?",
+          "a": "The price of a DJ for weddings in Penedès starts from €590. This price includes professional DJ, 4000W sound, LED lighting and travel to any winery or estate in the area."
+        },
+        {
+          "q": "Do you have experience with winery weddings?",
+          "a": "Yes, we are specialists in Penedès winery weddings. We have worked at Codorníu, Freixenet, Torres and many boutique wineries. We know the particularities of these unique spaces."
+        },
+        {
+          "q": "Do you do weddings among the vineyards?",
+          "a": "Yes, we do outdoor weddings among vineyards. We have equipment prepared for outdoors and experience in the specific conditions of the wine-growing area."
+        },
+        {
+          "q": "Do you also cover Sitges and the coast?",
+          "a": "Yes, we cover both the wine-growing interior (Vilafranca, Sant Sadurní) and the coast (Sitges, Vilanova). All of Alt and Baix Penedès with travel included."
+        },
+        {
+          "q": "What if the winery has electrical limitations?",
+          "a": "Many wineries have old installations with limitations. Our equipment is prepared to operate with a generator or adapt to the available power."
+        }
+      ]
+    },
+    "dj-bodas-osona": {
+      "faq": [
+        {
+          "q": "How much does a DJ cost for weddings in Osona?",
+          "a": "The price of a DJ for weddings in Osona starts from €590. This price includes professional DJ, 4000W sound, LED lighting and travel to any farmhouse or space in the region."
+        },
+        {
+          "q": "Do you have experience in Osona farmhouses?",
+          "a": "Yes, we have worked in the most emblematic farmhouses in Osona. We know the access, electrical particularities and logistics of these charming rural spaces."
+        },
+        {
+          "q": "What if the farmhouse has no electricity?",
+          "a": "Many farmhouses in Osona have electrical limitations or no connection. We have generators and equipment prepared to operate autonomously without losing quality."
+        },
+        {
+          "q": "Do you cover the entire Osona region?",
+          "a": "Yes, we cover the entire region: Vic, Manlleu, Torelló, Centelles, Tona, Taradell, La Garriga and all other towns. Travel included."
+        },
+        {
+          "q": "Do you do weddings with views of Montseny?",
+          "a": "Yes, there are beautiful farmhouses in Osona with views of Montseny and the Pyrenees. We know these spaces and their particularities to create memorable weddings."
+        }
+      ]
+    },
+    "dj-bodas-garraf": {
+      "faq": [
+        {
+          "q": "How much does a DJ cost for weddings in Garraf?",
+          "a": "The price of a DJ for weddings in Garraf starts from €590. This price includes professional DJ, outdoor-resistant 4000W sound, LED lighting and travel."
+        },
+        {
+          "q": "Do you do weddings in Sitges?",
+          "a": "Yes, Sitges is one of our favorite wedding destinations. We know the hotels, restaurants with terraces, beach bars and spaces with sea views in the area."
+        },
+        {
+          "q": "Do you have experience with beach weddings?",
+          "a": "Yes, we are specialists in coastal weddings. We have equipment prepared for outdoors with protection against humidity and Mediterranean wind."
+        },
+        {
+          "q": "What wedding spaces are there in Garraf?",
+          "a": "Garraf offers a great variety: beach bars, boutique hotels in Sitges, farmhouses with sea views, restaurants with terraces and charming private spaces."
+        },
+        {
+          "q": "Do you also cover Vilanova i la Geltrú?",
+          "a": "Yes, we cover the entire Garraf region: Sitges, Vilanova i la Geltrú, Cubelles, Sant Pere de Ribes and all other towns. Travel included."
+        }
+      ]
+    },
+    "dj-bodas-selva": {
+      "faq": [
+        {
+          "q": "How much does a DJ cost for weddings in La Selva?",
+          "a": "The price of a DJ for weddings in La Selva starts from €590. This price includes professional DJ, 4000W sound, LED lighting and travel to any point in the region."
+        },
+        {
+          "q": "Do you cover both the coast and inland La Selva?",
+          "a": "Yes, we cover the entire region: from Blanes and Lloret on the coast to Santa Coloma de Farners and Hostalric inland. Travel included."
+        },
+        {
+          "q": "Do you do weddings in Lloret de Mar?",
+          "a": "Yes, Lloret and Blanes are popular destinations for coastal weddings. We know the hotels, botanical gardens, restaurants with views and event spaces in the area."
+        },
+        {
+          "q": "Do you have experience in inland La Selva farmhouses?",
+          "a": "Yes, La Selva has beautiful farmhouses inland, near Montseny and the Guilleries. We know these spaces and their particularities."
+        },
+        {
+          "q": "Is La Selva well connected?",
+          "a": "Yes, La Selva is strategically located between Barcelona and Girona, with excellent highway access. We can easily reach any point in the region."
+        }
+      ]
+    },
+    "dj-bodas-emporda": {
+      "faq": [
+        {
+          "q": "How much does a DJ cost for weddings in Empordà?",
+          "a": "The price of a DJ for weddings in Empordà starts from €590. This price includes professional DJ, 4000W sound, LED lighting and travel to any point in the Alt or Baix Empordà."
+        },
+        {
+          "q": "Do you cover both Alt and Baix Empordà?",
+          "a": "Yes, we cover all of Empordà: from Figueres and Roses in Alt Empordà to Torroella de Montgrí and Pals in Baix Empordà. Travel included in the price."
+        },
+        {
+          "q": "Do you have experience in Empordà farmhouses?",
+          "a": "Yes, Empordà is a land of centuries-old farmhouses. We know many of these spaces and their acoustic particularities."
+        },
+        {
+          "q": "Do you do weddings on the Costa Brava Nord?",
+          "a": "Yes, Roses, Cadaqués, L'Escala and Empuriabrava are regular destinations for us. We know the hotels, restaurants and seaside venues in the area."
+        },
+        {
+          "q": "Is Empordà far from Barcelona?",
+          "a": "Empordà is approximately 1h30 from Barcelona by highway. Travel is included in our prices at no additional cost."
+        }
+      ]
     }
   },
   "stats": {

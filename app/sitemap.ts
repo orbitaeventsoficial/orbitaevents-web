@@ -48,6 +48,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/servicios/dj-bodas-girona`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${base}/servicios/dj-bodas-costa-brava`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${base}/servicios/dj-bodas-valles`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/servicios/dj-bodas-barcelona-ciudad`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/servicios/dj-bodas-baix-llobregat`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/servicios/dj-bodas-garraf`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/servicios/dj-bodas-penedes`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/servicios/dj-bodas-osona`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/servicios/dj-bodas-selva`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/servicios/dj-bodas-emporda`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
 
     // Contenido / Trust
     { url: `${base}/portfolio`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
