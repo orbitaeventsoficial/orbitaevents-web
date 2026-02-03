@@ -71,7 +71,13 @@ function QuoteMenu() {
       href: `/${locale}/configurador`,
       color: 'from-amber-500 to-orange-500'
     },
-    { 
+    {
+      icon: '📍',
+      labelKey: 'fab.zones',
+      href: `/${locale}/servicios/bodas#zonas`,
+      color: 'from-purple-500 to-indigo-500'
+    },
+    {
       icon: '💬',
       labelKey: 'fab.whatsapp',
       href: WHATSAPP_URL,
