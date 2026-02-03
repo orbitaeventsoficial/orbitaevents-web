@@ -53,15 +53,23 @@ export default async function DJBodasGarrafPage({ params }: PageProps) {
     heroSubtitle: 'Sitges · Vilanova · Cubelles · Costa y chiringuitos',
     minPrice: MIN_PRICE,
     towns: garrafTowns,
-    highlights: ['Bodas de costa', 'Vistas al Mediterráneo', 'Desplazamiento incluido', 'Equipo para exteriores'],
+    // Keywords SEO reals
+    highlights: ['DJ boda Sitges', 'Bodas playa Garraf', 'Precio DJ boda', 'Bodas LGTBI+ Sitges'],
     description: `DJ profesional para bodas en el Garraf. Especialistas en bodas de costa y espacios con vistas al mar.`,
     whyChooseUs: [
-      'Bodas de costa: Chiringuitos, terrazas y playas',
-      'Vistas al Mediterráneo: Espacios emblemáticos de Sitges',
+      'Bodas de costa: Chiringuitos, terrazas y playas de Sitges',
+      'Experiencia LGTBI+: Sitges es destino top para bodas diversas',
       'Desplazamiento incluido: Toda la comarca cubierta',
       'Equipo para exteriores: Protección contra humedad y viento',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
+    heroImage: '/img/portfolio/bodas/bodas-02.avif',
+    galleryImages: [
+      '/img/portfolio/bodas/bodas-01.avif',
+      '/img/portfolio/bodas/bodas-03.avif',
+      '/img/portfolio/bodas/bodas-04.avif',
+      '/img/portfolio/discomovil/discomovil-02.avif',
+    ],
   };
 
   return (

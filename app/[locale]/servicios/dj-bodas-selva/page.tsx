@@ -53,15 +53,23 @@ export default async function DJBodasSelvaPage({ params }: PageProps) {
     heroSubtitle: 'Blanes · Lloret · Santa Coloma · Hostalric · Costa e interior',
     minPrice: MIN_PRICE,
     towns: selvaTowns,
-    highlights: ['Costa e interior', 'Masías y playas', 'Desplazamiento incluido', 'Entre Barcelona y Girona'],
+    // Keywords SEO reals
+    highlights: ['DJ boda Lloret', 'Bodas Blanes Costa Brava', 'Precio DJ boda', 'Bodas playa Lloret'],
     description: `DJ profesional para bodas en La Selva. Costa e interior de la comarca entre Barcelona y Girona.`,
     whyChooseUs: [
       'Costa e interior: Blanes, Lloret y masías del interior',
       'Ubicación estratégica: Entre Barcelona y Girona',
       'Desplazamiento incluido: Toda la comarca cubierta',
-      'Variedad de espacios: Playas, hoteles y masías rurales',
+      'Jardines botánicos: Marimurtra y espacios únicos',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
+    heroImage: '/img/portfolio/bodas/bodas-02.avif',
+    galleryImages: [
+      '/img/portfolio/bodas/bodas-01.avif',
+      '/img/portfolio/bodas/bodas-03.avif',
+      '/img/portfolio/bodas/bodas-04.avif',
+      '/img/portfolio/discomovil/discomovil-06.avif',
+    ],
   };
 
   return (

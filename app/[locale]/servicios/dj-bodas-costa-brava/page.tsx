@@ -53,7 +53,8 @@ export default async function DJBodasCostaBravaPage({ params }: PageProps) {
     heroSubtitle: 'Cadaqués · Tossa · Lloret · Begur · Toda la costa',
     minPrice: MIN_PRICE,
     towns: costaBravaTowns,
-    highlights: ['Especialistas en costa', 'Equipo para exteriores', 'Bodas en playa', 'Plan B incluido'],
+    // Keywords SEO reals
+    highlights: ['DJ boda Costa Brava', 'Bodas playa Cadaqués', 'Precio DJ boda', 'DJ boda Begur'],
     description: `DJ profesional para bodas en la Costa Brava. Especialistas en bodas de costa con equipo resistente a exteriores.`,
     whyChooseUs: [
       'Especialistas en costa: Equipo preparado para exteriores',
@@ -62,6 +63,13 @@ export default async function DJBodasCostaBravaPage({ params }: PageProps) {
       'Plan B preparado: Nos adaptamos a cambios de tiempo',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
+    heroImage: '/img/portfolio/bodas/bodas-03.avif',
+    galleryImages: [
+      '/img/portfolio/bodas/bodas-01.avif',
+      '/img/portfolio/bodas/bodas-02.avif',
+      '/img/portfolio/bodas/bodas-04.avif',
+      '/img/portfolio/discomovil/discomovil-04.avif',
+    ],
   };
 
   return (
