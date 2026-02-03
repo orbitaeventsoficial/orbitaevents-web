@@ -28,8 +28,47 @@ import { PWAProvider } from '@/app/components/pwa/PWAProvider';
 import { TawkToChat } from '@/components/chat/TawkToChat';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// GOOGLE TAG MANAGER (GTM) - Gestiona Analytics, Ads, Meta Pixel, etc.
+// GOOGLE CONSENT MODE V2 + TAG MANAGER
 // ═══════════════════════════════════════════════════════════════════════════
+// Consent Mode v2 permite que GA4 modele las visitas de usuarios que no
+// aceptan cookies, mejorando la precisión de los datos sin violar GDPR.
+// ═══════════════════════════════════════════════════════════════════════════
+
+function GoogleConsentMode() {
+  return (
+    <Script
+      id="google-consent-mode"
+      strategy="beforeInteractive"
+      dangerouslySetInnerHTML={{
+        __html: `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+
+          // Consent Mode v2 - Default state (denied until user accepts)
+          gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'functionality_storage': 'granted',
+            'personalization_storage': 'denied',
+            'security_storage': 'granted',
+            'wait_for_update': 500
+          });
+
+          // Enable URL passthrough for better conversion modeling
+          gtag('set', 'url_passthrough', true);
+
+          // Enable ads data redaction when consent denied
+          gtag('set', 'ads_data_redaction', true);
+
+          // Make gtag available globally for consent updates
+          window.gtag = gtag;
+        `,
+      }}
+    />
+  );
+}
 
 function GoogleTagManager() {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
@@ -37,7 +76,7 @@ function GoogleTagManager() {
 
   return (
     <>
-      {/* Google Tag Manager - Head */}
+      {/* Google Tag Manager - Head (loads AFTER consent defaults) */}
       <Script
         id="gtm-head"
         strategy="afterInteractive"
@@ -425,6 +464,7 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <head>
+        <GoogleConsentMode />
         <GoogleTagManager />
         <UmamiAnalytics />
 
