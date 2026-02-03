@@ -6381,7 +6381,8 @@
       "call": "Trucar",
       "whatsapp": "WhatsApp",
       "quote": "Pressupost",
-      "configurator": "Configurador"
+      "configurator": "Configurador",
+      "zones": "Veure Zones"
     }
   },
   "mobileHome": {

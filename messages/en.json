@@ -6209,7 +6209,8 @@
       "call": "Call",
       "whatsapp": "WhatsApp",
       "quote": "Budget",
-      "configurator": "Configurator"
+      "configurator": "Configurator",
+      "zones": "View Areas"
     }
   },
   "mobileHome": {
