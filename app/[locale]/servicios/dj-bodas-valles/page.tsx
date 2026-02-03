@@ -53,7 +53,8 @@ export default async function DJBodasVallesPage({ params }: PageProps) {
     heroSubtitle: 'Granollers · Sabadell · Terrassa · Mollet · Toda la comarca',
     minPrice: MIN_PRICE,
     towns: vallesTowns,
-    highlights: ['DJ local', 'Desplazamiento incluido', 'Conocemos las masías', 'Visita previa gratis'],
+    // Keywords SEO reals
+    highlights: ['DJ boda Granollers', 'Bodas masía Vallès', 'Precio DJ boda', 'DJ boda Sabadell'],
     description: `DJ profesional local para bodas en el Vallès. Base en Granollers, cubrimos Oriental y Occidental.`,
     whyChooseUs: [
       'DJ local: Base en Granollers, conocemos la zona',
@@ -62,6 +63,13 @@ export default async function DJBodasVallesPage({ params }: PageProps) {
       'Visita previa: Conocemos el espacio antes del evento',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
+    heroImage: '/img/portfolio/bodas/bodas-02.avif',
+    galleryImages: [
+      '/img/portfolio/bodas/bodas-01.avif',
+      '/img/portfolio/bodas/bodas-03.avif',
+      '/img/portfolio/bodas/bodas-04.avif',
+      '/img/portfolio/discomovil/discomovil-03.avif',
+    ],
   };
 
   return (

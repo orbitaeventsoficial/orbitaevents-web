@@ -53,15 +53,23 @@ export default async function DJBodasBarcelonaCiudadPage({ params }: PageProps) 
     heroSubtitle: 'Eixample · Gràcia · Sarrià · Ciutat Vella · Todos los distritos',
     minPrice: MIN_PRICE,
     towns: barcelonaCiudadDistricts,
-    highlights: ['Todos los distritos', 'Desplazamiento incluido', 'Hoteles y restaurantes', 'Espacios emblemáticos'],
+    // Keywords SEO reals
+    highlights: ['DJ boda Barcelona', 'Precio DJ boda', 'Bodas hotel Barcelona', 'DJ rooftop Barcelona'],
     description: `DJ profesional para bodas en Barcelona ciudad. Cubrimos todos los distritos con desplazamiento incluido.`,
     whyChooseUs: [
       'Toda la ciudad: Eixample, Gràcia, Sarrià y más',
-      'Desplazamiento incluido: Sin costes adicionales',
-      'Espacios urbanos: Hoteles, restaurantes, terrazas y rooftops',
-      'Experiencia local: Conocemos los mejores venues de Barcelona',
+      'Hoteles 5 estrellas: W Hotel, Arts, Mandarin Oriental...',
+      'Espacios urbanos: Rooftops, restaurantes y terrazas',
+      'Conocemos las normativas: Horarios y límites de ruido',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
+    heroImage: '/img/portfolio/bodas/bodas-03.avif',
+    galleryImages: [
+      '/img/portfolio/bodas/bodas-01.avif',
+      '/img/portfolio/bodas/bodas-02.avif',
+      '/img/portfolio/bodas/bodas-04.avif',
+      '/img/portfolio/discomovil/discomovil-03.avif',
+    ],
   };
 
   return (

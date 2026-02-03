@@ -4,6 +4,7 @@ import { Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Check, ArrowRight, Star, Clock, Shield } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 
 export interface ZoneConfig {
   zone: string;
@@ -13,10 +14,12 @@ export interface ZoneConfig {
   heroSubtitle: string;
   minPrice: number;
   towns: string[];
-  highlights: string[];
+  highlights: string[];  // SEO keywords ara
   description: string;
   whyChooseUs: string[];
   faqs: Array<{ question: string; answer: string }>;
+  heroImage?: string;  // Imatge hero de la zona
+  galleryImages?: string[];  // Mini galeria de bodes
 }
 
 interface Props {
@@ -38,13 +41,30 @@ export default function ZoneLandingPage({ config }: Props) {
     description,
     whyChooseUs,
     faqs,
+    heroImage,
+    galleryImages,
   } = config;
 
   return (
     <main className="min-h-screen bg-[var(--bg-main)]">
-      {/* Hero Section */}
+      {/* Hero Section amb imatge */}
       <section className="relative py-20 md:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-surface)] to-[var(--bg-main)]" />
+        {/* Background image */}
+        {heroImage && (
+          <div className="absolute inset-0">
+            <Image
+              src={heroImage}
+              alt={`Bodas en ${zone}`}
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-[var(--bg-main)]" />
+          </div>
+        )}
+        {!heroImage && (
+          <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-surface)] to-[var(--bg-main)]" />
+        )}
 
         <div className="relative max-w-5xl mx-auto px-4 text-center">
           {/* Badge */}
@@ -114,22 +134,72 @@ export default function ZoneLandingPage({ config }: Props) {
             </a>
           </motion.div>
 
-          {/* Highlights */}
+          {/* Keywords SEO - Més visuals */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="flex flex-wrap justify-center gap-4 text-sm"
+            className="flex flex-wrap justify-center gap-3"
           >
-            {highlights.map((highlight) => (
-              <div key={highlight} className="flex items-center gap-2 text-white/80">
-                <Check className="w-4 h-4 text-[var(--oe-gold)]" />
+            {highlights.map((highlight, index) => (
+              <div
+                key={highlight}
+                className={`
+                  flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
+                  ${index === 0
+                    ? 'bg-[var(--oe-gold)] text-black'
+                    : index === 1
+                      ? 'bg-white/20 text-white border border-white/30'
+                      : 'bg-white/10 text-white/90 border border-white/20'
+                  }
+                `}
+              >
+                <Check className="w-4 h-4" />
                 {highlight}
               </div>
             ))}
           </motion.div>
         </div>
       </section>
+
+      {/* Galeria de bodes a la zona */}
+      {galleryImages && galleryImages.length > 0 && (
+        <section className="py-12 px-4">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold text-white mb-6 text-center">
+              {t('galleryTitle', { zone })}
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {galleryImages.slice(0, 4).map((img, index) => (
+                <motion.div
+                  key={img}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * index }}
+                  className="relative aspect-[4/3] rounded-2xl overflow-hidden group"
+                >
+                  <Image
+                    src={img}
+                    alt={`Boda en ${zone} - ${index + 1}`}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                </motion.div>
+              ))}
+            </div>
+            <div className="text-center mt-6">
+              <Link
+                href="/portfolio/bodas"
+                className="inline-flex items-center gap-2 text-[var(--oe-gold)] hover:underline"
+              >
+                {t('viewMoreWeddings')}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Contingut SEO */}
       <section className="py-16 px-4 bg-white/5">
