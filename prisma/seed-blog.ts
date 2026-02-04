@@ -1349,23 +1349,23 @@ async function main() {
     },
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // 5. TENDENCIAS BODAS BARCELONA 2025
+    // 5. COMO ELEGIR DJ BODA - GUIA DEFINITIVA
     // ═══════════════════════════════════════════════════════════════════════════
     {
-      slug: 'tendencias-bodas-barcelona-2025',
+      slug: 'como-elegir-dj-boda-guia-definitiva',
       author: 'Orbita Events',
       category: 'bodas',
-      tags: ['bodas', 'tendencias', 'barcelona', '2025', 'musica', 'decoracion'],
+      tags: ['bodas', 'dj', 'elegir', 'contratar', 'guia', 'consejos'],
       isPublished: true,
       publishedAt: new Date('2025-02-01'),
       readingTime: 10,
       translations: [
         {
           locale: 'es',
-          title: 'Tendencias de Bodas en Barcelona 2025: Musica, Decoracion y Experiencias',
-          excerpt: 'Descubre las tendencias mas destacadas para bodas en Barcelona en 2025. Desde micro-bodas hasta fiestas tematicas, pasando por la musica y los efectos que marcaran el ano.',
-          metaTitle: 'Tendencias Bodas Barcelona 2025 | Musica, Deco y Experiencias',
-          metaDescription: 'Las tendencias de bodas en Barcelona para 2025. Micro-bodas, sostenibilidad, fiestas tematicas, musica personalizada y experiencias inmersivas. Guia completa para tu boda.',
+          title: 'Como Elegir DJ para tu Boda en Barcelona: Guia Definitiva 2025',
+          excerpt: 'Todo lo que necesitas saber para elegir el DJ perfecto para tu boda. Tendencias musicales, efectos especiales, que pedir y que evitar. Por profesionales del sector.',
+          metaTitle: 'Como Elegir DJ Boda Barcelona | Guia Definitiva 2025',
+          metaDescription: 'Guia definitiva para elegir DJ de boda en Barcelona 2025. Tendencias musicales, efectos especiales, micro-bodas, precios y consejos de profesionales.',
           content: `<h2>Tendencias de Bodas en Barcelona 2025: Lo que esta Marcando el Ano</h2>
 
 <p>El mundo de las bodas evoluciona constantemente, y 2025 esta trayendo cambios significativos en como las parejas celebran su union. En Barcelona, una ciudad que combina tradicion mediterranea con vanguardia, estas tendencias se manifiestan de formas unicas y emocionantes.</p>
@@ -1568,10 +1568,10 @@ async function main() {
         },
         {
           locale: 'ca',
-          title: 'Tendencies de Casaments a Barcelona 2025: Musica, Decoracio i Experiencies',
-          excerpt: 'Descobreix les tendencies mes destacades per casaments a Barcelona el 2025. Des de micro-casaments fins a festes tematiques, passant per la musica i els efectes que marcaran l\'any.',
-          metaTitle: 'Tendencies Casaments Barcelona 2025 | Musica, Deco i Experiencies',
-          metaDescription: 'Les tendencies de casaments a Barcelona per 2025. Micro-casaments, sostenibilitat, festes tematiques, musica personalitzada i experiencies immersives. Guia completa pel teu casament.',
+          title: 'Com Triar DJ pel teu Casament a Barcelona: Guia Definitiva 2025',
+          excerpt: 'Tot el que necessites saber per triar el DJ perfecte pel teu casament. Tendencies musicals, efectes especials, que demanar i que evitar.',
+          metaTitle: 'Com Triar DJ Casament Barcelona | Guia Definitiva 2025',
+          metaDescription: 'Guia definitiva per triar DJ de casament a Barcelona 2025. Tendencies musicals, efectes especials, micro-casaments, preus i consells de professionals.',
           content: `<h2>Tendencies de Casaments a Barcelona 2025: El que esta Marcant l'Any</h2>
 
 <p>El mon dels casaments evoluciona constantment, i el 2025 esta portant canvis significatius en com les parelles celebren la seva unio. A Barcelona, una ciutat que combina tradicio mediterrania amb avantguarda, aquestes tendencies es manifesten de formes uniques i emocionants.</p>
@@ -1943,272 +1943,222 @@ async function main() {
       ]
     },
     // ═══════════════════════════════════════════════════════════════════════════
-    // 7. IDEAS DECORACION FIESTA HALLOWEEN
+    // 7. PREGUNTAS ANTES DE CONTRATAR DJ BODA
     // ═══════════════════════════════════════════════════════════════════════════
     {
-      slug: 'ideas-decoracion-fiesta-halloween-casa',
+      slug: 'preguntas-antes-contratar-dj-boda',
       author: 'Orbita Events',
-      category: 'fiestas',
-      tags: ['halloween', 'decoracion', 'fiestas', 'diy', 'ideas'],
+      category: 'bodas',
+      tags: ['bodas', 'dj', 'contratar', 'preguntas', 'consejos'],
       isPublished: true,
       publishedAt: new Date('2025-01-22'),
-      readingTime: 7,
+      readingTime: 8,
       translations: [
         {
           locale: 'es',
-          title: 'Ideas Decoracion Fiesta Halloween en Casa: Guia Completa 2025',
-          excerpt: 'Transforma tu casa en un escenario terrorificamente divertido. Ideas de decoracion DIY, iluminacion, ambientacion y todo lo que necesitas para la mejor fiesta de Halloween.',
-          metaTitle: 'Ideas Decoracion Fiesta Halloween Casa | Guia Completa DIY 2025',
-          metaDescription: 'Las mejores ideas para decorar tu fiesta de Halloween en casa. Decoracion DIY, iluminacion tematica, ambientacion musical y consejos profesionales.',
-          content: `<h2>Como Transformar tu Casa en el Escenario Perfecto para Halloween</h2>
+          title: '18 Preguntas que Debes Hacer Antes de Contratar un DJ para tu Boda',
+          excerpt: 'No contrates DJ para tu boda sin hacer estas preguntas. Precio, equipo, experiencia, playlist y todo lo que necesitas saber antes de firmar.',
+          metaTitle: 'Preguntas Antes de Contratar DJ Boda | Guia 2025',
+          metaDescription: 'Las 18 preguntas esenciales que debes hacer antes de contratar DJ para tu boda. Precio, equipo incluido, horas extra, experiencia y referencias.',
+          content: `<h2>Que Preguntar al DJ Antes de Contratarlo para tu Boda</h2>
 
-<p>Halloween es la excusa perfecta para organizar una fiesta tematica memorable. Con las ideas correctas de decoracion, puedes transformar cualquier espacio en una experiencia terrorificamente divertida. En esta guia te damos <strong>todas las claves para crear una ambientacion profesional</strong> sin gastar una fortuna.</p>
+<p>Contratar un DJ para tu boda es una de las decisiones mas importantes del evento. La musica marca la diferencia entre una fiesta memorable y una que se apaga a las 12. Pero no todos los DJs son iguales, y hacerle las preguntas correctas te ahorrara problemas.</p>
 
-<h2>Decoracion por Zonas</h2>
+<p>Despues de mas de 50 bodas, estas son las <strong>preguntas que toda pareja deberia hacer antes de firmar</strong>.</p>
 
-<h3>Entrada: La Primera Impresion</h3>
-<p>La entrada marca el tono de toda la fiesta. Ideas impactantes:</p>
+<h2>Preguntas sobre Precio y Contrato</h2>
+
+<h3>1. Que incluye exactamente el precio?</h3>
+<p>Asegurate de que te detallan: horas de servicio, equipo de sonido, iluminacion, desplazamiento, montaje y desmontaje. Algunos DJs te dan un precio que luego crece con extras.</p>
+
+<h3>2. Cuanto cuesta la hora extra?</h3>
+<p>Las bodas se alargan. Pregunta el precio de las horas extra antes, no a las 2 de la manana. Lo habitual es entre 75 y 200 euros la hora.</p>
+
+<h3>3. Hay costes de desplazamiento?</h3>
+<p>Si la boda es fuera de la ciudad del DJ, pregunta si cobra desplazamiento o si esta incluido.</p>
+
+<h3>4. Que politica de cancelacion tienes?</h3>
+<p>Importante saberlo por si hay imprevistos. Pregunta si la senal es reembolsable y hasta cuando puedes cancelar.</p>
+
+<h2>Preguntas sobre Equipo y Sonido</h2>
+
+<h3>5. Que equipo de sonido traes?</h3>
+<p>Los watios importan. Para bodas de mas de 100 personas necesitas minimo 2000W. Pregunta marcas y potencia.</p>
+
+<h3>6. Traes iluminacion?</h3>
+<p>Muchos DJs incluyen iluminacion basica LED. Otros cobran aparte. Pregunta que esta incluido: focos, laser, bola de espejos, luz negra...</p>
+
+<h3>7. Tienes equipo de backup?</h3>
+<p>Un DJ profesional siempre lleva equipo de repuesto por si algo falla. Si no lo tiene, piensalo dos veces.</p>
+
+<h3>8. Has trabajado en este venue antes?</h3>
+<p>Conocer el espacio es una ventaja enorme. Sabe donde poner los altavoces, si hay limitador de sonido, si necesita generador...</p>
+
+<h2>Preguntas sobre Experiencia</h2>
+
+<h3>9. Cuantas bodas has hecho?</h3>
+<p>No es lo mismo un DJ de discoteca que un DJ de bodas. Las bodas tienen protocolo, momentos especiales y publico muy diverso.</p>
+
+<h3>10. Puedo ver videos de bodas reales?</h3>
+<p>Fotos bonitas las tiene cualquiera. Pide videos del baile para ver como gestiona la pista y la energia de la fiesta.</p>
+
+<h3>11. Tienes referencias de parejas anteriores?</h3>
+<p>Un buen DJ te dara contactos de parejas que confirmen su trabajo. Si no quiere, mala senal.</p>
+
+<h2>Preguntas sobre la Musica</h2>
+
+<h3>12. Puedo enviar una lista de canciones?</h3>
+<p>Todo DJ de bodas deberia aceptar peticiones. Tambien deberia saber mezclarlas con criterio para que la fiesta fluya.</p>
+
+<h3>13. Hay canciones que no pondras?</h3>
+<p>Algunos DJs tienen "lineas rojas" musicales. Mejor saberlo antes.</p>
+
+<h3>14. Cubres la ceremonia y el coctel tambien?</h3>
+<p>Muchos DJs ofrecen servicio completo: ceremonia, coctel, cena y fiesta. Pregunta si es tu caso o solo cubre la fiesta.</p>
+
+<h3>15. Como gestionas las peticiones de los invitados?</h3>
+<p>Algunos invitados piden canciones que no encajan. Un buen DJ sabe gestionar esto con tacto.</p>
+
+<h2>Preguntas Practicas</h2>
+
+<h3>16. A que hora llegas a montar?</h3>
+<p>El montaje requiere entre 1 y 2 horas. Asegurate de que el timing encaja con el venue.</p>
+
+<h3>17. Como vas vestido?</h3>
+<p>Un DJ de bodas debe ir acorde al evento. Pregunta si tiene dress code o se adapta al tuyo.</p>
+
+<h3>18. Que pasa si enfermas el dia de la boda?</h3>
+<p>Un profesional tiene plan B: otro DJ de confianza que pueda sustituirle. Preguntalo.</p>
+
+<h2>Resumen: Red Flags</h2>
+
+<p>Desconfia si el DJ:</p>
 <ul>
-<li><strong>Telaranas gigantes:</strong> Las de algodon blanco estirado funcionan muy bien</li>
-<li><strong>Lapidas de carton:</strong> Faciles de hacer con cajas viejas y pintura gris</li>
-<li><strong>Calabazas con velas:</strong> El clasico que nunca falla</li>
-<li><strong>Humo bajo:</strong> Una maquina de humo rasante crea un efecto espectacular</li>
-<li><strong>Sonidos de ambiente:</strong> Un altavoz escondido con aullidos y puertas chirriantes</li>
+<li>No tiene contrato escrito</li>
+<li>No puede ensenarte videos de bodas reales</li>
+<li>No quiere reunirse contigo antes</li>
+<li>No tiene equipo de backup</li>
+<li>Cobra todo por adelantado sin garantias</li>
 </ul>
 
-<h3>Sala Principal: El Corazon de la Fiesta</h3>
-<ul>
-<li><strong>Iluminacion en rojo y morado:</strong> Sustituye las bombillas normales</li>
-<li><strong>Velas LED:</strong> Ambiente gotico sin riesgo de incendio</li>
-<li><strong>Telas negras colgando:</strong> Transforman cualquier espacio</li>
-<li><strong>Murciélagos de papel:</strong> Pegados al techo en diferentes alturas</li>
-<li><strong>Esqueletos y craneos:</strong> Como centros de mesa</li>
-</ul>
-
-<h3>Mesa de Bebidas: El Laboratorio</h3>
-<ul>
-<li><strong>Botellas con etiquetas de pociones:</strong> Descarga plantillas gratis online</li>
-<li><strong>Hielo seco:</strong> Crea efecto humo en los vasos (con cuidado)</li>
-<li><strong>Lucces dentro de tarros:</strong> Efecto magico</li>
-<li><strong>Pipetas y jeringas:</strong> Para servir shots</li>
-</ul>
-
-<h2>Iluminacion Tematica</h2>
-
-<p>La iluminacion es el <strong>80% del ambiente</strong> de cualquier fiesta. Para Halloween:</p>
-
-<ul>
-<li><strong>Luces LED naranjas:</strong> Crean ambiente calido y tematico</li>
-<li><strong>Luz negra (UV):</strong> Hace brillar elementos blancos y fluorescentes</li>
-<li><strong>Proyectores de gobos:</strong> Proyectan calabazas o murciélagos en paredes</li>
-<li><strong>Estroboscopica:</strong> Usada con moderacion, crea tension</li>
-<li><strong>Laseres verdes:</strong> Efecto "bosque encantado"</li>
-</ul>
-
-<h2>Ambientacion Musical</h2>
-
-<p>La musica correcta multiplica el efecto de la decoracion:</p>
-
-<ul>
-<li><strong>Thriller - Michael Jackson:</strong> El himno oficial de Halloween</li>
-<li><strong>Ghostbusters - Ray Parker Jr.:</strong> Divertida y tematica</li>
-<li><strong>Superstition - Stevie Wonder:</strong> Groove con toque misterioso</li>
-<li><strong>Time Warp - Rocky Horror:</strong> Para animar el baile</li>
-<li><strong>Monster Mash - Bobby Pickett:</strong> Clasico imprescindible</li>
-</ul>
-
-<p>Alternando musica tematica con los hits del momento, mantendras a todos bailando.</p>
-
-<h2>DIY: Decoraciones Caseras</h2>
-
-<h3>Fantasmas de Gasa</h3>
-<p>Materiales: gasa blanca, globos, hilo de pescar. Cuelgalos del techo a diferentes alturas.</p>
-
-<h3>Velas Sangrientas</h3>
-<p>Velas blancas con cera roja goteando. Efecto dramatico instantaneo.</p>
-
-<h3>Ojos en el Jardin</h3>
-<p>Bolas de ping pong con pupila pintada dentro de rollos de papel. De noche, parecen ojos brillando.</p>
-
-<h3>Manos Emergentes</h3>
-<p>Guantes de goma rellenos de arena, pintados de verde. Salen del jardin o macetas.</p>
-
-<h2>Pack Completo de Halloween</h2>
-
-<p>En <a href="/es/servicios/halloween">Orbita Events</a> ofrecemos un servicio completo para tu fiesta de Halloween:</p>
-
-<ul>
-<li>DJ profesional con musica tematica</li>
-<li>Iluminacion LED en colores Halloween</li>
-<li>Maquina de humo rasante incluida</li>
-<li>Efectos de luz estroboscopica</li>
-<li>Sonido profesional 4000W</li>
-</ul>
-
-<p><strong>Desde 400 euros</strong> tienes todo lo necesario para una fiesta de Halloween inolvidable.</p>
-
-<p><a href="/es/configurador">Calcula tu presupuesto</a> o <a href="/es/contacto">contactanos</a> para mas informacion.</p>`
+<p>En <a href="/es/servicios/bodas">Orbita Events</a> respondemos a todas estas preguntas en la primera reunion gratuita. <a href="/es/contacto">Contactanos</a> y compruebalo.</p>`
         },
         {
           locale: 'ca',
-          title: 'Idees Decoracio Festa Halloween a Casa: Guia Completa 2025',
-          excerpt: 'Transforma casa teva en un escenari terrorificament divertit. Idees de decoracio DIY, illuminacio, ambientacio i tot el que necessites per la millor festa de Halloween.',
-          metaTitle: 'Idees Decoracio Festa Halloween Casa | Guia Completa DIY 2025',
-          metaDescription: 'Les millors idees per decorar la teva festa de Halloween a casa. Decoracio DIY, illuminacio tematica, ambientacio musical i consells professionals.',
-          content: `<h2>Com Transformar Casa Teva en l'Escenari Perfecte per Halloween</h2>
+          title: '18 Preguntes que Has de Fer Abans de Contractar un DJ pel teu Casament',
+          excerpt: 'No contractis DJ pel teu casament sense fer aquestes preguntes. Preu, equip, experiencia, playlist i tot el que necessites saber.',
+          metaTitle: 'Preguntes Abans de Contractar DJ Casament | Guia 2025',
+          metaDescription: 'Les 18 preguntes essencials abans de contractar DJ pel teu casament. Preu, equip, hores extra, experiencia i referencies.',
+          content: `<h2>Que Preguntar al DJ Abans de Contractar-lo pel teu Casament</h2>
 
-<p>Halloween es l'excusa perfecta per organitzar una festa tematica memorable. Amb les idees correctes de decoracio, pots transformar qualsevol espai en una experiencia terrorificament divertida.</p>
+<p>Contractar un DJ pel casament es una de les decisions mes importants. La musica marca la diferencia entre una festa memorable i una que s'apaga a les 12.</p>
 
-<p>Consulta la guia completa en castella o <a href="/ca/contacto">contacta'ns</a> per assessorament professional.</p>`
+<p>Consulta la guia completa en castella o <a href="/ca/contacto">contacta'ns</a> per una reunio gratuita.</p>`
         }
       ]
     },
     // ═══════════════════════════════════════════════════════════════════════════
-    // 8. GUIA ORGANIZAR FIESTA CUMPLEANOS ADULTOS
+    // 8. QUE INCLUYE SERVICIO DJ BODAS
     // ═══════════════════════════════════════════════════════════════════════════
     {
-      slug: 'guia-organizar-fiesta-cumpleanos-adultos',
+      slug: 'que-incluye-servicio-dj-bodas-precio',
       author: 'Orbita Events',
-      category: 'fiestas',
-      tags: ['cumpleanos', 'fiestas', 'adultos', 'organizacion', 'guia'],
+      category: 'bodas',
+      tags: ['bodas', 'dj', 'precio', 'servicio', 'equipo'],
       isPublished: true,
       publishedAt: new Date('2025-01-25'),
-      readingTime: 9,
+      readingTime: 7,
       translations: [
         {
           locale: 'es',
-          title: 'Guia Completa: Organizar Fiesta de Cumpleanos para Adultos',
-          excerpt: 'Todo lo que necesitas saber para organizar una fiesta de cumpleanos para adultos memorable. Desde la planificacion hasta la musica, pasando por catering y decoracion.',
-          metaTitle: 'Como Organizar Fiesta Cumpleanos Adultos | Guia Completa 2025',
-          metaDescription: 'Guia definitiva para organizar fiestas de cumpleanos para adultos. Planificacion, musica, catering, decoracion y todos los secretos de los profesionales.',
-          content: `<h2>Como Organizar la Fiesta de Cumpleanos Perfecta para Adultos</h2>
+          title: 'Que Incluye el Servicio de DJ para Bodas: Desglose Completo',
+          excerpt: 'Descubre que incluye un servicio de DJ para bodas. Sonido, iluminacion, micro, montaje y lo que no te cuentan. Aprende a comparar presupuestos.',
+          metaTitle: 'Que Incluye Servicio DJ Bodas | Desglose y Precios 2025',
+          metaDescription: 'Que incluye exactamente un servicio de DJ para bodas. Sonido, luces, micro, montaje, horas y extras. Aprende a comparar presupuestos de DJ.',
+          content: `<h2>Que Incluye un Servicio de DJ para Bodas</h2>
 
-<p>Organizar una fiesta de cumpleanos para adultos va mucho mas alla de comprar un pastel y poner musica. Una celebracion memorable requiere planificacion, atencion a los detalles y conocer bien al homenajeado. En esta guia te damos <strong>todas las claves profesionales</strong> para que tu fiesta sea un exito.</p>
+<p>Cuando pides presupuesto a un DJ para tu boda, no todos incluyen lo mismo. Unos te dan precio "todo incluido" y otros te van sumando extras. Aqui te explicamos que deberia incluir un buen servicio de DJ y que cosas te pueden cobrar aparte.</p>
 
-<h2>1. Planificacion Inicial (4-6 semanas antes)</h2>
+<h2>Lo que Deberia Incluir Siempre</h2>
 
-<h3>Define el Tipo de Fiesta</h3>
-<p>El primer paso es decidir que tipo de celebracion quieres:</p>
+<h3>Equipo de Sonido</h3>
+<p>El sonido es lo basico. Un DJ de bodas profesional deberia traer:</p>
 <ul>
-<li><strong>Cena elegante:</strong> Para grupos reducidos (10-20 personas)</li>
-<li><strong>Fiesta con baile:</strong> Para grupos medios-grandes (30-100 personas)</li>
-<li><strong>Fiesta tematica:</strong> Anos 80, Hollywood, Tropical...</li>
-<li><strong>Celebracion sorpresa:</strong> Requiere coordinacion extra</li>
-<li><strong>Experiencia especial:</strong> Cata de vinos, escape room grupal...</li>
+<li><strong>Altavoces:</strong> Minimo 2000W para bodas de 80-150 personas. Para mas de 150, necesitaras 4000W o mas.</li>
+<li><strong>Mesa de mezclas:</strong> Profesional, no un portatil con Spotify.</li>
+<li><strong>Subwoofer:</strong> Para que se sienta el bajo cuando toca bailar.</li>
+<li><strong>Microfono inalambrico:</strong> Imprescindible para discursos y brindis.</li>
 </ul>
-
-<h3>El Espacio: Casa vs Local</h3>
-<p>Cada opcion tiene sus ventajas:</p>
-
-<p><strong>En casa:</strong></p>
-<ul>
-<li>Mas intimo y personal</li>
-<li>Control total sobre horarios</li>
-<li>Posibilidad de pernoctar invitados</li>
-<li>Requiere limpieza posterior</li>
-</ul>
-
-<p><strong>Local alquilado:</strong></p>
-<ul>
-<li>Mas espacio para invitados</li>
-<li>Sin preocupaciones de limpieza</li>
-<li>Puede tener restricciones de ruido</li>
-<li>Coste adicional de alquiler</li>
-</ul>
-
-<h2>2. La Lista de Invitados</h2>
-
-<p>Calcular bien el numero de invitados es crucial para el presupuesto:</p>
-
-<ul>
-<li><strong>Confirma asistencia:</strong> Usa Whatsapp o formularios online</li>
-<li><strong>Cuenta con un 15% menos:</strong> Siempre hay bajas de ultima hora</li>
-<li><strong>Considera las dinamicas:</strong> Grupos que se conocen vs presentaciones</li>
-</ul>
-
-<h2>3. El Catering</h2>
-
-<h3>Para Fiestas en Casa</h3>
-<ul>
-<li><strong>Picoteo y finger food:</strong> Facil de gestionar, sin cubiertos</li>
-<li><strong>BBQ:</strong> Interactivo y festivo</li>
-<li><strong>Cena servida:</strong> Para grupos mas pequenos</li>
-</ul>
-
-<h3>Calculo de Cantidades</h3>
-<ul>
-<li>8-10 piezas de picoteo por persona</li>
-<li>1.5 botellas de vino por cada 4 personas</li>
-<li>1 cerveza/hora por bebedor de cerveza</li>
-<li>Siempre ten alternativas sin alcohol</li>
-</ul>
-
-<h2>4. Musica y Entretenimiento</h2>
-
-<p>La musica es el alma de cualquier fiesta. Las opciones:</p>
-
-<h3>Playlist DIY</h3>
-<p>Funciona para fiestas informales de hasta 30 personas. Crea una playlist de 4-5 horas con los gustos del homenajeado.</p>
 
 <h3>DJ Profesional</h3>
-<p>Recomendado para mas de 30 personas o si quieres que haya baile. Un DJ profesional:</p>
+<p>El DJ deberia:</p>
 <ul>
-<li>Lee el ambiente y adapta la musica</li>
-<li>Gestiona los momentos especiales (tarta, discursos)</li>
-<li>Incluye equipo de sonido e iluminacion</li>
-<li>Elimina tu preocupacion por la musica</li>
+<li>Tener experiencia en bodas (no es lo mismo que pinchar en una discoteca)</li>
+<li>Gestionar todos los momentos: ceremonia, coctel, cena y baile</li>
+<li>Adaptarse a las peticiones de los novios</li>
+<li>Coordinar con el venue y el wedding planner</li>
 </ul>
 
-<h2>5. Decoracion</h2>
+<h3>Montaje y Desmontaje</h3>
+<p>El montaje suele requerir 1-2 horas antes del evento. El desmontaje, 30-60 minutos despues. Esto deberia estar incluido, no cobrado aparte.</p>
 
-<p>La decoracion marca la diferencia entre una reunion y una fiesta:</p>
+<h2>Lo que a Veces se Cobra Aparte</h2>
 
+<h3>Iluminacion</h3>
+<p>Algunos DJs incluyen iluminacion basica (2-4 focos LED). Pero si quieres algo mas espectacular, puede ser un extra:</p>
 <ul>
-<li><strong>Globos:</strong> El clasico que funciona (evita los de helio, no duran)</li>
-<li><strong>Iluminacion:</strong> Luces LED calidas crean ambiente festivo</li>
-<li><strong>Fotos del homenajeado:</strong> Un recorrido por su vida</li>
-<li><strong>Photocall:</strong> Para que los invitados se hagan fotos</li>
-<li><strong>Mesa dulce:</strong> Punto focal con postres y la tarta</li>
+<li><strong>Iluminacion basica LED:</strong> A veces incluida, a veces 50-150 euros extra</li>
+<li><strong>Barra LED / Wash lights:</strong> 100-200 euros</li>
+<li><strong>Luz negra UV:</strong> 50-80 euros</li>
+<li><strong>Laser:</strong> 80-150 euros</li>
 </ul>
 
-<h2>6. El Dia de la Fiesta</h2>
-
-<h3>Cronograma Sugerido</h3>
+<h3>Efectos Especiales</h3>
 <ul>
-<li><strong>-3 horas:</strong> Limpieza y decoracion final</li>
-<li><strong>-1 hora:</strong> Llegada del catering/DJ</li>
-<li><strong>Hora inicio:</strong> Musica ambiente, recepcion</li>
-<li><strong>+1 hora:</strong> La mayoria de invitados ha llegado</li>
-<li><strong>+2-3 horas:</strong> Momento tarta/discursos</li>
-<li><strong>+3 horas:</strong> Subir energia musical, baile</li>
-<li><strong>Hora fin:</strong> Ultima cancion, despedida</li>
+<li><strong>Humo bajo (primer baile):</strong> 100-200 euros</li>
+<li><strong>Chispas frias (sparklers):</strong> 150-300 euros</li>
+<li><strong>Confeti / CO2:</strong> 80-200 euros</li>
 </ul>
 
-<h2>Nuestros Packs para Cumpleanos</h2>
+<h3>Horas Extra</h3>
+<p>La mayoria de packs cubren 4-6 horas. Las horas extra suelen costar entre 75 y 200 euros cada una.</p>
 
-<p>En <a href="/es/servicios/fiestas">Orbita Events</a> ofrecemos diferentes opciones:</p>
+<h3>Desplazamiento</h3>
+<p>Si la boda es lejos de la base del DJ, puede haber un suplemento de desplazamiento (entre 0.30 y 0.50 euros/km).</p>
 
-<ul>
-<li><strong>Pack Flash (250 euros):</strong> 3 horas de DJ, sonido 4000W, luces LED</li>
-<li><strong>Pack Party Starter (400 euros):</strong> 5 horas, incluye maquina de humo</li>
-<li><strong>Pack Premium:</strong> Personalizado segun tus necesidades</li>
-</ul>
+<h2>Como Comparar Presupuestos de DJ</h2>
 
-<p>Todos los packs incluyen desplazamiento gratuito en 25km de Barcelona.</p>
+<p>Para comparar de verdad, haz una tabla con:</p>
 
-<p><strong>Quieres presupuesto para tu cumpleanos?</strong> <a href="/es/configurador">Calcula el precio</a> en 1 minuto o <a href="/es/contacto">contactanos</a> para asesoramiento.</p>`
+<ol>
+<li><strong>Horas incluidas</strong> (no es lo mismo 4h que 8h)</li>
+<li><strong>Potencia de sonido</strong> (W RMS, no W pico)</li>
+<li><strong>Iluminacion incluida o extra</strong></li>
+<li><strong>Precio hora extra</strong></li>
+<li><strong>Desplazamiento incluido o no</strong></li>
+<li><strong>Microfono incluido</strong></li>
+<li><strong>Seguro de responsabilidad civil</strong></li>
+</ol>
+
+<p>El mas barato no siempre es el peor, ni el mas caro el mejor. Mira la relacion calidad-precio y las resenas de parejas reales.</p>
+
+<h2>Nuestros Packs</h2>
+
+<p>En <a href="/es/servicios/bodas">Orbita Events</a> todos nuestros packs incluyen sonido profesional, DJ con experiencia en bodas, montaje, desmontaje y microfono. Sin sorpresas.</p>
+
+<p><a href="/es/configurador">Calcula tu presupuesto</a> en 2 minutos.</p>`
         },
         {
           locale: 'ca',
-          title: 'Guia Completa: Organitzar Festa d\'Aniversari per Adults',
-          excerpt: 'Tot el que necessites saber per organitzar una festa d\'aniversari per adults memorable. Des de la planificacio fins la musica, passant per catering i decoracio.',
-          metaTitle: 'Com Organitzar Festa Aniversari Adults | Guia Completa 2025',
-          metaDescription: 'Guia definitiva per organitzar festes d\'aniversari per adults. Planificacio, musica, catering, decoracio i tots els secrets dels professionals.',
-          content: `<h2>Com Organitzar la Festa d'Aniversari Perfecta per Adults</h2>
+          title: 'Que Inclou el Servei de DJ per Casaments: Desglossament Complet',
+          excerpt: 'Descobreix que inclou un servei de DJ per casaments. So, illuminacio, micro, muntatge i el que no t\'expliquen. Apren a comparar pressupostos.',
+          metaTitle: 'Que Inclou Servei DJ Casaments | Desglossament i Preus 2025',
+          metaDescription: 'Que inclou exactament un servei de DJ per casaments. So, llums, micro, muntatge, hores i extras. Apren a comparar pressupostos de DJ.',
+          content: `<h2>Que Inclou un Servei de DJ per Casaments</h2>
 
-<p>Organitzar una festa d'aniversari per adults va molt mes enlla de comprar un pastis i posar musica. Una celebracio memorable requereix planificacio, atencio als detalls i coneixer be l'homenatjat.</p>
+<p>Quan demanes pressupost a un DJ pel teu casament, no tots inclouen el mateix. Aqui t'expliquem que hauria d'incloure un bon servei de DJ.</p>
 
-<p>Consulta la guia completa en castella o <a href="/ca/contacto">contacta'ns</a> per assessorament professional.</p>`
+<p>Consulta la guia completa en castella o <a href="/ca/configurador">calcula el teu pressupost</a> en 2 minuts.</p>`
         }
       ]
     },
@@ -2488,160 +2438,106 @@ async function main() {
       ]
     },
     // ═══════════════════════════════════════════════════════════════════════════
-    // 11. FIESTA TEMATICA HARRY POTTER MUNDO MAGICO
+    // 11. CUANDO RESERVAR DJ BODA
     // ═══════════════════════════════════════════════════════════════════════════
     {
-      slug: 'fiesta-tematica-harry-potter-mundo-magico',
+      slug: 'cuando-reservar-dj-boda-temporada',
       author: 'Orbita Events',
-      category: 'fiestas',
-      tags: ['harry potter', 'mundo magico', 'fiesta tematica', 'hogwarts', 'decoracion'],
+      category: 'bodas',
+      tags: ['bodas', 'dj', 'reservar', 'temporada', 'planificacion'],
       isPublished: true,
       publishedAt: new Date('2025-02-01'),
-      readingTime: 9,
+      readingTime: 6,
       translations: [
         {
           locale: 'es',
-          title: 'Fiesta Tematica Harry Potter / Mundo Magico: Guia Completa',
-          excerpt: 'Organiza una fiesta que transporte a tus invitados a Hogwarts. Decoracion, actividades, comida tematica y todo lo necesario para una experiencia magica inolvidable.',
-          metaTitle: 'Fiesta Tematica Harry Potter Mundo Magico | Guia Completa 2025',
-          metaDescription: 'Como organizar una fiesta tematica Harry Potter perfecta. Decoracion de Hogwarts, velas flotantes, pociones, actividades y presupuesto. Guia profesional.',
-          content: `<h2>Como Organizar una Fiesta Magica de Mundo Harry Potter</h2>
+          title: 'Cuando Reservar el DJ para tu Boda: Temporadas, Plazos y Consejos',
+          excerpt: 'Descubre cuando deberias reservar el DJ para tu boda. Temporada alta, baja, con cuanta antelacion y como ahorrar eligiendo bien la fecha.',
+          metaTitle: 'Cuando Reservar DJ Boda | Temporada Alta, Plazos y Ahorro 2025',
+          metaDescription: 'Cuando reservar DJ para tu boda. Temporada alta (mayo-octubre), baja (noviembre-abril), antelacion recomendada y trucos para ahorrar.',
+          content: `<h2>Cuando Reservar el DJ para tu Boda</h2>
 
-<p>Quieres organizar una fiesta que transporte a tus invitados a Hogwarts? Las fiestas tematicas de mundo magico (Harry Potter, escuela de magia) son de las mas espectaculares. Aqui te explico como hacerlo.</p>
+<p>Una de las preguntas mas frecuentes que nos hacen las parejas: cuando deberia reservar el DJ? La respuesta corta: <strong>cuanto antes, mejor</strong>. La respuesta larga depende de la temporada, el dia de la semana y la zona.</p>
 
-<h2>Elementos Imprescindibles</h2>
+<h2>Temporada Alta vs Temporada Baja</h2>
 
-<h3>1. Invitaciones Estilo Carta de Hogwarts</h3>
+<h3>Temporada Alta (Mayo - Octubre)</h3>
+<p>Es cuando se celebran el 80% de las bodas en Catalunya. Los sabados de junio, julio y septiembre son los mas demandados.</p>
 <ul>
-<li>Sobre de papel kraft o pergamino</li>
-<li>Sello de lacre (puedes comprarlo o hacerlo con pistola de silicona roja)</li>
-<li>Texto en tipografia magica</li>
-<li>Billete de tren Plataforma 9 3/4 incluido</li>
+<li><strong>Antelacion recomendada:</strong> 8-12 meses</li>
+<li><strong>Sabados de junio/septiembre:</strong> Se reservan con 12+ meses</li>
+<li><strong>Precios:</strong> Los mas altos del ano</li>
 </ul>
 
-<h3>2. Decoracion Ambiental</h3>
-
-<p><strong>Entrada:</strong></p>
+<h3>Temporada Baja (Noviembre - Abril)</h3>
+<p>Menos demanda, mas disponibilidad y a menudo mejores precios.</p>
 <ul>
-<li>Cartel Plataforma 9 3/4</li>
-<li>Columna simulando el paso entre andenes</li>
+<li><strong>Antelacion recomendada:</strong> 3-6 meses</li>
+<li><strong>Precios:</strong> Muchos DJs ofrecen descuento (10-20%)</li>
+<li><strong>Ventaja:</strong> Mas atencion personalizada del DJ</li>
 </ul>
 
-<p><strong>Sala principal:</strong></p>
-<ul>
-<li>Velas flotantes LED (colgadas del techo con hilo de pescar transparente)</li>
-<li>Banderas de las casas (Gryffindor, Slytherin, Ravenclaw, Hufflepuff)</li>
-<li>Estanterias con libros antiguos y frascos de pociones</li>
-<li>Escobas decorativas</li>
-<li>Cuadros que se mueven (marcos con tablets reproduciendo videos)</li>
-</ul>
+<h2>Dia de la Semana</h2>
 
-<p><strong>Rincones tematicos:</strong></p>
-<ul>
-<li>Mesa de pociones (frascos de colores con etiquetas magicas)</li>
-<li>Rincon del Sombrero Seleccionador</li>
-<li>Jaula de Hedwig (buho de peluche)</li>
-<li>Espejo de Oesed</li>
-</ul>
+<h3>Sabado</h3>
+<p>El dia mas demandado. Se agota primero. Reserva con maxima antelacion.</p>
 
-<h3>3. Iluminacion</h3>
-<ul>
-<li>Velas, velas y mas velas (LED por seguridad)</li>
-<li>Luz calida general (nada de fluorescentes)</li>
-<li>Luces de hada en guirnaldas</li>
-<li>Proyeccion de estrellas en el techo (opcional)</li>
-</ul>
+<h3>Viernes</h3>
+<p>Cada vez mas popular. Suele tener un 10-15% de descuento respecto al sabado.</p>
 
-<h3>4. Musica y Sonido</h3>
-<ul>
-<li>Banda sonora de Harry Potter (John Williams)</li>
-<li>Musica medieval/celta de fondo</li>
-<li>Sonidos de castillo: viento, buhos, crepitar de fuego</li>
-<li>Para la fiesta: remixes de la BSO, musica epica</li>
-</ul>
+<h3>Domingo</h3>
+<p>Opcion mas economica (15-25% menos). Ideal si tus invitados tienen lunes libre.</p>
 
-<h2>Actividades</h2>
+<h3>Entre semana</h3>
+<p>Precio minimo, pero complicado para los invitados. Funciona bien para bodas intimas o destino.</p>
 
-<h3>Para Ninos</h3>
-<ul>
-<li><strong>Seleccion de casas</strong> con sombrero seleccionador</li>
-<li><strong>Clase de pociones:</strong> Mezclar ingredientes (refrescos de colores)</li>
-<li><strong>Busqueda de horrocruxes:</strong> Yincana por el espacio</li>
-<li><strong>Taller de varitas:</strong> Decorar varitas de madera</li>
-</ul>
+<h2>Plazos Recomendados</h2>
 
-<h3>Para Adultos</h3>
-<ul>
-<li><strong>Cata de pociones:</strong> Cocteles tematicos</li>
-<li><strong>Trivial Harry Potter:</strong> Por equipos/casas</li>
-<li><strong>Murder mystery:</strong> Misterio en Hogwarts</li>
-<li><strong>Torneo de los Tres Magos:</strong> Pruebas y retos</li>
-</ul>
+<ol>
+<li><strong>12-18 meses antes:</strong> Bodas en sabado de temporada alta</li>
+<li><strong>8-12 meses:</strong> Bodas en viernes/domingo de temporada alta</li>
+<li><strong>6-8 meses:</strong> Bodas en temporada baja</li>
+<li><strong>3-6 meses:</strong> Si tienes flexibilidad de fecha</li>
+<li><strong>Menos de 3 meses:</strong> Posible pero arriesgado, menos opciones</li>
+</ol>
 
-<h2>Comida y Bebida</h2>
-
-<p><strong>Dulces:</strong></p>
-<ul>
-<li>Ranas de chocolate (con tarjeta de mago)</li>
-<li>Grageas Bertie Bott (jelly beans de todos los sabores)</li>
-<li>Tarta de caldero</li>
-<li>Cupcakes con banderas de casas</li>
-</ul>
-
-<p><strong>Bebidas:</strong></p>
-<ul>
-<li>Cerveza de mantequilla (root beer + crema + caramelo)</li>
-<li>Zumo de calabaza</li>
-<li>Pocion multijugos (smoothie verde)</li>
-<li>Felix Felicis (limonada dorada con purpurina comestible)</li>
-</ul>
-
-<h2>Presupuesto Orientativo</h2>
-
-<h3>DIY (fiesta casera, 15-20 personas)</h3>
-<ul>
-<li>Decoracion: 80-150 euros</li>
-<li>Comida/bebida: 100-200 euros</li>
-<li>Disfraces/accesorios: 50-100 euros</li>
-<li><strong>Total: 230-450 euros</strong></li>
-</ul>
-
-<h3>Profesional (30+ personas)</h3>
-<ul>
-<li>Decoracion profesional: 300-600 euros</li>
-<li>Catering tematico: 300-500 euros</li>
-<li>DJ + sonido + iluminacion: 600-1.000 euros</li>
-<li>Actividades/animacion: 200-400 euros</li>
-<li><strong>Total: 1.400-2.500 euros</strong></li>
-</ul>
-
-<h2>Nuestra Experiencia Mundo Magico</h2>
-
-<p>En <a href="/es/tematica-mon-magic">Orbita Events</a> hemos creado la Experiencia Mundo Magico: un pack completo que incluye:</p>
+<h2>Trucos para Ahorrar</h2>
 
 <ul>
-<li>Sobres de lacre artesanales personalizados</li>
-<li>Velas flotantes LED</li>
-<li>Iluminacion ambiental de castillo</li>
-<li>DJ con musica tematica</li>
-<li>Efectos especiales (humo, luces)</li>
+<li><strong>Elige viernes o domingo:</strong> 10-25% mas barato que sabado</li>
+<li><strong>Temporada baja:</strong> Noviembre-abril tiene precios reducidos</li>
+<li><strong>Pack completo:</strong> Reservar DJ + iluminacion + efectos juntos suele salir mas barato que por separado</li>
+<li><strong>Reserva con tiempo:</strong> Algunos DJs ofrecen descuento por reserva anticipada</li>
+<li><strong>Evita puentes:</strong> Los fines de semana de puente tienen precio de sabado incluso en viernes</li>
 </ul>
 
-<p>Todo montado y desmontado por nosotros. Tu solo te preocupas de disfrazarte.</p>
+<h2>Que Pasa si Reservo Tarde?</h2>
 
-<p><strong>Quieres una fiesta magica sin complicaciones?</strong> <a href="/es/tematica-mon-magic">Ver Experiencia Mundo Magico</a></p>`
+<p>Si buscas DJ con menos de 3 meses de antelacion:</p>
+<ul>
+<li>Los mejores DJs ya estaran cogidos</li>
+<li>Tendras menos poder de negociacion</li>
+<li>Puede que no encuentres exactamente lo que buscas</li>
+<li>Pero no es imposible: siempre hay cancelaciones y profesionales disponibles</li>
+</ul>
+
+<h2>Que Hacer Ahora</h2>
+
+<p>Si ya tienes fecha de boda, lo mejor es pedir presupuesto ya. No compromete a nada y te aseguras disponibilidad.</p>
+
+<p>En <a href="/es/servicios/bodas">Orbita Events</a> puedes <a href="/es/configurador">calcular tu presupuesto</a> en 2 minutos y comprobar disponibilidad. Sin compromiso.</p>`
         },
         {
           locale: 'ca',
-          title: 'Festa Tematica Harry Potter / Mon Magic: Guia Completa',
-          excerpt: 'Organitza una festa que transporti els teus convidats a Hogwarts. Decoracio, activitats, menjar tematic i tot el necessari per una experiencia magica inoblidable.',
-          metaTitle: 'Festa Tematica Harry Potter Mon Magic | Guia Completa 2025',
-          metaDescription: 'Com organitzar una festa tematica Harry Potter perfecta. Decoracio de Hogwarts, espelmes flotants, pocions, activitats i pressupost. Guia professional.',
-          content: `<h2>Com Organitzar una Festa Magica de Mon Harry Potter</h2>
+          title: 'Quan Reservar el DJ pel teu Casament: Temporades, Terminis i Consells',
+          excerpt: 'Descobreix quan hauries de reservar el DJ pel casament. Temporada alta, baixa, amb quanta antelacio i com estalviar triant be la data.',
+          metaTitle: 'Quan Reservar DJ Casament | Temporada Alta, Terminis i Estalvi 2025',
+          metaDescription: 'Quan reservar DJ pel casament. Temporada alta (maig-octubre), baixa (novembre-abril), antelacio recomanada i trucs per estalviar.',
+          content: `<h2>Quan Reservar el DJ pel teu Casament</h2>
 
-<p>Vols organitzar una festa que transporti els teus convidats a Hogwarts? Les festes tematiques de mon magic son de les mes espectaculars.</p>
+<p>Una de les preguntes mes frequents: quan hauria de reservar el DJ? La resposta curta: com abans, millor.</p>
 
-<p>Consulta la guia completa en castella o <a href="/ca/tematica-mon-magic">veure Experiencia Mon Magic</a>.</p>`
+<p>Consulta la guia completa en castella o <a href="/ca/configurador">calcula el teu pressupost</a> en 2 minuts.</p>`
         }
       ]
     },
@@ -2751,6 +2647,109 @@ async function main() {
           content: `<h2>Quantes Hores de DJ Necessito pel Meu Casament</h2>
 
 <p>Una de les preguntes mes frequents al contractar DJ per casament es: quantes hores necessito? La resposta depen de com sigui el vostre casament.</p>
+
+<p>Consulta la guia completa en castella o <a href="/ca/configurador">calcula el teu pressupost</a>.</p>`
+        }
+      ]
+    },
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 13. PRECIO HORA EXTRA DJ BODA
+    // ═══════════════════════════════════════════════════════════════════════════
+    {
+      slug: 'precio-hora-extra-dj-boda',
+      author: 'Orbita Events',
+      category: 'bodas',
+      tags: ['bodas', 'dj', 'precio', 'hora extra', 'presupuesto'],
+      isPublished: true,
+      publishedAt: new Date('2025-02-05'),
+      readingTime: 5,
+      translations: [
+        {
+          locale: 'es',
+          title: 'Precio Hora Extra DJ Boda: Cuanto Cuesta y Cuando la Necesitas',
+          excerpt: 'Descubre cuanto cuesta la hora extra de DJ en una boda. Precios reales, cuando pedirla, como negociarla y alternativas para no gastar de mas.',
+          metaTitle: 'Precio Hora Extra DJ Boda | Cuanto Cuesta Realmente 2025',
+          metaDescription: 'Cuanto cuesta la hora extra de DJ en una boda. Precio medio 75-200 euros. Cuando pedirla, como negociarla y trucos para ahorrar.',
+          content: `<h2>Cuanto Cuesta la Hora Extra de DJ en una Boda</h2>
+
+<p>Son las 2 de la manana, la pista esta llena y tus invitados no quieren parar. Necesitas una hora extra de DJ. Pero cuanto cuesta? Te lo explico con datos reales.</p>
+
+<h2>Precio Medio de la Hora Extra</h2>
+
+<p>En Catalunya, la hora extra de DJ para boda oscila entre <strong>75 y 200 euros</strong>, dependiendo de:</p>
+
+<ul>
+<li><strong>Dia de la semana:</strong> Sabado mas caro que viernes o domingo</li>
+<li><strong>Temporada:</strong> Verano mas caro que invierno</li>
+<li><strong>Hora:</strong> De 2 a 3 es mas barato que de 3 a 4 (por la madrugada sube)</li>
+<li><strong>Lo que incluya:</strong> Solo musica o tambien iluminacion y efectos</li>
+</ul>
+
+<h3>Tabla Orientativa de Precios</h3>
+
+<p>Estos son precios medios en 2025 para bodas en Barcelona y Girona:</p>
+
+<ul>
+<li><strong>Hora extra estandar:</strong> 80-120 euros</li>
+<li><strong>Hora extra sabado temporada alta:</strong> 120-200 euros</li>
+<li><strong>Hora extra viernes/domingo:</strong> 75-100 euros</li>
+<li><strong>Hora extra temporada baja:</strong> 60-90 euros</li>
+</ul>
+
+<h2>Cuando Necesitas Hora Extra</h2>
+
+<h3>Senales de que tu boda pedira hora extra:</h3>
+<ul>
+<li>Mas de 100 invitados (las bodas grandes se alargan)</li>
+<li>Invitados jovenes (quieren fiesta hasta tarde)</li>
+<li>Boda en sabado de verano (la noche invita)</li>
+<li>Habeis contratado barra libre (si hay alcohol, la fiesta dura mas)</li>
+</ul>
+
+<h3>Cuando NO suele hacer falta:</h3>
+<ul>
+<li>Bodas intimas (menos de 50 personas)</li>
+<li>Boda en domingo (la gente madruga al dia siguiente)</li>
+<li>El venue cierra a una hora fija</li>
+</ul>
+
+<h2>Consejos para Gestionar las Horas Extra</h2>
+
+<h3>1. Negocia el precio antes</h3>
+<p>Incluye el precio de la hora extra en el contrato. A las 2 de la manana no es momento de negociar.</p>
+
+<h3>2. Contrata un pack mas largo</h3>
+<p>A menudo es mas barato contratar 6 horas desde el principio que 4 + 2 extras. El precio por hora suele bajar con mas horas.</p>
+
+<h3>3. Avisa con antelacion al DJ</h3>
+<p>Si a medianoche ya ves que querras seguir, avisa al DJ. Le da tiempo a reorganizar su set musical.</p>
+
+<h3>4. Pregunta al venue</h3>
+<p>Algunas masias y restaurantes tienen hora limite. No pidas hora extra si el espacio cierra a las 3.</p>
+
+<h2>Alternativas a la Hora Extra</h2>
+
+<ul>
+<li><strong>Playlist automatica:</strong> El DJ deja una playlist preparada para la ultima hora (sin DJ presente, solo musica)</li>
+<li><strong>After party acustico:</strong> Guitarra o musica suave para los que se quedan</li>
+<li><strong>Cerrar a tiempo:</strong> Un buen cierre musical es mejor que una hora extra con la pista medio vacia</li>
+</ul>
+
+<h2>Lo que Incluimos</h2>
+
+<p>En <a href="/es/servicios/bodas">Orbita Events</a>, las horas extra incluyen DJ + sonido + iluminacion. Sin extras ocultos. Y siempre con precio cerrado en contrato.</p>
+
+<p><a href="/es/configurador">Calcula tu presupuesto</a> y preguntanos por las horas extra.</p>`
+        },
+        {
+          locale: 'ca',
+          title: 'Preu Hora Extra DJ Casament: Quant Costa i Quan la Necessites',
+          excerpt: 'Descobreix quant costa l\'hora extra de DJ en un casament. Preus reals, quan demanar-la, com negociar-la i alternatives.',
+          metaTitle: 'Preu Hora Extra DJ Casament | Quant Costa Realment 2025',
+          metaDescription: 'Quant costa l\'hora extra de DJ en un casament. Preu mitja 75-200 euros. Quan demanar-la, com negociar-la i trucs per estalviar.',
+          content: `<h2>Quant Costa l'Hora Extra de DJ en un Casament</h2>
+
+<p>Son les 2 de la matinada, la pista esta plena i els teus convidats no volen parar. Necessites una hora extra de DJ. Pero quant costa?</p>
 
 <p>Consulta la guia completa en castella o <a href="/ca/configurador">calcula el teu pressupost</a>.</p>`
         }
