@@ -193,22 +193,22 @@ export function AvailabilityCalendar({
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={previousMonth}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          className="p-3 min-w-[48px] min-h-[48px] flex items-center justify-center hover:bg-white/10 active:bg-white/20 rounded-xl transition-colors touch-manipulation"
           aria-label={t('previousMonth')}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
-        <h2 className="text-xl font-semibold capitalize">{monthName}</h2>
+        <h2 className="text-lg md:text-xl font-bold capitalize">{monthName}</h2>
 
         <button
           onClick={nextMonth}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          className="p-3 min-w-[48px] min-h-[48px] flex items-center justify-center hover:bg-white/10 active:bg-white/20 rounded-xl transition-colors touch-manipulation"
           aria-label={t('nextMonth')}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -240,7 +240,7 @@ export function AvailabilityCalendar({
           </div>
 
           {/* Days grid */}
-          <div className={`grid grid-cols-7 gap-2 ${compact ? 'gap-1' : 'gap-2'}`}>
+          <div className={`grid grid-cols-7 ${compact ? 'gap-1' : 'gap-1.5 md:gap-2'}`}>
             {days.map((day, index) => {
               const isToday =
                 day.dateString === new Date().toISOString().split('T')[0];
@@ -250,18 +250,18 @@ export function AvailabilityCalendar({
                 <div
                   key={index}
                   className={`
-                    ${compact ? 'h-10' : 'h-14'}
+                    ${compact ? 'h-10' : 'h-12 md:h-14'}
                     border rounded-lg flex items-center justify-center
                     ${day.isCurrentMonth ? 'opacity-100' : 'opacity-30'}
                     ${isToday ? 'ring-2 ring-purple-500' : ''}
                     ${isPast ? 'opacity-40' : ''}
                     ${getStatusColor(day.availability?.status)}
                     ${day.availability?.note ? 'cursor-help' : ''}
-                    transition-all hover:scale-105
+                    transition-all active:scale-95 touch-manipulation
                   `}
                   title={day.availability?.note}
                 >
-                  <span className={compact ? 'text-xs' : 'text-sm'}>
+                  <span className={compact ? 'text-xs' : 'text-sm font-medium'}>
                     {day.date.getDate()}
                   </span>
                 </div>
@@ -273,22 +273,22 @@ export function AvailabilityCalendar({
 
       {/* Legend */}
       {showLegend && !loading && !error && (
-        <div className="mt-6 flex flex-wrap gap-4 justify-center text-sm">
-          <div className="flex items-center gap-2">
+        <div className="mt-6 flex flex-wrap gap-3 md:gap-4 justify-center text-sm">
+          <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg">
             <div className="w-4 h-4 rounded border bg-green-500/20 border-green-500"></div>
-            <span>{t('legend.available')}</span>
+            <span className="font-medium">{t('legend.available')}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg">
             <div className="w-4 h-4 rounded border bg-red-500/20 border-red-500"></div>
-            <span>{t('legend.booked')}</span>
+            <span className="font-medium">{t('legend.booked')}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg">
             <div className="w-4 h-4 rounded border bg-gray-500/20 border-gray-500"></div>
-            <span>{t('legend.blocked')}</span>
+            <span className="font-medium">{t('legend.blocked')}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg">
             <div className="w-4 h-4 rounded border bg-white/5 border-white/10"></div>
-            <span>{t('legend.noData')}</span>
+            <span className="font-medium">{t('legend.noData')}</span>
           </div>
         </div>
       )}
