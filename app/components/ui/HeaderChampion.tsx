@@ -145,16 +145,18 @@ export default function HeaderChampion() {
         role="banner"
         className={`
           fixed top-0 left-0 right-0 z-50
-          transition-all duration-300 ease-out
+          transition-transform duration-300 ease-out
           ${isVisible ? 'translate-y-0' : '-translate-y-full'}
           ${isScrolled
-            ? 'bg-zinc-950/98 backdrop-blur-xl shadow-xl shadow-black/30 border-b border-zinc-800/50'
-            : 'bg-zinc-950/80 backdrop-blur-md'
+            ? 'bg-zinc-950 md:bg-zinc-950/98 md:backdrop-blur-xl shadow-xl shadow-black/30 border-b border-zinc-800/50'
+            : 'bg-zinc-950 md:bg-zinc-950/80 md:backdrop-blur-md'
           }
         `}
         style={{
           willChange: 'transform',
           backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          transform: 'translateZ(0)',
         }}
       >
         <div className="container mx-auto px-4">
@@ -175,7 +177,7 @@ export default function HeaderChampion() {
                 height={80}
                 sizes="260px"
                 quality={85}
-                className="h-14 md:h-16 w-auto pointer-events-none select-none transition-transform group-hover:scale-105"
+                className="h-14 md:h-16 w-auto pointer-events-none select-none md:transition-transform md:group-hover:scale-105"
                 priority
                 draggable={false}
               />
@@ -373,7 +375,7 @@ export default function HeaderChampion() {
             className="fixed inset-0 z-40 lg:hidden"
           >
             <div
-              className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/95"
               onClick={() => setIsMobileMenuOpen(false)}
             />
 
