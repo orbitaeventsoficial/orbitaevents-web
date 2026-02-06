@@ -703,14 +703,14 @@ a,
    ════════════════════════════════════════════════════════════════════════════ */
 
 /* Force GPU acceleration and prevent flickering on mobile */
-img,
-svg,
-video,
-canvas,
-[class*="logo"],
-[class*="Logo"],
-[class*="card"],
-[class*="Card"] {
+img:not(.no-3d),
+svg:not(.no-3d),
+video:not(.no-3d),
+canvas:not(.no-3d),
+[class*="logo"]:not(.no-3d),
+[class*="Logo"]:not(.no-3d),
+[class*="card"]:not(.no-3d),
+[class*="Card"]:not(.no-3d) {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;

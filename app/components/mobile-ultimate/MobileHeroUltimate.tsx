@@ -290,7 +290,12 @@ export default function MobileHeroUltimate() {
   const contentOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
   
   useEffect(() => {
+    const maxWait = window.setTimeout(() => {
+      setVideoReady(true);
+    }, 1600);
+
     return () => {
+      window.clearTimeout(maxWait);
       if (videoReadyTimeout.current !== null) {
         window.clearTimeout(videoReadyTimeout.current);
         videoReadyTimeout.current = null;
