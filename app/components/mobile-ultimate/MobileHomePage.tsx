@@ -303,7 +303,14 @@ export default function MobileHomePage() {
   const [introFinished, setIntroFinished] = useState(false);
 
   useEffect(() => {
-    setShowIntro(true);
+    // Check if user has seen the intro in this session
+    const hasSeenIntro = sessionStorage.getItem('orbita-mobile-intro-seen');
+
+    if (!hasSeenIntro) {
+      setShowIntro(true);
+    } else {
+      setIntroFinished(true);
+    }
   }, []);
 
   useEffect(() => {
