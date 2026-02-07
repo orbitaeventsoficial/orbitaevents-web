@@ -143,7 +143,7 @@ function MorphingText() {
   }, [texts.length]);
 
   return (
-    <span className="relative inline-block min-w-[220px]">
+    <span className="relative inline-block min-w-[200px]">
       <span
         className="relative inline-block bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent font-black"
         style={{
@@ -229,7 +229,7 @@ function FloatingCTAs() {
           animate={{ x: 0, opacity: 0 }}
         />
 
-        <div className="relative flex items-center justify-center gap-2 py-4 px-5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl font-black text-black text-base shadow-2xl">
+        <div className="relative flex items-center justify-center gap-2 py-3.5 px-4 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl font-black text-black text-sm shadow-2xl">
           <span className="relative z-10">{t('buttons.requestQuote')}</span>
           <motion.svg
             className="w-4 h-4 relative z-10"
@@ -248,7 +248,7 @@ function FloatingCTAs() {
         href={WHATSAPP_URL_WITH_MESSAGE('Hola! Vull info sobre events temàtics')}
         whileTap={{ scale: 0.96 }}
         onTapStart={() => haptic('light')}
-        className="relative group flex items-center justify-center gap-2.5 py-4 px-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-md rounded-2xl border-2 border-green-500/30 font-bold text-white text-base shadow-xl overflow-hidden"
+        className="relative group flex items-center justify-center gap-2.5 py-4 px-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-md rounded-2xl border-2 border-green-500/30 font-bold text-white text-sm shadow-xl overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.4, duration: 0.8 }}
@@ -376,7 +376,7 @@ export default function MobileHeroUltimate() {
             initial={{ opacity: 0, y: 40, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.7, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[3.4rem] leading-[1.02] font-black text-white mt-6 mb-6 text-center mx-auto"
+            className="text-[3rem] leading-[1.05] font-black text-white mt-6 mb-6 text-center"
             style={{
               textShadow: '0 4px 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(251, 191, 36, 0.2)',
             }}

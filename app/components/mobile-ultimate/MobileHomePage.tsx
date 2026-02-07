@@ -62,7 +62,7 @@ function QuickFeatures() {
       {/* Background glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/10 rounded-full blur-[100px]" />
 
-      <div className="relative grid grid-cols-2 gap-3 auto-rows-fr">
+      <div className="relative grid grid-cols-2 gap-4">
         {features.map((feature, i) => (
           <motion.div
             key={feature.titleKey}
@@ -71,7 +71,7 @@ function QuickFeatures() {
             viewport={{ once: true }}
             transition={reduceMotion ? { duration: 0 } : { delay: i * 0.1, type: 'spring', damping: 20 }}
             whileTap={{ scale: 0.95 }}
-            className="relative group p-4 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 backdrop-blur-sm shadow-xl overflow-hidden h-full text-center"
+            className="relative group p-5 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 backdrop-blur-sm shadow-xl overflow-hidden"
           >
             {/* Hover glow effect */}
             <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-active:opacity-20 transition-opacity`} />
@@ -83,16 +83,16 @@ function QuickFeatures() {
               transition={reduceMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'linear', delay: i * 0.5 }}
             />
 
-            <div className="relative flex flex-col items-center">
+            <div className="relative">
               <motion.span
-                className="text-3xl block mb-2"
+                className="text-4xl block mb-3"
                 animate={reduceMotion ? { rotate: 0 } : { rotate: [0, 5, -5, 0] }}
                 transition={reduceMotion ? { duration: 0 } : { duration: 4, repeat: Infinity, delay: i * 0.3, ease: "easeInOut" }}
               >
                 {feature.icon}
               </motion.span>
-              <h3 className="text-white font-black text-sm mb-1">{t(feature.titleKey)}</h3>
-              <p className="text-white/60 text-[11px] leading-snug">{t(feature.descKey)}</p>
+              <h3 className="text-white font-black text-base mb-1">{t(feature.titleKey)}</h3>
+              <p className="text-white/60 text-xs leading-tight">{t(feature.descKey)}</p>
             </div>
           </motion.div>
         ))}
@@ -205,8 +205,8 @@ function GuaranteeSection() {
                 </div>
 
                 {/* Checkmark icon */}
-                <div className={`relative w-10 h-10 rounded-2xl bg-gradient-to-br ${guarantee.gradient} flex items-center justify-center shadow-lg`}>
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div className={`relative w-8 h-8 rounded-full bg-gradient-to-br ${guarantee.gradient} flex items-center justify-center shadow-lg`}>
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
