@@ -177,7 +177,7 @@ export default function HeaderChampion() {
                 height={80}
                 sizes="260px"
                 quality={85}
-                className="h-14 md:h-16 w-auto pointer-events-none select-none md:transition-transform md:group-hover:scale-105 no-3d"
+                className="h-14 md:h-16 w-auto pointer-events-none select-none md:transition-transform md:group-hover:scale-105"
                 priority
                 draggable={false}
               />
