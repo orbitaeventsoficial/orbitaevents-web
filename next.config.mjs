@@ -107,9 +107,8 @@ const nextConfig = {
 
   async rewrites() {
     return [
-      // Script proxy (ad-blocker bypass)
       { source: '/umami/script.js', destination: 'https://cloud.umami.is/script.js' },
-      // Note: /umami/api/send is handled by API route to forward real client IP
+      { source: '/umami/api/send', destination: 'https://cloud.umami.is/api/send' },
     ];
   },
 
