@@ -125,24 +125,24 @@ function QuoteMenu() {
                 key={action.labelKey}
                 href={action.href}
                 initial={reduceMotion ? false : { opacity: 0, y: 20, scale: 0.8 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
+                animate={{ 
+                  opacity: 1, 
+                  y: 0, 
                   scale: 1,
                   transition: reduceMotion ? { duration: 0 } : { delay: i * 0.1 }
                 }}
-                exit={{
-                  opacity: 0,
-                  y: 20,
+                exit={{ 
+                  opacity: 0, 
+                  y: 20, 
                   scale: 0.8,
                   transition: reduceMotion ? { duration: 0 } : { delay: (actions.length - i) * 0.05 }
                 }}
                 whileTap={{ scale: 0.95 }}
                 onTapStart={() => haptic('light')}
-                className={`flex items-center gap-3 px-6 py-4 min-h-[52px] rounded-2xl bg-gradient-to-r ${action.color} shadow-xl touch-manipulation`}
+                className={`flex items-center gap-3 px-5 py-3 rounded-2xl bg-gradient-to-r ${action.color} shadow-xl`}
               >
                 <span className="text-2xl">{action.icon}</span>
-                <span className="text-white font-bold text-base whitespace-nowrap">{t(action.labelKey)}</span>
+                <span className="text-white font-semibold whitespace-nowrap">{t(action.labelKey)}</span>
               </motion.a>
             ))}
           </motion.div>
@@ -153,9 +153,7 @@ function QuoteMenu() {
       <motion.button
         onClick={toggleMenu}
         whileTap={{ scale: 0.94 }}
-        aria-label={isOpen ? 'Tancar menú' : 'Obrir menú accions ràpides'}
-        aria-expanded={isOpen}
-        className="relative z-50 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-500 shadow-[0_10px_30px_rgba(251,191,36,0.45)] touch-manipulation"
+        className="relative z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-500 shadow-[0_10px_30px_rgba(251,191,36,0.45)]"
       >
         <motion.span
           animate={reduceMotion ? { rotate: 0 } : { rotate: isOpen ? 45 : 0 }}
@@ -211,8 +209,8 @@ function NavItemComponent({ item, isActive, onClick, locale, t }: NavItemProps) 
         // Navigate using Next.js router (SPA navigation)
         router.push(href);
       }}
-      whileTap={{ scale: 0.95 }}
-      className="relative flex flex-col items-center justify-center gap-1.5 py-3 px-5 min-h-[56px] min-w-[56px] touch-manipulation"
+      whileTap={{ scale: 0.9 }}
+      className="relative flex flex-col items-center gap-1 py-2 px-4"
     >
       {/* Icon */}
       <div className="relative">
@@ -233,7 +231,7 @@ function NavItemComponent({ item, isActive, onClick, locale, t }: NavItemProps) 
       </div>
 
       {/* Label */}
-      <span className={`text-[11px] font-semibold tracking-wide ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
+      <span className={`text-[10px] font-medium ${isActive ? 'text-amber-400' : 'text-white/50'}`}>
         {t(item.labelKey)}
       </span>
 
@@ -276,15 +274,13 @@ export default function MobileBottomNav() {
       initial={reduceMotion ? false : { y: 100 }}
       animate={{ y: 0 }}
       transition={reduceMotion ? { duration: 0 } : { type: 'spring', damping: 25, delay: 0.5 }}
-      className="fixed bottom-0 left-0 right-0 z-50"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-      aria-label="Navegació principal mòbil"
+      className="fixed bottom-0 left-0 right-0 z-50 safe-bottom"
     >
       {/* Background with blur */}
-      <div className="absolute inset-0 bg-zinc-950/95 backdrop-blur-xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]" />
+      <div className="absolute inset-0 bg-zinc-900/80 backdrop-blur-xl border-t border-white/10" />
 
       {/* Nav items */}
-      <div className="relative flex items-center justify-around px-1 py-1 min-h-[64px]">
+      <div className="relative flex items-end justify-around px-2 py-2">
         {/* Left items */}
         {NAV_ITEMS.slice(0, 2).map((item) => (
           <NavItemComponent

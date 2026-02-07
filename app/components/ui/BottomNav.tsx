@@ -80,14 +80,13 @@ export default function BottomNav() {
         fixed bottom-0 left-0 right-0 z-40
         lg:hidden
         bg-zinc-950/95 backdrop-blur-xl
-        border-t border-white/10
-        shadow-[0_-4px_20px_rgba(0,0,0,0.5)]
+        border-t border-white/5
+        pb-safe
       "
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       role="navigation"
       aria-label="Navegació mòbil"
     >
-      <div className="flex items-center justify-around min-h-[64px] px-1">
+      <div className="flex items-center justify-around h-16 px-2">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href, item.exactMatch);
@@ -99,20 +98,19 @@ export default function BottomNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="relative -mt-4 touch-manipulation"
-                aria-label={t(item.labelKey)}
+                className="relative -mt-4"
               >
                 <motion.div
                   whileTap={{ scale: 0.95 }}
                   className="
                     flex items-center justify-center
-                    w-16 h-16 rounded-full
+                    w-14 h-14 rounded-full
                     bg-gradient-to-br from-amber-500 to-amber-600
                     shadow-lg shadow-amber-500/30
                     text-black
                   "
                 >
-                  <Icon className="w-7 h-7" strokeWidth={2.5} />
+                  <Icon className="w-6 h-6" strokeWidth={2.5} />
                 </motion.div>
                 {/* Glow effect */}
                 <div className="absolute inset-0 rounded-full bg-amber-500/20 blur-xl -z-10" />
@@ -127,31 +125,30 @@ export default function BottomNav() {
               aria-current={active ? 'page' : undefined}
               className={`
                 flex flex-col items-center justify-center
-                min-w-[56px] min-h-[56px] py-2 px-3
+                min-w-[60px] h-full
                 transition-colors duration-200
-                touch-manipulation
-                ${active ? 'text-amber-400' : 'text-white/60'}
+                ${active ? 'text-amber-400' : 'text-white/70'}
               `}
             >
               <motion.div
                 whileTap={{ scale: 0.9 }}
                 className="relative"
               >
-                <Icon className="w-6 h-6" strokeWidth={active ? 2.5 : 2} />
+                <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} />
                 {/* Indicador actiu */}
                 {active && (
                   reduceMotion ? (
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-400" />
                   ) : (
                     <motion.div
                       layoutId="bottomNavIndicator"
-                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-amber-400"
+                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-400"
                       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                     />
                   )
                 )}
               </motion.div>
-              <span className={`text-[11px] mt-1.5 font-semibold tracking-wide ${active ? 'text-amber-400' : ''}`}>
+              <span className={`text-xs mt-1 font-medium ${active ? 'text-amber-400' : ''}`}>
                 {t(item.labelKey)}
               </span>
             </Link>
