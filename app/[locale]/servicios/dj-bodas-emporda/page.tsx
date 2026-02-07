@@ -53,24 +53,15 @@ export default async function DJBodasEmpordaPage({ params }: PageProps) {
     heroSubtitle: 'Figueres · Roses · Cadaqués · Costa Brava Nord',
     minPrice: MIN_PRICE,
     towns: empordaTowns,
-    // Keywords SEO reals
-    highlights: ['DJ boda Roses', 'Bodas masía Empordà', 'Precio DJ boda', 'Bodas Costa Brava'],
+    highlights: ['Masías con historia', 'Vistas al Mediterráneo', 'Encanto empordanés', 'Desplazamiento incluido'],
     description: `DJ profesional para bodas en el Empordà. Especialistas en masías empordanesas y espacios con vistas al Mediterráneo.`,
     whyChooseUs: [
       'Masías con historia: Conocemos los mejores espacios del Empordà',
       'Costa Brava Nord: Bodas frente al mar en Roses y Cadaqués',
-      'Idiomas: Hablamos catalán, castellano, inglés y francés',
+      'Encanto empordanés: Tradición y elegancia catalana',
       'Desplazamiento incluido: Cubrimos todo el Alt y Baix Empordà',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    // Imatges
-    heroImage: '/img/portfolio/bodas/bodas-01.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-01.avif',
-    ],
   };
 
   return (

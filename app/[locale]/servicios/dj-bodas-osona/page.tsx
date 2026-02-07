@@ -53,23 +53,15 @@ export default async function DJBodasOsonaPage({ params }: PageProps) {
     heroSubtitle: 'Vic · Manlleu · Torelló · Centelles · Masías con encanto',
     minPrice: MIN_PRICE,
     towns: osonaTowns,
-    // Keywords SEO reals
-    highlights: ['DJ boda Vic', 'Bodas masía Osona', 'Precio DJ boda', 'Bodas rurales Catalunya'],
+    highlights: ['Masías con encanto', 'Entorno rural', 'Desplazamiento incluido', 'Generador disponible'],
     description: `DJ profesional para bodas en Osona. Especialistas en masías y entornos rurales de la comarca.`,
     whyChooseUs: [
       'Masías con encanto: Experiencia en los mejores espacios de Osona',
-      'Generador propio: Para fincas sin conexión eléctrica',
+      'Entorno rural: Preparados para fincas sin conexión eléctrica',
       'Desplazamiento incluido: Toda la comarca cubierta',
       'Paisajes únicos: Bodas con vistas al Montseny y los Pirineos',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-01.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-05.avif',
-    ],
   };
 
   return (

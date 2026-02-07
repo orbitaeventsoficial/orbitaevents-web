@@ -53,8 +53,7 @@ export default async function DJBodasGironaPage({ params }: PageProps) {
     heroSubtitle: 'Girona · Figueres · Olot · Banyoles · Toda la provincia',
     minPrice: MIN_PRICE,
     towns: gironaTowns,
-    // Keywords SEO reals
-    highlights: ['DJ boda Girona', 'Bodas masía Girona', 'Precio DJ boda', 'DJ boda provincia Girona'],
+    highlights: ['Toda la provincia', 'Sonido profesional 4000W', 'Experiencia en masías', 'Catalán, castellano e inglés'],
     description: `¿Buscas un DJ para tu boda en Girona? En Òrbita Events somos especialistas en bodas en toda la provincia de Girona: desde la ciudad hasta el Empordà, pasando por la Garrotxa, el Gironès y la Selva.`,
     whyChooseUs: [
       'Cobertura completa: Trabajamos en toda la provincia de Girona',
@@ -63,13 +62,6 @@ export default async function DJBodasGironaPage({ params }: PageProps) {
       'Espacios históricos: Experiencia en monumentos y patrimonio protegido',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-01.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-09.avif',
-    ],
   };
 
   return (

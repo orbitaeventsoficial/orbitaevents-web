@@ -53,8 +53,7 @@ export default async function DJBodasMaresmePage({ params }: PageProps) {
     heroSubtitle: 'Mataró · Calella · Arenys de Mar · Vilassar · Toda la comarca',
     minPrice: MIN_PRICE,
     towns: maresmeTowns,
-    // Keywords SEO reals
-    highlights: ['DJ boda Mataró', 'Bodas playa Maresme', 'Precio DJ boda', 'DJ boda Calella'],
+    highlights: ['Toda la comarca', 'Desplazamiento incluido', 'Masías y costa', 'Generador disponible'],
     description: `DJ profesional para bodas en el Maresme. Cubrimos toda la comarca con desplazamiento incluido.`,
     whyChooseUs: [
       'Toda la comarca: Mataró, Calella, Arenys y más',
@@ -63,13 +62,6 @@ export default async function DJBodasMaresmePage({ params }: PageProps) {
       'Adaptable: Preparados para limitaciones eléctricas',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-04.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/discomovil/discomovil-08.avif',
-    ],
   };
 
   return (

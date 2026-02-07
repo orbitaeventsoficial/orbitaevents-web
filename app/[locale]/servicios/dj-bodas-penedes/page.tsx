@@ -53,23 +53,15 @@ export default async function DJBodasPenedesPage({ params }: PageProps) {
     heroSubtitle: 'Vilafranca · Sant Sadurní · Sitges · Bodegas y viñedos',
     minPrice: MIN_PRICE,
     towns: penedesTowns,
-    // Keywords SEO reals
-    highlights: ['Bodas bodega Penedès', 'DJ boda viñedos', 'Precio DJ boda', 'Bodas cava Sant Sadurní'],
+    highlights: ['Especialistas en bodegas', 'Bodas entre viñedos', 'Desplazamiento incluido', 'Entorno único'],
     description: `DJ profesional para bodas en el Penedès. Especialistas en bodas en bodegas y viñedos.`,
     whyChooseUs: [
       'Especialistas en bodegas: Codorníu, Freixenet, Torres...',
-      'Acústica en cavas: Sabemos ecualizar espacios subterráneos',
+      'Bodas entre viñedos: Experiencia en espacios únicos',
       'Desplazamiento incluido: Toda la comarca cubierta',
-      'Generador propio: Por si la finca no tiene potencia',
+      'Entorno wine country: Conocemos las particularidades de la zona',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-04.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-03.avif',
-      '/img/portfolio/discomovil/discomovil-04.avif',
-    ],
   };
 
   return (

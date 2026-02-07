@@ -53,23 +53,15 @@ export default async function DJBodasBaixLlobregatPage({ params }: PageProps) {
     heroSubtitle: 'Hospitalet · Cornellà · Sant Boi · El Prat · Toda la comarca',
     minPrice: MIN_PRICE,
     towns: baixLlobregatTowns,
-    // Keywords SEO reals
-    highlights: ['DJ boda Hospitalet', 'Bodas Castelldefels playa', 'Precio DJ boda', 'DJ boda Gavà Mar'],
+    highlights: ['Toda la comarca', 'Desplazamiento incluido', 'Masías y espacios rurales', 'Cerca de Barcelona'],
     description: `DJ profesional para bodas en el Baix Llobregat. Cubrimos toda la comarca con desplazamiento incluido.`,
     whyChooseUs: [
       'Toda la comarca: Hospitalet, Cornellà, Sant Boi y más',
-      'Bodas de playa: Castelldefels y Gavà Mar',
+      'Desplazamiento incluido: Sin costes adicionales',
       'Variedad de espacios: Masías, restaurantes y hoteles',
       'Conexión Barcelona: Fácil acceso desde la ciudad',
     ],
     faqs: faqItems.map(f => ({ question: f.q, answer: f.a })),
-    heroImage: '/img/portfolio/bodas/bodas-03.avif',
-    galleryImages: [
-      '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/bodas/bodas-02.avif',
-      '/img/portfolio/bodas/bodas-04.avif',
-      '/img/portfolio/discomovil/discomovil-07.avif',
-    ],
   };
 
   return (
