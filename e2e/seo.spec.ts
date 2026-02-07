@@ -44,7 +44,7 @@ test.describe('SEO & Metadata', () => {
     await page.goto('/');
 
     // Wait for images to load
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Get all images
     const images = page.locator('img');

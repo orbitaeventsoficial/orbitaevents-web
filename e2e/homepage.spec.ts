@@ -33,7 +33,7 @@ test.describe('Homepage', () => {
     await page.goto('/');
 
     // Wait for content to load
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Check that services are displayed
     const servicesSection = page.locator('text=/bodas|bodis|empresas/i').first();
@@ -43,7 +43,7 @@ test.describe('Homepage', () => {
   test('should be responsive on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Page should load on mobile
     await expect(page).toHaveTitle(/Òrbita Events/i);

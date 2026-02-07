@@ -5,7 +5,7 @@ const CONTACT_PATH = '/es/contacto';
 test.describe('Contact Form', () => {
   test('should display contact page', async ({ page }) => {
     await page.goto(CONTACT_PATH);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
     // Check page loaded
@@ -18,7 +18,7 @@ test.describe('Contact Form', () => {
 
   test('should have required form fields', async ({ page }) => {
     await page.goto(CONTACT_PATH);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
     // Check for essential form fields
@@ -36,7 +36,7 @@ test.describe('Contact Form', () => {
 
   test('should show validation errors for empty fields', async ({ page }) => {
     await page.goto(CONTACT_PATH);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
     // Try to submit empty form
@@ -53,7 +53,7 @@ test.describe('Contact Form', () => {
 
   test('should accept valid input', async ({ page }) => {
     await page.goto(CONTACT_PATH);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForSelector('#intro-overlay', { state: 'hidden', timeout: 20000 });
 
     // Fill form with valid data
