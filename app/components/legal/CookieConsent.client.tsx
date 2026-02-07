@@ -19,6 +19,12 @@ export default function CookieConsent() {
     marketing: false,
   });
 
+  const notifyConsentUpdate = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('orbita-consent-update'));
+    }
+  };
+
   const triggerPageView = () => {
     if (typeof window === 'undefined') return;
     if (!window.gtag) {
@@ -73,6 +79,7 @@ export default function CookieConsent() {
           triggerPageView();
         }
       }
+      notifyConsentUpdate();
     } catch {
       localStorage.removeItem(COOKIE_CONSENT_KEY);
       const timer = setTimeout(() => setShowBanner(true), 2000);
@@ -107,6 +114,7 @@ export default function CookieConsent() {
       });
       triggerPageView();
     }
+    notifyConsentUpdate();
   };
 
   const acceptNecessary = () => {
@@ -131,6 +139,7 @@ export default function CookieConsent() {
         ad_storage: 'denied',
       });
     }
+    notifyConsentUpdate();
   };
 
   const savePreferences = () => {
@@ -163,6 +172,7 @@ export default function CookieConsent() {
         ad_personalization: preferences.marketing ? 'granted' : 'denied',
       });
     }
+    notifyConsentUpdate();
   };
 
   if (!showBanner) return null;

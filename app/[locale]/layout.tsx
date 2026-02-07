@@ -25,74 +25,7 @@ import '@/app/globals.css';
 // Components
 import LayoutWrapper from '@/app/components/layout/LayoutWrapper';
 import { PWAProvider } from '@/app/components/pwa/PWAProvider';
-import { TawkToChat } from '@/components/chat/TawkToChat';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// GOOGLE TAG MANAGER (GTM) - Gestiona Analytics, Ads, Meta Pixel, etc.
-// ═══════════════════════════════════════════════════════════════════════════
-
-function GoogleTagManager() {
-  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
-  if (!gtmId) return null;
-
-  return (
-    <>
-      {/* Google Tag Manager - Head */}
-      <Script
-        id="gtm-head"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${gtmId}');
-          `,
-        }}
-      />
-    </>
-  );
-}
-
-function GoogleTagManagerBody() {
-  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
-  if (!gtmId) return null;
-
-  return (
-    <noscript>
-      <iframe
-        src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-        height="0"
-        width="0"
-        style={{ display: 'none', visibility: 'hidden' }}
-      />
-    </noscript>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// UMAMI ANALYTICS (SELF-HOSTED)
-// ═══════════════════════════════════════════════════════════════════════════
-
-function UmamiAnalytics() {
-  const websiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
-  if (!websiteId) return null;
-
-  const scriptUrl =
-    process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL ||
-    '/umami/script.js';
-
-  return (
-    <Script
-      id="umami-analytics"
-      src={scriptUrl}
-      strategy="afterInteractive"
-      data-website-id={websiteId}
-      data-host-url="/umami"
-    />
-  );
-}
+import ConsentScripts from '@/app/components/legal/ConsentScripts.client';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // JSON-LD STRUCTURED DATA - SEO MILLORAT
@@ -425,13 +358,29 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <head>
-        <GoogleTagManager />
-        <UmamiAnalytics />
+        {process.env.NEXT_PUBLIC_GTM_ID && (
+          <Script
+            id="gtag-consent-default"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('consent','default',{
+                  analytics_storage:'denied',
+                  ad_storage:'denied',
+                  ad_user_data:'denied',
+                  ad_personalization:'denied',
+                  wait_for_update:500
+                });
+              `,
+            }}
+          />
+        )}
 
         {/* Preconnects per performance - recursos externs */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
 
         {/* Preload critical resources for LCP - Hero */}
         <link rel="preload" href="/img/hero-poster.webp" as="image" type="image/webp" fetchPriority="high" />
@@ -449,8 +398,6 @@ export default async function LocaleLayout({
         className="font-sans antialiased bg-[var(--bg-main)] text-white overflow-x-hidden"
         suppressHydrationWarning
       >
-        <GoogleTagManagerBody />
-
         {/* JSON-LD Structured Data - In body to prevent Next.js head duplication */}
         <script
           type="application/ld+json"
@@ -536,14 +483,7 @@ export default async function LocaleLayout({
             </LayoutWrapper>
           </PWAProvider>
         </NextIntlClientProvider>
-
-        {/* Tawk.to Live Chat */}
-        <TawkToChat
-          propertyId={process.env.NEXT_PUBLIC_TAWK_PROPERTY_ID || ''}
-          widgetId={process.env.NEXT_PUBLIC_TAWK_WIDGET_ID || 'default'}
-          enabled={process.env.NEXT_PUBLIC_TAWK_ENABLED === 'true'}
-          loadDelay={3000}
-        />
+        <ConsentScripts />
       </body>
     </html>
   );
