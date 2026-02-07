@@ -1498,7 +1498,6 @@
     "urgencyMessage": "Solo 1 sábado en Diciembre",
     "nav": {
       "services": "Servicios",
-      "zones": "Zonas",
       "experiences": "Experiencias",
       "portfolio": "Portfolio",
       "reviews": "Opiniones",
@@ -1530,24 +1529,6 @@
       "halloweenDesc": "Noches de terror con todos los efectos",
       "bodaHalloween": "Boda Halloween",
       "bodaHalloweenDesc": "Boda con toque terrorífico"
-    },
-    "zones": {
-      "barcelona": "Barcelona Ciudad",
-      "barcelonaDesc": "Hoteles, rooftops y espacios urbanos",
-      "maresme": "Maresme",
-      "maresmeDesc": "Mataró, Calella y costa",
-      "garraf": "Garraf",
-      "garrafDesc": "Sitges, Vilanova y playa",
-      "valles": "Vallès",
-      "vallesDesc": "Terrassa, Sabadell y entorno",
-      "penedes": "Penedès",
-      "peNedesDesc": "Bodegas y viñedos",
-      "girona": "Girona",
-      "gironaDesc": "Ciudad y alrededores",
-      "emporda": "Empordà",
-      "empordaDesc": "Figueres, Roses y masías",
-      "costaBrava": "Costa Brava",
-      "costaBravaDesc": "Lloret, Tossa y calas"
     },
     "badges": {
       "popular": "Popular",

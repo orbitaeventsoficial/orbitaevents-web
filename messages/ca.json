@@ -2934,7 +2934,6 @@
     "urgencyMessage": "Sol 1 dissabte a Desembre",
     "nav": {
       "services": "Serveis",
-      "zones": "Zones",
       "experiences": "Experiències",
       "portfolio": "Portfolio",
       "reviews": "Opinions",
@@ -2966,24 +2965,6 @@
       "halloweenDesc": "Nits de terror amb tots els efectes",
       "bodaHalloween": "Boda Halloween",
       "bodaHalloweenDesc": "Casament amb toc terrorífic"
-    },
-    "zones": {
-      "barcelona": "Barcelona Ciutat",
-      "barcelonaDesc": "Hotels, rooftops i espais urbans",
-      "maresme": "Maresme",
-      "maresmeDesc": "Mataró, Calella i costa",
-      "garraf": "Garraf",
-      "garrafDesc": "Sitges, Vilanova i platja",
-      "valles": "Vallès",
-      "vallesDesc": "Terrassa, Sabadell i entorn",
-      "penedes": "Penedès",
-      "peNedesDesc": "Cellers i vinyes",
-      "girona": "Girona",
-      "gironaDesc": "Ciutat i voltants",
-      "emporda": "Empordà",
-      "empordaDesc": "Figueres, Roses i masies",
-      "costaBrava": "Costa Brava",
-      "costaBravaDesc": "Lloret, Tossa i cales"
     },
     "badges": {
       "popular": "Popular",

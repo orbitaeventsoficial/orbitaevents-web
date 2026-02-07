@@ -21,7 +21,7 @@ interface NavItemConfig {
   labelKey: string;
   href: string;
   badge?: string;
-  dropdownType?: 'services' | 'experiences' | 'zones';
+  dropdownType?: 'services' | 'experiences';
   dropdown?: {
     labelKey: string;
     descKey: string;
@@ -40,21 +40,6 @@ const navItemsConfig: NavItemConfig[] = [
       { labelKey: 'bodas', descKey: 'bodasDesc', href: '/servicios/bodas', icon: '💍' },
       { labelKey: 'fiestas', descKey: 'fiestasDesc', href: '/servicios/fiestas', icon: '🎉' },
       { labelKey: 'empresas', descKey: 'empresasDesc', href: '/servicios/empresas', icon: '💼' },
-    ]
-  },
-  {
-    labelKey: 'zones',
-    href: '/servicios/bodas',
-    dropdownType: 'zones',
-    dropdown: [
-      { labelKey: 'barcelona', descKey: 'barcelonaDesc', href: '/servicios/dj-bodas-barcelona-ciudad', icon: '🏙️' },
-      { labelKey: 'maresme', descKey: 'maresmeDesc', href: '/servicios/dj-bodas-maresme', icon: '🏖️' },
-      { labelKey: 'garraf', descKey: 'garrafDesc', href: '/servicios/dj-bodas-garraf', icon: '🌊' },
-      { labelKey: 'valles', descKey: 'vallesDesc', href: '/servicios/dj-bodas-valles', icon: '🌳' },
-      { labelKey: 'penedes', descKey: 'peNedesDesc', href: '/servicios/dj-bodas-penedes', icon: '🍷' },
-      { labelKey: 'girona', descKey: 'gironaDesc', href: '/servicios/dj-bodas-girona', icon: '🏰' },
-      { labelKey: 'emporda', descKey: 'empordaDesc', href: '/servicios/dj-bodas-emporda', icon: '🌅' },
-      { labelKey: 'costaBrava', descKey: 'costaBravaDesc', href: '/servicios/dj-bodas-costa-brava', icon: '⛵' },
     ]
   },
   {
@@ -81,7 +66,6 @@ export default function HeaderChampion() {
   const tNav = useTranslations('header.nav');
   const tServices = useTranslations('header.services');
   const tExperiences = useTranslations('header.experiences');
-  const tZones = useTranslations('header.zones');
 
   // Estados
   const [isVisible, setIsVisible] = useState(true);
@@ -187,7 +171,7 @@ export default function HeaderChampion() {
             <nav className="hidden lg:flex items-center gap-0.5">
               {navItemsConfig.map((item) => {
                 // Seleccionar el traductor correcte per al dropdown
-                const dropdownT = item.dropdownType === 'services' ? tServices : item.dropdownType === 'zones' ? tZones : tExperiences;
+                const dropdownT = item.dropdownType === 'services' ? tServices : tExperiences;
 
                 return (
                   <div
@@ -387,7 +371,7 @@ export default function HeaderChampion() {
               <div className="flex flex-col h-full pt-24 pb-6 px-6">
                 <div className="flex-1 space-y-1 overflow-y-auto">
                   {navItemsConfig.map((item) => {
-                    const dropdownT = item.dropdownType === 'services' ? tServices : item.dropdownType === 'zones' ? tZones : tExperiences;
+                    const dropdownT = item.dropdownType === 'services' ? tServices : tExperiences;
 
                     return (
                       <div key={item.href}>
