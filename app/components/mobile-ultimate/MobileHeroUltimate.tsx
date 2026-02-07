@@ -381,9 +381,6 @@ export default function MobileHeroUltimate() {
               textShadow: '0 4px 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(251, 191, 36, 0.2)',
             }}
           >
-            <span className="block text-[11px] tracking-[0.2em] text-amber-300/80 uppercase mb-2">
-              Build 006b82d
-            </span>
             {t('title')}
             <br />
             <MorphingText />
