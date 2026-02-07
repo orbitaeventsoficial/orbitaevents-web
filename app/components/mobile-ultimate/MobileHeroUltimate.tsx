@@ -301,7 +301,7 @@ export default function MobileHeroUltimate() {
   return (
     <section 
       ref={containerRef}
-      className="relative h-[100dvh] w-full overflow-hidden full-bleed"
+      className="relative h-[100dvh] w-full overflow-hidden"
       style={{ touchAction: 'pan-y' }}
     >
       {/* Video Background with Parallax */}

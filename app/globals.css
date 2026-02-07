@@ -963,8 +963,7 @@ input[type="range"].slider-custom::-moz-range-track {
    ----------------------------------------------------------------------------- */
 .btn-cta,
 .cta-button,
-button[class*="cta"],
-a[class*="cta"],
+[class*="cta"],
 button[class*="pressupost" i],
 a[class*="pressupost" i] {
   background: linear-gradient(135deg, #d7b86e 0%, #f59e0b 100%) !important;
@@ -979,8 +978,7 @@ a[class*="pressupost" i] {
 
 .btn-cta:hover,
 .cta-button:hover,
-button[class*="cta"]:hover,
-a[class*="cta"]:hover {
+[class*="cta"]:hover {
   transform: scale(1.05) !important;
   box-shadow: 
     0 6px 25px rgba(215, 184, 110, 0.5),
@@ -1550,33 +1548,23 @@ textarea:focus-visible {
 @media (max-width: 767px) {
   /* Padding horizontal en contenedores */
   .container,
-  main {
+  main,
+  section > div {
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
 
   /* Secciones con menos padding vertical en móvil */
   .section,
-  section:not(.full-bleed):not(.hero):not(.mobile-hero) {
+  section {
     padding-top: 48px;
     padding-bottom: 48px;
-  }
-
-  /* Full-bleed sections (hero, video, etc.) */
-  section.full-bleed,
-  section.full-bleed > div {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
   }
 
   /* Cards con padding interno adecuado */
   .card,
   .card-elegant,
-  .card-gold,
-  .card-hover,
-  .card-swipe-item {
+  [class*="card"] {
     padding: 20px !important;
   }
 }
