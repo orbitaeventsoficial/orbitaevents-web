@@ -118,6 +118,12 @@ export default async function GraciasPage() {
         dangerouslySetInnerHTML={{
           __html: `
             (function() {
+              var consent = null;
+              try {
+                consent = JSON.parse(localStorage.getItem('orbita_cookie_consent') || 'null');
+              } catch (e) {}
+              var allowMarketing = !!(consent && consent.marketing);
+
               // Push to dataLayer (GTM)
               window.dataLayer = window.dataLayer || [];
               window.dataLayer.push({
@@ -127,10 +133,12 @@ export default async function GraciasPage() {
                 'value': 1
               });
 
-              // Google Ads Conversion (reemplazar con tu AW-ID cuando lo tengas)
-              if (typeof window.gtag === 'function') {
+              // Google Ads Conversion (requires consent + IDs)
+              var adsId = '${process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_ID || ''}';
+              var adsLabel = '${process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL || ''}';
+              if (allowMarketing && adsId && adsLabel && typeof window.gtag === 'function') {
                 window.gtag('event', 'conversion', {
-                  'send_to': 'AW-CONVERSION_ID/CONVERSION_LABEL',
+                  'send_to': 'AW-' + adsId + '/' + adsLabel,
                   'value': 1.0,
                   'currency': 'EUR'
                 });
