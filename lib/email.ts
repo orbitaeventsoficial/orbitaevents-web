@@ -15,6 +15,11 @@ interface SendEmailOptions {
   text?: string;
 }
 
+const EMAIL_LOGO_URL = `${(process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '')}/img/logoplanetatextdreta.svg`;
+const EMAIL_CONTACT_PHONE = SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone;
+const EMAIL_CONTACT_EMAIL = SITE_CONFIG.business.email;
+const EMAIL_CONTACT_WEB = SITE_CONFIG.web.url;
+
 function htmlToText(html: string): string {
   return html
     .replace(/<style[\s\S]*?<\/style>/gi, '')
@@ -44,6 +49,64 @@ function escapeHtml(value: string): string {
 
 function sanitizeHeader(value: string): string {
   return value.replace(/[\r\n]+/g, ' ').trim();
+}
+
+function hasOrbitaBrandingInHeader(html: string): boolean {
+  const headChunk = html.slice(0, 1800).toLowerCase();
+  return (
+    headChunk.includes('logoplanetatextdreta') ||
+    headChunk.includes('data-orbita-email-logo') ||
+    headChunk.includes('òrbita events') ||
+    headChunk.includes('orbita events')
+  );
+}
+
+function hasOrbitaContactInFooter(html: string): boolean {
+  const tailChunk = html.slice(-2400).toLowerCase();
+  return (
+    tailChunk.includes('data-orbita-email-contact') ||
+    tailChunk.includes((EMAIL_CONTACT_EMAIL || '').toLowerCase()) ||
+    tailChunk.includes((EMAIL_CONTACT_PHONE || '').toLowerCase()) ||
+    tailChunk.includes((EMAIL_CONTACT_WEB || '').toLowerCase())
+  );
+}
+
+function injectOrbitaLogo(html: string): string {
+  if (!html || hasOrbitaBrandingInHeader(html)) {
+    return html;
+  }
+
+  const logoBlock = `
+    <div data-orbita-email-logo="true" style="text-align:center; padding: 18px 0 10px 0;">
+      <img src="${EMAIL_LOGO_URL}" alt="Òrbita Events" style="width: 196px; max-width: 72%; height: auto; display:inline-block;" />
+    </div>
+  `;
+
+  if (/<body[^>]*>/i.test(html)) {
+    return html.replace(/<body([^>]*)>/i, `<body$1>${logoBlock}`);
+  }
+
+  return `${logoBlock}${html}`;
+}
+
+function injectOrbitaContactFooter(html: string): string {
+  if (!html || hasOrbitaContactInFooter(html)) {
+    return html;
+  }
+
+  const footerBlock = `
+    <div data-orbita-email-contact="true" style="margin-top: 20px; padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.15); text-align:center; font-size: 12px; line-height:1.5; color: #9ca3af;">
+      <div style="margin-bottom: 6px; color: #e5e7eb; font-weight: 700; letter-spacing: 0.2px;">Òrbita Events</div>
+      <div>${EMAIL_CONTACT_PHONE} · ${EMAIL_CONTACT_EMAIL}</div>
+      <div style="margin-top: 4px;"><a href="${EMAIL_CONTACT_WEB}" style="color:#DAA520; text-decoration:none;">${EMAIL_CONTACT_WEB}</a></div>
+    </div>
+  `;
+
+  if (/<\/body>/i.test(html)) {
+    return html.replace(/<\/body>/i, `${footerBlock}</body>`);
+  }
+
+  return `${html}${footerBlock}`;
 }
 
 let cachedTransporter: nodemailer.Transporter | null = null;
@@ -104,12 +167,14 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
   const fromAddress = options.from?.trim() || `"Orbita Events" <${smtpFrom}>`;
   const toAddress = options.to.trim();
 
+  const brandedHtml = injectOrbitaContactFooter(injectOrbitaLogo(options.html));
+
   await transporter.sendMail({
     from: fromAddress,
     to: toAddress,
     subject: sanitizeHeader(options.subject),
-    html: options.html,
-    text: options.text?.trim() || htmlToText(options.html),
+    html: brandedHtml,
+    text: options.text?.trim() || htmlToText(brandedHtml),
     replyTo: options.replyTo?.trim(),
   });
 }

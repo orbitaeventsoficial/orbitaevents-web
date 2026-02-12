@@ -95,8 +95,10 @@ const COMPANY_INFO = {
   nif: process.env.COMPANY_NIF || 'Pendent de configurar',
   address: 'Granollers, Barcelona',
   phone: SITE_CONFIG.business.phone,
+  phoneDisplay: SITE_CONFIG.business.phoneDisplay,
   email: SITE_CONFIG.business.email,
   web: 'www.orbitaevents.com',
+  logoUrl: `${(process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '')}/img/logoplanetatextdreta.svg`,
   iban: process.env.COMPANY_IBAN || 'Pendent de configurar',
 };
 
@@ -163,8 +165,8 @@ export function generateQuoteHTML(data: QuoteData): string {
       padding-bottom: 20px;
       border-bottom: 3px solid #DAA520;
     }
-    .logo { font-size: 28pt; font-weight: 800; color: #1a1a1a; }
-    .logo span { color: #DAA520; }
+    .logo { display: flex; align-items: center; }
+    .logo img { width: 210px; max-width: 100%; height: auto; }
     .company-info { text-align: right; font-size: 9pt; color: #666; }
 
     /* Document Title */
@@ -323,12 +325,13 @@ export function generateQuoteHTML(data: QuoteData): string {
   <div class="document">
     <!-- Header -->
     <div class="header">
-      <div class="logo">ÒRBITA <span>EVENTS</span></div>
+      <div class="logo"><img src="${COMPANY_INFO.logoUrl}" alt="Òrbita Events" /></div>
       <div class="company-info">
         <strong>${COMPANY_INFO.legalName}</strong><br>
         ${COMPANY_INFO.address}<br>
-        ${COMPANY_INFO.phone}<br>
-        ${COMPANY_INFO.email}
+        ${COMPANY_INFO.phoneDisplay || COMPANY_INFO.phone}<br>
+        ${COMPANY_INFO.email}<br>
+        ${COMPANY_INFO.web}
       </div>
     </div>
 

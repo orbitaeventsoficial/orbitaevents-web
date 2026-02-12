@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import LeadActions from './LeadActions';
 import LeadSavedViews from './LeadSavedViews';
@@ -93,6 +94,12 @@ type LeadFilters = {
   to: Date | null;
 };
 
+type Pagination = {
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
 async function getLeads(filters: {
   status?: string | string[];
   priority?: string | string[];
@@ -100,6 +107,7 @@ async function getLeads(filters: {
   q?: string;
   from?: string;
   to?: string;
+  page?: string;
 }) {
   try {
     const status = toArray(filters.status).filter(isLeadStatus);
@@ -107,6 +115,9 @@ async function getLeads(filters: {
     const eventType = toArray(filters.eventType).filter(isEventType);
     const from = parseDate(filters.from);
     const to = parseDate(filters.to);
+    const pageRaw = Number.parseInt(filters.page || '1', 10);
+    const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
+    const pageSize = 50;
 
     const where: Prisma.LeadWhereInput = {
       ...(status.length ? { status: { in: status } } : {}),
@@ -131,6 +142,18 @@ async function getLeads(filters: {
         : {}),
     };
 
+    const cacheKey = [
+      'admin:leads',
+      `status=${status.join(',') || 'all'}`,
+      `priority=${priority.join(',') || 'all'}`,
+      `eventType=${eventType.join(',') || 'all'}`,
+      `q=${filters.q || ''}`,
+      `from=${from ? from.toISOString().slice(0, 10) : ''}`,
+      `to=${to ? to.toISOString().slice(0, 10) : ''}`,
+      `page=${page}`,
+      `size=${pageSize}`,
+    ].join('|');
+
     const [
       leads,
       filteredCount,
@@ -138,31 +161,36 @@ async function getLeads(filters: {
       newCount,
       negotiationCount,
       wonCount,
-    ] = await Promise.all([
-      prisma.lead.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        take: 200,
-        include: {
-          _count: {
-            select: {
-              notes: true,
+    ] = await cachedQuery(
+      cacheKey,
+      () => Promise.all([
+        prisma.lead.findMany({
+          where,
+          orderBy: { createdAt: 'desc' },
+          skip: (page - 1) * pageSize,
+          take: pageSize,
+          include: {
+            _count: {
+              select: {
+                notes: true,
+              },
+            },
+            booking: {
+              select: {
+                id: true,
+                reference: true,
+              },
             },
           },
-          booking: {
-            select: {
-              id: true,
-              reference: true,
-            },
-          },
-        },
-      }),
-      prisma.lead.count({ where }),
-      prisma.lead.count(),
-      prisma.lead.count({ where: { status: 'NEW' } }),
-      prisma.lead.count({ where: { status: { in: ['CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } } }),
-      prisma.lead.count({ where: { status: 'WON' } }),
-    ]);
+        }),
+        prisma.lead.count({ where }),
+        prisma.lead.count(),
+        prisma.lead.count({ where: { status: 'NEW' } }),
+        prisma.lead.count({ where: { status: { in: ['CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } } }),
+        prisma.lead.count({ where: { status: 'WON' } }),
+      ]),
+      CacheTTL.VERY_SHORT
+    );
 
     const normalizedFilters: LeadFilters = { status, priority, eventType, q: filters.q || '', from, to };
     return {
@@ -175,6 +203,11 @@ async function getLeads(filters: {
         won: wonCount,
       },
       filters: normalizedFilters,
+      pagination: {
+        page,
+        pageSize,
+        totalPages: Math.max(1, Math.ceil(filteredCount / pageSize)),
+      } as Pagination,
     };
   } catch (e) {
     log.error('Error obtenint leads:', e);
@@ -182,6 +215,7 @@ async function getLeads(filters: {
       leads: [],
       counts: { filtered: 0, total: 0, new: 0, negotiation: 0, won: 0 },
       filters: { status: [], priority: [], eventType: [], q: '', from: null, to: null } as LeadFilters,
+      pagination: { page: 1, pageSize: 50, totalPages: 1 } as Pagination,
     };
   }
 }
@@ -196,10 +230,11 @@ export default async function LeadsPage({
     q?: string;
     from?: string;
     to?: string;
+    page?: string;
   };
 }) {
-  const { status, priority, eventType, q, from, to } = searchParams || {};
-  const data = await getLeads({ status, priority, eventType, q, from, to });
+  const { status, priority, eventType, q, from, to, page } = searchParams || {};
+  const data = await getLeads({ status, priority, eventType, q, from, to, page });
   const leads = data.leads;
 
   // Estadístiques ràpides
@@ -503,6 +538,44 @@ export default async function LeadsPage({
           </table>
         </div>
       </section>
+
+      {data.pagination.totalPages > 1 && (
+        <section className="flex items-center justify-between rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300">
+          <span>
+            Pàgina {data.pagination.page} de {data.pagination.totalPages}
+          </span>
+          <div className="flex items-center gap-2">
+            {data.pagination.page > 1 ? (
+              <Link
+                href={`/admin/leads?${(() => {
+                  const params = new URLSearchParams(currentQuery);
+                  params.set('page', String(data.pagination.page - 1));
+                  return params.toString();
+                })()}`}
+                className="rounded-lg border border-slate-600/50 px-3 py-1 hover:bg-slate-700/50"
+              >
+                ← Anterior
+              </Link>
+            ) : (
+              <span className="rounded-lg border border-slate-700/50 px-3 py-1 text-slate-500">← Anterior</span>
+            )}
+            {data.pagination.page < data.pagination.totalPages ? (
+              <Link
+                href={`/admin/leads?${(() => {
+                  const params = new URLSearchParams(currentQuery);
+                  params.set('page', String(data.pagination.page + 1));
+                  return params.toString();
+                })()}`}
+                className="rounded-lg border border-slate-600/50 px-3 py-1 hover:bg-slate-700/50"
+              >
+                Següent →
+              </Link>
+            ) : (
+              <span className="rounded-lg border border-slate-700/50 px-3 py-1 text-slate-500">Següent →</span>
+            )}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

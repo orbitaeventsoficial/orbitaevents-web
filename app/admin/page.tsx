@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
+import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import { MetricCard, Card, Button } from './components/ui';
 import { MiniLineChart } from './components/Charts';
 import Link from 'next/link';
@@ -97,21 +98,27 @@ export default async function AdminDashboard() {
     upcomingTasks,
   ] = await Promise.all([
     // Total leads
-    prisma.lead.count().catch(() => 0),
+    cachedQuery('admin:dashboard:leads:count', () => prisma.lead.count(), CacheTTL.SHORT).catch(() => 0),
     // Leads aquest mes
-    prisma.lead.count({
-      where: { createdAt: { gte: startOfMonth } }
-    }).catch(() => 0),
+    cachedQuery(
+      `admin:dashboard:leads:month:${startOfMonth.toISOString().slice(0, 10)}`,
+      () => prisma.lead.count({ where: { createdAt: { gte: startOfMonth } } }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
     // Reserves confirmades
-    prisma.booking.count({
-      where: { status: 'CONFIRMED' }
-    }).catch(() => 0),
+    cachedQuery(
+      'admin:dashboard:bookings:confirmed',
+      () => prisma.booking.count({ where: { status: 'CONFIRMED' } }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
     // Reserves aquest mes
-    prisma.booking.count({
-      where: { createdAt: { gte: startOfMonth } }
-    }).catch(() => 0),
+    cachedQuery(
+      `admin:dashboard:bookings:month:${startOfMonth.toISOString().slice(0, 10)}`,
+      () => prisma.booking.count({ where: { createdAt: { gte: startOfMonth } } }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
     // Total clients
-    prisma.customer.count().catch(() => 0),
+    cachedQuery('admin:dashboard:customers:count', () => prisma.customer.count(), CacheTTL.MEDIUM).catch(() => 0),
     // Testimonis pendents
     prisma.customerTestimonial.count({
       where: { isApproved: false }
@@ -121,18 +128,22 @@ export default async function AdminDashboard() {
       where: { isApproved: true }
     }).catch(() => 0),
     // Últims leads
-    prisma.lead.findMany({
-      take: 5,
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        eventType: true,
-        status: true,
-        createdAt: true,
-      }
-    }).catch(() => []),
+    cachedQuery(
+      'admin:dashboard:recent-leads:5',
+      () => prisma.lead.findMany({
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          eventType: true,
+          status: true,
+          createdAt: true,
+        }
+      }),
+      CacheTTL.VERY_SHORT
+    ).catch(() => []),
     // Pròximes reserves
     prisma.booking.findMany({
       where: {
@@ -149,25 +160,41 @@ export default async function AdminDashboard() {
       }
     }).catch(() => []),
     // Inventari
-    prisma.inventoryItem.groupBy({
-      by: ['status'],
-      _count: true
-    }).catch(() => []),
+    cachedQuery(
+      'admin:dashboard:inventory:group-status',
+      () => prisma.inventoryItem.groupBy({
+        by: ['status'],
+        _count: true
+      }),
+      CacheTTL.SHORT
+    ).catch(() => []),
     // Valoració mitjana (ara dins del Promise.all)
     prisma.customerTestimonial.aggregate({
       where: { isApproved: true },
       _avg: { rating: true }
     }).catch(() => ({ _avg: { rating: null } })),
     // Leads guanyats (ara dins del Promise.all)
-    prisma.lead.count({ where: { status: 'WON' } }).catch(() => 0),
-    prisma.lead.findMany({
-      where: { createdAt: { gte: seriesStart } },
-      select: { createdAt: true, status: true },
-    }).catch(() => []),
-    prisma.booking.findMany({
-      where: { eventDate: { gte: seriesStart } },
-      select: { eventDate: true, status: true, total: true },
-    }).catch(() => []),
+    cachedQuery(
+      'admin:dashboard:leads:won',
+      () => prisma.lead.count({ where: { status: 'WON' } }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
+    cachedQuery(
+      `admin:dashboard:leads:series:${seriesStart.toISOString().slice(0, 10)}`,
+      () => prisma.lead.findMany({
+        where: { createdAt: { gte: seriesStart } },
+        select: { createdAt: true, status: true },
+      }),
+      CacheTTL.SHORT
+    ).catch(() => []),
+    cachedQuery(
+      `admin:dashboard:bookings:series:${seriesStart.toISOString().slice(0, 10)}`,
+      () => prisma.booking.findMany({
+        where: { eventDate: { gte: seriesStart } },
+        select: { eventDate: true, status: true, total: true },
+      }),
+      CacheTTL.SHORT
+    ).catch(() => []),
     prisma.booking.count({
       where: {
         status: 'COMPLETED',

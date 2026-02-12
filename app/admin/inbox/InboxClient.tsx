@@ -84,8 +84,10 @@ export default function InboxClient({
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showCompose, setShowCompose] = useState(false);
+  const [showQuote, setShowQuote] = useState(false);
   const [replyTo, setReplyTo] = useState<UnifiedEmail | null>(null);
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [loadingSelected, setLoadingSelected] = useState(false);
 
   // Convertir leads a format unificat
   const emails = useMemo(() => {
@@ -174,6 +176,88 @@ export default function InboxClient({
   function handleReply(email: UnifiedEmail) {
     setReplyTo(email);
     setShowCompose(true);
+  }
+
+  async function handleSelectEmail(email: UnifiedEmail) {
+    setSelectedEmail(email);
+
+    if (email.type !== 'imap' || !email.imapData?.uid) return;
+
+    setLoadingSelected(true);
+    try {
+      const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}`, { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok || !data?.email) return;
+
+      const detailed = data.email as ImapEmail;
+      setSelectedEmail((prev) => {
+        if (!prev || prev.id !== email.id) return prev;
+        return {
+          ...prev,
+          read: true,
+          preview: detailed.bodyText?.slice(0, 150) || prev.preview,
+          imapData: {
+            ...prev.imapData!,
+            ...detailed,
+          },
+        };
+      });
+    } catch {
+      // Ignore detail errors to keep inbox responsive.
+    } finally {
+      setLoadingSelected(false);
+    }
+  }
+
+  async function handleImportLeadFromEmail(email: UnifiedEmail) {
+    if (email.type !== 'imap' || !email.imapData?.uid) return;
+
+    try {
+      const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}/lead`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok || !data?.lead?.id) {
+        setFlashMessage({ type: 'error', text: data?.error || 'No s’ha pogut importar el lead' });
+        return;
+      }
+
+      setFlashMessage({
+        type: 'success',
+        text: data.action === 'updated'
+          ? `Lead actualitzat: ${data.lead.name}`
+          : `Lead creat: ${data.lead.name}`,
+      });
+      router.push(`/admin/leads/${data.lead.id}`);
+      router.refresh();
+    } catch {
+      setFlashMessage({ type: 'error', text: 'Error important email a lead' });
+    }
+  }
+
+  async function handleDeleteImapEmail(email: UnifiedEmail) {
+    if (email.type !== 'imap' || !email.imapData?.uid) return;
+    if (!confirm('Segur que vols eliminar aquest email?')) return;
+
+    try {
+      const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data?.ok) {
+        setFlashMessage({ type: 'error', text: data?.error || 'No s’ha pogut eliminar l’email' });
+        return;
+      }
+
+      setImapEmails((prev) => prev.filter((item) => item.uid !== email.imapData!.uid));
+      setSelectedEmail((prev) => (prev?.id === email.id ? null : prev));
+      setImapUnread((prev) => Math.max(0, prev - (email.read ? 0 : 1)));
+      setFlashMessage({ type: 'success', text: 'Email eliminat correctament' });
+    } catch {
+      setFlashMessage({ type: 'error', text: 'Error eliminant email' });
+    }
   }
 
   function formatDate(date: Date) {
@@ -340,7 +424,7 @@ export default function InboxClient({
             filteredEmails.map((email) => (
               <button
                 key={email.id}
-                onClick={() => setSelectedEmail(email)}
+                onClick={() => handleSelectEmail(email)}
                 type="button"
                 className={`w-full text-left p-4 border-b border-slate-700/30 hover:bg-slate-700/30 transition-colors ${
                   selectedEmail?.id === email.id ? 'bg-cyan-500/10 border-l-4 border-l-cyan-500' : ''
@@ -365,7 +449,7 @@ export default function InboxClient({
                       </p>
                     </div>
                     <p className="text-sm text-slate-400 truncate mt-0.5">{email.subject}</p>
-                    <p className="text-xs text-slate-500 truncate mt-1">{email.preview}</p>
+                    <p className="text-xs text-slate-500 truncate mt-1">{email.preview || email.subject}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1 flex-shrink-0">
                     <span className="text-xs text-slate-500">{formatDate(email.date)}</span>
@@ -462,6 +546,9 @@ export default function InboxClient({
 
               <div className="prose prose-invert max-w-none">
                 <h4 className="text-sm font-medium text-slate-400 mb-2">Missatge:</h4>
+                {loadingSelected && selectedEmail.type === 'imap' && (
+                  <p className="text-xs text-slate-500 mb-2">Carregant contingut complet...</p>
+                )}
                 {selectedEmail.imapData?.bodyHtml ? (
                   <div
                     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.imapData.bodyHtml) }}
@@ -483,6 +570,13 @@ export default function InboxClient({
                   className="flex-1 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors font-medium"
                 >
                   ↩️ Respondre
+                </button>
+                <button
+                  onClick={() => setShowQuote(true)}
+                  type="button"
+                  className="px-4 py-2 bg-amber-500/20 text-amber-300 rounded-xl border border-amber-500/30 hover:bg-amber-500/30 transition-colors"
+                >
+                  📄 Pressupost
                 </button>
                 {selectedEmail.leadData?.phone && (
                   <>
@@ -510,6 +604,24 @@ export default function InboxClient({
                     📋 Veure lead
                   </button>
                 )}
+                {selectedEmail.type === 'imap' && (
+                  <>
+                    <button
+                      onClick={() => handleImportLeadFromEmail(selectedEmail)}
+                      type="button"
+                      className="px-4 py-2 border border-cyan-500/30 text-cyan-300 rounded-xl hover:bg-cyan-500/10 transition-colors"
+                    >
+                      ➕ Crear/actualitzar lead
+                    </button>
+                    <button
+                      onClick={() => handleDeleteImapEmail(selectedEmail)}
+                      type="button"
+                      className="px-4 py-2 border border-rose-500/30 text-rose-300 rounded-xl hover:bg-rose-500/10 transition-colors"
+                    >
+                      🗑️ Eliminar email
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </>
@@ -531,6 +643,14 @@ export default function InboxClient({
             setShowCompose(false);
             setReplyTo(null);
           }}
+        />
+      )}
+
+      {showQuote && selectedEmail && (
+        <QuoteModal
+          target={selectedEmail}
+          onClose={() => setShowQuote(false)}
+          onSent={(message) => setFlashMessage({ type: 'success', text: message })}
         />
       )}
     </div>
@@ -665,6 +785,132 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
             }`}
           >
             {sent ? '✓ Enviat!' : sending ? 'Enviant...' : '📤 Enviar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuoteModal({
+  target,
+  onClose,
+  onSent,
+}: {
+  target: UnifiedEmail;
+  onClose: () => void;
+  onSent: (message: string) => void;
+}) {
+  const PACK_OPTIONS = [
+    { id: 'party-starter', label: 'Party Starter', price: 350 },
+    { id: 'party-machine', label: 'Party Machine', price: 400 },
+    { id: 'vip-experience', label: 'VIP Experience', price: 700 },
+    { id: 'boda-signature', label: 'Boda Signature', price: 800 },
+    { id: 'corporate-event', label: 'Corporate Event', price: 850 },
+  ];
+
+  const initialPack = PACK_OPTIONS[0];
+  const [packId, setPackId] = useState(initialPack.id);
+  const [price, setPrice] = useState(initialPack.price);
+  const [customMessage, setCustomMessage] = useState('');
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const recipient = target.leadData?.email || target.imapData?.from.address || target.from;
+  const leadId = target.leadData?.id;
+
+  async function handleSendQuote() {
+    setSending(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/admin/emails/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leadId,
+          to: recipient,
+          packId,
+          price: Number(price),
+          customMessage,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setError(data?.error || 'Error enviant pressupost');
+        setSending(false);
+        return;
+      }
+
+      onSent(`Pressupost enviat (${data.quoteNumber}) a ${recipient}`);
+      onClose();
+    } catch {
+      setError('Error enviant pressupost');
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" role="presentation">
+      <div className="bg-slate-800 border border-slate-700/50 rounded-2xl shadow-xl max-w-xl w-full" role="dialog" aria-modal="true" aria-labelledby="quote-title">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/50">
+          <h2 id="quote-title" className="text-lg font-semibold text-slate-100">📄 Pressupost personalitzat</h2>
+          <button onClick={onClose} type="button" className="p-2 hover:bg-slate-700/50 rounded-lg text-slate-400">✕</button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm text-slate-400 mb-1">Destinatari</label>
+            <input value={recipient} disabled className="w-full px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-300 text-sm" />
+          </div>
+          <div>
+            <label className="block text-sm text-slate-400 mb-1">Pack</label>
+            <select
+              value={packId}
+              onChange={(e) => {
+                const next = PACK_OPTIONS.find((p) => p.id === e.target.value);
+                setPackId(e.target.value);
+                if (next) setPrice(next.price);
+              }}
+              className="w-full px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 text-sm"
+            >
+              {PACK_OPTIONS.map((pack) => (
+                <option key={pack.id} value={pack.id}>{pack.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm text-slate-400 mb-1">Precio base (€)</label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value) || 0)}
+              className="w-full px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-slate-400 mb-1">Mensaje personalizado</label>
+            <textarea
+              value={customMessage}
+              onChange={(e) => setCustomMessage(e.target.value)}
+              rows={4}
+              className="w-full px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 text-sm"
+              placeholder="Detalles para el cliente..."
+            />
+          </div>
+          {error && <p className="text-xs text-rose-300" role="alert">{error}</p>}
+        </div>
+
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-700/50">
+          <button onClick={onClose} type="button" className="px-4 py-2 text-slate-400 hover:text-slate-200">Cancelar</button>
+          <button
+            onClick={handleSendQuote}
+            disabled={sending || !recipient || !packId || price <= 0}
+            type="button"
+            className="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white disabled:opacity-50"
+          >
+            {sending ? 'Enviando...' : 'Enviar presupuesto'}
           </button>
         </div>
       </div>

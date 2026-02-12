@@ -5,6 +5,7 @@
  */
 
 import { ImapFlow } from 'imapflow';
+import { simpleParser } from 'mailparser';
 import { log } from '@/lib/logger';
 
 // Configuració IMAP - DonDominio
@@ -105,35 +106,14 @@ export async function fetchEmails(options: {
         return emails;
       }
 
-      // Fetch emails
+      // Fetch emails (llistat ràpid): sense body complet per millor rendiment.
       for await (const message of client.fetch(sortedUids, {
         uid: true,
         envelope: true,
         bodyStructure: true,
         flags: true,
-        source: true,
       }, { uid: true })) {
         const envelope = message.envelope;
-        
-        // Parse body
-        let bodyText = '';
-        let bodyHtml = '';
-        
-        if (message.source) {
-          const source = message.source.toString();
-          // Simple extraction - en producció usar mailparser
-          const textMatch = source.match(/Content-Type: text\/plain[\s\S]*?\r\n\r\n([\s\S]*?)(?=\r\n--|\r\n\r\n)/i);
-          const htmlMatch = source.match(/Content-Type: text\/html[\s\S]*?\r\n\r\n([\s\S]*?)(?=\r\n--|\r\n\r\n)/i);
-          
-          if (textMatch) bodyText = textMatch[1] || '';
-          if (htmlMatch) bodyHtml = htmlMatch[1] || '';
-          
-          // Si no hi ha parts, el body és directe
-          if (!bodyText && !bodyHtml) {
-            const simpleBody = source.split('\r\n\r\n').slice(1).join('\r\n\r\n');
-            bodyText = simpleBody;
-          }
-        }
 
         const hasAttachments = message.bodyStructure?.childNodes?.some(
           (node: { disposition?: string }) => node.disposition === 'attachment'
@@ -153,8 +133,8 @@ export async function fetchEmails(options: {
           })) || [],
           subject: envelope?.subject || '(Sense assumpte)',
           date: envelope?.date || new Date(),
-          bodyText: bodyText.substring(0, 10000), // Limitar mida
-          bodyHtml: bodyHtml.substring(0, 50000),
+          bodyText: '',
+          bodyHtml: '',
           isRead: message.flags?.has('\\Seen') || false,
           hasAttachments,
           attachments: [],
@@ -193,14 +173,12 @@ export async function fetchEmailByUid(uid: number, folder: string = 'INBOX'): Pr
         let bodyHtml = '';
         
         if (message.source) {
-          const source = message.source.toString();
-          const textMatch = source.match(/Content-Type: text\/plain[\s\S]*?\r\n\r\n([\s\S]*?)(?=\r\n--|\r\n\r\n)/i);
-          const htmlMatch = source.match(/Content-Type: text\/html[\s\S]*?\r\n\r\n([\s\S]*?)(?=\r\n--|\r\n\r\n)/i);
-          
-          if (textMatch) bodyText = textMatch[1] || '';
-          if (htmlMatch) bodyHtml = htmlMatch[1] || '';
-          
-          if (!bodyText && !bodyHtml) {
+          try {
+            const parsed = await simpleParser(message.source);
+            bodyText = parsed.text || '';
+            bodyHtml = typeof parsed.html === 'string' ? parsed.html : '';
+          } catch {
+            const source = message.source.toString();
             bodyText = source.split('\r\n\r\n').slice(1).join('\r\n\r\n');
           }
         }

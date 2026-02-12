@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import AdminSearchModal from './components/AdminSearchModal';
 
 /**
@@ -19,7 +19,8 @@ function SidebarItem({
   isActive,
   badge,
   badgeColor = 'orange',
-  onClick
+  onClick,
+  onPrefetch,
 }: {
   icon: string;
   label: string;
@@ -28,6 +29,7 @@ function SidebarItem({
   badge?: string;
   badgeColor?: 'orange' | 'blue' | 'green' | 'red';
   onClick?: () => void;
+  onPrefetch?: (href: string) => void;
 }) {
   const badgeStyles = {
     orange: 'bg-orange-500/20 text-orange-200',
@@ -39,7 +41,10 @@ function SidebarItem({
   return (
     <Link
       href={href}
+      prefetch
       onClick={onClick}
+      onMouseEnter={() => onPrefetch?.(href)}
+      onFocus={() => onPrefetch?.(href)}
       aria-current={isActive ? 'page' : undefined}
       className={`
         flex items-center gap-3 px-3 py-3 rounded-xl
@@ -67,17 +72,22 @@ function BottomNavItem({
   label,
   href,
   isActive,
-  badge
+  badge,
+  onPrefetch,
 }: {
   icon: string;
   label: string;
   href: string;
   isActive: boolean;
   badge?: number;
+  onPrefetch?: (href: string) => void;
 }) {
   return (
     <Link
       href={href}
+      prefetch
+      onMouseEnter={() => onPrefetch?.(href)}
+      onFocus={() => onPrefetch?.(href)}
       className={`
         flex flex-col items-center justify-center gap-0.5 py-2 px-1 rounded-xl
         transition-all duration-200 active:scale-95 relative min-w-[60px]
@@ -118,6 +128,7 @@ function getCookieValue(name: string): string | null {
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [newLeadsCount, setNewLeadsCount] = useState(0);
@@ -139,11 +150,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     setMounted(true);
-    // Tancar sidebar al canviar de pàgina
-    setSidebarOpen(false);
-    // Cargar conteo de leads nuevos
+    // Cargar conteo de leads nuevos al iniciar.
     fetchNewLeadsCount();
-  }, [pathname, fetchNewLeadsCount]);
+  }, [fetchNewLeadsCount]);
+
+  useEffect(() => {
+    // Tancar sidebar al canviar de pàgina.
+    setSidebarOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    // Evita fer una petició a cada navegació: refresc periòdic.
+    const intervalId = setInterval(fetchNewLeadsCount, 45000);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') fetchNewLeadsCount();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [fetchNewLeadsCount]);
 
   useEffect(() => {
     document.documentElement.classList.add('admin-mode');
@@ -277,6 +304,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href);
   }, [pathname]);
 
+  const prefetchRoute = useCallback((href: string) => {
+    router.prefetch(href);
+  }, [router]);
+
   // Obtenir nom de la pàgina actual per al breadcrumb
   const getPageName = useCallback(() => {
     if (!pathname) return 'Dashboard';
@@ -349,7 +380,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </p>
               <div className="space-y-1">
                 {section.items.map((item) => (
-                  <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} />
+                  <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} onPrefetch={prefetchRoute} />
                 ))}
               </div>
             </div>
@@ -471,6 +502,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         {...item}
                         isActive={isActive(item.href)}
                         onClick={() => setSidebarOpen(false)}
+                        onPrefetch={prefetchRoute}
                       />
                     ))}
                   </div>
@@ -554,12 +586,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             label="Dashboard"
             href="/admin"
             isActive={pathname === '/admin'}
+            onPrefetch={prefetchRoute}
           />
           <BottomNavItem
             icon="📈"
             label="Analytics"
             href="/admin/analytics"
             isActive={pathname?.startsWith('/admin/analytics') || false}
+            onPrefetch={prefetchRoute}
           />
           <BottomNavItem
             icon="👥"
@@ -567,18 +601,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             href="/admin/leads"
             isActive={pathname?.startsWith('/admin/leads') || false}
             badge={newLeadsCount}
+            onPrefetch={prefetchRoute}
           />
           <BottomNavItem
             icon="📋"
             label="Reserves"
             href="/admin/bookings"
             isActive={pathname?.startsWith('/admin/bookings') || false}
+            onPrefetch={prefetchRoute}
           />
           <BottomNavItem
             icon="⚙️"
             label="Config"
             href="/admin/settings"
             isActive={pathname?.startsWith('/admin/settings') || false}
+            onPrefetch={prefetchRoute}
           />
         </div>
       </nav>

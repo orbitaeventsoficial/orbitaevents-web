@@ -1,5 +1,6 @@
 // app/admin/inbox/page.tsx
 import { prisma } from '@/lib/prisma';
+import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import InboxClient from './InboxClient';
 
@@ -10,54 +11,60 @@ export const metadata = {
 };
 
 async function getLeads() {
-  // Obtenir leads del formulari web
-  const leads = await prisma.lead.findMany({
-    where: {
-      email: { not: { contains: '@leads.orbitaevents.local' } },
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      message: true,
-      eventType: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-      preferredLocale: true,
-      interestedPackId: true,
-      interestedExtras: true,
-      budget: true,
-      guestCount: true,
-      eventDate: true,
-      eventLocation: true,
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 50,
-  });
-
-  return leads;
+  return cachedQuery(
+    'admin:inbox:leads:50',
+    () => prisma.lead.findMany({
+      where: {
+        email: { not: { contains: '@leads.orbitaevents.local' } },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        message: true,
+        eventType: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        preferredLocale: true,
+        interestedPackId: true,
+        interestedExtras: true,
+        budget: true,
+        guestCount: true,
+        eventDate: true,
+        eventLocation: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    }),
+    CacheTTL.VERY_SHORT
+  );
 }
 
 async function getStats() {
-  const [totalLeads, unreadLeads, todayLeads] = await Promise.all([
-    prisma.lead.count({
-      where: { email: { not: { contains: '@leads.orbitaevents.local' } } },
-    }),
-    prisma.lead.count({
-      where: { 
-        email: { not: { contains: '@leads.orbitaevents.local' } },
-        status: 'NEW',
-      },
-    }),
-    prisma.lead.count({
-      where: {
-        email: { not: { contains: '@leads.orbitaevents.local' } },
-        createdAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) },
-      },
-    }),
-  ]);
+  const startToday = new Date(new Date().setHours(0, 0, 0, 0));
+  const [totalLeads, unreadLeads, todayLeads] = await cachedQuery(
+    `admin:inbox:stats:${startToday.toISOString().slice(0, 10)}`,
+    () => Promise.all([
+      prisma.lead.count({
+        where: { email: { not: { contains: '@leads.orbitaevents.local' } } },
+      }),
+      prisma.lead.count({
+        where: { 
+          email: { not: { contains: '@leads.orbitaevents.local' } },
+          status: 'NEW',
+        },
+      }),
+      prisma.lead.count({
+        where: {
+          email: { not: { contains: '@leads.orbitaevents.local' } },
+          createdAt: { gte: startToday },
+        },
+      }),
+    ]),
+    CacheTTL.SHORT
+  );
 
   return { totalLeads, unreadLeads, todayLeads };
 }

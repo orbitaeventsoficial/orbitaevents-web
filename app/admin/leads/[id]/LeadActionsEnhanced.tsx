@@ -41,6 +41,7 @@ export default function LeadActionsEnhanced({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [optimisticStatus, setOptimisticStatus] = useState(currentStatus);
   
   // Quote generation state
   const [showQuoteModal, setShowQuoteModal] = useState(false);
@@ -50,10 +51,12 @@ export default function LeadActionsEnhanced({
   const [quoteHtml, setQuoteHtml] = useState<string | null>(null);
 
   const handleStatusChange = async (newStatus: string) => {
-    if (newStatus === currentStatus) return;
+    if (newStatus === optimisticStatus) return;
 
     setError(null);
     setSuccess(null);
+    const previousStatus = optimisticStatus;
+    setOptimisticStatus(newStatus);
 
     try {
       const res = await fetch(`/api/admin/leads/${leadId}/status`, {
@@ -74,6 +77,7 @@ export default function LeadActionsEnhanced({
 
       setTimeout(() => setSuccess(null), 3000);
     } catch (e) {
+      setOptimisticStatus(previousStatus);
       setError(e instanceof Error ? e.message : 'Error desconegut');
     }
   };
@@ -100,6 +104,7 @@ export default function LeadActionsEnhanced({
 
       setQuoteHtml(data.html);
       setSuccess(`Pressupost ${data.quoteNumber} generat! Total: ${data.total.toFixed(2)}€`);
+      setOptimisticStatus('QUOTE_SENT');
       
       startTransition(() => {
         router.refresh();
@@ -152,21 +157,21 @@ export default function LeadActionsEnhanced({
             <button
               key={status.value}
               onClick={() => handleStatusChange(status.value)}
-              disabled={isPending || status.value === currentStatus}
+              disabled={isPending || status.value === optimisticStatus}
               type="button"
-              aria-pressed={status.value === currentStatus}
+              aria-pressed={status.value === optimisticStatus}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left text-sm transition-colors ${
-                status.value === currentStatus
+                status.value === optimisticStatus
                   ? 'bg-stone-100 border-2 border-slate-400 font-medium'
                   : 'border border-stone-200 hover:bg-slate-50 hover:border-stone-200'
               } ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span className="text-lg">{status.icon}</span>
               <span className={`w-3 h-3 rounded-full ${status.color}`} />
-              <span className={status.value === currentStatus ? 'text-slate-700' : 'text-slate-700'}>
+              <span className={status.value === optimisticStatus ? 'text-slate-700' : 'text-slate-700'}>
                 {status.label}
               </span>
-              {status.value === currentStatus && (
+              {status.value === optimisticStatus && (
                 <span className="ml-auto text-xs text-slate-500">Actual</span>
               )}
             </button>

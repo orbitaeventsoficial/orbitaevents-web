@@ -9,6 +9,7 @@
  */
 
 import { getPacksByService, EXTRAS, type ExtraDefinition, type ServiceSlug, type PackDefinition } from '@/app/config/packs-config';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import { ORBITA_LOGO_BASE64 } from './logo-base64';
 
 type jsPDFType = import('jspdf').jsPDF;
@@ -113,10 +114,10 @@ function addFooter(doc: jsPDFType, pageNum: number, totalPages: number) {
   doc.setTextColor(...COLORS.grayDark);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  doc.text('orbitaevents.com', PAGE.marginLeft, footerY + 10);
+  doc.text(SITE_CONFIG.web.url.replace(/^https?:\/\//, ''), PAGE.marginLeft, footerY + 10);
   doc.setFont('helvetica', 'normal');
-  doc.text('info@orbitaevents.com', PAGE.marginLeft, footerY + 16);
-  doc.text('+34 674 23 85 76', PAGE.marginLeft, footerY + 22);
+  doc.text(SITE_CONFIG.business.email, PAGE.marginLeft, footerY + 16);
+  doc.text(SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone, PAGE.marginLeft, footerY + 22);
 
   doc.setTextColor(...COLORS.gray);
   doc.text('Barcelona · Girona · Catalunya', PAGE.width / 2, footerY + 16, { align: 'center' });

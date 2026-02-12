@@ -2,6 +2,7 @@
 import { log } from '@/lib/logger';
 // Pàgina de gestió de reserves
 import { prisma } from '@/lib/prisma';
+import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import BookingActions from './BookingActions';
 
@@ -31,29 +32,52 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   OTHER: '📋 Altre',
 };
 
-async function getBookings() {
+async function getBookings(pageParam?: string) {
   try {
-    const [bookings, stats] = await Promise.all([
-      prisma.booking.findMany({
-        orderBy: { eventDate: 'desc' },
-        take: 100,
-        include: {
-          pack: { include: { translations: { where: { locale: 'ca' } } } },
-          lead: { select: { id: true, name: true, source: true } },
-          _count: { select: { extras: true } },
-        },
-      }),
-      prisma.booking.groupBy({
-        by: ['status'],
-        _count: true,
-        _sum: { total: true },
-      }),
-    ]);
+    const pageRaw = Number.parseInt(pageParam || '1', 10);
+    const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
+    const pageSize = 40;
 
-    return { bookings, stats };
+    const [bookings, stats, totalCount] = await cachedQuery(
+      `admin:bookings:page:${page}:size:${pageSize}`,
+      () => Promise.all([
+        prisma.booking.findMany({
+          orderBy: { eventDate: 'desc' },
+          skip: (page - 1) * pageSize,
+          take: pageSize,
+          include: {
+            pack: { include: { translations: { where: { locale: 'ca' } } } },
+            lead: { select: { id: true, name: true, source: true } },
+            _count: { select: { extras: true } },
+          },
+        }),
+        prisma.booking.groupBy({
+          by: ['status'],
+          _count: true,
+          _sum: { total: true },
+        }),
+        prisma.booking.count(),
+      ]),
+      CacheTTL.VERY_SHORT
+    );
+
+    return {
+      bookings,
+      stats,
+      pagination: {
+        page,
+        pageSize,
+        total: totalCount,
+        totalPages: Math.max(1, Math.ceil(totalCount / pageSize)),
+      },
+    };
   } catch (error) {
     log.error('Error obtenint reserves:', error);
-    return { bookings: [], stats: [] };
+    return {
+      bookings: [],
+      stats: [],
+      pagination: { page: 1, pageSize: 40, total: 0, totalPages: 1 },
+    };
   }
 }
 
@@ -74,8 +98,12 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-export default async function BookingsPage() {
-  const { bookings, stats } = await getBookings();
+export default async function BookingsPage({
+  searchParams,
+}: {
+  searchParams?: { page?: string };
+}) {
+  const { bookings, stats, pagination } = await getBookings(searchParams?.page);
 
   // Transformar stats
   const statsMap = stats.reduce((acc, s) => {
@@ -92,7 +120,7 @@ export default async function BookingsPage() {
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">Reserves</h1>
           <p className="text-xs sm:text-sm text-slate-400">
-            {bookings.length} events · {formatCurrency(totalRevenue)}
+            {pagination.total} events · {formatCurrency(totalRevenue)}
           </p>
         </div>
         <Link
@@ -107,7 +135,7 @@ export default async function BookingsPage() {
       <section className="flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
         <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium text-slate-400 uppercase">Total</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{bookings.length}</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{pagination.total}</p>
           <p className="text-[10px] sm:text-xs text-slate-500 truncate">{formatCurrency(totalRevenue)}</p>
         </div>
         <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm p-3 sm:p-5">
@@ -279,6 +307,36 @@ export default async function BookingsPage() {
           </table>
         </div>
       </section>
+
+      {pagination.totalPages > 1 && (
+        <section className="flex items-center justify-between rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300">
+          <span>
+            Pàgina {pagination.page} de {pagination.totalPages}
+          </span>
+          <div className="flex items-center gap-2">
+            {pagination.page > 1 ? (
+              <Link
+                href={`/admin/bookings?page=${pagination.page - 1}`}
+                className="rounded-lg border border-slate-600/50 px-3 py-1 hover:bg-slate-700/50"
+              >
+                ← Anterior
+              </Link>
+            ) : (
+              <span className="rounded-lg border border-slate-700/50 px-3 py-1 text-slate-500">← Anterior</span>
+            )}
+            {pagination.page < pagination.totalPages ? (
+              <Link
+                href={`/admin/bookings?page=${pagination.page + 1}`}
+                className="rounded-lg border border-slate-600/50 px-3 py-1 hover:bg-slate-700/50"
+              >
+                Següent →
+              </Link>
+            ) : (
+              <span className="rounded-lg border border-slate-700/50 px-3 py-1 text-slate-500">Següent →</span>
+            )}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
