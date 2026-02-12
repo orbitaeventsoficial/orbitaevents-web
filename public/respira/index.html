@@ -184,8 +184,8 @@
     <div class="panel">
       <h1 style="letter-spacing:1px;margin-bottom:6px;">Respira</h1>
       <div class="hint">El sonido necesita un primer toque (sobre todo en iPhone). Luego ya suena el “pop” y ves la tarjeta.</div>
-      <button class="btn" id="startBtn">Tocar para empezar ✨</button>
-      <button class="btn" id="motionBtn" style="background:#ffd4e8;">Permitir movimiento</button>
+      <button class="btn" id="startBtn" type="button">Tocar para empezar ✨</button>
+      <button class="btn" id="motionBtn" type="button" style="background:#ffd4e8;">Permitir movimiento</button>
       <div class="hint">Funciona 100% offline.</div>
     </div>
   </div>
@@ -268,19 +268,46 @@
     const motionBtn = document.getElementById("motionBtn");
     const cardRoot = document.getElementById("cardRoot");
 
+    async function requestMotionPermission() {
+      try {
+        let granted = true;
+
+        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+          const motionRes = await DeviceMotionEvent.requestPermission();
+          granted = granted && motionRes === "granted";
+        }
+
+        if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+          const orientationRes = await DeviceOrientationEvent.requestPermission();
+          granted = granted && orientationRes === "granted";
+        }
+
+        if (!granted) {
+          motionBtn.textContent = "Movimiento no permitido";
+          motionBtn.style.background = "#ffd4e8";
+          return false;
+        }
+
+        // Android / desktop o iOS con permisos concedidos
+        motionBtn.textContent = "Movimiento disponible ✓";
+        motionBtn.style.background = "#c7f9cc";
+        return true;
+      } catch (e) {
+        motionBtn.textContent = "No se pudo activar";
+        return false;
+      }
+    }
+
     startBtn.addEventListener("click", async () => {
+      // iOS requiere gesto de usuario: pedimos permiso también aquí
+      await requestMotionPermission();
       playWaterSound();
       overlay.style.display = "none";
       cardRoot.setAttribute("aria-hidden", "false");
     }, { passive: true });
     
     motionBtn.addEventListener("click", async () => {
-      try {
-        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-          const res = await DeviceMotionEvent.requestPermission();
-          if (res !== "granted") return;
-        }
-      } catch (e) {}
+      await requestMotionPermission();
     }, { passive: true });
 
     // Burbuja al tocar la tarjeta
