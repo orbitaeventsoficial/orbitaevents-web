@@ -264,32 +264,32 @@
     "elegant": {
       "badge": "DJ · Discomòbil · Temàtics",
       "badgeEmoji": "✨",
-      "title1": "CREEM ESDEVENIMENTS",
-      "title2": "AMB EFECTES WOW.",
+      "title1": "MUNTEM FESTES",
+      "title2": "QUE LA GENT RECORDA.",
       "rotatingTexts": [
-        "AMB EFECTES WOW.",
-        "INOBLIDABLES.",
+        "QUE LA GENT RECORDA.",
+        "ON TOTHOM BALLA.",
         "AMB DISCOMÒBIL PRO.",
         "TIPUS TU CARA ME SUENA.",
-        "DE HALLOWEEN BRUTAL.",
-        "DE MÓN MÀGIC REAL.",
-        "AMB KARAOKE ÉPIC.",
-        "QUE FAN HISTÒRIA.",
-        "PER A BODES DE SOMNI.",
-        "CORPORATIUS D'IMPACTE.",
-        "QUE LA GENT RECORDA.",
+        "DE HALLOWEEN DE POR.",
+        "DE MÓN MÀGIC DE DEBÒ.",
+        "AMB KARAOKE FINS A LES 5.",
+        "QUE DEIXEN EMPREMTA.",
+        "PER A BODES COM CAL.",
+        "D'EMPRESA QUE SURTEN BÉ.",
+        "ON NINGÚ SEU.",
         "QUE NINGÚ MÉS FA."
       ],
       "subtitle": "Discomòbil · Bodes · Halloween · Món Màgic · Tu Cara Me Suena",
       "subtitleLocation": "Barcelona i Girona.",
-      "ctaContact": "Vull el meu esdeveniment",
-      "ctaPrices": "Veure què fem",
+      "ctaContact": "Parla amb nosaltres",
+      "ctaPrices": "Mira què fem",
       "rating": "5.0",
       "socialProof": "50+ esdeveniments realitzats",
       "recommendedAt": "Recomanats a",
       "whatsappMessage": "Hola! Vull info per a un esdeveniment temàtic"
     },
-    "badge": "🔥 50+ esdeveniments sense cap convidat assegut",
+    "badge": "🔥 +50 festes on tothom acaba ballant",
     "themingSpecialists": "Especialistes en Tematització",
     "location": "Barcelona + Girona",
     "stats": {
@@ -306,11 +306,11 @@
       "coverage": "Cobertura",
       "location": "BCN + Girona"
     },
-    "simpleBadge": "Venim del sector d'esdeveniments",
+    "simpleBadge": "Portem anys al món dels events",
     "simpleTitle1": "DJ i Discomòbil per a",
     "simpleTitle2": "Casaments i Events Barcelona",
-    "simpleSubtitle": "No som un DJ qualsevol. Venim del món dels esdeveniments – hem viscut milers de casaments des de dins.",
-    "simpleSubtitleHighlight": "Sabem exactament què fa que el teu event funcioni.",
+    "simpleSubtitle": "Hem estat darrere la taula de mescles en tot tipus de festes. Hem vist què funciona i què no.",
+    "simpleSubtitleHighlight": "I per això cada event ens surt millor que l'anterior.",
     "simpleServices": {
       "dj": "DJ Professional",
       "lighting": "Il·luminació PRO",
@@ -344,8 +344,8 @@
     "clients": "Han confiat en nosaltres"
   },
   "comparison": {
-    "title": "La diferència entre 'va estar bé' i 'INCREÏBLE'",
-    "subtitle": "La diferència entre una festa “que va ser bona” i una festa que es recordarà durant anys.",
+    "title": "La diferència entre 'va estar bé' i 'BRUTAL'",
+    "subtitle": "Hi ha festes que s'obliden al cap d'una setmana. I hi ha festes de les que la gent parla durant mesos.",
     "normal": {
       "music": "Només música de fons",
       "musicDesc": "Convidats avorrits, ambient pla",
@@ -355,11 +355,11 @@
       "equipmentDesc": "Va ser bo... però res d'especial"
     },
     "orbita": {
-      "music": "Experiència personalitzada completa",
-      "musicDesc": "Música + tematització + animació + jocs. Convidats ACTIVS i AGRADABLES.",
-      "dj": "Equip que LLEGEIX l'habitació en temps real",
-      "djDesc": "Adaptem música, llums, jocs i activitats segons l'entorn.",
-      "equipment": "Servei integral: música + decoració + animació + efectes",
+      "music": "Festa pensada de cap a peus",
+      "musicDesc": "Música, decoració, animació i jocs que encaixen entre ells. La gent s'ho passa bé de veritat.",
+      "dj": "DJ que mira la pista, no el mòbil",
+      "djDesc": "Adaptem la música i l'energia segons el que veiem. Si la gent seu, canviem de registre.",
+      "equipment": "Tot el pack: música + deco + animació + efectes",
       "equipmentDesc": "Cada moment té la seva màgia. \"No hem vist mai res semblant\"."
     }
   },
@@ -1671,9 +1671,9 @@
         "description": "Des de 2023, especialistes en discomòbil amb DJ professional, llums FX, tematització de casaments i festes temàtiques: Món Màgic, Halloween, Nadal, hawaianes. Festes infantils, animacions i trivial interactiu. El teu esdeveniment inoblidable!"
       },
       "hero": {
-        "title": "Vam néixer el 2023 per",
-        "titleHighlight": "Fer Festes que Marquen Vides",
-        "description": "<strong>Discomòbil professional</strong> amb DJ itinerant, llums FX espectaculars i tematització total. Casaments amb posades en escena màgiques, festes temàtiques (Món Màgic, Halloween, Nadal, hawaianes) i animacions interactives per a infantils i adults. Tenim ganes, temps i equip PRO per al teu esdeveniment!"
+        "title": "Des de 2023 fent",
+        "titleHighlight": "Festes que la Gent Recorda",
+        "description": "<strong>Discomòbil professional</strong> amb DJ, llums i tematització. Portem la festa sencera: casaments, temàtiques (Món Màgic, Halloween, Nadal, hawaianes) i animacions per a nens i grans. Tenim l'equip, les ganes i l'experiència."
       },
       "stats": {
         "years": {
@@ -1694,86 +1694,86 @@
         }
       },
       "history": {
-        "title": "La Nostra Història: De la Passió a la Independència",
-        "paragraph1": "Portem <strong>anys produint festes infantils, temàtiques i per a adults</strong>. El 2023 ens vam independitzar amb <strong>Òrbita Events</strong> per donar-te el millor: <strong>discomòbil amb equip complet</strong> (DJ professional, llums LED, FX com fum, CO2, confeti), <strong>tematització total</strong> i posades en escena que deixen bocabadats.",
-        "paragraph2": "<strong>Casaments</strong> són la nostra especialitat: cerimònies emotives, còctels animats i festes on ballen fins els avis. Creem mons: <strong>festes d'Escola de Màgia</strong> amb varetes lluminoses, <strong>Halloween</strong> terrorífiques, <strong>Nadal</strong> màgic, <strong>hawaianes</strong> tropicals, <strong>cap d'any</strong> explosiu... I trivial interactiu, animacions i jocs perquè ningú pari!",
-        "highlight": "🔥 Equip DJ professional, llums FX i ganes infinites. El teu encàrrec és el nostre pròxim hit!"
+        "title": "Com Hem Arribat Fins Aquí",
+        "paragraph1": "Fa <strong>anys que muntem festes de tot tipus</strong>: infantils, temàtiques, per a adults. El 2023 vam decidir anar pel nostre compte amb <strong>Òrbita Events</strong>. La idea era clara: <strong>discomòbil amb equip propi</strong> (DJ, llums LED, fum, CO2, confeti), <strong>tematització currada</strong> i muntatges que facin dir \"ostres\".",
+        "paragraph2": "Els <strong>casaments</strong> són el que més ens agrada: cerimònies ben fetes, còctels animats i festes on acaba ballant tothom, inclosos els avis. També muntem <strong>festes d'Escola de Màgia</strong> amb varetes, <strong>Halloween</strong> de por, <strong>Nadal</strong>, <strong>hawaianes</strong>, <strong>cap d'any</strong>... i jocs, trivial i animacions perquè ningú s'avoreixi.",
+        "highlight": "Equip DJ propi, llums FX i moltes ganes de fer-ho bé. El teu event és el nostre proper repte."
       },
       "services": {
-        "title": "El Que Fem (i Estimem)",
+        "title": "El Que Fem",
         "items": {
           "discomovil": {
             "title": "Discomòbil Itinerant",
             "desc": "DJ professional + equip complet per a qualsevol localització."
           },
           "lights": {
-            "title": "Llums i FX Espectaculars",
-            "desc": "LED, làser, fum, CO2, confeti. Efectes que fan fotos virals."
+            "title": "Llums i Efectes",
+            "desc": "LED, làser, fum, CO2, confeti. Perquè l'ambient es noti."
           },
           "theming": {
-            "title": "Tematització Total",
-            "desc": "Món Màgic, Halloween, Nadal, hawaianes, cap d'any. Mons immersius."
+            "title": "Tematització",
+            "desc": "Món Màgic, Halloween, Nadal, hawaianes, cap d'any. Muntem l'ambient sencer."
           },
           "kids": {
             "title": "Festes Infantils",
-            "desc": "Animacions, jocs, trivial interactiu. Diversió garantida."
+            "desc": "Animacions, jocs i trivial. Els nens s'ho passen bé i els pares descansen."
           },
           "weddings": {
-            "title": "Casaments Memorables",
-            "desc": "Posades en escena màgiques, cerimònia + ball inoblidable."
+            "title": "Casaments",
+            "desc": "De la cerimònia al ball: tot coordinat perquè surti rodó."
           },
           "animations": {
-            "title": "Animacions Interactives",
-            "desc": "Trivial, jocs, dinàmiques. Ningú es queda quiet."
+            "title": "Animacions i Jocs",
+            "desc": "Trivial, jocs i dinàmiques. Per quan la gent necessita moure's."
           }
         }
       },
       "process": {
         "title": "Com Treballem",
-        "subtitle": "De la idea a la festa perfecta en 4 passos simples. Sense estressos, tot sota control.",
+        "subtitle": "De la idea al dia de la festa en 4 passos. Sense maldecaps.",
         "steps": {
           "contact": {
             "title": "Ens Contactes",
-            "desc": "Explica'ns la teva idea per WhatsApp, formulari o trucada. Resposta en menys de 2h!"
+            "desc": "Escriu-nos per WhatsApp, omple el formulari o truca'ns. Et responem en menys de 2h."
           },
           "plan": {
             "title": "Planifiquem Junts",
-            "desc": "Dissenyem la festa ideal: música, llums, temàtica, horaris. Tot personalitzat per a tu."
+            "desc": "Decidim junts la música, les llums, la temàtica i els horaris. Adaptem tot al que necessites."
           },
           "setup": {
             "title": "Muntem Tot",
-            "desc": "Arribem amb temps, muntem l'equip i comprovem que tot estigui perfecte abans de començar."
+            "desc": "Arribem amb temps de sobra, muntem tot l'equip i ho provem abans que comenci la festa."
           },
           "party": {
             "title": "A Gaudir!",
-            "desc": "Tu només has de gaudir. Nosaltres ens encarreguem que la festa sigui èpica de principi a fi."
+            "desc": "Tu a passar-ho bé. De la resta ens n'encarreguem nosaltres."
           }
         }
       },
       "guarantees": {
-        "title": "Per Què Escollir-nos",
-        "subtitle": "No som una empresa més. Som gent apassionada que fa festes increïbles.",
+        "title": "Per Què Nosaltres",
+        "subtitle": "Ens agrada el que fem i treballem perquè et quedis tranquil.",
         "items": {
           "professional": {
             "title": "100% Professionals",
-            "desc": "Equip propi d'alta qualitat. Assegurança civil. Factura legal."
+            "desc": "Equip propi, assegurança civil i factura. Tot en regla."
           },
           "punctual": {
             "title": "Sempre Puntuals",
-            "desc": "Arribem mínim 1h abans. Mai t'hauràs de preocupar per res."
+            "desc": "Arribem mínim 1h abans. No hauràs d'estar pendent de res."
           },
           "passion": {
-            "title": "Passió Real",
-            "desc": "Ens encanta el que fem. I es nota en cada detall de la teva festa."
+            "title": "Ens Agrada Això",
+            "desc": "No ho fem per cobrir expedient. Ens ho passem bé muntant festes."
           },
           "quality": {
             "title": "Qualitat Garantida",
-            "desc": "Si no quedes satisfet, treballem fins que ho estiguis. Paraula."
+            "desc": "Si alguna cosa no et quadra, la solucionem. Punt."
           }
         }
       },
       "team": {
-        "title": "L'Equip Darrere de la Màgia",
+        "title": "L'Equip",
         "members": {
           "dj": {
             "name": "DJ Estrella",
@@ -1793,15 +1793,15 @@
         }
       },
       "cta": {
-        "title": "Preparat per a la Teva Festa Inoblidable?",
-        "description": "Discomòbil, casaments tematitzats, festes temàtiques Món Màgic o infantils amb animació. Contacta'ns i reserva la teva data abans que voli!",
-        "button": "Sol·licita Informació (Resposta en 2h)",
+        "title": "Tens una data al cap?",
+        "description": "Discomòbil, casaments, festes temàtiques o infantils. Escriu-nos i mirem disponibilitat.",
+        "button": "Demana Info (Resposta en 2h)",
         "location": "📍 Barcelona i voltants · 🚚 Discomòbil itinerant · 🎉 Disponibilitat immediata"
       }
     },
     "portfolio": {
-      "title": "Experiències que es recorden tota la vida",
-      "subtitle": "Cada esdeveniment és únic. Mira el que hem creat per a altres... i imagina el que podem crear per a tu.",
+      "title": "Alguns dels nostres events",
+      "subtitle": "Cada festa és diferent. Mira el que hem fet i fes-te una idea del que podem muntar per a tu.",
       "noCategories": "Encara no hi ha categories de portfolio configurades.",
       "viewGallery": "Veure galeria →",
       "breadcrumb": "Portfolio",
@@ -1820,15 +1820,26 @@
     "servicios": {
       "meta": {
         "title": "Serveis | DJ + Llums + Efectes per a Tot Tipus d'Esdeveniments",
-        "description": "Descobreix tots els nostres serveis: casaments èpics, discomòbil professional, festes privades, esdeveniments corporatius, producció tècnica i lloguer d'equipament. Barcelona i Girona."
+        "description": "Descobreix tots els nostres serveis: casaments èpics, discomòbil professional, festes privades, esdeveniments corporatius, producció tècnica i lloguer d'equipament. Barcelona i Girona.",
+        "keywords": [
+          "serveis esdeveniments Barcelona",
+          "DJ casaments Barcelona",
+          "discomobil Barcelona",
+          "festes privades Barcelona",
+          "esdeveniments corporatius Barcelona",
+          "animacio infantil Barcelona",
+          "lloguer so Barcelona",
+          "produccio tecnica esdeveniments"
+        ],
+        "imageAlt": "Serveis Orbita Events Barcelona"
       },
       "hero": {
         "badge": "+2 anys · Barcelona i Girona",
         "title": "Els Nostres Serveis",
-        "titleHighlight": "Per al Teu Esdeveniment Inoblidable",
-        "subtitle": "DJ professional + llums sincronitzades + efectes especials.",
-        "cta": "Configura el teu esdeveniment en 2 minuts i obtén el teu pressupost.",
-        "configureButton": "Configurar El Meu Esdeveniment Ara",
+        "titleHighlight": "Per a Qualsevol Tipus de Festa",
+        "subtitle": "DJ professional + llums + efectes. Tot el que necessites.",
+        "cta": "Munta el teu event en 2 minuts i mira el pressupost.",
+        "configureButton": "Configura el Teu Event",
         "exploreBelow": "O explora cada servei en detall a sota ↓",
         "features": {
           "equipment": "🎧 Equip professional de club",
@@ -1839,8 +1850,8 @@
       "items": {
         "bodas": {
           "name": "Casaments",
-          "tagline": "El dia més important mereix el millor ambient",
-          "desc": "Cerimònia emotiva, còctel elegant i festa memorable. Tot sincronitzat perquè els teus convidats ballin fins que tanquis la barra.",
+          "tagline": "Que el teu dia surti com l'has somiat",
+          "desc": "Cerimònia, còctel i festa. Ho coordinem tot perquè els convidats ballin fins a última hora.",
           "features": [
             "DJ que llegeix la sala",
             "Llums sincronitzades",
@@ -1850,8 +1861,8 @@
         },
         "discomovil": {
           "name": "Discomòbil",
-          "tagline": "La festa que els teus amics NO oblidaran",
-          "desc": "No posem playlists. Llegim la pista en temps real. Resultat: pista PLENA des de les 23h fins que marxen.",
+          "tagline": "La festa de la que parlaran durant setmanes",
+          "desc": "No posem una playlist i ens n'anem. Llegim la pista i adaptem la música perquè la gent no pari de ballar.",
           "features": [
             "Pista plena garantida",
             "Equipament professional",
@@ -1861,8 +1872,8 @@
         },
         "fiestas": {
           "name": "Festes Privades",
-          "tagline": "Aniversaris, comiadaments i temàtiques úniques",
-          "desc": "Des d'aniversaris extraordinaris fins a comiadaments memorables. Tematització completa disponible (Halloween, anys 80, Món Màgic...).",
+          "tagline": "Aniversaris, comiadaments i temàtiques",
+          "desc": "Aniversaris, comiadaments, festes temàtiques... Si tens una idea, la muntem. Halloween, anys 80, Món Màgic o el que vulguis.",
           "features": [
             "Tematització personalitzada",
             "DJ + efectes",
@@ -1883,8 +1894,8 @@
         },
         "empresas": {
           "name": "Esdeveniments Empreses",
-          "tagline": "L'esdeveniment que et fa quedar com un crack",
-          "desc": "Team building immersiu, sopars d'empresa impactants, presentacions memorables. Facturació + assegurances + zero estrès.",
+          "tagline": "Per quedar bé amb l'empresa",
+          "desc": "Team building, sopars d'empresa, presentacions. Amb factura, assegurança i sense maldecaps.",
           "features": [
             "Factura immediata",
             "Equipament professional",
@@ -1894,8 +1905,8 @@
         },
         "produccion": {
           "name": "Producció Tècnica",
-          "tagline": "Muntatge, operació i gestió sense ensurts",
-          "desc": "Disseny tècnic, muntatge professional, operació en directe. Per a productores i organitzadors que necessiten zero problemes.",
+          "tagline": "Muntatge i operació tècnica",
+          "desc": "Disseny tècnic, muntatge i operació en directe. Per a productores i organitzadors que no volen sorpreses.",
           "features": [
             "Equip tècnic complet",
             "Operació in situ",
@@ -1921,7 +1932,8 @@
         "subtitle": "Explica'ns el teu esdeveniment i et recomanem la millor opció.",
         "responseTime": "Responem en menys de 2 hores.",
         "button": "Demanar Assessorament Gratis",
-        "whatsappMessage": "Hola! Vull informació sobre els vostres serveis."
+        "whatsappMessage": "Hola! Vull informació sobre els vostres serveis.",
+        "whatsappButton": "WhatsApp"
       }
     },
     "search": {
@@ -3613,7 +3625,7 @@
     "trust": {
       "noCommitment": "Sense compromís",
       "freeQuote": "Pressupost gratuït",
-    "response24h": "Resposta en 2h"
+      "response24h": "Resposta en 2h"
     }
   },
   "seo": {
@@ -3882,13 +3894,13 @@
     "comingSoon": "Pròximament",
     "viewExperience": "Descobrir experiència",
     "notifyMe": "Avisar-me",
-      "cta": {
-        "badge": "Experiencia a mida",
-        "title": "No trobes la teva temàtica?",
-        "subtitle": "Creem experiències personalitzades. Explica'ns la teva idea i la fem realitat.",
-        "custom": "Crear experiència personalitzada",
-        "note": "Resposta en menys de 2 hores · Pressupost sense compromís"
-      }
+    "cta": {
+      "badge": "Experiencia a mida",
+      "title": "No trobes la teva temàtica?",
+      "subtitle": "Creem experiències personalitzades. Explica'ns la teva idea i la fem realitat.",
+      "custom": "Crear experiència personalitzada",
+      "note": "Resposta en menys de 2 hores · Pressupost sense compromís"
+    }
   },
   "mobileExperience": {
     "hero": {

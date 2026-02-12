@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
 export default async function AlquilerPage({ params }: { params: { locale: string } }) {
   const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'pages.servicios' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
 
   const features = t.raw('items.alquiler.features') as string[];
 
@@ -57,10 +58,10 @@ export default async function AlquilerPage({ params }: { params: { locale: strin
 
         <div className="flex flex-wrap gap-4">
           <Link href="/contacto" className="btn-primary px-6 py-3">
-            Solicitar info
+            {tCommon('buttons.contact')}
           </Link>
           <Link href="/configurador" className="btn-secondary px-6 py-3">
-            Configurar evento
+            {tCommon('buttons.configureEvent')}
           </Link>
         </div>
       </div>

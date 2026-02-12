@@ -8,32 +8,27 @@ import ServiciosClient from './client';
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'pages.servicios' });
+  const title = t('meta.title');
+  const description = t('meta.description');
+  const keywords = t.raw('meta.keywords') as string[];
+  const imageAlt = t('meta.imageAlt');
   return {
-    title: t('meta.title'),
-    description: t('meta.description'),
-    keywords: [
-      'servicios eventos Barcelona',
-      'DJ bodas Barcelona',
-      'discomovil Barcelona',
-      'fiestas privadas Barcelona',
-      'eventos corporativos Barcelona',
-      'animacion infantil Barcelona',
-      'alquiler sonido Barcelona',
-      'produccion tecnica eventos',
-    ],
+    title,
+    description,
+    keywords,
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
     alternates: { canonical: '/servicios' },
     openGraph: {
-      title: 'Servicios DJ y Eventos Barcelona | Orbita Events',
-      description: 'DJ profesional, discomovil, fiestas privadas, eventos corporativos, animacion infantil y mas. Desde 250 EUR. Barcelona y Girona.',
+      title,
+      description,
       url: '/servicios',
-      images: [{ url: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif', alt: 'Servicios Orbita Events Barcelona' }],
+      images: [{ url: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif', alt: imageAlt }],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Servicios DJ y Eventos Barcelona | Orbita Events',
-      description: 'DJ profesional, discomovil, fiestas privadas y mas. Desde 250 EUR.',
+      title,
+      description,
       images: ['/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif'],
     },
     robots: { index: true, follow: true },
@@ -97,6 +92,7 @@ export default async function ServiciosPage({ params }: { params: { locale: stri
           ctaResponseTime: t('cta.responseTime'),
           ctaButton: t('cta.button'),
           ctaWhatsappMessage: t('cta.whatsappMessage'),
+          ctaWhatsappButton: t('cta.whatsappButton'),
         }}
       />
     </div>

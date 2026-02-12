@@ -2233,80 +2233,91 @@
     },
     "servicios": {
       "meta": {
-        "title": "Services | DJ + Lights + Effects for All Types of Events",
-        "description": "Discover all our services: epic weddings, professional mobile disco, private parties, corporate events, technical production and equipment rental. Barcelona and Girona."
+        "title": "Event Services | DJ, Lights and Effects in Barcelona and Girona",
+        "description": "Discover our services for weddings, mobile DJ events, private parties, corporate events, technical production and equipment rental in Barcelona and Girona.",
+        "keywords": [
+          "event services Barcelona",
+          "wedding DJ Barcelona",
+          "mobile DJ Barcelona",
+          "private parties Barcelona",
+          "corporate events Barcelona",
+          "kids entertainment Barcelona",
+          "sound equipment rental Barcelona",
+          "technical event production"
+        ],
+        "imageAlt": "Orbita Events Services Barcelona"
       },
       "hero": {
         "badge": "+2 years · Barcelona and Girona",
         "title": "Our Services",
         "titleHighlight": "For Your Unforgettable Event",
-        "subtitle": "Professional DJ + synchronized lights + special effects.",
-        "cta": "Set up your event in 2 minutes and get your quote.",
-        "configureButton": "Set Up My Event Now",
+        "subtitle": "Professional DJ, synchronized lighting and special effects to make your event memorable.",
+        "cta": "Set up your event in 2 minutes and get a clear proposal.",
+        "configureButton": "Set Up My Event",
         "exploreBelow": "Or explore each service in detail below ↓",
         "features": {
-          "equipment": "🎧 Professional club team",
-          "backup": "Backup team at each event",
-          "guarantee": "Guaranteed full court"
+          "equipment": "Professional club-grade equipment",
+          "backup": "Backup equipment at every event",
+          "guarantee": "Packed dance floor guaranteed"
         }
       },
       "items": {
         "bodas": {
-          "name": "Wedding",
-          "tagline": "The most important day deserves the best atmosphere",
-          "desc": "Emotional ceremony, elegant cocktail and memorable party. All synchronized so that your guests dance until you close the bar.",
+          "name": "Weddings",
+          "tagline": "Your biggest day deserves the best atmosphere",
+          "desc": "Emotional ceremony, elegant cocktail and a memorable party. We coordinate everything so your guests keep dancing until the end.",
           "features": [
             "DJ who reads the room",
-            "Synchronized lights",
+            "Synchronized lighting",
             "Special effects",
-            "Total coordination"
+            "Full coordination"
           ]
         },
         "discomovil": {
-          "name": "Discommobile",
+          "name": "Mobile DJ",
           "tagline": "Professional DJ wherever you need it",
-          "desc": "We take the party wherever you want: gardens, farmhouses, beaches, venues. Complete autonomous equipment.",
+          "desc": "We bring the party wherever you want it: gardens, country houses, beaches or venues. Complete autonomous setup.",
           "features": [
-            "Complete laptop equipment",
+            "Complete portable setup",
             "Full autonomy",
             "Any location"
           ]
         },
         "fiestas": {
           "name": "Private Parties",
-          "tagline": "The party that your people will not forget",
-          "desc": "Birthdays, anniversaries, communions, graduations. We adapt the atmosphere to each celebration.",
+          "tagline": "The party your people will remember.",
+          "desc": "Birthdays, anniversaries, communions and graduations. We adapt the party to each celebration.",
           "features": [
-            "Custom music",
-            "Games and animation",
+            "Personalized music",
+            "Games and entertainment",
             "Special effects"
           ]
         },
         "empresas": {
-          "name": "Companies",
-          "tagline": "Impact corporate events",
-          "desc": "Team building, business dinners, inaugurations, presentations. Guaranteed professionalism.",
+          "name": "Corporate Events",
+          "tagline": "Corporate events up to the occasion",
+          "desc": "Team buildings, company dinners, openings and presentations. Professional execution with full coordination.",
           "features": [
-            "Corporate image",
-            "Total coordination",
+            "Corporate image support",
+            "Full coordination",
             "Professional sound"
           ]
         },
         "animacionInfantil": {
-          "name": "Children's Entertainment",
+          "name": "Kids Entertainment",
           "tagline": "Games, workshops, magic and fun for the little ones",
-          "desc": "Professional entertainers for birthday parties, communions and family events. Face painting, balloon twisting, workshops and games adapted to each age.",
+          "desc": "Professional entertainers for birthdays, communions and family events. Face painting, balloon twisting, workshops and age-adapted games.",
           "features": [
             "Professional entertainers",
             "Games and activities",
-            "Face painting + Balloon bending",
+            "Face painting + balloon twisting",
             "From €150"
           ]
         },
         "produccion": {
           "name": "Technical Production",
-          "tagline": "Assembly, operation and management without surprises",
-          "desc": "Technical design, professional assembly, live operation. For producers and organizers who need zero problems.",
+          "tagline": "Setup, operation and management without surprises",
+          "desc": "Technical design, professional setup and live operation for producers and organizers who need everything to run smoothly.",
           "features": [
             "Complete technical team",
             "On-site operation",
@@ -2315,24 +2326,25 @@
           ]
         },
         "alquiler": {
-          "name": "Rent",
-          "tagline": "Professional equipment with or without technician",
-          "desc": "EV ETX-15P, B-150 LED, Pioneer DJ. Rent the equipment we use at our events. Delivery included.",
+          "name": "Equipment Rental",
+          "tagline": "Professional gear with or without technician",
+          "desc": "EV ETX-15P, B-150 LED and Pioneer DJ. Rent the same equipment we use at our events, with delivery included.",
           "features": [
             "EV + Pioneer + B-150",
             "With/without technician",
-            "Consult"
+            "Ask for details"
           ]
         }
       },
-      "viewService": "See service",
+      "viewService": "View service",
       "mostPopular": "⭐ MOST POPULAR",
       "cta": {
-        "title": "Don't know what service you need?",
-        "subtitle": "Tell us about your event and we will recommend the best option.",
-        "responseTime": "We respond in less than 2 hours.",
-        "button": "Request Free Advice",
-        "whatsappMessage": "Hello! I want information about your services."
+        "title": "Not sure which service you need?",
+        "subtitle": "Tell us about your event and we will recommend the option that fits best.",
+        "responseTime": "We reply in less than 2 hours.",
+        "button": "Get Free Advice",
+        "whatsappMessage": "Hello! I want information about your services.",
+        "whatsappButton": "WhatsApp"
       }
     },
     "search": {
@@ -4107,7 +4119,7 @@
     "trust": {
       "noCommitment": "No commitment",
       "freeQuote": "Free quote",
-    "response24h": "Response in 2 hours"
+      "response24h": "Response in 2 hours"
     }
   },
   "seo": {

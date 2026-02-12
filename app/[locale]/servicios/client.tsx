@@ -39,6 +39,7 @@ interface ServiciosClientProps {
     ctaResponseTime: string;
     ctaButton: string;
     ctaWhatsappMessage: string;
+    ctaWhatsappButton: string;
   };
 }
 
@@ -219,7 +220,7 @@ export default function ServiciosClient({ servicios, texts }: ServiciosClientPro
                 className="inline-flex items-center justify-center gap-3 px-8 py-5 bg-[#25D366] hover:bg-[#20BD5A] rounded-2xl transition-all hover:shadow-[0_8px_30px_rgba(37,211,102,0.4)] text-white font-bold text-lg"
               >
                 <Icons.WhatsApp />
-                <span>WhatsApp</span>
+                <span>{texts.ctaWhatsappButton}</span>
               </a>
               <Link
                 href="/contacto"
