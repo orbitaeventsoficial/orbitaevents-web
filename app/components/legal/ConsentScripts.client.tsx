@@ -41,11 +41,13 @@ export default function ConsentScripts() {
   }, []);
 
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
   const umamiId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
   const umamiScriptUrl = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL || '/umami/script.js';
   const tawkEnabled = process.env.NEXT_PUBLIC_TAWK_ENABLED === 'true';
 
   const allowGtm = Boolean(gtmId) && (consent.analytics || consent.marketing);
+  const allowGoogleAds = Boolean(googleAdsId) && consent.marketing;
   const allowUmami = Boolean(umamiId) && consent.analytics;
   const allowTawk = tawkEnabled && consent.marketing;
 
@@ -75,6 +77,23 @@ export default function ConsentScripts() {
             />
           </noscript>
         </>
+      )}
+
+      {allowGoogleAds && (
+        <Script
+          id="google-ads-config"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              if (typeof window.gtag !== 'function') {
+                function gtag(){dataLayer.push(arguments);}
+                window.gtag = gtag;
+              }
+              window.gtag('config', '${googleAdsId}');
+            `,
+          }}
+        />
       )}
 
       {allowUmami && (

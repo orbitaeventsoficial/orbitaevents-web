@@ -7,7 +7,6 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nfix: graceful Supabase null handling for build without env vars\n\n- Changed supabase clients to return null when not configured\n- Added null checks to all API routes using supabaseAdmin\n- Added null checks to customerService and testimonialService\n- Allows build to succeed without Supabase environment variables\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git push:*)",
-      "Bash(npx vercel:*)",
       "WebFetch(domain:orbitaevents.com)",
       "Bash(taskkill:*)",
       "Bash(timeout /t 3 /nobreak)",
@@ -138,8 +137,6 @@
       "Bash(python:*)",
       "Bash(timeout 180 bash:*)",
       "Bash(timeout /t 30 /nobreak)",
-      "Bash(vercel env add:*)",
-      "Bash(vercel --prod:*)",
       "Bash(for url in \"/\" \"/es\" \"/contacto\" \"/servicios/bodas\" \"/portfolio\" \"/about\")",
       "Bash(pnpm remove:*)",
       "Bash(for url in \"/\" \"/contacto\" \"/servicios/bodas\" \"/about\")",
@@ -170,8 +167,6 @@
       "Bash(then)",
       "Bash(else)",
       "Bash(fi)",
-      "Bash(vercel --version:*)",
-      "Bash(vercel cache purge:*)",
       "Bash(test:*)",
       "Bash(do echo \"Verificando deployment \\(intento $i/6\\)...\")",
       "Bash(break)",
@@ -195,8 +190,6 @@
       "Bash(if [ -f .env.local ])",
       "Bash(then echo \"EXISTS\")",
       "Bash(else echo \"NOT_FOUND\")",
-      "Bash(vercel env:*)",
-      "Bash(vercel ls:*)",
       "Bash(pnpm dev)",
       "Bash(timeout 5 tail:*)",
       "Bash(netstat:*)",
@@ -207,9 +200,6 @@
       "Bash(npm run dev:*)",
       "Bash(node scripts/sync-reviews.mjs:*)",
       "Bash(node scripts/debug-serpapi.mjs:*)",
-      "Bash(vercel logs:*)",
-      "Bash(vercel inspect:*)",
-      "Bash(vercel list:*)",
       "Bash(node scripts/clean-deprecated-texts.js:*)",
       "Bash(node -p:*)",
       "Bash(node scripts/clean-unused-sections.js:*)",
@@ -220,7 +210,6 @@
       "Bash(jobs)",
       "Bash(kill:*)",
       "Bash(timeout 120 npm run build:*)",
-      "WebFetch(domain:vercel.com)",
       "Bash(SKIP_ASSET_SCRIPTS=1 npm run build:*)",
       "Bash(npx eslint:*)",
       "WebSearch",
@@ -248,7 +237,9 @@
       "Bash(npm uninstall:*)",
       "Bash(git diff:*)",
       "Bash(railway logs:*)",
-      "Bash(railway redeploy:*)"
+      "Bash(railway redeploy:*)",
+      "Bash(npx next build --no-lint)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }

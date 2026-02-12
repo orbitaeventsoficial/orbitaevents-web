@@ -18,9 +18,9 @@
  * - Textos usando sistema de traducciones
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useMobile } from './MobileAppShell';
 import { useLocale, useTranslations } from 'next-intl';
 import { WHATSAPP_NUMBER, WHATSAPP_URL } from '@/lib/constants';
@@ -256,8 +256,8 @@ function NavItemComponent({ item, isActive, onClick, locale, t }: NavItemProps) 
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function MobileBottomNav() {
-  const [activeId, setActiveId] = useState('home');
   const locale = useLocale();
+  const pathname = usePathname();
   const t = useTranslations('mobileNav');
   const reduceMotion = useReducedMotion();
 
@@ -268,6 +268,16 @@ export default function MobileBottomNav() {
     { id: 'gallery', labelKey: 'items.portfolio', href: '/portfolio', icon: GalleryIcon },
     { id: 'contact', labelKey: 'items.contact', href: '/contacto', icon: ContactIcon },
   ], []);
+
+  // Determine active tab from current pathname
+  const activeId = useMemo(() => {
+    const path = pathname.replace(`/${locale}`, '') || '/';
+    if (path === '/' || path === '') return 'home';
+    if (path.startsWith('/servicios') || path.startsWith('/tematica') || path.startsWith('/boda-halloween') || path.startsWith('/experiencias')) return 'services';
+    if (path.startsWith('/portfolio')) return 'gallery';
+    if (path.startsWith('/contacto') || path.startsWith('/configurador')) return 'contact';
+    return 'home';
+  }, [pathname, locale]);
 
   return (
     <motion.nav
@@ -287,7 +297,7 @@ export default function MobileBottomNav() {
             key={item.id}
             item={item}
             isActive={activeId === item.id}
-            onClick={() => setActiveId(item.id)}
+            onClick={() => {}}
             locale={locale}
             t={t}
           />
@@ -302,7 +312,7 @@ export default function MobileBottomNav() {
             key={item.id}
             item={item}
             isActive={activeId === item.id}
-            onClick={() => setActiveId(item.id)}
+            onClick={() => {}}
             locale={locale}
             t={t}
           />

@@ -6250,6 +6250,15 @@
         "desc": "Comunicación directa y sin intermediarios"
       }
     },
+    "reviews": {
+      "sectionLabel": "Reseñas verificadas de Google",
+      "sectionTitle": "Lo que dicen nuestros clientes",
+      "viewAll": "Ver todas las opiniones",
+      "inGoogle": "reseñas en Google"
+    },
+    "trustedBy": {
+      "sectionTitle": "Confían en nosotros"
+    },
     "footer": {
       "tagline": "Eventos temáticos que nadie más hace",
       "location": "Barcelona y Girona",

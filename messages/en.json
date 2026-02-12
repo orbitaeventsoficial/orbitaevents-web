@@ -6250,6 +6250,15 @@
         "desc": "Direct communication without intermediaries"
       }
     },
+    "reviews": {
+      "sectionLabel": "Verified Google reviews",
+      "sectionTitle": "What our clients say",
+      "viewAll": "View all reviews",
+      "inGoogle": "reviews on Google"
+    },
+    "trustedBy": {
+      "sectionTitle": "Trusted by"
+    },
     "footer": {
       "tagline": "Themed events that no one else does",
       "location": "Barcelona and Girona",

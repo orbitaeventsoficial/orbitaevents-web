@@ -6422,6 +6422,15 @@
         "desc": "Comunicació directa i sense intermediaris"
       }
     },
+    "reviews": {
+      "sectionLabel": "Ressenyes verificades de Google",
+      "sectionTitle": "El que diuen els nostres clients",
+      "viewAll": "Veure totes les opinions",
+      "inGoogle": "ressenyes a Google"
+    },
+    "trustedBy": {
+      "sectionTitle": "Confien en nosaltres"
+    },
     "footer": {
       "tagline": "Events temàtics que ningú més fa",
       "location": "Barcelona i Girona",
