@@ -66,6 +66,9 @@ const CalendarioUrgencia = dynamic(() => import('@/app/components/ui/CalendarioU
 const GoogleReviewsRotating = dynamic(() => import('@/app/components/home/GoogleReviewsRotating'), {
   ssr: false,
 });
+const TrustedByLogos = dynamic(() => import('@/app/components/marketing/TrustedByLogos'), {
+  ssr: false,
+});
 const GarantiaSection = dynamic(() => import('@/app/components/marketing/GarantiaSection'), {
   ssr: false,
 });
@@ -123,7 +126,10 @@ export default function HomePage() {
         {/* 4. RESEÑAS GOOGLE - Prova social */}
         <GoogleReviewsRotating />
 
-        {/* 5. GARANTÍA - Confiança */}
+        {/* 5. LOGOS CLIENTES - Confían en nosotros */}
+        <TrustedByLogos />
+
+        {/* 6. GARANTÍA - Confiança */}
         <GarantiaSection />
 
         {/* 6. CTA FINAL - Conversió */}

@@ -225,14 +225,14 @@ function GuaranteeSection() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const CLIENT_LOGOS = [
-  '/img/logoz/cliente1.webp',
-  '/img/logoz/cliente2.webp',
-  '/img/logoz/cliente3.webp',
-  '/img/logoz/cliente4.webp',
-  '/img/logoz/cliente5.webp',
-  '/img/logoz/cliente6.webp',
-  '/img/logoz/cliente7.webp',
-  '/img/logoz/cliente8.webp',
+  '/img/logos/cliente1.webp',
+  '/img/logos/cliente2.webp',
+  '/img/logos/cliente3.webp',
+  '/img/logos/cliente4.webp',
+  '/img/logos/cliente5.webp',
+  '/img/logos/cliente6.webp',
+  '/img/logos/cliente7.webp',
+  '/img/logos/cliente8.webp',
 ];
 
 function TrustedBySection() {
@@ -253,26 +253,26 @@ function TrustedBySection() {
       {/* Infinite scroll marquee */}
       <div className="relative">
         {/* Fade edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0a0a0b] to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0a0a0b] to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0a0a0b] to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0a0a0b] to-transparent z-10 pointer-events-none" />
 
         <motion.div
-          className="flex gap-8 items-center"
+          className="flex gap-6 items-center"
           animate={reduceMotion ? {} : { x: ['0%', '-50%'] }}
-          transition={reduceMotion ? { duration: 0 } : { x: { duration: 20, repeat: Infinity, ease: 'linear' } }}
+          transition={reduceMotion ? { duration: 0 } : { x: { duration: 25, repeat: Infinity, ease: 'linear' } }}
         >
           {/* Double the logos for seamless loop */}
           {[...CLIENT_LOGOS, ...CLIENT_LOGOS].map((logo, i) => (
             <div
               key={i}
-              className="flex-shrink-0 w-20 h-12 relative grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+              className="flex-shrink-0 w-16 h-16 relative rounded-xl overflow-hidden bg-white/10 p-2"
             >
               <Image
                 src={logo}
                 alt={`Cliente ${(i % CLIENT_LOGOS.length) + 1}`}
                 fill
-                sizes="80px"
-                className="object-contain"
+                sizes="64px"
+                className="object-contain p-1"
               />
             </div>
           ))}
