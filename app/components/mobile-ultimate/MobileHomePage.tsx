@@ -227,15 +227,27 @@ function GuaranteeSection() {
 
 function TrustedBySection() {
   const t = useTranslations('mobileHome.trustedBy');
-  const reduceMotion = useReducedMotion();
 
   return (
     <section className="py-10 overflow-hidden">
+      <style jsx>{`
+        @keyframes marquee-scroll-mobile {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        .marquee-track-mobile {
+          animation: marquee-scroll-mobile 25s linear infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .marquee-track-mobile { animation: none; }
+        }
+      `}</style>
+
       <motion.p
-        initial={reduceMotion ? false : { opacity: 0 }}
+        initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        className="text-center text-white/40 text-xs font-semibold tracking-widest uppercase mb-6 px-6"
+        className="text-center text-oe-orange text-xs font-semibold tracking-widest uppercase mb-6 px-6"
       >
         {t('sectionTitle')}
       </motion.p>
@@ -246,27 +258,26 @@ function TrustedBySection() {
         <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0a0a0b] to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0a0a0b] to-transparent z-10 pointer-events-none" />
 
-        <motion.div
-          className="flex gap-6 items-center"
-          animate={reduceMotion ? {} : { x: ['0%', '-50%'] }}
-          transition={reduceMotion ? { duration: 0 } : { x: { duration: 25, repeat: Infinity, ease: 'linear' } }}
-        >
-          {/* Double the logos for seamless loop */}
-          {[...CLIENT_LOGOS, ...CLIENT_LOGOS].map((logo, i) => (
-            <div
-              key={i}
-              className="flex-shrink-0 w-16 h-16 relative rounded-xl overflow-hidden bg-white/10 p-2"
-            >
-              <Image
-                src={logo}
-                alt={`Cliente ${(i % CLIENT_LOGOS.length) + 1}`}
-                fill
-                sizes="64px"
-                className="object-contain p-1"
-              />
+        <div className="marquee-track-mobile flex items-center w-max">
+          {[0, 1].map((block) => (
+            <div key={block} className="flex gap-5 items-center px-2.5">
+              {CLIENT_LOGOS.map((logo, i) => (
+                <div
+                  key={`${block}-${i}`}
+                  className="flex-shrink-0 w-28 h-28 relative rounded-xl overflow-hidden bg-white/10 p-3"
+                >
+                  <Image
+                    src={logo}
+                    alt={`Cliente ${i + 1}`}
+                    fill
+                    sizes="112px"
+                    className="object-contain p-1"
+                  />
+                </div>
+              ))}
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

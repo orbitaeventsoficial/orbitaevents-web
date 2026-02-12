@@ -19,7 +19,7 @@ async function main() {
       category: 'bodas',
       tags: ['bodas', 'precios', 'barcelona', 'dj', '2025'],
       isPublished: true,
-      publishedAt: new Date('2025-01-15'),
+      publishedAt: new Date('2023-03-14'),
       readingTime: 8,
       translations: [
         {
@@ -280,7 +280,7 @@ async function main() {
       category: 'consejos',
       tags: ['discomovil', 'dj', 'profesional', 'comparativa', 'eventos'],
       isPublished: true,
-      publishedAt: new Date('2025-01-20'),
+      publishedAt: new Date('2023-06-22'),
       readingTime: 7,
       translations: [
         {
@@ -559,7 +559,7 @@ async function main() {
       category: 'bodas',
       tags: ['bodas', 'primer baile', 'musica', 'canciones', 'romantico'],
       isPublished: true,
-      publishedAt: new Date('2025-01-25'),
+      publishedAt: new Date('2023-11-18'),
       readingTime: 9,
       translations: [
         {
@@ -894,7 +894,7 @@ async function main() {
       category: 'bodas',
       tags: ['bodas', 'efectos especiales', 'humo', 'bengalas', 'chispas', 'co2'],
       isPublished: true,
-      publishedAt: new Date('2025-01-28'),
+      publishedAt: new Date('2024-02-10'),
       readingTime: 7,
       translations: [
         {
@@ -1357,7 +1357,7 @@ async function main() {
       category: 'bodas',
       tags: ['bodas', 'tendencias', 'barcelona', '2025', 'musica', 'decoracion'],
       isPublished: true,
-      publishedAt: new Date('2025-02-01'),
+      publishedAt: new Date('2024-05-27'),
       readingTime: 10,
       translations: [
         {
@@ -1783,7 +1783,7 @@ async function main() {
       category: 'bodas',
       tags: ['bodas', 'canciones', 'primer baile', 'musica', 'romantico'],
       isPublished: true,
-      publishedAt: new Date('2025-01-20'),
+      publishedAt: new Date('2024-08-03'),
       readingTime: 10,
       translations: [
         {
@@ -1951,7 +1951,7 @@ async function main() {
       category: 'fiestas',
       tags: ['halloween', 'decoracion', 'fiestas', 'diy', 'ideas'],
       isPublished: true,
-      publishedAt: new Date('2025-01-22'),
+      publishedAt: new Date('2024-10-12'),
       readingTime: 7,
       translations: [
         {
@@ -2072,7 +2072,7 @@ async function main() {
       category: 'fiestas',
       tags: ['cumpleanos', 'fiestas', 'adultos', 'organizacion', 'guia'],
       isPublished: true,
-      publishedAt: new Date('2025-01-25'),
+      publishedAt: new Date('2024-12-19'),
       readingTime: 9,
       translations: [
         {
@@ -2221,7 +2221,7 @@ async function main() {
       category: 'empresas',
       tags: ['empresas', 'cena', 'musica', 'playlist', 'corporativo'],
       isPublished: true,
-      publishedAt: new Date('2025-01-28'),
+      publishedAt: new Date('2025-03-08'),
       readingTime: 6,
       translations: [
         {
@@ -2362,7 +2362,7 @@ async function main() {
       category: 'bodas',
       tags: ['bodas', 'masias', 'barcelona', 'girona', 'venues', 'espacios'],
       isPublished: true,
-      publishedAt: new Date('2025-01-30'),
+      publishedAt: new Date('2025-07-14'),
       readingTime: 12,
       translations: [
         {
@@ -2496,7 +2496,7 @@ async function main() {
       category: 'fiestas',
       tags: ['harry potter', 'mundo magico', 'fiesta tematica', 'hogwarts', 'decoracion'],
       isPublished: true,
-      publishedAt: new Date('2025-02-01'),
+      publishedAt: new Date('2025-11-22'),
       readingTime: 9,
       translations: [
         {
@@ -2654,7 +2654,7 @@ async function main() {
       category: 'bodas',
       tags: ['bodas', 'dj', 'horas', 'timing', 'planificacion'],
       isPublished: true,
-      publishedAt: new Date('2025-02-02'),
+      publishedAt: new Date('2026-01-30'),
       readingTime: 5,
       translations: [
         {

@@ -10,63 +10,111 @@ export const metadata = {
   title: 'Correu | Òrbita Admin',
 };
 
+type QuotePackOption = {
+  id: string;
+  label: string;
+  price: number;
+};
+
 async function getLeads() {
-  return cachedQuery(
-    'admin:inbox:leads:50',
-    () => prisma.lead.findMany({
-      where: {
-        email: { not: { contains: '@leads.orbitaevents.local' } },
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        message: true,
-        eventType: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-        preferredLocale: true,
-        interestedPackId: true,
-        interestedExtras: true,
-        budget: true,
-        guestCount: true,
-        eventDate: true,
-        eventLocation: true,
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 50,
-    }),
-    CacheTTL.VERY_SHORT
-  );
+  try {
+    return await cachedQuery(
+      'admin:inbox:leads:50',
+      () => prisma.lead.findMany({
+        where: {
+          email: { not: { contains: '@leads.orbitaevents.local' } },
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          message: true,
+          eventType: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          preferredLocale: true,
+          interestedPackId: true,
+          interestedExtras: true,
+          budget: true,
+          guestCount: true,
+          eventDate: true,
+          eventLocation: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+      }),
+      CacheTTL.VERY_SHORT
+    );
+  } catch (error) {
+    console.error('[Inbox] Error carregant leads:', error);
+    return [];
+  }
 }
 
 async function getStats() {
-  const startToday = new Date(new Date().setHours(0, 0, 0, 0));
-  const [totalLeads, unreadLeads, todayLeads] = await cachedQuery(
-    `admin:inbox:stats:${startToday.toISOString().slice(0, 10)}`,
-    () => Promise.all([
-      prisma.lead.count({
-        where: { email: { not: { contains: '@leads.orbitaevents.local' } } },
-      }),
-      prisma.lead.count({
-        where: { 
-          email: { not: { contains: '@leads.orbitaevents.local' } },
-          status: 'NEW',
-        },
-      }),
-      prisma.lead.count({
-        where: {
-          email: { not: { contains: '@leads.orbitaevents.local' } },
-          createdAt: { gte: startToday },
-        },
-      }),
-    ]),
-    CacheTTL.SHORT
-  );
+  try {
+    const startToday = new Date(new Date().setHours(0, 0, 0, 0));
+    const [totalLeads, unreadLeads, todayLeads] = await cachedQuery(
+      `admin:inbox:stats:${startToday.toISOString().slice(0, 10)}`,
+      () => Promise.all([
+        prisma.lead.count({
+          where: { email: { not: { contains: '@leads.orbitaevents.local' } } },
+        }),
+        prisma.lead.count({
+          where: {
+            email: { not: { contains: '@leads.orbitaevents.local' } },
+            status: 'NEW',
+          },
+        }),
+        prisma.lead.count({
+          where: {
+            email: { not: { contains: '@leads.orbitaevents.local' } },
+            createdAt: { gte: startToday },
+          },
+        }),
+      ]),
+      CacheTTL.SHORT
+    );
+    return { totalLeads, unreadLeads, todayLeads };
+  } catch (error) {
+    console.error('[Inbox] Error carregant stats:', error);
+    return { totalLeads: 0, unreadLeads: 0, todayLeads: 0 };
+  }
+}
 
-  return { totalLeads, unreadLeads, todayLeads };
+async function getQuotePacks(): Promise<QuotePackOption[]> {
+  try {
+    const packs = await cachedQuery(
+      'admin:inbox:quote-packs',
+      () => prisma.pack.findMany({
+        where: { isActive: true },
+        select: {
+          code: true,
+          slug: true,
+          price: true,
+          translations: {
+            where: { locale: 'es' },
+            select: { name: true },
+            take: 1,
+          },
+        },
+        orderBy: { price: 'asc' },
+        take: 20,
+      }),
+      CacheTTL.SHORT
+    );
+
+    return packs.map((pack) => ({
+      id: (pack.code || pack.slug || '').toLowerCase(),
+      label: pack.translations[0]?.name || pack.slug,
+      price: Number(pack.price || 0),
+    })).filter((pack) => pack.id && pack.price > 0);
+  } catch (error) {
+    console.error('[Inbox] Error carregant packs:', error);
+    return [];
+  }
 }
 
 // Verificar si IMAP està configurat
@@ -75,7 +123,7 @@ function isImapConfigured(): boolean {
 }
 
 export default async function InboxPage() {
-  const [leads, stats] = await Promise.all([getLeads(), getStats()]);
+  const [leads, stats, quotePacks] = await Promise.all([getLeads(), getStats(), getQuotePacks()]);
   const imapConfigured = isImapConfigured();
 
   return (
@@ -127,10 +175,11 @@ export default async function InboxPage() {
       )}
 
       {/* Main content */}
-      <InboxClient 
-        initialLeads={leads} 
-        stats={stats} 
+      <InboxClient
+        initialLeads={leads}
+        stats={stats}
         imapConfigured={imapConfigured}
+        quotePacks={quotePacks}
       />
     </div>
   );

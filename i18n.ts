@@ -9,7 +9,7 @@ export const locales = ['ca', 'es', 'en'] as const;
 export type Locale = (typeof locales)[number];
 
 // Idioma por defecto
-export const defaultLocale: Locale = 'es';
+export const defaultLocale: Locale = 'ca';
 
 // Informacion de idiomas
 export const localeConfig: Record<Locale, {

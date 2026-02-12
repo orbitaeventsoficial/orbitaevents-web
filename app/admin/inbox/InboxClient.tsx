@@ -54,6 +54,12 @@ interface Stats {
   todayLeads: number;
 }
 
+interface QuotePackOption {
+  id: string;
+  label: string;
+  price: number;
+}
+
 const STATUS_COLORS: Record<string, string> = {
   NEW: 'bg-blue-500/20 text-blue-300',
   CONTACTED: 'bg-yellow-500/20 text-yellow-300',
@@ -66,11 +72,13 @@ const STATUS_COLORS: Record<string, string> = {
 export default function InboxClient({
   initialLeads,
   stats,
-  imapConfigured
+  imapConfigured,
+  quotePacks,
 }: {
   initialLeads: LeadData[];
   stats: Stats;
   imapConfigured: boolean;
+  quotePacks: QuotePackOption[];
 }) {
   const router = useRouter();
 
@@ -649,6 +657,7 @@ export default function InboxClient({
       {showQuote && selectedEmail && (
         <QuoteModal
           target={selectedEmail}
+          packOptions={quotePacks}
           onClose={() => setShowQuote(false)}
           onSent={(message) => setFlashMessage({ type: 'success', text: message })}
         />
@@ -794,20 +803,23 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
 
 function QuoteModal({
   target,
+  packOptions,
   onClose,
   onSent,
 }: {
   target: UnifiedEmail;
+  packOptions: QuotePackOption[];
   onClose: () => void;
   onSent: (message: string) => void;
 }) {
-  const PACK_OPTIONS = [
+  const FALLBACK_OPTIONS: QuotePackOption[] = [
     { id: 'party-starter', label: 'Party Starter', price: 350 },
     { id: 'party-machine', label: 'Party Machine', price: 400 },
     { id: 'vip-experience', label: 'VIP Experience', price: 700 },
     { id: 'boda-signature', label: 'Boda Signature', price: 800 },
     { id: 'corporate-event', label: 'Corporate Event', price: 850 },
   ];
+  const PACK_OPTIONS = packOptions.length > 0 ? packOptions : FALLBACK_OPTIONS;
 
   const initialPack = PACK_OPTIONS[0];
   const [packId, setPackId] = useState(initialPack.id);

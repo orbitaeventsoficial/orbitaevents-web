@@ -239,7 +239,15 @@
       "Bash(railway logs:*)",
       "Bash(railway redeploy:*)",
       "Bash(npx next build --no-lint)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(winget list:*)",
+      "Bash(reg query:*)",
+      "Bash(\"C:\\\\Program Files\\\\PowerShell\\\\7\\\\pwsh.exe\" -Command \"Get-CimInstance Win32_Product | Where-Object { $_Name -like ''*PowerShell*'' } | Select-Object Name, Version, IdentifyingNumber | Format-Table -AutoSize\")",
+      "Bash(\"C:\\\\Program Files\\\\PowerShell\\\\7\\\\pwsh.exe\" -NoProfile -Command \"\\(Get-ItemProperty ''HKLM:\\\\SOFTWARE\\\\WOW6432Node\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\\\\*'' | Where-Object { $_DisplayName -like ''*PowerShell*x86*'' -or \\($_DisplayName -like ''*PowerShell*'' -and $_InstallLocation -like ''*x86*''\\) } | Select-Object DisplayName, UninstallString, PSChildName\\).PSChildName\")",
+      "Bash(\"C:\\\\ProgramData\\\\Package Cache\\\\{99c5cdc6-5e24-4e7b-a78f-47c300a00bff}\\\\PowerShell-7.5.4-win-x86.exe\" /uninstall /quiet /norestart)",
+      "Bash(\"C:\\\\ProgramData\\\\Package Cache\\\\{99c5cdc6-5e24-4e7b-a78f-47c300a00bff}\\\\PowerShell-7.5.4-win-x86.exe\" /uninstall)",
+      "Bash(pwsh -Command:*)",
+      "Bash(pwsh:*)"
     ]
   }
 }

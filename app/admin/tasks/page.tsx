@@ -37,21 +37,36 @@ export default async function TasksPage({
   const pageParam = Array.isArray(searchParams?.page) ? searchParams?.page[0] : searchParams?.page;
   const page = parsePage(pageParam);
   const limit = 30;
-  const where: Prisma.LeadTaskWhereInput | undefined = status
-    ? { status: { equals: status as LeadTaskStatus } }
-    : undefined;
-  const [tasks, total] = await Promise.all([
-    prisma.leadTask.findMany({
-      where,
-      orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
-      take: limit,
-      skip: (page - 1) * limit,
-      include: {
-        lead: { select: { id: true, name: true } },
-      },
-    }),
-    prisma.leadTask.count({ where }),
-  ]);
+
+  let tasks: Array<{
+    id: string;
+    title: string;
+    status: LeadTaskStatus;
+    dueDate: Date | null;
+    lead: { id: string; name: string };
+  }> = [];
+  let total = 0;
+
+  try {
+    const where: Prisma.LeadTaskWhereInput | undefined = status
+      ? { status: { equals: status as LeadTaskStatus } }
+      : undefined;
+    [tasks, total] = await Promise.all([
+      prisma.leadTask.findMany({
+        where,
+        orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
+        take: limit,
+        skip: (page - 1) * limit,
+        include: {
+          lead: { select: { id: true, name: true } },
+        },
+      }),
+      prisma.leadTask.count({ where }),
+    ]);
+  } catch (error) {
+    console.error('[Tasks] Error carregant tasques:', error);
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const buildHref = (targetPage: number) => {
     const params = new URLSearchParams();
