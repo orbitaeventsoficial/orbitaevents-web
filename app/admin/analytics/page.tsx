@@ -158,7 +158,13 @@ export default async function AnalyticsPage() {
   const umamiDashboardUrl =
     process.env.NEXT_PUBLIC_UMAMI_DASHBOARD_URL || 'https://analytics.orbitaevents.com';
   const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? '';
-  const umamiApiReady = Boolean(process.env.UMAMI_API_KEY) && Boolean(umamiWebsiteId);
+  const umamiApiKey = process.env.UMAMI_API_KEY || '';
+  const umamiBaseUrl = process.env.UMAMI_BASE_URL || 'https://cloud.umami.is';
+  const umamiApiReady = Boolean(umamiApiKey) && Boolean(umamiWebsiteId);
+  const umamiMissingVars = [
+    !umamiWebsiteId ? 'NEXT_PUBLIC_UMAMI_WEBSITE_ID' : null,
+    !umamiApiKey ? 'UMAMI_API_KEY' : null,
+  ].filter(Boolean) as string[];
   const ga4PropertyId = process.env.GA4_PROPERTY_ID || '';
   const ga4Status = getGa4ConfigStatus();
   const yearGrowth = data.revenue.lastYear > 0
@@ -598,9 +604,13 @@ export default async function AnalyticsPage() {
               <p className="text-xs uppercase text-slate-400">Estat</p>
               <p className="mt-2 text-lg font-semibold text-slate-100">{umamiReady ? 'Actiu' : 'Pendent'}</p>
               <p className="mt-2 text-xs text-slate-400">
-                {umamiApiReady ? 'Recollint dades' : 'Falta API Key'}
+                {umamiApiReady ? 'Recollint dades' : `Falten variables: ${umamiMissingVars.join(', ')}`}
               </p>
             </div>
+          </div>
+          <div className="mt-4 rounded-xl border border-slate-700/50 bg-slate-900/50 p-4">
+            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">API base</p>
+            <p className="mt-2 text-sm font-semibold text-slate-200">{umamiBaseUrl}</p>
           </div>
           {umamiApiReady && !umami && (
             <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300">

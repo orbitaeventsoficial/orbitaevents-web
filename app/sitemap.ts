@@ -1,6 +1,7 @@
 // app/sitemap.ts
 import type { MetadataRoute } from 'next';
 import { locales, defaultLocale } from '@/i18n';
+import { getEnabledZoneLandingSlugs } from '@/lib/coverage';
 
 // Categorias de portfolio para incluir en sitemap
 const PORTFOLIO_SLUGS = [
@@ -15,9 +16,10 @@ const PORTFOLIO_SLUGS = [
   'fiestas-tematicas-mon-magic',
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
   const now = new Date();
+  const enabledZoneSlugs = await getEnabledZoneLandingSlugs();
 
   // Paginas estaticas con prioridades estrategicas
   const staticPages: MetadataRoute.Sitemap = [
@@ -43,19 +45,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/servicios/produccion`, lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
     { url: `${base}/servicios/alquiler`, lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
 
-    // Landing pages por zonas - Long-tail SEO
-    { url: `${base}/servicios/dj-bodas-maresme`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/servicios/dj-bodas-girona`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/servicios/dj-bodas-costa-brava`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/servicios/dj-bodas-valles`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/servicios/dj-bodas-barcelona-ciudad`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/servicios/dj-bodas-baix-llobregat`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/servicios/dj-bodas-garraf`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/servicios/dj-bodas-penedes`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/servicios/dj-bodas-osona`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/servicios/dj-bodas-selva`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/servicios/dj-bodas-emporda`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-
     // Contenido / Trust
     { url: `${base}/portfolio`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${base}/opiniones`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
@@ -70,12 +59,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/legal/aviso-legal`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ];
 
+  const zonePages: MetadataRoute.Sitemap = enabledZoneSlugs.map((slug) => ({
+    url: `${base}/servicios/${slug}`,
+    lastModified: now,
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  }));
+
   // Versiones en otros idiomas (solo no-default)
   const localizedPages: MetadataRoute.Sitemap = [];
   const secondaryLocales = locales.filter((locale) => locale !== defaultLocale);
 
   // Solo localizar las paginas principales, no las legales
-  const pagesToLocalize = staticPages.filter(p => !p.url.includes('/legal/'));
+  const pagesToLocalize = [...staticPages, ...zonePages].filter(p => !p.url.includes('/legal/'));
 
   pagesToLocalize.forEach((page) => {
     secondaryLocales.forEach((locale) => {
@@ -109,5 +105,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   });
 
-  return [...staticPages, ...localizedPages, ...portfolioPages, ...localizedPortfolioPages];
+  return [...staticPages, ...zonePages, ...localizedPages, ...portfolioPages, ...localizedPortfolioPages];
 }

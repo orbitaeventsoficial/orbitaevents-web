@@ -157,7 +157,7 @@ async function fetchFromSerpAPI() {
 }
 
 async function fetchFromOutscraper() {
-  const apiKey = process.env.OUTSCRAPER_KEY;
+  const apiKey = process.env.OUTSCRAPER_KEY || process.env.OUTSCRAPER_API_KEY;
   if (!apiKey) {
     console.log('[Outscraper] No API key');
     return null;

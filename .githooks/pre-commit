@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+echo "Running asset sync (logos + filenames + portfolio + reviews)..."
+npm run assets:sync
+
+echo "Staging generated asset changes..."
+git add app/config/client-logos.ts public/img/logos app/config/portfolio-images.ts public/data/google-reviews.json
+

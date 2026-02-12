@@ -9,6 +9,7 @@ import { Link } from '@/lib/navigation';
 import { SITE_CONFIG } from '@/config/site-config';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import {
   Phone,
   Mail,
@@ -115,7 +116,31 @@ export default function Footer() {
   const tFooterLinks = useTranslations('footerLinks');
   const { track } = useAnalytics();
   const rawCoverage = t.raw('coverageAreas');
-  const coverageAreas = Array.isArray(rawCoverage) ? rawCoverage : DEFAULT_COVERAGE;
+  const localizedCoverage = Array.isArray(rawCoverage) ? rawCoverage : DEFAULT_COVERAGE;
+  const [coverageAreas, setCoverageAreas] = useState<string[]>(localizedCoverage);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadCoverage = async () => {
+      try {
+        const res = await fetch('/api/public/coverage', { cache: 'no-store' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data?.ok || !Array.isArray(data?.cities) || cancelled) return;
+        if (data.cities.length > 0) {
+          setCoverageAreas(data.cities);
+        }
+      } catch {
+        // Silent fallback to localized static coverage.
+      }
+    };
+
+    loadCoverage();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const trustSignals = [
     {

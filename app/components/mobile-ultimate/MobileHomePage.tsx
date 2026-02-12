@@ -36,6 +36,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { CLIENT_LOGOS } from '@/app/config/client-logos';
 
 // Lazy load HeroPortalLogo
 const HeroPortalLogo = dynamic(
@@ -223,17 +224,6 @@ function GuaranteeSection() {
 // ═══════════════════════════════════════════════════════════════════════════
 // TRUSTED BY / LOGOS SECTION
 // ═══════════════════════════════════════════════════════════════════════════
-
-const CLIENT_LOGOS = [
-  '/img/logos/cliente1.webp',
-  '/img/logos/cliente2.webp',
-  '/img/logos/cliente3.webp',
-  '/img/logos/cliente4.webp',
-  '/img/logos/cliente5.webp',
-  '/img/logos/cliente6.webp',
-  '/img/logos/cliente7.webp',
-  '/img/logos/cliente8.webp',
-];
 
 function TrustedBySection() {
   const t = useTranslations('mobileHome.trustedBy');

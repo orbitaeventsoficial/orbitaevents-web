@@ -43,7 +43,10 @@ export default function ConsentScripts() {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
   const umamiId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
-  const umamiScriptUrl = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL || '/umami/script.js';
+  const rawUmamiScriptUrl = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL || '/umami/script.js';
+  const umamiScriptUrl = rawUmamiScriptUrl.includes('cloud.umami.is')
+    ? '/umami/script.js'
+    : rawUmamiScriptUrl;
   const tawkEnabled = process.env.NEXT_PUBLIC_TAWK_ENABLED === 'true';
 
   const allowGtm = Boolean(gtmId) && (consent.analytics || consent.marketing);

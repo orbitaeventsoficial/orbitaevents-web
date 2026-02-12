@@ -8,17 +8,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-
-const CLIENT_LOGOS = [
-  '/img/logos/cliente1.webp',
-  '/img/logos/cliente2.webp',
-  '/img/logos/cliente3.webp',
-  '/img/logos/cliente4.webp',
-  '/img/logos/cliente5.webp',
-  '/img/logos/cliente6.webp',
-  '/img/logos/cliente7.webp',
-  '/img/logos/cliente8.webp',
-];
+import { CLIENT_LOGOS } from '@/app/config/client-logos';
 
 export default function TrustedByLogos() {
   const t = useTranslations('homePage.trustedBy');

@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
     if (authError) return authError;
 
     const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
     const locale = searchParams.get('locale') || 'es';
     const rawPage = parseInt(searchParams.get('page') || '1', 10);
     const rawLimit = parseInt(searchParams.get('limit') || '20', 10);
@@ -25,6 +26,19 @@ export async function GET(req: NextRequest) {
     const published = searchParams.get('published');
 
     const skip = (page - 1) * limit;
+
+    if (id) {
+      const post = await prisma.blogPost.findUnique({
+        where: { id },
+        include: { translations: true },
+      });
+
+      if (!post) {
+        return NextResponse.json({ error: 'Blog post not found' }, { status: 404 });
+      }
+
+      return NextResponse.json({ post });
+    }
 
     // Build where clause
     const where: Prisma.BlogPostWhereInput = {};
