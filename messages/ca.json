@@ -6524,5 +6524,31 @@
       "title": "Blog - Consells i Tendències | Òrbita Events",
       "description": "Descobreix consells, tendències i novetats sobre esdeveniments, casaments i música. El blog oficial d'Òrbita Events."
     }
+  },
+  "gracias": {
+    "meta": {
+      "title": "Gràcies per la teva sol·licitud! | Òrbita Events",
+      "description": "Hem rebut la teva sol·licitud. Et respondrem en menys de 2 hores."
+    },
+    "title": "Gràcies per contactar-nos!",
+    "subtitle": "Hem rebut la teva sol·licitud correctament",
+    "response": {
+      "title": "Resposta ràpida",
+      "text": "Et respondrem en <strong>menys de 2 hores</strong> (horari laboral)"
+    },
+    "urgent": {
+      "title": "Urgent?",
+      "whatsapp": "Escriu-nos per WhatsApp"
+    },
+    "nextSteps": {
+      "title": "Què segueix ara?",
+      "step1": "Revisarem la teva sol·licitud en detall",
+      "step2": "Et contactarem per confirmar data, ubicació i detalls",
+      "step3": "T'enviarem un pressupost personalitzat",
+      "step4": "Si et convenç, reservem la teva data amb un senyal del 30%"
+    },
+    "backHome": "Tornar a l'inici",
+    "viewPortfolio": "Veure portfolio",
+    "spamNote": "Revisa la teva safata de correu brossa si no veus el nostre email en les pròximes hores"
   }
 }

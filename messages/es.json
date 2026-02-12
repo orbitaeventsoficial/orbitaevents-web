@@ -6352,5 +6352,31 @@
       "title": "Blog - Consejos y Tendencias | Òrbita Events",
       "description": "Descubre consejos, tendencias y novedades sobre eventos, bodas y música. El blog oficial de Òrbita Events."
     }
+  },
+  "gracias": {
+    "meta": {
+      "title": "¡Gracias por tu solicitud! | Òrbita Events",
+      "description": "Hemos recibido tu solicitud. Te responderemos en menos de 2 horas."
+    },
+    "title": "¡Gracias por contactarnos!",
+    "subtitle": "Hemos recibido tu solicitud correctamente",
+    "response": {
+      "title": "Respuesta rápida",
+      "text": "Te responderemos en <strong>menos de 2 horas</strong> (horario laboral)"
+    },
+    "urgent": {
+      "title": "¿Urgente?",
+      "whatsapp": "Escríbenos por WhatsApp"
+    },
+    "nextSteps": {
+      "title": "¿Qué sigue ahora?",
+      "step1": "Revisaremos tu solicitud en detalle",
+      "step2": "Te contactaremos para confirmar fecha, ubicación y detalles",
+      "step3": "Te enviaremos un presupuesto personalizado",
+      "step4": "Si te convence, reservamos tu fecha con una señal del 30%"
+    },
+    "backHome": "Volver al inicio",
+    "viewPortfolio": "Ver portfolio",
+    "spamNote": "Revisa tu bandeja de spam si no ves nuestro email en las próximas horas"
   }
 }

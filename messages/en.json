@@ -6352,5 +6352,31 @@
       "title": "Blog - Tips and Trends | Orbita Events",
       "description": "Discover tips, trends and news about events, weddings and music. The official blog of Òrbita Events."
     }
+  },
+  "gracias": {
+    "meta": {
+      "title": "Thank you for your request! | Orbita Events",
+      "description": "We have received your request. We will respond within 2 hours."
+    },
+    "title": "Thank you for contacting us!",
+    "subtitle": "We have received your request successfully",
+    "response": {
+      "title": "Quick response",
+      "text": "We will respond within <strong>less than 2 hours</strong> (business hours)"
+    },
+    "urgent": {
+      "title": "Urgent?",
+      "whatsapp": "Write us on WhatsApp"
+    },
+    "nextSteps": {
+      "title": "What's next?",
+      "step1": "We will review your request in detail",
+      "step2": "We will contact you to confirm date, location and details",
+      "step3": "We will send you a personalized quote",
+      "step4": "If you agree, we reserve your date with a 30% deposit"
+    },
+    "backHome": "Back to home",
+    "viewPortfolio": "View portfolio",
+    "spamNote": "Check your spam folder if you don't see our email in the next few hours"
   }
 }
