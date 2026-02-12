@@ -247,7 +247,7 @@ function TrustedBySection() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        className="text-center text-oe-orange text-xs font-semibold tracking-widest uppercase mb-6 px-6"
+        className="mx-auto mb-6 max-w-xs px-6 text-center text-xs font-semibold uppercase tracking-[0.2em] text-zinc-200/95"
       >
         {t('sectionTitle')}
       </motion.p>

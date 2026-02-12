@@ -1503,7 +1503,8 @@
       "portfolio": "Portfolio",
       "reviews": "Opiniones",
       "contact": "Contacto",
-      "faq": "FAQ"
+      "faq": "FAQ",
+      "blog": "Blog"
     },
     "dropdowns": {
       "servicesTitle": "Nuestros servicios",
@@ -6219,7 +6220,8 @@
       "home": "Inicio",
       "services": "Servicios",
       "portfolio": "Portfolio",
-      "contact": "Contacto"
+      "contact": "Contacto",
+      "blog": "Blog"
     },
     "cta": "Pedir presupuesto",
     "fab": {

@@ -47,6 +47,13 @@ const GalleryIcon = ({ active }: { active: boolean }) => (
   </svg>
 );
 
+const BlogIcon = ({ active }: { active: boolean }) => (
+  <svg className={`w-6 h-6 ${active ? 'text-amber-400' : 'text-white/60'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 1.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h10l6 6v10a2 2 0 01-2 2z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v6h6M8 13h8M8 17h8" />
+  </svg>
+);
+
 const ContactIcon = ({ active }: { active: boolean }) => (
   <svg className={`w-6 h-6 ${active ? 'text-amber-400' : 'text-white/60'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.5 : 1.5}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -265,6 +272,7 @@ export default function MobileBottomNav() {
     { id: 'home', labelKey: 'items.home', href: '/', icon: HomeIcon },
     { id: 'services', labelKey: 'items.services', href: '/servicios', icon: ServicesIcon },
     // FAB va aquí (espacio)
+    { id: 'blog', labelKey: 'items.blog', href: '/blog', icon: BlogIcon },
     { id: 'gallery', labelKey: 'items.portfolio', href: '/portfolio', icon: GalleryIcon },
     { id: 'contact', labelKey: 'items.contact', href: '/contacto', icon: ContactIcon },
   ], []);
@@ -274,6 +282,7 @@ export default function MobileBottomNav() {
     const path = pathname.replace(`/${locale}`, '') || '/';
     if (path === '/' || path === '') return 'home';
     if (path.startsWith('/servicios') || path.startsWith('/tematica') || path.startsWith('/boda-halloween') || path.startsWith('/experiencias')) return 'services';
+    if (path.startsWith('/blog')) return 'blog';
     if (path.startsWith('/portfolio')) return 'gallery';
     if (path.startsWith('/contacto') || path.startsWith('/configurador')) return 'contact';
     return 'home';

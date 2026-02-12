@@ -32,13 +32,13 @@ export default function TrustedByLogos() {
         }
       `}</style>
 
-      <div className="container mx-auto px-6 mb-10">
+      <div className="container mx-auto mb-10 px-6">
         <motion.p
           initial={reduceMotion ? false : { opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center text-oe-orange text-sm font-semibold tracking-widest uppercase"
+          className="mx-auto max-w-3xl text-center text-sm font-semibold uppercase tracking-[0.22em] text-zinc-200/95"
         >
           {t('sectionTitle')}
         </motion.p>

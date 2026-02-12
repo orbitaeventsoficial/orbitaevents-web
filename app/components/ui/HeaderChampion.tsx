@@ -68,6 +68,7 @@ const navItemsConfig: NavItemConfig[] = [
     ]
   },
   { labelKey: 'portfolio', href: '/portfolio' },
+  { labelKey: 'blog', href: '/blog' },
   { labelKey: 'reviews', href: '/opiniones' },
   { labelKey: 'contact', href: '/contacto' },
 ];
@@ -82,6 +83,9 @@ export default function HeaderChampion() {
   const tServices = useTranslations('header.services');
   const tExperiences = useTranslations('header.experiences');
   const tZones = useTranslations('header.zones');
+  const respiraLabel = 'Respira';
+  const respiraTitle = 'Espacio sensorial';
+  const respiraDescription = 'Un espacio para personas con sensibilidad sensorial, para sentirse a gusto y descansar.';
 
   // Estados
   const [isVisible, setIsVisible] = useState(true);
@@ -311,6 +315,45 @@ export default function HeaderChampion() {
               })}
             </nav>
 
+            {/* Pestaña especial Respira (separada visualmente del menú) */}
+            <div className="hidden lg:flex items-center ml-4 pl-4 border-l border-zinc-700/70">
+              <div className="relative group">
+              <Link
+                href="/respira"
+                className="
+                  inline-flex items-center gap-2
+                  px-4 py-2.5
+                  rounded-xl
+                  border border-pink-300/50
+                  bg-gradient-to-r from-pink-500/90 via-fuchsia-500/90 to-rose-500/90
+                  text-white text-sm font-semibold
+                  shadow-lg shadow-pink-500/20
+                  transition-all duration-200
+                  hover:scale-[1.03] hover:shadow-pink-400/35
+                "
+                aria-label={respiraLabel}
+              >
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/25 text-base">
+                  🌼
+                </span>
+                <span>{respiraLabel}</span>
+              </Link>
+              <div
+                className="
+                  pointer-events-none
+                  absolute left-0 top-full mt-2 w-80
+                  rounded-xl border border-pink-200/40 bg-zinc-950/95 p-4
+                  text-white opacity-0 shadow-2xl shadow-pink-500/20
+                  transition-opacity duration-200
+                  group-hover:opacity-100 group-focus-within:opacity-100
+                "
+              >
+                <p className="text-sm font-semibold text-pink-300">{respiraTitle}</p>
+                <p className="mt-1 text-xs leading-relaxed text-zinc-200">{respiraDescription}</p>
+              </div>
+              </div>
+            </div>
+
             {/* ════════════════════════════════════════════════════════════ */}
             {/* CTA BUTTONS + Language */}
             {/* ════════════════════════════════════════════════════════════ */}
@@ -386,7 +429,33 @@ export default function HeaderChampion() {
               className="absolute top-0 right-0 h-full w-80 max-w-[85vw] bg-zinc-950 border-l border-zinc-800"
             >
               <div className="flex flex-col h-full pt-24 pb-6 px-6">
-                <div className="flex-1 space-y-1 overflow-y-auto">
+              <div className="flex-1 space-y-1 overflow-y-auto">
+                  <Link
+                    href="/respira"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="
+                      mb-3 flex items-center justify-between
+                      rounded-xl border border-pink-300/40
+                      bg-gradient-to-r from-pink-500/90 via-fuchsia-500/90 to-rose-500/90
+                      px-4 py-3 text-white
+                      shadow-lg shadow-pink-500/25
+                    "
+                  >
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/25 text-base">🌼</span>
+                      <span className="min-w-0">
+                        <span className="block font-semibold">{respiraLabel}</span>
+                        <span className="block text-xs text-white/90">{respiraTitle}</span>
+                      </span>
+                    </span>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                  <p className="mb-3 px-1 text-xs leading-relaxed text-zinc-300">
+                    {respiraDescription}
+                  </p>
+
                   {navItemsConfig.map((item) => {
                     const dropdownT = item.dropdownType === 'services' ? tServices : item.dropdownType === 'zones' ? tZones : tExperiences;
 

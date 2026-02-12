@@ -2953,7 +2953,8 @@
       "portfolio": "Portfolio",
       "reviews": "Opinions",
       "contact": "Contacte",
-      "faq": "FAQ"
+      "faq": "FAQ",
+      "blog": "Blog"
     },
     "dropdowns": {
       "servicesTitle": "Els nostres serveis",
@@ -6391,7 +6392,8 @@
       "home": "Inici",
       "services": "Serveis",
       "portfolio": "Portfolio",
-      "contact": "Contacte"
+      "contact": "Contacte",
+      "blog": "Blog"
     },
     "cta": "Demana pressupost",
     "fab": {
