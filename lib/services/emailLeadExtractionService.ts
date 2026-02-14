@@ -6,6 +6,7 @@ export type ExtractedLeadData = {
   phone?: string;
   eventType: EventType;
   eventDate?: Date;
+  eventSchedule?: string;
   guestCount?: number;
   budget?: string;
   eventLocation?: string;
@@ -265,6 +266,7 @@ export function extractLeadDataFromEmail(input: {
     phone: extractPhone(fullText),
     eventType: inferEventType(fullText),
     eventDate: extractEventDate(fullText),
+    eventSchedule: extractSchedule(fullText),
     guestCount: extractGuestCount(fullText),
     budget: extractBudget(fullText),
     eventLocation: extractEventLocation(fullText),

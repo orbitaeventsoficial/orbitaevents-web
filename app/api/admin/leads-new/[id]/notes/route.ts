@@ -69,7 +69,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 }
 
 // DELETE - Eliminar nota
-export async function DELETE(req: NextRequest, { params: _params }: Params) {
+export async function DELETE(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
   try {
@@ -80,6 +80,21 @@ export async function DELETE(req: NextRequest, { params: _params }: Params) {
       return NextResponse.json(
         { error: 'noteId és obligatori' },
         { status: 400 }
+      );
+    }
+
+    const note = await prisma.leadNote.findFirst({
+      where: {
+        id: noteId,
+        leadId: params.id,
+      },
+      select: { id: true },
+    });
+
+    if (!note) {
+      return NextResponse.json(
+        { error: 'Nota no trobada' },
+        { status: 404 }
       );
     }
 

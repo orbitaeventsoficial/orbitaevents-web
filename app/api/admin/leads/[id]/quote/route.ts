@@ -54,6 +54,13 @@ interface RouteContext {
   params: { id: string };
 }
 
+function parsePositiveNumber(value: string | null): number | null {
+  if (!value) return null;
+  const num = Number(value);
+  if (!Number.isFinite(num) || num <= 0) return null;
+  return num;
+}
+
 // GET: Obtenir HTML del pressupost (preview)
 export async function GET(req: NextRequest, { params }: RouteContext) {
   const authError = requireAuth(req);
@@ -68,9 +75,19 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: 'Lead no trobat' }, { status: 404 });
     }
 
-    // Determinar pack des de config centralitzada
-    const packKey = lead.interestedPackId?.toLowerCase() || 'default';
-    const packData = await resolvePack(packKey, lead.preferredLocale || 'es');
+    const { searchParams } = new URL(req.url);
+    const packKey =
+      searchParams.get('packId')?.toLowerCase()
+      || lead.interestedPackId?.toLowerCase()
+      || 'default';
+    const basePack = await resolvePack(packKey, lead.preferredLocale || 'es');
+    const customPrice = parsePositiveNumber(searchParams.get('customPrice'));
+    const customHours = parsePositiveNumber(searchParams.get('customHours'));
+    const packData = {
+      ...basePack,
+      price: customPrice ?? basePack.price,
+      djHours: customHours ?? basePack.djHours,
+    };
 
     // Crear dades del pressupost
     const quoteData = createQuoteFromLead(lead, packData);
@@ -160,7 +177,15 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       },
     });
 
-    const quoteUrl = `${baseUrl}/api/admin/leads/${params.id}/quote`;
+    const query = new URLSearchParams();
+    query.set('packId', packKey);
+    if (typeof body.customPrice === 'number' && Number.isFinite(body.customPrice) && body.customPrice > 0) {
+      query.set('customPrice', String(body.customPrice));
+    }
+    if (typeof body.customHours === 'number' && Number.isFinite(body.customHours) && body.customHours > 0) {
+      query.set('customHours', String(body.customHours));
+    }
+    const quoteUrl = `${baseUrl}/api/admin/leads/${params.id}/quote?${query.toString()}`;
     const documentTitle = `Pressupost ${quoteNumber}`;
 
     await prisma.leadDocument.create({

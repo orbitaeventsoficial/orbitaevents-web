@@ -6,6 +6,7 @@ export interface LeadSnapshotInput {
     phone?: string | null;
     eventType: string;
     eventDate?: Date | string | null;
+    eventSchedule?: string | null;
     eventLocation?: string | null;
     guestCount?: number | null;
     budget?: string | null;
@@ -53,6 +54,7 @@ export function buildLeadTechnicalSnapshot(input: LeadSnapshotInput) {
       phone: input.lead.phone ?? null,
       eventType: input.lead.eventType,
       eventDate: input.lead.eventDate ?? null,
+      eventSchedule: input.lead.eventSchedule ?? null,
       eventLocation: input.lead.eventLocation ?? null,
       guestCount: input.lead.guestCount ?? null,
       budget: input.lead.budget ?? null,

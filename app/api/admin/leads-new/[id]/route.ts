@@ -10,33 +10,37 @@ interface Params {
   params: { id: string };
 }
 
+const nullableString = z.union([z.string(), z.null()]).optional();
+const nullableArrayString = z.union([z.array(z.string()), z.null()]).optional();
+
 // Schema de validació per PATCH - Usem els enums correctes de Prisma
 const updateLeadSchema = z.object({
   name: z.string().min(1).optional(),
   email: z.string().email().optional(),
-  phone: z.string().optional(),
+  phone: nullableString,
   eventDate: z.string().optional(),
+  eventSchedule: nullableString,
   // EventType enum de Prisma
   eventType: z.enum(['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER']).optional(),
   // LeadStatus enum de Prisma
   status: z.enum(['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST']).optional(),
   // Priority enum de Prisma
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
-  source: z.string().optional(),
-  budget: z.string().optional(),
-  message: z.string().optional(), // És string a Prisma (ex: "5000€")
-  guestCount: z.number().int().positive().optional(),
-  eventLocation: z.string().optional(),
-  eventVenue: z.string().optional(),
-  notes: z.string().optional(),
-  interestedPackId: z.string().optional(),
-  interestedExtras: z.array(z.string()).optional(),
-  landingPage: z.string().optional(),
-  utmSource: z.string().optional(),
-  utmMedium: z.string().optional(),
-  utmCampaign: z.string().optional(),
-  assignedTo: z.string().optional(),
-  preferredLocale: z.string().optional(),
+  source: nullableString,
+  budget: nullableString,
+  message: nullableString, // És string a Prisma (ex: "5000€")
+  guestCount: z.union([z.number().int().positive(), z.null()]).optional(),
+  eventLocation: nullableString,
+  eventVenue: nullableString,
+  notes: nullableString,
+  interestedPackId: nullableString,
+  interestedExtras: nullableArrayString,
+  landingPage: nullableString,
+  utmSource: nullableString,
+  utmMedium: nullableString,
+  utmCampaign: nullableString,
+  assignedTo: nullableString,
+  preferredLocale: nullableString,
 }).strict();
 
 // GET - Detall d'un lead
@@ -107,6 +111,13 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const body: Record<string, unknown> = { ...parseResult.data };
+    // Camps no existents al model Lead: evitem error Prisma.
+    delete body.eventVenue;
+    delete body.notes;
+
+    // Camps obligatoris al model: mai null.
+    if (body.source === null) delete body.source;
+    if (body.preferredLocale === null) delete body.preferredLocale;
 
     const existing = await prisma.lead.findUnique({
       where: { id },

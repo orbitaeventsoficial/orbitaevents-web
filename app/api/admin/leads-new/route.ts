@@ -39,6 +39,7 @@ const leadSchema = z.object({
     'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER'
   ]),
   eventDate: z.string().optional(),
+  eventSchedule: z.string().optional(),
   eventLocation: z.string().optional(),
   eventVenue: z.string().optional(),
   guestCount: z.number().optional(),

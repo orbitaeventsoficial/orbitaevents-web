@@ -372,6 +372,7 @@ model Lead {
   phone            String?
   eventType        EventType
   eventDate        DateTime?
+  eventSchedule    String?
   eventLocation    String?
   guestCount       Int?
   budget           String?

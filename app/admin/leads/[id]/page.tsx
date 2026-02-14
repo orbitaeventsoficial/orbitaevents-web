@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import LeadActionsEnhanced from './LeadActionsEnhanced';
 import LeadProfileEditor from './LeadProfileEditor';
 import LeadWorkspace from './LeadWorkspace';
+import LeadNotesPanel from './LeadNotesPanel';
 import { scoreLead } from '@/lib/services/commercialScoring';
 import ScoreSnapshotButton from './ScoreSnapshotButton';
 import LeadTechnicalSnapshotPanel from './LeadTechnicalSnapshotPanel';
@@ -174,6 +175,7 @@ export default async function LeadDetailPage({ params }: Props) {
       phone: lead.phone,
       eventType: lead.eventType,
       eventDate: lead.eventDate,
+      eventSchedule: lead.eventSchedule,
       eventLocation: lead.eventLocation,
       guestCount: lead.guestCount,
       budget: lead.budget,
@@ -338,6 +340,7 @@ export default async function LeadDetailPage({ params }: Props) {
               email: lead.email,
               phone: lead.phone,
               eventDate: lead.eventDate ? lead.eventDate.toISOString() : null,
+              eventSchedule: lead.eventSchedule,
               eventType: lead.eventType,
               eventLocation: lead.eventLocation,
               guestCount: lead.guestCount,
@@ -357,45 +360,15 @@ export default async function LeadDetailPage({ params }: Props) {
             }}
           />
 
-          {/* Notes */}
-          <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-700 mb-4">
-              Notes ({lead.notes.length})
-            </h2>
-
-            {lead.notes.length === 0 ? (
-              <p className="text-sm text-slate-500 py-4 text-center">
-                Encara no hi ha notes
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {lead.notes.map((note) => (
-                  <div
-                    key={note.id}
-                    className="p-3 rounded-lg bg-slate-50 hover:bg-stone-100 transition-colors"
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs text-slate-500">
-                        {new Date(note.createdAt).toLocaleDateString('ca-ES', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </span>
-                      {note.createdBy && (
-                        <span className="text-xs text-slate-400">
-                          per {note.createdBy}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-slate-700 whitespace-pre-wrap">{note.content}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+          <LeadNotesPanel
+            leadId={lead.id}
+            initialNotes={lead.notes.map((note) => ({
+              id: note.id,
+              content: note.content,
+              createdBy: note.createdBy,
+              createdAt: note.createdAt.toISOString(),
+            }))}
+          />
 
           {/* Booking */}
           {lead.booking && (

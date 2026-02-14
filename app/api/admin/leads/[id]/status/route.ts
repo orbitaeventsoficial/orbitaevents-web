@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
+import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
 
 const VALID_STATUSES = [
   'NEW',
@@ -46,6 +47,39 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       );
     }
 
+    let linkedCustomerId = existingLead.customerId ?? null;
+
+    // Si passa a WON, crear/actualitzar client i enllaçar.
+    if (status === 'WON') {
+      const emailNormalized = normalizeEmail(existingLead.email);
+      const phoneNormalized = existingLead.phone ? normalizePhone(existingLead.phone) : null;
+      const nameNormalized = normalizeName(existingLead.name);
+
+      const customer = await prisma.customer.upsert({
+        where: { emailNormalized },
+        update: {
+          name: existingLead.name,
+          nameNormalized,
+          phone: existingLead.phone || null,
+          phoneNormalized,
+          source: existingLead.source,
+          preferredLocale: existingLead.preferredLocale || 'es',
+        },
+        create: {
+          email: existingLead.email.toLowerCase().trim(),
+          emailNormalized,
+          name: existingLead.name,
+          nameNormalized,
+          phone: existingLead.phone || null,
+          phoneNormalized,
+          source: existingLead.source,
+          preferredLocale: existingLead.preferredLocale || 'es',
+        },
+      });
+
+      linkedCustomerId = customer.id;
+    }
+
     // Actualitzar estat
     const updatedLead = await prisma.lead.update({
       where: { id },
@@ -53,6 +87,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         status: status as LeadStatus,
         contactedAt: status === 'CONTACTED' && !existingLead.contactedAt ? new Date() : undefined,
         convertedAt: status === 'WON' && !existingLead.convertedAt ? new Date() : undefined,
+        customerId: status === 'WON' ? linkedCustomerId : existingLead.customerId,
       },
     });
 

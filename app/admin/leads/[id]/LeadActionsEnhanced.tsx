@@ -117,8 +117,12 @@ export default function LeadActionsEnhanced({
   };
 
   const handlePreviewQuote = () => {
-    // Obrir preview en nova finestra
-    window.open(`/api/admin/leads/${leadId}/quote`, '_blank');
+    const params = new URLSearchParams();
+    params.set('packId', selectedPack);
+    if (typeof customPrice === 'number' && Number.isFinite(customPrice) && customPrice > 0) {
+      params.set('customPrice', String(customPrice));
+    }
+    window.open(`/api/admin/leads/${leadId}/quote?${params.toString()}`, '_blank');
   };
 
   const handlePrintQuote = () => {
