@@ -13,6 +13,7 @@ interface SendEmailOptions {
   replyTo?: string;
   from?: string;
   text?: string;
+  attachments?: nodemailer.SendMailOptions['attachments'];
 }
 
 const EMAIL_LOGO_URL = `${(process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '')}/img/logoplanetatextdreta.svg`;
@@ -141,9 +142,9 @@ function createTransporter() {
     pool: true,
     maxConnections: 3,
     maxMessages: 100,
-    connectionTimeout: 8000,
-    greetingTimeout: 8000,
-    socketTimeout: 10000,
+    connectionTimeout: 20000,
+    greetingTimeout: 20000,
+    socketTimeout: 30000,
     auth: {
       user: smtpUser,
       pass: smtpPass,
@@ -176,6 +177,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
     html: brandedHtml,
     text: options.text?.trim() || htmlToText(brandedHtml),
     replyTo: options.replyTo?.trim(),
+    attachments: options.attachments,
   });
 }
 

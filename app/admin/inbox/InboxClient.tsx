@@ -647,6 +647,7 @@ export default function InboxClient({
       {showCompose && (
         <ComposeModal
           replyTo={replyTo}
+          packOptions={quotePacks}
           onClose={() => {
             setShowCompose(false);
             setReplyTo(null);
@@ -667,10 +668,30 @@ export default function InboxClient({
 }
 
 // Compose Modal Component
-function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onClose: () => void }) {
+function ComposeModal({
+  replyTo,
+  packOptions,
+  onClose,
+}: {
+  replyTo: UnifiedEmail | null;
+  packOptions: QuotePackOption[];
+  onClose: () => void;
+}) {
+  const FALLBACK_OPTIONS: QuotePackOption[] = [
+    { id: 'party-starter', label: 'Party Starter', price: 350 },
+    { id: 'party-machine', label: 'Party Machine', price: 400 },
+    { id: 'vip-experience', label: 'VIP Experience', price: 700 },
+    { id: 'boda-signature', label: 'Boda Signature', price: 800 },
+    { id: 'corporate-event', label: 'Corporate Event', price: 850 },
+  ];
+  const PACK_OPTIONS = packOptions.length > 0 ? packOptions : FALLBACK_OPTIONS;
+  const initialPack = PACK_OPTIONS[0];
   const [to, setTo] = useState(replyTo?.from || '');
   const [subject, setSubject] = useState(replyTo ? `Re: ${replyTo.subject}` : '');
   const [body, setBody] = useState('');
+  const [attachQuote, setAttachQuote] = useState(false);
+  const [quotePackId, setQuotePackId] = useState(initialPack.id);
+  const [quotePrice, setQuotePrice] = useState(initialPack.price);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -684,7 +705,7 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
     setSuccess(null);
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
 
       const res = await fetch('/api/admin/emails/send', {
         method: 'POST',
@@ -694,6 +715,12 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
           subject,
           body,
           replyToId: replyTo?.leadData?.id,
+          quote: attachQuote
+            ? {
+                packId: quotePackId,
+                price: Number(quotePrice),
+              }
+            : undefined,
         }),
         signal: controller.signal,
       });
@@ -776,6 +803,47 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
               placeholder="Escriu el teu missatge..."
             />
           </div>
+          <div className="rounded-xl border border-slate-700/50 bg-slate-700/20 p-4">
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-300">
+              <input
+                type="checkbox"
+                checked={attachQuote}
+                onChange={(e) => setAttachQuote(e.target.checked)}
+              />
+              Adjuntar pressupost personalitzat
+            </label>
+            {attachQuote && (
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Pack</label>
+                  <select
+                    value={quotePackId}
+                    onChange={(e) => {
+                      const next = PACK_OPTIONS.find((p) => p.id === e.target.value);
+                      setQuotePackId(e.target.value);
+                      if (next) setQuotePrice(next.price);
+                    }}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-600/50 bg-slate-800/80 text-slate-100 text-sm"
+                  >
+                    {PACK_OPTIONS.map((pack) => (
+                      <option key={pack.id} value={pack.id}>
+                        {pack.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Preu base (€)</label>
+                  <input
+                    type="number"
+                    value={quotePrice}
+                    onChange={(e) => setQuotePrice(Number(e.target.value) || 0)}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-600/50 bg-slate-800/80 text-slate-100 text-sm"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-700/50 bg-slate-700/30" aria-live="polite">
@@ -784,7 +852,7 @@ function ComposeModal({ replyTo, onClose }: { replyTo: UnifiedEmail | null; onCl
           <button onClick={onClose} type="button" className="px-4 py-2 text-slate-400 hover:text-slate-200">Cancel·lar</button>
           <button
             onClick={handleSend}
-            disabled={sending || !to || !subject || !body}
+            disabled={sending || !to || !subject || !body || (attachQuote && quotePrice <= 0)}
             type="button"
             aria-busy={sending}
             className={`px-6 py-2 rounded-xl font-medium ${
