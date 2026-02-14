@@ -15,12 +15,12 @@ export default async function QuoteTemplateSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <Link href="/admin/settings" className="text-sm text-slate-500 hover:text-slate-700">
+      <header className="rounded-2xl border border-stone-300 bg-white p-6 shadow-sm" style={{ color: '#111111' }}>
+        <Link href="/admin/settings" className="text-sm !text-[#111111] hover:opacity-80">
           ← Volver a configuración
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-800">Plantilla de presupuestos</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <h1 className="mt-2 text-2xl font-semibold !text-[#111111]">Plantilla de presupuestos</h1>
+        <p className="mt-1 text-sm !text-[#111111]">
           Define el texto del presupuesto, condiciones y copia interna. Esta plantilla se usa en
           preview y en emails enviados al cliente.
         </p>

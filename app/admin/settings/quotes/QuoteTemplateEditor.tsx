@@ -61,12 +61,12 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
   }
 
   const inputClass =
-    'w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500';
+    'w-full rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-[#111111] focus:border-amber-500 focus:ring-1 focus:ring-amber-500';
 
   return (
-    <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5">
+    <section className="rounded-2xl border border-stone-300 bg-white p-5" style={{ color: '#111111' }}>
       <div className="grid gap-4 lg:grid-cols-2">
-        <label className="text-sm text-slate-300">
+        <label className="text-sm text-[#111111]">
           Título principal
           <input
             className={inputClass}
@@ -75,7 +75,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-slate-300">
+        <label className="text-sm text-[#111111]">
           Días de validez
           <input
             type="number"
@@ -87,7 +87,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-slate-300 lg:col-span-2">
+        <label className="text-sm text-[#111111] lg:col-span-2">
           Subtítulo cabecera
           <input
             className={inputClass}
@@ -96,7 +96,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-slate-300">
+        <label className="text-sm text-[#111111]">
           CTA título
           <input
             className={inputClass}
@@ -105,7 +105,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-slate-300">
+        <label className="text-sm text-[#111111]">
           CTA subtítulo
           <input
             className={inputClass}
@@ -114,7 +114,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-slate-300 lg:col-span-2">
+        <label className="text-sm text-[#111111] lg:col-span-2">
           Condiciones (una por línea)
           <textarea
             rows={8}
@@ -124,7 +124,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="flex items-center gap-2 text-sm text-slate-300">
+        <label className="flex items-center gap-2 text-sm text-[#111111]">
           <input
             type="checkbox"
             checked={form.sendAdminCopy}
@@ -133,7 +133,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           Enviar copia interna automática de cada presupuesto
         </label>
 
-        <label className="text-sm text-slate-300">
+        <label className="text-sm text-[#111111]">
           Email de copia interna
           <input
             type="email"
@@ -149,11 +149,11 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           type="button"
           onClick={save}
           disabled={saving}
-          className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-white disabled:opacity-60"
+          className="rounded-xl bg-amber-100 px-4 py-2 text-sm font-semibold text-[#111111] hover:bg-amber-200 disabled:opacity-60"
         >
           {saving ? 'Guardando...' : 'Guardar plantilla'}
         </button>
-        {message && <p className="text-sm text-slate-300">{message}</p>}
+        {message && <p className="text-sm text-[#111111]">{message}</p>}
       </div>
     </section>
   );
