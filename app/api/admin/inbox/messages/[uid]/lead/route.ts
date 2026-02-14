@@ -9,6 +9,13 @@ interface RouteParams {
   params: Promise<{ uid: string }>;
 }
 
+type FallbackEmailPayload = {
+  fromAddress?: string;
+  fromName?: string;
+  subject?: string;
+  bodyText?: string;
+};
+
 export const dynamic = 'force-dynamic';
 
 function sanitizeString(value: unknown, max = 500): string | undefined {
@@ -45,24 +52,28 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
 
   try {
+    const payload = await request.json().catch(() => ({}));
+    const fallbackEmail = (payload?.fallbackEmail || {}) as FallbackEmailPayload;
     const email = await fetchEmailByUid(uidNum);
-    if (!email) {
-      return NextResponse.json({ error: 'Email no trobat' }, { status: 404 });
-    }
 
-    if (!email.from?.address || !email.from.address.includes('@')) {
+    const senderAddress = email?.from?.address || fallbackEmail.fromAddress || '';
+    const senderName = email?.from?.name || fallbackEmail.fromName || '';
+    const subject = email?.subject || fallbackEmail.subject || '';
+    const bodyText = email?.bodyText || fallbackEmail.bodyText || '';
+
+    if (!senderAddress || !senderAddress.includes('@')) {
       return NextResponse.json({ error: 'Email remitent invàlid' }, { status: 400 });
     }
 
     const extractedRaw = extractLeadDataFromEmail({
-      fromName: email.from.name,
-      fromAddress: email.from.address,
-      subject: email.subject,
-      bodyText: email.bodyText,
+      fromName: senderName,
+      fromAddress: senderAddress,
+      subject,
+      bodyText,
     });
     const extracted = {
-      name: sanitizeString(extractedRaw.name, 120) || sanitizeString(email.from.name, 120) || 'Client',
-      email: sanitizeString(extractedRaw.email, 190)?.toLowerCase() || email.from.address.toLowerCase(),
+      name: sanitizeString(extractedRaw.name, 120) || sanitizeString(senderName, 120) || 'Client',
+      email: sanitizeString(extractedRaw.email, 190)?.toLowerCase() || senderAddress.toLowerCase(),
       phone: sanitizeString(extractedRaw.phone, 40),
       eventType: extractedRaw.eventType,
       eventDate: sanitizeOptionalDate(extractedRaw.eventDate),
@@ -94,7 +105,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           eventLocation: existing.eventLocation || extracted.eventLocation || null,
           source: existing.source === 'WEBSITE' ? 'OTHER' : existing.source,
           message: extracted.message
-            ? `${extracted.message}\n\n[importat des d'email: ${email.subject}]`
+            ? `${extracted.message}\n\n[importat des d'email: ${subject}]`
             : existing.message || null,
           updatedAt: new Date(),
         },
@@ -103,7 +114,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       await prisma.leadNote.create({
         data: {
           leadId: updated.id,
-          content: `📥 Email importat (UID ${uidNum})\nAssumpte: ${email.subject || '(Sense assumpte)'}`,
+          content: `📥 Email importat (UID ${uidNum})\nAssumpte: ${subject || '(Sense assumpte)'}`,
           createdBy: 'Admin Inbox',
         },
       });
@@ -113,11 +124,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           leadId: updated.id,
           type: 'SYSTEM',
           title: 'Lead actualitzat des d’Inbox',
-          description: `Importació automàtica des d’email ${email.from.address}`,
+          description: `Importació automàtica des d’email ${senderAddress}`,
           createdBy: 'Admin Inbox',
           metadata: {
             uid: uidNum,
-            subject: email.subject,
+            subject,
+            usedFallback: !email,
           },
         },
       });
@@ -146,8 +158,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         eventLocation: extracted.eventLocation || null,
         source: 'OTHER',
         message: extracted.message
-          ? `${extracted.message}\n\n[importat des d'email: ${email.subject}]`
-          : `Lead creat des d'email importat. Assumpte: ${email.subject || '(Sense assumpte)'}`,
+          ? `${extracted.message}\n\n[importat des d'email: ${subject}]`
+          : `Lead creat des d'email importat. Assumpte: ${subject || '(Sense assumpte)'}`,
         interestedExtras: [],
       },
     });
@@ -155,7 +167,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     await prisma.leadNote.create({
       data: {
         leadId: created.id,
-        content: `📥 Lead creat des d’email (UID ${uidNum})\nAssumpte: ${email.subject || '(Sense assumpte)'}`,
+        content: `📥 Lead creat des d’email (UID ${uidNum})\nAssumpte: ${subject || '(Sense assumpte)'}`,
         createdBy: 'Admin Inbox',
       },
     });
@@ -165,11 +177,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         leadId: created.id,
         type: 'SYSTEM',
         title: 'Lead creat des d’Inbox',
-        description: `Importació automàtica des d’email ${email.from.address}`,
+        description: `Importació automàtica des d’email ${senderAddress}`,
         createdBy: 'Admin Inbox',
         metadata: {
           uid: uidNum,
-          subject: email.subject,
+          subject,
+          usedFallback: !email,
         },
       },
     });

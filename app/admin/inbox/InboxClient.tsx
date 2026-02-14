@@ -224,6 +224,14 @@ export default function InboxClient({
       const res = await fetch(`/api/admin/inbox/messages/${email.imapData.uid}/lead`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fallbackEmail: {
+            fromAddress: email.imapData.from.address || email.from,
+            fromName: email.imapData.from.name || email.fromName,
+            subject: email.imapData.subject || email.subject,
+            bodyText: email.imapData.bodyText || email.preview || '',
+          },
+        }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok || !data?.lead?.id) {

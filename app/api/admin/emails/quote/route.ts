@@ -274,10 +274,16 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    if (error instanceof Error && /timeout/i.test(error.message)) {
+      return NextResponse.json(
+        { error: 'Timeout SMTP enviant pressupost. Revisa configuració SMTP (host/port/firewall).' },
+        { status: 504 }
+      );
+    }
 
     log.error('Error enviant pressupost:', error);
     return NextResponse.json(
-      { error: 'Error enviant pressupost' },
+      { error: error instanceof Error ? `Error enviant pressupost: ${error.message}` : 'Error enviant pressupost' },
       { status: 500 }
     );
   }
