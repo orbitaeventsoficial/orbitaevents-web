@@ -1511,3 +1511,34 @@ textarea:focus-visible {
   white-space: normal !important;
   width: auto !important;
 }
+
+/* Admin readability on light cards */
+.admin-mode .admin-readable :is(.bg-white, .bg-slate-50, .bg-stone-50) :is(
+  .text-slate-400,
+  .text-slate-500,
+  .text-slate-600,
+  .text-slate-700,
+  .text-slate-800,
+  .text-stone-400,
+  .text-stone-500,
+  .text-stone-600,
+  .text-stone-700,
+  .text-stone-800
+) {
+  color: #111827;
+}
+
+.admin-mode .admin-readable :is(.bg-white, .bg-slate-50, .bg-stone-50) :is(
+  input,
+  select,
+  textarea,
+  label,
+  th,
+  td
+) {
+  color: #111827;
+}
+
+.admin-mode .admin-readable :is(.bg-white, .bg-slate-50, .bg-stone-50) :is(input, textarea)::placeholder {
+  color: #475569;
+}

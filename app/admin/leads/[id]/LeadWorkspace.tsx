@@ -63,6 +63,7 @@ export default function LeadWorkspace({
   const [loadingTask, setLoadingTask] = useState(false);
   const [loadingDoc, setLoadingDoc] = useState(false);
   const [cleaningActivities, setCleaningActivities] = useState(false);
+  const [deletingDocumentId, setDeletingDocumentId] = useState<string | null>(null);
 
   const openTasks = useMemo(
     () => tasks.filter((task) => task.status !== 'DONE' && task.status !== 'CANCELLED'),
@@ -168,51 +169,70 @@ export default function LeadWorkspace({
     refreshActivities();
   };
 
+  const deleteDocument = async (documentId: string) => {
+    if (deletingDocumentId) return;
+    const confirmed = window.confirm('Vols eliminar aquest document?');
+    if (!confirmed) return;
+
+    setDeletingDocumentId(documentId);
+    const res = await fetch(`/api/admin/leads-new/${leadId}/documents/${documentId}`, {
+      method: 'DELETE',
+    });
+    setDeletingDocumentId(null);
+    if (!res.ok) return;
+
+    setDocuments((prev) => prev.filter((doc) => doc.id !== documentId));
+    refreshActivities();
+  };
+
   return (
     <div className="space-y-6">
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Tasques obertes</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-800">{openTasks.length}</p>
+          <p className="text-xs uppercase tracking-wide text-black">Tasques obertes</p>
+          <p className="mt-1 text-2xl font-semibold text-black">{openTasks.length}</p>
         </div>
         <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Tasques completades</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-800">{doneTasks.length}</p>
+          <p className="text-xs uppercase tracking-wide text-black">Tasques completades</p>
+          <p className="mt-1 text-2xl font-semibold text-black">{doneTasks.length}</p>
         </div>
         <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Documents</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-800">{documents.length}</p>
+          <p className="text-xs uppercase tracking-wide text-black">Documents</p>
+          <p className="mt-1 text-2xl font-semibold text-black">{documents.length}</p>
         </div>
         <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Activitat</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-800">{activities.length}</p>
+          <p className="text-xs uppercase tracking-wide text-black">Activitat</p>
+          <p className="mt-1 text-2xl font-semibold text-black">{activities.length}</p>
         </div>
       </section>
 
       <div className="grid gap-6 xl:grid-cols-3">
         <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm xl:col-span-2">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-slate-800">Pla comercial (tasques)</h2>
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+            <h2 className="text-lg font-semibold text-black">Seguiment comercial (tasques)</h2>
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-black">
               {openTasks.length} pendents
             </span>
           </div>
+          <p className="mt-1 text-sm text-black">
+            Llista de coses que has de fer per tancar aquest lead: trucades, seguiment i properes accions.
+          </p>
 
           <div className="mt-4 grid gap-2 md:grid-cols-12">
             <input
-              className="rounded-xl border border-stone-200 px-3 py-2 text-sm text-slate-700 md:col-span-5"
+              className="rounded-xl border border-stone-200 px-3 py-2 text-sm text-black md:col-span-5"
               placeholder="Ex: Trucar per tancar pressupost"
               value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
             />
             <input
               type="date"
-              className="rounded-xl border border-stone-200 px-3 py-2 text-sm text-slate-700 md:col-span-3"
+              className="rounded-xl border border-stone-200 px-3 py-2 text-sm text-black md:col-span-3"
               value={taskDueDate}
               onChange={(e) => setTaskDueDate(e.target.value)}
             />
             <select
-              className="rounded-xl border border-stone-200 px-3 py-2 text-sm text-slate-700 md:col-span-2"
+              className="rounded-xl border border-stone-200 px-3 py-2 text-sm text-black md:col-span-2"
               value={taskPriority}
               onChange={(e) => setTaskPriority(e.target.value)}
             >
@@ -233,7 +253,7 @@ export default function LeadWorkspace({
 
           <div className="mt-5 space-y-2">
             {tasks.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-stone-200 p-4 text-sm text-slate-500">
+              <p className="rounded-xl border border-dashed border-stone-200 p-4 text-sm text-black">
                 Encara no hi ha tasques en aquest lead.
               </p>
             ) : (
@@ -241,8 +261,8 @@ export default function LeadWorkspace({
                 <div key={task.id} className="rounded-xl border border-stone-200 p-3">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-sm font-semibold text-slate-800">{task.title}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-sm font-semibold text-black">{task.title}</p>
+                      <p className="text-xs text-black">
                         {task.dueDate ? `Venciment ${task.dueDate.slice(0, 10)}` : 'Sense data'} · Prioritat {task.priority} · Estat {task.status}
                       </p>
                     </div>
@@ -280,16 +300,16 @@ export default function LeadWorkspace({
         </section>
 
         <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-800">Documents comercials</h2>
+          <h2 className="text-lg font-semibold text-black">Documents comercials</h2>
           <div className="mt-3 space-y-2">
             <input
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm text-slate-700"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm text-black"
               placeholder="Títol document"
               value={docTitle}
               onChange={(e) => setDocTitle(e.target.value)}
             />
             <select
-              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm text-slate-700"
+              className="w-full rounded-xl border border-stone-200 px-3 py-2 text-sm text-black"
               value={docType}
               onChange={(e) => setDocType(e.target.value)}
             >
@@ -302,7 +322,7 @@ export default function LeadWorkspace({
             </select>
             <input
               type="file"
-              className="w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200"
+              className="w-full text-sm text-black file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-black hover:file:bg-slate-200"
               onChange={(e) => setDocFile(e.target.files?.[0] || null)}
             />
             <button
@@ -317,23 +337,34 @@ export default function LeadWorkspace({
 
           <div className="mt-4 space-y-2">
             {documents.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-stone-200 p-4 text-sm text-slate-500">
+              <p className="rounded-xl border border-dashed border-stone-200 p-4 text-sm text-black">
                 Encara no hi ha documents.
               </p>
             ) : (
               documents.map((doc) => (
-                <a
-                  key={doc.id}
-                  href={doc.fileUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block rounded-xl border border-stone-200 p-3 hover:bg-slate-50"
-                >
-                  <p className="text-sm font-semibold text-slate-800">{doc.title}</p>
-                  <p className="text-xs text-slate-500">
-                    {doc.type} · {doc.source} · {formatDateTime(doc.createdAt)}
-                  </p>
-                </a>
+                <div key={doc.id} className="rounded-xl border border-stone-200 p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <a
+                      href={doc.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="min-w-0 flex-1 hover:text-black"
+                    >
+                      <p className="truncate text-sm font-semibold text-black">{doc.title}</p>
+                      <p className="text-xs text-black">
+                        {doc.type} · {doc.source} · {formatDateTime(doc.createdAt)}
+                      </p>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => deleteDocument(doc.id)}
+                      disabled={deletingDocumentId === doc.id}
+                      className="rounded-lg border border-rose-300 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100 disabled:opacity-60"
+                    >
+                      {deletingDocumentId === doc.id ? 'Eliminant...' : 'Eliminar'}
+                    </button>
+                  </div>
+                </div>
               ))
             )}
           </div>
@@ -342,7 +373,7 @@ export default function LeadWorkspace({
 
       <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold text-slate-800">Timeline comercial</h2>
+          <h2 className="text-lg font-semibold text-black">Timeline comercial</h2>
           <button
             type="button"
             onClick={cleanDuplicateActivities}
@@ -354,7 +385,7 @@ export default function LeadWorkspace({
         </div>
         <div className="mt-4 space-y-3">
           {activities.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-stone-200 p-4 text-sm text-slate-500">
+            <p className="rounded-xl border border-dashed border-stone-200 p-4 text-sm text-black">
               Sense activitat registrada.
             </p>
           ) : (
@@ -362,16 +393,16 @@ export default function LeadWorkspace({
               <div key={activity.id} className="rounded-xl border border-stone-200 p-3">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-slate-800">{activity.title || activity.type}</p>
+                    <p className="text-sm font-semibold text-black">{activity.title || activity.type}</p>
                     {activity.description && (
-                      <p className="text-xs text-slate-600">{activity.description}</p>
+                      <p className="text-xs text-black">{activity.description}</p>
                     )}
                     {activity.createdBy && (
-                      <p className="text-xs text-slate-500">Per: {activity.createdBy}</p>
+                      <p className="text-xs text-black">Per: {activity.createdBy}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="text-xs text-slate-500">{formatDateTime(activity.createdAt)}</div>
+                    <div className="text-xs text-black">{formatDateTime(activity.createdAt)}</div>
                     <button
                       type="button"
                       onClick={() => deleteActivity(activity.id)}
