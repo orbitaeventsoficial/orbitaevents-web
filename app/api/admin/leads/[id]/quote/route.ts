@@ -11,6 +11,7 @@ import { generateQuoteHTML, createQuoteFromLead, generateQuoteNumber } from "@/l
 import { getDbPackByCode, getDbPacks } from '@/lib/packs-db';
 import type { PackDefinition } from "@/config/packs-config";
 import { requireAuth } from '@/lib/auth';
+import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
 
 type QuotePack = {
   name: string;
@@ -58,6 +59,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   const authError = requireAuth(req);
   if (authError) return authError;
   try {
+    const template = await getQuoteTemplateSettings();
     const lead = await prisma.lead.findUnique({
       where: { id: params.id },
     });
@@ -72,9 +74,16 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
 
     // Crear dades del pressupost
     const quoteData = createQuoteFromLead(lead, packData);
+    quoteData.validUntil = new Date(Date.now() + template.validityDays * 24 * 60 * 60 * 1000);
 
     // Generar HTML
-    const html = generateQuoteHTML(quoteData);
+    const html = generateQuoteHTML(quoteData, {
+      introTitle: template.introTitle,
+      introSubtitle: template.introSubtitle,
+      ctaTitle: template.ctaTitle,
+      ctaSubtitle: template.ctaSubtitle,
+      conditions: template.conditions,
+    });
 
     // Retornar com HTML renderitzable
     return new NextResponse(html, {
@@ -96,6 +105,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   const authError = requireAuth(req);
   if (authError) return authError;
   try {
+    const template = await getQuoteTemplateSettings();
     const body = await req.json().catch(() => ({}));
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
     
@@ -127,6 +137,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       packData,
       body.extras
     );
+    quoteData.validUntil = new Date(Date.now() + template.validityDays * 24 * 60 * 60 * 1000);
 
     // Generar número únic
     const quoteNumber = generateQuoteNumber();
@@ -170,13 +181,23 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
         type: 'DOCUMENT',
         title: 'Pressupost generat',
         description: documentTitle,
-        metadata: { quoteNumber },
+        metadata: {
+          quoteNumber,
+          total: quoteData.total,
+          source: 'lead_quote_route',
+        },
         createdBy: 'Sistema',
       },
     });
 
     // Generar HTML
-    const html = generateQuoteHTML(quoteData);
+    const html = generateQuoteHTML(quoteData, {
+      introTitle: template.introTitle,
+      introSubtitle: template.introSubtitle,
+      ctaTitle: template.ctaTitle,
+      ctaSubtitle: template.ctaSubtitle,
+      conditions: template.conditions,
+    });
 
     return NextResponse.json({
       success: true,

@@ -1194,6 +1194,52 @@ html.admin-mode h3 {
   font-weight: 600;
   color: #e2e8f0;
 }
+
+/* ==========================================================================
+   ADMIN SHELL - BASE VISUAL SYSTEM (aplica a todo /admin)
+   ========================================================================== */
+html.admin-mode .admin-shell {
+  color: #1e293b;
+}
+
+html.admin-mode .admin-shell section,
+html.admin-mode .admin-shell article,
+html.admin-mode .admin-shell .panel,
+html.admin-mode .admin-shell .card {
+  border-radius: 16px;
+}
+
+html.admin-mode .admin-shell input:not([type='checkbox']):not([type='radio']):not([type='file']),
+html.admin-mode .admin-shell select,
+html.admin-mode .admin-shell textarea {
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+}
+
+html.admin-mode .admin-shell input::placeholder,
+html.admin-mode .admin-shell textarea::placeholder {
+  color: #94a3b8;
+}
+
+html.admin-mode .admin-shell table thead tr {
+  background: #f8fafc;
+}
+
+html.admin-mode .admin-shell table th {
+  color: #475569;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+html.admin-mode .admin-shell table td {
+  color: #334155;
+}
+
+html.admin-mode .admin-shell table tbody tr:hover {
+  background: #f8fafc;
+}
 html::before {
   content: '';
   position: fixed;

@@ -198,7 +198,7 @@ export default function AdminSearchModal({
                 {results.customers.map((customer) => (
                   <Link
                     key={customer.id}
-                    href="/admin/contactes"
+                    href={`/admin/contactes/${customer.id}`}
                     onClick={onClose}
                     className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/40 px-3 py-2 text-sm text-slate-200 hover:border-cyan-500/40 hover:bg-slate-800/70"
                   >
@@ -217,6 +217,9 @@ export default function AdminSearchModal({
                 {[
                   { href: '/admin/leads', label: '👥 Leads' },
                   { href: '/admin/bookings', label: '📋 Reserves' },
+                  { href: '/admin/sales-ops', label: '🎯 Sales Ops' },
+                  { href: '/admin/rentabilidad', label: '📊 Rentabilidad' },
+                  { href: '/admin/finanzas', label: '💶 Finanzas' },
                   { href: '/admin/analytics', label: '📈 Analytics' },
                   { href: '/admin/contactes', label: '👤 Clients' },
                 ].map((item) => (

@@ -17,6 +17,19 @@ export interface AuthResult {
   method?: 'basic' | 'bearer';
 }
 
+export type AdminRole = 'OWNER' | 'MANAGER' | 'VIEWER';
+export type AdminPermission =
+  | 'read'
+  | 'mutate'
+  | 'automation'
+  | 'integrations';
+
+const ROLE_PERMISSIONS: Record<AdminRole, AdminPermission[]> = {
+  OWNER: ['read', 'mutate', 'automation', 'integrations'],
+  MANAGER: ['read', 'mutate', 'automation'],
+  VIEWER: ['read'],
+};
+
 /**
  * Verificar autenticació Basic Auth
  */
@@ -83,6 +96,29 @@ export function unauthorizedResponse(message = 'Unauthorized'): NextResponse {
       },
     }
   );
+}
+
+export function forbiddenResponse(message = 'Forbidden'): NextResponse {
+  return NextResponse.json(
+    { success: false, error: message },
+    { status: 403 }
+  );
+}
+
+export function getAdminRole(req: NextRequest): AdminRole {
+  const roleHeader = req.headers.get('x-admin-role')?.toUpperCase() as AdminRole | undefined;
+  const roleCookie = req.cookies.get('admin_role')?.value?.toUpperCase() as AdminRole | undefined;
+  const rawRole = roleHeader || roleCookie || 'OWNER';
+  return rawRole in ROLE_PERMISSIONS ? rawRole : 'OWNER';
+}
+
+export function requirePermission(req: NextRequest, permission: AdminPermission): NextResponse | null {
+  const role = getAdminRole(req);
+  const allowed = ROLE_PERMISSIONS[role].includes(permission);
+  if (!allowed) {
+    return forbiddenResponse(`Permission denied for role ${role}`);
+  }
+  return null;
 }
 
 /**

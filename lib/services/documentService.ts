@@ -68,6 +68,14 @@ export interface QuoteExtra {
   quantity: number;
 }
 
+export interface QuoteTemplateOverrides {
+  introTitle?: string;
+  introSubtitle?: string;
+  ctaTitle?: string;
+  ctaSubtitle?: string;
+  conditions?: string[];
+}
+
 export interface ContractData extends QuoteData {
   // Condicions contractuals
   depositAmount: number;
@@ -122,7 +130,7 @@ export function generateContractNumber(): string {
 // GENERAR HTML DEL PRESSUPOST
 // ============================================
 
-export function generateQuoteHTML(data: QuoteData): string {
+export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverrides = {}): string {
   const eventTypeLabel = getEventTypeLabel(data.eventType);
   const formattedDate = new Date(data.eventDate).toLocaleDateString('ca-ES', {
     weekday: 'long',
@@ -135,6 +143,21 @@ export function generateQuoteHTML(data: QuoteData): string {
     month: 'long',
     year: 'numeric',
   });
+  const introTitle = template.introTitle?.trim() || 'PRESSUPOST';
+  const introSubtitle =
+    template.introSubtitle?.trim() || 'Proposta personalitzada per al teu esdeveniment';
+  const ctaTitle = template.ctaTitle?.trim() || "T'agrada el que veus?";
+  const ctaSubtitle =
+    template.ctaSubtitle?.trim() || 'Reserva la teva data ara i assegura`t el millor preu';
+  const conditions = Array.isArray(template.conditions) && template.conditions.length > 0
+    ? template.conditions
+    : [
+        "Reserva: Es considera reserva ferma amb el pagament del 30% d'aval.",
+        "Pagament final: El 70% restant s'abona 7 dies abans de l'esdeveniment.",
+        "Cancel·lació: L'aval no és reemborsable un cop confirmada la reserva.",
+        'Desplaçament: Inclòs fins a 50km de Granollers. Consulteu per a distàncies superiors.',
+        "Hores extres: Es facturaran al preu indicat si l'esdeveniment s'allarga.",
+      ];
 
   return `
 <!DOCTYPE html>
@@ -337,8 +360,9 @@ export function generateQuoteHTML(data: QuoteData): string {
 
     <!-- Document Title -->
     <div class="doc-title">
-      <h1>PRESSUPOST</h1>
+      <h1>${escapeHtml(introTitle)}</h1>
       <div class="number">${data.quoteNumber}</div>
+      <div style="font-size: 10pt; color: #c7c7c7; margin-top: 6px;">${escapeHtml(introSubtitle)}</div>
       <div class="date">Emès: ${new Date().toLocaleDateString('ca-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
     </div>
 
@@ -433,11 +457,7 @@ export function generateQuoteHTML(data: QuoteData): string {
     <div class="conditions">
       <h3>Condicions del pressupost</h3>
       <ul>
-        <li><strong>Reserva:</strong> Es considera reserva ferma amb el pagament del 30% d'aval.</li>
-        <li><strong>Pagament final:</strong> El 70% restant s'abona 7 dies abans de l'esdeveniment.</li>
-        <li><strong>Cancel·lació:</strong> L'aval no és reemborsable un cop confirmada la reserva.</li>
-        <li><strong>Desplaçament:</strong> Inclòs fins a 50km de Granollers. Consulteu per a distàncies superiors.</li>
-        <li><strong>Hores extres:</strong> Es facturaran al preu indicat si l'esdeveniment s'allarga.</li>
+        ${conditions.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
       </ul>
     </div>
 
@@ -454,8 +474,8 @@ export function generateQuoteHTML(data: QuoteData): string {
 
     <!-- CTA -->
     <div class="cta-section">
-      <h3>T'agrada el que veus?</h3>
-      <p>Reserva la teva data ara i assegura't el millor preu</p>
+      <h3>${escapeHtml(ctaTitle)}</h3>
+      <p>${escapeHtml(ctaSubtitle)}</p>
       <div class="cta-buttons">
         <a href="https://wa.me/${SITE_CONFIG.business.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(`Hola! Vull confirmar el pressupost ${data.quoteNumber} per ${eventTypeLabel} el ${formattedDate}.`)}" class="cta-btn">Confirmar per WhatsApp</a>
         <a href="tel:${SITE_CONFIG.business.phone}" class="cta-btn secondary">${SITE_CONFIG.business.phoneDisplay}</a>

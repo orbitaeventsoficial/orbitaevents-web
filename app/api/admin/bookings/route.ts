@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
 import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 import { BookingStatus, EventType } from '@prisma/client';
@@ -61,6 +61,8 @@ export async function GET(req: NextRequest) {
   // Verificar autenticació
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'read');
+  if (permissionError) return permissionError;
 
   try {
     const { searchParams } = new URL(req.url);
@@ -141,6 +143,8 @@ export async function POST(req: NextRequest) {
   // Verificar autenticació
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
 
   try {
     const body = await req.json();

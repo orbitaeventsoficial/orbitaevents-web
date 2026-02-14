@@ -29,6 +29,17 @@ interface NotificationConfig {
     emailReady: boolean;
     whatsappReady: boolean;
   };
+  automation: {
+    cronSecretConfigured: boolean;
+    lastRun: string | null;
+    lastStatus: string | null;
+    lastMessage: string | null;
+    lastSummary: {
+      sequences?: { executed?: number; sentEmail?: number; sentWhatsapp?: number };
+      sla?: { createdTasks?: number };
+      kpi24h?: { responseRate?: number; commSent?: number; commResponded?: number };
+    } | null;
+  };
 }
 
 export default function SettingsNotificationsPage() {
@@ -36,7 +47,9 @@ export default function SettingsNotificationsPage() {
   const [instructions, setInstructions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [testing, setTesting] = useState(false);
+  const [runningAutopilot, setRunningAutopilot] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [autopilotResult, setAutopilotResult] = useState<{ success: boolean; message: string } | null>(null);
 
   useEffect(() => {
     fetchConfig();
@@ -78,6 +91,33 @@ export default function SettingsNotificationsPage() {
       });
     } finally {
       setTesting(false);
+    }
+  };
+
+  const handleRunAutopilotNow = async () => {
+    setRunningAutopilot(true);
+    setAutopilotResult(null);
+    try {
+      const res = await fetch('/api/admin/automation/daily-summary/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || 'No s’ha pogut executar el resum diari');
+      }
+      setAutopilotResult({
+        success: true,
+        message: 'Resum diari executat i enviat correctament',
+      });
+      await fetchConfig();
+    } catch (error) {
+      setAutopilotResult({
+        success: false,
+        message: error instanceof Error ? error.message : 'Error desconegut',
+      });
+    } finally {
+      setRunningAutopilot(false);
     }
   };
 
@@ -167,6 +207,86 @@ export default function SettingsNotificationsPage() {
         {!config?.status.emailReady && (
           <p className="mt-2 text-sm text-slate-500">
             Configura primer les variables SMTP per poder testejar
+          </p>
+        )}
+      </section>
+
+      {/* Commercial Autopilot */}
+      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-700 mb-4">🤖 Autopilot Comercial</h2>
+
+        <div className="grid gap-3 text-sm">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <span className="text-slate-500">CRON_SECRET</span>
+            <span className={config?.automation.cronSecretConfigured ? 'text-green-600' : 'text-red-600'}>
+              {config?.automation.cronSecretConfigured ? '✅ Configurat' : '❌ FALTA'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <span className="text-slate-500">Última execució</span>
+            <span className="text-slate-700">
+              {config?.automation.lastRun
+                ? new Date(config.automation.lastRun).toLocaleString('ca-ES')
+                : 'Mai'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <span className="text-slate-500">Estat</span>
+            <span
+              className={
+                config?.automation.lastStatus === 'ok'
+                  ? 'text-green-600'
+                  : config?.automation.lastStatus === 'error'
+                    ? 'text-red-600'
+                    : 'text-slate-700'
+              }
+            >
+              {config?.automation.lastStatus || 'Sense dades'}
+            </span>
+          </div>
+          {config?.automation.lastSummary && (
+            <div className="rounded-lg bg-slate-50 p-3 text-slate-700">
+              <p>
+                Seq: {config.automation.lastSummary.sequences?.executed ?? 0} · Email:{' '}
+                {config.automation.lastSummary.sequences?.sentEmail ?? 0} · WA:{' '}
+                {config.automation.lastSummary.sequences?.sentWhatsapp ?? 0}
+              </p>
+              <p>
+                SLA: {config.automation.lastSummary.sla?.createdTasks ?? 0} · Resp 24h:{' '}
+                {((config.automation.lastSummary.kpi24h?.responseRate ?? 0) * 100).toFixed(1)}%
+              </p>
+            </div>
+          )}
+          {config?.automation.lastMessage && (
+            <p className="text-xs text-red-600">Últim error: {config.automation.lastMessage}</p>
+          )}
+        </div>
+
+        {autopilotResult && (
+          <div
+            className={`mt-4 p-3 rounded-lg ${
+              autopilotResult.success
+                ? 'bg-green-50 border border-green-200 text-green-700'
+                : 'bg-red-50 border border-red-200 text-red-700'
+            }`}
+            role={autopilotResult.success ? 'status' : 'alert'}
+          >
+            {autopilotResult.message}
+          </div>
+        )}
+
+        <button
+          onClick={handleRunAutopilotNow}
+          disabled={runningAutopilot || !config?.automation.cronSecretConfigured}
+          type="button"
+          aria-busy={runningAutopilot}
+          className="mt-4 px-6 py-3 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {runningAutopilot ? '🚀 Executant...' : '🚀 Executar resum diari ara'}
+        </button>
+        {!config?.automation.cronSecretConfigured && (
+          <p className="mt-2 text-sm text-slate-500">
+            Configura <code className="bg-stone-100 px-1 rounded">CRON_SECRET</code> per activar l’autopilot.
           </p>
         )}
       </section>

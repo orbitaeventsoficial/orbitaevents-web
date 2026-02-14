@@ -248,6 +248,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       items: [
         { icon: '📊', label: 'Dashboard', href: '/admin' },
         { icon: '📈', label: 'Analytics', href: '/admin/analytics' },
+        { icon: '🎯', label: 'Sales Ops', href: '/admin/sales-ops' },
+        { icon: '📊', label: 'Rentabilitat', href: '/admin/rentabilidad' },
+        { icon: '💶', label: 'Finanzas', href: '/admin/finanzas' },
         { icon: '📅', label: 'Calendari', href: '/admin/calendario' },
       ]
     },
@@ -291,6 +294,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: 'Configuració',
       items: [
         { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
+        { icon: '📄', label: 'Plantilla presupuestos', href: '/admin/settings/quotes' },
+        { icon: '🔗', label: 'Integracions', href: '/admin/settings/integrations' },
         { icon: '🎛️', label: 'Features', href: '/admin/features' },
         { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
         { icon: '🎨', label: 'Tema', href: '/admin/theme' },
@@ -320,10 +325,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       tasks: 'Tasques',
       packs: 'Packs',
       analytics: 'Analytics',
+      'sales-ops': 'Sales Ops',
+      rentabilidad: 'Rentabilitat',
+      finanzas: 'Finanzas',
       emails: 'Emails Auto',
       inbox: 'Inbox (IMAP)',
       calendario: 'Calendari',
       settings: 'Configuració',
+      integrations: 'Integracions',
+      quotes: 'Plantilla presupuestos',
       inventory: 'Inventari',
       contactes: 'Clients',
       mensajes: 'Missatges',
@@ -573,7 +583,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main Content */}
       <main className="lg:pl-64 pt-14 lg:pt-16 pb-20 lg:pb-0 min-h-screen">
-        <div className="p-3 sm:p-4 lg:p-6">
+        <div className="admin-shell p-3 sm:p-4 lg:p-6">
           {children}
         </div>
       </main>

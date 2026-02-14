@@ -36,6 +36,7 @@ const updateLeadSchema = z.object({
   utmMedium: z.string().optional(),
   utmCampaign: z.string().optional(),
   assignedTo: z.string().optional(),
+  preferredLocale: z.string().optional(),
 }).strict();
 
 // GET - Detall d'un lead

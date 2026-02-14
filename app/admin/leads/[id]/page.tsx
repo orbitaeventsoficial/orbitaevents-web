@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import LeadActionsEnhanced from './LeadActionsEnhanced';
 import LeadProfileEditor from './LeadProfileEditor';
 import LeadWorkspace from './LeadWorkspace';
+import { scoreLead } from '@/lib/services/commercialScoring';
+import ScoreSnapshotButton from './ScoreSnapshotButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,10 +51,30 @@ const PRIORITY_LABELS: Record<string, { label: string; color: string }> = {
   URGENT: { label: 'Urgent', color: 'bg-red-100 text-red-700' },
 };
 
+function parseBudgetValue(input?: string | null): number | null {
+  if (!input) return null;
+  const normalized = input.replace(/[^\d.,]/g, '').replace(/\./g, '').replace(',', '.');
+  const value = Number(normalized);
+  return Number.isFinite(value) ? value : null;
+}
+
 export default async function LeadDetailPage({ params }: Props) {
   const lead = await prisma.lead.findUnique({
     where: { id: params.id },
     include: {
+      customer: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          preferredLocale: true,
+          source: true,
+          totalEvents: true,
+          totalSpent: true,
+          lastEventDate: true,
+        },
+      },
       notes: {
         orderBy: { createdAt: 'desc' },
         take: 20,
@@ -60,7 +82,13 @@ export default async function LeadDetailPage({ params }: Props) {
       tasks: { orderBy: { createdAt: 'desc' } },
       documents: { orderBy: { createdAt: 'desc' } },
       activities: { orderBy: { createdAt: 'desc' } },
-      booking: true,
+      booking: {
+        include: {
+          postEventReport: true,
+          clientSurvey: true,
+          clientFeedback: true,
+        },
+      },
     },
   });
 
@@ -71,6 +99,64 @@ export default async function LeadDetailPage({ params }: Props) {
   const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
   const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
   const priorityConf = PRIORITY_LABELS[lead.priority] || PRIORITY_LABELS.MEDIUM;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
+  const reviewUrl = lead.booking?.reviewToken
+    ? `${baseUrl}/${lead.preferredLocale || 'es'}/valoracio?token=${lead.booking.reviewToken}&ref=${lead.booking.reference}`
+    : null;
+  const reviewFlowStatus = !lead.booking
+    ? 'SENSE_RESERVA'
+    : (lead.booking.reviewSubmittedAt || lead.booking.clientSurvey)
+      ? 'RESPONDIDO'
+      : lead.booking.postEventEmailSent
+        ? 'ENVIADO'
+        : 'FALTA_ENVIAR';
+  const internalPostEventStatus = !lead.booking
+    ? 'SENSE_RESERVA'
+    : lead.booking.postEventReport && lead.booking.clientFeedback?.sentAt
+      ? 'COMPLETO'
+      : lead.booking.postEventReport || lead.booking.clientFeedback?.sentAt
+        ? 'EN_PROGRESO'
+        : 'PENDIENTE';
+  const leadAgeDays = Math.max(
+    0,
+    Math.floor((Date.now() - new Date(lead.createdAt).getTime()) / (1000 * 60 * 60 * 24))
+  );
+  const budgetValue = parseBudgetValue(lead.budget);
+  const estimatedRevenue = lead.booking?.total ?? budgetValue ?? null;
+  const leadScore = scoreLead({
+    status: lead.status,
+    createdAt: lead.createdAt,
+    updatedAt: lead.updatedAt,
+    eventDate: lead.eventDate,
+    budget: lead.budget,
+    phone: lead.phone,
+    eventLocation: lead.eventLocation,
+    guestCount: lead.guestCount,
+    interestedPackId: lead.interestedPackId,
+    source: lead.source,
+  });
+  const relatedLeads = await prisma.lead.findMany({
+    where: {
+      id: { not: lead.id },
+      OR: [
+        ...(lead.customerId ? [{ customerId: lead.customerId }] : []),
+        { email: lead.email },
+      ],
+    },
+    include: {
+      booking: {
+        select: {
+          id: true,
+          reference: true,
+          eventDate: true,
+          status: true,
+          total: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 20,
+  });
 
   const serializedTasks = lead.tasks.map((task) => ({
     ...task,
@@ -93,8 +179,9 @@ export default async function LeadDetailPage({ params }: Props) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+      <header className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
           <Link
             href="/admin/leads"
             className="text-sm text-slate-500 hover:text-slate-700 mb-2 inline-block"
@@ -115,34 +202,77 @@ export default async function LeadDetailPage({ params }: Props) {
               {priorityConf.label}
             </span>
           </div>
+          </div>
+
+          <div className="flex gap-2 flex-wrap">
+            {lead.phone && (
+              <>
+                <a
+                  href={`https://wa.me/${lead.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(
+                    `Hola ${lead.name}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`
+                  )}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-md bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600"
+                >
+                  💬 WhatsApp
+                </a>
+                <a
+                  href={`tel:${lead.phone}`}
+                  className="inline-flex items-center rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+                >
+                  📞 Trucar
+                </a>
+              </>
+            )}
+            <a
+              href={`mailto:${lead.email}`}
+              className="inline-flex items-center rounded-md bg-stone-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-200"
+            >
+              ✉️ Email
+            </a>
+          </div>
         </div>
 
-        <div className="flex gap-2 flex-wrap">
-          {lead.phone && (
-            <>
-              <a
-                href={`https://wa.me/${lead.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(
-                  `Hola ${lead.name}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`
-                )}`}
-                target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center rounded-md bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600"
-              >
-                💬 WhatsApp
-              </a>
-              <a
-                href={`tel:${lead.phone}`}
-                className="inline-flex items-center rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
-              >
-                📞 Trucar
-              </a>
-            </>
-          )}
-          <a
-            href={`mailto:${lead.email}`}
-            className="inline-flex items-center rounded-md bg-stone-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-200"
-          >
-            ✉️ Email
-          </a>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Valor estimat</p>
+            <p className="text-xl font-semibold text-slate-800">
+              {estimatedRevenue !== null ? `${estimatedRevenue.toLocaleString('ca-ES')}€` : '—'}
+            </p>
+          </div>
+          <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Antiguitat lead</p>
+            <p className="text-xl font-semibold text-slate-800">{leadAgeDays} dies</p>
+          </div>
+          <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Flux client</p>
+            <p className="text-xl font-semibold text-slate-800">
+              {reviewFlowStatus === 'RESPONDIDO'
+                ? 'Respondido'
+                : reviewFlowStatus === 'ENVIADO'
+                  ? 'Enviado'
+                  : reviewFlowStatus === 'FALTA_ENVIAR'
+                    ? 'Falta enviar'
+                    : 'Sin reserva'}
+            </p>
+          </div>
+          <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Post-event interno</p>
+            <p className="text-xl font-semibold text-slate-800">
+              {internalPostEventStatus === 'COMPLETO'
+                ? 'Completado'
+                : internalPostEventStatus === 'EN_PROGRESO'
+                  ? 'En progreso'
+                  : internalPostEventStatus === 'PENDIENTE'
+                    ? 'Pendiente'
+                    : 'Sin reserva'}
+            </p>
+          </div>
+          <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
+            <p className="text-xs uppercase tracking-wide text-slate-500">Lead score</p>
+            <p className="text-xl font-semibold text-slate-800">{leadScore.score} · {leadScore.band}</p>
+            <ScoreSnapshotButton leadId={lead.id} />
+          </div>
         </div>
       </header>
 
@@ -171,6 +301,7 @@ export default async function LeadDetailPage({ params }: Props) {
               utmSource: lead.utmSource,
               utmMedium: lead.utmMedium,
               utmCampaign: lead.utmCampaign,
+              preferredLocale: lead.preferredLocale,
             }}
           />
 
@@ -220,8 +351,8 @@ export default async function LeadDetailPage({ params }: Props) {
               <h2 className="text-lg font-semibold text-slate-700 mb-4">
                 Reserva associada
               </h2>
-              <div className="flex items-center justify-between p-4 rounded-lg border border-stone-200 hover:border-stone-200 transition-colors">
-                <div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-lg border border-stone-200 p-4">
                   <p className="font-medium text-slate-700">
                     📅 {new Date(lead.booking.eventDate).toLocaleDateString('ca-ES', {
                       weekday: 'short',
@@ -230,15 +361,151 @@ export default async function LeadDetailPage({ params }: Props) {
                       year: 'numeric',
                     })}
                   </p>
-                  <p className="text-sm text-slate-600">
-                    Ref: {lead.booking.reference}
-                  </p>
+                  <p className="text-sm text-slate-600">Ref: {lead.booking.reference}</p>
+                  <p className="text-sm text-slate-600">Tipus: {lead.booking.eventType}</p>
+                  <p className="text-sm text-slate-600">Ubicació: {lead.booking.eventLocation}</p>
+                  <p className="text-sm text-slate-600">Convidats: {lead.booking.guestCount}</p>
                 </div>
-                <div className="text-right">
+                <div className="rounded-lg border border-stone-200 p-4">
                   <p className="text-lg font-bold text-slate-700">
                     {lead.booking.total.toLocaleString('ca-ES')}€
                   </p>
-                  <p className="text-xs text-slate-500">{lead.booking.status}</p>
+                  <p className="text-sm text-slate-600">Estat: {lead.booking.status}</p>
+                  <p className="text-sm text-slate-600">Subtotal: {lead.booking.subtotal.toLocaleString('ca-ES')}€</p>
+                  <p className="text-sm text-slate-600">IVA: {lead.booking.vatAmount.toLocaleString('ca-ES')}€</p>
+                  <p className="text-sm text-slate-600">
+                    Dipòsit: {lead.booking.depositPaid ? 'Pagat' : 'Pendent'} ({lead.booking.depositAmount.toLocaleString('ca-ES')}€)
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    Resta: {lead.booking.remainingPaid ? 'Pagada' : 'Pendent'} ({lead.booking.remainingAmount.toLocaleString('ca-ES')}€)
+                  </p>
+                </div>
+                <div className="rounded-lg border border-stone-200 p-4 md:col-span-2">
+                  <h4 className="text-sm font-semibold text-slate-700 mb-2">Post-event i automatitzacions</h4>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div className="text-sm">
+                      <p className="text-slate-600">
+                        Estado cliente: <strong className={
+                          reviewFlowStatus === 'RESPONDIDO'
+                            ? 'text-emerald-600'
+                            : reviewFlowStatus === 'ENVIADO'
+                              ? 'text-blue-600'
+                              : 'text-amber-600'
+                        }>
+                          {reviewFlowStatus === 'RESPONDIDO'
+                            ? 'Respondido'
+                            : reviewFlowStatus === 'ENVIADO'
+                              ? 'Enviado'
+                              : reviewFlowStatus === 'FALTA_ENVIAR'
+                                ? 'Falta enviar'
+                                : 'Sin reserva'}
+                        </strong>
+                      </p>
+                      <p className="text-slate-600">
+                        Enlace valoración enviado: <strong className={lead.booking.postEventEmailSent ? 'text-emerald-600' : 'text-amber-600'}>
+                          {lead.booking.postEventEmailSent ? 'Sí' : 'No'}
+                        </strong>
+                      </p>
+                      <p className="text-slate-600">
+                        Fecha envío: {lead.booking.postEventEmailSentAt
+                          ? new Date(lead.booking.postEventEmailSentAt).toLocaleString('ca-ES')
+                          : '-'}
+                      </p>
+                      <p className="text-slate-600 break-all">
+                        Token review: {lead.booking.reviewToken || '-'}
+                      </p>
+                      <p className="text-slate-600">
+                        Cliente ha respondido: <strong className={(lead.booking.reviewSubmittedAt || lead.booking.clientSurvey) ? 'text-emerald-600' : 'text-amber-600'}>
+                          {(lead.booking.reviewSubmittedAt || lead.booking.clientSurvey) ? 'Sí' : 'No'}
+                        </strong>
+                      </p>
+                      <p className="text-slate-600">
+                        Fecha respuesta: {lead.booking.reviewSubmittedAt
+                          ? new Date(lead.booking.reviewSubmittedAt).toLocaleString('ca-ES')
+                          : lead.booking.clientSurvey?.submittedAt
+                            ? new Date(lead.booking.clientSurvey.submittedAt).toLocaleString('ca-ES')
+                            : '-'}
+                      </p>
+                    </div>
+                    <div className="text-sm">
+                      <p className="text-slate-600">
+                        Estado post-event interno: <strong className={
+                          internalPostEventStatus === 'COMPLETO'
+                            ? 'text-emerald-600'
+                            : internalPostEventStatus === 'EN_PROGRESO'
+                              ? 'text-blue-600'
+                              : 'text-amber-600'
+                        }>
+                          {internalPostEventStatus === 'COMPLETO'
+                            ? 'Completado'
+                            : internalPostEventStatus === 'EN_PROGRESO'
+                              ? 'En progreso'
+                              : internalPostEventStatus === 'PENDIENTE'
+                                ? 'Pendiente'
+                                : 'Sin reserva'}
+                        </strong>
+                      </p>
+                      <p className="text-slate-600">
+                        Informe tècnic: <strong>{lead.booking.postEventReport ? 'Completat' : 'Pendent'}</strong>
+                      </p>
+                      <p className="text-slate-600">
+                        Enquesta client: <strong>{lead.booking.clientSurvey ? 'Rebuda' : 'Sense resposta'}</strong>
+                      </p>
+                      <p className="text-slate-600">
+                        Feedback enviat: <strong>{lead.booking.clientFeedback?.sentAt ? 'Sí' : 'No'}</strong>
+                      </p>
+                      {lead.booking.clientSurvey && (
+                        <p className="text-slate-600">
+                          Rating/NPS: <strong>{lead.booking.clientSurvey.overallRating}/5 · {lead.booking.clientSurvey.npsScore}/10</strong>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <form action="/api/admin/emails/send-post-event" method="POST">
+                      <input type="hidden" name="bookingId" value={lead.booking.id} />
+                      <button
+                        type="submit"
+                        className="inline-flex items-center rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600"
+                      >
+                        Enviar enllaç valoració
+                      </button>
+                    </form>
+                    {reviewUrl && lead.phone && (
+                      <a
+                        href={`https://wa.me/${lead.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(
+                          `Hola ${lead.name}, gràcies per confiar en Òrbita Events! Ens ajudaria molt la teva valoració: ${reviewUrl}`
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center rounded-md bg-green-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-600"
+                      >
+                        Enviar per WhatsApp
+                      </a>
+                    )}
+                    {reviewUrl && (
+                      <a
+                        href={reviewUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center rounded-md bg-stone-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200"
+                      >
+                        Obrir formulari client
+                      </a>
+                    )}
+                    <Link href={`/admin/bookings/${lead.booking.id}`} className="inline-flex items-center rounded-md bg-stone-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200">
+                      Veure reserva completa
+                    </Link>
+                    <Link href="/admin/post-event/reports" className="inline-flex items-center rounded-md bg-stone-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200">
+                      Informes post-event
+                    </Link>
+                    <Link href="/admin/post-event/surveys" className="inline-flex items-center rounded-md bg-stone-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200">
+                      Enquestes client
+                    </Link>
+                    <Link href="/admin/emails" className="inline-flex items-center rounded-md bg-stone-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200">
+                      Automatitzacions email
+                    </Link>
+                  </div>
                 </div>
               </div>
             </section>
@@ -275,6 +542,16 @@ export default async function LeadDetailPage({ params }: Props) {
                 <dt className="text-xs text-slate-500">Idioma preferit</dt>
                 <dd className="text-slate-700">{lead.preferredLocale.toUpperCase()}</dd>
               </div>
+              <div>
+                <dt className="text-xs text-slate-500">Antiguitat lead</dt>
+                <dd className="text-slate-700">{leadAgeDays} dies</dd>
+              </div>
+              {lead.customerId && (
+                <div>
+                  <dt className="text-xs text-slate-500">Customer ID</dt>
+                  <dd className="font-mono text-xs text-slate-700 break-all">{lead.customerId}</dd>
+                </div>
+              )}
               <div>
                 <dt className="text-xs text-slate-500">Creat</dt>
                 <dd className="text-slate-700">
@@ -319,6 +596,171 @@ export default async function LeadDetailPage({ params }: Props) {
               )}
             </dl>
           </section>
+
+          <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+            <h3 className="text-sm font-semibold text-slate-700 mb-4">Attribution / UTM</h3>
+            <dl className="space-y-3 text-sm">
+              <div>
+                <dt className="text-xs text-slate-500">Source</dt>
+                <dd className="text-slate-700">{lead.source || '-'}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-500">UTM source</dt>
+                <dd className="text-slate-700 break-all">{lead.utmSource || '-'}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-500">UTM medium</dt>
+                <dd className="text-slate-700 break-all">{lead.utmMedium || '-'}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-500">UTM campaign</dt>
+                <dd className="text-slate-700 break-all">{lead.utmCampaign || '-'}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-500">Landing</dt>
+                <dd className="text-slate-700 break-all">{lead.landingPage || '-'}</dd>
+              </div>
+            </dl>
+          </section>
+
+          {lead.customer && (
+            <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+              <h3 className="text-sm font-semibold text-slate-700 mb-4">Relació Client</h3>
+              <dl className="space-y-3 text-sm">
+                <div>
+                  <dt className="text-xs text-slate-500">Nom</dt>
+                  <dd className="text-slate-700">{lead.customer.name || '-'}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-slate-500">Email</dt>
+                  <dd className="text-slate-700 break-all">{lead.customer.email || '-'}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-slate-500">Telèfon</dt>
+                  <dd className="text-slate-700">{lead.customer.phone || '-'}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-slate-500">Locale</dt>
+                  <dd className="text-slate-700">{lead.customer.preferredLocale}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-slate-500">Source</dt>
+                  <dd className="text-slate-700">{lead.customer.source}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-slate-500">Total events</dt>
+                  <dd className="text-slate-700">{lead.customer.totalEvents}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-slate-500">Total spent</dt>
+                  <dd className="text-slate-700">{lead.customer.totalSpent.toLocaleString('ca-ES')}€</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-slate-500">Last event date</dt>
+                  <dd className="text-slate-700">
+                    {lead.customer.lastEventDate
+                      ? new Date(lead.customer.lastEventDate).toLocaleDateString('ca-ES')
+                      : '-'}
+                  </dd>
+                </div>
+              </dl>
+              <Link
+                href={`/admin/contactes/${lead.customer.id}`}
+                className="mt-4 inline-flex rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
+              >
+                Obrir Customer 360
+              </Link>
+            </section>
+          )}
+
+          <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+            <h3 className="text-sm font-semibold text-slate-700 mb-4">
+              Historial del client ({relatedLeads.length})
+            </h3>
+            {relatedLeads.length === 0 ? (
+              <p className="text-sm text-slate-500">No hi ha altres events/leads d&apos;aquest client.</p>
+            ) : (
+              <div className="space-y-2">
+                {relatedLeads.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={`/admin/leads/${item.id}`}
+                    className="block rounded-lg border border-stone-200 p-3 hover:bg-slate-50"
+                  >
+                    <p className="text-sm font-medium text-slate-700">
+                      {EVENT_TYPE_LABELS[item.eventType] || item.eventType} · {item.status}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {item.eventDate ? new Date(item.eventDate).toLocaleDateString('ca-ES') : 'Sense data'} ·
+                      {' '}Lead creat {new Date(item.createdAt).toLocaleDateString('ca-ES')}
+                    </p>
+                    {item.booking ? (
+                      <p className="text-xs text-emerald-700">
+                        Reserva {item.booking.reference} · {item.booking.status} · {item.booking.total.toLocaleString('ca-ES')}€
+                      </p>
+                    ) : (
+                      <p className="text-xs text-amber-700">Sense reserva associada</p>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <details className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+            <summary className="cursor-pointer text-sm font-semibold text-slate-700">
+              Snapshot tècnic (JSON)
+            </summary>
+            <pre className="mt-4 max-h-80 overflow-auto rounded-lg bg-slate-950 p-3 text-xs text-slate-200">
+{JSON.stringify({
+  lead: {
+    id: lead.id,
+    name: lead.name,
+    email: lead.email,
+    phone: lead.phone,
+    eventType: lead.eventType,
+    eventDate: lead.eventDate,
+    eventLocation: lead.eventLocation,
+    guestCount: lead.guestCount,
+    budget: lead.budget,
+    status: lead.status,
+    priority: lead.priority,
+    source: lead.source,
+    assignedTo: lead.assignedTo,
+    preferredLocale: lead.preferredLocale,
+    customerId: lead.customerId,
+    interestedPackId: lead.interestedPackId,
+    interestedExtras: lead.interestedExtras,
+    utmSource: lead.utmSource,
+    utmMedium: lead.utmMedium,
+    utmCampaign: lead.utmCampaign,
+    landingPage: lead.landingPage,
+    createdAt: lead.createdAt,
+    updatedAt: lead.updatedAt,
+    contactedAt: lead.contactedAt,
+    convertedAt: lead.convertedAt,
+  },
+  stats: {
+    notes: lead.notes.length,
+    tasks: lead.tasks.length,
+    documents: lead.documents.length,
+    activities: lead.activities.length,
+    hasBooking: !!lead.booking,
+    postEvent: lead.booking
+      ? {
+          postEventEmailSent: lead.booking.postEventEmailSent,
+          postEventEmailSentAt: lead.booking.postEventEmailSentAt,
+          reviewToken: lead.booking.reviewToken,
+          reviewSubmittedAt: lead.booking.reviewSubmittedAt,
+          hasPostEventReport: !!lead.booking.postEventReport,
+          hasClientSurvey: !!lead.booking.clientSurvey,
+          hasClientFeedback: !!lead.booking.clientFeedback,
+        }
+      : null,
+  },
+}, null, 2)}
+            </pre>
+          </details>
         </div>
       </div>
     </div>

@@ -61,6 +61,11 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
       if (data.statsUpdated) {
         alert(`✅ Event completat!\n\nLes estadístiques s'han actualitzat:\n• +1 event\n• +${guestCount} persones`);
       }
+      if (data.calendarSync?.status === 'synced') {
+        alert('📅 Google Calendar sincronizado automáticamente.');
+      } else if (data.calendarSync?.status === 'error') {
+        alert(`⚠️ Reserva actualizada, pero falló la sync de Google Calendar: ${data.calendarSync.error || 'error desconocido'}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
     } finally {

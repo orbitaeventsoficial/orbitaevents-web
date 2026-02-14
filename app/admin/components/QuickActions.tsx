@@ -10,15 +10,38 @@ type CronSummary = {
   errors: number;
 };
 
+type RunAllSummary = {
+  sequences: {
+    executed: number;
+    sentEmail: number;
+    sentWhatsapp: number;
+    errors: number;
+  };
+  sla: {
+    createdTasks: number;
+    escalatedPriority: number;
+  };
+};
+
+type DailySummary = {
+  sequences: { executed: number; sentEmail: number; sentWhatsapp: number };
+  sla: { createdTasks: number };
+  kpi24h: { commSent: number; commResponded: number; responseRate: number };
+};
+
 export default function QuickActions() {
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<CronSummary | null>(null);
+  const [runAllSummary, setRunAllSummary] = useState<RunAllSummary | null>(null);
+  const [dailySummary, setDailySummary] = useState<DailySummary | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function runCron() {
     setLoading(true);
     setError(null);
     setSummary(null);
+    setRunAllSummary(null);
+    setDailySummary(null);
     try {
       const res = await fetch('/api/admin/emails/run-cron', {
         method: 'POST',
@@ -31,6 +54,52 @@ export default function QuickActions() {
       setSummary(data.summary || null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error executant cron');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function runAll() {
+    setLoading(true);
+    setError(null);
+    setSummary(null);
+    setRunAllSummary(null);
+    setDailySummary(null);
+    try {
+      const res = await fetch('/api/admin/automation/run-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || 'Error ejecutando automatizaciones');
+      }
+      setRunAllSummary(data.summary || null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error ejecutando automatizaciones');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function runDailySummaryNow() {
+    setLoading(true);
+    setError(null);
+    setSummary(null);
+    setRunAllSummary(null);
+    setDailySummary(null);
+    try {
+      const res = await fetch('/api/admin/automation/daily-summary/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || 'Error ejecutando resumen diario');
+      }
+      setDailySummary(data.summary || null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error ejecutando resumen diario');
     } finally {
       setLoading(false);
     }
@@ -69,11 +138,39 @@ export default function QuickActions() {
         >
           {loading ? '⏳ Executant...' : '⏱️ Executar post-event'}
         </button>
+        <button
+          type="button"
+          onClick={runAll}
+          disabled={loading}
+          className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-2 text-xs text-indigo-200 hover:bg-indigo-500/20 disabled:opacity-60"
+        >
+          {loading ? '⏳ Executant...' : '🚀 Ejecutar TODO (1 click)'}
+        </button>
+        <button
+          type="button"
+          onClick={runDailySummaryNow}
+          disabled={loading}
+          className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-60"
+        >
+          {loading ? '⏳ Executant...' : '📊 Resumen diario ahora'}
+        </button>
       </div>
 
       {summary && (
         <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
           Cron OK · Enviats {summary.sent} · Errors {summary.errors}
+        </div>
+      )}
+      {runAllSummary && (
+        <div className="mt-3 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-2 text-xs text-indigo-200">
+          TODO OK · Secuencias {runAllSummary.sequences.executed} (email {runAllSummary.sequences.sentEmail}, WA {runAllSummary.sequences.sentWhatsapp}) ·
+          {' '}SLA tasks {runAllSummary.sla.createdTasks}
+        </div>
+      )}
+      {dailySummary && (
+        <div className="mt-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200">
+          Resumen enviado · Secuencias {dailySummary.sequences.executed} · SLA {dailySummary.sla.createdTasks} ·
+          {' '}Resp 24h {(dailySummary.kpi24h.responseRate * 100).toFixed(1)}%
         </div>
       )}
       {error && (

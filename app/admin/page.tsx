@@ -204,7 +204,18 @@ export default async function AdminDashboard() {
       },
     }).catch(() => 0),
     prisma.setting.findMany({
-      where: { key: { in: ['emails.cron.lastRun', 'emails.cron.lastStatus', 'emails.cron.lastSummary', 'emails.cron.lastMessage'] } },
+      where: {
+        key: {
+          in: [
+            'emails.cron.lastRun',
+            'emails.cron.lastStatus',
+            'emails.cron.lastSummary',
+            'emails.cron.lastMessage',
+            'automation.commercial.lastRun',
+            'automation.commercial.lastStatus',
+          ],
+        },
+      },
     }).catch(() => []),
     prisma.$queryRaw`SELECT 1`.then(() => true).catch(() => false),
     prisma.lead.findMany({
@@ -305,6 +316,7 @@ export default async function AdminDashboard() {
     { label: 'IMAP', status: imapConfigured ? 'OK' : 'PENDENT' },
     { label: 'GA4', status: ga4Status.ready ? 'OK' : 'PENDENT' },
     { label: 'Cron', status: cronMap['emails.cron.lastStatus'] || '—' },
+    { label: 'Auto', status: cronMap['automation.commercial.lastStatus'] || '—' },
   ];
 
   const timeline = [
@@ -427,6 +439,12 @@ export default async function AdminDashboard() {
           </Link>
           <Link href="/admin/bookings" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
             📋 Reserves
+          </Link>
+          <Link href="/admin/finanzas" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+            💶 Finanzas
+          </Link>
+          <Link href="/admin/rentabilidad" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+            📊 Rentabilidad
           </Link>
           <Link href="/admin/calendario" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
             📅 Calendari

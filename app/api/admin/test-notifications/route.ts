@@ -9,11 +9,34 @@ import { log } from '@/lib/logger';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { requireAuth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 // GET: Diagnosticar configuració
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const automationSettings = await prisma.setting.findMany({
+    where: {
+      key: {
+        in: [
+          'automation.commercial.lastRun',
+          'automation.commercial.lastStatus',
+          'automation.commercial.lastSummary',
+          'automation.commercial.lastMessage',
+        ],
+      },
+    },
+  }).catch(() => []);
+  const automationMap = Object.fromEntries(automationSettings.map((item) => [item.key, item.value]));
+  const parsedLastSummary = (() => {
+    const raw = automationMap['automation.commercial.lastSummary'];
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  })();
   const config = {
     smtp: {
       host: process.env.SMTP_HOST ? '✅ Configurat' : '❌ FALTA',
@@ -38,6 +61,13 @@ export async function GET(req: NextRequest) {
     status: {
       emailReady: !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS),
       whatsappReady: !!(process.env.WHATSAPP_API_URL && process.env.WHATSAPP_API_TOKEN) || !!process.env.WHATSAPP_WEBHOOK_URL,
+    },
+    automation: {
+      cronSecretConfigured: !!process.env.CRON_SECRET,
+      lastRun: automationMap['automation.commercial.lastRun'] || null,
+      lastStatus: automationMap['automation.commercial.lastStatus'] || null,
+      lastMessage: automationMap['automation.commercial.lastMessage'] || null,
+      lastSummary: parsedLastSummary,
     },
   };
 
@@ -74,6 +104,21 @@ Opció B - WhatsApp Business API:
    WHATSAPP_API_URL=https://your-whatsapp-api-url
    WHATSAPP_API_TOKEN=el_teu_token
    ADMIN_WHATSAPP=+34612345678
+    `);
+  }
+  if (!process.env.CRON_SECRET) {
+    instructions.push(`
+🤖 CONFIGURAR AUTOPILOT COMERCIAL (Recomanat):
+
+1. Afegeix variable a Railway:
+   CRON_SECRET=una_clau_llarga_i_segura
+
+2. Programa una crida diària (cron extern o Railway):
+   GET /api/cron/commercial-daily
+   Header Authorization: Bearer CRON_SECRET
+
+3. Hora recomanada:
+   Cada dia 08:00 Europe/Madrid
     `);
   }
 

@@ -4,7 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
+import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
 
 interface Params {
   params: { id: string };
@@ -12,14 +13,18 @@ interface Params {
 
 // Schema de validació per PATCH
 const updateBookingSchema = z.object({
-  status: z.enum(['PENDING', 'CONFIRMED', 'DEPOSIT_PAID', 'COMPLETED', 'CANCELLED']).optional(),
+  status: z.enum(['PENDING', 'CONFIRMED', 'PREPARING', 'COMPLETED', 'CANCELLED']).optional(),
   eventDate: z.string().optional(),
   eventLocation: z.string().optional(),
   guestCount: z.number().optional(),
+  eventVenue: z.string().optional(),
   totalPrice: z.number().optional(),
   depositAmount: z.number().optional(),
   depositPaid: z.boolean().optional(),
-  depositPaidAt: z.string().optional(),
+  depositPaidAt: z.string().nullable().optional(),
+  remainingAmount: z.number().optional(),
+  remainingPaid: z.boolean().optional(),
+  remainingPaidAt: z.string().nullable().optional(),
   notes: z.string().optional(),
   internalNotes: z.string().optional(),
   startTime: z.string().optional(),
@@ -30,6 +35,8 @@ const updateBookingSchema = z.object({
 export async function GET(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'read');
+  if (permissionError) return permissionError;
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: params.id },
@@ -68,6 +75,8 @@ export async function GET(req: NextRequest, { params }: Params) {
 export async function PATCH(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
   try {
     const rawBody = await req.json();
     const { id } = params;
@@ -82,6 +91,16 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const body: Record<string, unknown> = { ...parseResult.data };
+    const syncSensitiveFields = new Set([
+      'status',
+      'eventDate',
+      'eventLocation',
+      'eventVenue',
+      'startTime',
+      'endTime',
+      'notes',
+    ]);
+    const shouldSyncCalendar = Object.keys(body).some((key) => syncSensitiveFields.has(key));
 
     const existing = await prisma.booking.findUnique({
       where: { id },
@@ -101,6 +120,22 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (body.depositPaidAt && typeof body.depositPaidAt === 'string') {
       body.depositPaidAt = new Date(body.depositPaidAt);
     }
+    if (body.remainingPaidAt && typeof body.remainingPaidAt === 'string') {
+      body.remainingPaidAt = new Date(body.remainingPaidAt);
+    }
+    if (typeof body.startTime === 'string') {
+      body.eventStartTime = body.startTime;
+    }
+    if (typeof body.endTime === 'string') {
+      body.eventEndTime = body.endTime;
+    }
+    if (typeof body.totalPrice === 'number') {
+      body.total = body.totalPrice;
+    }
+    delete body.startTime;
+    delete body.endTime;
+    delete body.totalPrice;
+    delete body.internalNotes;
 
     const oldStatus = existing.status;
     const newStatus = body.status as string | undefined;
@@ -151,6 +186,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       data: body,
     });
 
+    const calendarSync = shouldSyncCalendar
+      ? await syncBookingToGoogleCalendar(id)
+      : null;
+
     await prisma.adminLog.create({
       data: {
         action: 'UPDATE',
@@ -167,6 +206,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       ok: true,
       booking,
       statsUpdated: newStatus === 'COMPLETED' && oldStatus !== 'COMPLETED',
+      calendarSync,
     });
   } catch (error) {
     log.error('Error actualitzant reserva', error, { context: { bookingId: params.id } });
@@ -181,6 +221,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 export async function DELETE(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
   try {
     const { id } = params;
 

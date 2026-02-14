@@ -23,6 +23,7 @@ type LeadProfile = {
   utmSource?: string | null;
   utmMedium?: string | null;
   utmCampaign?: string | null;
+  preferredLocale?: string | null;
 };
 
 const STATUS_OPTIONS = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'];
@@ -51,6 +52,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     utmSource: lead.utmSource || '',
     utmMedium: lead.utmMedium || '',
     utmCampaign: lead.utmCampaign || '',
+    preferredLocale: (lead.preferredLocale || 'es').toLowerCase(),
   });
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
@@ -85,6 +87,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         utmSource: form.utmSource || null,
         utmMedium: form.utmMedium || null,
         utmCampaign: form.utmCampaign || null,
+        preferredLocale: form.preferredLocale || 'es',
       };
 
       const res = await fetch(`/api/admin/leads-new/${lead.id}`, {
@@ -254,6 +257,21 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             value={form.assignedTo}
             onChange={(e) => updateField('assignedTo', e.target.value)}
           />
+        </label>
+        <label className="flex flex-col gap-1 text-sm text-slate-600">
+          Idioma preferit
+          <select
+            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            value={form.preferredLocale}
+            onChange={(e) => updateField('preferredLocale', e.target.value)}
+          >
+            <option value="es">es</option>
+            <option value="ca">ca</option>
+            <option value="en">en</option>
+            <option value="fr">fr</option>
+            <option value="ar">ar</option>
+            <option value="zh">zh</option>
+          </select>
         </label>
         <label className="flex flex-col gap-1 text-sm text-slate-600">
           Pack interessat

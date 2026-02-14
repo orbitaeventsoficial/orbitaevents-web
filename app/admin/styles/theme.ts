@@ -36,26 +36,26 @@
 
 // Background colors
 export const bg = {
-  primary: 'bg-slate-900',
-  secondary: 'bg-slate-800/60',
-  card: 'bg-slate-800/80',
-  elevated: 'bg-slate-700/50',
-  input: 'bg-slate-800/80',
+  primary: 'bg-slate-100',
+  secondary: 'bg-white',
+  card: 'bg-white',
+  elevated: 'bg-slate-50',
+  input: 'bg-white',
 } as const;
 
 // Border colors
 export const border = {
-  subtle: 'border-slate-700/50',
-  default: 'border-slate-600/50',
-  focus: 'focus:border-cyan-500',
+  subtle: 'border-stone-200',
+  default: 'border-stone-300',
+  focus: 'focus:border-slate-500',
 } as const;
 
 // Text colors
 export const text = {
-  primary: 'text-slate-100',
-  secondary: 'text-slate-300',
-  muted: 'text-slate-400',
-  accent: 'text-cyan-400',
+  primary: 'text-slate-800',
+  secondary: 'text-slate-700',
+  muted: 'text-slate-500',
+  accent: 'text-slate-700',
 } as const;
 
 // Accent gradients for stat cards

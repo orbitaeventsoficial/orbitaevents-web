@@ -12,6 +12,8 @@ import {
 } from '@/lib/services/documentService';
 import { getDbPackByCode, getDbPacks } from '@/lib/packs-db';
 import type { PackDefinition } from '@/config/packs-config';
+import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 type QuotePack = {
   name: string;
@@ -119,6 +121,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const template = await getQuoteTemplateSettings();
+
     // Get lead if provided, otherwise create minimal data for quote
     let lead = leadId ? await prisma.lead.findUnique({ where: { id: leadId } }) : null;
     let recipientEmail = to;
@@ -162,10 +166,11 @@ export async function POST(req: NextRequest) {
           total: price * 1.21,
           quoteNumber: '',
           notes: undefined as string | undefined,
-          validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+          validUntil: new Date(Date.now() + template.validityDays * 24 * 60 * 60 * 1000),
         };
 
     quoteData.quoteNumber = generateQuoteNumber();
+    quoteData.validUntil = new Date(Date.now() + template.validityDays * 24 * 60 * 60 * 1000);
     quoteData.notes = mergeNotes([customMessage, notes, lead?.message || undefined]);
 
     // Only update lead records if we have a lead
@@ -189,7 +194,8 @@ export async function POST(req: NextRequest) {
           type: 'QUOTE',
           source: 'MANUAL',
           title: documentTitle,
-          fileUrl: 'email',
+          fileUrl: `quote-email:${quoteData.quoteNumber}`,
+          filePath: `lead/${leadId}/quote/${quoteData.quoteNumber}`,
           mimeType: 'text/html',
           createdBy: 'Admin',
         },
@@ -201,13 +207,38 @@ export async function POST(req: NextRequest) {
           type: 'EMAIL',
           title: 'Pressupost enviat',
           description: documentTitle,
-          metadata: { quoteNumber: quoteData.quoteNumber },
+          metadata: {
+            quoteNumber: quoteData.quoteNumber,
+            to: recipientEmail,
+            total: quoteData.total,
+            source: 'email_quote_route',
+          },
           createdBy: 'Admin',
         },
       });
+
+      if (lead.customerId) {
+        await prisma.customerActivity.create({
+          data: {
+            customerId: lead.customerId,
+            action: 'QUOTE_SENT',
+            details: {
+              leadId,
+              quoteNumber: quoteData.quoteNumber,
+              total: quoteData.total,
+            },
+          },
+        });
+      }
     }
 
-    const html = generateQuoteHTML(quoteData);
+    const html = generateQuoteHTML(quoteData, {
+      introTitle: template.introTitle,
+      introSubtitle: template.introSubtitle,
+      ctaTitle: template.ctaTitle,
+      ctaSubtitle: template.ctaSubtitle,
+      conditions: template.conditions,
+    });
 
     await sendEmail({
       to: recipientEmail,
@@ -216,10 +247,25 @@ export async function POST(req: NextRequest) {
       replyTo: (process.env.CONTACT_TO || '').trim() || undefined,
     });
 
+    let adminCopySent = false;
+    if (template.sendAdminCopy) {
+      const copyRecipient = template.adminCopyEmail || process.env.CONTACT_TO || SITE_CONFIG.business.email;
+      if (copyRecipient && copyRecipient !== recipientEmail) {
+        await sendEmail({
+          to: copyRecipient,
+          subject: `[Còpia] Pressupost ${quoteData.quoteNumber} · ${recipientName}`,
+          html,
+          replyTo: recipientEmail,
+        });
+        adminCopySent = true;
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       quoteNumber: quoteData.quoteNumber,
       total: quoteData.total,
+      adminCopySent,
     });
   } catch (error) {
     if (error instanceof Error && error.message.startsWith('Missing extras:')) {

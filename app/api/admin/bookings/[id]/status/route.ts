@@ -3,7 +3,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
+import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
 
 interface Params {
   params: { id: string };
@@ -16,6 +17,8 @@ type BookingStatus = typeof VALID_STATUSES[number];
 export async function PATCH(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
   try {
     const { id } = params;
     const body = await req.json();
@@ -91,6 +94,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       data: { status },
     });
 
+    const calendarSync = await syncBookingToGoogleCalendar(id);
+
     // Log
     await prisma.adminLog.create({
       data: {
@@ -110,6 +115,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       previousStatus: oldStatus,
       newStatus: status,
       statsUpdated,
+      calendarSync,
     });
   } catch (error) {
     log.error('Error canviant estat de reserva', error, { context: { bookingId: params.id } });
