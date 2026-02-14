@@ -274,8 +274,23 @@ export async function deleteEmail(uid: number, folder: string = 'INBOX'): Promis
     const mailbox = await client.getMailboxLock(folder);
 
     try {
-      await client.messageDelete([uid], { uid: true });
-      return true;
+      try {
+        await client.messageDelete([uid], { uid: true });
+        return true;
+      } catch {
+        // Fallback for servers that block direct delete: move to trash.
+        const all = await client.list();
+        const trash = all.find(
+          (f) =>
+            f.specialUse === '\\Trash' ||
+            /trash|papelera|eliminados|deleted/i.test(f.path || '')
+        );
+        if (!trash?.path) {
+          return false;
+        }
+        await client.messageMove([uid], trash.path, { uid: true });
+        return true;
+      }
     } finally {
       mailbox.release();
     }

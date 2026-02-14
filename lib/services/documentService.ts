@@ -173,11 +173,18 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
       font-family: 'Segoe UI', Arial, sans-serif;
       font-size: 11pt;
       line-height: 1.5;
-      color: #1a1a1a;
-      background: #fff;
+      color: #e5e7eb;
+      background: #0f1113;
     }
 
-    .document { max-width: 210mm; margin: 0 auto; padding: 20mm; }
+    .document {
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 20mm;
+      background: #14181c;
+      border: 1px solid #2a2f36;
+      border-radius: 12px;
+    }
 
     /* Header */
     .header {
@@ -186,38 +193,44 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
       align-items: flex-start;
       margin-bottom: 30px;
       padding-bottom: 20px;
-      border-bottom: 3px solid #DAA520;
+      border-bottom: 3px solid #d4b06e;
     }
     .logo { display: flex; align-items: center; }
     .logo img { width: 210px; max-width: 100%; height: auto; }
-    .company-info { text-align: right; font-size: 9pt; color: #666; }
+    .company-info { text-align: right; font-size: 9pt; color: #a1acb8; }
 
     /* Document Title */
     .doc-title {
-      background: linear-gradient(135deg, #1a1a1a, #333);
+      background: linear-gradient(135deg, #181d22, #232a31);
       color: #fff;
       padding: 20px 30px;
       border-radius: 8px;
       margin-bottom: 30px;
+      border: 1px solid #2f3740;
     }
     .doc-title h1 { font-size: 18pt; font-weight: 300; margin-bottom: 8px; }
-    .doc-title .number { font-size: 14pt; color: #DAA520; font-weight: 600; }
-    .doc-title .date { font-size: 10pt; color: #999; margin-top: 8px; }
+    .doc-title .number { font-size: 14pt; color: #d4b06e; font-weight: 600; }
+    .doc-title .date { font-size: 10pt; color: #9ba4af; margin-top: 8px; }
 
     /* Client & Event Info */
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
-    .info-box { background: #f8f8f8; padding: 20px; border-radius: 8px; }
+    .info-box {
+      background: #1a1f25;
+      border: 1px solid #2d343c;
+      padding: 20px;
+      border-radius: 8px;
+    }
     .info-box h3 {
       font-size: 10pt;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #DAA520;
+      color: #d4b06e;
       margin-bottom: 12px;
       padding-bottom: 8px;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #313a44;
     }
     .info-box p { margin-bottom: 6px; }
-    .info-box .label { color: #888; font-size: 9pt; }
+    .info-box .label { color: #94a3b8; font-size: 9pt; }
     .info-box .value { font-weight: 500; }
 
     /* Services Table */
@@ -226,14 +239,14 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
       font-size: 12pt;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #1a1a1a;
+      color: #f1f5f9;
       margin-bottom: 16px;
       padding-bottom: 8px;
-      border-bottom: 2px solid #DAA520;
+      border-bottom: 2px solid #d4b06e;
     }
 
     table { width: 100%; border-collapse: collapse; }
-    thead { background: #1a1a1a; color: #fff; }
+    thead { background: #20262d; color: #f8fafc; }
     th {
       padding: 12px 16px;
       text-align: left;
@@ -244,18 +257,19 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
     th:last-child { text-align: right; }
     td {
       padding: 16px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #2b333d;
       vertical-align: top;
     }
     td:last-child { text-align: right; font-weight: 500; }
-    .item-name { font-weight: 600; color: #1a1a1a; }
-    .item-desc { font-size: 9pt; color: #666; margin-top: 4px; }
+    .item-name { font-weight: 600; color: #f3f4f6; }
+    .item-desc { font-size: 9pt; color: #9ca3af; margin-top: 4px; }
 
     /* Totals */
     .totals {
       margin-left: auto;
       width: 280px;
-      background: #f8f8f8;
+      background: #1a1f25;
+      border: 1px solid #2d343c;
       padding: 20px;
       border-radius: 8px;
     }
@@ -263,40 +277,41 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
       display: flex;
       justify-content: space-between;
       padding: 8px 0;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #2b333d;
     }
     .totals-row:last-child { border-bottom: none; }
     .totals-row.total {
       font-size: 14pt;
       font-weight: 700;
-      color: #DAA520;
-      border-top: 2px solid #DAA520;
+      color: #d4b06e;
+      border-top: 2px solid #d4b06e;
       padding-top: 12px;
       margin-top: 8px;
     }
-    .totals-row .label { color: #666; }
+    .totals-row .label { color: #a1acb8; }
     .discount { color: #22c55e; }
 
     /* Notes & Conditions */
     .notes-section {
       margin-top: 30px;
       padding: 20px;
-      background: #fffbeb;
-      border-left: 4px solid #DAA520;
+      background: #2b2419;
+      border-left: 4px solid #d4b06e;
       border-radius: 0 8px 8px 0;
     }
-    .notes-section h3 { font-size: 10pt; color: #92400e; margin-bottom: 8px; }
-    .notes-section p { font-size: 9pt; color: #78350f; }
+    .notes-section h3 { font-size: 10pt; color: #f7d9a6; margin-bottom: 8px; }
+    .notes-section p { font-size: 9pt; color: #e9c98c; }
 
     .conditions {
       margin-top: 30px;
       padding: 20px;
-      background: #f1f5f9;
+      background: #1a1f25;
+      border: 1px solid #2d343c;
       border-radius: 8px;
       font-size: 9pt;
-      color: #64748b;
+      color: #b7c0cb;
     }
-    .conditions h3 { font-size: 10pt; color: #334155; margin-bottom: 12px; }
+    .conditions h3 { font-size: 10pt; color: #e2e8f0; margin-bottom: 12px; }
     .conditions ul { padding-left: 20px; }
     .conditions li { margin-bottom: 6px; }
 
@@ -304,44 +319,46 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
     .footer {
       margin-top: 40px;
       padding-top: 20px;
-      border-top: 1px solid #ddd;
+      border-top: 1px solid #2b333d;
       display: flex;
       justify-content: space-between;
       font-size: 9pt;
-      color: #888;
+      color: #a1acb8;
     }
     .validity {
-      background: #1a1a1a;
+      background: #20262d;
       color: #fff;
       padding: 8px 16px;
       border-radius: 4px;
       font-size: 10pt;
+      border: 1px solid #2f3740;
     }
-    .validity strong { color: #DAA520; }
+    .validity strong { color: #d4b06e; }
 
     /* CTA */
     .cta-section {
       margin-top: 30px;
       text-align: center;
       padding: 30px;
-      background: linear-gradient(135deg, #1a1a1a, #333);
+      background: linear-gradient(135deg, #181d22, #232a31);
       border-radius: 12px;
       color: #fff;
+      border: 1px solid #2f3740;
     }
     .cta-section h3 { font-size: 14pt; margin-bottom: 8px; }
-    .cta-section p { color: #999; font-size: 10pt; margin-bottom: 16px; }
+    .cta-section p { color: #aeb6c0; font-size: 10pt; margin-bottom: 16px; }
     .cta-buttons { display: flex; justify-content: center; gap: 16px; }
     .cta-btn {
       display: inline-block;
       padding: 12px 24px;
-      background: #DAA520;
-      color: #000;
+      background: #d4b06e;
+      color: #111827;
       text-decoration: none;
       border-radius: 6px;
       font-weight: 600;
       font-size: 10pt;
     }
-    .cta-btn.secondary { background: #333; color: #fff; border: 1px solid #555; }
+    .cta-btn.secondary { background: #26303a; color: #f3f4f6; border: 1px solid #3a4652; }
   </style>
 </head>
 <body>
@@ -362,7 +379,7 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
     <div class="doc-title">
       <h1>${escapeHtml(introTitle)}</h1>
       <div class="number">${data.quoteNumber}</div>
-      <div style="font-size: 10pt; color: #c7c7c7; margin-top: 6px;">${escapeHtml(introSubtitle)}</div>
+      <div style="font-size: 10pt; color: #b7c0cb; margin-top: 6px;">${escapeHtml(introSubtitle)}</div>
       <div class="date">Emès: ${new Date().toLocaleDateString('ca-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
     </div>
 
@@ -405,7 +422,7 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
             </td>
             <td>
               ${data.djHours}h de DJ professional<br>
-              <span style="font-size: 9pt; color: #888;">Hora extra: ${data.extraHourPrice}€</span>
+              <span style="font-size: 9pt; color: #9ca3af;">Hora extra: ${data.extraHourPrice}€</span>
             </td>
             <td>${data.packPrice.toFixed(2)}€</td>
           </tr>

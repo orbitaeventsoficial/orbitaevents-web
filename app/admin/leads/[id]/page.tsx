@@ -6,6 +6,9 @@ import LeadProfileEditor from './LeadProfileEditor';
 import LeadWorkspace from './LeadWorkspace';
 import { scoreLead } from '@/lib/services/commercialScoring';
 import ScoreSnapshotButton from './ScoreSnapshotButton';
+import LeadTechnicalSnapshotPanel from './LeadTechnicalSnapshotPanel';
+import { buildLeadTechnicalSnapshot } from '@/lib/services/leadSnapshotService';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -157,6 +160,44 @@ export default async function LeadDetailPage({ params }: Props) {
     orderBy: { createdAt: 'desc' },
     take: 20,
   });
+  const technicalSnapshot = buildLeadTechnicalSnapshot({
+    lead: {
+      id: lead.id,
+      name: lead.name,
+      email: lead.email,
+      phone: lead.phone,
+      eventType: lead.eventType,
+      eventDate: lead.eventDate,
+      eventLocation: lead.eventLocation,
+      guestCount: lead.guestCount,
+      budget: lead.budget,
+      status: lead.status,
+      priority: lead.priority,
+      source: lead.source,
+      assignedTo: lead.assignedTo,
+      preferredLocale: lead.preferredLocale,
+      customerId: lead.customerId,
+      interestedPackId: lead.interestedPackId,
+      interestedExtras: lead.interestedExtras,
+      utmSource: lead.utmSource,
+      utmMedium: lead.utmMedium,
+      utmCampaign: lead.utmCampaign,
+      landingPage: lead.landingPage,
+      createdAt: lead.createdAt,
+      updatedAt: lead.updatedAt,
+      contactedAt: lead.contactedAt,
+      convertedAt: lead.convertedAt,
+    },
+    stats: {
+      notes: lead.notes.length,
+      tasks: lead.tasks.length,
+      documents: lead.documents.length,
+      activities: lead.activities.length,
+    },
+    booking: lead.booking,
+  });
+  const technicalSnapshotJson = JSON.stringify(technicalSnapshot, null, 2);
+  const internalSnapshotEmail = process.env.CONTACT_TO || SITE_CONFIG.business.email;
 
   const serializedTasks = lead.tasks.map((task) => ({
     ...task,
@@ -707,60 +748,11 @@ export default async function LeadDetailPage({ params }: Props) {
             )}
           </section>
 
-          <details className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-            <summary className="cursor-pointer text-sm font-semibold text-slate-700">
-              Snapshot tècnic (JSON)
-            </summary>
-            <pre className="mt-4 max-h-80 overflow-auto rounded-lg bg-slate-950 p-3 text-xs text-slate-200">
-{JSON.stringify({
-  lead: {
-    id: lead.id,
-    name: lead.name,
-    email: lead.email,
-    phone: lead.phone,
-    eventType: lead.eventType,
-    eventDate: lead.eventDate,
-    eventLocation: lead.eventLocation,
-    guestCount: lead.guestCount,
-    budget: lead.budget,
-    status: lead.status,
-    priority: lead.priority,
-    source: lead.source,
-    assignedTo: lead.assignedTo,
-    preferredLocale: lead.preferredLocale,
-    customerId: lead.customerId,
-    interestedPackId: lead.interestedPackId,
-    interestedExtras: lead.interestedExtras,
-    utmSource: lead.utmSource,
-    utmMedium: lead.utmMedium,
-    utmCampaign: lead.utmCampaign,
-    landingPage: lead.landingPage,
-    createdAt: lead.createdAt,
-    updatedAt: lead.updatedAt,
-    contactedAt: lead.contactedAt,
-    convertedAt: lead.convertedAt,
-  },
-  stats: {
-    notes: lead.notes.length,
-    tasks: lead.tasks.length,
-    documents: lead.documents.length,
-    activities: lead.activities.length,
-    hasBooking: !!lead.booking,
-    postEvent: lead.booking
-      ? {
-          postEventEmailSent: lead.booking.postEventEmailSent,
-          postEventEmailSentAt: lead.booking.postEventEmailSentAt,
-          reviewToken: lead.booking.reviewToken,
-          reviewSubmittedAt: lead.booking.reviewSubmittedAt,
-          hasPostEventReport: !!lead.booking.postEventReport,
-          hasClientSurvey: !!lead.booking.clientSurvey,
-          hasClientFeedback: !!lead.booking.clientFeedback,
-        }
-      : null,
-  },
-}, null, 2)}
-            </pre>
-          </details>
+          <LeadTechnicalSnapshotPanel
+            leadId={lead.id}
+            snapshotJson={technicalSnapshotJson}
+            defaultEmail={internalSnapshotEmail}
+          />
         </div>
       </div>
     </div>

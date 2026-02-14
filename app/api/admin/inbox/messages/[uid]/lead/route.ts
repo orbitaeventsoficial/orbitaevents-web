@@ -11,6 +11,29 @@ interface RouteParams {
 
 export const dynamic = 'force-dynamic';
 
+function sanitizeString(value: unknown, max = 500): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const clean = value.trim();
+  if (!clean) return undefined;
+  return clean.slice(0, max);
+}
+
+function sanitizeOptionalDate(value: unknown): Date | undefined {
+  if (!(value instanceof Date)) return undefined;
+  return Number.isNaN(value.getTime()) ? undefined : value;
+}
+
+function sanitizeOptionalGuestCount(value: unknown): number | undefined {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
+  const rounded = Math.round(value);
+  if (rounded <= 0) return undefined;
+  return Math.min(rounded, 10000);
+}
+
+function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 export async function POST(request: NextRequest, { params }: RouteParams) {
   const authError = requireAuth(request);
   if (authError) return authError;
@@ -31,15 +54,30 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Email remitent invàlid' }, { status: 400 });
     }
 
-    const extracted = extractLeadDataFromEmail({
+    const extractedRaw = extractLeadDataFromEmail({
       fromName: email.from.name,
       fromAddress: email.from.address,
       subject: email.subject,
       bodyText: email.bodyText,
     });
+    const extracted = {
+      name: sanitizeString(extractedRaw.name, 120) || sanitizeString(email.from.name, 120) || 'Client',
+      email: sanitizeString(extractedRaw.email, 190)?.toLowerCase() || email.from.address.toLowerCase(),
+      phone: sanitizeString(extractedRaw.phone, 40),
+      eventType: extractedRaw.eventType,
+      eventDate: sanitizeOptionalDate(extractedRaw.eventDate),
+      guestCount: sanitizeOptionalGuestCount(extractedRaw.guestCount),
+      budget: sanitizeString(extractedRaw.budget, 120),
+      eventLocation: sanitizeString(extractedRaw.eventLocation, 160),
+      message: sanitizeString(extractedRaw.message, 4000),
+    };
+
+    if (!isValidEmail(extracted.email)) {
+      return NextResponse.json({ error: 'No s’ha pogut detectar un email vàlid del remitent' }, { status: 400 });
+    }
 
     const existing = await prisma.lead.findFirst({
-      where: { email: extracted.email },
+      where: { email: { equals: extracted.email, mode: 'insensitive' } },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -48,16 +86,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         where: { id: existing.id },
         data: {
           name: existing.name || extracted.name,
-          phone: existing.phone || extracted.phone,
+          phone: existing.phone || extracted.phone || null,
           eventType: existing.eventType || extracted.eventType,
-          eventDate: existing.eventDate || extracted.eventDate,
-          guestCount: existing.guestCount || extracted.guestCount,
-          budget: existing.budget || extracted.budget,
-          eventLocation: existing.eventLocation || extracted.eventLocation,
+          eventDate: existing.eventDate || extracted.eventDate || null,
+          guestCount: existing.guestCount || extracted.guestCount || null,
+          budget: existing.budget || extracted.budget || null,
+          eventLocation: existing.eventLocation || extracted.eventLocation || null,
           source: existing.source === 'WEBSITE' ? 'OTHER' : existing.source,
           message: extracted.message
             ? `${extracted.message}\n\n[importat des d'email: ${email.subject}]`
-            : existing.message,
+            : existing.message || null,
           updatedAt: new Date(),
         },
       });
@@ -100,12 +138,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       data: {
         name: extracted.name,
         email: extracted.email,
-        phone: extracted.phone,
+        phone: extracted.phone || null,
         eventType: extracted.eventType,
-        eventDate: extracted.eventDate,
-        guestCount: extracted.guestCount,
-        budget: extracted.budget,
-        eventLocation: extracted.eventLocation,
+        eventDate: extracted.eventDate || null,
+        guestCount: extracted.guestCount || null,
+        budget: extracted.budget || null,
+        eventLocation: extracted.eventLocation || null,
         source: 'OTHER',
         message: extracted.message
           ? `${extracted.message}\n\n[importat des d'email: ${email.subject}]`
@@ -148,6 +186,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error('Error creant lead des d’email', error as Error);
-    return NextResponse.json({ error: 'Error creant lead des d’email' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Error creant lead des d’email' },
+      { status: 500 }
+    );
   }
 }
