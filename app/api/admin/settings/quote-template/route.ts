@@ -17,8 +17,16 @@ export async function GET(req: NextRequest) {
   const permissionError = requirePermission(req, 'read');
   if (permissionError) return permissionError;
 
-  const template = await getQuoteTemplateSettings();
-  return NextResponse.json({ ok: true, template, defaults: DEFAULT_QUOTE_TEMPLATE });
+  try {
+    const template = await getQuoteTemplateSettings();
+    return NextResponse.json({ ok: true, template, defaults: DEFAULT_QUOTE_TEMPLATE });
+  } catch (error) {
+    log.error('Error loading quote template settings', error);
+    return NextResponse.json(
+      { ok: false, error: 'No se pudo cargar la plantilla de presupuesto' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {

@@ -75,12 +75,12 @@ export function normalizeQuoteTemplate(input: unknown): QuoteTemplateSettings {
 }
 
 export async function getQuoteTemplateSettings(): Promise<QuoteTemplateSettings> {
-  const setting = await prisma.setting.findUnique({
-    where: { key: QUOTE_TEMPLATE_SETTING_KEY },
-  });
-  if (!setting?.value) return DEFAULT_QUOTE_TEMPLATE;
-
   try {
+    const setting = await prisma.setting.findUnique({
+      where: { key: QUOTE_TEMPLATE_SETTING_KEY },
+    });
+    if (!setting?.value) return DEFAULT_QUOTE_TEMPLATE;
+
     const parsed = JSON.parse(setting.value);
     return normalizeQuoteTemplate(parsed);
   } catch {
@@ -92,23 +92,27 @@ export async function upsertQuoteTemplateSettings(
   input: QuoteTemplateSettings
 ): Promise<QuoteTemplateSettings> {
   const normalized = normalizeQuoteTemplate(input);
-  await prisma.setting.upsert({
-    where: { key: QUOTE_TEMPLATE_SETTING_KEY },
-    update: {
-      value: JSON.stringify(normalized),
-      type: 'JSON',
-      category: 'config',
-      label: 'Plantilla de pressupostos',
-      description: 'Configuració visual i operativa dels pressupostos enviats',
-    },
-    create: {
-      key: QUOTE_TEMPLATE_SETTING_KEY,
-      value: JSON.stringify(normalized),
-      type: 'JSON',
-      category: 'config',
-      label: 'Plantilla de pressupostos',
-      description: 'Configuració visual i operativa dels pressupostos enviats',
-    },
-  });
+  await prisma.setting
+    .upsert({
+      where: { key: QUOTE_TEMPLATE_SETTING_KEY },
+      update: {
+        value: JSON.stringify(normalized),
+        type: 'JSON',
+        category: 'config',
+        label: 'Plantilla de pressupostos',
+        description: 'Configuració visual i operativa dels pressupostos enviats',
+      },
+      create: {
+        key: QUOTE_TEMPLATE_SETTING_KEY,
+        value: JSON.stringify(normalized),
+        type: 'JSON',
+        category: 'config',
+        label: 'Plantilla de pressupostos',
+        description: 'Configuració visual i operativa dels pressupostos enviats',
+      },
+    })
+    .catch(() => {
+      throw new Error('No se pudo guardar la plantilla de presupuesto');
+    });
   return normalized;
 }
