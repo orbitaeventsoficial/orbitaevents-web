@@ -136,11 +136,15 @@ export default function InboxClient({
       const params = new URLSearchParams({ limit: '50', _t: String(Date.now()) });
       const res = await fetch(`/api/admin/inbox/messages?${params}`, { cache: 'no-store' });
       const data = await res.json();
-      const message = data?.error || 'Error carregant emails';
+      const message = data?.details
+        ? `${data?.error || 'Error carregant emails'}: ${data.details}`
+        : data?.error || 'Error carregant emails';
 
       if (!res.ok || !data.ok) {
         setImapError(message);
         setFlashMessage({ type: 'error', text: message });
+        setImapEmails([]);
+        setImapUnread(0);
         return;
       }
 
@@ -148,8 +152,11 @@ export default function InboxClient({
       setImapUnread(data.unread || 0);
       setFlashMessage(null);
     } catch (error) {
-      setImapError('Error de connexió');
-      setFlashMessage({ type: 'error', text: 'Error carregant emails IMAP' });
+      const msg = error instanceof Error ? `Error de connexió: ${error.message}` : 'Error de connexió';
+      setImapError(msg);
+      setFlashMessage({ type: 'error', text: msg });
+      setImapEmails([]);
+      setImapUnread(0);
     } finally {
       setLoadingImap(false);
     }

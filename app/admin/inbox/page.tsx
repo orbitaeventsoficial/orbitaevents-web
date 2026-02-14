@@ -134,7 +134,7 @@ export default async function InboxPage() {
           <h1 className="text-xl font-semibold text-slate-700">📬 Inbox</h1>
           <p className="text-sm text-slate-500">
             {stats.unreadLeads} leads nous · {stats.todayLeads} avui
-            {imapConfigured && ' · 📧 Correu connectat'}
+            {imapConfigured && ' · 📧 Correu configurat'}
           </p>
         </div>
         <div className="flex gap-2">
