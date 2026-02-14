@@ -35,12 +35,40 @@ function normalize(value: string): string {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function scoreKeyword(input: string, keyword: string): number {
+  const normalizedKeyword = normalize(keyword);
+  const compactKeyword = normalizedKeyword.trim();
+  if (!compactKeyword) return 0;
+
+  const boundaryRegex = new RegExp(`(^|\\b)${escapeRegExp(compactKeyword)}(\\b|$)`, 'i');
+  if (boundaryRegex.test(input)) {
+    return 100 + compactKeyword.length;
+  }
+
+  if (input.includes(compactKeyword)) {
+    return 20 + compactKeyword.length;
+  }
+
+  return 0;
+}
+
 export function matchHelpEntry(text: string): HelpEntry | null {
   const input = normalize(text);
+  let best: { entry: HelpEntry; score: number } | null = null;
+
   for (const entry of HELP_ENTRIES) {
+    let entryScore = 0;
     for (const keyword of entry.keywords) {
-      if (input.includes(normalize(keyword))) return entry;
+      entryScore = Math.max(entryScore, scoreKeyword(input, keyword));
+    }
+    if (entryScore > 0 && (!best || entryScore > best.score)) {
+      best = { entry, score: entryScore };
     }
   }
-  return null;
+
+  return best?.entry || null;
 }

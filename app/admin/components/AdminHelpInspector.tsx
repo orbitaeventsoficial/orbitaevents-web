@@ -14,6 +14,36 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
+function pickCandidateText(target: HTMLElement): string {
+  const ownHints = [
+    target.getAttribute('aria-label') || '',
+    target.getAttribute('title') || '',
+    target.getAttribute('placeholder') || '',
+    target.textContent || '',
+  ]
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  for (const value of ownHints) {
+    if (value.length >= 2 && value.length <= 90) return value;
+  }
+
+  let current: HTMLElement | null = target;
+  for (let i = 0; i < 5 && current; i += 1) {
+    const tag = current.tagName.toLowerCase();
+    const text = (current.textContent || '').trim().replace(/\s+/g, ' ');
+    const semanticTag = /^(label|button|a|h1|h2|h3|h4|h5|h6|dt|th|td|span|p)$/.test(tag);
+    if (semanticTag && text.length >= 2 && text.length <= 90) {
+      return text;
+    }
+    current = current.parentElement;
+  }
+
+  // Últim recurs: retall curt per evitar blocs enormes que donen falsos positius.
+  const fallback = (target.textContent || '').trim().replace(/\s+/g, ' ');
+  return fallback.slice(0, 90);
+}
+
 export default function AdminHelpInspector() {
   const [preview, setPreview] = useState<HelpPreview | null>(null);
 
@@ -26,13 +56,13 @@ export default function AdminHelpInspector() {
         return;
       }
 
-      const raw = (target.textContent || '').trim();
+      const raw = pickCandidateText(target);
       if (!raw || raw.length < 2) {
         setPreview(null);
         return;
       }
 
-      const entry = matchHelpEntry(raw.slice(0, 280));
+      const entry = matchHelpEntry(raw);
       if (!entry) {
         setPreview(null);
         return;
