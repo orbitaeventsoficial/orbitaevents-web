@@ -13,6 +13,12 @@ import QuickActions from './components/QuickActions';
 
 export const dynamic = 'force-dynamic';
 
+function timeoutPromise(ms: number): Promise<null> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(null), ms);
+  });
+}
+
 // Formatejador de temps relatiu
 function timeAgo(date: Date): string {
   const now = new Date();
@@ -65,12 +71,10 @@ export default async function AdminDashboard() {
   const smtpConfigured = Boolean(
     process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.SMTP_FROM
   );
-  let ga4 = null;
-  try {
-    ga4 = await getGa4Report();
-  } catch {
-    ga4 = null;
-  }
+  const ga4 = await Promise.race([
+    getGa4Report().catch(() => null),
+    timeoutPromise(1200),
+  ]);
 
   // Obtenir totes les dades en paral·lel (optimitzat)
   const [

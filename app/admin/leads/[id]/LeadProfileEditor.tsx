@@ -30,6 +30,41 @@ const STATUS_OPTIONS = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 
 const PRIORITY_OPTIONS = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
 const EVENT_TYPES = ['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER'];
 const SOURCE_OPTIONS = ['WEBSITE', 'CONFIGURATOR', 'PHONE', 'WHATSAPP', 'INSTAGRAM', 'REFERRAL', 'GOOGLE', 'OTHER'];
+const STATUS_LABELS: Record<string, string> = {
+  NEW: 'Nou lead',
+  CONTACTED: 'Contactat',
+  QUOTE_SENT: 'Pressupost enviat',
+  NEGOTIATING: 'En negociació',
+  WON: 'Guanyat',
+  LOST: 'Perdut',
+};
+const PRIORITY_LABELS: Record<string, string> = {
+  LOW: 'Baixa',
+  MEDIUM: 'Mitjana',
+  HIGH: 'Alta',
+  URGENT: 'Urgent',
+};
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  WEDDING: 'Boda',
+  BIRTHDAY: 'Aniversari',
+  CORPORATE: 'Corporatiu',
+  COMMUNION: 'Comunió',
+  BAPTISM: 'Bateig',
+  GRADUATION: 'Graduació',
+  ANNIVERSARY: 'Aniversari',
+  PRIVATE_PARTY: 'Festa privada',
+  OTHER: 'Altre',
+};
+const SOURCE_LABELS: Record<string, string> = {
+  WEBSITE: 'Web',
+  CONFIGURATOR: 'Configurador',
+  PHONE: 'Telèfon',
+  WHATSAPP: 'WhatsApp',
+  INSTAGRAM: 'Instagram',
+  REFERRAL: 'Recomanació',
+  GOOGLE: 'Google',
+  OTHER: 'Altres',
+};
 
 export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
   const [form, setForm] = useState({
@@ -113,8 +148,8 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-700">Fitxa del lead</h2>
-          <p className="text-sm text-slate-500">Dades principals i seguiment comercial.</p>
+          <h2 className="text-lg font-semibold text-slate-900">Fitxa del lead</h2>
+          <p className="text-sm text-slate-700">Dades principals i seguiment comercial.</p>
         </div>
         <button
           type="button"
@@ -170,7 +205,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           >
             {EVENT_TYPES.map((type) => (
               <option key={type} value={type}>
-                {type}
+                {EVENT_TYPE_LABELS[type] || type}
               </option>
             ))}
           </select>
@@ -217,7 +252,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           >
             {STATUS_OPTIONS.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {STATUS_LABELS[item] || item}
               </option>
             ))}
           </select>
@@ -231,7 +266,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           >
             {PRIORITY_OPTIONS.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {PRIORITY_LABELS[item] || item}
               </option>
             ))}
           </select>
@@ -245,7 +280,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           >
             {SOURCE_OPTIONS.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {SOURCE_LABELS[item] || item}
               </option>
             ))}
           </select>

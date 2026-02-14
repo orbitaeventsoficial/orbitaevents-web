@@ -41,7 +41,7 @@ function SidebarItem({
   return (
     <Link
       href={href}
-      prefetch
+      prefetch={false}
       onClick={onClick}
       onMouseEnter={() => onPrefetch?.(href)}
       onFocus={() => onPrefetch?.(href)}
@@ -127,7 +127,7 @@ function FavoriteChip({
   return (
     <Link
       href={href}
-      prefetch
+      prefetch={false}
       onClick={onClick}
       onMouseEnter={() => onPrefetch?.(href)}
       onFocus={() => onPrefetch?.(href)}
@@ -161,7 +161,7 @@ function BottomNavItem({
   return (
     <Link
       href={href}
-      prefetch
+      prefetch={false}
       onMouseEnter={() => onPrefetch?.(href)}
       onFocus={() => onPrefetch?.(href)}
       className={`

@@ -53,6 +53,11 @@ const PRIORITY_LABELS: Record<string, { label: string; color: string }> = {
   HIGH: { label: 'Alta', color: 'bg-orange-100 text-orange-700' },
   URGENT: { label: 'Urgent', color: 'bg-red-100 text-red-700' },
 };
+const SCORE_BAND_LABELS: Record<string, string> = {
+  LOW: 'BAIX',
+  MEDIUM: 'MITJÀ',
+  HIGH: 'ALT',
+};
 
 function parseBudgetValue(input?: string | null): number | null {
   if (!input) return null;
@@ -311,7 +316,9 @@ export default async function LeadDetailPage({ params }: Props) {
           </div>
           <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
             <p className="text-xs uppercase tracking-wide text-slate-500">Lead score</p>
-            <p className="text-xl font-semibold text-slate-800">{leadScore.score} · {leadScore.band}</p>
+            <p className="text-xl font-semibold text-slate-800">
+              {leadScore.score} · {SCORE_BAND_LABELS[leadScore.band] || leadScore.band}
+            </p>
             <ScoreSnapshotButton leadId={lead.id} />
           </div>
         </div>
@@ -589,7 +596,7 @@ export default async function LeadDetailPage({ params }: Props) {
               </div>
               {lead.customerId && (
                 <div>
-                  <dt className="text-xs text-slate-500">Customer ID</dt>
+                  <dt className="text-xs text-slate-600">ID client</dt>
                   <dd className="font-mono text-xs text-slate-700 break-all">{lead.customerId}</dd>
                 </div>
               )}
@@ -631,7 +638,7 @@ export default async function LeadDetailPage({ params }: Props) {
               )}
               {lead.landingPage && (
                 <div>
-                  <dt className="text-xs text-slate-500">Landing Page</dt>
+                  <dt className="text-xs text-slate-600">Pàgina d&apos;entrada</dt>
                   <dd className="text-slate-700 truncate">{lead.landingPage}</dd>
                 </div>
               )}
@@ -639,26 +646,26 @@ export default async function LeadDetailPage({ params }: Props) {
           </section>
 
           <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h3 className="text-sm font-semibold text-slate-700 mb-4">Attribution / UTM</h3>
+            <h3 className="text-sm font-semibold text-slate-800 mb-4">Atribució / UTM</h3>
             <dl className="space-y-3 text-sm">
               <div>
-                <dt className="text-xs text-slate-500">Source</dt>
+                <dt className="text-xs text-slate-600">Origen</dt>
                 <dd className="text-slate-700">{lead.source || '-'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-500">UTM source</dt>
+                <dt className="text-xs text-slate-600">UTM source</dt>
                 <dd className="text-slate-700 break-all">{lead.utmSource || '-'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-500">UTM medium</dt>
+                <dt className="text-xs text-slate-600">UTM medium</dt>
                 <dd className="text-slate-700 break-all">{lead.utmMedium || '-'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-500">UTM campaign</dt>
+                <dt className="text-xs text-slate-600">UTM campaign</dt>
                 <dd className="text-slate-700 break-all">{lead.utmCampaign || '-'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-500">Landing</dt>
+                <dt className="text-xs text-slate-600">Landing</dt>
                 <dd className="text-slate-700 break-all">{lead.landingPage || '-'}</dd>
               </div>
             </dl>
@@ -681,23 +688,23 @@ export default async function LeadDetailPage({ params }: Props) {
                   <dd className="text-slate-700">{lead.customer.phone || '-'}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Locale</dt>
+                  <dt className="text-xs text-slate-600">Idioma</dt>
                   <dd className="text-slate-700">{lead.customer.preferredLocale}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Source</dt>
+                  <dt className="text-xs text-slate-600">Origen</dt>
                   <dd className="text-slate-700">{lead.customer.source}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Total events</dt>
+                  <dt className="text-xs text-slate-600">Total d&apos;events</dt>
                   <dd className="text-slate-700">{lead.customer.totalEvents}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Total spent</dt>
+                  <dt className="text-xs text-slate-600">Despesa total</dt>
                   <dd className="text-slate-700">{lead.customer.totalSpent.toLocaleString('ca-ES')}€</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Last event date</dt>
+                  <dt className="text-xs text-slate-600">Últim event</dt>
                   <dd className="text-slate-700">
                     {lead.customer.lastEventDate
                       ? new Date(lead.customer.lastEventDate).toLocaleDateString('ca-ES')

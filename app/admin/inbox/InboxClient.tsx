@@ -83,7 +83,7 @@ export default function InboxClient({
   const router = useRouter();
 
   // State
-  const [activeTab, setActiveTab] = useState<'all' | 'leads' | 'emails'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'leads' | 'emails'>('leads');
   const [imapEmails, setImapEmails] = useState<ImapEmail[]>([]);
   const [imapUnread, setImapUnread] = useState(0);
   const [loadingImap, setLoadingImap] = useState(false);
@@ -163,10 +163,11 @@ export default function InboxClient({
   }, []);
 
   useEffect(() => {
-    if (imapConfigured) {
-      loadImapEmails();
-    }
-  }, [imapConfigured, loadImapEmails]);
+    if (!imapConfigured) return;
+    if (activeTab === 'leads') return;
+    if (imapEmails.length > 0) return;
+    loadImapEmails();
+  }, [imapConfigured, activeTab, imapEmails.length, loadImapEmails]);
 
   // Filtrar emails
   const deferredQuery = useDeferredValue(searchQuery);
