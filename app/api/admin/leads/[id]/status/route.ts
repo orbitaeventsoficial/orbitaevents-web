@@ -101,6 +101,13 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         convertedAt: status === 'WON' && !existingLead.convertedAt ? new Date() : undefined,
         customerId: status === 'WON' ? linkedCustomerId : existingLead.customerId,
       },
+      select: {
+        id: true,
+        status: true,
+        contactedAt: true,
+        convertedAt: true,
+        customerId: true,
+      },
     });
 
     // Registrar nota de canvi d'estat

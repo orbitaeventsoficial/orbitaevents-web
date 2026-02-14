@@ -186,6 +186,14 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     const lead = await prisma.lead.update({
       where: { id },
       data: body,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        status: true,
+        priority: true,
+        updatedAt: true,
+      },
     });
 
     await prisma.adminLog.create({
