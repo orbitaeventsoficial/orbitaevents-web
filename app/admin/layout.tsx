@@ -68,20 +68,39 @@ function SidebarItem({
 
 function SidebarSection({
   title,
+  storageKey,
   defaultOpen = false,
   children,
 }: {
   title: string;
+  storageKey: string;
   defaultOpen?: boolean;
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const raw = window.localStorage.getItem(`admin.section.${storageKey}`);
+    if (raw === '1') setOpen(true);
+    if (raw === '0') setOpen(false);
+  }, [storageKey]);
+
+  const toggle = useCallback(() => {
+    setOpen((value) => {
+      const next = !value;
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(`admin.section.${storageKey}`, next ? '1' : '0');
+      }
+      return next;
+    });
+  }, [storageKey]);
+
   return (
     <div className="mb-3">
       <button
         type="button"
-        onClick={() => setOpen((value) => !value)}
+        onClick={toggle}
         className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[11px] font-semibold text-slate-400 uppercase tracking-wider hover:bg-slate-800/60"
       >
         <span>{title}</span>
@@ -190,6 +209,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [mounted, setMounted] = useState(false);
   const [newLeadsCount, setNewLeadsCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [recentHrefs, setRecentHrefs] = useState<string[]>([]);
   const pathname = usePathname();
 
   // Cargar conteo de leads nuevos
@@ -360,6 +380,41 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     },
   ]), []);
 
+  const navLabelMap = useMemo(() => {
+    const map = new Map<string, string>();
+    priorityItems.forEach((item) => map.set(item.href, item.label));
+    navSections.forEach((section) => {
+      section.items.forEach((item) => map.set(item.href, item.label));
+    });
+    return map;
+  }, [priorityItems, navSections]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const key = 'admin.recent.hrefs';
+    const saved = window.localStorage.getItem(key);
+    if (!saved) return;
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        setRecentHrefs(parsed.filter((v) => typeof v === 'string').slice(0, 6));
+      }
+    } catch {
+      // ignore broken cache
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!pathname?.startsWith('/admin')) return;
+    const key = 'admin.recent.hrefs';
+    setRecentHrefs((prev) => {
+      const next = [pathname, ...prev.filter((item) => item !== pathname)].slice(0, 6);
+      window.localStorage.setItem(key, JSON.stringify(next));
+      return next;
+    });
+  }, [pathname]);
+
   const isActive = useCallback((href: string) => {
     return href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href);
   }, [pathname]);
@@ -466,8 +521,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
 
+          {recentHrefs.length > 0 && (
+            <div className="mb-4 px-3">
+              <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                Recientes
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {recentHrefs.map((href) => (
+                  <FavoriteChip
+                    key={href}
+                    href={href}
+                    label={navLabelMap.get(href) || href.replace('/admin/', '')}
+                    isActive={isActive(href)}
+                    onPrefetch={prefetchRoute}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {navSections.map((section) => (
-            <SidebarSection key={section.title} title={section.title} defaultOpen={section.defaultOpen}>
+            <SidebarSection
+              key={section.title}
+              title={section.title}
+              storageKey={section.title.toLowerCase().replace(/\s+/g, '-')}
+              defaultOpen={section.defaultOpen}
+            >
               {section.items.map((item) => (
                 <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} onPrefetch={prefetchRoute} />
               ))}
@@ -613,8 +692,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
               </div>
 
+              {recentHrefs.length > 0 && (
+                <div className="mb-4 px-3">
+                  <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                    Recientes
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {recentHrefs.map((href) => (
+                      <FavoriteChip
+                        key={href}
+                        href={href}
+                        label={navLabelMap.get(href) || href.replace('/admin/', '')}
+                        isActive={isActive(href)}
+                        onClick={() => setSidebarOpen(false)}
+                        onPrefetch={prefetchRoute}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {navSections.map((section) => (
-                <SidebarSection key={section.title} title={section.title} defaultOpen={section.defaultOpen}>
+                <SidebarSection
+                  key={section.title}
+                  title={section.title}
+                  storageKey={section.title.toLowerCase().replace(/\s+/g, '-')}
+                  defaultOpen={section.defaultOpen}
+                >
                   {section.items.map((item) => (
                     <SidebarItem
                       key={item.href}
