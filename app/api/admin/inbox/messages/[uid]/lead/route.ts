@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { EventType } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { log } from '@/lib/logger';
@@ -41,6 +42,20 @@ function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function mergeImportedMessage(existing: string | null | undefined, imported: string | undefined, subject: string): string | null {
+  if (!imported) return existing || null;
+  const marker = `[importat des d'email: ${subject}]`;
+  if (existing?.includes(marker)) return existing;
+  const cleaned = imported.trim();
+  return `${cleaned}\n\n${marker}`.slice(0, 4000);
+}
+
+function resolveEventType(existingType: EventType, extractedType: EventType): EventType {
+  // Si el lead encara està en OTHER, permet millorar-lo amb el tipus inferit del correu.
+  if (existingType === 'OTHER' && extractedType !== 'OTHER') return extractedType;
+  return existingType || extractedType;
+}
+
 export async function POST(request: NextRequest, { params }: RouteParams) {
   const authError = requireAuth(request);
   if (authError) return authError;
@@ -81,6 +96,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       budget: sanitizeString(extractedRaw.budget, 120),
       eventLocation: sanitizeString(extractedRaw.eventLocation, 160),
       message: sanitizeString(extractedRaw.message, 4000),
+      commercialSummary: sanitizeString(extractedRaw.commercialSummary, 1500),
+      importantUnknowns: Array.isArray(extractedRaw.importantUnknowns)
+        ? extractedRaw.importantUnknowns
+            .map((item) => sanitizeString(item, 220))
+            .filter((item): item is string => Boolean(item))
+            .slice(0, 6)
+        : [],
     };
 
     if (!isValidEmail(extracted.email)) {
@@ -93,20 +115,40 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (existing) {
+      const uidMarker = `(UID ${uidNum})`;
+      const alreadyImported = await prisma.leadNote.findFirst({
+        where: {
+          leadId: existing.id,
+          content: { contains: uidMarker },
+        },
+        select: { id: true },
+      });
+
+      if (alreadyImported) {
+        return NextResponse.json({
+          ok: true,
+          action: 'already_imported',
+          lead: {
+            id: existing.id,
+            name: existing.name,
+            email: existing.email,
+            status: existing.status,
+          },
+        });
+      }
+
       const updated = await prisma.lead.update({
         where: { id: existing.id },
         data: {
           name: existing.name || extracted.name,
           phone: existing.phone || extracted.phone || null,
-          eventType: existing.eventType || extracted.eventType,
+          eventType: resolveEventType(existing.eventType, extracted.eventType),
           eventDate: existing.eventDate || extracted.eventDate || null,
           guestCount: existing.guestCount || extracted.guestCount || null,
           budget: existing.budget || extracted.budget || null,
           eventLocation: existing.eventLocation || extracted.eventLocation || null,
           source: existing.source === 'WEBSITE' ? 'OTHER' : existing.source,
-          message: extracted.message
-            ? `${extracted.message}\n\n[importat des d'email: ${subject}]`
-            : existing.message || null,
+          message: mergeImportedMessage(existing.message, extracted.message, subject),
           updatedAt: new Date(),
         },
       });
@@ -114,7 +156,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       await prisma.leadNote.create({
         data: {
           leadId: updated.id,
-          content: `📥 Email importat (UID ${uidNum})\nAssumpte: ${subject || '(Sense assumpte)'}`,
+          content: [
+            `📥 Email importat (UID ${uidNum})`,
+            `Assumpte: ${subject || '(Sense assumpte)'}`,
+            extracted.commercialSummary ? `\n🧠 Resum comercial automàtic\n${extracted.commercialSummary}` : '',
+            extracted.importantUnknowns.length
+              ? `\n⚠️ Revisar manualment\n${extracted.importantUnknowns.map((line) => `- ${line}`).join('\n')}`
+              : '',
+          ]
+            .filter(Boolean)
+            .join('\n'),
           createdBy: 'Admin Inbox',
         },
       });
@@ -167,7 +218,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     await prisma.leadNote.create({
       data: {
         leadId: created.id,
-        content: `📥 Lead creat des d’email (UID ${uidNum})\nAssumpte: ${subject || '(Sense assumpte)'}`,
+        content: [
+          `📥 Lead creat des d’email (UID ${uidNum})`,
+          `Assumpte: ${subject || '(Sense assumpte)'}`,
+          extracted.commercialSummary ? `\n🧠 Resum comercial automàtic\n${extracted.commercialSummary}` : '',
+          extracted.importantUnknowns.length
+            ? `\n⚠️ Revisar manualment\n${extracted.importantUnknowns.map((line) => `- ${line}`).join('\n')}`
+            : '',
+        ]
+          .filter(Boolean)
+          .join('\n'),
         createdBy: 'Admin Inbox',
       },
     });

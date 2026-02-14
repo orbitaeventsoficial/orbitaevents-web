@@ -75,6 +75,7 @@ const SOURCE_ICONS: Record<string, string> = {
   PHONE: '📞',
   WHATSAPP: '💬',
   INSTAGRAM: '📸',
+  WALLAPOP: '🟣',
   REFERRAL: '👥',
   GOOGLE: '🔍',
   OTHER: '📩',

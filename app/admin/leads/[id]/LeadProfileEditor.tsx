@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import InfoTooltip from '../../components/InfoTooltip';
 
 type LeadProfile = {
   id: string;
@@ -29,7 +31,7 @@ type LeadProfile = {
 const STATUS_OPTIONS = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'];
 const PRIORITY_OPTIONS = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
 const EVENT_TYPES = ['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER'];
-const SOURCE_OPTIONS = ['WEBSITE', 'CONFIGURATOR', 'PHONE', 'WHATSAPP', 'INSTAGRAM', 'REFERRAL', 'GOOGLE', 'OTHER'];
+const SOURCE_OPTIONS = ['WEBSITE', 'CONFIGURATOR', 'PHONE', 'WHATSAPP', 'INSTAGRAM', 'WALLAPOP', 'REFERRAL', 'GOOGLE', 'OTHER'];
 const STATUS_LABELS: Record<string, string> = {
   NEW: 'Nou lead',
   CONTACTED: 'Contactat',
@@ -61,12 +63,14 @@ const SOURCE_LABELS: Record<string, string> = {
   PHONE: 'Telèfon',
   WHATSAPP: 'WhatsApp',
   INSTAGRAM: 'Instagram',
+  WALLAPOP: 'Wallapop',
   REFERRAL: 'Recomanació',
   GOOGLE: 'Google',
   OTHER: 'Altres',
 };
 
 export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
+  const router = useRouter();
   const [form, setForm] = useState({
     name: lead.name || '',
     email: lead.email || '',
@@ -90,10 +94,37 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     preferredLocale: (lead.preferredLocale || 'es').toLowerCase(),
   });
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
 
   const updateField = (key: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleDeleteLead = async () => {
+    if (deleting) return;
+    const confirmed = window.confirm(
+      'Segur que vols eliminar aquest registre? Aquesta acció no es pot desfer.'
+    );
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setStatus(null);
+    try {
+      const res = await fetch(`/api/admin/leads-new/${lead.id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'No s’ha pogut eliminar el registre');
+      }
+      router.push('/admin/leads');
+      router.refresh();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Error eliminant registre');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleSave = async () => {
@@ -151,15 +182,25 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           <h2 className="text-lg font-semibold text-slate-900">Fitxa del lead</h2>
           <p className="text-sm text-slate-700">Dades principals i seguiment comercial.</p>
         </div>
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={saving}
-          aria-busy={saving}
-          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-60"
-        >
-          {saving ? 'Guardant...' : 'Guardar canvis'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleDeleteLead}
+            disabled={deleting || saving}
+            className="rounded-lg border border-rose-300 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-60"
+          >
+            {deleting ? 'Eliminant...' : 'Eliminar registre'}
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || deleting}
+            aria-busy={saving}
+            className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-60"
+          >
+            {saving ? 'Guardant...' : 'Guardar canvis'}
+          </button>
+        </div>
       </div>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -244,7 +285,10 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           />
         </label>
         <label className="flex flex-col gap-1 text-sm text-slate-600">
-          Estat
+          <span className="inline-flex items-center gap-1">
+            Estat
+            <InfoTooltip text="Fase comercial actual del lead: nou, contactat, pressupost enviat, negociació, guanyat o perdut." />
+          </span>
           <select
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
             value={form.status}
@@ -258,7 +302,10 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm text-slate-600">
-          Prioritat
+          <span className="inline-flex items-center gap-1">
+            Prioritat
+            <InfoTooltip text="Nivell d'urgència comercial per ordenar seguiment i tasques." />
+          </span>
           <select
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
             value={form.priority}
@@ -272,7 +319,10 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm text-slate-600">
-          Origen
+          <span className="inline-flex items-center gap-1">
+            Origen
+            <InfoTooltip text="Canal pel qual ha arribat el lead (Web, WhatsApp, Instagram, Wallapop, etc.)." />
+          </span>
           <select
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
             value={form.source}
@@ -328,7 +378,10 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
 
       <div className="mt-4 grid gap-4 md:grid-cols-3">
         <label className="flex flex-col gap-1 text-sm text-slate-600">
-          Landing page
+          <span className="inline-flex items-center gap-1">
+            Landing page
+            <InfoTooltip text="Pàgina exacta on l'usuari estava quan va enviar el formulari." />
+          </span>
           <input
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
             value={form.landingPage}
@@ -336,7 +389,10 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           />
         </label>
         <label className="flex flex-col gap-1 text-sm text-slate-600">
-          UTM source
+          <span className="inline-flex items-center gap-1">
+            UTM source
+            <InfoTooltip text="Font de la campanya (ex: google, instagram, newsletter)." />
+          </span>
           <input
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
             value={form.utmSource}
@@ -344,7 +400,10 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           />
         </label>
         <label className="flex flex-col gap-1 text-sm text-slate-600">
-          UTM medium
+          <span className="inline-flex items-center gap-1">
+            UTM medium
+            <InfoTooltip text="Tipus de canal de captació (ex: cpc, social, email, organic)." />
+          </span>
           <input
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
             value={form.utmMedium}
@@ -352,7 +411,10 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
           />
         </label>
         <label className="flex flex-col gap-1 text-sm text-slate-600 md:col-span-2">
-          UTM campaign
+          <span className="inline-flex items-center gap-1">
+            UTM campaign
+            <InfoTooltip text="Nom de la campanya de màrqueting (ex: primavera-2026, black-friday)." />
+          </span>
           <input
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
             value={form.utmCampaign}

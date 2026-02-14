@@ -5,6 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import AdminSearchModal from './components/AdminSearchModal';
+import AdminHelpLegend from './components/AdminHelpLegend';
+import AdminHelpInspector from './components/AdminHelpInspector';
+import { AdminHelpModeProvider, useAdminHelpMode } from './components/AdminHelpMode';
 
 /**
  * 🎨 ADMIN LAYOUT - Òrbita Events
@@ -204,6 +207,14 @@ function getCookieValue(name: string): string | null {
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminHelpModeProvider>
+      <AdminLayoutShell>{children}</AdminLayoutShell>
+    </AdminHelpModeProvider>
+  );
+}
+
+function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -211,6 +222,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [searchOpen, setSearchOpen] = useState(false);
   const [recentHrefs, setRecentHrefs] = useState<string[]>([]);
   const pathname = usePathname();
+  const { enabled: helpModeEnabled, toggle: toggleHelpMode } = useAdminHelpMode();
 
   // Cargar conteo de leads nuevos
   const fetchNewLeadsCount = useCallback(async () => {
@@ -464,10 +476,39 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return pageNames[page] || page.charAt(0).toUpperCase() + page.slice(1);
   }, [pathname]);
 
+  const isHelpTarget = useCallback((target: EventTarget | null): boolean => {
+    if (!(target instanceof HTMLElement)) return false;
+    return Boolean(
+      target.closest('[data-help-tooltip="true"]') ||
+      target.closest('[data-help-tooltip-panel="true"]') ||
+      target.closest('[data-help-toggle="true"]')
+    );
+  }, []);
+
+  const blockInteractionInHelpMode = useCallback((event: React.SyntheticEvent) => {
+    if (!helpModeEnabled) return;
+    if (isHelpTarget(event.target)) return;
+    event.preventDefault();
+    event.stopPropagation();
+  }, [helpModeEnabled, isHelpTarget]);
+
   return (
     <html lang="es" suppressHydrationWarning>
       <body className="bg-slate-950 text-slate-200 antialiased" suppressHydrationWarning>
-        <div className="min-h-screen">
+        <div
+          className="min-h-screen"
+          onClickCapture={blockInteractionInHelpMode}
+          onDoubleClickCapture={blockInteractionInHelpMode}
+          onSubmitCapture={blockInteractionInHelpMode}
+          onPointerDownCapture={blockInteractionInHelpMode}
+        >
+          {helpModeEnabled && (
+            <div className="fixed left-1/2 top-16 z-[70] -translate-x-1/2 rounded-full border border-amber-400/60 bg-amber-100 px-4 py-2 text-xs font-semibold text-amber-900 shadow-lg">
+              Mode ajuda actiu: les accions estan bloquejades. Passa per sobre dels símbols ? per veure la llegenda.
+            </div>
+          )}
+          {helpModeEnabled && <AdminHelpLegend />}
+          {helpModeEnabled && <AdminHelpInspector />}
           {/* Desktop Sidebar */}
       <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-zinc-900/95 backdrop-blur-sm border-r border-zinc-700/80 flex-col z-40">
         {/* Logo */}
@@ -587,6 +628,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <div className="flex items-center gap-1">
+          <button
+            type="button"
+            data-help-toggle="true"
+            onClick={toggleHelpMode}
+            className={`p-2.5 text-slate-300 rounded-xl transition-colors ${
+              helpModeEnabled ? 'bg-amber-500/20 text-amber-300' : 'hover:bg-slate-800 active:bg-slate-700'
+            }`}
+            aria-label="Activar o desactivar mode ajuda"
+            aria-pressed={helpModeEnabled}
+          >
+            ?
+          </button>
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
@@ -763,6 +816,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <span className="text-slate-100 font-medium">{getPageName()}</span>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            data-help-toggle="true"
+            onClick={toggleHelpMode}
+            className={`rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
+              helpModeEnabled
+                ? 'border-amber-400/70 bg-amber-500/20 text-amber-300'
+                : 'border-zinc-700/80 bg-zinc-800/60 text-slate-300 hover:border-amber-500/30 hover:text-slate-100'
+            }`}
+            aria-pressed={helpModeEnabled}
+            aria-label="Activar o desactivar mode ajuda"
+          >
+            ? Ajuda {helpModeEnabled ? 'ON' : 'OFF'}
+          </button>
           <button
             type="button"
             onClick={() => setSearchOpen(true)}

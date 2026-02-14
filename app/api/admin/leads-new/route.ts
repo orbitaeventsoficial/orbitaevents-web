@@ -49,7 +49,7 @@ const leadSchema = z.object({
   assignedTo: z.string().optional(),
   source: z.enum([
     'WEBSITE', 'CONFIGURATOR', 'PHONE', 'WHATSAPP',
-    'INSTAGRAM', 'REFERRAL', 'GOOGLE', 'OTHER'
+    'INSTAGRAM', 'WALLAPOP', 'REFERRAL', 'GOOGLE', 'OTHER'
   ]).optional(),
   utmSource: z.string().optional(),
   utmMedium: z.string().optional(),

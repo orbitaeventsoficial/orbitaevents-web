@@ -9,6 +9,7 @@ import ScoreSnapshotButton from './ScoreSnapshotButton';
 import LeadTechnicalSnapshotPanel from './LeadTechnicalSnapshotPanel';
 import { buildLeadTechnicalSnapshot } from '@/lib/services/leadSnapshotService';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import InfoTooltip from '@/app/admin/components/InfoTooltip';
 
 export const dynamic = 'force-dynamic';
 
@@ -315,7 +316,10 @@ export default async function LeadDetailPage({ params }: Props) {
             </p>
           </div>
           <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
-            <p className="text-xs uppercase tracking-wide text-slate-500">Lead score</p>
+            <p className="inline-flex items-center gap-1 text-xs uppercase tracking-wide text-slate-500">
+              Lead score
+              <InfoTooltip text="Puntuació automàtica de qualitat comercial segons dades del lead i fase del procés." />
+            </p>
             <p className="text-xl font-semibold text-slate-800">
               {leadScore.score} · {SCORE_BAND_LABELS[leadScore.band] || leadScore.band}
             </p>
@@ -646,26 +650,44 @@ export default async function LeadDetailPage({ params }: Props) {
           </section>
 
           <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h3 className="text-sm font-semibold text-slate-800 mb-4">Atribució / UTM</h3>
+            <h3 className="inline-flex items-center gap-1 text-sm font-semibold text-slate-800 mb-4">
+              Atribució / UTM
+              <InfoTooltip text="Dades de màrqueting per saber d'on arriba el lead i quina campanya ha funcionat." />
+            </h3>
             <dl className="space-y-3 text-sm">
               <div>
-                <dt className="text-xs text-slate-600">Origen</dt>
+                <dt className="inline-flex items-center gap-1 text-xs text-slate-600">
+                  Origen
+                  <InfoTooltip text="Canal d'entrada del lead: web, whatsapp, instagram, wallapop, etc." />
+                </dt>
                 <dd className="text-slate-700">{lead.source || '-'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-600">UTM source</dt>
+                <dt className="inline-flex items-center gap-1 text-xs text-slate-600">
+                  UTM source
+                  <InfoTooltip text="Font de trànsit: google, instagram, newsletter..." />
+                </dt>
                 <dd className="text-slate-700 break-all">{lead.utmSource || '-'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-600">UTM medium</dt>
+                <dt className="inline-flex items-center gap-1 text-xs text-slate-600">
+                  UTM medium
+                  <InfoTooltip text="Tipus de canal: cpc, social, email, organic..." />
+                </dt>
                 <dd className="text-slate-700 break-all">{lead.utmMedium || '-'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-600">UTM campaign</dt>
+                <dt className="inline-flex items-center gap-1 text-xs text-slate-600">
+                  UTM campaign
+                  <InfoTooltip text="Nom de la campanya de captació." />
+                </dt>
                 <dd className="text-slate-700 break-all">{lead.utmCampaign || '-'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-600">Landing</dt>
+                <dt className="inline-flex items-center gap-1 text-xs text-slate-600">
+                  Landing
+                  <InfoTooltip text="URL de la pàgina on era l'usuari abans d'enviar el formulari." />
+                </dt>
                 <dd className="text-slate-700 break-all">{lead.landingPage || '-'}</dd>
               </div>
             </dl>

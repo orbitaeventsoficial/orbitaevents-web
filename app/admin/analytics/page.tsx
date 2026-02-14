@@ -138,6 +138,7 @@ const SOURCE_LABELS: Record<string, string> = {
   PHONE: 'Telèfon',
   WHATSAPP: 'WhatsApp',
   INSTAGRAM: 'Instagram',
+  WALLAPOP: 'Wallapop',
   REFERRAL: 'Referit',
   GOOGLE: 'Google',
   OTHER: 'Altres',

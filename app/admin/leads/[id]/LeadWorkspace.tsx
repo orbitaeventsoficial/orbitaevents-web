@@ -145,6 +145,17 @@ export default function LeadWorkspace({
     setDocFile(null);
   };
 
+  const deleteActivity = async (activityId: string) => {
+    const confirmed = window.confirm('Vols eliminar aquesta activitat del timeline?');
+    if (!confirmed) return;
+
+    const res = await fetch(`/api/admin/leads-new/${leadId}/activities/${activityId}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) return;
+    setActivities((prev) => prev.filter((activity) => activity.id !== activityId));
+  };
+
   return (
     <div className="space-y-6">
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -337,7 +348,16 @@ export default function LeadWorkspace({
                       <p className="text-xs text-slate-500">Per: {activity.createdBy}</p>
                     )}
                   </div>
-                  <div className="text-xs text-slate-500">{formatDateTime(activity.createdAt)}</div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-xs text-slate-500">{formatDateTime(activity.createdAt)}</div>
+                    <button
+                      type="button"
+                      onClick={() => deleteActivity(activity.id)}
+                      className="rounded-lg border border-rose-300 bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
               </div>
             ))

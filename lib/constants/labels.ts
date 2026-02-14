@@ -31,6 +31,7 @@ export const SOURCE_LABELS: Record<string, string> = {
   website: 'Web',
   instagram: 'Instagram',
   whatsapp: 'WhatsApp',
+  wallapop: 'Wallapop',
   referral: 'Referència',
   google: 'Google',
   other: 'Altre',

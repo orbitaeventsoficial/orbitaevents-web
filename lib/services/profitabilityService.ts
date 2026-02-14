@@ -69,6 +69,7 @@ const DEFAULT_CONFIG: ProfitabilityConfig = {
     PHONE: 12,
     WHATSAPP: 10,
     INSTAGRAM: 35,
+    WALLAPOP: 16,
     REFERRAL: 8,
     GOOGLE: 28,
     OTHER: 20,
