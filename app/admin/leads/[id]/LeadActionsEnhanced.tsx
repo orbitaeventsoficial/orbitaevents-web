@@ -22,6 +22,7 @@ const STATUS_OPTIONS = [
 ];
 
 const PACK_OPTIONS = [
+  { value: 'manual', label: 'Manual / Personalitzat ✍️', price: 0, hours: 0 },
   { value: 'flash', label: 'Pack Flash ⚡', price: 450, hours: 4 },
   { value: 'party-starter', label: 'Pack Party Starter 🎉', price: 650, hours: 5 },
   { value: 'premium', label: 'Pack Premium ✨', price: 950, hours: 6 },
@@ -51,6 +52,7 @@ export default function LeadActionsEnhanced({
   const [quoteHtml, setQuoteHtml] = useState<string | null>(null);
 
   const selectedPackInfo = PACK_OPTIONS.find(p => p.value === selectedPack);
+  const isManualMode = selectedPack === 'manual';
 
   const parseCustomPrice = (): number | null => {
     const raw = customPriceInput.trim();
@@ -61,7 +63,9 @@ export default function LeadActionsEnhanced({
     return Math.round(value * 100) / 100;
   };
 
-  const effectivePrice = parseCustomPrice() ?? selectedPackInfo?.price ?? 0;
+  const effectivePrice = isManualMode
+    ? parseCustomPrice() ?? 0
+    : parseCustomPrice() ?? selectedPackInfo?.price ?? 0;
 
   const handleStatusChange = async (newStatus: string) => {
     if (newStatus === optimisticStatus) return;
@@ -104,7 +108,7 @@ export default function LeadActionsEnhanced({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          packId: selectedPack,
+          packId: isManualMode ? 'flash' : selectedPack,
           customPrice: parseCustomPrice(),
         }),
       });
@@ -131,7 +135,7 @@ export default function LeadActionsEnhanced({
 
   const handlePreviewQuote = () => {
     const params = new URLSearchParams();
-    params.set('packId', selectedPack);
+    params.set('packId', isManualMode ? 'flash' : selectedPack);
     const customPrice = parseCustomPrice();
     if (typeof customPrice === 'number' && Number.isFinite(customPrice) && customPrice > 0) {
       params.set('customPrice', String(customPrice));
@@ -212,7 +216,9 @@ export default function LeadActionsEnhanced({
             >
               {PACK_OPTIONS.map((pack) => (
                 <option key={pack.value} value={pack.value}>
-                  {pack.label} - {pack.price}€ ({pack.hours}h)
+                  {pack.value === 'manual'
+                    ? pack.label
+                    : `${pack.label} - ${pack.price}€ (${pack.hours}h)`}
                 </option>
               ))}
             </select>
@@ -221,15 +227,20 @@ export default function LeadActionsEnhanced({
           {/* Preu personalitzat */}
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-2">
-              Preu personalitzat (opcional)
+              Preu personalitzat {isManualMode ? '(obligatori)' : '(opcional)'}
             </label>
             <input
               type="text"
               inputMode="decimal"
               value={customPriceInput}
               onChange={(e) => setCustomPriceInput(e.target.value)}
-              placeholder={`${selectedPackInfo?.price}€ (per defecte). Ex: 200 o 200,00`}
-              className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              placeholder={
+                isManualMode
+                  ? 'Ex: 200 o 200,00'
+                  : `${selectedPackInfo?.price}€ (per defecte). Ex: 200 o 200,00`
+              }
+              disabled={!isManualMode}
+              className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-stone-100 disabled:text-slate-400"
             />
           </div>
 
@@ -253,14 +264,15 @@ export default function LeadActionsEnhanced({
           <div className="flex gap-2">
             <button
               onClick={handlePreviewQuote}
+              disabled={isManualMode && effectivePrice <= 0}
               type="button"
-              className="flex-1 px-4 py-2 border border-stone-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="flex-1 px-4 py-2 border border-stone-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               👁️ Preview
             </button>
             <button
               onClick={handleGenerateQuote}
-              disabled={isGenerating}
+              disabled={isGenerating || (isManualMode && effectivePrice <= 0)}
               type="button"
               aria-busy={isGenerating}
               className="flex-1 px-4 py-2 bg-amber-500 rounded-lg text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-50"
