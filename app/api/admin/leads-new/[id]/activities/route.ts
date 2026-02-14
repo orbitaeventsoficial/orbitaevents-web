@@ -8,6 +8,13 @@ interface Params {
   params: { id: string };
 }
 
+function uidFromMetadata(metadata: unknown): string | null {
+  if (!metadata || typeof metadata !== 'object') return null;
+  const uid = (metadata as { uid?: unknown }).uid;
+  if (typeof uid === 'number' || typeof uid === 'string') return String(uid);
+  return null;
+}
+
 const activitySchema = z.object({
   type: z.enum(['NOTE', 'STATUS_CHANGE', 'EMAIL', 'CALL', 'WHATSAPP', 'DOCUMENT', 'TASK', 'SYSTEM']).optional(),
   title: z.string().min(1),
@@ -54,5 +61,56 @@ export async function POST(req: NextRequest, { params }: Params) {
   } catch (error) {
     log.error('Error creant activitat', error);
     return NextResponse.json({ error: 'Error creant activitat' }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
+  try {
+    const activities = await prisma.leadActivity.findMany({
+      where: { leadId: params.id },
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        createdBy: true,
+        metadata: true,
+      },
+    });
+
+    const keepByKey = new Map<string, string>();
+    const idsToDelete: string[] = [];
+
+    for (const activity of activities) {
+      const uid = uidFromMetadata(activity.metadata);
+      const key = [
+        uid ? `uid:${uid}` : '',
+        `title:${(activity.title || '').trim()}`,
+        `desc:${(activity.description || '').trim()}`,
+        `by:${(activity.createdBy || '').trim()}`,
+      ].join('|');
+
+      if (keepByKey.has(key)) {
+        idsToDelete.push(activity.id);
+      } else {
+        keepByKey.set(key, activity.id);
+      }
+    }
+
+    if (idsToDelete.length > 0) {
+      await prisma.leadActivity.deleteMany({
+        where: {
+          id: { in: idsToDelete },
+          leadId: params.id,
+        },
+      });
+    }
+
+    return NextResponse.json({ ok: true, deleted: idsToDelete.length });
+  } catch (error) {
+    log.error('Error netejant activitats duplicades', error);
+    return NextResponse.json({ error: 'Error netejant activitats duplicades' }, { status: 500 });
   }
 }

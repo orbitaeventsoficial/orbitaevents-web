@@ -28,7 +28,9 @@ export default function LeadNotesPanel({
 }) {
   const [notes, setNotes] = useState(initialNotes);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [cleaning, setCleaning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const deleteNote = async (noteId: string) => {
     const confirmed = window.confirm('Vols eliminar aquesta nota?');
@@ -51,11 +53,48 @@ export default function LeadNotesPanel({
     }
   };
 
+  const cleanDuplicates = async () => {
+    if (cleaning) return;
+    setCleaning(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await fetch(`/api/admin/leads-new/${leadId}/notes`, {
+        method: 'PUT',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'No s’han pogut netejar duplicats');
+      if ((data.deleted || 0) > 0) {
+        setSuccess(`S'han eliminat ${data.deleted} notes duplicades.`);
+        window.location.reload();
+      } else {
+        setSuccess('No hi havia notes duplicades.');
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error netejant duplicats');
+    } finally {
+      setCleaning(false);
+    }
+  };
+
   return (
     <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-700 mb-4">Notes ({notes.length})</h2>
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold text-slate-700">Notes ({notes.length})</h2>
+        <button
+          type="button"
+          onClick={cleanDuplicates}
+          disabled={cleaning}
+          className="rounded-md border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-60"
+        >
+          {cleaning ? 'Netejant...' : 'Netejar duplicats'}
+        </button>
+      </div>
       {error && (
         <p className="mb-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>
+      )}
+      {success && (
+        <p className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</p>
       )}
 
       {notes.length === 0 ? (

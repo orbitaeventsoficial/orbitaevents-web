@@ -9,6 +9,11 @@ interface Params {
   params: { id: string };
 }
 
+function extractUid(content: string): string | null {
+  const match = content.match(/\(UID\s*(\d+)\)/i);
+  return match?.[1] || null;
+}
+
 // POST - Afegir nota a un lead
 export async function POST(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
@@ -65,6 +70,47 @@ export async function POST(req: NextRequest, { params }: Params) {
       { error: 'Error creant nota' },
       { status: 500 }
     );
+  }
+}
+
+// PUT - Netejar notes duplicades
+export async function PUT(req: NextRequest, { params }: Params) {
+  const authError = requireAuth(req);
+  if (authError) return authError;
+  try {
+    const notes = await prisma.leadNote.findMany({
+      where: { leadId: params.id },
+      orderBy: { createdAt: 'asc' },
+      select: { id: true, content: true },
+    });
+
+    const keepByKey = new Map<string, string>();
+    const idsToDelete: string[] = [];
+
+    for (const note of notes) {
+      const uid = extractUid(note.content);
+      const normalized = note.content.trim().replace(/\s+/g, ' ');
+      const key = uid ? `uid:${uid}` : `content:${normalized}`;
+      if (keepByKey.has(key)) {
+        idsToDelete.push(note.id);
+      } else {
+        keepByKey.set(key, note.id);
+      }
+    }
+
+    if (idsToDelete.length > 0) {
+      await prisma.leadNote.deleteMany({
+        where: {
+          id: { in: idsToDelete },
+          leadId: params.id,
+        },
+      });
+    }
+
+    return NextResponse.json({ ok: true, deleted: idsToDelete.length });
+  } catch (error) {
+    log.error('Error netejant notes duplicades:', error);
+    return NextResponse.json({ error: 'Error netejant notes duplicades' }, { status: 500 });
   }
 }
 

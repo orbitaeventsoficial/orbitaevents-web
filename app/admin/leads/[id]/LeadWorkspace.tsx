@@ -62,6 +62,7 @@ export default function LeadWorkspace({
   const [docFile, setDocFile] = useState<File | null>(null);
   const [loadingTask, setLoadingTask] = useState(false);
   const [loadingDoc, setLoadingDoc] = useState(false);
+  const [cleaningActivities, setCleaningActivities] = useState(false);
 
   const openTasks = useMemo(
     () => tasks.filter((task) => task.status !== 'DONE' && task.status !== 'CANCELLED'),
@@ -154,6 +155,17 @@ export default function LeadWorkspace({
     });
     if (!res.ok) return;
     setActivities((prev) => prev.filter((activity) => activity.id !== activityId));
+  };
+
+  const cleanDuplicateActivities = async () => {
+    if (cleaningActivities) return;
+    setCleaningActivities(true);
+    const res = await fetch(`/api/admin/leads-new/${leadId}/activities`, {
+      method: 'DELETE',
+    });
+    setCleaningActivities(false);
+    if (!res.ok) return;
+    refreshActivities();
   };
 
   return (
@@ -329,7 +341,17 @@ export default function LeadWorkspace({
       </div>
 
       <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-800">Timeline comercial</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-lg font-semibold text-slate-800">Timeline comercial</h2>
+          <button
+            type="button"
+            onClick={cleanDuplicateActivities}
+            disabled={cleaningActivities}
+            className="rounded-md border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-60"
+          >
+            {cleaningActivities ? 'Netejant...' : 'Netejar duplicats'}
+          </button>
+        </div>
         <div className="mt-4 space-y-3">
           {activities.length === 0 ? (
             <p className="rounded-xl border border-dashed border-stone-200 p-4 text-sm text-slate-500">
