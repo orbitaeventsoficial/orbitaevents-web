@@ -169,7 +169,15 @@ async function getLeads(filters: {
           orderBy: { createdAt: 'desc' },
           skip: (page - 1) * pageSize,
           take: pageSize,
-          include: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            eventType: true,
+            eventDate: true,
+            status: true,
+            priority: true,
             _count: {
               select: {
                 notes: true,
