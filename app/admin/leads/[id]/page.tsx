@@ -180,7 +180,12 @@ export default async function LeadDetailPage({ params }: Props) {
         { email: lead.email },
       ],
     },
-    include: {
+    select: {
+      id: true,
+      eventType: true,
+      status: true,
+      eventDate: true,
+      createdAt: true,
       booking: {
         select: {
           id: true,
