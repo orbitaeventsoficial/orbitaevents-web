@@ -46,9 +46,22 @@ export default function LeadActionsEnhanced({
   // Quote generation state
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [selectedPack, setSelectedPack] = useState(PACK_OPTIONS[0].value);
-  const [customPrice, setCustomPrice] = useState<number | null>(null);
+  const [customPriceInput, setCustomPriceInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [quoteHtml, setQuoteHtml] = useState<string | null>(null);
+
+  const selectedPackInfo = PACK_OPTIONS.find(p => p.value === selectedPack);
+
+  const parseCustomPrice = (): number | null => {
+    const raw = customPriceInput.trim();
+    if (!raw) return null;
+    const normalized = raw.replace(/[€\s]/g, '').replace(',', '.');
+    const value = Number(normalized);
+    if (!Number.isFinite(value) || value <= 0) return null;
+    return Math.round(value * 100) / 100;
+  };
+
+  const effectivePrice = parseCustomPrice() ?? selectedPackInfo?.price ?? 0;
 
   const handleStatusChange = async (newStatus: string) => {
     if (newStatus === optimisticStatus) return;
@@ -92,7 +105,7 @@ export default function LeadActionsEnhanced({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           packId: selectedPack,
-          customPrice: customPrice,
+          customPrice: parseCustomPrice(),
         }),
       });
 
@@ -119,6 +132,7 @@ export default function LeadActionsEnhanced({
   const handlePreviewQuote = () => {
     const params = new URLSearchParams();
     params.set('packId', selectedPack);
+    const customPrice = parseCustomPrice();
     if (typeof customPrice === 'number' && Number.isFinite(customPrice) && customPrice > 0) {
       params.set('customPrice', String(customPrice));
     }
@@ -135,8 +149,6 @@ export default function LeadActionsEnhanced({
       }
     }
   };
-
-  const selectedPackInfo = PACK_OPTIONS.find(p => p.value === selectedPack);
 
   return (
     <div className="space-y-6">
@@ -212,10 +224,11 @@ export default function LeadActionsEnhanced({
               Preu personalitzat (opcional)
             </label>
             <input
-              type="number"
-              value={customPrice || ''}
-              onChange={(e) => setCustomPrice(e.target.value ? Number(e.target.value) : null)}
-              placeholder={`${selectedPackInfo?.price}€ (per defecte)`}
+              type="text"
+              inputMode="decimal"
+              value={customPriceInput}
+              onChange={(e) => setCustomPriceInput(e.target.value)}
+              placeholder={`${selectedPackInfo?.price}€ (per defecte). Ex: 200 o 200,00`}
               className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
             />
           </div>
@@ -224,15 +237,15 @@ export default function LeadActionsEnhanced({
           <div className="p-3 bg-slate-50 rounded-lg">
             <div className="flex justify-between text-sm">
               <span className="text-slate-600">Base:</span>
-              <span className="font-medium">{customPrice || selectedPackInfo?.price}€</span>
+              <span className="font-medium">{effectivePrice}€</span>
             </div>
             <div className="flex justify-between text-sm mt-1">
               <span className="text-slate-600">IVA (21%):</span>
-              <span className="font-medium">{((customPrice || selectedPackInfo?.price || 0) * 0.21).toFixed(2)}€</span>
+              <span className="font-medium">{(effectivePrice * 0.21).toFixed(2)}€</span>
             </div>
             <div className="flex justify-between text-sm mt-2 pt-2 border-t border-stone-200">
               <span className="font-semibold text-slate-700">Total:</span>
-              <span className="font-bold text-amber-600">{((customPrice || selectedPackInfo?.price || 0) * 1.21).toFixed(2)}€</span>
+              <span className="font-bold text-amber-600">{(effectivePrice * 1.21).toFixed(2)}€</span>
             </div>
           </div>
 
