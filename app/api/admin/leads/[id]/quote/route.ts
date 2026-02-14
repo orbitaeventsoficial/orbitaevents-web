@@ -54,6 +54,47 @@ interface RouteContext {
   params: { id: string };
 }
 
+type LeadQuoteRow = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  eventType: string;
+  eventDate: Date | null;
+  eventLocation: string | null;
+  guestCount: number | null;
+  budget: string | null;
+  message: string | null;
+  interestedPackId: string | null;
+  interestedExtras: string[] | null;
+  source: string;
+  preferredLocale: string;
+};
+
+async function fetchLeadForQuote(leadId: string): Promise<LeadQuoteRow | null> {
+  const rows = await prisma.$queryRaw<LeadQuoteRow[]>`
+    SELECT
+      id,
+      name,
+      email,
+      phone,
+      "eventType",
+      "eventDate",
+      "eventLocation",
+      "guestCount",
+      budget,
+      message,
+      "interestedPackId",
+      "interestedExtras",
+      source,
+      "preferredLocale"
+    FROM "leads"
+    WHERE id = ${leadId}
+    LIMIT 1
+  `;
+  return rows[0] || null;
+}
+
 function parsePositiveNumber(value: string | null): number | null {
   if (!value) return null;
   const num = Number(value);
@@ -67,9 +108,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   if (authError) return authError;
   try {
     const template = await getQuoteTemplateSettings();
-    const lead = await prisma.lead.findUnique({
-      where: { id: params.id },
-    });
+    const lead = await fetchLeadForQuote(params.id);
 
     if (!lead) {
       return NextResponse.json({ error: 'Lead no trobat' }, { status: 404 });
@@ -126,9 +165,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     const body = await req.json().catch(() => ({}));
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
     
-    const lead = await prisma.lead.findUnique({
-      where: { id: params.id },
-    });
+    const lead = await fetchLeadForQuote(params.id);
 
     if (!lead) {
       return NextResponse.json({ error: 'Lead no trobat' }, { status: 404 });
@@ -161,11 +198,10 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     quoteData.quoteNumber = quoteNumber;
 
     // Actualitzar lead amb estat QUOTE_SENT
-    await prisma.lead.update({
+    await prisma.lead.updateMany({
       where: { id: params.id },
       data: {
         status: 'QUOTE_SENT',
-        updatedAt: new Date(),
       },
     });
 

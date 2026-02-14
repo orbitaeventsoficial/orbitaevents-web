@@ -21,6 +21,7 @@ interface Props {
 export async function generateMetadata({ params }: Props) {
   const lead = await prisma.lead.findUnique({
     where: { id: params.id },
+    select: { name: true },
   });
 
   return {
@@ -71,7 +72,33 @@ function parseBudgetValue(input?: string | null): number | null {
 export default async function LeadDetailPage({ params }: Props) {
   const lead = await prisma.lead.findUnique({
     where: { id: params.id },
-    include: {
+    select: {
+      id: true,
+      customerId: true,
+      name: true,
+      email: true,
+      phone: true,
+      eventType: true,
+      eventDate: true,
+      eventLocation: true,
+      guestCount: true,
+      budget: true,
+      message: true,
+      interestedPackId: true,
+      interestedExtras: true,
+      source: true,
+      landingPage: true,
+      utmSource: true,
+      utmMedium: true,
+      utmCampaign: true,
+      status: true,
+      priority: true,
+      assignedTo: true,
+      preferredLocale: true,
+      createdAt: true,
+      updatedAt: true,
+      contactedAt: true,
+      convertedAt: true,
       customer: {
         select: {
           id: true,
@@ -175,7 +202,6 @@ export default async function LeadDetailPage({ params }: Props) {
       phone: lead.phone,
       eventType: lead.eventType,
       eventDate: lead.eventDate,
-      eventSchedule: lead.eventSchedule,
       eventLocation: lead.eventLocation,
       guestCount: lead.guestCount,
       budget: lead.budget,
@@ -340,7 +366,6 @@ export default async function LeadDetailPage({ params }: Props) {
               email: lead.email,
               phone: lead.phone,
               eventDate: lead.eventDate ? lead.eventDate.toISOString() : null,
-              eventSchedule: lead.eventSchedule,
               eventType: lead.eventType,
               eventLocation: lead.eventLocation,
               guestCount: lead.guestCount,

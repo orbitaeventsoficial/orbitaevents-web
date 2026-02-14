@@ -19,7 +19,6 @@ const updateLeadSchema = z.object({
   email: z.string().email().optional(),
   phone: nullableString,
   eventDate: z.string().optional(),
-  eventSchedule: nullableString,
   // EventType enum de Prisma
   eventType: z.enum(['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER']).optional(),
   // LeadStatus enum de Prisma
@@ -50,7 +49,33 @@ export async function GET(req: NextRequest, { params }: Params) {
   try {
     const lead = await prisma.lead.findUnique({
       where: { id: params.id },
-      include: {
+      select: {
+        id: true,
+        customerId: true,
+        name: true,
+        email: true,
+        phone: true,
+        eventType: true,
+        eventDate: true,
+        eventLocation: true,
+        guestCount: true,
+        budget: true,
+        message: true,
+        interestedPackId: true,
+        interestedExtras: true,
+        source: true,
+        landingPage: true,
+        utmSource: true,
+        utmMedium: true,
+        utmCampaign: true,
+        status: true,
+        priority: true,
+        assignedTo: true,
+        preferredLocale: true,
+        createdAt: true,
+        updatedAt: true,
+        contactedAt: true,
+        convertedAt: true,
         notes: { orderBy: { createdAt: 'desc' }, take: 10 },
         activities: { orderBy: { createdAt: 'desc' }, take: 20 },
         tasks: { orderBy: { createdAt: 'desc' }, take: 10 },
@@ -121,6 +146,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     const existing = await prisma.lead.findUnique({
       where: { id },
+      select: {
+        id: true,
+        status: true,
+        contactedAt: true,
+      },
     });
 
     if (!existing) {
@@ -189,7 +219,12 @@ export async function DELETE(req: NextRequest, { params }: Params) {
 
     const existing = await prisma.lead.findUnique({
       where: { id },
-      include: { booking: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        booking: { select: { id: true } },
+      },
     });
 
     if (!existing) {

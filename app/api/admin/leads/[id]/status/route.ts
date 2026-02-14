@@ -38,6 +38,18 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     // Verificar que el lead existeix
     const existingLead = await prisma.lead.findUnique({
       where: { id },
+      select: {
+        id: true,
+        status: true,
+        contactedAt: true,
+        convertedAt: true,
+        customerId: true,
+        email: true,
+        phone: true,
+        name: true,
+        source: true,
+        preferredLocale: true,
+      },
     });
 
     if (!existingLead) {

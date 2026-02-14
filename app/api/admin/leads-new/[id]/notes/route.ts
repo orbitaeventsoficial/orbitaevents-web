@@ -33,6 +33,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     // Verificar que el lead existeix
     const lead = await prisma.lead.findUnique({
       where: { id },
+      select: { id: true },
     });
 
     if (!lead) {

@@ -10,7 +10,6 @@ type LeadProfile = {
   email: string;
   phone?: string | null;
   eventDate?: string | null;
-  eventSchedule?: string | null;
   eventType?: string | null;
   eventLocation?: string | null;
   guestCount?: number | null;
@@ -77,7 +76,6 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     email: lead.email || '',
     phone: lead.phone || '',
     eventDate: lead.eventDate ? lead.eventDate.slice(0, 10) : '',
-    eventSchedule: lead.eventSchedule || '',
     eventType: lead.eventType || 'OTHER',
     eventLocation: lead.eventLocation || '',
     guestCount: lead.guestCount?.toString() || '',
@@ -138,7 +136,6 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         email: form.email,
         phone: form.phone || null,
         eventDate: form.eventDate || undefined,
-        eventSchedule: form.eventSchedule || null,
         eventType: form.eventType,
         eventLocation: form.eventLocation || null,
         guestCount: form.guestCount ? Number(form.guestCount) : undefined,
@@ -238,15 +235,6 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
             value={form.eventDate}
             onChange={(e) => updateField('eventDate', e.target.value)}
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
-          Horari (de - a)
-          <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
-            value={form.eventSchedule}
-            onChange={(e) => updateField('eventSchedule', e.target.value)}
-            placeholder="19:30 - 23:00"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm text-slate-600">
