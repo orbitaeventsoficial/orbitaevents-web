@@ -69,7 +69,12 @@ export async function GET(req: NextRequest) {
     // Si només vol el comptador de leads nous
     const countOnly = searchParams.get('countOnly') === 'true';
     if (countOnly) {
-      const count = await prisma.lead.count({ where: { status: 'NEW' } });
+      const count = await prisma.lead.count({
+        where: {
+          status: 'NEW',
+          NOT: { email: { contains: '@leads.orbitaevents.local' } },
+        },
+      });
       return NextResponse.json({ ok: true, count });
     }
 

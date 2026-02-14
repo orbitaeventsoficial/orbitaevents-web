@@ -1128,12 +1128,12 @@ html.admin-mode,
 body.admin-mode,
 body.admin-mode.hero-loading,
 body.admin-mode:not(.intro-done) {
-  background-color: #0b1120 !important;
-  background: #0b1120 !important;
+  background-color: #111315 !important;
+  background: #111315 !important;
 }
 
 html.admin-mode::before {
-  background: #0b1120 !important;
+  background: #111315 !important;
 }
 
 html.admin-mode header,
@@ -1144,18 +1144,18 @@ body.admin-mode .header,
 body.admin-mode [class*="Header"],
 body.admin-mode header.scrolled,
 body.admin-mode .header-scrolled {
-  background: #0f172a !important;
-  border-bottom: 1px solid #1e293b !important;
+  background: #1a1e22 !important;
+  border-bottom: 1px solid #323841 !important;
 }
 
 html.admin-mode {
-  --bg-main: #0b1120;
-  --bg-surface: #0f172a;
-  --bg-card: #ffffff;
-  --bg-elevated: #e2e8f0;
-  --color-bg-primary: #0b1120;
-  --color-bg-secondary: #0f172a;
-  --color-bg-card: #ffffff;
+  --bg-main: #111315;
+  --bg-surface: #1a1e22;
+  --bg-card: #f4f1e8;
+  --bg-elevated: #ebe4d6;
+  --color-bg-primary: #111315;
+  --color-bg-secondary: #1a1e22;
+  --color-bg-card: #f4f1e8;
 }
 
 html.admin-mode .card,
@@ -1168,8 +1168,8 @@ html.admin-mode .card-elegant,
 body.admin-mode .card-elegant,
 html.admin-mode .card-swipe-item,
 body.admin-mode .card-swipe-item {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
+  background: #f4f1e8 !important;
+  border-color: #e0d6c3 !important;
 }
 
 html.admin-mode body {
@@ -1212,33 +1212,33 @@ html.admin-mode .admin-shell .card {
 html.admin-mode .admin-shell input:not([type='checkbox']):not([type='radio']):not([type='file']),
 html.admin-mode .admin-shell select,
 html.admin-mode .admin-shell textarea {
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  color: #334155;
+  border: 1px solid #d8ccba;
+  background: #f7f2e8;
+  color: #2f2b26;
 }
 
 html.admin-mode .admin-shell input::placeholder,
 html.admin-mode .admin-shell textarea::placeholder {
-  color: #94a3b8;
+  color: #8c8172;
 }
 
 html.admin-mode .admin-shell table thead tr {
-  background: #f8fafc;
+  background: #efe6d7;
 }
 
 html.admin-mode .admin-shell table th {
-  color: #475569;
+  color: #6f6457;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 html.admin-mode .admin-shell table td {
-  color: #334155;
+  color: #3b342d;
 }
 
 html.admin-mode .admin-shell table tbody tr:hover {
-  background: #f8fafc;
+  background: #f1eadf;
 }
 html::before {
   content: '';

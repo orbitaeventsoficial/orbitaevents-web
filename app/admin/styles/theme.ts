@@ -36,46 +36,46 @@
 
 // Background colors
 export const bg = {
-  primary: 'bg-slate-100',
-  secondary: 'bg-white',
-  card: 'bg-white',
-  elevated: 'bg-slate-50',
-  input: 'bg-white',
+  primary: 'bg-[#111315]',
+  secondary: 'bg-[#1a1e22]',
+  card: 'bg-[#f4f1e8]',
+  elevated: 'bg-[#ebe4d6]',
+  input: 'bg-[#f7f2e8]',
 } as const;
 
 // Border colors
 export const border = {
-  subtle: 'border-stone-200',
-  default: 'border-stone-300',
-  focus: 'focus:border-slate-500',
+  subtle: 'border-[#e0d6c3]',
+  default: 'border-[#d4c7b2]',
+  focus: 'focus:border-[#b8871e]',
 } as const;
 
 // Text colors
 export const text = {
-  primary: 'text-slate-800',
-  secondary: 'text-slate-700',
-  muted: 'text-slate-500',
-  accent: 'text-slate-700',
+  primary: 'text-[#2f2b26]',
+  secondary: 'text-[#3b342d]',
+  muted: 'text-[#6f6457]',
+  accent: 'text-[#b8871e]',
 } as const;
 
 // Accent gradients for stat cards
 export const accent = {
-  cyan: 'from-cyan-500/10 to-blue-600/5',
+  cyan: 'from-amber-500/10 to-orange-600/5',
   emerald: 'from-emerald-500/10 to-emerald-600/5',
   rose: 'from-rose-500/10 to-rose-600/5',
   amber: 'from-amber-500/10 to-amber-600/5',
-  purple: 'from-purple-500/10 to-purple-600/5',
-  sky: 'from-sky-500/10 to-sky-600/5',
+  purple: 'from-stone-500/10 to-amber-600/5',
+  sky: 'from-orange-500/10 to-amber-600/5',
 } as const;
 
 // Accent border colors
 export const accentBorder = {
-  cyan: 'border-cyan-500/20',
+  cyan: 'border-amber-500/20',
   emerald: 'border-emerald-500/20',
   rose: 'border-rose-500/20',
   amber: 'border-amber-500/20',
-  purple: 'border-purple-500/20',
-  sky: 'border-sky-500/20',
+  purple: 'border-stone-500/20',
+  sky: 'border-orange-500/20',
 } as const;
 
 // Badge colors (semi-transparent for dark theme)
@@ -83,7 +83,7 @@ export const badge = {
   blue: 'bg-blue-500/20 text-blue-300',
   yellow: 'bg-yellow-500/20 text-yellow-300',
   purple: 'bg-purple-500/20 text-purple-300',
-  orange: 'bg-orange-500/20 text-orange-300',
+  orange: 'bg-amber-500/20 text-amber-300',
   green: 'bg-emerald-500/20 text-emerald-300',
   red: 'bg-rose-500/20 text-rose-300',
   gray: 'bg-slate-500/20 text-slate-300',
@@ -91,41 +91,41 @@ export const badge = {
 
 // Common component classes
 export const card = {
-  base: 'rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm',
-  header: 'bg-slate-700/30 border-b border-slate-700/50',
-  hover: 'hover:bg-slate-700/40',
+  base: 'rounded-2xl border border-[#d4c7b2] bg-[#f4f1e8] backdrop-blur-sm',
+  header: 'bg-[#ebe4d6] border-b border-[#d4c7b2]',
+  hover: 'hover:bg-[#efe6d7]',
 } as const;
 
 export const button = {
-  primary: 'rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 active:from-cyan-600 active:to-blue-700',
-  secondary: 'rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-slate-200 hover:bg-slate-600/50',
-  ghost: 'rounded-xl bg-transparent px-4 py-2 text-slate-400 hover:bg-slate-700/50 hover:text-slate-200',
+  primary: 'rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 px-4 py-2 text-white shadow-lg shadow-amber-600/20 hover:from-amber-500 hover:to-orange-500 active:from-amber-700 active:to-orange-700',
+  secondary: 'rounded-xl border border-[#d4c7b2] bg-[#f7f2e8] px-4 py-2 text-[#3b342d] hover:bg-[#efe6d7]',
+  ghost: 'rounded-xl bg-transparent px-4 py-2 text-[#6f6457] hover:bg-[#efe6d7] hover:text-[#3b342d]',
 } as const;
 
 export const input = {
-  base: 'rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500',
+  base: 'rounded-xl border border-[#d4c7b2] bg-[#f7f2e8] px-4 py-2 text-[#2f2b26] placeholder:text-[#8c8172] focus:border-[#b8871e] focus:ring-1 focus:ring-[#b8871e]',
 } as const;
 
 // Table styles
 export const table = {
-  header: 'bg-slate-700/30 border-b border-slate-700/50',
-  row: 'border-b border-slate-700/30 hover:bg-slate-700/30',
+  header: 'bg-[#efe6d7] border-b border-[#d4c7b2]',
+  row: 'border-b border-[#e0d6c3] hover:bg-[#f1eadf]',
   cell: 'px-4 py-3',
 } as const;
 
 // Status colors for leads/bookings (dark theme)
 export const statusColors = {
-  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Nou' },
-  CONTACTED: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Contactat' },
-  QUOTE_SENT: { bg: 'bg-purple-500/20', text: 'text-purple-300', label: 'Pressupost' },
-  NEGOTIATING: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'Negociant' },
-  WON: { bg: 'bg-emerald-500/20', text: 'text-emerald-300', label: 'Guanyat' },
-  LOST: { bg: 'bg-slate-500/20', text: 'text-slate-400', label: 'Perdut' },
-  PENDING: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Pendent' },
+  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Nuevo' },
+  CONTACTED: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Contactado' },
+  QUOTE_SENT: { bg: 'bg-purple-500/20', text: 'text-purple-300', label: 'Presupuesto' },
+  NEGOTIATING: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'Negociando' },
+  WON: { bg: 'bg-emerald-500/20', text: 'text-emerald-300', label: 'Ganado' },
+  LOST: { bg: 'bg-slate-500/20', text: 'text-slate-400', label: 'Perdido' },
+  PENDING: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Pendiente' },
   CONFIRMED: { bg: 'bg-emerald-500/20', text: 'text-emerald-300', label: 'Confirmada' },
-  PREPARING: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Preparant' },
+  PREPARING: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Preparando' },
   COMPLETED: { bg: 'bg-teal-500/20', text: 'text-teal-300', label: 'Completada' },
-  CANCELLED: { bg: 'bg-rose-500/20', text: 'text-rose-300', label: 'Cancel·lada' },
+  CANCELLED: { bg: 'bg-rose-500/20', text: 'text-rose-300', label: 'Cancelada' },
 } as const;
 
 // Priority colors

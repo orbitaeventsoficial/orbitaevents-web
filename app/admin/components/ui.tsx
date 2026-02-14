@@ -12,34 +12,34 @@ type AccentColor = 'cyan' | 'emerald' | 'rose' | 'amber' | 'purple' | 'sky';
 
 const accentStyles: Record<AccentColor, { gradient: string; border: string; text: string }> = {
   cyan: {
-    gradient: 'from-cyan-50 to-blue-50',
-    border: 'border-cyan-200 hover:border-cyan-300',
-    text: 'text-cyan-700',
+    gradient: 'from-amber-50 to-orange-100/50',
+    border: 'border-amber-200 hover:border-amber-300',
+    text: 'text-amber-800',
   },
   emerald: {
-    gradient: 'from-emerald-50 to-emerald-100/50',
+    gradient: 'from-emerald-50 to-lime-100/40',
     border: 'border-emerald-200 hover:border-emerald-300',
-    text: 'text-emerald-700',
+    text: 'text-emerald-800',
   },
   rose: {
-    gradient: 'from-rose-50 to-rose-100/50',
+    gradient: 'from-rose-50 to-red-100/50',
     border: 'border-rose-200 hover:border-rose-300',
-    text: 'text-rose-700',
+    text: 'text-rose-800',
   },
   amber: {
-    gradient: 'from-amber-50 to-amber-100/60',
+    gradient: 'from-amber-50 to-orange-100/60',
     border: 'border-amber-200 hover:border-amber-300',
-    text: 'text-amber-700',
+    text: 'text-amber-800',
   },
   purple: {
-    gradient: 'from-violet-50 to-violet-100/60',
-    border: 'border-violet-200 hover:border-violet-300',
-    text: 'text-violet-700',
+    gradient: 'from-stone-100 to-amber-100/50',
+    border: 'border-stone-300 hover:border-stone-400',
+    text: 'text-stone-800',
   },
   sky: {
-    gradient: 'from-sky-50 to-sky-100/60',
-    border: 'border-sky-200 hover:border-sky-300',
-    text: 'text-sky-700',
+    gradient: 'from-orange-50 to-amber-100/50',
+    border: 'border-orange-200 hover:border-orange-300',
+    text: 'text-orange-800',
   },
 };
 
@@ -100,9 +100,9 @@ export function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden shadow-sm">
+    <div className="rounded-2xl border border-[#e0d6c3] bg-[#f4f1e8] overflow-hidden shadow-sm">
       {(title || subtitle || action) && (
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-stone-200 flex items-center justify-between gap-3 bg-slate-50">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-[#e0d6c3] flex items-center justify-between gap-3 bg-[#ebe4d6]">
           <div className="min-w-0 flex-1">
             {title && <h3 className="text-sm sm:text-base font-semibold text-slate-800 truncate">{title}</h3>}
             {subtitle && <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 truncate">{subtitle}</p>}
@@ -138,9 +138,9 @@ export function Button({
     ${size === 'sm' ? 'px-2.5 sm:px-3 py-1.5 text-xs' : 'px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm'}`;
 
   const variantClasses = {
-    primary: 'bg-slate-800 text-white hover:bg-slate-700 active:bg-slate-900',
-    secondary: 'border border-stone-200 bg-white text-slate-700 hover:bg-slate-50',
-    ghost: 'bg-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-700',
+    primary: 'bg-[#b8871e] text-white hover:bg-[#a57718] active:bg-[#946a14]',
+    secondary: 'border border-[#d6cab7] bg-[#f7f2e8] text-[#3b342d] hover:bg-[#efe6d7]',
+    ghost: 'bg-transparent text-[#6f6457] hover:bg-[#efe6d7] hover:text-[#3b342d]',
   };
 
   const className = `${baseClasses} ${variantClasses[variant]}`;

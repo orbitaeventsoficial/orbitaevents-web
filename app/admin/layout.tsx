@@ -66,6 +66,63 @@ function SidebarItem({
   );
 }
 
+function SidebarSection({
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className="mb-3">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[11px] font-semibold text-slate-400 uppercase tracking-wider hover:bg-slate-800/60"
+      >
+        <span>{title}</span>
+        <span className={`transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
+      </button>
+      {open && <div className="mt-1 space-y-1">{children}</div>}
+    </div>
+  );
+}
+
+function FavoriteChip({
+  href,
+  label,
+  isActive,
+  onClick,
+  onPrefetch,
+}: {
+  href: string;
+  label: string;
+  isActive: boolean;
+  onClick?: () => void;
+  onPrefetch?: (href: string) => void;
+}) {
+  return (
+    <Link
+      href={href}
+      prefetch
+      onClick={onClick}
+      onMouseEnter={() => onPrefetch?.(href)}
+      onFocus={() => onPrefetch?.(href)}
+      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+        isActive
+          ? 'bg-amber-500/20 text-amber-200 border border-amber-500/40'
+          : 'bg-slate-800/70 text-slate-300 border border-slate-700 hover:bg-slate-800'
+      }`}
+    >
+      {label}
+    </Link>
+  );
+}
+
 // Bottom Navigation Item para móvil
 function BottomNavItem({
   icon,
@@ -92,7 +149,7 @@ function BottomNavItem({
         flex flex-col items-center justify-center gap-0.5 py-2 px-1 rounded-xl
         transition-all duration-200 active:scale-95 relative min-w-[60px]
         ${isActive
-          ? 'text-cyan-300'
+          ? 'text-amber-300'
           : 'text-slate-500'
         }
       `}
@@ -100,16 +157,16 @@ function BottomNavItem({
       <span className="text-xl relative">
         {icon}
         {badge && badge > 0 && (
-          <span className="absolute -top-1 -right-2 min-w-[16px] h-4 bg-cyan-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+          <span className="absolute -top-1 -right-2 min-w-[16px] h-4 bg-amber-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
             {badge > 99 ? '99+' : badge}
           </span>
         )}
       </span>
-      <span className={`text-[10px] font-medium ${isActive ? 'text-cyan-300' : 'text-slate-500'}`}>
+      <span className={`text-[10px] font-medium ${isActive ? 'text-amber-300' : 'text-slate-500'}`}>
         {label}
       </span>
       {isActive && (
-        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-cyan-400 rounded-full" />
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-amber-400 rounded-full" />
       )}
     </Link>
   );
@@ -242,68 +299,66 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
   }, []);
 
+  const priorityItems = useMemo(() => ([
+    { icon: '📊', label: 'Dashboard', href: '/admin' },
+    { icon: '👥', label: 'Leads', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
+    { icon: '📋', label: 'Reservas', href: '/admin/bookings' },
+    { icon: '📅', label: 'Calendario', href: '/admin/calendario' },
+    { icon: '💶', label: 'Finanzas', href: '/admin/finanzas' },
+    { icon: '🎯', label: 'Sales Ops', href: '/admin/sales-ops' },
+  ]), [newLeadsCount]);
+
+  const favoriteItems = useMemo(() => ([
+    { label: 'Leads', href: '/admin/leads' },
+    { label: 'Reservas', href: '/admin/bookings' },
+    { label: 'Calendario', href: '/admin/calendario' },
+    { label: 'Presupuestos', href: '/admin/settings/quotes' },
+  ]), []);
+
   const navSections = useMemo(() => ([
     {
-      title: 'General',
+      title: 'CRM Avanzado',
+      defaultOpen: false,
       items: [
-        { icon: '📊', label: 'Dashboard', href: '/admin' },
+        { icon: '📝', label: 'Tareas', href: '/admin/tasks' },
+        { icon: '👤', label: 'Clientes', href: '/admin/contactes' },
+        { icon: '💬', label: 'Mensajes', href: '/admin/mensajes' },
+        { icon: '⭐', label: 'Reseñas', href: '/admin/ressenyes' },
+        { icon: '📝', label: 'Postevento', href: '/admin/post-event' },
+        { icon: '📥', label: 'Inbox (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' as const },
+      ]
+    },
+    {
+      title: 'Negocio Y Contenido',
+      defaultOpen: false,
+      items: [
         { icon: '📈', label: 'Analytics', href: '/admin/analytics' },
-        { icon: '🎯', label: 'Sales Ops', href: '/admin/sales-ops' },
-        { icon: '📊', label: 'Rentabilitat', href: '/admin/rentabilidad' },
-        { icon: '💶', label: 'Finanzas', href: '/admin/finanzas' },
-        { icon: '📅', label: 'Calendari', href: '/admin/calendario' },
-      ]
-    },
-    {
-      title: 'CRM',
-      items: [
-        { icon: '👥', label: 'Leads', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
-        { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
-        { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
-        { icon: '👤', label: 'Clients', href: '/admin/contactes' },
-        { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
-        { icon: '⭐', label: 'Ressenyes', href: '/admin/ressenyes' },
-      ]
-    },
-    {
-      title: 'Contingut',
-      items: [
+        { icon: '📊', label: 'Rentabilidad', href: '/admin/rentabilidad' },
         { icon: '📦', label: 'Packs', href: '/admin/packs' },
-        { icon: '💰', label: 'Preus', href: '/admin/pricing' },
+        { icon: '💰', label: 'Precios', href: '/admin/pricing' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
         { icon: '📝', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
-      ]
-    },
-    {
-      title: 'Operacions',
-      items: [
-        { icon: '🎸', label: 'Inventari', href: '/admin/inventory' },
-        { icon: '📝', label: 'Post-Event', href: '/admin/post-event' },
-      ]
-    },
-    {
-      title: 'Automatització',
-      items: [
-        { icon: '📥', label: 'Inbox (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' as const },
+        { icon: '🎸', label: 'Inventario', href: '/admin/inventory' },
         { icon: '🤖', label: 'Emails Auto', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
         { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
         { icon: '⭐', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
-      ]
-    },
-    {
-      title: 'Configuració',
-      items: [
-        { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
-        { icon: '📄', label: 'Plantilla presupuestos', href: '/admin/settings/quotes' },
-        { icon: '🔗', label: 'Integracions', href: '/admin/settings/integrations' },
-        { icon: '🎛️', label: 'Features', href: '/admin/features' },
-        { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
-        { icon: '🎨', label: 'Tema', href: '/admin/theme' },
-        { icon: '🌐', label: 'Traduccions', href: '/admin/translations' },
         { icon: '📝', label: 'Blog', href: '/admin/blog' },
       ]
     },
-  ]), [newLeadsCount]);
+    {
+      title: 'Configuración',
+      defaultOpen: false,
+      items: [
+        { icon: '⚙️', label: 'Configuración', href: '/admin/settings' },
+        { icon: '📄', label: 'Plantilla presupuestos', href: '/admin/settings/quotes' },
+        { icon: '🔗', label: 'Integraciones', href: '/admin/settings/integrations' },
+        { icon: '🎛️', label: 'Features', href: '/admin/features' },
+        { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
+        { icon: '🎨', label: 'Tema', href: '/admin/theme' },
+        { icon: '🌐', label: 'Traducciones', href: '/admin/translations' },
+      ]
+    },
+  ]), []);
 
   const isActive = useCallback((href: string) => {
     return href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href);
@@ -321,49 +376,49 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const page = segments[segments.length - 1];
     const pageNames: Record<string, string> = {
       leads: 'Leads',
-      bookings: 'Reserves',
-      tasks: 'Tasques',
+      bookings: 'Reservas',
+      tasks: 'Tareas',
       packs: 'Packs',
       analytics: 'Analytics',
       'sales-ops': 'Sales Ops',
-      rentabilidad: 'Rentabilitat',
+      rentabilidad: 'Rentabilidad',
       finanzas: 'Finanzas',
       emails: 'Emails Auto',
       inbox: 'Inbox (IMAP)',
-      calendario: 'Calendari',
-      settings: 'Configuració',
-      integrations: 'Integracions',
+      calendario: 'Calendario',
+      settings: 'Configuración',
+      integrations: 'Integraciones',
       quotes: 'Plantilla presupuestos',
-      inventory: 'Inventari',
-      contactes: 'Clients',
-      mensajes: 'Missatges',
-      ressenyes: 'Ressenyes',
+      inventory: 'Inventario',
+      contactes: 'Clientes',
+      mensajes: 'Mensajes',
+      ressenyes: 'Reseñas',
       faq: 'FAQ',
-      pricing: 'Preus',
+      pricing: 'Precios',
       coverage: 'Cobertura',
       features: 'Features',
       theme: 'Tema',
-      stats: 'Estadístiques',
+      stats: 'Estadísticas',
       blog: 'Blog',
       canvas: 'Canvas',
-      translations: 'Traduccions',
+      translations: 'Traducciones',
       'text-manager': 'Textos PRO',
-      'post-event': 'Post-Event',
+      'post-event': 'Postevento',
       'google-reviews': 'Google Reviews',
     };
     return pageNames[page] || page.charAt(0).toUpperCase() + page.slice(1);
   }, [pathname]);
 
   return (
-    <html lang="ca" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body className="bg-slate-950 text-slate-200 antialiased" suppressHydrationWarning>
         <div className="min-h-screen">
           {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-slate-900/95 backdrop-blur-sm border-r border-slate-800 flex-col z-40">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-zinc-900/95 backdrop-blur-sm border-r border-zinc-700/80 flex-col z-40">
         {/* Logo */}
         <div className="p-4 border-b border-slate-800">
           <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30 p-1.5">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30 p-1.5">
               <Image
                 src="/img/logosoloplaneta.svg"
                 alt="Òrbita"
@@ -376,24 +431,47 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
             <div>
               <span className="text-slate-200 font-semibold">Òrbita</span>
-              <span className="text-cyan-300 font-semibold ml-1">Admin</span>
+              <span className="text-amber-300 font-semibold ml-1">Admin</span>
             </div>
           </Link>
         </div>
 
         {/* Nav */}
         <nav className="flex-1 p-3 overflow-y-auto">
-          {navSections.map((section) => (
-            <div key={section.title} className="mb-6">
-              <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-                {section.title}
-              </p>
-              <div className="space-y-1">
-                {section.items.map((item) => (
-                  <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} onPrefetch={prefetchRoute} />
-                ))}
-              </div>
+          <div className="mb-4">
+            <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+              Prioridad
+            </p>
+            <div className="space-y-1">
+              {priorityItems.map((item) => (
+                <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} onPrefetch={prefetchRoute} />
+              ))}
             </div>
+          </div>
+
+          <div className="mb-4 px-3">
+            <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+              Favoritos
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {favoriteItems.map((item) => (
+                <FavoriteChip
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  isActive={isActive(item.href)}
+                  onPrefetch={prefetchRoute}
+                />
+              ))}
+            </div>
+          </div>
+
+          {navSections.map((section) => (
+            <SidebarSection key={section.title} title={section.title} defaultOpen={section.defaultOpen}>
+              {section.items.map((item) => (
+                <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} onPrefetch={prefetchRoute} />
+              ))}
+            </SidebarSection>
           ))}
         </nav>
 
@@ -408,11 +486,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Mobile Header - Mejorado */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-slate-900/95 backdrop-blur-xl border-b border-slate-800 z-50 px-3 flex items-center justify-between safe-area-top">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-zinc-900/95 backdrop-blur-xl border-b border-zinc-700/80 z-50 px-3 flex items-center justify-between safe-area-top">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
-          aria-label="Obrir menú admin"
+          aria-label="Abrir menú admin"
           aria-expanded={sidebarOpen}
           aria-controls="admin-mobile-sidebar"
           className="p-2.5 -ml-1 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
@@ -424,7 +502,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div className="flex flex-col items-center">
           <span className="text-slate-200 font-semibold text-sm">
-            <span className="text-cyan-300">Òrbita</span> Admin
+            <span className="text-amber-300">Òrbita</span> Admin
           </span>
           <span className="text-[10px] text-slate-400 font-medium">{getPageName()}</span>
         </div>
@@ -434,19 +512,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             type="button"
             onClick={() => setSearchOpen(true)}
             className="p-2.5 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
-            aria-label="Cercar (Ctrl+K)"
+            aria-label="Buscar (Ctrl+K)"
           >
             🔍
           </button>
           <Link
             href="/admin/settings/notifications"
             className="p-2.5 -mr-1 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors relative"
-            aria-label="Notificacions"
+            aria-label="Notificaciones"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-            <span className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+            <span className="absolute top-2 right-2 w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
           </Link>
         </div>
       </header>
@@ -456,7 +534,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <>
           {/* Backdrop */}
           <div
-            className={`lg:hidden fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-40 transition-opacity duration-300
+            className={`lg:hidden fixed inset-0 bg-zinc-950/50 backdrop-blur-sm z-40 transition-opacity duration-300
               ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             onClick={() => setSidebarOpen(false)}
             role="presentation"
@@ -465,14 +543,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <aside
             id="admin-mobile-sidebar"
             aria-label="Menú admin"
-            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-slate-900 border-r border-slate-800 z-50 overflow-hidden
+            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-zinc-900 border-r border-zinc-700/80 z-50 overflow-hidden
               transform transition-transform duration-300 ease-out
               ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
           >
             {/* Header del sidebar */}
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
+            <div className="p-4 border-b border-zinc-700/80 flex items-center justify-between bg-zinc-900">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-md p-1.5">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md p-1.5">
                   <Image
                     src="/img/logosoloplaneta.svg"
                     alt="Òrbita"
@@ -483,12 +561,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
                 <div>
                   <span className="text-slate-100 font-semibold text-sm">Òrbita Admin</span>
-                  <p className="text-[10px] text-slate-400">Panel de gestio</p>
+                  <p className="text-[10px] text-slate-400">Panel de gestión</p>
                 </div>
               </div>
               <button
                 type="button"
-                aria-label="Tancar menú admin"
+                aria-label="Cerrar menú admin"
                 onClick={() => setSidebarOpen(false)}
                 className="p-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
               >
@@ -500,39 +578,69 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* Navegación */}
             <nav className="p-3 overflow-y-auto h-[calc(100%-140px)]">
-              {navSections.map((section) => (
-                <div key={section.title} className="mb-5">
-                  <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-                    {section.title}
-                  </p>
-                  <div className="space-y-0.5">
-                    {section.items.map((item) => (
-                      <SidebarItem
-                        key={item.href}
-                        {...item}
-                        isActive={isActive(item.href)}
-                        onClick={() => setSidebarOpen(false)}
-                        onPrefetch={prefetchRoute}
-                      />
-                    ))}
-                  </div>
+              <div className="mb-4">
+                <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                  Prioridad
+                </p>
+                <div className="space-y-0.5">
+                  {priorityItems.map((item) => (
+                    <SidebarItem
+                      key={item.href}
+                      {...item}
+                      isActive={isActive(item.href)}
+                      onClick={() => setSidebarOpen(false)}
+                      onPrefetch={prefetchRoute}
+                    />
+                  ))}
                 </div>
+              </div>
+
+              <div className="mb-4 px-3">
+                <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                  Favoritos
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {favoriteItems.map((item) => (
+                    <FavoriteChip
+                      key={item.href}
+                      href={item.href}
+                      label={item.label}
+                      isActive={isActive(item.href)}
+                      onClick={() => setSidebarOpen(false)}
+                      onPrefetch={prefetchRoute}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {navSections.map((section) => (
+                <SidebarSection key={section.title} title={section.title} defaultOpen={section.defaultOpen}>
+                  {section.items.map((item) => (
+                    <SidebarItem
+                      key={item.href}
+                      {...item}
+                      isActive={isActive(item.href)}
+                      onClick={() => setSidebarOpen(false)}
+                      onPrefetch={prefetchRoute}
+                    />
+                  ))}
+                </SidebarSection>
               ))}
             </nav>
 
             {/* Footer del sidebar móvil */}
-            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-slate-800 bg-slate-900">
+            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-zinc-700/80 bg-zinc-900">
               <Link
                 href="/admin/settings"
                 onClick={() => setSidebarOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-xl bg-slate-800 border border-slate-700 active:scale-[0.98] transition-transform"
+                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-800 border border-zinc-700 active:scale-[0.98] transition-transform"
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-semibold shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-semibold shadow-sm">
                   A
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-slate-100">Admin</p>
-                  <p className="text-xs text-slate-400">Configuracio del compte</p>
+                  <p className="text-xs text-slate-400">Configuración de la cuenta</p>
                 </div>
                 <svg className="w-5 h-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -544,7 +652,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       {/* Desktop Header */}
-      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-slate-800 px-6 items-center justify-between bg-slate-900/95 backdrop-blur-xl z-30">
+      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-zinc-700/80 px-6 items-center justify-between bg-zinc-900/95 backdrop-blur-xl z-30">
         <div className="flex items-center gap-3 text-sm">
           <Link href="/admin" className="text-slate-400 hover:text-slate-200 transition-colors">Admin</Link>
           <span className="text-slate-600">/</span>
@@ -554,26 +662,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="hidden md:flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-800/60 px-3 py-2 text-xs text-slate-300 hover:border-cyan-500/30 hover:text-slate-100 transition-colors"
-            aria-label="Cercar (Ctrl+K)"
+            className="hidden md:flex items-center gap-2 rounded-xl border border-zinc-700/80 bg-zinc-800/60 px-3 py-2 text-xs text-slate-300 hover:border-amber-500/30 hover:text-slate-100 transition-colors"
+            aria-label="Buscar (Ctrl+K)"
           >
-            🔍 Cercar
+            🔍 Buscar
             <span className="rounded-md border border-slate-700 px-2 py-0.5 text-[10px] text-slate-500">Ctrl/⌘K</span>
           </button>
           <Link
             href="/admin/settings/notifications"
             className="relative p-2.5 text-slate-300 hover:text-slate-100 hover:bg-slate-800 rounded-xl transition-colors"
-            aria-label="Notificacions"
+            aria-label="Notificaciones"
           >
             🔔
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
           </Link>
           <div className="h-6 w-px bg-slate-800" />
           <Link
             href="/admin/settings"
             className="flex items-center gap-3 px-3 py-1.5 hover:bg-slate-800 rounded-xl transition-colors"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-sm font-medium shadow-sm">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-sm font-medium shadow-sm">
               A
             </div>
             <span className="text-slate-100 text-sm font-medium">Admin</span>
@@ -589,7 +697,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 z-50 safe-area-bottom">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-700/80 z-50 safe-area-bottom">
         <div className="flex items-center justify-around h-full px-2 max-w-lg mx-auto">
           <BottomNavItem
             icon="📊"
@@ -615,14 +723,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           />
           <BottomNavItem
             icon="📋"
-            label="Reserves"
+            label="Reservas"
             href="/admin/bookings"
             isActive={pathname?.startsWith('/admin/bookings') || false}
             onPrefetch={prefetchRoute}
           />
           <BottomNavItem
             icon="⚙️"
-            label="Config"
+            label="Ajustes"
             href="/admin/settings"
             isActive={pathname?.startsWith('/admin/settings') || false}
             onPrefetch={prefetchRoute}

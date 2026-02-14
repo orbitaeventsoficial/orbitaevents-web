@@ -25,35 +25,65 @@ export default async function FinanzasPage() {
   const monthStart = startOfMonth(now);
   const weekAhead = addDays(now, 7);
 
-  const bookings = await prisma.booking.findMany({
-    where: { status: { not: 'CANCELLED' } },
-    orderBy: { eventDate: 'asc' },
-    select: {
-      id: true,
-      reference: true,
-      status: true,
-      clientName: true,
-      clientPhone: true,
-      eventDate: true,
-      total: true,
-      depositAmount: true,
-      depositPaid: true,
-      depositPaidAt: true,
-      remainingAmount: true,
-      remainingPaid: true,
-      remainingPaidAt: true,
-    },
-    take: 500,
-  });
-  const commLogs = await prisma.adminLog.findMany({
-    where: {
-      entity: 'booking',
-      entityId: { in: bookings.map((booking) => booking.id) },
-      action: { in: ['COMM_SENT', 'COMM_RESPONDED'] },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 2000,
-  });
+  let bookings: Array<{
+    id: string;
+    reference: string;
+    status: string;
+    clientName: string;
+    clientPhone: string;
+    eventDate: Date;
+    total: number;
+    depositAmount: number;
+    depositPaid: boolean;
+    depositPaidAt: Date | null;
+    remainingAmount: number;
+    remainingPaid: boolean;
+    remainingPaidAt: Date | null;
+  }> = [];
+  let commLogs: Array<{
+    entityId: string | null;
+    action: string;
+    createdAt: Date;
+    details: unknown;
+  }> = [];
+
+  try {
+    bookings = await prisma.booking.findMany({
+      where: { status: { not: 'CANCELLED' } },
+      orderBy: { eventDate: 'asc' },
+      select: {
+        id: true,
+        reference: true,
+        status: true,
+        clientName: true,
+        clientPhone: true,
+        eventDate: true,
+        total: true,
+        depositAmount: true,
+        depositPaid: true,
+        depositPaidAt: true,
+        remainingAmount: true,
+        remainingPaid: true,
+        remainingPaidAt: true,
+      },
+      take: 500,
+    });
+
+    if (bookings.length > 0) {
+      commLogs = await prisma.adminLog.findMany({
+        where: {
+          entity: 'booking',
+          entityId: { in: bookings.map((booking) => booking.id) },
+          action: { in: ['COMM_SENT', 'COMM_RESPONDED'] },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 2000,
+      });
+    }
+  } catch {
+    bookings = [];
+    commLogs = [];
+  }
   const logsByBooking = commLogs.reduce<Record<string, typeof commLogs>>((acc, item) => {
     if (!item.entityId) return acc;
     if (!acc[item.entityId]) acc[item.entityId] = [];

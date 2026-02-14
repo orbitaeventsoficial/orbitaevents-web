@@ -31,7 +31,7 @@ export default async function SalesOpsPage() {
     prisma.lead.groupBy({
       by: ['source', 'status', 'assignedTo'],
       _count: true,
-    }),
+    }).catch(() => []),
     prisma.lead.findMany({
       where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } },
       select: {
@@ -52,22 +52,22 @@ export default async function SalesOpsPage() {
       },
       orderBy: { createdAt: 'desc' },
       take: 1000,
-    }),
+    }).catch(() => []),
     prisma.lead.count({
       where: {
         status: 'NEW',
         createdAt: { lte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
       },
-    }),
+    }).catch(() => 0),
     prisma.adminLog.count({
       where: { action: 'COMM_SENT', createdAt: { gte: thirtyDaysAgo } },
-    }),
+    }).catch(() => 0),
     prisma.adminLog.count({
       where: { action: 'COMM_RESPONDED', createdAt: { gte: thirtyDaysAgo } },
-    }),
+    }).catch(() => 0),
     prisma.adminLog.count({
       where: { action: 'COMM_SEQUENCE_EXEC', createdAt: { gte: thirtyDaysAgo } },
-    }),
+    }).catch(() => 0),
   ]);
 
   const sourceMap = new Map<string, { total: number; won: number }>();
