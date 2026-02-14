@@ -314,19 +314,19 @@ export default async function LeadDetailPage({ params }: Props) {
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
-            <p className="text-xs uppercase tracking-wide text-slate-500">Valor estimat</p>
-            <p className="text-xl font-semibold text-slate-800">
+          <div className="rounded-xl border border-stone-300 bg-white px-4 py-3">
+            <p className="text-xs uppercase tracking-wide !text-[#111111]">Valor estimat</p>
+            <p className="text-xl font-semibold !text-[#111111]">
               {estimatedRevenue !== null ? `${estimatedRevenue.toLocaleString('ca-ES')}€` : '—'}
             </p>
           </div>
-          <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
-            <p className="text-xs uppercase tracking-wide text-slate-500">Antiguitat lead</p>
-            <p className="text-xl font-semibold text-slate-800">{leadAgeDays} dies</p>
+          <div className="rounded-xl border border-stone-300 bg-white px-4 py-3">
+            <p className="text-xs uppercase tracking-wide !text-[#111111]">Antiguitat lead</p>
+            <p className="text-xl font-semibold !text-[#111111]">{leadAgeDays} dies</p>
           </div>
-          <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
-            <p className="text-xs uppercase tracking-wide text-slate-500">Flux client</p>
-            <p className="text-xl font-semibold text-slate-800">
+          <div className="rounded-xl border border-stone-300 bg-white px-4 py-3">
+            <p className="text-xs uppercase tracking-wide !text-[#111111]">Flux client</p>
+            <p className="text-xl font-semibold !text-[#111111]">
               {reviewFlowStatus === 'RESPONDIDO'
                 ? 'Respondido'
                 : reviewFlowStatus === 'ENVIADO'
@@ -336,9 +336,9 @@ export default async function LeadDetailPage({ params }: Props) {
                     : 'Sin reserva'}
             </p>
           </div>
-          <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
-            <p className="text-xs uppercase tracking-wide text-slate-500">Post-event interno</p>
-            <p className="text-xl font-semibold text-slate-800">
+          <div className="rounded-xl border border-stone-300 bg-white px-4 py-3">
+            <p className="text-xs uppercase tracking-wide !text-[#111111]">Post-event interno</p>
+            <p className="text-xl font-semibold !text-[#111111]">
               {internalPostEventStatus === 'COMPLETO'
                 ? 'Completado'
                 : internalPostEventStatus === 'EN_PROGRESO'
@@ -348,12 +348,12 @@ export default async function LeadDetailPage({ params }: Props) {
                     : 'Sin reserva'}
             </p>
           </div>
-          <div className="rounded-xl border border-stone-200 bg-slate-50 px-4 py-3">
-            <p className="inline-flex items-center gap-1 text-xs uppercase tracking-wide text-slate-500">
+          <div className="rounded-xl border border-stone-300 bg-white px-4 py-3">
+            <p className="inline-flex items-center gap-1 text-xs uppercase tracking-wide !text-[#111111]">
               Lead score
               <InfoTooltip text="Puntuació automàtica de qualitat comercial segons dades del lead i fase del procés." />
             </p>
-            <p className="text-xl font-semibold text-slate-800">
+            <p className="text-xl font-semibold !text-[#111111]">
               {leadScore.score} · {SCORE_BAND_LABELS[leadScore.band] || leadScore.band}
             </p>
             <ScoreSnapshotButton leadId={lead.id} />

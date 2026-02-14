@@ -33,12 +33,11 @@ export default function ScoreSnapshotButton({ leadId }: { leadId: string }) {
         type="button"
         onClick={saveSnapshot}
         disabled={saving}
-        className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+        className="rounded-lg border border-stone-300 bg-[#f8fafc] px-3 py-1.5 text-xs font-semibold !text-[#111111] hover:bg-stone-100 disabled:opacity-60"
       >
         {saving ? 'Guardando...' : 'Guardar snapshot score'}
       </button>
-      {msg && <p className="mt-1 text-xs text-slate-500">{msg}</p>}
+      {msg && <p className="mt-1 text-xs !text-[#111111]">{msg}</p>}
     </div>
   );
 }
-
