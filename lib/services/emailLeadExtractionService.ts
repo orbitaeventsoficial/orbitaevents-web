@@ -19,6 +19,13 @@ function normalizeWhitespace(input: string): string {
   return input.replace(/\s+/g, ' ').trim();
 }
 
+function splitLines(input: string): string[] {
+  return input
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 function extractPhone(text: string): string | undefined {
   const labeled = text.match(
     /(?:tel[eè]fono|tel[eè]fon|m[oò]vil|m[oò]bil|whatsapp)\s*[:\-]?\s*(\+?\d[\d().\s-]{7,}\d)/i
@@ -151,37 +158,61 @@ function extractBudget(text: string): string | undefined {
   const labeled = text.match(/(?:presupuesto|pressupost|budget)\s*[:\-]?\s*([^\n\r]+)/i);
   if (labeled) return normalizeWhitespace(labeled[1]).slice(0, 120);
 
-  const eur = text.match(/\b(\d{2,5})\s*(?:€|eur|euros?)\b/i);
+  const eur = text.match(/\b(\d{2,6}(?:[.,]\d{1,2})?)\s*(?:€|eur|euros?)\b/i);
   if (!eur) return undefined;
-  return `${eur[1]}€`;
+  return `${eur[1].replace('.', ',')}€`;
 }
 
 function extractEventLocation(text: string): string | undefined {
   const labeled = text.match(/(?:ubicaci[oó]n|lugar|localidad|ciudad|location|lloc)\s*[:\-]?\s*([^\n\r]+)/i);
-  if (!labeled) return undefined;
-  return normalizeWhitespace(labeled[1]).slice(0, 160);
+  if (labeled) return normalizeWhitespace(labeled[1]).slice(0, 160);
+
+  const sentence = text.match(
+    /(?:se celebr(?:a|ar[aà])|tindr[aà]\s+lloc|es\s+fa(?:r[aà])?)\s+(?:el\s+d[ií]a\s+[^\n\r]{0,40}\s+)?(?:en|a)\s+([^\n\r.,;]{4,120})/i
+  );
+  if (sentence) return normalizeWhitespace(sentence[1]).slice(0, 160);
+  return undefined;
 }
 
 function extractSchedule(text: string): string | undefined {
-  const windows = Array.from(
-    text.matchAll(/\b(\d{1,2}[:.]\d{2})\s*(?:h)?\s*(?:-|a|to|hasta)\s*(\d{1,2}[:.]\d{2})\b/gi)
-  )
+  const windows = Array.from(text.matchAll(/\b(\d{1,2}(?::|[.])\d{2})\s*(?:h)?\s*(?:-|a|to|hasta)\s*(\d{1,2}(?::|[.])\d{2})\b/gi))
     .map((m) => `${m[1].replace('.', ':')}-${m[2].replace('.', ':')}`)
-    .slice(0, 3);
+    .slice(0, 5);
 
-  const startsAt = text.match(/\b(?:a partir de|desde|des de)\s+las?\s*(\d{1,2}[:.]\d{2})\b/i);
+  const startsAt = text.match(/\b(?:a partir de|desde|des de)\s+(?:las?\s*)?(\d{1,2}(?::|[.])\d{2})\b/i);
   if (startsAt) windows.unshift(`desde ${startsAt[1].replace('.', ':')}`);
 
   if (windows.length === 0) return undefined;
-  return windows.join(', ');
+  return Array.from(new Set(windows)).join(', ').slice(0, 180);
 }
 
 function extractRequestedItems(text: string): string | undefined {
-  const labeled = text.match(
-    /(?:material incluid[oa]|material incl[oò]s|incluye|inclou)\s*[:\-]?\s*([^\n\r]{10,300})/i
+  const lines = splitLines(text);
+  const startIdx = lines.findIndex((line) =>
+    /(?:material incluid[oa]|material incl[oò]s|incluye|inclou)/i.test(line)
   );
-  if (!labeled) return undefined;
-  return normalizeWhitespace(labeled[1]).slice(0, 220);
+  if (startIdx === -1) return undefined;
+
+  const chunk: string[] = [];
+  const firstInline = lines[startIdx].split(/[:\-]/).slice(1).join(':').trim();
+  if (firstInline) chunk.push(firstInline);
+
+  for (let i = startIdx + 1; i < lines.length; i += 1) {
+    const current = lines[i];
+    if (!current) break;
+    if (
+      /^(data|fecha|date|horari|horario|preu|precio|pressupost|presupuesto|pagament|pago|gr[aà]cies|moltes|salutaci[oó]n)/i.test(
+        current
+      )
+    ) {
+      break;
+    }
+    chunk.push(current.replace(/^[•\-*]\s*/, ''));
+    if (chunk.length >= 10) break;
+  }
+
+  if (chunk.length === 0) return undefined;
+  return normalizeWhitespace(chunk.join(', ')).slice(0, 320);
 }
 
 function inferIntent(text: string): string {
@@ -210,15 +241,12 @@ function buildCommercialSummary(text: string): string | undefined {
 }
 
 function extractImportantUnknowns(body: string): string[] | undefined {
-  const lines = body
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line.length >= 8);
+  const lines = splitLines(body).filter((line) => line.length >= 8);
 
   const candidates = lines.filter((line) => {
     const lower = line.toLowerCase();
     const hasSignal =
-      /\b(\d{1,2}[:.]\d{2}|\d+\s*€|eur|euros?|factura|pagament|pago|transferencia|bizum|montaje|desmontaje|micr[oò]fon|escenari|escenario|condiciones?|requisitos?|confirm|urgent)\b/i.test(
+      /\b(\d{1,2}[:.]\d{2}|\d+\s*€|eur|euros?|factura|pagament|pago|transferencia|bizum|iban|nif|cif|montaje|desmontaje|micr[oò]fon|escenari|escenario|condiciones?|requisitos?|confirm|urgent|señal|aval|anticipo|plazo|vence)\b/i.test(
         line
       );
     const alreadyLabeled = /^(data|fecha|date|tel[eè]fon|tel[eè]fono|m[oò]vil|horari|horario|material|ubicaci[oó]n|lugar)\s*[:\-]/i.test(
@@ -259,19 +287,23 @@ export function extractLeadDataFromEmail(input: {
   const subject = input.subject || '';
   const body = input.bodyText || '';
   const fullText = `${subject}\n${body}`;
+  const normalizedText = fullText
+    .replace(/\u00a0/g, ' ')
+    .replace(/\s+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n');
 
   return {
     name: buildDisplayName(input.fromName || '', input.fromAddress),
     email: input.fromAddress.trim().toLowerCase(),
-    phone: extractPhone(fullText),
-    eventType: inferEventType(fullText),
-    eventDate: extractEventDate(fullText),
-    eventSchedule: extractSchedule(fullText),
-    guestCount: extractGuestCount(fullText),
-    budget: extractBudget(fullText),
-    eventLocation: extractEventLocation(fullText),
+    phone: extractPhone(normalizedText),
+    eventType: inferEventType(normalizedText),
+    eventDate: extractEventDate(normalizedText),
+    eventSchedule: extractSchedule(normalizedText),
+    guestCount: extractGuestCount(normalizedText),
+    budget: extractBudget(normalizedText),
+    eventLocation: extractEventLocation(normalizedText),
     message: body.trim().slice(0, 4000) || undefined,
-    commercialSummary: buildCommercialSummary(fullText),
+    commercialSummary: buildCommercialSummary(normalizedText),
     importantUnknowns: extractImportantUnknowns(body),
   };
 }
