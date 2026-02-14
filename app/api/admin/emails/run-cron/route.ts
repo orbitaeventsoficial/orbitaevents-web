@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     for (const booking of completedBookings) {
       const email = booking.clientEmail;
       const name = booking.clientName;
-      const locale = booking.lead?.preferredLocale || 'es';
+      const locale = booking.lead?.preferredLocale || 'ca';
 
       if (!email || email.includes('@leads.orbitaevents.local')) {
         results.push({

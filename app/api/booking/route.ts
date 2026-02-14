@@ -240,7 +240,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
               clientName: body.clientName,
               clientEmail: body.clientEmail,
               clientPhone: body.clientPhone,
-              preferredLocale: body.preferredLocale || 'es',
+              preferredLocale: body.preferredLocale || 'ca',
               eventType: body.eventType as any,
               eventDate,
               eventStartTime: body.eventStartTime,

@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     const email = booking.clientEmail;
     const name = booking.clientName;
-    const locale = booking.lead?.preferredLocale || booking.preferredLocale || 'es';
+    const locale = booking.lead?.preferredLocale || booking.preferredLocale || 'ca';
 
     // Skip si no hi ha email vàlid
     if (!email || email.includes('@leads.orbitaevents.local')) {

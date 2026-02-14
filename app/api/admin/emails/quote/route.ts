@@ -14,6 +14,7 @@ import { getDbPackByCode, getDbPacks } from '@/lib/packs-db';
 import type { PackDefinition } from '@/config/packs-config';
 import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { translateHtmlForLocale, translateTextForLocale } from '@/lib/services/translationService';
 
 type QuotePack = {
   name: string;
@@ -136,8 +137,14 @@ export async function POST(req: NextRequest) {
       recipientEmail = lead.email;
       recipientName = lead.name;
     }
+    const emailCountBefore = leadId
+      ? await prisma.leadActivity.count({
+          where: { leadId, type: 'EMAIL' },
+        })
+      : 0;
 
-    const packDataBase = await resolvePack(String(packId).toLowerCase(), locale);
+    const resolvedLocale = String(lead?.preferredLocale || locale || 'ca').toLowerCase();
+    const packDataBase = await resolvePack(String(packId).toLowerCase(), resolvedLocale);
     const packData = {
       ...packDataBase,
       price,
@@ -239,12 +246,18 @@ export async function POST(req: NextRequest) {
       ctaSubtitle: template.ctaSubtitle,
       conditions: template.conditions,
     });
+    const translatedHtml = await translateHtmlForLocale(html, resolvedLocale);
+    const translatedSubject = await translateTextForLocale(
+      `Pressupost ${quoteData.quoteNumber} - Òrbita Events`,
+      resolvedLocale
+    );
 
     await sendEmail({
       to: recipientEmail,
-      subject: `Pressupost ${quoteData.quoteNumber} - Òrbita Events`,
-      html,
+      subject: translatedSubject,
+      html: translatedHtml,
       replyTo: (process.env.CONTACT_TO || '').trim() || undefined,
+      brandingStyle: emailCountBefore === 0 ? 'hero' : 'soft',
     });
 
     let adminCopySent = false;
@@ -254,8 +267,9 @@ export async function POST(req: NextRequest) {
         await sendEmail({
           to: copyRecipient,
           subject: `[Còpia] Pressupost ${quoteData.quoteNumber} · ${recipientName}`,
-          html,
+          html: translatedHtml,
           replyTo: recipientEmail,
+          brandingStyle: 'soft',
         });
         adminCopySent = true;
       }

@@ -14,9 +14,11 @@ interface SendEmailOptions {
   from?: string;
   text?: string;
   attachments?: nodemailer.SendMailOptions['attachments'];
+  brandingStyle?: 'hero' | 'soft';
 }
 
-const EMAIL_LOGO_URL = `${(process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '')}/img/logoplanetatextdreta.svg`;
+const APP_BASE_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '');
+const EMAIL_LOGO_URL = `${APP_BASE_URL}/img/logosoloplaneta.png`;
 const EMAIL_CONTACT_PHONE = SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone;
 const EMAIL_CONTACT_EMAIL = SITE_CONFIG.business.email;
 const EMAIL_CONTACT_WEB = SITE_CONFIG.web.url;
@@ -70,6 +72,77 @@ function hasOrbitaContactInFooter(html: string): boolean {
     tailChunk.includes((EMAIL_CONTACT_PHONE || '').toLowerCase()) ||
     tailChunk.includes((EMAIL_CONTACT_WEB || '').toLowerCase())
   );
+}
+
+function hasOrbitaEmailShell(html: string): boolean {
+  return /data-orbita-email-shell\s*=\s*["']true["']/i.test(html);
+}
+
+function extractBodyHtml(html: string): string {
+  const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  if (bodyMatch?.[1]) return bodyMatch[1].trim();
+  return html.trim();
+}
+
+function ensureOrbitaEmailShell(html: string, brandingStyle: 'hero' | 'soft' = 'soft'): string {
+  if (!html || hasOrbitaEmailShell(html)) {
+    return html;
+  }
+
+  const content = extractBodyHtml(html);
+  const isHero = brandingStyle === 'hero';
+  const headerStyle = isHero
+    ? "background:linear-gradient(120deg,#111827 0%,#1f2937 50%,#0f172a 100%);padding:18px 24px;"
+    : 'background:#111827;padding:12px 18px;';
+  const logoSize = isHero ? 46 : 30;
+  const logoCellWidth = isHero ? 58 : 42;
+  const titleSize = isHero ? 20 : 16;
+  const subtitle = isHero ? 'Comunicació oficial' : 'Missatge de seguiment';
+  const contentPadding = isHero ? '24px' : '18px';
+  return `<!doctype html>
+<html lang="ca">
+  <body style="margin:0;padding:0;background:#f5f5f4;font-family:'Segoe UI',Arial,sans-serif;color:#111827;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table data-orbita-email-shell="true" role="presentation" width="680" cellspacing="0" cellpadding="0" style="max-width:680px;width:100%;background:#ffffff;border:1px solid #e7e5e4;border-radius:14px;overflow:hidden;">
+            <tr>
+              <td style="${headerStyle}">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td style="width:${logoCellWidth}px;vertical-align:middle;">
+                      <img src="${EMAIL_LOGO_URL}" alt="Òrbita Events" width="${logoSize}" height="${logoSize}" style="display:block;width:${logoSize}px;height:${logoSize}px;border-radius:${isHero ? '10px' : '8px'};background:#ffffff;padding:${isHero ? '4px' : '3px'};" />
+                    </td>
+                    <td style="vertical-align:middle;">
+                      <div style="font-size:${titleSize}px;font-weight:800;letter-spacing:0.2px;color:#ffffff;">Òrbita Events</div>
+                      <div style="margin-top:5px;font-size:12px;color:#cbd5e1;">${subtitle}</div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:${contentPadding};">
+                ${content}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:18px 24px;border-top:1px solid #e7e5e4;background:#fafaf9;">
+                <div style="font-size:13px;color:#334155;">Gràcies per la teva confiança. Estem a la teva disposició.</div>
+                <div style="margin-top:6px;font-size:12px;color:#64748b;">
+                  ${EMAIL_CONTACT_PHONE} · ${EMAIL_CONTACT_EMAIL}
+                </div>
+                <div style="margin-top:6px;font-size:12px;">
+                  <a href="${EMAIL_CONTACT_WEB}" style="color:#0f172a;text-decoration:none;">${EMAIL_CONTACT_WEB}</a>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
 }
 
 function injectOrbitaLogo(html: string): string {
@@ -168,7 +241,10 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
   const fromAddress = options.from?.trim() || `"Orbita Events" <${smtpFrom}>`;
   const toAddress = options.to.trim();
 
-  const brandedHtml = injectOrbitaContactFooter(injectOrbitaLogo(options.html));
+  const brandedHtml = ensureOrbitaEmailShell(
+    injectOrbitaContactFooter(injectOrbitaLogo(options.html)),
+    options.brandingStyle || 'soft'
+  );
 
   await transporter.sendMail({
     from: fromAddress,

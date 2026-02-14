@@ -17,12 +17,12 @@ export default async function QuoteTemplateSettingsPage() {
     <div className="space-y-6">
       <header className="rounded-2xl border border-stone-300 bg-white p-6 shadow-sm" style={{ color: '#111111' }}>
         <Link href="/admin/settings" className="text-sm !text-[#111111] hover:opacity-80">
-          ← Volver a configuración
+          ← Tornar a configuració
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold !text-[#111111]">Plantilla de presupuestos</h1>
+        <h1 className="mt-2 text-2xl font-semibold !text-[#111111]">Plantilla de pressupostos</h1>
         <p className="mt-1 text-sm !text-[#111111]">
-          Define el texto del presupuesto, condiciones y copia interna. Esta plantilla se usa en
-          preview y en emails enviados al cliente.
+          Defineix el text del pressupost, condicions i còpia interna. Aquesta plantilla s&apos;usa a
+          la previsualització i als emails enviats al client.
         </p>
         {usingFallback ? (
           <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">

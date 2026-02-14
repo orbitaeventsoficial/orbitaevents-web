@@ -75,7 +75,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
           phone: existingLead.phone || null,
           phoneNormalized,
           source: existingLead.source,
-          preferredLocale: existingLead.preferredLocale || 'es',
+          preferredLocale: existingLead.preferredLocale || 'ca',
         },
         create: {
           email: existingLead.email.toLowerCase().trim(),
@@ -85,7 +85,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
           phone: existingLead.phone || null,
           phoneNormalized,
           source: existingLead.source,
-          preferredLocale: existingLead.preferredLocale || 'es',
+          preferredLocale: existingLead.preferredLocale || 'ca',
         },
       });
 

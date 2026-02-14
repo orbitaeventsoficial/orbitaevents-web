@@ -150,6 +150,7 @@ export default function ComposeForm({ leads, packs }: Props) {
             subject,
             body,
             leadId: selectedLeadId || undefined,
+            locale,
           }),
         });
 

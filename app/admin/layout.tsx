@@ -332,45 +332,45 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   const priorityItems = useMemo(() => ([
-    { icon: '📊', label: 'Dashboard', href: '/admin' },
+    { icon: '📊', label: 'Tauler', href: '/admin' },
     { icon: '👥', label: 'Leads', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
-    { icon: '📋', label: 'Reservas', href: '/admin/bookings' },
-    { icon: '📅', label: 'Calendario', href: '/admin/calendario' },
-    { icon: '💶', label: 'Finanzas', href: '/admin/finanzas' },
+    { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
+    { icon: '📅', label: 'Calendari', href: '/admin/calendario' },
+    { icon: '💶', label: 'Finances', href: '/admin/finanzas' },
     { icon: '🎯', label: 'Sales Ops', href: '/admin/sales-ops' },
   ]), [newLeadsCount]);
 
   const favoriteItems = useMemo(() => ([
     { label: 'Leads', href: '/admin/leads' },
-    { label: 'Reservas', href: '/admin/bookings' },
-    { label: 'Calendario', href: '/admin/calendario' },
-    { label: 'Presupuestos', href: '/admin/settings/quotes' },
+    { label: 'Reserves', href: '/admin/bookings' },
+    { label: 'Calendari', href: '/admin/calendario' },
+    { label: 'Pressupostos', href: '/admin/settings/quotes' },
   ]), []);
 
   const navSections = useMemo(() => ([
     {
-      title: 'CRM Avanzado',
+      title: 'CRM Avançat',
       defaultOpen: false,
       items: [
-        { icon: '📝', label: 'Tareas', href: '/admin/tasks' },
-        { icon: '👤', label: 'Clientes', href: '/admin/contactes' },
-        { icon: '💬', label: 'Mensajes', href: '/admin/mensajes' },
-        { icon: '⭐', label: 'Reseñas', href: '/admin/ressenyes' },
-        { icon: '📝', label: 'Postevento', href: '/admin/post-event' },
+        { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
+        { icon: '👤', label: 'Clients', href: '/admin/contactes' },
+        { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
+        { icon: '⭐', label: 'Ressenyes', href: '/admin/ressenyes' },
+        { icon: '📝', label: 'Postevent', href: '/admin/post-event' },
         { icon: '📥', label: 'Inbox (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' as const },
       ]
     },
     {
-      title: 'Negocio Y Contenido',
+      title: 'Negoci i contingut',
       defaultOpen: false,
       items: [
         { icon: '📈', label: 'Analytics', href: '/admin/analytics' },
         { icon: '📊', label: 'Rentabilidad', href: '/admin/rentabilidad' },
         { icon: '📦', label: 'Packs', href: '/admin/packs' },
-        { icon: '💰', label: 'Precios', href: '/admin/pricing' },
+        { icon: '💰', label: 'Preus', href: '/admin/pricing' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
         { icon: '📝', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
-        { icon: '🎸', label: 'Inventario', href: '/admin/inventory' },
+        { icon: '🎸', label: 'Inventari', href: '/admin/inventory' },
         { icon: '🤖', label: 'Emails Auto', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
         { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
         { icon: '⭐', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
@@ -378,16 +378,16 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       ]
     },
     {
-      title: 'Configuración',
+      title: 'Configuració',
       defaultOpen: false,
       items: [
-        { icon: '⚙️', label: 'Configuración', href: '/admin/settings' },
-        { icon: '📄', label: 'Plantilla presupuestos', href: '/admin/settings/quotes' },
-        { icon: '🔗', label: 'Integraciones', href: '/admin/settings/integrations' },
+        { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
+        { icon: '📄', label: 'Plantilla pressupostos', href: '/admin/settings/quotes' },
+        { icon: '🔗', label: 'Integracions', href: '/admin/settings/integrations' },
         { icon: '🎛️', label: 'Features', href: '/admin/features' },
         { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
         { icon: '🎨', label: 'Tema', href: '/admin/theme' },
-        { icon: '🌐', label: 'Traducciones', href: '/admin/translations' },
+        { icon: '🌐', label: 'Traduccions', href: '/admin/translations' },
       ]
     },
   ]), []);
@@ -437,14 +437,14 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   // Obtenir nom de la pàgina actual per al breadcrumb
   const getPageName = useCallback(() => {
-    if (!pathname) return 'Dashboard';
+    if (!pathname) return 'Tauler';
     const segments = pathname.split('/').filter(Boolean);
-    if (segments.length <= 1) return 'Dashboard';
+    if (segments.length <= 1) return 'Tauler';
     const page = segments[segments.length - 1];
     const pageNames: Record<string, string> = {
       leads: 'Leads',
-      bookings: 'Reservas',
-      tasks: 'Tareas',
+      bookings: 'Reserves',
+      tasks: 'Tasques',
       packs: 'Packs',
       analytics: 'Analytics',
       'sales-ops': 'Sales Ops',
@@ -452,25 +452,25 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       finanzas: 'Finanzas',
       emails: 'Emails Auto',
       inbox: 'Inbox (IMAP)',
-      calendario: 'Calendario',
-      settings: 'Configuración',
-      integrations: 'Integraciones',
-      quotes: 'Plantilla presupuestos',
-      inventory: 'Inventario',
-      contactes: 'Clientes',
-      mensajes: 'Mensajes',
-      ressenyes: 'Reseñas',
-      faq: 'FAQ',
-      pricing: 'Precios',
+      calendario: 'Calendari',
+      settings: 'Configuració',
+      integrations: 'Integracions',
+      quotes: 'Plantilla pressupostos',
+      inventory: 'Inventari',
+      contactes: 'Clients',
+      mensajes: 'Missatges',
+      ressenyes: 'Ressenyes',
+      faq: 'PMF',
+      pricing: 'Preus',
       coverage: 'Cobertura',
       features: 'Features',
       theme: 'Tema',
       stats: 'Estadísticas',
       blog: 'Blog',
       canvas: 'Canvas',
-      translations: 'Traducciones',
+      translations: 'Traduccions',
       'text-manager': 'Textos PRO',
-      'post-event': 'Postevento',
+      'post-event': 'Postevent',
       'google-reviews': 'Google Reviews',
     };
     return pageNames[page] || page.charAt(0).toUpperCase() + page.slice(1);
@@ -493,7 +493,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   }, [helpModeEnabled, isHelpTarget]);
 
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="ca" suppressHydrationWarning>
       <body className="bg-slate-950 text-slate-200 antialiased" suppressHydrationWarning>
         <div
           className="min-h-screen"
@@ -536,7 +536,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         <nav className="flex-1 p-3 overflow-y-auto">
           <div className="mb-4">
             <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-              Prioridad
+              Prioritat
             </p>
             <div className="space-y-1">
               {priorityItems.map((item) => (
@@ -547,7 +547,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
           <div className="mb-4 px-3">
             <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-              Favoritos
+              Preferits
             </p>
             <div className="flex flex-wrap gap-1.5">
               {favoriteItems.map((item) => (
@@ -693,7 +693,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 </div>
                 <div>
                   <span className="text-slate-100 font-semibold text-sm">Òrbita Admin</span>
-                  <p className="text-[10px] text-slate-400">Panel de gestión</p>
+                  <p className="text-[10px] text-slate-400">Panell de gestió</p>
                 </div>
               </div>
               <button
@@ -712,7 +712,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             <nav className="p-3 overflow-y-auto h-[calc(100%-140px)]">
               <div className="mb-4">
                 <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-                  Prioridad
+                  Prioritat
                 </p>
                 <div className="space-y-0.5">
                   {priorityItems.map((item) => (
@@ -729,7 +729,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
               <div className="mb-4 px-3">
                 <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-                  Favoritos
+                  Preferits
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {favoriteItems.map((item) => (
@@ -797,7 +797,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-slate-100">Admin</p>
-                  <p className="text-xs text-slate-400">Configuración de la cuenta</p>
+                  <p className="text-xs text-slate-400">Configuració del compte</p>
                 </div>
                 <svg className="w-5 h-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -872,7 +872,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         <div className="flex items-center justify-around h-full px-2 max-w-lg mx-auto">
           <BottomNavItem
             icon="📊"
-            label="Dashboard"
+            label="Tauler"
             href="/admin"
             isActive={pathname === '/admin'}
             onPrefetch={prefetchRoute}
@@ -894,14 +894,14 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           />
           <BottomNavItem
             icon="📋"
-            label="Reservas"
+            label="Reserves"
             href="/admin/bookings"
             isActive={pathname?.startsWith('/admin/bookings') || false}
             onPrefetch={prefetchRoute}
           />
           <BottomNavItem
             icon="⚙️"
-            label="Ajustes"
+            label="Ajustos"
             href="/admin/settings"
             isActive={pathname?.startsWith('/admin/settings') || false}
             onPrefetch={prefetchRoute}

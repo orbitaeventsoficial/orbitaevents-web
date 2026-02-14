@@ -705,6 +705,7 @@ function ComposeModal({
   const [to, setTo] = useState(replyTo?.from || '');
   const [subject, setSubject] = useState(replyTo ? `Re: ${replyTo.subject}` : '');
   const [body, setBody] = useState('');
+  const [locale] = useState((replyTo?.leadData?.preferredLocale || 'ca').toLowerCase());
   const [attachQuote, setAttachQuote] = useState(false);
   const [quotePackId, setQuotePackId] = useState(initialPack.id);
   const [quotePrice, setQuotePrice] = useState(initialPack.price);
@@ -731,6 +732,7 @@ function ComposeModal({
           subject,
           body,
           replyToId: replyTo?.leadData?.id,
+          locale,
           quote: attachQuote
             ? {
                 packId: quotePackId,

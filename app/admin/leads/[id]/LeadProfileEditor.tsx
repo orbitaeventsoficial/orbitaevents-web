@@ -91,7 +91,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     utmSource: lead.utmSource || '',
     utmMedium: lead.utmMedium || '',
     utmCampaign: lead.utmCampaign || '',
-    preferredLocale: (lead.preferredLocale || 'es').toLowerCase(),
+    preferredLocale: (lead.preferredLocale || 'ca').toLowerCase(),
   });
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -153,7 +153,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         utmSource: form.utmSource || null,
         utmMedium: form.utmMedium || null,
         utmCampaign: form.utmCampaign || null,
-        preferredLocale: form.preferredLocale || 'es',
+        preferredLocale: form.preferredLocale || 'ca',
       };
 
       const res = await fetch(`/api/admin/leads-new/${lead.id}`, {
@@ -353,7 +353,11 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             <option value="es">es</option>
             <option value="ca">ca</option>
             <option value="en">en</option>
+            <option value="ru">ru</option>
             <option value="fr">fr</option>
+            <option value="de">de</option>
+            <option value="it">it</option>
+            <option value="pt">pt</option>
             <option value="ar">ar</option>
             <option value="zh">zh</option>
           </select>

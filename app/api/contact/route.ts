@@ -179,7 +179,7 @@ export async function POST(req: NextRequest) {
             source: determineSource(packId, packName),
             status: 'NEW',
             priority: 'MEDIUM',
-            preferredLocale: locale || 'es',
+            preferredLocale: locale || 'ca',
           }
         });
         _savedLeadId = newLead.id;
