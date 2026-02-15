@@ -750,7 +750,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 </div>
               </dl>
               <Link
-                href={`/admin/clientes/${lead.customer.id}`}
+                href={`/admin/contactes/${lead.customer.id}`}
                 className="mt-4 inline-flex rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
               >
                 Obrir Customer 360

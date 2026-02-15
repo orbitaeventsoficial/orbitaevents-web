@@ -325,7 +325,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </Link>
           {customer && (
             <Link
-              href={`/admin/clientes/${customer.id}`}
+              href={`/admin/contactes/${customer.id}`}
               className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
             >
               Obrir fitxa client 360

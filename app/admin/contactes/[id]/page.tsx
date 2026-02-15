@@ -1,11 +1,19 @@
-import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
+import { fetchCustomerHub } from '@/lib/customer-hub/fetchCustomerHub';
+import CustomerHubClient from './_components/CustomerHubClient';
 
 interface Props {
   params: { id: string };
-  searchParams?: { tab?: string };
 }
 
-export default function ContactesCustomerRedirect({ params, searchParams }: Props) {
-  const tab = searchParams?.tab ? `?tab=${encodeURIComponent(searchParams.tab)}` : '';
-  redirect(`/admin/clientes/${params.id}${tab}`);
+export const dynamic = 'force-dynamic';
+
+export default async function CustomerHubPage({ params }: Props) {
+  try {
+    const data = await fetchCustomerHub(params.id);
+    return <CustomerHubClient initial={data} />;
+  } catch {
+    notFound();
+  }
 }
+

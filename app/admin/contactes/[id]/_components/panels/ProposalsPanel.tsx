@@ -1,0 +1,57 @@
+import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
+import Link from 'next/link';
+
+export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
+  return (
+    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-100">Pressupostos</h2>
+          <p className="text-sm text-slate-400">Proposals lligats a aquesta fitxa.</p>
+        </div>
+        <Link
+          href={`/admin/presupuestos?customerId=${data.customer.id}`}
+          className="rounded-lg bg-cyan-500 px-3 py-2 text-xs font-semibold text-white hover:bg-cyan-600"
+        >
+          Nou pressupost
+        </Link>
+      </div>
+
+      <div className="mt-4 space-y-2">
+        {data.proposals.length === 0 ? (
+          <Empty text="No hi ha pressupostos. Crea’n un des d’aquí." />
+        ) : (
+          data.proposals.map((proposal) => (
+            <div key={proposal.id} className="rounded-xl border border-slate-700/70 bg-slate-800/60 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold text-slate-100">{proposal.reference}</p>
+                <span className="rounded-full border border-slate-600 px-2 py-0.5 text-[11px] text-slate-300">
+                  {proposal.status}
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-slate-400">
+                {new Date(proposal.createdAt).toLocaleDateString('ca-ES')} · {proposal.total.toFixed(2)}€
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Link
+                  href={`/admin/presupuestos?proposalId=${proposal.id}`}
+                  className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
+                >
+                  Editar
+                </Link>
+                <button className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700">
+                  Enviar
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </section>
+  );
+}
+
+function Empty({ text }: { text: string }) {
+  return <p className="rounded-lg border border-slate-700/60 bg-slate-800/50 p-3 text-sm text-slate-400">{text}</p>;
+}
+

@@ -398,7 +398,7 @@ export default function AdminContactesPage() {
                         </svg>
                       </button>
                       <Link
-                        href={`/admin/clientes/${customer.id}`}
+                        href={`/admin/contactes/${customer.id}`}
                         className="p-2 bg-slate-700/50 text-slate-300 rounded-lg hover:bg-slate-600/50 transition-all"
                         title="Fitxa 360"
                       >
