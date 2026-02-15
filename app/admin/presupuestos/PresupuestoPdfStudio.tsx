@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ALL_SERVICES,
   EXTRAS,
@@ -344,53 +344,6 @@ export default function PresupuestoPdfStudio({
     brandTagline,
   ]);
 
-  useEffect(() => {
-    if (!draftLoaded || !customerId || !selectedPack) return;
-
-    const timeout = window.setTimeout(() => {
-      setAutosaving(true);
-      void saveProposalDraft('DRAFT')
-        .then(() => setAutosaveTick(Date.now()))
-        .catch(() => {
-          // Keep silent to avoid noisy UI while editing.
-        })
-        .finally(() => setAutosaving(false));
-    }, 750);
-
-    return () => window.clearTimeout(timeout);
-  }, [
-    draftLoaded,
-    customerId,
-    selectedPack,
-    locale,
-    eventType,
-    packId,
-    packName,
-    basePrice,
-    durationHours,
-    featuresText,
-    conditionsText,
-    whyChooseUs,
-    selectedExtras,
-    customExtras,
-    discount,
-    discountReason,
-    clientContact,
-    clientName,
-    clientEmail,
-    clientPhone,
-    eventDate,
-    guests,
-    validityDays,
-    total,
-    extrasPrice,
-    brandName,
-    brandWebsite,
-    brandEmail,
-    brandPhone,
-    brandTagline,
-  ]);
-
   function reloadPackValues(nextPackId: string, nextService?: ServiceSlug) {
     const service = nextService || eventType;
     const available = getPacksByService(service);
@@ -426,7 +379,7 @@ export default function PresupuestoPdfStudio({
     setCustomExtras((prev) => prev.filter((extra) => extra.id !== id));
   }
 
-  function buildProposalSnapshot() {
+  const buildProposalSnapshot = useCallback(() => {
     return {
       locale,
       eventType,
@@ -475,9 +428,39 @@ export default function PresupuestoPdfStudio({
         brandTagline,
       },
     };
-  }
+  }, [
+    locale,
+    eventType,
+    packId,
+    packName,
+    basePrice,
+    durationHours,
+    featuresText,
+    conditionsText,
+    whyChooseUs,
+    mappedSelectedExtras,
+    customExtras,
+    customerId,
+    clientName,
+    clientEmail,
+    clientPhone,
+    clientContact,
+    eventDate,
+    guests,
+    extrasPrice,
+    discount,
+    discountReason,
+    total,
+    brandName,
+    brandWebsite,
+    brandEmail,
+    brandPhone,
+    brandTagline,
+  ]);
 
-  async function saveProposalDraft(status: 'DRAFT' | 'SENT' = 'DRAFT'): Promise<string | null> {
+  const saveProposalDraft = useCallback(async (
+    status: 'DRAFT' | 'SENT' = 'DRAFT'
+  ): Promise<string | null> => {
     if (!customerId || !selectedPack) return null;
 
     const subtotal = Math.max(0, Number(basePrice) || 0) + extrasPrice;
@@ -518,7 +501,34 @@ export default function PresupuestoPdfStudio({
       return data.proposal.id as string;
     }
     return proposalId || data?.proposal?.id || null;
-  }
+  }, [
+    customerId,
+    selectedPack,
+    basePrice,
+    extrasPrice,
+    discount,
+    locale,
+    validityDays,
+    buildProposalSnapshot,
+    proposalId,
+    leadId,
+  ]);
+
+  useEffect(() => {
+    if (!draftLoaded || !customerId || !selectedPack) return;
+
+    const timeout = window.setTimeout(() => {
+      setAutosaving(true);
+      void saveProposalDraft('DRAFT')
+        .then(() => setAutosaveTick(Date.now()))
+        .catch(() => {
+          // Keep silent to avoid noisy UI while editing.
+        })
+        .finally(() => setAutosaving(false));
+    }, 750);
+
+    return () => window.clearTimeout(timeout);
+  }, [draftLoaded, customerId, selectedPack, saveProposalDraft]);
 
   async function buildPdf() {
     if (!selectedPack) return null;
