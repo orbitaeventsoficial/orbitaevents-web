@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requirePermission } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
 import { log } from '@/lib/logger';
+import { getRequestId } from '@/lib/request-context';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,7 @@ export async function POST(req: NextRequest) {
   if (permissionError) return permissionError;
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
+  const requestId = getRequestId(req);
 
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) {
@@ -36,7 +38,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, summary: data.summary });
   } catch (error) {
-    log.error('Error triggering commercial-daily from admin', error);
+    log.error('Error triggering commercial-daily from admin', error, {
+      context: { requestId, endpoint: 'admin/automation/daily-summary/run:POST' },
+    });
     return NextResponse.json(
       { ok: false, error: 'No se pudo lanzar el resumen diario' },
       { status: 500 }

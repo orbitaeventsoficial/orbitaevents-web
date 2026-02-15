@@ -5,6 +5,7 @@ import { runCommercialSequences } from '@/lib/services/commercialSequenceService
 import { enforceLeadSla } from '@/lib/services/slaAutomationService';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { getRequestId } from '@/lib/request-context';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,7 @@ export async function POST(req: NextRequest) {
   if (permissionError) return permissionError;
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
+  const requestId = getRequestId(req);
 
   try {
     const [sequences, sla] = await Promise.all([
@@ -39,7 +41,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, summary });
   } catch (error) {
-    log.error('Error running all automations', error);
+    log.error('Error running all automations', error, {
+      context: { requestId, endpoint: 'admin/automation/run-all:POST' },
+    });
     return NextResponse.json({ ok: false, error: 'No se pudo ejecutar automatizaciones' }, { status: 500 });
   }
 }

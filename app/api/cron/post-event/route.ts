@@ -7,28 +7,36 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/config/site-config';
+import { getRequestId } from '@/lib/request-context';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 // Verificar autorizacion (el cron envia CRON_SECRET)
-function isAuthorized(request: NextRequest): boolean {
+function isAuthorized(request: NextRequest, requestId: string): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
   if (!cronSecret) {
-    log.error('CRON_SECRET no configurado - el cron no puede ejecutarse');
+    log.error('CRON_SECRET no configurado - el cron no puede ejecutarse', undefined, {
+      context: { requestId, endpoint: 'cron/post-event:isAuthorized' },
+    });
     return false;
   }
 
   if (!authHeader) {
-    log.warn('Intento de acceso a cron sin authorization header');
+    log.warn('Intento de acceso a cron sin authorization header', {
+      requestId,
+      endpoint: 'cron/post-event:isAuthorized',
+    });
     return false;
   }
 
   const isValid = authHeader === `Bearer ${cronSecret}`;
   if (!isValid) {
     log.warn('Intento de acceso a cron con credenciales invalidas', {
+      requestId,
+      endpoint: 'cron/post-event:isAuthorized',
       ip: request.headers.get('x-forwarded-for'),
     });
   }
@@ -45,7 +53,8 @@ interface ProcessedResult {
 }
 
 export async function GET(request: NextRequest) {
-  if (!isAuthorized(request)) {
+  const requestId = getRequestId(request);
+  if (!isAuthorized(request, requestId)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -150,7 +159,12 @@ export async function GET(request: NextRequest) {
 
           } catch (emailError) {
             log.error('Error enviando email post-event', emailError, {
-              context: { bookingId: booking.id, bookingRef: booking.reference },
+              context: {
+                requestId,
+                endpoint: 'cron/post-event:GET',
+                bookingId: booking.id,
+                bookingRef: booking.reference,
+              },
             });
             return {
               bookingId: booking.id,
@@ -181,7 +195,9 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    log.error('Error en cron post-event:', error);
+    log.error('Error en cron post-event:', error, {
+      context: { requestId, endpoint: 'cron/post-event:GET' },
+    });
     return NextResponse.json(
       {
         error: 'Error procesando eventos',

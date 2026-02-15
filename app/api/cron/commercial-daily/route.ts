@@ -6,15 +6,18 @@ import { enforceLeadSla } from '@/lib/services/slaAutomationService';
 import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { getRequestId } from '@/lib/request-context';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-function isAuthorized(request: NextRequest): boolean {
+function isAuthorized(request: NextRequest, requestId: string): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) {
-    log.error('CRON_SECRET no configurado para commercial-daily');
+    log.error('CRON_SECRET no configurado para commercial-daily', undefined, {
+      context: { requestId, endpoint: 'cron/commercial-daily:isAuthorized' },
+    });
     return false;
   }
   return authHeader === `Bearer ${cronSecret}`;
@@ -47,7 +50,8 @@ async function saveRunStatus(status: 'ok' | 'error', summary: unknown, message?:
 }
 
 export async function GET(request: NextRequest) {
-  if (!isAuthorized(request)) {
+  const requestId = getRequestId(request);
+  if (!isAuthorized(request, requestId)) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -136,7 +140,9 @@ export async function GET(request: NextRequest) {
     await saveRunStatus('ok', summary);
     return NextResponse.json({ ok: true, summary });
   } catch (error) {
-    log.error('commercial-daily cron failed', error);
+    log.error('commercial-daily cron failed', error, {
+      context: { requestId, endpoint: 'cron/commercial-daily:GET' },
+    });
     await saveRunStatus('error', {}, error instanceof Error ? error.message : 'Unknown error');
     return NextResponse.json({ ok: false, error: 'Cron commercial-daily failed' }, { status: 500 });
   }

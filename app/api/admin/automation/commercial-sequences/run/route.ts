@@ -3,6 +3,7 @@ import { requireAuth, requirePermission } from '@/lib/auth';
 import { runCommercialSequences } from '@/lib/services/commercialSequenceService';
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { getRequestId } from '@/lib/request-context';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,7 @@ export async function GET(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'read');
   if (permissionError) return permissionError;
+  const requestId = getRequestId(req);
 
   try {
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -43,7 +45,9 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    log.error('Error reading sequence metrics', error);
+    log.error('Error reading sequence metrics', error, {
+      context: { requestId, endpoint: 'admin/automation/commercial-sequences/run:GET' },
+    });
     return NextResponse.json({ ok: false, error: 'No se pudo leer métricas' }, { status: 500 });
   }
 }
@@ -53,6 +57,7 @@ export async function POST(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'automation');
   if (permissionError) return permissionError;
+  const requestId = getRequestId(req);
 
   try {
     const summary = await runCommercialSequences();
@@ -66,7 +71,9 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({ ok: true, summary });
   } catch (error) {
-    log.error('Error running commercial sequences', error);
+    log.error('Error running commercial sequences', error, {
+      context: { requestId, endpoint: 'admin/automation/commercial-sequences/run:POST' },
+    });
     return NextResponse.json(
       { ok: false, error: 'No se pudo ejecutar secuencias comerciales' },
       { status: 500 }
