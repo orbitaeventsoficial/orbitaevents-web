@@ -4,6 +4,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import SettingsClient from './SettingsClient';
+import DbReconnectButton from './DbReconnectButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -88,6 +89,7 @@ export default async function SettingsPage() {
             Gestiona les configuracions del sistema i estadístiques públiques
           </p>
         </div>
+        <DbReconnectButton />
       </header>
 
       {/* Info Alert */}

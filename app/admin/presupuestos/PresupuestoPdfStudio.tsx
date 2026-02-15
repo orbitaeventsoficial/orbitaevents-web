@@ -59,7 +59,7 @@ function buildPackFromForm(params: {
 }
 
 export default function PresupuestoPdfStudio() {
-  const [locale, setLocale] = useState<Locale>('es');
+  const [locale, setLocale] = useState<Locale>('ca');
   const [eventType, setEventType] = useState<ServiceSlug>('bodas');
   const [packId, setPackId] = useState<string>(() => getPacksByService('bodas')[0]?.id || '');
   const [clientContact, setClientContact] = useState('');
@@ -70,10 +70,10 @@ export default function PresupuestoPdfStudio() {
   const [guests, setGuests] = useState(80);
   const [validityDays, setValidityDays] = useState(15);
   const [conditionsText, setConditionsText] = useState(
-    "Reserva con 30% para bloquear fecha.\nPago final 7 días antes del evento.\nDesplazamiento incluido hasta 50km."
+    "Reserva amb 30% per bloquejar la data.\nPagament final 7 dies abans de l'esdeveniment.\nDesplacament inclos fins a 50km."
   );
   const [whyChooseUs, setWhyChooseUs] = useState(
-    'Equipo técnico profesional, respuesta rápida y propuesta adaptada para que todo salga perfecto sin complicaciones.'
+    'Equip tecnic professional, resposta rapida i proposta adaptada perque tot surti perfecte sense complicacions.'
   );
   const [discount, setDiscount] = useState(0);
   const [discountReason, setDiscountReason] = useState('');
@@ -82,6 +82,7 @@ export default function PresupuestoPdfStudio() {
   const [customExtraName, setCustomExtraName] = useState('');
   const [customExtraPrice, setCustomExtraPrice] = useState(0);
   const [generating, setGenerating] = useState(false);
+  const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [brandName, setBrandName] = useState('Orbita Events');
   const [brandWebsite, setBrandWebsite] = useState('orbitaevents.com');
@@ -175,59 +176,132 @@ export default function PresupuestoPdfStudio() {
     setCustomExtras((prev) => prev.filter((extra) => extra.id !== id));
   }
 
+  async function buildPdf() {
+    if (!selectedPack) return null;
+    const finalPack = buildPackFromForm({
+      source: selectedPack,
+      name: packName,
+      price: basePrice,
+      durationHours,
+      featuresText,
+    });
+
+    return generateQuotePDF(
+      {
+        eventType,
+        pack: finalPack,
+        date: eventDate || '-',
+        guests: Math.max(0, Number(guests) || 0),
+        extras: allExtrasForPdf,
+        extrasCatalog: extrasCatalogForPdf,
+        basePrice: Math.max(0, Number(basePrice) || 0),
+        extrasPrice,
+        discount: Math.max(0, Number(discount) || 0),
+        discountReason: discountReason.trim(),
+        total,
+        clientContact: clientContact.trim() || undefined,
+        clientName: clientName.trim() || 'Client',
+        clientEmail: clientEmail.trim() || '',
+        clientPhone: clientPhone.trim() || undefined,
+        validityDays,
+        conditions: toFeatureLines(conditionsText),
+        whyChooseUs: whyChooseUs.trim() || undefined,
+      },
+      locale,
+      {
+        logoDataUrl: logoDataUrl || undefined,
+        brandName: brandName.trim() || undefined,
+        website: brandWebsite.trim() || undefined,
+        contactEmail: brandEmail.trim() || undefined,
+        contactPhone: brandPhone.trim() || undefined,
+        tagline: brandTagline.trim() || undefined,
+      }
+    );
+  }
+
   async function downloadPdf() {
     if (!selectedPack) return;
     setGenerating(true);
     setMessage(null);
 
     try {
-      const finalPack = buildPackFromForm({
-        source: selectedPack,
-        name: packName,
-        price: basePrice,
-        durationHours,
-        featuresText,
-      });
-
-      const doc = await generateQuotePDF(
-        {
-          eventType,
-          pack: finalPack,
-          date: eventDate || '-',
-          guests: Math.max(0, Number(guests) || 0),
-          extras: allExtrasForPdf,
-          extrasCatalog: extrasCatalogForPdf,
-          basePrice: Math.max(0, Number(basePrice) || 0),
-          extrasPrice,
-          discount: Math.max(0, Number(discount) || 0),
-          discountReason: discountReason.trim(),
-          total,
-          clientContact: clientContact.trim() || undefined,
-          clientName: clientName.trim() || 'Cliente',
-          clientEmail: clientEmail.trim() || '',
-          clientPhone: clientPhone.trim() || undefined,
-          validityDays,
-          conditions: toFeatureLines(conditionsText),
-          whyChooseUs: whyChooseUs.trim() || undefined,
-        },
-        locale,
-        {
-          logoDataUrl: logoDataUrl || undefined,
-          brandName: brandName.trim() || undefined,
-          website: brandWebsite.trim() || undefined,
-          contactEmail: brandEmail.trim() || undefined,
-          contactPhone: brandPhone.trim() || undefined,
-          tagline: brandTagline.trim() || undefined,
-        }
-      );
+      const doc = await buildPdf();
+      if (!doc) throw new Error('No s’ha pogut generar el PDF');
 
       const fileName = `presupuesto-${(clientName || 'cliente').trim().toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.pdf`;
       doc.save(fileName);
-      setMessage('PDF generado correctamente.');
+      setMessage('PDF generat correctament.');
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'No se pudo generar el PDF');
+      setMessage(error instanceof Error ? error.message : 'No s’ha pogut generar el PDF');
     } finally {
       setGenerating(false);
+    }
+  }
+
+  async function printPdf() {
+    if (!selectedPack) return;
+    setGenerating(true);
+    setMessage(null);
+    try {
+      const doc = await buildPdf();
+      if (!doc) throw new Error('No s’ha pogut generar el PDF');
+      doc.autoPrint();
+      const url = doc.output('bloburl');
+      window.open(url, '_blank');
+      setMessage('PDF preparat per imprimir.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No s’ha pogut preparar la impressio');
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  async function sendQuoteEmail() {
+    if (!clientEmail.trim()) {
+      setMessage('Cal indicar email del client per enviar el pressupost.');
+      return;
+    }
+    setSending(true);
+    setMessage(null);
+    try {
+      const payloadExtras = [
+        ...mappedSelectedExtras.map((extra) => ({
+          name: extra.name,
+          description: extra.description,
+          price: extra.price || 0,
+          quantity: 1,
+        })),
+        ...customExtras.map((extra) => ({
+          name: extra.name,
+          description: 'Extra personalitzat',
+          price: extra.price,
+          quantity: 1,
+        })),
+      ];
+
+      const response = await fetch('/api/admin/emails/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: clientEmail.trim(),
+          packId: packId || 'custom',
+          price: total,
+          extras: payloadExtras,
+          notes: toFeatureLines(conditionsText).join('\n'),
+          customMessage: whyChooseUs.trim(),
+          locale,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data?.error || 'No s’ha pogut enviar el pressupost');
+      }
+      setMessage(`Pressupost enviat correctament a ${clientEmail.trim()}.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Error enviant el pressupost');
+    } finally {
+      setSending(false);
     }
   }
 
@@ -251,10 +325,13 @@ export default function PresupuestoPdfStudio() {
           <label className="text-sm text-slate-300">
             Idioma PDF
             <select className={inputClass} value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
-              <option value="es">Español</option>
               <option value="ca">Català</option>
+              <option value="es">Español</option>
               <option value="en">English</option>
             </select>
+            <span className="mt-1 block text-xs text-slate-400">
+              Aquest idioma s&apos;aplica a descarregar i imprimir el PDF.
+            </span>
           </label>
 
           <label className="text-sm text-slate-300">
@@ -480,10 +557,26 @@ export default function PresupuestoPdfStudio() {
           <button
             type="button"
             onClick={downloadPdf}
-            disabled={generating || !selectedPack}
+            disabled={generating || sending || !selectedPack}
             className="rounded-xl border border-emerald-500/40 bg-emerald-500/15 px-5 py-2.5 text-sm font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-60"
           >
-            {generating ? 'Generando PDF...' : 'Descargar PDF'}
+            {generating ? 'Generant PDF...' : 'Descarregar PDF'}
+          </button>
+          <button
+            type="button"
+            onClick={printPdf}
+            disabled={generating || sending || !selectedPack}
+            className="rounded-xl border border-sky-500/40 bg-sky-500/15 px-5 py-2.5 text-sm font-semibold text-sky-200 hover:bg-sky-500/20 disabled:opacity-60"
+          >
+            {generating ? 'Generant PDF...' : 'Imprimir PDF'}
+          </button>
+          <button
+            type="button"
+            onClick={sendQuoteEmail}
+            disabled={generating || sending || !selectedPack || !clientEmail.trim()}
+            className="rounded-xl border border-violet-500/40 bg-violet-500/15 px-5 py-2.5 text-sm font-semibold text-violet-200 hover:bg-violet-500/20 disabled:opacity-60"
+          >
+            {sending ? 'Enviant...' : 'Enviar pressupost'}
           </button>
           {message && <p className="text-sm text-slate-300">{message}</p>}
         </div>
