@@ -59,12 +59,12 @@ export default function BlogAdminPage() {
   useEffect(() => {
     const created = searchParams.get('created');
     if (created === '1') {
-      setFlashMessage({ type: 'success', text: 'Post creado correctamente' });
+      setFlashMessage({ type: 'success', text: 'Post creat correctament' });
     }
   }, [searchParams]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este post?')) return;
+    if (!confirm('Segur que vols eliminar aquest post?')) return;
 
     try {
       const res = await fetch(`/api/admin/blog?id=${id}`, {
@@ -72,7 +72,7 @@ export default function BlogAdminPage() {
       });
 
       if (res.ok) {
-        setFlashMessage({ type: 'success', text: 'Post eliminado correctamente' });
+        setFlashMessage({ type: 'success', text: 'Post eliminat correctament' });
         fetchPosts();
       } else {
         setFlashMessage({ type: 'error', text: 'Error en eliminar el post' });
@@ -120,7 +120,7 @@ export default function BlogAdminPage() {
             aria-label="Idioma"
             className="rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
           >
-            <option value="es">Español</option>
+            <option value="es">Castellà</option>
             <option value="ca">Català</option>
           </select>
 
@@ -165,13 +165,13 @@ export default function BlogAdminPage() {
         </div>
       ) : posts.length === 0 ? (
         <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-12 text-center">
-          <p className="text-slate-400">No hay posts todavía</p>
+          <p className="text-slate-400">Encara no hi ha posts</p>
           <button
             onClick={() => (window.location.href = '/admin/blog/new')}
             type="button"
             className="mt-4 text-cyan-400 hover:text-cyan-300"
           >
-            Crear el primer
+            Crea el primer
           </button>
         </div>
       ) : (
@@ -184,19 +184,19 @@ export default function BlogAdminPage() {
                     Títol
                   </th>
                   <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
-                    Categoría
+                    Categoria
                   </th>
                   <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
                     Estat
                   </th>
                   <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
-                    Visitas
+                    Visites
                   </th>
                   <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
                     Data
                   </th>
                   <th scope="col" className="px-6 py-3 text-right font-medium text-slate-300">
-                    Acciones
+                    Accions
                   </th>
                 </tr>
               </thead>
@@ -276,7 +276,7 @@ export default function BlogAdminPage() {
                 Anterior
               </button>
               <span className="flex items-center px-4 text-slate-400">
-                Página {page} de {totalPages}
+                Pàgina {page} de {totalPages}
               </span>
               <button
                 onClick={() => setPage(page + 1)}
@@ -284,7 +284,7 @@ export default function BlogAdminPage() {
                 type="button"
                 className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-slate-200 disabled:opacity-50 hover:bg-slate-600/50 transition-colors"
               >
-                Siguiente
+                Següent
               </button>
             </div>
           )}
