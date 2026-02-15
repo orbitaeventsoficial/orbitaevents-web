@@ -33,7 +33,7 @@ export default function CustomerHeader({
           ? 'Post-esdeveniment'
           : data.customer.status === 'LOST'
             ? 'Perdut'
-            : 'Lead';
+            : 'Entrada';
   const statusTone =
     data.customer.status === 'CONFIRMED'
       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'

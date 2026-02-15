@@ -148,7 +148,7 @@ function TaskColumn({
                 </button>
                 {task.leadId && (
                   <Link href={`/admin/leads/${task.leadId}`} className="text-xs text-cyan-300 hover:text-cyan-200">
-                    Obrir lead
+                    Obrir entrada
                   </Link>
                 )}
               </div>
@@ -159,4 +159,3 @@ function TaskColumn({
     </div>
   );
 }
-

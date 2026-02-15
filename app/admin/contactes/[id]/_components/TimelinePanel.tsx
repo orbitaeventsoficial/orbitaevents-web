@@ -6,7 +6,7 @@ import Link from 'next/link';
 export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO[] }) {
   return (
     <aside className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4 lg:sticky lg:top-[220px]">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Timeline</h2>
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Cronologia</h2>
       <p className="mt-1 text-xs text-slate-400">Activitat unificada del client</p>
 
       <div className="mt-3 max-h-[68vh] space-y-2 overflow-y-auto pr-1">
@@ -39,4 +39,3 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
     </aside>
   );
 }
-

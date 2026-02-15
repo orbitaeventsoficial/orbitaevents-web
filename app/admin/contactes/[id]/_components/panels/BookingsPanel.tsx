@@ -2,12 +2,19 @@ import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
 import Link from 'next/link';
 
 export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
+  const statusLabel = (status: string) => {
+    if (status === 'CONFIRMED') return 'Confirmada';
+    if (status === 'TENTATIVE') return 'Pendent';
+    if (status === 'CANCELLED') return 'Cancel·lada';
+    return status;
+  };
+
   return (
     <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-slate-100">Reserva / Dates</h2>
-          <p className="text-sm text-slate-400">Planificació d’events del client.</p>
+          <p className="text-sm text-slate-400">Planificació d’esdeveniments del client.</p>
         </div>
         <Link
           href={`/admin/bookings/new?customerId=${data.customer.id}`}
@@ -28,7 +35,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-slate-100">{booking.reference || booking.id.slice(0, 8)}</p>
                 <span className="rounded-full border border-slate-600 px-2 py-0.5 text-[11px] text-slate-300">
-                  {booking.status}
+                  {statusLabel(booking.status)}
                 </span>
               </div>
               <p className="mt-1 text-xs text-slate-400">
@@ -50,4 +57,3 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
     </section>
   );
 }
-
