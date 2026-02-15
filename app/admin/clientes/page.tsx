@@ -47,6 +47,7 @@ export default function AdminContactesPage() {
   const [stats, setStats] = useState<CustomerStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 25;
@@ -98,6 +99,13 @@ export default function AdminContactesPage() {
   useEffect(() => {
     fetchCustomers();
   }, [fetchCustomers]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setSearch(searchInput.trim());
+    }, 250);
+    return () => window.clearTimeout(timeout);
+  }, [searchInput]);
 
   // Add customer
   const handleAddCustomer = async () => {
@@ -249,8 +257,8 @@ export default function AdminContactesPage() {
           <input
             type="search"
             placeholder="Cercar contacte..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             aria-label="Cercar contacte"
             className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
           />

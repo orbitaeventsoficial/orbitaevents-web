@@ -190,11 +190,14 @@ export default function TextManagerPage() {
   // Estats de UI
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [showOnlyModified, setShowOnlyModified] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<'sections' | 'all' | 'search'>('sections');
   const [activeLanguage, setActiveLanguage] = useState<'es' | 'ca' | 'en'>('es');
+  const [resultsPage, setResultsPage] = useState(1);
+  const resultsPageSize = 100;
 
   // Historial de canvis
   const [changeHistory, setChangeHistory] = useState<Array<{
@@ -211,6 +214,13 @@ export default function TextManagerPage() {
   useEffect(() => {
     loadTexts();
   }, []);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim());
+    }, 300);
+    return () => window.clearTimeout(timeout);
+  }, [searchTerm]);
 
   async function loadTexts() {
     setLoading(true);
@@ -298,8 +308,7 @@ export default function TextManagerPage() {
         return;
       }
 
-      // TRADUCCIÓN AUTOMÁTICA
-      // Para cada texto modificado, traducir a los otros 2 idiomas
+      // TRADUCCIÓN AUTOMÁTICA EN BATCH (1 request)
       const allModifications: Record<string, Record<string, string>> = {
         es: {},
         ca: {},
@@ -308,26 +317,29 @@ export default function TextManagerPage() {
 
       setSuccess('🔄 Traduciendo automáticamente...');
 
-      for (const [path, text] of Object.entries(modifications)) {
-        // Traducir el texto a los 3 idiomas
+      const modifiedEntries = Object.entries(modifications);
+      const uniqueTexts = Array.from(new Set(
+        modifiedEntries.map(([, text]) => text.trim()).filter(Boolean)
+      ));
+      let translationsByText: Record<string, Record<string, string>> = {};
+      if (uniqueTexts.length > 0) {
         const translateResponse = await fetch('/api/admin/translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, targetLanguages: ['es', 'ca', 'en'] })
+          body: JSON.stringify({ texts: uniqueTexts, targetLanguages: ['es', 'ca', 'en'] })
         });
-
-        const translateData = await translateResponse.json();
-
-        if (translateData.ok && translateData.translations) {
-          allModifications.es[path] = translateData.translations.es;
-          allModifications.ca[path] = translateData.translations.ca;
-          allModifications.en[path] = translateData.translations.en;
-        } else {
-          // Si falla la traducción, usar el texto original para todos
-          allModifications.es[path] = text;
-          allModifications.ca[path] = text;
-          allModifications.en[path] = text;
+        const translateData = await translateResponse.json().catch(() => ({}));
+        if (translateResponse.ok && translateData?.ok) {
+          translationsByText = (translateData.translationsByText || {}) as Record<string, Record<string, string>>;
         }
+      }
+
+      for (const [path, text] of modifiedEntries) {
+        const normalizedText = text.trim();
+        const translated = translationsByText[normalizedText] || {};
+        allModifications.es[path] = translated.es || text;
+        allModifications.ca[path] = translated.ca || text;
+        allModifications.en[path] = translated.en || text;
       }
 
       // Desar los 3 idiomas en paralelo
@@ -440,8 +452,8 @@ export default function TextManagerPage() {
     }
 
     // Filtrar por búsqueda
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+    if (debouncedSearchTerm) {
+      const term = debouncedSearchTerm.toLowerCase();
       texts = texts.filter(([path, value]) =>
         path.toLowerCase().includes(term) ||
         value.toLowerCase().includes(term)
@@ -457,7 +469,24 @@ export default function TextManagerPage() {
     texts.sort((a, b) => a[0].localeCompare(b[0]));
 
     return texts;
-  }, [currentTexts, originalTexts, activeSection, searchTerm, showOnlyModified, getSection]);
+  }, [currentTexts, originalTexts, activeSection, debouncedSearchTerm, showOnlyModified, getSection]);
+
+  useEffect(() => {
+    setResultsPage(1);
+  }, [debouncedSearchTerm, activeSection, showOnlyModified, activeLanguage]);
+
+  const totalFilteredPages = useMemo(() => {
+    return Math.max(1, Math.ceil(filteredTexts.length / resultsPageSize));
+  }, [filteredTexts.length]);
+
+  const paginatedFilteredTexts = useMemo(() => {
+    const start = (resultsPage - 1) * resultsPageSize;
+    return filteredTexts.slice(start, start + resultsPageSize);
+  }, [filteredTexts, resultsPage]);
+
+  useEffect(() => {
+    if (resultsPage > totalFilteredPages) setResultsPage(totalFilteredPages);
+  }, [resultsPage, totalFilteredPages]);
 
   const sectionCounts = useMemo(() => {
     const counts: Record<string, { total: number; modified: number }> = {};
@@ -808,7 +837,36 @@ export default function TextManagerPage() {
                   )}
                 </div>
               ) : (
-                filteredTexts.map(([path, value]) => {
+                <>
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-700/60 bg-slate-900/70 px-3 py-2 text-xs text-slate-300">
+                    <span>
+                      Mostrant {(resultsPage - 1) * resultsPageSize + 1}-
+                      {Math.min(resultsPage * resultsPageSize, filteredTexts.length)} de {filteredTexts.length}
+                    </span>
+                    {totalFilteredPages > 1 && (
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setResultsPage((prev) => Math.max(1, prev - 1))}
+                          disabled={resultsPage <= 1}
+                          className="rounded border border-slate-600 px-2 py-1 disabled:opacity-40"
+                        >
+                          Anterior
+                        </button>
+                        <span>Pàgina {resultsPage} de {totalFilteredPages}</span>
+                        <button
+                          type="button"
+                          onClick={() => setResultsPage((prev) => Math.min(totalFilteredPages, prev + 1))}
+                          disabled={resultsPage >= totalFilteredPages}
+                          className="rounded border border-slate-600 px-2 py-1 disabled:opacity-40"
+                        >
+                          Següent
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                {paginatedFilteredTexts.map(([path, value]) => {
                   const isModified = value !== originalTexts[path];
                   const otherLangValues = {
                     es: esTexts[path],
@@ -909,7 +967,8 @@ export default function TextManagerPage() {
                       </div>
                     </div>
                   );
-                })
+                })}
+                </>
               )}
             </div>
           </main>
