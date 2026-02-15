@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import InfoTooltip from '../../components/InfoTooltip';
+import { ADMIN_HELP } from '../../help-content';
 
 type LeadProfile = {
   id: string;
@@ -287,7 +288,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             Estat
-            <InfoTooltip text="Fase comercial actual del lead: nou, contactat, pressupost enviat, negociació, guanyat o perdut." />
+            <InfoTooltip text={ADMIN_HELP.leadStatus} />
           </span>
           <select
             className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
@@ -304,7 +305,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             Prioritat
-            <InfoTooltip text="Nivell d'urgència comercial per ordenar seguiment i tasques." />
+            <InfoTooltip text={ADMIN_HELP.leadPriority} />
           </span>
           <select
             className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
@@ -321,7 +322,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             Origen
-            <InfoTooltip text="Canal pel qual ha arribat el lead (Web, WhatsApp, Instagram, Wallapop, etc.)." />
+            <InfoTooltip text={ADMIN_HELP.leadEditorSource} />
           </span>
           <select
             className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
@@ -384,7 +385,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             Landing page
-            <InfoTooltip text="Pàgina exacta on l'usuari estava quan va enviar el formulari." />
+            <InfoTooltip text={ADMIN_HELP.leadEditorLanding} />
           </span>
           <input
             className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
@@ -395,7 +396,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             UTM source
-            <InfoTooltip text="Font de la campanya (ex: google, instagram, newsletter)." />
+            <InfoTooltip text={ADMIN_HELP.leadEditorUtmSource} />
           </span>
           <input
             className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
@@ -406,7 +407,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             UTM medium
-            <InfoTooltip text="Tipus de canal de captació (ex: cpc, social, email, organic)." />
+            <InfoTooltip text={ADMIN_HELP.leadEditorUtmMedium} />
           </span>
           <input
             className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
@@ -417,7 +418,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         <label className="flex flex-col gap-1 text-sm text-slate-300 md:col-span-2">
           <span className="inline-flex items-center gap-1">
             UTM campaign
-            <InfoTooltip text="Nom de la campanya de màrqueting (ex: primavera-2026, black-friday)." />
+            <InfoTooltip text={ADMIN_HELP.leadEditorUtmCampaign} />
           </span>
           <input
             className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
