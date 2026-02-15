@@ -43,21 +43,6 @@ const navItemsConfig: NavItemConfig[] = [
     ]
   },
   {
-    labelKey: 'zones',
-    href: '/servicios/bodas',
-    dropdownType: 'zones',
-    dropdown: [
-      { labelKey: 'barcelona', descKey: 'barcelonaDesc', href: '/servicios/dj-bodas-barcelona-ciudad', icon: '🏙️' },
-      { labelKey: 'maresme', descKey: 'maresmeDesc', href: '/servicios/dj-bodas-maresme', icon: '🏖️' },
-      { labelKey: 'garraf', descKey: 'garrafDesc', href: '/servicios/dj-bodas-garraf', icon: '🌊' },
-      { labelKey: 'valles', descKey: 'vallesDesc', href: '/servicios/dj-bodas-valles', icon: '🌳' },
-      { labelKey: 'penedes', descKey: 'peNedesDesc', href: '/servicios/dj-bodas-penedes', icon: '🍷' },
-      { labelKey: 'girona', descKey: 'gironaDesc', href: '/servicios/dj-bodas-girona', icon: '🏰' },
-      { labelKey: 'emporda', descKey: 'empordaDesc', href: '/servicios/dj-bodas-emporda', icon: '🌅' },
-      { labelKey: 'costaBrava', descKey: 'costaBravaDesc', href: '/servicios/dj-bodas-costa-brava', icon: '⛵' },
-    ]
-  },
-  {
     labelKey: 'experiences',
     href: '/experiencias',
     badge: 'NEW',
@@ -68,7 +53,6 @@ const navItemsConfig: NavItemConfig[] = [
     ]
   },
   { labelKey: 'portfolio', href: '/portfolio' },
-  { labelKey: 'blog', href: '/blog' },
   { labelKey: 'reviews', href: '/opiniones' },
   { labelKey: 'contact', href: '/contacto' },
 ];
