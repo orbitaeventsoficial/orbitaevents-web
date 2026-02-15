@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
+import { getRequestId } from '@/lib/request-context';
 import { ProposalStatus } from '@prisma/client';
 import { z } from 'zod';
 
@@ -40,6 +41,7 @@ async function generateProposalReference(): Promise<string> {
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const requestId = getRequestId(req);
 
   try {
     const { searchParams } = new URL(req.url);
@@ -66,7 +68,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ ok: true, proposals });
   } catch (error) {
-    log.error('Error obtenint pressupostos', error);
+    log.error('Error obtenint pressupostos', error, {
+      context: { requestId, endpoint: 'admin/proposals:GET' },
+    });
     return NextResponse.json({ ok: false, error: 'Error obtenint pressupostos' }, { status: 500 });
   }
 }
@@ -76,6 +80,8 @@ export async function POST(req: NextRequest) {
   if (authError) return authError;
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
+  const requestId = getRequestId(req);
+  let customerIdForLog: string | undefined;
 
   try {
     const body = await req.json();
@@ -85,6 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     const data = parsed.data;
+    customerIdForLog = data.customerId;
     const reference = await generateProposalReference();
 
     const proposal = await prisma.proposal.create({
@@ -113,7 +120,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, proposal }, { status: 201 });
   } catch (error) {
-    log.error('Error creant pressupost', error);
+    log.error('Error creant pressupost', error, {
+      context: { requestId, endpoint: 'admin/proposals:POST', customerId: customerIdForLog },
+    });
     return NextResponse.json({ ok: false, error: 'Error creant pressupost' }, { status: 500 });
   }
 }

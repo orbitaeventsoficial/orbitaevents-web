@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth, requirePermission } from '@/lib/auth';
+import { getRequestId } from '@/lib/request-context';
 import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 import { BookingStatus, EventType } from '@prisma/client';
@@ -64,6 +65,7 @@ export async function GET(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'read');
   if (permissionError) return permissionError;
+  const requestId = getRequestId(req);
 
   try {
     const { searchParams } = new URL(req.url);
@@ -132,7 +134,9 @@ export async function GET(req: NextRequest) {
       }, {} as Record<string, { count: number; revenue: number }>),
     });
   } catch (error) {
-    log.error('Error obtenint reserves:', error);
+    log.error('Error obtenint reserves:', error, {
+      context: { requestId, endpoint: 'admin/bookings:GET' },
+    });
     return NextResponse.json(
       { error: 'Error obtenint reserves' },
       { status: 500 }
@@ -147,6 +151,8 @@ export async function POST(req: NextRequest) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+  const requestId = getRequestId(req);
+  let customerIdForLog: string | null = null;
 
   try {
     const body = await req.json();
@@ -177,6 +183,7 @@ export async function POST(req: NextRequest) {
       });
       linkedCustomerId = byEmail?.id || null;
     }
+    customerIdForLog = linkedCustomerId;
 
     // Obtenir pack i preu
     const pack = await prisma.pack.findUnique({
@@ -283,7 +290,13 @@ export async function POST(req: NextRequest) {
       booking,
     });
   } catch (error) {
-    log.error('Error creant reserva:', error);
+    log.error('Error creant reserva:', error, {
+      context: {
+        requestId,
+        endpoint: 'admin/bookings:POST',
+        customerId: customerIdForLog,
+      },
+    });
     return NextResponse.json(
       { error: 'Error creant reserva' },
       { status: 500 }

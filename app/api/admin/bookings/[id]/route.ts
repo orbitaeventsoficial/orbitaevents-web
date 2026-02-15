@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
 import { requireAuth, requirePermission } from '@/lib/auth';
+import { getRequestId } from '@/lib/request-context';
 import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
 
 interface Params {
@@ -37,6 +38,7 @@ export async function GET(req: NextRequest, { params }: Params) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'read');
   if (permissionError) return permissionError;
+  const requestId = getRequestId(req);
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: params.id },
@@ -63,7 +65,9 @@ export async function GET(req: NextRequest, { params }: Params) {
       booking,
     });
   } catch (error) {
-    log.error('Error obtenint reserva', error, { context: { bookingId: params.id } });
+    log.error('Error obtenint reserva', error, {
+      context: { requestId, endpoint: 'admin/bookings/[id]:GET', bookingId: params.id },
+    });
     return NextResponse.json(
       { error: 'Error obtenint reserva' },
       { status: 500 }
@@ -77,6 +81,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+  const requestId = getRequestId(req);
+  let customerIdForLog: string | null = null;
   try {
     const rawBody = await req.json();
     const { id } = params;
@@ -120,6 +126,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (body.depositPaidAt && typeof body.depositPaidAt === 'string') {
       body.depositPaidAt = new Date(body.depositPaidAt);
     }
+    customerIdForLog = existing.customerId;
     if (body.remainingPaidAt && typeof body.remainingPaidAt === 'string') {
       body.remainingPaidAt = new Date(body.remainingPaidAt);
     }
@@ -209,7 +216,14 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       calendarSync,
     });
   } catch (error) {
-    log.error('Error actualitzant reserva', error, { context: { bookingId: params.id } });
+    log.error('Error actualitzant reserva', error, {
+      context: {
+        requestId,
+        endpoint: 'admin/bookings/[id]:PATCH',
+        bookingId: params.id,
+        customerId: customerIdForLog,
+      },
+    });
     return NextResponse.json(
       { error: 'Error actualitzant reserva' },
       { status: 500 }
@@ -223,6 +237,8 @@ export async function DELETE(req: NextRequest, { params }: Params) {
   if (authError) return authError;
   const permissionError = requirePermission(req, 'mutate');
   if (permissionError) return permissionError;
+  const requestId = getRequestId(req);
+  let customerIdForLog: string | null = null;
   try {
     const { id } = params;
 
@@ -236,6 +252,7 @@ export async function DELETE(req: NextRequest, { params }: Params) {
         { status: 404 }
       );
     }
+    customerIdForLog = existing.customerId;
 
     // Només permetre eliminar si està PENDING o CANCELLED
     if (!['PENDING', 'CANCELLED'].includes(existing.status)) {
@@ -274,7 +291,14 @@ export async function DELETE(req: NextRequest, { params }: Params) {
       ok: true,
     });
   } catch (error) {
-    log.error('Error eliminant reserva', error, { context: { bookingId: params.id } });
+    log.error('Error eliminant reserva', error, {
+      context: {
+        requestId,
+        endpoint: 'admin/bookings/[id]:DELETE',
+        bookingId: params.id,
+        customerId: customerIdForLog,
+      },
+    });
     return NextResponse.json(
       { error: 'Error eliminant reserva' },
       { status: 500 }

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
 import { verifyCsrf } from '@/lib/csrf';
+import { getRequestId } from '@/lib/request-context';
 import { ProposalStatus } from '@prisma/client';
 import { z } from 'zod';
 
@@ -30,6 +31,7 @@ interface Params {
 export async function GET(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const requestId = getRequestId(req);
 
   try {
     const proposal = await prisma.proposal.findUnique({
@@ -47,7 +49,9 @@ export async function GET(req: NextRequest, { params }: Params) {
 
     return NextResponse.json({ ok: true, proposal });
   } catch (error) {
-    log.error('Error obtenint pressupost', error);
+    log.error('Error obtenint pressupost', error, {
+      context: { requestId, endpoint: 'admin/proposals/[id]:GET', proposalId: params.id },
+    });
     return NextResponse.json({ ok: false, error: 'Error obtenint pressupost' }, { status: 500 });
   }
 }
@@ -57,6 +61,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if (authError) return authError;
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
+  const requestId = getRequestId(req);
+  let customerIdForLog: string | undefined;
 
   try {
     const body = await req.json();
@@ -77,10 +83,18 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         customer: { select: { id: true, name: true, email: true } },
       },
     });
+    customerIdForLog = proposal.customerId;
 
     return NextResponse.json({ ok: true, proposal });
   } catch (error) {
-    log.error('Error actualitzant pressupost', error);
+    log.error('Error actualitzant pressupost', error, {
+      context: {
+        requestId,
+        endpoint: 'admin/proposals/[id]:PATCH',
+        proposalId: params.id,
+        customerId: customerIdForLog,
+      },
+    });
     return NextResponse.json({ ok: false, error: 'Error actualitzant pressupost' }, { status: 500 });
   }
 }
