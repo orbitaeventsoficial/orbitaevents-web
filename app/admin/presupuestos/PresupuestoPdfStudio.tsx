@@ -26,6 +26,12 @@ type StudioProps = {
   initialCustomerEmail?: string;
   initialLeadId?: string;
   initialProposalId?: string;
+  initialBrandName?: string;
+  initialBrandWebsite?: string;
+  initialBrandEmail?: string;
+  initialBrandPhone?: string;
+  initialBrandTagline?: string;
+  initialBrandLogoDataUrl?: string;
 };
 
 const STUDIO_DRAFT_KEY = 'admin.presupuestos.pdfstudio.draft.v1';
@@ -140,6 +146,12 @@ export default function PresupuestoPdfStudio({
   initialCustomerEmail = '',
   initialLeadId = '',
   initialProposalId = '',
+  initialBrandName = 'Orbita Events',
+  initialBrandWebsite = 'orbitaevents.com',
+  initialBrandEmail = '',
+  initialBrandPhone = '',
+  initialBrandTagline = 'Tu evento. Tu estilo. Tu noche perfecta.',
+  initialBrandLogoDataUrl = '',
 }: StudioProps) {
   const [locale, setLocale] = useState<Locale>('ca');
   const [eventType, setEventType] = useState<ServiceSlug>('bodas');
@@ -169,16 +181,19 @@ export default function PresupuestoPdfStudio({
   const [generating, setGenerating] = useState(false);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [brandName, setBrandName] = useState('Orbita Events');
-  const [brandWebsite, setBrandWebsite] = useState('orbitaevents.com');
-  const [brandEmail, setBrandEmail] = useState('');
-  const [brandPhone, setBrandPhone] = useState('');
-  const [brandTagline, setBrandTagline] = useState('Tu evento. Tu estilo. Tu noche perfecta.');
-  const [logoDataUrl, setLogoDataUrl] = useState<string>('');
+  const [brandName, setBrandName] = useState(initialBrandName || 'Orbita Events');
+  const [brandWebsite, setBrandWebsite] = useState(initialBrandWebsite || 'orbitaevents.com');
+  const [brandEmail, setBrandEmail] = useState(initialBrandEmail || '');
+  const [brandPhone, setBrandPhone] = useState(initialBrandPhone || '');
+  const [brandTagline, setBrandTagline] = useState(
+    initialBrandTagline || 'Tu evento. Tu estilo. Tu noche perfecta.'
+  );
+  const [logoDataUrl, setLogoDataUrl] = useState<string>(initialBrandLogoDataUrl || '');
   const [draftLoaded, setDraftLoaded] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [autosaving, setAutosaving] = useState(false);
   const [autosaveTick, setAutosaveTick] = useState(0);
+  const [allowBrandOverride, setAllowBrandOverride] = useState(false);
   const isCustomerScoped = Boolean(customerId);
 
   const packs = useMemo(() => getPacksByService(eventType), [eventType]);
@@ -750,6 +765,17 @@ export default function PresupuestoPdfStudio({
               : autosaveTick > 0
                 ? ' Guardat.'
                 : ''}
+            <div className="mt-2 flex items-center gap-2 text-[11px]">
+              <input
+                id="brand-override"
+                type="checkbox"
+                checked={allowBrandOverride}
+                onChange={(e) => setAllowBrandOverride(e.target.checked)}
+              />
+              <label htmlFor="brand-override" className="cursor-pointer">
+                Permetre override de marca/logo només per aquest pressupost
+              </label>
+            </div>
           </div>
         )}
         <div className="grid gap-4 md:grid-cols-2">
@@ -805,7 +831,7 @@ export default function PresupuestoPdfStudio({
               type="file"
               accept="image/png,image/jpeg,image/webp"
               onChange={(e) => onLogoChange(e.target.files?.[0] || null)}
-              disabled={isCustomerScoped}
+              disabled={isCustomerScoped && !allowBrandOverride}
             />
           </label>
           <label className="text-sm text-slate-300">
@@ -862,7 +888,7 @@ export default function PresupuestoPdfStudio({
               className={inputClass}
               value={brandName}
               onChange={(e) => setBrandName(e.target.value)}
-              readOnly={isCustomerScoped}
+              readOnly={isCustomerScoped && !allowBrandOverride}
             />
           </label>
           <label className="text-sm text-slate-300">
@@ -871,7 +897,7 @@ export default function PresupuestoPdfStudio({
               className={inputClass}
               value={brandWebsite}
               onChange={(e) => setBrandWebsite(e.target.value)}
-              readOnly={isCustomerScoped}
+              readOnly={isCustomerScoped && !allowBrandOverride}
             />
           </label>
           <label className="text-sm text-slate-300">
@@ -880,7 +906,7 @@ export default function PresupuestoPdfStudio({
               className={inputClass}
               value={brandEmail}
               onChange={(e) => setBrandEmail(e.target.value)}
-              readOnly={isCustomerScoped}
+              readOnly={isCustomerScoped && !allowBrandOverride}
             />
           </label>
           <label className="text-sm text-slate-300">
@@ -889,7 +915,7 @@ export default function PresupuestoPdfStudio({
               className={inputClass}
               value={brandPhone}
               onChange={(e) => setBrandPhone(e.target.value)}
-              readOnly={isCustomerScoped}
+              readOnly={isCustomerScoped && !allowBrandOverride}
             />
           </label>
           <label className="text-sm text-slate-300 md:col-span-2">
@@ -898,7 +924,7 @@ export default function PresupuestoPdfStudio({
               className={inputClass}
               value={brandTagline}
               onChange={(e) => setBrandTagline(e.target.value)}
-              readOnly={isCustomerScoped}
+              readOnly={isCustomerScoped && !allowBrandOverride}
             />
           </label>
         </div>

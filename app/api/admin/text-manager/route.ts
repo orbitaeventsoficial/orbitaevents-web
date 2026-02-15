@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
 import { prisma } from '@/app/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -227,6 +227,8 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
   try {
     const body = await req.json();
     const { modifications, locale = 'es' } = body as {
@@ -303,6 +305,8 @@ export async function PUT(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
   try {
     const body = await req.json();
     const { action } = body as { action: string };

@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
-import { requireAuth } from '@/lib/auth';
+import { requireAuth, requirePermission } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,6 +40,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
 
   try {
     const body = await req.json();
@@ -110,6 +112,8 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const permissionError = requirePermission(req, 'mutate');
+  if (permissionError) return permissionError;
 
   try {
     const { searchParams } = new URL(req.url);

@@ -35,6 +35,22 @@ export default async function PresupuestosPage({
         select: { id: true, name: true, email: true },
       })
     : null;
+  const brandSettingsRows = await prisma.setting.findMany({
+    where: {
+      key: {
+        in: [
+          'quotes.brandName',
+          'quotes.brandWebsite',
+          'quotes.brandEmail',
+          'quotes.brandPhone',
+          'quotes.brandTagline',
+          'quotes.logoDataUrl',
+        ],
+      },
+    },
+    select: { key: true, value: true },
+  });
+  const brandSettings = Object.fromEntries(brandSettingsRows.map((row) => [row.key, row.value]));
 
   return (
     <div className="space-y-6">
@@ -59,6 +75,12 @@ export default async function PresupuestosPage({
         initialCustomerEmail={customer?.email || ''}
         initialLeadId={leadId}
         initialProposalId={proposalId}
+        initialBrandName={String(brandSettings['quotes.brandName'] || 'Orbita Events')}
+        initialBrandWebsite={String(brandSettings['quotes.brandWebsite'] || 'orbitaevents.com')}
+        initialBrandEmail={String(brandSettings['quotes.brandEmail'] || '')}
+        initialBrandPhone={String(brandSettings['quotes.brandPhone'] || '')}
+        initialBrandTagline={String(brandSettings['quotes.brandTagline'] || 'Tu evento. Tu estilo. Tu noche perfecta.')}
+        initialBrandLogoDataUrl={String(brandSettings['quotes.logoDataUrl'] || '')}
       />
     </div>
   );
