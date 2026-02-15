@@ -1,7 +1,31 @@
+ 'use client';
+
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
+  const router = useRouter();
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const updateStatus = async (proposalId: string, status: 'ACCEPTED' | 'EXPIRED') => {
+    try {
+      setBusyId(proposalId + status);
+      const payload: Record<string, unknown> = { status };
+      if (status === 'ACCEPTED') payload.acceptedAt = new Date().toISOString();
+      const res = await fetch(`/api/admin/proposals/${proposalId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) return;
+      router.refresh();
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   return (
     <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
       <div className="flex items-center justify-between gap-3">
@@ -47,6 +71,22 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
                     Enviar
                   </button>
                 </form>
+                <button
+                  type="button"
+                  onClick={() => updateStatus(proposal.id, 'ACCEPTED')}
+                  disabled={busyId === proposal.id + 'ACCEPTED'}
+                  className="rounded border border-emerald-600/40 px-2 py-1 text-xs text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-60"
+                >
+                  {busyId === proposal.id + 'ACCEPTED' ? 'Guardant...' : 'Marcar acceptat'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateStatus(proposal.id, 'EXPIRED')}
+                  disabled={busyId === proposal.id + 'EXPIRED'}
+                  className="rounded border border-amber-600/40 px-2 py-1 text-xs text-amber-300 hover:bg-amber-500/10 disabled:opacity-60"
+                >
+                  {busyId === proposal.id + 'EXPIRED' ? 'Guardant...' : 'Marcar caducat'}
+                </button>
               </div>
             </div>
           ))
