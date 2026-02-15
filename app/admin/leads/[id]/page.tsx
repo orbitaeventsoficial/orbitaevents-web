@@ -30,12 +30,12 @@ export async function generateMetadata({ params }: Props) {
 }
 
 const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
-  NEW: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Nou Lead' },
-  CONTACTED: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Contactat' },
-  QUOTE_SENT: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Pressupost enviat' },
-  NEGOTIATING: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Negociació' },
-  WON: { bg: 'bg-green-100', text: 'text-green-700', label: 'Guanyat!' },
-  LOST: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Perdut' },
+  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Nou Lead' },
+  CONTACTED: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Contactat' },
+  QUOTE_SENT: { bg: 'bg-purple-500/20', text: 'text-purple-300', label: 'Pressupost enviat' },
+  NEGOTIATING: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'Negociació' },
+  WON: { bg: 'bg-green-500/20', text: 'text-green-300', label: 'Guanyat!' },
+  LOST: { bg: 'bg-slate-500/20', text: 'text-slate-300', label: 'Perdut' },
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -51,10 +51,10 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
 };
 
 const PRIORITY_LABELS: Record<string, { label: string; color: string }> = {
-  LOW: { label: 'Baixa', color: 'bg-stone-100 text-slate-700' },
-  MEDIUM: { label: 'Mitjana', color: 'bg-blue-100 text-blue-700' },
-  HIGH: { label: 'Alta', color: 'bg-orange-100 text-orange-700' },
-  URGENT: { label: 'Urgent', color: 'bg-red-100 text-red-700' },
+  LOW: { label: 'Baixa', color: 'bg-slate-500/20 text-slate-300' },
+  MEDIUM: { label: 'Mitjana', color: 'bg-blue-500/20 text-blue-300' },
+  HIGH: { label: 'Alta', color: 'bg-orange-500/20 text-orange-300' },
+  URGENT: { label: 'Urgent', color: 'bg-red-500/20 text-red-300' },
 };
 const SCORE_BAND_LABELS: Record<string, string> = {
   LOW: 'BAIX',
@@ -259,16 +259,16 @@ export default async function LeadDetailPage({ params }: Props) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <header className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <header className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
           <Link
             href="/admin/leads"
-            className="text-sm text-slate-500 hover:text-slate-700 mb-2 inline-block"
+            className="text-sm text-slate-400 hover:text-slate-100 mb-2 inline-block"
           >
             ← Tornar a leads
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
             {lead.name}
           </h1>
           <div className="mt-2 flex items-center gap-3 flex-wrap">
@@ -277,7 +277,7 @@ export default async function LeadDetailPage({ params }: Props) {
             >
               {statusConf.label}
             </span>
-            <span className="text-sm text-slate-500">{eventType}</span>
+            <span className="text-sm text-slate-400">{eventType}</span>
             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${priorityConf.color}`}>
               {priorityConf.label}
             </span>
@@ -306,7 +306,7 @@ export default async function LeadDetailPage({ params }: Props) {
             )}
             <a
               href={`mailto:${lead.email}`}
-              className="inline-flex items-center rounded-md bg-stone-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-stone-200"
+              className="inline-flex items-center rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700"
             >
               ✉️ Email
             </a>
@@ -314,46 +314,46 @@ export default async function LeadDetailPage({ params }: Props) {
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          <div className="rounded-xl border border-stone-300 px-4 py-3" style={{ backgroundColor: '#ffffff', color: '#111111' }}>
-            <p className="text-xs uppercase tracking-wide !text-[#111111]">Valor estimat</p>
-            <p className="text-xl font-semibold !text-[#111111]">
+          <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3">
+            <p className="text-xs uppercase tracking-wide text-slate-300">Valor estimat</p>
+            <p className="text-xl font-semibold text-slate-100">
               {estimatedRevenue !== null ? `${estimatedRevenue.toLocaleString('ca-ES')}€` : '—'}
             </p>
           </div>
-          <div className="rounded-xl border border-stone-300 px-4 py-3" style={{ backgroundColor: '#ffffff', color: '#111111' }}>
-            <p className="text-xs uppercase tracking-wide !text-[#111111]">Antiguitat lead</p>
-            <p className="text-xl font-semibold !text-[#111111]">{leadAgeDays} dies</p>
+          <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3">
+            <p className="text-xs uppercase tracking-wide text-slate-300">Antiguitat lead</p>
+            <p className="text-xl font-semibold text-slate-100">{leadAgeDays} dies</p>
           </div>
-          <div className="rounded-xl border border-stone-300 px-4 py-3" style={{ backgroundColor: '#ffffff', color: '#111111' }}>
-            <p className="text-xs uppercase tracking-wide !text-[#111111]">Flux client</p>
-            <p className="text-xl font-semibold !text-[#111111]">
+          <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3">
+            <p className="text-xs uppercase tracking-wide text-slate-300">Flux client</p>
+            <p className="text-xl font-semibold text-slate-100">
               {reviewFlowStatus === 'RESPONDIDO'
-                ? 'Respondido'
+                ? 'Respost'
                 : reviewFlowStatus === 'ENVIADO'
-                  ? 'Enviado'
+                  ? 'Enviat'
                   : reviewFlowStatus === 'FALTA_ENVIAR'
                     ? 'Falta enviar'
-                    : 'Sin reserva'}
+                    : 'Sense reserva'}
             </p>
           </div>
-          <div className="rounded-xl border border-stone-300 px-4 py-3" style={{ backgroundColor: '#ffffff', color: '#111111' }}>
-            <p className="text-xs uppercase tracking-wide !text-[#111111]">Post-event interno</p>
-            <p className="text-xl font-semibold !text-[#111111]">
+          <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3">
+            <p className="text-xs uppercase tracking-wide text-slate-300">Post-event intern</p>
+            <p className="text-xl font-semibold text-slate-100">
               {internalPostEventStatus === 'COMPLETO'
-                ? 'Completado'
+                ? 'Completat'
                 : internalPostEventStatus === 'EN_PROGRESO'
-                  ? 'En progreso'
+                  ? 'En progrés'
                   : internalPostEventStatus === 'PENDIENTE'
-                    ? 'Pendiente'
-                    : 'Sin reserva'}
+                    ? 'Pendent'
+                    : 'Sense reserva'}
             </p>
           </div>
-          <div className="rounded-xl border border-stone-300 px-4 py-3" style={{ backgroundColor: '#ffffff', color: '#111111' }}>
-            <p className="inline-flex items-center gap-1 text-xs uppercase tracking-wide !text-[#111111]">
+          <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3">
+            <p className="inline-flex items-center gap-1 text-xs uppercase tracking-wide text-slate-300">
               Lead score
               <InfoTooltip text="Puntuació automàtica de qualitat comercial segons dades del lead i fase del procés." />
             </p>
-            <p className="text-xl font-semibold !text-[#111111]">
+            <p className="text-xl font-semibold text-slate-100">
               {leadScore.score} · {SCORE_BAND_LABELS[leadScore.band] || leadScore.band}
             </p>
             <ScoreSnapshotButton leadId={lead.id} />
@@ -402,13 +402,13 @@ export default async function LeadDetailPage({ params }: Props) {
 
           {/* Booking */}
           {lead.booking && (
-            <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-slate-700 mb-4">
+            <section className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-slate-100 mb-4">
                 Reserva associada
               </h2>
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-lg border border-stone-200 p-4">
-                  <p className="font-medium text-slate-700">
+                <div className="rounded-lg border border-white/10 p-4">
+                  <p className="font-medium text-slate-100">
                     📅 {new Date(lead.booking.eventDate).toLocaleDateString('ca-ES', {
                       weekday: 'short',
                       day: '2-digit',
@@ -416,31 +416,31 @@ export default async function LeadDetailPage({ params }: Props) {
                       year: 'numeric',
                     })}
                   </p>
-                  <p className="text-sm text-slate-600">Ref: {lead.booking.reference}</p>
-                  <p className="text-sm text-slate-600">Tipus: {lead.booking.eventType}</p>
-                  <p className="text-sm text-slate-600">Ubicació: {lead.booking.eventLocation}</p>
-                  <p className="text-sm text-slate-600">Convidats: {lead.booking.guestCount}</p>
+                  <p className="text-sm text-slate-300">Ref: {lead.booking.reference}</p>
+                  <p className="text-sm text-slate-300">Tipus: {lead.booking.eventType}</p>
+                  <p className="text-sm text-slate-300">Ubicació: {lead.booking.eventLocation}</p>
+                  <p className="text-sm text-slate-300">Convidats: {lead.booking.guestCount}</p>
                 </div>
-                <div className="rounded-lg border border-stone-200 p-4">
-                  <p className="text-lg font-bold text-slate-700">
+                <div className="rounded-lg border border-white/10 p-4">
+                  <p className="text-lg font-bold text-slate-100">
                     {lead.booking.total.toLocaleString('ca-ES')}€
                   </p>
-                  <p className="text-sm text-slate-600">Estat: {lead.booking.status}</p>
-                  <p className="text-sm text-slate-600">Subtotal: {lead.booking.subtotal.toLocaleString('ca-ES')}€</p>
-                  <p className="text-sm text-slate-600">IVA: {lead.booking.vatAmount.toLocaleString('ca-ES')}€</p>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-slate-300">Estat: {lead.booking.status}</p>
+                  <p className="text-sm text-slate-300">Subtotal: {lead.booking.subtotal.toLocaleString('ca-ES')}€</p>
+                  <p className="text-sm text-slate-300">IVA: {lead.booking.vatAmount.toLocaleString('ca-ES')}€</p>
+                  <p className="text-sm text-slate-300">
                     Dipòsit: {lead.booking.depositPaid ? 'Pagat' : 'Pendent'} ({lead.booking.depositAmount.toLocaleString('ca-ES')}€)
                   </p>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-slate-300">
                     Resta: {lead.booking.remainingPaid ? 'Pagada' : 'Pendent'} ({lead.booking.remainingAmount.toLocaleString('ca-ES')}€)
                   </p>
                 </div>
-                <div className="rounded-lg border border-stone-200 p-4 md:col-span-2">
-                  <h4 className="text-sm font-semibold text-slate-700 mb-2">Post-event i automatitzacions</h4>
+                <div className="rounded-lg border border-white/10 p-4 md:col-span-2">
+                  <h4 className="text-sm font-semibold text-slate-100 mb-2">Post-event i automatitzacions</h4>
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="text-sm">
-                      <p className="text-slate-600">
-                        Estado cliente: <strong className={
+                      <p className="text-slate-300">
+                        Estat cliente: <strong className={
                           reviewFlowStatus === 'RESPONDIDO'
                             ? 'text-emerald-600'
                             : reviewFlowStatus === 'ENVIADO'
@@ -448,34 +448,34 @@ export default async function LeadDetailPage({ params }: Props) {
                               : 'text-amber-600'
                         }>
                           {reviewFlowStatus === 'RESPONDIDO'
-                            ? 'Respondido'
+                            ? 'Respost'
                             : reviewFlowStatus === 'ENVIADO'
-                              ? 'Enviado'
+                              ? 'Enviat'
                               : reviewFlowStatus === 'FALTA_ENVIAR'
                                 ? 'Falta enviar'
-                                : 'Sin reserva'}
+                                : 'Sense reserva'}
                         </strong>
                       </p>
-                      <p className="text-slate-600">
+                      <p className="text-slate-300">
                         Enlace valoración enviado: <strong className={lead.booking.postEventEmailSent ? 'text-emerald-600' : 'text-amber-600'}>
                           {lead.booking.postEventEmailSent ? 'Sí' : 'No'}
                         </strong>
                       </p>
-                      <p className="text-slate-600">
-                        Fecha envío: {lead.booking.postEventEmailSentAt
+                      <p className="text-slate-300">
+                        Data envío: {lead.booking.postEventEmailSentAt
                           ? new Date(lead.booking.postEventEmailSentAt).toLocaleString('ca-ES')
                           : '-'}
                       </p>
-                      <p className="text-slate-600 break-all">
+                      <p className="text-slate-300 break-all">
                         Token review: {lead.booking.reviewToken || '-'}
                       </p>
-                      <p className="text-slate-600">
-                        Cliente ha respondido: <strong className={(lead.booking.reviewSubmittedAt || lead.booking.clientSurvey) ? 'text-emerald-600' : 'text-amber-600'}>
+                      <p className="text-slate-300">
+                        Client ha respondido: <strong className={(lead.booking.reviewSubmittedAt || lead.booking.clientSurvey) ? 'text-emerald-600' : 'text-amber-600'}>
                           {(lead.booking.reviewSubmittedAt || lead.booking.clientSurvey) ? 'Sí' : 'No'}
                         </strong>
                       </p>
-                      <p className="text-slate-600">
-                        Fecha respuesta: {lead.booking.reviewSubmittedAt
+                      <p className="text-slate-300">
+                        Data respuesta: {lead.booking.reviewSubmittedAt
                           ? new Date(lead.booking.reviewSubmittedAt).toLocaleString('ca-ES')
                           : lead.booking.clientSurvey?.submittedAt
                             ? new Date(lead.booking.clientSurvey.submittedAt).toLocaleString('ca-ES')
@@ -483,8 +483,8 @@ export default async function LeadDetailPage({ params }: Props) {
                       </p>
                     </div>
                     <div className="text-sm">
-                      <p className="text-slate-600">
-                        Estado post-event interno: <strong className={
+                      <p className="text-slate-300">
+                        Estat post-event interno: <strong className={
                           internalPostEventStatus === 'COMPLETO'
                             ? 'text-emerald-600'
                             : internalPostEventStatus === 'EN_PROGRESO'
@@ -492,25 +492,25 @@ export default async function LeadDetailPage({ params }: Props) {
                               : 'text-amber-600'
                         }>
                           {internalPostEventStatus === 'COMPLETO'
-                            ? 'Completado'
+                            ? 'Completat'
                             : internalPostEventStatus === 'EN_PROGRESO'
                               ? 'En progreso'
                               : internalPostEventStatus === 'PENDIENTE'
-                                ? 'Pendiente'
-                                : 'Sin reserva'}
+                                ? 'Pendent'
+                                : 'Sense reserva'}
                         </strong>
                       </p>
-                      <p className="text-slate-600">
+                      <p className="text-slate-300">
                         Informe tècnic: <strong>{lead.booking.postEventReport ? 'Completat' : 'Pendent'}</strong>
                       </p>
-                      <p className="text-slate-600">
+                      <p className="text-slate-300">
                         Enquesta client: <strong>{lead.booking.clientSurvey ? 'Rebuda' : 'Sense resposta'}</strong>
                       </p>
-                      <p className="text-slate-600">
+                      <p className="text-slate-300">
                         Feedback enviat: <strong>{lead.booking.clientFeedback?.sentAt ? 'Sí' : 'No'}</strong>
                       </p>
                       {lead.booking.clientSurvey && (
-                        <p className="text-slate-600">
+                        <p className="text-slate-300">
                           Rating/NPS: <strong>{lead.booking.clientSurvey.overallRating}/5 · {lead.booking.clientSurvey.npsScore}/10</strong>
                         </p>
                       )}
@@ -543,21 +543,21 @@ export default async function LeadDetailPage({ params }: Props) {
                         href={reviewUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center rounded-md bg-stone-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200"
+                        className="inline-flex items-center rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700"
                       >
                         Obrir formulari client
                       </a>
                     )}
-                    <Link href={`/admin/bookings/${lead.booking.id}`} className="inline-flex items-center rounded-md bg-stone-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200">
+                    <Link href={`/admin/bookings/${lead.booking.id}`} className="inline-flex items-center rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700">
                       Veure reserva completa
                     </Link>
-                    <Link href="/admin/post-event/reports" className="inline-flex items-center rounded-md bg-stone-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200">
+                    <Link href="/admin/post-event/reports" className="inline-flex items-center rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700">
                       Informes post-event
                     </Link>
-                    <Link href="/admin/post-event/surveys" className="inline-flex items-center rounded-md bg-stone-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200">
+                    <Link href="/admin/post-event/surveys" className="inline-flex items-center rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700">
                       Enquestes client
                     </Link>
-                    <Link href="/admin/emails" className="inline-flex items-center rounded-md bg-stone-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-200">
+                    <Link href="/admin/emails" className="inline-flex items-center rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700">
                       Automatitzacions email
                     </Link>
                   </div>
@@ -586,30 +586,30 @@ export default async function LeadDetailPage({ params }: Props) {
           />
 
           {/* Metadades */}
-          <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h3 className="text-sm font-semibold text-slate-700 mb-4">Detalls del registre</h3>
+          <section className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
+            <h3 className="text-sm font-semibold text-slate-100 mb-4">Detalls del registre</h3>
             <dl className="space-y-3 text-sm">
               <div>
-                <dt className="text-xs text-slate-500">ID</dt>
-                <dd className="font-mono text-xs text-slate-700 break-all">{lead.id}</dd>
+                <dt className="text-xs text-slate-400">ID</dt>
+                <dd className="font-mono text-xs text-slate-100 break-all">{lead.id}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-500">Idioma preferit</dt>
-                <dd className="text-slate-700">{lead.preferredLocale.toUpperCase()}</dd>
+                <dt className="text-xs text-slate-400">Idioma preferit</dt>
+                <dd className="text-slate-100">{lead.preferredLocale.toUpperCase()}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-500">Antiguitat lead</dt>
-                <dd className="text-slate-700">{leadAgeDays} dies</dd>
+                <dt className="text-xs text-slate-400">Antiguitat lead</dt>
+                <dd className="text-slate-100">{leadAgeDays} dies</dd>
               </div>
               {lead.customerId && (
                 <div>
-                  <dt className="text-xs text-slate-600">ID client</dt>
-                  <dd className="font-mono text-xs text-slate-700 break-all">{lead.customerId}</dd>
+                  <dt className="text-xs text-slate-300">ID client</dt>
+                  <dd className="font-mono text-xs text-slate-100 break-all">{lead.customerId}</dd>
                 </div>
               )}
               <div>
-                <dt className="text-xs text-slate-500">Creat</dt>
-                <dd className="text-slate-700">
+                <dt className="text-xs text-slate-400">Creat</dt>
+                <dd className="text-slate-100">
                   {new Date(lead.createdAt).toLocaleDateString('ca-ES', {
                     day: '2-digit',
                     month: 'long',
@@ -620,8 +620,8 @@ export default async function LeadDetailPage({ params }: Props) {
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-500">Actualitzat</dt>
-                <dd className="text-slate-700">
+                <dt className="text-xs text-slate-400">Actualitzat</dt>
+                <dd className="text-slate-100">
                   {new Date(lead.updatedAt).toLocaleDateString('ca-ES', {
                     day: '2-digit',
                     month: 'long',
@@ -633,8 +633,8 @@ export default async function LeadDetailPage({ params }: Props) {
               </div>
               {lead.contactedAt && (
                 <div>
-                  <dt className="text-xs text-slate-500">Contactat</dt>
-                  <dd className="text-slate-700">
+                  <dt className="text-xs text-slate-400">Contactat</dt>
+                  <dd className="text-slate-100">
                     {new Date(lead.contactedAt).toLocaleDateString('ca-ES', {
                       day: '2-digit',
                       month: 'long',
@@ -645,92 +645,92 @@ export default async function LeadDetailPage({ params }: Props) {
               )}
               {lead.landingPage && (
                 <div>
-                  <dt className="text-xs text-slate-600">Pàgina d&apos;entrada</dt>
-                  <dd className="text-slate-700 truncate">{lead.landingPage}</dd>
+                  <dt className="text-xs text-slate-300">Pàgina d&apos;entrada</dt>
+                  <dd className="text-slate-100 truncate">{lead.landingPage}</dd>
                 </div>
               )}
             </dl>
           </section>
 
-          <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h3 className="inline-flex items-center gap-1 text-sm font-semibold text-slate-800 mb-4">
+          <section className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
+            <h3 className="inline-flex items-center gap-1 text-sm font-semibold text-slate-100 mb-4">
               Atribució / UTM
               <InfoTooltip text="Dades de màrqueting per saber d'on arriba el lead i quina campanya ha funcionat." />
             </h3>
             <dl className="space-y-3 text-sm">
               <div>
-                <dt className="inline-flex items-center gap-1 text-xs text-slate-600">
+                <dt className="inline-flex items-center gap-1 text-xs text-slate-300">
                   Origen
                   <InfoTooltip text="Canal d'entrada del lead: web, whatsapp, instagram, wallapop, etc." />
                 </dt>
-                <dd className="text-slate-700">{lead.source || '-'}</dd>
+                <dd className="text-slate-100">{lead.source || '-'}</dd>
               </div>
               <div>
-                <dt className="inline-flex items-center gap-1 text-xs text-slate-600">
+                <dt className="inline-flex items-center gap-1 text-xs text-slate-300">
                   UTM source
                   <InfoTooltip text="Font de trànsit: google, instagram, newsletter..." />
                 </dt>
-                <dd className="text-slate-700 break-all">{lead.utmSource || '-'}</dd>
+                <dd className="text-slate-100 break-all">{lead.utmSource || '-'}</dd>
               </div>
               <div>
-                <dt className="inline-flex items-center gap-1 text-xs text-slate-600">
+                <dt className="inline-flex items-center gap-1 text-xs text-slate-300">
                   UTM medium
                   <InfoTooltip text="Tipus de canal: cpc, social, email, organic..." />
                 </dt>
-                <dd className="text-slate-700 break-all">{lead.utmMedium || '-'}</dd>
+                <dd className="text-slate-100 break-all">{lead.utmMedium || '-'}</dd>
               </div>
               <div>
-                <dt className="inline-flex items-center gap-1 text-xs text-slate-600">
+                <dt className="inline-flex items-center gap-1 text-xs text-slate-300">
                   UTM campaign
                   <InfoTooltip text="Nom de la campanya de captació." />
                 </dt>
-                <dd className="text-slate-700 break-all">{lead.utmCampaign || '-'}</dd>
+                <dd className="text-slate-100 break-all">{lead.utmCampaign || '-'}</dd>
               </div>
               <div>
-                <dt className="inline-flex items-center gap-1 text-xs text-slate-600">
+                <dt className="inline-flex items-center gap-1 text-xs text-slate-300">
                   Landing
                   <InfoTooltip text="URL de la pàgina on era l'usuari abans d'enviar el formulari." />
                 </dt>
-                <dd className="text-slate-700 break-all">{lead.landingPage || '-'}</dd>
+                <dd className="text-slate-100 break-all">{lead.landingPage || '-'}</dd>
               </div>
             </dl>
           </section>
 
           {lead.customer && (
-            <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-              <h3 className="text-sm font-semibold text-slate-700 mb-4">Relació Client</h3>
+            <section className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
+              <h3 className="text-sm font-semibold text-slate-100 mb-4">Relació Client</h3>
               <dl className="space-y-3 text-sm">
                 <div>
-                  <dt className="text-xs text-slate-500">Nom</dt>
-                  <dd className="text-slate-700">{lead.customer.name || '-'}</dd>
+                  <dt className="text-xs text-slate-400">Nom</dt>
+                  <dd className="text-slate-100">{lead.customer.name || '-'}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Email</dt>
-                  <dd className="text-slate-700 break-all">{lead.customer.email || '-'}</dd>
+                  <dt className="text-xs text-slate-400">Email</dt>
+                  <dd className="text-slate-100 break-all">{lead.customer.email || '-'}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Telèfon</dt>
-                  <dd className="text-slate-700">{lead.customer.phone || '-'}</dd>
+                  <dt className="text-xs text-slate-400">Telèfon</dt>
+                  <dd className="text-slate-100">{lead.customer.phone || '-'}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-600">Idioma</dt>
-                  <dd className="text-slate-700">{lead.customer.preferredLocale}</dd>
+                  <dt className="text-xs text-slate-300">Idioma</dt>
+                  <dd className="text-slate-100">{lead.customer.preferredLocale}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-600">Origen</dt>
-                  <dd className="text-slate-700">{lead.customer.source}</dd>
+                  <dt className="text-xs text-slate-300">Origen</dt>
+                  <dd className="text-slate-100">{lead.customer.source}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-600">Total d&apos;events</dt>
-                  <dd className="text-slate-700">{lead.customer.totalEvents}</dd>
+                  <dt className="text-xs text-slate-300">Total d&apos;events</dt>
+                  <dd className="text-slate-100">{lead.customer.totalEvents}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-600">Despesa total</dt>
-                  <dd className="text-slate-700">{lead.customer.totalSpent.toLocaleString('ca-ES')}€</dd>
+                  <dt className="text-xs text-slate-300">Despesa total</dt>
+                  <dd className="text-slate-100">{lead.customer.totalSpent.toLocaleString('ca-ES')}€</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-600">Últim event</dt>
-                  <dd className="text-slate-700">
+                  <dt className="text-xs text-slate-300">Últim event</dt>
+                  <dd className="text-slate-100">
                     {lead.customer.lastEventDate
                       ? new Date(lead.customer.lastEventDate).toLocaleDateString('ca-ES')
                       : '-'}
@@ -746,24 +746,24 @@ export default async function LeadDetailPage({ params }: Props) {
             </section>
           )}
 
-          <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h3 className="text-sm font-semibold text-slate-700 mb-4">
+          <section className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
+            <h3 className="text-sm font-semibold text-slate-100 mb-4">
               Historial del client ({relatedLeads.length})
             </h3>
             {relatedLeads.length === 0 ? (
-              <p className="text-sm text-slate-500">No hi ha altres events/leads d&apos;aquest client.</p>
+              <p className="text-sm text-slate-400">No hi ha altres events/leads d&apos;aquest client.</p>
             ) : (
               <div className="space-y-2">
                 {relatedLeads.map((item) => (
                   <Link
                     key={item.id}
                     href={`/admin/leads/${item.id}`}
-                    className="block rounded-lg border border-stone-200 p-3 hover:bg-slate-50"
+                    className="block rounded-lg border border-white/10 p-3 hover:bg-slate-800"
                   >
-                    <p className="text-sm font-medium text-slate-700">
+                    <p className="text-sm font-medium text-slate-100">
                       {EVENT_TYPE_LABELS[item.eventType] || item.eventType} · {item.status}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       {item.eventDate ? new Date(item.eventDate).toLocaleDateString('ca-ES') : 'Sense data'} ·
                       {' '}Lead creat {new Date(item.createdAt).toLocaleDateString('ca-ES')}
                     </p>
@@ -790,3 +790,6 @@ export default async function LeadDetailPage({ params }: Props) {
     </div>
   );
 }
+
+
+

@@ -78,9 +78,9 @@ export default function LeadNotesPanel({
   };
 
   return (
-    <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+    <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold text-slate-700">Notes ({notes.length})</h2>
+        <h2 className="text-lg font-semibold text-slate-200">Notes ({notes.length})</h2>
         <button
           type="button"
           onClick={cleanDuplicates}
@@ -98,14 +98,14 @@ export default function LeadNotesPanel({
       )}
 
       {notes.length === 0 ? (
-        <p className="text-sm text-slate-500 py-4 text-center">Encara no hi ha notes</p>
+        <p className="text-sm text-slate-400 py-4 text-center">Encara no hi ha notes</p>
       ) : (
         <div className="space-y-4">
           {notes.map((note) => (
-            <div key={note.id} className="p-3 rounded-lg bg-slate-50 hover:bg-stone-100 transition-colors">
+            <div key={note.id} className="p-3 rounded-lg bg-slate-50 hover:bg-white/5 transition-colors">
               <div className="flex items-center justify-between gap-3 mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500">{formatNoteDate(note.createdAt)}</span>
+                  <span className="text-xs text-slate-400">{formatNoteDate(note.createdAt)}</span>
                   {note.createdBy && <span className="text-xs text-slate-400">per {note.createdBy}</span>}
                 </div>
                 <button
@@ -117,7 +117,7 @@ export default function LeadNotesPanel({
                   {deletingId === note.id ? 'Eliminant...' : 'Eliminar'}
                 </button>
               </div>
-              <p className="text-sm text-slate-700 whitespace-pre-wrap">{note.content}</p>
+              <p className="text-sm text-slate-200 whitespace-pre-wrap">{note.content}</p>
             </div>
           ))}
         </div>
@@ -125,3 +125,4 @@ export default function LeadNotesPanel({
     </section>
   );
 }
+

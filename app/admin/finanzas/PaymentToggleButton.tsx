@@ -39,7 +39,7 @@ export default function PaymentToggleButton({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || 'No se pudo actualizar el pago');
+        throw new Error(data?.error || 'No s\'ha pogut actualitzar el pagament');
       }
       router.refresh();
     } finally {
@@ -54,11 +54,13 @@ export default function PaymentToggleButton({
       disabled={saving}
       className={`rounded-md px-2 py-1 text-xs font-semibold ${
         currentValue
-          ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-          : 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+          ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/20'
+          : 'bg-amber-500/15 text-amber-300 hover:bg-amber-500/20'
       } disabled:opacity-60`}
     >
-      {saving ? '...' : currentValue ? 'Pagado' : 'Pendiente'}
+      {saving ? '...' : currentValue ? 'Pagat' : 'Pendent'}
     </button>
   );
 }
+
+

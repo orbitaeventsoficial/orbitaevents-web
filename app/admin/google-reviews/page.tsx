@@ -160,7 +160,7 @@ export default function GoogleReviewsAdminPage() {
                 initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={reduceMotion ? { duration: 0 } : { delay: index * 0.05 }}
-                className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/[0.07] transition-colors"
+                className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-slate-950/60/[0.07] transition-colors"
               >
                 <div className="flex items-start gap-4">
                   {/* Avatar */}
@@ -219,3 +219,4 @@ export default function GoogleReviewsAdminPage() {
     </div>
   );
 }
+

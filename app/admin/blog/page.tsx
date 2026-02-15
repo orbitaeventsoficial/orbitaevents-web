@@ -46,7 +46,7 @@ export default function BlogAdminPage() {
       setTotalPages(data.pagination?.totalPages || 0);
     } catch (error) {
       log.error('Failed to fetch posts:', error);
-      setFlashMessage({ type: 'error', text: 'Error cargando posts' });
+      setFlashMessage({ type: 'error', text: 'Error carregant posts' });
     } finally {
       setLoading(false);
     }
@@ -75,11 +75,11 @@ export default function BlogAdminPage() {
         setFlashMessage({ type: 'success', text: 'Post eliminado correctamente' });
         fetchPosts();
       } else {
-        setFlashMessage({ type: 'error', text: 'Error al eliminar el post' });
+        setFlashMessage({ type: 'error', text: 'Error en eliminar el post' });
       }
     } catch (error) {
       log.error('Failed to delete post:', error);
-      setFlashMessage({ type: 'error', text: 'Error al eliminar el post' });
+      setFlashMessage({ type: 'error', text: 'Error en eliminar el post' });
     }
   };
 
@@ -97,11 +97,11 @@ export default function BlogAdminPage() {
       if (res.ok) {
         fetchPosts();
       } else {
-        setFlashMessage({ type: 'error', text: 'Error al actualizar el post' });
+        setFlashMessage({ type: 'error', text: 'Error en actualitzar el post' });
       }
     } catch (error) {
       log.error('Failed to update post:', error);
-      setFlashMessage({ type: 'error', text: 'Error al actualizar el post' });
+      setFlashMessage({ type: 'error', text: 'Error en actualitzar el post' });
     }
   };
 
@@ -130,7 +130,7 @@ export default function BlogAdminPage() {
             className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-white font-medium shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors"
           >
             <PlusIcon className="h-5 w-5" />
-            Nuevo Post
+            Nou post
           </button>
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function BlogAdminPage() {
             type="button"
             className="mt-4 text-cyan-400 hover:text-cyan-300"
           >
-            Crear el primero
+            Crear el primer
           </button>
         </div>
       ) : (
@@ -181,19 +181,19 @@ export default function BlogAdminPage() {
               <thead className="bg-slate-700/30 border-b border-slate-700/50">
                 <tr>
                   <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
-                    Título
+                    Títol
                   </th>
                   <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
                     Categoría
                   </th>
                   <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
-                    Estado
+                    Estat
                   </th>
                   <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
                     Visitas
                   </th>
                   <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
-                    Fecha
+                    Data
                   </th>
                   <th scope="col" className="px-6 py-3 text-right font-medium text-slate-300">
                     Acciones
@@ -208,7 +208,7 @@ export default function BlogAdminPage() {
                       <td className="px-6 py-4">
                         <div>
                           <div className="font-medium text-slate-100">
-                            {translation?.title || 'Sin título'}
+                            {translation?.title || 'Sense títol'}
                           </div>
                           <div className="text-sm text-slate-500">/{post.slug}</div>
                         </div>
@@ -229,7 +229,7 @@ export default function BlogAdminPage() {
                               : 'bg-yellow-500/20 text-yellow-300'
                           }`}
                         >
-                          {post.isPublished ? 'Publicado' : 'Borrador'}
+                          {post.isPublished ? 'Publicat' : 'Esborrany'}
                         </button>
                       </td>
                       <td className="px-6 py-4 text-slate-400">{post.viewCount}</td>
@@ -293,3 +293,4 @@ export default function BlogAdminPage() {
     </div>
   );
 }
+

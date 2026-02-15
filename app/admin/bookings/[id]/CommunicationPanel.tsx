@@ -27,8 +27,8 @@ export default function CommunicationPanel({
   const [loading, setLoading] = useState<FlowKey | null>(null);
 
   function formatStatus(state: FlowState['state']): string {
-    if (state === 'RESPONDIDO') return 'Respondido';
-    if (state === 'ENVIADO') return 'Enviado';
+    if (state === 'RESPONDIDO') return 'Respost';
+    if (state === 'ENVIADO') return 'Enviat';
     return 'Falta enviar';
   }
 
@@ -68,21 +68,21 @@ export default function CommunicationPanel({
   ];
 
   return (
-    <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-800">Comunicaciones multicanal</h2>
+    <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-slate-100">Comunicaciones multicanal</h2>
       <div className="mt-3 space-y-3">
         {flows.map((flow) => {
           const status = initialStatuses[flow.key];
           return (
-            <div key={flow.key} className="rounded-lg border border-stone-200 p-3">
+            <div key={flow.key} className="rounded-lg border border-white/10 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-slate-800">{flow.label}</p>
-                <p className="text-xs text-slate-500">
-                  Estado: <strong>{formatStatus(status.state)}</strong>{' '}
+                <p className="text-sm font-semibold text-slate-100">{flow.label}</p>
+                <p className="text-xs text-slate-400">
+                  Estat: <strong>{formatStatus(status.state)}</strong>{' '}
                   {status.lastChannel ? `· último canal ${status.lastChannel}` : ''}
                 </p>
               </div>
-              <div className="mt-1 text-[11px] text-slate-500">
+              <div className="mt-1 text-[11px] text-slate-400">
                 <span>Último envío: {formatDateTime(status.sentAt)}</span>
                 <span className="mx-2">·</span>
                 <span>Última respuesta: {formatDateTime(status.respondedAt)}</span>
@@ -116,7 +116,7 @@ export default function CommunicationPanel({
                   type="button"
                   onClick={() => run('log_sent', flow.key, 'whatsapp')}
                   disabled={loading === flow.key}
-                  className="rounded-md border border-stone-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                  className="rounded-md border border-white/10 bg-slate-950/60 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-white/5 disabled:opacity-60"
                 >
                   Marcar enviado
                 </button>
@@ -136,3 +136,6 @@ export default function CommunicationPanel({
     </section>
   );
 }
+
+
+

@@ -21,20 +21,20 @@ export default function CalendarSyncButton({ bookingId }: { bookingId: string })
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'No se pudo sincronizar con Google Calendar');
+        throw new Error(data?.error || 'No s\'ha pogut sincronitzar amb Google Calendar');
       }
       const status = data?.result?.status as string | undefined;
       setMessage(
         status === 'synced'
-          ? 'Google Calendar sincronizado'
+          ? 'Google Calendar sincronitzat'
           : status === 'deleted'
-            ? 'Evento eliminado de Google Calendar'
-            : 'Sincronización no necesaria'
+            ? 'Esdeveniment eliminat de Google Calendar'
+            : 'Sincronització no necessària'
       );
       router.refresh();
     } catch (error) {
       setIsError(true);
-      setMessage(error instanceof Error ? error.message : 'Error inesperado');
+      setMessage(error instanceof Error ? error.message : 'Error inesperat');
     } finally {
       setLoading(false);
     }
@@ -46,12 +46,12 @@ export default function CalendarSyncButton({ bookingId }: { bookingId: string })
         type="button"
         onClick={syncNow}
         disabled={loading}
-        className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+        className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5 disabled:opacity-60"
       >
-        {loading ? 'Sincronizando...' : 'Sync Google Calendar ahora'}
+        {loading ? 'Sincronitzant...' : 'Sincronitza Google Calendar ara'}
       </button>
       {message && (
-        <p className={`text-[11px] ${isError ? 'text-rose-600' : 'text-emerald-700'}`}>
+        <p className={`text-[11px] ${isError ? 'text-rose-300' : 'text-emerald-300'}`}>
           {message}
         </p>
       )}

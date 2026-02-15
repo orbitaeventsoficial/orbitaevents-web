@@ -41,15 +41,15 @@ export default function LeadTechnicalSnapshotPanel({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'No se pudo ejecutar la acción');
+        throw new Error(data?.error || 'No s\'ha pogut executar l\'acció');
       }
       setMessage(
         action === 'save_document'
-          ? 'Snapshot guardado en documentos del lead.'
-          : `Snapshot enviado por email a ${data.recipient || recipient}.`
+          ? 'Snapshot desat als documents del lead.'
+          : `Snapshot enviat per correu a ${data.recipient || recipient}.`
       );
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Error inesperado');
+      setMessage(error instanceof Error ? error.message : 'Error inesperat');
     } finally {
       setBusy(null);
     }
@@ -58,9 +58,9 @@ export default function LeadTechnicalSnapshotPanel({
   async function copySnapshot() {
     try {
       await navigator.clipboard.writeText(snapshotJson);
-      setMessage('Snapshot copiado al portapapeles.');
+      setMessage('Snapshot copiat al porta-retalls.');
     } catch {
-      setMessage('No se pudo copiar el snapshot.');
+      setMessage('No s\'ha pogut copiar el snapshot.');
     }
   }
 
@@ -75,8 +75,8 @@ export default function LeadTechnicalSnapshotPanel({
   }
 
   return (
-    <details open className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-      <summary className="cursor-pointer text-sm font-semibold text-slate-700">
+    <details open className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
+      <summary className="cursor-pointer text-sm font-semibold text-slate-200">
         Snapshot técnico (JSON)
       </summary>
 
@@ -85,16 +85,16 @@ export default function LeadTechnicalSnapshotPanel({
           <button
             type="button"
             onClick={copySnapshot}
-            className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-50"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5"
           >
             Copiar JSON
           </button>
           <button
             type="button"
             onClick={downloadSnapshot}
-            className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-stone-50"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5"
           >
-            Descargar .json
+            Descarregar .json
           </button>
           <button
             type="button"
@@ -102,7 +102,7 @@ export default function LeadTechnicalSnapshotPanel({
             disabled={busy !== null}
             className="rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
           >
-            {busy === 'save_document' ? 'Guardando...' : 'Guardar en documentos'}
+            {busy === 'save_document' ? 'Desant...' : 'Desar en documents'}
           </button>
         </div>
 
@@ -111,8 +111,8 @@ export default function LeadTechnicalSnapshotPanel({
             type="email"
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
-            placeholder="Email interno"
-            className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-slate-700"
+            placeholder="Correu intern"
+            className="w-full rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-200"
           />
           <button
             type="button"
@@ -120,11 +120,11 @@ export default function LeadTechnicalSnapshotPanel({
             disabled={busy !== null}
             className="rounded-lg bg-amber-500 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-60"
           >
-            {busy === 'send_email' ? 'Enviando...' : 'Enviar por email interno'}
+            {busy === 'send_email' ? 'Enviant...' : 'Enviar per correu intern'}
           </button>
         </div>
 
-        {message ? <p className="text-xs text-slate-600">{message}</p> : null}
+        {message ? <p className="text-xs text-slate-300">{message}</p> : null}
       </div>
 
       <pre className="mt-4 max-h-80 overflow-auto rounded-lg bg-slate-950 p-3 text-xs text-slate-200">
@@ -133,3 +133,6 @@ export default function LeadTechnicalSnapshotPanel({
     </details>
   );
 }
+
+
+

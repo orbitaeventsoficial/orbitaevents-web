@@ -22,7 +22,7 @@ const TYPE_LABELS: Record<Setting['type'], string> = {
   JSON: 'JSON',
 };
 
-// Keys que contenen dades sensibles que s'han d'amagar
+// Keys que contenen dades sensibles que s\'han d'amagar
 const SENSITIVE_KEYS = ['refreshToken', 'accessToken', 'secret', 'password', 'apiKey'];
 
 function isSensitiveKey(key: string): boolean {
@@ -248,7 +248,7 @@ export default function SettingsClient({
                                 disabled={isSaving}
                                 type="button"
                               >
-                                Cancelar
+                                Cancel·lar
                               </button>
                               <button
                                 className="text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors"
@@ -257,7 +257,7 @@ export default function SettingsClient({
                                 type="button"
                                 aria-busy={isSaving}
                               >
-                                {isSaving ? 'Guardant...' : 'Guardar'}
+                                {isSaving ? 'Guardant...' : 'Desar'}
                               </button>
                             </div>
                           </div>
@@ -291,3 +291,5 @@ export default function SettingsClient({
     </div>
   );
 }
+
+

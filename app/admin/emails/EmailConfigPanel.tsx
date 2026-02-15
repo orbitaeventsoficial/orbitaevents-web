@@ -160,9 +160,10 @@ export default function EmailConfigPanel() {
               : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
           }`}
         >
-          {saved ? '✅ Guardat!' : saving ? 'Guardant...' : '💾 Guardar configuracio'}
+          {saved ? '✅ Guardat!' : saving ? 'Guardant...' : '💾 Desar configuracio'}
         </button>
       </div>
     </section>
   );
 }
+

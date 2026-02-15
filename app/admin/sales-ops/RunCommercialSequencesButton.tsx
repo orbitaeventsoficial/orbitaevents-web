@@ -17,12 +17,12 @@ export default function RunCommercialSequencesButton() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'No se pudo ejecutar secuencias');
+        throw new Error(data?.error || 'No s\'ha pogut executar seqüències');
       }
       const s = data.summary;
-      setMsg(`Ejecutado: ${s.executed} · email ${s.sentEmail} · WA ${s.sentWhatsapp} · errores ${s.errors}`);
+      setMsg(`Executat: ${s.executed} · correu ${s.sentEmail} · WA ${s.sentWhatsapp} · errors ${s.errors}`);
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : 'Error ejecutando secuencias');
+      setMsg(error instanceof Error ? error.message : 'Error executant seqüències');
     } finally {
       setRunning(false);
     }
@@ -36,9 +36,11 @@ export default function RunCommercialSequencesButton() {
         disabled={running}
         className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
       >
-        {running ? 'Ejecutando...' : 'Run secuencias comerciales'}
+        {running ? 'Executant...' : 'Executar seqüències comercials'}
       </button>
-      {msg && <p className="text-xs text-slate-500">{msg}</p>}
+      {msg && <p className="text-xs text-slate-300">{msg}</p>}
     </div>
   );
 }
+
+

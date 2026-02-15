@@ -171,7 +171,7 @@ export default async function PacksPage() {
                       <div>
                         <span className="text-2xl font-bold text-slate-100">{pack.price}€</span>
                         {pack.originalPrice && (
-                          <span className="ml-2 text-sm text-slate-500 line-through">
+                          <span className="ml-2 text-sm text-slate-400 line-through">
                             {pack.originalPrice}€
                           </span>
                         )}
@@ -210,7 +210,7 @@ export default async function PacksPage() {
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-700/30">
+                    <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-700/30">
                       <span>{pack._count.bookings} reserves</span>
                       <span>{pack.inventory.length} elements inventari</span>
                     </div>
@@ -219,13 +219,13 @@ export default async function PacksPage() {
                   <div className="px-4 py-3 bg-slate-700/30 border-t border-slate-700/30 flex gap-2">
                     <Link
                       href={`/admin/packs/${pack.id}`}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-slate-500/50 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-white/50/50 transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
                       href={`/admin/packs/${pack.id}/inventory`}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-slate-500/50 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-white/50/50 transition-colors"
                     >
                       📦 Inventari
                     </Link>
@@ -285,7 +285,7 @@ export default async function PacksPage() {
                       <div>
                         <span className="text-2xl font-bold text-slate-100">{pack.price}€</span>
                         {pack.originalPrice && (
-                          <span className="ml-2 text-sm text-slate-500 line-through">
+                          <span className="ml-2 text-sm text-slate-400 line-through">
                             {pack.originalPrice}€
                           </span>
                         )}
@@ -324,7 +324,7 @@ export default async function PacksPage() {
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-700/30">
+                    <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-700/30">
                       <span>{pack._count.bookings} reserves</span>
                       <span>{pack.inventory.length} elements inventari</span>
                     </div>
@@ -333,13 +333,13 @@ export default async function PacksPage() {
                   <div className="px-4 py-3 bg-slate-700/30 border-t border-slate-700/30 flex gap-2">
                     <Link
                       href={`/admin/packs/${pack.id}`}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-slate-500/50 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-white/50/50 transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
                       href={`/admin/packs/${pack.id}/inventory`}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-slate-500/50 transition-colors"
+                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-white/50/50 transition-colors"
                     >
                       📦 Inventari
                     </Link>
@@ -355,9 +355,12 @@ export default async function PacksPage() {
         <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-12 text-center">
           <span className="text-4xl">📦</span>
           <p className="mt-4 text-slate-300">No hi ha packs configurats</p>
-          <p className="text-sm text-slate-500">Executa el seed per carregar dades inicials</p>
+          <p className="text-sm text-slate-400">Executa el seed per carregar dades inicials</p>
         </div>
       )}
     </div>
   );
 }
+
+
+

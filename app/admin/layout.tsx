@@ -11,7 +11,7 @@ import { AdminHelpModeProvider, useAdminHelpMode } from './components/AdminHelpM
 
 /**
  * 🎨 ADMIN LAYOUT - Òrbita Events
- * Estil càlid i acollidor amb tons beige/taronja suau
+ * Estil sobri i professional amb focus en llegibilitat
  * Mobile-first design amb bottom navigation
  */
 
@@ -365,7 +365,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       defaultOpen: false,
       items: [
         { icon: '📈', label: 'Analytics', href: '/admin/analytics' },
-        { icon: '📊', label: 'Rentabilidad', href: '/admin/rentabilidad' },
+        { icon: '📊', label: 'Rendibilitat', href: '/admin/rentabilidad' },
         { icon: '📦', label: 'Packs', href: '/admin/packs' },
         { icon: '💰', label: 'Preus', href: '/admin/pricing' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
@@ -448,8 +448,8 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       packs: 'Packs',
       analytics: 'Analytics',
       'sales-ops': 'Sales Ops',
-      rentabilidad: 'Rentabilidad',
-      finanzas: 'Finanzas',
+      rentabilidad: 'Rendibilitat',
+      finanzas: 'Finances',
       emails: 'Emails Auto',
       inbox: 'Inbox (IMAP)',
       calendario: 'Calendari',
@@ -565,7 +565,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           {recentHrefs.length > 0 && (
             <div className="mb-4 px-3">
               <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-                Recientes
+                Recents
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {recentHrefs.map((href) => (
@@ -610,7 +610,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
-          aria-label="Abrir menú admin"
+          aria-label="Obrir menú admin"
           aria-expanded={sidebarOpen}
           aria-controls="admin-mobile-sidebar"
           className="p-2.5 -ml-1 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
@@ -644,14 +644,14 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             type="button"
             onClick={() => setSearchOpen(true)}
             className="p-2.5 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
-            aria-label="Buscar (Ctrl+K)"
+            aria-label="Cercar (Ctrl+K)"
           >
             🔍
           </button>
           <Link
             href="/admin/settings/notifications"
             className="p-2.5 -mr-1 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors relative"
-            aria-label="Notificaciones"
+            aria-label="Notificacions"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -698,7 +698,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
               </div>
               <button
                 type="button"
-                aria-label="Cerrar menú admin"
+                aria-label="Tancar menú admin"
                 onClick={() => setSidebarOpen(false)}
                 className="p-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
               >
@@ -748,7 +748,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
               {recentHrefs.length > 0 && (
                 <div className="mb-4 px-3">
                   <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-                    Recientes
+                    Recents
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {recentHrefs.map((href) => (
@@ -834,15 +834,15 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             type="button"
             onClick={() => setSearchOpen(true)}
             className="hidden md:flex items-center gap-2 rounded-xl border border-zinc-700/80 bg-zinc-800/60 px-3 py-2 text-xs text-slate-300 hover:border-amber-500/30 hover:text-slate-100 transition-colors"
-            aria-label="Buscar (Ctrl+K)"
+            aria-label="Cercar (Ctrl+K)"
           >
-            🔍 Buscar
+            🔍 Cercar
             <span className="rounded-md border border-slate-700 px-2 py-0.5 text-[10px] text-slate-500">Ctrl/⌘K</span>
           </button>
           <Link
             href="/admin/settings/notifications"
             className="relative p-2.5 text-slate-300 hover:text-slate-100 hover:bg-slate-800 rounded-xl transition-colors"
-            aria-label="Notificaciones"
+            aria-label="Notificacions"
           >
             🔔
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
@@ -901,7 +901,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           />
           <BottomNavItem
             icon="⚙️"
-            label="Ajustos"
+            label="Configuració"
             href="/admin/settings"
             isActive={pathname?.startsWith('/admin/settings') || false}
             onPrefetch={prefetchRoute}
@@ -914,3 +914,5 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
+
+

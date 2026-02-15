@@ -6,7 +6,7 @@ import ComposeForm from './ComposeForm';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Nou Email | Òrbita Admin',
+  title: 'Nou correu | Òrbita Admin',
 };
 
 async function getLeadsAndPacks() {
@@ -54,14 +54,14 @@ export default async function ComposePage() {
       {/* Header */}
       <header className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-700">✏️ Nou Email</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-semibold text-slate-200">✏️ Nou correu</h1>
+          <p className="text-sm text-slate-400 mt-1">
             Envia pressupostos professionals i respon sol·licituds
           </p>
         </div>
         <Link
           href="/admin/inbox"
-          className="px-4 py-2 border border-stone-200 rounded-lg hover:bg-slate-50 text-sm"
+          className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 text-sm"
         >
           ← Tornar a l&apos;inbox
         </Link>
@@ -71,3 +71,6 @@ export default async function ComposePage() {
     </div>
   );
 }
+
+
+

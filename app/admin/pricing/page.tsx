@@ -302,7 +302,7 @@ export default function PricingAdminPage() {
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard icon="💰" label="Ingressos Totals" value={formatCurrency(stats.totalRevenue._sum.total || 0)} sublabel={`${stats.completedBookings} events completats`} color="emerald" />
-            <StatCard icon="📦" label="Total Packs" value={stats.totalPacks.toString()} sublabel={`${stats.totalBookings} reserves totals`} color="cyan" />
+            <StatCard icon="📦" label="Total packs" value={stats.totalPacks.toString()} sublabel={`${stats.totalBookings} reserves totals`} color="cyan" />
             <StatCard icon="✨" label="Total Extras" value={stats.totalExtras.toString()} sublabel="disponibles" color="purple" />
             <StatCard icon="🔧" label="Inventari" value={stats.totalInventory.toString()} sublabel="ítems registrats" color="amber" />
           </div>
@@ -464,7 +464,7 @@ export default function PricingAdminPage() {
                           <div className="flex gap-2">
                             <button onClick={() => setEditingExtra(null)} className="px-3 py-1.5 text-sm bg-slate-700/50 hover:bg-slate-600/50 rounded-lg transition-colors text-slate-300">Cancel·lar</button>
                             <button onClick={() => savePrice(extra.id)} disabled={saving} className="px-4 py-1.5 text-sm bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50">
-                              {saving ? '...' : '✓ Guardar'}
+                              {saving ? '...' : '✓ Desar'}
                             </button>
                           </div>
                         </div>
@@ -689,7 +689,7 @@ export default function PricingAdminPage() {
 
             {filteredInventory.length === 0 && (
               <div className="text-center py-12 text-slate-400">
-                No s'han trobat resultats
+                No s\'han trobat resultats
               </div>
             )}
           </div>
@@ -736,3 +736,5 @@ function StatCard({
     </div>
   );
 }
+
+

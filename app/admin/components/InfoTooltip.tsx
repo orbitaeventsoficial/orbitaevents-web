@@ -18,7 +18,7 @@ export default function InfoTooltip({ text }: InfoTooltipProps) {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-amber-300 bg-amber-50 text-[10px] font-bold leading-none text-amber-700 hover:bg-amber-100"
+        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-amber-400/40 bg-amber-500/15 text-[10px] font-bold leading-none text-amber-200 hover:bg-amber-500/20"
         aria-label="Informació"
         aria-expanded={open}
       >
@@ -26,7 +26,7 @@ export default function InfoTooltip({ text }: InfoTooltipProps) {
       </button>
       <span
         data-help-tooltip-panel="true"
-        className={`absolute left-1/2 top-[calc(100%+8px)] z-30 w-64 -translate-x-1/2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-xs font-normal text-slate-700 shadow-lg ${
+        className={`absolute left-1/2 top-[calc(100%+8px)] z-30 w-64 -translate-x-1/2 rounded-lg border border-white/10 bg-slate-950/95 px-3 py-2 text-left text-xs font-normal text-slate-200 shadow-lg ${
           open ? 'block' : 'hidden group-hover:block group-focus-within:block'
         }`}
       >

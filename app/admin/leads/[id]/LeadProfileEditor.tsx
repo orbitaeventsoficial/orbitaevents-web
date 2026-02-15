@@ -176,11 +176,11 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
   };
 
   return (
-    <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+    <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-slate-900">Fitxa del lead</h2>
-          <p className="text-sm text-slate-700">Dades principals i seguiment comercial.</p>
+          <p className="text-sm text-slate-200">Dades principals i seguiment comercial.</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -198,49 +198,49 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             aria-busy={saving}
             className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-60"
           >
-            {saving ? 'Guardant...' : 'Guardar canvis'}
+            {saving ? 'Guardant...' : 'Desar canvis'}
           </button>
         </div>
       </div>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           Nom
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.name}
             onChange={(e) => updateField('name', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           Email
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.email}
             onChange={(e) => updateField('email', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           Telèfon
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.phone}
             onChange={(e) => updateField('phone', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           Data event
           <input
             type="date"
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.eventDate}
             onChange={(e) => updateField('eventDate', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           Tipus event
           <select
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.eventType}
             onChange={(e) => updateField('eventType', e.target.value)}
           >
@@ -251,46 +251,46 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           Ubicació
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.eventLocation}
             onChange={(e) => updateField('eventLocation', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           Invitats
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.guestCount}
             onChange={(e) => updateField('guestCount', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           Pressupost
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.budget}
             onChange={(e) => updateField('budget', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600 md:col-span-2">
+        <label className="flex flex-col gap-1 text-sm text-slate-300 md:col-span-2">
           Missatge
           <textarea
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             rows={3}
             value={form.message}
             onChange={(e) => updateField('message', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             Estat
             <InfoTooltip text="Fase comercial actual del lead: nou, contactat, pressupost enviat, negociació, guanyat o perdut." />
           </span>
           <select
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.status}
             onChange={(e) => updateField('status', e.target.value)}
           >
@@ -301,13 +301,13 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             Prioritat
             <InfoTooltip text="Nivell d'urgència comercial per ordenar seguiment i tasques." />
           </span>
           <select
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.priority}
             onChange={(e) => updateField('priority', e.target.value)}
           >
@@ -318,13 +318,13 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             Origen
             <InfoTooltip text="Canal pel qual ha arribat el lead (Web, WhatsApp, Instagram, Wallapop, etc.)." />
           </span>
           <select
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.source}
             onChange={(e) => updateField('source', e.target.value)}
           >
@@ -335,18 +335,18 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           Responsable
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.assignedTo}
             onChange={(e) => updateField('assignedTo', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           Idioma preferit
           <select
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.preferredLocale}
             onChange={(e) => updateField('preferredLocale', e.target.value)}
           >
@@ -362,18 +362,18 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             <option value="zh">zh</option>
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           Pack interessat
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.interestedPackId}
             onChange={(e) => updateField('interestedPackId', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600 md:col-span-2">
+        <label className="flex flex-col gap-1 text-sm text-slate-300 md:col-span-2">
           Extras (separats per coma)
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.interestedExtras}
             onChange={(e) => updateField('interestedExtras', e.target.value)}
           />
@@ -381,46 +381,46 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
       </div>
 
       <div className="mt-4 grid gap-4 md:grid-cols-3">
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             Landing page
             <InfoTooltip text="Pàgina exacta on l'usuari estava quan va enviar el formulari." />
           </span>
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.landingPage}
             onChange={(e) => updateField('landingPage', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             UTM source
             <InfoTooltip text="Font de la campanya (ex: google, instagram, newsletter)." />
           </span>
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.utmSource}
             onChange={(e) => updateField('utmSource', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600">
+        <label className="flex flex-col gap-1 text-sm text-slate-300">
           <span className="inline-flex items-center gap-1">
             UTM medium
             <InfoTooltip text="Tipus de canal de captació (ex: cpc, social, email, organic)." />
           </span>
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.utmMedium}
             onChange={(e) => updateField('utmMedium', e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-600 md:col-span-2">
+        <label className="flex flex-col gap-1 text-sm text-slate-300 md:col-span-2">
           <span className="inline-flex items-center gap-1">
             UTM campaign
             <InfoTooltip text="Nom de la campanya de màrqueting (ex: primavera-2026, black-friday)." />
           </span>
           <input
-            className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-slate-700"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-slate-200"
             value={form.utmCampaign}
             onChange={(e) => updateField('utmCampaign', e.target.value)}
           />
@@ -428,10 +428,12 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
       </div>
 
       {status && (
-        <p className="mt-3 text-sm text-slate-500" role="status" aria-live="polite">
+        <p className="mt-3 text-sm text-slate-400" role="status" aria-live="polite">
           {status}
         </p>
       )}
     </section>
   );
 }
+
+

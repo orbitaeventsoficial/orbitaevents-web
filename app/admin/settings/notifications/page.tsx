@@ -126,7 +126,7 @@ export default function SettingsNotificationsPage() {
       <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
         <div className="text-center">
           <div className="animate-spin h-8 w-8 border-4 border-amber-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-slate-500">Carregant configuració...</p>
+          <p className="text-slate-400">Carregant configuració...</p>
         </div>
       </div>
     );
@@ -139,14 +139,14 @@ export default function SettingsNotificationsPage() {
         <div>
           <Link
             href="/admin/settings"
-            className="text-sm text-slate-500 hover:text-slate-700 mb-2 inline-block"
+            className="text-sm text-slate-400 hover:text-slate-200 mb-2 inline-block"
           >
             ← Tornar a configuració
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-700">
-            📧 Configuració de Notificacions
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-200">
+            📧 Configuracio de notificacions
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-400">
             Gestiona com reps alertes quan entra un nou lead
           </p>
         </div>
@@ -154,25 +154,25 @@ export default function SettingsNotificationsPage() {
 
       {/* Status Cards */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className={`rounded-xl border p-6 shadow-sm ${config?.status.emailReady ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
+        <div className={`rounded-xl border p-6 shadow-sm ${config?.status.emailReady ? 'border-emerald-400/30 bg-emerald-950/30' : 'border-rose-400/30 bg-rose-950/30'}`}>
           <div className="flex items-center gap-3 mb-2">
             <span className="text-2xl">{config?.status.emailReady ? '✅' : '❌'}</span>
-            <h2 className="text-lg font-semibold text-slate-700">Email</h2>
+            <h2 className="text-lg font-semibold text-slate-200">Email</h2>
           </div>
-          <p className={`text-sm ${config?.status.emailReady ? 'text-green-700' : 'text-red-700'}`}>
+          <p className={`text-sm ${config?.status.emailReady ? 'text-emerald-300' : 'text-rose-300'}`}>
             {config?.status.emailReady 
               ? 'Configurat i funcionant' 
-              : 'No configurat - No rebràs emails de leads nous'
+              : 'No configurat: no rebràs correus de leads nous'
             }
           </p>
         </div>
 
-        <div className={`rounded-xl border p-6 shadow-sm ${config?.status.whatsappReady ? 'border-green-200 bg-green-50' : 'border-yellow-200 bg-yellow-50'}`}>
+        <div className={`rounded-xl border p-6 shadow-sm ${config?.status.whatsappReady ? 'border-emerald-400/30 bg-emerald-950/30' : 'border-yellow-400/30 bg-yellow-950/30'}`}>
           <div className="flex items-center gap-3 mb-2">
             <span className="text-2xl">{config?.status.whatsappReady ? '✅' : '⚠️'}</span>
-            <h2 className="text-lg font-semibold text-slate-700">WhatsApp</h2>
+            <h2 className="text-lg font-semibold text-slate-200">WhatsApp</h2>
           </div>
-          <p className={`text-sm ${config?.status.whatsappReady ? 'text-green-700' : 'text-yellow-700'}`}>
+          <p className={`text-sm ${config?.status.whatsappReady ? 'text-emerald-300' : 'text-yellow-300'}`}>
             {config?.status.whatsappReady 
               ? 'Configurat com a backup' 
               : 'No configurat (opcional)'
@@ -182,11 +182,11 @@ export default function SettingsNotificationsPage() {
       </div>
 
       {/* Test Email */}
-      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-700 mb-4">🧪 Test d'Email</h2>
+      <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-200 mb-4">🧪 Test d'Email</h2>
         
       {testResult && (
-          <div className={`mb-4 p-4 rounded-lg ${testResult.success ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`} role={testResult.success ? 'status' : 'alert'}>
+          <div className={`mb-4 p-4 rounded-lg ${testResult.success ? 'bg-emerald-950/30 border border-emerald-400/30 text-emerald-300' : 'bg-rose-950/30 border border-rose-400/30 text-rose-300'}`} role={testResult.success ? 'status' : 'alert'}>
             <div className="flex items-center gap-2">
               <span className="text-xl">{testResult.success ? '✅' : '❌'}</span>
               <span>{testResult.message}</span>
@@ -205,47 +205,47 @@ export default function SettingsNotificationsPage() {
         </button>
         
         {!config?.status.emailReady && (
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-slate-400">
             Configura primer les variables SMTP per poder testejar
           </p>
         )}
       </section>
 
       {/* Commercial Autopilot */}
-      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-700 mb-4">🤖 Autopilot Comercial</h2>
+      <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-200 mb-4">🤖 Autopilot Comercial</h2>
 
         <div className="grid gap-3 text-sm">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-            <span className="text-slate-500">CRON_SECRET</span>
-            <span className={config?.automation.cronSecretConfigured ? 'text-green-600' : 'text-red-600'}>
+          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <span className="text-slate-400">CRON_SECRET</span>
+            <span className={config?.automation.cronSecretConfigured ? 'text-emerald-300' : 'text-rose-300'}>
               {config?.automation.cronSecretConfigured ? '✅ Configurat' : '❌ FALTA'}
             </span>
           </div>
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-            <span className="text-slate-500">Última execució</span>
-            <span className="text-slate-700">
+          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <span className="text-slate-400">Última execució</span>
+            <span className="text-slate-200">
               {config?.automation.lastRun
                 ? new Date(config.automation.lastRun).toLocaleString('ca-ES')
                 : 'Mai'}
             </span>
           </div>
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-            <span className="text-slate-500">Estat</span>
+          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <span className="text-slate-400">Estat</span>
             <span
               className={
                 config?.automation.lastStatus === 'ok'
-                  ? 'text-green-600'
+                  ? 'text-emerald-300'
                   : config?.automation.lastStatus === 'error'
-                    ? 'text-red-600'
-                    : 'text-slate-700'
+                    ? 'text-rose-300'
+                    : 'text-slate-200'
               }
             >
               {config?.automation.lastStatus || 'Sense dades'}
             </span>
           </div>
           {config?.automation.lastSummary && (
-            <div className="rounded-lg bg-slate-50 p-3 text-slate-700">
+            <div className="rounded-lg bg-white/5 p-3 text-slate-200">
               <p>
                 Seq: {config.automation.lastSummary.sequences?.executed ?? 0} · Email:{' '}
                 {config.automation.lastSummary.sequences?.sentEmail ?? 0} · WA:{' '}
@@ -258,7 +258,7 @@ export default function SettingsNotificationsPage() {
             </div>
           )}
           {config?.automation.lastMessage && (
-            <p className="text-xs text-red-600">Últim error: {config.automation.lastMessage}</p>
+            <p className="text-xs text-rose-300">Últim error: {config.automation.lastMessage}</p>
           )}
         </div>
 
@@ -266,8 +266,8 @@ export default function SettingsNotificationsPage() {
           <div
             className={`mt-4 p-3 rounded-lg ${
               autopilotResult.success
-                ? 'bg-green-50 border border-green-200 text-green-700'
-                : 'bg-red-50 border border-red-200 text-red-700'
+                ? 'bg-emerald-950/30 border border-emerald-400/30 text-emerald-300'
+                : 'bg-rose-950/30 border border-rose-400/30 text-rose-300'
             }`}
             role={autopilotResult.success ? 'status' : 'alert'}
           >
@@ -285,24 +285,24 @@ export default function SettingsNotificationsPage() {
           {runningAutopilot ? '🚀 Executant...' : '🚀 Executar resum diari ara'}
         </button>
         {!config?.automation.cronSecretConfigured && (
-          <p className="mt-2 text-sm text-slate-500">
-            Configura <code className="bg-stone-100 px-1 rounded">CRON_SECRET</code> per activar l’autopilot.
+          <p className="mt-2 text-sm text-slate-400">
+            Configura <code className="bg-white/5 px-1 rounded">CRON_SECRET</code> per activar l’autopilot.
           </p>
         )}
       </section>
 
       {/* Configuration Details */}
-      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-700 mb-4">⚙️ Configuració Actual</h2>
+      <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-200 mb-4">⚙️ Configuració Actual</h2>
         
         <div className="space-y-4">
           <div>
-            <h3 className="text-sm font-medium text-slate-700 mb-2">SMTP (Email)</h3>
+            <h3 className="text-sm font-medium text-slate-200 mb-2">SMTP (Email)</h3>
             <div className="grid gap-2 text-sm">
               {Object.entries(config?.smtp || {}).map(([key, value]) => (
-                <div key={key} className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500 uppercase text-xs">{key}</span>
-                  <span className={value.includes('✅') ? 'text-green-600' : value.includes('❌') ? 'text-red-600' : 'text-slate-700'}>
+                <div key={key} className="flex justify-between py-1 border-b border-white/10">
+                  <span className="text-slate-400 uppercase text-xs">{key}</span>
+                  <span className={value.includes('✅') ? 'text-emerald-300' : value.includes('❌') ? 'text-rose-300' : 'text-slate-200'}>
                     {value}
                   </span>
                 </div>
@@ -311,12 +311,12 @@ export default function SettingsNotificationsPage() {
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-slate-700 mb-2">Destinataris</h3>
+            <h3 className="text-sm font-medium text-slate-200 mb-2">Destinataris</h3>
             <div className="grid gap-2 text-sm">
               {Object.entries(config?.recipients || {}).map(([key, value]) => (
-                <div key={key} className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500 uppercase text-xs">{key}</span>
-                  <span className="text-slate-700">{value}</span>
+                <div key={key} className="flex justify-between py-1 border-b border-white/10">
+                  <span className="text-slate-400 uppercase text-xs">{key}</span>
+                  <span className="text-slate-200">{value}</span>
                 </div>
               ))}
             </div>
@@ -326,11 +326,11 @@ export default function SettingsNotificationsPage() {
 
       {/* Instructions */}
       {instructions.length > 0 && !config?.status.emailReady && (
-        <section className="rounded-xl border border-amber-200 bg-amber-50 p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-amber-900 mb-4">📝 Instruccions de Configuració</h2>
+        <section className="rounded-xl border border-amber-400/30 bg-amber-950/30 p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-amber-200 mb-4">📝 Instruccions de Configuració</h2>
           
           {instructions.map((instruction, index) => (
-            <pre key={index} className="bg-white text-green-400 p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap mb-4">
+            <pre key={index} className="bg-slate-950/60 text-green-400 p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap mb-4">
               {instruction}
             </pre>
           ))}
@@ -338,12 +338,12 @@ export default function SettingsNotificationsPage() {
       )}
 
       {/* Quick Reference */}
-      <section className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-700 mb-4">📚 Referència Ràpida</h2>
+      <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-200 mb-4">📚 Referència Ràpida</h2>
         
-        <div className="prose prose-sm max-w-none text-slate-600">
-          <h3 className="text-base font-medium text-slate-700">Variables d'entorn necessàries:</h3>
-          <div className="bg-slate-50 p-4 rounded-lg font-mono text-xs">
+        <div className="prose prose-sm max-w-none text-slate-300">
+          <h3 className="text-base font-medium text-slate-200">Variables d'entorn necessàries:</h3>
+          <div className="bg-white/5 p-4 rounded-lg font-mono text-xs">
             <div className="text-red-500"># Obligatòries per email</div>
             <div>SMTP_HOST=smtp.dondominio.com</div>
             <div>SMTP_PORT=587</div>
@@ -351,15 +351,15 @@ export default function SettingsNotificationsPage() {
             <div>SMTP_PASS=la_teva_contrasenya</div>
             <div>SMTP_FROM=info@orbitaevents.com</div>
             <div>CONTACT_TO=info@orbitaevents.com</div>
-            <div className="mt-4 text-yellow-600"># Opcionals per WhatsApp</div>
+            <div className="mt-4 text-yellow-300"># Opcionals per WhatsApp</div>
             <div>ADMIN_WHATSAPP=+34612345678</div>
             <div>WHATSAPP_WEBHOOK_URL=https://hook.make.com/xxx</div>
           </div>
           
-          <h3 className="text-base font-medium text-slate-700 mt-6">On configurar:</h3>
+          <h3 className="text-base font-medium text-slate-200 mt-6">On configurar:</h3>
           <ol className="list-decimal pl-4 space-y-1">
-            <li>Ves al <a href="https://railway.app" target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:underline">Railway Dashboard</a></li>
-            <li>Selecciona el projecte <code className="bg-stone-100 px-1 rounded">orbitaevents-web</code></li>
+            <li>Ves al <a href="https://railway.app" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:underline">panell de Railway</a></li>
+            <li>Selecciona el projecte <code className="bg-white/5 px-1 rounded">orbitaevents-web</code></li>
             <li>Settings → Environment Variables</li>
             <li>Afegeix cada variable amb el seu valor</li>
             <li>Redesplega el projecte</li>
@@ -369,3 +369,9 @@ export default function SettingsNotificationsPage() {
     </div>
   );
 }
+
+
+
+
+
+

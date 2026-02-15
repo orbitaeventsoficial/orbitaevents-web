@@ -23,7 +23,7 @@ export default function PaymentReminderActions({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'send_email', flow: 'PAYMENT' }),
       });
-      if (!res.ok) throw new Error('No se pudo enviar email');
+      if (!res.ok) throw new Error('No s\'ha pogut enviar el correu');
       router.refresh();
     } finally {
       setLoading(false);
@@ -38,7 +38,7 @@ export default function PaymentReminderActions({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'log_sent', flow: 'PAYMENT', channel: 'whatsapp' }),
       });
-      if (!res.ok) throw new Error('No se pudo guardar estado');
+      if (!res.ok) throw new Error('No s\'ha pogut desar l\'estat');
       router.refresh();
     } finally {
       setLoading(false);
@@ -53,7 +53,7 @@ export default function PaymentReminderActions({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'send_whatsapp', flow: 'PAYMENT' }),
       });
-      if (!res.ok) throw new Error('No se pudo enviar WhatsApp API');
+      if (!res.ok) throw new Error('No s\'ha pogut enviar per WhatsApp API');
       router.refresh();
     } finally {
       setLoading(false);
@@ -78,7 +78,7 @@ export default function PaymentReminderActions({
         rel="noreferrer"
         className="rounded-md bg-green-500 px-2 py-1 text-xs font-semibold text-white hover:bg-green-600"
       >
-        Abrir WA
+        Obrir WA
       </a>
       <button
         type="button"
@@ -92,9 +92,9 @@ export default function PaymentReminderActions({
         type="button"
         onClick={markWhatsAppSent}
         disabled={loading}
-        className="rounded-md border border-stone-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+        className="rounded-md border border-white/10 bg-slate-950/60 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-white/5 disabled:opacity-60"
       >
-        Marcar WA enviado
+        Marcar WA enviat
       </button>
     </div>
   );

@@ -70,17 +70,17 @@ export default function FeaturesPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
-          🎛️ Features Toggle
+          🎛️ Activació de funcionalitats
         </h1>
         <p className="mt-1 text-sm text-slate-400">
-          Activa o desactiva funcionalitats del lloc web
+          Activa o desactiva funcionalitats del web
         </p>
       </header>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-blue-600/5 backdrop-blur-sm p-4">
-          <div className="text-xs font-medium text-cyan-400 uppercase">Total Features</div>
+          <div className="text-xs font-medium text-cyan-400 uppercase">Total funcionalitats</div>
           <div className="text-3xl font-bold text-slate-100 mt-2">{features.length}</div>
         </div>
         <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-4">
@@ -88,7 +88,7 @@ export default function FeaturesPage() {
           <div className="text-3xl font-bold text-slate-100 mt-2">{activeCount}</div>
         </div>
         <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
-          <div className="text-xs font-medium text-slate-400 uppercase">Desactivades</div>
+              <div className="text-xs font-medium text-slate-400 uppercase">Desactivades</div>
           <div className="text-3xl font-bold text-slate-100 mt-2">{features.length - activeCount}</div>
         </div>
       </div>
@@ -121,9 +121,9 @@ export default function FeaturesPage() {
                 } ${saving === feature.key ? 'opacity-50' : ''}`}
               >
                 <div
-                  className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
-                    feature.enabled ? 'translate-x-6' : 'translate-x-0'
-                  }`}
+                    className={`absolute top-1 left-1 w-6 h-6 bg-slate-100 rounded-full transition-transform ${
+                      feature.enabled ? 'translate-x-6' : 'translate-x-0'
+                    }`}
                 />
               </button>
             </div>

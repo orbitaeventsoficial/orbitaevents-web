@@ -1001,17 +1001,18 @@ function QuoteModal({
         </div>
 
         <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-700/50">
-          <button onClick={onClose} type="button" className="px-4 py-2 text-slate-400 hover:text-slate-200">Cancelar</button>
+          <button onClick={onClose} type="button" className="px-4 py-2 text-slate-400 hover:text-slate-200">Cancel·lar</button>
           <button
             onClick={handleSendQuote}
             disabled={sending || !recipient || !packId || price <= 0}
             type="button"
             className="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white disabled:opacity-50"
           >
-            {sending ? 'Enviando...' : 'Enviar presupuesto'}
+            {sending ? 'Enviant...' : 'Enviar pressupost'}
           </button>
         </div>
       </div>
     </div>
   );
 }
+

@@ -4,7 +4,7 @@ import { log } from '@/lib/logger';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// TIPOS
+// TIPUS
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface TextNode {
@@ -36,7 +36,7 @@ interface TranslationComparison {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CONFIGURACIÓN DE SECCIONES
+// CONFIGURACIÓ DE SECCIONS
 // ═══════════════════════════════════════════════════════════════════════════
 
 const SECTIONS: Section[] = [
@@ -44,21 +44,21 @@ const SECTIONS: Section[] = [
     id: 'hero',
     name: 'Hero Principal',
     icon: '🏠',
-    description: 'Títulos, subtítulos y badges del hero',
+    description: 'Títols, subtítols i badges del hero',
     color: 'from-purple-500 to-pink-500',
     paths: ['hero.']
   },
   {
     id: 'nav',
-    name: 'Navegación & Header',
+    name: 'Navegació i capçalera',
     icon: '📱',
-    description: 'Menú, navegación, selector de idioma',
+    description: 'Menú, navegació i selector d\'idioma',
     color: 'from-blue-500 to-cyan-500',
     paths: ['common.nav.', 'common.buttons.', 'common.breadcrumbs.']
   },
   {
     id: 'services',
-    name: 'Servicios',
+    name: 'Serveis',
     icon: '🎯',
     description: 'Bodas, fiestas, corporativo, discomóvil',
     color: 'from-green-500 to-emerald-500',
@@ -66,7 +66,7 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'packs',
-    name: 'Packs & Precios',
+    name: 'Packs i preus',
     icon: '📦',
     description: 'Descripciones de packs, features, precios',
     color: 'from-orange-500 to-amber-500',
@@ -76,7 +76,7 @@ const SECTIONS: Section[] = [
     id: 'cta',
     name: 'CTAs & Garantías',
     icon: '✅',
-    description: 'Llamadas a la acción, garantías, urgencia',
+    description: 'Crides a l\'acció, garanties i urgència',
     color: 'from-red-500 to-rose-500',
     paths: ['guarantee.', 'finalCta.', 'cta.', 'urgency.', 'offerModal.']
   },
@@ -114,7 +114,7 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'themes',
-    name: 'Páginas Temáticas',
+    name: 'Pàgines temàtiques',
     icon: '🎃',
     description: 'Halloween, Món Màgic, temáticas especiales',
     color: 'from-purple-600 to-orange-500',
@@ -124,13 +124,13 @@ const SECTIONS: Section[] = [
     id: 'meta',
     name: 'SEO & Meta',
     icon: '🔍',
-    description: 'Títulos SEO, descripciones, OG tags',
+    description: 'Títols SEO, descripcions i etiquetes OG',
     color: 'from-cyan-500 to-blue-500',
     paths: ['meta.', 'seo.']
   },
   {
     id: 'admin',
-    name: 'Panel Admin',
+    name: 'Panell admin',
     icon: '⚙️',
     description: 'Dashboard, bookings, leads, CRM',
     color: 'from-gray-600 to-gray-800',
@@ -162,7 +162,7 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'common',
-    name: 'Común & Sistema',
+    name: 'Comú i sistema',
     icon: '🔧',
     description: 'Meses, errores, loader, genéricos',
     color: 'from-stone-500 to-neutral-600',
@@ -175,7 +175,7 @@ const SECTIONS: Section[] = [
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function TextManagerPage() {
-  // Estados principales
+  // Estats principals
   const [esTexts, setEsTexts] = useState<Record<string, string>>({});
   const [caTexts, setCaTexts] = useState<Record<string, string>>({});
   const [enTexts, setEnTexts] = useState<Record<string, string>>({});
@@ -187,7 +187,7 @@ export default function TextManagerPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Estados de UI
+  // Estats de UI
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showOnlyModified, setShowOnlyModified] = useState(false);
@@ -196,7 +196,7 @@ export default function TextManagerPage() {
   const [viewMode, setViewMode] = useState<'sections' | 'all' | 'search'>('sections');
   const [activeLanguage, setActiveLanguage] = useState<'es' | 'ca' | 'en'>('es');
 
-  // Historial de cambios
+  // Historial de canvis
   const [changeHistory, setChangeHistory] = useState<Array<{
     path: string;
     oldValue: string;
@@ -205,7 +205,7 @@ export default function TextManagerPage() {
   }>>([]);
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CARGAR DATOS
+  // CARREGAR DADES
   // ═══════════════════════════════════════════════════════════════════════════
 
   useEffect(() => {
@@ -227,17 +227,17 @@ export default function TextManagerPage() {
         setOriginalCaTexts(data.ca);
         setOriginalEnTexts(data.en || {});
       } else {
-        setError(data.error || 'Error cargando textos');
+        setError(data.error || 'Error carregant textos');
       }
     } catch (err) {
-      setError('Error de conexión');
+      setError('Error de connexió');
       log.error('Text manager error', err);
     }
     setLoading(false);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FUNCIONES DE MODIFICACIÓN
+  // FUNCIONS DE MODIFICACIÓ
   // ═══════════════════════════════════════════════════════════════════════════
 
   const handleTextChange = useCallback((path: string, value: string, locale?: 'es' | 'ca' | 'en') => {
@@ -269,7 +269,7 @@ export default function TextManagerPage() {
     setSuccess(null);
 
     try {
-      // Encontrar textos modificados (solo en el idioma activo)
+      // Encontrar textos modificats (solo en el idioma activo)
       const modifications: Record<string, string> = {};
 
       if (activeLanguage === 'es') {
@@ -293,7 +293,7 @@ export default function TextManagerPage() {
       }
 
       if (Object.keys(modifications).length === 0) {
-        setError('No hay cambios para guardar');
+        setError('No hi ha canvis per desar');
         setSaving(false);
         return;
       }
@@ -330,7 +330,7 @@ export default function TextManagerPage() {
         }
       }
 
-      // Guardar los 3 idiomas en paralelo
+      // Desar los 3 idiomas en paralelo
       const savePromises = [
         fetch('/api/admin/text-manager', {
           method: 'PUT',
@@ -367,10 +367,10 @@ export default function TextManagerPage() {
         setSuccess(`✅ ${Object.keys(modifications).length} textos guardados y traducidos automáticamente a ES, CA y EN`);
         setChangeHistory([]);
       } else {
-        setError('Error guardando algunos idiomas');
+        setError('Error desant alguns idiomes');
       }
     } catch (err) {
-      setError('Error de conexión al guardar');
+      setError('Error de connexió en desar');
       log.error('Text manager save error', err);
     }
 
@@ -388,7 +388,7 @@ export default function TextManagerPage() {
   };
 
   const handleRevertAll = () => {
-    if (confirm('¿Revertir TODOS los cambios en este idioma?')) {
+    if (confirm('Vols revertir TOTS els canvis d\'aquest idioma?')) {
       if (activeLanguage === 'es') {
         setEsTexts({ ...originalEsTexts });
       } else if (activeLanguage === 'ca') {
@@ -401,7 +401,7 @@ export default function TextManagerPage() {
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CÁLCULOS Y FILTROS
+  // CÀLCULS I FILTRES
   // ═══════════════════════════════════════════════════════════════════════════
 
   const getSection = useCallback((path: string): string => {
@@ -448,7 +448,7 @@ export default function TextManagerPage() {
       );
     }
 
-    // Filtrar solo modificados
+    // Filtrar solo modificats
     if (showOnlyModified) {
       texts = texts.filter(([path, value]) => value !== originalTexts[path]);
     }
@@ -485,10 +485,10 @@ export default function TextManagerPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-500 border-t-transparent mx-auto"></div>
-          <p className="mt-4 text-slate-600 text-lg">Cargando textos...</p>
+          <p className="mt-4 text-slate-300 text-lg">Carregant textos...</p>
           <p className="text-sm text-slate-400">Analizando estructura del JSON</p>
         </div>
       </div>
@@ -496,24 +496,24 @@ export default function TextManagerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-950">
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* HEADER FIJO */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      <header className="sticky top-0 z-50 bg-white border-b border-stone-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-slate-900/95 border-b border-slate-700/60 shadow-sm backdrop-blur">
         {/* TABS DE IDIOMA */}
         <div className="bg-gradient-to-r from-orange-50 to-rose-50 border-b border-orange-100">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-slate-600">🌐 Idioma MASTER (se traduce automáticamente):</span>
+                <span className="text-sm font-semibold text-slate-300">🌐 Idioma MASTER (es tradueix automàticament):</span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setActiveLanguage('es')}
                     className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                       activeLanguage === 'es'
                         ? 'bg-orange-500 text-white shadow-lg scale-105'
-                        : 'bg-white text-slate-600 hover:bg-orange-50'
+                        : 'bg-slate-900/70 text-slate-300 hover:bg-slate-700'
                     }`}
                   >
                     🇪🇸 Español
@@ -523,7 +523,7 @@ export default function TextManagerPage() {
                     className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                       activeLanguage === 'ca'
                         ? 'bg-orange-500 text-white shadow-lg scale-105'
-                        : 'bg-white text-slate-600 hover:bg-orange-50'
+                        : 'bg-slate-900/70 text-slate-300 hover:bg-slate-700'
                     }`}
                   >
                     🏴 Català
@@ -533,15 +533,15 @@ export default function TextManagerPage() {
                     className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                       activeLanguage === 'en'
                         ? 'bg-orange-500 text-white shadow-lg scale-105'
-                        : 'bg-white text-slate-600 hover:bg-orange-50'
+                        : 'bg-slate-900/70 text-slate-300 hover:bg-slate-700'
                     }`}
                   >
                     🇬🇧 English
                   </button>
                 </div>
               </div>
-              <div className="text-xs text-slate-500 bg-white px-3 py-1.5 rounded-lg border border-orange-200">
-                💡 Escribe en cualquier idioma y se traduce automáticamente a los 3
+              <div className="text-xs text-slate-400 bg-slate-900/70 px-3 py-1.5 rounded-lg border border-orange-200">
+                💡 Escriu en qualsevol idioma i es tradueix automàticament als 3
               </div>
             </div>
           </div>
@@ -549,13 +549,13 @@ export default function TextManagerPage() {
 
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
-            {/* Título */}
+            {/* Títol */}
             <div>
-              <h1 className="text-2xl font-bold text-slate-700 flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
                 📝 Text Manager PRO
               </h1>
-              <p className="text-sm text-slate-500">
-                {Object.keys(currentTexts).length} textos · {modifiedCount} modificados
+              <p className="text-sm text-slate-400">
+                {Object.keys(currentTexts).length} textos · {modifiedCount} modificats
               </p>
             </div>
 
@@ -564,10 +564,10 @@ export default function TextManagerPage() {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Buscar textos... (path o contenido)"
+                  placeholder="Cercar textos... (path o contenido)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-stone-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
+                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-slate-700/60 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                   🔍
@@ -575,7 +575,7 @@ export default function TextManagerPage() {
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
                   >
                     ✕
                   </button>
@@ -585,58 +585,58 @@ export default function TextManagerPage() {
 
             {/* Acciones */}
             <div className="flex items-center gap-3">
-              {/* Toggle modificados */}
+              {/* Toggle modificats */}
               <button
                 onClick={() => setShowOnlyModified(!showOnlyModified)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   showOnlyModified
                     ? 'bg-orange-500 text-white'
-                    : 'bg-stone-100 text-slate-600 hover:bg-stone-100'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-800'
                 }`}
               >
-                {showOnlyModified ? '✅ Solo modificados' : '📋 Mostrar todos'}
+                {showOnlyModified ? '✅ Solo modificats' : '📋 Mostrar todos'}
               </button>
 
-              {/* Comparar idiomas */}
+              {/* Comparar idiomes */}
               <button
                 onClick={() => setShowComparison(!showComparison)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   showComparison
                     ? 'bg-blue-500 text-white'
-                    : 'bg-stone-100 text-slate-600 hover:bg-stone-100'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-800'
                 }`}
               >
                 🌐 ES/CA
               </button>
 
-              {/* Revertir todo */}
+              {/* Revertir tot */}
               {modifiedCount > 0 && (
                 <button
                   onClick={handleRevertAll}
-                  className="px-4 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-all"
+                  className="px-4 py-2 rounded-lg text-sm font-medium border border-rose-500/40 bg-rose-500/15 text-rose-300 hover:bg-rose-500/20 transition-all"
                 >
                   ↩️ Revertir ({modifiedCount})
                 </button>
               )}
 
-              {/* Guardar */}
+              {/* Desar */}
               <button
                 onClick={handleSave}
                 disabled={saving || modifiedCount === 0}
                 className={`px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 ${
                   modifiedCount > 0
                     ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white hover:shadow-lg hover:scale-105'
-                    : 'bg-stone-100 text-slate-400 cursor-not-allowed'
+                    : 'bg-slate-800 text-slate-400 cursor-not-allowed'
                 }`}
               >
                 {saving ? (
                   <>
                     <span className="animate-spin">⏳</span>
-                    Guardando...
+                    Desant...
                   </>
                 ) : (
                   <>
-                    💾 Guardar {modifiedCount > 0 && `(${modifiedCount})`}
+                    💾 Desar {modifiedCount > 0 && `(${modifiedCount})`}
                   </>
                 )}
               </button>
@@ -646,31 +646,31 @@ export default function TextManagerPage() {
       </header>
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* MENSAJES */}
+      {/* MISSATGES */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {(error || success) && (
         <div className="max-w-7xl mx-auto px-4 mt-4">
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 flex items-center justify-between" role="alert">
+            <div className="p-4 rounded-xl border border-rose-500/40 bg-rose-500/15 text-rose-300 flex items-center justify-between" role="alert">
               <span>❌ {error}</span>
               <button
                 onClick={() => setError(null)}
                 type="button"
                 aria-label="Tancar error"
-                className="text-red-400 hover:text-red-600"
+                className="text-rose-300 hover:text-rose-200"
               >
                 ✕
               </button>
             </div>
           )}
           {success && (
-            <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 flex items-center justify-between" role="status" aria-live="polite">
+            <div className="p-4 rounded-xl border border-emerald-500/40 bg-emerald-500/15 text-emerald-300 flex items-center justify-between" role="status" aria-live="polite">
               <span>{success}</span>
               <button
                 onClick={() => setSuccess(null)}
                 type="button"
                 aria-label="Tancar confirmacio"
-                className="text-green-400 hover:text-green-600"
+                className="text-emerald-300 hover:text-emerald-200"
               >
                 ✕
               </button>
@@ -682,29 +682,29 @@ export default function TextManagerPage() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex gap-6">
           {/* ═══════════════════════════════════════════════════════════════ */}
-          {/* SIDEBAR - SECCIONES */}
+          {/* SIDEBAR - SECCIONS */}
           {/* ═══════════════════════════════════════════════════════════════ */}
           <aside className="w-72 flex-shrink-0">
             <div className="sticky top-28 space-y-2">
-              {/* Mostrar todo */}
+              {/* Mostrar tot */}
               <button
                 onClick={() => setActiveSection(null)}
                 type="button"
                 className={`w-full p-3 rounded-xl text-left transition-all ${
                   !activeSection
-                    ? 'bg-gradient-to-r from-slate-200 to-slate-300 text-slate-700 shadow-lg'
-                    : 'bg-white hover:bg-slate-50 text-slate-700'
+                    ? 'bg-gradient-to-r from-slate-200 to-slate-300 text-slate-100 shadow-lg'
+                    : 'bg-slate-900/70 hover:bg-slate-900/60 text-slate-100'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">📁 Todas las secciones</span>
+                  <span className="font-medium">📁 Totes les seccions</span>
                   <span className="text-xs opacity-70">
                     {Object.keys(esTexts).length}
                   </span>
                 </div>
               </button>
 
-              {/* Secciones */}
+              {/* Seccions */}
               {SECTIONS.map(section => {
                 const counts = sectionCounts[section.id] || { total: 0, modified: 0 };
                 const isActive = activeSection === section.id;
@@ -717,7 +717,7 @@ export default function TextManagerPage() {
                     className={`w-full p-3 rounded-xl text-left transition-all ${
                       isActive
                         ? `bg-gradient-to-r ${section.color} text-white shadow-lg`
-                        : 'bg-white hover:bg-slate-50 text-slate-700'
+                        : 'bg-slate-900/70 hover:bg-slate-900/60 text-slate-100'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -727,7 +727,7 @@ export default function TextManagerPage() {
                       <div className="flex items-center gap-2">
                         {counts.modified > 0 && (
                           <span className={`text-xs px-2 py-0.5 rounded-full ${
-                            isActive ? 'bg-white/20' : 'bg-orange-100 text-orange-600'
+                            isActive ? 'bg-white/20' : 'bg-orange-500/20 text-orange-300'
                           }`}>
                             {counts.modified}
                           </span>
@@ -746,13 +746,13 @@ export default function TextManagerPage() {
 
               {/* Historial */}
               {changeHistory.length > 0 && (
-                <div className="mt-6 p-4 bg-white rounded-xl border border-stone-200">
-                  <h3 className="font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                <div className="mt-6 p-4 bg-slate-900/70 rounded-xl border border-slate-700/60">
+                  <h3 className="font-semibold text-slate-100 mb-3 flex items-center gap-2">
                     📜 Historial ({changeHistory.length})
                   </h3>
                   <div className="max-h-48 overflow-y-auto space-y-2">
                     {changeHistory.slice(-10).reverse().map((change, i) => (
-                      <div key={i} className="text-xs p-2 bg-slate-50 rounded-lg">
+                      <div key={i} className="text-xs p-2 bg-slate-900/60 rounded-lg">
                         <code className="text-orange-600 break-all">
                           {change.path.split('.').slice(-2).join('.')}
                         </code>
@@ -768,14 +768,14 @@ export default function TextManagerPage() {
           </aside>
 
           {/* ═══════════════════════════════════════════════════════════════ */}
-          {/* CONTENIDO PRINCIPAL */}
+          {/* CONTINGUT PRINCIPAL */}
           {/* ═══════════════════════════════════════════════════════════════ */}
           <main className="flex-1 min-w-0">
-            {/* Info de sección activa */}
+            {/* Info de secció activa */}
             {activeSection && (
               <div className={`mb-6 p-4 rounded-xl bg-gradient-to-r ${
                 SECTIONS.find(s => s.id === activeSection)?.color || 'from-slate-500 to-slate-600'
-              } text-slate-700`}>
+              } text-slate-100`}>
                 <h2 className="text-xl font-bold flex items-center gap-2">
                   {SECTIONS.find(s => s.id === activeSection)?.icon}
                   {SECTIONS.find(s => s.id === activeSection)?.name}
@@ -786,24 +786,24 @@ export default function TextManagerPage() {
                 <div className="mt-2 text-sm opacity-70">
                   {sectionCounts[activeSection]?.total} textos
                   {sectionCounts[activeSection]?.modified > 0 && (
-                    <> · <strong>{sectionCounts[activeSection].modified} modificados</strong></>
+                    <> · <strong>{sectionCounts[activeSection].modified} modificats</strong></>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Lista de textos */}
+            {/* Llista de textos */}
             <div className="space-y-3">
               {filteredTexts.length === 0 ? (
                 <div className="text-center py-12 text-slate-400">
                   <div className="text-4xl mb-4">🔍</div>
-                  <p>No se encontraron textos</p>
+                  <p>No s\'han trobat textos</p>
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm('')}
                       className="mt-2 text-orange-500 hover:underline"
                     >
-                      Limpiar búsqueda
+                      Netejar cerca
                     </button>
                   )}
                 </div>
@@ -819,89 +819,89 @@ export default function TextManagerPage() {
                   return (
                     <div
                       key={path}
-                      className={`bg-white rounded-xl border transition-all ${
+                      className={`bg-slate-900/70 rounded-xl border transition-all ${
                         isModified
                           ? 'border-orange-300 shadow-md shadow-orange-100'
-                          : 'border-stone-200 hover:border-stone-200'
+                          : 'border-slate-700/60 hover:border-slate-700/60'
                       }`}
                     >
                       <div className="p-4">
-                        {/* Header del texto */}
+                        {/* Capçalera del text */}
                         <div className="flex items-start justify-between gap-4 mb-3">
                           <div className="flex-1 min-w-0">
-                            <code className="text-sm text-slate-500 break-all font-mono bg-stone-100 px-2 py-1 rounded">
+                            <code className="text-sm text-slate-400 break-all font-mono bg-slate-800 px-2 py-1 rounded">
                               {path}
                             </code>
                             {isModified && (
                               <span className="ml-2 text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
-                                ✏️ Modificado
+                                ✏️ Modificat
                               </span>
                             )}
                           </div>
                           
-                          {/* Acciones */}
+                          {/* Accions */}
                           <div className="flex items-center gap-2">
                             {isModified && (
                               <button
                                 onClick={() => handleRevert(path)}
-                                className="text-xs px-3 py-1 rounded-lg bg-stone-100 text-slate-600 hover:bg-stone-100 transition-colors"
-                                title="Revertir cambios"
+                                className="text-xs px-3 py-1 rounded-lg border border-slate-600 bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
+                                title="Revertir canvis"
                               >
                                 ↩️ Revertir
                               </button>
                             )}
                             <span className="text-xs text-slate-400">
-                              {value.length} chars
+                              {value.length} caràcters
                             </span>
                           </div>
                         </div>
 
-                        {/* Editor de texto */}
+                        {/* Editor de text */}
                         <textarea
                           value={value}
                           onChange={(e) => handleTextChange(path, e.target.value)}
                           rows={value.length > 100 ? 3 : value.length > 50 ? 2 : 1}
                           className={`w-full px-4 py-3 rounded-lg border transition-all resize-none font-sans ${
                             isModified
-                              ? 'border-orange-300 bg-orange-50/50 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20'
-                              : 'border-stone-200 bg-slate-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                              ? 'border-orange-500/40 bg-orange-500/10 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20'
+                              : 'border-slate-700/60 bg-slate-900/60 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
                           }`}
-                          placeholder="Texto vacío..."
+                          placeholder="Text buit..."
                         />
 
-                        {/* Comparación con otros idiomas */}
+                        {/* Comparació amb altres idiomes */}
                         {showComparison && (
                           <div className="mt-3 space-y-2">
                             {activeLanguage !== 'es' && otherLangValues.es && (
-                              <div className="p-3 bg-red-50 rounded-lg border border-red-100">
-                                <div className="flex items-center gap-2 text-xs text-red-600 mb-1">
-                                  <span className="font-semibold">🇪🇸 Español:</span>
+                              <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10">
+                                <div className="flex items-center gap-2 text-xs text-rose-300 mb-1">
+                                  <span className="font-semibold">🇪🇸 Espanyol:</span>
                                 </div>
-                                <p className="text-sm text-red-800">{otherLangValues.es}</p>
+                                <p className="text-sm text-rose-200">{otherLangValues.es}</p>
                               </div>
                             )}
                             {activeLanguage !== 'ca' && otherLangValues.ca && (
-                              <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                                <div className="flex items-center gap-2 text-xs text-blue-600 mb-1">
+                              <div className="p-3 rounded-lg border border-blue-500/30 bg-blue-500/10">
+                                <div className="flex items-center gap-2 text-xs text-blue-300 mb-1">
                                   <span className="font-semibold">🏴 Català:</span>
                                 </div>
-                                <p className="text-sm text-blue-800">{otherLangValues.ca}</p>
+                                <p className="text-sm text-blue-200">{otherLangValues.ca}</p>
                               </div>
                             )}
                             {activeLanguage !== 'en' && otherLangValues.en && (
-                              <div className="p-3 bg-green-50 rounded-lg border border-green-100">
-                                <div className="flex items-center gap-2 text-xs text-green-600 mb-1">
+                              <div className="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10">
+                                <div className="flex items-center gap-2 text-xs text-emerald-300 mb-1">
                                   <span className="font-semibold">🇬🇧 English:</span>
                                 </div>
-                                <p className="text-sm text-green-800">{otherLangValues.en}</p>
+                                <p className="text-sm text-emerald-200">{otherLangValues.en}</p>
                               </div>
                             )}
                           </div>
                         )}
 
-                        {/* Valor original si modificado */}
+                        {/* Valor original si modificat */}
                         {isModified && (
-                          <div className="mt-2 p-2 bg-slate-50 rounded-lg text-xs text-slate-500 border border-slate-100">
+                          <div className="mt-2 p-2 rounded-lg text-xs text-slate-400 border border-slate-700 bg-slate-900/60">
                             <span className="font-medium">Original:</span>{' '}
                             <span className="italic">{originalTexts[path]}</span>
                           </div>
@@ -917,7 +917,7 @@ export default function TextManagerPage() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* BOTÓN FLOTANTE DE GUARDAR */}
+      {/* BOTÓ FLOTANT DE DESAR */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {modifiedCount > 0 && (
         <div className="fixed bottom-6 right-6 z-50">
@@ -929,11 +929,11 @@ export default function TextManagerPage() {
             {saving ? (
               <>
                 <span className="animate-spin">⏳</span>
-                Guardando...
+                Desant...
               </>
             ) : (
               <>
-                💾 Guardar {modifiedCount} cambios
+                💾 Desar {modifiedCount} canvis
               </>
             )}
           </button>
@@ -942,3 +942,6 @@ export default function TextManagerPage() {
     </div>
   );
 }
+
+
+

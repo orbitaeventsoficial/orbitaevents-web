@@ -72,7 +72,7 @@ export function MetricCard({
       <div className="flex items-start justify-between mb-2 sm:mb-3">
         <div className="min-w-0 flex-1">
           <p className="text-xs sm:text-sm text-slate-500 font-medium truncate">{label}</p>
-          <p className="text-2xl sm:text-3xl font-semibold text-slate-800 mt-0.5 sm:mt-1">{value}</p>
+          <p className="text-2xl sm:text-3xl font-semibold text-slate-100 mt-0.5 sm:mt-1">{value}</p>
         </div>
         {icon && <span className={`text-xl sm:text-2xl opacity-80 shrink-0 ml-2 ${style.text}`}>{icon}</span>}
       </div>
@@ -104,7 +104,7 @@ export function Card({
       {(title || subtitle || action) && (
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-[#e0d6c3] flex items-center justify-between gap-3 bg-[#ebe4d6]">
           <div className="min-w-0 flex-1">
-            {title && <h3 className="text-sm sm:text-base font-semibold text-slate-800 truncate">{title}</h3>}
+            {title && <h3 className="text-sm sm:text-base font-semibold text-slate-100 truncate">{title}</h3>}
             {subtitle && <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 truncate">{subtitle}</p>}
           </div>
           {action && <div className="shrink-0">{action}</div>}
@@ -161,3 +161,4 @@ export function Button({
     </button>
   );
 }
+

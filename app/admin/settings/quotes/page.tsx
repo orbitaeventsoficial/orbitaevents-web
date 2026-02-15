@@ -15,18 +15,18 @@ export default async function QuoteTemplateSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="rounded-2xl border border-stone-300 bg-white p-6 shadow-sm" style={{ color: '#111111' }}>
-        <Link href="/admin/settings" className="text-sm !text-[#111111] hover:opacity-80">
+      <header className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
+        <Link href="/admin/settings" className="text-sm text-slate-300 hover:text-slate-100">
           ← Tornar a configuració
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold !text-[#111111]">Plantilla de pressupostos</h1>
-        <p className="mt-1 text-sm !text-[#111111]">
+        <h1 className="mt-2 text-2xl font-semibold text-slate-100">Plantilla de pressupostos</h1>
+        <p className="mt-1 text-sm text-slate-300">
           Defineix el text del pressupost, condicions i còpia interna. Aquesta plantilla s&apos;usa a
           la previsualització i als emails enviats al client.
         </p>
         {usingFallback ? (
-          <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            No se pudo cargar la configuración guardada. Se muestran valores por defecto.
+          <p className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/15 px-3 py-2 text-sm text-amber-300">
+            No s&apos;ha pogut carregar la configuració guardada. Es mostren valors per defecte.
           </p>
         ) : null}
       </header>

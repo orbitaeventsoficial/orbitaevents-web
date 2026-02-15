@@ -73,12 +73,12 @@ export default function NewBlogPostPage() {
         const error = await res.json();
         setFlashMessage({
           type: 'error',
-          text: error.error || 'Error al crear el post',
+          text: error.error || 'Error en crear el post',
         });
       }
     } catch (error) {
       log.error('Failed to create post:', error);
-      setFlashMessage({ type: 'error', text: 'Error al crear el post' });
+      setFlashMessage({ type: 'error', text: 'Error en crear el post' });
     } finally {
       setLoading(false);
     }
@@ -109,8 +109,8 @@ export default function NewBlogPostPage() {
   return (
     <div className="p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Nuevo Post</h1>
-        <p className="mt-2 text-white/60">Crea un nuevo artículo para el blog</p>
+        <h1 className="text-3xl font-bold text-white">Nou post</h1>
+        <p className="mt-2 text-white/60">Crea un nou article per al blog</p>
       </div>
 
       {flashMessage && (
@@ -138,9 +138,9 @@ export default function NewBlogPostPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* General Settings */}
+        {/* Configuració general */}
         <div className="rounded-lg border border-white/10 bg-white/5 p-6">
-          <h2 className="mb-4 text-xl font-semibold text-white">Configuración General</h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">Configuració general</h2>
 
           <div className="space-y-4">
             <div>
@@ -164,7 +164,7 @@ export default function NewBlogPostPage() {
                 required
               />
               <p className="mt-1 text-xs text-white/60">
-                Se generará automáticamente del título español si lo dejas vacío
+                Es generarà automàticament des del títol en espanyol si ho deixes buit
               </p>
             </div>
 
@@ -181,7 +181,7 @@ export default function NewBlogPostPage() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-white">
-                  Categoría
+                  Categoria
                 </label>
                 <select
                   value={formData.category}
@@ -189,18 +189,18 @@ export default function NewBlogPostPage() {
                   className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white"
                 >
                   <option value="general">General</option>
-                  <option value="bodas">Bodas</option>
-                  <option value="eventos">Eventos</option>
-                  <option value="consejos">Consejos</option>
-                  <option value="tendencias">Tendencias</option>
-                  <option value="tecnologia">Tecnología</option>
+                  <option value="bodas">Bodes</option>
+                  <option value="eventos">Esdeveniments</option>
+                  <option value="consejos">Consells</option>
+                  <option value="tendencias">Tendències</option>
+                  <option value="tecnologia">Tecnologia</option>
                 </select>
               </div>
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-medium text-white">
-                Tags (separados por comas)
+                Etiquetes (separades per comes)
               </label>
               <input
                 type="text"
@@ -213,7 +213,7 @@ export default function NewBlogPostPage() {
 
             <div>
               <label className="mb-2 block text-sm font-medium text-white">
-                Imagen Destacada (URL)
+                Imatge destacada (URL)
               </label>
               <input
                 type="url"
@@ -229,7 +229,7 @@ export default function NewBlogPostPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="mb-2 block text-sm font-medium text-white">
-                  Tiempo de Lectura (minutos)
+                  Temps de lectura (minuts)
                 </label>
                 <input
                   type="number"
@@ -253,7 +253,7 @@ export default function NewBlogPostPage() {
                     aria-label="Publicar ahora"
                     className="h-5 w-5 rounded"
                   />
-                  <span className="text-sm font-medium text-white">Publicar ahora</span>
+                  <span className="text-sm font-medium text-white">Publicar ara</span>
                 </label>
               </div>
             </div>
@@ -263,7 +263,7 @@ export default function NewBlogPostPage() {
         {/* Translations */}
         <div className="rounded-lg border border-white/10 bg-white/5 p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">Contenido</h2>
+            <h2 className="text-xl font-semibold text-white">Contingut</h2>
             <div className="flex gap-2">
               <button
                 type="button"
@@ -274,7 +274,7 @@ export default function NewBlogPostPage() {
                     : 'bg-white/5 text-white/60'
                 }`}
               >
-                Español
+                Espanyol
               </button>
               <button
                 type="button"
@@ -293,7 +293,7 @@ export default function NewBlogPostPage() {
           <div className="space-y-4">
             <div>
               <label className="mb-2 block text-sm font-medium text-white">
-                Título *
+                Títol *
               </label>
               <input
                 type="text"
@@ -306,7 +306,7 @@ export default function NewBlogPostPage() {
 
             <div>
               <label className="mb-2 block text-sm font-medium text-white">
-                Extracto *
+                Extracte *
               </label>
               <textarea
                 value={formData.translations[activeLocale].excerpt}
@@ -319,7 +319,7 @@ export default function NewBlogPostPage() {
 
             <div>
               <label className="mb-2 block text-sm font-medium text-white">
-                Contenido (Markdown) *
+                Contingut (Markdown) *
               </label>
               <textarea
                 value={formData.translations[activeLocale].content}
@@ -332,7 +332,7 @@ export default function NewBlogPostPage() {
 
             <div>
               <label className="mb-2 block text-sm font-medium text-white">
-                Meta Título (SEO)
+                Meta títol (SEO)
               </label>
               <input
                 type="text"
@@ -340,14 +340,14 @@ export default function NewBlogPostPage() {
                 onChange={(e) =>
                   updateTranslation(activeLocale, 'metaTitle', e.target.value)
                 }
-                placeholder="Si está vacío, se usará el título"
+                placeholder="Si està buit, s'usarà el títol"
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
               />
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-medium text-white">
-                Meta Descripción (SEO)
+                Meta descripció (SEO)
               </label>
               <textarea
                 value={formData.translations[activeLocale].metaDescription}
@@ -355,7 +355,7 @@ export default function NewBlogPostPage() {
                   updateTranslation(activeLocale, 'metaDescription', e.target.value)
                 }
                 rows={2}
-                placeholder="Si está vacía, se usará el extracto"
+                placeholder="Si està buida, s'usarà l'extracte"
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-white/50"
               />
             </div>
@@ -370,17 +370,19 @@ export default function NewBlogPostPage() {
             aria-busy={loading}
             className="rounded-lg bg-purple-600 px-6 py-3 text-white hover:bg-purple-700 disabled:opacity-50"
           >
-            {loading ? 'Guardando...' : 'Crear Post'}
+            {loading ? 'Desant...' : 'Crear post'}
           </button>
           <button
             type="button"
             onClick={() => router.push('/admin/blog')}
             className="rounded-lg border border-white/10 bg-white/5 px-6 py-3 text-white hover:bg-white/10"
           >
-            Cancelar
+            Cancel·lar
           </button>
         </div>
       </form>
     </div>
   );
 }
+
+

@@ -232,10 +232,10 @@ export default function AdminContactesPage() {
           </svg>
           <input
             type="search"
-            placeholder="Buscar contacte..."
+            placeholder="Cercar contacte..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            aria-label="Buscar contacte"
+            aria-label="Cercar contacte"
             className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
           />
         </div>
@@ -357,7 +357,7 @@ export default function AdminContactesPage() {
                       <Link
                         href={`/admin/contactes/${customer.id}`}
                         className="p-2 bg-slate-700/50 text-slate-300 rounded-lg hover:bg-slate-600/50 transition-all"
-                        title="Ficha 360"
+                        title="Fitxa 360"
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -540,7 +540,7 @@ export default function AdminContactesPage() {
                   <div className="flex items-center gap-4">
                     <span className="text-3xl">🎉</span>
                     <div>
-                      <p className="text-slate-100 font-medium group-hover:text-emerald-400">Post-Event Complet</p>
+                      <p className="text-slate-100 font-medium group-hover:text-emerald-400">Post-event Complet</p>
                       <p className="text-slate-500 text-sm">Canvas 10/10 + Gràcies + Demanar opinió</p>
                     </div>
                   </div>
@@ -593,3 +593,4 @@ export default function AdminContactesPage() {
     </div>
   );
 }
+

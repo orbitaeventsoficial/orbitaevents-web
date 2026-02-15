@@ -57,9 +57,9 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
       // Refrescar la pàgina
       router.refresh();
 
-      // Si s'han actualitzat les stats, mostrar notificació
+      // Si s\'han actualitzat les stats, mostrar notificació
       if (data.statsUpdated) {
-        alert(`✅ Event completat!\n\nLes estadístiques s'han actualitzat:\n• +1 event\n• +${guestCount} persones`);
+        alert(`✅ Event completat!\n\nLes estadístiques s\'han actualitzat:\n• +1 event\n• +${guestCount} persones`);
       }
       if (data.calendarSync?.status === 'synced') {
         alert('📅 Google Calendar sincronizado automáticamente.');
@@ -162,3 +162,4 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
     </div>
   );
 }
+

@@ -85,7 +85,7 @@ export default function EditBlogPostPage() {
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok || !data?.post) {
-          setFlashMessage({ type: 'error', text: data?.error || 'No se pudo cargar el post' });
+          setFlashMessage({ type: 'error', text: data?.error || 'No s\'ha pogut carregar el post' });
           return;
         }
 
@@ -120,7 +120,7 @@ export default function EditBlogPostPage() {
         });
       } catch (error) {
         log.error('Failed to load blog post', error);
-        setFlashMessage({ type: 'error', text: 'Error cargando el post' });
+        setFlashMessage({ type: 'error', text: 'Error carregant el post' });
       } finally {
         setLoading(false);
       }
@@ -173,15 +173,15 @@ export default function EditBlogPostPage() {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setFlashMessage({ type: 'error', text: data?.error || 'Error guardando cambios' });
+        setFlashMessage({ type: 'error', text: data?.error || 'Error desant canvis' });
         return;
       }
 
-      setFlashMessage({ type: 'success', text: 'Post actualizado correctamente' });
+      setFlashMessage({ type: 'success', text: 'Post actualitzat correctament' });
       setTimeout(() => router.push('/admin/blog'), 700);
     } catch (error) {
       log.error('Failed to update blog post', error);
-      setFlashMessage({ type: 'error', text: 'Error guardando cambios' });
+      setFlashMessage({ type: 'error', text: 'Error desant canvis' });
     } finally {
       setSaving(false);
     }
@@ -199,15 +199,15 @@ export default function EditBlogPostPage() {
     <div className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">Editar Post</h1>
-          <p className="mt-1 text-sm text-slate-400">Actualiza contenido, SEO y estado de publicación</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">Editar post</h1>
+          <p className="mt-1 text-sm text-slate-400">Actualitza contingut, SEO i estat de publicació</p>
         </div>
         <button
           type="button"
           onClick={() => router.push('/admin/blog')}
           className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm text-slate-200 hover:bg-slate-600/50 transition-colors"
         >
-          Volver
+          Tornar
         </button>
       </header>
 
@@ -227,7 +227,7 @@ export default function EditBlogPostPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6">
-          <h2 className="text-lg font-semibold text-slate-100 mb-4">Configuración</h2>
+          <h2 className="text-lg font-semibold text-slate-100 mb-4">Configuració</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label className="block text-sm text-slate-400 mb-1">Slug</label>
@@ -247,7 +247,7 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Categoría</label>
+              <label className="block text-sm text-slate-400 mb-1">Categoria</label>
               <input
                 value={formData.category}
                 onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
@@ -255,7 +255,7 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm text-slate-400 mb-1">Tags (coma separada)</label>
+              <label className="block text-sm text-slate-400 mb-1">Etiquetes (separades per comes)</label>
               <input
                 value={formData.tags}
                 onChange={(e) => setFormData((prev) => ({ ...prev, tags: e.target.value }))}
@@ -263,7 +263,7 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm text-slate-400 mb-1">Imagen destacada URL</label>
+              <label className="block text-sm text-slate-400 mb-1">URL imatge destacada</label>
               <input
                 value={formData.featuredImage}
                 onChange={(e) => setFormData((prev) => ({ ...prev, featuredImage: e.target.value }))}
@@ -271,7 +271,7 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Tiempo lectura (min)</label>
+              <label className="block text-sm text-slate-400 mb-1">Temps lectura (min)</label>
               <input
                 type="number"
                 min={1}
@@ -287,7 +287,7 @@ export default function EditBlogPostPage() {
                   checked={formData.isPublished}
                   onChange={(e) => setFormData((prev) => ({ ...prev, isPublished: e.target.checked }))}
                 />
-                Publicado
+                Publicat
               </label>
             </div>
           </div>
@@ -295,7 +295,7 @@ export default function EditBlogPostPage() {
 
         <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-100">Contenido</h2>
+            <h2 className="text-lg font-semibold text-slate-100">Contingut</h2>
             <div className="flex gap-2">
               <button
                 type="button"
@@ -306,7 +306,7 @@ export default function EditBlogPostPage() {
                     : 'border border-slate-700 text-slate-400'
                 }`}
               >
-                Español
+                Espanyol
               </button>
               <button
                 type="button"
@@ -324,7 +324,7 @@ export default function EditBlogPostPage() {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Título</label>
+              <label className="block text-sm text-slate-400 mb-1">Títol</label>
               <input
                 value={formData.translations[activeLocale].title}
                 onChange={(e) => updateTranslation(activeLocale, 'title', e.target.value)}
@@ -333,7 +333,7 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Extracto</label>
+              <label className="block text-sm text-slate-400 mb-1">Extracte</label>
               <textarea
                 value={formData.translations[activeLocale].excerpt}
                 onChange={(e) => updateTranslation(activeLocale, 'excerpt', e.target.value)}
@@ -343,7 +343,7 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Contenido</label>
+              <label className="block text-sm text-slate-400 mb-1">Contingut</label>
               <textarea
                 value={formData.translations[activeLocale].content}
                 onChange={(e) => updateTranslation(activeLocale, 'content', e.target.value)}
@@ -353,7 +353,7 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Meta título (SEO)</label>
+              <label className="block text-sm text-slate-400 mb-1">Meta títol (SEO)</label>
               <input
                 value={formData.translations[activeLocale].metaTitle}
                 onChange={(e) => updateTranslation(activeLocale, 'metaTitle', e.target.value)}
@@ -361,7 +361,7 @@ export default function EditBlogPostPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Meta descripción (SEO)</label>
+              <label className="block text-sm text-slate-400 mb-1">Meta descripció (SEO)</label>
               <textarea
                 value={formData.translations[activeLocale].metaDescription}
                 onChange={(e) => updateTranslation(activeLocale, 'metaDescription', e.target.value)}
@@ -378,17 +378,20 @@ export default function EditBlogPostPage() {
             disabled={saving}
             className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-2.5 text-white font-medium disabled:opacity-50"
           >
-            {saving ? 'Guardando...' : 'Guardar cambios'}
+            {saving ? 'Desant...' : 'Desar canvis'}
           </button>
           <button
             type="button"
             onClick={() => router.push('/admin/blog')}
             className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-6 py-2.5 text-slate-200"
           >
-            Cancelar
+            Cancel·lar
           </button>
         </div>
       </form>
     </div>
   );
 }
+
+
+

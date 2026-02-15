@@ -1151,11 +1151,11 @@ body.admin-mode .header-scrolled {
 html.admin-mode {
   --bg-main: #111315;
   --bg-surface: #1a1e22;
-  --bg-card: #f4f1e8;
-  --bg-elevated: #ebe4d6;
+  --bg-card: #12161b;
+  --bg-elevated: #171c22;
   --color-bg-primary: #111315;
   --color-bg-secondary: #1a1e22;
-  --color-bg-card: #f4f1e8;
+  --color-bg-card: #12161b;
 }
 
 html.admin-mode .card,
@@ -1168,8 +1168,8 @@ html.admin-mode .card-elegant,
 body.admin-mode .card-elegant,
 html.admin-mode .card-swipe-item,
 body.admin-mode .card-swipe-item {
-  background: #f4f1e8 !important;
-  border-color: #e0d6c3 !important;
+  background: #12161b !important;
+  border-color: #2a313a !important;
 }
 
 html.admin-mode body {
@@ -1199,7 +1199,9 @@ html.admin-mode h3 {
    ADMIN SHELL - BASE VISUAL SYSTEM (aplica a todo /admin)
    ========================================================================== */
 html.admin-mode .admin-shell {
-  color: #1e293b;
+  color: #e5e7eb;
+  max-width: 1600px;
+  margin-inline: auto;
 }
 
 html.admin-mode .admin-shell section,
@@ -1209,36 +1211,51 @@ html.admin-mode .admin-shell .card {
   border-radius: 16px;
 }
 
+html.admin-mode .admin-shell > * + * {
+  margin-top: 1rem;
+}
+
+html.admin-mode .admin-shell header {
+  border-radius: 14px;
+}
+
+html.admin-mode .admin-shell button,
+html.admin-mode .admin-shell [role='button'],
+html.admin-mode .admin-shell a.inline-flex,
+html.admin-mode .admin-shell a[class*='rounded'] {
+  min-height: 38px;
+}
+
 html.admin-mode .admin-shell input:not([type='checkbox']):not([type='radio']):not([type='file']),
 html.admin-mode .admin-shell select,
 html.admin-mode .admin-shell textarea {
-  border: 1px solid #d8ccba;
-  background: #f7f2e8;
-  color: #2f2b26;
+  border: 1px solid #2f3742;
+  background: #0f1318;
+  color: #e5e7eb;
 }
 
 html.admin-mode .admin-shell input::placeholder,
 html.admin-mode .admin-shell textarea::placeholder {
-  color: #8c8172;
+  color: #94a3b8;
 }
 
 html.admin-mode .admin-shell table thead tr {
-  background: #efe6d7;
+  background: #1a1f27;
 }
 
 html.admin-mode .admin-shell table th {
-  color: #6f6457;
+  color: #cbd5e1;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 html.admin-mode .admin-shell table td {
-  color: #3b342d;
+  color: #e5e7eb;
 }
 
 html.admin-mode .admin-shell table tbody tr:hover {
-  background: #f1eadf;
+  background: #1a1f27;
 }
 html::before {
   content: '';
@@ -1512,84 +1529,17 @@ textarea:focus-visible {
   width: auto !important;
 }
 
-/* Admin readability on light cards */
-.admin-mode .admin-readable :is(.bg-white, .bg-slate-50, .bg-stone-50) :is(
-  .text-slate-400,
-  .text-slate-500,
-  .text-slate-600,
-  .text-slate-700,
-  .text-slate-800,
-  .text-stone-400,
-  .text-stone-500,
-  .text-stone-600,
-  .text-stone-700,
-  .text-stone-800
-) {
-  color: #111827;
-}
-
-.admin-mode .admin-readable :is(.bg-white, .bg-slate-50, .bg-stone-50) :is(
-  input,
-  select,
-  textarea,
-  label,
-  th,
-  td
-) {
-  color: #111827;
-}
-
-.admin-mode .admin-readable :is(.bg-white, .bg-slate-50, .bg-stone-50) :is(input, textarea)::placeholder {
-  color: #475569;
-}
-
-/* Hard-force readability for ALL admin content (main panel only) */
+/* Admin contrast hardening: dark background + readable text everywhere */
 html.admin-mode .admin-shell,
 html.admin-mode .admin-shell * {
-  color: #111111 !important;
+  color: #e5e7eb !important;
 }
 
-html.admin-mode .admin-shell :is(
-  .bg-slate-950,
-  .bg-slate-900,
-  .bg-slate-800,
-  .bg-slate-700,
-  .bg-zinc-950,
-  .bg-zinc-900,
-  .bg-zinc-800,
-  .bg-zinc-700,
-  .bg-stone-900,
-  .bg-stone-800,
-  .bg-stone-700,
-  .bg-black,
-  .bg-slate-900\/95,
-  .bg-slate-800\/80,
-  .bg-slate-800\/60,
-  .bg-slate-700\/50,
-  .bg-zinc-900\/95,
-  .bg-zinc-800\/60,
-  .bg-zinc-800\/50,
-  .bg-zinc-700\/80
-) {
-  background-color: #ffffff !important;
-}
-
-html.admin-mode .admin-shell :is(
-  .border-slate-900,
-  .border-slate-800,
-  .border-slate-700,
-  .border-slate-600,
-  .border-zinc-900,
-  .border-zinc-800,
-  .border-zinc-700,
-  .border-zinc-600
-) {
-  border-color: #d6d3d1 !important;
-}
-
-/* Unified admin visual language */
+html.admin-mode,
+body.admin-mode,
 html.admin-mode .admin-shell.admin-unified {
-  background: #f5f5f4 !important;
+  background: #0b0d10 !important;
+  background-color: #0b0d10 !important;
 }
 
 html.admin-mode .admin-shell.admin-unified :is(
@@ -1602,20 +1552,137 @@ html.admin-mode .admin-shell.admin-unified :is(
   .rounded-2xl,
   .rounded-3xl
 ) {
-  background-color: #ffffff;
-  border-color: #e7e5e4;
+  background-color: #12161b !important;
+  border-color: #2a313a !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24) !important;
 }
 
-html.admin-mode .admin-shell.admin-unified :is(
+html.admin-mode .admin-shell :is(
+  .bg-white,
+  .bg-slate-50,
+  .bg-stone-50,
+  .bg-slate-100,
+  .bg-stone-100
+) {
+  background-color: #12161b !important;
+}
+
+html.admin-mode .admin-shell :is(
   input:not([type='checkbox']):not([type='radio']):not([type='file']),
   select,
   textarea
 ) {
-  background: #ffffff !important;
-  border: 1px solid #d6d3d1 !important;
-  color: #111111 !important;
+  background: #0f1318 !important;
+  border: 1px solid #2f3742 !important;
+  color: #e5e7eb !important;
 }
 
-html.admin-mode .admin-shell.admin-unified :is(button, .btn, [role='button']) {
-  color: #111111;
+html.admin-mode .admin-shell :is(
+  button,
+  .btn,
+  [role='button'],
+  a.inline-flex,
+  a[class*='rounded']
+):not([class*='bg-gradient']) {
+  background-color: #1a2028 !important;
+  border: 1px solid #334155 !important;
+  color: #e5e7eb !important;
+  border-radius: 10px !important;
+}
+
+html.admin-mode .admin-shell :is(
+  button,
+  .btn,
+  [role='button'],
+  a.inline-flex,
+  a[class*='rounded']
+):not([class*='bg-gradient']):hover {
+  background-color: #202834 !important;
+  border-color: #475569 !important;
+}
+
+html.admin-mode .admin-shell :is(h1, h2, h3, h4, h5, h6) {
+  color: #f8fafc !important;
+  letter-spacing: -0.01em;
+}
+
+html.admin-mode .admin-shell :is(p, span, label, td, th, li, dd, dt) {
+  overflow-wrap: anywhere;
+}
+
+html.admin-mode .admin-shell :is(input, textarea)::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.admin-mode .admin-shell :is(.text-black, .text-slate-900, .text-zinc-900, .text-stone-900) {
+  color: #e5e7eb !important;
+}
+
+html.admin-mode .admin-shell :is(
+  .text-slate-800,
+  .text-slate-700,
+  .text-slate-600,
+  .text-stone-800,
+  .text-stone-700,
+  .text-stone-600,
+  .text-zinc-800,
+  .text-zinc-700
+) {
+  color: #dbe3ee !important;
+}
+
+html.admin-mode .admin-shell :is(.bg-white, .bg-slate-50, .bg-stone-50, .bg-stone-100) {
+  background-color: #12161b !important;
+  border-color: #2a313a !important;
+}
+
+html.admin-mode .admin-shell table {
+  width: 100%;
+}
+
+html.admin-mode .admin-shell .overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+html.admin-mode .admin-shell pre,
+html.admin-mode .admin-shell code {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+html.admin-mode .admin-shell img,
+html.admin-mode .admin-shell video,
+html.admin-mode .admin-shell iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  html.admin-mode .admin-shell {
+    overflow-x: clip;
+    max-width: 100%;
+  }
+
+  html.admin-mode .admin-shell table {
+    min-width: 640px;
+  }
+
+  html.admin-mode .admin-shell {
+    padding-inline: 0.5rem !important;
+  }
+
+  html.admin-mode .admin-shell :is(
+    section,
+    article,
+    .panel,
+    .card,
+    .rounded-xl,
+    .rounded-2xl,
+    .rounded-3xl
+  ) {
+    border-radius: 12px !important;
+  }
 }

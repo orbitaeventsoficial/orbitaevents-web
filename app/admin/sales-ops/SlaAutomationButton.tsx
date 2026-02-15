@@ -25,7 +25,7 @@ export default function SlaAutomationButton() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'No se pudo ejecutar la automatización');
+        throw new Error(data?.error || 'No s\'ha pogut executar l\'automatització');
       }
       setResult({
         staleLeads: data.staleLeads || 0,
@@ -33,7 +33,7 @@ export default function SlaAutomationButton() {
         escalatedPriority: data.escalatedPriority || 0,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error inesperado');
+      setError(e instanceof Error ? e.message : 'Error inesperat');
     } finally {
       setRunning(false);
     }
@@ -47,15 +47,17 @@ export default function SlaAutomationButton() {
         disabled={running}
         className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
       >
-        {running ? 'Ejecutando...' : 'Ejecutar Reglas SLA'}
+        {running ? 'Executant...' : 'Executar regles SLA'}
       </button>
       {result && (
-        <p className="text-xs text-emerald-700">
-          OK: stale {result.staleLeads}, tareas creadas {result.createdTasks}, prioridades elevadas {result.escalatedPriority}.
+        <p className="text-xs text-emerald-300">
+          OK: leads inactius {result.staleLeads}, tasques creades {result.createdTasks}, prioritats elevades {result.escalatedPriority}.
         </p>
       )}
-      {error && <p className="text-xs text-rose-700">{error}</p>}
+      {error && <p className="text-xs text-rose-300">{error}</p>}
     </div>
   );
 }
+
+
 

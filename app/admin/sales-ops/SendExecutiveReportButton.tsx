@@ -17,11 +17,11 @@ export default function SendExecutiveReportButton() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'No se pudo enviar reporte');
+        throw new Error(data?.error || 'No s\'ha pogut enviar l\'informe');
       }
-      setMsg(`Reporte enviado a ${data.recipient}`);
+      setMsg(`Informe enviat a ${data.recipient}`);
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : 'Error inesperado');
+      setMsg(e instanceof Error ? e.message : 'Error inesperat');
     } finally {
       setSending(false);
     }
@@ -35,10 +35,12 @@ export default function SendExecutiveReportButton() {
         disabled={sending}
         className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
       >
-        {sending ? 'Enviando...' : 'Enviar reporte ejecutivo'}
+        {sending ? 'Enviant...' : 'Enviar informe executiu'}
       </button>
-      {msg && <p className="text-xs text-slate-500">{msg}</p>}
+      {msg && <p className="text-xs text-slate-300">{msg}</p>}
     </div>
   );
 }
+
+
 

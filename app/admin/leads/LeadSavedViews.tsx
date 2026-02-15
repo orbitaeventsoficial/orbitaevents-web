@@ -108,7 +108,7 @@ export default function LeadSavedViews({ currentQuery }: { currentQuery: string 
           disabled={!name.trim() || !currentQuery || loading}
           className="rounded-xl bg-cyan-500/20 px-4 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/30 disabled:opacity-50"
         >
-          Guardar
+          Desar
         </button>
       </div>
 
@@ -144,3 +144,4 @@ export default function LeadSavedViews({ currentQuery }: { currentQuery: string 
     </section>
   );
 }
+

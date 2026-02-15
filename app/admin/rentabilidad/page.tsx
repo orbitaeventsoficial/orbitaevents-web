@@ -43,23 +43,23 @@ export default async function RentabilidadPage() {
 
   return (
     <div className="space-y-6">
-      <header className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-800">Rentabilidad ejecutiva</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Margen por evento, riesgo y retorno por canal comercial.
+      <header className="rounded-2xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold text-slate-100">Rendibilitat executiva</h1>
+        <p className="mt-1 text-sm text-slate-400">
+          Marge per esdeveniment, risc i retorn per canal comercial.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <a
             href="/api/admin/reports/profitability"
             target="_blank"
             rel="noreferrer"
-            className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
           >
             Exportar JSON
           </a>
           <Link
             href="/admin/sales-ops"
-            className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
           >
             Ir a Sales Ops
           </Link>
@@ -67,48 +67,48 @@ export default async function RentabilidadPage() {
       </header>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
-          <p className="text-xs text-slate-500">Ingresos realizados</p>
-          <p className="text-2xl font-semibold text-slate-800">{money(report.realized.revenue)}</p>
-          <p className="text-xs text-slate-500">{report.realized.bookings} eventos completados</p>
+        <div className="rounded-xl border border-white/10 bg-slate-950/60 p-4 shadow-sm">
+          <p className="text-xs text-slate-400">Ingressos realizados</p>
+          <p className="text-2xl font-semibold text-slate-100">{money(report.realized.revenue)}</p>
+          <p className="text-xs text-slate-400">{report.realized.bookings} esdeveniments completats</p>
         </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
-          <p className="text-xs text-emerald-700">Margen neto realizado</p>
-          <p className="text-2xl font-semibold text-emerald-700">{money(report.realized.netMargin)}</p>
-          <p className="text-xs text-emerald-700">Margen medio {pct(report.realized.avgMarginPct)}</p>
+        <div className="rounded-xl border border-emerald-400/30 bg-emerald-950/30 p-4 shadow-sm">
+          <p className="text-xs text-emerald-300">Marge net realitzat</p>
+          <p className="text-2xl font-semibold text-emerald-300">{money(report.realized.netMargin)}</p>
+          <p className="text-xs text-emerald-300">Marge mitjà {pct(report.realized.avgMarginPct)}</p>
         </div>
-        <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
-          <p className="text-xs text-slate-500">Forecast ingresos</p>
-          <p className="text-2xl font-semibold text-slate-800">{money(report.forecast.revenue)}</p>
-          <p className="text-xs text-slate-500">{report.forecast.bookings} eventos en pipeline</p>
+        <div className="rounded-xl border border-white/10 bg-slate-950/60 p-4 shadow-sm">
+          <p className="text-xs text-slate-400">Previsió d'ingressos</p>
+          <p className="text-2xl font-semibold text-slate-100">{money(report.forecast.revenue)}</p>
+          <p className="text-xs text-slate-400">{report.forecast.bookings} esdeveniments en pipeline</p>
         </div>
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
-          <p className="text-xs text-amber-700">Forecast margen</p>
-          <p className="text-2xl font-semibold text-amber-700">{money(report.forecast.netMargin)}</p>
-          <p className="text-xs text-amber-700">Margen medio {pct(report.forecast.avgMarginPct)}</p>
+        <div className="rounded-xl border border-amber-400/30 bg-amber-950/30 p-4 shadow-sm">
+          <p className="text-xs text-amber-300">Previsió de marge</p>
+          <p className="text-2xl font-semibold text-amber-300">{money(report.forecast.netMargin)}</p>
+          <p className="text-xs text-amber-300">Marge mitjà {pct(report.forecast.avgMarginPct)}</p>
         </div>
       </section>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-800">Top eventos por margen</h2>
+        <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-100">Top esdeveniments per marge</h2>
           <div className="mt-3 space-y-2">
             {report.topProfitability.length === 0 ? (
-              <p className="text-sm text-slate-500">Sin eventos completados todavía.</p>
+              <p className="text-sm text-slate-400">Encara no hi ha esdeveniments completats.</p>
             ) : (
               report.topProfitability.slice(0, 12).map((row) => (
                 <Link
                   key={row.id}
                   href={`/admin/bookings/${row.id}`}
-                  className="block rounded-lg border border-stone-200 p-3 hover:bg-slate-50"
+                  className="block rounded-lg border border-white/10 p-3 hover:bg-white/5"
                 >
-                  <p className="text-sm font-semibold text-slate-800">
+                  <p className="text-sm font-semibold text-slate-100">
                     {row.reference} · {row.clientName}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-400">
                     {new Date(row.eventDate).toLocaleDateString('ca-ES')} · {row.source}
                   </p>
-                  <p className="mt-1 text-xs text-emerald-700">
+                  <p className="mt-1 text-xs text-emerald-300">
                     Margen {money(row.netMargin)} ({pct(row.marginPct)})
                   </p>
                 </Link>
@@ -117,22 +117,22 @@ export default async function RentabilidadPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-800">Eventos en riesgo</h2>
+        <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-100">Esdeveniments en riesgo</h2>
           <div className="mt-3 space-y-2">
             {report.riskProfitability.length === 0 ? (
-              <p className="text-sm text-slate-500">Sin alertas de margen.</p>
+              <p className="text-sm text-slate-400">Sense alertes de marge.</p>
             ) : (
               report.riskProfitability.slice(0, 12).map((row) => (
                 <Link
                   key={row.id}
                   href={`/admin/bookings/${row.id}`}
-                  className="block rounded-lg border border-stone-200 p-3 hover:bg-slate-50"
+                  className="block rounded-lg border border-white/10 p-3 hover:bg-white/5"
                 >
-                  <p className="text-sm font-semibold text-slate-800">
+                  <p className="text-sm font-semibold text-slate-100">
                     {row.reference} · {row.clientName}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-400">
                     {new Date(row.eventDate).toLocaleDateString('ca-ES')} · {row.source}
                   </p>
                   <p className="mt-1 text-xs text-rose-700">
@@ -145,27 +145,27 @@ export default async function RentabilidadPage() {
         </section>
       </div>
 
-      <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-800">Rentabilidad por canal</h2>
+      <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-100">Rendibilitat per canal</h2>
         <div className="mt-4 overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="border-b border-stone-200 text-left text-xs uppercase text-slate-500">
+              <tr className="border-b border-white/10 text-left text-xs uppercase text-slate-400">
                 <th className="py-2">Canal</th>
-                <th className="py-2">Eventos</th>
-                <th className="py-2">Ingresos</th>
-                <th className="py-2">Margen neto</th>
-                <th className="py-2">Margen %</th>
+                <th className="py-2">Esdeveniments</th>
+                <th className="py-2">Ingressos</th>
+                <th className="py-2">Marge net</th>
+                <th className="py-2">Marge %</th>
               </tr>
             </thead>
             <tbody>
               {report.bySource.map((row) => (
-                <tr key={row.source} className="border-b border-stone-100">
-                  <td className="py-2 font-medium text-slate-700">{row.source}</td>
-                  <td className="py-2 text-slate-700">{row.bookings}</td>
-                  <td className="py-2 text-slate-700">{money(row.revenue)}</td>
-                  <td className="py-2 text-slate-700">{money(row.netMargin)}</td>
-                  <td className="py-2 text-slate-700">{pct(row.avgMarginPct)}</td>
+                <tr key={row.source} className="border-b border-white/10">
+                  <td className="py-2 font-medium text-slate-200">{row.source}</td>
+                  <td className="py-2 text-slate-200">{row.bookings}</td>
+                  <td className="py-2 text-slate-200">{money(row.revenue)}</td>
+                  <td className="py-2 text-slate-200">{money(row.netMargin)}</td>
+                  <td className="py-2 text-slate-200">{pct(row.avgMarginPct)}</td>
                 </tr>
               ))}
             </tbody>
@@ -178,3 +178,8 @@ export default async function RentabilidadPage() {
     </div>
   );
 }
+
+
+
+
+

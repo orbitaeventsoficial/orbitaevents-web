@@ -12,11 +12,11 @@ import CalendarSyncButton from './CalendarSyncButton';
 export const dynamic = 'force-dynamic';
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  PENDING: { label: 'Pendent', bg: 'bg-yellow-100', text: 'text-yellow-700' },
-  CONFIRMED: { label: 'Confirmada', bg: 'bg-green-100', text: 'text-green-700' },
-  PREPARING: { label: 'Preparant', bg: 'bg-blue-100', text: 'text-blue-700' },
-  COMPLETED: { label: 'Completada', bg: 'bg-emerald-100', text: 'text-emerald-700' },
-  CANCELLED: { label: 'Cancel·lada', bg: 'bg-red-100', text: 'text-red-700' },
+  PENDING: { label: 'Pendent', bg: 'bg-yellow-500/15', text: 'text-yellow-300' },
+  CONFIRMED: { label: 'Confirmada', bg: 'bg-emerald-500/15', text: 'text-emerald-300' },
+  PREPARING: { label: 'Preparant', bg: 'bg-cyan-500/15', text: 'text-cyan-300' },
+  COMPLETED: { label: 'Completada', bg: 'bg-emerald-500/15', text: 'text-emerald-300' },
+  CANCELLED: { label: 'Cancel·lada', bg: 'bg-rose-500/15', text: 'text-rose-300' },
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -110,9 +110,9 @@ function buildGoogleCalendarUrl(booking: {
   const end = combineDateAndTime(booking.eventDate, booking.eventEndTime);
   const location = [booking.eventVenue, booking.eventLocation].filter(Boolean).join(' · ');
   const details = [
-    `Cliente: ${booking.clientName}`,
-    `Referencia: ${booking.reference}`,
-    booking.notes ? `Notas: ${booking.notes}` : null,
+    `Client: ${booking.clientName}`,
+    `Referència: ${booking.reference}`,
+    booking.notes ? `Notes: ${booking.notes}` : null,
   ]
     .filter(Boolean)
     .join('\n');
@@ -215,7 +215,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <div className="flex items-center gap-3">
             <Link
               href="/admin/bookings"
-              className="text-slate-400 hover:text-slate-600 transition-colors"
+              className="text-slate-400 hover:text-slate-300 transition-colors"
             >
               ← Tornar
             </Link>
@@ -223,10 +223,10 @@ export default async function BookingDetailPage({ params }: PageProps) {
               {statusConf.label}
             </span>
           </div>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-700">
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-200">
             Reserva {booking.reference}
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-400">
             {eventType} · {formatDate(booking.eventDate)}
           </p>
         </div>
@@ -240,68 +240,68 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </header>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Total reserva</p>
-          <p className="text-xl font-semibold text-slate-800">{formatCurrency(booking.total)}</p>
+        <div className="rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-slate-400">Total reserva</p>
+          <p className="text-xl font-semibold text-slate-100">{formatCurrency(booking.total)}</p>
         </div>
-        <div className="rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Pago</p>
-          <p className="text-xl font-semibold text-slate-800">
-            {booking.depositPaid && booking.remainingPaid ? 'Completado' : booking.depositPaid ? 'Parcial' : 'Pendiente'}
+        <div className="rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-slate-400">Pagament</p>
+          <p className="text-xl font-semibold text-slate-100">
+            {booking.depositPaid && booking.remainingPaid ? 'Completat' : booking.depositPaid ? 'Parcial' : 'Pendent'}
           </p>
         </div>
-        <div className="rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Flujo cliente</p>
-          <p className="text-xl font-semibold text-slate-800">
+        <div className="rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-slate-400">Flux client</p>
+          <p className="text-xl font-semibold text-slate-100">
             {reviewFlowStatus === 'RESPONDIDO'
-              ? 'Respondido'
+              ? 'Respost'
               : reviewFlowStatus === 'ENVIADO'
-                ? 'Enviado'
+                ? 'Enviat'
                 : 'Falta enviar'}
           </p>
         </div>
-        <div className="rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Post-event interno</p>
-          <p className="text-xl font-semibold text-slate-800">
+        <div className="rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-slate-400">Post-event intern</p>
+          <p className="text-xl font-semibold text-slate-100">
             {internalPostEventStatus === 'COMPLETO'
-              ? 'Completado'
+              ? 'Completat'
               : internalPostEventStatus === 'EN_PROGRESO'
-                ? 'En progreso'
-                : 'Pendiente'}
+                ? 'En progrés'
+                : 'Pendent'}
           </p>
         </div>
-        <div className="rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Lead comercial</p>
-          <p className="text-xl font-semibold text-slate-800">{booking.lead?.status || 'Sin lead'}</p>
+        <div className="rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-slate-400">Lead comercial</p>
+          <p className="text-xl font-semibold text-slate-100">{booking.lead?.status || 'Sense lead'}</p>
         </div>
       </section>
 
       {/* Client Info */}
-      <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-700 mb-4">Informació del Client</h2>
+      <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-slate-200 mb-4">Informació del Client</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Nom</p>
-            <p className="mt-1 text-slate-700 font-medium">{booking.clientName}</p>
+            <p className="text-xs font-medium text-slate-400 uppercase">Nom</p>
+            <p className="mt-1 text-slate-200 font-medium">{booking.clientName}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Email</p>
-            <a href={`mailto:${booking.clientEmail}`} className="mt-1 text-blue-600 hover:underline block">
+            <p className="text-xs font-medium text-slate-400 uppercase">Email</p>
+            <a href={`mailto:${booking.clientEmail}`} className="mt-1 text-cyan-300 hover:underline block">
               {booking.clientEmail}
             </a>
           </div>
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Telèfon</p>
-            <a href={`tel:${booking.clientPhone}`} className="mt-1 text-blue-600 hover:underline block">
+            <p className="text-xs font-medium text-slate-400 uppercase">Telèfon</p>
+            <a href={`tel:${booking.clientPhone}`} className="mt-1 text-cyan-300 hover:underline block">
               {booking.clientPhone}
             </a>
           </div>
         </div>
         {booking.lead && (
-          <div className="mt-4 pt-4 border-t border-stone-200">
+          <div className="mt-4 pt-4 border-t border-white/10">
             <Link
               href={`/admin/leads/${booking.lead.id}`}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-cyan-300 hover:underline"
             >
               Veure lead original →
             </Link>
@@ -319,119 +319,119 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </form>
           <Link
             href={`/admin/post-event/reports/new?bookingId=${booking.id}`}
-            className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
           >
-            Crear informe interno
+            Crear informe intern
           </Link>
           {customer && (
             <Link
               href={`/admin/contactes/${customer.id}`}
-              className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+              className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
             >
-              Abrir ficha cliente 360
+              Obrir fitxa client 360
             </Link>
           )}
           <a
             href={googleCalendarUrl}
             target="_blank"
             rel="noreferrer"
-            className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
           >
-            Añadir a Google Calendar
+            Afegir a Google Calendar
           </a>
           <Link
             href="/admin/settings/integrations"
-            className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
           >
-            Sync móvil/ICS
+            Sincronitzar mòbil/ICS
           </Link>
           <CalendarSyncButton bookingId={booking.id} />
         </div>
         {customer && (
-          <div className="mt-3 rounded-lg border border-stone-200 bg-slate-50 p-3 text-xs text-slate-600">
-            Historial cliente: {customer.totalEvents} eventos · {formatCurrency(customer.totalSpent)} ·
-            {' '}último evento {customer.lastEventDate ? new Date(customer.lastEventDate).toLocaleDateString('ca-ES') : '-'}
+          <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3 text-xs text-slate-300">
+            Historial client: {customer.totalEvents} esdeveniments · {formatCurrency(customer.totalSpent)} ·
+            {' '}últim esdeveniment {customer.lastEventDate ? new Date(customer.lastEventDate).toLocaleDateString('ca-ES') : '-'}
           </div>
         )}
       </section>
 
       {/* Event Info */}
-      <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-700 mb-4">Detalls de l&apos;Event</h2>
+      <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-slate-200 mb-4">Detalls de l&apos;Event</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Tipus</p>
-            <p className="mt-1 text-slate-700">{eventType}</p>
+            <p className="text-xs font-medium text-slate-400 uppercase">Tipus</p>
+            <p className="mt-1 text-slate-200">{eventType}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Data</p>
-            <p className="mt-1 text-slate-700 font-medium">{formatDate(booking.eventDate)}</p>
+            <p className="text-xs font-medium text-slate-400 uppercase">Data</p>
+            <p className="mt-1 text-slate-200 font-medium">{formatDate(booking.eventDate)}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Horari</p>
-            <p className="mt-1 text-slate-700">
+            <p className="text-xs font-medium text-slate-400 uppercase">Horari</p>
+            <p className="mt-1 text-slate-200">
               {booking.eventStartTime || '--:--'} - {booking.eventEndTime || '--:--'}
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium text-slate-500 uppercase">Convidats</p>
-            <p className="mt-1 text-slate-700 font-medium">{booking.guestCount} persones</p>
+            <p className="text-xs font-medium text-slate-400 uppercase">Convidats</p>
+            <p className="mt-1 text-slate-200 font-medium">{booking.guestCount} persones</p>
           </div>
           <div className="sm:col-span-2">
-            <p className="text-xs font-medium text-slate-500 uppercase">Ubicació</p>
-            <p className="mt-1 text-slate-700">{booking.eventLocation}</p>
+            <p className="text-xs font-medium text-slate-400 uppercase">Ubicació</p>
+            <p className="mt-1 text-slate-200">{booking.eventLocation}</p>
           </div>
           {booking.eventVenue && (
             <div className="sm:col-span-2">
-              <p className="text-xs font-medium text-slate-500 uppercase">Espai</p>
-              <p className="mt-1 text-slate-700">{booking.eventVenue}</p>
+              <p className="text-xs font-medium text-slate-400 uppercase">Espai</p>
+              <p className="mt-1 text-slate-200">{booking.eventVenue}</p>
             </div>
           )}
         </div>
       </section>
 
       {/* Services */}
-      <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-700 mb-4">Serveis Contractats</h2>
+      <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-slate-200 mb-4">Serveis Contractats</h2>
 
         {/* Pack */}
-        <div className="p-4 bg-amber-50 rounded-lg border border-amber-200 mb-4">
+        <div className="p-4 bg-amber-950/30 rounded-lg border border-amber-400/30 mb-4">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs font-medium text-amber-700 uppercase">Pack</span>
-              <p className="text-lg font-semibold text-amber-900">
+              <span className="text-xs font-medium text-amber-300 uppercase">Pack</span>
+              <p className="text-lg font-semibold text-amber-200">
                 {packTranslation?.name || booking.pack.slug}
               </p>
               {packTranslation?.tagline && (
-                <p className="text-sm text-amber-700">{packTranslation.tagline}</p>
+                <p className="text-sm text-amber-300">{packTranslation.tagline}</p>
               )}
-              <p className="text-xs text-amber-600 mt-1">
+              <p className="text-xs text-amber-300 mt-1">
                 {booking.pack.djHours}h DJ · {booking.pack.soundWatts}W So
                 {booking.pack.includesFog && ' · Fum'}
                 {booking.pack.includesMic && ' · Micro'}
               </p>
             </div>
-            <p className="text-xl font-bold text-amber-900">{formatCurrency(booking.pack.price)}</p>
+            <p className="text-xl font-bold text-amber-200">{formatCurrency(booking.pack.price)}</p>
           </div>
         </div>
 
         {/* Extras */}
         {booking.extras.length > 0 && (
           <div className="space-y-2">
-            <p className="text-sm font-medium text-slate-700">Extras</p>
+            <p className="text-sm font-medium text-slate-200">Extras</p>
             {booking.extras.map((extra) => {
               const extraTranslation = extra.extra.translations.find((t) => t.locale === 'ca');
               return (
-                <div key={extra.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <div key={extra.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                   <div>
-                    <p className="font-medium text-slate-700">
+                    <p className="font-medium text-slate-200">
                       {extraTranslation?.name || extra.extra.slug}
                     </p>
                     {extra.quantity > 1 && (
-                      <p className="text-xs text-slate-500">x{extra.quantity}</p>
+                      <p className="text-xs text-slate-400">x{extra.quantity}</p>
                     )}
                   </div>
-                  <p className="font-medium text-slate-700">{formatCurrency(extra.price)}</p>
+                  <p className="font-medium text-slate-200">{formatCurrency(extra.price)}</p>
                 </div>
               );
             })}
@@ -440,9 +440,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
         {/* Extra Hours */}
         {booking.extraHours > 0 && (
-          <div className="mt-4 flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-            <p className="font-medium text-blue-900">Hores extra</p>
-            <p className="font-medium text-blue-900">
+          <div className="mt-4 flex items-center justify-between p-3 bg-cyan-950/30 rounded-lg">
+            <p className="font-medium text-cyan-200">Hores extra</p>
+            <p className="font-medium text-cyan-200">
               {booking.extraHours}h × {formatCurrency(booking.pack.extraHourPrice)} = {formatCurrency(booking.extraHours * booking.pack.extraHourPrice)}
             </p>
           </div>
@@ -450,24 +450,24 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Pricing */}
-      <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-700 mb-4">Resum Econòmic</h2>
+      <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-slate-200 mb-4">Resum Econòmic</h2>
         <div className="space-y-3">
-          <div className="flex justify-between text-slate-600">
+          <div className="flex justify-between text-slate-300">
             <span>Subtotal</span>
             <span>{formatCurrency(booking.subtotal)}</span>
           </div>
           {booking.discount > 0 && (
-            <div className="flex justify-between text-green-600">
+            <div className="flex justify-between text-emerald-300">
               <span>Descompte {booking.discountCode && `(${booking.discountCode})`}</span>
               <span>-{formatCurrency(booking.discount)}</span>
             </div>
           )}
-          <div className="flex justify-between text-slate-600">
+          <div className="flex justify-between text-slate-300">
             <span>IVA ({booking.vatRate}%)</span>
             <span>{formatCurrency(booking.vatAmount)}</span>
           </div>
-          <div className="flex justify-between text-xl font-bold text-slate-700 pt-3 border-t">
+          <div className="flex justify-between text-xl font-bold text-slate-200 pt-3 border-t">
             <span>Total</span>
             <span>{formatCurrency(booking.total)}</span>
           </div>
@@ -475,17 +475,17 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
         {/* Payment Status */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className={`p-4 rounded-lg ${booking.depositPaid ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-            <p className="text-xs font-medium uppercase text-slate-500">Paga i Senyal (30%)</p>
+          <div className={`p-4 rounded-lg ${booking.depositPaid ? 'bg-emerald-950/30 border border-emerald-400/30' : 'bg-rose-950/30 border border-rose-400/30'}`}>
+            <p className="text-xs font-medium uppercase text-slate-400">Paga i Senyal (30%)</p>
             <p className="text-lg font-bold">{formatCurrency(booking.depositAmount)}</p>
-            <span className={`text-xs ${booking.depositPaid ? 'text-green-600' : 'text-red-600'}`}>
+            <span className={`text-xs ${booking.depositPaid ? 'text-emerald-300' : 'text-rose-300'}`}>
               {booking.depositPaid ? '✓ Pagat' : '✗ Pendent'}
             </span>
           </div>
-          <div className={`p-4 rounded-lg ${booking.remainingPaid ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200'}`}>
-            <p className="text-xs font-medium uppercase text-slate-500">Resta</p>
+          <div className={`p-4 rounded-lg ${booking.remainingPaid ? 'bg-emerald-950/30 border border-emerald-400/30' : 'bg-amber-950/30 border border-amber-400/30'}`}>
+            <p className="text-xs font-medium uppercase text-slate-400">Resta</p>
             <p className="text-lg font-bold">{formatCurrency(booking.remainingAmount)}</p>
-            <span className={`text-xs ${booking.remainingPaid ? 'text-green-600' : 'text-amber-600'}`}>
+            <span className={`text-xs ${booking.remainingPaid ? 'text-emerald-300' : 'text-amber-300'}`}>
               {booking.remainingPaid ? '✓ Pagat' : '○ Pendent'}
             </span>
           </div>
@@ -494,32 +494,32 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Notes */}
       {booking.notes && (
-        <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-slate-700 mb-4">Notes</h2>
-          <p className="text-slate-700 whitespace-pre-wrap">{booking.notes}</p>
+        <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-slate-200 mb-4">Notes</h2>
+          <p className="text-slate-200 whitespace-pre-wrap">{booking.notes}</p>
         </section>
       )}
 
-      <section className="rounded-xl border border-stone-200 bg-white shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-700 mb-4">Historial de comunicaciones</h2>
+      <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-slate-200 mb-4">Historial de comunicacions</h2>
         {recentCommRows.length === 0 ? (
-          <p className="text-sm text-slate-500">Todavía no hay comunicaciones registradas para este evento.</p>
+          <p className="text-sm text-slate-400">Encara no hi ha comunicacions registrades per aquest esdeveniment.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-stone-200 text-left text-xs uppercase tracking-wide text-slate-500">
-                  <th className="px-2 py-2">Fecha</th>
-                  <th className="px-2 py-2">Acción</th>
-                  <th className="px-2 py-2">Flujo</th>
+                <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide text-slate-400">
+                  <th className="px-2 py-2">Data</th>
+                  <th className="px-2 py-2">Acció</th>
+                  <th className="px-2 py-2">Flux</th>
                   <th className="px-2 py-2">Canal</th>
                 </tr>
               </thead>
               <tbody>
                 {recentCommRows.map((row) => (
-                  <tr key={row.id} className="border-b border-stone-100 text-slate-700">
+                  <tr key={row.id} className="border-b border-white/10 text-slate-200">
                     <td className="px-2 py-2 whitespace-nowrap">{new Date(row.createdAt).toLocaleString('ca-ES')}</td>
-                    <td className="px-2 py-2">{row.action === 'COMM_RESPONDED' ? 'Respondido' : 'Enviado'}</td>
+                    <td className="px-2 py-2">{row.action === 'COMM_RESPONDED' ? 'Respost' : 'Enviat'}</td>
                     <td className="px-2 py-2">{row.flow}</td>
                     <td className="px-2 py-2">{row.channel}</td>
                   </tr>
@@ -532,24 +532,24 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
       {/* Post-Event Section */}
       {booking.status === 'COMPLETED' && (
-        <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
-          <h2 className="text-lg font-semibold text-emerald-900 mb-4">Post-Event</h2>
+        <section className="rounded-xl border border-emerald-400/30 bg-emerald-950/30 p-6">
+          <h2 className="mb-4 text-lg font-semibold text-emerald-200">Post-event</h2>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className={`p-4 rounded-lg border ${booking.postEventReport ? 'bg-green-100 border-green-300' : 'bg-white border-stone-200'}`}>
-              <p className="font-medium text-slate-700">Informe Intern</p>
-              <p className="text-sm text-slate-500">
+            <div className={`p-4 rounded-lg border ${booking.postEventReport ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-slate-950/60 border-white/10'}`}>
+              <p className="font-medium text-slate-200">Informe Intern</p>
+              <p className="text-sm text-slate-400">
                 {booking.postEventReport ? '✓ Completat' : 'Pendent de completar'}
               </p>
             </div>
-            <div className={`p-4 rounded-lg border ${booking.clientSurvey ? 'bg-green-100 border-green-300' : 'bg-white border-stone-200'}`}>
-              <p className="font-medium text-slate-700">Enquesta Client</p>
-              <p className="text-sm text-slate-500">
+            <div className={`p-4 rounded-lg border ${booking.clientSurvey ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-slate-950/60 border-white/10'}`}>
+              <p className="font-medium text-slate-200">Enquesta Client</p>
+              <p className="text-sm text-slate-400">
                 {booking.clientSurvey ? `✓ NPS: ${booking.clientSurvey.npsScore}` : 'Pendent de rebre'}
               </p>
             </div>
-            <div className={`p-4 rounded-lg border ${booking.clientFeedback ? 'bg-green-100 border-green-300' : 'bg-white border-stone-200'}`}>
-              <p className="font-medium text-slate-700">Feedback Enviat</p>
-              <p className="text-sm text-slate-500">
+            <div className={`p-4 rounded-lg border ${booking.clientFeedback ? 'bg-emerald-500/15 border-emerald-400/30' : 'bg-slate-950/60 border-white/10'}`}>
+              <p className="font-medium text-slate-200">Feedback Enviat</p>
+              <p className="text-sm text-slate-400">
                 {booking.clientFeedback ? `✓ Codi: ${booking.clientFeedback.discountCode}` : 'Pendent d\'enviar'}
               </p>
             </div>
@@ -582,3 +582,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </div>
   );
 }
+
+
+
+
+

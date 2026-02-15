@@ -8,7 +8,7 @@ interface AdminErrorProps {
 export default function AdminError({ error, reset }: AdminErrorProps) {
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white border border-amber-200 rounded-2xl p-8 text-center shadow-lg">
+      <div className="max-w-md w-full bg-slate-950/60 border border-amber-200 rounded-2xl p-8 text-center shadow-lg">
         <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <svg
             className="w-8 h-8 text-rose-500"
@@ -57,7 +57,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
 
           <a
             href="/admin"
-            className="px-5 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium rounded-xl transition-colors"
+            className="px-5 py-2.5 bg-white/5 hover:bg-stone-200 text-stone-700 font-medium rounded-xl transition-colors"
           >
             Tornar a l&apos;inici
           </a>
@@ -66,3 +66,4 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
     </div>
   );
 }
+

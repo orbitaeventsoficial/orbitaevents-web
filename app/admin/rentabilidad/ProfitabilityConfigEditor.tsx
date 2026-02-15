@@ -33,25 +33,25 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'No se pudo guardar configuración');
+        throw new Error(data?.error || 'No s\'ha pogut desar la configuració');
       }
-      setMsg('Configuración guardada');
+      setMsg('Configuració desada');
     } catch (error) {
-      setMsg(error instanceof Error ? error.message : 'Error al guardar');
+      setMsg(error instanceof Error ? error.message : 'Error en desar');
     } finally {
       setSaving(false);
     }
   }
 
   const inputClass =
-    'w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500';
+    'w-full rounded-xl border border-stone-300 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500';
 
   return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-800">Configurar costes y CAC</h2>
+    <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-sm">
+      <h2 className="text-lg font-semibold text-slate-100">Configuració de costos i CAC</h2>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <label className="text-xs text-slate-500">
-          Coste pack ratio (0-1)
+        <label className="text-xs text-slate-400">
+          Ratio cost pack (0-1)
           <input
             type="number"
             step="0.01"
@@ -62,8 +62,8 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
             onChange={(e) => update('packCostRatio', Number(e.target.value))}
           />
         </label>
-        <label className="text-xs text-slate-500">
-          Coste extras ratio (0-1)
+        <label className="text-xs text-slate-400">
+          Ratio cost extres (0-1)
           <input
             type="number"
             step="0.01"
@@ -74,8 +74,8 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
             onChange={(e) => update('extraCostRatio', Number(e.target.value))}
           />
         </label>
-        <label className="text-xs text-slate-500">
-          Coste hora extra ratio (0-1)
+        <label className="text-xs text-slate-400">
+          Ratio cost hora extra (0-1)
           <input
             type="number"
             step="0.01"
@@ -86,8 +86,8 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
             onChange={(e) => update('extraHourCostRatio', Number(e.target.value))}
           />
         </label>
-        <label className="text-xs text-slate-500">
-          Coste operativo fijo (€)
+        <label className="text-xs text-slate-400">
+          Cost operatiu fix (EUR)
           <input
             type="number"
             step="1"
@@ -99,10 +99,10 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
       </div>
 
       <div className="mt-4">
-        <p className="text-sm font-semibold text-slate-700">CAC por canal (€)</p>
+        <p className="text-sm font-semibold text-slate-200">CAC per canal (EUR)</p>
         <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {Object.entries(form.channelCac).map(([channel, value]) => (
-            <label key={channel} className="text-xs text-slate-500">
+            <label key={channel} className="text-xs text-slate-400">
               {channel}
               <input
                 type="number"
@@ -123,10 +123,12 @@ export default function ProfitabilityConfigEditor({ initial }: { initial: Profit
           disabled={saving}
           className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
         >
-          {saving ? 'Guardando...' : 'Guardar configuración'}
+          {saving ? 'Desant...' : 'Desar configuració'}
         </button>
-        {msg && <p className="text-sm text-slate-500">{msg}</p>}
+        {msg && <p className="text-sm text-slate-400">{msg}</p>}
       </div>
     </section>
   );
 }
+
+

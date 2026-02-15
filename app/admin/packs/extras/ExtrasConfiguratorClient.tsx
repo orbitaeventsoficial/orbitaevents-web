@@ -147,7 +147,7 @@ export default function ExtrasConfiguratorClient() {
             disabled={saving}
             className="inline-flex items-center rounded-xl bg-emerald-500/80 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
           >
-            {saving ? 'Guardant…' : 'Guardar canvis'}
+            {saving ? 'Guardant…' : 'Desar canvis'}
           </button>
         </div>
       </div>
@@ -302,3 +302,4 @@ export default function ExtrasConfiguratorClient() {
     </div>
   );
 }
+

@@ -50,24 +50,24 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'No se pudo guardar la plantilla');
+        throw new Error(data?.error || 'No s’ha pogut desar la plantilla');
       }
-      setMessage('Plantilla guardada correctamente');
+      setMessage('Plantilla desada correctament');
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Error guardando plantilla');
+      setMessage(error instanceof Error ? error.message : 'Error desant plantilla');
     } finally {
       setSaving(false);
     }
   }
 
   const inputClass =
-    'w-full rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-[#111111] focus:border-amber-500 focus:ring-1 focus:ring-amber-500';
+    'w-full rounded-xl border border-slate-700/60 bg-slate-900/60 px-4 py-2.5 text-sm text-slate-100 focus:border-amber-500 focus:ring-1 focus:ring-amber-500';
 
   return (
-    <section className="rounded-2xl border border-stone-300 bg-white p-5" style={{ color: '#111111' }}>
+    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
       <div className="grid gap-4 lg:grid-cols-2">
-        <label className="text-sm text-[#111111]">
-          Título principal
+        <label className="text-sm text-slate-300">
+          Títol principal
           <input
             className={inputClass}
             value={form.introTitle}
@@ -75,8 +75,8 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-[#111111]">
-          Días de validez
+        <label className="text-sm text-slate-300">
+          Dies de validesa
           <input
             type="number"
             min={1}
@@ -87,8 +87,8 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-[#111111] lg:col-span-2">
-          Subtítulo cabecera
+        <label className="text-sm text-slate-300 lg:col-span-2">
+          Subtítol capçalera
           <input
             className={inputClass}
             value={form.introSubtitle}
@@ -96,8 +96,8 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-[#111111]">
-          CTA título
+        <label className="text-sm text-slate-300">
+          Títol CTA
           <input
             className={inputClass}
             value={form.ctaTitle}
@@ -105,8 +105,8 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-[#111111]">
-          CTA subtítulo
+        <label className="text-sm text-slate-300">
+          Subtítol CTA
           <input
             className={inputClass}
             value={form.ctaSubtitle}
@@ -114,8 +114,8 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-[#111111] lg:col-span-2">
-          Condiciones (una por línea)
+        <label className="text-sm text-slate-300 lg:col-span-2">
+          Condicions (una per línia)
           <textarea
             rows={8}
             className={inputClass}
@@ -124,17 +124,17 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="flex items-center gap-2 text-sm text-[#111111]">
+        <label className="flex items-center gap-2 text-sm text-slate-300">
           <input
             type="checkbox"
             checked={form.sendAdminCopy}
             onChange={(e) => update('sendAdminCopy', e.target.checked)}
           />
-          Enviar copia interna automática de cada presupuesto
+          Enviar còpia interna automàtica de cada pressupost
         </label>
 
-        <label className="text-sm text-[#111111]">
-          Email de copia interna
+        <label className="text-sm text-slate-300">
+          Email de còpia interna
           <input
             type="email"
             className={inputClass}
@@ -149,11 +149,11 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           type="button"
           onClick={save}
           disabled={saving}
-          className="rounded-xl bg-amber-100 px-4 py-2 text-sm font-semibold text-[#111111] hover:bg-amber-200 disabled:opacity-60"
+          className="rounded-xl border border-amber-500/40 bg-amber-500/15 px-4 py-2 text-sm font-semibold text-amber-200 hover:bg-amber-500/20 disabled:opacity-60"
         >
-          {saving ? 'Guardando...' : 'Guardar plantilla'}
+          {saving ? 'Desant...' : 'Desar plantilla'}
         </button>
-        {message && <p className="text-sm text-[#111111]">{message}</p>}
+        {message && <p className="text-sm text-slate-300">{message}</p>}
       </div>
     </section>
   );
