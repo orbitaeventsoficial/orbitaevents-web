@@ -250,17 +250,23 @@ export async function DELETE(req: NextRequest, { params }: Params) {
       );
     }
 
-    await prisma.$transaction([
-      prisma.leadNote.deleteMany({ where: { leadId: id } }),
-      prisma.leadActivity.deleteMany({ where: { leadId: id } }),
-      prisma.leadTask.deleteMany({ where: { leadId: id } }),
-      prisma.leadDocument.deleteMany({ where: { leadId: id } }),
-      prisma.lead.delete({
+    await prisma.$transaction(async (tx) => {
+      await tx.leadNote.deleteMany({ where: { leadId: id } });
+      await tx.leadActivity.deleteMany({ where: { leadId: id } });
+      await tx.leadTask.deleteMany({ where: { leadId: id } });
+      try {
+        const txAny = tx as any;
+        await txAny.task.deleteMany({ where: { leadId: id } });
+      } catch {
+        // Compatibility with environments pending task migration.
+      }
+      await tx.leadDocument.deleteMany({ where: { leadId: id } });
+      await tx.lead.delete({
         where: { id },
         // Evitem retornar totes les columnes per compatibilitat amb esquemes antics.
         select: { id: true },
-      }),
-    ]);
+      });
+    });
 
     try {
       await prisma.adminLog.create({

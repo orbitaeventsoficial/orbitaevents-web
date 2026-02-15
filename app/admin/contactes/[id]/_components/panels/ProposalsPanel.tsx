@@ -39,9 +39,14 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
                 >
                   Editar
                 </Link>
-                <button className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700">
-                  Enviar
-                </button>
+                <form action={`/api/admin/proposals/${proposal.id}/send`} method="POST">
+                  <button
+                    type="submit"
+                    className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
+                  >
+                    Enviar
+                  </button>
+                </form>
               </div>
             </div>
           ))
@@ -54,4 +59,3 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
 function Empty({ text }: { text: string }) {
   return <p className="rounded-lg border border-slate-700/60 bg-slate-800/50 p-3 text-sm text-slate-400">{text}</p>;
 }
-

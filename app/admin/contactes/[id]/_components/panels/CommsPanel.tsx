@@ -1,4 +1,5 @@
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
+import Link from 'next/link';
 
 export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
   return (
@@ -9,9 +10,24 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
       <div className="mt-3 rounded-xl border border-slate-700/70 bg-slate-800/60 p-3">
         <p className="text-xs text-slate-400">Composer ràpid</p>
         <div className="mt-2 flex flex-wrap gap-2">
-          <button className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700">Plantilla 1r contacte</button>
-          <button className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700">Enviar pressupost</button>
-          <button className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700">Recordatori</button>
+          <Link
+            href={`/admin/emails?customerId=${data.customer.id}&template=primer-contacte`}
+            className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
+          >
+            Plantilla 1r contacte
+          </Link>
+          <Link
+            href={`/admin/emails?customerId=${data.customer.id}&template=enviament-pressupost`}
+            className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
+          >
+            Enviar pressupost
+          </Link>
+          <Link
+            href={`/admin/emails?customerId=${data.customer.id}&template=recordatori`}
+            className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
+          >
+            Recordatori
+          </Link>
         </div>
       </div>
 
@@ -41,4 +57,3 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
     </section>
   );
 }
-

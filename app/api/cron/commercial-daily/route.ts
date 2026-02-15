@@ -49,6 +49,19 @@ async function saveRunStatus(status: 'ok' | 'error', summary: unknown, message?:
   }
 }
 
+async function countOpenTasksUniversalOrLegacy() {
+  try {
+    const prismaAny = prisma as any;
+    return await prismaAny.task.count({
+      where: { status: { in: ['OPEN', 'IN_PROGRESS'] } },
+    });
+  } catch {
+    return prisma.leadTask.count({
+      where: { status: { in: ['OPEN', 'IN_PROGRESS'] } },
+    });
+  }
+}
+
 export async function GET(request: NextRequest) {
   const requestId = getRequestId(request);
   if (!isAuthorized(request, requestId)) {
@@ -72,9 +85,7 @@ export async function GET(request: NextRequest) {
       prisma.lead.count({
         where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } },
       }),
-      prisma.leadTask.count({
-        where: { status: { in: ['OPEN', 'IN_PROGRESS'] } },
-      }),
+      countOpenTasksUniversalOrLegacy(),
     ]);
 
     const responseRate = commSent24h > 0 ? commResponded24h / commSent24h : 0;

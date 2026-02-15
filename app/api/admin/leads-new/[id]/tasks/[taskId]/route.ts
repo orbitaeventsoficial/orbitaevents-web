@@ -42,6 +42,28 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       data: updateData,
     });
 
+    try {
+      const prismaAny = prisma as any;
+      await prismaAny.task.updateMany({
+        where: { legacyLeadTaskId: params.taskId },
+        data: {
+          title: task.title,
+          description: task.description,
+          dueDate: task.dueDate,
+          status: task.status,
+          priority: task.priority,
+          assignedTo: task.assignedTo,
+          completedAt: task.completedAt,
+        },
+      });
+    } catch (syncError) {
+      log.warn('No s\'ha pogut sincronitzar task universal (PATCH)', {
+        leadId: params.id,
+        taskId: params.taskId,
+        error: syncError instanceof Error ? syncError.message : String(syncError),
+      });
+    }
+
     await prisma.leadActivity.create({
       data: {
         leadId: params.id,
@@ -66,6 +88,19 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     await prisma.leadTask.delete({
       where: { id: params.taskId },
     });
+
+    try {
+      const prismaAny = prisma as any;
+      await prismaAny.task.deleteMany({
+        where: { legacyLeadTaskId: params.taskId },
+      });
+    } catch (syncError) {
+      log.warn('No s\'ha pogut sincronitzar task universal (DELETE)', {
+        leadId: params.id,
+        taskId: params.taskId,
+        error: syncError instanceof Error ? syncError.message : String(syncError),
+      });
+    }
 
     await prisma.leadActivity.create({
       data: {

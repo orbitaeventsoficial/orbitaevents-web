@@ -365,7 +365,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       ]
     },
     {
-      title: 'Herramientas',
+      title: 'Eines',
       defaultOpen: false,
       items: [
         { icon: '💶', label: 'Finances', href: '/admin/finanzas' },
@@ -384,7 +384,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       ]
     },
     {
-      title: 'Configuración',
+      title: 'Configuració',
       defaultOpen: false,
       items: [
         { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
@@ -448,7 +448,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     if (segments.length <= 1) return 'Tauler';
     const page = segments[segments.length - 1];
     const pageNames: Record<string, string> = {
-      leads: 'Leads',
+      leads: 'Entrades',
       bookings: 'Reserves',
       tasks: 'Tasques',
       packs: 'Packs',
@@ -474,7 +474,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       coverage: 'Cobertura',
       features: 'Features',
       theme: 'Tema',
-      stats: 'Estadísticas',
+      stats: 'Estadístiques',
       blog: 'Blog',
       canvas: 'Canvas',
       translations: 'Traduccions',
@@ -513,7 +513,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         >
           {helpModeEnabled && (
             <div className="fixed left-1/2 top-16 z-[70] -translate-x-1/2 rounded-full border border-amber-400/60 bg-amber-100 px-4 py-2 text-xs font-semibold text-amber-900 shadow-lg">
-              Modo ayuda activo: las acciones están bloqueadas. Pulsa los iconos de ayuda para ver explicaciones.
+              Mode ajuda actiu: les accions estan bloquejades. Prem els icones d'ajuda per veure explicacions.
             </div>
           )}
           {helpModeEnabled && <AdminHelpLegend />}

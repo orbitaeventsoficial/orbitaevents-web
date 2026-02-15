@@ -17,11 +17,13 @@ function deriveHubStatus(input: {
 }
 
 export async function fetchCustomerHub(customerId: string): Promise<CustomerHubDTO> {
-  const customer = await prisma.customer.findUnique({
+  const prismaAny = prisma as any;
+  const customer: any = await prismaAny.customer.findUnique({
     where: { id: customerId },
     include: {
       proposals: { orderBy: { createdAt: 'desc' }, take: 80 },
       bookings: { orderBy: { createdAt: 'desc' }, take: 80 },
+      tasks: { orderBy: [{ status: 'asc' }, { dueDate: 'asc' }, { createdAt: 'desc' }], take: 120 },
       activityLog: { orderBy: { createdAt: 'desc' }, take: 120 },
       leads: {
         orderBy: { createdAt: 'desc' },
@@ -35,7 +37,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
 
   if (!customer) throw new Error('Customer not found');
 
-  const proposals = customer.proposals.map((p) => ({
+  const proposals = customer.proposals.map((p: any) => ({
     id: p.id,
     reference: p.reference,
     status: p.status as 'DRAFT' | 'SENT' | 'VIEWED' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED',
@@ -46,7 +48,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     snapshot: (p.snapshot as Record<string, unknown> | null) || undefined,
   }));
 
-  const bookings = customer.bookings.map((b) => ({
+  const bookings = customer.bookings.map((b: any) => ({
     id: b.id,
     reference: b.reference,
     date: b.eventDate?.toISOString(),
@@ -58,8 +60,8 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     totalAmount: typeof b.total === 'number' ? b.total : undefined,
   }));
 
-  const tasks: TaskDTO[] = customer.leads.flatMap((lead) =>
-    lead.tasks.map((task) => ({
+  const tasks: TaskDTO[] = customer.tasks.length > 0
+    ? customer.tasks.map((task: any) => ({
       id: task.id,
       title: task.title,
       dueDate: task.dueDate?.toISOString(),
@@ -68,14 +70,26 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
         task.priority === 'HIGH' || task.priority === 'MEDIUM' || task.priority === 'LOW'
           ? task.priority
           : undefined,
-      leadId: lead.id,
+      leadId: task.leadId || undefined,
     }))
-  );
+    : customer.leads.flatMap((lead: any) =>
+      lead.tasks.map((task: any) => ({
+        id: task.id,
+        title: task.title,
+        dueDate: task.dueDate?.toISOString(),
+        done: task.status === 'DONE',
+        priority:
+          task.priority === 'HIGH' || task.priority === 'MEDIUM' || task.priority === 'LOW'
+            ? task.priority
+            : undefined,
+        leadId: lead.id,
+      }))
+    );
 
-  const leadMessages: MessageDTO[] = customer.leads.flatMap((lead) =>
+  const leadMessages: MessageDTO[] = customer.leads.flatMap((lead: any) =>
     lead.activities
-      .filter((activity) => ['EMAIL', 'NOTE', 'CALL', 'WHATSAPP'].includes(activity.type))
-      .map((activity) => ({
+      .filter((activity: any) => ['EMAIL', 'NOTE', 'CALL', 'WHATSAPP'].includes(activity.type))
+      .map((activity: any) => ({
         id: activity.id,
         channel: activity.type === 'EMAIL' ? 'EMAIL' : activity.type === 'WHATSAPP' ? 'WHATSAPP' : 'NOTE',
         subject: activity.title || undefined,
@@ -86,7 +100,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       }))
   );
 
-  const customerNotes: MessageDTO[] = customer.activityLog.map((a) => ({
+  const customerNotes: MessageDTO[] = customer.activityLog.map((a: any) => ({
     id: `ca-${a.id}`,
     channel: 'NOTE',
     subject: a.action,
@@ -99,22 +113,22 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     .slice(0, 120);
 
   const active = resolveActiveDocument(proposals);
-  const activeProposal = active.proposalId ? proposals.find((p) => p.id === active.proposalId) : undefined;
+  const activeProposal = active.proposalId ? proposals.find((p: any) => p.id === active.proposalId) : undefined;
 
-  const totalQuoted = proposals.reduce((sum, p) => sum + (p.total || 0), 0);
-  const totalPaid = customer.bookings.reduce((sum, b) => sum + (b.depositPaid ? (b.depositAmount || 0) : 0), 0);
+  const totalQuoted = proposals.reduce((sum: number, p: any) => sum + (p.total || 0), 0);
+  const totalPaid = customer.bookings.reduce((sum: number, b: any) => sum + (b.depositPaid ? (b.depositAmount || 0) : 0), 0);
   const marginEstimated =
     activeProposal && typeof activeProposal.snapshot?.subtotal === 'number' && typeof activeProposal.snapshot?.total === 'number'
       ? Number(activeProposal.snapshot.total) - Number(activeProposal.snapshot.subtotal)
       : undefined;
 
   const nextEventDate = bookings
-    .filter((b) => b.date && b.status !== 'CANCELLED')
-    .sort((a, b) => ((a.date || '') > (b.date || '') ? 1 : -1))[0]?.date;
+    .filter((b: any) => b.date && b.status !== 'CANCELLED')
+    .sort((a: any, b: any) => ((a.date || '') > (b.date || '') ? 1 : -1))[0]?.date;
 
   const status = deriveHubStatus({
-    leadStatuses: customer.leads.map((l) => l.status),
-    bookingStatuses: customer.bookings.map((b) => b.status),
+    leadStatuses: customer.leads.map((l: any) => l.status),
+    bookingStatuses: customer.bookings.map((b: any) => b.status),
   });
 
   const timeline = buildTimeline({
@@ -122,13 +136,13 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     bookings,
     tasks,
     messages,
-    customerActivities: customer.activityLog.map((a) => ({
+    customerActivities: customer.activityLog.map((a: any) => ({
       id: a.id,
       action: a.action,
       createdAt: a.createdAt,
     })),
-    leadActivities: customer.leads.flatMap((lead) =>
-      lead.activities.map((a) => ({
+    leadActivities: customer.leads.flatMap((lead: any) =>
+      lead.activities.map((a: any) => ({
         id: a.id,
         type: a.type,
         title: a.title,
@@ -162,4 +176,3 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     timeline,
   };
 }
-

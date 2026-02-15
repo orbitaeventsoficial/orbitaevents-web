@@ -261,6 +261,7 @@ model Customer {
   leads             Lead[]
   bookings          Booking[]
   proposals         Proposal[]
+  tasks             Task[]
   testimonials      CustomerTestimonial[]
   discountCodes     CustomerDiscountCode[]
   activityLog       CustomerActivity[]
@@ -396,6 +397,7 @@ model Lead {
   proposals        Proposal[]
   activities       LeadActivity[]
   tasks            LeadTask[]
+  universalTasks   Task[]
   documents        LeadDocument[]
 
   createdAt        DateTime   @default(now())
@@ -614,6 +616,7 @@ model Booking {
   clientSurvey       ClientSurvey?
   clientFeedback     ClientFeedback?
   proposals          Proposal[]
+  tasks              Task[]
 
   // Post-event email automation
   postEventEmailSent   Boolean   @default(false)
@@ -672,6 +675,7 @@ model Proposal {
   snapshot      Json
   pdfUrl        String?
   pdfKey        String?
+  tasks         Task[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   sentAt        DateTime?
@@ -682,6 +686,35 @@ model Proposal {
   @@index([bookingId])
   @@index([status, createdAt])
   @@map("proposals")
+}
+
+model Task {
+  id               String           @id @default(cuid())
+  customerId       String?
+  customer         Customer?        @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  leadId           String?
+  lead             Lead?            @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  bookingId        String?
+  booking          Booking?         @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  proposalId       String?
+  proposal         Proposal?        @relation(fields: [proposalId], references: [id], onDelete: SetNull)
+  legacyLeadTaskId String?          @unique
+  title            String
+  description      String?          @db.Text
+  dueDate          DateTime?
+  status           LeadTaskStatus   @default(OPEN)
+  priority         LeadTaskPriority @default(MEDIUM)
+  assignedTo       String?
+  createdBy        String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  completedAt      DateTime?
+
+  @@index([customerId, status, dueDate])
+  @@index([leadId, status])
+  @@index([bookingId])
+  @@index([proposalId])
+  @@map("tasks")
 }
 
 model BookingExtra {

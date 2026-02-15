@@ -86,7 +86,7 @@ export default async function RentabilidadPage() {
             href="/admin/sales-ops"
             className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
           >
-            Ir a Sales Ops
+            Anar a Sales Ops
           </Link>
         </div>
       </header>

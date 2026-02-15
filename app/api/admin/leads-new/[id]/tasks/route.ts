@@ -46,6 +46,11 @@ export async function POST(req: NextRequest, { params }: Params) {
     const data = parsed.data;
     const dueDate = data.dueDate ? new Date(data.dueDate) : null;
 
+    const lead = await prisma.lead.findUnique({
+      where: { id: params.id },
+      select: { customerId: true },
+    });
+
     const task = await prisma.leadTask.create({
       data: {
         leadId: params.id,
@@ -58,6 +63,45 @@ export async function POST(req: NextRequest, { params }: Params) {
         createdBy: data.createdBy,
       },
     });
+
+    // Dual-write: keep universal task table in sync (non-blocking for legacy compatibility).
+    try {
+      const prismaAny = prisma as any;
+      await prismaAny.task.upsert({
+        where: { legacyLeadTaskId: task.id },
+        update: {
+          customerId: lead?.customerId ?? null,
+          leadId: params.id,
+          title: task.title,
+          description: task.description,
+          dueDate: task.dueDate,
+          status: task.status,
+          priority: task.priority,
+          assignedTo: task.assignedTo,
+          createdBy: task.createdBy,
+          completedAt: task.completedAt,
+        },
+        create: {
+          legacyLeadTaskId: task.id,
+          customerId: lead?.customerId ?? null,
+          leadId: params.id,
+          title: task.title,
+          description: task.description,
+          dueDate: task.dueDate,
+          status: task.status,
+          priority: task.priority,
+          assignedTo: task.assignedTo,
+          createdBy: task.createdBy,
+          completedAt: task.completedAt,
+        },
+      });
+    } catch (syncError) {
+      log.warn('No s\'ha pogut sincronitzar task universal', {
+        leadId: params.id,
+        taskId: task.id,
+        error: syncError instanceof Error ? syncError.message : String(syncError),
+      });
+    }
 
     await prisma.leadActivity.create({
       data: {

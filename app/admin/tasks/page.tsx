@@ -34,6 +34,8 @@ export default async function TasksPage({
 }) {
   const statusParam = Array.isArray(searchParams?.status) ? searchParams?.status[0] : searchParams?.status;
   const status: LeadTaskStatus | undefined = isTaskStatus(statusParam) ? statusParam : undefined;
+  const customerIdParam = Array.isArray(searchParams?.customerId) ? searchParams?.customerId[0] : searchParams?.customerId;
+  const customerId = customerIdParam && customerIdParam.trim() ? customerIdParam.trim() : undefined;
   const pageParam = Array.isArray(searchParams?.page) ? searchParams?.page[0] : searchParams?.page;
   const page = parsePage(pageParam);
   const limit = 25;
@@ -43,34 +45,79 @@ export default async function TasksPage({
     title: string;
     status: LeadTaskStatus;
     dueDate: Date | null;
-    lead: { id: string; name: string };
+    lead?: { id: string; name: string };
+    customer?: { id: string; name: string };
   }> = [];
   let total = 0;
 
   try {
-    const where: Prisma.LeadTaskWhereInput | undefined = status
-      ? { status: { equals: status as LeadTaskStatus } }
-      : undefined;
-    [tasks, total] = await Promise.all([
-      prisma.leadTask.findMany({
+    const where = {
+      ...(status ? { status: { equals: status } } : {}),
+      ...(customerId ? { customerId } : {}),
+    };
+    const prismaAny = prisma as any;
+    const [rows, count] = await Promise.all([
+      prismaAny.task.findMany({
         where,
         orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
         take: limit,
         skip: (page - 1) * limit,
         include: {
           lead: { select: { id: true, name: true } },
+          customer: { select: { id: true, name: true } },
+        },
+      }),
+      prismaAny.task.count({ where }),
+    ]);
+    tasks = rows.map((row: any) => ({
+      id: row.id,
+      title: row.title,
+      status: row.status,
+      dueDate: row.dueDate,
+      lead: row.lead ? { id: row.lead.id, name: row.lead.name } : undefined,
+      customer: row.customer ? { id: row.customer.id, name: row.customer.name } : undefined,
+    }));
+    total = count;
+  } catch (error) {
+    console.error('[Tasks] Error carregant tasques universals, fallback legacy:', error);
+    const where: Prisma.LeadTaskWhereInput = {
+      ...(status ? { status: { equals: status } } : {}),
+      ...(customerId ? { lead: { customerId } } : {}),
+    };
+    const [legacyRows, legacyCount] = await Promise.all([
+      prisma.leadTask.findMany({
+        where,
+        orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
+        take: limit,
+        skip: (page - 1) * limit,
+        include: {
+          lead: {
+            select: {
+              id: true,
+              name: true,
+              customer: { select: { id: true, name: true } },
+            },
+          },
         },
       }),
       prisma.leadTask.count({ where }),
     ]);
-  } catch (error) {
-    console.error('[Tasks] Error carregant tasques:', error);
+    tasks = legacyRows.map((row) => ({
+      id: row.id,
+      title: row.title,
+      status: row.status,
+      dueDate: row.dueDate,
+      lead: { id: row.lead.id, name: row.lead.name },
+      customer: row.lead.customer ? { id: row.lead.customer.id, name: row.lead.customer.name } : undefined,
+    }));
+    total = legacyCount;
   }
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const buildHref = (targetPage: number) => {
     const params = new URLSearchParams();
     if (status) params.set('status', status);
+    if (customerId) params.set('customerId', customerId);
     params.set('page', String(targetPage));
     return `/admin/tasks?${params.toString()}`;
   };
@@ -81,7 +128,7 @@ export default async function TasksPage({
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">Tasques</h1>
           <p className="text-xs sm:text-sm text-slate-400">
-            {total} tasques
+            {total} tasques {customerId ? 'del client' : ''}
           </p>
         </div>
         <Link
@@ -96,7 +143,7 @@ export default async function TasksPage({
         {VALID_STATUS.map((value) => (
           <Link
             key={value}
-            href={`/admin/tasks?status=${value}`}
+            href={`/admin/tasks?${new URLSearchParams({ ...(customerId ? { customerId } : {}), status: value }).toString()}`}
             className={`rounded-full border px-3 py-1 ${
               status === value ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
             }`}
@@ -105,7 +152,7 @@ export default async function TasksPage({
           </Link>
         ))}
         <Link
-          href="/admin/tasks"
+          href={customerId ? `/admin/tasks?customerId=${customerId}` : '/admin/tasks'}
           className={`rounded-full border px-3 py-1 ${
             !status ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
           }`}
@@ -125,13 +172,13 @@ export default async function TasksPage({
             {tasks.map((task) => (
               <Link
                 key={task.id}
-                href={`/admin/leads/${task.lead.id}`}
+                href={task.customer ? `/admin/contactes/${task.customer.id}` : task.lead ? `/admin/leads/${task.lead.id}` : '/admin/tasks'}
                 className="flex items-center justify-between px-4 py-3 hover:bg-slate-700/30 transition-colors"
               >
                 <div className="min-w-0">
                   <p className="text-sm text-slate-100 truncate">{task.title}</p>
                   <p className="text-xs text-slate-500">
-                    {task.lead.name} · {STATUS_LABELS[task.status] || task.status}
+                    {(task.customer?.name || task.lead?.name || 'Sense relació')} · {STATUS_LABELS[task.status] || task.status}
                   </p>
                 </div>
                 <span className="text-xs text-slate-400">
