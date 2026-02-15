@@ -331,303 +331,364 @@ export async function generateQuotePDF(
   const extrasCatalog = data.extrasCatalog ?? EXTRAS;
 
   const t = {
-    ca: { quote: 'Pressupost', eventDetails: 'Detalls de l\'Event', guests: 'Convidats', selectedPack: 'Pack Seleccionat', hours: 'hores', features: 'Característiques Incloses', extras: 'Extres Seleccionats', priceSummary: 'Resum de Preus', basePack: 'Pack base', extrasTotal: 'Total extres', discount: 'Descompte', total: 'TOTAL', validUntilPrefix: 'Pressupost vàlid durant', validUntilSuffix: 'dies', disclaimer: 'Els preus no inclouen IVA. Consulta condicions.', nextSteps: 'PRÒXIMS PASSOS', step1: 'Confirma disponibilitat contactant-nos', step2: 'Reserva amb un senyal del 30%', step3: 'Gaudeix del teu event perfecte', contact: 'Contacte', conditions: 'Condicions', whyChooseUs: 'Per què escollir-nos' },
-    es: { quote: 'Presupuesto', eventDetails: 'Detalles del Evento', guests: 'Invitados', selectedPack: 'Pack Seleccionado', hours: 'horas', features: 'Características Incluidas', extras: 'Extras Seleccionados', priceSummary: 'Resumen de Precios', basePack: 'Pack base', extrasTotal: 'Total extras', discount: 'Descuento', total: 'TOTAL', validUntilPrefix: 'Presupuesto válido durante', validUntilSuffix: 'días', disclaimer: 'Los precios no incluyen IVA. Consulta condiciones.', nextSteps: 'PRÓXIMOS PASOS', step1: 'Confirma disponibilidad contactándonos', step2: 'Reserva con una señal del 30%', step3: 'Disfruta de tu evento perfecto', contact: 'Contacto', conditions: 'Condiciones', whyChooseUs: 'Por qué elegirnos' },
-    en: { quote: 'Quote', eventDetails: 'Event Details', guests: 'Guests', selectedPack: 'Selected Package', hours: 'hours', features: 'Included Features', extras: 'Selected Extras', priceSummary: 'Price Summary', basePack: 'Base package', extrasTotal: 'Extras total', discount: 'Discount', total: 'TOTAL', validUntilPrefix: 'Quote valid for', validUntilSuffix: 'days', disclaimer: 'Prices do not include VAT. See conditions.', nextSteps: 'NEXT STEPS', step1: 'Confirm availability by contacting us', step2: 'Book with a 30% deposit', step3: 'Enjoy your perfect event', contact: 'Contact', conditions: 'Conditions', whyChooseUs: 'Why choose us' },
+    ca: {
+      quote: 'Pressupost',
+      eventDetails: 'Detalls de l\'event',
+      guests: 'Convidats',
+      selectedPack: 'Pack seleccionat',
+      hours: 'hores',
+      features: 'Que inclou',
+      extras: 'Extres',
+      priceSummary: 'Resum economic',
+      basePack: 'Pack base',
+      extrasTotal: 'Extres',
+      discount: 'Descompte',
+      total: 'Total',
+      validUntilPrefix: 'Validesa:',
+      validUntilSuffix: 'dies',
+      disclaimer: 'Preus sense IVA.',
+      contact: 'Contacte',
+      conditions: 'Condicions',
+      whyChooseUs: 'Per que escollir-nos',
+      quoteRef: 'Referencia',
+      issueDate: 'Data',
+    },
+    es: {
+      quote: 'Presupuesto',
+      eventDetails: 'Detalles del evento',
+      guests: 'Invitados',
+      selectedPack: 'Pack seleccionado',
+      hours: 'horas',
+      features: 'Que incluye',
+      extras: 'Extras',
+      priceSummary: 'Resumen economico',
+      basePack: 'Pack base',
+      extrasTotal: 'Extras',
+      discount: 'Descuento',
+      total: 'Total',
+      validUntilPrefix: 'Validez:',
+      validUntilSuffix: 'dias',
+      disclaimer: 'Precios sin IVA.',
+      contact: 'Contacto',
+      conditions: 'Condiciones',
+      whyChooseUs: 'Por que elegirnos',
+      quoteRef: 'Referencia',
+      issueDate: 'Fecha',
+    },
+    en: {
+      quote: 'Quote',
+      eventDetails: 'Event details',
+      guests: 'Guests',
+      selectedPack: 'Selected package',
+      hours: 'hours',
+      features: 'What is included',
+      extras: 'Extras',
+      priceSummary: 'Price summary',
+      basePack: 'Base package',
+      extrasTotal: 'Extras',
+      discount: 'Discount',
+      total: 'Total',
+      validUntilPrefix: 'Validity:',
+      validUntilSuffix: 'days',
+      disclaimer: 'Prices excl. VAT.',
+      contact: 'Contact',
+      conditions: 'Conditions',
+      whyChooseUs: 'Why choose us',
+      quoteRef: 'Reference',
+      issueDate: 'Date',
+    },
   }[locale];
 
-  const headerTitle = t.quote;
-  let y = addHeader(doc, headerTitle, branding);
+  const neutral = [241, 245, 249] as [number, number, number];
+  const muted = [148, 163, 184] as [number, number, number];
+  const border = [51, 65, 85] as [number, number, number];
+  const surface = [24, 28, 33] as [number, number, number];
+  const accent = [212, 175, 55] as [number, number, number];
 
-  const quoteNum = `OE-${Date.now().toString(36).toUpperCase()}`;
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text(`REF: ${quoteNum}`, PAGE.width - PAGE.marginRight, y, { align: 'right' });
-  doc.setTextColor(...COLORS.grayDark);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.text(`${new Date().toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB')}`, PAGE.width - PAGE.marginRight, y + 5, { align: 'right' });
+  const left = 15;
+  const contentWidth = 180;
+  const pageBottom = 255;
+  const lineHeight = 4;
+  let y = 18;
 
-  if (data.clientName) {
-    doc.setTextColor(...COLORS.blackSoft);
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(data.clientName, PAGE.marginLeft, y);
-    y += 8;
-  }
-  const contactLines = [data.clientContact, data.clientEmail, data.clientPhone]
-    .map((line) => (line || '').trim())
-    .filter(Boolean);
-  if (contactLines.length > 0) {
-    doc.setTextColor(...COLORS.grayDark);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text(contactLines.join(' · '), PAGE.marginLeft, y);
-    y += 6;
-  }
-  y += 12;
-
-  const eventCardHeight = 32;
-  y = checkPageBreak(doc, y, eventCardHeight + 10, headerTitle, branding);
-  doc.setFillColor(...COLORS.bgLight);
-  doc.setDrawColor(...COLORS.grayLight);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(15, y, PAGE.contentWidth + 10, eventCardHeight, 4, 4, 'FD');
-  doc.setFillColor(...COLORS.gold);
-  doc.rect(15, y, 3, eventCardHeight, 'F');
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.eventDetails.toUpperCase(), 23, y + 9);
-  doc.setTextColor(...COLORS.blackSoft);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
+  const quoteRef = `OE-${Date.now().toString(36).toUpperCase()}`;
+  const issueDate = new Date().toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB');
   const eventTypeName = SERVICE_NAMES[data.eventType as ServiceSlug]?.[locale] || data.eventType;
-  doc.text(`${eventTypeName}`, 23, y + 18);
-  doc.setTextColor(...COLORS.grayDark);
-  doc.setFontSize(8);
-  if (data.date && data.date !== '-') {
-    doc.text(`${data.date}`, 23, y + 26);
-    doc.text(`${data.guests} ${t.guests.toLowerCase()}`, 95, y + 26);
-  } else {
-    doc.text(`${data.guests} ${t.guests.toLowerCase()}`, 23, y + 26);
-  }
-  y += eventCardHeight + 12;
+  const brandName = branding?.brandName?.trim() || 'Orbita Events';
+  const validityDays = Math.max(1, Math.round(data.validityDays || 15));
 
-  const packCardHeight = 55;
-  y = checkPageBreak(doc, y, packCardHeight + 10, headerTitle, branding);
-  doc.setFillColor(218, 165, 32);
-  doc.roundedRect(15, y, PAGE.contentWidth + 10, packCardHeight, 4, 4, 'F');
-  doc.setFillColor(235, 185, 52);
-  doc.roundedRect(15, y, PAGE.contentWidth + 10, 28, 4, 4, 'F');
-  doc.setFillColor(255, 215, 0);
-  doc.rect(15, y, 4, packCardHeight, 'F');
-  doc.setTextColor(...COLORS.blackSoft);
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.selectedPack.toUpperCase(), 24, y + 9);
-  doc.setFontSize(15);
-  doc.text(data.pack.name.toUpperCase(), 24, y + 22);
-  doc.setTextColor(26, 26, 26);
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${data.pack.durationHours} ${t.hours}`, 24, y + 32);
-  doc.setTextColor(...COLORS.blackSoft);
-  doc.setFontSize(22);
-  doc.setFont('helvetica', 'bold');
-  doc.text(data.pack.price, PAGE.width - PAGE.marginRight - 5, y + 32, { align: 'right' });
-  if (data.pack.price.toLowerCase().includes('desde')) {
-    doc.setFontSize(7);
+  doc.setFillColor(18, 20, 24);
+  doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
+
+  const ensureSpace = (space: number): boolean => y + space <= pageBottom;
+
+  const drawLabelValue = (label: string, value: string, x: number, top: number, width: number) => {
+    doc.setTextColor(...muted);
     doc.setFont('helvetica', 'normal');
-    doc.text('*precio aproximado', PAGE.width - PAGE.marginRight - 5, y + 40, { align: 'right' });
+    doc.setFontSize(8);
+    doc.text(label.toUpperCase(), x, top);
+    doc.setTextColor(...neutral);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    const lines = doc.splitTextToSize(value || '-', width);
+    doc.text(lines.slice(0, 2), x, top + 6);
+  };
+
+  const drawHeader = (compact: boolean) => {
+    const headerHeight = compact ? 14 : 22;
+    doc.setFillColor(...surface);
+    doc.roundedRect(left, y, contentWidth, headerHeight, 2, 2, 'F');
+    doc.setDrawColor(...border);
+    doc.roundedRect(left, y, contentWidth, headerHeight, 2, 2, 'S');
+
+    if (!compact && branding?.logoDataUrl) {
+      try {
+        doc.addImage(branding.logoDataUrl, 'PNG', left + 4, y + 5, 10, 10);
+      } catch {
+        // Ignore logo errors and keep text branding.
+      }
+    }
+
+    const titleX = compact ? left + 4 : left + 17;
+    doc.setTextColor(...neutral);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(compact ? 10 : 14);
+    doc.text(brandName, titleX, y + (compact ? 7 : 8));
+    if (!compact) {
+      doc.setTextColor(...accent);
+      doc.setFontSize(10);
+      doc.text(t.quote, titleX, y + 14);
+    }
+
+    doc.setTextColor(...muted);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(`${t.quoteRef}: ${quoteRef}`, left + contentWidth - 4, y + (compact ? 6 : 7), { align: 'right' });
+    doc.text(`${t.issueDate}: ${issueDate}`, left + contentWidth - 4, y + (compact ? 10 : 11), { align: 'right' });
+    if (!compact) {
+      doc.text(`${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix}`, left + contentWidth - 4, y + 15, { align: 'right' });
+    }
+
+    y += headerHeight + 5;
+  };
+
+  const drawFooter = () => {
+    const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
+    const email = branding?.contactEmail?.trim() || SITE_CONFIG.business.email;
+    const phone = branding?.contactPhone?.trim() || SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone;
+    doc.setDrawColor(...border);
+    doc.line(left, 282, left + contentWidth, 282);
+    doc.setTextColor(...muted);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.text(`${website} · ${email} · ${phone}`, left, 287);
+  };
+
+  drawHeader(false);
+
+  if (!ensureSpace(20)) {
+    drawFooter();
+    return doc;
   }
-  y += packCardHeight + 12;
+  doc.setFillColor(...surface);
+  doc.roundedRect(left, y, contentWidth, 16, 2, 2, 'F');
+  doc.setDrawColor(...border);
+  doc.roundedRect(left, y, contentWidth, 16, 2, 2, 'S');
+  drawLabelValue('Client', data.clientName || data.clientContact || '-', left + 4, y + 6, 70);
+  drawLabelValue(t.contact, [data.clientContact, data.clientEmail, data.clientPhone].filter(Boolean).join(' · ') || '-', left + 88, y + 6, 85);
+  y += 20;
 
-  const maxFeatures = Math.min(data.pack.features.length, 8);
-  const featuresPerColumn = Math.ceil(maxFeatures / 2);
-  const featuresHeight = (featuresPerColumn * 8) + 20;
-  y = checkPageBreak(doc, y, featuresHeight, headerTitle, branding);
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(10);
+  if (!ensureSpace(26)) {
+    drawFooter();
+    return doc;
+  }
+  doc.setFillColor(...surface);
+  doc.roundedRect(left, y, contentWidth, 22, 2, 2, 'F');
+  doc.setDrawColor(...border);
+  doc.roundedRect(left, y, contentWidth, 22, 2, 2, 'S');
+  drawLabelValue(t.eventDetails, `${eventTypeName}`, left + 4, y + 6, 80);
+  drawLabelValue('Data', data.date || '-', left + 88, y + 6, 85);
+  drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 14, 85);
+  y += 26;
+
+  if (!ensureSpace(16)) {
+    drawFooter();
+    return doc;
+  }
+  doc.setTextColor(...accent);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.features.toUpperCase(), PAGE.marginLeft, y);
+  doc.setFontSize(11);
+  doc.text(t.selectedPack.toUpperCase(), left, y);
+  y += 4;
+  doc.setDrawColor(...border);
+  doc.line(left, y, left + contentWidth, y);
+  y += 5;
+  doc.setTextColor(...neutral);
+  doc.setFontSize(13);
+  doc.text(data.pack.name, left, y);
+  doc.setFontSize(10);
+  doc.setTextColor(...muted);
+  doc.text(`${data.pack.durationHours} ${t.hours}`, left, y + 6);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...accent);
+  doc.setFontSize(16);
+  doc.text(`${data.basePrice.toFixed(2)}€`, left + contentWidth, y + 2, { align: 'right' });
   y += 10;
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...COLORS.blackSoft);
-  data.pack.features.slice(0, maxFeatures).forEach((feature, index) => {
-    const cleanFeature = feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim();
-    const column = index < featuresPerColumn ? 0 : 1;
-    const rowInColumn = index % featuresPerColumn;
-    const x = column === 0 ? PAGE.marginLeft : 110;
-    const featureY = y + (rowInColumn * 8);
-    doc.setFillColor(...COLORS.gold);
-    doc.circle(x + 1, featureY - 1.5, 1, 'F');
-    doc.setTextColor(...COLORS.blackSoft);
-    doc.text(cleanFeature.substring(0, 45), x + 4, featureY);
-  });
-  y += (featuresPerColumn * 8) + 12;
 
-  if (data.extras.length > 0) {
-    const extrasHeight = (data.extras.length * 7) + 20;
-    y = checkPageBreak(doc, y, extrasHeight, headerTitle, branding);
-    doc.setTextColor(...COLORS.gold);
+  const features = data.pack.features
+    .map((feature) => feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim())
+    .filter(Boolean)
+    .slice(0, 4);
+
+  if (features.length > 0) {
+    if (!ensureSpace(8 + features.length * lineHeight)) {
+      drawFooter();
+      return doc;
+    }
+    doc.setTextColor(...accent);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text(t.extras.toUpperCase(), PAGE.marginLeft, y);
-    y += 10;
-    doc.setFontSize(8);
+    doc.text(t.features.toUpperCase(), left, y);
+    y += 5;
+    doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...COLORS.blackSoft);
-    data.extras.forEach((extraName) => {
-      const extra = extrasCatalog.find((e) => e.name === extraName || e.id === extraName);
-      const price = extra?.price ? `+${extra.price}€` : '';
-      doc.setFillColor(...COLORS.goldLight);
-      doc.circle(21, y - 1.5, 1, 'F');
-      doc.text(`${extraName}`, 24, y);
-      if (price) {
-        doc.setTextColor(...COLORS.gold);
+    doc.setFontSize(9);
+    for (const feature of features) {
+      if (!ensureSpace(lineHeight + 1)) break;
+      doc.setFillColor(...accent);
+      doc.circle(left + 1.5, y - 1.3, 0.9, 'F');
+      const line = doc.splitTextToSize(feature, 170)[0];
+      doc.text(line, left + 5, y);
+      y += lineHeight;
+    }
+    y += 2;
+  }
+
+  if (data.extras.length > 0) {
+    const extrasRows = data.extras.slice(0, 4);
+    if (!ensureSpace(8 + extrasRows.length * lineHeight)) {
+      drawFooter();
+      return doc;
+    }
+    doc.setTextColor(...accent);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text(t.extras.toUpperCase(), left, y);
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...neutral);
+    doc.setFontSize(9);
+    for (const extraName of extrasRows) {
+      const extra = extrasCatalog.find((item) => item.name === extraName || item.id === extraName);
+      const priceText = typeof extra?.price === 'number' ? `+${extra.price}€` : '';
+      if (!ensureSpace(lineHeight + 1)) break;
+      const line = doc.splitTextToSize(extraName, 145)[0];
+      doc.text(line, left, y);
+      if (priceText) {
+        doc.setTextColor(...accent);
         doc.setFont('helvetica', 'bold');
-        doc.text(price, 105, y, { align: 'right' });
-        doc.setTextColor(...COLORS.blackSoft);
+        doc.text(priceText, left + contentWidth, y, { align: 'right' });
+        doc.setTextColor(...neutral);
         doc.setFont('helvetica', 'normal');
       }
-      y += 7;
-    });
-    y += 10;
+      y += lineHeight;
+    }
+    y += 2;
   }
 
-  const summaryHeight = 60;
-  y = checkPageBreak(doc, y, summaryHeight + 25, headerTitle, branding);
-  y = Math.max(y, PAGE.safeBottom - summaryHeight - 20);
-
-  const stepsY = y;
-  doc.setFillColor(...COLORS.bgDark);
-  doc.setDrawColor(...COLORS.gold);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(15, stepsY, 90, 55, 4, 4, 'FD');
-  doc.setFillColor(...COLORS.gold);
-  doc.rect(15, stepsY, 90, 2, 'F');
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.nextSteps, 20, stepsY + 12);
-  doc.setTextColor(...COLORS.grayDark);
-  doc.setFontSize(7);
-  doc.setFont('helvetica', 'normal');
-
-  doc.setFillColor(...COLORS.gold);
-  doc.circle(21, stepsY + 21, 2, 'F');
-  doc.setTextColor(...COLORS.white);
-  doc.setFontSize(6);
-  doc.text('1', 21, stepsY + 22.5, { align: 'center' });
-  doc.setTextColor(...COLORS.grayDark);
-  doc.setFontSize(7);
-  doc.text(t.step1.substring(0, 35), 26, stepsY + 22);
-
-  doc.setFillColor(...COLORS.gold);
-  doc.circle(21, stepsY + 33, 2, 'F');
-  doc.setTextColor(...COLORS.white);
-  doc.setFontSize(6);
-  doc.text('2', 21, stepsY + 34.5, { align: 'center' });
-  doc.setTextColor(...COLORS.grayDark);
-  doc.setFontSize(7);
-  doc.text(t.step2.substring(0, 35), 26, stepsY + 34);
-
-  doc.setFillColor(...COLORS.gold);
-  doc.circle(21, stepsY + 45, 2, 'F');
-  doc.setTextColor(...COLORS.white);
-  doc.setFontSize(6);
-  doc.text('3', 21, stepsY + 46.5, { align: 'center' });
-  doc.setTextColor(...COLORS.grayDark);
-  doc.setFontSize(7);
-  doc.text(t.step3.substring(0, 35), 26, stepsY + 46);
-
-  doc.setFillColor(248, 248, 248);
-  doc.roundedRect(112, stepsY + 2, 82, 53, 4, 4, 'F');
-  doc.setFillColor(...COLORS.white);
-  doc.setDrawColor(...COLORS.grayLight);
-  doc.setLineWidth(0.5);
-  doc.roundedRect(110, stepsY, 82, 53, 4, 4, 'FD');
-  doc.setFillColor(...COLORS.gold);
-  doc.rect(110, stepsY, 2, 53, 'F');
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.priceSummary.toUpperCase(), 117, stepsY + 9);
-  doc.setTextColor(...COLORS.blackSoft);
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-
-  let priceY = stepsY + 18;
-  doc.text(t.basePack, 117, priceY);
-  doc.setFont('helvetica', 'bold');
-  doc.text(`${data.basePrice}€`, 185, priceY, { align: 'right' });
-  doc.setFont('helvetica', 'normal');
-
-  if (data.extrasPrice > 0) {
-    priceY += 7;
-    doc.text(t.extrasTotal, 117, priceY);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`${data.extrasPrice}€`, 185, priceY, { align: 'right' });
-    doc.setFont('helvetica', 'normal');
+  if (!ensureSpace(30)) {
+    drawFooter();
+    return doc;
   }
+  doc.setFillColor(...surface);
+  doc.roundedRect(left, y, contentWidth, 26, 2, 2, 'F');
+  doc.setDrawColor(...border);
+  doc.roundedRect(left, y, contentWidth, 26, 2, 2, 'S');
+  doc.setTextColor(...accent);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text(t.priceSummary.toUpperCase(), left + 4, y + 7);
 
+  let priceY = y + 11;
+  doc.setTextColor(...neutral);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text(t.basePack, left + 4, priceY);
+  doc.text(`${data.basePrice.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
+  priceY += 4.5;
+  doc.text(t.extrasTotal, left + 4, priceY);
+  doc.text(`${data.extrasPrice.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
   if (data.discount > 0) {
-    priceY += 7;
-    doc.setTextColor(...COLORS.success);
-    doc.text(`${t.discount}`, 117, priceY);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`-${data.discount}€`, 185, priceY, { align: 'right' });
-    doc.setTextColor(...COLORS.blackSoft);
-    doc.setFont('helvetica', 'normal');
+    priceY += 4.5;
+    doc.text(t.discount, left + 4, priceY);
+    doc.text(`-${data.discount.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
   }
-
-  priceY += 10;
-  doc.setDrawColor(...COLORS.gold);
-  doc.setLineWidth(1);
-  doc.line(117, priceY - 3, 185, priceY - 3);
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(11);
+  priceY += 5;
+  doc.setDrawColor(...border);
+  doc.line(left + 4, priceY - 3, left + contentWidth - 4, priceY - 3);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.total, 117, priceY + 5);
-  doc.setFontSize(16);
-  doc.text(`${data.total}€`, 185, priceY + 5, { align: 'right' });
+  doc.setFontSize(12);
+  doc.setTextColor(...accent);
+  doc.text(t.total.toUpperCase(), left + 4, priceY + 2);
+  doc.text(`${data.total.toFixed(2)}€`, left + contentWidth - 4, priceY + 2, { align: 'right' });
+  y += 30;
 
-  const disclaimerY = stepsY + 60;
-  doc.setFillColor(...COLORS.bgLight);
-  doc.roundedRect(15, disclaimerY, PAGE.contentWidth + 10, 14, 2, 2, 'F');
-  doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(7);
-  doc.setFont('helvetica', 'bold');
-  const validityDays = Math.max(1, Math.round(data.validityDays || 15));
-  doc.text(`${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix}`, 25, disclaimerY + 6);
-  doc.setTextColor(...COLORS.grayDark);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(6);
-  doc.text(t.disclaimer, 25, disclaimerY + 11);
-
-  let narrativeY = disclaimerY + 20;
-  const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 6);
-
+  const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 3);
   if (conditions.length > 0) {
-    narrativeY = checkPageBreak(doc, narrativeY, 32 + conditions.length * 5, headerTitle, branding);
-    doc.setFillColor(...COLORS.bgLight);
-    doc.roundedRect(15, narrativeY, PAGE.contentWidth + 10, 24 + conditions.length * 5, 3, 3, 'F');
-    doc.setTextColor(...COLORS.gold);
-    doc.setFontSize(8);
+    const conditionHeight = 8 + conditions.length * 4;
+    if (!ensureSpace(conditionHeight)) {
+      drawFooter();
+      return doc;
+    }
+    doc.setTextColor(...accent);
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text(t.conditions.toUpperCase(), 20, narrativeY + 8);
-    doc.setTextColor(...COLORS.grayDark);
-    doc.setFontSize(7);
+    doc.text(t.conditions.toUpperCase(), left, y);
+    y += 4.5;
+    doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
-    conditions.forEach((condition, index) => {
-      const shortLine = condition.length > 105 ? `${condition.slice(0, 102)}...` : condition;
-      doc.text(`- ${shortLine}`, 20, narrativeY + 14 + index * 5);
-    });
-    narrativeY += 32 + conditions.length * 5;
+    doc.setFontSize(8);
+    for (const condition of conditions) {
+      if (!ensureSpace(4.5)) break;
+      const lines = doc.splitTextToSize(`• ${condition}`, 175).slice(0, 1);
+      doc.text(lines, left, y);
+      y += 4 * lines.length;
+    }
+    y += 2;
   }
 
-  const whyChooseUs = (data.whyChooseUs || '').trim();
-  if (whyChooseUs) {
-    narrativeY = checkPageBreak(doc, narrativeY, 34, headerTitle, branding);
-    doc.setFillColor(255, 252, 240);
-    doc.roundedRect(15, narrativeY, PAGE.contentWidth + 10, 30, 3, 3, 'F');
-    doc.setFillColor(...COLORS.gold);
-    doc.rect(15, narrativeY, 2, 30, 'F');
-    doc.setTextColor(...COLORS.gold);
-    doc.setFontSize(8);
+  if (data.whyChooseUs?.trim()) {
+    const whyLines = doc.splitTextToSize(data.whyChooseUs.trim(), 174).slice(0, 2);
+    const boxHeight = 8 + whyLines.length * 4;
+    if (!ensureSpace(boxHeight + 1)) {
+      drawFooter();
+      return doc;
+    }
+    doc.setFillColor(...surface);
+    doc.roundedRect(left, y, contentWidth, boxHeight, 2, 2, 'F');
+    doc.setDrawColor(...border);
+    doc.roundedRect(left, y, contentWidth, boxHeight, 2, 2, 'S');
+    doc.setTextColor(...accent);
     doc.setFont('helvetica', 'bold');
-    doc.text(t.whyChooseUs.toUpperCase(), 20, narrativeY + 8);
-    doc.setTextColor(...COLORS.grayDark);
-    doc.setFontSize(7);
+    doc.setFontSize(10);
+    doc.text(t.whyChooseUs.toUpperCase(), left + 4, y + 5);
+    doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
-    const whyLines = doc.splitTextToSize(whyChooseUs, 170).slice(0, 3);
-    doc.text(whyLines, 20, narrativeY + 14);
+    doc.setFontSize(8);
+    doc.text(whyLines, left + 4, y + 9);
+    y += boxHeight + 1;
   }
 
-  addAllFooters(doc, branding);
+  if (!ensureSpace(8)) {
+    drawFooter();
+    return doc;
+  }
+  doc.setTextColor(...muted);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.text(`${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix} · ${t.disclaimer}`, left, y);
+
+  drawFooter();
   return doc;
 }
 

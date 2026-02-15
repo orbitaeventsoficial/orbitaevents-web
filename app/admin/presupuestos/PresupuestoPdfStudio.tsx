@@ -58,6 +58,36 @@ function buildPackFromForm(params: {
   };
 }
 
+async function translateTextForPdf(text: string, locale: Locale): Promise<string> {
+  const clean = text.trim();
+  if (!clean) return text;
+  try {
+    const res = await fetch('/api/admin/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: clean,
+        targetLanguages: [locale],
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data?.ok) return text;
+    return String(data?.translations?.[locale] || text);
+  } catch {
+    return text;
+  }
+}
+
+async function translateListForPdf(items: string[], locale: Locale): Promise<string[]> {
+  if (items.length === 0) return items;
+  const unique = Array.from(new Set(items.map((item) => item.trim()).filter(Boolean)));
+  const translatedPairs = await Promise.all(
+    unique.map(async (item) => [item, await translateTextForPdf(item, locale)] as const)
+  );
+  const dictionary = new Map<string, string>(translatedPairs);
+  return items.map((item) => dictionary.get(item.trim()) || item);
+}
+
 export default function PresupuestoPdfStudio() {
   const [locale, setLocale] = useState<Locale>('ca');
   const [eventType, setEventType] = useState<ServiceSlug>('bodas');
@@ -123,24 +153,6 @@ export default function PresupuestoPdfStudio() {
     return Math.max(0, basePrice + extrasPrice - Math.max(0, discount));
   }, [basePrice, extrasPrice, discount]);
 
-  const allExtrasForPdf = useMemo(() => {
-    const presetNames = mappedSelectedExtras.map((extra) => extra.name);
-    const customNames = customExtras.map((extra) => extra.name);
-    return [...presetNames, ...customNames];
-  }, [mappedSelectedExtras, customExtras]);
-
-  const extrasCatalogForPdf = useMemo<ExtraDefinition[]>(() => {
-    const customAsCatalog: ExtraDefinition[] = customExtras.map((extra) => ({
-      id: extra.id,
-      name: extra.name,
-      description: 'Extra personalizado',
-      price: extra.price,
-      icon: '•',
-      category: 'other',
-    }));
-    return [...EXTRAS, ...customAsCatalog];
-  }, [customExtras]);
-
   function reloadPackValues(nextPackId: string, nextService?: ServiceSlug) {
     const service = nextService || eventType;
     const available = getPacksByService(service);
@@ -178,12 +190,54 @@ export default function PresupuestoPdfStudio() {
 
   async function buildPdf() {
     if (!selectedPack) return null;
+    const translatedPackName = await translateTextForPdf(packName, locale);
+    const translatedFeatures = await translateListForPdf(toFeatureLines(featuresText), locale);
+    const translatedConditions = await translateListForPdf(toFeatureLines(conditionsText), locale);
+    const translatedWhy = await translateTextForPdf(whyChooseUs, locale);
+
+    const translatedPresetExtras = await Promise.all(
+      mappedSelectedExtras.map(async (extra) => ({
+        ...extra,
+        name: await translateTextForPdf(extra.name, locale),
+      }))
+    );
+    const translatedCustomExtras = await Promise.all(
+      customExtras.map(async (extra) => ({
+        ...extra,
+        name: await translateTextForPdf(extra.name, locale),
+      }))
+    );
+
+    const translatedExtrasNames = [
+      ...translatedPresetExtras.map((extra) => extra.name),
+      ...translatedCustomExtras.map((extra) => extra.name),
+    ];
+
+    const translatedExtrasCatalog: ExtraDefinition[] = [
+      ...translatedPresetExtras.map((extra) => ({
+        id: extra.id,
+        name: extra.name,
+        description: extra.description || 'Extra',
+        price: extra.price || 0,
+        icon: extra.icon || '•',
+        category: extra.category || 'other',
+      })),
+      ...translatedCustomExtras.map((extra) => ({
+        id: extra.id,
+        name: extra.name,
+        description: 'Extra personalitzat',
+        price: extra.price,
+        icon: '•',
+        category: 'other' as const,
+      })),
+    ];
+
     const finalPack = buildPackFromForm({
       source: selectedPack,
-      name: packName,
+      name: translatedPackName || packName,
       price: basePrice,
       durationHours,
-      featuresText,
+      featuresText: translatedFeatures.join('\n'),
     });
 
     return generateQuotePDF(
@@ -192,8 +246,8 @@ export default function PresupuestoPdfStudio() {
         pack: finalPack,
         date: eventDate || '-',
         guests: Math.max(0, Number(guests) || 0),
-        extras: allExtrasForPdf,
-        extrasCatalog: extrasCatalogForPdf,
+        extras: translatedExtrasNames,
+        extrasCatalog: translatedExtrasCatalog,
         basePrice: Math.max(0, Number(basePrice) || 0),
         extrasPrice,
         discount: Math.max(0, Number(discount) || 0),
@@ -204,8 +258,8 @@ export default function PresupuestoPdfStudio() {
         clientEmail: clientEmail.trim() || '',
         clientPhone: clientPhone.trim() || undefined,
         validityDays,
-        conditions: toFeatureLines(conditionsText),
-        whyChooseUs: whyChooseUs.trim() || undefined,
+        conditions: translatedConditions,
+        whyChooseUs: translatedWhy.trim() || undefined,
       },
       locale,
       {
