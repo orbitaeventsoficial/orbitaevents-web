@@ -594,10 +594,17 @@ export async function generateQuotePDF(
     .slice(0, 4);
 
   if (features.length > 0) {
-    if (!ensureSpace(8 + features.length * lineHeight)) {
+    const featureRows = features.map((feature) => doc.splitTextToSize(feature, 170).slice(0, 2).length);
+    const featureLinesTotal = featureRows.reduce((sum, n) => sum + n, 0);
+    const featuresBoxHeight = 10 + featureLinesTotal * lineHeight + 2;
+    if (!ensureSpace(featuresBoxHeight + 2)) {
       drawFooter();
       return doc;
     }
+    doc.setFillColor(...surface);
+    doc.roundedRect(left, y - 4, contentWidth, featuresBoxHeight, 2, 2, 'F');
+    doc.setDrawColor(...border);
+    doc.roundedRect(left, y - 4, contentWidth, featuresBoxHeight, 2, 2, 'S');
     doc.setTextColor(...accent);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
@@ -619,10 +626,17 @@ export async function generateQuotePDF(
 
   if (data.extras.length > 0) {
     const extrasRows = data.extras.slice(0, 4);
-    if (!ensureSpace(8 + extrasRows.length * lineHeight)) {
+    const extraLineCounts = extrasRows.map((extraName) => doc.splitTextToSize(extraName, 145).slice(0, 2).length);
+    const extrasLinesTotal = extraLineCounts.reduce((sum, n) => sum + n, 0);
+    const extrasBoxHeight = 10 + extrasLinesTotal * lineHeight + 2;
+    if (!ensureSpace(extrasBoxHeight + 2)) {
       drawFooter();
       return doc;
     }
+    doc.setFillColor(...surface);
+    doc.roundedRect(left, y - 4, contentWidth, extrasBoxHeight, 2, 2, 'F');
+    doc.setDrawColor(...border);
+    doc.roundedRect(left, y - 4, contentWidth, extrasBoxHeight, 2, 2, 'S');
     doc.setTextColor(...accent);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
@@ -706,11 +720,17 @@ export async function generateQuotePDF(
 
   const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 4);
   if (conditions.length > 0) {
-    const conditionHeight = 9 + conditions.length * 5;
-    if (!ensureSpace(conditionHeight)) {
+    const conditionLineCounts = conditions.map((condition) => doc.splitTextToSize(`• ${condition}`, 175).slice(0, 2).length);
+    const conditionLinesTotal = conditionLineCounts.reduce((sum, n) => sum + n, 0);
+    const conditionHeight = 10 + conditionLinesTotal * 4.4;
+    if (!ensureSpace(conditionHeight + 2)) {
       drawFooter();
       return doc;
     }
+    doc.setFillColor(...surface);
+    doc.roundedRect(left, y - 4, contentWidth, conditionHeight, 2, 2, 'F');
+    doc.setDrawColor(...border);
+    doc.roundedRect(left, y - 4, contentWidth, conditionHeight, 2, 2, 'S');
     doc.setTextColor(...accent);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
