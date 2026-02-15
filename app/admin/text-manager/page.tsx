@@ -1,7 +1,7 @@
 'use client';
 import { log } from '@/lib/logger';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -198,6 +198,11 @@ export default function TextManagerPage() {
   const [activeLanguage, setActiveLanguage] = useState<'es' | 'ca' | 'en'>('es');
   const [resultsPage, setResultsPage] = useState(1);
   const resultsPageSize = 100;
+  const listViewportRef = useRef<HTMLDivElement | null>(null);
+  const [virtualScrollTop, setVirtualScrollTop] = useState(0);
+  const [virtualViewportHeight, setVirtualViewportHeight] = useState(0);
+  const VIRTUAL_ROW_ESTIMATE = 320;
+  const VIRTUAL_OVERSCAN = 3;
 
   // Historial de canvis
   const [changeHistory, setChangeHistory] = useState<Array<{
@@ -487,6 +492,137 @@ export default function TextManagerPage() {
   useEffect(() => {
     if (resultsPage > totalFilteredPages) setResultsPage(totalFilteredPages);
   }, [resultsPage, totalFilteredPages]);
+
+  useEffect(() => {
+    const updateViewport = () => {
+      if (!listViewportRef.current) return;
+      setVirtualViewportHeight(listViewportRef.current.clientHeight);
+    };
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+    return () => window.removeEventListener('resize', updateViewport);
+  }, [resultsPage, activeLanguage, showComparison]);
+
+  const shouldVirtualize = paginatedFilteredTexts.length > 50;
+  const virtualRange = useMemo(() => {
+    if (!shouldVirtualize) {
+      return { startIndex: 0, endIndex: paginatedFilteredTexts.length };
+    }
+    const visibleRows = Math.max(1, Math.ceil(virtualViewportHeight / VIRTUAL_ROW_ESTIMATE));
+    const startIndex = Math.max(0, Math.floor(virtualScrollTop / VIRTUAL_ROW_ESTIMATE) - VIRTUAL_OVERSCAN);
+    const endIndex = Math.min(
+      paginatedFilteredTexts.length,
+      startIndex + visibleRows + VIRTUAL_OVERSCAN * 2
+    );
+    return { startIndex, endIndex };
+  }, [paginatedFilteredTexts.length, shouldVirtualize, virtualViewportHeight, virtualScrollTop]);
+
+  const visibleEntries = useMemo(() => {
+    return paginatedFilteredTexts.slice(virtualRange.startIndex, virtualRange.endIndex);
+  }, [paginatedFilteredTexts, virtualRange.startIndex, virtualRange.endIndex]);
+
+  const topSpacerHeight = shouldVirtualize ? virtualRange.startIndex * VIRTUAL_ROW_ESTIMATE : 0;
+  const bottomSpacerHeight = shouldVirtualize
+    ? Math.max(0, (paginatedFilteredTexts.length - virtualRange.endIndex) * VIRTUAL_ROW_ESTIMATE)
+    : 0;
+
+  const renderTextCard = (path: string, value: string) => {
+    const isModified = value !== originalTexts[path];
+    const otherLangValues = {
+      es: esTexts[path],
+      ca: caTexts[path],
+      en: enTexts[path]
+    };
+
+    return (
+      <div
+        key={path}
+        className={`bg-slate-900/70 rounded-xl border transition-all ${
+          isModified
+            ? 'border-orange-300 shadow-md shadow-orange-100'
+            : 'border-slate-700/60 hover:border-slate-700/60'
+        }`}
+      >
+        <div className="p-4">
+          <div className="flex items-start justify-between gap-4 mb-3">
+            <div className="flex-1 min-w-0">
+              <code className="text-sm text-slate-400 break-all font-mono bg-slate-800 px-2 py-1 rounded">
+                {path}
+              </code>
+              {isModified && (
+                <span className="ml-2 text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                  ✏️ Modificat
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              {isModified && (
+                <button
+                  onClick={() => handleRevert(path)}
+                  className="text-xs px-3 py-1 rounded-lg border border-slate-600 bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
+                  title="Revertir canvis"
+                >
+                  ↩️ Revertir
+                </button>
+              )}
+              <span className="text-xs text-slate-400">
+                {value.length} caràcters
+              </span>
+            </div>
+          </div>
+
+          <textarea
+            value={value}
+            onChange={(e) => handleTextChange(path, e.target.value)}
+            rows={value.length > 100 ? 3 : value.length > 50 ? 2 : 1}
+            className={`w-full px-4 py-3 rounded-lg border transition-all resize-none font-sans ${
+              isModified
+                ? 'border-orange-500/40 bg-orange-500/10 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20'
+                : 'border-slate-700/60 bg-slate-900/60 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+            }`}
+            placeholder="Text buit..."
+          />
+
+          {showComparison && (
+            <div className="mt-3 space-y-2">
+              {activeLanguage !== 'es' && otherLangValues.es && (
+                <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10">
+                  <div className="flex items-center gap-2 text-xs text-rose-300 mb-1">
+                    <span className="font-semibold">🇪🇸 Espanyol:</span>
+                  </div>
+                  <p className="text-sm text-rose-200">{otherLangValues.es}</p>
+                </div>
+              )}
+              {activeLanguage !== 'ca' && otherLangValues.ca && (
+                <div className="p-3 rounded-lg border border-blue-500/30 bg-blue-500/10">
+                  <div className="flex items-center gap-2 text-xs text-blue-300 mb-1">
+                    <span className="font-semibold">🏴 Català:</span>
+                  </div>
+                  <p className="text-sm text-blue-200">{otherLangValues.ca}</p>
+                </div>
+              )}
+              {activeLanguage !== 'en' && otherLangValues.en && (
+                <div className="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10">
+                  <div className="flex items-center gap-2 text-xs text-emerald-300 mb-1">
+                    <span className="font-semibold">🇬🇧 English:</span>
+                  </div>
+                  <p className="text-sm text-emerald-200">{otherLangValues.en}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {isModified && (
+            <div className="mt-2 p-2 rounded-lg text-xs text-slate-400 border border-slate-700 bg-slate-900/60">
+              <span className="font-medium">Original:</span>{' '}
+              <span className="italic">{originalTexts[path]}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   const sectionCounts = useMemo(() => {
     const counts: Record<string, { total: number; modified: number }> = {};
@@ -866,108 +1002,19 @@ export default function TextManagerPage() {
                     )}
                   </div>
 
-                {paginatedFilteredTexts.map(([path, value]) => {
-                  const isModified = value !== originalTexts[path];
-                  const otherLangValues = {
-                    es: esTexts[path],
-                    ca: caTexts[path],
-                    en: enTexts[path]
-                  };
-                  
-                  return (
-                    <div
-                      key={path}
-                      className={`bg-slate-900/70 rounded-xl border transition-all ${
-                        isModified
-                          ? 'border-orange-300 shadow-md shadow-orange-100'
-                          : 'border-slate-700/60 hover:border-slate-700/60'
-                      }`}
-                    >
-                      <div className="p-4">
-                        {/* Capçalera del text */}
-                        <div className="flex items-start justify-between gap-4 mb-3">
-                          <div className="flex-1 min-w-0">
-                            <code className="text-sm text-slate-400 break-all font-mono bg-slate-800 px-2 py-1 rounded">
-                              {path}
-                            </code>
-                            {isModified && (
-                              <span className="ml-2 text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
-                                ✏️ Modificat
-                              </span>
-                            )}
-                          </div>
-                          
-                          {/* Accions */}
-                          <div className="flex items-center gap-2">
-                            {isModified && (
-                              <button
-                                onClick={() => handleRevert(path)}
-                                className="text-xs px-3 py-1 rounded-lg border border-slate-600 bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
-                                title="Revertir canvis"
-                              >
-                                ↩️ Revertir
-                              </button>
-                            )}
-                            <span className="text-xs text-slate-400">
-                              {value.length} caràcters
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Editor de text */}
-                        <textarea
-                          value={value}
-                          onChange={(e) => handleTextChange(path, e.target.value)}
-                          rows={value.length > 100 ? 3 : value.length > 50 ? 2 : 1}
-                          className={`w-full px-4 py-3 rounded-lg border transition-all resize-none font-sans ${
-                            isModified
-                              ? 'border-orange-500/40 bg-orange-500/10 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20'
-                              : 'border-slate-700/60 bg-slate-900/60 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
-                          }`}
-                          placeholder="Text buit..."
-                        />
-
-                        {/* Comparació amb altres idiomes */}
-                        {showComparison && (
-                          <div className="mt-3 space-y-2">
-                            {activeLanguage !== 'es' && otherLangValues.es && (
-                              <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10">
-                                <div className="flex items-center gap-2 text-xs text-rose-300 mb-1">
-                                  <span className="font-semibold">🇪🇸 Espanyol:</span>
-                                </div>
-                                <p className="text-sm text-rose-200">{otherLangValues.es}</p>
-                              </div>
-                            )}
-                            {activeLanguage !== 'ca' && otherLangValues.ca && (
-                              <div className="p-3 rounded-lg border border-blue-500/30 bg-blue-500/10">
-                                <div className="flex items-center gap-2 text-xs text-blue-300 mb-1">
-                                  <span className="font-semibold">🏴 Català:</span>
-                                </div>
-                                <p className="text-sm text-blue-200">{otherLangValues.ca}</p>
-                              </div>
-                            )}
-                            {activeLanguage !== 'en' && otherLangValues.en && (
-                              <div className="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10">
-                                <div className="flex items-center gap-2 text-xs text-emerald-300 mb-1">
-                                  <span className="font-semibold">🇬🇧 English:</span>
-                                </div>
-                                <p className="text-sm text-emerald-200">{otherLangValues.en}</p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Valor original si modificat */}
-                        {isModified && (
-                          <div className="mt-2 p-2 rounded-lg text-xs text-slate-400 border border-slate-700 bg-slate-900/60">
-                            <span className="font-medium">Original:</span>{' '}
-                            <span className="italic">{originalTexts[path]}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                {shouldVirtualize ? (
+                  <div
+                    ref={listViewportRef}
+                    onScroll={(event) => setVirtualScrollTop(event.currentTarget.scrollTop)}
+                    className="max-h-[72vh] overflow-y-auto pr-1 space-y-3"
+                  >
+                    <div style={{ height: topSpacerHeight }} />
+                    {visibleEntries.map(([path, value]) => renderTextCard(path, value))}
+                    <div style={{ height: bottomSpacerHeight }} />
+                  </div>
+                ) : (
+                  paginatedFilteredTexts.map(([path, value]) => renderTextCard(path, value))
+                )}
                 </>
               )}
             </div>
