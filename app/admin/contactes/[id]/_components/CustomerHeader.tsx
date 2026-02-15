@@ -24,6 +24,16 @@ export default function CustomerHeader({
   setTab: (tab: TabKey) => void;
 }) {
   const id = data.customer.id;
+  const statusLabel =
+    data.customer.status === 'CONFIRMED'
+      ? 'Confirmat'
+      : data.customer.status === 'NEGOTIATION'
+        ? 'En negociació'
+        : data.customer.status === 'POSTEVENT'
+          ? 'Post-esdeveniment'
+          : data.customer.status === 'LOST'
+            ? 'Perdut'
+            : 'Lead';
   const statusTone =
     data.customer.status === 'CONFIRMED'
       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
@@ -41,11 +51,11 @@ export default function CustomerHeader({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <Link href="/admin/clientes" className="text-xs text-slate-400 hover:text-slate-200">
+              <Link href="/admin/contactes" className="text-xs text-slate-400 hover:text-slate-200">
                 ← Clients
               </Link>
               <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${statusTone}`}>
-                {data.customer.status}
+                {statusLabel}
               </span>
             </div>
             <h1 className="mt-1 truncate text-xl font-semibold text-slate-100">{data.customer.name}</h1>
