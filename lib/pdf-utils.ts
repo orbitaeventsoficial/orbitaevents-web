@@ -93,6 +93,24 @@ function fitWithin(
   return { width: width * ratio, height: height * ratio };
 }
 
+function formatClientDate(input: string, locale: 'ca' | 'es' | 'en'): string {
+  const raw = (input || '').trim();
+  if (!raw) return '-';
+  const direct = new Date(raw);
+  if (!Number.isNaN(direct.getTime())) {
+    return direct.toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB');
+  }
+  const parts = raw.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
+  if (!parts) return raw;
+  const day = Number(parts[1]);
+  const month = Number(parts[2]) - 1;
+  let year = Number(parts[3]);
+  if (year < 100) year += 2000;
+  const parsed = new Date(year, month, day);
+  if (Number.isNaN(parsed.getTime())) return raw;
+  return parsed.toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB');
+}
+
 function checkPageBreak(
   doc: jsPDFType,
   currentY: number,
@@ -437,6 +455,7 @@ export async function generateQuotePDF(
   const quoteRef = `OE-${Date.now().toString(36).toUpperCase()}`;
   const issueDate = new Date().toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB');
   const eventTypeName = SERVICE_NAMES[data.eventType as ServiceSlug]?.[locale] || data.eventType;
+  const eventDate = formatClientDate(data.date || '-', locale);
   const brandName = branding?.brandName?.trim() || 'Orbita Events';
   const validityDays = Math.max(1, Math.round(data.validityDays || 15));
 
@@ -550,17 +569,22 @@ export async function generateQuotePDF(
     drawFooter();
     return doc;
   }
-  const eventTypeLines = Math.min(2, doc.splitTextToSize(`${eventTypeName}`, 80).length);
-  const dateLines = Math.min(2, doc.splitTextToSize(data.date || '-', 85).length);
-  const guestsLines = 1;
-  const eventBoxHeight = 14 + Math.max(eventTypeLines, dateLines + guestsLines) * 4.8;
+  const eventTypeLines = Math.min(3, doc.splitTextToSize(`${eventTypeName}`, 80).length);
+  const dateLines = Math.min(3, doc.splitTextToSize(eventDate, 85).length);
+  const guestsLines = Math.min(2, doc.splitTextToSize(`${Math.max(0, data.guests)}`, 85).length);
+  const labelToValueGap = 5.5;
+  const eventRowHeight = 4.9;
+  const fieldHeight = (lineCount: number) => labelToValueGap + lineCount * eventRowHeight;
+  const rightFieldHeight = fieldHeight(dateLines) + 2.5 + fieldHeight(guestsLines);
+  const leftFieldHeight = fieldHeight(eventTypeLines);
+  const eventBoxHeight = 11 + Math.max(leftFieldHeight, rightFieldHeight);
   doc.setFillColor(...surface);
   doc.roundedRect(left, y, contentWidth, eventBoxHeight, 3, 3, 'F');
   doc.setDrawColor(...border);
   doc.roundedRect(left, y, contentWidth, eventBoxHeight, 3, 3, 'S');
-  drawLabelValue(t.eventDetails, `${eventTypeName}`, left + 4, y + 6, 80, 2);
-  const dateUsed = drawLabelValue('Data', data.date || '-', left + 88, y + 6, 85, 2);
-  drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 6 + dateUsed * 4.8 + 2, 85, 1);
+  drawLabelValue(t.eventDetails, `${eventTypeName}`, left + 4, y + 6, 80, 3);
+  const dateUsed = drawLabelValue(t.issueDate, eventDate, left + 88, y + 6, 85, 3);
+  drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 6 + fieldHeight(dateUsed) + 2.5, 85, 2);
   y += eventBoxHeight + 5;
 
   if (!ensureSpace(18)) {
@@ -667,7 +691,18 @@ export async function generateQuotePDF(
     data.discount > 0 && data.discountReason?.trim()
       ? Math.min(2, doc.splitTextToSize(data.discountReason.trim(), 120).length)
       : 0;
-  const summaryHeight = 22 + (data.discount > 0 ? 4.5 : 0) + discountReasonLines * 3.8;
+  const summaryRows = 2 + (data.discount > 0 ? 1 : 0);
+  const summaryTopPadding = 8;
+  const summaryRowGap = 5;
+  const summaryReasonGap = discountReasonLines > 0 ? 4.2 + discountReasonLines * 3.8 : 0;
+  const summaryTotalGap = 11;
+  const summaryBottomPadding = 4;
+  const summaryHeight =
+    summaryTopPadding +
+    summaryRows * summaryRowGap +
+    summaryReasonGap +
+    summaryTotalGap +
+    summaryBottomPadding;
 
   if (!ensureSpace(summaryHeight + 4)) {
     drawFooter();
@@ -682,41 +717,44 @@ export async function generateQuotePDF(
   doc.setFontSize(9.5);
   doc.text(t.priceSummary, left + 4, y + 7);
 
-  let priceY = y + 11;
+  let priceY = y + summaryTopPadding + 3;
   doc.setTextColor(...neutral);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.text(t.basePack, left + 4, priceY);
   doc.text(`${data.basePrice.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
-  priceY += 4.5;
+  priceY += summaryRowGap;
   doc.text(t.extrasTotal, left + 4, priceY);
   doc.text(`${data.extrasPrice.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
   if (data.discount > 0) {
-    priceY += 4.5;
+    priceY += summaryRowGap;
     doc.text(t.discount, left + 4, priceY);
     doc.text(`-${data.discount.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
 
     const reason = data.discountReason?.trim();
     if (reason) {
-      priceY += 3.8;
+      priceY += 4.2;
       doc.setTextColor(...muted);
       doc.setFontSize(7.5);
       const reasonLines = doc.splitTextToSize(reason, 120).slice(0, 2);
       doc.text(reasonLines, left + 4, priceY);
       doc.setTextColor(...neutral);
       doc.setFontSize(9);
-      priceY += 3.5 * reasonLines.length;
+      priceY += 3.8 * reasonLines.length;
     }
   }
-  priceY += 5;
+  priceY += 6;
   doc.setDrawColor(...border);
   doc.line(left + 4, priceY - 3, left + contentWidth - 4, priceY - 3);
+  doc.setFillColor(34, 31, 10);
+  doc.roundedRect(left + 3, priceY - 0.5, contentWidth - 6, 7.5, 1.5, 1.5, 'F');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
+  doc.setFontSize(13);
   doc.setTextColor(...accent);
-  doc.text(t.total.toUpperCase(), left + 4, priceY + 2);
-  doc.text(`${data.total.toFixed(2)}€`, left + contentWidth - 4, priceY + 2, { align: 'right' });
-  y += summaryHeight + 4;
+  doc.text(t.total.toUpperCase(), left + 6, priceY + 4.8);
+  doc.setFontSize(18);
+  doc.text(`${data.total.toFixed(2)}€`, left + contentWidth - 6, priceY + 5.1, { align: 'right' });
+  y += summaryHeight + 5;
 
   const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 4);
   if (conditions.length > 0) {
