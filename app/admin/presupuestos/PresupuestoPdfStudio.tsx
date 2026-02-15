@@ -196,6 +196,39 @@ export default function PresupuestoPdfStudio({
   const [allowBrandOverride, setAllowBrandOverride] = useState(false);
   const isCustomerScoped = Boolean(customerId);
 
+  useEffect(() => {
+    if (logoDataUrl) return;
+
+    const candidates = [
+      '/img/ologo-text-dreta.png',
+      '/img/ologo-text-dreta.jpg',
+      '/img/logo-text-dreta.png',
+      '/img/logo-text-dreta.jpg',
+    ];
+
+    const tryLoadLogo = async () => {
+      for (const url of candidates) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const blob = await res.blob();
+          const dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result));
+            reader.onerror = () => reject(new Error('Failed to read logo blob'));
+            reader.readAsDataURL(blob);
+          });
+          setLogoDataUrl(dataUrl);
+          return;
+        } catch {
+          // keep trying next candidate
+        }
+      }
+    };
+
+    void tryLoadLogo();
+  }, [logoDataUrl]);
+
   const packs = useMemo(() => getPacksByService(eventType), [eventType]);
 
   const selectedPack = useMemo(() => {

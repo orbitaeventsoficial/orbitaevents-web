@@ -463,8 +463,6 @@ export async function generateQuotePDF(
   doc.setFillColor(18, 20, 24);
   doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
 
-  const ensureSpace = (space: number): boolean => y + space <= pageBottom;
-
   const drawLabelValue = (
     label: string,
     value: string,
@@ -548,6 +546,14 @@ export async function generateQuotePDF(
     y += headerHeight + 8;
   };
 
+  const ensureSpace = (space: number): boolean => {
+    // Never truncate: if content doesn't fit, continue on a new page.
+    if (y + space <= pageBottom) return true;
+    doc.addPage();
+    drawHeader(true);
+    return y + space <= pageBottom;
+  };
+
   const drawFooter = () => {
     const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
     const email = branding?.contactEmail?.trim() || SITE_CONFIG.business.email;
@@ -562,10 +568,7 @@ export async function generateQuotePDF(
 
   drawHeader(false);
 
-  if (!ensureSpace(22)) {
-    drawFooter();
-    return doc;
-  }
+  ensureSpace(22);
   const clientValue = data.clientName || data.clientContact || '-';
   const contactValue = [data.clientContact, data.clientEmail, data.clientPhone].filter(Boolean).join(' · ') || '-';
   const clientLinesCount = Math.min(3, doc.splitTextToSize(clientValue, 70).length);
@@ -574,12 +577,9 @@ export async function generateQuotePDF(
   drawCard(left, y, contentWidth, clientBoxHeight, 2, true);
   drawLabelValue('Client', clientValue, left + 4, y + 6, 70, 3);
   drawLabelValue(t.contact, contactValue, left + 88, y + 6, 85, 3);
-  y += clientBoxHeight + 6;
+  y += clientBoxHeight + 8;
 
-  if (!ensureSpace(30)) {
-    drawFooter();
-    return doc;
-  }
+  ensureSpace(30);
   const eventTypeLines = Math.min(3, doc.splitTextToSize(`${eventTypeName}`, 80).length);
   const dateLines = Math.min(3, doc.splitTextToSize(eventDate, 85).length);
   const guestsLines = Math.min(2, doc.splitTextToSize(`${Math.max(0, data.guests)}`, 85).length);
@@ -593,87 +593,78 @@ export async function generateQuotePDF(
   drawLabelValue(t.eventDetails, `${eventTypeName}`, left + 4, y + 6, 80, 3);
   const dateUsed = drawLabelValue(t.issueDate, eventDate, left + 88, y + 6, 85, 3);
   drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 6 + fieldHeight(dateUsed) + 2.5, 85, 2);
-  y += eventBoxHeight + 5;
+  y += eventBoxHeight + 7;
 
   const packNameLines = doc.splitTextToSize(data.pack.name, 126).slice(0, 2);
-  const packInfoHeight = 20 + (packNameLines.length - 1) * 4;
-  if (!ensureSpace(packInfoHeight + 7)) {
-    drawFooter();
-    return doc;
-  }
-  drawCard(left, y - 3, contentWidth, packInfoHeight + 2, 2, false);
+  const packInfoHeight = 22 + (packNameLines.length - 1) * 4.6;
+  ensureSpace(packInfoHeight + 7);
+  drawCard(left, y - 3, contentWidth, packInfoHeight + 3, 2, false);
   doc.setTextColor(...accent);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
+  doc.setFontSize(10.5);
   doc.text(t.selectedPack.toUpperCase(), left + 4, y + 2);
-  y += 7;
+  y += 7.5;
   doc.setTextColor(...neutral);
-  doc.setFontSize(12.5);
+  doc.setFontSize(13);
   doc.text(packNameLines, left + 4, y);
   doc.setFontSize(10);
   doc.setTextColor(...muted);
-  doc.text(`${data.pack.durationHours} ${t.hours}`, left + 4, y + 7 + (packNameLines.length - 1) * 4.2);
+  doc.text(`${data.pack.durationHours} ${t.hours}`, left + 4, y + 7.5 + (packNameLines.length - 1) * 4.6);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...accent);
   doc.setFontSize(16);
   doc.text(`${data.basePrice.toFixed(2)}€`, left + contentWidth - 4, y + 2, { align: 'right' });
-  y += 13 + (packNameLines.length - 1) * 4;
+  y += 14.5 + (packNameLines.length - 1) * 4.6;
 
   const features = data.pack.features
     .map((feature) => feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim())
     .filter(Boolean)
-    .slice(0, 4);
+    .slice(0, 6);
 
   if (features.length > 0) {
     const featureRows = features.map((feature) => doc.splitTextToSize(feature, 170).slice(0, 2).length);
     const featureLinesTotal = featureRows.reduce((sum, n) => sum + n, 0);
-    const featuresBoxHeight = 10 + featureLinesTotal * lineHeight + 2;
-    if (!ensureSpace(featuresBoxHeight + 2)) {
-      drawFooter();
-      return doc;
-    }
+    const featuresBoxHeight = 12 + featureLinesTotal * lineHeight + 4;
+    ensureSpace(featuresBoxHeight + 2);
     drawCard(left, y - 4, contentWidth, featuresBoxHeight, 2, false);
     doc.setTextColor(...accent);
     doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
     doc.text(t.features, left + 4, y);
-    y += 5;
+    y += 6;
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
     for (const feature of features) {
-      if (!ensureSpace(lineHeight + 1)) break;
+      ensureSpace(lineHeight + 1);
       doc.setFillColor(...accent);
-      doc.circle(left + 5.5, y - 1.3, 0.9, 'F');
+      doc.circle(left + 5.5, y - 1.25, 0.95, 'F');
       const lines = doc.splitTextToSize(feature, 170).slice(0, 2);
       doc.text(lines, left + 9, y);
       y += lineHeight * lines.length;
     }
-    y += 2;
+    y += 3;
   }
 
   if (data.extras.length > 0) {
-    const extrasRows = data.extras.slice(0, 4);
+    const extrasRows = data.extras.slice(0, 6);
     const extraLineCounts = extrasRows.map((extraName) => doc.splitTextToSize(extraName, 145).slice(0, 2).length);
     const extrasLinesTotal = extraLineCounts.reduce((sum, n) => sum + n, 0);
-    const extrasBoxHeight = 10 + extrasLinesTotal * lineHeight + 2;
-    if (!ensureSpace(extrasBoxHeight + 2)) {
-      drawFooter();
-      return doc;
-    }
+    const extrasBoxHeight = 12 + extrasLinesTotal * lineHeight + 4;
+    ensureSpace(extrasBoxHeight + 2);
     drawCard(left, y - 4, contentWidth, extrasBoxHeight, 2, false);
     doc.setTextColor(...accent);
     doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
     doc.text(t.extras, left + 4, y);
-    y += 5;
+    y += 6;
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...neutral);
     doc.setFontSize(9);
     for (const extraName of extrasRows) {
       const extra = extrasCatalog.find((item) => item.name === extraName || item.id === extraName);
       const priceText = typeof extra?.price === 'number' ? `+${extra.price}€` : '';
-      if (!ensureSpace(lineHeight + 1)) break;
+      ensureSpace(lineHeight + 1);
       const lines = doc.splitTextToSize(extraName, 145).slice(0, 2);
       doc.text(lines, left + 4, y);
       if (priceText) {
@@ -685,7 +676,7 @@ export async function generateQuotePDF(
       }
       y += lineHeight * lines.length;
     }
-    y += 2;
+    y += 3;
   }
 
   const discountReasonLines =
@@ -694,9 +685,9 @@ export async function generateQuotePDF(
       : 0;
   const summaryRows = 2 + (data.discount > 0 ? 1 : 0);
   const summaryTopPadding = 8;
-  const summaryRowGap = 5;
+  const summaryRowGap = 6;
   const summaryReasonGap = discountReasonLines > 0 ? 4.2 + discountReasonLines * 3.8 : 0;
-  const summaryTotalGap = 11;
+  const summaryTotalGap = 12;
   const summaryBottomPadding = 4;
   const summaryHeight =
     summaryTopPadding +
@@ -705,10 +696,7 @@ export async function generateQuotePDF(
     summaryTotalGap +
     summaryBottomPadding;
 
-  if (!ensureSpace(summaryHeight + 4)) {
-    drawFooter();
-    return doc;
-  }
+  ensureSpace(summaryHeight + 4);
   drawCard(left, y, contentWidth, summaryHeight, 2, true);
   doc.setTextColor(...accent);
   doc.setFont('helvetica', 'bold');
@@ -745,49 +733,43 @@ export async function generateQuotePDF(
   doc.setDrawColor(...border);
   doc.line(left + 4, priceY - 3, left + contentWidth - 4, priceY - 3);
   doc.setFillColor(34, 31, 10);
-  doc.roundedRect(left + 3, priceY - 0.5, contentWidth - 6, 7.5, 1.5, 1.5, 'F');
+  doc.roundedRect(left + 3, priceY - 0.5, contentWidth - 6, 8.5, 1.6, 1.6, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
   doc.setTextColor(...accent);
-  doc.text(t.total.toUpperCase(), left + 6, priceY + 4.8);
+  doc.text(t.total.toUpperCase(), left + 6, priceY + 5.4);
   doc.setFontSize(18);
-  doc.text(`${data.total.toFixed(2)}€`, left + contentWidth - 6, priceY + 5.1, { align: 'right' });
-  y += summaryHeight + 5;
+  doc.text(`${data.total.toFixed(2)}€`, left + contentWidth - 6, priceY + 5.7, { align: 'right' });
+  y += summaryHeight + 7;
 
-  const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 4);
+  const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 6);
   if (conditions.length > 0) {
     const conditionLineCounts = conditions.map((condition) => doc.splitTextToSize(`• ${condition}`, 175).slice(0, 2).length);
     const conditionLinesTotal = conditionLineCounts.reduce((sum, n) => sum + n, 0);
-    const conditionHeight = 12 + conditionLinesTotal * lineHeight;
-    if (!ensureSpace(conditionHeight + 2)) {
-      drawFooter();
-      return doc;
-    }
+    const conditionHeight = 12 + conditionLinesTotal * lineHeight + 4;
+    ensureSpace(conditionHeight + 2);
     drawCard(left, y - 4, contentWidth, conditionHeight, 2, false);
     doc.setTextColor(...accent);
     doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
     doc.text(t.conditions, left + 4, y);
-    y += 6;
+    y += 6.5;
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.2);
     for (const condition of conditions) {
-      if (!ensureSpace(lineHeight + 1)) break;
+      ensureSpace(lineHeight + 1);
       const lines = doc.splitTextToSize(`• ${condition}`, 175).slice(0, 2);
       doc.text(lines, left + 4, y);
       y += lineHeight * lines.length;
     }
-    y += 2.5;
+    y += 3.5;
   }
 
   if (data.whyChooseUs?.trim()) {
     const whyLines = doc.splitTextToSize(data.whyChooseUs.trim(), 174).slice(0, 3);
     const boxHeight = 12 + whyLines.length * lineHeight;
-    if (!ensureSpace(boxHeight + 1)) {
-      drawFooter();
-      return doc;
-    }
+    ensureSpace(boxHeight + 1);
     drawCard(left, y, contentWidth, boxHeight, 2, true);
     doc.setTextColor(...accent);
     doc.setFont('helvetica', 'bold');
@@ -800,10 +782,7 @@ export async function generateQuotePDF(
     y += boxHeight + 1.5;
   }
 
-  if (!ensureSpace(8)) {
-    drawFooter();
-    return doc;
-  }
+  ensureSpace(8);
   doc.setTextColor(...muted);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
