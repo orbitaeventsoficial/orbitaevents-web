@@ -646,10 +646,10 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 ? 'border-amber-400/70 bg-amber-500/20 text-amber-200'
                 : 'border-slate-700/80 text-slate-200 hover:bg-slate-800 active:bg-slate-700'
             }`}
-            aria-label="Activar o desactivar modo ayuda"
+            aria-label="Activar o desactivar mode ajuda"
             aria-pressed={helpModeEnabled}
           >
-            ❓ Ayuda
+            ❓ Ajuda
           </button>
           <button
             type="button"
@@ -837,9 +837,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 : 'border-zinc-700/80 bg-zinc-800/60 text-slate-300 hover:border-amber-500/30 hover:text-slate-100'
             }`}
             aria-pressed={helpModeEnabled}
-            aria-label="Activar o desactivar modo ayuda"
+            aria-label="Activar o desactivar mode ajuda"
           >
-            ❓ Ayuda {helpModeEnabled ? 'ON' : 'OFF'}
+            ❓ Ajuda {helpModeEnabled ? 'ON' : 'OFF'}
           </button>
           <button
             type="button"
@@ -890,14 +890,14 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           />
           <BottomNavItem
             icon="📈"
-            label="Analytics"
+            label="Analítica"
             href="/admin/analytics"
             isActive={pathname?.startsWith('/admin/analytics') || false}
             onPrefetch={prefetchRoute}
           />
           <BottomNavItem
             icon="👥"
-            label="Leads"
+            label="Entrades"
             href="/admin/leads"
             isActive={pathname?.startsWith('/admin/leads') || false}
             badge={newLeadsCount}

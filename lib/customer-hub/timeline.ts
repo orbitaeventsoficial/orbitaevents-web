@@ -11,6 +11,23 @@ type BuildTimelineInput = {
 
 export function buildTimeline(input: BuildTimelineInput): TimelineEventDTO[] {
   const events: TimelineEventDTO[] = [];
+  const bookingStatusLabel = (status: string) => {
+    if (status === 'CONFIRMED') return 'confirmada';
+    if (status === 'TENTATIVE') return 'pendent';
+    if (status === 'CANCELLED') return 'cancel·lada';
+    if (status === 'COMPLETED') return 'completada';
+    if (status === 'PREPARING') return 'en preparació';
+    return status.toLowerCase();
+  };
+  const activityLabel = (action: string) => {
+    if (action === 'NOTE_ADDED') return 'Nota interna afegida';
+    if (action === 'MESSAGE_SENT') return 'Missatge enviat';
+    if (action === 'TASK_CREATED') return 'Tasca creada';
+    if (action === 'TASK_DONE') return 'Tasca completada';
+    if (action === 'PROPOSAL_SENT') return 'Pressupost enviat';
+    if (action === 'BOOKING_CONFIRMED') return 'Reserva confirmada';
+    return action;
+  };
 
   for (const p of input.proposals) {
     events.push({
@@ -44,7 +61,7 @@ export function buildTimeline(input: BuildTimelineInput): TimelineEventDTO[] {
       id: `booking:${b.id}:created`,
       type: b.status === 'CONFIRMED' || b.status === 'COMPLETED' ? 'BOOKING_CONFIRMED' : 'BOOKING_CREATED',
       at: b.date,
-      title: `Reserva ${b.reference || b.id.slice(0, 8)} · ${b.status}`,
+      title: `Reserva ${b.reference || b.id.slice(0, 8)} · ${bookingStatusLabel(b.status)}`,
       link: { label: 'Veure reserva', href: `/admin/bookings/${b.id}` },
     });
   }
@@ -55,7 +72,7 @@ export function buildTimeline(input: BuildTimelineInput): TimelineEventDTO[] {
       type: t.done ? 'TASK_DONE' : 'TASK_CREATED',
       at: t.dueDate || new Date().toISOString(),
       title: `${t.done ? 'Tasca completada' : 'Tasca creada'}: ${t.title}`,
-      link: t.leadId ? { label: 'Veure lead', href: `/admin/leads/${t.leadId}` } : undefined,
+      link: t.leadId ? { label: 'Veure entrada', href: `/admin/leads/${t.leadId}` } : undefined,
     });
   }
 
@@ -65,7 +82,7 @@ export function buildTimeline(input: BuildTimelineInput): TimelineEventDTO[] {
       type: m.channel === 'NOTE' ? 'NOTE_ADDED' : 'MESSAGE_SENT',
       at: m.sentAt || m.createdAt,
       title: m.subject || m.bodyPreview || 'Comunicació',
-      link: m.leadId ? { label: 'Veure lead', href: `/admin/leads/${m.leadId}` } : undefined,
+      link: m.leadId ? { label: 'Veure entrada', href: `/admin/leads/${m.leadId}` } : undefined,
     });
   }
 
@@ -74,7 +91,7 @@ export function buildTimeline(input: BuildTimelineInput): TimelineEventDTO[] {
       id: `ca:${a.id}`,
       type: 'ACTIVITY',
       at: a.createdAt.toISOString(),
-      title: a.action,
+      title: activityLabel(a.action),
     });
   }
 
@@ -83,12 +100,11 @@ export function buildTimeline(input: BuildTimelineInput): TimelineEventDTO[] {
       id: `la:${a.id}`,
       type: 'ACTIVITY',
       at: a.createdAt.toISOString(),
-      title: a.title || a.type,
-      link: { label: 'Veure lead', href: `/admin/leads/${a.leadId}` },
+      title: a.title || activityLabel(a.type),
+      link: { label: 'Veure entrada', href: `/admin/leads/${a.leadId}` },
     });
   }
 
   events.sort((a, b) => (a.at < b.at ? 1 : -1));
   return events.slice(0, 250);
 }
-
