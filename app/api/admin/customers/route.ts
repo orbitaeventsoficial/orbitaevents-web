@@ -26,24 +26,46 @@ export async function GET(request: NextRequest) {
     const includeStats = searchParams.get('stats') === 'true';
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '25', 10);
+    const q = (searchParams.get('q') || '').trim();
     const skip = (page - 1) * limit;
+    const where = q
+      ? {
+          OR: [
+            { name: { contains: q, mode: 'insensitive' as const } },
+            { email: { contains: q, mode: 'insensitive' as const } },
+            { phone: { contains: q } },
+            { instagram: { contains: q, mode: 'insensitive' as const } },
+          ],
+        }
+      : undefined;
 
     // Query paginada
-    const customers = await prisma.customer.findMany({
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: limit,
-      include: {
-        _count: {
-          select: {
-            testimonials: true,
-            discountCodes: true,
+    const [customers, total] = await Promise.all([
+      prisma.customer.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: {
+          _count: {
+            select: {
+              testimonials: true,
+              discountCodes: true,
+            },
           },
         },
-      },
-    });
+      }),
+      prisma.customer.count({ where }),
+    ]);
 
-    let responseData: Record<string, unknown> = { customers, page, limit };
+    let responseData: Record<string, unknown> = {
+      customers,
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+      q,
+    };
 
     if (includeStats) {
       // Stats amb queries a la BD en comptes de filtrar en memòria

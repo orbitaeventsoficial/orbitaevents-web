@@ -9,7 +9,7 @@
  * - Veure historial d'events
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 
@@ -45,6 +45,8 @@ interface CustomerStats {
 export default function AdminContactesPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [stats, setStats] = useState<CustomerStats | null>(null);
+  const [totalCustomers, setTotalCustomers] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState('');
@@ -75,7 +77,14 @@ export default function AdminContactesPage() {
     setError(null);
 
     try {
-      const response = await fetch('/api/admin/customers?stats=true', {
+      const params = new URLSearchParams({
+        stats: 'true',
+        page: String(page),
+        limit: String(pageSize),
+      });
+      if (search) params.set('q', search);
+
+      const response = await fetch(`/api/admin/customers?${params.toString()}`, {
         credentials: 'include',
       });
 
@@ -87,14 +96,37 @@ export default function AdminContactesPage() {
       }
 
       const data = await response.json();
-      setCustomers(data.data || []);
-      setStats(data.stats || null);
+      const payload = data?.data || {};
+      const rawCustomers = Array.isArray(payload.customers)
+        ? payload.customers
+        : Array.isArray(payload)
+          ? payload
+          : [];
+
+      const mappedCustomers: Customer[] = rawCustomers.map((item: Record<string, unknown>) => ({
+        id: String(item.id || ''),
+        name: String(item.name || ''),
+        email: String(item.email || ''),
+        phone: item.phone ? String(item.phone) : null,
+        city: item.city ? String(item.city) : null,
+        instagram: item.instagram ? String(item.instagram) : null,
+        source: item.source ? String(item.source).toLowerCase() : undefined,
+        total_events: typeof item.totalEvents === 'number' ? item.totalEvents : 0,
+        total_spent: typeof item.totalSpent === 'number' ? item.totalSpent : 0,
+        is_vip: typeof item.totalSpent === 'number' ? item.totalSpent >= 2000 : false,
+        created_at: String(item.createdAt || ''),
+      }));
+
+      setCustomers(mappedCustomers);
+      setTotalCustomers(Number(payload.total || 0));
+      setTotalPages(Number(payload.totalPages || 1));
+      setStats((payload.stats as CustomerStats) || null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page, pageSize, search]);
 
   useEffect(() => {
     fetchCustomers();
@@ -106,6 +138,10 @@ export default function AdminContactesPage() {
     }, 250);
     return () => window.clearTimeout(timeout);
   }, [searchInput]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   // Add customer
   const handleAddCustomer = async () => {
@@ -134,8 +170,12 @@ export default function AdminContactesPage() {
 
       const result = await response.json();
 
-      // Afegir a la llista
-      setCustomers((prev) => [result.data, ...prev]);
+      // Refresh llista perquè respecti paginació i filtres server-side
+      if (page === 1) {
+        await fetchCustomers();
+      } else {
+        setPage(1);
+      }
       setShowAddModal(false);
 
       // Reset form
@@ -188,27 +228,6 @@ export default function AdminContactesPage() {
       setActionLoading(false);
     }
   };
-
-  // Filter customers
-  const searchLower = search.trim().toLowerCase();
-  const filteredCustomers = useMemo(() => {
-    if (!searchLower) return customers;
-    return customers.filter((customer) =>
-      customer.name.toLowerCase().includes(searchLower) ||
-      customer.email?.toLowerCase().includes(searchLower) ||
-      customer.phone?.includes(search)
-    );
-  }, [customers, searchLower, search]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [search]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredCustomers.length / pageSize));
-  const paginatedCustomers = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filteredCustomers.slice(start, start + pageSize);
-  }, [filteredCustomers, page]);
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
@@ -291,14 +310,14 @@ export default function AdminContactesPage() {
       )}
 
       {/* Empty */}
-      {!loading && filteredCustomers.length === 0 && (
+      {!loading && customers.length === 0 && (
         <div className="text-center py-20" role="status" aria-live="polite">
           <p className="text-slate-400 text-lg">No hi ha contactes</p>
         </div>
       )}
 
       {/* Customers List */}
-      {!loading && filteredCustomers.length > 0 && (
+      {!loading && customers.length > 0 && (
         <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
           <table className="w-full text-sm">
             <thead>
@@ -311,7 +330,7 @@ export default function AdminContactesPage() {
               </tr>
             </thead>
             <tbody>
-              {paginatedCustomers.map((customer) => (
+              {customers.map((customer) => (
                 <tr key={customer.id} className="border-b border-slate-700/30 hover:bg-slate-700/30 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
@@ -396,9 +415,9 @@ export default function AdminContactesPage() {
         </div>
       )}
 
-      {!loading && filteredCustomers.length > 0 && (
+      {!loading && customers.length > 0 && (
         <div className="flex items-center justify-between text-xs text-slate-400">
-          <span>Pàgina {page} de {totalPages} · {filteredCustomers.length} contactes</span>
+          <span>Pàgina {page} de {totalPages} · {totalCustomers} contactes</span>
           <div className="flex gap-2">
             <button
               type="button"
