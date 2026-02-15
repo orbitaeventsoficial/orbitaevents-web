@@ -444,6 +444,7 @@ export async function generateQuotePDF(
   const muted = [148, 163, 184] as [number, number, number];
   const border = [51, 65, 85] as [number, number, number];
   const surface = [24, 28, 33] as [number, number, number];
+  const surfaceSoft = [29, 34, 40] as [number, number, number];
   const accent = [212, 175, 55] as [number, number, number];
 
   const left = 14;
@@ -484,12 +485,25 @@ export async function generateQuotePDF(
     return lines.length;
   };
 
+  const drawCard = (
+    x: number,
+    top: number,
+    width: number,
+    height: number,
+    rounded = 2,
+    soft = false
+  ) => {
+    doc.setFillColor(...(soft ? surfaceSoft : surface));
+    doc.roundedRect(x, top, width, height, rounded, rounded, 'F');
+    doc.setDrawColor(...border);
+    doc.roundedRect(x, top, width, height, rounded, rounded, 'S');
+    doc.setFillColor(...accent);
+    doc.roundedRect(x, top + 1.5, 1.4, Math.max(2, height - 3), 0.8, 0.8, 'F');
+  };
+
   const drawHeader = (compact: boolean) => {
     const headerHeight = compact ? 16 : 26;
-    doc.setFillColor(...surface);
-    doc.roundedRect(left, y, contentWidth, headerHeight, 3, 3, 'F');
-    doc.setDrawColor(...border);
-    doc.roundedRect(left, y, contentWidth, headerHeight, 3, 3, 'S');
+    drawCard(left, y, contentWidth, headerHeight, 3, true);
 
     const logoSource = branding?.logoDataUrl || ORBITA_LOGO_TEXT_DRETA_BASE64 || ORBITA_LOGO_BASE64;
     const hasLogo = typeof logoSource === 'string' && logoSource.length > 100;
@@ -557,10 +571,7 @@ export async function generateQuotePDF(
   const clientLinesCount = Math.min(3, doc.splitTextToSize(clientValue, 70).length);
   const contactLinesCount = Math.min(3, doc.splitTextToSize(contactValue, 85).length);
   const clientBoxHeight = 12 + Math.max(clientLinesCount, contactLinesCount) * 4.8;
-  doc.setFillColor(...surface);
-  doc.roundedRect(left, y, contentWidth, clientBoxHeight, 2, 2, 'F');
-  doc.setDrawColor(...border);
-  doc.roundedRect(left, y, contentWidth, clientBoxHeight, 2, 2, 'S');
+  drawCard(left, y, contentWidth, clientBoxHeight, 2, true);
   drawLabelValue('Client', clientValue, left + 4, y + 6, 70, 3);
   drawLabelValue(t.contact, contactValue, left + 88, y + 6, 85, 3);
   y += clientBoxHeight + 6;
@@ -578,39 +589,35 @@ export async function generateQuotePDF(
   const rightFieldHeight = fieldHeight(dateLines) + 2.5 + fieldHeight(guestsLines);
   const leftFieldHeight = fieldHeight(eventTypeLines);
   const eventBoxHeight = 11 + Math.max(leftFieldHeight, rightFieldHeight);
-  doc.setFillColor(...surface);
-  doc.roundedRect(left, y, contentWidth, eventBoxHeight, 3, 3, 'F');
-  doc.setDrawColor(...border);
-  doc.roundedRect(left, y, contentWidth, eventBoxHeight, 3, 3, 'S');
+  drawCard(left, y, contentWidth, eventBoxHeight, 3, true);
   drawLabelValue(t.eventDetails, `${eventTypeName}`, left + 4, y + 6, 80, 3);
   const dateUsed = drawLabelValue(t.issueDate, eventDate, left + 88, y + 6, 85, 3);
   drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 6 + fieldHeight(dateUsed) + 2.5, 85, 2);
   y += eventBoxHeight + 5;
 
-  if (!ensureSpace(18)) {
+  const packNameLines = doc.splitTextToSize(data.pack.name, 126).slice(0, 2);
+  const packInfoHeight = 20 + (packNameLines.length - 1) * 4;
+  if (!ensureSpace(packInfoHeight + 7)) {
     drawFooter();
     return doc;
   }
+  drawCard(left, y - 3, contentWidth, packInfoHeight + 2, 2, false);
   doc.setTextColor(...accent);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.text(t.selectedPack.toUpperCase(), left, y);
-  y += 5;
-  doc.setDrawColor(...border);
-  doc.line(left, y, left + contentWidth, y);
-  y += 5;
+  doc.setFontSize(10);
+  doc.text(t.selectedPack.toUpperCase(), left + 4, y + 2);
+  y += 7;
   doc.setTextColor(...neutral);
   doc.setFontSize(12.5);
-  const packNameLines = doc.splitTextToSize(data.pack.name, 126).slice(0, 2);
-  doc.text(packNameLines, left, y);
+  doc.text(packNameLines, left + 4, y);
   doc.setFontSize(10);
   doc.setTextColor(...muted);
-  doc.text(`${data.pack.durationHours} ${t.hours}`, left, y + 7 + (packNameLines.length - 1) * 4.2);
+  doc.text(`${data.pack.durationHours} ${t.hours}`, left + 4, y + 7 + (packNameLines.length - 1) * 4.2);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...accent);
   doc.setFontSize(16);
-  doc.text(`${data.basePrice.toFixed(2)}€`, left + contentWidth, y + 2, { align: 'right' });
-  y += 12 + (packNameLines.length - 1) * 4;
+  doc.text(`${data.basePrice.toFixed(2)}€`, left + contentWidth - 4, y + 2, { align: 'right' });
+  y += 13 + (packNameLines.length - 1) * 4;
 
   const features = data.pack.features
     .map((feature) => feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim())
@@ -625,14 +632,11 @@ export async function generateQuotePDF(
       drawFooter();
       return doc;
     }
-    doc.setFillColor(...surface);
-    doc.roundedRect(left, y - 4, contentWidth, featuresBoxHeight, 2, 2, 'F');
-    doc.setDrawColor(...border);
-    doc.roundedRect(left, y - 4, contentWidth, featuresBoxHeight, 2, 2, 'S');
+    drawCard(left, y - 4, contentWidth, featuresBoxHeight, 2, false);
     doc.setTextColor(...accent);
     doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
-    doc.text(t.features, left, y);
+    doc.text(t.features, left + 4, y);
     y += 5;
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
@@ -640,9 +644,9 @@ export async function generateQuotePDF(
     for (const feature of features) {
       if (!ensureSpace(lineHeight + 1)) break;
       doc.setFillColor(...accent);
-      doc.circle(left + 1.5, y - 1.3, 0.9, 'F');
+      doc.circle(left + 5.5, y - 1.3, 0.9, 'F');
       const lines = doc.splitTextToSize(feature, 170).slice(0, 2);
-      doc.text(lines, left + 5, y);
+      doc.text(lines, left + 9, y);
       y += lineHeight * lines.length;
     }
     y += 2;
@@ -657,14 +661,11 @@ export async function generateQuotePDF(
       drawFooter();
       return doc;
     }
-    doc.setFillColor(...surface);
-    doc.roundedRect(left, y - 4, contentWidth, extrasBoxHeight, 2, 2, 'F');
-    doc.setDrawColor(...border);
-    doc.roundedRect(left, y - 4, contentWidth, extrasBoxHeight, 2, 2, 'S');
+    drawCard(left, y - 4, contentWidth, extrasBoxHeight, 2, false);
     doc.setTextColor(...accent);
     doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
-    doc.text(t.extras, left, y);
+    doc.text(t.extras, left + 4, y);
     y += 5;
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...neutral);
@@ -674,7 +675,7 @@ export async function generateQuotePDF(
       const priceText = typeof extra?.price === 'number' ? `+${extra.price}€` : '';
       if (!ensureSpace(lineHeight + 1)) break;
       const lines = doc.splitTextToSize(extraName, 145).slice(0, 2);
-      doc.text(lines, left, y);
+      doc.text(lines, left + 4, y);
       if (priceText) {
         doc.setTextColor(...accent);
         doc.setFont('helvetica', 'bold');
@@ -708,10 +709,7 @@ export async function generateQuotePDF(
     drawFooter();
     return doc;
   }
-  doc.setFillColor(...surface);
-  doc.roundedRect(left, y, contentWidth, summaryHeight, 2, 2, 'F');
-  doc.setDrawColor(...border);
-  doc.roundedRect(left, y, contentWidth, summaryHeight, 2, 2, 'S');
+  drawCard(left, y, contentWidth, summaryHeight, 2, true);
   doc.setTextColor(...accent);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9.5);
@@ -765,14 +763,11 @@ export async function generateQuotePDF(
       drawFooter();
       return doc;
     }
-    doc.setFillColor(...surface);
-    doc.roundedRect(left, y - 4, contentWidth, conditionHeight, 2, 2, 'F');
-    doc.setDrawColor(...border);
-    doc.roundedRect(left, y - 4, contentWidth, conditionHeight, 2, 2, 'S');
+    drawCard(left, y - 4, contentWidth, conditionHeight, 2, false);
     doc.setTextColor(...accent);
     doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
-    doc.text(t.conditions, left, y);
+    doc.text(t.conditions, left + 4, y);
     y += 6;
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
@@ -780,7 +775,7 @@ export async function generateQuotePDF(
     for (const condition of conditions) {
       if (!ensureSpace(lineHeight + 1)) break;
       const lines = doc.splitTextToSize(`• ${condition}`, 175).slice(0, 2);
-      doc.text(lines, left, y);
+      doc.text(lines, left + 4, y);
       y += lineHeight * lines.length;
     }
     y += 2.5;
@@ -793,10 +788,7 @@ export async function generateQuotePDF(
       drawFooter();
       return doc;
     }
-    doc.setFillColor(...surface);
-    doc.roundedRect(left, y, contentWidth, boxHeight, 2, 2, 'F');
-    doc.setDrawColor(...border);
-    doc.roundedRect(left, y, contentWidth, boxHeight, 2, 2, 'S');
+    drawCard(left, y, contentWidth, boxHeight, 2, true);
     doc.setTextColor(...accent);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9.5);
