@@ -70,6 +70,17 @@ function normalizeWebsite(value: string): string {
   return value.replace(/^https?:\/\//, '');
 }
 
+function isDataUrl(value: string): boolean {
+  return /^data:image\//.test(value);
+}
+
+function getImageFormatFromDataUrl(dataUrl: string): 'PNG' | 'JPEG' {
+  if (!isDataUrl(dataUrl)) return 'PNG';
+  if (dataUrl.startsWith('data:image/jpeg') || dataUrl.startsWith('data:image/jpg')) return 'JPEG';
+  if (dataUrl.startsWith('data:image/png')) return 'PNG';
+  return 'PNG';
+}
+
 function checkPageBreak(
   doc: jsPDFType,
   currentY: number,
@@ -405,11 +416,11 @@ export async function generateQuotePDF(
   const surface = [24, 28, 33] as [number, number, number];
   const accent = [212, 175, 55] as [number, number, number];
 
-  const left = 15;
-  const contentWidth = 180;
+  const left = 14;
+  const contentWidth = 182;
   const pageBottom = 255;
-  const lineHeight = 4;
-  let y = 18;
+  const lineHeight = 4.8;
+  let y = 16;
 
   const quoteRef = `OE-${Date.now().toString(36).toUpperCase()}`;
   const issueDate = new Date().toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB');
@@ -435,41 +446,45 @@ export async function generateQuotePDF(
   };
 
   const drawHeader = (compact: boolean) => {
-    const headerHeight = compact ? 14 : 22;
+    const headerHeight = compact ? 16 : 26;
     doc.setFillColor(...surface);
-    doc.roundedRect(left, y, contentWidth, headerHeight, 2, 2, 'F');
+    doc.roundedRect(left, y, contentWidth, headerHeight, 3, 3, 'F');
     doc.setDrawColor(...border);
-    doc.roundedRect(left, y, contentWidth, headerHeight, 2, 2, 'S');
+    doc.roundedRect(left, y, contentWidth, headerHeight, 3, 3, 'S');
 
-    if (!compact && branding?.logoDataUrl) {
+    const logoSource = branding?.logoDataUrl || ORBITA_LOGO_BASE64;
+    const hasLogo = typeof logoSource === 'string' && logoSource.length > 100;
+
+    if (!compact && hasLogo) {
       try {
-        doc.addImage(branding.logoDataUrl, 'PNG', left + 4, y + 5, 10, 10);
+        const fmt = getImageFormatFromDataUrl(logoSource);
+        doc.addImage(logoSource, fmt, left + 5, y + 5, 12, 12);
       } catch {
         // Ignore logo errors and keep text branding.
       }
     }
 
-    const titleX = compact ? left + 4 : left + 17;
+    const titleX = hasLogo ? left + 21 : left + 6;
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(compact ? 10 : 14);
-    doc.text(brandName, titleX, y + (compact ? 7 : 8));
+    doc.setFontSize(compact ? 10.5 : 15);
+    doc.text(brandName, titleX, y + (compact ? 9 : 11));
     if (!compact) {
       doc.setTextColor(...accent);
       doc.setFontSize(10);
-      doc.text(t.quote, titleX, y + 14);
+      doc.text(t.quote.toUpperCase(), titleX, y + 18.5);
     }
 
     doc.setTextColor(...muted);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.text(`${t.quoteRef}: ${quoteRef}`, left + contentWidth - 4, y + (compact ? 6 : 7), { align: 'right' });
-    doc.text(`${t.issueDate}: ${issueDate}`, left + contentWidth - 4, y + (compact ? 10 : 11), { align: 'right' });
+    doc.text(`${t.quoteRef}: ${quoteRef}`, left + contentWidth - 6, y + (compact ? 7 : 8.5), { align: 'right' });
+    doc.text(`${t.issueDate}: ${issueDate}`, left + contentWidth - 6, y + (compact ? 11 : 13), { align: 'right' });
     if (!compact) {
-      doc.text(`${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix}`, left + contentWidth - 4, y + 15, { align: 'right' });
+      doc.text(`${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix}`, left + contentWidth - 6, y + 18.5, { align: 'right' });
     }
 
-    y += headerHeight + 5;
+    y += headerHeight + 8;
   };
 
   const drawFooter = () => {
@@ -496,22 +511,22 @@ export async function generateQuotePDF(
   doc.roundedRect(left, y, contentWidth, 16, 2, 2, 'S');
   drawLabelValue('Client', data.clientName || data.clientContact || '-', left + 4, y + 6, 70);
   drawLabelValue(t.contact, [data.clientContact, data.clientEmail, data.clientPhone].filter(Boolean).join(' · ') || '-', left + 88, y + 6, 85);
-  y += 20;
+  y += 22;
 
-  if (!ensureSpace(26)) {
+  if (!ensureSpace(28)) {
     drawFooter();
     return doc;
   }
   doc.setFillColor(...surface);
-  doc.roundedRect(left, y, contentWidth, 22, 2, 2, 'F');
+  doc.roundedRect(left, y, contentWidth, 24, 3, 3, 'F');
   doc.setDrawColor(...border);
-  doc.roundedRect(left, y, contentWidth, 22, 2, 2, 'S');
+  doc.roundedRect(left, y, contentWidth, 24, 3, 3, 'S');
   drawLabelValue(t.eventDetails, `${eventTypeName}`, left + 4, y + 6, 80);
   drawLabelValue('Data', data.date || '-', left + 88, y + 6, 85);
   drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 14, 85);
-  y += 26;
+  y += 29;
 
-  if (!ensureSpace(16)) {
+  if (!ensureSpace(18)) {
     drawFooter();
     return doc;
   }
@@ -519,7 +534,7 @@ export async function generateQuotePDF(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
   doc.text(t.selectedPack.toUpperCase(), left, y);
-  y += 4;
+  y += 5;
   doc.setDrawColor(...border);
   doc.line(left, y, left + contentWidth, y);
   y += 5;
@@ -533,7 +548,7 @@ export async function generateQuotePDF(
   doc.setTextColor(...accent);
   doc.setFontSize(16);
   doc.text(`${data.basePrice.toFixed(2)}€`, left + contentWidth, y + 2, { align: 'right' });
-  y += 10;
+  y += 12;
 
   const features = data.pack.features
     .map((feature) => feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim())
@@ -622,6 +637,17 @@ export async function generateQuotePDF(
     priceY += 4.5;
     doc.text(t.discount, left + 4, priceY);
     doc.text(`-${data.discount.toFixed(2)}€`, left + contentWidth - 4, priceY, { align: 'right' });
+
+    const reason = data.discountReason?.trim();
+    if (reason) {
+      priceY += 3.8;
+      doc.setTextColor(...muted);
+      doc.setFontSize(7.5);
+      const reasonLine = doc.splitTextToSize(reason, 120).slice(0, 1);
+      doc.text(reasonLine, left + 4, priceY);
+      doc.setTextColor(...neutral);
+      doc.setFontSize(9);
+    }
   }
   priceY += 5;
   doc.setDrawColor(...border);
@@ -633,9 +659,9 @@ export async function generateQuotePDF(
   doc.text(`${data.total.toFixed(2)}€`, left + contentWidth - 4, priceY + 2, { align: 'right' });
   y += 30;
 
-  const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 3);
+  const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 4);
   if (conditions.length > 0) {
-    const conditionHeight = 8 + conditions.length * 4;
+    const conditionHeight = 9 + conditions.length * 5;
     if (!ensureSpace(conditionHeight)) {
       drawFooter();
       return doc;
@@ -644,7 +670,7 @@ export async function generateQuotePDF(
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text(t.conditions.toUpperCase(), left, y);
-    y += 4.5;
+    y += 5.5;
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
