@@ -26,8 +26,28 @@ export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right
 
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
+  const closeTimeoutRef = useRef<number | null>(null);
+
+  const openTip = useCallback(() => {
+    if (closeTimeoutRef.current) {
+      window.clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setOpen(true);
+  }, []);
+
+  const closeTipDelayed = useCallback(() => {
+    if (closeTimeoutRef.current) window.clearTimeout(closeTimeoutRef.current);
+    closeTimeoutRef.current = window.setTimeout(() => {
+      setOpen(false);
+      closeTimeoutRef.current = null;
+    }, 120);
+  }, []);
 
   useEffect(() => setMounted(true), []);
+  useEffect(() => () => {
+    if (closeTimeoutRef.current) window.clearTimeout(closeTimeoutRef.current);
+  }, []);
 
   const cleanText = useMemo(() => (text ?? '').trim(), [text]);
 
@@ -109,14 +129,15 @@ export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right
     <div
       ref={panelRef}
       role="tooltip"
-      className="fixed z-[9999] max-w-[320px] rounded-xl border border-white/10 bg-slate-950/95 px-3 py-2 text-left text-xs leading-4 text-slate-200 shadow-xl"
+      className="fixed z-[99999] w-[320px] max-w-[calc(100vw-24px)] rounded-xl border border-white/10 bg-[#0b0f14] px-3 py-2 text-left text-xs leading-4 text-white shadow-2xl"
       style={{
         top: pos?.top ?? -9999,
         left: pos?.left ?? -9999,
         transformOrigin: pos?.transformOrigin ?? 'center',
+        pointerEvents: 'auto',
       }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={openTip}
+      onMouseLeave={closeTipDelayed}
     >
       {cleanText}
     </div>
@@ -128,11 +149,11 @@ export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right
         ref={btnRef}
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
-        className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-amber-400/35 bg-amber-500/10 text-[11px] font-bold leading-none text-amber-200 hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/30"
+        onMouseEnter={openTip}
+        onMouseLeave={closeTipDelayed}
+        onFocus={openTip}
+        onBlur={closeTipDelayed}
+        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-white/10 text-[12px] font-bold leading-none text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
         aria-label="Ajuda"
         aria-expanded={open}
       >
