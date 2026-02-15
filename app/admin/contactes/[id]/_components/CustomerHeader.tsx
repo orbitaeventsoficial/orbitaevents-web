@@ -68,7 +68,7 @@ export default function CustomerHeader({
               Nova reserva
             </Link>
             <Link
-              href={`/admin/tasks?customerId=${id}`}
+              href={`/admin/tasks/new?customerId=${id}`}
               className="rounded-lg bg-amber-500 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-600"
             >
               Nova tasca
@@ -147,4 +147,3 @@ function formatDate(value?: string) {
     year: 'numeric',
   });
 }
-

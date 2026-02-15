@@ -131,12 +131,20 @@ export default async function TasksPage({
             {total} tasques {customerId ? 'del client' : ''}
           </p>
         </div>
-        <Link
-          href="/admin"
-          className="inline-flex items-center rounded-xl border border-slate-600/50 bg-slate-700/50 px-3 py-2 text-xs sm:text-sm font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
-        >
-          ← Tornar
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href={customerId ? `/admin/tasks/new?customerId=${customerId}` : '/admin/tasks/new'}
+            className="inline-flex items-center rounded-xl bg-amber-500 px-3 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-amber-600 transition-colors"
+          >
+            Nova tasca
+          </Link>
+          <Link
+            href={customerId ? `/admin/contactes/${customerId}?tab=tasks` : '/admin'}
+            className="inline-flex items-center rounded-xl border border-slate-600/50 bg-slate-700/50 px-3 py-2 text-xs sm:text-sm font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
+          >
+            ← Tornar
+          </Link>
+        </div>
       </header>
 
       <section className="flex flex-wrap items-center gap-2 text-xs">

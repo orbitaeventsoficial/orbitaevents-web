@@ -13,7 +13,7 @@ export default function TasksNotesPanel({ data }: { data: CustomerHubDTO }) {
           <p className="text-sm text-slate-400">Checklist operativa vinculada al client.</p>
         </div>
         <Link
-          href={`/admin/tasks?customerId=${data.customer.id}`}
+          href={`/admin/tasks/new?customerId=${data.customer.id}`}
           className="rounded-lg bg-amber-500 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-600"
         >
           Nova tasca
@@ -64,4 +64,3 @@ function TaskColumn({
     </div>
   );
 }
-
