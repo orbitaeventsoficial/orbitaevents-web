@@ -177,6 +177,9 @@ export default function PresupuestoPdfStudio({
   const [logoDataUrl, setLogoDataUrl] = useState<string>('');
   const [draftLoaded, setDraftLoaded] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [autosaving, setAutosaving] = useState(false);
+  const [autosaveTick, setAutosaveTick] = useState(0);
+  const isCustomerScoped = Boolean(customerId);
 
   const packs = useMemo(() => getPacksByService(eventType), [eventType]);
 
@@ -319,6 +322,53 @@ export default function PresupuestoPdfStudio({
     basePrice,
     durationHours,
     featuresText,
+    brandName,
+    brandWebsite,
+    brandEmail,
+    brandPhone,
+    brandTagline,
+  ]);
+
+  useEffect(() => {
+    if (!draftLoaded || !customerId || !selectedPack) return;
+
+    const timeout = window.setTimeout(() => {
+      setAutosaving(true);
+      void saveProposalDraft('DRAFT')
+        .then(() => setAutosaveTick(Date.now()))
+        .catch(() => {
+          // Keep silent to avoid noisy UI while editing.
+        })
+        .finally(() => setAutosaving(false));
+    }, 750);
+
+    return () => window.clearTimeout(timeout);
+  }, [
+    draftLoaded,
+    customerId,
+    selectedPack,
+    locale,
+    eventType,
+    packId,
+    packName,
+    basePrice,
+    durationHours,
+    featuresText,
+    conditionsText,
+    whyChooseUs,
+    selectedExtras,
+    customExtras,
+    discount,
+    discountReason,
+    clientContact,
+    clientName,
+    clientEmail,
+    clientPhone,
+    eventDate,
+    guests,
+    validityDays,
+    total,
+    extrasPrice,
     brandName,
     brandWebsite,
     brandEmail,
@@ -692,6 +742,16 @@ export default function PresupuestoPdfStudio({
   return (
     <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
       <div className="space-y-5 rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+        {isCustomerScoped && (
+          <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200">
+            Modo client actiu. Aquest pressupost es guarda automàticament a la fitxa del client.
+            {autosaving
+              ? ' Guardant...'
+              : autosaveTick > 0
+                ? ' Guardat.'
+                : ''}
+          </div>
+        )}
         <div className="grid gap-4 md:grid-cols-2">
           <label className="text-sm text-slate-300">
             Idioma preferit del client
@@ -745,23 +805,45 @@ export default function PresupuestoPdfStudio({
               type="file"
               accept="image/png,image/jpeg,image/webp"
               onChange={(e) => onLogoChange(e.target.files?.[0] || null)}
+              disabled={isCustomerScoped}
             />
           </label>
           <label className="text-sm text-slate-300">
             Persona de contacto
-            <input className={inputClass} value={clientContact} onChange={(e) => setClientContact(e.target.value)} />
+            <input
+              className={inputClass}
+              value={clientContact}
+              onChange={(e) => setClientContact(e.target.value)}
+              readOnly={isCustomerScoped}
+            />
           </label>
           <label className="text-sm text-slate-300">
             Nombre cliente
-            <input className={inputClass} value={clientName} onChange={(e) => setClientName(e.target.value)} />
+            <input
+              className={inputClass}
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              readOnly={isCustomerScoped}
+            />
           </label>
           <label className="text-sm text-slate-300">
             Email cliente
-            <input className={inputClass} type="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} />
+            <input
+              className={inputClass}
+              type="email"
+              value={clientEmail}
+              onChange={(e) => setClientEmail(e.target.value)}
+              readOnly={isCustomerScoped}
+            />
           </label>
           <label className="text-sm text-slate-300">
             Teléfono cliente
-            <input className={inputClass} value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} />
+            <input
+              className={inputClass}
+              value={clientPhone}
+              onChange={(e) => setClientPhone(e.target.value)}
+              readOnly={isCustomerScoped}
+            />
           </label>
           <label className="text-sm text-slate-300">
             Fecha evento
@@ -776,23 +858,48 @@ export default function PresupuestoPdfStudio({
         <div className="grid gap-4 md:grid-cols-2">
           <label className="text-sm text-slate-300">
             Marca / Empresa
-            <input className={inputClass} value={brandName} onChange={(e) => setBrandName(e.target.value)} />
+            <input
+              className={inputClass}
+              value={brandName}
+              onChange={(e) => setBrandName(e.target.value)}
+              readOnly={isCustomerScoped}
+            />
           </label>
           <label className="text-sm text-slate-300">
             Web marca
-            <input className={inputClass} value={brandWebsite} onChange={(e) => setBrandWebsite(e.target.value)} />
+            <input
+              className={inputClass}
+              value={brandWebsite}
+              onChange={(e) => setBrandWebsite(e.target.value)}
+              readOnly={isCustomerScoped}
+            />
           </label>
           <label className="text-sm text-slate-300">
             Email marca
-            <input className={inputClass} value={brandEmail} onChange={(e) => setBrandEmail(e.target.value)} />
+            <input
+              className={inputClass}
+              value={brandEmail}
+              onChange={(e) => setBrandEmail(e.target.value)}
+              readOnly={isCustomerScoped}
+            />
           </label>
           <label className="text-sm text-slate-300">
             Teléfono marca
-            <input className={inputClass} value={brandPhone} onChange={(e) => setBrandPhone(e.target.value)} />
+            <input
+              className={inputClass}
+              value={brandPhone}
+              onChange={(e) => setBrandPhone(e.target.value)}
+              readOnly={isCustomerScoped}
+            />
           </label>
           <label className="text-sm text-slate-300 md:col-span-2">
             Tagline footer
-            <input className={inputClass} value={brandTagline} onChange={(e) => setBrandTagline(e.target.value)} />
+            <input
+              className={inputClass}
+              value={brandTagline}
+              onChange={(e) => setBrandTagline(e.target.value)}
+              readOnly={isCustomerScoped}
+            />
           </label>
         </div>
 
