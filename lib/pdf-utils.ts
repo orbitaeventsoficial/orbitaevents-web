@@ -722,7 +722,7 @@ export async function generateQuotePDF(
   if (conditions.length > 0) {
     const conditionLineCounts = conditions.map((condition) => doc.splitTextToSize(`• ${condition}`, 175).slice(0, 2).length);
     const conditionLinesTotal = conditionLineCounts.reduce((sum, n) => sum + n, 0);
-    const conditionHeight = 10 + conditionLinesTotal * 4.4;
+    const conditionHeight = 12 + conditionLinesTotal * lineHeight;
     if (!ensureSpace(conditionHeight + 2)) {
       drawFooter();
       return doc;
@@ -735,22 +735,22 @@ export async function generateQuotePDF(
     doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
     doc.text(t.conditions, left, y);
-    y += 5.5;
+    y += 6;
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
+    doc.setFontSize(8.2);
     for (const condition of conditions) {
-      if (!ensureSpace(4.5)) break;
+      if (!ensureSpace(lineHeight + 1)) break;
       const lines = doc.splitTextToSize(`• ${condition}`, 175).slice(0, 2);
       doc.text(lines, left, y);
-      y += 4 * lines.length;
+      y += lineHeight * lines.length;
     }
-    y += 2;
+    y += 2.5;
   }
 
   if (data.whyChooseUs?.trim()) {
-    const whyLines = doc.splitTextToSize(data.whyChooseUs.trim(), 174).slice(0, 2);
-    const boxHeight = 8 + whyLines.length * 4;
+    const whyLines = doc.splitTextToSize(data.whyChooseUs.trim(), 174).slice(0, 3);
+    const boxHeight = 12 + whyLines.length * lineHeight;
     if (!ensureSpace(boxHeight + 1)) {
       drawFooter();
       return doc;
@@ -762,12 +762,12 @@ export async function generateQuotePDF(
     doc.setTextColor(...accent);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9.5);
-    doc.text(t.whyChooseUs, left + 4, y + 5);
+    doc.text(t.whyChooseUs, left + 4, y + 6);
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.text(whyLines, left + 4, y + 9);
-    y += boxHeight + 1;
+    doc.setFontSize(8.2);
+    doc.text(whyLines, left + 4, y + 11);
+    y += boxHeight + 1.5;
   }
 
   if (!ensureSpace(8)) {
