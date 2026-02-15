@@ -3,11 +3,19 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamicImport from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
-import AdminSearchModal from './components/AdminSearchModal';
-import AdminHelpLegend from './components/AdminHelpLegend';
-import AdminHelpInspector from './components/AdminHelpInspector';
 import { AdminHelpModeProvider, useAdminHelpMode } from './components/AdminHelpMode';
+
+const AdminSearchModal = dynamicImport(() => import('./components/AdminSearchModal'), {
+  ssr: false,
+});
+const AdminHelpLegend = dynamicImport(() => import('./components/AdminHelpLegend'), {
+  ssr: false,
+});
+const AdminHelpInspector = dynamicImport(() => import('./components/AdminHelpInspector'), {
+  ssr: false,
+});
 
 /**
  * 🎨 ADMIN LAYOUT - Òrbita Events
