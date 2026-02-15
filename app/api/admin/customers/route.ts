@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const includeStats = searchParams.get('stats') === 'true';
     const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '100', 10);
+    const limit = parseInt(searchParams.get('limit') || '25', 10);
     const skip = (page - 1) * limit;
 
     // Query paginada

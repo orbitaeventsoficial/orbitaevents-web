@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
     const priorityParam = searchParams.get('priority');
     const search = searchParams.get('search');
     const page = safeParseInt(searchParams.get('page'), 1, 1);
-    const limit = safeParseInt(searchParams.get('limit'), 50, 1, 200);
+    const limit = safeParseInt(searchParams.get('limit'), 25, 1, 200);
 
     const where = {
       ...(isValidStatus(statusParam) && { status: statusParam }),
