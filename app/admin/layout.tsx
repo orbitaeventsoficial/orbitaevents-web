@@ -361,7 +361,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       items: [
         { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
         { icon: '📅', label: 'Calendari', href: '/admin/calendario' },
-        { icon: '📥', label: 'Inbox (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' as const },
+        { icon: '📥', label: 'Safata (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' as const },
       ]
     },
     {
@@ -369,17 +369,17 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       defaultOpen: false,
       items: [
         { icon: '💶', label: 'Finances', href: '/admin/finanzas' },
-        { icon: '🎯', label: 'Sales Ops', href: '/admin/sales-ops' },
+        { icon: '🎯', label: 'Operativa de vendes', href: '/admin/sales-ops' },
         { icon: '⭐', label: 'Ressenyes', href: '/admin/ressenyes' },
-        { icon: '📝', label: 'Postevent', href: '/admin/post-event' },
-        { icon: '📈', label: 'Analytics', href: '/admin/analytics' },
+        { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event' },
+        { icon: '📈', label: 'Analítica', href: '/admin/analytics' },
         { icon: '📊', label: 'Rendibilitat', href: '/admin/rentabilidad' },
         { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
         { icon: '📝', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
-        { icon: '🤖', label: 'Emails Auto', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
+        { icon: '🤖', label: 'Correus automàtics', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
         { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
-        { icon: '⭐', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
+        { icon: '⭐', label: 'Ressenyes de Google', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
         { icon: '📝', label: 'Blog', href: '/admin/blog' },
       ]
     },
@@ -452,13 +452,13 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       bookings: 'Reserves',
       tasks: 'Tasques',
       packs: 'Packs',
-      analytics: 'Analytics',
-      'sales-ops': 'Sales Ops',
+      analytics: 'Analítica',
+      'sales-ops': 'Operativa de vendes',
       rentabilidad: 'Rendibilitat',
       catalog: 'Catàleg',
       finanzas: 'Finances',
-      emails: 'Emails Auto',
-      inbox: 'Inbox (IMAP)',
+      emails: 'Correus automàtics',
+      inbox: 'Safata (IMAP)',
       calendario: 'Calendari',
       settings: 'Configuració',
       integrations: 'Integracions',
@@ -479,8 +479,8 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       canvas: 'Canvas',
       translations: 'Traduccions',
       'text-manager': 'Textos PRO',
-      'post-event': 'Postevent',
-      'google-reviews': 'Google Reviews',
+      'post-event': 'Post-esdeveniment',
+      'google-reviews': 'Ressenyes de Google',
     };
     return pageNames[page] || page.charAt(0).toUpperCase() + page.slice(1);
   }, [pathname]);
