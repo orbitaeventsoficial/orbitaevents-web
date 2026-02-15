@@ -107,6 +107,14 @@ export default function AdminSearchModal({
     return results.leads.length > 0 || results.bookings.length > 0 || results.customers.length > 0;
   }, [results]);
 
+  const bookingStatusLabel = (status: string) => {
+    if (status === 'CONFIRMED') return 'Confirmada';
+    if (status === 'TENTATIVE') return 'Pendent';
+    if (status === 'CANCELLED') return 'Cancel·lada';
+    if (status === 'COMPLETED') return 'Completada';
+    return status;
+  };
+
   if (!open) return null;
 
   return (
@@ -123,8 +131,8 @@ export default function AdminSearchModal({
             ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Cerca leads, reserves o clients..."
-            aria-label="Cercar al panell"
+            placeholder="Cerca entrades, reserves o clients..."
+            aria-label="Cercar al panell d’administració"
             className="w-full bg-transparent text-sm text-slate-100 placeholder:text-slate-500 outline-none"
           />
           <button
@@ -155,7 +163,7 @@ export default function AdminSearchModal({
 
           {results.leads.length > 0 && (
             <div className="border-t border-slate-800 px-4 py-3">
-              <p className="text-[11px] uppercase tracking-wider text-slate-500">Leads</p>
+              <p className="text-[11px] uppercase tracking-wider text-slate-500">Entrades</p>
               <div className="mt-2 space-y-2">
                 {results.leads.map((lead) => (
                   <Link
@@ -184,7 +192,7 @@ export default function AdminSearchModal({
                     className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/40 px-3 py-2 text-sm text-slate-200 hover:border-cyan-500/40 hover:bg-slate-800/70"
                   >
                     <span className="truncate">{booking.reference} · {booking.clientName}</span>
-                    <span className="text-[11px] text-slate-500">{booking.status}</span>
+                    <span className="text-[11px] text-slate-500">{bookingStatusLabel(booking.status)}</span>
                   </Link>
                 ))}
               </div>
@@ -203,7 +211,7 @@ export default function AdminSearchModal({
                     className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/40 px-3 py-2 text-sm text-slate-200 hover:border-cyan-500/40 hover:bg-slate-800/70"
                   >
                     <span className="truncate">{customer.name}</span>
-                    <span className="text-[11px] text-slate-500">{customer.totalEvents} events</span>
+                    <span className="text-[11px] text-slate-500">{customer.totalEvents} esdeveniments</span>
                   </Link>
                 ))}
               </div>
@@ -215,12 +223,12 @@ export default function AdminSearchModal({
               <p className="text-[11px] uppercase tracking-wider text-slate-500">Accessos ràpids</p>
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 {[
-                  { href: '/admin/leads', label: '👥 Leads' },
+                  { href: '/admin/leads', label: '👥 Entrades' },
                   { href: '/admin/bookings', label: '📋 Reserves' },
                   { href: '/admin/sales-ops', label: '🎯 Sales Ops' },
-                  { href: '/admin/rentabilidad', label: '📊 Rentabilidad' },
-                  { href: '/admin/finanzas', label: '💶 Finanzas' },
-                  { href: '/admin/analytics', label: '📈 Analytics' },
+                  { href: '/admin/rentabilidad', label: '📊 Rendibilitat' },
+                  { href: '/admin/finanzas', label: '💶 Finances' },
+                  { href: '/admin/analytics', label: '📈 Analítica' },
                   { href: '/admin/clientes', label: '👤 Clients' },
                 ].map((item) => (
                   <Link

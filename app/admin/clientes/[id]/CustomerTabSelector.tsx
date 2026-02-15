@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 type TabKey = 'resumen' | 'presupuestos' | 'reservas' | 'comunicaciones' | 'tareas' | 'leads' | 'notas';
 
 const TAB_LABELS: Record<TabKey, string> = {
-  resumen: 'Resumen',
-  presupuestos: 'Presupuestos',
-  reservas: 'Reservas',
-  comunicaciones: 'Comunicaciones',
-  tareas: 'Tareas',
-  leads: 'Leads',
-  notas: 'Notas/Docs',
+  resumen: 'Resum',
+  presupuestos: 'Pressupostos',
+  reservas: 'Reserves',
+  comunicaciones: 'Comunicacions',
+  tareas: 'Tasques',
+  leads: 'Entrades',
+  notas: 'Notes/Docs',
 };
 
 export default function CustomerTabSelector({
@@ -24,7 +24,7 @@ export default function CustomerTabSelector({
   const router = useRouter();
   return (
     <label className="block sm:hidden">
-      <span className="mb-1 block text-xs text-slate-400">Vista de la ficha</span>
+      <span className="mb-1 block text-xs text-slate-400">Vista de la fitxa</span>
       <select
         value={currentTab}
         onChange={(e) => router.push(`/admin/clientes/${customerId}?tab=${e.target.value}`)}
