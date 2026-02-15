@@ -696,6 +696,14 @@ export async function generateQuotePDF(
     summaryTotalGap +
     summaryBottomPadding;
 
+  const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 6);
+  const conditionLineCounts = conditions.map((condition) => doc.splitTextToSize(`• ${condition}`, 175).slice(0, 2).length);
+  const conditionLinesTotal = conditionLineCounts.reduce((sum, n) => sum + n, 0);
+  const conditionHeight = conditions.length > 0 ? 12 + conditionLinesTotal * lineHeight + 4 : 0;
+
+  // Keep summary and conditions together when possible to avoid awkward page splits.
+  ensureSpace(summaryHeight + 7 + (conditionHeight > 0 ? conditionHeight + 2 : 0));
+
   ensureSpace(summaryHeight + 4);
   drawCard(left, y, contentWidth, summaryHeight, 2, true);
   doc.setTextColor(...accent);
@@ -742,11 +750,7 @@ export async function generateQuotePDF(
   doc.text(`${data.total.toFixed(2)}€`, left + contentWidth - 6, priceY + 5.7, { align: 'right' });
   y += summaryHeight + 7;
 
-  const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 6);
   if (conditions.length > 0) {
-    const conditionLineCounts = conditions.map((condition) => doc.splitTextToSize(`• ${condition}`, 175).slice(0, 2).length);
-    const conditionLinesTotal = conditionLineCounts.reduce((sum, n) => sum + n, 0);
-    const conditionHeight = 12 + conditionLinesTotal * lineHeight + 4;
     ensureSpace(conditionHeight + 2);
     drawCard(left, y - 4, contentWidth, conditionHeight, 2, false);
     doc.setTextColor(...accent);
