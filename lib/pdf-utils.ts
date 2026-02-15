@@ -431,7 +431,7 @@ export async function generateQuotePDF(
   const left = 14;
   const contentWidth = 182;
   const pageBottom = 255;
-  const lineHeight = 4.8;
+  const lineHeight = 5;
   let y = 16;
 
   const quoteRef = `OE-${Date.now().toString(36).toUpperCase()}`;
@@ -455,10 +455,10 @@ export async function generateQuotePDF(
   ): number => {
     doc.setTextColor(...muted);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.text(label.toUpperCase(), x, top);
     doc.setTextColor(...neutral);
-    doc.setFontSize(11);
+    doc.setFontSize(10.5);
     doc.setFont('helvetica', 'bold');
     const lines = doc.splitTextToSize(value || '-', width).slice(0, maxLines);
     doc.text(lines, x, top + 6);
@@ -606,9 +606,9 @@ export async function generateQuotePDF(
     doc.setDrawColor(...border);
     doc.roundedRect(left, y - 4, contentWidth, featuresBoxHeight, 2, 2, 'S');
     doc.setTextColor(...accent);
-    doc.setFontSize(10);
+    doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
-    doc.text(t.features.toUpperCase(), left, y);
+    doc.text(t.features, left, y);
     y += 5;
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
@@ -638,9 +638,9 @@ export async function generateQuotePDF(
     doc.setDrawColor(...border);
     doc.roundedRect(left, y - 4, contentWidth, extrasBoxHeight, 2, 2, 'S');
     doc.setTextColor(...accent);
-    doc.setFontSize(10);
+    doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
-    doc.text(t.extras.toUpperCase(), left, y);
+    doc.text(t.extras, left, y);
     y += 5;
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...neutral);
@@ -679,8 +679,8 @@ export async function generateQuotePDF(
   doc.roundedRect(left, y, contentWidth, summaryHeight, 2, 2, 'S');
   doc.setTextColor(...accent);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.text(t.priceSummary.toUpperCase(), left + 4, y + 7);
+  doc.setFontSize(9.5);
+  doc.text(t.priceSummary, left + 4, y + 7);
 
   let priceY = y + 11;
   doc.setTextColor(...neutral);
@@ -732,9 +732,9 @@ export async function generateQuotePDF(
     doc.setDrawColor(...border);
     doc.roundedRect(left, y - 4, contentWidth, conditionHeight, 2, 2, 'S');
     doc.setTextColor(...accent);
-    doc.setFontSize(10);
+    doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
-    doc.text(t.conditions.toUpperCase(), left, y);
+    doc.text(t.conditions, left, y);
     y += 5.5;
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
@@ -761,8 +761,8 @@ export async function generateQuotePDF(
     doc.roundedRect(left, y, contentWidth, boxHeight, 2, 2, 'S');
     doc.setTextColor(...accent);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text(t.whyChooseUs.toUpperCase(), left + 4, y + 5);
+    doc.setFontSize(9.5);
+    doc.text(t.whyChooseUs, left + 4, y + 5);
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
