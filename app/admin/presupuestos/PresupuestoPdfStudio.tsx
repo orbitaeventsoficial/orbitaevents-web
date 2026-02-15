@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ALL_SERVICES,
   EXTRAS,
@@ -10,6 +10,7 @@ import {
   type ServiceSlug,
 } from '@/app/config/packs-config';
 import { generateQuotePDF } from '@/lib/pdf-utils';
+import { z } from 'zod';
 
 type Locale = 'ca' | 'es' | 'en';
 
@@ -18,6 +19,15 @@ type CustomExtra = {
   name: string;
   price: number;
 };
+
+const STUDIO_DRAFT_KEY = 'admin.presupuestos.pdfstudio.draft.v1';
+const quoteStudioSchema = z.object({
+  clientName: z.string().trim().min(2, 'Nom del client massa curt'),
+  clientEmail: z.string().trim().email('Email del client no valid'),
+  guests: z.number().int().min(1, 'Convidats ha de ser minim 1'),
+  validityDays: z.number().int().min(1).max(120),
+  basePrice: z.number().min(0),
+});
 
 const SERVICE_LABEL: Record<ServiceSlug, string> = {
   bodas: 'Bodas',
@@ -61,6 +71,7 @@ function buildPackFromForm(params: {
 async function translateTextForPdf(text: string, locale: Locale): Promise<string> {
   const clean = text.trim();
   if (!clean) return text;
+  if (locale === 'ca') return text;
   try {
     const res = await fetch('/api/admin/translate', {
       method: 'POST',
@@ -120,6 +131,8 @@ export default function PresupuestoPdfStudio() {
   const [brandPhone, setBrandPhone] = useState('');
   const [brandTagline, setBrandTagline] = useState('Tu evento. Tu estilo. Tu noche perfecta.');
   const [logoDataUrl, setLogoDataUrl] = useState<string>('');
+  const [draftLoaded, setDraftLoaded] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const packs = useMemo(() => getPacksByService(eventType), [eventType]);
 
@@ -152,6 +165,122 @@ export default function PresupuestoPdfStudio() {
   const total = useMemo(() => {
     return Math.max(0, basePrice + extrasPrice - Math.max(0, discount));
   }, [basePrice, extrasPrice, discount]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || draftLoaded) return;
+    try {
+      const raw = window.localStorage.getItem(STUDIO_DRAFT_KEY);
+      if (!raw) {
+        setDraftLoaded(true);
+        return;
+      }
+      const draft = JSON.parse(raw) as Record<string, unknown>;
+      if (typeof draft.locale === 'string') setLocale(draft.locale as Locale);
+      if (typeof draft.eventType === 'string') setEventType(draft.eventType as ServiceSlug);
+      if (typeof draft.packId === 'string') setPackId(draft.packId);
+      if (typeof draft.clientContact === 'string') setClientContact(draft.clientContact);
+      if (typeof draft.clientName === 'string') setClientName(draft.clientName);
+      if (typeof draft.clientEmail === 'string') setClientEmail(draft.clientEmail);
+      if (typeof draft.clientPhone === 'string') setClientPhone(draft.clientPhone);
+      if (typeof draft.eventDate === 'string') setEventDate(draft.eventDate);
+      if (typeof draft.guests === 'number') setGuests(draft.guests);
+      if (typeof draft.validityDays === 'number') setValidityDays(draft.validityDays);
+      if (typeof draft.conditionsText === 'string') setConditionsText(draft.conditionsText);
+      if (typeof draft.whyChooseUs === 'string') setWhyChooseUs(draft.whyChooseUs);
+      if (typeof draft.discount === 'number') setDiscount(draft.discount);
+      if (typeof draft.discountReason === 'string') setDiscountReason(draft.discountReason);
+      if (Array.isArray(draft.selectedExtras)) {
+        setSelectedExtras(draft.selectedExtras.filter((id): id is string => typeof id === 'string'));
+      }
+      if (Array.isArray(draft.customExtras)) {
+        setCustomExtras(
+          draft.customExtras
+            .map((item) => ({
+              id: typeof (item as any)?.id === 'string' ? (item as any).id : '',
+              name: typeof (item as any)?.name === 'string' ? (item as any).name : '',
+              price: Number((item as any)?.price || 0),
+            }))
+            .filter((item) => item.id && item.name)
+        );
+      }
+      if (typeof draft.packName === 'string') setPackName(draft.packName);
+      if (typeof draft.basePrice === 'number') setBasePrice(draft.basePrice);
+      if (typeof draft.durationHours === 'number') setDurationHours(draft.durationHours);
+      if (typeof draft.featuresText === 'string') setFeaturesText(draft.featuresText);
+      if (typeof draft.brandName === 'string') setBrandName(draft.brandName);
+      if (typeof draft.brandWebsite === 'string') setBrandWebsite(draft.brandWebsite);
+      if (typeof draft.brandEmail === 'string') setBrandEmail(draft.brandEmail);
+      if (typeof draft.brandPhone === 'string') setBrandPhone(draft.brandPhone);
+      if (typeof draft.brandTagline === 'string') setBrandTagline(draft.brandTagline);
+    } catch {
+      // Ignore corrupted drafts.
+    } finally {
+      setDraftLoaded(true);
+    }
+  }, [draftLoaded]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !draftLoaded) return;
+    const timeout = window.setTimeout(() => {
+      const draft = {
+        locale,
+        eventType,
+        packId,
+        clientContact,
+        clientName,
+        clientEmail,
+        clientPhone,
+        eventDate,
+        guests,
+        validityDays,
+        conditionsText,
+        whyChooseUs,
+        discount,
+        discountReason,
+        selectedExtras,
+        customExtras,
+        packName,
+        basePrice,
+        durationHours,
+        featuresText,
+        brandName,
+        brandWebsite,
+        brandEmail,
+        brandPhone,
+        brandTagline,
+      };
+      window.localStorage.setItem(STUDIO_DRAFT_KEY, JSON.stringify(draft));
+    }, 650);
+
+    return () => window.clearTimeout(timeout);
+  }, [
+    draftLoaded,
+    locale,
+    eventType,
+    packId,
+    clientContact,
+    clientName,
+    clientEmail,
+    clientPhone,
+    eventDate,
+    guests,
+    validityDays,
+    conditionsText,
+    whyChooseUs,
+    discount,
+    discountReason,
+    selectedExtras,
+    customExtras,
+    packName,
+    basePrice,
+    durationHours,
+    featuresText,
+    brandName,
+    brandWebsite,
+    brandEmail,
+    brandPhone,
+    brandTagline,
+  ]);
 
   function reloadPackValues(nextPackId: string, nextService?: ServiceSlug) {
     const service = nextService || eventType;
@@ -275,6 +404,7 @@ export default function PresupuestoPdfStudio() {
 
   async function downloadPdf() {
     if (!selectedPack) return;
+    if (!validateBeforeGenerate(false)) return;
     setGenerating(true);
     setMessage(null);
 
@@ -294,6 +424,7 @@ export default function PresupuestoPdfStudio() {
 
   async function printPdf() {
     if (!selectedPack) return;
+    if (!validateBeforeGenerate(false)) return;
     setGenerating(true);
     setMessage(null);
     try {
@@ -311,7 +442,9 @@ export default function PresupuestoPdfStudio() {
   }
 
   async function sendQuoteEmail() {
+    if (!validateBeforeGenerate(true)) return;
     if (!clientEmail.trim()) {
+      setValidationError('Cal indicar email del client per enviar el pressupost.');
       setMessage('Cal indicar email del client per enviar el pressupost.');
       return;
     }
@@ -369,22 +502,46 @@ export default function PresupuestoPdfStudio() {
     reader.readAsDataURL(file);
   }
 
+  function clearDraft() {
+    if (typeof window === 'undefined') return;
+    window.localStorage.removeItem(STUDIO_DRAFT_KEY);
+    setMessage('Esborrany local eliminat.');
+  }
+
+  function validateBeforeGenerate(requireEmail = false): boolean {
+    const parsed = quoteStudioSchema.safeParse({
+      clientName,
+      clientEmail: requireEmail ? clientEmail : clientEmail || 'placeholder@orbitaevents.local',
+      guests,
+      validityDays,
+      basePrice,
+    });
+    if (!parsed.success) {
+      const first = parsed.error.issues[0]?.message || 'Dades no valides';
+      setValidationError(first);
+      setMessage(first);
+      return false;
+    }
+    setValidationError(null);
+    return true;
+  }
+
   const inputClass =
-    'w-full rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-500 focus:ring-1 focus:ring-amber-500';
+    'w-full rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 outline-none focus-visible:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500/70';
 
   return (
     <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
       <div className="space-y-5 rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
         <div className="grid gap-4 md:grid-cols-2">
           <label className="text-sm text-slate-300">
-            Idioma PDF
+            Idioma preferit del client
             <select className={inputClass} value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
               <option value="ca">Català</option>
               <option value="es">Español</option>
               <option value="en">English</option>
             </select>
             <span className="mt-1 block text-xs text-slate-400">
-              Aquest idioma s&apos;aplica a descarregar i imprimir el PDF.
+              Aquest idioma s&apos;aplica directament al PDF i a l&apos;enviament.
             </span>
           </label>
 
@@ -612,7 +769,7 @@ export default function PresupuestoPdfStudio() {
             type="button"
             onClick={downloadPdf}
             disabled={generating || sending || !selectedPack}
-            className="rounded-xl border border-emerald-500/40 bg-emerald-500/15 px-5 py-2.5 text-sm font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-60"
+            className="rounded-xl border border-emerald-500/40 bg-emerald-500/15 px-5 py-2.5 text-sm font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70"
           >
             {generating ? 'Generant PDF...' : 'Descarregar PDF'}
           </button>
@@ -620,7 +777,7 @@ export default function PresupuestoPdfStudio() {
             type="button"
             onClick={printPdf}
             disabled={generating || sending || !selectedPack}
-            className="rounded-xl border border-sky-500/40 bg-sky-500/15 px-5 py-2.5 text-sm font-semibold text-sky-200 hover:bg-sky-500/20 disabled:opacity-60"
+            className="rounded-xl border border-sky-500/40 bg-sky-500/15 px-5 py-2.5 text-sm font-semibold text-sky-200 hover:bg-sky-500/20 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70"
           >
             {generating ? 'Generant PDF...' : 'Imprimir PDF'}
           </button>
@@ -628,10 +785,18 @@ export default function PresupuestoPdfStudio() {
             type="button"
             onClick={sendQuoteEmail}
             disabled={generating || sending || !selectedPack || !clientEmail.trim()}
-            className="rounded-xl border border-violet-500/40 bg-violet-500/15 px-5 py-2.5 text-sm font-semibold text-violet-200 hover:bg-violet-500/20 disabled:opacity-60"
+            className="rounded-xl border border-violet-500/40 bg-violet-500/15 px-5 py-2.5 text-sm font-semibold text-violet-200 hover:bg-violet-500/20 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"
           >
             {sending ? 'Enviant...' : 'Enviar pressupost'}
           </button>
+          <button
+            type="button"
+            onClick={clearDraft}
+            className="rounded-xl border border-slate-600/50 bg-slate-800/60 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-slate-700/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/70"
+          >
+            Netejar esborrany
+          </button>
+          {validationError && <p className="text-sm text-rose-300">{validationError}</p>}
           {message && <p className="text-sm text-slate-300">{message}</p>}
         </div>
       </div>

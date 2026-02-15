@@ -11,6 +11,7 @@
 import { getPacksByService, EXTRAS, type ExtraDefinition, type ServiceSlug, type PackDefinition } from '@/app/config/packs-config';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { ORBITA_LOGO_BASE64 } from './logo-base64';
+import { ORBITA_LOGO_TEXT_DRETA_BASE64 } from './logo-wordmark-base64';
 
 type jsPDFType = import('jspdf').jsPDF;
 let jsPDFModule: typeof import('jspdf') | null = null;
@@ -79,6 +80,17 @@ function getImageFormatFromDataUrl(dataUrl: string): 'PNG' | 'JPEG' {
   if (dataUrl.startsWith('data:image/jpeg') || dataUrl.startsWith('data:image/jpg')) return 'JPEG';
   if (dataUrl.startsWith('data:image/png')) return 'PNG';
   return 'PNG';
+}
+
+function fitWithin(
+  width: number,
+  height: number,
+  maxWidth: number,
+  maxHeight: number
+): { width: number; height: number } {
+  if (width <= 0 || height <= 0) return { width: maxWidth, height: maxHeight };
+  const ratio = Math.min(maxWidth / width, maxHeight / height);
+  return { width: width * ratio, height: height * ratio };
 }
 
 function checkPageBreak(
@@ -433,7 +445,14 @@ export async function generateQuotePDF(
 
   const ensureSpace = (space: number): boolean => y + space <= pageBottom;
 
-  const drawLabelValue = (label: string, value: string, x: number, top: number, width: number) => {
+  const drawLabelValue = (
+    label: string,
+    value: string,
+    x: number,
+    top: number,
+    width: number,
+    maxLines = 3
+  ): number => {
     doc.setTextColor(...muted);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
@@ -441,8 +460,9 @@ export async function generateQuotePDF(
     doc.setTextColor(...neutral);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    const lines = doc.splitTextToSize(value || '-', width);
-    doc.text(lines.slice(0, 2), x, top + 6);
+    const lines = doc.splitTextToSize(value || '-', width).slice(0, maxLines);
+    doc.text(lines, x, top + 6);
+    return lines.length;
   };
 
   const drawHeader = (compact: boolean) => {
@@ -452,23 +472,31 @@ export async function generateQuotePDF(
     doc.setDrawColor(...border);
     doc.roundedRect(left, y, contentWidth, headerHeight, 3, 3, 'S');
 
-    const logoSource = branding?.logoDataUrl || ORBITA_LOGO_BASE64;
+    const logoSource = branding?.logoDataUrl || ORBITA_LOGO_TEXT_DRETA_BASE64 || ORBITA_LOGO_BASE64;
     const hasLogo = typeof logoSource === 'string' && logoSource.length > 100;
+    let logoBlockWidth = 0;
 
     if (!compact && hasLogo) {
       try {
         const fmt = getImageFormatFromDataUrl(logoSource);
-        doc.addImage(logoSource, fmt, left + 5, y + 5, 12, 12);
+        const props = doc.getImageProperties(logoSource);
+        const fitted = fitWithin(props.width, props.height, 52, 14);
+        const logoX = left + 5;
+        const logoY = y + 5 + (14 - fitted.height) / 2;
+        doc.addImage(logoSource, fmt, logoX, logoY, fitted.width, fitted.height);
+        logoBlockWidth = fitted.width + 8;
       } catch {
         // Ignore logo errors and keep text branding.
       }
     }
 
-    const titleX = hasLogo ? left + 21 : left + 6;
+    const titleXRaw = hasLogo ? left + Math.max(21, logoBlockWidth + 5) : left + 6;
+    const titleX = Math.min(titleXRaw, left + 96);
     doc.setTextColor(...neutral);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(compact ? 10.5 : 15);
-    doc.text(brandName, titleX, y + (compact ? 9 : 11));
+    const brandLine = doc.splitTextToSize(brandName, 78)[0] || brandName;
+    doc.text(brandLine, titleX, y + (compact ? 9 : 11));
     if (!compact) {
       doc.setTextColor(...accent);
       doc.setFontSize(10);
@@ -501,30 +529,39 @@ export async function generateQuotePDF(
 
   drawHeader(false);
 
-  if (!ensureSpace(20)) {
+  if (!ensureSpace(22)) {
     drawFooter();
     return doc;
   }
+  const clientValue = data.clientName || data.clientContact || '-';
+  const contactValue = [data.clientContact, data.clientEmail, data.clientPhone].filter(Boolean).join(' · ') || '-';
+  const clientLinesCount = Math.min(3, doc.splitTextToSize(clientValue, 70).length);
+  const contactLinesCount = Math.min(3, doc.splitTextToSize(contactValue, 85).length);
+  const clientBoxHeight = 12 + Math.max(clientLinesCount, contactLinesCount) * 4.8;
   doc.setFillColor(...surface);
-  doc.roundedRect(left, y, contentWidth, 16, 2, 2, 'F');
+  doc.roundedRect(left, y, contentWidth, clientBoxHeight, 2, 2, 'F');
   doc.setDrawColor(...border);
-  doc.roundedRect(left, y, contentWidth, 16, 2, 2, 'S');
-  drawLabelValue('Client', data.clientName || data.clientContact || '-', left + 4, y + 6, 70);
-  drawLabelValue(t.contact, [data.clientContact, data.clientEmail, data.clientPhone].filter(Boolean).join(' · ') || '-', left + 88, y + 6, 85);
-  y += 22;
+  doc.roundedRect(left, y, contentWidth, clientBoxHeight, 2, 2, 'S');
+  drawLabelValue('Client', clientValue, left + 4, y + 6, 70, 3);
+  drawLabelValue(t.contact, contactValue, left + 88, y + 6, 85, 3);
+  y += clientBoxHeight + 6;
 
-  if (!ensureSpace(28)) {
+  if (!ensureSpace(30)) {
     drawFooter();
     return doc;
   }
+  const eventTypeLines = Math.min(2, doc.splitTextToSize(`${eventTypeName}`, 80).length);
+  const dateLines = Math.min(2, doc.splitTextToSize(data.date || '-', 85).length);
+  const guestsLines = 1;
+  const eventBoxHeight = 14 + Math.max(eventTypeLines, dateLines + guestsLines) * 4.8;
   doc.setFillColor(...surface);
-  doc.roundedRect(left, y, contentWidth, 24, 3, 3, 'F');
+  doc.roundedRect(left, y, contentWidth, eventBoxHeight, 3, 3, 'F');
   doc.setDrawColor(...border);
-  doc.roundedRect(left, y, contentWidth, 24, 3, 3, 'S');
-  drawLabelValue(t.eventDetails, `${eventTypeName}`, left + 4, y + 6, 80);
-  drawLabelValue('Data', data.date || '-', left + 88, y + 6, 85);
-  drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 14, 85);
-  y += 29;
+  doc.roundedRect(left, y, contentWidth, eventBoxHeight, 3, 3, 'S');
+  drawLabelValue(t.eventDetails, `${eventTypeName}`, left + 4, y + 6, 80, 2);
+  const dateUsed = drawLabelValue('Data', data.date || '-', left + 88, y + 6, 85, 2);
+  drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 6 + dateUsed * 4.8 + 2, 85, 1);
+  y += eventBoxHeight + 5;
 
   if (!ensureSpace(18)) {
     drawFooter();
@@ -539,16 +576,17 @@ export async function generateQuotePDF(
   doc.line(left, y, left + contentWidth, y);
   y += 5;
   doc.setTextColor(...neutral);
-  doc.setFontSize(13);
-  doc.text(data.pack.name, left, y);
+  doc.setFontSize(12.5);
+  const packNameLines = doc.splitTextToSize(data.pack.name, 126).slice(0, 2);
+  doc.text(packNameLines, left, y);
   doc.setFontSize(10);
   doc.setTextColor(...muted);
-  doc.text(`${data.pack.durationHours} ${t.hours}`, left, y + 6);
+  doc.text(`${data.pack.durationHours} ${t.hours}`, left, y + 7 + (packNameLines.length - 1) * 4.2);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...accent);
   doc.setFontSize(16);
   doc.text(`${data.basePrice.toFixed(2)}€`, left + contentWidth, y + 2, { align: 'right' });
-  y += 12;
+  y += 12 + (packNameLines.length - 1) * 4;
 
   const features = data.pack.features
     .map((feature) => feature.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim())
@@ -572,9 +610,9 @@ export async function generateQuotePDF(
       if (!ensureSpace(lineHeight + 1)) break;
       doc.setFillColor(...accent);
       doc.circle(left + 1.5, y - 1.3, 0.9, 'F');
-      const line = doc.splitTextToSize(feature, 170)[0];
-      doc.text(line, left + 5, y);
-      y += lineHeight;
+      const lines = doc.splitTextToSize(feature, 170).slice(0, 2);
+      doc.text(lines, left + 5, y);
+      y += lineHeight * lines.length;
     }
     y += 2;
   }
@@ -597,8 +635,8 @@ export async function generateQuotePDF(
       const extra = extrasCatalog.find((item) => item.name === extraName || item.id === extraName);
       const priceText = typeof extra?.price === 'number' ? `+${extra.price}€` : '';
       if (!ensureSpace(lineHeight + 1)) break;
-      const line = doc.splitTextToSize(extraName, 145)[0];
-      doc.text(line, left, y);
+      const lines = doc.splitTextToSize(extraName, 145).slice(0, 2);
+      doc.text(lines, left, y);
       if (priceText) {
         doc.setTextColor(...accent);
         doc.setFont('helvetica', 'bold');
@@ -606,19 +644,25 @@ export async function generateQuotePDF(
         doc.setTextColor(...neutral);
         doc.setFont('helvetica', 'normal');
       }
-      y += lineHeight;
+      y += lineHeight * lines.length;
     }
     y += 2;
   }
 
-  if (!ensureSpace(30)) {
+  const discountReasonLines =
+    data.discount > 0 && data.discountReason?.trim()
+      ? Math.min(2, doc.splitTextToSize(data.discountReason.trim(), 120).length)
+      : 0;
+  const summaryHeight = 22 + (data.discount > 0 ? 4.5 : 0) + discountReasonLines * 3.8;
+
+  if (!ensureSpace(summaryHeight + 4)) {
     drawFooter();
     return doc;
   }
   doc.setFillColor(...surface);
-  doc.roundedRect(left, y, contentWidth, 26, 2, 2, 'F');
+  doc.roundedRect(left, y, contentWidth, summaryHeight, 2, 2, 'F');
   doc.setDrawColor(...border);
-  doc.roundedRect(left, y, contentWidth, 26, 2, 2, 'S');
+  doc.roundedRect(left, y, contentWidth, summaryHeight, 2, 2, 'S');
   doc.setTextColor(...accent);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
@@ -643,10 +687,11 @@ export async function generateQuotePDF(
       priceY += 3.8;
       doc.setTextColor(...muted);
       doc.setFontSize(7.5);
-      const reasonLine = doc.splitTextToSize(reason, 120).slice(0, 1);
-      doc.text(reasonLine, left + 4, priceY);
+      const reasonLines = doc.splitTextToSize(reason, 120).slice(0, 2);
+      doc.text(reasonLines, left + 4, priceY);
       doc.setTextColor(...neutral);
       doc.setFontSize(9);
+      priceY += 3.5 * reasonLines.length;
     }
   }
   priceY += 5;
@@ -657,7 +702,7 @@ export async function generateQuotePDF(
   doc.setTextColor(...accent);
   doc.text(t.total.toUpperCase(), left + 4, priceY + 2);
   doc.text(`${data.total.toFixed(2)}€`, left + contentWidth - 4, priceY + 2, { align: 'right' });
-  y += 30;
+  y += summaryHeight + 4;
 
   const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 4);
   if (conditions.length > 0) {
@@ -676,7 +721,7 @@ export async function generateQuotePDF(
     doc.setFontSize(8);
     for (const condition of conditions) {
       if (!ensureSpace(4.5)) break;
-      const lines = doc.splitTextToSize(`• ${condition}`, 175).slice(0, 1);
+      const lines = doc.splitTextToSize(`• ${condition}`, 175).slice(0, 2);
       doc.text(lines, left, y);
       y += 4 * lines.length;
     }

@@ -1,10 +1,23 @@
 import Link from 'next/link';
-import PresupuestoPdfStudio from './PresupuestoPdfStudio';
+import dynamicImport from 'next/dynamic';
+
+const PresupuestoPdfStudio = dynamicImport(() => import('./PresupuestoPdfStudio'), {
+  ssr: false,
+  loading: () => (
+    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 text-sm text-slate-300">
+      Carregant editor de pressupostos...
+    </section>
+  ),
+});
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Editor PDF Presupuestos | Orbita Admin',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function PresupuestosPage() {
