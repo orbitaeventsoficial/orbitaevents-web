@@ -57,16 +57,37 @@ const SERVICE_NAMES: Record<ServiceSlug, { ca: string; es: string; en: string }>
   alquiler: { ca: 'Lloguer d\'Equip', es: 'Alquiler de Equipo', en: 'Equipment Rental' },
 };
 
+export interface PdfBrandingOptions {
+  logoDataUrl?: string;
+  brandName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  website?: string;
+  tagline?: string;
+}
 
-function checkPageBreak(doc: jsPDFType, currentY: number, neededSpace: number, title: string): number {
+function normalizeWebsite(value: string): string {
+  return value.replace(/^https?:\/\//, '');
+}
+
+function checkPageBreak(
+  doc: jsPDFType,
+  currentY: number,
+  neededSpace: number,
+  title: string,
+  branding?: PdfBrandingOptions
+): number {
   if (currentY + neededSpace > PAGE.safeBottom) {
     doc.addPage();
-    return addHeader(doc, title);
+    return addHeader(doc, title, branding);
   }
   return currentY;
 }
 
-function addHeader(doc: jsPDFType, title: string): number {
+function addHeader(doc: jsPDFType, title: string, branding?: PdfBrandingOptions): number {
+  const brandName = branding?.brandName?.trim() || 'ÒRBITA EVENTS';
+  const logoSource = branding?.logoDataUrl || ORBITA_LOGO_BASE64;
+
   doc.setFillColor(...COLORS.blackSoft);
   doc.rect(0, 0, PAGE.width, 50, 'F');
   doc.setFillColor(...COLORS.gold);
@@ -75,20 +96,17 @@ function addHeader(doc: jsPDFType, title: string): number {
   doc.rect(0, 48, PAGE.width, 2, 'F');
 
   let textStartX = 22;
-  if (ORBITA_LOGO_BASE64 && ORBITA_LOGO_BASE64.length > 100) {
+  if (logoSource && logoSource.length > 100) {
     try {
-      doc.addImage(ORBITA_LOGO_BASE64, 'PNG', 12, 6, 38, 38);
+      doc.addImage(logoSource, 'PNG', 12, 6, 38, 38);
       textStartX = 55;
     } catch { /* fallback to text */ }
   }
 
   doc.setTextColor(...COLORS.gold);
-  doc.setFontSize(26);
+  doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
-  doc.text('ÒRBITA', textStartX, 24);
-  const orbitaWidth = doc.getTextWidth('ÒRBITA') + 3;
-  doc.setFont('helvetica', 'normal');
-  doc.text('EVENTS', textStartX + orbitaWidth, 24);
+  doc.text(brandName.toUpperCase(), textStartX, 24);
   doc.setTextColor(...COLORS.grayLight);
   doc.setFontSize(10);
   doc.text(title.toUpperCase(), textStartX, 38);
@@ -103,7 +121,12 @@ function addHeader(doc: jsPDFType, title: string): number {
   return PAGE.marginTop;
 }
 
-function addFooter(doc: jsPDFType, pageNum: number, totalPages: number) {
+function addFooter(doc: jsPDFType, pageNum: number, totalPages: number, branding?: PdfBrandingOptions) {
+  const website = normalizeWebsite(branding?.website?.trim() || SITE_CONFIG.web.url);
+  const contactEmail = branding?.contactEmail?.trim() || SITE_CONFIG.business.email;
+  const contactPhone = branding?.contactPhone?.trim() || SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone;
+  const tagline = branding?.tagline?.trim() || "L'Esdeveniment Que La Teva Gent NO Oblidarà";
+
   const footerY = PAGE.height - 35;
   doc.setFillColor(...COLORS.bgLight);
   doc.rect(0, footerY - 5, PAGE.width, 40, 'F');
@@ -114,10 +137,10 @@ function addFooter(doc: jsPDFType, pageNum: number, totalPages: number) {
   doc.setTextColor(...COLORS.grayDark);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  doc.text(SITE_CONFIG.web.url.replace(/^https?:\/\//, ''), PAGE.marginLeft, footerY + 10);
+  doc.text(website, PAGE.marginLeft, footerY + 10);
   doc.setFont('helvetica', 'normal');
-  doc.text(SITE_CONFIG.business.email, PAGE.marginLeft, footerY + 16);
-  doc.text(SITE_CONFIG.business.phoneDisplay || SITE_CONFIG.business.phone, PAGE.marginLeft, footerY + 22);
+  doc.text(contactEmail, PAGE.marginLeft, footerY + 16);
+  doc.text(contactPhone, PAGE.marginLeft, footerY + 22);
 
   doc.setTextColor(...COLORS.gray);
   doc.text('Barcelona · Girona · Catalunya', PAGE.width / 2, footerY + 16, { align: 'center' });
@@ -134,14 +157,14 @@ function addFooter(doc: jsPDFType, pageNum: number, totalPages: number) {
   doc.setTextColor(...COLORS.grayDark);
   doc.setFontSize(7);
   doc.setFont('helvetica', 'italic');
-  doc.text("L'Esdeveniment Que La Teva Gent NO Oblidarà", PAGE.width / 2, footerY + 28, { align: 'center' });
+  doc.text(tagline, PAGE.width / 2, footerY + 28, { align: 'center' });
 }
 
-function addAllFooters(doc: jsPDFType) {
+function addAllFooters(doc: jsPDFType, branding?: PdfBrandingOptions) {
   const totalPages = doc.internal.pages.length - 1;
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
-    addFooter(doc, i, totalPages);
+    addFooter(doc, i, totalPages, branding);
   }
 }
 
@@ -291,24 +314,30 @@ export interface QuoteData {
   total: number;
   clientName?: string;
   clientEmail?: string;
+  clientPhone?: string;
+  clientContact?: string;
+  validityDays?: number;
+  conditions?: string[];
+  whyChooseUs?: string;
 }
 
 export async function generateQuotePDF(
   data: QuoteData,
-  locale: 'ca' | 'es' | 'en' = 'ca'
+  locale: 'ca' | 'es' | 'en' = 'ca',
+  branding?: PdfBrandingOptions
 ): Promise<jsPDFType> {
   const { default: jsPDF } = await getJsPDF();
   const doc = new jsPDF();
   const extrasCatalog = data.extrasCatalog ?? EXTRAS;
 
   const t = {
-    ca: { quote: 'Pressupost', eventDetails: 'Detalls de l\'Event', guests: 'Convidats', selectedPack: 'Pack Seleccionat', hours: 'hores', features: 'Característiques Incloses', extras: 'Extres Seleccionats', priceSummary: 'Resum de Preus', basePack: 'Pack base', extrasTotal: 'Total extres', discount: 'Descompte', total: 'TOTAL', validUntil: 'Pressupost vàlid durant 15 dies', disclaimer: 'Els preus no inclouen IVA. Consulta condicions.', nextSteps: 'PRÒXIMS PASSOS', step1: 'Confirma disponibilitat contactant-nos', step2: 'Reserva amb un senyal del 30%', step3: 'Gaudeix del teu event perfecte' },
-    es: { quote: 'Presupuesto', eventDetails: 'Detalles del Evento', guests: 'Invitados', selectedPack: 'Pack Seleccionado', hours: 'horas', features: 'Características Incluidas', extras: 'Extras Seleccionados', priceSummary: 'Resumen de Precios', basePack: 'Pack base', extrasTotal: 'Total extras', discount: 'Descuento', total: 'TOTAL', validUntil: 'Presupuesto válido durante 15 días', disclaimer: 'Los precios no incluyen IVA. Consulta condiciones.', nextSteps: 'PRÓXIMOS PASOS', step1: 'Confirma disponibilidad contactándonos', step2: 'Reserva con una señal del 30%', step3: 'Disfruta de tu evento perfecto' },
-    en: { quote: 'Quote', eventDetails: 'Event Details', guests: 'Guests', selectedPack: 'Selected Package', hours: 'hours', features: 'Included Features', extras: 'Selected Extras', priceSummary: 'Price Summary', basePack: 'Base package', extrasTotal: 'Extras total', discount: 'Discount', total: 'TOTAL', validUntil: 'Quote valid for 15 days', disclaimer: 'Prices do not include VAT. See conditions.', nextSteps: 'NEXT STEPS', step1: 'Confirm availability by contacting us', step2: 'Book with a 30% deposit', step3: 'Enjoy your perfect event' },
+    ca: { quote: 'Pressupost', eventDetails: 'Detalls de l\'Event', guests: 'Convidats', selectedPack: 'Pack Seleccionat', hours: 'hores', features: 'Característiques Incloses', extras: 'Extres Seleccionats', priceSummary: 'Resum de Preus', basePack: 'Pack base', extrasTotal: 'Total extres', discount: 'Descompte', total: 'TOTAL', validUntilPrefix: 'Pressupost vàlid durant', validUntilSuffix: 'dies', disclaimer: 'Els preus no inclouen IVA. Consulta condicions.', nextSteps: 'PRÒXIMS PASSOS', step1: 'Confirma disponibilitat contactant-nos', step2: 'Reserva amb un senyal del 30%', step3: 'Gaudeix del teu event perfecte', contact: 'Contacte', conditions: 'Condicions', whyChooseUs: 'Per què escollir-nos' },
+    es: { quote: 'Presupuesto', eventDetails: 'Detalles del Evento', guests: 'Invitados', selectedPack: 'Pack Seleccionado', hours: 'horas', features: 'Características Incluidas', extras: 'Extras Seleccionados', priceSummary: 'Resumen de Precios', basePack: 'Pack base', extrasTotal: 'Total extras', discount: 'Descuento', total: 'TOTAL', validUntilPrefix: 'Presupuesto válido durante', validUntilSuffix: 'días', disclaimer: 'Los precios no incluyen IVA. Consulta condiciones.', nextSteps: 'PRÓXIMOS PASOS', step1: 'Confirma disponibilidad contactándonos', step2: 'Reserva con una señal del 30%', step3: 'Disfruta de tu evento perfecto', contact: 'Contacto', conditions: 'Condiciones', whyChooseUs: 'Por qué elegirnos' },
+    en: { quote: 'Quote', eventDetails: 'Event Details', guests: 'Guests', selectedPack: 'Selected Package', hours: 'hours', features: 'Included Features', extras: 'Selected Extras', priceSummary: 'Price Summary', basePack: 'Base package', extrasTotal: 'Extras total', discount: 'Discount', total: 'TOTAL', validUntilPrefix: 'Quote valid for', validUntilSuffix: 'days', disclaimer: 'Prices do not include VAT. See conditions.', nextSteps: 'NEXT STEPS', step1: 'Confirm availability by contacting us', step2: 'Book with a 30% deposit', step3: 'Enjoy your perfect event', contact: 'Contact', conditions: 'Conditions', whyChooseUs: 'Why choose us' },
   }[locale];
 
   const headerTitle = t.quote;
-  let y = addHeader(doc, headerTitle);
+  let y = addHeader(doc, headerTitle, branding);
 
   const quoteNum = `OE-${Date.now().toString(36).toUpperCase()}`;
   doc.setTextColor(...COLORS.gold);
@@ -327,10 +356,20 @@ export async function generateQuotePDF(
     doc.text(data.clientName, PAGE.marginLeft, y);
     y += 8;
   }
+  const contactLines = [data.clientContact, data.clientEmail, data.clientPhone]
+    .map((line) => (line || '').trim())
+    .filter(Boolean);
+  if (contactLines.length > 0) {
+    doc.setTextColor(...COLORS.grayDark);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text(contactLines.join(' · '), PAGE.marginLeft, y);
+    y += 6;
+  }
   y += 12;
 
   const eventCardHeight = 32;
-  y = checkPageBreak(doc, y, eventCardHeight + 10, headerTitle);
+  y = checkPageBreak(doc, y, eventCardHeight + 10, headerTitle, branding);
   doc.setFillColor(...COLORS.bgLight);
   doc.setDrawColor(...COLORS.grayLight);
   doc.setLineWidth(0.3);
@@ -357,7 +396,7 @@ export async function generateQuotePDF(
   y += eventCardHeight + 12;
 
   const packCardHeight = 55;
-  y = checkPageBreak(doc, y, packCardHeight + 10, headerTitle);
+  y = checkPageBreak(doc, y, packCardHeight + 10, headerTitle, branding);
   doc.setFillColor(218, 165, 32);
   doc.roundedRect(15, y, PAGE.contentWidth + 10, packCardHeight, 4, 4, 'F');
   doc.setFillColor(235, 185, 52);
@@ -388,7 +427,7 @@ export async function generateQuotePDF(
   const maxFeatures = Math.min(data.pack.features.length, 8);
   const featuresPerColumn = Math.ceil(maxFeatures / 2);
   const featuresHeight = (featuresPerColumn * 8) + 20;
-  y = checkPageBreak(doc, y, featuresHeight, headerTitle);
+  y = checkPageBreak(doc, y, featuresHeight, headerTitle, branding);
   doc.setTextColor(...COLORS.gold);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
@@ -412,7 +451,7 @@ export async function generateQuotePDF(
 
   if (data.extras.length > 0) {
     const extrasHeight = (data.extras.length * 7) + 20;
-    y = checkPageBreak(doc, y, extrasHeight, headerTitle);
+    y = checkPageBreak(doc, y, extrasHeight, headerTitle, branding);
     doc.setTextColor(...COLORS.gold);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
@@ -440,7 +479,7 @@ export async function generateQuotePDF(
   }
 
   const summaryHeight = 60;
-  y = checkPageBreak(doc, y, summaryHeight + 25, headerTitle);
+  y = checkPageBreak(doc, y, summaryHeight + 25, headerTitle, branding);
   y = Math.max(y, PAGE.safeBottom - summaryHeight - 20);
 
   const stepsY = y;
@@ -542,13 +581,53 @@ export async function generateQuotePDF(
   doc.setTextColor(...COLORS.gold);
   doc.setFontSize(7);
   doc.setFont('helvetica', 'bold');
-  doc.text(t.validUntil, 25, disclaimerY + 6);
+  const validityDays = Math.max(1, Math.round(data.validityDays || 15));
+  doc.text(`${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix}`, 25, disclaimerY + 6);
   doc.setTextColor(...COLORS.grayDark);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
   doc.text(t.disclaimer, 25, disclaimerY + 11);
 
-  addAllFooters(doc);
+  let narrativeY = disclaimerY + 20;
+  const conditions = (data.conditions || []).map((item) => item.trim()).filter(Boolean).slice(0, 6);
+
+  if (conditions.length > 0) {
+    narrativeY = checkPageBreak(doc, narrativeY, 32 + conditions.length * 5, headerTitle, branding);
+    doc.setFillColor(...COLORS.bgLight);
+    doc.roundedRect(15, narrativeY, PAGE.contentWidth + 10, 24 + conditions.length * 5, 3, 3, 'F');
+    doc.setTextColor(...COLORS.gold);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text(t.conditions.toUpperCase(), 20, narrativeY + 8);
+    doc.setTextColor(...COLORS.grayDark);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    conditions.forEach((condition, index) => {
+      const shortLine = condition.length > 105 ? `${condition.slice(0, 102)}...` : condition;
+      doc.text(`- ${shortLine}`, 20, narrativeY + 14 + index * 5);
+    });
+    narrativeY += 32 + conditions.length * 5;
+  }
+
+  const whyChooseUs = (data.whyChooseUs || '').trim();
+  if (whyChooseUs) {
+    narrativeY = checkPageBreak(doc, narrativeY, 34, headerTitle, branding);
+    doc.setFillColor(255, 252, 240);
+    doc.roundedRect(15, narrativeY, PAGE.contentWidth + 10, 30, 3, 3, 'F');
+    doc.setFillColor(...COLORS.gold);
+    doc.rect(15, narrativeY, 2, 30, 'F');
+    doc.setTextColor(...COLORS.gold);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text(t.whyChooseUs.toUpperCase(), 20, narrativeY + 8);
+    doc.setTextColor(...COLORS.grayDark);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    const whyLines = doc.splitTextToSize(whyChooseUs, 170).slice(0, 3);
+    doc.text(whyLines, 20, narrativeY + 14);
+  }
+
+  addAllFooters(doc, branding);
   return doc;
 }
 

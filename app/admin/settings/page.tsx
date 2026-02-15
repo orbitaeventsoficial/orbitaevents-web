@@ -111,6 +111,15 @@ export default async function SettingsPage() {
       {/* Quick Links */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link
+          href="/admin/presupuestos"
+          className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-sm p-6 hover:border-emerald-400/40 hover:bg-emerald-500/15 transition-all"
+        >
+          <div className="text-2xl mb-2">🧾</div>
+          <h3 className="font-semibold text-slate-100">Editor PDF presupuesto</h3>
+          <p className="text-sm text-slate-300">Personaliza cliente, pack, extras y descarga el PDF al instante</p>
+        </Link>
+
+        <Link
           href="/admin/settings/quotes"
           className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6 hover:border-slate-600/50 hover:bg-slate-700/40 transition-all"
         >

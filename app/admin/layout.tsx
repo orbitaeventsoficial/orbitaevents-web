@@ -344,6 +344,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     { label: 'Leads', href: '/admin/leads' },
     { label: 'Reserves', href: '/admin/bookings' },
     { label: 'Calendari', href: '/admin/calendario' },
+    { label: 'Editor PDF', href: '/admin/presupuestos' },
     { label: 'Pressupostos', href: '/admin/settings/quotes' },
   ]), []);
 
@@ -364,6 +365,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       title: 'Negoci i contingut',
       defaultOpen: false,
       items: [
+        { icon: '🧾', label: 'Editor PDF pressupost', href: '/admin/presupuestos' },
         { icon: '📈', label: 'Analytics', href: '/admin/analytics' },
         { icon: '📊', label: 'Rendibilitat', href: '/admin/rentabilidad' },
         { icon: '📦', label: 'Packs', href: '/admin/packs' },
@@ -462,6 +464,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       ressenyes: 'Ressenyes',
       faq: 'PMF',
       pricing: 'Preus',
+      presupuestos: 'Editor PDF pressupost',
       coverage: 'Cobertura',
       features: 'Features',
       theme: 'Tema',

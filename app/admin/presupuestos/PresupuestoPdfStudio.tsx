@@ -1,0 +1,552 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import {
+  ALL_SERVICES,
+  EXTRAS,
+  getPacksByService,
+  type ExtraDefinition,
+  type PackDefinition,
+  type ServiceSlug,
+} from '@/app/config/packs-config';
+import { generateQuotePDF } from '@/lib/pdf-utils';
+
+type Locale = 'ca' | 'es' | 'en';
+
+type CustomExtra = {
+  id: string;
+  name: string;
+  price: number;
+};
+
+const SERVICE_LABEL: Record<ServiceSlug, string> = {
+  bodas: 'Bodas',
+  fiestas: 'Fiestas',
+  discomovil: 'Discomóvil',
+  alquiler: 'Alquiler',
+  empresas: 'Empresas',
+  produccion: 'Producción',
+};
+
+function formatEUR(value: number): string {
+  return `${Math.max(0, value).toFixed(2)}€`;
+}
+
+function toFeatureLines(text: string): string[] {
+  return text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function buildPackFromForm(params: {
+  source: PackDefinition;
+  name: string;
+  price: number;
+  durationHours: number;
+  featuresText: string;
+}): PackDefinition {
+  const features = toFeatureLines(params.featuresText);
+  return {
+    ...params.source,
+    name: params.name.trim() || params.source.name,
+    priceValue: Math.max(0, params.price),
+    price: formatEUR(params.price),
+    durationHours: Math.max(1, Math.round(params.durationHours)),
+    duration: `${Math.max(1, Math.round(params.durationHours))} horas`,
+    features: features.length > 0 ? features : params.source.features,
+  };
+}
+
+export default function PresupuestoPdfStudio() {
+  const [locale, setLocale] = useState<Locale>('es');
+  const [eventType, setEventType] = useState<ServiceSlug>('bodas');
+  const [packId, setPackId] = useState<string>(() => getPacksByService('bodas')[0]?.id || '');
+  const [clientContact, setClientContact] = useState('');
+  const [clientName, setClientName] = useState('Cliente');
+  const [clientEmail, setClientEmail] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [eventDate, setEventDate] = useState('');
+  const [guests, setGuests] = useState(80);
+  const [validityDays, setValidityDays] = useState(15);
+  const [conditionsText, setConditionsText] = useState(
+    "Reserva con 30% para bloquear fecha.\nPago final 7 días antes del evento.\nDesplazamiento incluido hasta 50km."
+  );
+  const [whyChooseUs, setWhyChooseUs] = useState(
+    'Equipo técnico profesional, respuesta rápida y propuesta adaptada para que todo salga perfecto sin complicaciones.'
+  );
+  const [discount, setDiscount] = useState(0);
+  const [discountReason, setDiscountReason] = useState('');
+  const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
+  const [customExtras, setCustomExtras] = useState<CustomExtra[]>([]);
+  const [customExtraName, setCustomExtraName] = useState('');
+  const [customExtraPrice, setCustomExtraPrice] = useState(0);
+  const [generating, setGenerating] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [brandName, setBrandName] = useState('Orbita Events');
+  const [brandWebsite, setBrandWebsite] = useState('orbitaevents.com');
+  const [brandEmail, setBrandEmail] = useState('');
+  const [brandPhone, setBrandPhone] = useState('');
+  const [brandTagline, setBrandTagline] = useState('Tu evento. Tu estilo. Tu noche perfecta.');
+  const [logoDataUrl, setLogoDataUrl] = useState<string>('');
+
+  const packs = useMemo(() => getPacksByService(eventType), [eventType]);
+
+  const selectedPack = useMemo(() => {
+    const found = packs.find((pack) => pack.id === packId);
+    return found || packs[0];
+  }, [packId, packs]);
+
+  const [packName, setPackName] = useState(selectedPack?.name || 'Pack personalizado');
+  const [basePrice, setBasePrice] = useState(selectedPack?.priceValue || 0);
+  const [durationHours, setDurationHours] = useState(selectedPack?.durationHours || 4);
+  const [featuresText, setFeaturesText] = useState((selectedPack?.features || []).join('\n'));
+
+  const compatibleExtras = useMemo(
+    () => EXTRAS.filter((extra) => !extra.compatibleWith || extra.compatibleWith.includes(eventType)),
+    [eventType]
+  );
+
+  const mappedSelectedExtras = useMemo(
+    () => compatibleExtras.filter((extra) => selectedExtras.includes(extra.id)),
+    [compatibleExtras, selectedExtras]
+  );
+
+  const extrasPrice = useMemo(() => {
+    const base = mappedSelectedExtras.reduce((sum, extra) => sum + (extra.price || 0), 0);
+    const custom = customExtras.reduce((sum, extra) => sum + Math.max(0, extra.price), 0);
+    return base + custom;
+  }, [mappedSelectedExtras, customExtras]);
+
+  const total = useMemo(() => {
+    return Math.max(0, basePrice + extrasPrice - Math.max(0, discount));
+  }, [basePrice, extrasPrice, discount]);
+
+  const allExtrasForPdf = useMemo(() => {
+    const presetNames = mappedSelectedExtras.map((extra) => extra.name);
+    const customNames = customExtras.map((extra) => extra.name);
+    return [...presetNames, ...customNames];
+  }, [mappedSelectedExtras, customExtras]);
+
+  const extrasCatalogForPdf = useMemo<ExtraDefinition[]>(() => {
+    const customAsCatalog: ExtraDefinition[] = customExtras.map((extra) => ({
+      id: extra.id,
+      name: extra.name,
+      description: 'Extra personalizado',
+      price: extra.price,
+      icon: '•',
+      category: 'other',
+    }));
+    return [...EXTRAS, ...customAsCatalog];
+  }, [customExtras]);
+
+  function reloadPackValues(nextPackId: string, nextService?: ServiceSlug) {
+    const service = nextService || eventType;
+    const available = getPacksByService(service);
+    const found = available.find((pack) => pack.id === nextPackId) || available[0];
+    if (!found) return;
+
+    setPackId(found.id);
+    setPackName(found.name);
+    setBasePrice(found.priceValue);
+    setDurationHours(found.durationHours);
+    setFeaturesText(found.features.join('\n'));
+  }
+
+  function toggleExtra(id: string) {
+    setSelectedExtras((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
+
+  function addCustomExtra() {
+    const name = customExtraName.trim();
+    if (!name) return;
+    const price = Math.max(0, Number(customExtraPrice) || 0);
+    const item: CustomExtra = {
+      id: `custom-${Date.now().toString(36)}`,
+      name,
+      price,
+    };
+    setCustomExtras((prev) => [...prev, item]);
+    setCustomExtraName('');
+    setCustomExtraPrice(0);
+  }
+
+  function removeCustomExtra(id: string) {
+    setCustomExtras((prev) => prev.filter((extra) => extra.id !== id));
+  }
+
+  async function downloadPdf() {
+    if (!selectedPack) return;
+    setGenerating(true);
+    setMessage(null);
+
+    try {
+      const finalPack = buildPackFromForm({
+        source: selectedPack,
+        name: packName,
+        price: basePrice,
+        durationHours,
+        featuresText,
+      });
+
+      const doc = await generateQuotePDF(
+        {
+          eventType,
+          pack: finalPack,
+          date: eventDate || '-',
+          guests: Math.max(0, Number(guests) || 0),
+          extras: allExtrasForPdf,
+          extrasCatalog: extrasCatalogForPdf,
+          basePrice: Math.max(0, Number(basePrice) || 0),
+          extrasPrice,
+          discount: Math.max(0, Number(discount) || 0),
+          discountReason: discountReason.trim(),
+          total,
+          clientContact: clientContact.trim() || undefined,
+          clientName: clientName.trim() || 'Cliente',
+          clientEmail: clientEmail.trim() || '',
+          clientPhone: clientPhone.trim() || undefined,
+          validityDays,
+          conditions: toFeatureLines(conditionsText),
+          whyChooseUs: whyChooseUs.trim() || undefined,
+        },
+        locale,
+        {
+          logoDataUrl: logoDataUrl || undefined,
+          brandName: brandName.trim() || undefined,
+          website: brandWebsite.trim() || undefined,
+          contactEmail: brandEmail.trim() || undefined,
+          contactPhone: brandPhone.trim() || undefined,
+          tagline: brandTagline.trim() || undefined,
+        }
+      );
+
+      const fileName = `presupuesto-${(clientName || 'cliente').trim().toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.pdf`;
+      doc.save(fileName);
+      setMessage('PDF generado correctamente.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No se pudo generar el PDF');
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function onLogoChange(file: File | null) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : '';
+      setLogoDataUrl(result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  const inputClass =
+    'w-full rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-2 text-sm text-slate-100 focus:border-amber-500 focus:ring-1 focus:ring-amber-500';
+
+  return (
+    <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <div className="space-y-5 rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="text-sm text-slate-300">
+            Idioma PDF
+            <select className={inputClass} value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
+              <option value="es">Español</option>
+              <option value="ca">Català</option>
+              <option value="en">English</option>
+            </select>
+          </label>
+
+          <label className="text-sm text-slate-300">
+            Tipo de evento
+            <select
+              className={inputClass}
+              value={eventType}
+              onChange={(e) => {
+                const next = e.target.value as ServiceSlug;
+                setEventType(next);
+                setSelectedExtras([]);
+                reloadPackValues('', next);
+              }}
+            >
+              {ALL_SERVICES.map((service) => (
+                <option key={service} value={service}>
+                  {SERVICE_LABEL[service]}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="text-sm text-slate-300 md:col-span-2">
+            Pack base
+            <select className={inputClass} value={packId} onChange={(e) => reloadPackValues(e.target.value)}>
+              {packs.map((pack) => (
+                <option key={pack.id} value={pack.id}>
+                  {pack.name} ({pack.price})
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="text-sm text-slate-300 md:col-span-2">
+            Logo (PNG/JPG)
+            <input
+              className={inputClass}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              onChange={(e) => onLogoChange(e.target.files?.[0] || null)}
+            />
+          </label>
+          <label className="text-sm text-slate-300">
+            Persona de contacto
+            <input className={inputClass} value={clientContact} onChange={(e) => setClientContact(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300">
+            Nombre cliente
+            <input className={inputClass} value={clientName} onChange={(e) => setClientName(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300">
+            Email cliente
+            <input className={inputClass} type="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300">
+            Teléfono cliente
+            <input className={inputClass} value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300">
+            Fecha evento
+            <input className={inputClass} type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300">
+            Invitados
+            <input className={inputClass} type="number" min={0} value={guests} onChange={(e) => setGuests(Number(e.target.value) || 0)} />
+          </label>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="text-sm text-slate-300">
+            Marca / Empresa
+            <input className={inputClass} value={brandName} onChange={(e) => setBrandName(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300">
+            Web marca
+            <input className={inputClass} value={brandWebsite} onChange={(e) => setBrandWebsite(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300">
+            Email marca
+            <input className={inputClass} value={brandEmail} onChange={(e) => setBrandEmail(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300">
+            Teléfono marca
+            <input className={inputClass} value={brandPhone} onChange={(e) => setBrandPhone(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300 md:col-span-2">
+            Tagline footer
+            <input className={inputClass} value={brandTagline} onChange={(e) => setBrandTagline(e.target.value)} />
+          </label>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <label className="text-sm text-slate-300 md:col-span-2">
+            Nombre visible del pack
+            <input className={inputClass} value={packName} onChange={(e) => setPackName(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300">
+            Duración (h)
+            <input
+              className={inputClass}
+              type="number"
+              min={1}
+              max={24}
+              value={durationHours}
+              onChange={(e) => setDurationHours(Number(e.target.value) || 1)}
+            />
+          </label>
+          <label className="text-sm text-slate-300">
+            Validez (días)
+            <input
+              className={inputClass}
+              type="number"
+              min={1}
+              max={90}
+              value={validityDays}
+              onChange={(e) => setValidityDays(Math.max(1, Number(e.target.value) || 15))}
+            />
+          </label>
+          <label className="text-sm text-slate-300">
+            Precio base (€)
+            <input
+              className={inputClass}
+              type="number"
+              min={0}
+              value={basePrice}
+              onChange={(e) => setBasePrice(Math.max(0, Number(e.target.value) || 0))}
+            />
+          </label>
+          <label className="text-sm text-slate-300">
+            Descuento (€)
+            <input
+              className={inputClass}
+              type="number"
+              min={0}
+              value={discount}
+              onChange={(e) => setDiscount(Math.max(0, Number(e.target.value) || 0))}
+            />
+          </label>
+          <label className="text-sm text-slate-300">
+            Motivo descuento
+            <input className={inputClass} value={discountReason} onChange={(e) => setDiscountReason(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300 md:col-span-3">
+            Features del pack (una por línea)
+            <textarea rows={6} className={inputClass} value={featuresText} onChange={(e) => setFeaturesText(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300 md:col-span-3">
+            Condiciones (una por línea)
+            <textarea rows={4} className={inputClass} value={conditionsText} onChange={(e) => setConditionsText(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300 md:col-span-3">
+            Explicación humanizada: por qué elegirnos
+            <textarea rows={3} className={inputClass} value={whyChooseUs} onChange={(e) => setWhyChooseUs(e.target.value)} />
+          </label>
+        </div>
+
+        <div className="space-y-3 rounded-xl border border-slate-700/60 bg-slate-950/40 p-4">
+          <h3 className="text-sm font-semibold text-slate-100">Extras del catálogo</h3>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {compatibleExtras.map((extra) => (
+              <label key={extra.id} className="flex items-center gap-2 rounded-lg border border-slate-700/40 px-3 py-2 text-sm text-slate-200">
+                <input
+                  type="checkbox"
+                  checked={selectedExtras.includes(extra.id)}
+                  onChange={() => toggleExtra(extra.id)}
+                />
+                <span className="flex-1">{extra.name}</span>
+                <span className="text-xs text-amber-300">{extra.price ? `+${extra.price}€` : 'Consultar'}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3 rounded-xl border border-slate-700/60 bg-slate-950/40 p-4">
+          <h3 className="text-sm font-semibold text-slate-100">Extras personalizados</h3>
+          <div className="grid gap-3 md:grid-cols-[1fr_160px_auto]">
+            <input
+              className={inputClass}
+              placeholder="Nombre del extra"
+              value={customExtraName}
+              onChange={(e) => setCustomExtraName(e.target.value)}
+            />
+            <input
+              className={inputClass}
+              type="number"
+              min={0}
+              value={customExtraPrice}
+              onChange={(e) => setCustomExtraPrice(Number(e.target.value) || 0)}
+            />
+            <button
+              type="button"
+              onClick={addCustomExtra}
+              className="rounded-xl border border-amber-500/40 bg-amber-500/15 px-4 py-2 text-sm font-semibold text-amber-200 hover:bg-amber-500/20"
+            >
+              Añadir
+            </button>
+          </div>
+
+          {customExtras.length > 0 && (
+            <div className="space-y-2">
+              {customExtras.map((extra) => (
+                <div key={extra.id} className="flex items-center justify-between rounded-lg border border-slate-700/40 px-3 py-2 text-sm">
+                  <span className="text-slate-200">{extra.name}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-amber-300">+{extra.price}€</span>
+                    <button
+                      type="button"
+                      onClick={() => removeCustomExtra(extra.id)}
+                      className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2 py-1 text-xs text-rose-200 hover:bg-rose-500/20"
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={downloadPdf}
+            disabled={generating || !selectedPack}
+            className="rounded-xl border border-emerald-500/40 bg-emerald-500/15 px-5 py-2.5 text-sm font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-60"
+          >
+            {generating ? 'Generando PDF...' : 'Descargar PDF'}
+          </button>
+          {message && <p className="text-sm text-slate-300">{message}</p>}
+        </div>
+      </div>
+
+      <aside className="h-fit rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+        <h2 className="text-lg font-semibold text-slate-100">Vista rápida</h2>
+        <p className="mt-1 text-sm text-slate-400">Resumen de lo que saldrá en el PDF.</p>
+
+        <div className="mt-4 space-y-3 text-sm">
+          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+            <p className="text-slate-400">Branding</p>
+            <p className="font-semibold text-slate-100">{brandName || 'Marca'}</p>
+            <p className="text-slate-300">{brandWebsite || '-'}</p>
+            <p className="text-slate-300">{brandEmail || '-'} · {brandPhone || '-'}</p>
+          </div>
+
+          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+            <p className="text-slate-400">Cliente</p>
+            <p className="font-semibold text-slate-100">{clientName || 'Cliente'}</p>
+            <p className="text-slate-300">{clientContact || '-'}</p>
+            <p className="text-slate-300">{clientEmail || '-'} · {clientPhone || '-'}</p>
+          </div>
+
+          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+            <p className="text-slate-400">Evento</p>
+            <p className="font-semibold text-slate-100">{SERVICE_LABEL[eventType]}</p>
+            <p className="text-slate-300">{eventDate || 'Sin fecha'} · {guests} invitados</p>
+            <p className="text-slate-300">Validez: {validityDays} días</p>
+          </div>
+
+          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+            <p className="text-slate-400">Narrativa comercial</p>
+            <p className="text-slate-200 line-clamp-3">{whyChooseUs || '-'}</p>
+          </div>
+
+          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+            <p className="text-slate-400">Pack</p>
+            <p className="font-semibold text-slate-100">{packName || selectedPack?.name || '-'}</p>
+            <p className="text-slate-300">{durationHours}h</p>
+          </div>
+
+          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+            <p className="text-slate-400 mb-2">Costes</p>
+            <div className="flex items-center justify-between text-slate-200">
+              <span>Base</span>
+              <span>{formatEUR(basePrice)}</span>
+            </div>
+            <div className="flex items-center justify-between text-slate-200">
+              <span>Extras</span>
+              <span>{formatEUR(extrasPrice)}</span>
+            </div>
+            <div className="flex items-center justify-between text-emerald-300">
+              <span>Descuento</span>
+              <span>-{formatEUR(discount)}</span>
+            </div>
+            <div className="mt-2 border-t border-slate-700 pt-2 flex items-center justify-between text-base font-semibold text-amber-300">
+              <span>Total</span>
+              <span>{formatEUR(total)}</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  );
+}
