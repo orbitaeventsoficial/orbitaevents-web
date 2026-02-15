@@ -489,23 +489,28 @@ export default function ConfiguradorClient() {
                   }`}
                 >
                 <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <input
-                    type="checkbox"
-                    id={`extra-${extra.id}`}
-                    name={`extra-${extra.id}`}
-                    checked={config.extras.includes(extra.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setConfig({ ...config, extras: [...config.extras, extra.id] });
-                      } else {
-                        setConfig({
-                          ...config,
-                          extras: config.extras.filter((id) => id !== extra.id),
-                        });
-                      }
-                    }}
-                    className="w-5 h-5 mt-0.5"
-                  />
+                  <div className="relative mt-0.5 h-5 w-5 shrink-0">
+                    <input
+                      type="checkbox"
+                      id={`extra-${extra.id}`}
+                      name={`extra-${extra.id}`}
+                      checked={config.extras.includes(extra.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setConfig({ ...config, extras: [...config.extras, extra.id] });
+                        } else {
+                          setConfig({
+                            ...config,
+                            extras: config.extras.filter((id) => id !== extra.id),
+                          });
+                        }
+                      }}
+                      className="peer absolute inset-0 z-10 h-5 w-5 cursor-pointer appearance-none opacity-0"
+                    />
+                    <div className="flex h-5 w-5 items-center justify-center rounded border-2 border-white/35 bg-black/30 transition-all peer-checked:border-oe-gold peer-checked:bg-oe-gold">
+                      <Check className="h-3.5 w-3.5 text-black opacity-0 transition-opacity peer-checked:opacity-100" strokeWidth={3} />
+                    </div>
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-white font-semibold flex items-center gap-2">
                       <span>{extra.icon}</span>

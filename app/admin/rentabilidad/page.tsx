@@ -118,7 +118,7 @@ export default async function RentabilidadPage() {
         </section>
 
         <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-100">Esdeveniments en riesgo</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Esdeveniments en risc</h2>
           <div className="mt-3 space-y-2">
             {report.riskProfitability.length === 0 ? (
               <p className="text-sm text-slate-400">Sense alertes de marge.</p>

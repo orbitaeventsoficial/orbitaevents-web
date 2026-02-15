@@ -200,8 +200,8 @@ export default async function AnalyticsPage() {
         <div className="absolute -left-16 -bottom-24 h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
         <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Orbita Analytics</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Panell premium de rendiment</h1>
+            <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Òrbita Analytics</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Panell de rendiment</h1>
             <p className="mt-2 max-w-xl text-sm text-slate-300">
               Totes les mètriques essencials en un sol lloc: vendes, leads, qualitat i creixement.
             </p>
@@ -217,30 +217,19 @@ export default async function AnalyticsPage() {
         </div>
       </section>
 
-      {/* GA4 Starfleet Control */}
-      <section className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 text-white">
-        <div
-          className="absolute inset-0 opacity-50"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 15% 20%, rgba(255,255,255,0.2) 0 2px, transparent 2px),' +
-              'radial-gradient(circle at 85% 30%, rgba(255,255,255,0.18) 0 1.5px, transparent 1.5px),' +
-              'radial-gradient(circle at 55% 70%, rgba(255,255,255,0.12) 0 1px, transparent 1px)',
-          }}
-        />
-        <div className="absolute -left-24 -top-32 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl" />
-        <div className="absolute -right-24 -bottom-28 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl" />
+      {/* GA4 */}
+      <section className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6 text-white">
         <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-cyan-300">GA4 · Enterprise Bridge</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight">Panell de control galactic</h2>
+            <p className="text-xs uppercase tracking-[0.3em] text-cyan-300">GA4</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight">Panell de control</h2>
             <p className="mt-2 max-w-xl text-sm text-slate-300">
-              Dades en temps real, trafic, pagines i events. Alimentat per GA4 Data API.
+              Dades de trànsit, pàgines i esdeveniments amb la GA4 Data API.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <span className="rounded-full border border-slate-600/50 bg-slate-700/50 px-3 py-1 text-xs">
-              Property ID {ga4PropertyId || '—'}
+              ID propietat {ga4PropertyId || '—'}
             </span>
             <span
               className={`rounded-full border border-slate-600/50 px-3 py-1 text-xs ${
@@ -254,7 +243,7 @@ export default async function AnalyticsPage() {
 
         {!ga4Ready && (
           <div className="mt-6 rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
-            Configuracio incompleta. {ga4Status.reason || 'Revisa variables GA4 a Railway.'}
+            Configuració incompleta. {ga4Status.reason || 'Revisa les variables de GA4 a Railway.'}
           </div>
         )}
 
@@ -266,7 +255,7 @@ export default async function AnalyticsPage() {
 
         {ga4Ready && !ga4 && !ga4Error && (
           <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
-            GA4 actiu pero sense dades. Revisa permisos del service account o quota de l&apos;API.
+            GA4 actiu però sense dades. Revisa permisos del compte de servei o la quota de l&apos;API.
           </div>
         )}
 
@@ -285,11 +274,11 @@ export default async function AnalyticsPage() {
               <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.pageViews}</p>
             </div>
             <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-              <p className="text-xs uppercase text-slate-400">Events</p>
+              <p className="text-xs uppercase text-slate-400">Esdeveniments</p>
               <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.eventCount}</p>
             </div>
             <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-              <p className="text-xs uppercase text-slate-400">Temps mitja (min)</p>
+              <p className="text-xs uppercase text-slate-400">Temps mitjà (min)</p>
               <p className="mt-2 text-3xl font-semibold text-white">{avgSessionMinutes}</p>
             </div>
           </div>
@@ -298,7 +287,7 @@ export default async function AnalyticsPage() {
         {ga4 && (
           <div className="mt-6 grid gap-4 lg:grid-cols-3">
             <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
-              <div className="border-b border-slate-600/50 px-4 py-3 text-sm font-semibold text-slate-200">Top Pages</div>
+              <div className="border-b border-slate-600/50 px-4 py-3 text-sm font-semibold text-slate-200">Pàgines principals</div>
               <div className="space-y-2 p-4 text-sm text-slate-300">
                 {ga4.pages.map((row) => (
                   <div key={row.dimension} className="flex items-center justify-between">
@@ -309,7 +298,7 @@ export default async function AnalyticsPage() {
               </div>
             </div>
             <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
-              <div className="border-b border-slate-600/50 px-4 py-3 text-sm font-semibold text-slate-200">Sources</div>
+              <div className="border-b border-slate-600/50 px-4 py-3 text-sm font-semibold text-slate-200">Fonts</div>
               <div className="space-y-2 p-4 text-sm text-slate-300">
                 {ga4.sources.map((row) => (
                   <div key={row.dimension} className="flex items-center justify-between">
@@ -321,7 +310,7 @@ export default async function AnalyticsPage() {
             </div>
             <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
               <div className="border-b border-slate-600/50 px-4 py-3 text-sm font-semibold text-slate-200">
-                Realtime (top)
+                Temps real (top)
               </div>
               <div className="space-y-2 p-4 text-sm text-slate-300">
                 <div className="flex items-center justify-between">
@@ -336,7 +325,7 @@ export default async function AnalyticsPage() {
                 ))}
                 {ga4.realtimeFallback && (
                   <p className="pt-2 text-xs text-amber-300">
-                    Realtime parcial: solo usuarios activos disponibles.
+                    Temps real parcial: només usuaris actius disponibles.
                   </p>
                 )}
               </div>
@@ -371,8 +360,8 @@ export default async function AnalyticsPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 backdrop-blur-sm p-5">
           <div className="flex items-center justify-between text-xs font-medium uppercase text-slate-400">
-            <span>Facturacio Any</span>
-            <span className="text-cyan-400">Revenue</span>
+            <span>Facturació any</span>
+            <span className="text-cyan-400">Ingressos</span>
           </div>
           <p className="mt-3 text-3xl font-semibold text-slate-100">
             {data.revenue.thisYear.toLocaleString('ca-ES')}€
@@ -383,15 +372,15 @@ export default async function AnalyticsPage() {
         </div>
         <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-5">
           <div className="flex items-center justify-between text-xs font-medium uppercase text-slate-400">
-            <span>Reserves Any</span>
-            <span className="text-emerald-400">Bookings</span>
+            <span>Reserves any</span>
+            <span className="text-emerald-400">Reserves</span>
           </div>
           <p className="mt-3 text-3xl font-semibold text-slate-100">{data.bookings.thisYear}</p>
           <p className="mt-2 text-xs text-slate-500">{data.bookings.total} totals</p>
         </div>
         <div className="rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-purple-600/5 backdrop-blur-sm p-5">
           <div className="flex items-center justify-between text-xs font-medium uppercase text-slate-400">
-            <span>Ticket Mitja</span>
+            <span>Tiquet mitjà</span>
             <span className="text-purple-400">AVG</span>
           </div>
           <p className="mt-3 text-3xl font-semibold text-slate-100">
@@ -407,7 +396,7 @@ export default async function AnalyticsPage() {
             {data.satisfaction.nps.toFixed(1)}
           </p>
           <p className="mt-2 text-xs text-slate-500">
-            ⭐ {data.satisfaction.rating.toFixed(1)} valoracio
+            ⭐ {data.satisfaction.rating.toFixed(1)} valoració
           </p>
         </div>
       </section>
@@ -417,7 +406,7 @@ export default async function AnalyticsPage() {
         {/* Leads per Font */}
         <div className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm">
           <div className="border-b border-slate-700/50 bg-slate-700/30 p-4">
-            <h3 className="font-semibold text-slate-100">Leads per Font</h3>
+            <h3 className="font-semibold text-slate-100">Leads per origen</h3>
             <p className="mt-1 text-xs text-slate-400">{data.leads.thisYear} leads aquest any</p>
           </div>
           <div className="p-4 space-y-3">
@@ -497,7 +486,7 @@ export default async function AnalyticsPage() {
       {/* Events per Tipus */}
       <section className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm">
         <div className="border-b border-slate-700/50 bg-slate-700/30 p-4">
-          <h3 className="font-semibold text-slate-100">Reserves per Tipus d&apos;Event</h3>
+          <h3 className="font-semibold text-slate-100">Reserves per tipus d&apos;esdeveniment</h3>
         </div>
         <div className="p-4">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
@@ -525,7 +514,7 @@ export default async function AnalyticsPage() {
       <section className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm">
         <div className="border-b border-slate-700/50 bg-slate-700/30 p-4">
           <h2 className="text-lg font-semibold text-slate-100">GTM · Centre de control</h2>
-          <p className="text-xs text-slate-400">Gestio de tags, triggers i accessos rapids</p>
+          <p className="text-xs text-slate-400">Gestió d&apos;etiquetes, activadors i accessos ràpids</p>
         </div>
         <div className="p-4 space-y-4">
           <div className="flex flex-col gap-3 rounded-xl border border-slate-600/50 bg-slate-700/30 p-4 md:flex-row md:items-center md:justify-between">
@@ -565,7 +554,7 @@ export default async function AnalyticsPage() {
               rel="noreferrer"
               className="rounded-lg border border-slate-600/50 bg-slate-700/30 p-4 text-sm text-slate-200 hover:border-cyan-500/30 hover:text-cyan-300 transition"
             >
-              Guia de tags i triggers
+              Guia d&apos;etiquetes i activadors
             </a>
             <a
               href="https://support.google.com/tagmanager/answer/6107166"
@@ -578,9 +567,8 @@ export default async function AnalyticsPage() {
           </div>
 
           <div className="rounded-lg border border-slate-600/50 bg-slate-700/30 p-4 text-sm text-slate-300">
-            Les metrics de traffic i clicks depenen del desti de Google Tag Manager (per exemple GA4).
-            Si vols veure analytics dins del panell, connecta un desti compatible o digues-me
-            quin proveidor vols usar.
+            Les mètriques de trànsit i clics depenen del destí de Google Tag Manager (per exemple, GA4).
+            Si vols veure analítica dins del panell, connecta un destí compatible o indica quin proveïdor vols usar.
           </div>
         </div>
       </section>
@@ -588,8 +576,8 @@ export default async function AnalyticsPage() {
       {/* Umami Analytics */}
       <section className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm">
         <div className="border-b border-slate-700/50 bg-slate-700/30 p-4">
-          <h2 className="text-lg font-semibold text-slate-100">Umami · Analytics</h2>
-          <p className="text-xs text-slate-400">Panell principal i estat de configuracio</p>
+          <h2 className="text-lg font-semibold text-slate-100">Umami · Analítica</h2>
+          <p className="text-xs text-slate-400">Panell principal i estat de configuració</p>
         </div>
         <div className="p-4 space-y-4">
           <div className="grid gap-3 lg:grid-cols-3">
@@ -609,13 +597,13 @@ export default async function AnalyticsPage() {
               </p>
             </div>
           </div>
-          <div className="mt-4 rounded-xl border border-slate-700/50 bg-slate-900/50 p-4">
+            <div className="mt-4 rounded-xl border border-slate-700/50 bg-slate-900/50 p-4">
             <p className="text-xs uppercase tracking-[0.18em] text-slate-500">API base</p>
             <p className="mt-2 text-sm font-semibold text-slate-200">{umamiBaseUrl}</p>
           </div>
           {umamiApiReady && !umami && (
             <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300">
-              No hem pogut carregar Umami. Revisa el token o torna-ho a provar mes tard.
+              No hem pogut carregar Umami. Revisa el token o torna-ho a provar més tard.
             </div>
           )}
           {umami && (
@@ -625,15 +613,15 @@ export default async function AnalyticsPage() {
                 <p className="mt-2 text-2xl font-semibold text-slate-100">{umami.totals.pageviews}</p>
               </div>
               <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-                <p className="text-xs font-medium uppercase text-slate-400">Visitors</p>
+                <p className="text-xs font-medium uppercase text-slate-400">Visitants</p>
                 <p className="mt-2 text-2xl font-semibold text-slate-100">{umami.totals.visitors}</p>
               </div>
               <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-                <p className="text-xs font-medium uppercase text-slate-400">Visits</p>
+                <p className="text-xs font-medium uppercase text-slate-400">Visites</p>
                 <p className="mt-2 text-2xl font-semibold text-slate-100">{umami.totals.visits}</p>
               </div>
               <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-                <p className="text-xs font-medium uppercase text-slate-400">Avg. visit (min)</p>
+                <p className="text-xs font-medium uppercase text-slate-400">Mitjana visita (min)</p>
                 <p className="mt-2 text-2xl font-semibold text-slate-100">{avgVisitMinutes}</p>
               </div>
             </div>
@@ -642,7 +630,7 @@ export default async function AnalyticsPage() {
             <div className="grid gap-4 lg:grid-cols-3">
               <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
                 <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Top Pages
+                  Pàgines principals
                 </div>
                 <div className="space-y-2 p-4 text-sm">
                   {umami.topPages.slice(0, 6).map((row) => (
@@ -655,7 +643,7 @@ export default async function AnalyticsPage() {
               </div>
               <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
                 <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Referrers
+                  Referències
                 </div>
                 <div className="space-y-2 p-4 text-sm">
                   {umami.referrers.slice(0, 6).map((row) => (
@@ -668,7 +656,7 @@ export default async function AnalyticsPage() {
               </div>
               <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
                 <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Countries
+                  Països
                 </div>
                 <div className="space-y-2 p-4 text-sm">
                   {umami.countries.slice(0, 6).map((row) => (
@@ -681,7 +669,7 @@ export default async function AnalyticsPage() {
               </div>
               <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
                 <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Devices
+                  Dispositius
                 </div>
                 <div className="space-y-2 p-4 text-sm">
                   {umami.devices.slice(0, 6).map((row) => (
@@ -694,7 +682,7 @@ export default async function AnalyticsPage() {
               </div>
               <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
                 <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Browsers
+                  Navegadors
                 </div>
                 <div className="space-y-2 p-4 text-sm">
                   {umami.browsers.slice(0, 6).map((row) => (
@@ -707,7 +695,7 @@ export default async function AnalyticsPage() {
               </div>
               <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
                 <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Events
+                  Esdeveniments
                 </div>
                 <div className="space-y-2 p-4 text-sm">
                   {umami.events.slice(0, 6).map((row) => (
@@ -727,7 +715,7 @@ export default async function AnalyticsPage() {
               rel="noreferrer"
               className="inline-flex items-center justify-center rounded-lg border border-slate-600/50 bg-slate-700/30 px-4 py-2 text-sm font-medium text-slate-200 hover:border-cyan-500/30 hover:text-cyan-300 transition"
             >
-              Obrir panel Umami
+              Obrir panell Umami
             </a>
             <a
               href="https://umami.is/docs"
@@ -739,8 +727,8 @@ export default async function AnalyticsPage() {
             </a>
           </div>
           <div className="rounded-lg border border-slate-600/50 bg-slate-700/30 p-4 text-sm text-slate-300">
-            Aquesta es la font principal d&apos;analytics (traffic, pagines, events i conversions) per a la web.
-            Si el Website ID no esta configurat, revisa les variables d&apos;entorn.
+            Aquesta és la font principal d&apos;analítica (trànsit, pàgines, esdeveniments i conversions) per al web.
+            Si el Website ID no està configurat, revisa les variables d&apos;entorn.
           </div>
         </div>
       </section>

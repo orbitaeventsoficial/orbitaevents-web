@@ -141,6 +141,11 @@
     position: relative; /* iOS fix for overscroll */
   }
 
+  /* Checkbox natiu: evita el blau per defecte del navegador */
+  input[type='checkbox'] {
+    accent-color: var(--oe-gold);
+  }
+
   /* ══════════════════════════════════════════════════════════════════════════
      HERO PORTAL - PANTALLA NEGRA INICIAL (CSS puro, sense JS)
      Evita flash del contingut abans del logo

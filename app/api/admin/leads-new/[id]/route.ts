@@ -250,18 +250,32 @@ export async function DELETE(req: NextRequest, { params }: Params) {
       );
     }
 
-    await prisma.lead.delete({
-      where: { id },
-    });
+    await prisma.$transaction([
+      prisma.leadNote.deleteMany({ where: { leadId: id } }),
+      prisma.leadActivity.deleteMany({ where: { leadId: id } }),
+      prisma.leadTask.deleteMany({ where: { leadId: id } }),
+      prisma.leadDocument.deleteMany({ where: { leadId: id } }),
+      prisma.lead.delete({
+        where: { id },
+        // Evitem retornar totes les columnes per compatibilitat amb esquemes antics.
+        select: { id: true },
+      }),
+    ]);
 
-    await prisma.adminLog.create({
-      data: {
-        action: 'DELETE',
-        entity: 'lead',
-        entityId: id,
-        details: { name: existing.name, email: existing.email },
-      },
-    });
+    try {
+      await prisma.adminLog.create({
+        data: {
+          action: 'DELETE',
+          entity: 'lead',
+          entityId: id,
+          details: { name: existing.name, email: existing.email },
+        },
+      });
+    } catch (logError) {
+      log.error('Lead eliminat però no s’ha pogut escriure adminLog', logError, {
+        context: { leadId: id },
+      });
+    }
 
     return NextResponse.json({
       ok: true,

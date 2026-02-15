@@ -85,16 +85,16 @@ export default function LeadNotesPanel({
           type="button"
           onClick={cleanDuplicates}
           disabled={cleaning}
-          className="rounded-md border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-60"
+          className="rounded-md border border-amber-500/40 bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-200 hover:bg-amber-500/25 disabled:opacity-60"
         >
           {cleaning ? 'Netejant...' : 'Netejar duplicats'}
         </button>
       </div>
       {error && (
-        <p className="mb-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>
+        <p className="mb-3 rounded-lg border border-rose-500/40 bg-rose-500/15 px-3 py-2 text-sm text-rose-200">{error}</p>
       )}
       {success && (
-        <p className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</p>
+        <p className="mb-3 rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-3 py-2 text-sm text-emerald-200">{success}</p>
       )}
 
       {notes.length === 0 ? (
@@ -102,22 +102,22 @@ export default function LeadNotesPanel({
       ) : (
         <div className="space-y-4">
           {notes.map((note) => (
-            <div key={note.id} className="p-3 rounded-lg bg-slate-50 hover:bg-white/5 transition-colors">
+            <div key={note.id} className="rounded-lg border border-slate-700/60 bg-slate-800/70 p-3 transition-colors hover:bg-slate-800">
               <div className="flex items-center justify-between gap-3 mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-400">{formatNoteDate(note.createdAt)}</span>
-                  {note.createdBy && <span className="text-xs text-slate-400">per {note.createdBy}</span>}
+                  <span className="text-xs text-slate-300">{formatNoteDate(note.createdAt)}</span>
+                  {note.createdBy && <span className="text-xs text-slate-300">per {note.createdBy}</span>}
                 </div>
                 <button
                   type="button"
                   onClick={() => deleteNote(note.id)}
                   disabled={deletingId === note.id}
-                  className="rounded-md border border-rose-300 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100 disabled:opacity-60"
+                  className="rounded-md border border-rose-500/40 bg-rose-500/15 px-2.5 py-1 text-xs font-medium text-rose-200 hover:bg-rose-500/25 disabled:opacity-60"
                 >
                   {deletingId === note.id ? 'Eliminant...' : 'Eliminar'}
                 </button>
               </div>
-              <p className="text-sm text-slate-200 whitespace-pre-wrap">{note.content}</p>
+              <p className="whitespace-pre-wrap text-sm text-slate-100">{note.content}</p>
             </div>
           ))}
         </div>

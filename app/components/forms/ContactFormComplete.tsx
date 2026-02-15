@@ -549,7 +549,7 @@ export default function ContactFormComplete({
         {/* Checkbox privacitat */}
         <div className={`${errors.acceptPrivacy && touched.acceptPrivacy ? 'error-field' : ''}`}>
           <label htmlFor="acceptPrivacy" className="flex items-start gap-3 cursor-pointer group">
-            <div className="relative mt-1">
+            <div className="relative mt-1 h-5 w-5 shrink-0">
               <input
                 type="checkbox"
                 id="acceptPrivacy"
@@ -557,7 +557,7 @@ export default function ContactFormComplete({
                 checked={formData.acceptPrivacy}
                 onChange={(e) => updateField('acceptPrivacy', e.target.checked)}
                 onBlur={() => touchField('acceptPrivacy')}
-                className="sr-only peer"
+                className="peer absolute inset-0 z-10 h-5 w-5 cursor-pointer appearance-none opacity-0"
               />
               <div className={`w-5 h-5 rounded border-2 transition-all
                            peer-checked:bg-amber-500 peer-checked:border-amber-500
@@ -591,14 +591,14 @@ export default function ContactFormComplete({
 
         {/* Checkbox marketing */}
         <label htmlFor="acceptMarketing" className="flex items-start gap-3 cursor-pointer group">
-          <div className="relative mt-1">
+          <div className="relative mt-1 h-5 w-5 shrink-0">
             <input
               type="checkbox"
               id="acceptMarketing"
               name="acceptMarketing"
               checked={formData.acceptMarketing}
               onChange={(e) => updateField('acceptMarketing', e.target.checked)}
-              className="sr-only peer"
+              className="peer absolute inset-0 z-10 h-5 w-5 cursor-pointer appearance-none opacity-0"
             />
             <div className="w-5 h-5 rounded border-2 border-white/30 transition-all
                          group-hover:border-white/50
