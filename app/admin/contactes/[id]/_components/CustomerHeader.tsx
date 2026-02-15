@@ -73,17 +73,17 @@ export default function CustomerHeader({
             >
               Nova tasca
             </Link>
-            <button
-              type="button"
+            <Link
+              href={`/admin/emails?customerId=${id}`}
               className="rounded-lg border border-slate-600/80 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700"
             >
               Enviar missatge
-            </button>
+            </Link>
           </div>
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-          <KpiChip label="Pròxim event" value={formatDate(data.kpis.nextEventDate)} />
+          <KpiChip label="Pròxim esdeveniment" value={formatDate(data.kpis.nextEventDate)} />
           <KpiChip label="Total pressupostat" value={money(data.kpis.totalQuoted)} />
           <KpiChip label="Total cobrat" value={money(data.kpis.totalPaid)} />
           <KpiChip label="Marge estimat" value={money(data.kpis.marginEstimated)} />

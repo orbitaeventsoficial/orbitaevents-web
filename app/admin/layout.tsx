@@ -340,7 +340,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   const priorityItems = useMemo(() => ([
-    { icon: '📥', label: 'Entrades (Leads)', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
+    { icon: '📥', label: 'Entrades', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
     { icon: '👤', label: 'Clients', href: '/admin/clientes' },
     { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
     { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
