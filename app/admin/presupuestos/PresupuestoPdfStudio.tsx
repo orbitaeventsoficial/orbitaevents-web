@@ -68,35 +68,62 @@ function buildPackFromForm(params: {
   };
 }
 
-async function translateTextForPdf(text: string, locale: Locale): Promise<string> {
-  const clean = text.trim();
-  if (!clean) return text;
-  if (locale === 'ca') return text;
+const pdfTranslationCache = new Map<string, Map<Locale, string>>();
+
+async function translateBatchForPdf(texts: string[], locale: Locale): Promise<Map<string, string>> {
+  const cleaned = texts.map((t) => t.trim()).filter(Boolean);
+  const unique = Array.from(new Set(cleaned));
+  const result = new Map<string, string>();
+
+  if (unique.length === 0) return result;
+  if (locale === 'ca') {
+    for (const text of unique) result.set(text, text);
+    return result;
+  }
+
+  const toFetch: string[] = [];
+  for (const original of unique) {
+    const cachedByLang = pdfTranslationCache.get(original);
+    const cached = cachedByLang?.get(locale);
+    if (cached) result.set(original, cached);
+    else toFetch.push(original);
+  }
+
+  if (toFetch.length === 0) return result;
+
   try {
     const res = await fetch('/api/admin/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        text: clean,
+        texts: toFetch,
         targetLanguages: [locale],
       }),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data?.ok) return text;
-    return String(data?.translations?.[locale] || text);
-  } catch {
-    return text;
-  }
-}
+    if (!res.ok || !data?.ok) {
+      for (const original of toFetch) result.set(original, original);
+      return result;
+    }
 
-async function translateListForPdf(items: string[], locale: Locale): Promise<string[]> {
-  if (items.length === 0) return items;
-  const unique = Array.from(new Set(items.map((item) => item.trim()).filter(Boolean)));
-  const translatedPairs = await Promise.all(
-    unique.map(async (item) => [item, await translateTextForPdf(item, locale)] as const)
-  );
-  const dictionary = new Map<string, string>(translatedPairs);
-  return items.map((item) => dictionary.get(item.trim()) || item);
+    const translationsByText: Record<string, Record<string, string>> =
+      data?.translationsByText || {};
+
+    for (const original of toFetch) {
+      const translated = String(translationsByText?.[original]?.[locale] || original);
+      let byLang = pdfTranslationCache.get(original);
+      if (!byLang) {
+        byLang = new Map<Locale, string>();
+        pdfTranslationCache.set(original, byLang);
+      }
+      byLang.set(locale, translated);
+      result.set(original, translated);
+    }
+  } catch {
+    for (const original of toFetch) result.set(original, original);
+  }
+
+  return result;
 }
 
 export default function PresupuestoPdfStudio() {
@@ -319,23 +346,30 @@ export default function PresupuestoPdfStudio() {
 
   async function buildPdf() {
     if (!selectedPack) return null;
-    const translatedPackName = await translateTextForPdf(packName, locale);
-    const translatedFeatures = await translateListForPdf(toFeatureLines(featuresText), locale);
-    const translatedConditions = await translateListForPdf(toFeatureLines(conditionsText), locale);
-    const translatedWhy = await translateTextForPdf(whyChooseUs, locale);
+    const rawFeatures = toFeatureLines(featuresText);
+    const rawConditions = toFeatureLines(conditionsText);
+    const rawExtrasNames = [
+      ...mappedSelectedExtras.map((extra) => extra.name),
+      ...customExtras.map((extra) => extra.name),
+    ];
+    const batch = await translateBatchForPdf(
+      [packName, whyChooseUs, ...rawFeatures, ...rawConditions, ...rawExtrasNames],
+      locale
+    );
 
-    const translatedPresetExtras = await Promise.all(
-      mappedSelectedExtras.map(async (extra) => ({
-        ...extra,
-        name: await translateTextForPdf(extra.name, locale),
-      }))
-    );
-    const translatedCustomExtras = await Promise.all(
-      customExtras.map(async (extra) => ({
-        ...extra,
-        name: await translateTextForPdf(extra.name, locale),
-      }))
-    );
+    const translatedPackName = batch.get(packName.trim()) || packName;
+    const translatedWhy = batch.get(whyChooseUs.trim()) || whyChooseUs;
+    const translatedFeatures = rawFeatures.map((line) => batch.get(line.trim()) || line);
+    const translatedConditions = rawConditions.map((line) => batch.get(line.trim()) || line);
+
+    const translatedPresetExtras = mappedSelectedExtras.map((extra) => ({
+      ...extra,
+      name: batch.get(extra.name.trim()) || extra.name,
+    }));
+    const translatedCustomExtras = customExtras.map((extra) => ({
+      ...extra,
+      name: batch.get(extra.name.trim()) || extra.name,
+    }));
 
     const translatedExtrasNames = [
       ...translatedPresetExtras.map((extra) => extra.name),

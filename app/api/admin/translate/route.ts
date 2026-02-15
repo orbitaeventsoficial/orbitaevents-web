@@ -8,12 +8,46 @@ import { checkRateLimit } from '@/lib/rate-limit';
 export const dynamic = 'force-dynamic';
 
 const MAX_TEXT_LENGTH = 2000;
+const MAX_BATCH_TEXTS = 200;
+const MAX_BATCH_TOTAL_CHARS = 50000;
 const TRANSLATE_TIMEOUT_MS = 6000;
 const ALLOWED_LANGUAGES = ['es', 'ca', 'en'] as const;
 const DEEPL_API_KEY = process.env.DEEPL_API_KEY;
 const DEEPL_BASE_URL =
   process.env.DEEPL_BASE_URL ||
   (DEEPL_API_KEY?.includes(':fx') ? 'https://api-free.deepl.com' : 'https://api.deepl.com');
+
+type TranslateBody = {
+  text?: string;
+  texts?: string[];
+  targetLanguages?: string[];
+};
+
+function normalizeTexts(body: TranslateBody): string[] {
+  if (Array.isArray(body.texts)) return body.texts.filter((t) => typeof t === 'string');
+  if (typeof body.text === 'string') return [body.text];
+  return [];
+}
+
+async function mapLimit<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T, index: number) => Promise<R>
+): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let nextIndex = 0;
+
+  async function worker() {
+    while (nextIndex < items.length) {
+      const current = nextIndex++;
+      results[current] = await fn(items[current], current);
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, () => worker());
+  await Promise.all(workers);
+  return results;
+}
 
 function mapDeepLTarget(lang: string): string {
   if (lang === 'es') return 'ES';
@@ -88,20 +122,30 @@ export async function POST(req: NextRequest) {
   if (rateLimit) return rateLimit;
 
   try {
-    const body = await req.json();
-    const { text, targetLanguages = ['es', 'ca', 'en'] } = body as {
-      text: string;
-      targetLanguages?: string[];
-    };
+    const body = (await req.json()) as TranslateBody;
+    const targetLanguages = Array.isArray(body.targetLanguages) ? body.targetLanguages : ['es', 'ca', 'en'];
+    const texts = normalizeTexts(body).map((t) => t.trim()).filter(Boolean);
 
-    if (!text || typeof text !== 'string') {
+    if (texts.length === 0) {
+      return NextResponse.json({ ok: false, error: 'Texto requerido' }, { status: 400 });
+    }
+
+    if (texts.length > MAX_BATCH_TEXTS) {
       return NextResponse.json(
-        { ok: false, error: 'Texto requerido' },
+        { ok: false, error: `Demasiados textos (max ${MAX_BATCH_TEXTS})` },
         { status: 400 }
       );
     }
 
-    if (text.length > MAX_TEXT_LENGTH) {
+    const totalChars = texts.reduce((sum, current) => sum + current.length, 0);
+    if (totalChars > MAX_BATCH_TOTAL_CHARS) {
+      return NextResponse.json(
+        { ok: false, error: `Payload demasiado grande (max ${MAX_BATCH_TOTAL_CHARS} chars)` },
+        { status: 400 }
+      );
+    }
+
+    if (texts.some((text) => text.length > MAX_TEXT_LENGTH)) {
       return NextResponse.json(
         { ok: false, error: `Texto demasiado largo (max ${MAX_TEXT_LENGTH})` },
         { status: 400 }
@@ -119,19 +163,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Traducir a cada idioma objetivo
-    const translations: Record<string, string> = {};
+    const translationsByText: Record<string, Record<string, string>> = {};
+    for (const original of texts) translationsByText[original] = {};
 
     for (const lang of filteredTargets) {
       const langCode = lang === 'ca' ? 'ca' : lang === 'en' ? 'en' : 'es';
-      const deeplTranslation = await translateWithDeepL(text, langCode);
-      translations[lang] = deeplTranslation ?? (await translateText(text, langCode));
+      const translated = await mapLimit(texts, 4, async (original) => {
+        const deeplTranslation = await translateWithDeepL(original, langCode);
+        return deeplTranslation ?? (await translateText(original, langCode));
+      });
+
+      for (let i = 0; i < texts.length; i++) {
+        translationsByText[texts[i]][lang] = translated[i] ?? texts[i];
+      }
+    }
+
+    if (texts.length === 1) {
+      return NextResponse.json({
+        ok: true,
+        original: texts[0],
+        translations: translationsByText[texts[0]],
+        translationsByText,
+      });
     }
 
     return NextResponse.json({
       ok: true,
-      original: text,
-      translations,
+      originals: texts,
+      translationsByText,
     });
 
   } catch (error) {

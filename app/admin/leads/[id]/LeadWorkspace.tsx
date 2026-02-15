@@ -207,7 +207,7 @@ export default function LeadWorkspace({
       </section>
 
       <div className="grid gap-6 xl:grid-cols-3">
-        <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm xl:col-span-2">
+        <section id="lead-tasks" className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm xl:col-span-2">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-slate-100">Seguiment comercial (tasques)</h2>
             <span className="rounded-full bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-100">
@@ -299,7 +299,7 @@ export default function LeadWorkspace({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
+        <section id="lead-documents" className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-100">Documents comercials</h2>
           <div className="mt-3 space-y-2">
             <input

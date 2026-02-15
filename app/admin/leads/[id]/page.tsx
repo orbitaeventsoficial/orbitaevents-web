@@ -5,6 +5,7 @@ import LeadActionsEnhanced from './LeadActionsEnhanced';
 import LeadProfileEditor from './LeadProfileEditor';
 import LeadWorkspace from './LeadWorkspace';
 import LeadNotesPanel from './LeadNotesPanel';
+import LeadGuidedFlow from './LeadGuidedFlow';
 import { scoreLead } from '@/lib/services/commercialScoring';
 import ScoreSnapshotButton from './ScoreSnapshotButton';
 import LeadTechnicalSnapshotPanel from './LeadTechnicalSnapshotPanel';
@@ -255,6 +256,7 @@ export default async function LeadDetailPage({ params }: Props) {
     ...activity,
     createdAt: activity.createdAt.toISOString(),
   }));
+  const openTasksCount = lead.tasks.filter((task) => task.status !== 'DONE' && task.status !== 'CANCELLED').length;
 
   return (
     <div className="space-y-6">
@@ -360,6 +362,16 @@ export default async function LeadDetailPage({ params }: Props) {
           </div>
         </div>
       </header>
+
+      <LeadGuidedFlow
+        leadId={lead.id}
+        currentStatus={lead.status}
+        hasCustomer={Boolean(lead.customerId)}
+        hasBooking={Boolean(lead.booking)}
+        bookingId={lead.booking?.id}
+        documentsCount={lead.documents.length}
+        openTasksCount={openTasksCount}
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Columna Principal */}

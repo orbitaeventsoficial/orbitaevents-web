@@ -507,7 +507,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         >
           {helpModeEnabled && (
             <div className="fixed left-1/2 top-16 z-[70] -translate-x-1/2 rounded-full border border-amber-400/60 bg-amber-100 px-4 py-2 text-xs font-semibold text-amber-900 shadow-lg">
-              Mode ajuda actiu: les accions estan bloquejades. Passa per sobre dels símbols ? per veure la llegenda.
+              Modo ayuda activo: las acciones están bloqueadas. Pulsa los iconos de ayuda para ver explicaciones.
             </div>
           )}
           {helpModeEnabled && <AdminHelpLegend />}
@@ -635,13 +635,15 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             type="button"
             data-help-toggle="true"
             onClick={toggleHelpMode}
-            className={`p-2.5 text-slate-300 rounded-xl transition-colors ${
-              helpModeEnabled ? 'bg-amber-500/20 text-amber-300' : 'hover:bg-slate-800 active:bg-slate-700'
+            className={`rounded-xl border px-2.5 py-2 text-xs font-semibold transition-colors ${
+              helpModeEnabled
+                ? 'border-amber-400/70 bg-amber-500/20 text-amber-200'
+                : 'border-slate-700/80 text-slate-200 hover:bg-slate-800 active:bg-slate-700'
             }`}
-            aria-label="Activar o desactivar mode ajuda"
+            aria-label="Activar o desactivar modo ayuda"
             aria-pressed={helpModeEnabled}
           >
-            ?
+            ❓ Ayuda
           </button>
           <button
             type="button"
@@ -829,9 +831,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 : 'border-zinc-700/80 bg-zinc-800/60 text-slate-300 hover:border-amber-500/30 hover:text-slate-100'
             }`}
             aria-pressed={helpModeEnabled}
-            aria-label="Activar o desactivar mode ajuda"
+            aria-label="Activar o desactivar modo ayuda"
           >
-            ? Ajuda {helpModeEnabled ? 'ON' : 'OFF'}
+            ❓ Ayuda {helpModeEnabled ? 'ON' : 'OFF'}
           </button>
           <button
             type="button"

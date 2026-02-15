@@ -94,7 +94,7 @@ export default function AdminHelpInspector() {
           className="absolute w-72 rounded-xl border border-amber-300/70 bg-slate-950/60 p-3 shadow-2xl"
           style={{ left: preview.x, top: preview.y }}
         >
-          <p className="text-xs font-semibold text-slate-900">{preview.term}</p>
+          <p className="text-xs font-semibold text-amber-200">{preview.term}</p>
           <p className="mt-1 text-xs text-slate-200">{preview.description}</p>
         </div>
       )}
