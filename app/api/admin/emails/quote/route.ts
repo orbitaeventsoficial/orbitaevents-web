@@ -237,6 +237,82 @@ export async function POST(req: NextRequest) {
           },
         });
       }
+
+      // Seguiment automàtic 48h després d'enviar pressupost.
+      const followUpTitle = `Seguiment pressupost ${quoteData.quoteNumber}`;
+      const followUpDueDate = new Date(Date.now() + 48 * 60 * 60 * 1000);
+      if (lead.customerId) {
+        try {
+          const prismaAny = prisma as any;
+          const existingTask = await prismaAny.task.findFirst({
+            where: {
+              customerId: lead.customerId,
+              leadId,
+              title: followUpTitle,
+              status: { in: ['OPEN', 'IN_PROGRESS'] },
+            },
+            select: { id: true },
+          });
+          if (!existingTask) {
+            await prismaAny.task.create({
+              data: {
+                customerId: lead.customerId,
+                leadId,
+                title: followUpTitle,
+                description: 'Fer seguiment comercial del pressupost enviat.',
+                dueDate: followUpDueDate,
+                status: 'OPEN',
+                priority: 'MEDIUM',
+                createdBy: 'Sistema',
+              },
+            });
+          }
+        } catch {
+          const legacyTask = await prisma.leadTask.findFirst({
+            where: {
+              leadId,
+              title: followUpTitle,
+              status: { in: ['OPEN', 'IN_PROGRESS'] },
+            },
+            select: { id: true },
+          });
+          if (!legacyTask) {
+            await prisma.leadTask.create({
+              data: {
+                leadId,
+                title: followUpTitle,
+                description: 'Fer seguiment comercial del pressupost enviat.',
+                dueDate: followUpDueDate,
+                status: 'OPEN',
+                priority: 'MEDIUM',
+                createdBy: 'Sistema',
+              },
+            });
+          }
+        }
+      } else {
+        const legacyTask = await prisma.leadTask.findFirst({
+          where: {
+            leadId,
+            title: followUpTitle,
+            status: { in: ['OPEN', 'IN_PROGRESS'] },
+          },
+          select: { id: true },
+        });
+        if (!legacyTask) {
+          await prisma.leadTask.create({
+            data: {
+              leadId,
+              title: followUpTitle,
+              description: 'Fer seguiment comercial del pressupost enviat.',
+              dueDate: followUpDueDate,
+              status: 'OPEN',
+              priority: 'MEDIUM',
+              createdBy: 'Sistema',
+            },
+          });
+        }
+      }
     }
 
     const html = generateQuoteHTML(quoteData, {
