@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAdminHelpMode } from './AdminHelpMode';
 
@@ -30,9 +30,8 @@ export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right
   useEffect(() => setMounted(true), []);
 
   const cleanText = useMemo(() => (text ?? '').trim(), [text]);
-  if (!shouldRender || !cleanText) return null;
 
-  const computePosition = () => {
+  const computePosition = useCallback(() => {
     const btn = btnRef.current;
     const panel = panelRef.current;
     if (!btn || !panel) return;
@@ -86,7 +85,7 @@ export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right
     left = clamp(left, padding, vw - pr.width - padding);
 
     setPos({ top, left, transformOrigin });
-  };
+  }, [side]);
 
   useEffect(() => {
     if (!open) return;
@@ -102,7 +101,9 @@ export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right
       window.removeEventListener('resize', onResize);
       window.removeEventListener('scroll', onScroll, true);
     };
-  }, [open, side]);
+  }, [open, computePosition]);
+
+  if (!shouldRender || !cleanText) return null;
 
   const panel = (
     <div
@@ -142,4 +143,3 @@ export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right
     </span>
   );
 }
-
