@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import CalendarTokenManager from './CalendarTokenManager';
+import IntegrationSetupWizard from './IntegrationSetupWizard';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +30,7 @@ export default async function IntegrationsPage() {
           'integrations.googleCalendar.connectedEmail',
           'integrations.googleCalendar.connectedAt',
           'integrations.googleCalendar.calendarId',
+          'emails.cron.lastStatus',
         ],
       },
     },
@@ -36,11 +38,19 @@ export default async function IntegrationsPage() {
 
   const map = Object.fromEntries(settings.map((s) => [s.key, s.value]));
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '');
-  const imapConfigured = Boolean(
-    process.env.IMAP_HOST && process.env.IMAP_PORT && process.env.IMAP_USER && process.env.IMAP_PASS
-  );
+  const missingImapVars = [
+    !process.env.IMAP_HOST ? 'IMAP_HOST' : null,
+    !process.env.IMAP_PORT ? 'IMAP_PORT' : null,
+    !process.env.IMAP_USER ? 'IMAP_USER' : null,
+    !process.env.IMAP_PASS ? 'IMAP_PASS' : null,
+  ].filter(Boolean) as string[];
+  const imapConfigured = missingImapVars.length === 0;
   const calendarFeedToken = map['integrations.calendar.feedToken'];
   const googleCalendarConnected = Boolean(map['integrations.googleCalendar.refreshToken']);
+  const calendarIdConfigured = Boolean(
+    map['integrations.googleCalendar.calendarId'] || process.env.GOOGLE_CALENDAR_ID
+  );
+  const cronActive = String(map['emails.cron.lastStatus'] || '').toUpperCase() === 'OK';
 
   return (
     <div className="space-y-6">
@@ -50,6 +60,17 @@ export default async function IntegrationsPage() {
           Sincronitza CRM, emails i calendari amb Google i mòbil.
         </p>
       </header>
+
+      <IntegrationSetupWizard
+        gmailConnected={Boolean(map['integrations.gmail.refreshToken'])}
+        imapConfigured={imapConfigured}
+        googleCalendarConnected={googleCalendarConnected}
+        calendarIdConfigured={calendarIdConfigured}
+        icsFeedConfigured={Boolean(calendarFeedToken)}
+        cronActive={cronActive}
+        connectedEmail={String(map['integrations.googleCalendar.connectedEmail'] || map['integrations.gmail.email'] || '')}
+        missingImapVars={missingImapVars}
+      />
 
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
@@ -93,6 +114,11 @@ export default async function IntegrationsPage() {
           <p className="mt-2 text-sm text-slate-300">
             Captura i importació d&apos;emails a leads CRM.
           </p>
+          {!imapConfigured && (
+            <p className="mt-1 text-xs text-amber-300">
+              Falten: {missingImapVars.join(', ')}
+            </p>
+          )}
           <Link
             href="/admin/inbox/settings"
             className="mt-4 inline-flex rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700"
@@ -110,9 +136,14 @@ export default async function IntegrationsPage() {
             Sincronització automàtica de reserves confirmades/preparació i baixa automàtica en cancel·lar.
           </p>
           <p className="mt-1 text-xs text-slate-400">
-            Calendari: {map['integrations.googleCalendar.calendarId'] || 'primary'}
+            Calendari: {map['integrations.googleCalendar.calendarId'] || process.env.GOOGLE_CALENDAR_ID || 'primary'}
             {' '}· Compte: {map['integrations.googleCalendar.connectedEmail'] || '-'}
           </p>
+          {!calendarIdConfigured && (
+            <p className="mt-1 text-xs text-amber-300">
+              Falta calendarId (setting `integrations.googleCalendar.calendarId` o env `GOOGLE_CALENDAR_ID`)
+            </p>
+          )}
           <a
             href="/api/google-calendar/oauth/start"
             className="mt-4 inline-flex rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700"
@@ -131,6 +162,18 @@ export default async function IntegrationsPage() {
           </p>
           <CalendarTokenManager baseUrl={baseUrl} initialToken={calendarFeedToken || null} />
         </article>
+      </section>
+
+      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-100">Checklist tècnic</h2>
+        <div className="mt-3 grid gap-2 text-xs text-slate-300 sm:grid-cols-2">
+          <p>• Gmail token: {map['integrations.gmail.refreshToken'] ? 'OK' : 'Pendent'}</p>
+          <p>• Google token: {map['integrations.google.refreshToken'] ? 'OK' : 'Pendent'}</p>
+          <p>• Calendar token: {googleCalendarConnected ? 'OK' : 'Pendent'}</p>
+          <p>• Calendar ID: {calendarIdConfigured ? 'OK' : 'Pendent'}</p>
+          <p>• ICS token: {calendarFeedToken ? 'OK' : 'Pendent'}</p>
+          <p>• Cron estat: {map['emails.cron.lastStatus'] || 'Pendent'}</p>
+        </div>
       </section>
     </div>
   );

@@ -390,7 +390,7 @@ export default function PricingAdminPage() {
                   Packs (NOMÉS LECTURA)
                 </div>
                 <p className="text-slate-400">
-                  Els packs es gestionen a /admin/packs. Aquí només veus estadístiques.
+                  Els packs es gestionen a /admin/catalog?tab=packs. Aquí només veus estadístiques.
                 </p>
               </div>
               <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
@@ -517,8 +517,8 @@ export default function PricingAdminPage() {
               <p className="font-semibold text-slate-200">Només lectura</p>
               <p className="text-sm text-slate-400">
                 Per editar packs, ves a{' '}
-                <Link href="/admin/packs" className="text-cyan-400 hover:underline font-medium">
-                  /admin/packs
+                <Link href="/admin/catalog?tab=packs" className="text-cyan-400 hover:underline font-medium">
+                  /admin/catalog?tab=packs
                 </Link>
               </p>
             </div>
@@ -595,7 +595,7 @@ export default function PricingAdminPage() {
                       <span className="font-semibold text-emerald-300 ml-1">{formatCurrency(pack.totalRevenue)}</span>
                     </div>
                   </div>
-                  <Link href="/admin/packs" className="text-cyan-400 hover:text-cyan-300 text-sm font-medium">
+                  <Link href="/admin/catalog?tab=packs" className="text-cyan-400 hover:text-cyan-300 text-sm font-medium">
                     Editar →
                   </Link>
                 </div>

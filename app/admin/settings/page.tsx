@@ -131,12 +131,12 @@ export default async function SettingsPage() {
         </Link>
 
         <Link
-          href="/admin/packs"
+          href="/admin/catalog?tab=packs"
           className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6 hover:border-slate-600/50 hover:bg-slate-700/40 transition-all"
         >
           <div className="text-2xl mb-2">📦</div>
-          <h3 className="font-semibold text-slate-100">Gestionar Packs</h3>
-          <p className="text-sm text-slate-400">Edita preus, traduccions i contingut dels packs</p>
+          <h3 className="font-semibold text-slate-100">Catàleg</h3>
+          <p className="text-sm text-slate-400">Packs, extres, inventari i regles de preu</p>
         </Link>
 
         <Link
