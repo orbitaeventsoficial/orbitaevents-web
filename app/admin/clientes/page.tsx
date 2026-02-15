@@ -1,12 +1,12 @@
 'use client';
 
 /**
- * ADMIN PANEL - GESTIÓ DE CONTACTES CRM
+ * ADMIN PANEL - GESTIÓ DE CLIENTS CRM
  * =====================================
- * Panel per gestionar contactes amb:
- * - Afegir contactes manualment
- * - Iniciar processos (post-event, review request, etc)
- * - Veure historial d'events
+ * Panell per gestionar clients amb:
+ * - Afegir clients manualment
+ * - Iniciar processos (post-esdeveniment, sol·licitud d'opinió, etc.)
+ * - Veure historial d'esdeveniments
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -92,7 +92,7 @@ export default function AdminContactesPage() {
         if (response.status === 401) {
           throw new Error('No autoritzat');
         }
-        throw new Error('Error carregant contactes');
+        throw new Error('Error carregant clients');
       }
 
       const data = await response.json();
@@ -146,7 +146,7 @@ export default function AdminContactesPage() {
   // Add customer
   const handleAddCustomer = async () => {
     if (!newCustomer.name || !newCustomer.email) {
-      setError('Nom i email són obligatoris');
+      setError('Nom i correu són obligatoris');
       return;
     }
 
@@ -165,7 +165,7 @@ export default function AdminContactesPage() {
 
       if (!response.ok) {
         const result = await response.json();
-        throw new Error(result.error || 'Error creant contacte');
+        throw new Error(result.error || 'Error creant client');
       }
 
       const result = await response.json();
@@ -243,9 +243,9 @@ export default function AdminContactesPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
-            Gestió de Contactes
+            Gestió de Clients
           </h1>
-          <p className="text-sm text-slate-400 mt-1">CRM - Afegeix contactes i inicia processos</p>
+          <p className="text-sm text-slate-400 mt-1">CRM - Afegeix clients i inicia processos</p>
         </div>
 
         {/* Stats */}
@@ -261,7 +261,7 @@ export default function AdminContactesPage() {
             </div>
             <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm px-4 py-3 text-center">
               <p className="text-2xl font-bold text-slate-100">{stats.withEvents}</p>
-              <p className="text-xs text-emerald-400">Amb events</p>
+              <p className="text-xs text-emerald-400">Amb esdeveniments</p>
             </div>
           </div>
         )}
@@ -275,10 +275,10 @@ export default function AdminContactesPage() {
           </svg>
           <input
             type="search"
-            placeholder="Cercar contacte..."
+            placeholder="Cercar client..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            aria-label="Cercar contacte"
+            aria-label="Cercar client"
             className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
           />
         </div>
@@ -291,7 +291,7 @@ export default function AdminContactesPage() {
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Afegir Contacte
+          Afegir Client
         </button>
       </div>
 
@@ -312,7 +312,7 @@ export default function AdminContactesPage() {
       {/* Empty */}
       {!loading && customers.length === 0 && (
         <div className="text-center py-20" role="status" aria-live="polite">
-          <p className="text-slate-400 text-lg">No hi ha contactes</p>
+          <p className="text-slate-400 text-lg">No hi ha clients</p>
         </div>
       )}
 
@@ -375,7 +375,7 @@ export default function AdminContactesPage() {
                       customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300' :
                       'bg-slate-500/20 text-slate-400'
                     }`}>
-                      {customer.source || 'desconegut'}
+                      {customer.source || 'desconeguda'}
                     </span>
                   </td>
                   <td className="p-4 hidden sm:table-cell text-slate-400">
@@ -417,7 +417,7 @@ export default function AdminContactesPage() {
 
       {!loading && customers.length > 0 && (
         <div className="flex items-center justify-between text-xs text-slate-400">
-          <span>Pàgina {page} de {totalPages} · {totalCustomers} contactes</span>
+          <span>Pàgina {page} de {totalPages} · {totalCustomers} clients</span>
           <div className="flex gap-2">
             <button
               type="button"
@@ -439,7 +439,7 @@ export default function AdminContactesPage() {
         </div>
       )}
 
-      {/* MODAL: Afegir Contacte */}
+      {/* MODAL: Afegir Client */}
       <AnimatePresence>
         {showAddModal && (
           <motion.div
@@ -460,7 +460,7 @@ export default function AdminContactesPage() {
               aria-labelledby="add-contact-title"
               className="bg-slate-800 border border-slate-700/50 rounded-2xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto"
             >
-              <h2 id="add-contact-title" className="text-2xl font-bold text-slate-100 mb-6">Afegir Contacte</h2>
+              <h2 id="add-contact-title" className="text-2xl font-bold text-slate-100 mb-6">Afegir Client</h2>
 
               <div className="space-y-4">
                 <div>
@@ -592,7 +592,7 @@ export default function AdminContactesPage() {
                     <span className="text-3xl">⭐</span>
                     <div>
                       <p className="text-slate-100 font-medium group-hover:text-amber-400">Demanar Opinió</p>
-                      <p className="text-slate-500 text-sm">Envia email demanant review</p>
+                      <p className="text-slate-500 text-sm">Envia un correu demanant una opinió</p>
                     </div>
                   </div>
                 </button>
@@ -607,7 +607,7 @@ export default function AdminContactesPage() {
                   <div className="flex items-center gap-4">
                     <span className="text-3xl">🎉</span>
                     <div>
-                      <p className="text-slate-100 font-medium group-hover:text-emerald-400">Post-event Complet</p>
+                      <p className="text-slate-100 font-medium group-hover:text-emerald-400">Post-esdeveniment complet</p>
                       <p className="text-slate-500 text-sm">Canvas 10/10 + Gràcies + Demanar opinió</p>
                     </div>
                   </div>
