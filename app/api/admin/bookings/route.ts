@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic';
 
 const bookingSchema = z.object({
   leadId: z.string().optional(),
+  customerId: z.string().optional(),
   clientName: z.string().min(1),
   clientEmail: z.string().email(),
   clientPhone: z.string().min(1),
@@ -103,6 +104,7 @@ export async function GET(req: NextRequest) {
           pack: { include: { translations: { where: { locale: 'ca' } } } },
           extras: { include: { extra: { include: { translations: { where: { locale: 'ca' } } } } } },
           lead: { select: { id: true, name: true, source: true } },
+          customer: { select: { id: true, name: true, email: true } },
         },
         orderBy: { eventDate: 'asc' },
         skip: (page - 1) * limit,
@@ -158,6 +160,23 @@ export async function POST(req: NextRequest) {
     }
 
     const data = parsed.data;
+    let linkedCustomerId: string | null = data.customerId || null;
+
+    if (!linkedCustomerId && data.leadId) {
+      const lead = await prisma.lead.findUnique({
+        where: { id: data.leadId },
+        select: { customerId: true },
+      });
+      linkedCustomerId = lead?.customerId || null;
+    }
+
+    if (!linkedCustomerId) {
+      const byEmail = await prisma.customer.findUnique({
+        where: { emailNormalized: data.clientEmail.trim().toLowerCase() },
+        select: { id: true },
+      });
+      linkedCustomerId = byEmail?.id || null;
+    }
 
     // Obtenir pack i preu
     const pack = await prisma.pack.findUnique({
@@ -189,6 +208,7 @@ export async function POST(req: NextRequest) {
       data: {
         reference,
         leadId: data.leadId,
+        customerId: linkedCustomerId,
         clientName: data.clientName,
         clientEmail: data.clientEmail,
         clientPhone: data.clientPhone,

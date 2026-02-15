@@ -259,6 +259,8 @@ model Customer {
 
   // Relacions
   leads             Lead[]
+  bookings          Booking[]
+  proposals         Proposal[]
   testimonials      CustomerTestimonial[]
   discountCodes     CustomerDiscountCode[]
   activityLog       CustomerActivity[]
@@ -391,6 +393,7 @@ model Lead {
 
   notes            LeadNote[]
   booking          Booking?
+  proposals        Proposal[]
   activities       LeadActivity[]
   tasks            LeadTask[]
   documents        LeadDocument[]
@@ -561,6 +564,8 @@ model Booking {
   reference      String        @unique // "OE-2024-001"
   leadId         String?       @unique
   lead           Lead?         @relation(fields: [leadId], references: [id])
+  customerId     String?
+  customer       Customer?     @relation(fields: [customerId], references: [id])
 
   // Client
   clientName      String
@@ -608,6 +613,7 @@ model Booking {
   postEventReport    PostEventReport?
   clientSurvey       ClientSurvey?
   clientFeedback     ClientFeedback?
+  proposals          Proposal[]
 
   // Post-event email automation
   postEventEmailSent   Boolean   @default(false)
@@ -622,6 +628,7 @@ model Booking {
   @@index([status])
   @@index([packId])
   @@index([createdAt])
+  @@index([customerId])
   @@index([reference]) // Per generació de referències
   @@index([status, eventDate]) // Consultes combinades
   @@index([status, eventDate, postEventEmailSent]) // Per cron post-event
@@ -634,6 +641,47 @@ enum BookingStatus {
   PREPARING
   COMPLETED
   CANCELLED
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model Proposal {
+  id            String         @id @default(cuid())
+  reference     String         @unique
+  customerId    String
+  customer      Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  leadId        String?
+  lead          Lead?          @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  bookingId     String?
+  booking       Booking?       @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  status        ProposalStatus @default(DRAFT)
+  locale        String         @default("es")
+  currency      String         @default("EUR")
+  validityDays  Int            @default(15)
+  subtotal      Float
+  discount      Float          @default(0)
+  vatRate       Float          @default(21)
+  vatAmount     Float
+  total         Float
+  snapshot      Json
+  pdfUrl        String?
+  pdfKey        String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  sentAt        DateTime?
+  acceptedAt    DateTime?
+
+  @@index([customerId, createdAt])
+  @@index([leadId])
+  @@index([bookingId])
+  @@index([status, createdAt])
+  @@map("proposals")
 }
 
 model BookingExtra {

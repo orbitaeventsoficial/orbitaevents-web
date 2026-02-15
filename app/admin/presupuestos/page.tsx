@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import dynamicImport from 'next/dynamic';
+import { prisma } from '@/lib/prisma';
 
 const PresupuestoPdfStudio = dynamicImport(() => import('./PresupuestoPdfStudio'), {
   ssr: false,
@@ -20,7 +21,21 @@ export const metadata = {
   },
 };
 
-export default function PresupuestosPage() {
+export default async function PresupuestosPage({
+  searchParams,
+}: {
+  searchParams?: { customerId?: string; leadId?: string; proposalId?: string };
+}) {
+  const customerId = searchParams?.customerId || '';
+  const leadId = searchParams?.leadId || '';
+  const proposalId = searchParams?.proposalId || '';
+  const customer = customerId
+    ? await prisma.customer.findUnique({
+        where: { id: customerId },
+        select: { id: true, name: true, email: true },
+      })
+    : null;
+
   return (
     <div className="space-y-6">
       <header className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
@@ -31,9 +46,20 @@ export default function PresupuestosPage() {
         <p className="mt-1 text-sm text-slate-300">
           Personaliza cliente, pack, extras, descuentos y texto para generar el PDF al momento.
         </p>
+        {customer && (
+          <p className="mt-2 text-xs text-cyan-200">
+            Guardant a fitxa: <strong>{customer.name}</strong> ({customer.email})
+          </p>
+        )}
       </header>
 
-      <PresupuestoPdfStudio />
+      <PresupuestoPdfStudio
+        initialCustomerId={customer?.id || ''}
+        initialCustomerName={customer?.name || ''}
+        initialCustomerEmail={customer?.email || ''}
+        initialLeadId={leadId}
+        initialProposalId={proposalId}
+      />
     </div>
   );
 }

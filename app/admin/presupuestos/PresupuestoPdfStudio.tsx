@@ -20,6 +20,14 @@ type CustomExtra = {
   price: number;
 };
 
+type StudioProps = {
+  initialCustomerId?: string;
+  initialCustomerName?: string;
+  initialCustomerEmail?: string;
+  initialLeadId?: string;
+  initialProposalId?: string;
+};
+
 const STUDIO_DRAFT_KEY = 'admin.presupuestos.pdfstudio.draft.v1';
 const quoteStudioSchema = z.object({
   clientName: z.string().trim().min(2, 'Nom del client massa curt'),
@@ -126,14 +134,23 @@ async function translateBatchForPdf(texts: string[], locale: Locale): Promise<Ma
   return result;
 }
 
-export default function PresupuestoPdfStudio() {
+export default function PresupuestoPdfStudio({
+  initialCustomerId = '',
+  initialCustomerName = '',
+  initialCustomerEmail = '',
+  initialLeadId = '',
+  initialProposalId = '',
+}: StudioProps) {
   const [locale, setLocale] = useState<Locale>('ca');
   const [eventType, setEventType] = useState<ServiceSlug>('bodas');
   const [packId, setPackId] = useState<string>(() => getPacksByService('bodas')[0]?.id || '');
   const [clientContact, setClientContact] = useState('');
-  const [clientName, setClientName] = useState('Cliente');
-  const [clientEmail, setClientEmail] = useState('');
+  const [clientName, setClientName] = useState(initialCustomerName || 'Cliente');
+  const [clientEmail, setClientEmail] = useState(initialCustomerEmail || '');
   const [clientPhone, setClientPhone] = useState('');
+  const [customerId] = useState(initialCustomerId);
+  const [leadId] = useState(initialLeadId);
+  const [proposalId, setProposalId] = useState(initialProposalId);
   const [eventDate, setEventDate] = useState('');
   const [guests, setGuests] = useState(80);
   const [validityDays, setValidityDays] = useState(15);
@@ -344,6 +361,100 @@ export default function PresupuestoPdfStudio() {
     setCustomExtras((prev) => prev.filter((extra) => extra.id !== id));
   }
 
+  function buildProposalSnapshot() {
+    return {
+      locale,
+      eventType,
+      packId,
+      packName,
+      basePrice,
+      durationHours,
+      features: toFeatureLines(featuresText),
+      conditions: toFeatureLines(conditionsText),
+      whyChooseUs: whyChooseUs.trim(),
+      extras: {
+        preset: mappedSelectedExtras.map((extra) => ({
+          id: extra.id,
+          name: extra.name,
+          description: extra.description,
+          price: extra.price || 0,
+        })),
+        custom: customExtras.map((extra) => ({
+          id: extra.id,
+          name: extra.name,
+          price: extra.price,
+        })),
+      },
+      customer: {
+        customerId,
+        name: clientName.trim(),
+        email: clientEmail.trim(),
+        phone: clientPhone.trim(),
+        contact: clientContact.trim(),
+      },
+      event: {
+        date: eventDate,
+        guests,
+      },
+      pricing: {
+        extrasPrice,
+        discount,
+        discountReason: discountReason.trim(),
+        total,
+      },
+      brand: {
+        brandName,
+        brandWebsite,
+        brandEmail,
+        brandPhone,
+        brandTagline,
+      },
+    };
+  }
+
+  async function saveProposalDraft(status: 'DRAFT' | 'SENT' = 'DRAFT'): Promise<string | null> {
+    if (!customerId || !selectedPack) return null;
+
+    const subtotal = Math.max(0, Number(basePrice) || 0) + extrasPrice;
+    const discountSafe = Math.max(0, Number(discount) || 0);
+    const vatRate = 21;
+    const baseAfterDiscount = Math.max(0, subtotal - discountSafe);
+    const vatAmount = baseAfterDiscount * (vatRate / 100);
+    const finalTotal = baseAfterDiscount + vatAmount;
+
+    const payload = {
+      customerId,
+      leadId: leadId || undefined,
+      status,
+      locale,
+      currency: 'EUR',
+      validityDays,
+      subtotal,
+      discount: discountSafe,
+      vatRate,
+      vatAmount,
+      total: finalTotal,
+      snapshot: buildProposalSnapshot(),
+    };
+
+    const url = proposalId ? `/api/admin/proposals/${proposalId}` : '/api/admin/proposals';
+    const method = proposalId ? 'PATCH' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data?.ok) {
+      throw new Error(data?.error || 'No s’ha pogut guardar el pressupost');
+    }
+    if (!proposalId && data?.proposal?.id) {
+      setProposalId(data.proposal.id);
+      return data.proposal.id as string;
+    }
+    return proposalId || data?.proposal?.id || null;
+  }
+
   async function buildPdf() {
     if (!selectedPack) return null;
     const rawFeatures = toFeatureLines(featuresText);
@@ -443,6 +554,7 @@ export default function PresupuestoPdfStudio() {
     setMessage(null);
 
     try {
+      await saveProposalDraft('DRAFT');
       const doc = await buildPdf();
       if (!doc) throw new Error('No s’ha pogut generar el PDF');
 
@@ -462,6 +574,7 @@ export default function PresupuestoPdfStudio() {
     setGenerating(true);
     setMessage(null);
     try {
+      await saveProposalDraft('DRAFT');
       const doc = await buildPdf();
       if (!doc) throw new Error('No s’ha pogut generar el PDF');
       doc.autoPrint();
@@ -518,6 +631,13 @@ export default function PresupuestoPdfStudio() {
       if (!response.ok) {
         throw new Error(data?.error || 'No s’ha pogut enviar el pressupost');
       }
+
+      const savedProposalId = await saveProposalDraft('SENT');
+      const targetProposalId = savedProposalId || proposalId;
+      if (targetProposalId) {
+        await fetch(`/api/admin/proposals/${targetProposalId}/send`, { method: 'POST' });
+      }
+
       setMessage(`Pressupost enviat correctament a ${clientEmail.trim()}.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Error enviant el pressupost');
@@ -543,6 +663,12 @@ export default function PresupuestoPdfStudio() {
   }
 
   function validateBeforeGenerate(requireEmail = false): boolean {
+    if (!customerId) {
+      const message = 'Selecciona un cliente antes de generar o enviar presupuesto.';
+      setValidationError(message);
+      setMessage(message);
+      return false;
+    }
     const parsed = quoteStudioSchema.safeParse({
       clientName,
       clientEmail: requireEmail ? clientEmail : clientEmail || 'placeholder@orbitaevents.local',

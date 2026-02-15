@@ -332,40 +332,38 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   const priorityItems = useMemo(() => ([
-    { icon: '📊', label: 'Tauler', href: '/admin' },
-    { icon: '👥', label: 'Leads', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
+    { icon: '📥', label: 'Entrades (Leads)', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
+    { icon: '👤', label: 'Clients', href: '/admin/clientes' },
     { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
-    { icon: '📅', label: 'Calendari', href: '/admin/calendario' },
-    { icon: '💶', label: 'Finances', href: '/admin/finanzas' },
-    { icon: '🎯', label: 'Sales Ops', href: '/admin/sales-ops' },
+    { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
+    { icon: '🧾', label: 'Pressupost (PDF)', href: '/admin/presupuestos' },
   ]), [newLeadsCount]);
 
   const favoriteItems = useMemo(() => ([
-    { label: 'Leads', href: '/admin/leads' },
+    { label: 'Entrades', href: '/admin/leads' },
+    { label: 'Clients', href: '/admin/clientes' },
     { label: 'Reserves', href: '/admin/bookings' },
-    { label: 'Calendari', href: '/admin/calendario' },
-    { label: 'Editor PDF', href: '/admin/presupuestos' },
-    { label: 'Pressupostos', href: '/admin/settings/quotes' },
+    { label: 'Tasques', href: '/admin/tasks' },
   ]), []);
 
   const navSections = useMemo(() => ([
     {
-      title: 'CRM Avançat',
-      defaultOpen: false,
+      title: 'Operativa',
+      defaultOpen: true,
       items: [
-        { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
-        { icon: '👤', label: 'Clients', href: '/admin/contactes' },
         { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
-        { icon: '⭐', label: 'Ressenyes', href: '/admin/ressenyes' },
-        { icon: '📝', label: 'Postevent', href: '/admin/post-event' },
+        { icon: '📅', label: 'Calendari', href: '/admin/calendario' },
         { icon: '📥', label: 'Inbox (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' as const },
       ]
     },
     {
-      title: 'Negoci i contingut',
+      title: 'Herramientas',
       defaultOpen: false,
       items: [
-        { icon: '🧾', label: 'Editor PDF pressupost', href: '/admin/presupuestos' },
+        { icon: '💶', label: 'Finances', href: '/admin/finanzas' },
+        { icon: '🎯', label: 'Sales Ops', href: '/admin/sales-ops' },
+        { icon: '⭐', label: 'Ressenyes', href: '/admin/ressenyes' },
+        { icon: '📝', label: 'Postevent', href: '/admin/post-event' },
         { icon: '📈', label: 'Analytics', href: '/admin/analytics' },
         { icon: '📊', label: 'Rendibilitat', href: '/admin/rentabilidad' },
         { icon: '📦', label: 'Packs', href: '/admin/packs' },
@@ -380,7 +378,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       ]
     },
     {
-      title: 'Configuració',
+      title: 'Configuración',
       defaultOpen: false,
       items: [
         { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
@@ -460,6 +458,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       quotes: 'Plantilla pressupostos',
       inventory: 'Inventari',
       contactes: 'Clients',
+      clientes: 'Clients',
       mensajes: 'Missatges',
       ressenyes: 'Ressenyes',
       faq: 'PMF',
