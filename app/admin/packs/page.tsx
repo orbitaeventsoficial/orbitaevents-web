@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import SyncButton from './SyncButton';
 import { getAllPacks } from '@/config/packs-config';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,7 +45,15 @@ async function getPacks() {
   }
 }
 
-export default async function PacksPage() {
+export default async function PacksPage({
+  searchParams,
+}: {
+  searchParams?: { legacy?: string };
+}) {
+  if (searchParams?.legacy !== '1') {
+    redirect('/admin/catalog?tab=packs');
+  }
+
   const packs = await getPacks();
   const configPacks = getAllPacks();
   const packsInSync = packs.length === configPacks.length;

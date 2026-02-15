@@ -36,7 +36,7 @@ async function getBookings(pageParam?: string) {
   try {
     const pageRaw = Number.parseInt(pageParam || '1', 10);
     const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
-    const pageSize = 40;
+    const pageSize = 25;
 
     const [bookings, stats, totalCount] = await cachedQuery(
       `admin:bookings:page:${page}:size:${pageSize}`,
@@ -76,7 +76,7 @@ async function getBookings(pageParam?: string) {
     return {
       bookings: [],
       stats: [],
-      pagination: { page: 1, pageSize: 40, total: 0, totalPages: 1 },
+      pagination: { page: 1, pageSize: 25, total: 0, totalPages: 1 },
     };
   }
 }

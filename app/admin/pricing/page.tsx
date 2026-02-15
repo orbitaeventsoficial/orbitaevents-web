@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -137,6 +138,9 @@ function formatDate(dateString: string): string {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function PricingAdminPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const legacyMode = searchParams.get('legacy') === '1';
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'extras' | 'packs' | 'inventory'>('overview');
   const [extras, setExtras] = useState<ExtraData[]>([]);
@@ -151,8 +155,16 @@ export default function PricingAdminPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   useEffect(() => {
+    if (!legacyMode) {
+      router.replace('/admin/catalog?tab=pricing');
+      return;
+    }
+  }, [router, legacyMode]);
+
+  useEffect(() => {
+    if (!legacyMode) return;
     loadData();
-  }, []);
+  }, [legacyMode]);
 
   async function loadData() {
     setLoading(true);

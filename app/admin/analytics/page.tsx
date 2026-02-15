@@ -4,6 +4,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { getUmamiReport } from '@/lib/analytics/umami';
 import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -132,6 +133,57 @@ async function getAnalyticsData() {
   }
 }
 
+async function getOperationalKpis() {
+  const now = new Date();
+  const last7Days = new Date(now);
+  last7Days.setDate(last7Days.getDate() - 6);
+
+  try {
+    const [leads7d, leadsWithQuote, totalLeads, proposalsAccepted, proposalsSentOrAccepted, contactedLeads] =
+      await Promise.all([
+        prisma.lead.count({ where: { createdAt: { gte: last7Days } } }),
+        prisma.lead.count({ where: { status: { in: ['QUOTE_SENT', 'NEGOTIATING', 'WON'] } } }),
+        prisma.lead.count(),
+        prisma.proposal.count({ where: { status: 'ACCEPTED' } }),
+        prisma.proposal.count({ where: { status: { in: ['SENT', 'ACCEPTED'] } } }),
+        prisma.lead.findMany({
+          where: { contactedAt: { not: null } },
+          select: { createdAt: true, contactedAt: true },
+          take: 2000,
+          orderBy: { createdAt: 'desc' },
+        }),
+      ]);
+
+    const conversionToQuotePct = totalLeads > 0 ? (leadsWithQuote / totalLeads) * 100 : 0;
+    const proposalsAcceptedPct =
+      proposalsSentOrAccepted > 0 ? (proposalsAccepted / proposalsSentOrAccepted) * 100 : 0;
+    const avgFirstContactHours =
+      contactedLeads.length > 0
+        ? contactedLeads.reduce((sum, row) => {
+            if (!row.contactedAt) return sum;
+            return sum + (row.contactedAt.getTime() - row.createdAt.getTime()) / (1000 * 60 * 60);
+          }, 0) / contactedLeads.length
+        : 0;
+
+    return {
+      leads7d,
+      conversionToQuotePct,
+      proposalsAcceptedPct,
+      avgFirstContactHours,
+      last7Days,
+    };
+  } catch (error) {
+    log.error('Error obtenint KPI operatius:', error);
+    return {
+      leads7d: 0,
+      conversionToQuotePct: 0,
+      proposalsAcceptedPct: 0,
+      avgFirstContactHours: 0,
+      last7Days,
+    };
+  }
+}
+
 const SOURCE_LABELS: Record<string, string> = {
   WEBSITE: 'Web',
   CONFIGURATOR: 'Configurador',
@@ -155,6 +207,7 @@ const EVENT_TYPE_LABELS: Record<string, { label: string; icon: string }> = {
 
 export default async function AnalyticsPage() {
   const data = await getAnalyticsData();
+  const ops = await getOperationalKpis();
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID || 'No configurat';
   const umamiDashboardUrl =
     process.env.NEXT_PUBLIC_UMAMI_DASHBOARD_URL || 'https://analytics.orbitaevents.com';
@@ -213,6 +266,39 @@ export default async function AnalyticsPage() {
             <span className="rounded-full border border-slate-600/50 bg-slate-700/50 px-3 py-1 text-xs">
               {Number(yearGrowth) >= 0 ? '📈' : '📉'} {yearGrowth}% YoY
             </span>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6 text-white">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-300">Operativa comercial</p>
+            <h2 className="mt-1 text-xl font-semibold">KPI accionables</h2>
+          </div>
+          <Link
+            href={`/admin/leads?from=${ops.last7Days.toISOString().slice(0, 10)}&page=1`}
+            className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20"
+          >
+            Veure leads d&apos;aquesta setmana
+          </Link>
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-4">
+          <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
+            <p className="text-xs uppercase text-slate-400">Leads 7 dies</p>
+            <p className="mt-2 text-3xl font-semibold">{ops.leads7d}</p>
+          </div>
+          <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
+            <p className="text-xs uppercase text-slate-400">% leads a pressupost</p>
+            <p className="mt-2 text-3xl font-semibold">{ops.conversionToQuotePct.toFixed(1)}%</p>
+          </div>
+          <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
+            <p className="text-xs uppercase text-slate-400">% pressupostos acceptats</p>
+            <p className="mt-2 text-3xl font-semibold">{ops.proposalsAcceptedPct.toFixed(1)}%</p>
+          </div>
+          <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
+            <p className="text-xs uppercase text-slate-400">1r contacte mitjà</p>
+            <p className="mt-2 text-3xl font-semibold">{Math.max(0, Math.round(ops.avgFirstContactHours))}h</p>
           </div>
         </div>
       </section>

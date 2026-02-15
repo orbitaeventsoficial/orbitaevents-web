@@ -48,6 +48,8 @@ export default function AdminContactesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const pageSize = 25;
   const reduceMotion = useReducedMotion();
 
   // Modals
@@ -190,6 +192,20 @@ export default function AdminContactesPage() {
     );
   }, [customers, searchLower, search]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredCustomers.length / pageSize));
+  const paginatedCustomers = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredCustomers.slice(start, start + pageSize);
+  }, [filteredCustomers, page]);
+
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
+
   // ═══════════════════════════════════════════════════════════════════════════
   // RENDER
   // ═══════════════════════════════════════════════════════════════════════════
@@ -287,7 +303,7 @@ export default function AdminContactesPage() {
               </tr>
             </thead>
             <tbody>
-              {filteredCustomers.map((customer) => (
+              {paginatedCustomers.map((customer) => (
                 <tr key={customer.id} className="border-b border-slate-700/30 hover:bg-slate-700/30 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
@@ -369,6 +385,30 @@ export default function AdminContactesPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {!loading && filteredCustomers.length > 0 && (
+        <div className="flex items-center justify-between text-xs text-slate-400">
+          <span>Pàgina {page} de {totalPages} · {filteredCustomers.length} contactes</span>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              disabled={page === 1}
+              className="rounded-lg border border-slate-700 px-3 py-1 disabled:pointer-events-none disabled:opacity-40 hover:text-slate-200"
+            >
+              ← Anterior
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+              disabled={page === totalPages}
+              className="rounded-lg border border-slate-700 px-3 py-1 disabled:pointer-events-none disabled:opacity-40 hover:text-slate-200"
+            >
+              Següent →
+            </button>
+          </div>
         </div>
       )}
 

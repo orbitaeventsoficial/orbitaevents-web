@@ -117,7 +117,7 @@ async function getLeads(filters: {
     const to = parseDate(filters.to);
     const pageRaw = Number.parseInt(filters.page || '1', 10);
     const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
-    const pageSize = 50;
+    const pageSize = 25;
 
     const where: Prisma.LeadWhereInput = {
       ...(status.length ? { status: { in: status } } : {}),
@@ -223,7 +223,7 @@ async function getLeads(filters: {
       leads: [],
       counts: { filtered: 0, total: 0, new: 0, negotiation: 0, won: 0 },
       filters: { status: [], priority: [], eventType: [], q: '', from: null, to: null } as LeadFilters,
-      pagination: { page: 1, pageSize: 50, totalPages: 1 } as Pagination,
+      pagination: { page: 1, pageSize: 25, totalPages: 1 } as Pagination,
     };
   }
 }

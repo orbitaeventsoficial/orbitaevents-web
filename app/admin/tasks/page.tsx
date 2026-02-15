@@ -36,7 +36,7 @@ export default async function TasksPage({
   const status: LeadTaskStatus | undefined = isTaskStatus(statusParam) ? statusParam : undefined;
   const pageParam = Array.isArray(searchParams?.page) ? searchParams?.page[0] : searchParams?.page;
   const page = parsePage(pageParam);
-  const limit = 30;
+  const limit = 25;
 
   let tasks: Array<{
     id: string;

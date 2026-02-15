@@ -77,7 +77,7 @@ export default function CatalogPage({
           {activeTab === 'packs' && (
             <>
               <Link
-                href="/admin/packs"
+                href="/admin/packs?legacy=1"
                 className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
               >
                 Obrir gestió de packs
@@ -99,7 +99,7 @@ export default function CatalogPage({
                 Obrir catàleg d&apos;extres
               </Link>
               <Link
-                href="/admin/pricing?tab=extras"
+                href="/admin/pricing?legacy=1"
                 className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
               >
                 Revisar vendes d&apos;extres
@@ -115,7 +115,7 @@ export default function CatalogPage({
                 Obrir inventari
               </Link>
               <Link
-                href="/admin/pricing?tab=inventory"
+                href="/admin/pricing?legacy=1"
                 className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
               >
                 Veure ús i rendiment
@@ -125,7 +125,7 @@ export default function CatalogPage({
           {activeTab === 'pricing' && (
             <>
               <Link
-                href="/admin/pricing"
+                href="/admin/pricing?legacy=1"
                 className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
               >
                 Obrir gestor de preus
