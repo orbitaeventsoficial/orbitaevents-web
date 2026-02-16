@@ -1,6 +1,7 @@
 'use client';
 
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
+import { labelEstatPressupost } from '@/lib/customer-hub/labels';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -24,16 +25,6 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
     } finally {
       setBusyId(null);
     }
-  };
-
-  const statusLabel = (status: string) => {
-    if (status === 'DRAFT') return 'Esborrany';
-    if (status === 'SENT') return 'Enviat';
-    if (status === 'ACCEPTED') return 'Acceptat';
-    if (status === 'REJECTED') return 'Rebutjat';
-    if (status === 'EXPIRED') return 'Caducat';
-    if (status === 'VIEWED') return 'Llegit';
-    return status;
   };
 
   return (
@@ -60,7 +51,7 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-slate-100">{proposal.reference}</p>
                 <span className="rounded-full border border-slate-600 px-2 py-0.5 text-[11px] text-slate-300">
-                  {statusLabel(proposal.status)}
+                  {labelEstatPressupost(proposal.status)}
                 </span>
               </div>
               <p className="mt-1 text-xs text-slate-400">

@@ -27,12 +27,12 @@ export async function generateMetadata({ params }: Props) {
   });
 
   return {
-    title: lead ? `${lead.name} | Leads` : 'Lead no trobat',
+    title: lead ? `${lead.name} | Entrades` : 'Entrada no trobada',
   };
 }
 
 const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
-  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Nou Lead' },
+  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Nova entrada' },
   CONTACTED: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Contactat' },
   QUOTE_SENT: { bg: 'bg-purple-500/20', text: 'text-purple-300', label: 'Pressupost enviat' },
   NEGOTIATING: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'Negociació' },
@@ -41,13 +41,13 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }>
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Boda',
+  WEDDING: '💍 Casament',
   BIRTHDAY: '🎂 Aniversari',
   CORPORATE: '🎯 Corporatiu',
   COMMUNION: '⛪ Comunió',
   BAPTISM: '👶 Bateig',
   GRADUATION: '🎓 Graduació',
-  ANNIVERSARY: '🎉 Aniversari',
+  ANNIVERSARY: '🎉 Celebració',
   PRIVATE_PARTY: '🎵 Festa privada',
   OTHER: '📋 Altre',
 };
@@ -269,7 +269,7 @@ export default async function LeadDetailPage({ params }: Props) {
             href="/admin/leads"
             className="text-sm text-slate-400 hover:text-slate-100 mb-2 inline-block"
           >
-            ← Tornar a leads
+            ← Tornar a entrades
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
             {lead.name}
@@ -324,7 +324,7 @@ export default async function LeadDetailPage({ params }: Props) {
             </p>
           </div>
           <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3">
-            <p className="text-xs uppercase tracking-wide text-slate-300">Antiguitat lead</p>
+            <p className="text-xs uppercase tracking-wide text-slate-300">Antiguitat de l&apos;entrada</p>
             <p className="text-xl font-semibold text-slate-100">{leadAgeDays} dies</p>
           </div>
           <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3">
@@ -353,7 +353,7 @@ export default async function LeadDetailPage({ params }: Props) {
           </div>
           <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3">
             <p className="inline-flex items-center gap-1 text-xs uppercase tracking-wide text-slate-300">
-              Lead score
+              Puntuació entrada
               <InfoTooltip text={ADMIN_HELP.leadScore} />
             </p>
             <p className="text-xl font-semibold text-slate-100">
@@ -453,7 +453,7 @@ export default async function LeadDetailPage({ params }: Props) {
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="text-sm">
                       <p className="text-slate-300">
-                        Estat cliente: <strong className={
+                        Estat client: <strong className={
                           reviewFlowStatus === 'RESPONDIDO'
                             ? 'text-emerald-600'
                             : reviewFlowStatus === 'ENVIADO'
@@ -470,25 +470,25 @@ export default async function LeadDetailPage({ params }: Props) {
                         </strong>
                       </p>
                       <p className="text-slate-300">
-                        Enlace valoración enviado: <strong className={lead.booking.postEventEmailSent ? 'text-emerald-600' : 'text-amber-600'}>
+                        Enllaç de valoració enviat: <strong className={lead.booking.postEventEmailSent ? 'text-emerald-600' : 'text-amber-600'}>
                           {lead.booking.postEventEmailSent ? 'Sí' : 'No'}
                         </strong>
                       </p>
                       <p className="text-slate-300">
-                        Data envío: {lead.booking.postEventEmailSentAt
+                        Data d&apos;enviament: {lead.booking.postEventEmailSentAt
                           ? new Date(lead.booking.postEventEmailSentAt).toLocaleString('ca-ES')
                           : '-'}
                       </p>
                       <p className="text-slate-300 break-all">
-                        Token review: {lead.booking.reviewToken || '-'}
+                        Token de valoració: {lead.booking.reviewToken || '-'}
                       </p>
                       <p className="text-slate-300">
-                        Client ha respondido: <strong className={(lead.booking.reviewSubmittedAt || lead.booking.clientSurvey) ? 'text-emerald-600' : 'text-amber-600'}>
+                        El client ha respost: <strong className={(lead.booking.reviewSubmittedAt || lead.booking.clientSurvey) ? 'text-emerald-600' : 'text-amber-600'}>
                           {(lead.booking.reviewSubmittedAt || lead.booking.clientSurvey) ? 'Sí' : 'No'}
                         </strong>
                       </p>
                       <p className="text-slate-300">
-                        Data respuesta: {lead.booking.reviewSubmittedAt
+                        Data de resposta: {lead.booking.reviewSubmittedAt
                           ? new Date(lead.booking.reviewSubmittedAt).toLocaleString('ca-ES')
                           : lead.booking.clientSurvey?.submittedAt
                             ? new Date(lead.booking.clientSurvey.submittedAt).toLocaleString('ca-ES')
@@ -497,7 +497,7 @@ export default async function LeadDetailPage({ params }: Props) {
                     </div>
                     <div className="text-sm">
                       <p className="text-slate-300">
-                        Estat post-event interno: <strong className={
+                        Estat intern de post-esdeveniment: <strong className={
                           internalPostEventStatus === 'COMPLETO'
                             ? 'text-emerald-600'
                             : internalPostEventStatus === 'EN_PROGRESO'
@@ -507,7 +507,7 @@ export default async function LeadDetailPage({ params }: Props) {
                           {internalPostEventStatus === 'COMPLETO'
                             ? 'Completat'
                             : internalPostEventStatus === 'EN_PROGRESO'
-                              ? 'En progreso'
+                              ? 'En progrés'
                               : internalPostEventStatus === 'PENDIENTE'
                                 ? 'Pendent'
                                 : 'Sense reserva'}
@@ -571,7 +571,7 @@ export default async function LeadDetailPage({ params }: Props) {
                       Enquestes client
                     </Link>
                     <Link href="/admin/emails" className="inline-flex items-center rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700">
-                      Automatitzacions email
+                      Automatitzacions de correu
                     </Link>
                   </div>
                 </div>
@@ -611,7 +611,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 <dd className="text-slate-100">{lead.preferredLocale.toUpperCase()}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-400">Antiguitat lead</dt>
+                <dt className="text-xs text-slate-400">Antiguitat de l&apos;entrada</dt>
                 <dd className="text-slate-100">{leadAgeDays} dies</dd>
               </div>
               {lead.customerId && (
@@ -754,7 +754,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 href={`/admin/contactes/${lead.customer.id}`}
                 className="mt-4 inline-flex rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
               >
-                Obrir Customer 360
+                Obrir fitxa client
               </Link>
             </section>
           )}
@@ -764,7 +764,7 @@ export default async function LeadDetailPage({ params }: Props) {
               Historial del client ({relatedLeads.length})
             </h3>
             {relatedLeads.length === 0 ? (
-              <p className="text-sm text-slate-400">No hi ha altres events/leads d&apos;aquest client.</p>
+              <p className="text-sm text-slate-400">No hi ha altres esdeveniments/entrades d&apos;aquest client.</p>
             ) : (
               <div className="space-y-2">
                 {relatedLeads.map((item) => (
@@ -778,7 +778,7 @@ export default async function LeadDetailPage({ params }: Props) {
                     </p>
                     <p className="text-xs text-slate-400">
                       {item.eventDate ? new Date(item.eventDate).toLocaleDateString('ca-ES') : 'Sense data'} ·
-                      {' '}Lead creat {new Date(item.createdAt).toLocaleDateString('ca-ES')}
+                      {' '}Entrada creada {new Date(item.createdAt).toLocaleDateString('ca-ES')}
                     </p>
                     {item.booking ? (
                       <p className="text-xs text-emerald-700">

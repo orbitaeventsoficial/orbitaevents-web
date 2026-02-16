@@ -13,7 +13,7 @@ interface Props {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'NEW', label: 'Nou Lead', color: 'bg-blue-500', icon: '🆕' },
+  { value: 'NEW', label: 'Nova entrada', color: 'bg-blue-500', icon: '🆕' },
   { value: 'CONTACTED', label: 'Contactat', color: 'bg-yellow-500', icon: '📞' },
   { value: 'QUOTE_SENT', label: 'Pressupost enviat', color: 'bg-purple-500', icon: '📄' },
   { value: 'NEGOTIATING', label: 'En negociació', color: 'bg-orange-500', icon: '🤝' },
@@ -268,7 +268,7 @@ export default function LeadActionsEnhanced({
               type="button"
               className="flex-1 px-4 py-2 border border-white/10 rounded-lg text-sm font-medium text-slate-200 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              👁️ Preview
+              👁️ Vista prèvia
             </button>
             <button
               onClick={handleGenerateQuote}
@@ -277,7 +277,7 @@ export default function LeadActionsEnhanced({
               aria-busy={isGenerating}
               className="flex-1 px-4 py-2 bg-amber-500 rounded-lg text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-50"
             >
-              {isGenerating ? '⏳ Generant...' : '📤 Generar'}
+              {isGenerating ? '⏳ Generant...' : '📤 Genera'}
             </button>
           </div>
 
@@ -322,8 +322,8 @@ export default function LeadActionsEnhanced({
           >
             <span className="text-xl">✉️</span>
             <div className="text-left">
-              <div className="font-medium">Email</div>
-              <div className="text-xs opacity-80">Enviar pressupost per email</div>
+                <div className="font-medium">Correu</div>
+                <div className="text-xs opacity-80">Enviar pressupost per correu</div>
             </div>
           </a>
 

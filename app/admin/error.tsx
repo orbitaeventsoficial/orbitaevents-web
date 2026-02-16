@@ -26,11 +26,11 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
         </div>
 
         <h2 className="text-xl font-bold text-stone-800 mb-2">
-          Error en el Panel d&apos;Admin
+          Error al panell d&apos;administració
         </h2>
 
         <p className="text-stone-500 mb-6">
-          S&apos;ha produït un error inesperat. L&apos;equip tècnic ha estat notificat.
+          S&apos;ha produït un error inesperat.
         </p>
 
         {process.env.NODE_ENV === 'development' && (
@@ -52,7 +52,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
             type="button"
             className="px-5 py-2.5 bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 text-white font-medium rounded-xl transition-all shadow-sm"
           >
-            Reintentar
+            Torna-ho a provar
           </button>
 
           <a

@@ -2,6 +2,7 @@
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { labelEstatReserva } from '@/lib/customer-hub/labels';
 
 type LeadResult = {
   id: string;
@@ -107,14 +108,6 @@ export default function AdminSearchModal({
     return results.leads.length > 0 || results.bookings.length > 0 || results.customers.length > 0;
   }, [results]);
 
-  const bookingStatusLabel = (status: string) => {
-    if (status === 'CONFIRMED') return 'Confirmada';
-    if (status === 'TENTATIVE') return 'Pendent';
-    if (status === 'CANCELLED') return 'Cancel·lada';
-    if (status === 'COMPLETED') return 'Completada';
-    return status;
-  };
-
   if (!open) return null;
 
   return (
@@ -192,7 +185,7 @@ export default function AdminSearchModal({
                     className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/40 px-3 py-2 text-sm text-slate-200 hover:border-cyan-500/40 hover:bg-slate-800/70"
                   >
                     <span className="truncate">{booking.reference} · {booking.clientName}</span>
-                    <span className="text-[11px] text-slate-500">{bookingStatusLabel(booking.status)}</span>
+                    <span className="text-[11px] text-slate-500">{labelEstatReserva(booking.status)}</span>
                   </Link>
                 ))}
               </div>

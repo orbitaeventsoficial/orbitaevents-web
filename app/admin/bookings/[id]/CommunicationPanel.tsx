@@ -45,7 +45,7 @@ export default function CommunicationPanel({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, flow, channel }),
       });
-      if (!res.ok) throw new Error('Error comunicación');
+      if (!res.ok) throw new Error('Error de comunicació');
       router.refresh();
     } finally {
       setLoading(null);
@@ -54,22 +54,22 @@ export default function CommunicationPanel({
 
   function waLink(flow: FlowKey) {
     const messageByFlow: Record<FlowKey, string> = {
-      PAYMENT: `Hola ${clientName}, te contactamos por el pago pendiente de tu evento.`,
-      POST_EVENT: `Hola ${clientName}, te reenviamos la valoración post-evento.`,
-      GENERAL: `Hola ${clientName}, te escribimos desde Òrbita Events sobre tu evento.`,
+      PAYMENT: `Hola ${clientName}, et contactem pel pagament pendent del teu esdeveniment.`,
+      POST_EVENT: `Hola ${clientName}, et reenviem la valoració post-esdeveniment.`,
+      GENERAL: `Hola ${clientName}, t'escrivim des d'Òrbita Events sobre el teu esdeveniment.`,
     };
     return `https://wa.me/${clientPhone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(messageByFlow[flow])}`;
   }
 
   const flows: Array<{ key: FlowKey; label: string }> = [
-    { key: 'PAYMENT', label: 'Cobro' },
-    { key: 'POST_EVENT', label: 'Post-evento' },
+    { key: 'PAYMENT', label: 'Cobrament' },
+    { key: 'POST_EVENT', label: 'Post-esdeveniment' },
     { key: 'GENERAL', label: 'General' },
   ];
 
   return (
     <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-100">Comunicaciones multicanal</h2>
+      <h2 className="text-lg font-semibold text-slate-100">Comunicacions multicanal</h2>
       <div className="mt-3 space-y-3">
         {flows.map((flow) => {
           const status = initialStatuses[flow.key];
@@ -79,13 +79,13 @@ export default function CommunicationPanel({
                 <p className="text-sm font-semibold text-slate-100">{flow.label}</p>
                 <p className="text-xs text-slate-400">
                   Estat: <strong>{formatStatus(status.state)}</strong>{' '}
-                  {status.lastChannel ? `· último canal ${status.lastChannel}` : ''}
+                  {status.lastChannel ? `· últim canal ${status.lastChannel}` : ''}
                 </p>
               </div>
               <div className="mt-1 text-[11px] text-slate-400">
-                <span>Último envío: {formatDateTime(status.sentAt)}</span>
+                <span>Últim enviament: {formatDateTime(status.sentAt)}</span>
                 <span className="mx-2">·</span>
-                <span>Última respuesta: {formatDateTime(status.respondedAt)}</span>
+                <span>Última resposta: {formatDateTime(status.respondedAt)}</span>
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
                 <button
@@ -94,7 +94,7 @@ export default function CommunicationPanel({
                   disabled={loading === flow.key}
                   className="rounded-md bg-slate-800 px-2 py-1 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
                 >
-                  Email
+                  Correu
                 </button>
                 <a
                   href={waLink(flow.key)}
@@ -102,7 +102,7 @@ export default function CommunicationPanel({
                   rel="noreferrer"
                   className="rounded-md bg-green-500 px-2 py-1 text-xs font-semibold text-white hover:bg-green-600"
                 >
-                  Abrir WhatsApp
+                  Obrir WhatsApp
                 </a>
                 <button
                   type="button"
@@ -110,7 +110,7 @@ export default function CommunicationPanel({
                   disabled={loading === flow.key}
                   className="rounded-md bg-emerald-600 px-2 py-1 text-xs font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
                 >
-                  Enviar WhatsApp API
+                  Enviar per API de WhatsApp
                 </button>
                 <button
                   type="button"
@@ -118,7 +118,7 @@ export default function CommunicationPanel({
                   disabled={loading === flow.key}
                   className="rounded-md border border-white/10 bg-slate-950/60 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-white/5 disabled:opacity-60"
                 >
-                  Marcar enviado
+                  Marcar enviat
                 </button>
                 <button
                   type="button"
@@ -126,7 +126,7 @@ export default function CommunicationPanel({
                   disabled={loading === flow.key}
                   className="rounded-md border border-emerald-300 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-60"
                 >
-                  Marcar respondido
+                  Marcar respost
                 </button>
               </div>
             </div>

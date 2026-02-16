@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
+import { labelEstatClient } from '@/lib/customer-hub/labels';
 
 type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks';
 
@@ -24,16 +25,7 @@ export default function CustomerHeader({
   setTab: (tab: TabKey) => void;
 }) {
   const id = data.customer.id;
-  const statusLabel =
-    data.customer.status === 'CONFIRMED'
-      ? 'Confirmat'
-      : data.customer.status === 'NEGOTIATION'
-        ? 'En negociació'
-        : data.customer.status === 'POSTEVENT'
-          ? 'Post-esdeveniment'
-          : data.customer.status === 'LOST'
-            ? 'Perdut'
-            : 'Entrada';
+  const statusLabel = labelEstatClient(data.customer.status);
   const statusTone =
     data.customer.status === 'CONFIRMED'
       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'

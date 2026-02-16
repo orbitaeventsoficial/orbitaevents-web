@@ -1,4 +1,5 @@
 import type { BookingDTO, MessageDTO, ProposalDTO, TaskDTO, TimelineEventDTO } from './dto';
+import { labelEstatReserva } from './labels';
 
 type BuildTimelineInput = {
   proposals: ProposalDTO[];
@@ -11,14 +12,7 @@ type BuildTimelineInput = {
 
 export function buildTimeline(input: BuildTimelineInput): TimelineEventDTO[] {
   const events: TimelineEventDTO[] = [];
-  const bookingStatusLabel = (status: string) => {
-    if (status === 'CONFIRMED') return 'confirmada';
-    if (status === 'TENTATIVE') return 'pendent';
-    if (status === 'CANCELLED') return 'cancel·lada';
-    if (status === 'COMPLETED') return 'completada';
-    if (status === 'PREPARING') return 'en preparació';
-    return status.toLowerCase();
-  };
+  const bookingStatusLabel = (status: string) => labelEstatReserva(status).toLowerCase();
   const activityLabel = (action: string) => {
     if (action === 'NOTE_ADDED') return 'Nota interna afegida';
     if (action === 'MESSAGE_SENT') return 'Missatge enviat';
