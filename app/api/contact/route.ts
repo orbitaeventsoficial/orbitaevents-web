@@ -11,11 +11,214 @@ import { escapeHtml } from '@/lib/utils/sanitize';
 import { verifyTurnstileToken } from '@/lib/turnstile';
 import type { EventType, LeadSource } from '@prisma/client';
 
-// Validacion de datos con Zod
-const contactSchema = z.object({
-  name: z.string().min(2, 'Nombre demasiado corto').max(50),
-  contact: z.string().min(3, 'Introduce email o telefono'),
-  event: z.string().min(1, 'Selecciona tipo de evento'),
+type Locale = 'ca' | 'es' | 'en';
+
+const CONTACT_COPY: Record<Locale, Record<string, string>> = {
+  ca: {
+    nameTooShort: 'Nom massa curt',
+    enterEmailOrPhone: 'Introdueix correu o telèfon',
+    selectEventType: "Selecciona tipus d'esdeveniment",
+    invalidData: 'Dades no vàlides',
+    captchaFailed: 'Verificació de seguretat fallida. Torna-ho a intentar.',
+    noteNewWebContact: 'Nou contacte via web',
+    notePack: 'Pack',
+    noteMessage: 'Missatge',
+    noteLeadCreatedVia: 'Lead creat via',
+    viaConfigurator: 'configurador',
+    viaWebForm: 'formulari web',
+    noteInterestedPack: 'Pack interessat',
+    notePhoneContact: 'Contacte per telèfon',
+    adminLeadTitle: 'NOU LEAD',
+    adminCustomer: 'Client',
+    adminEmail: 'Correu',
+    adminPhone: 'Telèfon',
+    adminEventType: "Tipus d'esdeveniment",
+    adminEventDate: "Data de l'esdeveniment",
+    adminGuests: 'Nombre de convidats',
+    adminPeople: 'persones',
+    adminMessage: 'Missatge',
+    adminSelectedPack: 'Pack seleccionat',
+    adminRequestedExtras: 'Extres sol·licitats',
+    adminCallNow: 'Trucar a',
+    adminReplyByEmail: 'Respondre per correu',
+    adminReplySubjectPrefix: 'Re: La teva sol·licitud a Orbita Events',
+    adminSystemFooter: 'Òrbita Events | Sistema de leads automatitzat',
+    adminMailSubjectPrefix: 'NOU LEAD',
+    adminMailFrom: 'Òrbita Events Web',
+    clientHeader: 'Missatge rebut',
+    clientGreeting: 'Hola',
+    clientThanks: 'Gràcies per contactar amb',
+    clientReceivedFor: 'Hem rebut la teva sol·licitud per',
+    clientReference: 'La teva referència',
+    clientSaveCode: 'Guarda aquest codi per a qualsevol consulta',
+    clientStep1Title: 'Revisem la teva sol·licitud',
+    clientStep1Text: 'En les pròximes hores analitzem les teves necessitats.',
+    clientStep2Title: 'Et contactem en menys de 2 hores',
+    clientStep2Text: 'Fins i tot caps de setmana.',
+    clientStep3Title: 'Pressupost personalitzat',
+    clientStep3Text: 'T’enviem una proposta detallada adaptada al teu esdeveniment.',
+    clientEstimatedBudget: 'Pressupost estimat',
+    clientEstimatedNote: '*Preu orientatiu. Confirmarem el preu final al correu.',
+    clientCallNow: 'Trucar ara al',
+    clientReasonEmail: 'Has rebut aquest correu perquè has demanat informació a orbitaevents.com.',
+    clientMailSubjectPrefix: 'Rebut! La teva sol·licitud per',
+    successMessage: 'Missatge enviat correctament',
+    estimatedResponse: '2-4 hores',
+    sendError: 'Error en enviar el missatge. Si ho prefereixes, truca’ns al',
+    retrySuffix: 'o torna-ho a provar.',
+  },
+  es: {
+    nameTooShort: 'Nombre demasiado corto',
+    enterEmailOrPhone: 'Introduce email o telefono',
+    selectEventType: 'Selecciona tipo de evento',
+    invalidData: 'Datos invalidos',
+    captchaFailed: 'Verificacion de seguridad fallida. Por favor intenta de nuevo.',
+    noteNewWebContact: 'Nuevo contacto via web',
+    notePack: 'Pack',
+    noteMessage: 'Mensaje',
+    noteLeadCreatedVia: 'Lead creado via',
+    viaConfigurator: 'configurador',
+    viaWebForm: 'formulario web',
+    noteInterestedPack: 'Pack interesado',
+    notePhoneContact: 'Contacto por telefono',
+    adminLeadTitle: 'NUEVO LEAD',
+    adminCustomer: 'Cliente',
+    adminEmail: 'Email',
+    adminPhone: 'Telefono',
+    adminEventType: 'Tipo de evento',
+    adminEventDate: 'Fecha del evento',
+    adminGuests: 'Numero de invitados',
+    adminPeople: 'personas',
+    adminMessage: 'Mensaje',
+    adminSelectedPack: 'Pack seleccionado',
+    adminRequestedExtras: 'Extras solicitados',
+    adminCallNow: 'Llamar a',
+    adminReplyByEmail: 'Responder por email',
+    adminReplySubjectPrefix: 'Re: Tu solicitud en Orbita Events',
+    adminSystemFooter: 'Orbita Events | Sistema de leads automatizado',
+    adminMailSubjectPrefix: 'NUEVO LEAD',
+    adminMailFrom: 'Orbita Events Web',
+    clientHeader: 'Mensaje recibido',
+    clientGreeting: 'Hola',
+    clientThanks: 'Gracias por contactar con',
+    clientReceivedFor: 'Hemos recibido tu solicitud para',
+    clientReference: 'Tu referencia',
+    clientSaveCode: 'Guarda este codigo para cualquier consulta',
+    clientStep1Title: 'Revisamos tu solicitud',
+    clientStep1Text: 'En las proximas horas analizamos tus necesidades.',
+    clientStep2Title: 'Te contactamos en menos de 2 horas',
+    clientStep2Text: 'Incluso fines de semana.',
+    clientStep3Title: 'Presupuesto personalizado',
+    clientStep3Text: 'Te enviamos una propuesta detallada adaptada a tu evento.',
+    clientEstimatedBudget: 'Presupuesto estimado',
+    clientEstimatedNote: '*Precio orientativo. Confirmaremos el precio final en nuestro email.',
+    clientCallNow: 'Llamar ahora al',
+    clientReasonEmail: 'Has recibido este email porque solicitaste informacion en orbitaevents.com.',
+    clientMailSubjectPrefix: 'Recibido! Tu solicitud para',
+    successMessage: 'Mensaje enviado con exito',
+    estimatedResponse: '2-4 horas',
+    sendError: 'Error al enviar el mensaje. Si lo prefieres, llamanos al',
+    retrySuffix: 'o vuelve a intentarlo.',
+  },
+  en: {
+    nameTooShort: 'Name is too short',
+    enterEmailOrPhone: 'Enter email or phone',
+    selectEventType: 'Select event type',
+    invalidData: 'Invalid data',
+    captchaFailed: 'Security verification failed. Please try again.',
+    noteNewWebContact: 'New web contact',
+    notePack: 'Pack',
+    noteMessage: 'Message',
+    noteLeadCreatedVia: 'Lead created via',
+    viaConfigurator: 'configurator',
+    viaWebForm: 'web form',
+    noteInterestedPack: 'Interested pack',
+    notePhoneContact: 'Phone contact',
+    adminLeadTitle: 'NEW LEAD',
+    adminCustomer: 'Customer',
+    adminEmail: 'Email',
+    adminPhone: 'Phone',
+    adminEventType: 'Event type',
+    adminEventDate: 'Event date',
+    adminGuests: 'Guests',
+    adminPeople: 'people',
+    adminMessage: 'Message',
+    adminSelectedPack: 'Selected pack',
+    adminRequestedExtras: 'Requested extras',
+    adminCallNow: 'Call',
+    adminReplyByEmail: 'Reply by email',
+    adminReplySubjectPrefix: 'Re: Your request at Orbita Events',
+    adminSystemFooter: 'Orbita Events | Automated lead system',
+    adminMailSubjectPrefix: 'NEW LEAD',
+    adminMailFrom: 'Orbita Events Web',
+    clientHeader: 'Message received',
+    clientGreeting: 'Hi',
+    clientThanks: 'Thanks for contacting',
+    clientReceivedFor: 'We have received your request for',
+    clientReference: 'Your reference',
+    clientSaveCode: 'Save this code for any query',
+    clientStep1Title: 'We review your request',
+    clientStep1Text: 'In the next few hours we analyse your needs.',
+    clientStep2Title: 'We contact you in less than 2 hours',
+    clientStep2Text: 'Even on weekends.',
+    clientStep3Title: 'Custom quote',
+    clientStep3Text: 'We send you a detailed proposal tailored to your event.',
+    clientEstimatedBudget: 'Estimated quote',
+    clientEstimatedNote: '*Indicative price. We will confirm final price by email.',
+    clientCallNow: 'Call now at',
+    clientReasonEmail: 'You received this email because you requested information at orbitaevents.com.',
+    clientMailSubjectPrefix: 'Received! Your request for',
+    successMessage: 'Message sent successfully',
+    estimatedResponse: '2-4 hours',
+    sendError: 'Error sending message. If you prefer, call us at',
+    retrySuffix: 'or try again.',
+  },
+};
+
+const EVENT_TYPE_LABELS: Record<Locale, Record<string, string>> = {
+  ca: {
+    boda: 'Casament', bodas: 'Casament', wedding: 'Casament', discomovil: 'Discomòbil',
+    empresa: 'Esdeveniment corporatiu', empresas: 'Esdeveniment corporatiu', corporate: 'Esdeveniment corporatiu',
+    fiesta: 'Festa privada', fiestas: 'Festa privada',
+    cumpleanos: 'Aniversari', cumpleanyos: 'Aniversari', birthday: 'Aniversari',
+    communion: 'Comunió', baptism: 'Bateig', graduation: 'Graduació', anniversary: 'Aniversari',
+    tematizacion: 'Tematització', produccion: 'Producció tècnica', alquiler: "Lloguer d'equip",
+    otro: 'Altre', other: 'Altre',
+  },
+  es: {
+    boda: 'Boda', bodas: 'Boda', wedding: 'Boda', discomovil: 'Discomovil',
+    empresa: 'Evento corporativo', empresas: 'Evento corporativo', corporate: 'Evento corporativo',
+    fiesta: 'Fiesta privada', fiestas: 'Fiesta privada',
+    cumpleanos: 'Cumpleanos', cumpleanyos: 'Cumpleanos', birthday: 'Cumpleanos',
+    communion: 'Comunion', baptism: 'Bautizo', graduation: 'Graduacion', anniversary: 'Aniversario',
+    tematizacion: 'Tematizacion', produccion: 'Produccion tecnica', alquiler: 'Alquiler de equipo',
+    otro: 'Otro', other: 'Otro',
+  },
+  en: {
+    boda: 'Wedding', bodas: 'Wedding', wedding: 'Wedding', discomovil: 'Mobile disco',
+    empresa: 'Corporate event', empresas: 'Corporate event', corporate: 'Corporate event',
+    fiesta: 'Private party', fiestas: 'Private party',
+    cumpleanos: 'Birthday', cumpleanyos: 'Birthday', birthday: 'Birthday',
+    communion: 'Communion', baptism: 'Baptism', graduation: 'Graduation', anniversary: 'Anniversary',
+    tematizacion: 'Theming', produccion: 'Technical production', alquiler: 'Equipment rental',
+    otro: 'Other', other: 'Other',
+  },
+};
+
+function resolveLocale(req: NextRequest, candidate?: string): Locale {
+  const c = (candidate || '').toLowerCase();
+  if (c === 'ca' || c === 'es' || c === 'en') return c as Locale;
+  const lang = req.headers.get('accept-language')?.toLowerCase() || '';
+  if (lang.includes('ca')) return 'ca';
+  if (lang.includes('en')) return 'en';
+  return 'es';
+}
+
+// Validacio de dades amb Zod
+const contactSchema = (t: Record<string, string>) => z.object({
+  name: z.string().min(2, t.nameTooShort).max(50),
+  contact: z.string().min(3, t.enterEmailOrPhone),
+  event: z.string().min(1, t.selectEventType),
   message: z.string().optional(),
   packId: z.string().optional(),
   packName: z.string().optional(),
@@ -26,31 +229,6 @@ const contactSchema = z.object({
   locale: z.string().optional(),
   turnstileToken: z.string().optional(),
 });
-
-// Mapeo de tipos de evento para emails
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  boda: 'Boda',
-  bodas: 'Boda',
-  wedding: 'Boda',
-  discomovil: 'Discomovil',
-  empresa: 'Evento corporativo',
-  empresas: 'Evento corporativo',
-  corporate: 'Evento corporativo',
-  fiesta: 'Fiesta privada',
-  fiestas: 'Fiesta privada',
-  cumpleanos: 'Cumpleanos',
-  cumpleanyos: 'Cumpleanos',
-  birthday: 'Cumpleanos',
-  communion: 'Comunion',
-  baptism: 'Bautizo',
-  graduation: 'Graduacion',
-  anniversary: 'Aniversario',
-  tematizacion: 'Tematizacion',
-  produccion: 'Produccion tecnica',
-  alquiler: 'Alquiler de equipo',
-  otro: 'Otro',
-  other: 'Otro',
-};
 
 function mapEventType(eventStr: string): EventType {
   const normalized = eventStr.toLowerCase();
@@ -76,14 +254,18 @@ export async function POST(req: NextRequest) {
 
   const rateLimitResult = await checkRateLimit(req, RATE_LIMITS.contact);
   if (rateLimitResult) return rateLimitResult;
+  let locale = resolveLocale(req);
+  let t = CONTACT_COPY[locale];
 
   try {
     const body = await req.json();
-    const parsed = contactSchema.safeParse(body);
+    locale = resolveLocale(req, typeof body?.locale === 'string' ? body.locale : undefined);
+    t = CONTACT_COPY[locale];
+    const parsed = contactSchema(t).safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Datos invalidos', details: parsed.error.format() },
+        { error: t.invalidData, details: parsed.error.format() },
         { status: 400 }
       );
     }
@@ -96,7 +278,7 @@ export async function POST(req: NextRequest) {
 
     if (!isValidCaptcha) {
       return NextResponse.json(
-        { error: 'Verificacion de seguridad fallida. Por favor intenta de nuevo.' },
+        { error: t.captchaFailed },
         { status: 403 }
       );
     }
@@ -112,7 +294,7 @@ export async function POST(req: NextRequest) {
       eventDate,
       guests,
       extras,
-      locale,
+      locale: formLocale,
     } = parsed.data;
 
     const isEmail = contact.includes('@');
@@ -120,13 +302,13 @@ export async function POST(req: NextRequest) {
     const clientPhone: string | undefined = isEmail ? undefined : contact.replace(/[^\d+]/g, '');
 
     const leadId = `OE-${Date.now().toString(36).toUpperCase()}`;
-    const timestamp = new Date().toLocaleString('es-ES', {
+    const timestamp = new Date().toLocaleString(locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES', {
       timeZone: 'Europe/Madrid',
       dateStyle: 'full',
       timeStyle: 'short',
     });
 
-    const eventLabel = EVENT_TYPE_LABELS[event.toLowerCase()] || event;
+    const eventLabel = EVENT_TYPE_LABELS[locale][event.toLowerCase()] || event;
 
     let _savedLeadId: string | null = null;
 
@@ -149,7 +331,7 @@ export async function POST(req: NextRequest) {
             interestedPackId: packId || existingLead.interestedPackId,
             interestedExtras: extras && extras.length > 0 ? extras : existingLead.interestedExtras,
             source: determineSource(packId, packName),
-            preferredLocale: locale || existingLead.preferredLocale,
+            preferredLocale: formLocale || locale || existingLead.preferredLocale,
             updatedAt: new Date(),
           }
         });
@@ -158,7 +340,7 @@ export async function POST(req: NextRequest) {
         await prisma.leadNote.create({
           data: {
             leadId: updatedLead.id,
-            content: `Nuevo contacto via web: ${eventLabel}${packName ? ` - Pack: ${packName}` : ''}${message ? `\nMensaje: ${message}` : ''}`,
+            content: `${t.noteNewWebContact}: ${eventLabel}${packName ? ` - ${t.notePack}: ${packName}` : ''}${message ? `\n${t.noteMessage}: ${message}` : ''}`,
           }
         });
       } else {
@@ -179,7 +361,7 @@ export async function POST(req: NextRequest) {
             source: determineSource(packId, packName),
             status: 'NEW',
             priority: 'MEDIUM',
-            preferredLocale: locale || 'ca',
+            preferredLocale: formLocale || locale || 'ca',
           }
         });
         _savedLeadId = newLead.id;
@@ -187,7 +369,7 @@ export async function POST(req: NextRequest) {
         await prisma.leadNote.create({
           data: {
             leadId: newLead.id,
-            content: `Lead creado via ${packId ? 'configurador' : 'formulario web'}${packName ? ` - Pack interesado: ${packName}` : ''}${!clientEmail ? ` (Contacto por telefono: ${clientPhone})` : ''}`,
+            content: `${t.noteLeadCreatedVia} ${packId ? t.viaConfigurator : t.viaWebForm}${packName ? ` - ${t.noteInterestedPack}: ${packName}` : ''}${!clientEmail ? ` (${t.notePhoneContact}: ${clientPhone})` : ''}`,
           }
         });
       }
@@ -257,59 +439,59 @@ export async function POST(req: NextRequest) {
 <body>
   <div class="container">
     <div class="header">
-      <h1>NUEVO LEAD</h1>
+      <h1>${t.adminLeadTitle}</h1>
       <div class="lead-id">ID: ${leadId} | ${timestamp}</div>
     </div>
 
     <div class="content">
       <div class="field">
-        <div class="field-label">Cliente</div>
+        <div class="field-label">${t.adminCustomer}</div>
         <div class="field-value">${escapeHtml(name)}</div>
       </div>
 
       <div class="field">
-        <div class="field-label">${isEmail ? 'Email' : 'Telefono'}</div>
+        <div class="field-label">${isEmail ? t.adminEmail : t.adminPhone}</div>
         <div class="field-value">${escapeHtml(contact)}</div>
       </div>
 
       <div class="field">
-        <div class="field-label">Tipo de evento</div>
+        <div class="field-label">${t.adminEventType}</div>
         <div class="field-value">${escapeHtml(eventLabel)}</div>
       </div>
 
       ${eventDate ? `
       <div class="field">
-        <div class="field-label">Fecha del evento</div>
+        <div class="field-label">${t.adminEventDate}</div>
         <div class="field-value">${eventDate}</div>
       </div>
       ` : ''}
 
       ${guests ? `
       <div class="field">
-        <div class="field-label">Numero de invitados</div>
-        <div class="field-value">${guests} personas</div>
+        <div class="field-label">${t.adminGuests}</div>
+        <div class="field-value">${guests} ${t.adminPeople}</div>
       </div>
       ` : ''}
 
       ${message ? `
       <div class="field">
-        <div class="field-label">Mensaje</div>
+        <div class="field-label">${t.adminMessage}</div>
         <div class="field-value">${escapeHtml(message)}</div>
       </div>
       ` : ''}
 
       ${packName ? `
       <div class="highlight-box">
-        <div class="field-label">Pack seleccionado</div>
+        <div class="field-label">${t.adminSelectedPack}</div>
         <div class="field-value">${escapeHtml(packName)}</div>
-        ${estimatedPrice ? `<div class="price">${estimatedPrice.toLocaleString('es-ES')} EUR</div>` : ''}
+        ${estimatedPrice ? `<div class="price">${estimatedPrice.toLocaleString(locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES')} EUR</div>` : ''}
         ${packId ? `<div style="font-size: 12px; color: #666; margin-top: 8px;">ID: ${escapeHtml(packId)}</div>` : ''}
       </div>
       ` : ''}
 
       ${extras && Array.isArray(extras) && extras.length > 0 ? `
       <div class="field">
-        <div class="field-label">Extras solicitados</div>
+        <div class="field-label">${t.adminRequestedExtras}</div>
         <div class="extras-list">
           ${extras.filter(e => e != null).map(e => `<span class="extra-tag">${String(e).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`).join('')}
         </div>
@@ -317,18 +499,18 @@ export async function POST(req: NextRequest) {
       ` : ''}
 
       ${clientPhone ? `
-      <a href="tel:${escapeHtml(clientPhone)}" class="cta-button">Llamar a ${escapeHtml(name)}</a>
+      <a href="tel:${escapeHtml(clientPhone)}" class="cta-button">${t.adminCallNow} ${escapeHtml(name)}</a>
       ` : ''}
 
       ${isEmail ? `
-      <a href="mailto:${clientEmail}?subject=${encodeURIComponent('Re: Tu solicitud en Orbita Events - ' + eventLabel)}" class="cta-button" style="background: #4A90D9;">
-        Responder por email
+      <a href="mailto:${clientEmail}?subject=${encodeURIComponent(`${t.adminReplySubjectPrefix} - ${eventLabel}`)}" class="cta-button" style="background: #4A90D9;">
+        ${t.adminReplyByEmail}
       </a>
       ` : ''}
     </div>
 
     <div class="footer">
-      Orbita Events | Sistema de leads automatizado<br>
+      ${t.adminSystemFooter}<br>
       ${timestamp}
     </div>
   </div>
@@ -341,10 +523,10 @@ export async function POST(req: NextRequest) {
       sendEmailWithTimeout(
         {
           to: adminEmail,
-          subject: `NUEVO LEAD: ${name} - ${eventLabel} ${estimatedPrice ? `(${estimatedPrice} EUR)` : ''}`,
+          subject: `${t.adminMailSubjectPrefix}: ${name} - ${eventLabel} ${estimatedPrice ? `(${estimatedPrice} EUR)` : ''}`,
           html: adminEmailHtml,
           replyTo: clientEmail || undefined,
-          from: `"Orbita Events Web" <${smtpFrom}>`,
+          from: `"${t.adminMailFrom}" <${smtpFrom}>`,
         },
         8000
       ).catch((emailError) => {
@@ -383,32 +565,32 @@ export async function POST(req: NextRequest) {
 <body>
   <div class="container">
     <div class="header">
-      <h1>Mensaje recibido</h1>
+      <h1>${t.clientHeader}</h1>
     </div>
 
     <div class="content">
-      <p class="greeting">Hola <strong>${escapeHtml(name)}</strong>,</p>
+      <p class="greeting">${t.clientGreeting} <strong>${escapeHtml(name)}</strong>,</p>
 
-      <p>Gracias por contactar con <strong>Orbita Events</strong>. Hemos recibido tu solicitud para <strong>${escapeHtml(eventLabel)}</strong>.</p>
+      <p>${t.clientThanks} <strong>Orbita Events</strong>. ${t.clientReceivedFor} <strong>${escapeHtml(eventLabel)}</strong>.</p>
 
       <div class="info-box">
-        <strong>Tu referencia: ${leadId}</strong><br>
-        <span style="font-size: 14px; color: #666;">Guarda este codigo para cualquier consulta</span>
+        <strong>${t.clientReference}: ${leadId}</strong><br>
+        <span style="font-size: 14px; color: #666;">${t.clientSaveCode}</span>
       </div>
 
-      <div class="step"><strong>Revisamos tu solicitud</strong><br>En las proximas horas analizamos tus necesidades.</div>
-      <div class="step"><strong>Te contactamos en menos de 2 horas</strong><br>Incluso fines de semana.</div>
-      <div class="step"><strong>Presupuesto personalizado</strong><br>Te enviamos una propuesta detallada adaptada a tu evento.</div>
+      <div class="step"><strong>${t.clientStep1Title}</strong><br>${t.clientStep1Text}</div>
+      <div class="step"><strong>${t.clientStep2Title}</strong><br>${t.clientStep2Text}</div>
+      <div class="step"><strong>${t.clientStep3Title}</strong><br>${t.clientStep3Text}</div>
 
       ${estimatedPrice ? `
       <div class="info-box" style="border-left-color: #25D366; background: #f0fff4;">
-        <strong>Presupuesto estimado: ${estimatedPrice.toLocaleString('es-ES')} EUR</strong><br>
-        <span style="font-size: 14px; color: #666;">*Precio orientativo. Confirmaremos el precio final en nuestro email.</span>
+        <strong>${t.clientEstimatedBudget}: ${estimatedPrice.toLocaleString(locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES')} EUR</strong><br>
+        <span style="font-size: 14px; color: #666;">${t.clientEstimatedNote}</span>
       </div>
       ` : ''}
 
       <div class="cta-section">
-        <a href="tel:${SITE_CONFIG.business.phone}" class="cta-button">Llamar ahora al ${SITE_CONFIG.business.phoneDisplay}</a>
+        <a href="tel:${SITE_CONFIG.business.phone}" class="cta-button">${t.clientCallNow} ${SITE_CONFIG.business.phoneDisplay}</a>
       </div>
     </div>
 
@@ -416,7 +598,7 @@ export async function POST(req: NextRequest) {
       <strong>Orbita Events</strong><br>
       <a href="tel:${SITE_CONFIG.business.phone}">${SITE_CONFIG.business.phoneDisplay}</a> |
       <a href="mailto:${SITE_CONFIG.business.email}">${SITE_CONFIG.business.email}</a><br><br>
-      Has recibido este email porque solicitaste informacion en orbitaevents.com.
+      ${t.clientReasonEmail}
     </div>
   </div>
 </body>
@@ -425,7 +607,7 @@ export async function POST(req: NextRequest) {
         sendEmailWithTimeout(
           {
             to: clientEmail,
-            subject: `Recibido! Tu solicitud para ${eventLabel} - Orbita Events`,
+            subject: `${t.clientMailSubjectPrefix} ${eventLabel} - Orbita Events`,
             html: clientEmailHtml,
           },
           8000
@@ -443,9 +625,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      message: 'Mensaje enviado con exito',
+      message: t.successMessage,
       leadId,
-      estimatedResponse: '2-4 horas',
+      estimatedResponse: t.estimatedResponse,
     });
 
   } catch (error) {
@@ -453,7 +635,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        error: `Error al enviar el mensaje. Si lo prefieres, llamanos al ${SITE_CONFIG.business.phoneDisplay} o vuelve a intentarlo.`,
+        error: `${t.sendError} ${SITE_CONFIG.business.phoneDisplay} ${t.retrySuffix}`,
         phone: SITE_CONFIG.business.phone,
         debug: process.env.NODE_ENV === 'development' ? String(error) : undefined,
       },
