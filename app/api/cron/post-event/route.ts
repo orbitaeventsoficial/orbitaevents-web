@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
         batch.map(async (booking): Promise<ProcessedResult> => {
           const email = booking.clientEmail;
           const name = booking.clientName;
-          const locale = booking.lead?.preferredLocale || 'es';
+            const locale = booking.lead?.preferredLocale || 'ca';
 
           if (!email || email.includes('@leads.orbitaevents.local')) {
             return {
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
               clientName: name,
               email: email || 'N/A',
               status: 'skipped',
-              reason: 'No valid email',
+              reason: 'No hi ha un correu vàlid',
             };
           }
 
@@ -171,7 +171,7 @@ export async function GET(request: NextRequest) {
               clientName: name,
               email,
               status: 'error',
-              reason: emailError instanceof Error ? emailError.message : 'Unknown error',
+              reason: emailError instanceof Error ? emailError.message : 'Error desconegut',
             };
           }
         })
@@ -200,8 +200,8 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(
       {
-        error: 'Error procesando eventos',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: 'Error processant esdeveniments',
+        details: error instanceof Error ? error.message : 'Error desconegut',
       },
       { status: 500 }
     );
@@ -210,11 +210,11 @@ export async function GET(request: NextRequest) {
 
 function getSubjectLine(locale: string, name: string): string {
   const subjects: Record<string, string> = {
-    es: `${name}, gracias por confiar en nosotros. Que tal fue tu evento?`,
-    ca: `${name}, gracies per confiar en nosaltres. Com va anar el teu event?`,
+    es: `${name}, gracias por confiar en nosotros. ¿Qué tal fue tu evento?`,
+    ca: `${name}, gràcies per confiar en nosaltres. Com va anar el teu esdeveniment?`,
     en: `${name}, thank you for trusting us. How was your event?`,
   };
-  return subjects[locale] || subjects.es;
+  return subjects[locale] || subjects.ca;
 }
 
 function generatePostEventEmail(params: {
@@ -228,7 +228,7 @@ function generatePostEventEmail(params: {
   const { name, packName, eventDate, reviewUrl, googleReviewUrl, locale } = params;
 
   const firstName = name.split(' ')[0];
-  const formattedDate = eventDate.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', {
+  const formattedDate = eventDate.toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -238,30 +238,30 @@ function generatePostEventEmail(params: {
     es: {
       title: 'Gracias por tu confianza',
       greeting: `Hola ${firstName},`,
-      intro: `Esperamos que tu evento del <strong>${formattedDate}</strong> con el <strong>${packName}</strong> haya sido increible y que tu y tus invitados hayais disfrutado al maximo.`,
-      question: 'Nos dejas tu opinion?',
-      explanation: 'Tu feedback nos ayuda a mejorar y ademas tenemos un regalo para ti.',
-      reward: 'Al dejarnos tu valoracion recibiras un codigo de descuento exclusivo para tu proximo evento o para compartir con amigos y familiares.',
-      cta: 'Dejar mi valoracion',
-      bonus: 'Cuanto mas compartas, mayor descuento',
+      intro: `Esperamos que tu evento del <strong>${formattedDate}</strong> con el <strong>${packName}</strong> haya sido increíble y que tú y tus invitados lo hayáis disfrutado al máximo.`,
+      question: '¿Nos dejas tu opinión?',
+      explanation: 'Tu opinión nos ayuda a mejorar y, además, tenemos un regalo para ti.',
+      reward: 'Al dejarnos tu valoración, recibirás un código de descuento exclusivo para tu próximo evento o para compartir con amigos y familiares.',
+      cta: 'Dejar mi valoración',
+      bonus: 'Cuanto más compartas, mayor descuento',
       bonusDetails: '+5% extra si compartes foto / +10% extra si compartes video',
-      googleText: 'Tambien puedes dejarnos una resena en Google:',
-      googleCta: 'Resena en Google',
-      footer: 'Gracias por formar parte de la familia Orbita Events',
+      googleText: 'También puedes dejarnos una reseña en Google:',
+      googleCta: 'Reseña en Google',
+      footer: 'Gracias por formar parte de la familia Òrbita Events',
     },
     ca: {
-      title: 'Gracies per la teva confiança',
+      title: 'Gràcies per la teva confiança',
       greeting: `Hola ${firstName},`,
-      intro: `Esperem que el teu event del <strong>${formattedDate}</strong> amb el <strong>${packName}</strong> hagi estat increible i que tu i els teus convidats hagueu gaudit al maxim.`,
-      question: 'Ens deixes la teva opinio?',
-      explanation: 'El teu feedback ens ajuda a millorar i a mes tenim un regal per a tu.',
-      reward: 'En deixar-nos la teva valoracio rebras un codi de descompte exclusiu pel teu proxim event o per compartir amb amics i familiars.',
-      cta: 'Deixar la meva valoracio',
-      bonus: 'Com mes comparteixis, mes descompte',
+      intro: `Esperem que el teu esdeveniment del <strong>${formattedDate}</strong> amb el <strong>${packName}</strong> hagi estat increïble i que tu i els teus convidats n’hàgiu gaudit al màxim.`,
+      question: 'Ens deixes la teva opinió?',
+      explanation: 'La teva opinió ens ajuda a millorar i, a més, tenim un regal per a tu.',
+      reward: 'En deixar-nos la teva valoració, rebràs un codi de descompte exclusiu per al teu pròxim esdeveniment o per compartir amb amics i familiars.',
+      cta: 'Deixar la meva valoració',
+      bonus: 'Com més comparteixis, més descompte',
       bonusDetails: '+5% extra si comparteixes foto / +10% extra si comparteixes video',
-      googleText: 'Tambe pots deixar-nos una ressenya a Google:',
+      googleText: 'També pots deixar-nos una ressenya a Google:',
       googleCta: 'Ressenya a Google',
-      footer: 'Gracies per formar part de la familia Orbita Events',
+      footer: 'Gràcies per formar part de la família Òrbita Events',
     },
     en: {
       title: 'Thank you for your trust',

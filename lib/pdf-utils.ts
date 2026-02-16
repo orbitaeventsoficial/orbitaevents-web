@@ -376,7 +376,7 @@ export async function generateQuotePDF(
   const t = {
     ca: {
       quote: 'Pressupost',
-      eventDetails: 'Detalls de l\'event',
+      eventDetails: 'Detalls de l\'esdeveniment',
       eventDate: 'Data',
       schedule: 'Horari',
       location: 'Lloc',

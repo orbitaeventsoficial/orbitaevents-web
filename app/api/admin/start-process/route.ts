@@ -158,7 +158,7 @@ async function sendReviewRequestEmail(customer: { name: string; email: string },
             <h2 style="color: #FFB800; margin-top: 0;">Hola ${customer.name.split(' ')[0]}!</h2>
 
             <p style="font-size: 16px; line-height: 1.6;">
-              Esperem que el teu event hagi anat genial! 🎉
+              Esperem que el teu esdeveniment hagi anat genial! 🎉
             </p>
 
             <p style="font-size: 16px; line-height: 1.6;">
@@ -166,7 +166,7 @@ async function sendReviewRequestEmail(customer: { name: string; email: string },
             </p>
 
             <p style="font-size: 16px; line-height: 1.6;">
-              Com a agraïment, rebràs un <strong style="color: #FFB800;">descompte de fins al 25%</strong> per al teu pròxim event!
+              Com a agraïment, rebràs un <strong style="color: #FFB800;">descompte de fins al 25%</strong> per al teu pròxim esdeveniment!
             </p>
 
             <div style="text-align: center; margin: 30px 0;">
@@ -270,7 +270,7 @@ async function sendWelcomeEmail(customer: { name: string; email: string }, local
             <h2 style="color: #FFB800; margin-top: 0;">Hola ${customer.name.split(' ')[0]}!</h2>
 
             <p style="font-size: 16px; line-height: 1.6;">
-              Gràcies per confiar en Òrbita Events per als teus events especials.
+              Gràcies per confiar en Òrbita Events per als teus esdeveniments especials.
             </p>
 
             <p style="font-size: 16px; line-height: 1.6;">
@@ -364,7 +364,7 @@ async function sendPromoEmail(customer: { name: string; email: string }) {
             </div>
 
             <p style="font-size: 14px; color: #888;">
-              Contacta'ns per reservar el teu pròxim event!
+              Contacta'ns per reservar el teu pròxim esdeveniment!
             </p>
           </div>
 

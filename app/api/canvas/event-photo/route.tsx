@@ -1,5 +1,5 @@
 // app/api/canvas/event-photo/route.tsx
-// Canvas dinàmic amb foto de l'event del client + codi de descompte
+// Canvas dinàmic amb foto de l'esdeveniment del client + codi de descompte
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 
@@ -31,10 +31,10 @@ export async function GET(req: NextRequest) {
   const eventLabels: Record<string, string> = {
     WEDDING: 'la teva boda',
     BIRTHDAY: 'el teu aniversari',
-    CORPORATE: 'el teu event corporatiu',
+    CORPORATE: 'el teu esdeveniment corporatiu',
     COMMUNION: 'la teva comunió',
     BAPTISM: 'el teu bateig',
-    event: 'el teu event',
+    event: 'el teu esdeveniment',
   };
 
   const eventLabel = eventLabels[eventType] || eventLabels.event;
@@ -220,7 +220,7 @@ export async function GET(req: NextRequest) {
                 marginTop: '12px',
               }}
             >
-              Vàlid pel teu pròxim event
+              Vàlid per al teu pròxim esdeveniment
             </span>
           </div>
 
