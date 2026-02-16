@@ -46,8 +46,8 @@ async function getBookings(pageParam?: string) {
           skip: (page - 1) * pageSize,
           take: pageSize,
           include: {
-            pack: { include: { translations: { where: { locale: 'ca' } } } },
-            lead: { select: { id: true, name: true, source: true } },
+            pack: { include: { translations: true } },
+            lead: { select: { id: true, name: true, source: true, preferredLocale: true } },
             _count: { select: { extras: true } },
           },
         }),
@@ -79,6 +79,20 @@ async function getBookings(pageParam?: string) {
       pagination: { page: 1, pageSize: 25, total: 0, totalPages: 1 },
     };
   }
+}
+
+function getPackName(
+  translations: Array<{ locale: string; name: string }>,
+  fallback: string,
+  locale?: string | null
+) {
+  const preferred = String(locale || 'ca').toLowerCase();
+  return (
+    translations.find((t) => t.locale === preferred)?.name ||
+    translations.find((t) => t.locale === 'ca')?.name ||
+    translations[0]?.name ||
+    fallback
+  );
 }
 
 function formatDate(date: Date): string {
@@ -211,7 +225,7 @@ export default async function BookingsPage({
                   <div className="flex items-center gap-2">
                     <span className="text-slate-300">{eventType}</span>
                     <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-medium">
-                      {booking.pack.translations[0]?.name || booking.pack.slug}
+                      {getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale)}
                     </span>
                   </div>
                   <span className="text-slate-400 font-medium">
@@ -279,7 +293,7 @@ export default async function BookingsPage({
                       </td>
                       <td className="px-4 py-3">
                         <span className="inline-flex rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs font-medium text-cyan-300">
-                          {booking.pack.translations[0]?.name || booking.pack.slug}
+                          {getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale)}
                         </span>
                         {booking._count.extras > 0 && (
                           <span className="ml-1 text-xs text-slate-500">+{booking._count.extras}</span>

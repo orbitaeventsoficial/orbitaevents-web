@@ -7,6 +7,20 @@ export const metadata = {
   title: 'Feedback post-esdeveniment | Òrbita Admin',
 };
 
+function getPackName(
+  translations: Array<{ locale: string; name: string }>,
+  fallback: string,
+  locale?: string | null
+) {
+  const preferred = String(locale || 'ca').toLowerCase();
+  return (
+    translations.find((t) => t.locale === preferred)?.name ||
+    translations.find((t) => t.locale === 'ca')?.name ||
+    translations[0]?.name ||
+    fallback
+  );
+}
+
 async function getCompletedBookings() {
   return prisma.booking.findMany({
     where: {
@@ -16,7 +30,8 @@ async function getCompletedBookings() {
     orderBy: { eventDate: 'desc' },
     take: 50,
     include: {
-      pack: { include: { translations: { where: { locale: 'es' } } } },
+      pack: { include: { translations: true } },
+      lead: { select: { preferredLocale: true } },
       clientSurvey: true,
     },
   });
@@ -65,7 +80,7 @@ export default async function FeedbackPage() {
       ) : (
         <div className="space-y-3">
           {bookings.map((booking) => {
-            const packName = booking.pack.translations[0]?.name || booking.pack.slug;
+            const packName = getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
             const hasSurvey = !!booking.clientSurvey;
 
             return (

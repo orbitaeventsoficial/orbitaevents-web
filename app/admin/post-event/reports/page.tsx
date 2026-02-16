@@ -7,13 +7,28 @@ export const metadata = {
   title: 'Informes Post-Event | Òrbita Admin',
 };
 
+function getPackName(
+  translations: Array<{ locale: string; name: string }>,
+  fallback: string,
+  locale?: string | null
+) {
+  const preferred = String(locale || 'ca').toLowerCase();
+  return (
+    translations.find((t) => t.locale === preferred)?.name ||
+    translations.find((t) => t.locale === 'ca')?.name ||
+    translations[0]?.name ||
+    fallback
+  );
+}
+
 async function getReports() {
   return prisma.postEventReport.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
       booking: {
         include: {
-          pack: { include: { translations: { where: { locale: 'es' } } } },
+          pack: { include: { translations: true } },
+          lead: { select: { preferredLocale: true } },
         },
       },
     },
@@ -29,7 +44,8 @@ async function getAvailableBookings() {
     orderBy: { eventDate: 'desc' },
     take: 5,
     include: {
-      pack: { include: { translations: { where: { locale: 'es' } } } },
+      pack: { include: { translations: true } },
+      lead: { select: { preferredLocale: true } },
     },
   });
 }
@@ -86,7 +102,7 @@ export default async function ReportsPage() {
           </div>
           <div className="divide-y divide-slate-100">
             {availableBookings.map((booking) => {
-              const packName = booking.pack.translations[0]?.name || booking.pack.slug;
+              const packName = getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
               return (
                 <div key={booking.id} className="p-4 flex items-center justify-between hover:bg-white/5">
                   <div>
@@ -122,7 +138,11 @@ export default async function ReportsPage() {
       ) : (
         <div className="space-y-3">
           {reports.map((report) => {
-            const packName = report.booking.pack.translations[0]?.name || report.booking.pack.slug;
+            const packName = getPackName(
+              report.booking.pack.translations,
+              report.booking.pack.slug,
+              report.booking.lead?.preferredLocale
+            );
             return (
               <div
                 key={report.id}

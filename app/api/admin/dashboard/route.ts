@@ -15,6 +15,10 @@ export async function GET(req: NextRequest) {
   if (authError) return authError;
 
   try {
+    const { searchParams } = new URL(req.url);
+    const localeParam = String(searchParams.get('locale') || 'ca').toLowerCase();
+    const locale =
+      localeParam.startsWith('es') ? 'es' : localeParam.startsWith('en') ? 'en' : 'ca';
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfYear = new Date(now.getFullYear(), 0, 1);
@@ -95,7 +99,7 @@ export async function GET(req: NextRequest) {
               status: { in: ['CONFIRMED', 'PREPARING'] },
             },
             include: {
-              pack: { include: { translations: { where: { locale: 'ca' } } } },
+              pack: { include: { translations: { where: { locale } } } },
             },
             orderBy: { eventDate: 'asc' },
             take: 5,
@@ -168,7 +172,7 @@ export async function GET(req: NextRequest) {
             orderBy: { createdAt: 'desc' },
             take: 5,
             include: {
-              pack: { include: { translations: { where: { locale: 'ca' } } } },
+              pack: { include: { translations: { where: { locale } } } },
             },
           }),
         CacheTTL.VERY_SHORT

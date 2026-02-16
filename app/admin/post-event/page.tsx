@@ -10,6 +10,20 @@ export const metadata = {
   title: 'Post-Event | Òrbita Admin',
 };
 
+function getPackName(
+  translations: Array<{ locale: string; name: string }>,
+  fallback: string,
+  locale?: string | null
+) {
+  const preferred = String(locale || 'ca').toLowerCase();
+  return (
+    translations.find((t) => t.locale === preferred)?.name ||
+    translations.find((t) => t.locale === 'ca')?.name ||
+    translations[0]?.name ||
+    fallback
+  );
+}
+
 async function getPostEventData() {
   try {
     const [
@@ -28,7 +42,8 @@ async function getPostEventData() {
         orderBy: { eventDate: 'desc' },
         take: 10,
         include: {
-          pack: { include: { translations: { where: { locale: 'es' } } } },
+          pack: { include: { translations: true } },
+          lead: { select: { preferredLocale: true } },
         },
       }),
       // Informes pendents (draft)
@@ -240,7 +255,7 @@ export default async function PostEventPage() {
         <div className="divide-y divide-slate-100">
           {data.recentBookings.map((booking) => {
             const packName =
-              booking.pack.translations[0]?.name || booking.pack.slug;
+              getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
             return (
               <div
                 key={booking.id}

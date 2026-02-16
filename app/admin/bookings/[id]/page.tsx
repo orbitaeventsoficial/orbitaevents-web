@@ -142,6 +142,18 @@ function parseLogDetails(details: unknown): Record<string, unknown> {
   return details as Record<string, unknown>;
 }
 
+function getPackTranslation(
+  translations: Array<{ locale: string; name: string; tagline?: string | null }>,
+  locale?: string | null
+) {
+  const preferred = String(locale || 'ca').toLowerCase();
+  return (
+    translations.find((t) => t.locale === preferred) ||
+    translations.find((t) => t.locale === 'ca') ||
+    translations[0]
+  );
+}
+
 export default async function BookingDetailPage({ params }: PageProps) {
   const booking = await getBooking(params.id);
 
@@ -151,7 +163,10 @@ export default async function BookingDetailPage({ params }: PageProps) {
 
   const statusConf = STATUS_CONFIG[booking.status] || STATUS_CONFIG.PENDING;
   const eventType = EVENT_TYPE_LABELS[booking.eventType] || booking.eventType;
-  const packTranslation = booking.pack.translations.find((t) => t.locale === 'ca');
+  const packTranslation = getPackTranslation(
+    booking.pack.translations,
+    booking.lead?.preferredLocale || (booking as any).preferredLocale || 'ca'
+  );
   const commLogs = await prisma.adminLog.findMany({
     where: {
       entity: 'booking',
@@ -420,7 +435,10 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <div className="space-y-2">
             <p className="text-sm font-medium text-slate-200">Extras</p>
             {booking.extras.map((extra) => {
-              const extraTranslation = extra.extra.translations.find((t) => t.locale === 'ca');
+              const extraTranslation = getPackTranslation(
+                extra.extra.translations as Array<{ locale: string; name: string; tagline?: string | null }>,
+                booking.lead?.preferredLocale || (booking as any).preferredLocale || 'ca'
+              );
               return (
                 <div key={extra.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                   <div>

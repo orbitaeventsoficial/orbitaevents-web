@@ -69,6 +69,9 @@ export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
+    const localeParam = String(searchParams.get('locale') || 'ca').toLowerCase();
+    const locale =
+      localeParam.startsWith('es') ? 'es' : localeParam.startsWith('en') ? 'en' : 'ca';
     const status = searchParams.get('status');
     const eventType = searchParams.get('eventType');
     const fromDate = searchParams.get('fromDate');
@@ -103,9 +106,9 @@ export async function GET(req: NextRequest) {
       prisma.booking.findMany({
         where,
         include: {
-          pack: { include: { translations: { where: { locale: 'ca' } } } },
-          extras: { include: { extra: { include: { translations: { where: { locale: 'ca' } } } } } },
-          lead: { select: { id: true, name: true, source: true } },
+          pack: { include: { translations: { where: { locale } } } },
+          extras: { include: { extra: { include: { translations: { where: { locale } } } } } },
+          lead: { select: { id: true, name: true, source: true, preferredLocale: true } },
           customer: { select: { id: true, name: true, email: true } },
         },
         orderBy: { eventDate: 'asc' },

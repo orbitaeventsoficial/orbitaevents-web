@@ -7,13 +7,28 @@ export const metadata = {
   title: 'Enquestes Post-Event | Òrbita Admin',
 };
 
+function getPackName(
+  translations: Array<{ locale: string; name: string }>,
+  fallback: string,
+  locale?: string | null
+) {
+  const preferred = String(locale || 'ca').toLowerCase();
+  return (
+    translations.find((t) => t.locale === preferred)?.name ||
+    translations.find((t) => t.locale === 'ca')?.name ||
+    translations[0]?.name ||
+    fallback
+  );
+}
+
 async function getSurveys() {
   return prisma.clientSurvey.findMany({
     orderBy: { submittedAt: 'desc' },
     include: {
       booking: {
         include: {
-          pack: { include: { translations: { where: { locale: 'es' } } } },
+          pack: { include: { translations: true } },
+          lead: { select: { preferredLocale: true } },
         },
       },
     },
@@ -83,7 +98,11 @@ export default async function SurveysPage() {
       ) : (
         <div className="space-y-3">
           {surveys.map((survey) => {
-            const packName = survey.booking.pack.translations[0]?.name || survey.booking.pack.slug;
+            const packName = getPackName(
+              survey.booking.pack.translations,
+              survey.booking.pack.slug,
+              survey.booking.lead?.preferredLocale
+            );
             return (
               <div
                 key={survey.id}
