@@ -247,7 +247,9 @@
       "Bash(\"C:\\\\ProgramData\\\\Package Cache\\\\{99c5cdc6-5e24-4e7b-a78f-47c300a00bff}\\\\PowerShell-7.5.4-win-x86.exe\" /uninstall /quiet /norestart)",
       "Bash(\"C:\\\\ProgramData\\\\Package Cache\\\\{99c5cdc6-5e24-4e7b-a78f-47c300a00bff}\\\\PowerShell-7.5.4-win-x86.exe\" /uninstall)",
       "Bash(pwsh -Command:*)",
-      "Bash(pwsh:*)"
+      "Bash(pwsh:*)",
+      "Bash(Sort-Object LastWriteTime -Descending)",
+      "Bash(Select-Object -First 20)"
     ]
   }
 }

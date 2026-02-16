@@ -87,8 +87,15 @@ export default function LeadActionsEnhanced({
         throw new Error(data.error || 'Error actualitzant estat');
       }
 
+      const payload = await res.json();
+      const customerId = payload?.lead?.customerId as string | undefined;
+
       setSuccess('Estat actualitzat!');
       startTransition(() => {
+        if (newStatus === 'WON' && customerId) {
+          router.push(`/admin/contactes/${customerId}`);
+          return;
+        }
         router.refresh();
       });
 

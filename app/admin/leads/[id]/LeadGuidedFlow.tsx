@@ -63,7 +63,15 @@ export default function LeadGuidedFlow({
         const data = await res.json();
         throw new Error(data.error || 'No s’ha pogut actualitzar l’estat');
       }
-      startTransition(() => router.refresh());
+      const payload = await res.json();
+      const customerId = payload?.lead?.customerId as string | undefined;
+      startTransition(() => {
+        if (nextStatus === 'WON' && customerId) {
+          router.push(`/admin/contactes/${customerId}`);
+          return;
+        }
+        router.refresh();
+      });
     } catch (e) {
       setStatus(previous);
       setError(e instanceof Error ? e.message : 'Error desconegut');

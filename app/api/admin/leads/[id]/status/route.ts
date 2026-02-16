@@ -47,8 +47,20 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         email: true,
         phone: true,
         name: true,
+        eventType: true,
+        eventDate: true,
+        eventLocation: true,
+        guestCount: true,
+        budget: true,
+        message: true,
+        interestedPackId: true,
+        interestedExtras: true,
         source: true,
         preferredLocale: true,
+        utmSource: true,
+        utmMedium: true,
+        utmCampaign: true,
+        landingPage: true,
       },
     });
 
@@ -126,6 +138,37 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         description: `${existingLead.status} → ${status}`,
       },
     });
+
+    // Traçabilitat CRM: quan es converteix a client, registrem context complet.
+    if (status === 'WON' && linkedCustomerId) {
+      await prisma.customerActivity.create({
+        data: {
+          customerId: linkedCustomerId,
+          action: 'LEAD_CONVERTED',
+          details: {
+            leadId: existingLead.id,
+            fromStatus: existingLead.status,
+            toStatus: status,
+            eventType: existingLead.eventType,
+            eventDate: existingLead.eventDate,
+            eventLocation: existingLead.eventLocation,
+            guestCount: existingLead.guestCount,
+            budget: existingLead.budget,
+            message: existingLead.message,
+            interestedPackId: existingLead.interestedPackId,
+            interestedExtras: existingLead.interestedExtras,
+            source: existingLead.source,
+            preferredLocale: existingLead.preferredLocale,
+            attribution: {
+              utmSource: existingLead.utmSource,
+              utmMedium: existingLead.utmMedium,
+              utmCampaign: existingLead.utmCampaign,
+              landingPage: existingLead.landingPage,
+            },
+          },
+        },
+      });
+    }
 
     return NextResponse.json({
       ok: true,
