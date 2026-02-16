@@ -31,15 +31,15 @@ export default function EmailConfigPanel() {
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || 'Error saving configuration');
+        throw new Error(data.error || "Error desant la configuració");
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-      log.info('Email configuration saved successfully', { config });
+      log.info('Configuració de correu desada correctament', { config });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      const errorMessage = err instanceof Error ? err.message : 'Error desconegut';
       setError(errorMessage);
-      log.error('Failed to save email configuration', err, {
+      log.error('No s’ha pogut desar la configuració de correu', err, {
         context: { config }
       });
     } finally {
@@ -50,11 +50,10 @@ export default function EmailConfigPanel() {
   return (
     <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-700/30">
-        <h2 className="font-semibold text-slate-100">⚙️ Configuracio</h2>
+        <h2 className="font-semibold text-slate-100">⚙️ Configuració</h2>
       </div>
 
       <div className="p-6 space-y-5">
-        {/* Google Review URL */}
         <div>
           <label className="text-sm font-medium text-slate-300 block mb-1">
             URL Google Reviews
@@ -67,10 +66,9 @@ export default function EmailConfigPanel() {
           />
         </div>
 
-        {/* Post Event Delay */}
         <div>
           <label className="text-sm font-medium text-slate-300 block mb-1">
-            Dies delay post-event
+            Dies de retard post-esdeveniment
           </label>
           <select
             value={config.postEventDelay}
@@ -83,7 +81,6 @@ export default function EmailConfigPanel() {
           </select>
         </div>
 
-        {/* Toggles */}
         <div className="space-y-3">
           <label className="flex items-center gap-3 cursor-pointer">
             <input
@@ -92,7 +89,7 @@ export default function EmailConfigPanel() {
               onChange={(e) => setConfig({ ...config, enablePostEvent: e.target.checked })}
               className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
             />
-            <span className="text-sm text-slate-300">Email post-event automatic</span>
+            <span className="text-sm text-slate-300">Correu post-esdeveniment automàtic</span>
           </label>
 
           <label className="flex items-center gap-3 cursor-pointer">
@@ -102,7 +99,7 @@ export default function EmailConfigPanel() {
               onChange={(e) => setConfig({ ...config, enableCanvas: e.target.checked })}
               className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
             />
-            <span className="text-sm text-slate-300">Email canvas + descompte</span>
+            <span className="text-sm text-slate-300">Correu de canvas + descompte</span>
           </label>
 
           <label className="flex items-center gap-3 cursor-pointer">
@@ -112,13 +109,12 @@ export default function EmailConfigPanel() {
               onChange={(e) => setConfig({ ...config, enableLeadConfirmation: e.target.checked })}
               className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
             />
-            <span className="text-sm text-slate-300">Confirmacio lead (al client)</span>
+            <span className="text-sm text-slate-300">Confirmació d’entrada (al client)</span>
           </label>
         </div>
 
-        {/* Discounts */}
         <div>
-          <p className="text-sm font-medium text-slate-300 mb-2">Percentatges descompte</p>
+          <p className="text-sm font-medium text-slate-300 mb-2">Percentatges de descompte</p>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="flex items-center justify-between bg-slate-700/50 px-3 py-2 rounded-lg text-slate-300">
               <span>Base:</span>
@@ -139,14 +135,12 @@ export default function EmailConfigPanel() {
           </div>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30" role="alert">
             <p className="text-sm text-rose-300">❌ {error}</p>
           </div>
         )}
 
-        {/* Save Button */}
         <button
           onClick={handleSave}
           disabled={saving}
@@ -160,7 +154,7 @@ export default function EmailConfigPanel() {
               : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
           }`}
         >
-          {saved ? '✅ Guardat!' : saving ? 'Guardant...' : '💾 Desar configuracio'}
+          {saved ? '✅ Desat!' : saving ? 'Desant...' : '💾 Desa configuració'}
         </button>
       </div>
     </section>

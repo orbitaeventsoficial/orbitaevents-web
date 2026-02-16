@@ -27,12 +27,12 @@ export default function SendPostEventButton({ bookingId }: { bookingId: string }
 
       if (!response.ok) {
         const data = await response.json().catch(() => null);
-        throw new Error(data?.error || 'Error sending email');
+        throw new Error(data?.error || "No s'ha pogut enviar el correu");
       }
 
       window.location.reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : 'Error desconegut');
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,7 @@ export default function SendPostEventButton({ bookingId }: { bookingId: string }
         aria-busy={loading}
         className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium rounded-xl shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {loading ? 'Sending...' : 'Enviar ahora'}
+        {loading ? 'Enviant...' : 'Envia ara'}
       </button>
       {error && (
         <span className="text-xs text-rose-400" role="alert">

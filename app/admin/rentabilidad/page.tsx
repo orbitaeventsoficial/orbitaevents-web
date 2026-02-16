@@ -32,7 +32,7 @@ export default async function RentabilidadPage() {
           entityId: 'profitability',
           action: 'ERROR',
           details: {
-            message: error instanceof Error ? error.message : 'Unknown profitability error',
+            message: error instanceof Error ? error.message : 'Error de rendibilitat desconegut',
           },
         },
       });
@@ -120,7 +120,7 @@ export default async function RentabilidadPage() {
         <>
           <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-white/10 bg-slate-950/60 p-4 shadow-sm">
-              <p className="text-xs text-slate-400">Ingressos realizados</p>
+              <p className="text-xs text-slate-400">Ingressos realitzats</p>
               <p className="text-2xl font-semibold text-slate-100">{money(report.realized.revenue)}</p>
               <p className="text-xs text-slate-400">{report.realized.bookings} esdeveniments completats</p>
             </div>
@@ -161,7 +161,7 @@ export default async function RentabilidadPage() {
                         {new Date(row.eventDate).toLocaleDateString('ca-ES')} · {row.source}
                       </p>
                       <p className="mt-1 text-xs text-emerald-300">
-                        Margen {money(row.netMargin)} ({pct(row.marginPct)})
+                        Marge {money(row.netMargin)} ({pct(row.marginPct)})
                       </p>
                     </Link>
                   ))
@@ -188,7 +188,7 @@ export default async function RentabilidadPage() {
                         {new Date(row.eventDate).toLocaleDateString('ca-ES')} · {row.source}
                       </p>
                       <p className="mt-1 text-xs text-rose-700">
-                        Margen {money(row.netMargin)} ({pct(row.marginPct)})
+                        Marge {money(row.netMargin)} ({pct(row.marginPct)})
                       </p>
                     </Link>
                   ))

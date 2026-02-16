@@ -134,7 +134,7 @@ export default function ComposeForm({ leads, packs }: Props) {
         setSending(false);
       }
     } else {
-      // Email normal
+      // Correu normal
       if (!to || !subject || !body) {
         setError('Omple tots els camps');
         return;
@@ -173,7 +173,6 @@ export default function ComposeForm({ leads, packs }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Mode selector */}
       <div className="flex gap-2 p-1 bg-slate-800/60 rounded-xl w-fit border border-slate-700/50">
         <button
           onClick={() => setMode('email')}
@@ -183,7 +182,7 @@ export default function ComposeForm({ leads, packs }: Props) {
             mode === 'email' ? 'bg-slate-700/80 text-slate-100 shadow' : 'text-slate-400 hover:text-slate-300'
           }`}
         >
-          ✉️ Email normal
+          ✉️ Correu normal
         </button>
         <button
           onClick={() => setMode('quote')}
@@ -197,19 +196,17 @@ export default function ComposeForm({ leads, packs }: Props) {
         </button>
       </div>
 
-      {/* Form */}
       <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
         <div className="p-6 space-y-6">
 
-          {/* Select Lead */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">
-              Selecciona Lead (opcional)
+              Selecciona entrada (opcional)
             </label>
             <select
               value={selectedLeadId}
               onChange={(e) => setSelectedLeadId(e.target.value)}
-              aria-label="Selecciona lead"
+              aria-label="Selecciona entrada"
               className={inputClasses}
             >
               <option value="">-- Escriu email manualment --</option>
@@ -221,10 +218,9 @@ export default function ComposeForm({ leads, packs }: Props) {
             </select>
           </div>
 
-          {/* Lead details preview */}
           {selectedLead && (
             <div className="bg-slate-700/30 rounded-xl p-4 border border-slate-700/50">
-              <h4 className="font-medium text-slate-200 mb-3">📋 Detalls del lead</h4>
+              <h4 className="font-medium text-slate-200 mb-3">📋 Detalls de l'entrada</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <span className="text-slate-400">Tipus:</span>
@@ -257,13 +253,11 @@ export default function ComposeForm({ leads, packs }: Props) {
           )}
 
           {mode === 'quote' ? (
-            // Quote form
             <>
-              {/* Manual email when no lead selected */}
               {!selectedLeadId && (
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Email del client *
+                    Correu del client *
                   </label>
                   <input
                     type="email"
@@ -275,7 +269,6 @@ export default function ComposeForm({ leads, packs }: Props) {
                 </div>
               )}
 
-              {/* Pack selector */}
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
                   Pack recomanat *
@@ -453,7 +446,7 @@ export default function ComposeForm({ leads, packs }: Props) {
                   : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
               }`}
             >
-              {sent ? '✓ Enviat!' : sending ? 'Enviant...' : mode === 'quote' ? '📤 Enviar pressupost' : '📤 Enviar email'}
+              {sent ? '✓ Enviat!' : sending ? 'Enviant...' : mode === 'quote' ? '📤 Envia pressupost' : '📤 Envia correu'}
             </button>
           </div>
         </div>

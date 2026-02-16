@@ -323,7 +323,7 @@ export default function InboxClient({
               activeTab === 'leads' ? 'bg-cyan-500/20 text-cyan-300' : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'
             }`}
           >
-            📋 Leads web ({initialLeads.length})
+            📋 Entrades web ({initialLeads.length})
           </button>
           {imapConfigured && (
             <button
@@ -759,7 +759,7 @@ function ComposeModal({
         onClose();
       }, 1200);
     } catch (error) {
-      log.error('Error sending email', error);
+      log.error('Error enviant correu', error);
       if (error instanceof Error && error.name === 'AbortError') {
         setError('Temps d\'espera esgotat. Intenta-ho de nou.');
       } else {
@@ -879,7 +879,7 @@ function ComposeModal({
               'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500'
             }`}
           >
-            {sent ? '✓ Enviat!' : sending ? 'Enviant...' : '📤 Enviar'}
+            {sent ? '✓ Enviat!' : sending ? 'Enviant...' : '📤 Envia'}
           </button>
         </div>
       </div>
@@ -979,7 +979,7 @@ function QuoteModal({
             </select>
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Precio base (€)</label>
+            <label className="block text-sm text-slate-400 mb-1">Preu base (€)</label>
             <input
               type="number"
               value={price}
@@ -988,13 +988,13 @@ function QuoteModal({
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Mensaje personalizado</label>
+            <label className="block text-sm text-slate-400 mb-1">Missatge personalitzat</label>
             <textarea
               value={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
               rows={4}
               className="w-full px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 text-sm"
-              placeholder="Detalles para el cliente..."
+              placeholder="Detalls per al client..."
             />
           </div>
           {error && <p className="text-xs text-rose-300" role="alert">{error}</p>}
@@ -1008,7 +1008,7 @@ function QuoteModal({
             type="button"
             className="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white disabled:opacity-50"
           >
-            {sending ? 'Enviant...' : 'Enviar pressupost'}
+            {sending ? 'Enviant...' : 'Envia pressupost'}
           </button>
         </div>
       </div>

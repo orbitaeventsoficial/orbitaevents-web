@@ -37,19 +37,19 @@ type StudioProps = {
 const STUDIO_DRAFT_KEY = 'admin.presupuestos.pdfstudio.draft.v1';
 const quoteStudioSchema = z.object({
   clientName: z.string().trim().min(2, 'Nom del client massa curt'),
-  clientEmail: z.string().trim().email('Email del client no valid'),
+  clientEmail: z.string().trim().email("Correu del client no vàlid"),
   guests: z.number().int().min(1, 'Convidats ha de ser minim 1'),
   validityDays: z.number().int().min(1).max(120),
   basePrice: z.number().min(0),
 });
 
 const SERVICE_LABEL: Record<ServiceSlug, string> = {
-  bodas: 'Bodas',
-  fiestas: 'Fiestas',
-  discomovil: 'Discomóvil',
-  alquiler: 'Alquiler',
-  empresas: 'Empresas',
-  produccion: 'Producción',
+  bodas: 'Bodes',
+  fiestas: 'Festes',
+  discomovil: 'Discomòbil',
+  alquiler: 'Lloguer',
+  empresas: 'Empreses',
+  produccion: 'Producció',
 };
 
 function formatEUR(value: number): string {
@@ -150,14 +150,14 @@ export default function PresupuestoPdfStudio({
   initialBrandWebsite = 'orbitaevents.com',
   initialBrandEmail = '',
   initialBrandPhone = '',
-  initialBrandTagline = 'Tu evento. Tu estilo. Tu noche perfecta.',
+  initialBrandTagline = 'El teu esdeveniment. El teu estil. La teva nit perfecta.',
   initialBrandLogoDataUrl = '',
 }: StudioProps) {
   const [locale, setLocale] = useState<Locale>('ca');
   const [eventType, setEventType] = useState<ServiceSlug>('bodas');
   const [packId, setPackId] = useState<string>(() => getPacksByService('bodas')[0]?.id || '');
   const [clientContact, setClientContact] = useState('');
-  const [clientName, setClientName] = useState(initialCustomerName || 'Cliente');
+  const [clientName, setClientName] = useState(initialCustomerName || 'Client');
   const [clientEmail, setClientEmail] = useState(initialCustomerEmail || '');
   const [clientPhone, setClientPhone] = useState('');
   const [customerId] = useState(initialCustomerId);
@@ -186,7 +186,7 @@ export default function PresupuestoPdfStudio({
   const [brandEmail, setBrandEmail] = useState(initialBrandEmail || '');
   const [brandPhone, setBrandPhone] = useState(initialBrandPhone || '');
   const [brandTagline, setBrandTagline] = useState(
-    initialBrandTagline || 'Tu evento. Tu estilo. Tu noche perfecta.'
+    initialBrandTagline || 'El teu esdeveniment. El teu estil. La teva nit perfecta.'
   );
   const [logoDataUrl, setLogoDataUrl] = useState<string>(initialBrandLogoDataUrl || '');
   const [draftLoaded, setDraftLoaded] = useState(false);
@@ -666,7 +666,7 @@ export default function PresupuestoPdfStudio({
       const doc = await buildPdf();
       if (!doc) throw new Error('No s’ha pogut generar el PDF');
 
-      const fileName = `presupuesto-${(clientName || 'cliente').trim().toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.pdf`;
+      const fileName = `pressupost-${(clientName || 'client').trim().toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.pdf`;
       doc.save(fileName);
       setMessage('PDF generat correctament.');
     } catch (error) {
@@ -772,7 +772,7 @@ export default function PresupuestoPdfStudio({
 
   function validateBeforeGenerate(requireEmail = false): boolean {
     if (!customerId) {
-      const message = 'Selecciona un cliente antes de generar o enviar presupuesto.';
+      const message = 'Selecciona un client abans de generar o enviar un pressupost.';
       setValidationError(message);
       setMessage(message);
       return false;
@@ -802,7 +802,7 @@ export default function PresupuestoPdfStudio({
       <div className="space-y-5 rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
         {isCustomerScoped && (
           <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200">
-            Modo client actiu. Aquest pressupost es guarda automàticament a la fitxa del client.
+            Mode client actiu. Aquest pressupost es guarda automàticament a la fitxa del client.
             {autosaving
               ? ' Guardant...'
               : autosaveTick > 0
@@ -835,7 +835,7 @@ export default function PresupuestoPdfStudio({
           </label>
 
           <label className="text-sm text-slate-300">
-            Tipo de evento
+            Tipus d'esdeveniment
             <select
               className={inputClass}
               value={eventType}
@@ -868,7 +868,7 @@ export default function PresupuestoPdfStudio({
 
         <div className="grid gap-4 md:grid-cols-2">
           <label className="text-sm text-slate-300 md:col-span-2">
-            Logo (PNG/JPG)
+            Logotip (PNG/JPG)
             <input
               className={inputClass}
               type="file"
@@ -878,7 +878,7 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Persona de contacto
+            Persona de contacte
             <input
               className={inputClass}
               value={clientContact}
@@ -887,7 +887,7 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Nombre cliente
+            Nom del client
             <input
               className={inputClass}
               value={clientName}
@@ -896,7 +896,7 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Email cliente
+            Correu del client
             <input
               className={inputClass}
               type="email"
@@ -906,7 +906,7 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Teléfono cliente
+            Telèfon del client
             <input
               className={inputClass}
               value={clientPhone}
@@ -915,11 +915,11 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Fecha evento
+            Data de l'esdeveniment
             <input className={inputClass} type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
           </label>
           <label className="text-sm text-slate-300">
-            Invitados
+            Convidats
             <input className={inputClass} type="number" min={0} value={guests} onChange={(e) => setGuests(Number(e.target.value) || 0)} />
           </label>
         </div>
@@ -935,7 +935,7 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Web marca
+            Web de la marca
             <input
               className={inputClass}
               value={brandWebsite}
@@ -944,7 +944,7 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Email marca
+            Correu de la marca
             <input
               className={inputClass}
               value={brandEmail}
@@ -953,7 +953,7 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Teléfono marca
+            Telèfon de la marca
             <input
               className={inputClass}
               value={brandPhone}
@@ -962,7 +962,7 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300 md:col-span-2">
-            Tagline footer
+            Eslògan del peu
             <input
               className={inputClass}
               value={brandTagline}
@@ -974,11 +974,11 @@ export default function PresupuestoPdfStudio({
 
         <div className="grid gap-4 md:grid-cols-3">
           <label className="text-sm text-slate-300 md:col-span-2">
-            Nombre visible del pack
+            Nom visible del pack
             <input className={inputClass} value={packName} onChange={(e) => setPackName(e.target.value)} />
           </label>
           <label className="text-sm text-slate-300">
-            Duración (h)
+            Durada (h)
             <input
               className={inputClass}
               type="number"
@@ -989,7 +989,7 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Validez (días)
+            Validesa (dies)
             <input
               className={inputClass}
               type="number"
@@ -1000,7 +1000,7 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Precio base (€)
+            Preu base (€)
             <input
               className={inputClass}
               type="number"
@@ -1010,7 +1010,7 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Descuento (€)
+            Descompte (€)
             <input
               className={inputClass}
               type="number"
@@ -1020,25 +1020,25 @@ export default function PresupuestoPdfStudio({
             />
           </label>
           <label className="text-sm text-slate-300">
-            Motivo descuento
+            Motiu del descompte
             <input className={inputClass} value={discountReason} onChange={(e) => setDiscountReason(e.target.value)} />
           </label>
           <label className="text-sm text-slate-300 md:col-span-3">
-            Features del pack (una por línea)
+            Característiques del pack (una per línia)
             <textarea rows={6} className={inputClass} value={featuresText} onChange={(e) => setFeaturesText(e.target.value)} />
           </label>
           <label className="text-sm text-slate-300 md:col-span-3">
-            Condiciones (una por línea)
+            Condicions (una per línia)
             <textarea rows={4} className={inputClass} value={conditionsText} onChange={(e) => setConditionsText(e.target.value)} />
           </label>
           <label className="text-sm text-slate-300 md:col-span-3">
-            Explicación humanizada: por qué elegirnos
+            Explicació comercial: per què triar-nos
             <textarea rows={3} className={inputClass} value={whyChooseUs} onChange={(e) => setWhyChooseUs(e.target.value)} />
           </label>
         </div>
 
         <div className="space-y-3 rounded-xl border border-slate-700/60 bg-slate-950/40 p-4">
-          <h3 className="text-sm font-semibold text-slate-100">Extras del catálogo</h3>
+          <h3 className="text-sm font-semibold text-slate-100">Extres del catàleg</h3>
           <div className="grid gap-2 sm:grid-cols-2">
             {compatibleExtras.map((extra) => (
               <label key={extra.id} className="flex items-center gap-2 rounded-lg border border-slate-700/40 px-3 py-2 text-sm text-slate-200">
@@ -1055,11 +1055,11 @@ export default function PresupuestoPdfStudio({
         </div>
 
         <div className="space-y-3 rounded-xl border border-slate-700/60 bg-slate-950/40 p-4">
-          <h3 className="text-sm font-semibold text-slate-100">Extras personalizados</h3>
+          <h3 className="text-sm font-semibold text-slate-100">Extres personalitzats</h3>
           <div className="grid gap-3 md:grid-cols-[1fr_160px_auto]">
             <input
               className={inputClass}
-              placeholder="Nombre del extra"
+              placeholder="Nom de l'extra"
               value={customExtraName}
               onChange={(e) => setCustomExtraName(e.target.value)}
             />
@@ -1075,7 +1075,7 @@ export default function PresupuestoPdfStudio({
               onClick={addCustomExtra}
               className="rounded-xl border border-amber-500/40 bg-amber-500/15 px-4 py-2 text-sm font-semibold text-amber-200 hover:bg-amber-500/20"
             >
-              Añadir
+              Afegir
             </button>
           </div>
 
@@ -1091,7 +1091,7 @@ export default function PresupuestoPdfStudio({
                       onClick={() => removeCustomExtra(extra.id)}
                       className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2 py-1 text-xs text-rose-200 hover:bg-rose-500/20"
                     >
-                      Quitar
+                      Treure
                     </button>
                   </div>
                 </div>
@@ -1123,7 +1123,7 @@ export default function PresupuestoPdfStudio({
             disabled={generating || sending || !selectedPack || !clientEmail.trim()}
             className="rounded-xl border border-violet-500/40 bg-violet-500/15 px-5 py-2.5 text-sm font-semibold text-violet-200 hover:bg-violet-500/20 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"
           >
-            {sending ? 'Enviant...' : 'Enviar pressupost'}
+            {sending ? 'Enviant...' : 'Envia pressupost'}
           </button>
           <button
             type="button"
@@ -1138,29 +1138,29 @@ export default function PresupuestoPdfStudio({
       </div>
 
       <aside className="h-fit rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
-        <h2 className="text-lg font-semibold text-slate-100">Vista rápida</h2>
-        <p className="mt-1 text-sm text-slate-400">Resumen de lo que saldrá en el PDF.</p>
+        <h2 className="text-lg font-semibold text-slate-100">Vista ràpida</h2>
+        <p className="mt-1 text-sm text-slate-400">Resum del que sortirà al PDF.</p>
 
         <div className="mt-4 space-y-3 text-sm">
           <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
-            <p className="text-slate-400">Branding</p>
+            <p className="text-slate-400">Marca</p>
             <p className="font-semibold text-slate-100">{brandName || 'Marca'}</p>
             <p className="text-slate-300">{brandWebsite || '-'}</p>
             <p className="text-slate-300">{brandEmail || '-'} · {brandPhone || '-'}</p>
           </div>
 
           <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
-            <p className="text-slate-400">Cliente</p>
-            <p className="font-semibold text-slate-100">{clientName || 'Cliente'}</p>
+            <p className="text-slate-400">Client</p>
+            <p className="font-semibold text-slate-100">{clientName || 'Client'}</p>
             <p className="text-slate-300">{clientContact || '-'}</p>
             <p className="text-slate-300">{clientEmail || '-'} · {clientPhone || '-'}</p>
           </div>
 
           <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
-            <p className="text-slate-400">Evento</p>
+            <p className="text-slate-400">Esdeveniment</p>
             <p className="font-semibold text-slate-100">{SERVICE_LABEL[eventType]}</p>
-            <p className="text-slate-300">{eventDate || 'Sin fecha'} · {guests} invitados</p>
-            <p className="text-slate-300">Validez: {validityDays} días</p>
+            <p className="text-slate-300">{eventDate || 'Sense data'} · {guests} convidats</p>
+            <p className="text-slate-300">Validesa: {validityDays} dies</p>
           </div>
 
           <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
@@ -1175,17 +1175,17 @@ export default function PresupuestoPdfStudio({
           </div>
 
           <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
-            <p className="text-slate-400 mb-2">Costes</p>
+            <p className="text-slate-400 mb-2">Costos</p>
             <div className="flex items-center justify-between text-slate-200">
               <span>Base</span>
               <span>{formatEUR(basePrice)}</span>
             </div>
             <div className="flex items-center justify-between text-slate-200">
-              <span>Extras</span>
+              <span>Extres</span>
               <span>{formatEUR(extrasPrice)}</span>
             </div>
             <div className="flex items-center justify-between text-emerald-300">
-              <span>Descuento</span>
+              <span>Descompte</span>
               <span>-{formatEUR(discount)}</span>
             </div>
             <div className="mt-2 border-t border-slate-700 pt-2 flex items-center justify-between text-base font-semibold text-amber-300">
