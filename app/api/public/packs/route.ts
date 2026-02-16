@@ -24,7 +24,7 @@ export async function GET(req: Request) {
   const serviceParam = searchParams.get('service');
   const allowedServices = new Set(['bodas', 'fiestas', 'discomovil', 'empresas', 'alquiler', 'produccion']);
   const service = serviceParam && allowedServices.has(serviceParam) ? serviceParam : undefined;
-  const locale = searchParams.get('locale') || 'es';
+  const locale = searchParams.get('locale') || 'ca';
 
   const packs = await getDbPacks({
     service: service as any,

@@ -76,7 +76,7 @@ export default function CustomerHeader({
               Nova tasca
             </Link>
             <Link
-              href={`/admin/emails?customerId=${id}`}
+              href={`/admin/inbox/compose?customerId=${id}`}
               className="rounded-lg border border-slate-600/80 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700"
             >
               Envia missatge

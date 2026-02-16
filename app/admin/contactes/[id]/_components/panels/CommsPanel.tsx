@@ -47,19 +47,19 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
         <p className="text-xs text-slate-400">Accions ràpides</p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Link
-            href={`/admin/emails?customerId=${data.customer.id}&template=primer-contacte`}
+            href={`/admin/inbox/compose?customerId=${data.customer.id}&template=primer-contacte`}
             className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
           >
             Plantilla 1r contacte
           </Link>
           <Link
-            href={`/admin/emails?customerId=${data.customer.id}&template=enviament-pressupost`}
+            href={`/admin/inbox/compose?customerId=${data.customer.id}&template=enviament-pressupost`}
             className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
           >
             Envia pressupost
           </Link>
           <Link
-            href={`/admin/emails?customerId=${data.customer.id}&template=recordatori`}
+            href={`/admin/inbox/compose?customerId=${data.customer.id}&template=recordatori`}
             className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
           >
             Recordatori

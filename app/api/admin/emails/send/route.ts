@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { to, subject, body: messageBody, leadId, replyToId, quote, locale } = body || {};
+    const { to, subject, body: messageBody, leadId, replyToId, customerId, quote, locale } = body || {};
 
     if (!to || !subject || !messageBody) {
       return NextResponse.json(
@@ -183,7 +183,15 @@ export async function POST(req: NextRequest) {
           select: { id: true, preferredLocale: true },
         })
       : null;
-    const resolvedLocale = normalizeLocale(leadForLocale?.preferredLocale || locale || 'ca');
+    const customerForLocale = customerId
+      ? await prisma.customer.findUnique({
+          where: { id: String(customerId) },
+          select: { id: true, preferredLocale: true },
+        })
+      : null;
+    const resolvedLocale = normalizeLocale(
+      leadForLocale?.preferredLocale || customerForLocale?.preferredLocale || locale || 'ca'
+    );
     const translatedSubject = await translateTextForLocale(String(subject), resolvedLocale);
     const translatedBody = await translateTextForLocale(String(messageBody), resolvedLocale);
     const quoteAttachment = quote && typeof quote === 'object' ? quote : null;
@@ -271,6 +279,20 @@ export async function POST(req: NextRequest) {
           title: 'Email enviat',
           description: `${translatedSubject}${attachments ? ' (amb pressupost)' : ''}`,
           createdBy: 'Admin',
+        },
+      });
+    }
+
+    if (customerForLocale?.id) {
+      await prisma.customerActivity.create({
+        data: {
+          customerId: customerForLocale.id,
+          action: 'EMAIL_SENT',
+          details: {
+            to,
+            subject: translatedSubject,
+            source: 'admin_emails_send',
+          },
         },
       });
     }

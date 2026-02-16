@@ -9,7 +9,7 @@ export const metadata = {
   title: 'Nou correu | Òrbita Admin',
 };
 
-async function getLeadsAndPacks() {
+async function getLeadsAndPacks(customerId?: string) {
   const [leads, packs] = await Promise.all([
     prisma.lead.findMany({
       where: {
@@ -43,11 +43,29 @@ async function getLeadsAndPacks() {
     }),
   ]);
 
-  return { leads, packs };
+  const customer = customerId
+    ? await prisma.customer.findUnique({
+        where: { id: customerId },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          preferredLocale: true,
+        },
+      })
+    : null;
+
+  return { leads, packs, customer };
 }
 
-export default async function ComposePage() {
-  const { leads, packs } = await getLeadsAndPacks();
+export default async function ComposePage({
+  searchParams,
+}: {
+  searchParams?: { customerId?: string; template?: string };
+}) {
+  const customerId = searchParams?.customerId || '';
+  const template = searchParams?.template || '';
+  const { leads, packs, customer } = await getLeadsAndPacks(customerId || undefined);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -67,7 +85,21 @@ export default async function ComposePage() {
         </Link>
       </header>
 
-      <ComposeForm leads={leads} packs={packs} />
+      <ComposeForm
+        leads={leads}
+        packs={packs}
+        initialCustomer={
+          customer
+            ? {
+                id: customer.id,
+                name: customer.name,
+                email: customer.email || '',
+                preferredLocale: customer.preferredLocale || 'ca',
+              }
+            : undefined
+        }
+        initialTemplate={template}
+      />
     </div>
   );
 }

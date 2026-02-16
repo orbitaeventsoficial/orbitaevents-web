@@ -29,6 +29,13 @@ interface Pack {
 interface Props {
   leads: Lead[];
   packs: Pack[];
+  initialCustomer?: {
+    id: string;
+    name: string;
+    email: string;
+    preferredLocale: string | null;
+  };
+  initialTemplate?: string;
 }
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -41,7 +48,7 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   OTHER: '📋 Altre',
 };
 
-export default function ComposeForm({ leads, packs }: Props) {
+export default function ComposeForm({ leads, packs, initialCustomer, initialTemplate }: Props) {
   const router = useRouter();
 
   // Mode: 'email' o 'quote'
@@ -86,6 +93,35 @@ export default function ComposeForm({ leads, packs }: Props) {
     }
   }, [selectedLeadId, selectedLead]);
 
+  useEffect(() => {
+    if (initialTemplate === 'enviament-pressupost') {
+      setMode('quote');
+      return;
+    }
+    if (initialTemplate === 'primer-contacte' || initialTemplate === 'recordatori') {
+      setMode('email');
+    }
+  }, [initialTemplate]);
+
+  useEffect(() => {
+    if (selectedLeadId) return;
+    if (!initialCustomer?.email) return;
+    setTo(initialCustomer.email);
+    setLocale(initialCustomer.preferredLocale || 'ca');
+    if (!body.trim() && initialTemplate === 'primer-contacte') {
+      setBody(`Hola ${initialCustomer.name},\n\nGracies per contactar amb nosaltres. Et podem preparar una proposta ajustada al que necessites.\n\nSi et va be, et truquem i ho tanquem en 5 minuts.`);
+    }
+    if (!body.trim() && initialTemplate === 'recordatori') {
+      setBody(`Hola ${initialCustomer.name},\n\nEt faig un recordatori per si vols que revisem la proposta i tanquem detalls.\n\nQuan et vagi be, ho comentem.`);
+    }
+    if (!subject.trim() && initialTemplate === 'primer-contacte') {
+      setSubject(`Primer contacte amb ${initialCustomer.name}`);
+    }
+    if (!subject.trim() && initialTemplate === 'recordatori') {
+      setSubject(`Recordatori - seguiment ${initialCustomer.name}`);
+    }
+  }, [initialCustomer, initialTemplate, selectedLeadId, subject, body]);
+
   // When pack changes
   useEffect(() => {
     if (selectedPack) {
@@ -111,6 +147,7 @@ export default function ComposeForm({ leads, packs }: Props) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             leadId: selectedLeadId || undefined,
+            customerId: initialCustomer?.id || undefined,
             to: selectedLeadId ? undefined : to.trim(), // Send manual email if no lead
             packId: selectedPackId,
             price: parseFloat(price),
@@ -150,6 +187,7 @@ export default function ComposeForm({ leads, packs }: Props) {
             subject,
             body,
             leadId: selectedLeadId || undefined,
+            customerId: initialCustomer?.id || undefined,
             locale,
           }),
         });

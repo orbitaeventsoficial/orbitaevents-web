@@ -95,7 +95,7 @@ async function getQuotePacks(): Promise<QuotePackOption[]> {
           slug: true,
           price: true,
           translations: {
-            where: { locale: 'es' },
+            where: { locale: 'ca' },
             select: { name: true },
             take: 1,
           },

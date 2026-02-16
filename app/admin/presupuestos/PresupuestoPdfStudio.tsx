@@ -754,6 +754,7 @@ export default function PresupuestoPdfStudio({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          customerId: customerId || undefined,
           to: clientEmail.trim(),
           packId: packId || 'custom',
           price: total,

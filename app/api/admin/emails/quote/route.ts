@@ -105,6 +105,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       leadId,
+      customerId,
       to, // Manual email when no lead
       packId,
       price,
@@ -114,10 +115,10 @@ export async function POST(req: NextRequest) {
       locale,
     } = body || {};
 
-    // Need either leadId or manual email
-    if ((!leadId && !to) || !packId || typeof price !== 'number') {
+    // Need either leadId or customerId or manual email
+    if ((!leadId && !customerId && !to) || !packId || typeof price !== 'number') {
       return NextResponse.json(
-        { error: 'Falten camps obligatoris: (leadId o email), packId, price' },
+        { error: 'Falten camps obligatoris: (leadId o customerId o email), packId, price' },
         { status: 400 }
       );
     }
@@ -126,6 +127,12 @@ export async function POST(req: NextRequest) {
 
     // Get lead if provided, otherwise create minimal data for quote
     let lead = leadId ? await prisma.lead.findUnique({ where: { id: leadId } }) : null;
+    const customer = customerId
+      ? await prisma.customer.findUnique({
+          where: { id: String(customerId) },
+          select: { id: true, name: true, email: true, preferredLocale: true },
+        })
+      : null;
     let recipientEmail = to;
     let recipientName = 'Client';
 
@@ -136,6 +143,12 @@ export async function POST(req: NextRequest) {
     if (lead) {
       recipientEmail = lead.email;
       recipientName = lead.name;
+    } else if (customer) {
+      recipientEmail = customer.email || recipientEmail;
+      recipientName = customer.name || recipientName;
+    }
+    if (!recipientEmail) {
+      return NextResponse.json({ error: 'No hi ha correu de desti del client' }, { status: 400 });
     }
     const emailCountBefore = leadId
       ? await prisma.leadActivity.count({
@@ -143,7 +156,9 @@ export async function POST(req: NextRequest) {
         })
       : 0;
 
-    const resolvedLocale = String(lead?.preferredLocale || locale || 'ca').toLowerCase();
+    const resolvedLocale = String(
+      lead?.preferredLocale || customer?.preferredLocale || locale || 'ca'
+    ).toLowerCase();
     const packDataBase = await resolvePack(String(packId).toLowerCase(), resolvedLocale);
     const packData = {
       ...packDataBase,
@@ -313,6 +328,20 @@ export async function POST(req: NextRequest) {
           });
         }
       }
+    }
+    if (!lead && customer?.id) {
+      await prisma.customerActivity.create({
+        data: {
+          customerId: customer.id,
+          action: 'QUOTE_SENT',
+          details: {
+            quoteNumber: quoteData.quoteNumber,
+            total: quoteData.total,
+            to: recipientEmail,
+            source: 'email_quote_route',
+          },
+        },
+      });
     }
 
     const html = generateQuoteHTML(quoteData, {
