@@ -7,6 +7,52 @@ import { requireAuth } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 const SETTING_KEY = 'coverage.areas';
+type Locale = 'ca' | 'es' | 'en';
+const MESSAGES: Record<Locale, Record<string, string>> = {
+  ca: {
+    parsingAreas: 'Error interpretant àrees de cobertura:',
+    gettingAreas: 'Error obtenint àrees de cobertura',
+    actionCityRequired: 'Action i city són obligatoris',
+    provinceRequired: 'Province és obligatori per afegir',
+    cityAlreadyExists: 'Aquesta ciutat ja existeix',
+    invalidAction: 'Acció no vàlida',
+    updated: 'Àrees de cobertura actualitzades correctament',
+    updatingAreas: 'Error actualitzant àrees de cobertura',
+    label: 'Àrees de cobertura',
+    description: 'Ciutats i províncies on opera Òrbita Events',
+  },
+  es: {
+    parsingAreas: 'Error parseando áreas de cobertura:',
+    gettingAreas: 'Error obteniendo áreas de cobertura',
+    actionCityRequired: 'Action y city son requeridos',
+    provinceRequired: 'Province es requerido para añadir',
+    cityAlreadyExists: 'Esta ciudad ya existe',
+    invalidAction: 'Acción no válida',
+    updated: 'Áreas de cobertura actualizadas correctamente',
+    updatingAreas: 'Error actualizando áreas de cobertura',
+    label: 'Áreas de Cobertura',
+    description: 'Ciudades y provincias donde opera Órbita Events',
+  },
+  en: {
+    parsingAreas: 'Error parsing coverage areas:',
+    gettingAreas: 'Error fetching coverage areas',
+    actionCityRequired: 'Action and city are required',
+    provinceRequired: 'Province is required to add a city',
+    cityAlreadyExists: 'This city already exists',
+    invalidAction: 'Invalid action',
+    updated: 'Coverage areas updated successfully',
+    updatingAreas: 'Error updating coverage areas',
+    label: 'Coverage Areas',
+    description: 'Cities and provinces where Òrbita Events operates',
+  },
+};
+
+function resolveLocale(req: NextRequest): Locale {
+  const lang = req.headers.get('accept-language')?.toLowerCase() || '';
+  if (lang.includes('ca')) return 'ca';
+  if (lang.includes('en')) return 'en';
+  return 'es';
+}
 
 interface CoverageArea {
   city: string;
@@ -18,6 +64,7 @@ interface CoverageArea {
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const t = MESSAGES[resolveLocale(req)];
 
   try {
     const setting = await prisma.setting.findUnique({
@@ -30,7 +77,7 @@ export async function GET(req: NextRequest) {
       try {
         areas = JSON.parse(setting.value);
       } catch (error) {
-        log.error('Error parseando áreas de cobertura:', error);
+        log.error(t.parsingAreas, error);
       }
     }
 
@@ -55,8 +102,8 @@ export async function GET(req: NextRequest) {
           value: JSON.stringify(areas),
           type: 'JSON',
           category: 'config',
-          label: 'Áreas de Cobertura',
-          description: 'Ciudades y provincias donde opera Órbita Events',
+          label: t.label,
+          description: t.description,
         },
         update: {
           value: JSON.stringify(areas),
@@ -69,9 +116,9 @@ export async function GET(req: NextRequest) {
       areas,
     });
   } catch (error) {
-    log.error('Error obteniendo áreas de cobertura:', error);
+    log.error(t.gettingAreas + ':', error);
     return NextResponse.json(
-      { ok: false, error: 'Error obteniendo áreas de cobertura' },
+      { ok: false, error: t.gettingAreas },
       { status: 500 }
     );
   }
@@ -81,6 +128,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const t = MESSAGES[resolveLocale(req)];
 
   try {
     const body = await req.json();
@@ -88,7 +136,7 @@ export async function POST(req: NextRequest) {
 
     if (!action || !city) {
       return NextResponse.json(
-        { ok: false, error: 'Action y city son requeridos' },
+        { ok: false, error: t.actionCityRequired },
         { status: 400 }
       );
     }
@@ -103,7 +151,7 @@ export async function POST(req: NextRequest) {
       try {
         areas = JSON.parse(setting.value);
       } catch (error) {
-        log.error('Error parseando áreas:', error);
+        log.error(t.parsingAreas, error);
       }
     }
 
@@ -112,7 +160,7 @@ export async function POST(req: NextRequest) {
       case 'add': {
         if (!province) {
           return NextResponse.json(
-            { ok: false, error: 'Province es requerido para añadir' },
+            { ok: false, error: t.provinceRequired },
             { status: 400 }
           );
         }
@@ -121,7 +169,7 @@ export async function POST(req: NextRequest) {
         const exists = areas.some((a) => a.city === city);
         if (exists) {
           return NextResponse.json(
-            { ok: false, error: 'Esta ciudad ya existe' },
+            { ok: false, error: t.cityAlreadyExists },
             { status: 400 }
           );
         }
@@ -149,7 +197,7 @@ export async function POST(req: NextRequest) {
 
       default:
         return NextResponse.json(
-          { ok: false, error: 'Acción no válida' },
+          { ok: false, error: t.invalidAction },
           { status: 400 }
         );
     }
@@ -162,8 +210,8 @@ export async function POST(req: NextRequest) {
         value: JSON.stringify(areas),
         type: 'JSON',
         category: 'config',
-        label: 'Áreas de Cobertura',
-        description: 'Ciudades y provincias donde opera Órbita Events',
+        label: t.label,
+        description: t.description,
       },
       update: {
         value: JSON.stringify(areas),
@@ -182,13 +230,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      message: 'Áreas de cobertura actualizadas correctamente',
+      message: t.updated,
       areas,
     });
   } catch (error) {
-    log.error('Error actualizando áreas de cobertura:', error);
+    log.error(t.updatingAreas + ':', error);
     return NextResponse.json(
-      { ok: false, error: 'Error actualizando áreas de cobertura' },
+      { ok: false, error: t.updatingAreas },
       { status: 500 }
     );
   }

@@ -9,22 +9,125 @@ import { escapeHtml } from '@/lib/utils/sanitize';
 
 export const dynamic = 'force-dynamic';
 
-const REQUEST_TYPE_LABELS: Record<string, string> = {
-  ACCESS: "Derecho de acceso",
-  RECTIFICATION: 'Derecho de rectificacion',
-  ERASURE: 'Derecho de supresion',
-  RESTRICTION: 'Derecho de limitacion',
-  PORTABILITY: 'Derecho de portabilidad',
-  OBJECTION: 'Derecho de oposicion',
-  AUTOMATED: 'Decisiones automatizadas',
+type Locale = 'ca' | 'es' | 'en';
+type VerifyMessages = {
+  requestTypes: Record<string, string>;
+  tokenMissing: string;
+  verifyError: string;
+  htmlLang: string;
+  successTitle: string;
+  successPageTitle: string;
+  hello: string;
+  verifiedIntro: string;
+  processedSoon: string;
+  deadlineLabel: string;
+  gdprNotice: string;
+  backHome: string;
+  rightsReserved: string;
+  errorPageTitle: string;
+  verifyErrorTitle: string;
+  verifyErrorIntro: string;
+  needHelp: string;
 };
 
+const MESSAGES: Record<Locale, VerifyMessages> = {
+  ca: {
+    requestTypes: {
+      ACCESS: "Dret d'accés",
+      RECTIFICATION: 'Dret de rectificació',
+      ERASURE: 'Dret de supressió',
+      RESTRICTION: 'Dret de limitació',
+      PORTABILITY: 'Dret de portabilitat',
+      OBJECTION: "Dret d'oposició",
+      AUTOMATED: 'Decisions automatitzades',
+    },
+    tokenMissing: 'No s’ha proporcionat cap token',
+    verifyError: 'Error verificant la sol·licitud',
+    htmlLang: 'ca',
+    successTitle: 'Sol·licitud verificada',
+    successPageTitle: 'Sol·licitud verificada - Orbita Events',
+    hello: 'Hola',
+    verifiedIntro: 'La teva sol·licitud de',
+    processedSoon: 'ha estat verificada correctament. El nostre equip la processarà al més aviat possible.',
+    deadlineLabel: 'Data límit de resposta',
+    gdprNotice: 'Segons el RGPD, tenim fins a 30 dies per respondre la teva sol·licitud. Si necessitem més temps, t\'ho notificarem.',
+    backHome: "Tornar a l'inici",
+    rightsReserved: 'Orbita Events. Tots els drets reservats.',
+    errorPageTitle: 'Error - Orbita Events',
+    verifyErrorTitle: 'Error de verificació',
+    verifyErrorIntro: 'No hem pogut verificar la teva sol·licitud.',
+    needHelp: "Si necessites ajuda, contacta'ns a",
+  },
+  es: {
+    requestTypes: {
+      ACCESS: 'Derecho de acceso',
+      RECTIFICATION: 'Derecho de rectificacion',
+      ERASURE: 'Derecho de supresion',
+      RESTRICTION: 'Derecho de limitacion',
+      PORTABILITY: 'Derecho de portabilidad',
+      OBJECTION: 'Derecho de oposicion',
+      AUTOMATED: 'Decisiones automatizadas',
+    },
+    tokenMissing: 'Token no proporcionado',
+    verifyError: 'Error verificando la solicitud',
+    htmlLang: 'es',
+    successTitle: 'Solicitud verificada',
+    successPageTitle: 'Solicitud verificada - Orbita Events',
+    hello: 'Hola',
+    verifiedIntro: 'Tu solicitud de',
+    processedSoon: 'ha sido verificada correctamente. Nuestro equipo procesará tu solicitud lo antes posible.',
+    deadlineLabel: 'Fecha limite de respuesta',
+    gdprNotice: 'Segun el RGPD, tenemos hasta 30 dias para responder a tu solicitud. Si necesitamos mas tiempo, te lo notificaremos.',
+    backHome: 'Volver al inicio',
+    rightsReserved: 'Orbita Events. Todos los derechos reservados.',
+    errorPageTitle: 'Error - Orbita Events',
+    verifyErrorTitle: 'Error de verificacion',
+    verifyErrorIntro: 'No hemos podido verificar tu solicitud.',
+    needHelp: 'Si necesitas ayuda, contactanos en',
+  },
+  en: {
+    requestTypes: {
+      ACCESS: 'Right of access',
+      RECTIFICATION: 'Right of rectification',
+      ERASURE: 'Right of erasure',
+      RESTRICTION: 'Right of restriction',
+      PORTABILITY: 'Right of portability',
+      OBJECTION: 'Right of objection',
+      AUTOMATED: 'Automated decisions',
+    },
+    tokenMissing: 'Missing token',
+    verifyError: 'Error verifying request',
+    htmlLang: 'en',
+    successTitle: 'Request verified',
+    successPageTitle: 'Request verified - Orbita Events',
+    hello: 'Hello',
+    verifiedIntro: 'Your request for',
+    processedSoon: 'has been verified successfully. Our team will process it as soon as possible.',
+    deadlineLabel: 'Response deadline',
+    gdprNotice: 'Under GDPR, we have up to 30 days to respond to your request. If we need more time, we will notify you.',
+    backHome: 'Back to home',
+    rightsReserved: 'Orbita Events. All rights reserved.',
+    errorPageTitle: 'Error - Orbita Events',
+    verifyErrorTitle: 'Verification error',
+    verifyErrorIntro: 'We could not verify your request.',
+    needHelp: 'If you need help, contact us at',
+  },
+};
+
+function resolveLocale(req: NextRequest): Locale {
+  const lang = req.headers.get('accept-language')?.toLowerCase() || '';
+  if (lang.includes('ca')) return 'ca';
+  if (lang.includes('en')) return 'en';
+  return 'es';
+}
+
 export async function GET(req: NextRequest) {
+  const t = MESSAGES[resolveLocale(req)];
   const { searchParams } = new URL(req.url);
   const token = searchParams.get('token');
 
   if (!token) {
-    return new NextResponse(generateErrorPage('Token no proporcionado'), {
+    return new NextResponse(generateErrorPage(t.tokenMissing, t), {
       status: 400,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
@@ -36,8 +139,9 @@ export async function GET(req: NextRequest) {
     return new NextResponse(
       generateSuccessPage(
         request.requesterName,
-        REQUEST_TYPE_LABELS[request.requestType] || request.requestType,
-        request.legalDeadline
+        t.requestTypes[request.requestType] || request.requestType,
+        request.legalDeadline,
+        t
       ),
       {
         status: 200,
@@ -45,8 +149,8 @@ export async function GET(req: NextRequest) {
       }
     );
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Error verificando la solicitud';
-    return new NextResponse(generateErrorPage(message), {
+    const message = error instanceof Error ? error.message : t.verifyError;
+    return new NextResponse(generateErrorPage(message, t), {
       status: 400,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
@@ -56,15 +160,16 @@ export async function GET(req: NextRequest) {
 function generateSuccessPage(
   name: string,
   requestType: string,
-  deadline: Date
+  deadline: Date,
+  t: VerifyMessages
 ): string {
   return `
     <!DOCTYPE html>
-    <html lang="es">
+    <html lang="${t.htmlLang}">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Solicitud verificada - Orbita Events</title>
+      <title>${t.successPageTitle}</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -163,17 +268,15 @@ function generateSuccessPage(
           </svg>
         </div>
 
-        <h1>Solicitud verificada</h1>
+        <h1>${t.successTitle}</h1>
 
-        <p>Hola <span class="highlight">${escapeHtml(name)}</span>,</p>
+        <p>${t.hello} <span class="highlight">${escapeHtml(name)}</span>,</p>
 
-        <p>Tu solicitud de <strong>${escapeHtml(requestType)}</strong> ha sido verificada correctamente.</p>
-
-        <p>Nuestro equipo procesara tu solicitud lo antes posible.</p>
+        <p>${t.verifiedIntro} <strong>${escapeHtml(requestType)}</strong> ${t.processedSoon}</p>
 
         <div class="deadline">
-          <div class="deadline-label">Fecha limite de respuesta</div>
-          <div class="deadline-date">${new Date(deadline).toLocaleDateString('es-ES', {
+          <div class="deadline-label">${t.deadlineLabel}</div>
+          <div class="deadline-date">${new Date(deadline).toLocaleDateString(t.htmlLang === 'ca' ? 'ca-ES' : t.htmlLang === 'en' ? 'en-GB' : 'es-ES', {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
@@ -181,14 +284,13 @@ function generateSuccessPage(
         </div>
 
         <p style="font-size: 14px;">
-          Segun el RGPD, tenemos hasta 30 dias para responder a tu solicitud.
-          Si necesitamos mas tiempo, te lo notificaremos.
+          ${t.gdprNotice}
         </p>
 
-        <a href="/" class="btn">Volver al inicio</a>
+        <a href="/" class="btn">${t.backHome}</a>
 
         <div class="footer">
-          ${new Date().getFullYear()} Orbita Events. Todos los derechos reservados.
+          ${new Date().getFullYear()} ${t.rightsReserved}
         </div>
       </div>
     </body>
@@ -196,14 +298,14 @@ function generateSuccessPage(
   `;
 }
 
-function generateErrorPage(error: string): string {
+function generateErrorPage(error: string, t: VerifyMessages): string {
   return `
     <!DOCTYPE html>
-    <html lang="es">
+    <html lang="${t.htmlLang}">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Error - Orbita Events</title>
+      <title>${t.errorPageTitle}</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -281,15 +383,15 @@ function generateErrorPage(error: string): string {
           </svg>
         </div>
 
-        <h1>Error de verificacion</h1>
+        <h1>${t.verifyErrorTitle}</h1>
 
-        <p>No hemos podido verificar tu solicitud.</p>
+        <p>${t.verifyErrorIntro}</p>
 
         <div class="error-msg">${escapeHtml(error)}</div>
 
-        <p>Si necesitas ayuda, contactanos en <strong>info@orbitaevents.com</strong></p>
+        <p>${t.needHelp} <strong>info@orbitaevents.com</strong></p>
 
-        <a href="/" class="btn">Volver al inicio</a>
+        <a href="/" class="btn">${t.backHome}</a>
       </div>
     </body>
     </html>

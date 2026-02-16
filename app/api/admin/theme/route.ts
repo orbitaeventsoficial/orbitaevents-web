@@ -7,6 +7,55 @@ import { requireAuth } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 const SETTING_KEY = 'theme.colors';
+type Locale = 'ca' | 'es' | 'en';
+const MESSAGES: Record<Locale, Record<string, string>> = {
+  ca: {
+    parsingTheme: 'Error interpretant colors del tema:',
+    gettingTheme: 'Error obtenint el tema',
+    actionRequired: 'Action és obligatori',
+    colorsRequired: 'Colors és obligatori',
+    invalidColor: 'Color no vàlid per a',
+    invalidAction: 'Acció no vàlida',
+    messageReset: 'Tema restablert correctament',
+    messageSaved: 'Tema desat correctament',
+    updatingTheme: 'Error actualitzant el tema',
+    label: 'Colors del tema',
+    description: 'Paleta de colors personalitzada d’Òrbita Events',
+  },
+  es: {
+    parsingTheme: 'Error parseando colores del tema:',
+    gettingTheme: 'Error obteniendo tema',
+    actionRequired: 'Action es requerido',
+    colorsRequired: 'Colors es requerido',
+    invalidColor: 'Color inválido para',
+    invalidAction: 'Acción no válida',
+    messageReset: 'Tema reseteado correctamente',
+    messageSaved: 'Tema guardado correctamente',
+    updatingTheme: 'Error actualizando tema',
+    label: 'Colores del Tema',
+    description: 'Paleta de colores personalizada de Órbita Events',
+  },
+  en: {
+    parsingTheme: 'Error parsing theme colors:',
+    gettingTheme: 'Error fetching theme',
+    actionRequired: 'Action is required',
+    colorsRequired: 'Colors are required',
+    invalidColor: 'Invalid color for',
+    invalidAction: 'Invalid action',
+    messageReset: 'Theme reset successfully',
+    messageSaved: 'Theme saved successfully',
+    updatingTheme: 'Error updating theme',
+    label: 'Theme Colors',
+    description: 'Custom color palette for Òrbita Events',
+  },
+};
+
+function resolveLocale(req: NextRequest): Locale {
+  const lang = req.headers.get('accept-language')?.toLowerCase() || '';
+  if (lang.includes('ca')) return 'ca';
+  if (lang.includes('en')) return 'en';
+  return 'es';
+}
 
 interface ThemeColors {
   primary: string;
@@ -38,6 +87,7 @@ const DEFAULT_COLORS: ThemeColors = {
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const t = MESSAGES[resolveLocale(req)];
 
   try {
     const setting = await prisma.setting.findUnique({
@@ -50,7 +100,7 @@ export async function GET(req: NextRequest) {
       try {
         colors = JSON.parse(setting.value);
       } catch (error) {
-        log.error('Error parseando colores del tema:', error);
+        log.error(t.parsingTheme, error);
       }
     }
 
@@ -59,9 +109,9 @@ export async function GET(req: NextRequest) {
       colors,
     });
   } catch (error) {
-    log.error('Error obteniendo tema:', error);
+    log.error(t.gettingTheme + ':', error);
     return NextResponse.json(
-      { ok: false, error: 'Error obteniendo tema' },
+      { ok: false, error: t.gettingTheme },
       { status: 500 }
     );
   }
@@ -71,6 +121,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
+  const t = MESSAGES[resolveLocale(req)];
 
   try {
     const body = await req.json();
@@ -78,7 +129,7 @@ export async function POST(req: NextRequest) {
 
     if (!action) {
       return NextResponse.json(
-        { ok: false, error: 'Action es requerido' },
+        { ok: false, error: t.actionRequired },
         { status: 400 }
       );
     }
@@ -89,7 +140,7 @@ export async function POST(req: NextRequest) {
       case 'save': {
         if (!colors) {
           return NextResponse.json(
-            { ok: false, error: 'Colors es requerido' },
+            { ok: false, error: t.colorsRequired },
             { status: 400 }
           );
         }
@@ -99,7 +150,7 @@ export async function POST(req: NextRequest) {
         for (const [key, value] of Object.entries(colors)) {
           if (typeof value !== 'string' || !hexColorRegex.test(value)) {
             return NextResponse.json(
-              { ok: false, error: `Color inválido para ${key}: ${value}` },
+              { ok: false, error: `${t.invalidColor} ${key}: ${value}` },
               { status: 400 }
             );
           }
@@ -116,7 +167,7 @@ export async function POST(req: NextRequest) {
 
       default:
         return NextResponse.json(
-          { ok: false, error: 'Acción no válida' },
+          { ok: false, error: t.invalidAction },
           { status: 400 }
         );
     }
@@ -129,8 +180,8 @@ export async function POST(req: NextRequest) {
         value: JSON.stringify(finalColors),
         type: 'JSON',
         category: 'config',
-        label: 'Colores del Tema',
-        description: 'Paleta de colores personalizada de Órbita Events',
+        label: t.label,
+        description: t.description,
       },
       update: {
         value: JSON.stringify(finalColors),
@@ -149,13 +200,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      message: action === 'reset' ? 'Tema reseteado correctamente' : 'Tema guardado correctamente',
+      message: action === 'reset' ? t.messageReset : t.messageSaved,
       colors: finalColors,
     });
   } catch (error) {
-    log.error('Error actualizando tema:', error);
+    log.error(t.updatingTheme + ':', error);
     return NextResponse.json(
-      { ok: false, error: 'Error actualizando tema' },
+      { ok: false, error: t.updatingTheme },
       { status: 500 }
     );
   }

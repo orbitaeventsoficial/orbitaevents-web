@@ -15,16 +15,53 @@ import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { verifyCsrf } from '@/lib/csrf';
 
 export const dynamic = 'force-dynamic';
+type Locale = 'ca' | 'es' | 'en';
+const MESSAGES: Record<Locale, Record<string, string>> = {
+  ca: {
+    invalidEmail: 'Correu electrònic no vàlid',
+    invalidName: 'El nom ha de tenir almenys 2 caràcters',
+    privacyRequired: 'Has d’acceptar la política de privacitat',
+    invalidData: 'Dades no vàlides',
+    verificationSent: "Sol·licitud creada. Revisa el teu correu per verificar-la.",
+    creatingError: 'Error creant la sol·licitud',
+    verificationEmailLog: 'Correu de verificació enviat',
+  },
+  es: {
+    invalidEmail: 'Email no valido',
+    invalidName: 'El nombre debe tener minimo 2 caracteres',
+    privacyRequired: 'Debes aceptar la politica de privacidad',
+    invalidData: 'Datos invalidos',
+    verificationSent: 'Solicitud creada. Comprueba tu email para verificarla.',
+    creatingError: 'Error creando la solicitud',
+    verificationEmailLog: 'Email de verificacion enviado',
+  },
+  en: {
+    invalidEmail: 'Invalid email',
+    invalidName: 'Name must be at least 2 characters',
+    privacyRequired: 'You must accept the privacy policy',
+    invalidData: 'Invalid data',
+    verificationSent: 'Request created. Check your email to verify it.',
+    creatingError: 'Error creating request',
+    verificationEmailLog: 'Verification email sent',
+  },
+};
 
-const dataRequestSchema = z.object({
+function resolveLocale(req: NextRequest): Locale {
+  const lang = req.headers.get('accept-language')?.toLowerCase() || '';
+  if (lang.includes('ca')) return 'ca';
+  if (lang.includes('en')) return 'en';
+  return 'es';
+}
+
+const dataRequestSchema = (t: Record<string, string>) => z.object({
   requesterEmail: z
     .string()
-    .email('Email no valido')
+    .email(t.invalidEmail)
     .max(255)
     .transform((val) => val.toLowerCase().trim()),
   requesterName: z
     .string()
-    .min(2, 'El nombre debe tener minimo 2 caracteres')
+    .min(2, t.invalidName)
     .max(100)
     .transform((val) => val.trim()),
   requesterPhone: z
@@ -49,11 +86,12 @@ const dataRequestSchema = z.object({
   specificData: z.array(z.string()).optional(),
   reason: z.string().max(500).optional(),
   gdprConsent: z.boolean().refine((val) => val === true, {
-    message: 'Debes aceptar la politica de privacidad',
+    message: t.privacyRequired,
   }),
 });
 
 export async function POST(req: NextRequest) {
+  const t = MESSAGES[resolveLocale(req)];
   const csrfError = verifyCsrf(req);
   if (csrfError) return csrfError;
 
@@ -63,13 +101,13 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const validationResult = dataRequestSchema.safeParse(body);
+    const validationResult = dataRequestSchema(t).safeParse(body);
     if (!validationResult.success) {
       const firstError = validationResult.error.errors[0];
       return NextResponse.json(
         {
           success: false,
-          error: firstError.message || 'Datos invalidos',
+          error: firstError.message || t.invalidData,
         },
         { status: 400 }
       );
@@ -101,7 +139,7 @@ export async function POST(req: NextRequest) {
         entityType: 'DataRequest',
         entityId: request.id,
         action: 'CONSENT_GRANTED',
-        reason: 'Email de verificacion enviado',
+        reason: t.verificationEmailLog,
       });
     } catch (emailError) {
       log.error('Error enviando email de verificacion:', emailError);
@@ -114,13 +152,13 @@ export async function POST(req: NextRequest) {
         status: request.status,
         legalDeadline: request.legalDeadline,
       },
-      message: 'Solicitud creada. Comprueba tu email para verificarla.',
+      message: t.verificationSent,
     });
   } catch (error: unknown) {
     log.error('Error creating data request:', error);
 
     const errorMessage =
-      error instanceof Error ? error.message : 'Error creando la solicitud';
+      error instanceof Error ? error.message : t.creatingError;
 
     return NextResponse.json(
       { success: false, error: errorMessage },

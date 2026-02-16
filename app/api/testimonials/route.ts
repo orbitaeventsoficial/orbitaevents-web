@@ -4,6 +4,38 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
 
+type Locale = 'ca' | 'es' | 'en';
+const MESSAGES: Record<Locale, Record<string, string>> = {
+  ca: {
+    success: 'Valoració enviada correctament',
+    invalid: 'Dades no vàlides',
+    processing: 'Error processant la valoració',
+    fetching: 'Error carregant valoracions',
+    verifiedCustomer: 'Client verificat',
+  },
+  es: {
+    success: 'Valoración enviada correctamente',
+    invalid: 'Datos inválidos',
+    processing: 'Error procesando la valoración',
+    fetching: 'Error cargando valoraciones',
+    verifiedCustomer: 'Cliente verificado',
+  },
+  en: {
+    success: 'Testimonial submitted successfully',
+    invalid: 'Invalid data',
+    processing: 'Error processing testimonial',
+    fetching: 'Error fetching testimonials',
+    verifiedCustomer: 'Verified customer',
+  },
+};
+
+function resolveLocale(request: NextRequest): Locale {
+  const lang = request.headers.get('accept-language')?.toLowerCase() || '';
+  if (lang.includes('ca')) return 'ca';
+  if (lang.includes('en')) return 'en';
+  return 'es';
+}
+
 // Validation schema
 const testimonialSchema = z.object({
   rating: z.number().min(1).max(5),
@@ -37,6 +69,7 @@ function normalizeString(str: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const t = MESSAGES[resolveLocale(request)];
   try {
     const body = await request.json();
     const data = testimonialSchema.parse(body);
@@ -143,20 +176,20 @@ export async function POST(request: NextRequest) {
       success: true,
       discountCode,
       discountPercent,
-      message: 'Testimonial submitted successfully',
+      message: t.success,
     });
   } catch (error) {
     log.error('Error submitting testimonial', error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid data', details: error.errors },
+        { error: t.invalid, details: error.errors },
         { status: 400 }
       );
     }
 
     return NextResponse.json(
-      { error: 'Error processing testimonial' },
+      { error: t.processing },
       { status: 500 }
     );
   }
@@ -164,6 +197,7 @@ export async function POST(request: NextRequest) {
 
 // GET: Fetch approved testimonials for public display
 export async function GET(request: NextRequest) {
+  const t = MESSAGES[resolveLocale(request)];
   try {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '10');
@@ -191,14 +225,14 @@ export async function GET(request: NextRequest) {
       where: { isApproved: true },
     });
 
-    const formattedTestimonials = testimonials.map((t) => ({
-      id: t.id,
-      name: t.showName ? t.customer.name : 'Cliente verificado',
-      text: t.text,
-      rating: t.rating,
-      photoUrl: t.showPhoto ? t.photoUrl : null,
-      eventType: t.eventType,
-      createdAt: t.createdAt,
+    const formattedTestimonials = testimonials.map((testimonial) => ({
+      id: testimonial.id,
+      name: testimonial.showName ? testimonial.customer.name : t.verifiedCustomer,
+      text: testimonial.text,
+      rating: testimonial.rating,
+      photoUrl: testimonial.showPhoto ? testimonial.photoUrl : null,
+      eventType: testimonial.eventType,
+      createdAt: testimonial.createdAt,
     }));
 
     return NextResponse.json({
@@ -209,7 +243,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     log.error('Error fetching testimonials', error);
     return NextResponse.json(
-      { error: 'Error fetching testimonials' },
+      { error: t.fetching },
       { status: 500 }
     );
   }
