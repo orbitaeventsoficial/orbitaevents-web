@@ -22,6 +22,48 @@ const VALID_UPLOAD_TYPES = [
   'video/quicktime',
 ];
 
+type UploadLocale = 'ca' | 'es' | 'en';
+
+const UPLOAD_MESSAGES: Record<UploadLocale, Record<string, string>> = {
+  ca: {
+    unauthorized: 'No autoritzat',
+    storageNotConfigured: 'Storage no configurat',
+    missingFileNameOrType: 'Falten paràmetres fileName i fileType',
+    invalidFolder: 'Carpeta no vàlida',
+    invalidFileType: 'Tipus de fitxer no permès. Fes servir JPG, PNG, WebP, GIF o MP4.',
+    missingFile: "No s'ha proporcionat cap fitxer",
+    fileTooLarge: 'Fitxer massa gran per pujada directa. Fes servir signed URL.',
+    processingError: "Error processant el fitxer",
+  },
+  es: {
+    unauthorized: 'No autorizado',
+    storageNotConfigured: 'Storage no configurado',
+    missingFileNameOrType: 'Faltan parametros fileName y fileType',
+    invalidFolder: 'Carpeta invalida',
+    invalidFileType: 'Tipo de fichero no permitido. Usa JPG, PNG, WebP, GIF o MP4.',
+    missingFile: 'No se ha proporcionado ningun fichero',
+    fileTooLarge: 'Fichero demasiado grande para upload directo. Usa signed URL.',
+    processingError: 'Error procesando el fichero',
+  },
+  en: {
+    unauthorized: 'Unauthorized',
+    storageNotConfigured: 'Storage is not configured',
+    missingFileNameOrType: 'Missing fileName and fileType parameters',
+    invalidFolder: 'Invalid folder',
+    invalidFileType: 'File type not allowed. Use JPG, PNG, WebP, GIF or MP4.',
+    missingFile: 'No file was provided',
+    fileTooLarge: 'File too large for direct upload. Use signed URL.',
+    processingError: 'Error processing file',
+  },
+};
+
+function resolveUploadLocale(request: NextRequest): UploadLocale {
+  const header = request.headers.get('accept-language')?.toLowerCase() || '';
+  if (header.includes('ca')) return 'ca';
+  if (header.includes('en')) return 'en';
+  return 'es';
+}
+
 function normalizeFolder(input: unknown): string | null {
   const folder = typeof input === 'string' ? input.trim() : '';
   if (!folder) return 'uploads';
@@ -74,6 +116,8 @@ function getSupabaseAdmin() {
 }
 
 export async function POST(request: NextRequest) {
+  const locale = resolveUploadLocale(request);
+  const t = UPLOAD_MESSAGES[locale];
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;
 
@@ -85,7 +129,7 @@ export async function POST(request: NextRequest) {
       ip: request.headers.get('x-forwarded-for') || 'unknown',
     });
     return NextResponse.json(
-      { error: 'No autorizado' },
+      { error: t.unauthorized },
       { status: 401, headers: { 'WWW-Authenticate': 'Basic realm="Upload"' } }
     );
   }
@@ -95,7 +139,7 @@ export async function POST(request: NextRequest) {
 
     if (!supabaseAdmin) {
       return NextResponse.json(
-        { error: 'Storage no configurado' },
+        { error: t.storageNotConfigured },
         { status: 500 }
       );
     }
@@ -109,21 +153,21 @@ export async function POST(request: NextRequest) {
 
       if (!fileName || !fileType) {
         return NextResponse.json(
-          { error: 'Faltan parametros fileName y fileType' },
+          { error: t.missingFileNameOrType },
           { status: 400 }
         );
       }
 
       if (!folder) {
         return NextResponse.json(
-          { error: 'Carpeta invalida' },
+          { error: t.invalidFolder },
           { status: 400 }
         );
       }
 
       if (!VALID_UPLOAD_TYPES.includes(fileType)) {
         return NextResponse.json(
-          { error: 'Tipo de fichero no permitido. Usa JPG, PNG, WebP, GIF o MP4.' },
+          { error: t.invalidFileType },
           { status: 400 }
         );
       }
@@ -161,21 +205,21 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json(
-        { error: 'No se ha proporcionado ningun fichero' },
+        { error: t.missingFile },
         { status: 400 }
       );
     }
 
     if (!folder) {
       return NextResponse.json(
-        { error: 'Carpeta invalida' },
+        { error: t.invalidFolder },
         { status: 400 }
       );
     }
 
     if (!VALID_UPLOAD_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Tipo de fichero no permitido. Usa JPG, PNG, WebP, GIF o MP4.' },
+        { error: t.invalidFileType },
         { status: 400 }
       );
     }
@@ -183,7 +227,7 @@ export async function POST(request: NextRequest) {
     if (file.size > DIRECT_UPLOAD_LIMIT) {
       return NextResponse.json(
         {
-          error: 'Fichero demasiado grande para upload directo. Usa signed URL.',
+          error: t.fileTooLarge,
           useSignedUrl: true,
         },
         { status: 413 }
@@ -225,7 +269,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     log.error('Error subiendo fichero', error);
     return NextResponse.json(
-      { error: 'Error procesando el fichero' },
+      { error: t.processingError },
       { status: 500 }
     );
   }

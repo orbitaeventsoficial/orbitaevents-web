@@ -6,6 +6,7 @@ import './globals.css';
 import caMessages from '@/messages/ca.json';
 
 const homeMeta = (caMessages as Record<string, any>)?.homePage?.meta || {};
+const homeKeywords = Array.isArray(homeMeta.keywords) ? homeMeta.keywords : [];
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -25,18 +26,7 @@ export const metadata: Metadata = {
     template: '%s | Òrbita Events',
   },
   description: homeMeta.description || 'Experiències immersives per esdeveniments',
-  keywords: [
-    'eventos catalunya',
-    'dj profesional barcelona',
-    'bodas barcelona',
-    'fiestas girona',
-    'eventos costa brava',
-    'eventos corporativos',
-    'discomovil profesional',
-    'produccion eventos',
-    'sonido profesional',
-    'iluminacion eventos',
-  ],
+  keywords: homeKeywords,
   authors: [{ name: 'Òrbita Events', url: 'https://orbitaevents.com' }],
   creator: 'Òrbita Events',
   publisher: 'Òrbita Events',
@@ -52,7 +42,7 @@ export const metadata: Metadata = {
         url: '/og-default.jpg',
         width: 1200,
         height: 630,
-        alt: 'Òrbita Events - Eventos profesionales Catalunya',
+        alt: homeMeta.ogImageAlt || 'Òrbita Events',
       },
     ],
   },

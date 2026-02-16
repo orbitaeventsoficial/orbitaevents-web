@@ -10,7 +10,7 @@ export default function NotFound() {
   return (
     <html lang="ca">
       <head>
-        <title>{`404 - ${t.title || 'Pàgina no trobada'} | Òrbita Events`}</title>
+        <title>{`404 - ${t.title} | Òrbita Events`}</title>
         <meta name="robots" content="noindex" />
         <style>{`
           * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -81,10 +81,10 @@ export default function NotFound() {
         <div className="container">
           <div className="code">404</div>
           <div className="bar" />
-          <h2>{t.title || 'Aquesta pàgina no existeix'}</h2>
-          <p>{t.description || 'Sembla que aquesta pàgina se\'n va anar de festa i no va tornar.'}</p>
+          <h2>{t.title}</h2>
+          <p>{t.description}</p>
           <a href="/" className="btn">
-            {t.backToHome || 'Tornar a l\'inici'}
+            {t.backToHome}
           </a>
         </div>
       </body>
