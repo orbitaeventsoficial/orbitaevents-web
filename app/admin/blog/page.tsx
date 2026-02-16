@@ -234,7 +234,7 @@ export default function BlogAdminPage() {
                       </td>
                       <td className="px-6 py-4 text-slate-400">{post.viewCount}</td>
                       <td className="px-6 py-4 text-sm text-slate-400">
-                        {new Date(post.createdAt).toLocaleDateString('es-ES')}
+                        {new Date(post.createdAt).toLocaleDateString('ca-ES')}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex justify-end gap-2">

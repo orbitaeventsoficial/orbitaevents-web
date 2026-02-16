@@ -43,10 +43,10 @@ function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
 }
 
 async function resolvePack(packKey: string, locale?: string): Promise<QuotePack> {
-  const pack = await getDbPackByCode(packKey, locale || 'es');
+  const pack = await getDbPackByCode(packKey, locale || 'ca');
   if (pack) return packToQuotePack(pack);
 
-  const fallback = await getDbPacks({ service: 'fiestas', locale: locale || 'es' });
+  const fallback = await getDbPacks({ service: 'fiestas', locale: locale || 'ca' });
   return packToQuotePack(fallback[0]);
 }
 
@@ -119,7 +119,7 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
       searchParams.get('packId')?.toLowerCase()
       || lead.interestedPackId?.toLowerCase()
       || 'default';
-    const basePack = await resolvePack(packKey, lead.preferredLocale || 'es');
+    const basePack = await resolvePack(packKey, lead.preferredLocale || 'ca');
     const customPrice = parsePositiveNumber(searchParams.get('customPrice'));
     const customHours = parsePositiveNumber(searchParams.get('customHours'));
     const packData = {
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
 
     // Determinar pack (del body o del lead) des de config centralitzada
     const packKey = body.packId?.toLowerCase() || lead.interestedPackId?.toLowerCase() || 'default';
-    const basePack = await resolvePack(packKey, lead.preferredLocale || 'es');
+    const basePack = await resolvePack(packKey, lead.preferredLocale || 'ca');
 
     // Override amb dades del body si existeixen
     const packData = {

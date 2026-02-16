@@ -44,17 +44,17 @@ function buildEmailContent(flow: CommFlow, booking: {
 
   if (flow === 'PAYMENT') {
     return {
-      subject: `Recordatorio de pago · ${booking.reference}`,
+      subject: `Recordatori de pagament · ${booking.reference}`,
       html: `
         <div style="font-family:Segoe UI,Arial,sans-serif;background:#0b1120;color:#e2e8f0;padding:24px">
-          <h2 style="margin:0 0 12px 0;color:#f8fafc">Recordatorio de pago</h2>
-          <p>Hola ${firstName}, te escribimos para revisar los pagos de tu evento (${booking.reference}).</p>
+          <h2 style="margin:0 0 12px 0;color:#f8fafc">Recordatori de pagament</h2>
+          <p>Hola ${firstName}, t'escrivim per revisar els pagaments del teu esdeveniment (${booking.reference}).</p>
           <ul style="line-height:1.8">
-            <li>Señal: <strong>${booking.depositAmount.toLocaleString('es-ES')}€</strong></li>
-            <li>Resto: <strong>${booking.remainingAmount.toLocaleString('es-ES')}€</strong></li>
-            <li>Evento: <strong>${new Date(booking.eventDate).toLocaleDateString('es-ES')}</strong></li>
+            <li>Paga i senyal: <strong>${booking.depositAmount.toLocaleString('ca-ES')}€</strong></li>
+            <li>Resta: <strong>${booking.remainingAmount.toLocaleString('ca-ES')}€</strong></li>
+            <li>Esdeveniment: <strong>${new Date(booking.eventDate).toLocaleDateString('ca-ES')}</strong></li>
           </ul>
-          <p>Si ya está realizado, responde a este email y lo marcamos.</p>
+          <p>Si ja està fet, respon aquest correu i ho marquem.</p>
         </div>
       `,
     };
@@ -62,23 +62,23 @@ function buildEmailContent(flow: CommFlow, booking: {
 
   if (flow === 'POST_EVENT') {
     return {
-      subject: `Seguimiento post-evento · ${booking.reference}`,
+      subject: `Seguiment post-esdeveniment · ${booking.reference}`,
       html: `
         <div style="font-family:Segoe UI,Arial,sans-serif;background:#0b1120;color:#e2e8f0;padding:24px">
-          <h2 style="margin:0 0 12px 0;color:#f8fafc">Gracias por tu evento</h2>
-          <p>Hola ${firstName}, esperamos que el evento haya sido excelente.</p>
-          <p>Si no pudiste completar la valoración, te la reenviamos en un momento.</p>
+          <h2 style="margin:0 0 12px 0;color:#f8fafc">Gràcies pel teu esdeveniment</h2>
+          <p>Hola ${firstName}, esperem que l'esdeveniment hagi anat genial.</p>
+          <p>Si no vas poder completar la valoració, te la reenviem en un moment.</p>
         </div>
       `,
     };
   }
 
   return {
-    subject: `Seguimiento de evento · ${booking.reference}`,
+    subject: `Seguiment d'esdeveniment · ${booking.reference}`,
     html: `
       <div style="font-family:Segoe UI,Arial,sans-serif;background:#0b1120;color:#e2e8f0;padding:24px">
-        <h2 style="margin:0 0 12px 0;color:#f8fafc">Seguimiento</h2>
-        <p>Hola ${firstName}, seguimos en contacto para cualquier ajuste del evento ${booking.reference}.</p>
+        <h2 style="margin:0 0 12px 0;color:#f8fafc">Seguiment</h2>
+        <p>Hola ${firstName}, seguim en contacte per a qualsevol ajust de l'esdeveniment ${booking.reference}.</p>
       </div>
     `,
   };
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     const body = await req.json().catch(() => ({}));
     const payload = parseBody(body);
     if (!payload) {
-      return NextResponse.json({ ok: false, error: 'Payload inválido' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Payload invàlid' }, { status: 400 });
     }
 
     const booking = await prisma.booking.findUnique({
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest, { params }: Params) {
       },
     });
     if (!booking) {
-      return NextResponse.json({ ok: false, error: 'Reserva no encontrada' }, { status: 404 });
+      return NextResponse.json({ ok: false, error: 'Reserva no trobada' }, { status: 404 });
     }
 
     if (payload.action === 'send_email') {
@@ -167,7 +167,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     if (payload.action === 'log_sent') {
       if (!payload.channel) {
-        return NextResponse.json({ ok: false, error: 'Canal requerido' }, { status: 400 });
+        return NextResponse.json({ ok: false, error: 'Canal obligatori' }, { status: 400 });
       }
       await prisma.adminLog.create({
         data: {
@@ -195,6 +195,6 @@ export async function POST(req: NextRequest, { params }: Params) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     log.error('Error in booking communications route', error);
-    return NextResponse.json({ ok: false, error: 'No se pudo procesar la comunicación' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'No s’ha pogut processar la comunicació' }, { status: 500 });
   }
 }

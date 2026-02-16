@@ -47,10 +47,10 @@ function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
 }
 
 async function resolvePack(packKey: string, locale?: string): Promise<QuotePack> {
-  const pack = await getDbPackByCode(packKey, locale || 'es');
+  const pack = await getDbPackByCode(packKey, locale || 'ca');
   if (pack) return packToQuotePack(pack);
 
-  const fallback = await getDbPacks({ service: 'fiestas', locale: locale || 'es' });
+  const fallback = await getDbPacks({ service: 'fiestas', locale: locale || 'ca' });
   return packToQuotePack(fallback[0]);
 }
 
