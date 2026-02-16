@@ -7,17 +7,35 @@ import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
+function normalizeLocale(raw?: string | null): 'ca' | 'es' | 'en' {
+  const value = String(raw || 'ca').toLowerCase();
+  if (value.startsWith('es')) return 'es';
+  if (value.startsWith('en')) return 'en';
+  return 'ca';
+}
+
+function pickTranslation<T extends { locale: string }>(translations: T[], locale: 'ca' | 'es' | 'en'): T | undefined {
+  return (
+    translations.find((t) => t.locale === locale) ||
+    translations.find((t) => t.locale === 'ca') ||
+    translations.find((t) => t.locale === 'es') ||
+    translations.find((t) => t.locale === 'en') ||
+    translations[0]
+  );
+}
+
 // GET - Obtenir tots els preus i dades vinculades
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
   try {
+    const { searchParams } = new URL(req.url);
+    const locale = normalizeLocale(searchParams.get('locale'));
+
     // 1. Extras (EDITABLES - preus que pots canviar)
     const extras = await prisma.extra.findMany({
       include: {
-        translations: {
-          where: { locale: 'es' },
-        },
+        translations: true,
         inventory: {
           include: {
             item: {
@@ -49,9 +67,7 @@ export async function GET(req: NextRequest) {
     // 2. Packs (NOMÉS LECTURA - calculats automàticament)
     const packs = await prisma.pack.findMany({
       include: {
-        translations: {
-          where: { locale: 'es' },
-        },
+        translations: true,
         inventory: {
           include: {
             item: {
@@ -136,7 +152,7 @@ export async function GET(req: NextRequest) {
       topExtras: extras
         .map(e => ({
           slug: e.slug,
-          name: e.translations[0]?.name || e.slug,
+          name: pickTranslation(e.translations, locale)?.name || e.slug,
           totalSales: e.bookingExtras.length,
           revenue: e.bookingExtras.reduce((sum, be) => sum + be.price * be.quantity, 0),
         }))
@@ -146,7 +162,7 @@ export async function GET(req: NextRequest) {
       topPacks: packs
         .map(p => ({
           slug: p.slug,
-          name: p.translations[0]?.name || p.slug,
+          name: pickTranslation(p.translations, locale)?.name || p.slug,
           totalBookings: p._count.bookings,
           revenue: p.bookings.reduce((sum, b) => sum + b.total, 0),
         }))
@@ -174,8 +190,8 @@ export async function GET(req: NextRequest) {
         extras: extras.map(e => ({
           id: e.id,
           slug: e.slug,
-          name: e.translations[0]?.name || e.slug,
-          description: e.translations[0]?.description,
+          name: pickTranslation(e.translations, locale)?.name || e.slug,
+          description: pickTranslation(e.translations, locale)?.description,
           price: e.price,
           priceType: e.priceType,
           isActive: e.isActive,
@@ -202,8 +218,8 @@ export async function GET(req: NextRequest) {
         packs: packs.map(p => ({
           id: p.id,
           slug: p.slug,
-          name: p.translations[0]?.name || p.slug,
-          tagline: p.translations[0]?.tagline,
+          name: pickTranslation(p.translations, locale)?.name || p.slug,
+          tagline: pickTranslation(p.translations, locale)?.tagline,
           price: p.price,
           originalPrice: p.originalPrice,
           extraHourPrice: p.extraHourPrice,
@@ -297,7 +313,7 @@ export async function PUT(req: NextRequest) {
     // Verificar que l'extra existeix
     const extra = await prisma.extra.findUnique({
       where: { id: extraId },
-      include: { translations: { where: { locale: 'es' } } },
+      include: { translations: true },
     });
 
     if (!extra) {
@@ -323,14 +339,14 @@ export async function PUT(req: NextRequest) {
           field: 'price',
           oldValue: extra.price,
           newValue: price,
-          extraName: extra.translations[0]?.name || extra.slug,
+          extraName: pickTranslation(extra.translations, 'ca')?.name || extra.slug,
         },
       },
     });
 
     return NextResponse.json({
       ok: true,
-      message: `Preu de "${extra.translations[0]?.name || extra.slug}" actualitzat a ${price}€`,
+      message: `Preu de "${pickTranslation(extra.translations, 'ca')?.name || extra.slug}" actualitzat a ${price}€`,
       extra: updated,
     });
   } catch (error) {

@@ -118,7 +118,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('es-ES', {
+  return new Intl.NumberFormat('ca-ES', {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 0,
@@ -169,7 +169,7 @@ export default function PricingAdminPage() {
   async function loadData() {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/pricing');
+      const res = await fetch('/api/admin/pricing?locale=ca');
       const data = await res.json();
       if (data.ok) {
         setExtras(data.data.extras);
