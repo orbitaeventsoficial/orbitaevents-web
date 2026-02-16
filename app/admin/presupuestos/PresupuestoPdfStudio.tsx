@@ -38,6 +38,45 @@ type StudioProps = {
 const STUDIO_DRAFT_KEY = 'admin.presupuestos.pdfstudio.draft.v1';
 const CUSTOM_PACK_ID = '__custom_pack__';
 
+const STUDIO_COPY: Record<Locale, { hours: string; customServiceName: string; customExtraDescription: string; defaultClientName: string; sendQuote: string; sendingQuote: string; noDate: string; noSchedule: string; noLocation: string; clientLabel: string }> = {
+  ca: {
+    hours: 'hores',
+    customServiceName: 'Servei personalitzat',
+    customExtraDescription: 'Extra personalitzat',
+    defaultClientName: 'Client',
+    sendQuote: 'Envia pressupost',
+    sendingQuote: 'Enviant...',
+    noDate: 'Sense data',
+    noSchedule: 'Sense horari',
+    noLocation: 'Sense ubicació',
+    clientLabel: 'Client',
+  },
+  es: {
+    hours: 'horas',
+    customServiceName: 'Servicio personalizado',
+    customExtraDescription: 'Extra personalizado',
+    defaultClientName: 'Cliente',
+    sendQuote: 'Enviar presupuesto',
+    sendingQuote: 'Enviando...',
+    noDate: 'Sin fecha',
+    noSchedule: 'Sin horario',
+    noLocation: 'Sin ubicación',
+    clientLabel: 'Cliente',
+  },
+  en: {
+    hours: 'hours',
+    customServiceName: 'Custom service',
+    customExtraDescription: 'Custom extra',
+    defaultClientName: 'Client',
+    sendQuote: 'Send quote',
+    sendingQuote: 'Sending...',
+    noDate: 'No date',
+    noSchedule: 'No schedule',
+    noLocation: 'No location',
+    clientLabel: 'Client',
+  },
+};
+
 function normalizeStudioLocale(value?: string): Locale {
   const raw = String(value || '').toLowerCase();
   if (raw.startsWith('es')) return 'es';
@@ -78,15 +117,17 @@ function buildPackFromForm(params: {
   price: number;
   durationHours: number;
   featuresText: string;
+  locale: Locale;
 }): PackDefinition {
   const features = toFeatureLines(params.featuresText);
+  const duration = Math.max(1, Math.round(params.durationHours));
   return {
     ...params.source,
     name: params.name.trim() || params.source.name,
     priceValue: Math.max(0, params.price),
     price: formatEUR(params.price),
-    durationHours: Math.max(1, Math.round(params.durationHours)),
-    duration: `${Math.max(1, Math.round(params.durationHours))} horas`,
+    durationHours: duration,
+    duration: `${duration} ${STUDIO_COPY[params.locale].hours}`,
     features: features.length > 0 ? features : params.source.features,
   };
 }
@@ -164,10 +205,11 @@ export default function PresupuestoPdfStudio({
   initialBrandLogoDataUrl = '',
 }: StudioProps) {
   const [locale, setLocale] = useState<Locale>(normalizeStudioLocale(initialPreferredLocale));
+  const studioText = STUDIO_COPY[locale];
   const [eventType, setEventType] = useState<ServiceSlug>('bodas');
   const [packId, setPackId] = useState<string>(() => getPacksByService('bodas')[0]?.id || '');
   const [clientContact, setClientContact] = useState('');
-  const [clientName, setClientName] = useState(initialCustomerName || 'Client');
+  const [clientName, setClientName] = useState(initialCustomerName || STUDIO_COPY.ca.defaultClientName);
   const [clientEmail, setClientEmail] = useState(initialCustomerEmail || '');
   const [clientPhone, setClientPhone] = useState('');
   const [customerId] = useState(initialCustomerId);
@@ -253,7 +295,7 @@ export default function PresupuestoPdfStudio({
     return found || packs[0];
   }, [packId, packs]);
 
-  const [packName, setPackName] = useState(selectedPack?.name || 'Pack personalizado');
+  const [packName, setPackName] = useState(selectedPack?.name || STUDIO_COPY.ca.customServiceName);
   const [basePrice, setBasePrice] = useState(selectedPack?.priceValue || 0);
   const [durationHours, setDurationHours] = useState(selectedPack?.durationHours || 4);
   const [featuresText, setFeaturesText] = useState((selectedPack?.features || []).join('\n'));
@@ -634,7 +676,7 @@ export default function PresupuestoPdfStudio({
       ...translatedCustomExtras.map((extra) => ({
         id: extra.id,
         name: extra.name,
-        description: 'Extra personalitzat',
+        description: studioText.customExtraDescription,
         price: extra.price,
         icon: '•',
         category: 'other' as const,
@@ -647,6 +689,7 @@ export default function PresupuestoPdfStudio({
       price: basePrice,
       durationHours,
       featuresText: translatedFeatures.join('\n'),
+      locale,
     });
 
     return generateQuotePDF(
@@ -665,7 +708,7 @@ export default function PresupuestoPdfStudio({
         discountReason: discountReason.trim(),
         total,
         clientContact: clientContact.trim() || undefined,
-        clientName: clientName.trim() || 'Client',
+        clientName: clientName.trim() || studioText.defaultClientName,
         clientEmail: clientEmail.trim() || '',
         clientPhone: clientPhone.trim() || undefined,
         validityDays,
@@ -744,7 +787,7 @@ export default function PresupuestoPdfStudio({
         })),
         ...customExtras.map((extra) => ({
           name: extra.name,
-          description: 'Extra personalitzat',
+          description: studioText.customExtraDescription,
           price: extra.price,
           quantity: 1,
         })),
@@ -893,13 +936,13 @@ export default function PresupuestoPdfStudio({
                 const nextPackId = e.target.value;
                 if (nextPackId === CUSTOM_PACK_ID) {
                   setPackId(CUSTOM_PACK_ID);
-                  if (!packName.trim()) setPackName('Servei personalitzat');
+                  if (!packName.trim()) setPackName(studioText.customServiceName);
                   return;
                 }
                 reloadPackValues(nextPackId);
               }}
             >
-              <option value={CUSTOM_PACK_ID}>Servei personalitzat</option>
+              <option value={CUSTOM_PACK_ID}>{studioText.customServiceName}</option>
               {packs.map((pack) => (
                 <option key={pack.id} value={pack.id}>
                   {pack.name} ({pack.price})
@@ -1187,7 +1230,7 @@ export default function PresupuestoPdfStudio({
             disabled={generating || sending || !selectedPack || !clientEmail.trim()}
             className="rounded-xl border border-violet-500/40 bg-violet-500/15 px-5 py-2.5 text-sm font-semibold text-violet-200 hover:bg-violet-500/20 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"
           >
-            {sending ? 'Enviant...' : 'Envia pressupost'}
+            {sending ? studioText.sendingQuote : studioText.sendQuote}
           </button>
           <button
             type="button"
@@ -1214,8 +1257,8 @@ export default function PresupuestoPdfStudio({
           </div>
 
           <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
-            <p className="text-slate-400">Client</p>
-            <p className="font-semibold text-slate-100">{clientName || 'Client'}</p>
+            <p className="text-slate-400">{studioText.clientLabel}</p>
+            <p className="font-semibold text-slate-100">{clientName || studioText.defaultClientName}</p>
             <p className="text-slate-300">{clientContact || '-'}</p>
             <p className="text-slate-300">{clientEmail || '-'} · {clientPhone || '-'}</p>
           </div>
@@ -1223,8 +1266,8 @@ export default function PresupuestoPdfStudio({
           <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
             <p className="text-slate-400">Esdeveniment</p>
             <p className="font-semibold text-slate-100">{SERVICE_LABEL[eventType]}</p>
-            <p className="text-slate-300">{eventDate || 'Sense data'} · {guests} convidats</p>
-            <p className="text-slate-300">{eventSchedule || 'Sense horari'} · {eventLocation || 'Sense ubicació'}</p>
+            <p className="text-slate-300">{eventDate || studioText.noDate} · {guests} convidats</p>
+            <p className="text-slate-300">{eventSchedule || studioText.noSchedule} · {eventLocation || studioText.noLocation}</p>
             <p className="text-slate-300">Validesa: {validityDays} dies</p>
           </div>
 

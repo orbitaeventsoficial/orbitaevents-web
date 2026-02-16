@@ -12,7 +12,7 @@ const createProposalSchema = z.object({
   leadId: z.string().optional(),
   bookingId: z.string().optional(),
   status: z.nativeEnum(ProposalStatus).optional(),
-  locale: z.string().default('es'),
+  locale: z.string().optional(),
   currency: z.string().default('EUR'),
   validityDays: z.number().int().min(1).max(120).default(15),
   subtotal: z.number().min(0),
@@ -93,6 +93,11 @@ export async function POST(req: NextRequest) {
     const data = parsed.data;
     customerIdForLog = data.customerId;
     const reference = await generateProposalReference();
+    const customer = await prisma.customer.findUnique({
+      where: { id: data.customerId },
+      select: { preferredLocale: true },
+    });
+    const resolvedLocale = (data.locale || customer?.preferredLocale || 'ca').toLowerCase();
 
     const proposal = await prisma.proposal.create({
       data: {
@@ -101,7 +106,7 @@ export async function POST(req: NextRequest) {
         leadId: data.leadId,
         bookingId: data.bookingId,
         status: data.status ?? 'DRAFT',
-        locale: data.locale,
+        locale: resolvedLocale,
         currency: data.currency,
         validityDays: data.validityDays,
         subtotal: data.subtotal,

@@ -59,7 +59,22 @@ function mergeNotes(parts: Array<string | undefined | null>): string | undefined
   return filtered.length ? filtered.join('\n\n') : undefined;
 }
 
-async function normalizeExtras(extras: unknown): Promise<QuoteExtra[] | undefined> {
+function resolveLocalizedExtra(
+  translations: Array<{ locale: string; name: string; description: string | null }>,
+  locale: string
+) {
+  const normalized = locale.toLowerCase();
+  return (
+    translations.find((t) => t.locale.toLowerCase() === normalized) ||
+    translations.find((t) => t.locale.toLowerCase().startsWith(normalized.slice(0, 2))) ||
+    translations.find((t) => t.locale === 'ca') ||
+    translations.find((t) => t.locale === 'es') ||
+    translations.find((t) => t.locale === 'en') ||
+    translations[0]
+  );
+}
+
+async function normalizeExtras(extras: unknown, locale: string): Promise<QuoteExtra[] | undefined> {
   if (!Array.isArray(extras) || extras.length === 0) return undefined;
 
   const hasObjectExtras = extras.some(
@@ -89,12 +104,15 @@ async function normalizeExtras(extras: unknown): Promise<QuoteExtra[] | undefine
     throw new Error(`Missing extras: ${missing.join(', ')}`);
   }
 
-  return dbExtras.map((extra) => ({
-    name: extra.translations[0]?.name || extra.slug,
-    description: extra.translations[0]?.description || undefined,
-    price: extra.price,
-    quantity: 1,
-  }));
+  return dbExtras.map((extra) => {
+    const localized = resolveLocalizedExtra(extra.translations as any, locale);
+    return {
+      name: localized?.name || extra.slug,
+      description: localized?.description || undefined,
+      price: extra.price,
+      quantity: 1,
+    };
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -165,7 +183,7 @@ export async function POST(req: NextRequest) {
       price,
     };
 
-    const quoteExtras = await normalizeExtras(extras);
+    const quoteExtras = await normalizeExtras(extras, resolvedLocale);
 
     // Create quote data - use lead if available, otherwise minimal data
     const quoteData = lead
@@ -173,7 +191,7 @@ export async function POST(req: NextRequest) {
       : {
           clientName: recipientName,
           clientEmail: recipientEmail,
-          eventType: 'Event',
+          eventType: resolvedLocale.startsWith('en') ? 'Event' : resolvedLocale.startsWith('es') ? 'Evento' : 'Esdeveniment',
           eventDate: new Date(),
           eventLocation: '',
           guestCount: 0,

@@ -145,18 +145,18 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
   });
   const introTitle = template.introTitle?.trim() || 'PRESSUPOST';
   const introSubtitle =
-    template.introSubtitle?.trim() || 'Proposta personalitzada per al teu esdeveniment';
+    template.introSubtitle?.trim() || 'Proposta feta a mida per al teu esdeveniment';
   const ctaTitle = template.ctaTitle?.trim() || "T'agrada el que veus?";
   const ctaSubtitle =
-    template.ctaSubtitle?.trim() || 'Reserva la teva data ara i assegura`t el millor preu';
+    template.ctaSubtitle?.trim() || "Reserva la teva data ara i assegura't el millor preu";
   const conditions = Array.isArray(template.conditions) && template.conditions.length > 0
     ? template.conditions
     : [
-        "Reserva: Es considera reserva ferma amb el pagament del 30% d'aval.",
-        "Pagament final: El 70% restant s'abona 7 dies abans de l'esdeveniment.",
-        "Cancel·lació: L'aval no és reemborsable un cop confirmada la reserva.",
-        'Desplaçament: Inclòs fins a 50km de Granollers. Consulteu per a distàncies superiors.',
-        "Hores extres: Es facturaran al preu indicat si l'esdeveniment s'allarga.",
+        "Reserva: la data queda confirmada amb el pagament del 30% d'aval.",
+        "Pagament final: el 70% restant s'abona 7 dies abans de l'esdeveniment.",
+        "Cancel·lació: l'aval no és reemborsable un cop confirmada la reserva.",
+        'Desplaçament: inclòs fins a 50 km de Granollers. Per a distàncies superiors, et passarem pressupost.',
+        "Hores extres: si l'esdeveniment s'allarga, es facturaran al preu indicat.",
       ];
 
   return `
