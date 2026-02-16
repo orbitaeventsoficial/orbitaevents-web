@@ -62,14 +62,14 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
                   href={`/admin/presupuestos?proposalId=${proposal.id}`}
                   className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
                 >
-                  Editar
+                  Edita
                 </Link>
                 <form action={`/api/admin/proposals/${proposal.id}/send`} method="POST">
                   <button
                     type="submit"
                     className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
                   >
-                    Enviar
+                    Envia
                   </button>
                 </form>
                 <button

@@ -124,7 +124,7 @@ export default function ManualActionsPanel() {
         <div>
           <h3 className="text-sm font-medium text-slate-200 mb-2">Executar Cron Post-Event</h3>
           <p className="text-xs text-slate-400 mb-3">
-            Envia emails a tots els events completats pendents
+            Envia correus a tots els esdeveniments completats pendents
           </p>
           <button
             onClick={runCronManually}
@@ -175,7 +175,7 @@ export default function ManualActionsPanel() {
                 : 'bg-slate-700/50 text-slate-200 border border-slate-600/50 hover:bg-slate-600/50'
             }`}
           >
-            {runningReminder ? 'Enviant...' : '⭐ Enviar recordatori'}
+            {runningReminder ? 'Enviant...' : '⭐ Envia recordatori'}
           </button>
           {reminderResult && (
             <p
@@ -191,7 +191,7 @@ export default function ManualActionsPanel() {
 
         {/* Send Test Email */}
         <div>
-          <h3 className="text-sm font-medium text-slate-200 mb-2">Enviar Email de Prova</h3>
+          <h3 className="text-sm font-medium text-slate-200 mb-2">Envia correu de prova</h3>
           <p className="text-xs text-slate-400 mb-3">
             Envia un email de prova per verificar la configuració SMTP
           </p>

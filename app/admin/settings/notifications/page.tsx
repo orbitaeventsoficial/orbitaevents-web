@@ -144,7 +144,7 @@ export default function SettingsNotificationsPage() {
             ← Tornar a configuració
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-200">
-            📧 Configuracio de notificacions
+            📧 Configuració de notificacions
           </h1>
           <p className="mt-1 text-sm text-slate-400">
             Gestiona com reps alertes quan entra un nou lead
@@ -201,7 +201,7 @@ export default function SettingsNotificationsPage() {
           aria-busy={testing}
           className="px-6 py-3 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {testing ? '📤 Enviant...' : '📧 Enviar Email de Test'}
+          {testing ? '📤 Enviant...' : '📧 Envia correu de prova'}
         </button>
         
         {!config?.status.emailReady && (
@@ -291,7 +291,7 @@ export default function SettingsNotificationsPage() {
         )}
       </section>
 
-      {/* Configuration Details */}
+      {/* Detall de configuració */}
       <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-200 mb-4">⚙️ Configuració Actual</h2>
         
@@ -324,7 +324,7 @@ export default function SettingsNotificationsPage() {
         </div>
       </section>
 
-      {/* Instructions */}
+      {/* Instruccions */}
       {instructions.length > 0 && !config?.status.emailReady && (
         <section className="rounded-xl border border-amber-400/30 bg-amber-950/30 p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-amber-200 mb-4">📝 Instruccions de Configuració</h2>
@@ -337,7 +337,7 @@ export default function SettingsNotificationsPage() {
         </section>
       )}
 
-      {/* Quick Reference */}
+      {/* Referència ràpida */}
       <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-200 mb-4">📚 Referència Ràpida</h2>
         
@@ -360,7 +360,7 @@ export default function SettingsNotificationsPage() {
           <ol className="list-decimal pl-4 space-y-1">
             <li>Ves al <a href="https://railway.app" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:underline">panell de Railway</a></li>
             <li>Selecciona el projecte <code className="bg-white/5 px-1 rounded">orbitaevents-web</code></li>
-            <li>Settings → Environment Variables</li>
+            <li>Configuració → Variables d&apos;entorn</li>
             <li>Afegeix cada variable amb el seu valor</li>
             <li>Redesplega el projecte</li>
           </ol>

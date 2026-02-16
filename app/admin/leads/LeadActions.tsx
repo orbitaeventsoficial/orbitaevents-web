@@ -17,11 +17,11 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
 
   const handleDelete = async () => {
     if (hasBooking) {
-      alert('No es pot eliminar un lead amb reserva associada');
+      alert("No es pot eliminar una entrada amb reserva associada");
       return;
     }
 
-    if (!confirm(`Segur que vols eliminar el lead "${leadName}"?\n\nAquesta acció no es pot desfer.`)) {
+    if (!confirm(`Segur que vols eliminar l'entrada "${leadName}"?\n\nAquesta acció no es pot desfer.`)) {
       return;
     }
 
@@ -33,12 +33,12 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || 'Error eliminant lead');
+        throw new Error(data.error || "Error eliminant l'entrada");
       }
 
       router.refresh();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Error eliminant lead');
+      alert(error instanceof Error ? error.message : "Error eliminant l'entrada");
     } finally {
       setIsDeleting(false);
     }
@@ -53,7 +53,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
           )}`}
           target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center rounded-lg bg-emerald-500/20 px-3 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/30 transition-colors border border-emerald-500/30"
-          title="Enviar WhatsApp"
+          title="Envia per WhatsApp"
         >
           💬 WA
         </a>
@@ -74,7 +74,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
             ? 'bg-slate-700/30 text-slate-500 cursor-not-allowed border border-slate-600/30'
             : 'bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/30'
           }`}
-        title={hasBooking ? 'No es pot eliminar (té reserva)' : 'Eliminar lead'}
+        title={hasBooking ? 'No es pot eliminar (té reserva)' : 'Elimina entrada'}
       >
         {isDeleting ? '...' : '🗑️'}
       </button>

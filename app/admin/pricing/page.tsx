@@ -313,7 +313,7 @@ export default function PricingAdminPage() {
         <div className="space-y-8">
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard icon="💰" label="Ingressos Totals" value={formatCurrency(stats.totalRevenue._sum.total || 0)} sublabel={`${stats.completedBookings} events completats`} color="emerald" />
+            <StatCard icon="💰" label="Ingressos totals" value={formatCurrency(stats.totalRevenue._sum.total || 0)} sublabel={`${stats.completedBookings} esdeveniments completats`} color="emerald" />
             <StatCard icon="📦" label="Total packs" value={stats.totalPacks.toString()} sublabel={`${stats.totalBookings} reserves totals`} color="cyan" />
             <StatCard icon="✨" label="Total Extras" value={stats.totalExtras.toString()} sublabel="disponibles" color="purple" />
             <StatCard icon="🔧" label="Inventari" value={stats.totalInventory.toString()} sublabel="ítems registrats" color="amber" />
@@ -685,7 +685,7 @@ export default function PricingAdminPage() {
 
                   {item.recentUsage.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-slate-700/30">
-                      <p className="text-xs text-slate-500 mb-2">Últims events:</p>
+                      <p className="text-xs text-slate-500 mb-2">Últims esdeveniments:</p>
                       <div className="flex gap-2 overflow-x-auto">
                         {item.recentUsage.map((usage, i) => (
                           <span key={i} className="px-2 py-1 bg-slate-700/30 rounded text-xs text-slate-400 whitespace-nowrap border border-slate-700/50">

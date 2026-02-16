@@ -9,11 +9,11 @@ import type { EventType, LeadStatus, Priority, Prisma } from '@prisma/client';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Leads | Òrbita Admin',
+  title: 'Entrades | Òrbita Admin',
 };
 
 const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
-  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Nou Lead' },
+  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Entrada nova' },
   CONTACTED: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Contactat' },
   QUOTE_SENT: { bg: 'bg-purple-500/20', text: 'text-purple-300', label: 'Pressupost enviat' },
   NEGOTIATING: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'Negociació' },
@@ -259,7 +259,7 @@ export default async function LeadsPage({
       {/* Header - Mobile optimized */}
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">Leads</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">Entrades</h1>
           <p className="text-xs sm:text-sm text-slate-400">
             {data.counts.filtered} de {stats.total} contactes
           </p>
@@ -425,7 +425,7 @@ export default async function LeadsPage({
         {leads.length === 0 ? (
           <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-8 text-center">
             <span className="text-4xl">📭</span>
-            <p className="mt-2 text-slate-300">Encara no hi ha leads</p>
+            <p className="mt-2 text-slate-300">Encara no hi ha entrades</p>
             <p className="text-xs text-slate-500">Els contactes apareixeran aquí</p>
           </div>
         ) : (
@@ -491,7 +491,7 @@ export default async function LeadsPage({
                   <td colSpan={7} className="px-4 py-12 text-center text-slate-400">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-4xl">📭</span>
-                      <p>Encara no hi ha leads</p>
+                      <p>Encara no hi ha entrades</p>
                     </div>
                   </td>
                 </tr>

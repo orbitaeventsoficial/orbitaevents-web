@@ -32,7 +32,7 @@ export default async function PresupuestosPage({
   const customer = customerId
     ? await prisma.customer.findUnique({
         where: { id: customerId },
-        select: { id: true, name: true, email: true },
+        select: { id: true, name: true, email: true, preferredLocale: true },
       })
     : null;
   const brandSettingsRows = await prisma.setting.findMany({
@@ -75,6 +75,7 @@ export default async function PresupuestosPage({
         initialCustomerEmail={customer?.email || ''}
         initialLeadId={leadId}
         initialProposalId={proposalId}
+        initialPreferredLocale={customer?.preferredLocale || 'ca'}
         initialBrandName={String(brandSettings['quotes.brandName'] || 'Orbita Events')}
         initialBrandWebsite={String(brandSettings['quotes.brandWebsite'] || 'orbitaevents.com')}
         initialBrandEmail={String(brandSettings['quotes.brandEmail'] || '')}

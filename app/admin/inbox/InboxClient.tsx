@@ -250,8 +250,8 @@ export default function InboxClient({
       setFlashMessage({
         type: 'success',
         text: data.action === 'updated'
-          ? `Lead actualitzat: ${data.lead.name}`
-          : `Lead creat: ${data.lead.name}`,
+          ? `Entrada actualitzada: ${data.lead.name}`
+          : `Entrada creada: ${data.lead.name}`,
       });
       router.push(`/admin/leads/${data.lead.id}`);
       router.refresh();
@@ -461,7 +461,7 @@ export default function InboxClient({
                       <span className={`text-xs px-1.5 py-0.5 rounded ${
                         email.type === 'lead' ? 'bg-purple-500/20 text-purple-300' : 'bg-emerald-500/20 text-emerald-300'
                       }`}>
-                        {email.type === 'lead' ? 'Lead web' : 'Email IMAP'}
+                        {email.type === 'lead' ? 'Entrada web' : 'Correu IMAP'}
                       </span>
                       {!email.read && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">
@@ -496,7 +496,7 @@ export default function InboxClient({
                     <span className={`text-xs px-2 py-1 rounded ${
                       selectedEmail.type === 'lead' ? 'bg-purple-500/20 text-purple-300' : 'bg-emerald-500/20 text-emerald-300'
                     }`}>
-                      {selectedEmail.type === 'lead' ? '📋 Lead web' : '📧 Email IMAP'}
+                      {selectedEmail.type === 'lead' ? '📋 Entrada web' : '📧 Correu IMAP'}
                     </span>
                     {selectedEmail.leadData?.status && (
                       <span className={`px-2 py-1 rounded text-xs font-medium ${STATUS_COLORS[selectedEmail.leadData.status] || 'bg-slate-700/50 text-slate-400'}`}>

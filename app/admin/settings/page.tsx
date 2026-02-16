@@ -16,7 +16,7 @@ const CATEGORY_CONFIG: Record<string, { label: string; icon: string; description
   stats: {
     label: 'Estadístiques Públiques',
     icon: '📊',
-    description: 'Números que apareixen a la web (events, persones, etc.)',
+    description: 'Números que apareixen a la web (esdeveniments, persones, etc.)',
   },
   company: {
     label: 'Empresa',
@@ -95,7 +95,7 @@ export default async function SettingsPage() {
       {/* Info Alert */}
       <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm p-4">
         <p className="text-sm text-amber-200">
-          <strong>Nota:</strong> Les estadístiques públiques (events, persones) s&apos;actualitzen
+          <strong>Nota:</strong> Les estadístiques públiques (esdeveniments, persones) s&apos;actualitzen
           automàticament quan una reserva passa a <span className="font-semibold text-amber-300">COMPLETED</span>.
           Pots editar-les manualment si cal ajustar els números inicials.
         </p>

@@ -7,7 +7,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
     <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-100">Reserva / Dates</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Reserves / Dates</h2>
           <p className="text-sm text-slate-400">Planificació d’esdeveniments del client.</p>
         </div>
         <Link

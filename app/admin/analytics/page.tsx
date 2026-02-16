@@ -569,7 +569,7 @@ export default async function AnalyticsPage() {
         </div>
       </section>
 
-      {/* Events per Tipus */}
+      {/* Esdeveniments per tipus */}
       <section className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm">
         <div className="border-b border-slate-700/50 bg-slate-700/30 p-4">
           <h3 className="font-semibold text-slate-100">Reserves per tipus d&apos;esdeveniment</h3>
@@ -648,7 +648,7 @@ export default async function AnalyticsPage() {
               rel="noreferrer"
               className="rounded-lg border border-slate-600/50 bg-slate-700/30 p-4 text-sm text-slate-200 hover:border-cyan-500/30 hover:text-cyan-300 transition"
             >
-              Events i dataLayer
+              Esdeveniments i dataLayer
             </a>
           </div>
 
@@ -659,7 +659,7 @@ export default async function AnalyticsPage() {
         </div>
       </section>
 
-      {/* Umami Analytics */}
+      {/* Umami Analítica */}
       <section className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm">
         <div className="border-b border-slate-700/50 bg-slate-700/30 p-4">
           <h2 className="text-lg font-semibold text-slate-100">Umami · Analítica</h2>
@@ -668,11 +668,11 @@ export default async function AnalyticsPage() {
         <div className="p-4 space-y-4">
           <div className="grid gap-3 lg:grid-cols-3">
             <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-              <p className="text-xs font-medium uppercase text-slate-400">Dashboard</p>
+              <p className="text-xs font-medium uppercase text-slate-400">Tauler</p>
               <p className="mt-2 text-sm font-semibold text-slate-200">{umamiDashboardUrl}</p>
             </div>
             <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-              <p className="text-xs font-medium uppercase text-slate-400">Website ID</p>
+              <p className="text-xs font-medium uppercase text-slate-400">ID del web</p>
               <p className="mt-2 text-sm font-semibold text-slate-200">{umamiWebsiteId || 'No configurat'}</p>
             </div>
             <div className="flex flex-col justify-between rounded-xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 p-4">
@@ -814,7 +814,7 @@ export default async function AnalyticsPage() {
           </div>
           <div className="rounded-lg border border-slate-600/50 bg-slate-700/30 p-4 text-sm text-slate-300">
             Aquesta és la font principal d&apos;analítica (trànsit, pàgines, esdeveniments i conversions) per al web.
-            Si el Website ID no està configurat, revisa les variables d&apos;entorn.
+            Si l&apos;ID del web no està configurat, revisa les variables d&apos;entorn.
           </div>
         </div>
       </section>

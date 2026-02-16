@@ -364,7 +364,7 @@ export default async function AdminDashboard() {
     ...(!ga4Status.ready ? [{
       type: 'error',
       title: 'GA4 pendent',
-      description: ga4Status.reason || 'Configura GA4 al panell Analytics',
+      description: ga4Status.reason || 'Configura GA4 al panell d’analítica',
       href: '/admin/analytics',
       action: 'Configurar',
     }] : []),
@@ -392,7 +392,7 @@ export default async function AdminDashboard() {
     ...(postEventPending > 0 ? [{
       type: 'warning',
       title: 'Emails post-event pendents',
-      description: `${postEventPending} events sense email enviat.`,
+      description: `${postEventPending} esdeveniments sense correu enviat.`,
       href: '/admin/emails',
       action: 'Gestionar',
     }] : []),
@@ -419,8 +419,8 @@ export default async function AdminDashboard() {
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-slate-100">Resum rapid</h1>
-            <p className="text-slate-400 text-xs">Visio general del negoci</p>
+            <h1 className="text-lg sm:text-xl font-semibold text-slate-100">Resum ràpid</h1>
+            <p className="text-slate-400 text-xs">Visió general del negoci</p>
           </div>
           <Link href="/admin/leads" className="sm:hidden">
             <Button variant="primary" icon="+" label="Nou" />
@@ -428,7 +428,7 @@ export default async function AdminDashboard() {
         </div>
         <div className="hidden sm:flex items-center gap-3">
           <Link href="/admin/analytics">
-            <Button variant="secondary" icon="📈" label="Analytics" />
+            <Button variant="secondary" icon="📈" label="Analítica" />
           </Link>
           <Link href="/admin/leads">
             <Button variant="primary" icon="+" label="Nou lead" />
@@ -439,16 +439,16 @@ export default async function AdminDashboard() {
             📥 Inbox (IMAP)
           </Link>
           <Link href="/admin/emails" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
-            🤖 Emails Auto
+            🤖 Correus automàtics
           </Link>
           <Link href="/admin/bookings" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
             📋 Reserves
           </Link>
           <Link href="/admin/finanzas" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
-            💶 Finanzas
+            💶 Finances
           </Link>
           <Link href="/admin/rentabilidad" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
-            📊 Rentabilidad
+            📊 Rendibilitat
           </Link>
           <Link href="/admin/calendario" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
             📅 Calendari
@@ -461,7 +461,7 @@ export default async function AdminDashboard() {
           <div>
             <p className="text-xs sm:text-sm text-slate-400 font-medium">Testimonis pendents</p>
             <p className="text-base sm:text-lg font-semibold text-slate-100">
-              {testimonialsPending} pendent{testimonialsPending > 1 ? 's' : ''} d&apos;aprovacio
+              {testimonialsPending} pendent{testimonialsPending > 1 ? 's' : ''} d&apos;aprovació
             </p>
           </div>
           <Link href="/admin/ressenyes" className="self-start sm:self-auto">
@@ -547,7 +547,7 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      {/* Metriques essencials */}
+      {/* Mètriques essencials */}
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
         <MetricCard
           icon="📋"
@@ -559,7 +559,7 @@ export default async function AdminDashboard() {
         />
         <MetricCard
           icon="📨"
-          label="Consultes mes"
+          label="Consultes del mes"
           value={leadsThisMonth.toString()}
           change={`${leadsCount} totals`}
           changeType="up"
@@ -569,7 +569,7 @@ export default async function AdminDashboard() {
           icon="🏆"
           label="Clients"
           value={customersCount.toString()}
-          change={`${conversionRate}% conversió`}
+          change={`${conversionRate}% de conversió`}
           changeType="up"
           accent="purple"
         />
@@ -591,16 +591,16 @@ export default async function AdminDashboard() {
         />
         <MetricCard
           icon="⏱️"
-          label="Temps mitja web"
+          label="Temps mitjà web"
           value={ga4AvgSessionMin ? `${ga4AvgSessionMin} min` : '-'}
-          change={ga4PageViews ? `${ga4PageViews} pagines` : 'GA4 pendent'}
+          change={ga4PageViews ? `${ga4PageViews} pàgines` : 'GA4 pendent'}
           changeType="neutral"
           accent="rose"
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <Card title="Transit web (30 dies)" subtitle="Sessions i usuaris" noPadding>
+        <Card title="Trànsit web (30 dies)" subtitle="Sessions i usuaris" noPadding>
           <div className="p-4 sm:p-6">
             <MiniLineChart
               series={[
@@ -613,17 +613,17 @@ export default async function AdminDashboard() {
             )}
           </div>
         </Card>
-        <Card title="Leads i conversio" subtitle="Consultes i tancaments" noPadding>
+        <Card title="Entrades i conversió" subtitle="Consultes i tancaments" noPadding>
           <div className="p-4 sm:p-6">
             <MiniLineChart
               series={[
-                { data: leadsSeries, stroke: '#34d399', label: 'Leads', value: leadsThisMonth },
+                { data: leadsSeries, stroke: '#34d399', label: 'Entrades', value: leadsThisMonth },
                 { data: leadsWonSeries, stroke: '#fbbf24', label: 'Guanyats', value: wonLeads },
               ]}
             />
           </div>
         </Card>
-        <Card title="Reserves i facturacio" subtitle="Events confirmats" noPadding>
+        <Card title="Reserves i facturació" subtitle="Esdeveniments confirmats" noPadding>
           <div className="p-4 sm:p-6">
             <MiniLineChart
               series={[
@@ -637,10 +637,10 @@ export default async function AdminDashboard() {
 
       {/* Contingut principal - Responsive */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Proxims events */}
+        {/* Pròxims esdeveniments */}
         <div className="lg:col-span-2">
           <Card
-            title="Proxims events"
+            title="Pròxims esdeveniments"
             subtitle={`${upcomingBookings.length} programats`}
             action={
               <Link href="/admin/calendario">
@@ -665,7 +665,7 @@ export default async function AdminDashboard() {
                     <div className="min-w-0 flex-1">
                       <p className="text-slate-100 font-medium text-sm sm:text-base truncate">{booking.clientName || 'Client'}</p>
                       <p className="text-slate-400 text-xs sm:text-sm truncate">
-                        {formatEventDate(new Date(booking.eventDate))} · {booking.eventType || 'Event'}
+                        {formatEventDate(new Date(booking.eventDate))} · {booking.eventType || 'Esdeveniment'}
                       </p>
                     </div>
                     <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -676,7 +676,7 @@ export default async function AdminDashboard() {
               </div>
             ) : (
               <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-                <p className="text-slate-400 text-sm">No hi ha events programats</p>
+                <p className="text-slate-400 text-sm">No hi ha esdeveniments programats</p>
                 <Link href="/admin/bookings" className="text-cyan-400 hover:text-cyan-300 text-sm mt-2 inline-block font-medium">
                   Crear nova reserva →
                 </Link>
@@ -685,9 +685,9 @@ export default async function AdminDashboard() {
           </Card>
         </div>
 
-        {/* Activitat recent - Oculto en movil muy pequeño */}
+      {/* Activitat recent */}
         <div className="hidden sm:block">
-          <Card title="Activitat" subtitle="Ultimes accions">
+          <Card title="Activitat" subtitle="Últimes accions">
             <div className="space-y-3 sm:space-y-4">
               {activities.map((activity, i) => (
                 <div key={i} className="flex items-start gap-3">
@@ -705,9 +705,9 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* Leads recents - Optimizado para movil */}
+      {/* Entrades recents */}
       <Card
-        title="Leads recents"
+        title="Entrades recents"
         subtitle={`${leadsCount} totals`}
         action={
           <Link href="/admin/leads">
@@ -754,18 +754,18 @@ export default async function AdminDashboard() {
           </div>
         ) : (
           <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-            <p className="text-slate-400 text-sm">No hi ha leads encara</p>
-            <p className="text-slate-500 text-xs mt-1">Els leads apareixeran aquí</p>
+            <p className="text-slate-400 text-sm">Encara no hi ha entrades</p>
+            <p className="text-slate-500 text-xs mt-1">Les entrades apareixeran aquí</p>
           </div>
         )}
       </Card>
 
-      {/* Quick stats */}
+      {/* Estadístiques ràpides */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-3 sm:p-5 rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-purple-600/5 backdrop-blur-sm">
-          <p className="text-slate-400 text-xs sm:text-sm font-medium">Conversio</p>
+          <p className="text-slate-400 text-xs sm:text-sm font-medium">Conversió</p>
           <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">{conversionRate}%</p>
-          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{wonLeads}/{leadsCount} leads</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{wonLeads}/{leadsCount} entrades</p>
         </div>
         <div className="p-3 sm:p-5 rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm">
           <p className="text-slate-400 text-xs sm:text-sm font-medium">Testimonis</p>
@@ -773,7 +773,7 @@ export default async function AdminDashboard() {
           <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{testimonialsPending} pendents</p>
         </div>
         <div className="p-3 sm:p-5 rounded-2xl border border-rose-500/20 bg-gradient-to-br from-rose-500/10 to-rose-600/5 backdrop-blur-sm">
-          <p className="text-slate-400 text-xs sm:text-sm font-medium">Valoracio</p>
+          <p className="text-slate-400 text-xs sm:text-sm font-medium">Valoració</p>
           <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">⭐ {rating}</p>
           <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">Mitjana</p>
         </div>

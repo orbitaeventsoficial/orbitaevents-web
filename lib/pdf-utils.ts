@@ -345,6 +345,8 @@ export interface QuoteData {
   eventType: string;
   pack: PackDefinition;
   date: string;
+  eventSchedule?: string;
+  eventLocation?: string;
   guests: number;
   extras: string[];
   extrasCatalog?: ExtraDefinition[];
@@ -375,6 +377,9 @@ export async function generateQuotePDF(
     ca: {
       quote: 'Pressupost',
       eventDetails: 'Detalls de l\'event',
+      eventDate: 'Data',
+      schedule: 'Horari',
+      location: 'Lloc',
       guests: 'Convidats',
       selectedPack: 'Pack seleccionat',
       hours: 'hores',
@@ -397,6 +402,9 @@ export async function generateQuotePDF(
     es: {
       quote: 'Presupuesto',
       eventDetails: 'Detalles del evento',
+      eventDate: 'Fecha',
+      schedule: 'Horario',
+      location: 'Lugar',
       guests: 'Invitados',
       selectedPack: 'Pack seleccionado',
       hours: 'horas',
@@ -419,6 +427,9 @@ export async function generateQuotePDF(
     en: {
       quote: 'Quote',
       eventDetails: 'Event details',
+      eventDate: 'Date',
+      schedule: 'Schedule',
+      location: 'Location',
       guests: 'Guests',
       selectedPack: 'Selected package',
       hours: 'hours',
@@ -457,6 +468,8 @@ export async function generateQuotePDF(
   const issueDate = new Date().toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB');
   const eventTypeName = SERVICE_NAMES[data.eventType as ServiceSlug]?.[locale] || data.eventType;
   const eventDate = formatClientDate(data.date || '-', locale);
+  const eventSchedule = data.eventSchedule?.trim() || '-';
+  const eventLocation = data.eventLocation?.trim() || '-';
   const brandName = branding?.brandName?.trim() || 'Orbita Events';
   const validityDays = Math.max(1, Math.round(data.validityDays || 15));
 
@@ -580,7 +593,8 @@ export async function generateQuotePDF(
   y += clientBoxHeight + 8;
 
   ensureSpace(30);
-  const eventTypeLines = Math.min(3, doc.splitTextToSize(`${eventTypeName}`, 80).length);
+  const eventDetailsText = [eventTypeName, `${t.location}: ${eventLocation}`, `${t.schedule}: ${eventSchedule}`].join('\n');
+  const eventTypeLines = Math.min(5, doc.splitTextToSize(eventDetailsText, 80).length);
   const dateLines = Math.min(3, doc.splitTextToSize(eventDate, 85).length);
   const guestsLines = Math.min(2, doc.splitTextToSize(`${Math.max(0, data.guests)}`, 85).length);
   const labelToValueGap = 5.5;
@@ -590,8 +604,8 @@ export async function generateQuotePDF(
   const leftFieldHeight = fieldHeight(eventTypeLines);
   const eventBoxHeight = 11 + Math.max(leftFieldHeight, rightFieldHeight);
   drawCard(left, y, contentWidth, eventBoxHeight, 3, true);
-  drawLabelValue(t.eventDetails, `${eventTypeName}`, left + 4, y + 6, 80, 3);
-  const dateUsed = drawLabelValue(t.issueDate, eventDate, left + 88, y + 6, 85, 3);
+  drawLabelValue(t.eventDetails, eventDetailsText, left + 4, y + 6, 80, 5);
+  const dateUsed = drawLabelValue(t.eventDate, eventDate, left + 88, y + 6, 85, 3);
   drawLabelValue(t.guests, `${Math.max(0, data.guests)}`, left + 88, y + 6 + fieldHeight(dateUsed) + 2.5, 85, 2);
   y += eventBoxHeight + 7;
 

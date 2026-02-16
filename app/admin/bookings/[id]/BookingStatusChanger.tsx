@@ -64,7 +64,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
       if (data.calendarSync?.status === 'synced') {
         alert('📅 Google Calendar sincronizado automáticamente.');
       } else if (data.calendarSync?.status === 'error') {
-        alert(`⚠️ Reserva actualizada, pero falló la sync de Google Calendar: ${data.calendarSync.error || 'error desconocido'}`);
+        alert(`⚠️ Reserva actualitzada, però ha fallat la sincronització amb Google Calendar: ${data.calendarSync.error || 'error desconegut'}`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');

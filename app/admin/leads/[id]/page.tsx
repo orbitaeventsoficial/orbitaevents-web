@@ -734,7 +734,7 @@ export default async function LeadDetailPage({ params }: Props) {
                   <dd className="text-slate-100">{lead.customer.source}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-300">Total d&apos;events</dt>
+                  <dt className="text-xs text-slate-300">Total d&apos;esdeveniments</dt>
                   <dd className="text-slate-100">{lead.customer.totalEvents}</dd>
                 </div>
                 <div>

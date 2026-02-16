@@ -110,7 +110,7 @@ export default function CommunicationPanel({
                   disabled={loading === flow.key}
                   className="rounded-md bg-emerald-600 px-2 py-1 text-xs font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
                 >
-                  Enviar per API de WhatsApp
+                  Envia per API de WhatsApp
                 </button>
                 <button
                   type="button"

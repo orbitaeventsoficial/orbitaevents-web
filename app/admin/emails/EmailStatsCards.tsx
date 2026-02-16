@@ -12,7 +12,7 @@ interface Stats {
 export default function EmailStatsCards({ stats }: { stats: Stats }) {
   const cards = [
     {
-      label: 'Leads amb email',
+      label: 'Entrades amb correu',
       value: stats.leadsWithEmail,
       icon: '📧',
       sublabel: 'Ultims 30 dies',

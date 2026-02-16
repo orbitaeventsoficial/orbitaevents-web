@@ -60,7 +60,7 @@ export default async function FeedbackPage() {
       {bookings.length === 0 ? (
         <div className="bg-slate-950/60 border border-white/10 rounded-xl p-12 text-center">
           <div className="text-4xl mb-4">💌</div>
-          <p className="text-slate-400">No hi ha events completats recent ment</p>
+          <p className="text-slate-400">No hi ha esdeveniments completats recentment</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -97,7 +97,7 @@ export default async function FeedbackPage() {
                       href={`mailto:${booking.clientEmail}?subject=Gràcies per confiar en Òrbita Events!&body=Hola ${booking.clientName},%0D%0A%0D%0AGràcies per confiar en nosaltres per al vostre event del ${new Date(booking.eventDate).toLocaleDateString('ca-ES')}!`}
                       className="px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-green-600"
                     >
-                      ✉️ Enviar Email
+                      ✉️ Envia correu
                     </Link>
                     <Link
                       href={`/admin/bookings/${booking.id}`}

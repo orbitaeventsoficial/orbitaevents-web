@@ -159,7 +159,7 @@ export default async function SalesOpsPage() {
           <p className="text-2xl font-semibold text-slate-100">{forecastTotal.toLocaleString('ca-ES')}€</p>
         </div>
         <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
-          <p className="text-xs text-slate-400">Leads oberts</p>
+          <p className="text-xs text-slate-400">Entrades obertes</p>
           <p className="text-2xl font-semibold text-slate-100">{scored.length}</p>
         </div>
         <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
@@ -266,7 +266,7 @@ export default async function SalesOpsPage() {
       </div>
 
       <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-100">Leads en risc (prioritzar avui)</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Entrades en risc (prioritzar avui)</h2>
         <div className="mt-4 space-y-2">
           {riskLeads.length === 0 ? (
             <p className="text-sm text-slate-300">Sense riscos rellevants.</p>

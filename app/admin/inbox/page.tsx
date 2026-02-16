@@ -148,7 +148,7 @@ export default async function InboxPage() {
             href="/admin/inbox/settings"
             className="px-4 py-2 border border-white/10 text-slate-200 rounded-lg hover:bg-white/5 transition-colors text-sm"
           >
-            ⚙️ Configuracio
+            ⚙️ Configuració
           </Link>
         </div>
       </header>

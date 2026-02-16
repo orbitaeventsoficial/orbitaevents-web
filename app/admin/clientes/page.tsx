@@ -325,7 +325,7 @@ export default function AdminContactesPage() {
                 <th scope="col" className="text-left p-4 text-slate-300 font-medium">Nom</th>
                 <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden md:table-cell">Contacte</th>
                 <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden lg:table-cell">Font</th>
-                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden sm:table-cell">Events</th>
+                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden sm:table-cell">Esdeveniments</th>
                 <th scope="col" className="text-left p-4 text-slate-300 font-medium">Accions</th>
               </tr>
             </thead>
@@ -640,7 +640,7 @@ export default function AdminContactesPage() {
                     <span className="text-3xl">🎁</span>
                     <div>
                       <p className="text-slate-100 font-medium group-hover:text-pink-400">Promoció</p>
-                      <p className="text-slate-500 text-sm">Enviar oferta o descompte especial</p>
+                      <p className="text-slate-500 text-sm">Envia oferta o descompte especial</p>
                     </div>
                   </div>
                 </button>

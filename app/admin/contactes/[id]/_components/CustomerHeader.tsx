@@ -9,7 +9,7 @@ type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks
 const TABS: Array<{ key: TabKey; label: string }> = [
   { key: 'summary', label: 'Resum' },
   { key: 'proposals', label: 'Pressupostos' },
-  { key: 'bookings', label: 'Reserva / Dates' },
+  { key: 'bookings', label: 'Reserves / Dates' },
   { key: 'margin', label: 'Extres / Marge' },
   { key: 'comms', label: 'Comunicacions' },
   { key: 'tasks', label: 'Tasques / Notes' },
@@ -79,7 +79,7 @@ export default function CustomerHeader({
               href={`/admin/emails?customerId=${id}`}
               className="rounded-lg border border-slate-600/80 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700"
             >
-              Enviar missatge
+              Envia missatge
             </Link>
           </div>
         </div>

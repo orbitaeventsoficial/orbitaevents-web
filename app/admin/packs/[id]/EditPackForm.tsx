@@ -57,9 +57,82 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
       ? pack.translations
       : [
           { locale: 'es', name: '', description: '', tagline: '', features: [] },
-          { locale: 'ca', name: '', description: '', tagline: '', features: [] }
+          { locale: 'ca', name: '', description: '', tagline: '', features: [] },
+          { locale: 'en', name: '', description: '', tagline: '', features: [] }
         ]
   );
+
+  const fillMissingTranslations = async (current: PackTranslation[]): Promise<PackTranslation[]> => {
+    const ensureLocales = ['ca', 'es', 'en'];
+    const normalized = ensureLocales.map((locale) => {
+      const found = current.find((t) => t.locale === locale);
+      return found || { locale, name: '', description: '', tagline: '', features: [] };
+    });
+
+    const base = normalized.find((t) => t.locale === 'ca' && t.name.trim())
+      || normalized.find((t) => t.name.trim());
+    if (!base) return normalized;
+
+    const targets = normalized.filter((t) => t.locale !== base.locale);
+    const needTargets = targets.filter(
+      (t) =>
+        !t.name.trim() ||
+        !String(t.description || '').trim() ||
+        !String(t.tagline || '').trim() ||
+        !(t.features || []).some((f) => f.trim())
+    );
+    if (needTargets.length === 0) return normalized;
+
+    const sourceTexts = [
+      base.name,
+      String(base.description || ''),
+      String(base.tagline || ''),
+      ...(base.features || []),
+    ].map((s) => s.trim()).filter(Boolean);
+
+    if (sourceTexts.length === 0) return normalized;
+
+    try {
+      const res = await fetch('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          texts: sourceTexts,
+          targetLanguages: needTargets.map((t) => t.locale),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) return normalized;
+
+      const translationsByText = (data?.translationsByText || {}) as Record<string, Record<string, string>>;
+      const translated = normalized.map((entry) => {
+        if (entry.locale === base.locale) return entry;
+        const lang = entry.locale;
+        const trName = translationsByText?.[base.name]?.[lang] || base.name;
+        const trDescription = base.description
+          ? (translationsByText?.[String(base.description)]?.[lang] || String(base.description))
+          : '';
+        const trTagline = base.tagline
+          ? (translationsByText?.[String(base.tagline)]?.[lang] || String(base.tagline))
+          : '';
+        const trFeatures = (base.features || []).map(
+          (feature) => translationsByText?.[feature]?.[lang] || feature
+        );
+
+        return {
+          ...entry,
+          name: entry.name.trim() ? entry.name : trName,
+          description: String(entry.description || '').trim() ? entry.description : trDescription,
+          tagline: String(entry.tagline || '').trim() ? entry.tagline : trTagline,
+          features: (entry.features || []).some((f) => f.trim()) ? entry.features : trFeatures,
+        };
+      });
+
+      return translated;
+    } catch {
+      return normalized;
+    }
+  };
 
   const updateTranslation = (locale: string, field: keyof PackTranslation, value: string | string[]) => {
     setTranslations(prev =>
@@ -86,6 +159,9 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
     setSuccess(false);
 
     try {
+      const preparedTranslations = await fillMissingTranslations(translations);
+      setTranslations(preparedTranslations);
+
       const response = await fetch(`/api/admin/packs/${pack.id}`, {
         method: 'PATCH',
         headers: {
@@ -105,7 +181,7 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
           isActive: formData.isActive,
           isFeatured: formData.isFeatured,
           order: parseInt(formData.order.toString()),
-          translations: translations,
+          translations: preparedTranslations,
         }),
       });
 

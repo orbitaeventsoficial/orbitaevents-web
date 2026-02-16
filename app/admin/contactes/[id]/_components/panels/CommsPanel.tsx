@@ -56,7 +56,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
             href={`/admin/emails?customerId=${data.customer.id}&template=enviament-pressupost`}
             className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
           >
-            Enviar pressupost
+            Envia pressupost
           </Link>
           <Link
             href={`/admin/emails?customerId=${data.customer.id}&template=recordatori`}
@@ -94,7 +94,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
             disabled={saving || !note.trim()}
             className="rounded bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-60"
           >
-            {saving ? 'Guardant...' : 'Guardar nota'}
+            {saving ? 'Guardant...' : 'Desa nota'}
           </button>
         </div>
       </div>
@@ -125,4 +125,3 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
     </section>
   );
 }
-

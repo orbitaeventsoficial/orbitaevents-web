@@ -115,17 +115,17 @@ export const table = {
 
 // Status colors for leads/bookings (dark theme)
 export const statusColors = {
-  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Nuevo' },
-  CONTACTED: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Contactado' },
-  QUOTE_SENT: { bg: 'bg-purple-500/20', text: 'text-purple-300', label: 'Presupuesto' },
-  NEGOTIATING: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'Negociando' },
-  WON: { bg: 'bg-emerald-500/20', text: 'text-emerald-300', label: 'Ganado' },
-  LOST: { bg: 'bg-slate-500/20', text: 'text-slate-400', label: 'Perdido' },
-  PENDING: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Pendiente' },
+  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Nova' },
+  CONTACTED: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Contactada' },
+  QUOTE_SENT: { bg: 'bg-purple-500/20', text: 'text-purple-300', label: 'Pressupost enviat' },
+  NEGOTIATING: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'En negociació' },
+  WON: { bg: 'bg-emerald-500/20', text: 'text-emerald-300', label: 'Guanyada' },
+  LOST: { bg: 'bg-slate-500/20', text: 'text-slate-400', label: 'Perduda' },
+  PENDING: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Pendent' },
   CONFIRMED: { bg: 'bg-emerald-500/20', text: 'text-emerald-300', label: 'Confirmada' },
-  PREPARING: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Preparando' },
+  PREPARING: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Preparant' },
   COMPLETED: { bg: 'bg-teal-500/20', text: 'text-teal-300', label: 'Completada' },
-  CANCELLED: { bg: 'bg-rose-500/20', text: 'text-rose-300', label: 'Cancelada' },
+  CANCELLED: { bg: 'bg-rose-500/20', text: 'text-rose-300', label: 'Cancel·lada' },
 } as const;
 
 // Priority colors

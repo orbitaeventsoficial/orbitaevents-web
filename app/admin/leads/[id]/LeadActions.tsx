@@ -9,7 +9,7 @@ interface Props {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'NEW', label: 'Nou Lead', color: 'bg-blue-500' },
+  { value: 'NEW', label: 'Entrada nova', color: 'bg-blue-500' },
   { value: 'CONTACTED', label: 'Contactat', color: 'bg-yellow-500' },
   { value: 'QUOTE_SENT', label: 'Pressupost enviat', color: 'bg-purple-500' },
   { value: 'NEGOTIATING', label: 'En negociació', color: 'bg-orange-500' },

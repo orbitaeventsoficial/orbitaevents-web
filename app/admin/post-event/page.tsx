@@ -80,7 +80,7 @@ export default async function PostEventPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-100">Post-Event</h1>
           <p className="mt-1 text-sm text-slate-400">
-            Gestiona informes, enquestes i feedback dels events
+            Gestiona informes, enquestes i feedback dels esdeveniments
           </p>
         </div>
       </header>
@@ -93,7 +93,7 @@ export default async function PostEventPage() {
           <p className="text-xs text-orange-400 mt-1">Esborrany</p>
         </div>
         <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 shadow-sm">
-          <p className="text-xs font-medium text-blue-300 uppercase">Enquestes per Enviar</p>
+          <p className="text-xs font-medium text-blue-300 uppercase">Enquestes per enviar</p>
           <p className="mt-2 text-3xl font-bold text-blue-200">{data.pendingSurveys}</p>
           <p className="text-xs text-blue-400 mt-1">Sense enquesta enviada</p>
         </div>
@@ -263,7 +263,7 @@ export default async function PostEventPage() {
           })}
           {data.recentBookings.length === 0 && (
             <div className="p-8 text-center text-slate-400">
-              ✅ Tots els events completats tenen informe
+              ✅ Tots els esdeveniments completats tenen informe
             </div>
           )}
         </div>

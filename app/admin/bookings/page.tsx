@@ -120,7 +120,7 @@ export default async function BookingsPage({
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">Reserves</h1>
           <p className="text-xs sm:text-sm text-slate-400">
-            {pagination.total} events · {formatCurrency(totalRevenue)}
+            {pagination.total} esdeveniments · {formatCurrency(totalRevenue)}
           </p>
         </div>
         <Link

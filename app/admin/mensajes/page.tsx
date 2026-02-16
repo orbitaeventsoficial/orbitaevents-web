@@ -17,7 +17,7 @@ async function getMessagesData() {
       pendingLeads,
       todayLeads,
     ] = await Promise.all([
-      // Leads recents amb missatge
+      // Entrades recents amb missatge
       prisma.lead.findMany({
         where: {
           message: { not: null },
@@ -31,11 +31,11 @@ async function getMessagesData() {
           },
         },
       }),
-      // Leads pendents de contactar
+      // Entrades pendents de contactar
       prisma.lead.count({
         where: { status: 'NEW' },
       }),
-      // Leads d'avui
+      // Entrades d'avui
       prisma.lead.count({
         where: {
           createdAt: {
@@ -103,7 +103,7 @@ export default async function MensajesPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-100">Missatges</h1>
           <p className="mt-1 text-sm text-slate-400">
-            Gestiona les comunicacions amb clients
+            Gestiona les comunicacions amb la clientela
           </p>
         </div>
       </header>
@@ -111,27 +111,27 @@ export default async function MensajesPage() {
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 shadow-sm">
-          <p className="text-xs font-medium text-blue-300 uppercase">Pendents de Contactar</p>
+          <p className="text-xs font-medium text-blue-300 uppercase">Pendents de contactar</p>
           <p className="mt-2 text-3xl font-bold text-blue-200">{data.pendingLeads}</p>
-          <p className="text-xs text-blue-400 mt-1">Leads nous sense resposta</p>
+          <p className="text-xs text-blue-400 mt-1">Entrades noves sense resposta</p>
         </div>
         <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-4 shadow-sm">
-          <p className="text-xs font-medium text-green-300 uppercase">Rebuts Avui</p>
+          <p className="text-xs font-medium text-green-300 uppercase">Rebudes avui</p>
           <p className="mt-2 text-3xl font-bold text-green-200">{data.todayLeads}</p>
         </div>
         <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
-          <p className="text-xs font-medium text-slate-400 uppercase">Total Converses</p>
+          <p className="text-xs font-medium text-slate-400 uppercase">Total converses</p>
           <p className="mt-2 text-3xl font-bold text-slate-100">{data.recentLeads.length}</p>
         </div>
       </section>
 
-      {/* Quick Actions */}
+      {/* Accions ràpides */}
       <section className="flex flex-wrap gap-3">
         <Link
           href="/admin/leads?status=NEW"
           className="inline-flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
         >
-          🔵 Veure Nous ({data.pendingLeads})
+          🔵 Veure noves ({data.pendingLeads})
         </Link>
         <a
           href="https://wa.me/34600000000"
@@ -144,22 +144,22 @@ export default async function MensajesPage() {
           href="/admin/leads"
           className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700"
         >
-          👥 Tots els leads
+          👥 Totes les entrades
         </Link>
       </section>
 
-      {/* Message Templates */}
+      {/* Plantilles de missatge */}
       <section className="rounded-xl border border-slate-700/60 bg-slate-900/70 shadow-sm overflow-hidden">
         <div className="bg-slate-800/80 border-b border-slate-700 p-4">
           <h3 className="font-semibold text-slate-100">📋 Plantilles Ràpides</h3>
         </div>
         <div className="p-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <button type="button" className="p-3 rounded-lg border border-slate-700/60 bg-slate-900/50 text-left hover:bg-slate-800/70 transition-colors">
-            <p className="font-medium text-slate-100">Primer Contacte</p>
-            <p className="text-xs text-slate-400 mt-1">Resposta inicial a nou lead</p>
+            <p className="font-medium text-slate-100">Primer contacte</p>
+            <p className="text-xs text-slate-400 mt-1">Resposta inicial a una entrada nova</p>
           </button>
           <button type="button" className="p-3 rounded-lg border border-slate-700/60 bg-slate-900/50 text-left hover:bg-slate-800/70 transition-colors">
-            <p className="font-medium text-slate-100">Enviar Pressupost</p>
+            <p className="font-medium text-slate-100">Envia pressupost</p>
             <p className="text-xs text-slate-400 mt-1">Acompanyament de pressupost</p>
           </button>
           <button type="button" className="p-3 rounded-lg border border-slate-700/60 bg-slate-900/50 text-left hover:bg-slate-800/70 transition-colors">
@@ -171,20 +171,20 @@ export default async function MensajesPage() {
             <p className="text-xs text-slate-400 mt-1">Confirmar reserva</p>
           </button>
           <button type="button" className="p-3 rounded-lg border border-slate-700/60 bg-slate-900/50 text-left hover:bg-slate-800/70 transition-colors">
-            <p className="font-medium text-slate-100">Pre-Event</p>
-            <p className="text-xs text-slate-400 mt-1">Detalls abans de l&apos;event</p>
+            <p className="font-medium text-slate-100">Preesdeveniment</p>
+            <p className="text-xs text-slate-400 mt-1">Detalls abans de l&apos;esdeveniment</p>
           </button>
           <button type="button" className="p-3 rounded-lg border border-slate-700/60 bg-slate-900/50 text-left hover:bg-slate-800/70 transition-colors">
-            <p className="font-medium text-slate-100">Post-Event</p>
+            <p className="font-medium text-slate-100">Postesdeveniment</p>
             <p className="text-xs text-slate-400 mt-1">Agraïment i enquesta</p>
           </button>
         </div>
       </section>
 
-      {/* Recent Messages */}
+      {/* Missatges recents */}
       <section className="rounded-xl border border-slate-700/60 bg-slate-900/70 shadow-sm overflow-hidden">
         <div className="bg-slate-800/80 border-b border-slate-700 p-4">
-          <h3 className="font-semibold text-slate-100">📬 Missatges Recents</h3>
+          <h3 className="font-semibold text-slate-100">📬 Missatges recents</h3>
         </div>
         <div className="divide-y divide-slate-100">
           {data.recentLeads.map((lead) => {
@@ -235,7 +235,7 @@ export default async function MensajesPage() {
                     <Link
                       href={`/admin/leads/${lead.id}`}
                       className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800 text-slate-100 hover:bg-slate-700"
-                      title="Veure"
+                      title="Obre"
                     >
                       👁️
                     </Link>

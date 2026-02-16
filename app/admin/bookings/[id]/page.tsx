@@ -271,7 +271,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </p>
         </div>
         <div className="rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-400">Lead comercial</p>
+          <p className="text-xs uppercase tracking-wide text-slate-400">Entrada comercial</p>
           <p className="text-xl font-semibold text-slate-100">{booking.lead?.status || 'Sense lead'}</p>
         </div>
       </section>
@@ -314,7 +314,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
               type="submit"
               className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600"
             >
-              Enviar post-event client
+              Envia postesdeveniment al client
             </button>
           </form>
           <Link

@@ -26,6 +26,7 @@ type StudioProps = {
   initialCustomerEmail?: string;
   initialLeadId?: string;
   initialProposalId?: string;
+  initialPreferredLocale?: string;
   initialBrandName?: string;
   initialBrandWebsite?: string;
   initialBrandEmail?: string;
@@ -35,6 +36,14 @@ type StudioProps = {
 };
 
 const STUDIO_DRAFT_KEY = 'admin.presupuestos.pdfstudio.draft.v1';
+const CUSTOM_PACK_ID = '__custom_pack__';
+
+function normalizeStudioLocale(value?: string): Locale {
+  const raw = String(value || '').toLowerCase();
+  if (raw.startsWith('es')) return 'es';
+  if (raw.startsWith('en')) return 'en';
+  return 'ca';
+}
 const quoteStudioSchema = z.object({
   clientName: z.string().trim().min(2, 'Nom del client massa curt'),
   clientEmail: z.string().trim().email("Correu del client no vàlid"),
@@ -146,6 +155,7 @@ export default function PresupuestoPdfStudio({
   initialCustomerEmail = '',
   initialLeadId = '',
   initialProposalId = '',
+  initialPreferredLocale = 'ca',
   initialBrandName = 'Orbita Events',
   initialBrandWebsite = 'orbitaevents.com',
   initialBrandEmail = '',
@@ -153,7 +163,7 @@ export default function PresupuestoPdfStudio({
   initialBrandTagline = 'El teu esdeveniment. El teu estil. La teva nit perfecta.',
   initialBrandLogoDataUrl = '',
 }: StudioProps) {
-  const [locale, setLocale] = useState<Locale>('ca');
+  const [locale, setLocale] = useState<Locale>(normalizeStudioLocale(initialPreferredLocale));
   const [eventType, setEventType] = useState<ServiceSlug>('bodas');
   const [packId, setPackId] = useState<string>(() => getPacksByService('bodas')[0]?.id || '');
   const [clientContact, setClientContact] = useState('');
@@ -164,10 +174,12 @@ export default function PresupuestoPdfStudio({
   const [leadId] = useState(initialLeadId);
   const [proposalId, setProposalId] = useState(initialProposalId);
   const [eventDate, setEventDate] = useState('');
+  const [eventSchedule, setEventSchedule] = useState('');
+  const [eventLocation, setEventLocation] = useState('');
   const [guests, setGuests] = useState(80);
   const [validityDays, setValidityDays] = useState(15);
   const [conditionsText, setConditionsText] = useState(
-    "Reserva amb 30% per bloquejar la data.\nPagament final 7 dies abans de l'esdeveniment.\nDesplacament inclos fins a 50km."
+    "Reserva amb 30% per bloquejar la data.\nPagament final 7 dies abans de l'esdeveniment.\nDesplaçament inclòs fins a 50 km."
   );
   const [whyChooseUs, setWhyChooseUs] = useState(
     'Equip tecnic professional, resposta rapida i proposta adaptada perque tot surti perfecte sense complicacions.'
@@ -195,6 +207,11 @@ export default function PresupuestoPdfStudio({
   const [autosaveTick, setAutosaveTick] = useState(0);
   const [allowBrandOverride, setAllowBrandOverride] = useState(false);
   const isCustomerScoped = Boolean(customerId);
+
+  useEffect(() => {
+    if (!isCustomerScoped || !draftLoaded) return;
+    setLocale(normalizeStudioLocale(initialPreferredLocale));
+  }, [isCustomerScoped, initialPreferredLocale, draftLoaded]);
 
   useEffect(() => {
     if (logoDataUrl) return;
@@ -278,6 +295,8 @@ export default function PresupuestoPdfStudio({
       if (typeof draft.clientEmail === 'string') setClientEmail(draft.clientEmail);
       if (typeof draft.clientPhone === 'string') setClientPhone(draft.clientPhone);
       if (typeof draft.eventDate === 'string') setEventDate(draft.eventDate);
+      if (typeof draft.eventSchedule === 'string') setEventSchedule(draft.eventSchedule);
+      if (typeof draft.eventLocation === 'string') setEventLocation(draft.eventLocation);
       if (typeof draft.guests === 'number') setGuests(draft.guests);
       if (typeof draft.validityDays === 'number') setValidityDays(draft.validityDays);
       if (typeof draft.conditionsText === 'string') setConditionsText(draft.conditionsText);
@@ -326,6 +345,8 @@ export default function PresupuestoPdfStudio({
         clientEmail,
         clientPhone,
         eventDate,
+        eventSchedule,
+        eventLocation,
         guests,
         validityDays,
         conditionsText,
@@ -358,6 +379,8 @@ export default function PresupuestoPdfStudio({
     clientEmail,
     clientPhone,
     eventDate,
+    eventSchedule,
+    eventLocation,
     guests,
     validityDays,
     conditionsText,
@@ -445,6 +468,8 @@ export default function PresupuestoPdfStudio({
       },
       event: {
         date: eventDate,
+        schedule: eventSchedule.trim(),
+        location: eventLocation.trim(),
         guests,
       },
       pricing: {
@@ -479,6 +504,8 @@ export default function PresupuestoPdfStudio({
     clientPhone,
     clientContact,
     eventDate,
+    eventSchedule,
+    eventLocation,
     guests,
     extrasPrice,
     discount,
@@ -627,6 +654,8 @@ export default function PresupuestoPdfStudio({
         eventType,
         pack: finalPack,
         date: eventDate || '-',
+        eventSchedule: eventSchedule.trim() || undefined,
+        eventLocation: eventLocation.trim() || undefined,
         guests: Math.max(0, Number(guests) || 0),
         extras: translatedExtrasNames,
         extrasCatalog: translatedExtrasCatalog,
@@ -856,13 +885,29 @@ export default function PresupuestoPdfStudio({
 
           <label className="text-sm text-slate-300 md:col-span-2">
             Pack base
-            <select className={inputClass} value={packId} onChange={(e) => reloadPackValues(e.target.value)}>
+            <select
+              className={inputClass}
+              value={packId}
+              onChange={(e) => {
+                const nextPackId = e.target.value;
+                if (nextPackId === CUSTOM_PACK_ID) {
+                  setPackId(CUSTOM_PACK_ID);
+                  if (!packName.trim()) setPackName('Servei personalitzat');
+                  return;
+                }
+                reloadPackValues(nextPackId);
+              }}
+            >
+              <option value={CUSTOM_PACK_ID}>Servei personalitzat</option>
               {packs.map((pack) => (
                 <option key={pack.id} value={pack.id}>
                   {pack.name} ({pack.price})
                 </option>
               ))}
             </select>
+            <span className="mt-1 block text-xs text-slate-400">
+              Si tries servei personalitzat, pots definir nom, preu, hores i característiques manualment.
+            </span>
           </label>
         </div>
 
@@ -917,6 +962,24 @@ export default function PresupuestoPdfStudio({
           <label className="text-sm text-slate-300">
             Data de l'esdeveniment
             <input className={inputClass} type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
+          </label>
+          <label className="text-sm text-slate-300">
+            Horari aproximat
+            <input
+              className={inputClass}
+              value={eventSchedule}
+              onChange={(e) => setEventSchedule(e.target.value)}
+              placeholder="Ex.: 20:00 - 03:00"
+            />
+          </label>
+          <label className="text-sm text-slate-300 md:col-span-2">
+            Lloc de l&apos;esdeveniment
+            <input
+              className={inputClass}
+              value={eventLocation}
+              onChange={(e) => setEventLocation(e.target.value)}
+              placeholder="Ex.: Masia Can X, Girona"
+            />
           </label>
           <label className="text-sm text-slate-300">
             Convidats
@@ -1160,6 +1223,7 @@ export default function PresupuestoPdfStudio({
             <p className="text-slate-400">Esdeveniment</p>
             <p className="font-semibold text-slate-100">{SERVICE_LABEL[eventType]}</p>
             <p className="text-slate-300">{eventDate || 'Sense data'} · {guests} convidats</p>
+            <p className="text-slate-300">{eventSchedule || 'Sense horari'} · {eventLocation || 'Sense ubicació'}</p>
             <p className="text-slate-300">Validesa: {validityDays} dies</p>
           </div>
 

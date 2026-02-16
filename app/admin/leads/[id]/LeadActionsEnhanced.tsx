@@ -309,7 +309,7 @@ export default function LeadActionsEnhanced({
               <span className="text-xl">💬</span>
               <div className="text-left">
                 <div className="font-medium">WhatsApp</div>
-                <div className="text-xs opacity-80">Enviar pressupost</div>
+                <div className="text-xs opacity-80">Envia pressupost</div>
               </div>
             </a>
           )}
@@ -323,7 +323,7 @@ export default function LeadActionsEnhanced({
             <span className="text-xl">✉️</span>
             <div className="text-left">
                 <div className="font-medium">Correu</div>
-                <div className="text-xs opacity-80">Enviar pressupost per correu</div>
+                <div className="text-xs opacity-80">Envia pressupost per correu</div>
             </div>
           </a>
 

@@ -51,7 +51,7 @@ export default async function ReportsPage() {
             📋 Informes Post-Event
           </h1>
           <p className="mt-1 text-sm text-slate-400">
-            Informes interns completats després dels events
+            Informes interns completats després dels esdeveniments
           </p>
         </div>
         <Link
@@ -114,7 +114,7 @@ export default async function ReportsPage() {
           <div className="text-4xl mb-4">📋</div>
           <p className="text-slate-400 mb-4">Encara no hi ha informes creats</p>
           {availableBookings.length === 0 ? (
-            <p className="text-sm text-slate-400">No hi ha events completats pendents d&apos;informe</p>
+            <p className="text-sm text-slate-400">No hi ha esdeveniments completats pendents d&apos;informe</p>
           ) : (
             <p className="text-sm text-slate-400">Selecciona un event de la llista superior per crear un informe</p>
           )}
