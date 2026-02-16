@@ -1,5 +1,5 @@
 // app/api/admin/translate/route.ts
-// API de traducción automática para Text Manager
+// API de traducció automàtica per al gestor de textos
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { requireAuth } from '@/lib/auth';
@@ -87,10 +87,10 @@ async function translateWithDeepL(text: string, targetLang: string): Promise<str
   }
 }
 
-// Función simple de traducción usando Google Translate (sin API key)
+// Funció simple de traducció amb Google Translate (sense API key)
 async function translateText(text: string, targetLang: string): Promise<string> {
   try {
-    // Usar Google Translate vía fetch simple
+    // Fer servir Google Translate via fetch simple
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
 
     const controller = new AbortController();
@@ -103,14 +103,14 @@ async function translateText(text: string, targetLang: string): Promise<string> 
       return data[0][0][0];
     }
 
-    return text; // Si falla, devolver el texto original
+    return text; // Si falla, retornem el text original
   } catch (error) {
-    log.error('Error traduciendo:', error);
-    return text; // Si falla, devolver el texto original
+    log.error('Error traduint:', error);
+    return text; // Si falla, retornem el text original
   }
 }
 
-// POST - Traducir texto a múltiples idiomas
+// POST - Traduir text a múltiples idiomes
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
@@ -127,12 +127,12 @@ export async function POST(req: NextRequest) {
     const texts = normalizeTexts(body).map((t) => t.trim()).filter(Boolean);
 
     if (texts.length === 0) {
-      return NextResponse.json({ ok: false, error: 'Texto requerido' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Text obligatori' }, { status: 400 });
     }
 
     if (texts.length > MAX_BATCH_TEXTS) {
       return NextResponse.json(
-        { ok: false, error: `Demasiados textos (max ${MAX_BATCH_TEXTS})` },
+        { ok: false, error: `Massa textos (màx ${MAX_BATCH_TEXTS})` },
         { status: 400 }
       );
     }
@@ -140,14 +140,14 @@ export async function POST(req: NextRequest) {
     const totalChars = texts.reduce((sum, current) => sum + current.length, 0);
     if (totalChars > MAX_BATCH_TOTAL_CHARS) {
       return NextResponse.json(
-        { ok: false, error: `Payload demasiado grande (max ${MAX_BATCH_TOTAL_CHARS} chars)` },
+        { ok: false, error: `Payload massa gran (màx ${MAX_BATCH_TOTAL_CHARS} caràcters)` },
         { status: 400 }
       );
     }
 
     if (texts.some((text) => text.length > MAX_TEXT_LENGTH)) {
       return NextResponse.json(
-        { ok: false, error: `Texto demasiado largo (max ${MAX_TEXT_LENGTH})` },
+        { ok: false, error: `Text massa llarg (màx ${MAX_TEXT_LENGTH})` },
         { status: 400 }
       );
     }
@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
 
     if (filteredTargets.length === 0) {
       return NextResponse.json(
-        { ok: false, error: 'Idiomas no válidos' },
+        { ok: false, error: 'Idiomes no vàlids' },
         { status: 400 }
       );
     }
@@ -194,27 +194,27 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    log.error('Error en traducción:', error);
+    log.error('Error en traducció:', error);
     return NextResponse.json(
-      { ok: false, error: 'Error en traducción' },
+      { ok: false, error: 'Error en traducció' },
       { status: 500 }
     );
   }
 }
 
-// Detectar idioma del texto
+// Detectar idioma del text
 function detectLanguage(text: string): 'es' | 'ca' | 'en' {
   const lowerText = text.toLowerCase();
 
-  // Palabras clave en catalán
+  // Paraules clau en català
   const catalanWords = ['què', 'és', 'són', 'està', 'amb', 'però', 'també', 'molt', 'més', 'aquest', 'aquesta'];
   const catalanCount = catalanWords.filter(word => lowerText.includes(word)).length;
 
-  // Palabras clave en inglés
+  // Paraules clau en anglès
   const englishWords = ['the', 'is', 'are', 'was', 'were', 'have', 'has', 'with', 'this', 'that'];
   const englishCount = englishWords.filter(word => lowerText.includes(` ${word} `)).length;
 
-  // Palabras clave en español
+  // Paraules clau en castellà
   const spanishWords = ['que', 'es', 'son', 'está', 'con', 'pero', 'también', 'muy', 'más', 'este', 'esta'];
   const spanishCount = spanishWords.filter(word => lowerText.includes(word)).length;
 
@@ -223,7 +223,7 @@ function detectLanguage(text: string): 'es' | 'ca' | 'en' {
   return 'es';
 }
 
-// GET - Detectar idioma de un texto
+// GET - Detectar idioma d'un text
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
@@ -240,14 +240,14 @@ export async function GET(req: NextRequest) {
 
     if (!text) {
       return NextResponse.json(
-        { ok: false, error: 'Texto requerido' },
+        { ok: false, error: 'Text obligatori' },
         { status: 400 }
       );
     }
 
     if (text.length > MAX_TEXT_LENGTH) {
       return NextResponse.json(
-        { ok: false, error: `Texto demasiado largo (max ${MAX_TEXT_LENGTH})` },
+        { ok: false, error: `Text massa llarg (màx ${MAX_TEXT_LENGTH})` },
         { status: 400 }
       );
     }
@@ -261,9 +261,9 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error) {
-    log.error('Error detectando idioma:', error);
+    log.error('Error detectant idioma:', error);
     return NextResponse.json(
-      { ok: false, error: 'Error detectando idioma' },
+      { ok: false, error: 'Error detectant idioma' },
       { status: 500 }
     );
   }

@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     log.error('Error reading sequence metrics', error, {
       context: { requestId, endpoint: 'admin/automation/commercial-sequences/run:GET' },
     });
-    return NextResponse.json({ ok: false, error: 'No se pudo leer métricas' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'No s’han pogut llegir les mètriques' }, { status: 500 });
   }
 }
 
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
       context: { requestId, endpoint: 'admin/automation/commercial-sequences/run:POST' },
     });
     return NextResponse.json(
-      { ok: false, error: 'No se pudo ejecutar secuencias comerciales' },
+      { ok: false, error: 'No s’han pogut executar les seqüències comercials' },
       { status: 500 }
     );
   }

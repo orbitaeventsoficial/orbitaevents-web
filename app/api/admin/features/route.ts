@@ -6,53 +6,53 @@ import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-// Definición de features disponibles
+// Definició de funcionalitats disponibles
 const AVAILABLE_FEATURES = [
   {
     key: 'features.reviews_enabled',
-    label: 'Reviews Públicas',
-    description: 'Mostrar sección de reseñas y Google Reviews en la web',
+    label: 'Ressenyes públiques',
+    description: 'Mostrar la secció de ressenyes i Google Reviews al web',
     icon: '⭐',
   },
   {
     key: 'features.calendar_enabled',
-    label: 'Calendario de Disponibilidad',
-    description: 'Mostrar calendario con fechas disponibles/ocupadas',
+    label: 'Calendari de disponibilitat',
+    description: 'Mostrar calendari amb dates disponibles/ocupades',
     icon: '📅',
   },
   {
     key: 'features.offers_enabled',
-    label: 'Ofertas Especiales',
-    description: 'Mostrar sección de ofertas y promociones',
+    label: 'Ofertes especials',
+    description: 'Mostrar secció d’ofertes i promocions',
     icon: '🎁',
   },
   {
     key: 'features.livechat_enabled',
     label: 'Live Chat',
-    description: 'Activar chat en vivo para soporte inmediato',
+    description: 'Activar xat en viu per a suport immediat',
     icon: '💬',
   },
   {
     key: 'features.blog_enabled',
     label: 'Blog',
-    description: 'Mostrar sección de blog y artículos',
+    description: 'Mostrar secció de blog i articles',
     icon: '📝',
   },
   {
     key: 'features.configurator_enabled',
-    label: 'Configurador de Eventos',
-    description: 'Activar configurador interactivo de eventos',
+    label: 'Configurador d’esdeveniments',
+    description: 'Activar configurador interactiu d’esdeveniments',
     icon: '🎛️',
   },
 ];
 
-// GET - Obtener estado de todas las features
+// GET - Obtenir estat de totes les funcionalitats
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
 
   try {
-    // Obtener valores actuales de la BD
+    // Obtenir valors actuals de la BD
     const settings = await prisma.setting.findMany({
       where: {
         key: {
@@ -61,16 +61,16 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Crear mapa de valores
+    // Crear mapa de valors
     const settingsMap = new Map(settings.map((s) => [s.key, s.value === 'true']));
 
-    // Construir lista de features con su estado
+    // Construir llista de funcionalitats amb el seu estat
     const features = AVAILABLE_FEATURES.map((feature) => ({
       key: feature.key,
       label: feature.label,
       description: feature.description,
       icon: feature.icon,
-      enabled: settingsMap.get(feature.key) ?? true, // Por defecto true
+      enabled: settingsMap.get(feature.key) ?? true, // Per defecte true
     }));
 
     return NextResponse.json({
@@ -78,15 +78,15 @@ export async function GET(req: NextRequest) {
       features,
     });
   } catch (error) {
-    log.error('Error obteniendo features:', error);
+    log.error('Error obtenint funcionalitats:', error);
     return NextResponse.json(
-      { ok: false, error: 'Error obteniendo features' },
+      { ok: false, error: 'Error obtenint funcionalitats' },
       { status: 500 }
     );
   }
 }
 
-// POST - Actualizar estado de una feature
+// POST - Actualitzar l'estat d'una funcionalitat
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
@@ -97,21 +97,21 @@ export async function POST(req: NextRequest) {
 
     if (!key || typeof enabled !== 'boolean') {
       return NextResponse.json(
-        { ok: false, error: 'Key y enabled son requeridos' },
+        { ok: false, error: 'Key i enabled són obligatoris' },
         { status: 400 }
       );
     }
 
-    // Verificar que la feature existe
+    // Verificar que la funcionalitat existeix
     const featureExists = AVAILABLE_FEATURES.some((f) => f.key === key);
     if (!featureExists) {
       return NextResponse.json(
-        { ok: false, error: 'Feature no válida' },
+        { ok: false, error: 'Funcionalitat no vàlida' },
         { status: 400 }
       );
     }
 
-    // Actualizar o crear el setting
+    // Actualitzar o crear la configuració
     await prisma.setting.upsert({
       where: { key },
       create: {
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Log del cambio
+    // Log del canvi
     await prisma.adminLog.create({
       data: {
         action: 'UPDATE',
@@ -139,12 +139,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      message: 'Feature actualizada correctamente',
+      message: 'Funcionalitat actualitzada correctament',
     });
   } catch (error) {
-    log.error('Error actualizando feature:', error);
+    log.error('Error actualitzant funcionalitat:', error);
     return NextResponse.json(
-      { ok: false, error: 'Error actualizando feature' },
+      { ok: false, error: 'Error actualitzant funcionalitat' },
       { status: 500 }
     );
   }

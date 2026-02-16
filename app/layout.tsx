@@ -3,6 +3,9 @@
 // IMPORTANT: HTML structure is in [locale]/layout.tsx to support i18n
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import caMessages from '@/messages/ca.json';
+
+const homeMeta = (caMessages as Record<string, any>)?.homePage?.meta || {};
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -18,11 +21,10 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com'),
   title: {
-    default: 'Òrbita Events | DJ + Luces + Efectos | Barcelona y Girona',
+    default: homeMeta.title || 'Òrbita Events',
     template: '%s | Òrbita Events',
   },
-  description:
-    'Eventos profesionales en Catalunya: bodas memorables, fiestas privadas, eventos corporativos. DJ profesional + luces sincronizadas + efectos especiales. 2+ años de experiencia en Barcelona y Girona.',
+  description: homeMeta.description || 'Experiències immersives per esdeveniments',
   keywords: [
     'eventos catalunya',
     'dj profesional barcelona',
@@ -40,12 +42,11 @@ export const metadata: Metadata = {
   publisher: 'Òrbita Events',
   openGraph: {
     type: 'website',
-    locale: 'es_ES',
+    locale: 'ca_ES',
     url: '/',
     siteName: 'Òrbita Events',
-    title: 'Òrbita Events | El Evento Que Tu Gente NO Olvidará',
-    description:
-      'DJ profesional + luces + efectos para bodas, fiestas y eventos corporativos en Barcelona y Girona. 2+ años de experiencia.',
+    title: homeMeta.ogTitle || homeMeta.title || 'Òrbita Events',
+    description: homeMeta.ogDescription || homeMeta.description || 'Experiències immersives per esdeveniments',
     images: [
       {
         url: '/og-default.jpg',
@@ -59,8 +60,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@orbitaevents',
     creator: '@orbitaevents',
-    title: 'Òrbita Events | DJ + Luces + Efectos',
-    description: 'Eventos memorables en Barcelona y Girona. 2+ años de experiencia.',
+    title: homeMeta.ogTitle || homeMeta.title || 'Òrbita Events',
+    description: homeMeta.ogDescription || homeMeta.description || 'Experiències immersives per esdeveniments',
     images: ['/og-default.jpg'],
   },
   alternates: {

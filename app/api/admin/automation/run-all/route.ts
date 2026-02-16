@@ -44,6 +44,6 @@ export async function POST(req: NextRequest) {
     log.error('Error running all automations', error, {
       context: { requestId, endpoint: 'admin/automation/run-all:POST' },
     });
-    return NextResponse.json({ ok: false, error: 'No se pudo ejecutar automatizaciones' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'No s’han pogut executar les automatitzacions' }, { status: 500 });
   }
 }

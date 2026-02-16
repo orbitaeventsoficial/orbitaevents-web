@@ -117,8 +117,8 @@ export default async function SettingsPage() {
           className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-sm p-6 hover:border-emerald-400/40 hover:bg-emerald-500/15 transition-all"
         >
           <div className="text-2xl mb-2">🧾</div>
-          <h3 className="font-semibold text-slate-100">Editor PDF presupuesto</h3>
-          <p className="text-sm text-slate-300">Personaliza cliente, pack, extras y descarga el PDF al instante</p>
+          <h3 className="font-semibold text-slate-100">Editor PDF de pressupost</h3>
+          <p className="text-sm text-slate-300">Personalitza client, pack, extres i descarrega el PDF a l’instant</p>
         </Link>
 
         <Link
@@ -126,8 +126,8 @@ export default async function SettingsPage() {
           className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6 hover:border-slate-600/50 hover:bg-slate-700/40 transition-all"
         >
           <div className="text-2xl mb-2">📄</div>
-          <h3 className="font-semibold text-slate-100">Plantilla presupuestos</h3>
-          <p className="text-sm text-slate-400">Texto, condiciones y copia interna de presupuestos</p>
+          <h3 className="font-semibold text-slate-100">Plantilla de pressupostos</h3>
+          <p className="text-sm text-slate-400">Text, condicions i còpia interna dels pressupostos</p>
         </Link>
 
         <Link

@@ -2,11 +2,15 @@
 // Este archivo DEBE exportar su propio HTML completo porque está fuera del [locale] layout
 // y el root layout usa componentes que requieren next-intl
 
+import caMessages from '@/messages/ca.json';
+
 export default function NotFound() {
+  const t = (caMessages as Record<string, any>).notFound || {};
+
   return (
-    <html lang="es">
+    <html lang="ca">
       <head>
-        <title>404 - Página no encontrada | Òrbita Events</title>
+        <title>{`404 - ${t.title || 'Pàgina no trobada'} | Òrbita Events`}</title>
         <meta name="robots" content="noindex" />
         <style>{`
           * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -77,10 +81,10 @@ export default function NotFound() {
         <div className="container">
           <div className="code">404</div>
           <div className="bar" />
-          <h2>Esta Página No Existe</h2>
-          <p>Parece que esta página se fue de fiesta y no volvió.</p>
+          <h2>{t.title || 'Aquesta pàgina no existeix'}</h2>
+          <p>{t.description || 'Sembla que aquesta pàgina se\'n va anar de festa i no va tornar.'}</p>
           <a href="/" className="btn">
-            Volver al Inicio
+            {t.backToHome || 'Tornar a l\'inici'}
           </a>
         </div>
       </body>

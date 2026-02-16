@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) {
-    return NextResponse.json({ ok: false, error: 'CRON_SECRET no configurado' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'CRON_SECRET no configurat' }, { status: 500 });
   }
 
   try {
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const data = await response.json().catch(() => ({}));
     if (!response.ok || !data?.ok) {
       return NextResponse.json(
-        { ok: false, error: data?.error || 'No se pudo ejecutar resumen diario' },
+        { ok: false, error: data?.error || 'No s’ha pogut executar el resum diari' },
         { status: 500 }
       );
     }
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       context: { requestId, endpoint: 'admin/automation/daily-summary/run:POST' },
     });
     return NextResponse.json(
-      { ok: false, error: 'No se pudo lanzar el resumen diario' },
+      { ok: false, error: 'No s’ha pogut llançar el resum diari' },
       { status: 500 }
     );
   }
