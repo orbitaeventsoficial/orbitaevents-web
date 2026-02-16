@@ -9,7 +9,7 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Analytics | Òrbita Admin',
+  title: 'Analítica | Òrbita Admin',
 };
 
 async function getAnalyticsData() {
@@ -253,10 +253,10 @@ export default async function AnalyticsPage() {
         <div className="absolute -left-16 -bottom-24 h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
         <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Òrbita Analytics</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Òrbita Analítica</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">Panell de rendiment</h1>
             <p className="mt-2 max-w-xl text-sm text-slate-300">
-              Totes les mètriques essencials en un sol lloc: vendes, leads, qualitat i creixement.
+              Totes les mètriques essencials en un sol lloc: vendes, entrades, qualitat i creixement.
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -280,16 +280,16 @@ export default async function AnalyticsPage() {
             href={`/admin/leads?from=${ops.last7Days.toISOString().slice(0, 10)}&page=1`}
             className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20"
           >
-            Veure leads d&apos;aquesta setmana
+            Veure entrades d&apos;aquesta setmana
           </Link>
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-4">
           <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-            <p className="text-xs uppercase text-slate-400">Leads 7 dies</p>
+            <p className="text-xs uppercase text-slate-400">Entrades 7 dies</p>
             <p className="mt-2 text-3xl font-semibold">{ops.leads7d}</p>
           </div>
           <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-            <p className="text-xs uppercase text-slate-400">% leads a pressupost</p>
+            <p className="text-xs uppercase text-slate-400">% entrades a pressupost</p>
             <p className="mt-2 text-3xl font-semibold">{ops.conversionToQuotePct.toFixed(1)}%</p>
           </div>
           <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
@@ -487,13 +487,13 @@ export default async function AnalyticsPage() {
         </div>
       </section>
 
-      {/* Leads Section */}
+      {/* Entrades Section */}
       <section className="grid gap-6 lg:grid-cols-2">
-        {/* Leads per Font */}
+        {/* Entrades per Font */}
         <div className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm">
           <div className="border-b border-slate-700/50 bg-slate-700/30 p-4">
-            <h3 className="font-semibold text-slate-100">Leads per origen</h3>
-            <p className="mt-1 text-xs text-slate-400">{data.leads.thisYear} leads aquest any</p>
+            <h3 className="font-semibold text-slate-100">Entrades per origen</h3>
+            <p className="mt-1 text-xs text-slate-400">{data.leads.thisYear} entrades aquest any</p>
           </div>
           <div className="p-4 space-y-3">
             {data.leads.bySource.map((source) => {
@@ -525,11 +525,11 @@ export default async function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Conversió Leads */}
+        {/* Conversió d'entrades */}
         <div className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm">
           <div className="border-b border-slate-700/50 bg-slate-700/30 p-4">
-            <h3 className="font-semibold text-slate-100">Conversió de Leads</h3>
-            <p className="mt-1 text-xs text-slate-400">Estat dels leads</p>
+            <h3 className="font-semibold text-slate-100">Conversió d&apos;entrades</h3>
+            <p className="mt-1 text-xs text-slate-400">Estat de les entrades</p>
           </div>
           <div className="p-4 space-y-3">
             {data.leads.conversionByMonth.map((status) => {
