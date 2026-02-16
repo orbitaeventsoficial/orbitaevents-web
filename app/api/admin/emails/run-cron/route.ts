@@ -270,7 +270,7 @@ function generatePostEventEmail(params: {
     ca: {
       title: 'Gràcies per la teva confiança!',
       greeting: `Hola ${firstName},`,
-      intro: `Esperem que el teu event del <strong>${formattedDate}</strong> amb el <strong>${packName}</strong> hagi estat increïble.`,
+      intro: `Esperem que el teu esdeveniment del <strong>${formattedDate}</strong> amb el <strong>${packName}</strong> hagi estat increïble.`,
       question: 'Ens deixes la teva opinió?',
       explanation: 'La teva opinió ens ajuda a millorar i, a més, <strong>tenim un regal per a tu</strong>.',
       reward: 'En deixar-nos la teva valoració rebràs un <strong>codi de descompte exclusiu</strong>.',

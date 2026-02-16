@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     const { email } = await req.json();
 
     if (!email || !email.includes('@')) {
-      return NextResponse.json({ error: 'Email invalido' }, { status: 400 });
+      return NextResponse.json({ error: 'Correu electrònic no vàlid' }, { status: 400 });
     }
 
     const testHtml = `
@@ -30,19 +30,19 @@ export async function POST(req: NextRequest) {
 <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 20px;">
   <div style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 16px; overflow: hidden;">
     <div style="background: linear-gradient(135deg, #DAA520, #B8860B); padding: 30px; text-align: center;">
-      <h1 style="color: #000; margin: 0; font-size: 24px;">Email de prueba</h1>
+      <h1 style="color: #000; margin: 0; font-size: 24px;">Correu de prova</h1>
     </div>
     <div style="padding: 30px; color: #e5e5e5;">
       <p style="font-size: 16px; margin: 0 0 20px 0;">
-        Si estas leyendo este email, la configuracion SMTP funciona correctamente.
+        Si estàs llegint aquest correu, la configuració SMTP funciona correctament.
       </p>
       <div style="background: rgba(34,197,94,0.1); border: 1px solid #22c55e; border-radius: 12px; padding: 16px; text-align: center;">
         <p style="margin: 0; color: #22c55e; font-weight: bold;">
-          Todo configurado correctamente.
+          Tot està configurat correctament.
         </p>
       </div>
       <p style="font-size: 14px; color: #666; margin-top: 20px;">
-        Enviado desde el panel de administracion de Orbita Events.
+        Enviat des del panell d&apos;administració d&apos;Orbita Events.
       </p>
     </div>
     <div style="padding: 20px; background: #0a0a0a; text-align: center;">
@@ -57,15 +57,15 @@ export async function POST(req: NextRequest) {
 
     await sendEmail({
       to: email,
-      subject: 'Email de prueba - Orbita Events Admin',
+      subject: 'Correu de prova - Orbita Events Admin',
       html: testHtml,
     });
 
-    return NextResponse.json({ ok: true, message: 'Email de prueba enviado' });
+    return NextResponse.json({ ok: true, message: 'Correu de prova enviat' });
   } catch (error) {
-    log.error('Error enviando email de prueba:', error);
+    log.error('Error enviant correu de prova:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Error enviando email' },
+      { error: error instanceof Error ? error.message : 'Error enviant correu' },
       { status: 500 }
     );
   }
