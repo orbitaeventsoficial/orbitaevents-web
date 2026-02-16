@@ -20,6 +20,29 @@ interface ProcessedResult {
   reason?: string;
 }
 
+function normalizeLocale(locale?: string | null): 'ca' | 'es' | 'en' {
+  const raw = String(locale || 'ca').trim().toLowerCase();
+  if (raw.startsWith('es')) return 'es';
+  if (raw.startsWith('en')) return 'en';
+  return 'ca';
+}
+
+function resolvePackName(
+  translations: Array<{ locale: string; name: string }> | undefined,
+  locale: 'ca' | 'es' | 'en'
+): string {
+  if (!translations || translations.length === 0) return locale === 'en' ? 'Your pack' : locale === 'es' ? 'Tu pack' : 'El teu pack';
+  return (
+    translations.find((t) => t.locale.toLowerCase() === locale)?.name ||
+    translations.find((t) => t.locale.toLowerCase().startsWith(locale))?.name ||
+    translations.find((t) => t.locale === 'ca')?.name ||
+    translations.find((t) => t.locale === 'es')?.name ||
+    translations.find((t) => t.locale === 'en')?.name ||
+    translations[0]?.name ||
+    (locale === 'en' ? 'Your pack' : locale === 'es' ? 'Tu pack' : 'El teu pack')
+  );
+}
+
 async function saveCronStatus(payload: {
   status: 'ok' | 'error';
   summary?: Record<string, number>;
@@ -85,7 +108,7 @@ export async function POST(req: NextRequest) {
     for (const booking of completedBookings) {
       const email = booking.clientEmail;
       const name = booking.clientName;
-      const locale = booking.lead?.preferredLocale || 'ca';
+      const locale = normalizeLocale(booking.lead?.preferredLocale || 'ca');
 
       if (!email || email.includes('@leads.orbitaevents.local')) {
         results.push({
@@ -103,9 +126,7 @@ export async function POST(req: NextRequest) {
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
         const reviewUrl = `${baseUrl}/${locale}/valoracio?token=${reviewToken}&ref=${booking.reference}`;
 
-        const packName = booking.pack?.translations?.find(t => t.locale === locale)?.name
-          || booking.pack?.translations?.[0]?.name
-          || 'El teu pack';
+        const packName = resolvePackName(booking.pack?.translations as any, locale);
 
         const emailHtml = generatePostEventEmail({
           name,
@@ -195,7 +216,7 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json(
       {
-        error: 'Error processant events',
+        error: 'Error processant esdeveniments',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
@@ -203,14 +224,14 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function getSubjectLine(locale: string, name: string): string {
+function getSubjectLine(locale: 'ca' | 'es' | 'en', name: string): string {
   const firstName = name.split(' ')[0];
-  const subjects: Record<string, string> = {
+  const subjects: Record<'ca' | 'es' | 'en', string> = {
     es: `🎉 ${firstName}, ¡gracias por confiar en nosotros!`,
     ca: `🎉 ${firstName}, gràcies per confiar en nosaltres!`,
     en: `🎉 ${firstName}, thank you for trusting us!`,
   };
-  return subjects[locale] || subjects.es;
+  return subjects[locale];
 }
 
 function generatePostEventEmail(params: {
@@ -219,16 +240,19 @@ function generatePostEventEmail(params: {
   eventDate: Date;
   reviewUrl: string;
   googleReviewUrl: string;
-  locale: string;
+  locale: 'ca' | 'es' | 'en';
 }): string {
   const { name, packName, eventDate, reviewUrl, googleReviewUrl, locale } = params;
 
   const firstName = name.split(' ')[0];
-  const formattedDate = eventDate.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', {
+  const formattedDate = eventDate.toLocaleDateString(
+    locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB',
+    {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
-  });
+    }
+  );
 
   const texts = {
     es: {
@@ -236,8 +260,8 @@ function generatePostEventEmail(params: {
       greeting: `Hola ${firstName},`,
       intro: `Esperamos que tu evento del <strong>${formattedDate}</strong> con el <strong>${packName}</strong> haya sido increíble.`,
       question: '¿Nos dejas tu opinión?',
-      explanation: 'Tu feedback nos ayuda a mejorar y además... <strong>¡tenemos un regalo para ti!</strong>',
-      reward: 'Al dejarnos tu valoración recibirás un <strong>código de descuento exclusivo</strong>.',
+      explanation: 'Tu opinión nos ayuda a mejorar y, además, <strong>tenemos un regalo para ti</strong>.',
+      reward: 'Al dejarnos tu valoración, recibirás un <strong>código de descuento exclusivo</strong>.',
       cta: 'Dejar mi valoración',
       googleText: 'También puedes dejarnos una reseña en Google:',
       googleCta: 'Reseña en Google',
@@ -248,7 +272,7 @@ function generatePostEventEmail(params: {
       greeting: `Hola ${firstName},`,
       intro: `Esperem que el teu event del <strong>${formattedDate}</strong> amb el <strong>${packName}</strong> hagi estat increïble.`,
       question: 'Ens deixes la teva opinió?',
-      explanation: 'El teu feedback ens ajuda a millorar i a més... <strong>tenim un regal per a tu!</strong>',
+      explanation: 'La teva opinió ens ajuda a millorar i, a més, <strong>tenim un regal per a tu</strong>.',
       reward: 'En deixar-nos la teva valoració rebràs un <strong>codi de descompte exclusiu</strong>.',
       cta: 'Deixar valoració',
       googleText: 'També pots deixar-nos una ressenya a Google:',
@@ -260,8 +284,8 @@ function generatePostEventEmail(params: {
       greeting: `Hi ${firstName},`,
       intro: `We hope your event on <strong>${formattedDate}</strong> with the <strong>${packName}</strong> was amazing.`,
       question: 'Would you leave us a review?',
-      explanation: 'Your feedback helps us improve and... <strong>we have a gift for you!</strong>',
-      reward: 'When you leave your review, you\'ll receive an <strong>exclusive discount code</strong>.',
+      explanation: 'Your feedback helps us improve and <strong>we have a gift for you</strong>.',
+      reward: "When you leave your review, you'll receive an <strong>exclusive discount code</strong>.",
       cta: 'Leave review',
       googleText: 'You can also leave us a Google review:',
       googleCta: 'Google Review',

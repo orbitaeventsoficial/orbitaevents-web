@@ -9,6 +9,29 @@ import { requireAuth } from '@/lib/auth';
 // Google Reviews URL
 const GOOGLE_REVIEW_URL = 'https://g.page/r/CXcgbvANsXSzEBI/review';
 
+function normalizeLocale(locale?: string | null): 'ca' | 'es' | 'en' {
+  const raw = String(locale || 'ca').trim().toLowerCase();
+  if (raw.startsWith('es')) return 'es';
+  if (raw.startsWith('en')) return 'en';
+  return 'ca';
+}
+
+function resolvePackName(
+  translations: Array<{ locale: string; name: string }> | undefined,
+  locale: 'ca' | 'es' | 'en'
+): string {
+  if (!translations || translations.length === 0) return locale === 'en' ? 'Your pack' : locale === 'es' ? 'Tu pack' : 'El teu pack';
+  return (
+    translations.find((t) => t.locale.toLowerCase() === locale)?.name ||
+    translations.find((t) => t.locale.toLowerCase().startsWith(locale))?.name ||
+    translations.find((t) => t.locale === 'ca')?.name ||
+    translations.find((t) => t.locale === 'es')?.name ||
+    translations.find((t) => t.locale === 'en')?.name ||
+    translations[0]?.name ||
+    (locale === 'en' ? 'Your pack' : locale === 'es' ? 'Tu pack' : 'El teu pack')
+  );
+}
+
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
@@ -51,7 +74,7 @@ export async function POST(req: NextRequest) {
 
     const email = booking.clientEmail;
     const name = booking.clientName;
-    const locale = booking.lead?.preferredLocale || booking.preferredLocale || 'ca';
+    const locale = normalizeLocale(booking.lead?.preferredLocale || booking.preferredLocale || 'ca');
 
     // Skip si no hi ha email vàlid
     if (!email || email.includes('@leads.orbitaevents.local')) {
@@ -67,9 +90,7 @@ export async function POST(req: NextRequest) {
     const reviewUrl = `${baseUrl}/${locale}/valoracio?token=${reviewToken}&ref=${booking.reference}`;
 
     // Nom del pack
-    const packName = booking.pack?.translations?.find(t => t.locale === locale)?.name 
-      || booking.pack?.translations?.[0]?.name 
-      || 'El teu pack';
+    const packName = resolvePackName(booking.pack?.translations as any, locale);
 
     // Enviar email
     const emailHtml = generatePostEventEmail({
@@ -121,13 +142,14 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function getSubjectLine(locale: string, name: string): string {
+function getSubjectLine(locale: 'ca' | 'es' | 'en', name: string): string {
+  const firstName = name.split(' ')[0];
   const subjects: Record<string, string> = {
-    es: `🎉 ${name}, ¡gracias por confiar en nosotros! ¿Qué tal fue tu evento?`,
-    ca: `🎉 ${name}, gràcies per confiar en nosaltres! Com va anar el teu event?`,
-    en: `🎉 ${name}, thank you for trusting us! How was your event?`,
+    es: `🎉 ${firstName}, ¡gracias por confiar en nosotros! ¿Qué tal fue tu evento?`,
+    ca: `🎉 ${firstName}, gràcies per confiar en nosaltres! Com va anar el teu esdeveniment?`,
+    en: `🎉 ${firstName}, thank you for trusting us! How was your event?`,
   };
-  return subjects[locale] || subjects.es;
+  return subjects[locale];
 }
 
 function generatePostEventEmail(params: {
@@ -136,16 +158,19 @@ function generatePostEventEmail(params: {
   eventDate: Date;
   reviewUrl: string;
   googleReviewUrl: string;
-  locale: string;
+  locale: 'ca' | 'es' | 'en';
 }): string {
   const { name, packName, eventDate, reviewUrl, googleReviewUrl, locale } = params;
   
   const firstName = name.split(' ')[0];
-  const formattedDate = eventDate.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', {
+  const formattedDate = eventDate.toLocaleDateString(
+    locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB',
+    {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
-  });
+    }
+  );
 
   const texts = {
     es: {
@@ -153,8 +178,8 @@ function generatePostEventEmail(params: {
       greeting: `Hola ${firstName},`,
       intro: `Esperamos que tu evento del <strong>${formattedDate}</strong> con el <strong>${packName}</strong> haya sido increíble.`,
       question: '¿Nos dejas tu opinión?',
-      explanation: 'Tu feedback nos ayuda a mejorar y además... <strong>¡tenemos un regalo para ti!</strong>',
-      reward: 'Al dejarnos tu valoración recibirás un <strong>código de descuento exclusivo</strong> para tu próximo evento.',
+      explanation: 'Tu opinión nos ayuda a mejorar y, además, <strong>tenemos un regalo para ti</strong>.',
+      reward: 'Al dejarnos tu valoración, recibirás un <strong>código de descuento exclusivo</strong> para tu próximo evento.',
       cta: 'Dejar mi valoración y conseguir descuento',
       googleText: 'También puedes dejarnos una reseña en Google:',
       googleCta: 'Reseña en Google',
@@ -165,8 +190,8 @@ function generatePostEventEmail(params: {
       greeting: `Hola ${firstName},`,
       intro: `Esperem que el teu event del <strong>${formattedDate}</strong> amb el <strong>${packName}</strong> hagi estat increïble.`,
       question: 'Ens deixes la teva opinió?',
-      explanation: 'El teu feedback ens ajuda a millorar i a més... <strong>tenim un regal per a tu!</strong>',
-      reward: 'En deixar-nos la teva valoració rebràs un <strong>codi de descompte exclusiu</strong> pel teu pròxim event.',
+      explanation: 'La teva opinió ens ajuda a millorar i, a més, <strong>tenim un regal per a tu</strong>.',
+      reward: 'En deixar-nos la teva valoració rebràs un <strong>codi de descompte exclusiu</strong> per al teu pròxim esdeveniment.',
       cta: 'Deixar valoració i aconseguir descompte',
       googleText: 'També pots deixar-nos una ressenya a Google:',
       googleCta: 'Ressenya a Google',
@@ -177,8 +202,8 @@ function generatePostEventEmail(params: {
       greeting: `Hi ${firstName},`,
       intro: `We hope your event on <strong>${formattedDate}</strong> with the <strong>${packName}</strong> was amazing.`,
       question: 'Would you leave us a review?',
-      explanation: 'Your feedback helps us improve and... <strong>we have a gift for you!</strong>',
-      reward: 'When you leave your review, you\'ll receive an <strong>exclusive discount code</strong> for your next event.',
+      explanation: 'Your feedback helps us improve and <strong>we have a gift for you</strong>.',
+      reward: "When you leave your review, you'll receive an <strong>exclusive discount code</strong> for your next event.",
       cta: 'Leave review and get discount',
       googleText: 'You can also leave us a Google review:',
       googleCta: 'Google Review',

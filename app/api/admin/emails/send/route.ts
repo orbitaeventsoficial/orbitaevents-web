@@ -259,7 +259,7 @@ export async function POST(req: NextRequest) {
     await sendEmail({
       to,
       subject: translatedSubject,
-      html: bodyToHtml(translatedBody),
+      html: buildBrandedEmailHtml(bodyToHtml(translatedBody), resolvedLocale),
       replyTo,
       brandingStyle: emailCountBefore === 0 ? 'hero' : 'soft',
       attachments,
