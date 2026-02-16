@@ -1,9 +1,10 @@
 // app/[locale]/opiniones/client.tsx
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { useLocale } from 'next-intl';
 import { Link } from '@/lib/navigation';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -29,6 +30,110 @@ interface WebTestimonial {
   eventType?: string;
   createdAt: string;
 }
+
+type UiLocale = 'ca' | 'es' | 'en';
+
+const UI_COPY: Record<UiLocale, {
+  verifiedBadge: string;
+  heroBadge: string;
+  heroTitlePrefix: string;
+  heroTitleAccent: string;
+  ratingWord: string;
+  reviewsWord: string;
+  introWithCount: (count: number) => string;
+  introNoCount: string;
+  knownTitle: string;
+  knownDescription: string;
+  knownButton: string;
+  webOpinionsTitle: string;
+  webOpinionsSubtitle: string;
+  googleTitle: string;
+  googleSubtitle: string;
+  googleCta: string;
+  emptyState: string;
+  finalTitlePrefix: string;
+  finalTitleAccent: string;
+  finalWithCount: (count: number) => string;
+  finalNoCount: string;
+  configureEvent: string;
+  contact: string;
+}> = {
+  ca: {
+    verifiedBadge: 'Verificat',
+    heroBadge: '⭐ Ressenyes verificades',
+    heroTitlePrefix: 'El que diuen',
+    heroTitleAccent: 'els nostres clients',
+    ratingWord: 'valoració',
+    reviewsWord: 'ressenyes',
+    introWithCount: (count) => `Més de ${count} famílies i empreses han confiat en nosaltres. Llegeix les seves experiències i, si ja ens coneixes, deixa la teva.`,
+    introNoCount: 'Famílies i empreses han confiat en nosaltres. Llegeix les seves experiències i, si ja ens coneixes, deixa la teva.',
+    knownTitle: 'Ja ens coneixes?',
+    knownDescription: 'Deixa la teva valoració i obtén fins a un 25% de descompte per al teu pròxim esdeveniment',
+    knownButton: 'Deixa la meva opinió i obtén descompte',
+    webOpinionsTitle: 'Opinions del nostre web',
+    webOpinionsSubtitle: 'Testimonis verificats de clients',
+    googleTitle: 'Ressenyes de Google',
+    googleSubtitle: 'Opinions verificades de Google Business',
+    googleCta: 'Veure-les totes a Google',
+    emptyState: 'Encara no hi ha ressenyes disponibles. Sigues la primera persona a deixar la teva opinió.',
+    finalTitlePrefix: 'Vols viure una experiència',
+    finalTitleAccent: 'inoblidable',
+    finalWithCount: (count) => `Uneix-te a les més de ${count} famílies que han confiat en nosaltres`,
+    finalNoCount: 'Uneix-te a les famílies que han confiat en nosaltres',
+    configureEvent: 'Configura el teu esdeveniment',
+    contact: 'Contacta',
+  },
+  es: {
+    verifiedBadge: 'Verificado',
+    heroBadge: '⭐ Reseñas verificadas',
+    heroTitlePrefix: 'Lo que dicen',
+    heroTitleAccent: 'nuestros clientes',
+    ratingWord: 'valoración',
+    reviewsWord: 'reseñas',
+    introWithCount: (count) => `Más de ${count} familias y empresas han confiado en nosotros. Lee sus experiencias y, si ya nos conoces, deja la tuya.`,
+    introNoCount: 'Familias y empresas han confiado en nosotros. Lee sus experiencias y, si ya nos conoces, deja la tuya.',
+    knownTitle: '¿Ya nos conoces?',
+    knownDescription: 'Deja tu valoración y obtén hasta un 25% de descuento para tu próximo evento',
+    knownButton: 'Dejar mi opinión y obtener descuento',
+    webOpinionsTitle: 'Opiniones de nuestra web',
+    webOpinionsSubtitle: 'Testimonios verificados de clientes',
+    googleTitle: 'Reseñas de Google',
+    googleSubtitle: 'Opiniones verificadas de Google Business',
+    googleCta: 'Ver todas en Google',
+    emptyState: 'Aún no hay reseñas disponibles. ¡Sé el primero en dejar tu opinión!',
+    finalTitlePrefix: '¿Quieres vivir una experiencia',
+    finalTitleAccent: 'inolvidable',
+    finalWithCount: (count) => `Únete a las más de ${count} familias que han confiado en nosotros`,
+    finalNoCount: 'Únete a las familias que han confiado en nosotros',
+    configureEvent: 'Configura tu evento',
+    contact: 'Contactar',
+  },
+  en: {
+    verifiedBadge: 'Verified',
+    heroBadge: '⭐ Verified reviews',
+    heroTitlePrefix: 'What',
+    heroTitleAccent: 'our clients say',
+    ratingWord: 'rating',
+    reviewsWord: 'reviews',
+    introWithCount: (count) => `Over ${count} families and companies have trusted us. Read their experiences and, if you already know us, share yours.`,
+    introNoCount: 'Families and companies have trusted us. Read their experiences and, if you already know us, share yours.',
+    knownTitle: 'Already worked with us?',
+    knownDescription: 'Leave your review and get up to 25% off your next event',
+    knownButton: 'Leave my review and get a discount',
+    webOpinionsTitle: 'Reviews from our website',
+    webOpinionsSubtitle: 'Verified customer testimonials',
+    googleTitle: 'Google reviews',
+    googleSubtitle: 'Verified reviews from Google Business',
+    googleCta: 'View all on Google',
+    emptyState: 'No reviews are available yet. Be the first to share your experience.',
+    finalTitlePrefix: 'Want to live an',
+    finalTitleAccent: 'unforgettable experience',
+    finalWithCount: (count) => `Join the ${count}+ families that have trusted us`,
+    finalNoCount: 'Join the families that have trusted us',
+    configureEvent: 'Build your event',
+    contact: 'Contact',
+  },
+};
 
 interface FormData {
   rating: number;
@@ -144,7 +249,13 @@ function GoogleReviewCard({ review }: { review: GoogleReview }) {
   );
 }
 
-function WebTestimonialCard({ testimonial }: { testimonial: WebTestimonial }) {
+function WebTestimonialCard({
+  testimonial,
+  verifiedLabel,
+}: {
+  testimonial: WebTestimonial;
+  verifiedLabel: string;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -182,10 +293,10 @@ function WebTestimonialCard({ testimonial }: { testimonial: WebTestimonial }) {
           </div>
         </div>
 
-        <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full">
-          Verificado
-        </span>
-      </div>
+          <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full">
+          {verifiedLabel}
+          </span>
+        </div>
 
       <p className="text-white/90 leading-relaxed">
         "{testimonial.text}"
@@ -546,6 +657,9 @@ function SuccessState({ discountCode, discountPercent }: { discountCode: string;
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function OpinionesClient() {
+  const locale = useLocale();
+  const lang: UiLocale = locale.startsWith('ca') ? 'ca' : locale.startsWith('en') ? 'en' : 'es';
+  const t = UI_COPY[lang];
   const [googleReviews, setGoogleReviews] = useState<GoogleReview[]>([]);
   const [webTestimonials, setWebTestimonials] = useState<WebTestimonial[]>([]);
   const [averageRating, setAverageRating] = useState(5);
@@ -560,14 +674,28 @@ export default function OpinionesClient() {
         let googleCount = 0;
         let googleSource: string | null = null;
         let webCount = 0;
+        let hasGoogleReviews = false;
+        let hasGoogleRating = false;
         // Load Google reviews
         const googleRes = await fetch('/api/google-reviews');
         if (googleRes.ok) {
           const googleData = await googleRes.json();
-          setGoogleReviews(googleData.reviews || []);
+          const parsedGoogleReviews = googleData.reviews || [];
+          setGoogleReviews(parsedGoogleReviews);
           setAverageRating(googleData.rating || 5);
+          hasGoogleReviews = parsedGoogleReviews.length > 0;
+          hasGoogleRating = typeof googleData.rating === 'number';
           googleCount = googleData.user_ratings_total || 0;
           googleSource = googleData.source || null;
+        }
+
+        const statsRes = await fetch('/api/public/stats');
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          googleCount = Math.max(googleCount, statsData?.googleReviewsCount || 0);
+          if (!hasGoogleReviews && !hasGoogleRating && typeof statsData?.averageRating === 'number') {
+            setAverageRating(statsData.averageRating);
+          }
         }
 
         // Load web testimonials
@@ -613,25 +741,26 @@ export default function OpinionesClient() {
             className="text-center max-w-4xl mx-auto"
           >
             <span className="inline-block px-5 py-2.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
-              ⭐ Reseñas verificadas
+              {t.heroBadge}
             </span>
 
             <h1 className="text-4xl md:text-6xl font-black text-white mb-6">
-              Lo que dicen{' '}
+              {t.heroTitlePrefix}{' '}
               <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-                nuestros clientes
+                {t.heroTitleAccent}
               </span>
             </h1>
 
             <div className="flex items-center justify-center gap-4 mb-8">
               <RatingStars rating={5} size={28} />
               <span className="text-white text-3xl font-bold">{averageRating.toFixed(1)}</span>
-              <span className="text-white/60 text-lg">· {totalReviews}+ reseñas</span>
+              <span className="text-white/60 text-lg">
+                · {totalReviews > 0 ? `${totalReviews}+ ${t.reviewsWord}` : t.reviewsWord}
+              </span>
             </div>
 
             <p className="text-xl text-white/70 max-w-2xl mx-auto">
-              Más de {totalReviews} familias y empresas han confiado en nosotros.
-              Lee sus experiencias y, si ya nos conoces, deja la tuya.
+              {totalReviews > 0 ? t.introWithCount(totalReviews) : t.introNoCount}
             </p>
           </motion.div>
         </div>
@@ -646,15 +775,17 @@ export default function OpinionesClient() {
             viewport={{ once: true }}
             className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-2xl p-6 md:p-8 text-center"
           >
-            <h2 className="text-2xl font-bold text-white mb-2">¿Ya nos conoces?</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">{t.knownTitle}</h2>
             <p className="text-white/70 mb-6">
-              Deja tu valoración y obtén hasta un <span className="text-amber-400 font-bold">25% de descuento</span> para tu próximo evento
+              {t.knownDescription.split('25%')[0]}
+              <span className="text-amber-400 font-bold">25%</span>
+              {t.knownDescription.split('25%')[1] || ''}
             </p>
             <button
               onClick={() => setShowForm(true)}
               className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all"
             >
-              Dejar mi opinión y obtener descuento
+              {t.knownButton}
             </button>
           </motion.div>
         </div>
@@ -720,13 +851,13 @@ export default function OpinionesClient() {
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2 className="text-2xl font-bold text-white mb-2">Opiniones de nuestra web</h2>
-              <p className="text-white/60">Testimonios verificados de clientes</p>
+              <h2 className="text-2xl font-bold text-white mb-2">{t.webOpinionsTitle}</h2>
+              <p className="text-white/60">{t.webOpinionsSubtitle}</p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {webTestimonials.map((testimonial) => (
-                <WebTestimonialCard key={testimonial.id} testimonial={testimonial} />
+                <WebTestimonialCard key={testimonial.id} testimonial={testimonial} verifiedLabel={t.verifiedBadge} />
               ))}
             </div>
           </div>
@@ -745,9 +876,9 @@ export default function OpinionesClient() {
             >
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Icons.Google />
-                <h2 className="text-2xl font-bold text-white">Reseñas de Google</h2>
+                <h2 className="text-2xl font-bold text-white">{t.googleTitle}</h2>
               </div>
-              <p className="text-white/60">Opiniones verificadas de Google Business</p>
+              <p className="text-white/60">{t.googleSubtitle}</p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -764,10 +895,10 @@ export default function OpinionesClient() {
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white transition-colors"
               >
                 <Icons.Google />
-                <span>Ver todas en Google</span>
-              </a>
+                  <span>{t.googleCta}</span>
+                </a>
+              </div>
             </div>
-          </div>
         </section>
       )}
 
@@ -776,7 +907,7 @@ export default function OpinionesClient() {
         <section className="py-16">
           <div className="container mx-auto px-4 text-center">
             <p className="text-white/60 text-lg">
-              Aún no hay reseñas disponibles. ¡Sé el primero en dejar tu opinión!
+              {t.emptyState}
             </p>
           </div>
         </section>
@@ -791,24 +922,24 @@ export default function OpinionesClient() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              ¿Quieres vivir una experiencia{' '}
-              <span className="text-amber-400">inolvidable</span>?
+              {t.finalTitlePrefix}{' '}
+              <span className="text-amber-400">{t.finalTitleAccent}</span>?
             </h2>
             <p className="text-white/70 mb-8 max-w-xl mx-auto">
-              Únete a las más de {totalReviews} familias que han confiado en nosotros
+              {totalReviews > 0 ? t.finalWithCount(totalReviews) : t.finalNoCount}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/configurador"
                 className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/30 transition-all"
               >
-                Configura tu evento
+                {t.configureEvent}
               </Link>
               <Link
                 href="/contacto"
                 className="px-8 py-4 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all"
               >
-                Contactar
+                {t.contact}
               </Link>
             </div>
           </motion.div>
