@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CustomerHubDTO, HubStatus } from '@/lib/customer-hub/dto';
 import { labelEstatClient } from '@/lib/customer-hub/labels';
+import { fetchWithCsrf } from '@/lib/csrf';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES I CONSTANTS
@@ -107,7 +108,7 @@ export default function CustomerHeader({
     setActionLoading(`status-${newStatus}`);
     setMenuOpen(false);
     try {
-      const res = await fetch(`/api/admin/customers/${id}/status`, {
+      const res = await fetchWithCsrf(`/api/admin/customers/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),

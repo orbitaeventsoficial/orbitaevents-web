@@ -275,7 +275,7 @@ export default function AdminContactesPage() {
           </svg>
           <input
             type="search"
-            placeholder="Cercar client..."
+            placeholder="Buscar por nombre, email, teléfono, Instagram o código descuento"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             aria-label="Cercar client"

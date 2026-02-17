@@ -41,8 +41,8 @@ export async function PATCH(
     const leadStatusMap: Record<string, string> = {
       LEAD: 'NEW',
       NEGOTIATION: 'NEGOTIATING',
-      CONFIRMED: 'CONVERTED',
-      POSTEVENT: 'CONVERTED',
+      CONFIRMED: 'WON',
+      POSTEVENT: 'WON',
       LOST: 'LOST',
     };
     const leadStatus = leadStatusMap[status] || 'NEW';

@@ -38,6 +38,15 @@ interface ConfigState {
   appliedOffer: string | null;
 }
 
+interface AppliedDiscountCode {
+  code: string;
+  source: 'customer' | 'global' | 'feedback';
+  type: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  value: number;
+  expiresAt: string;
+  isAccumulative?: boolean;
+}
+
 // Helper per obtenir text traduït de l'extra
 function isI18nKey(value: string): boolean {
   return value.startsWith('pages.') || value.startsWith('extras.');
@@ -80,6 +89,10 @@ export default function ConfiguradorClient() {
   });
   const [extrasCatalog, setExtrasCatalog] = useState<ExtraDefinition[]>(EXTRAS);
   const [minDate, setMinDate] = useState(''); // Hydration-safe
+  const [discountCodeInput, setDiscountCodeInput] = useState('');
+  const [discountCodeLoading, setDiscountCodeLoading] = useState(false);
+  const [discountCodeError, setDiscountCodeError] = useState('');
+  const [appliedDiscountCode, setAppliedDiscountCode] = useState<AppliedDiscountCode | null>(null);
 
   // Set minDate on client to avoid hydration mismatch
   useEffect(() => {
@@ -115,6 +128,65 @@ export default function ConfiguradorClient() {
       active = false;
     };
   }, []);
+
+  const getDiscountCodeErrorText = (reason: string) => {
+    switch (reason) {
+      case 'EXPIRED':
+        return 'Este código ha caducado.';
+      case 'INACTIVE':
+        return 'Este código no está activo.';
+      case 'MAX_USES_REACHED':
+      case 'ALREADY_USED':
+        return 'Este código ya no se puede usar.';
+      case 'NOT_FOUND':
+        return 'Código no válido.';
+      default:
+        return 'No se pudo validar el código.';
+    }
+  };
+
+  const applyDiscountCode = async () => {
+    const code = discountCodeInput.trim().toUpperCase();
+    if (!code) return;
+
+    setDiscountCodeLoading(true);
+    setDiscountCodeError('');
+    try {
+      const res = await fetch(`/api/public/discount-code?code=${encodeURIComponent(code)}`, {
+        cache: 'no-store',
+      });
+      const data = await res.json();
+      if (!res.ok || !data?.ok) {
+        throw new Error('DISCOUNT_API_ERROR');
+      }
+
+      if (!data.valid) {
+        setAppliedDiscountCode(null);
+        setDiscountCodeError(getDiscountCodeErrorText(String(data.reason || '')));
+        return;
+      }
+
+      setAppliedDiscountCode({
+        code: String(data.code || code),
+        source: data.source,
+        type: data.type,
+        value: Number(data.value || 0),
+        expiresAt: String(data.expiresAt || ''),
+        isAccumulative: Boolean(data.isAccumulative),
+      });
+    } catch {
+      setAppliedDiscountCode(null);
+      setDiscountCodeError('Error validando el código. Inténtalo de nuevo.');
+    } finally {
+      setDiscountCodeLoading(false);
+    }
+  };
+
+  const clearDiscountCode = () => {
+    setAppliedDiscountCode(null);
+    setDiscountCodeInput('');
+    setDiscountCodeError('');
+  };
 
   // Detectar pack pre-seleccionado desde URL (viene de páginas de servicios)
   useEffect(() => {
@@ -227,6 +299,22 @@ export default function ConfiguradorClient() {
           discount: Math.round((subtotal * (OFFERS.seasonal.discount || 0)) / 100),
           reason: OFFERS.seasonal.name,
           priority: 3,
+        });
+      }
+    }
+
+    // 4. Código promocional válido (si existe)
+    if (appliedDiscountCode) {
+      const codeDiscount =
+        appliedDiscountCode.type === 'PERCENTAGE'
+          ? Math.round((subtotal * appliedDiscountCode.value) / 100)
+          : Math.round(appliedDiscountCode.value);
+
+      if (codeDiscount > 0) {
+        applicableOffers.push({
+          discount: codeDiscount,
+          reason: `Código ${appliedDiscountCode.code}`,
+          priority: 4,
         });
       }
     }
@@ -542,6 +630,52 @@ export default function ConfiguradorClient() {
                 </div>
               )}
             </div>
+        </div>
+
+        {/* Código de descuento */}
+        <div className="p-6 rounded-xl bg-bg-surface border border-border">
+          <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+            <Tag className="w-5 h-5 text-oe-gold" />
+            Código de descuento
+          </h3>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              value={discountCodeInput}
+              onChange={(e) => {
+                setDiscountCodeInput(e.target.value.toUpperCase());
+                setDiscountCodeError('');
+              }}
+              placeholder="Ej: ORBITA10"
+              className="flex-1 px-4 py-3 rounded-lg bg-bg-main text-white border border-border focus:border-oe-gold outline-none"
+            />
+            <button
+              type="button"
+              onClick={applyDiscountCode}
+              disabled={discountCodeLoading || !discountCodeInput.trim()}
+              className="px-5 py-3 rounded-lg bg-oe-gold text-black font-bold disabled:opacity-50"
+            >
+              {discountCodeLoading ? 'Validando...' : 'Aplicar'}
+            </button>
+            {appliedDiscountCode && (
+              <button
+                type="button"
+                onClick={clearDiscountCode}
+                className="px-4 py-3 rounded-lg border border-border text-white"
+              >
+                Quitar
+              </button>
+            )}
+          </div>
+          {discountCodeError && (
+            <p className="mt-2 text-sm text-red-400">{discountCodeError}</p>
+          )}
+          {appliedDiscountCode && !discountCodeError && (
+            <p className="mt-2 text-sm text-emerald-400">
+              Código activo: {appliedDiscountCode.code} · caduca el{' '}
+              {new Date(appliedDiscountCode.expiresAt).toLocaleDateString('es-ES')}
+            </p>
+          )}
         </div>
 
         {/* Resumen Precio */}

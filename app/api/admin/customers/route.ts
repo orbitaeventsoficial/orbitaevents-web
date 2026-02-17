@@ -31,10 +31,22 @@ export async function GET(request: NextRequest) {
     const where = q
       ? {
           OR: [
+            { id: { contains: q, mode: 'insensitive' as const } },
             { name: { contains: q, mode: 'insensitive' as const } },
+            { nameNormalized: { contains: q, mode: 'insensitive' as const } },
             { email: { contains: q, mode: 'insensitive' as const } },
+            { emailNormalized: { contains: q, mode: 'insensitive' as const } },
             { phone: { contains: q } },
+            { phoneNormalized: { contains: q } },
             { instagram: { contains: q, mode: 'insensitive' as const } },
+            { instagramNormalized: { contains: q, mode: 'insensitive' as const } },
+            {
+              discountCodes: {
+                some: {
+                  code: { contains: q, mode: 'insensitive' as const },
+                },
+              },
+            },
           ],
         }
       : undefined;
