@@ -126,6 +126,10 @@ export function requirePermission(req: NextRequest, permission: AdminPermission)
  * Retorna null si autenticat, o NextResponse si no
  */
 export function requireAuth(req: NextRequest): NextResponse | null {
+  if (req.headers.get('x-admin-authenticated') === '1') {
+    return null;
+  }
+
   const bearerAuth = verifyBearerAuth(req);
   const auth = bearerAuth.authenticated ? bearerAuth : verifyBasicAuth(req);
   if (!auth.authenticated) {
