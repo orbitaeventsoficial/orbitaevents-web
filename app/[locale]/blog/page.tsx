@@ -85,7 +85,7 @@ export default async function BlogPage({
             </div>
           ) : (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post) => {
+              {posts.map((post: (typeof posts)[number]) => {
                 const translation = post.translations[0];
                 if (!translation) return null;
 

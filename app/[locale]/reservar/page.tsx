@@ -58,7 +58,7 @@ export default async function BookingPage({
   });
 
   // Transform data for component
-  const packsForForm = packs.map((pack) => ({
+  const packsForForm = packs.map((pack: (typeof packs)[number]) => ({
     id: pack.id,
     slug: pack.slug,
     name: pack.translations[0]?.name || pack.slug,
@@ -67,7 +67,7 @@ export default async function BookingPage({
     djHours: pack.djHours,
   }));
 
-  const extrasForForm = extras.map((extra) => ({
+  const extrasForForm = extras.map((extra: (typeof extras)[number]) => ({
     id: extra.id,
     slug: extra.slug,
     name: extra.translations[0]?.name || extra.slug,

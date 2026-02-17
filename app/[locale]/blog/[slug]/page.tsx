@@ -38,7 +38,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const translation = post.translations[0];
-
   return {
     title: translation.metaTitle || translation.title,
     description: translation.metaDescription || translation.excerpt,
@@ -85,6 +84,9 @@ export default async function BlogPostPage({ params }: Props) {
   }
 
   const translation = post.translations[0];
+  const tags: string[] = Array.isArray(post.tags)
+    ? post.tags.filter((tag: unknown): tag is string => typeof tag === 'string')
+    : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-purple-950/20 to-black">
@@ -159,9 +161,9 @@ export default async function BlogPostPage({ params }: Props) {
               </div>
               <div>
                 <div className="font-medium text-white">{post.author}</div>
-                {post.tags.length > 0 && (
+                {tags.length > 0 && (
                   <div className="flex gap-2 text-sm text-white/60">
-                    {post.tags.map((tag) => (
+                    {tags.map((tag: string) => (
                       <span key={tag}>#{tag}</span>
                     ))}
                   </div>

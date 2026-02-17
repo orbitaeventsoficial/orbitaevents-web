@@ -104,9 +104,21 @@
   },
   "pnpm": {
     "overrides": {
-      "semver": "5.7.2",
+      "semver": "^7.6.3",
       "glob": "10.5.0",
       "tmp": "0.2.4"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@prisma/client",
+      "@prisma/engines",
+      "@swc/core",
+      "core-js",
+      "esbuild",
+      "prisma",
+      "protobufjs",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }
