@@ -10,7 +10,7 @@ import { labelEstatClient } from '@/lib/customer-hub/labels';
 // TYPES I CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks';
+type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks' | 'discounts';
 
 const TABS: Array<{ key: TabKey; label: string; icon: string; badge?: (data: CustomerHubDTO) => number | null }> = [
   { key: 'summary', label: 'Resum', icon: '📊' },
@@ -33,6 +33,12 @@ const TABS: Array<{ key: TabKey; label: string; icon: string; badge?: (data: Cus
     label: 'Tasques',
     icon: '✅',
     badge: (data) => data.tasks.filter((t) => !t.done).length || null,
+  },
+  {
+    key: 'discounts',
+    label: 'Descomptes',
+    icon: '🏷️',
+    badge: (data) => (data.discountCodes || []).filter((dc) => dc.isActive && dc.currentUses < dc.maxUses && new Date(dc.validUntil) > new Date()).length || null,
   },
 ];
 

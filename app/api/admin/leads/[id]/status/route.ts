@@ -73,8 +73,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     let linkedCustomerId = existingLead.customerId ?? null;
 
-    // Si passa a WON, crear/actualitzar client i enllaçar.
-    if (status === 'WON') {
+    // Si el lead NO té customer associat, crear-lo en qualsevol canvi d'estat
+    if (!linkedCustomerId && existingLead.email && !existingLead.email.endsWith('@leads.orbitaevents.local')) {
       const emailNormalized = normalizeEmail(existingLead.email);
       const phoneNormalized = existingLead.phone ? normalizePhone(existingLead.phone) : null;
       const nameNormalized = normalizeName(existingLead.name);
@@ -111,7 +111,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         status: status as LeadStatus,
         contactedAt: status === 'CONTACTED' && !existingLead.contactedAt ? new Date() : undefined,
         convertedAt: status === 'WON' && !existingLead.convertedAt ? new Date() : undefined,
-        customerId: status === 'WON' ? linkedCustomerId : existingLead.customerId,
+        customerId: linkedCustomerId,
       },
       select: {
         id: true,

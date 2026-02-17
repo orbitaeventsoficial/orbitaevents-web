@@ -41,7 +41,11 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
   );
 
   const nextTask = data.tasks.find((t) => !t.done);
-  const nextEvent = upcomingBookings[0];
+  const nextEvents = upcomingBookings.slice(0, 3);
+  const nextEvent = nextEvents[0];
+  const activeDiscounts = (data.discountCodes || []).filter(
+    (dc) => dc.isActive && dc.currentUses < dc.maxUses && new Date(dc.validUntil) > new Date()
+  );
 
   // Alertes automàtiques
   const alerts: Array<{ type: 'warning' | 'info' | 'success'; text: string }> = [];
@@ -56,6 +60,9 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
   }
   if (confirmedBookings > 0) {
     alerts.push({ type: 'success', text: `${confirmedBookings} reserva${confirmedBookings > 1 ? 'es' : ''} confirmada${confirmedBookings > 1 ? 'es' : ''}` });
+  }
+  if (activeDiscounts.length > 0) {
+    alerts.push({ type: 'info', text: `${activeDiscounts.length} codi${activeDiscounts.length > 1 ? 's' : ''} de descompte actiu${activeDiscounts.length > 1 ? 's' : ''} (${activeDiscounts.map(d => d.code).join(', ')})` });
   }
 
   const handleSave = useCallback(async () => {
@@ -261,38 +268,48 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
         />
 
         <ActionCard
-          title="Pròxim esdeveniment"
-          isEmpty={!nextEvent}
+          title={`Pròxims esdeveniments (${nextEvents.length})`}
+          isEmpty={nextEvents.length === 0}
           emptyText="Sense esdeveniments programats"
           content={
-            nextEvent && (
-              <>
-                <p className="text-sm font-medium text-slate-100">
-                  {nextEvent.reference || 'Reserva'}
-                </p>
-                <p className="mt-1 text-xs text-slate-400">
-                  {nextEvent.date && new Date(nextEvent.date).toLocaleDateString('ca-ES', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                  })}
-                  {nextEvent.startTime && ` · ${nextEvent.startTime}`}
-                </p>
-                {nextEvent.location && (
-                  <p className="text-xs text-slate-500">📍 {nextEvent.location}</p>
-                )}
-              </>
+            nextEvents.length > 0 && (
+              <div className="space-y-3">
+                {nextEvents.map((ev) => (
+                  <div key={ev.id} className="rounded-lg border border-slate-700/40 bg-slate-800/30 p-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-slate-100">
+                        {ev.reference || 'Reserva'}
+                      </p>
+                      <a
+                        href={`/admin/bookings/${ev.id}`}
+                        className="text-[11px] text-cyan-300 hover:text-cyan-200"
+                      >
+                        Obrir →
+                      </a>
+                    </div>
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      {ev.date && new Date(ev.date).toLocaleDateString('ca-ES', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                      })}
+                      {ev.startTime && ` · ${ev.startTime}`}
+                    </p>
+                    {ev.location && (
+                      <p className="text-[11px] text-slate-500">📍 {ev.location}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             )
           }
           action={
-            nextEvent && (
-              <a
-                href={`/admin/bookings/${nextEvent.id}`}
-                className="text-xs text-cyan-300 hover:text-cyan-200"
-              >
-                Veure reserva →
-              </a>
-            )
+            <a
+              href={`/admin/bookings/new?customerId=${data.customer.id}`}
+              className="text-xs text-cyan-300 hover:text-cyan-200"
+            >
+              + Nova reserva
+            </a>
           }
         />
       </div>

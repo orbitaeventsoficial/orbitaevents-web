@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import type { CustomerHubDTO, HubStatus, MessageDTO, TaskDTO } from './dto';
+import type { CustomerHubDTO, DiscountCodeDTO, HubStatus, MessageDTO, TaskDTO } from './dto';
 import { resolveActiveDocument } from './proposalActive';
 import { buildTimeline } from './timeline';
 
@@ -22,7 +22,12 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     where: { id: customerId },
     include: {
       proposals: { orderBy: { createdAt: 'desc' }, take: 80 },
-      bookings: { orderBy: { createdAt: 'desc' }, take: 80 },
+      bookings: {
+        orderBy: { createdAt: 'desc' },
+        take: 80,
+        include: { pack: { include: { translations: true } } },
+      },
+      discountCodes: { orderBy: { createdAt: 'desc' }, take: 50 },
       tasks: { orderBy: [{ status: 'asc' }, { dueDate: 'asc' }, { createdAt: 'desc' }], take: 120 },
       activityLog: { orderBy: { createdAt: 'desc' }, take: 120 },
       leads: {
@@ -48,17 +53,34 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     snapshot: (p.snapshot as Record<string, unknown> | null) || undefined,
   }));
 
-  const bookings = customer.bookings.map((b: any) => ({
-    id: b.id,
-    reference: b.reference,
-    date: b.eventDate?.toISOString(),
-    startTime: b.eventStartTime || undefined,
-    endTime: b.eventEndTime || undefined,
-    status: b.status,
-    location: b.eventLocation || undefined,
-    depositAmount: typeof b.depositAmount === 'number' ? b.depositAmount : undefined,
-    totalAmount: typeof b.total === 'number' ? b.total : undefined,
-  }));
+  const bookings = customer.bookings.map((b: any) => {
+    // Resoldre nom del pack amb traduccions
+    let packName = b.pack?.name || undefined;
+    if (b.pack?.translations?.length > 0) {
+      const caTranslation = b.pack.translations.find((t: any) => t.locale === 'ca');
+      const esTranslation = b.pack.translations.find((t: any) => t.locale === 'es');
+      packName = caTranslation?.name || esTranslation?.name || packName;
+    }
+
+    return {
+      id: b.id,
+      reference: b.reference,
+      date: b.eventDate?.toISOString(),
+      startTime: b.eventStartTime || undefined,
+      endTime: b.eventEndTime || undefined,
+      status: b.status,
+      location: b.eventLocation || undefined,
+      venue: b.eventVenue || undefined,
+      depositAmount: typeof b.depositAmount === 'number' ? b.depositAmount : undefined,
+      totalAmount: typeof b.total === 'number' ? b.total : undefined,
+      eventType: b.eventType || undefined,
+      packName,
+      guestCount: typeof b.guestCount === 'number' ? b.guestCount : undefined,
+      depositPaid: b.depositPaid ?? undefined,
+      remainingPaid: b.remainingPaid ?? undefined,
+      discountCode: b.discountCode || undefined,
+    };
+  });
 
   const tasks: TaskDTO[] = customer.tasks.length > 0
     ? customer.tasks.map((task: any) => ({
@@ -152,6 +174,19 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     ),
   });
 
+  const discountCodes: DiscountCodeDTO[] = (customer.discountCodes || []).map((dc: any) => ({
+    id: dc.id,
+    code: dc.code,
+    discountPercent: dc.discountPercent,
+    validFrom: dc.validFrom?.toISOString(),
+    validUntil: dc.validUntil?.toISOString(),
+    maxUses: dc.maxUses,
+    currentUses: dc.currentUses,
+    sourceType: dc.sourceType,
+    isActive: dc.isActive,
+    usedAt: dc.usedAt?.toISOString(),
+  }));
+
   return {
     customer: {
       id: customer.id,
@@ -174,5 +209,6 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     tasks,
     messages,
     timeline,
+    discountCodes,
   };
 }

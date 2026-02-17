@@ -341,7 +341,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   const priorityItems = useMemo(() => ([
     { icon: '📥', label: 'Entrades', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
-    { icon: '👤', label: 'Clients', href: '/admin/clientes' },
+    { icon: '👤', label: 'Clients', href: '/admin/contactes' },
     { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
     { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
     { icon: '🧾', label: 'Pressupost (PDF)', href: '/admin/presupuestos' },
@@ -349,7 +349,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   const favoriteItems = useMemo(() => ([
     { label: 'Entrades', href: '/admin/leads' },
-    { label: 'Clients', href: '/admin/clientes' },
+    { label: 'Clients', href: '/admin/contactes' },
     { label: 'Reserves', href: '/admin/bookings' },
     { label: 'Tasques', href: '/admin/tasks' },
   ]), []);

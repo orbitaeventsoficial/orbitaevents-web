@@ -178,6 +178,7 @@ async function getLeads(filters: {
             eventDate: true,
             status: true,
             priority: true,
+            customerId: true,
             _count: {
               select: {
                 notes: true,
@@ -445,7 +446,13 @@ export default async function LeadsPage({
                       {lead.name?.charAt(0).toUpperCase() || '?'}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-100 truncate">{lead.name}</p>
+                      {lead.customerId ? (
+                        <Link href={`/admin/contactes/${lead.customerId}`} className="font-medium text-slate-100 truncate block hover:text-cyan-300" onClick={(e) => e.stopPropagation()}>
+                          {lead.name}
+                        </Link>
+                      ) : (
+                        <p className="font-medium text-slate-100 truncate">{lead.name}</p>
+                      )}
                       <p className="text-xs text-slate-400 truncate">{lead.email}</p>
                     </div>
                   </div>
@@ -504,9 +511,16 @@ export default async function LeadsPage({
                   return (
                     <tr key={lead.id} className="hover:bg-slate-700/30 transition-colors">
                       <td className="px-4 py-3">
-                        <Link href={`/admin/leads/${lead.id}`} className="font-medium text-slate-100 hover:text-cyan-400">
-                          {lead.name}
-                        </Link>
+                        <div className="flex items-center gap-1.5">
+                          <Link href={`/admin/leads/${lead.id}`} className="font-medium text-slate-100 hover:text-cyan-400">
+                            {lead.name}
+                          </Link>
+                          {lead.customerId && (
+                            <Link href={`/admin/contactes/${lead.customerId}`} className="text-cyan-400 hover:text-cyan-300" title="Fitxa client">
+                              👤
+                            </Link>
+                          )}
+                        </div>
                         {lead.booking && (
                           <div className="text-xs text-emerald-400">✓ {lead.booking.reference}</div>
                         )}

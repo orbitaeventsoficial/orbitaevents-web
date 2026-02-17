@@ -10,6 +10,7 @@ import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { verifyTurnstileToken } from '@/lib/turnstile';
 import type { EventType, LeadSource } from '@prisma/client';
+import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
 
 type Locale = 'ca' | 'es' | 'en';
 
@@ -372,6 +373,58 @@ export async function POST(req: NextRequest) {
             content: `${t.noteLeadCreatedVia} ${packId ? t.viaConfigurator : t.viaWebForm}${packName ? ` - ${t.noteInterestedPack}: ${packName}` : ''}${!clientEmail ? ` (${t.notePhoneContact}: ${clientPhone})` : ''}`,
           }
         });
+      }
+
+      // Crear/actualitzar Customer automàticament si tenim email vàlid
+      if (_savedLeadId && clientEmail && !clientEmail.endsWith('@leads.orbitaevents.local')) {
+        try {
+          const emailNorm = normalizeEmail(clientEmail);
+          const nameNorm = normalizeName(name);
+          const phoneNorm = clientPhone ? normalizePhone(clientPhone) : null;
+
+          const customer = await prisma.customer.upsert({
+            where: { emailNormalized: emailNorm },
+            update: {
+              name,
+              nameNormalized: nameNorm,
+              phone: clientPhone || undefined,
+              phoneNormalized: phoneNorm || undefined,
+              preferredLocale: formLocale || locale || 'ca',
+            },
+            create: {
+              email: clientEmail.toLowerCase().trim(),
+              emailNormalized: emailNorm,
+              name,
+              nameNormalized: nameNorm,
+              phone: clientPhone || null,
+              phoneNormalized: phoneNorm,
+              source: determineSource(packId, packName),
+              preferredLocale: formLocale || locale || 'ca',
+            },
+          });
+
+          // Enllaçar lead amb customer
+          await prisma.lead.update({
+            where: { id: _savedLeadId },
+            data: { customerId: customer.id },
+          });
+
+          // Registrar activitat
+          await prisma.customerActivity.create({
+            data: {
+              customerId: customer.id,
+              action: 'LEAD_CREATED',
+              details: {
+                leadId: _savedLeadId,
+                eventType: mapEventType(event),
+                source: determineSource(packId, packName),
+                packName: packName || undefined,
+              },
+            },
+          });
+        } catch (customerError) {
+          log.error('Error creant/actualitzant customer des del formulari de contacte', customerError);
+        }
       }
 
     } catch (dbError) {

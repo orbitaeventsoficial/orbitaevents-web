@@ -28,9 +28,29 @@ export type BookingDTO = {
   endTime?: string;
   status: string;
   location?: string;
+  venue?: string;
   depositAmount?: number;
   totalAmount?: number;
   reference?: string;
+  eventType?: string;
+  packName?: string;
+  guestCount?: number;
+  depositPaid?: boolean;
+  remainingPaid?: boolean;
+  discountCode?: string;
+};
+
+export type DiscountCodeDTO = {
+  id: string;
+  code: string;
+  discountPercent: number;
+  validFrom: string;
+  validUntil: string;
+  maxUses: number;
+  currentUses: number;
+  sourceType: string;
+  isActive: boolean;
+  usedAt?: string;
 };
 
 export type TaskDTO = {
@@ -94,5 +114,6 @@ export type CustomerHubDTO = {
   tasks: TaskDTO[];
   messages: MessageDTO[];
   timeline: TimelineEventDTO[];
+  discountCodes: DiscountCodeDTO[];
 };
 

@@ -181,15 +181,25 @@ export default async function BookingDetailPage({ params }: PageProps) {
     POST_EVENT: deriveFlowStatus(commLogs, 'POST_EVENT'),
     GENERAL: deriveFlowStatus(commLogs, 'GENERAL'),
   } as const;
-  const customer = await prisma.customer.findFirst({
-    where: { emailNormalized: booking.clientEmail.trim().toLowerCase() },
-    select: {
-      id: true,
-      totalEvents: true,
-      totalSpent: true,
-      lastEventDate: true,
-    },
-  });
+  const customer = booking.customerId
+    ? await prisma.customer.findUnique({
+        where: { id: booking.customerId },
+        select: {
+          id: true,
+          totalEvents: true,
+          totalSpent: true,
+          lastEventDate: true,
+        },
+      })
+    : await prisma.customer.findFirst({
+        where: { emailNormalized: booking.clientEmail.trim().toLowerCase() },
+        select: {
+          id: true,
+          totalEvents: true,
+          totalSpent: true,
+          lastEventDate: true,
+        },
+      });
   const reviewFlowStatus = booking.reviewSubmittedAt || booking.clientSurvey
     ? 'RESPONDIDO'
     : booking.postEventEmailSent
@@ -234,6 +244,14 @@ export default async function BookingDetailPage({ params }: PageProps) {
             >
               ← Tornar
             </Link>
+            {customer && (
+              <Link
+                href={`/admin/contactes/${customer.id}`}
+                className="rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-cyan-700 transition-colors"
+              >
+                👤 Fitxa Client
+              </Link>
+            )}
             <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${statusConf.bg} ${statusConf.text}`}>
               {statusConf.label}
             </span>

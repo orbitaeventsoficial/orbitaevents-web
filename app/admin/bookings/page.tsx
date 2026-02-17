@@ -211,7 +211,7 @@ export default async function BookingsPage({
                         {statusConf.label}
                       </span>
                     </div>
-                    <p className="font-medium text-slate-100 mt-2 truncate">{booking.clientName}</p>
+                    <p className="font-medium text-slate-100 mt-2 truncate">{booking.clientName}{booking.customerId && ' 👤'}</p>
                     <p className="text-xs text-slate-400 truncate">{booking.eventLocation}</p>
                   </div>
                   <div className="text-right shrink-0">
@@ -281,7 +281,13 @@ export default async function BookingsPage({
                         <code className="text-xs font-mono bg-slate-700/50 text-slate-300 px-2 py-1 rounded">{booking.reference}</code>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-100">{booking.clientName}</div>
+                        {booking.customerId ? (
+                          <Link href={`/admin/contactes/${booking.customerId}`} className="font-medium text-slate-100 hover:text-cyan-300">
+                            {booking.clientName}
+                          </Link>
+                        ) : (
+                          <div className="font-medium text-slate-100">{booking.clientName}</div>
+                        )}
                         <div className="text-xs text-slate-400 truncate max-w-[150px]">{booking.eventLocation}</div>
                       </td>
                       <td className="px-4 py-3 text-slate-300 text-xs">{eventType}</td>

@@ -265,12 +265,22 @@ export default async function LeadDetailPage({ params }: Props) {
       <header className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-          <Link
-            href="/admin/leads"
-            className="text-sm text-slate-400 hover:text-slate-100 mb-2 inline-block"
-          >
-            ← Tornar a entrades
-          </Link>
+          <div className="flex items-center gap-3 mb-2">
+            <Link
+              href="/admin/leads"
+              className="text-sm text-slate-400 hover:text-slate-100"
+            >
+              ← Tornar a entrades
+            </Link>
+            {lead.customerId && (
+              <Link
+                href={`/admin/contactes/${lead.customerId}`}
+                className="rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-cyan-700 transition-colors"
+              >
+                👤 Fitxa Client
+              </Link>
+            )}
+          </div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
             {lead.name}
           </h1>
