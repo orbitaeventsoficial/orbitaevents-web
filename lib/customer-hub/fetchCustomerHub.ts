@@ -6,9 +6,12 @@ import { buildTimeline } from './timeline';
 function deriveHubStatus(input: {
   leadStatuses: string[];
   bookingStatuses: string[];
+  manualStatus?: HubStatus | null;
 }): HubStatus {
+  if (input.manualStatus) return input.manualStatus;
   if (input.bookingStatuses.some((s) => s === 'COMPLETED')) return 'POSTEVENT';
   if (input.bookingStatuses.some((s) => s === 'CONFIRMED' || s === 'PREPARING')) return 'CONFIRMED';
+  if (input.leadStatuses.some((s) => s === 'WON')) return 'CONFIRMED';
   if (input.leadStatuses.some((s) => s === 'NEGOTIATING' || s === 'QUOTE_SENT' || s === 'CONTACTED')) {
     return 'NEGOTIATION';
   }
@@ -223,6 +226,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   const status = deriveHubStatus({
     leadStatuses: leads.map((l: any) => l.status),
     bookingStatuses: bookingsRows.map((b: any) => b.status),
+    manualStatus: resolveManualStatus(activityLog),
   });
 
   const timeline = buildTimeline({
@@ -345,4 +349,12 @@ async function safeQuery<T>(query: () => Promise<T>, fallback: T): Promise<T> {
   } catch {
     return fallback;
   }
+}
+
+function resolveManualStatus(activities: Array<{ action?: string; details?: unknown }>): HubStatus | null {
+  const lastStatusChange = activities.find((activity) => activity?.action === 'STATUS_CHANGED');
+  const raw = (lastStatusChange?.details as { newStatus?: string } | null)?.newStatus;
+  if (!raw) return null;
+  const allowed: HubStatus[] = ['LEAD', 'NEGOTIATION', 'CONFIRMED', 'POSTEVENT', 'LOST'];
+  return allowed.includes(raw as HubStatus) ? (raw as HubStatus) : null;
 }

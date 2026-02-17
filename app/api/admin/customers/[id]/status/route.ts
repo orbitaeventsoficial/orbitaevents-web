@@ -61,6 +61,14 @@ export async function PATCH(
       });
     }
 
+    // Si és POSTEVENT, marcar bookings actius com COMPLETED
+    if (status === 'POSTEVENT') {
+      await prisma.booking.updateMany({
+        where: { customerId, status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } },
+        data: { status: 'COMPLETED' },
+      });
+    }
+
     // Si és LOST, marcar bookings com CANCELLED
     if (status === 'LOST') {
       await prisma.booking.updateMany({
