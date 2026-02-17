@@ -21,31 +21,100 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
   const resolvedCustomerId = await resolveCustomerId(prismaAny, customerId);
   if (!resolvedCustomerId) throw new Error('Customer not found');
 
-  const customer: any = await prismaAny.customer.findUnique({
+  const customerBase: any = await prismaAny.customer.findUnique({
     where: { id: resolvedCustomerId },
-    include: {
-      proposals: { orderBy: { createdAt: 'desc' }, take: 80 },
-      bookings: {
-        orderBy: { createdAt: 'desc' },
-        take: 80,
-        include: { pack: { include: { translations: true } } },
-      },
-      discountCodes: { orderBy: { createdAt: 'desc' }, take: 50 },
-      tasks: { orderBy: [{ status: 'asc' }, { dueDate: 'asc' }, { createdAt: 'desc' }], take: 120 },
-      activityLog: { orderBy: { createdAt: 'desc' }, take: 120 },
-      leads: {
-        orderBy: { createdAt: 'desc' },
-        include: {
-          activities: { orderBy: { createdAt: 'desc' }, take: 60 },
-          tasks: { orderBy: { createdAt: 'desc' }, take: 60 },
-        },
-      },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      createdAt: true,
     },
   });
 
-  if (!customer) throw new Error('Customer not found');
+  if (!customerBase) throw new Error('Customer not found');
 
-  const proposals = customer.proposals.map((p: any) => ({
+  const leads: any[] = await safeQuery(() =>
+    prismaAny.lead.findMany({
+      where: { customerId: resolvedCustomerId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        activities: { orderBy: { createdAt: 'desc' }, take: 60 },
+        tasks: { orderBy: { createdAt: 'desc' }, take: 60 },
+      },
+    }),
+    []
+  );
+
+  const leadIds = leads.map((l: any) => l.id);
+
+  const proposals: any[] = await safeQuery(() =>
+    prismaAny.proposal.findMany({
+      where: { customerId: resolvedCustomerId },
+      orderBy: { createdAt: 'desc' },
+      take: 80,
+    }),
+    []
+  );
+
+  const bookingsRaw: any[] = await safeQuery(
+    () =>
+      prismaAny.booking.findMany({
+        where: { customerId: resolvedCustomerId },
+        orderBy: { createdAt: 'desc' },
+        take: 80,
+        include: { pack: { include: { translations: true } } },
+      }),
+    []
+  );
+
+  const bookingsFallbackRaw: any[] =
+    bookingsRaw.length > 0 || leadIds.length === 0
+      ? []
+      : await safeQuery(
+          () =>
+            prismaAny.booking.findMany({
+              where: { leadId: { in: leadIds } },
+              orderBy: { createdAt: 'desc' },
+              take: 80,
+              include: { pack: { include: { translations: true } } },
+            }),
+          []
+        );
+
+  const bookingsRows = bookingsRaw.length > 0 ? bookingsRaw : bookingsFallbackRaw;
+
+  const customerTasks: any[] = await safeQuery(
+    () =>
+      prismaAny.task.findMany({
+        where: { customerId: resolvedCustomerId },
+        orderBy: [{ status: 'asc' }, { dueDate: 'asc' }, { createdAt: 'desc' }],
+        take: 120,
+      }),
+    []
+  );
+
+  const activityLog: any[] = await safeQuery(
+    () =>
+      prismaAny.customerActivity.findMany({
+        where: { customerId: resolvedCustomerId },
+        orderBy: { createdAt: 'desc' },
+        take: 120,
+      }),
+    []
+  );
+
+  const customerDiscountCodes: any[] = await safeQuery(
+    () =>
+      prismaAny.customerDiscountCode.findMany({
+        where: { customerId: resolvedCustomerId },
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+      }),
+    []
+  );
+
+  const proposalsMapped = proposals.map((p: any) => ({
     id: p.id,
     reference: p.reference,
     status: p.status as 'DRAFT' | 'SENT' | 'VIEWED' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED',
@@ -56,7 +125,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     snapshot: (p.snapshot as Record<string, unknown> | null) || undefined,
   }));
 
-  const bookings = customer.bookings.map((b: any) => {
+  const bookings = bookingsRows.map((b: any) => {
     // Resoldre nom del pack amb traduccions
     let packName = b.pack?.name || undefined;
     if (b.pack?.translations?.length > 0) {
@@ -85,8 +154,8 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     };
   });
 
-  const tasks: TaskDTO[] = customer.tasks.length > 0
-    ? customer.tasks.map((task: any) => ({
+  const tasks: TaskDTO[] = customerTasks.length > 0
+    ? customerTasks.map((task: any) => ({
       id: task.id,
       title: task.title,
       dueDate: task.dueDate?.toISOString(),
@@ -97,7 +166,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
           : undefined,
       leadId: task.leadId || undefined,
     }))
-    : customer.leads.flatMap((lead: any) =>
+    : leads.flatMap((lead: any) =>
       lead.tasks.map((task: any) => ({
         id: task.id,
         title: task.title,
@@ -111,7 +180,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       }))
     );
 
-  const leadMessages: MessageDTO[] = customer.leads.flatMap((lead: any) =>
+  const leadMessages: MessageDTO[] = leads.flatMap((lead: any) =>
     lead.activities
       .filter((activity: any) => ['EMAIL', 'NOTE', 'CALL', 'WHATSAPP'].includes(activity.type))
       .map((activity: any) => ({
@@ -125,7 +194,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       }))
   );
 
-  const customerNotes: MessageDTO[] = customer.activityLog.map((a: any) => ({
+  const customerNotes: MessageDTO[] = activityLog.map((a: any) => ({
     id: `ca-${a.id}`,
     channel: 'NOTE',
     subject: a.action,
@@ -137,11 +206,11 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
     .slice(0, 120);
 
-  const active = resolveActiveDocument(proposals);
-  const activeProposal = active.proposalId ? proposals.find((p: any) => p.id === active.proposalId) : undefined;
+  const active = resolveActiveDocument(proposalsMapped);
+  const activeProposal = active.proposalId ? proposalsMapped.find((p: any) => p.id === active.proposalId) : undefined;
 
-  const totalQuoted = proposals.reduce((sum: number, p: any) => sum + (p.total || 0), 0);
-  const totalPaid = customer.bookings.reduce((sum: number, b: any) => sum + (b.depositPaid ? (b.depositAmount || 0) : 0), 0);
+  const totalQuoted = proposalsMapped.reduce((sum: number, p: any) => sum + (p.total || 0), 0);
+  const totalPaid = bookingsRows.reduce((sum: number, b: any) => sum + (b.depositPaid ? (b.depositAmount || 0) : 0), 0);
   const marginEstimated =
     activeProposal && typeof activeProposal.snapshot?.subtotal === 'number' && typeof activeProposal.snapshot?.total === 'number'
       ? Number(activeProposal.snapshot.total) - Number(activeProposal.snapshot.subtotal)
@@ -152,21 +221,21 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     .sort((a: any, b: any) => ((a.date || '') > (b.date || '') ? 1 : -1))[0]?.date;
 
   const status = deriveHubStatus({
-    leadStatuses: customer.leads.map((l: any) => l.status),
-    bookingStatuses: customer.bookings.map((b: any) => b.status),
+    leadStatuses: leads.map((l: any) => l.status),
+    bookingStatuses: bookingsRows.map((b: any) => b.status),
   });
 
   const timeline = buildTimeline({
-    proposals,
+    proposals: proposalsMapped,
     bookings,
     tasks,
     messages,
-    customerActivities: customer.activityLog.map((a: any) => ({
+    customerActivities: activityLog.map((a: any) => ({
       id: a.id,
       action: a.action,
       createdAt: a.createdAt,
     })),
-    leadActivities: customer.leads.flatMap((lead: any) =>
+    leadActivities: leads.flatMap((lead: any) =>
       lead.activities.map((a: any) => ({
         id: a.id,
         type: a.type,
@@ -177,7 +246,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     ),
   });
 
-  const discountCodes: DiscountCodeDTO[] = (customer.discountCodes || []).map((dc: any) => ({
+  const discountCodes: DiscountCodeDTO[] = (customerDiscountCodes || []).map((dc: any) => ({
     id: dc.id,
     code: dc.code,
     discountPercent: dc.discountPercent,
@@ -192,12 +261,12 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
 
   return {
     customer: {
-      id: customer.id,
-      name: customer.name,
-      email: customer.email || undefined,
-      phone: customer.phone || undefined,
+      id: customerBase.id,
+      name: customerBase.name,
+      email: customerBase.email || undefined,
+      phone: customerBase.phone || undefined,
       status,
-      createdAt: customer.createdAt.toISOString(),
+      createdAt: customerBase.createdAt.toISOString(),
     },
     kpis: {
       nextEventDate,
@@ -207,7 +276,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       marginEstimated,
     },
     active,
-    proposals,
+    proposals: proposalsMapped,
     bookings,
     tasks,
     messages,
@@ -223,12 +292,57 @@ async function resolveCustomerId(prismaAny: any, entityId: string): Promise<stri
   });
   if (customer?.id) return customer.id;
 
-  const [lead, booking, proposal, task] = await Promise.all([
-    prismaAny.lead.findUnique({ where: { id: entityId }, select: { customerId: true } }),
-    prismaAny.booking.findUnique({ where: { id: entityId }, select: { customerId: true } }),
-    prismaAny.proposal.findUnique({ where: { id: entityId }, select: { customerId: true } }),
-    prismaAny.task.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+  const lead = await safeQuery(
+    () => prismaAny.lead.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+    null
+  );
+  if (lead?.customerId) return lead.customerId;
+
+  const booking = await safeQuery(
+    () => prismaAny.booking.findUnique({ where: { id: entityId }, select: { leadId: true } }),
+    null
+  );
+  if (booking?.leadId) {
+    const bookingLead = await safeQuery(
+      () => prismaAny.lead.findUnique({ where: { id: booking.leadId }, select: { customerId: true } }),
+      null
+    );
+    if (bookingLead?.customerId) return bookingLead.customerId;
+  }
+
+  const proposal = await safeQuery(
+    () => prismaAny.proposal.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+    null
+  );
+  if (proposal?.customerId) return proposal.customerId;
+
+  const task = await safeQuery(
+    () => prismaAny.task.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+    null
+  );
+  if (task?.customerId) return task.customerId;
+
+  const [leadTask, leadActivity, leadDocument] = await Promise.all([
+    safeQuery(() => prismaAny.leadTask.findUnique({ where: { id: entityId }, select: { leadId: true } }), null),
+    safeQuery(() => prismaAny.leadActivity.findUnique({ where: { id: entityId }, select: { leadId: true } }), null),
+    safeQuery(() => prismaAny.leadDocument.findUnique({ where: { id: entityId }, select: { leadId: true } }), null),
   ]);
 
-  return lead?.customerId || booking?.customerId || proposal?.customerId || task?.customerId || null;
+  const fallbackLeadId = leadTask?.leadId || leadActivity?.leadId || leadDocument?.leadId;
+  if (!fallbackLeadId) return null;
+
+  const fallbackLead = await safeQuery(
+    () => prismaAny.lead.findUnique({ where: { id: fallbackLeadId }, select: { customerId: true } }),
+    null
+  );
+
+  return fallbackLead?.customerId || null;
+}
+
+async function safeQuery<T>(query: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await query();
+  } catch {
+    return fallback;
+  }
 }
