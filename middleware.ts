@@ -7,7 +7,7 @@ import { locales, defaultLocale, type Locale } from './i18n';
 // ═══════════════════════════════════════════════════════════════════════════════
 // IMPORTANT: Configura aquestes variables al panell de Railway:
 // - ADMIN_USER: nom d'usuari per l'admin
-// - ADMIN_PASS: contrasenya segura (mínim 16 caràcters)
+// - ADMIN_PASS o ADMIN_PASSWORD: contrasenya segura (mínim 16 caràcters)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Rate limiting per intents d'autenticació admin (protecció força bruta)
@@ -222,7 +222,7 @@ export async function middleware(req: NextRequest) {
 
     // Obtenir credencials des de variables d'entorn
     const ADMIN_USER = process.env.ADMIN_USER;
-    const ADMIN_PASS = process.env.ADMIN_PASS;
+    const ADMIN_PASS = process.env.ADMIN_PASS || process.env.ADMIN_PASSWORD;
 
     // Si no hi ha variables configurades, bloquejar accés (sense log d'error)
     if (!ADMIN_USER || !ADMIN_PASS) {

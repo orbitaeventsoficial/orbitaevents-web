@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyCsrf } from '@/lib/csrf';
 
 const ADMIN_USER = process.env.ADMIN_USER;
-const ADMIN_PASS = process.env.ADMIN_PASS;
+const ADMIN_PASS = process.env.ADMIN_PASS || process.env.ADMIN_PASSWORD;
 const ADMIN_KEY = process.env.ADMIN_KEY;
 
 export interface AuthResult {
