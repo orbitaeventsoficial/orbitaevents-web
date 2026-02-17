@@ -18,8 +18,11 @@ function deriveHubStatus(input: {
 
 export async function fetchCustomerHub(customerId: string): Promise<CustomerHubDTO> {
   const prismaAny = prisma as any;
+  const resolvedCustomerId = await resolveCustomerId(prismaAny, customerId);
+  if (!resolvedCustomerId) throw new Error('Customer not found');
+
   const customer: any = await prismaAny.customer.findUnique({
-    where: { id: customerId },
+    where: { id: resolvedCustomerId },
     include: {
       proposals: { orderBy: { createdAt: 'desc' }, take: 80 },
       bookings: {
@@ -211,4 +214,21 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     timeline,
     discountCodes,
   };
+}
+
+async function resolveCustomerId(prismaAny: any, entityId: string): Promise<string | null> {
+  const customer = await prismaAny.customer.findUnique({
+    where: { id: entityId },
+    select: { id: true },
+  });
+  if (customer?.id) return customer.id;
+
+  const [lead, booking, proposal, task] = await Promise.all([
+    prismaAny.lead.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+    prismaAny.booking.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+    prismaAny.proposal.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+    prismaAny.task.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+  ]);
+
+  return lead?.customerId || booking?.customerId || proposal?.customerId || task?.customerId || null;
 }
