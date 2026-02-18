@@ -147,7 +147,7 @@ export default function SettingsNotificationsPage() {
             📧 Configuració de notificacions
           </h1>
           <p className="mt-1 text-sm text-slate-400">
-            Gestiona com reps alertes quan entra un nou lead
+            Gestiona com reps alertes quan entra una nova entrada
           </p>
         </div>
       </header>
@@ -162,7 +162,7 @@ export default function SettingsNotificationsPage() {
           <p className={`text-sm ${config?.status.emailReady ? 'text-emerald-300' : 'text-rose-300'}`}>
             {config?.status.emailReady 
               ? 'Configurat i funcionant' 
-              : 'No configurat: no rebràs correus de leads nous'
+              : 'No configurat: no rebràs correus d’entrades noves'
             }
           </p>
         </div>
@@ -174,7 +174,7 @@ export default function SettingsNotificationsPage() {
           </div>
           <p className={`text-sm ${config?.status.whatsappReady ? 'text-emerald-300' : 'text-yellow-300'}`}>
             {config?.status.whatsappReady 
-              ? 'Configurat com a backup' 
+              ? 'Configurat com a suport' 
               : 'No configurat (opcional)'
             }
           </p>
@@ -211,9 +211,9 @@ export default function SettingsNotificationsPage() {
         )}
       </section>
 
-      {/* Commercial Autopilot */}
+      {/* Pilot automàtic comercial */}
       <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-200 mb-4">🤖 Autopilot Comercial</h2>
+        <h2 className="text-lg font-semibold text-slate-200 mb-4">🤖 Pilot automàtic comercial</h2>
 
         <div className="grid gap-3 text-sm">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">

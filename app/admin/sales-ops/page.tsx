@@ -33,6 +33,12 @@ function statusBadge(status: AuditStatus) {
   return 'border-rose-500/40 bg-rose-500/10 text-rose-200';
 }
 
+function statusPanel(status: AuditStatus) {
+  if (status === 'FORT') return 'border-emerald-500/25 bg-emerald-500/5';
+  if (status === 'A_MILLORAR') return 'border-amber-500/25 bg-amber-500/5';
+  return 'border-rose-500/25 bg-rose-500/5';
+}
+
 export default async function SalesOpsPage() {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const [leadGroups, leads, slaSnapshot, commSent30d, commResponded30d, sequenceExec30d] = await Promise.all([
@@ -180,13 +186,13 @@ export default async function SalesOpsPage() {
       cta: 'Optimitzar missatges',
     },
     {
-      area: 'Volum de pipeline',
+      area: 'Volum de l\'embut',
       status: pipelineStatus,
       avui: `${scored.length} entrades obertes i ${pipelineTotal.toLocaleString('ca-ES')}€ en joc`,
       en30: 'Neteja d\'embut i focus en oportunitats calentes.',
       en90: 'Escalat de captació per canals amb millor win-rate.',
       href: '/admin/leads',
-      cta: 'Revisar pipeline',
+      cta: 'Revisar embut',
     },
     {
       area: 'Risc de pèrdua',
@@ -227,7 +233,7 @@ export default async function SalesOpsPage() {
     {
       area: 'Visibilitat financera',
       status: 'A_MILLORAR',
-      avui: 'Forecast disponible, falta lectura setmanal fixa.',
+      avui: 'Previsió disponible, falta lectura setmanal fixa.',
       en30: 'Revisió setmanal d\'ingressos, marge i cobraments.',
       en90: 'Quadre executiu de marge per tipus d\'esdeveniment.',
       href: '/admin/finanzas',
@@ -264,22 +270,27 @@ export default async function SalesOpsPage() {
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
-          <p className="text-xs text-slate-400">Pipeline brut</p>
+          <p className="text-sm">💼</p>
+          <p className="text-xs text-slate-400">Embut brut</p>
           <p className="text-2xl font-semibold text-slate-100">{pipelineTotal.toLocaleString('ca-ES')}€</p>
         </div>
         <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
-          <p className="text-xs text-slate-400">Forecast ponderat</p>
+          <p className="text-sm">🔮</p>
+          <p className="text-xs text-slate-400">Previsió ponderada</p>
           <p className="text-2xl font-semibold text-slate-100">{forecastTotal.toLocaleString('ca-ES')}€</p>
         </div>
         <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
+          <p className="text-sm">📥</p>
           <p className="text-xs text-slate-400">Entrades obertes</p>
           <p className="text-2xl font-semibold text-slate-100">{scored.length}</p>
         </div>
         <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
-          <p className="text-xs text-slate-400">Score mitjà</p>
+          <p className="text-sm">🎯</p>
+          <p className="text-xs text-slate-400">Puntuació mitjana</p>
           <p className="text-2xl font-semibold text-slate-100">{avgScore.toFixed(1)}</p>
         </div>
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 shadow-sm">
+          <p className="text-sm">⏱️</p>
           <p className="text-xs text-amber-300">Entrades sense resposta (&gt;24h)</p>
           <p className="text-2xl font-semibold text-amber-200">{slaSnapshot}</p>
         </div>
@@ -330,7 +341,7 @@ export default async function SalesOpsPage() {
           <p className="mt-2 text-sm text-slate-200">Valor total de totes les oportunitats obertes ara mateix.</p>
         </div>
         <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Forecast ponderat</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Previsió ponderada</p>
           <p className="mt-2 text-sm text-slate-200">Ingressos esperats segons probabilitat real de tancament.</p>
         </div>
         <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4">
@@ -350,7 +361,7 @@ export default async function SalesOpsPage() {
         </div>
         <div className="mt-4 space-y-3">
           {auditRows.map((row) => (
-            <article key={row.area} className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4">
+            <article key={row.area} className={`rounded-xl border p-4 ${statusPanel(row.status)}`}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold text-slate-100">{row.area}</h3>
                 <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${statusBadge(row.status)}`}>
@@ -363,7 +374,7 @@ export default async function SalesOpsPage() {
               <div className="mt-3">
                 <Link
                   href={row.href}
-                  className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-700"
+                  className="rounded-lg border border-slate-500/80 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-700"
                 >
                   {row.cta}
                 </Link>
@@ -388,9 +399,9 @@ export default async function SalesOpsPage() {
         <article className="rounded-2xl border border-violet-500/30 bg-violet-500/10 p-5 shadow-sm">
           <h2 className="text-lg font-semibold text-violet-100">Pla d&apos;escalat a 90 dies</h2>
           <ol className="mt-3 space-y-2 text-sm text-violet-50">
-            <li>1. Predicció: alertes abans que un lead entri en risc.</li>
+            <li>1. Predicció: alertes abans que una entrada entri en risc.</li>
             <li>2. Automatització: seqüències per segment i tipus d&apos;esdeveniment.</li>
-            <li>3. Quadre executiu: marge i forecast per canal en una sola vista.</li>
+            <li>3. Quadre executiu: marge i previsió per canal en una sola vista.</li>
             <li>4. Qualitat de dades: regles intel·ligents a la captura inicial.</li>
             <li>5. Post-event: feedback incorporat per millorar proposta comercial.</li>
             <li>6. Operativa solo: més accions en 1 clic i menys canvi de pantalla.</li>
@@ -407,8 +418,8 @@ export default async function SalesOpsPage() {
                 <tr className="border-b border-slate-700 text-left text-xs uppercase text-slate-400">
                   <th className="py-2">Origen</th>
                   <th className="py-2">Total</th>
-                  <th className="py-2">WON</th>
-                  <th className="py-2">Win rate</th>
+                  <th className="py-2">Tancats</th>
+                  <th className="py-2">Taxa de tancament</th>
                 </tr>
               </thead>
               <tbody>
@@ -433,8 +444,8 @@ export default async function SalesOpsPage() {
                 <tr className="border-b border-slate-700 text-left text-xs uppercase text-slate-400">
                   <th className="py-2">Comercial</th>
                   <th className="py-2">Total</th>
-                  <th className="py-2">WON</th>
-                  <th className="py-2">Win rate</th>
+                  <th className="py-2">Tancats</th>
+                  <th className="py-2">Taxa de tancament</th>
                 </tr>
               </thead>
               <tbody>
@@ -462,7 +473,7 @@ export default async function SalesOpsPage() {
               <div key={lead.id} className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold text-slate-100">
-                    {lead.name} · {lead.status} · score {lead.scoring.score}
+                    {lead.name} · {lead.status} · puntuació {lead.scoring.score}
                   </p>
                   <p className="text-xs text-slate-300">
                     Prob. {toPct(lead.scoring.probability)} · {lead.weighted.toLocaleString('ca-ES')}€
@@ -478,7 +489,7 @@ export default async function SalesOpsPage() {
                     href={`/admin/leads/${lead.id}`}
                     className="rounded-lg border border-slate-600 bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-100 hover:bg-slate-700"
                   >
-                    Obrir lead
+                    Obrir entrada
                   </Link>
                   {lead.phone && (
                     <a
