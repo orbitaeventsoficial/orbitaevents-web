@@ -15,7 +15,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/app/config/site-config';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -154,11 +154,13 @@ function ReviewCard({ review }: { review: GoogleReview }) {
 
 export default function GoogleReviewsRotating() {
   const t = useTranslations('googleReviews');
+  const locale = useLocale();
   const [reviews, setReviews] = useState<GoogleReview[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [averageRating, setAverageRating] = useState(5);
   const [totalReviews, setTotalReviews] = useState(0);
+  const [lastUpdated, setLastUpdated] = useState<string | undefined>(undefined);
 
   // Cargar reseñas desde l'API (agrega GBP + Places + DB + JSON estàtic)
   useEffect(() => {
@@ -170,6 +172,7 @@ export default function GoogleReviewsRotating() {
         setReviews(data.reviews);
         setAverageRating(data.rating);
         setTotalReviews(data.user_ratings_total);
+        setLastUpdated(data.lastUpdated);
       } catch (error) {
         console.error('Error loading reviews:', error);
       }
@@ -198,6 +201,20 @@ export default function GoogleReviewsRotating() {
     setIsAutoPlaying(false);
     setCurrentIndex((prev) => (prev + 1) % reviews.length);
   };
+
+  const formattedLastUpdated = (() => {
+    if (!lastUpdated) return null;
+    const parsed = new Date(lastUpdated);
+    if (Number.isNaN(parsed.getTime())) return null;
+    return new Intl.DateTimeFormat(locale, {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Europe/Madrid',
+    }).format(parsed);
+  })();
 
   if (reviews.length === 0) {
     // Fallback: CTA elegant per aconseguir la primera ressenya
@@ -230,6 +247,11 @@ export default function GoogleReviewsRotating() {
             {totalReviews > 0 && (
               <p className="text-white/80 text-base mb-6">
                 ⭐ {averageRating.toFixed(1)} · {totalReviews} ressenyes a Google
+              </p>
+            )}
+            {formattedLastUpdated && (
+              <p className="text-white/60 text-sm mb-4">
+                {t('meta.lastUpdate', { date: formattedLastUpdated })}
               </p>
             )}
             <a
@@ -267,7 +289,7 @@ export default function GoogleReviewsRotating() {
           className="text-center mb-12"
         >
           <span className="inline-block px-5 py-2.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-semibold mb-6">
-            ⭐ Ressenyes verificades de Google
+            ⭐ {t('badge.opinions')}
           </span>
           <h2 className="text-4xl md:text-6xl font-black text-white mb-4">
             {t('sectionTitle')}{' '}
@@ -280,6 +302,15 @@ export default function GoogleReviewsRotating() {
             <span className="text-white text-2xl font-bold">{averageRating.toFixed(1)}</span>
             <span className="text-white/60">· {totalReviews} ressenyes a Google</span>
           </div>
+          <p className="text-white/50 text-sm mt-3">
+            {formattedLastUpdated
+              ? t('meta.lastUpdateAndVisible', {
+                  date: formattedLastUpdated,
+                  visible: reviews.length,
+                  total: totalReviews,
+                })
+              : t('meta.visibleOnly', { visible: reviews.length, total: totalReviews })}
+          </p>
         </motion.div>
 
         {/* Carousel */}
@@ -342,7 +373,7 @@ export default function GoogleReviewsRotating() {
             className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white font-semibold transition-colors"
           >
             <Icons.Google />
-            <span>Deixa la teva ressenya a Google</span>
+            <span>{t('leaveReviewLink')}</span>
           </a>
         </motion.div>
       </div>

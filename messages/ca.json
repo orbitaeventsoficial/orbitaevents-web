@@ -201,7 +201,8 @@
       "configureEvent": "Configura el meu esdeveniment",
       "seeMore": "Veure més",
       "close": "Tancar",
-      "closeNotifications": "Tancar notificacions"
+      "closeNotifications": "Tancar notificacions",
+      "callNow": "Trucar ara"
     },
     "whatsapp": {
       "tooltip1": "Et podem ajudar?",
@@ -5821,6 +5822,11 @@
     },
     "badge": {
       "opinions": "opinions a Google"
+    },
+    "meta": {
+      "lastUpdate": "Actualitzat: {date}",
+      "lastUpdateAndVisible": "Actualitzat: {date} · Mostrant {visible} de {total}",
+      "visibleOnly": "Mostrant {visible} de {total}"
     },
     "reviews": [
       {

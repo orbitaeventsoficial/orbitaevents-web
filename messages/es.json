@@ -201,7 +201,8 @@
       "configureEvent": "Configura mi evento",
       "seeMore": "Ver más",
       "close": "Cerrar",
-      "closeNotifications": "Cerrar notificaciones"
+      "closeNotifications": "Cerrar notificaciones",
+      "callNow": "Llamar ahora"
     },
     "whatsapp": {
       "tooltip1": "¿Te podemos ayudar?",
@@ -5649,6 +5650,11 @@
     },
     "badge": {
       "opinions": "opiniones en Google"
+    },
+    "meta": {
+      "lastUpdate": "Actualizado: {date}",
+      "lastUpdateAndVisible": "Actualizado: {date} · Mostrando {visible} de {total}",
+      "visibleOnly": "Mostrando {visible} de {total}"
     },
     "reviews": [
       {
