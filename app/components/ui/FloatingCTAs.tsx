@@ -10,9 +10,20 @@ import { SITE_CONFIG } from '@/app/config/site-config';
 
 // Horari d'atenció: 8:00-20:00 cada dia
 function isBusinessHours(): boolean {
+  const hour = new Date().getHours();
+  return hour >= 8 && hour < 20;
+}
+
+// Retorna el missatge fora d'horari amb l'hora exacta d'obertura
+function getOffHoursMessage(): string {
   const now = new Date();
   const hour = now.getHours();
-  return hour >= 8 && hour < 20;
+  if (hour >= 20) {
+    // Avui ha tancat — obrim demà a les 8h
+    return "Tanquem a les 20h — t'escriurem demà a les 8h 👋";
+  }
+  // Encara no hem obert (0-7h)
+  return "Obrim avui a les 8h — escriu-nos! 💬";
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -102,7 +113,7 @@ export function ContactDesktop() {
                   <div className="flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 bg-[#25D366] rounded-full animate-pulse" />
                     <span className="text-white/80">
-                      {businessHours ? 'Respon en menys de 2h 💬' : 'Estem tancats — t\'escriurem demà 👋'}
+                      {businessHours ? 'Respon en menys de 2h 💬' : getOffHoursMessage()}
                     </span>
                   </div>
                   <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full">

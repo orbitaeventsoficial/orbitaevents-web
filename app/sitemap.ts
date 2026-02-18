@@ -3,6 +3,23 @@ import type { MetadataRoute } from 'next';
 import { locales, defaultLocale } from '@/i18n';
 import { getEnabledZoneLandingSlugs } from '@/lib/coverage';
 
+async function getBlogSlugs(): Promise<{ slug: string; updatedAt?: string }[]> {
+  try {
+    const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
+    const res = await fetch(`${base}/api/public/blog?limit=50&locale=es`, {
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.posts || []).map((p: { slug: string; updatedAt?: string }) => ({
+      slug: p.slug,
+      updatedAt: p.updatedAt,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 // Categorias de portfolio para incluir en sitemap
 const PORTFOLIO_SLUGS = [
   'bodas',
@@ -19,7 +36,10 @@ const PORTFOLIO_SLUGS = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
   const now = new Date();
-  const enabledZoneSlugs = await getEnabledZoneLandingSlugs();
+  const [enabledZoneSlugs, blogSlugs] = await Promise.all([
+    getEnabledZoneLandingSlugs(),
+    getBlogSlugs(),
+  ]);
 
   // Paginas estaticas con prioridades estrategicas
   const staticPages: MetadataRoute.Sitemap = [
@@ -105,5 +125,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   });
 
-  return [...staticPages, ...zonePages, ...localizedPages, ...portfolioPages, ...localizedPortfolioPages];
+  // Blog posts dinàmics
+  const blogPages: MetadataRoute.Sitemap = blogSlugs.map(({ slug, updatedAt }) => ({
+    url: `${base}/blog/${slug}`,
+    lastModified: updatedAt ? new Date(updatedAt) : now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.65,
+  }));
+
+  // Versions localitzades dels posts del blog
+  const localizedBlogPages: MetadataRoute.Sitemap = [];
+  blogSlugs.forEach(({ slug, updatedAt }) => {
+    secondaryLocales.forEach((locale) => {
+      localizedBlogPages.push({
+        url: `${base}/${locale}/blog/${slug}`,
+        lastModified: updatedAt ? new Date(updatedAt) : now,
+        changeFrequency: 'monthly' as const,
+        priority: 0.58,
+      });
+    });
+  });
+
+  return [
+    ...staticPages,
+    ...zonePages,
+    ...localizedPages,
+    ...portfolioPages,
+    ...localizedPortfolioPages,
+    ...blogPages,
+    ...localizedBlogPages,
+  ];
 }
