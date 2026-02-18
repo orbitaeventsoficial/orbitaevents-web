@@ -7,6 +7,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 function useCountUp(target: number, duration: number, started: boolean): number {
   const [count, setCount] = useState(0);
@@ -25,43 +26,39 @@ function useCountUp(target: number, duration: number, started: boolean): number 
   return count;
 }
 
-const STATS = [
+const STAT_CONFIGS = [
   {
+    key: 'events' as const,
     value: 50,
     prefix: '',
     suffix: '+',
-    label: 'Events realitzats',
-    sublabel: 'i comptant',
     emoji: '🎉',
     gradient: 'from-amber-400 to-orange-500',
     glow: 'rgba(251,191,36,0.2)',
   },
   {
+    key: 'rating' as const,
     value: 5,
     prefix: '',
     suffix: '.0★',
-    label: 'Valoració Google',
-    sublabel: 'sense excepcions',
     emoji: '🌟',
     gradient: 'from-yellow-300 to-amber-400',
     glow: 'rgba(253,224,71,0.15)',
   },
   {
+    key: 'response' as const,
     value: 2,
     prefix: '<',
     suffix: 'h',
-    label: 'Temps de resposta',
-    sublabel: 'garantit sempre',
     emoji: '⚡',
     gradient: 'from-cyan-400 to-blue-500',
     glow: 'rgba(34,211,238,0.15)',
   },
   {
+    key: 'experience' as const,
     value: 3,
     prefix: '',
     suffix: '+',
-    label: "Anys d'experiència",
-    sublabel: 'a Catalunya',
     emoji: '🏆',
     gradient: 'from-purple-400 to-pink-500',
     glow: 'rgba(167,139,250,0.15)',
@@ -69,17 +66,21 @@ const STATS = [
 ] as const;
 
 function StatCard({
-  stat,
+  config,
+  label,
+  sublabel,
   delay,
   started,
 }: {
-  stat: (typeof STATS)[number];
+  config: (typeof STAT_CONFIGS)[number];
+  label: string;
+  sublabel: string;
   delay: number;
   started: boolean;
 }) {
   const reduceMotion = useReducedMotion();
-  const count = useCountUp(stat.value, 2000, started && !reduceMotion);
-  const display = reduceMotion ? stat.value : count;
+  const count = useCountUp(config.value, 2000, started && !reduceMotion);
+  const display = reduceMotion ? config.value : count;
 
   return (
     <motion.div
@@ -91,7 +92,7 @@ function StatCard({
       }
       className="relative flex flex-col items-center justify-center p-8 rounded-3xl border border-white/10 text-center overflow-hidden group hover:border-white/20 transition-colors"
       style={{
-        background: `radial-gradient(ellipse at 50% 0%, ${stat.glow}, transparent 65%), rgba(255,255,255,0.03)`,
+        background: `radial-gradient(ellipse at 50% 0%, ${config.glow}, transparent 65%), rgba(255,255,255,0.03)`,
       }}
     >
       {!reduceMotion && (
@@ -102,21 +103,22 @@ function StatCard({
         />
       )}
 
-      <span className="text-4xl mb-3 block">{stat.emoji}</span>
+      <span className="text-4xl mb-3 block">{config.emoji}</span>
       <div
-        className={`text-5xl md:text-6xl font-black bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent leading-none mb-2`}
+        className={`text-5xl md:text-6xl font-black bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent leading-none mb-2`}
       >
-        {stat.prefix}
+        {config.prefix}
         {display}
-        {stat.suffix}
+        {config.suffix}
       </div>
-      <p className="text-white font-bold text-lg mt-2">{stat.label}</p>
-      <p className="text-white/40 text-sm mt-1">{stat.sublabel}</p>
+      <p className="text-white font-bold text-lg mt-2">{label}</p>
+      <p className="text-white/40 text-sm mt-1">{sublabel}</p>
     </motion.div>
   );
 }
 
 export default function StatsSection() {
+  const t = useTranslations('homePage.stats');
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-10%' });
   const reduceMotion = useReducedMotion();
@@ -133,19 +135,26 @@ export default function StatsSection() {
           className="text-center mb-14"
         >
           <span className="inline-block px-5 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold tracking-wider uppercase mb-4">
-            En xifres
+            {t('sectionLabel')}
           </span>
           <h2 className="text-4xl md:text-5xl font-black text-white">
-            Per què triar{' '}
+            {t('heading')}{' '}
             <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-              Òrbita Events?
+              {t('headingHighlight')}
             </span>
           </h2>
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-          {STATS.map((stat, i) => (
-            <StatCard key={stat.label} stat={stat} delay={i * 0.1} started={isInView} />
+          {STAT_CONFIGS.map((config, i) => (
+            <StatCard
+              key={config.key}
+              config={config}
+              label={t(`${config.key}.label`)}
+              sublabel={t(`${config.key}.sublabel`)}
+              delay={i * 0.1}
+              started={isInView}
+            />
           ))}
         </div>
       </div>

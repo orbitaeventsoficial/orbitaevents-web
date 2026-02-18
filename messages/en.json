@@ -1888,7 +1888,8 @@
         "answer": "Yes, we cover the province of Barcelona and the province of Girona (including the Costa Brava). FREE transport up to 25 km from Granollers (our base). Beyond, it is added according to the distance. We have done events in Barcelona, ​​Granollers, Mataró, Sabadell, Terrassa, Vic, Girona, Figueres, Blanes, Lloret... If it is in our area, we will go."
       },
       "4": {
-        "question": "What happens if there are technical problems during the event?"
+        "question": "What happens if there are technical problems during the event?",
+        "answer": "All our equipment includes complete backup gear. In the unlikely event that any technical issue arises, we have immediate solutions to ensure the show never stops. In exceptional circumstances completely beyond our control, we return 100% of the deposit and help you find a quality alternative."
       },
       "5": {
         "question": "Can I choose the music or do you decide?",
@@ -5023,6 +5024,52 @@
     },
     "trustedBy": {
       "sectionTitle": "Companies that trust us"
+    },
+    "stats": {
+      "sectionLabel": "By the numbers",
+      "heading": "Why choose",
+      "headingHighlight": "Òrbita Events?",
+      "events": { "label": "Events done", "sublabel": "and counting" },
+      "rating": { "label": "Google Rating", "sublabel": "without exceptions" },
+      "response": { "label": "Response time", "sublabel": "always guaranteed" },
+      "experience": { "label": "Years of experience", "sublabel": "in Catalonia" }
+    },
+    "process": {
+      "sectionLabel": "The process",
+      "title": "How does it work?",
+      "subtitle": "3 steps · 0 complications",
+      "step1": {
+        "title": "Tell us about your event",
+        "desc": "Contact us via WhatsApp or configure your quote online. We listen with no commitment and you get an answer in less than 2 hours."
+      },
+      "step2": {
+        "title": "We design it together",
+        "desc": "We create a 100% personalised quote for your event. No surprises, no hidden costs. Everything clear from the start."
+      },
+      "step3": {
+        "title": "You enjoy, we take care of everything",
+        "desc": "On the day, the Òrbita team handles every detail so the event is perfect. You just enjoy the moment."
+      },
+      "ctaStart": "Let's start",
+      "ctaCalculate": "Calculate your price"
+    },
+    "portfolio": {
+      "sectionLabel": "Our work",
+      "title": "Events that speak",
+      "titleHighlight": "for themselves",
+      "subtitle": "Real photos of our events in Catalonia",
+      "viewAll": "See all events",
+      "viewPortfolio": "See all",
+      "viewPortfolioDesc": "portfolio",
+      "categories": {
+        "all": "All",
+        "discomovil": "Mobile disco",
+        "halloween": "Halloween",
+        "monMagic": "Magic World",
+        "bodas": "Weddings",
+        "empreses": "Corporate",
+        "privades": "Private parties"
+      }
     }
   },
   "privacyPortal": {

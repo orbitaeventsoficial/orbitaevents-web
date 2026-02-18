@@ -1541,7 +1541,8 @@
         "answer": "Sí, cobrim la província de Barcelona i la província de Girona (inclosa la Costa Brava). Transport GRATUÏT fins a 25 km des de Granollers (la nostra base). Més enllà d'això, s'afegeix segons la distància. Hem fet actes a Barcelona, ​​​​Granollers, Mataró, Sabadell, Terrassa, Vic, Girona, Figueres, Blanes, Lloret... Si és a la nostra zona, vindrem."
       },
       "4": {
-        "question": "Què passa si hi ha problemes tècnics durant l'esdeveniment?"
+        "question": "Què passa si hi ha problemes tècnics durant l'esdeveniment?",
+        "answer": "Tots els nostres equips porten material de còpia de seguretat complet. En el cas improbable que sorgeixi qualsevol problema tècnic, tenim solucions immediates per garantir que l'espectacle no s'aturi mai. En circumstàncies excepcionals completament fora del nostre control, et retornem el 100% del dipòsit i t'ajudem a trobar una alternativa de qualitat."
       },
       "5": {
         "question": "Puc triar la música o ets tu qui decideixes?",
@@ -5195,6 +5196,52 @@
     },
     "trustedBy": {
       "sectionTitle": "Empreses que confien en nosaltres"
+    },
+    "stats": {
+      "sectionLabel": "En xifres",
+      "heading": "Per què triar",
+      "headingHighlight": "Òrbita Events?",
+      "events": { "label": "Events realitzats", "sublabel": "i comptant" },
+      "rating": { "label": "Valoració Google", "sublabel": "sense excepcions" },
+      "response": { "label": "Temps de resposta", "sublabel": "garantit sempre" },
+      "experience": { "label": "Anys d'experiència", "sublabel": "a Catalunya" }
+    },
+    "process": {
+      "sectionLabel": "El procés",
+      "title": "Com funciona?",
+      "subtitle": "3 passos · 0 complicacions",
+      "step1": {
+        "title": "Explica'ns el teu event",
+        "desc": "Contacta'ns per WhatsApp o configura el teu pressupost online. T'escoltem sense cap compromís i en menys de 2h tens resposta."
+      },
+      "step2": {
+        "title": "Ho dissenyem junts",
+        "desc": "Creem un pressupost 100% personalitzat per al teu event. Sense sorpreses ni costos ocults. Tot clar des del primer moment."
+      },
+      "step3": {
+        "title": "Tu gaudeixes, nosaltres ho cuidem tot",
+        "desc": "El dia B, l'equip d'Òrbita s'encarrega de cada detall perquè l'event sigui perfecte. Tu, a gaudir del moment."
+      },
+      "ctaStart": "Comencem ara",
+      "ctaCalculate": "Calcula el teu preu"
+    },
+    "portfolio": {
+      "sectionLabel": "El nostre treball",
+      "title": "Events que parlen",
+      "titleHighlight": "per si sols",
+      "subtitle": "Fotos reals dels nostres events a Catalunya",
+      "viewAll": "Veure tots els events",
+      "viewPortfolio": "Veure tot",
+      "viewPortfolioDesc": "el portfolio",
+      "categories": {
+        "all": "Tots",
+        "discomovil": "Discomòbil",
+        "halloween": "Halloween",
+        "monMagic": "Món Màgic",
+        "bodas": "Bodas",
+        "empreses": "Empreses",
+        "privades": "Privades"
+      }
     }
   },
   "privacyPortal": {

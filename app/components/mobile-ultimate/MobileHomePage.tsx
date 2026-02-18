@@ -35,6 +35,7 @@ import MobileCTAUrgency from './MobileCTAUrgency';
 import MobileStatsSection from './MobileStatsSection';
 import MobileProcessSection from './MobileProcessSection';
 import MobilePortfolioShowcase from './MobilePortfolioShowcase';
+import FAQSection from '@/app/components/home/FAQSection';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
@@ -633,6 +634,9 @@ export default function MobileHomePage() {
 
           {/* Reviews */}
           <MobileReviewsSection />
+
+          {/* FAQ - Preguntes freqüents amb JSON-LD schema */}
+          <FAQSection />
 
           {/* Final CTA */}
           <MobileCTAUrgency />

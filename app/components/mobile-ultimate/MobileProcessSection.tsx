@@ -6,41 +6,29 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { motion, useReducedMotion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 
-// ── Dades dels passos ──────────────────────────────────────────────────────
+// ── Estils dels passos (no text) ───────────────────────────────────────────
 
-const STEPS = [
-  {
-    number: '01',
-    emoji: '💬',
-    title: "Explica'ns el teu event",
-    desc: "Contacta'ns per WhatsApp o configura el teu pressupost online. T'escoltem sense cap compromís.",
-    gradient: 'from-amber-500 to-orange-500',
-    glow: 'rgba(245,158,11,0.25)',
-  },
-  {
-    number: '02',
-    emoji: '✨',
-    title: 'Ho dissenyem junts',
-    desc: 'Rebràs un pressupost personalitzat en menys de 2h. Sense sorpreses, sense costos ocults.',
-    gradient: 'from-purple-500 to-pink-500',
-    glow: 'rgba(168,85,247,0.2)',
-  },
-  {
-    number: '03',
-    emoji: '🎊',
-    title: 'Tu gaudeixes, nosaltres ho cuidem tot',
-    desc: "El dia B, l'equip d'Òrbita s'encarrega de cada detall. Tu, a gaudir del moment.",
-    gradient: 'from-emerald-500 to-teal-400',
-    glow: 'rgba(16,185,129,0.2)',
-  },
+const STEP_STYLES = [
+  { gradient: 'from-amber-500 to-orange-500', glow: 'rgba(245,158,11,0.25)', emoji: '💬' },
+  { gradient: 'from-purple-500 to-pink-500',  glow: 'rgba(168,85,247,0.2)',  emoji: '✨' },
+  { gradient: 'from-emerald-500 to-teal-400', glow: 'rgba(16,185,129,0.2)',  emoji: '🎊' },
 ] as const;
 
 // ── Component principal ────────────────────────────────────────────────────
 
 export default function MobileProcessSection() {
+  const t = useTranslations('homePage.process');
+  const tCommon = useTranslations('common');
   const reduceMotion = useReducedMotion();
+
+  const steps = [
+    { number: '01', title: t('step1.title'), desc: t('step1.desc') },
+    { number: '02', title: t('step2.title'), desc: t('step2.desc') },
+    { number: '03', title: t('step3.title'), desc: t('step3.desc') },
+  ] as const;
 
   return (
     <section className="py-14 px-6 relative overflow-hidden">
@@ -56,59 +44,62 @@ export default function MobileProcessSection() {
         className="text-center mb-10"
       >
         <span className="inline-block px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold tracking-wider uppercase mb-3">
-          El procés
+          {t('sectionLabel')}
         </span>
         <h2 className="text-3xl font-black text-white">
-          Com funciona?
+          {t('title')}
         </h2>
-        <p className="text-white/45 text-sm mt-2">3 passos · 0 complicacions</p>
+        <p className="text-white/45 text-sm mt-2">{t('subtitle')}</p>
       </motion.div>
 
       {/* Steps */}
       <div className="relative">
-        {STEPS.map((step, i) => (
-          <motion.div
-            key={step.number}
-            initial={reduceMotion ? false : { opacity: 0, x: i % 2 === 0 ? -24 : 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={
-              reduceMotion
-                ? { duration: 0 }
-                : { delay: i * 0.14, type: 'spring', damping: 20 }
-            }
-            className="relative flex gap-4 pb-7 last:pb-0"
-          >
-            {/* Connecting line */}
-            {i < STEPS.length - 1 && (
-              <div className="absolute left-7 top-14 bottom-0 w-px bg-gradient-to-b from-white/20 to-transparent" />
-            )}
+        {steps.map((step, i) => {
+          const style = STEP_STYLES[i];
+          return (
+            <motion.div
+              key={step.number}
+              initial={reduceMotion ? false : { opacity: 0, x: i % 2 === 0 ? -24 : 24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={
+                reduceMotion
+                  ? { duration: 0 }
+                  : { delay: i * 0.14, type: 'spring', damping: 20 }
+              }
+              className="relative flex gap-4 pb-7 last:pb-0"
+            >
+              {/* Connecting line */}
+              {i < steps.length - 1 && (
+                <div className="absolute left-7 top-14 bottom-0 w-px bg-gradient-to-b from-white/20 to-transparent" />
+              )}
 
-            {/* Icon + number */}
-            <div className="relative flex-shrink-0">
-              <div
-                className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${step.gradient} flex items-center justify-center`}
-                style={{ boxShadow: `0 8px 28px ${step.glow}` }}
-              >
-                <span className="text-2xl">{step.emoji}</span>
+              {/* Icon + number */}
+              <div className="relative flex-shrink-0">
+                <div
+                  className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${style.gradient} flex items-center justify-center`}
+                  style={{ boxShadow: `0 8px 28px ${style.glow}` }}
+                >
+                  <span className="text-2xl">{style.emoji}</span>
+                </div>
+                {/* Number badge */}
+                <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-zinc-950 border border-white/20 flex items-center justify-center">
+                  <span className="text-white/70 text-[9px] font-black leading-none">
+                    {step.number}
+                  </span>
+                </div>
               </div>
-              {/* Number badge */}
-              <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-zinc-950 border border-white/20 flex items-center justify-center">
-                <span className="text-white/70 text-[9px] font-black leading-none">
-                  {step.number}
-                </span>
-              </div>
-            </div>
 
-            {/* Text */}
-            <div className="flex-1 pt-1.5">
-              <h3 className="text-white font-black text-base mb-1.5 leading-snug">
-                {step.title}
-              </h3>
-              <p className="text-white/55 text-sm leading-relaxed">{step.desc}</p>
-            </div>
-          </motion.div>
-        ))}
+              {/* Text */}
+              <div className="flex-1 pt-1.5">
+                <h3 className="text-white font-black text-base mb-1.5 leading-snug">
+                  {step.title}
+                </h3>
+                <p className="text-white/55 text-sm leading-relaxed">{step.desc}</p>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* CTA */}
@@ -135,7 +126,7 @@ export default function MobileProcessSection() {
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
           </svg>
-          <span>Comencem ara!</span>
+          <span>{t('ctaStart')}</span>
         </a>
       </motion.div>
     </section>

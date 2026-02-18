@@ -8,14 +8,15 @@
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
 
-// ── Dades de categories ────────────────────────────────────────────────────
+// ── Dades de categories (estils i fotos, no text) ──────────────────────────
 
 const CATEGORIES = [
   {
-    id: 'discomovil',
-    label: '🎧 Discomòbil',
+    id: 'discomovil' as const,
+    emoji: '🎧',
     accent: 'from-amber-500 to-orange-500',
     border: 'border-amber-500/50',
     text: 'text-amber-400',
@@ -25,8 +26,8 @@ const CATEGORIES = [
     ),
   },
   {
-    id: 'halloween',
-    label: '🎃 Halloween',
+    id: 'halloween' as const,
+    emoji: '🎃',
     accent: 'from-orange-600 to-red-700',
     border: 'border-orange-500/50',
     text: 'text-orange-400',
@@ -36,8 +37,8 @@ const CATEGORIES = [
     ),
   },
   {
-    id: 'mon-magic',
-    label: '🪄 Món Màgic',
+    id: 'monMagic' as const,
+    emoji: '🪄',
     accent: 'from-purple-600 to-pink-600',
     border: 'border-purple-500/50',
     text: 'text-purple-400',
@@ -47,8 +48,8 @@ const CATEGORIES = [
     ),
   },
   {
-    id: 'bodas',
-    label: '💍 Bodas',
+    id: 'bodas' as const,
+    emoji: '💍',
     accent: 'from-pink-500 to-rose-500',
     border: 'border-pink-500/50',
     text: 'text-pink-400',
@@ -58,8 +59,8 @@ const CATEGORIES = [
     ),
   },
   {
-    id: 'empreses',
-    label: '🏢 Empreses',
+    id: 'empreses' as const,
+    emoji: '🏢',
     accent: 'from-blue-500 to-cyan-500',
     border: 'border-blue-500/50',
     text: 'text-blue-400',
@@ -69,8 +70,8 @@ const CATEGORIES = [
     ),
   },
   {
-    id: 'privades',
-    label: '🎉 Privades',
+    id: 'privades' as const,
+    emoji: '🎉',
     accent: 'from-emerald-500 to-teal-500',
     border: 'border-emerald-500/50',
     text: 'text-emerald-400',
@@ -87,6 +88,7 @@ type CategoryId = (typeof CATEGORIES)[number]['id'];
 
 export default function MobilePortfolioShowcase() {
   const { locale } = useMobile();
+  const t = useTranslations('homePage.portfolio');
   const reduceMotion = useReducedMotion();
   const [activeId, setActiveId] = useState<CategoryId>('discomovil');
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -115,12 +117,12 @@ export default function MobilePortfolioShowcase() {
         className="text-center mb-8 px-6"
       >
         <span className="inline-block px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold tracking-wider uppercase mb-3">
-          El nostre treball
+          {t('sectionLabel')}
         </span>
         <h2 className="text-3xl font-black text-white">
-          Events que parlen{' '}
+          {t('title')}{' '}
           <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-            per si sols
+            {t('titleHighlight')}
           </span>
         </h2>
       </motion.div>
@@ -141,7 +143,7 @@ export default function MobilePortfolioShowcase() {
                 : 'bg-white/5 border-white/10 text-white/60'
             }`}
           >
-            {cat.label}
+            {cat.emoji} {t(`categories.${cat.id}`)}
           </button>
         ))}
       </div>
@@ -162,7 +164,7 @@ export default function MobilePortfolioShowcase() {
           >
             <Image
               src={src}
-              alt={`${active.label} ${i + 1}`}
+              alt={`${t(`categories.${active.id}`)} ${i + 1}`}
               fill
               sizes="208px"
               className="object-cover"
@@ -184,8 +186,8 @@ export default function MobilePortfolioShowcase() {
             </svg>
           </div>
           <div className="text-center px-4">
-            <p className="text-white font-bold text-sm">Veure tot</p>
-            <p className="text-white/50 text-xs mt-0.5">el portfolio</p>
+            <p className="text-white font-bold text-sm">{t('viewPortfolio')}</p>
+            <p className="text-white/50 text-xs mt-0.5">{t('viewPortfolioDesc')}</p>
           </div>
         </a>
       </motion.div>
@@ -201,9 +203,9 @@ export default function MobilePortfolioShowcase() {
           href={`/${locale}/portfolio`}
           className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-full text-white/70 text-sm font-medium hover:bg-white/10 active:scale-95 transition-all"
         >
-          <span>Veure tots els events</span>
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          <span>{t('viewAll')}</span>
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </a>
       </motion.div>

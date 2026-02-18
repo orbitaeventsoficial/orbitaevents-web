@@ -1888,7 +1888,8 @@
         "answer": "Sí, cubrimos la provincia de Barcelona y la provincia de Girona (incluida la Costa Brava). Transporte GRATUITO hasta 25 km desde Granollers (nuestra base). Más allá, se añade según la distancia. Hemos hecho eventos en Barcelona, Granollers, Mataró, Sabadell, Terrassa, Vic, Girona, Figueres, Blanes, Lloret... Si está en nuestra zona, iremos."
       },
       "4": {
-        "question": "¿Qué pasa si hay problemas técnicos durante el evento?"
+        "question": "¿Qué pasa si hay problemas técnicos durante el evento?",
+        "answer": "Todos nuestros equipos llevan material de copia de seguridad completo. En el improbable caso de que surja algún problema técnico, tenemos soluciones inmediatas para garantizar que el espectáculo nunca se detenga. En circunstancias excepcionales completamente fuera de nuestro control, te devolvemos el 100% del depósito y te ayudamos a encontrar una alternativa de calidad."
       },
       "5": {
         "question": "¿Puedo elegir la música o decides tú?",
@@ -5023,6 +5024,52 @@
     },
     "trustedBy": {
       "sectionTitle": "Empresas que confían en nosotros"
+    },
+    "stats": {
+      "sectionLabel": "En cifras",
+      "heading": "¿Por qué elegir",
+      "headingHighlight": "Òrbita Events?",
+      "events": { "label": "Eventos realizados", "sublabel": "y contando" },
+      "rating": { "label": "Valoración Google", "sublabel": "sin excepciones" },
+      "response": { "label": "Tiempo de respuesta", "sublabel": "garantizado siempre" },
+      "experience": { "label": "Años de experiencia", "sublabel": "en Cataluña" }
+    },
+    "process": {
+      "sectionLabel": "El proceso",
+      "title": "¿Cómo funciona?",
+      "subtitle": "3 pasos · 0 complicaciones",
+      "step1": {
+        "title": "Cuéntanos tu evento",
+        "desc": "Contáctanos por WhatsApp o configura tu presupuesto online. Te escuchamos sin ningún compromiso y en menos de 2h tienes respuesta."
+      },
+      "step2": {
+        "title": "Lo diseñamos juntos",
+        "desc": "Creamos un presupuesto 100% personalizado para tu evento. Sin sorpresas ni costes ocultos. Todo claro desde el primer momento."
+      },
+      "step3": {
+        "title": "Tú disfrutas, nosotros lo cuidamos todo",
+        "desc": "El gran día, el equipo de Òrbita se encarga de cada detalle para que el evento sea perfecto. Tú, a disfrutar del momento."
+      },
+      "ctaStart": "Empezamos ahora",
+      "ctaCalculate": "Calcula tu precio"
+    },
+    "portfolio": {
+      "sectionLabel": "Nuestro trabajo",
+      "title": "Eventos que hablan",
+      "titleHighlight": "por sí solos",
+      "subtitle": "Fotos reales de nuestros eventos en Cataluña",
+      "viewAll": "Ver todos los eventos",
+      "viewPortfolio": "Ver todo",
+      "viewPortfolioDesc": "el portfolio",
+      "categories": {
+        "all": "Todos",
+        "discomovil": "Discoteca móvil",
+        "halloween": "Halloween",
+        "monMagic": "Mundo Mágico",
+        "bodas": "Bodas",
+        "empreses": "Empresas",
+        "privades": "Privadas"
+      }
     }
   },
   "privacyPortal": {

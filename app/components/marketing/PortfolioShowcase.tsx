@@ -9,11 +9,12 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
+import { useTranslations } from 'next-intl';
 
-const CATEGORIES = [
+const CATEGORY_CONFIGS = [
   {
-    id: 'all',
-    label: 'Tots',
+    id: 'all' as const,
+    emoji: '📋',
     photos: [
       '/img/portfolio/discomovil/discomovil-01.avif',
       '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif',
@@ -27,49 +28,50 @@ const CATEGORIES = [
     ],
   },
   {
-    id: 'discomovil',
-    label: '🎧 Discomòbil',
+    id: 'discomovil' as const,
+    emoji: '🎧',
     photos: Array.from({ length: 9 }, (_, i) =>
       `/img/portfolio/discomovil/discomovil-${String(i + 1).padStart(2, '0')}.avif`
     ),
   },
   {
-    id: 'halloween',
-    label: '🎃 Halloween',
+    id: 'halloween' as const,
+    emoji: '🎃',
     photos: Array.from({ length: 9 }, (_, i) =>
       `/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-${String(i + 1).padStart(2, '0')}.avif`
     ),
   },
   {
-    id: 'mon-magic',
-    label: '🪄 Món Màgic',
+    id: 'monMagic' as const,
+    emoji: '🪄',
     photos: Array.from({ length: 9 }, (_, i) =>
       `/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-${String(i + 1).padStart(2, '0')}.avif`
     ),
   },
   {
-    id: 'bodas',
-    label: '💍 Bodas',
+    id: 'bodas' as const,
+    emoji: '💍',
     photos: Array.from({ length: 4 }, (_, i) =>
       `/img/portfolio/bodas/bodas-${String(i + 1).padStart(2, '0')}.avif`
     ),
   },
   {
-    id: 'empreses',
-    label: '🏢 Empreses',
+    id: 'empreses' as const,
+    emoji: '🏢',
     photos: Array.from({ length: 9 }, (_, i) =>
       `/img/portfolio/eventos-empresa/eventos-empresa-${String(i + 1).padStart(2, '0')}.avif`
     ),
   },
 ] as const;
 
-type CategoryId = (typeof CATEGORIES)[number]['id'];
+type CategoryId = (typeof CATEGORY_CONFIGS)[number]['id'];
 
 export default function PortfolioShowcase() {
+  const t = useTranslations('homePage.portfolio');
   const [activeId, setActiveId] = useState<CategoryId>('all');
   const reduceMotion = useReducedMotion();
 
-  const active = CATEGORIES.find((c) => c.id === activeId) ?? CATEGORIES[0];
+  const active = CATEGORY_CONFIGS.find((c) => c.id === activeId) ?? CATEGORY_CONFIGS[0];
 
   return (
     <section className="relative py-16 md:py-24 overflow-hidden">
@@ -84,15 +86,15 @@ export default function PortfolioShowcase() {
           className="text-center mb-12"
         >
           <span className="inline-block px-5 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-bold tracking-wider uppercase mb-4">
-            El nostre treball
+            {t('sectionLabel')}
           </span>
           <h2 className="text-4xl md:text-5xl font-black text-white mb-3">
-            Events que parlen{' '}
+            {t('title')}{' '}
             <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-              per si sols
+              {t('titleHighlight')}
             </span>
           </h2>
-          <p className="text-white/50 text-lg">Fotos reals dels nostres events a Catalunya</p>
+          <p className="text-white/50 text-lg">{t('subtitle')}</p>
         </motion.div>
 
         {/* Filter tabs */}
@@ -102,7 +104,7 @@ export default function PortfolioShowcase() {
           viewport={{ once: true }}
           className="flex flex-wrap justify-center gap-3 mb-10"
         >
-          {CATEGORIES.map((cat) => (
+          {CATEGORY_CONFIGS.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveId(cat.id)}
@@ -112,7 +114,7 @@ export default function PortfolioShowcase() {
                   : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white'
               }`}
             >
-              {cat.label}
+              {cat.emoji} {t(`categories.${cat.id}`)}
             </button>
           ))}
         </motion.div>
@@ -160,7 +162,7 @@ export default function PortfolioShowcase() {
             href="/portfolio"
             className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-2xl text-white font-semibold transition-all"
           >
-            Veure tots els events
+            {t('viewAll')}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>

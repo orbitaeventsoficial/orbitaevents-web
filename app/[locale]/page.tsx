@@ -87,6 +87,10 @@ const GarantiaSection = dynamic(() => import('@/app/components/marketing/Garanti
 const CTAFinal = dynamic(() => import('@/app/components/marketing/CTAFinal'), {
   ssr: false,
 });
+const FAQSection = dynamic(() => import('@/app/components/home/FAQSection'), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
 const HomePageWrapper = dynamic(() => import('@/app/components/HomePageWrapper'), {
   loading: () => <HeroSkeleton />,
 });
@@ -153,7 +157,10 @@ export default function HomePage() {
         {/* 8. GARANTÍA - Confiança */}
         <GarantiaSection />
 
-        {/* 6. CTA FINAL - Conversió */}
+        {/* 9. FAQ - Preguntes freqüents amb JSON-LD schema */}
+        <FAQSection />
+
+        {/* 10. CTA FINAL - Conversió */}
         <CTAFinal />
       </main>
     </HomePageWrapper>
