@@ -229,6 +229,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const [newLeadsCount, setNewLeadsCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [recentHrefs, setRecentHrefs] = useState<string[]>([]);
+  const [soloMode, setSoloMode] = useState(false);
   const pathname = usePathname();
   const { enabled: helpModeEnabled, toggle: toggleHelpMode } = useAdminHelpMode();
 
@@ -341,6 +342,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   const priorityItems = useMemo(() => ([
     { icon: '📥', label: 'Entrades', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
+    { icon: '⚡', label: 'Entrada ràpida', href: '/admin/intake' },
     { icon: '👤', label: 'Clients', href: '/admin/contactes' },
     { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
     { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
@@ -361,6 +363,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       items: [
         { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
         { icon: '📅', label: 'Calendari', href: '/admin/calendario' },
+        { icon: '🔍', label: 'Duplicats', href: '/admin/duplicats' },
+        { icon: '📦', label: 'Inventari', href: '/admin/inventory' },
+        { icon: '🎟️', label: 'Descomptes', href: '/admin/discount-codes' },
         { icon: '📥', label: 'Safata (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' as const },
       ]
     },
@@ -433,6 +438,23 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     });
   }, [pathname]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const saved = window.localStorage.getItem('admin.solo.mode');
+    if (saved === '0') setSoloMode(false);
+    if (saved === '1') setSoloMode(true);
+  }, []);
+
+  const toggleSoloMode = useCallback(() => {
+    setSoloMode((value) => {
+      const next = !value;
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('admin.solo.mode', next ? '1' : '0');
+      }
+      return next;
+    });
+  }, []);
+
   const isActive = useCallback((href: string) => {
     return href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href);
   }, [pathname]);
@@ -440,6 +462,11 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const prefetchRoute = useCallback((href: string) => {
     router.prefetch(href);
   }, [router]);
+
+  const visibleNavSections = useMemo(
+    () => (soloMode ? [] : navSections),
+    [navSections, soloMode]
+  );
 
   // Obtenir nom de la pàgina actual per al breadcrumb
   const getPageName = useCallback(() => {
@@ -590,7 +617,21 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             </div>
           )}
 
-          {navSections.map((section) => (
+          <div className="px-3 mb-3">
+            <button
+              type="button"
+              onClick={toggleSoloMode}
+              className={`w-full rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
+                soloMode
+                  ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
+                  : 'border-amber-500/40 bg-amber-500/10 text-amber-200'
+              }`}
+            >
+              {soloMode ? 'Mode Solo actiu (simple)' : 'Mode avançat actiu'}
+            </button>
+          </div>
+
+          {visibleNavSections.map((section) => (
             <SidebarSection
               key={section.title}
               title={section.title}
@@ -637,6 +678,19 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={toggleSoloMode}
+            className={`rounded-xl border px-2 py-2 text-[11px] font-semibold transition-colors ${
+              soloMode
+                ? 'border-emerald-400/70 bg-emerald-500/20 text-emerald-200'
+                : 'border-amber-400/70 bg-amber-500/20 text-amber-200'
+            }`}
+            aria-label="Canviar mode solo"
+            aria-pressed={soloMode}
+          >
+            {soloMode ? 'Solo' : 'Avançat'}
+          </button>
           <button
             type="button"
             data-help-toggle="true"
@@ -776,7 +830,21 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 </div>
               )}
 
-              {navSections.map((section) => (
+              <div className="px-3 mb-3">
+                <button
+                  type="button"
+                  onClick={toggleSoloMode}
+                  className={`w-full rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
+                    soloMode
+                      ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
+                      : 'border-amber-500/40 bg-amber-500/10 text-amber-200'
+                  }`}
+                >
+                  {soloMode ? 'Mode Solo actiu (simple)' : 'Mode avançat actiu'}
+                </button>
+              </div>
+
+              {visibleNavSections.map((section) => (
                 <SidebarSection
                   key={section.title}
                   title={section.title}
@@ -827,6 +895,19 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <span className="text-slate-100 font-medium">{getPageName()}</span>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={toggleSoloMode}
+            className={`rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
+              soloMode
+                ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
+                : 'border-amber-500/40 bg-amber-500/10 text-amber-200'
+            }`}
+            aria-pressed={soloMode}
+            aria-label="Canviar mode solo"
+          >
+            {soloMode ? 'Mode Solo' : 'Mode avançat'}
+          </button>
           <button
             type="button"
             data-help-toggle="true"

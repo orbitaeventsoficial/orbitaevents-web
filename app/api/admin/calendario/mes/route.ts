@@ -12,6 +12,7 @@ type CalendarDay = {
   reservas: {
     id: string;
     leadId: string | null;
+    customerId: string | null;
     fechaEvento: string;
     clienteNombre: string | null;
     ubicacion: string | null;
@@ -59,6 +60,7 @@ export async function GET(request: NextRequest) {
       select: {
         id: true,
         leadId: true,
+        customerId: true,
         eventDate: true,
         clientName: true,
         eventLocation: true,
@@ -108,6 +110,7 @@ export async function GET(request: NextRequest) {
         days[key].reservas.push({
           id: booking.id,
           leadId: booking.leadId ?? null,
+          customerId: booking.customerId ?? null,
           fechaEvento: booking.eventDate.toISOString(),
           clienteNombre: booking.clientName,
           ubicacion: booking.eventVenue || booking.eventLocation,

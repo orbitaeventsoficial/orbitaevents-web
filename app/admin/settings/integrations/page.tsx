@@ -91,7 +91,7 @@ export default async function IntegrationsPage() {
 
         <article className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-100">Gmail OAuth</h2>
+            <h2 className="text-lg font-semibold text-slate-100">Gmail (OAuth)</h2>
             <BoolBadge ok={Boolean(map['integrations.gmail.refreshToken'])} />
           </div>
           <p className="mt-2 text-sm text-slate-300">
@@ -129,7 +129,7 @@ export default async function IntegrationsPage() {
 
         <article className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-100">Google Calendar Sync</h2>
+            <h2 className="text-lg font-semibold text-slate-100">Sincronització Google Calendar</h2>
             <BoolBadge ok={googleCalendarConnected} />
           </div>
           <p className="mt-2 text-sm text-slate-300">
@@ -154,7 +154,7 @@ export default async function IntegrationsPage() {
 
         <article className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-100">Calendar Feed (ICS)</h2>
+            <h2 className="text-lg font-semibold text-slate-100">Feed de calendari (ICS)</h2>
             <BoolBadge ok={Boolean(calendarFeedToken)} />
           </div>
           <p className="mt-2 text-sm text-slate-300">

@@ -49,7 +49,7 @@ export default function InboxSettingsClient({
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
-          Configurar Inbox (Gmail)
+          Configurar safata d&apos;entrada (Gmail)
         </h1>
         <p className="mt-1 text-sm text-slate-400">
           Connecta el teu compte de Gmail per veure els emails al panel d&apos;administració.

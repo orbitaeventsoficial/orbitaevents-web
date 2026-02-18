@@ -7,6 +7,7 @@ type CalendarApiDay = {
   reservas: {
     id: string;
     leadId?: string | null;
+    customerId?: string | null;
     fechaEvento: string;
     clienteNombre?: string | null;
     ubicacion?: string | null;
@@ -516,7 +517,13 @@ export default function CalendarMonthClient() {
             {selectedDayData.key && (
               <div className="flex flex-wrap items-center gap-2">
                 <Link
-                  href={`/reservas/new?date=${selectedDayData.key}`}
+                  href={`/admin/clientes?add=1&date=${selectedDayData.key}`}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-violet-500/40 bg-violet-500/15 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-violet-200 transition-all hover:bg-violet-500/25 hover:border-violet-400/50 active:scale-[0.98]"
+                >
+                  + Nou client
+                </Link>
+                <Link
+                  href={`/admin/bookings/new?date=${selectedDayData.key}`}
                   className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-lg shadow-cyan-500/20 transition-all hover:from-cyan-400 hover:to-blue-500 hover:shadow-cyan-500/30 active:scale-[0.98]"
                 >
                   + Nova reserva
@@ -541,10 +548,9 @@ export default function CalendarMonthClient() {
               <div className="mt-3 max-h-64 space-y-2 overflow-auto pr-1">
                 {selectedDayData.payload?.reservas?.length ? (
                   selectedDayData.payload.reservas.map((r) => (
-                    <Link
+                    <div
                       key={r.id}
-                      href={r.leadId ? `/admin/leads/${r.leadId}` : `/admin/bookings/${r.id}`}
-                      className="block rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5 transition-all hover:border-emerald-500/30 hover:bg-emerald-500/15"
+                      className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5 transition-all hover:border-emerald-500/30 hover:bg-emerald-500/15"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="font-medium text-emerald-200 text-sm">
@@ -568,7 +574,34 @@ export default function CalendarMonthClient() {
                           minute: '2-digit',
                         })}
                       </div>
-                    </Link>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <Link
+                          href={`/admin/bookings/${r.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[10px] font-medium text-cyan-300 hover:text-cyan-200 hover:underline"
+                        >
+                          Reserva →
+                        </Link>
+                        {r.leadId && (
+                          <Link
+                            href={`/admin/leads/${r.leadId}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[10px] font-medium text-amber-300 hover:text-amber-200 hover:underline"
+                          >
+                            Entrada →
+                          </Link>
+                        )}
+                        {r.customerId && (
+                          <Link
+                            href={`/admin/contactes/${r.customerId}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[10px] font-medium text-violet-300 hover:text-violet-200 hover:underline"
+                          >
+                            👤 Client →
+                          </Link>
+                        )}
+                      </div>
+                    </div>
                   ))
                 ) : (
                   <div className="rounded-xl border border-dashed border-slate-600/50 px-3 py-4 text-center text-sm text-slate-500">

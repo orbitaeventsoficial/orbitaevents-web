@@ -9,9 +9,10 @@
  * - Veure historial d'esdeveniments
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -38,11 +39,50 @@ interface CustomerStats {
   recentMonth: number;
 }
 
+function getNextStep(customer: Customer): { label: string; href: string; hint: string } {
+  if ((customer.total_events || 0) > 0) {
+    return {
+      label: 'Post-esdeveniment',
+      href: '/admin/post-event',
+      hint: 'Tancar cicle i demanar feedback',
+    };
+  }
+
+  return {
+    label: 'Crear pressupost',
+    href: `/admin/presupuestos?email=${encodeURIComponent(customer.email)}`,
+    hint: 'Primer pas per avançar venda',
+  };
+}
+
+type ExecutionPriority = 'ALTA' | 'MITJANA' | 'BAIXA';
+
+function getExecutionPriority(customer: Customer): { level: ExecutionPriority; score: number; hint: string } {
+  const createdAt = customer.created_at ? new Date(customer.created_at) : new Date();
+  const daysSinceCreated = Math.max(0, Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24)));
+  const hasContactChannel = Boolean(customer.email || customer.phone);
+
+  if (customer.is_vip) {
+    return { level: 'ALTA', score: 100, hint: 'Client VIP: seguiment prioritari' };
+  }
+  if ((customer.total_events || 0) === 0 && hasContactChannel && daysSinceCreated <= 3) {
+    return { level: 'ALTA', score: 90, hint: 'Lead recent sense esdeveniment' };
+  }
+  if ((customer.total_events || 0) === 0 && daysSinceCreated <= 14) {
+    return { level: 'MITJANA', score: 60, hint: 'Oportunitat activa' };
+  }
+  if ((customer.total_events || 0) > 0) {
+    return { level: 'MITJANA', score: 50, hint: 'Client amb potencial recurrència' };
+  }
+  return { level: 'BAIXA', score: 20, hint: 'Seguiment no urgent' };
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function AdminContactesPage() {
+  const searchParams = useSearchParams();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [stats, setStats] = useState<CustomerStats | null>(null);
   const [totalCustomers, setTotalCustomers] = useState(0);
@@ -53,6 +93,7 @@ export default function AdminContactesPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 25;
+  const [priorityFilter, setPriorityFilter] = useState<'ALL' | ExecutionPriority>('ALL');
   const reduceMotion = useReducedMotion();
 
   // Modals
@@ -66,10 +107,22 @@ export default function AdminContactesPage() {
     name: '',
     email: '',
     phone: '',
-    city: '',
+    dni: '',
     instagram: '',
+    source: 'OTHER' as string,
     notes: '',
   });
+
+  // Duplicate detection
+  const [duplicateWarnings, setDuplicateWarnings] = useState<Array<{
+    id: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    matchScore: number;
+    matchReasons: Array<{ field: string; type: string; score: number }>;
+  }>>([]);
+  const [checkingDuplicates, setCheckingDuplicates] = useState(false);
 
   // Fetch customers
   const fetchCustomers = useCallback(async () => {
@@ -143,10 +196,75 @@ export default function AdminContactesPage() {
     setPage(1);
   }, [search]);
 
+  const filteredCustomers = useMemo(() => {
+    const withPriority = customers.map((customer) => ({
+      customer,
+      priority: getExecutionPriority(customer),
+    }));
+
+    const filtered = priorityFilter === 'ALL'
+      ? withPriority
+      : withPriority.filter((item) => item.priority.level === priorityFilter);
+
+    return filtered.sort((a, b) => b.priority.score - a.priority.score);
+  }, [customers, priorityFilter]);
+
+  useEffect(() => {
+    const shouldOpen = searchParams.get('add') === '1';
+    if (!shouldOpen) return;
+
+    const date = searchParams.get('date');
+    setShowAddModal(true);
+    if (date) {
+      setNewCustomer((prev) => ({
+        ...prev,
+        notes: prev.notes || `Origen calendari (${date})`,
+      }));
+    }
+  }, [searchParams]);
+
+  // Check duplicates in real-time
+  useEffect(() => {
+    const { name, email, phone, instagram } = newCustomer;
+    if (!name && !email && !phone) {
+      setDuplicateWarnings([]);
+      return;
+    }
+    const timeout = window.setTimeout(async () => {
+      setCheckingDuplicates(true);
+      try {
+        const res = await fetch('/api/admin/customers/check-duplicates', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ name, email, phone, instagram }),
+        });
+        const data = await res.json();
+        setDuplicateWarnings(data?.duplicates || []);
+      } catch {
+        setDuplicateWarnings([]);
+      } finally {
+        setCheckingDuplicates(false);
+      }
+    }, 400);
+    return () => window.clearTimeout(timeout);
+  }, [newCustomer]);
+
   // Add customer
   const handleAddCustomer = async () => {
     if (!newCustomer.name || !newCustomer.email) {
       setError('Nom i correu són obligatoris');
+      return;
+    }
+
+    // Warn about high-score duplicates
+    const highScoreDup = duplicateWarnings.find((d) => d.matchScore >= 80);
+    if (highScoreDup && !window.confirm(
+      `ATENCIÓ: S'ha detectat un possible duplicat:\n\n` +
+      `"${highScoreDup.name}" (${highScoreDup.email})\n` +
+      `Coincidència: ${highScoreDup.matchScore}%\n\n` +
+      `Vols crear-lo igualment?`
+    )) {
       return;
     }
 
@@ -158,8 +276,13 @@ export default function AdminContactesPage() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          ...newCustomer,
-          source: 'manual',
+          name: newCustomer.name,
+          email: newCustomer.email,
+          phone: newCustomer.phone || undefined,
+          instagram: newCustomer.instagram || undefined,
+          dni: newCustomer.dni || undefined,
+          source: newCustomer.source,
+          notes: newCustomer.notes || undefined,
         }),
       });
 
@@ -170,21 +293,23 @@ export default function AdminContactesPage() {
 
       const result = await response.json();
 
-      // Refresh llista perquè respecti paginació i filtres server-side
+      // Refresh llista
       if (page === 1) {
         await fetchCustomers();
       } else {
         setPage(1);
       }
       setShowAddModal(false);
+      setDuplicateWarnings([]);
 
       // Reset form
       setNewCustomer({
         name: '',
         email: '',
         phone: '',
-        city: '',
+        dni: '',
         instagram: '',
+        source: 'OTHER',
         notes: '',
       });
 
@@ -295,6 +420,26 @@ export default function AdminContactesPage() {
         </button>
       </div>
 
+      {/* Filtres d'execució */}
+      {!loading && customers.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {(['ALL', 'ALTA', 'MITJANA', 'BAIXA'] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setPriorityFilter(value)}
+              className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                priorityFilter === value
+                  ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200'
+                  : 'border-slate-700 text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {value === 'ALL' ? 'Totes prioritats' : `Prioritat ${value.toLowerCase()}`}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Error */}
       {error && (
         <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4" role="alert">
@@ -326,11 +471,15 @@ export default function AdminContactesPage() {
                 <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden md:table-cell">Contacte</th>
                 <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden lg:table-cell">Font</th>
                 <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden sm:table-cell">Esdeveniments</th>
+                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden xl:table-cell">Prioritat</th>
+                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden xl:table-cell">Proper pas</th>
                 <th scope="col" className="text-left p-4 text-slate-300 font-medium">Accions</th>
               </tr>
             </thead>
             <tbody>
-              {customers.map((customer) => (
+              {filteredCustomers.map(({ customer, priority }) => {
+                const nextStep = getNextStep(customer);
+                return (
                 <tr key={customer.id} className="border-b border-slate-700/30 hover:bg-slate-700/30 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
@@ -381,8 +530,33 @@ export default function AdminContactesPage() {
                   <td className="p-4 hidden sm:table-cell text-slate-400">
                     {customer.total_events || 0}
                   </td>
+                  <td className="p-4 hidden xl:table-cell">
+                    <span
+                      className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ${
+                        priority.level === 'ALTA'
+                          ? 'bg-rose-500/20 text-rose-300'
+                          : priority.level === 'MITJANA'
+                            ? 'bg-amber-500/20 text-amber-300'
+                            : 'bg-emerald-500/20 text-emerald-300'
+                      }`}
+                      title={priority.hint}
+                    >
+                      {priority.level}
+                    </span>
+                  </td>
+                  <td className="p-4 hidden xl:table-cell">
+                    <div className="space-y-1">
+                      <Link
+                        href={nextStep.href}
+                        className="inline-flex rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-2 py-1 text-xs font-semibold text-cyan-300 hover:bg-cyan-500/20"
+                      >
+                        {nextStep.label}
+                      </Link>
+                      <p className="text-[11px] text-slate-500">{nextStep.hint}</p>
+                    </div>
+                  </td>
                   <td className="p-4">
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => {
                           setSelectedCustomer(customer);
@@ -391,12 +565,12 @@ export default function AdminContactesPage() {
                         type="button"
                         className="p-2 bg-emerald-500/20 text-emerald-300 rounded-lg hover:bg-emerald-500/30 transition-all"
                         title="Iniciar procés"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </button>
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </button>
                       <Link
                         href={`/admin/contactes/${customer.id}`}
                         className="p-2 bg-slate-700/50 text-slate-300 rounded-lg hover:bg-slate-600/50 transition-all"
@@ -406,10 +580,31 @@ export default function AdminContactesPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </Link>
+                      <Link
+                        href={`/admin/tasks?customerId=${customer.id}`}
+                        className="px-2 py-1 bg-amber-500/20 text-amber-300 rounded-lg hover:bg-amber-500/30 transition-all text-xs font-medium"
+                        title="Tasques del client"
+                      >
+                        Tasques
+                      </Link>
+                      <Link
+                        href={`/admin/leads?q=${encodeURIComponent(customer.email)}`}
+                        className="px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded-lg hover:bg-cyan-500/30 transition-all text-xs font-medium"
+                        title="Entrades relacionades"
+                      >
+                        Entrades
+                      </Link>
+                      <Link
+                        href={`/admin/presupuestos?customerId=${customer.id}`}
+                        className="px-2 py-1 bg-violet-500/20 text-violet-300 rounded-lg hover:bg-violet-500/30 transition-all text-xs font-medium"
+                        title="Pressupostos del client"
+                      >
+                        Pressupost
+                      </Link>
                     </div>
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>
@@ -417,7 +612,7 @@ export default function AdminContactesPage() {
 
       {!loading && customers.length > 0 && (
         <div className="flex items-center justify-between text-xs text-slate-400">
-          <span>Pàgina {page} de {totalPages} · {totalCustomers} clients</span>
+          <span>Pàgina {page} de {totalPages} · {filteredCustomers.length} visibles · {totalCustomers} clients</span>
           <div className="flex gap-2">
             <button
               type="button"
@@ -458,55 +653,90 @@ export default function AdminContactesPage() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="add-contact-title"
-              className="bg-slate-800 border border-slate-700/50 rounded-2xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto"
+              className="bg-slate-800 border border-slate-700/50 rounded-2xl p-6 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto"
             >
               <h2 id="add-contact-title" className="text-2xl font-bold text-slate-100 mb-6">Afegir Client</h2>
 
+              {/* Duplicate warnings */}
+              {duplicateWarnings.length > 0 && (
+                <div className="mb-5 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">
+                  <p className="text-sm font-semibold text-amber-300 mb-2">
+                    Possibles duplicats detectats
+                  </p>
+                  {duplicateWarnings.map((dup) => (
+                    <Link
+                      key={dup.id}
+                      href={`/admin/contactes/${dup.id}`}
+                      className="flex items-center justify-between rounded-lg bg-amber-500/5 border border-amber-500/20 px-3 py-2 mb-1.5 last:mb-0 hover:bg-amber-500/15 transition-colors"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-slate-100">{dup.name}</p>
+                        <p className="text-xs text-slate-400">{dup.email}{dup.phone ? ` · ${dup.phone}` : ''}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                          dup.matchScore >= 80 ? 'bg-rose-500/20 text-rose-300' :
+                          dup.matchScore >= 50 ? 'bg-amber-500/20 text-amber-300' :
+                          'bg-slate-500/20 text-slate-400'
+                        }`}>
+                          {dup.matchScore}%
+                        </span>
+                        <span className="text-xs text-slate-500">
+                          {dup.matchReasons.map((r) => r.field).join(', ')}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                  {checkingDuplicates && <p className="text-xs text-amber-400 mt-2">Comprovant...</p>}
+                </div>
+              )}
+
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm text-slate-400 mb-2">Nom *</label>
-                  <input
-                    type="text"
-                    value={newCustomer.name}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
-                    placeholder="Maria García"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-slate-400 mb-2">Email *</label>
-                  <input
-                    type="email"
-                    value={newCustomer.email}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
-                    placeholder="maria@email.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-slate-400 mb-2">Telèfon</label>
-                  <input
-                    type="tel"
-                    value={newCustomer.phone}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
-                    placeholder="699 123 456"
-                  />
-                </div>
-
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-slate-400 mb-2">Ciutat</label>
+                  <div className="col-span-2">
+                    <label className="block text-sm text-slate-400 mb-2">Nom *</label>
                     <input
                       type="text"
-                      value={newCustomer.city}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, city: e.target.value })}
+                      value={newCustomer.name}
+                      onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
                       className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
-                      placeholder="Barcelona"
+                      placeholder="Maria García"
                     />
                   </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-sm text-slate-400 mb-2">Email *</label>
+                    <input
+                      type="email"
+                      value={newCustomer.email}
+                      onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                      placeholder="maria@email.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-slate-400 mb-2">Telèfon</label>
+                    <input
+                      type="tel"
+                      value={newCustomer.phone}
+                      onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                      placeholder="699 123 456"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-slate-400 mb-2">DNI / NIF / NIE</label>
+                    <input
+                      type="text"
+                      value={newCustomer.dni}
+                      onChange={(e) => setNewCustomer({ ...newCustomer, dni: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                      placeholder="12345678A"
+                    />
+                  </div>
+
                   <div>
                     <label className="block text-sm text-slate-400 mb-2">Instagram</label>
                     <input
@@ -517,6 +747,25 @@ export default function AdminContactesPage() {
                       placeholder="@usuari"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-sm text-slate-400 mb-2">Font</label>
+                    <select
+                      value={newCustomer.source}
+                      onChange={(e) => setNewCustomer({ ...newCustomer, source: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                    >
+                      <option value="PHONE">Telèfon</option>
+                      <option value="WHATSAPP">WhatsApp</option>
+                      <option value="INSTAGRAM">Instagram</option>
+                      <option value="WALLAPOP">Wallapop</option>
+                      <option value="WEBSITE">Web</option>
+                      <option value="CONFIGURATOR">Configurador</option>
+                      <option value="REFERRAL">Boca-orella</option>
+                      <option value="GOOGLE">Google</option>
+                      <option value="OTHER">Altre</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>
@@ -525,7 +774,7 @@ export default function AdminContactesPage() {
                     value={newCustomer.notes}
                     onChange={(e) => setNewCustomer({ ...newCustomer, notes: e.target.value })}
                     className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all resize-none"
-                    rows={3}
+                    rows={2}
                     placeholder="Notes internes..."
                   />
                 </div>
@@ -533,7 +782,7 @@ export default function AdminContactesPage() {
 
               <div className="flex gap-4 mt-8">
                 <button
-                  onClick={() => setShowAddModal(false)}
+                  onClick={() => { setShowAddModal(false); setDuplicateWarnings([]); }}
                   type="button"
                   className="flex-1 py-3 border border-slate-600/50 text-slate-300 rounded-xl hover:bg-slate-700/50 transition-all"
                 >
@@ -660,4 +909,3 @@ export default function AdminContactesPage() {
     </div>
   );
 }
-

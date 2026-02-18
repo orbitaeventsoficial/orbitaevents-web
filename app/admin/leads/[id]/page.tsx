@@ -627,7 +627,11 @@ export default async function LeadDetailPage({ params }: Props) {
               {lead.customerId && (
                 <div>
                   <dt className="text-xs text-slate-300">ID client</dt>
-                  <dd className="font-mono text-xs text-slate-100 break-all">{lead.customerId}</dd>
+                  <dd className="font-mono text-xs break-all">
+                    <Link href={`/admin/contactes/${lead.customerId}`} className="text-cyan-300 hover:text-cyan-200 hover:underline">
+                      {lead.customerId}
+                    </Link>
+                  </dd>
                 </div>
               )}
               <div>
@@ -791,11 +795,18 @@ export default async function LeadDetailPage({ params }: Props) {
                       {' '}Entrada creada {new Date(item.createdAt).toLocaleDateString('ca-ES')}
                     </p>
                     {item.booking ? (
-                      <p className="text-xs text-emerald-700">
-                        Reserva {item.booking.reference} · {item.booking.status} · {item.booking.total.toLocaleString('ca-ES')}€
+                      <p className="text-xs text-emerald-400">
+                        <Link
+                          href={`/admin/bookings/${item.booking.id}`}
+                          className="hover:underline hover:text-emerald-300"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Reserva {item.booking.reference}
+                        </Link>
+                        {' '}· {item.booking.status} · {item.booking.total.toLocaleString('ca-ES')}€
                       </p>
                     ) : (
-                      <p className="text-xs text-amber-700">Sense reserva associada</p>
+                      <p className="text-xs text-amber-400">Sense reserva associada</p>
                     )}
                   </Link>
                 ))}

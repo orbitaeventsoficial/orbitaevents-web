@@ -5,6 +5,9 @@ import { MetricCard, Card, Button } from './components/ui';
 import { MiniLineChart } from './components/Charts';
 import Link from 'next/link';
 import QuickActions from './components/QuickActions';
+import { generateDailyChecklistTasks } from '@/lib/services/dailyChecklist';
+import LeadStatusQuickActions from './components/LeadStatusQuickActions';
+import BookingStatusQuickActions from './components/BookingStatusQuickActions';
 
 /**
  * Dashboard - Òrbita Admin
@@ -60,7 +63,11 @@ function toDateKey(date: Date) {
 }
 
 export default async function AdminDashboard() {
+  await generateDailyChecklistTasks().catch(() => null);
+
   const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const seriesStart = new Date(now);
   seriesStart.setDate(now.getDate() - 30);
@@ -100,6 +107,13 @@ export default async function AdminDashboard() {
     recentCustomerActivity,
     recentAdminLogs,
     upcomingTasks,
+    staleLeadsCount,
+    hotLeadsCount,
+    quotesInFlightCount,
+    checklistTodayDoneCount,
+    checklistTodayPendingCount,
+    commandLeads,
+    commandBookings,
   ] = await Promise.all([
     // Total leads
     cachedQuery('admin:dashboard:leads:count', () => prisma.lead.count(), CacheTTL.SHORT).catch(() => 0),
@@ -252,6 +266,65 @@ export default async function AdminDashboard() {
         dueDate: true,
         status: true,
         lead: { select: { id: true, name: true } },
+      },
+    }).catch(() => []),
+    prisma.lead.count({
+      where: {
+        status: { in: ['NEW', 'CONTACTED'] },
+        createdAt: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) },
+      },
+    }).catch(() => 0),
+    prisma.lead.count({
+      where: {
+        status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] },
+        priority: { in: ['HIGH', 'URGENT'] },
+      },
+    }).catch(() => 0),
+    prisma.lead.count({
+      where: {
+        status: { in: ['QUOTE_SENT', 'NEGOTIATING'] },
+      },
+    }).catch(() => 0),
+    prisma.task.count({
+      where: {
+        createdBy: 'system:daily-checklist',
+        createdAt: { gte: todayStart, lte: todayEnd },
+        status: 'DONE',
+      },
+    }).catch(() => 0),
+    prisma.task.count({
+      where: {
+        createdBy: 'system:daily-checklist',
+        createdAt: { gte: todayStart, lte: todayEnd },
+        status: { in: ['OPEN', 'IN_PROGRESS'] },
+      },
+    }).catch(() => 0),
+    prisma.lead.findMany({
+      where: {
+        status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] },
+      },
+      orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
+      take: 6,
+      select: {
+        id: true,
+        name: true,
+        status: true,
+        priority: true,
+        createdAt: true,
+      },
+    }).catch(() => []),
+    prisma.booking.findMany({
+      where: {
+        status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] },
+      },
+      orderBy: [{ eventDate: 'asc' }, { createdAt: 'desc' }],
+      take: 6,
+      select: {
+        id: true,
+        reference: true,
+        clientName: true,
+        status: true,
+        eventDate: true,
       },
     }).catch(() => []),
   ]);
@@ -413,6 +486,45 @@ export default async function AdminDashboard() {
     }] : []),
   ];
 
+  const pilotToday = [
+    {
+      id: 'leads',
+      step: 'Pas 1',
+      title: 'Respondre entrades',
+      description: leadsThisMonth > 0 ? `${leadsThisMonth} consultes aquest mes` : 'No hi ha noves consultes',
+      href: '/admin/leads',
+      cta: 'Anar a entrades',
+      tone: leadsThisMonth > 0 ? 'amber' : 'emerald',
+    },
+    {
+      id: 'tasks',
+      step: 'Pas 2',
+      title: 'Executar tasques',
+      description: upcomingTasks.length > 0 ? `${upcomingTasks.length} tasques obertes` : 'Cap tasca pendent',
+      href: '/admin/tasks',
+      cta: 'Veure tasques',
+      tone: upcomingTasks.length > 0 ? 'amber' : 'emerald',
+    },
+    {
+      id: 'postevent',
+      step: 'Pas 3',
+      title: 'Tancar post-esdeveniment',
+      description: postEventPending > 0 ? `${postEventPending} correus pendents` : 'Post-esdeveniment al dia',
+      href: '/admin/emails',
+      cta: 'Gestionar',
+      tone: postEventPending > 0 ? 'rose' : 'emerald',
+    },
+    {
+      id: 'bookings',
+      step: 'Pas 4',
+      title: 'Preparar reserves',
+      description: bookingsConfirmed > 0 ? `${bookingsConfirmed} reserves confirmades` : 'Sense reserves confirmades',
+      href: '/admin/bookings',
+      cta: 'Veure reserves',
+      tone: 'sky',
+    },
+  ] as const;
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
@@ -455,6 +567,187 @@ export default async function AdminDashboard() {
           </Link>
         </div>
       </div>
+
+      <section className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/12 to-cyan-500/8 p-4 sm:p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-300">Mode Solo</p>
+            <h2 className="text-base sm:text-lg font-semibold text-slate-100">Pilot automàtic d&apos;avui</h2>
+            <p className="mt-1 text-xs text-slate-300">No és lineal: pots començar directament pel pas 2 o pas 3.</p>
+          </div>
+          <span className="rounded-full border border-emerald-400/40 bg-emerald-500/15 px-2.5 py-1 text-[10px] font-semibold text-emerald-200">
+            4 passos clars
+          </span>
+        </div>
+        <div className="mb-3 flex flex-wrap gap-2">
+          <Link href="/admin/tasks" className="rounded-full border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-200">
+            Comença per pas 2
+          </Link>
+          <Link href="/admin/emails" className="rounded-full border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-200">
+            Comença per pas 3
+          </Link>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {pilotToday.map((item) => {
+            const toneClasses = item.tone === 'rose'
+              ? 'border-rose-500/30 bg-rose-500/10'
+              : item.tone === 'amber'
+                ? 'border-amber-500/30 bg-amber-500/10'
+                : item.tone === 'sky'
+                  ? 'border-sky-500/30 bg-sky-500/10'
+                  : 'border-emerald-500/30 bg-emerald-500/10';
+            return (
+              <Link key={item.id} href={item.href} className={`rounded-xl border p-3 transition-colors hover:border-cyan-400/50 ${toneClasses}`}>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{item.step}</p>
+                <p className="text-sm font-semibold text-slate-100">{item.title}</p>
+                <p className="mt-1 text-xs text-slate-300">{item.description}</p>
+                <span className="mt-3 inline-flex text-xs font-semibold text-white underline decoration-dotted">
+                  {item.cta}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-cyan-500/25 bg-gradient-to-br from-cyan-500/10 to-slate-900/40 p-4 sm:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-cyan-300">Checklist d&apos;avui</p>
+            <h2 className="text-base sm:text-lg font-semibold text-slate-100">Control diari de feina</h2>
+            <p className="mt-1 text-xs text-slate-400">Marca les tasques com a fetes i avança sense perdre el fil.</p>
+          </div>
+          <Link
+            href="/admin/tasks?status=OPEN"
+            className="inline-flex items-center rounded-xl border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-xs sm:text-sm font-semibold text-cyan-200 hover:bg-cyan-500/20"
+          >
+            Obrir tasques pendents
+          </Link>
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
+            <p className="text-xs text-slate-400">Pendents</p>
+            <p className="mt-1 text-2xl font-bold text-amber-300">{checklistTodayPendingCount}</p>
+          </div>
+          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
+            <p className="text-xs text-slate-400">Fetes</p>
+            <p className="mt-1 text-2xl font-bold text-emerald-300">{checklistTodayDoneCount}</p>
+          </div>
+          <div className="rounded-xl border border-slate-600/50 bg-slate-800/60 p-3">
+            <p className="text-xs text-slate-400">Progrés</p>
+            <p className="mt-1 text-2xl font-bold text-slate-100">
+              {checklistTodayDoneCount + checklistTodayPendingCount > 0
+                ? `${Math.round((checklistTodayDoneCount / (checklistTodayDoneCount + checklistTodayPendingCount)) * 100)}%`
+                : '0%'}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-4 sm:p-5">
+        <div className="mb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-300">Navegació bidireccional</p>
+          <h2 className="text-base sm:text-lg font-semibold text-slate-100">Anar i tornar en 1 clic</h2>
+          <p className="mt-1 text-xs text-slate-400">Cada flux clau té camí d&apos;anada i de tornada.</p>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+          <Link href="/admin/leads" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Entrades → Clients</Link>
+          <Link href="/admin/contactes" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Clients → Entrades</Link>
+          <Link href="/admin/bookings" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Reserves → Calendari</Link>
+          <Link href="/admin/calendario" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Calendari → Reserves</Link>
+          <Link href="/admin/presupuestos" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Pressupost → Lead</Link>
+          <Link href="/admin/leads" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Lead → Pressupost</Link>
+          <Link href="/admin/tasks" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Tasques → Entrades</Link>
+          <Link href="/admin/leads" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Entrades → Tasques</Link>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-violet-500/25 bg-gradient-to-br from-violet-500/10 to-slate-900/40 p-4 sm:p-5">
+        <div className="mb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-300">Centre de comandament</p>
+          <h2 className="text-base sm:text-lg font-semibold text-slate-100">Mou estats sense canviar de pantalla</h2>
+          <p className="mt-1 text-xs text-slate-400">Accions ràpides de Leads i Reserves des del tauler principal.</p>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Leads actius</p>
+              <Link href="/admin/leads" className="text-[11px] text-cyan-300 hover:underline">Obrir Entrades</Link>
+            </div>
+            <div className="space-y-2">
+              {commandLeads.length === 0 ? (
+                <p className="text-xs text-slate-500">Sense leads actius.</p>
+              ) : (
+                commandLeads.map((lead) => (
+                  <div key={lead.id} className="flex items-center justify-between gap-2 rounded-lg border border-slate-700/50 bg-slate-900/50 px-2 py-2">
+                    <div className="min-w-0">
+                      <Link href={`/admin/leads/${lead.id}`} className="block truncate text-sm text-slate-100 hover:text-cyan-300">
+                        {lead.name}
+                      </Link>
+                      <p className="text-[11px] text-slate-500">Prioritat {lead.priority.toLowerCase()} · {timeAgo(new Date(lead.createdAt))}</p>
+                    </div>
+                    <LeadStatusQuickActions
+                      leadId={lead.id}
+                      currentStatus={lead.status as 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST'}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+          <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Reserves actives</p>
+              <Link href="/admin/bookings" className="text-[11px] text-cyan-300 hover:underline">Obrir Reserves</Link>
+            </div>
+            <div className="space-y-2">
+              {commandBookings.length === 0 ? (
+                <p className="text-xs text-slate-500">Sense reserves actives.</p>
+              ) : (
+                commandBookings.map((booking) => (
+                  <div key={booking.id} className="flex items-center justify-between gap-2 rounded-lg border border-slate-700/50 bg-slate-900/50 px-2 py-2">
+                    <div className="min-w-0">
+                      <Link href={`/admin/bookings/${booking.id}`} className="block truncate text-sm text-slate-100 hover:text-cyan-300">
+                        {booking.reference} · {booking.clientName}
+                      </Link>
+                      <p className="text-[11px] text-slate-500">{formatEventDate(new Date(booking.eventDate))}</p>
+                    </div>
+                    <BookingStatusQuickActions
+                      bookingId={booking.id}
+                      currentStatus={booking.status as 'PENDING' | 'CONFIRMED' | 'PREPARING' | 'COMPLETED' | 'CANCELLED'}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-4 sm:p-5">
+        <div className="mb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-cyan-300">Radar d&apos;execució</p>
+          <h2 className="text-base sm:text-lg font-semibold text-slate-100">On posar el focus avui</h2>
+          <p className="mt-1 text-xs text-slate-400">Semàfors simples: vermell = urgent, groc = important, verd = controlat.</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Link href="/admin/leads" className="rounded-xl border border-slate-700/60 bg-slate-800/50 p-3 hover:border-rose-500/40">
+            <p className="text-xs text-slate-400">Temps sense resposta</p>
+            <p className={`mt-1 text-xl font-bold ${staleLeadsCount > 0 ? 'text-rose-300' : 'text-emerald-300'}`}>{staleLeadsCount}</p>
+            <p className="mt-1 text-xs text-slate-300">Leads amb més de 24h sense avançar. Primer punt a netejar cada dia.</p>
+          </Link>
+          <Link href="/admin/leads" className="rounded-xl border border-slate-700/60 bg-slate-800/50 p-3 hover:border-amber-500/40">
+            <p className="text-xs text-slate-400">Leads calents</p>
+            <p className={`mt-1 text-xl font-bold ${hotLeadsCount > 0 ? 'text-amber-300' : 'text-emerald-300'}`}>{hotLeadsCount}</p>
+            <p className="mt-1 text-xs text-slate-300">Prioritat alta/urgent. Són els que poden tancar abans.</p>
+          </Link>
+          <Link href="/admin/presupuestos" className="rounded-xl border border-slate-700/60 bg-slate-800/50 p-3 hover:border-cyan-500/40">
+            <p className="text-xs text-slate-400">Pressupostos en joc</p>
+            <p className={`mt-1 text-xl font-bold ${quotesInFlightCount > 0 ? 'text-cyan-300' : 'text-emerald-300'}`}>{quotesInFlightCount}</p>
+            <p className="mt-1 text-xs text-slate-300">Enviats o negociant. Seguiment curt per convertir-los en reserva.</p>
+          </Link>
+        </div>
+      </section>
 
       {testimonialsPending > 0 && (
         <div className="flex flex-col gap-2 rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between backdrop-blur-sm">

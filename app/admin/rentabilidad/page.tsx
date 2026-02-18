@@ -162,6 +162,9 @@ export default async function RentabilidadPage() {
                       </p>
                       <p className="mt-1 text-xs text-emerald-300">
                         Marge {money(row.netMargin)} ({pct(row.marginPct)})
+                        {row.travelCost > 0 && (
+                          <span className="ml-2 text-slate-400">· Viatge {money(row.travelCost)}</span>
+                        )}
                       </p>
                     </Link>
                   ))
@@ -189,6 +192,9 @@ export default async function RentabilidadPage() {
                       </p>
                       <p className="mt-1 text-xs text-rose-700">
                         Marge {money(row.netMargin)} ({pct(row.marginPct)})
+                        {row.travelCost > 0 && (
+                          <span className="ml-2 text-slate-400">· Viatge {money(row.travelCost)}</span>
+                        )}
                       </p>
                     </Link>
                   ))

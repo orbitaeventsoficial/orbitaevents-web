@@ -305,7 +305,13 @@ export default async function BookingDetailPage({ params }: PageProps) {
         </div>
         <div className="rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 shadow-sm">
           <p className="text-xs uppercase tracking-wide text-slate-400">Entrada comercial</p>
-          <p className="text-xl font-semibold text-slate-100">{booking.lead?.status || 'Sense lead'}</p>
+          <p className="text-xl font-semibold text-slate-100">
+            {booking.lead ? (
+              <Link href={`/admin/leads/${booking.lead.id}`} className="hover:text-cyan-300 transition-colors">
+                {booking.lead.status}
+              </Link>
+            ) : 'Sense lead'}
+          </p>
         </div>
       </section>
 
@@ -315,7 +321,13 @@ export default async function BookingDetailPage({ params }: PageProps) {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <p className="text-xs font-medium text-slate-400 uppercase">Nom</p>
-            <p className="mt-1 text-slate-200 font-medium">{booking.clientName}</p>
+            {customer ? (
+              <Link href={`/admin/contactes/${customer.id}`} className="mt-1 text-slate-200 font-medium hover:text-cyan-300 transition-colors block">
+                {booking.clientName}
+              </Link>
+            ) : (
+              <p className="mt-1 text-slate-200 font-medium">{booking.clientName}</p>
+            )}
           </div>
           <div>
             <p className="text-xs font-medium text-slate-400 uppercase">Email</p>
@@ -527,6 +539,39 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* Travel / Distance */}
+      {(() => {
+        const bAny = booking as Record<string, unknown>;
+        const distanceKm = typeof bAny.distanceKm === 'number' ? bAny.distanceKm : null;
+        const travelCost = typeof bAny.travelCost === 'number' ? bAny.travelCost : null;
+        if (!distanceKm && !travelCost) return null;
+        return (
+          <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-slate-200 mb-4">Desplaçament</h2>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {distanceKm != null && (
+                <div>
+                  <p className="text-xs font-medium uppercase text-slate-400">Distància</p>
+                  <p className="text-lg font-bold text-slate-200">{distanceKm} km</p>
+                </div>
+              )}
+              {typeof bAny.fuelCostPerKm === 'number' && (
+                <div>
+                  <p className="text-xs font-medium uppercase text-slate-400">Cost per km</p>
+                  <p className="text-lg font-bold text-slate-200">{bAny.fuelCostPerKm}€/km</p>
+                </div>
+              )}
+              {travelCost != null && (
+                <div>
+                  <p className="text-xs font-medium uppercase text-slate-400">Cost total viatge</p>
+                  <p className="text-lg font-bold text-amber-300">{formatCurrency(travelCost)}</p>
+                </div>
+              )}
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Notes */}
       {booking.notes && (

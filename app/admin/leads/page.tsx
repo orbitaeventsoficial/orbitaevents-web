@@ -3,7 +3,9 @@ import { log } from '@/lib/logger';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import LeadActions from './LeadActions';
+import LeadQuickStatus from './LeadQuickStatus';
 import LeadSavedViews from './LeadSavedViews';
+import LeadViewToggle from './LeadViewToggle';
 import type { EventType, LeadStatus, Priority, Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
@@ -100,6 +102,21 @@ type Pagination = {
   totalPages: number;
 };
 
+function getPendingTimeBadge(createdAt: Date, status: LeadStatus) {
+  if (status === 'WON' || status === 'LOST') {
+    return { label: 'Tancat', className: 'bg-slate-500/20 text-slate-300' };
+  }
+
+  const hours = Math.floor((Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60));
+  if (hours >= 24) {
+    return { label: `${hours}h (urgent)`, className: 'bg-rose-500/20 text-rose-300' };
+  }
+  if (hours >= 8) {
+    return { label: `${hours}h (aviat)`, className: 'bg-amber-500/20 text-amber-300' };
+  }
+  return { label: `${Math.max(0, hours)}h (controlat)`, className: 'bg-emerald-500/20 text-emerald-300' };
+}
+
 async function getLeads(filters: {
   status?: string | string[];
   priority?: string | string[];
@@ -176,6 +193,7 @@ async function getLeads(filters: {
             phone: true,
             eventType: true,
             eventDate: true,
+            createdAt: true,
             status: true,
             priority: true,
             customerId: true,
@@ -292,6 +310,8 @@ export default async function LeadsPage({
           <p className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-bold text-slate-100">{stats.convertits}</p>
         </div>
       </section>
+
+      <LeadViewToggle>
 
       <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
         <form method="get" className="grid gap-3 lg:grid-cols-6">
@@ -435,10 +455,9 @@ export default async function LeadsPage({
             const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
 
             return (
-              <Link
+              <article
                 key={lead.id}
-                href={`/admin/leads/${lead.id}`}
-                className="block rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4 hover:bg-slate-700/40 active:bg-slate-700/60 transition-colors"
+                className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4 hover:bg-slate-700/40 transition-colors"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -446,13 +465,9 @@ export default async function LeadsPage({
                       {lead.name?.charAt(0).toUpperCase() || '?'}
                     </div>
                     <div className="min-w-0 flex-1">
-                      {lead.customerId ? (
-                        <Link href={`/admin/contactes/${lead.customerId}`} className="font-medium text-slate-100 truncate block hover:text-cyan-300" onClick={(e) => e.stopPropagation()}>
-                          {lead.name}
-                        </Link>
-                      ) : (
-                        <p className="font-medium text-slate-100 truncate">{lead.name}</p>
-                      )}
+                      <Link href={`/admin/leads/${lead.id}`} className="font-medium text-slate-100 truncate block hover:text-cyan-300">
+                        {lead.name}
+                      </Link>
                       <p className="text-xs text-slate-400 truncate">{lead.email}</p>
                     </div>
                   </div>
@@ -468,10 +483,47 @@ export default async function LeadsPage({
                       : 'Sense data'}
                   </span>
                 </div>
+                <div className="mt-2">
+                  {(() => {
+                    const pending = getPendingTimeBadge(new Date(lead.createdAt), lead.status);
+                    return (
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${pending.className}`}>
+                        Temps pendent: {pending.label}
+                      </span>
+                    );
+                  })()}
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/admin/leads/${lead.id}`}
+                      className="rounded-lg border border-cyan-500/40 px-2 py-1 text-[11px] font-medium text-cyan-300 hover:bg-cyan-500/10"
+                    >
+                      Obrir fitxa
+                    </Link>
+                    {lead.customerId && (
+                      <Link
+                        href={`/admin/contactes/${lead.customerId}`}
+                        className="rounded-lg border border-violet-500/40 px-2 py-1 text-[11px] font-medium text-violet-300 hover:bg-violet-500/10"
+                      >
+                        Client
+                      </Link>
+                    )}
+                  </div>
+                  <LeadQuickStatus
+                    leadId={lead.id}
+                    currentStatus={lead.status}
+                  />
+                </div>
                 {lead.booking && (
-                  <div className="mt-2 text-xs text-emerald-400 font-medium">✓ Reserva: {lead.booking.reference}</div>
+                  <Link
+                    href={`/admin/bookings/${lead.booking.id}`}
+                    className="mt-2 block text-xs text-emerald-400 font-medium hover:text-emerald-300 hover:underline"
+                  >
+                    ✓ Reserva: {lead.booking.reference}
+                  </Link>
                 )}
-              </Link>
+              </article>
             );
           })
         )}
@@ -487,6 +539,7 @@ export default async function LeadsPage({
                 <th className="px-4 py-3 text-left font-medium text-slate-300">Contacte</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-300">Tipus</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-300">Data</th>
+                <th className="px-4 py-3 text-left font-medium text-slate-300">Temps pendent</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-300">Estat</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-300">Prioritat</th>
                 <th className="px-4 py-3 text-right font-medium text-slate-300">Accions</th>
@@ -495,7 +548,7 @@ export default async function LeadsPage({
             <tbody className="divide-y divide-slate-700/30">
               {leads.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-slate-400">
+                  <td colSpan={8} className="px-4 py-12 text-center text-slate-400">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-4xl">📭</span>
                       <p>Encara no hi ha entrades</p>
@@ -522,7 +575,9 @@ export default async function LeadsPage({
                           )}
                         </div>
                         {lead.booking && (
-                          <div className="text-xs text-emerald-400">✓ {lead.booking.reference}</div>
+                          <Link href={`/admin/bookings/${lead.booking.id}`} className="text-xs text-emerald-400 hover:text-emerald-300 hover:underline block">
+                            ✓ {lead.booking.reference}
+                          </Link>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -540,6 +595,16 @@ export default async function LeadsPage({
                           : '—'}
                       </td>
                       <td className="px-4 py-3">
+                        {(() => {
+                          const pending = getPendingTimeBadge(new Date(lead.createdAt), lead.status);
+                          return (
+                            <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${pending.className}`}>
+                              {pending.label}
+                            </span>
+                          );
+                        })()}
+                      </td>
+                      <td className="px-4 py-3">
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text}`}>
                           {statusConf.label}
                         </span>
@@ -550,7 +615,13 @@ export default async function LeadsPage({
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <LeadActions leadId={lead.id} leadName={lead.name} phone={lead.phone} hasBooking={!!lead.booking} />
+                        <LeadActions
+                          leadId={lead.id}
+                          leadName={lead.name}
+                          phone={lead.phone}
+                          hasBooking={!!lead.booking}
+                          currentStatus={lead.status}
+                        />
                       </td>
                     </tr>
                   );
@@ -598,6 +669,8 @@ export default async function LeadsPage({
           </div>
         </section>
       )}
+
+      </LeadViewToggle>
     </div>
   );
 }

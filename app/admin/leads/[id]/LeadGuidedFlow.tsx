@@ -6,12 +6,61 @@ import { useRouter } from 'next/navigation';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 
-const STATUS_ORDER: LeadStatus[] = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'];
+const STEPS: Array<{
+  status: LeadStatus;
+  label: string;
+  icon: string;
+  color: string;
+  activeColor: string;
+  doneColor: string;
+}> = [
+  {
+    status: 'NEW',
+    label: 'Entrada nova',
+    icon: '📥',
+    color: 'border-blue-500/30 bg-blue-500/5 text-blue-300',
+    activeColor: 'border-blue-400 bg-blue-500/20 text-blue-200 ring-2 ring-blue-400/50',
+    doneColor: 'border-blue-500/50 bg-blue-500/15 text-blue-300',
+  },
+  {
+    status: 'CONTACTED',
+    label: 'Contactat',
+    icon: '📞',
+    color: 'border-yellow-500/30 bg-yellow-500/5 text-yellow-300',
+    activeColor: 'border-yellow-400 bg-yellow-500/20 text-yellow-200 ring-2 ring-yellow-400/50',
+    doneColor: 'border-yellow-500/50 bg-yellow-500/15 text-yellow-300',
+  },
+  {
+    status: 'QUOTE_SENT',
+    label: 'Pressupost enviat',
+    icon: '📄',
+    color: 'border-purple-500/30 bg-purple-500/5 text-purple-300',
+    activeColor: 'border-purple-400 bg-purple-500/20 text-purple-200 ring-2 ring-purple-400/50',
+    doneColor: 'border-purple-500/50 bg-purple-500/15 text-purple-300',
+  },
+  {
+    status: 'NEGOTIATING',
+    label: 'Negociant',
+    icon: '🤝',
+    color: 'border-orange-500/30 bg-orange-500/5 text-orange-300',
+    activeColor: 'border-orange-400 bg-orange-500/20 text-orange-200 ring-2 ring-orange-400/50',
+    doneColor: 'border-orange-500/50 bg-orange-500/15 text-orange-300',
+  },
+  {
+    status: 'WON',
+    label: 'Guanyat!',
+    icon: '🎉',
+    color: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-300',
+    activeColor: 'border-emerald-400 bg-emerald-500/20 text-emerald-200 ring-2 ring-emerald-400/50',
+    doneColor: 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300',
+  },
+];
 
-function hasReachedStatus(current: LeadStatus, target: LeadStatus) {
-  const currentIndex = STATUS_ORDER.indexOf(current);
-  const targetIndex = STATUS_ORDER.indexOf(target);
-  return currentIndex >= targetIndex;
+const STATUS_ORDER: LeadStatus[] = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON'];
+
+function getStatusIndex(status: LeadStatus): number {
+  const idx = STATUS_ORDER.indexOf(status);
+  return idx >= 0 ? idx : 0;
 }
 
 export default function LeadGuidedFlow({
@@ -37,16 +86,19 @@ export default function LeadGuidedFlow({
   const [error, setError] = useState<string | null>(null);
   const [creatingTask, setCreatingTask] = useState(false);
 
+  const isLost = status === 'LOST';
+  const currentIndex = getStatusIndex(status);
+
   const progress = useMemo(() => {
     const stepsDone = [
-      hasReachedStatus(status, 'CONTACTED'),
-      hasReachedStatus(status, 'QUOTE_SENT'),
-      documentsCount > 0,
-      hasReachedStatus(status, 'WON') || hasCustomer,
-      hasBooking,
+      currentIndex >= 1, // Contactat
+      currentIndex >= 2, // Pressupost enviat
+      currentIndex >= 3, // Negociant
+      currentIndex >= 4 || hasCustomer, // Guanyat
+      hasBooking, // Reserva creada
     ].filter(Boolean).length;
-    return { stepsDone, total: 5 };
-  }, [status, documentsCount, hasCustomer, hasBooking]);
+    return { stepsDone, total: 5, pct: Math.round((stepsDone / 5) * 100) };
+  }, [currentIndex, hasCustomer, hasBooking]);
 
   const updateStatus = async (nextStatus: LeadStatus) => {
     setError(null);
@@ -61,7 +113,7 @@ export default function LeadGuidedFlow({
       });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || 'No s’ha pogut actualitzar l’estat');
+        throw new Error(data.error || "No s'ha pogut actualitzar l'estat");
       }
       const payload = await res.json();
       const customerId = payload?.lead?.customerId as string | undefined;
@@ -96,7 +148,7 @@ export default function LeadGuidedFlow({
       });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || 'No s’ha pogut crear la tasca');
+        throw new Error(data.error || "No s'ha pogut crear la tasca");
       }
       startTransition(() => router.refresh());
     } catch (e) {
@@ -106,18 +158,42 @@ export default function LeadGuidedFlow({
     }
   };
 
+  // Suggest next action
+  const nextAction = useMemo(() => {
+    if (isLost) return null;
+    if (currentIndex === 0) return { label: 'Contactar client', action: () => updateStatus('CONTACTED') };
+    if (currentIndex === 1) return { label: 'Enviar pressupost', href: `/admin/presupuestos?leadId=${leadId}` };
+    if (currentIndex === 2) return { label: 'Iniciar negociaci\u00f3', action: () => updateStatus('NEGOTIATING') };
+    if (currentIndex === 3) return { label: 'Marcar com a guanyat', action: () => updateStatus('WON') };
+    if (currentIndex === 4 && !hasBooking) return { label: 'Crear reserva', href: `/admin/bookings/new?leadId=${leadId}` };
+    if (hasBooking && bookingId) return { label: 'Veure reserva', href: `/admin/bookings/${bookingId}` };
+    return null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, isLost, hasBooking, bookingId, leadId]);
+
   return (
-    <section className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-5 shadow-sm">
+    <section className="rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 p-5 shadow-sm">
+      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-slate-100">Asistente comercial (paso a paso)</h2>
-          <p className="text-sm text-slate-300">
-            Progreso {progress.stepsDone}/{progress.total}. Pulsa un botón y sigue al siguiente paso.
+          <h2 className="text-base font-semibold text-slate-100">Pipeline comercial</h2>
+          <p className="text-sm text-slate-400">
+            Progr\u00e9s: {progress.stepsDone}/{progress.total} passos completats
           </p>
         </div>
-        <div className="rounded-full border border-cyan-400/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200">
-          Estado: {status}
-        </div>
+        {isLost && (
+          <div className="rounded-full border border-rose-500/40 bg-rose-500/10 px-3 py-1 text-xs font-semibold text-rose-300">
+            PERDUT
+          </div>
+        )}
+      </div>
+
+      {/* Progress bar */}
+      <div className="mt-3 h-2 w-full rounded-full bg-slate-700/50 overflow-hidden">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-500"
+          style={{ width: `${progress.pct}%` }}
+        />
       </div>
 
       {error && (
@@ -126,60 +202,105 @@ export default function LeadGuidedFlow({
         </p>
       )}
 
-      <div className="mt-4 grid gap-2 lg:grid-cols-5">
-        <button
-          type="button"
-          onClick={() => updateStatus('CONTACTED')}
-          disabled={isPending || hasReachedStatus(status, 'CONTACTED')}
-          className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-3 py-2 text-xs font-semibold text-slate-100 hover:bg-slate-800 disabled:opacity-50"
-        >
-          1) Marcar CONTACTED
-        </button>
-        <button
-          type="button"
-          onClick={() => updateStatus('QUOTE_SENT')}
-          disabled={isPending || hasReachedStatus(status, 'QUOTE_SENT')}
-          className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-3 py-2 text-xs font-semibold text-slate-100 hover:bg-slate-800 disabled:opacity-50"
-        >
-          2) Marcar QUOTE_SENT
-        </button>
-        <a
-          href="#lead-documents"
-          className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-3 py-2 text-center text-xs font-semibold text-slate-100 hover:bg-slate-800"
-        >
-          3) Ir a documentos PDF
-        </a>
-        <button
-          type="button"
-          onClick={() => updateStatus('WON')}
-          disabled={isPending || hasReachedStatus(status, 'WON')}
-          className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-3 py-2 text-xs font-semibold text-slate-100 hover:bg-slate-800 disabled:opacity-50"
-        >
-          4) Marcar WON (cliente)
-        </button>
-        <Link
-          href={hasBooking && bookingId ? `/admin/bookings/${bookingId}` : '/admin/bookings'}
-          className="rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-center text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20"
-        >
-          {hasBooking ? '5) Ver reserva' : '5) Ir a reservas'}
-        </Link>
+      {/* Pipeline steps */}
+      <div className="mt-4 flex flex-col gap-1 lg:flex-row lg:gap-0">
+        {STEPS.map((step, i) => {
+          const stepIndex = getStatusIndex(step.status);
+          const isDone = currentIndex > stepIndex;
+          const isActive = currentIndex === stepIndex && !isLost;
+          const canClick = !isLost && !isPending && stepIndex > currentIndex;
+
+          const stepClass = isActive
+            ? step.activeColor
+            : isDone
+              ? step.doneColor
+              : step.color;
+
+          return (
+            <div key={step.status} className="flex items-center flex-1">
+              <button
+                type="button"
+                onClick={() => canClick && updateStatus(step.status)}
+                disabled={!canClick}
+                className={`relative flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all ${stepClass} ${
+                  canClick ? 'cursor-pointer hover:opacity-90' : 'cursor-default'
+                } ${isDone ? 'opacity-70' : ''}`}
+              >
+                <span className="text-base">{isDone ? '✓' : step.icon}</span>
+                <span className="hidden sm:inline">{step.label}</span>
+                <span className="sm:hidden">{i + 1}</span>
+              </button>
+              {i < STEPS.length - 1 && (
+                <span className={`hidden lg:block mx-1 text-lg ${isDone ? 'text-emerald-500' : 'text-slate-600'}`}>
+                  →
+                </span>
+              )}
+            </div>
+          );
+        })}
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
+      {/* Next suggested action + quick actions */}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        {nextAction && (
+          nextAction.href ? (
+            <Link
+              href={nextAction.href}
+              className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-all"
+            >
+              {nextAction.label} →
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={nextAction.action}
+              disabled={isPending}
+              className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-all disabled:opacity-50"
+            >
+              {nextAction.label} →
+            </button>
+          )
+        )}
+
         <button
           type="button"
           onClick={createFollowUpTask}
           disabled={creatingTask}
-          className="rounded-lg border border-amber-400/40 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/20 disabled:opacity-60"
+          className="rounded-xl border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-200 hover:bg-amber-500/20 disabled:opacity-60 transition-colors"
         >
-          {creatingTask ? 'Creando tarea...' : 'Crear tarea de seguimiento'}
+          {creatingTask ? 'Creant...' : '+ Tasca de seguiment'}
         </button>
-        <a
-          href="#lead-tasks"
-          className="rounded-lg border border-slate-700/60 bg-slate-900/70 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-800"
-        >
-          Ver tareas ({openTasksCount})
-        </a>
+
+        {openTasksCount > 0 && (
+          <a
+            href="#lead-tasks"
+            className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-colors"
+          >
+            Tasques ({openTasksCount})
+          </a>
+        )}
+
+        {!isLost && (
+          <button
+            type="button"
+            onClick={() => updateStatus('LOST')}
+            disabled={isPending}
+            className="rounded-xl border border-rose-500/30 bg-rose-500/5 px-3 py-2 text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors disabled:opacity-50"
+          >
+            Marcar perdut
+          </button>
+        )}
+
+        {isLost && (
+          <button
+            type="button"
+            onClick={() => updateStatus('NEW')}
+            disabled={isPending}
+            className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-xs font-medium text-emerald-400 hover:bg-emerald-500/10 transition-colors disabled:opacity-50"
+          >
+            Reobrir entrada
+          </button>
+        )}
       </div>
     </section>
   );

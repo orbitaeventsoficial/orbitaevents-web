@@ -9,11 +9,13 @@ interface LeadActionsProps {
   leadName: string;
   phone?: string | null;
   hasBooking: boolean;
+  currentStatus: 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 }
 
-export default function LeadActions({ leadId, leadName, phone, hasBooking }: LeadActionsProps) {
+export default function LeadActions({ leadId, leadName, phone, hasBooking, currentStatus }: LeadActionsProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [statusUpdating, setStatusUpdating] = useState(false);
 
   const handleDelete = async () => {
     if (hasBooking) {
@@ -44,8 +46,43 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking }: Lea
     }
   };
 
+  const handleStatusChange = async (nextStatus: LeadActionsProps['currentStatus']) => {
+    if (statusUpdating || nextStatus === currentStatus) return;
+    setStatusUpdating(true);
+    try {
+      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || "Error actualitzant l'estat");
+      }
+      router.refresh();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Error actualitzant l'estat");
+    } finally {
+      setStatusUpdating(false);
+    }
+  };
+
   return (
     <div className="flex items-center justify-end gap-2">
+      <select
+        value={currentStatus}
+        onChange={(e) => handleStatusChange(e.target.value as LeadActionsProps['currentStatus'])}
+        disabled={statusUpdating}
+        className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-2 py-1.5 text-xs text-slate-200"
+        title="Canviar estat"
+      >
+        <option value="NEW">Entrada nova</option>
+        <option value="CONTACTED">Contactat</option>
+        <option value="QUOTE_SENT">Pressupost enviat</option>
+        <option value="NEGOTIATING">Negociació</option>
+        <option value="WON">Guanyat</option>
+        <option value="LOST">Perdut</option>
+      </select>
       {phone && (
         <a
           href={`https://wa.me/${phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(

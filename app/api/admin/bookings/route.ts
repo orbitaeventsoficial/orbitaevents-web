@@ -254,6 +254,39 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    if (linkedCustomerId) {
+      await prisma.customerActivity.create({
+        data: {
+          customerId: linkedCustomerId,
+          action: 'BOOKING_CREATED',
+          details: {
+            bookingId: booking.id,
+            reference: booking.reference,
+            eventDate: booking.eventDate,
+            eventType: booking.eventType,
+            status: booking.status,
+          },
+        },
+      });
+
+      const prepDueDate = new Date(booking.eventDate);
+      prepDueDate.setDate(prepDueDate.getDate() - 7);
+
+      await prisma.task.create({
+        data: {
+          customerId: linkedCustomerId,
+          bookingId: booking.id,
+          leadId: data.leadId || null,
+          title: `Preparar reserva ${booking.reference}`,
+          description: 'Revisa horaris, ubicació, inventari, extres i confirmació final amb client.',
+          dueDate: prepDueDate,
+          status: 'OPEN',
+          priority: 'HIGH',
+          createdBy: 'system:auto-booking-create',
+        },
+      });
+    }
+
     // Si ve d'un lead, actualitzar-lo a WON
     if (data.leadId) {
       await prisma.lead.update({

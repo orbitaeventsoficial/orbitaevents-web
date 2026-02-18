@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
 
 export default function MarginExtrasPanel({
@@ -28,9 +29,17 @@ export default function MarginExtrasPanel({
         <Metric label="Marge estimat" value={money(margin)} />
       </div>
 
-      <p className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200">
-        Per editar extres i cost real, obre l’Studio amb el proposal actiu.
-      </p>
+      <div className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200 flex items-center justify-between">
+        <span>Per editar extres i cost real, obre l&apos;Studio amb el proposal actiu.</span>
+        {active && (
+          <Link
+            href={`/admin/presupuestos?proposalId=${active.id}&customerId=${data.customer.id}`}
+            className="rounded-lg bg-amber-500/20 border border-amber-500/40 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/30 transition-colors ml-3 shrink-0"
+          >
+            Obrir Studio →
+          </Link>
+        )}
+      </div>
     </section>
   );
 }

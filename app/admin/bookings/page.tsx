@@ -194,9 +194,8 @@ export default async function BookingsPage({
             const isPast = new Date(booking.eventDate) < new Date();
 
             return (
-              <Link
+              <article
                 key={booking.id}
-                href={`/admin/bookings/${booking.id}`}
                 className={`block rounded-2xl border backdrop-blur-sm p-4 transition-colors ${
                   isPast && booking.status !== 'COMPLETED'
                     ? 'border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-orange-600/5'
@@ -206,12 +205,24 @@ export default async function BookingsPage({
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <code className="text-[10px] font-mono bg-slate-700/50 text-slate-300 px-1.5 py-0.5 rounded">{booking.reference}</code>
+                      <Link href={`/admin/bookings/${booking.id}`}>
+                        <code className="text-[10px] font-mono bg-slate-700/50 text-slate-300 px-1.5 py-0.5 rounded">{booking.reference}</code>
+                      </Link>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConf.bg} ${statusConf.text}`}>
                         {statusConf.label}
                       </span>
                     </div>
-                    <p className="font-medium text-slate-100 mt-2 truncate">{booking.clientName}{booking.customerId && ' 👤'}</p>
+                    {booking.customerId ? (
+                      <Link
+                        href={`/admin/contactes/${booking.customerId}`}
+                        className="font-medium text-slate-100 mt-2 truncate block hover:text-cyan-300"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {booking.clientName} 👤
+                      </Link>
+                    ) : (
+                      <p className="font-medium text-slate-100 mt-2 truncate">{booking.clientName}</p>
+                    )}
                     <p className="text-xs text-slate-400 truncate">{booking.eventLocation}</p>
                   </div>
                   <div className="text-right shrink-0">
@@ -232,7 +243,15 @@ export default async function BookingsPage({
                     {new Date(booking.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
                   </span>
                 </div>
-              </Link>
+                <div className="mt-3">
+                  <BookingActions
+                    id={booking.id}
+                    status={booking.status}
+                    eventDate={booking.eventDate.toISOString()}
+                    customerId={booking.customerId}
+                  />
+                </div>
+              </article>
             );
           })
         )}
@@ -278,7 +297,9 @@ export default async function BookingsPage({
                       }`}
                     >
                       <td className="px-4 py-3">
-                        <code className="text-xs font-mono bg-slate-700/50 text-slate-300 px-2 py-1 rounded">{booking.reference}</code>
+                        <Link href={`/admin/bookings/${booking.id}`} className="hover:opacity-80 transition-opacity">
+                          <code className="text-xs font-mono bg-slate-700/50 text-cyan-300 px-2 py-1 rounded cursor-pointer">{booking.reference}</code>
+                        </Link>
                       </td>
                       <td className="px-4 py-3">
                         {booking.customerId ? (
@@ -289,6 +310,11 @@ export default async function BookingsPage({
                           <div className="font-medium text-slate-100">{booking.clientName}</div>
                         )}
                         <div className="text-xs text-slate-400 truncate max-w-[150px]">{booking.eventLocation}</div>
+                        {booking.lead && (
+                          <Link href={`/admin/leads/${booking.lead.id}`} className="text-[10px] text-cyan-400 hover:text-cyan-300 hover:underline">
+                            Entrada: {booking.lead.name}
+                          </Link>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-slate-300 text-xs">{eventType}</td>
                       <td className="px-4 py-3">
@@ -317,7 +343,12 @@ export default async function BookingsPage({
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <BookingActions id={booking.id} status={booking.status} />
+                        <BookingActions
+                          id={booking.id}
+                          status={booking.status}
+                          eventDate={booking.eventDate.toISOString()}
+                          customerId={booking.customerId}
+                        />
                       </td>
                     </tr>
                   );

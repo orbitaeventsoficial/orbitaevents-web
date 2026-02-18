@@ -11,6 +11,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { successResponse, ApiErrors } from '@/lib/api-response';
 import { verifyCsrf } from '@/lib/csrf';
+import { normalizeDni } from '@/lib/utils/normalize';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +39,8 @@ export async function GET(request: NextRequest) {
             { emailNormalized: { contains: q, mode: 'insensitive' as const } },
             { phone: { contains: q } },
             { phoneNormalized: { contains: q } },
+            { dni: { contains: q, mode: 'insensitive' as const } },
+            { dniNormalized: { contains: q, mode: 'insensitive' as const } },
             { instagram: { contains: q, mode: 'insensitive' as const } },
             { instagramNormalized: { contains: q, mode: 'insensitive' as const } },
             {
@@ -119,7 +122,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, email, phone, instagram, preferredLocale } = body;
+    const { name, email, phone, instagram, preferredLocale, dni, source, notes } = body;
 
     if (!name || !email) {
       return ApiErrors.badRequest('Nom i email són obligatoris');
@@ -127,13 +130,24 @@ export async function POST(request: NextRequest) {
 
     const emailNormalized = email.toLowerCase().trim();
 
-    // Comprovar si ja existeix
+    // Comprovar si ja existeix per email
     const existing = await prisma.customer.findUnique({
       where: { emailNormalized },
     });
 
     if (existing) {
       return ApiErrors.conflict('Ja existeix un client amb aquest email');
+    }
+
+    // Normalitzar DNI i comprovar duplicat
+    const dniNormalized = dni ? normalizeDni(dni) : null;
+    if (dniNormalized) {
+      const existingByDni = await prisma.customer.findUnique({
+        where: { dniNormalized },
+      });
+      if (existingByDni) {
+        return ApiErrors.conflict(`Ja existeix un client amb aquest DNI/NIF: ${existingByDni.name}`);
+      }
     }
 
     // Normalitzar nom (sense accents, lowercase)
@@ -153,22 +167,73 @@ export async function POST(request: NextRequest) {
       ? instagram.replace('@', '').toLowerCase().trim()
       : null;
 
-    // Crear client
-    const customer = await prisma.customer.create({
-      data: {
-        name: name.trim(),
-        nameNormalized,
-        email: emailNormalized,
-        emailNormalized,
-        phone: phone?.trim() || null,
-        phoneNormalized,
-        instagram: instagram?.trim() || null,
-        instagramNormalized,
-        preferredLocale: preferredLocale || 'es',
-        source: 'OTHER',
-        gdprConsent: true,
-        gdprConsentDate: new Date(),
-      },
+    // Validar source contra el enum
+    const validSources = ['WEBSITE', 'CONFIGURATOR', 'PHONE', 'WHATSAPP', 'INSTAGRAM', 'WALLAPOP', 'REFERRAL', 'GOOGLE', 'OTHER'];
+    const customerSource = validSources.includes(source) ? source : 'OTHER';
+
+    const initialNotes = typeof notes === 'string' ? notes.trim() : '';
+
+    // Crear client + activitat + tasca guia inicial (tot en transacció)
+    const customer = await prisma.$transaction(async (tx) => {
+      const created = await tx.customer.create({
+        data: {
+          name: name.trim(),
+          nameNormalized,
+          email: emailNormalized,
+          emailNormalized,
+          phone: phone?.trim() || null,
+          phoneNormalized,
+          instagram: instagram?.trim() || null,
+          instagramNormalized,
+          dni: dni?.trim() || null,
+          dniNormalized,
+          preferredLocale: preferredLocale || 'es',
+          source: customerSource,
+          gdprConsent: true,
+          gdprConsentDate: new Date(),
+        },
+      });
+
+      await tx.customerActivity.create({
+        data: {
+          customerId: created.id,
+          action: 'CUSTOMER_CREATED',
+          details: {
+            source: customerSource,
+            preferredLocale: preferredLocale || 'es',
+            hasInitialNotes: Boolean(initialNotes),
+          },
+        },
+      });
+
+      if (initialNotes) {
+        await tx.customerActivity.create({
+          data: {
+            customerId: created.id,
+            action: 'INITIAL_NOTES',
+            details: { notes: initialNotes },
+          },
+        });
+      }
+
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 1);
+
+      await tx.task.create({
+        data: {
+          customerId: created.id,
+          title: 'Validar fitxa inicial del client',
+          description: initialNotes
+            ? `Revisa les notes inicials i defineix el següent pas comercial.\n\nNotes:\n${initialNotes}`
+            : 'Confirma dades de contacte, tipus d’esdeveniment i següent acció comercial.',
+          dueDate,
+          status: 'OPEN',
+          priority: 'HIGH',
+          createdBy: 'system:auto-customer-create',
+        },
+      });
+
+      return created;
     });
 
     return successResponse(customer, 'Client creat correctament', 201);

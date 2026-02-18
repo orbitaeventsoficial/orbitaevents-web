@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Configurar Inbox | Òrbita Admin',
+  title: "Configurar safata d'entrada | Òrbita Admin",
 };
 
 function isImapConfigured() {

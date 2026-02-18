@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import type { LeadTaskStatus, Prisma } from '@prisma/client';
+import TaskRowActions from './TaskRowActions';
+import GenerateDailyChecklistButton from './GenerateDailyChecklistButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +27,23 @@ function isTaskStatus(value?: string): value is LeadTaskStatus {
 function parsePage(value?: string) {
   const parsed = Number.parseInt(value || '1', 10);
   return Number.isNaN(parsed) || parsed < 1 ? 1 : parsed;
+}
+
+function resolveDestination(task: {
+  title: string;
+  customer?: { id: string; name: string };
+  lead?: { id: string; name: string };
+}) {
+  if (task.customer) return `/admin/contactes/${task.customer.id}`;
+  if (task.lead) return `/admin/leads/${task.lead.id}`;
+
+  const title = task.title.toLowerCase();
+  if (title.includes('entrades')) return '/admin/leads?status=NEW';
+  if (title.includes('pressupost')) return '/admin/presupuestos';
+  if (title.includes('reserves') || title.includes('calendari')) return '/admin/calendario';
+  if (title.includes('post-esdeveniment')) return '/admin/emails';
+  if (title.includes('tasques')) return '/admin/tasks?status=OPEN';
+  return '/admin/tasks';
 }
 
 export default async function TasksPage({
@@ -132,6 +151,7 @@ export default async function TasksPage({
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <GenerateDailyChecklistButton />
           <Link
             href={customerId ? `/admin/tasks/new?customerId=${customerId}` : '/admin/tasks/new'}
             className="inline-flex items-center rounded-xl bg-amber-500 px-3 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-amber-600 transition-colors"
@@ -177,23 +197,32 @@ export default async function TasksPage({
           </div>
         ) : (
           <div className="divide-y divide-slate-700/30">
-            {tasks.map((task) => (
-              <Link
-                key={task.id}
-                href={task.customer ? `/admin/contactes/${task.customer.id}` : task.lead ? `/admin/leads/${task.lead.id}` : '/admin/tasks'}
-                className="flex items-center justify-between px-4 py-3 hover:bg-slate-700/30 transition-colors"
-              >
-                <div className="min-w-0">
-                  <p className="text-sm text-slate-100 truncate">{task.title}</p>
-                  <p className="text-xs text-slate-500">
-                    {(task.customer?.name || task.lead?.name || 'Sense relació')} · {STATUS_LABELS[task.status] || task.status}
-                  </p>
-                </div>
-                <span className="text-xs text-slate-400">
-                  {task.dueDate ? new Date(task.dueDate).toLocaleDateString('ca-ES') : 'Sense data'}
-                </span>
-              </Link>
-            ))}
+            {tasks.map((task) => {
+              const destinationHref = resolveDestination(task);
+              return (
+                <article key={task.id} className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-700/30 transition-colors">
+                  <Link
+                    href={destinationHref}
+                    className="min-w-0 flex-1"
+                  >
+                    <p className="text-sm text-slate-100 truncate">{task.title}</p>
+                    <p className="text-xs text-slate-500">
+                      {(task.customer?.name || task.lead?.name || 'Sense relació')} · {STATUS_LABELS[task.status] || task.status}
+                    </p>
+                  </Link>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <span className="text-xs text-slate-400">
+                      {task.dueDate ? new Date(task.dueDate).toLocaleDateString('ca-ES') : 'Sense data'}
+                    </span>
+                    <TaskRowActions
+                      taskId={task.id}
+                      status={task.status}
+                      destinationHref={destinationHref}
+                    />
+                  </div>
+                </article>
+              );
+            })}
           </div>
         )}
       </section>

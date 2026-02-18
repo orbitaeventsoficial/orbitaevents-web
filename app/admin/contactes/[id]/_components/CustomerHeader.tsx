@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import type { CustomerHubDTO, HubStatus } from '@/lib/customer-hub/dto';
 import { labelEstatClient } from '@/lib/customer-hub/labels';
 import { fetchWithCsrf } from '@/lib/csrf';
+import { useHubContext } from './CustomerHubClient';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES I CONSTANTS
@@ -89,7 +89,7 @@ export default function CustomerHeader({
   tab: TabKey;
   setTab: (tab: TabKey) => void;
 }) {
-  const router = useRouter();
+  const { refresh } = useHubContext();
   const [menuOpen, setMenuOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -103,6 +103,52 @@ export default function CustomerHeader({
     ? formatRelativeTime(data.kpis.lastContactAt)
     : 'mai contactat';
 
+  const stageOrder: HubStatus[] = ['LEAD', 'NEGOTIATION', 'CONFIRMED', 'POSTEVENT', 'LOST'];
+  const currentStageIndex = stageOrder.indexOf(status);
+  const stageLabel: Record<HubStatus, string> = {
+    LEAD: 'Entrada',
+    NEGOTIATION: 'Negociació',
+    CONFIRMED: 'Confirmat',
+    POSTEVENT: 'Post-esdeveniment',
+    LOST: 'Perdut',
+  };
+
+  const nextAction = (() => {
+    if (status === 'LEAD') {
+      return {
+        label: 'Crear pressupost',
+        href: `/admin/presupuestos?customerId=${id}`,
+        description: 'Primer pas per avançar aquest client.',
+      };
+    }
+    if (status === 'NEGOTIATION') {
+      return {
+        label: 'Enviar seguiment',
+        href: `/admin/inbox/compose?customerId=${id}&template=recordatori`,
+        description: 'Fer seguiment de proposta i desbloquejar decisió.',
+      };
+    }
+    if (status === 'CONFIRMED') {
+      return {
+        label: 'Revisar reserva',
+        href: `/admin/bookings?customerId=${id}`,
+        description: 'Validar preparació d’equip, horari i logística.',
+      };
+    }
+    if (status === 'POSTEVENT') {
+      return {
+        label: 'Tancar post-esdeveniment',
+        href: '/admin/post-event',
+        description: 'Enviar post-event, feedback i tancar cicle.',
+      };
+    }
+    return {
+      label: 'Reactivar oportunitat',
+      href: `/admin/leads?q=${encodeURIComponent(data.customer.email || data.customer.name)}`,
+      description: 'Revisa context i decideix si es pot reobrir.',
+    };
+  })();
+
   // Handler per canviar estat del client manualment
   const changeStatus = useCallback(async (newStatus: HubStatus) => {
     setActionLoading(`status-${newStatus}`);
@@ -114,14 +160,14 @@ export default function CustomerHeader({
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.ok) {
-        router.refresh();
+        refresh();
       }
     } catch {
       // Silently fail, user can retry
     } finally {
       setActionLoading(null);
     }
-  }, [id, router]);
+  }, [id, refresh]);
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-700/70 bg-zinc-900/95 backdrop-blur">
@@ -280,6 +326,44 @@ export default function CustomerHeader({
             label="Última comunicació"
             value={formatDate(data.kpis.lastContactAt)}
           />
+        </div>
+
+        {/* Estat del procés + següent acció */}
+        <div className="grid gap-3 lg:grid-cols-2">
+          <div className="rounded-xl border border-slate-700/70 bg-slate-800/50 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">On està aquest client</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {stageOrder.map((stage, idx) => {
+                const isCurrent = stage === status;
+                const isDone = status !== 'LOST' && idx < currentStageIndex;
+                return (
+                  <span
+                    key={stage}
+                    className={`rounded-full px-2 py-1 text-[11px] font-semibold ${
+                      isCurrent
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                        : isDone
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          : 'bg-slate-700/50 text-slate-400 border border-slate-600/50'
+                    }`}
+                  >
+                    {stageLabel[stage]}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-cyan-300">Següent millor acció</p>
+            <p className="mt-1 text-sm text-slate-100">{nextAction.description}</p>
+            <Link
+              href={nextAction.href}
+              className="mt-2 inline-flex rounded-lg border border-cyan-500/40 bg-cyan-500/20 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/30"
+            >
+              {nextAction.label}
+            </Link>
+          </div>
         </div>
 
         {/* Tabs - Desktop */}

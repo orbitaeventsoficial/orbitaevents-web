@@ -48,15 +48,26 @@ export async function PATCH(
     const leadStatus = leadStatusMap[status] || 'NEW';
 
     // Actualitzar tots els leads del client
+    const leads = await prisma.lead.findMany({
+      where: { customerId },
+      select: { id: true },
+    });
+    const leadIds = leads.map((l: any) => l.id);
+
     await prisma.lead.updateMany({
       where: { customerId },
       data: { status: leadStatus as any },
     });
 
+    // Filtre per bookings vinculats directament o via lead
+    const bookingFilter = leadIds.length > 0
+      ? { OR: [{ customerId }, { leadId: { in: leadIds } }] }
+      : { customerId };
+
     // Si és CONFIRMED, actualitzar bookings a CONFIRMED
     if (status === 'CONFIRMED') {
       await prisma.booking.updateMany({
-        where: { customerId, status: 'PENDING' },
+        where: { ...bookingFilter, status: 'PENDING' },
         data: { status: 'CONFIRMED' },
       });
     }
@@ -64,7 +75,7 @@ export async function PATCH(
     // Si és POSTEVENT, marcar bookings actius com COMPLETED
     if (status === 'POSTEVENT') {
       await prisma.booking.updateMany({
-        where: { customerId, status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } },
+        where: { ...bookingFilter, status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } },
         data: { status: 'COMPLETED' },
       });
     }
@@ -72,7 +83,7 @@ export async function PATCH(
     // Si és LOST, marcar bookings com CANCELLED
     if (status === 'LOST') {
       await prisma.booking.updateMany({
-        where: { customerId, status: { in: ['PENDING', 'CONFIRMED'] } },
+        where: { ...bookingFilter, status: { in: ['PENDING', 'CONFIRMED'] } },
         data: { status: 'CANCELLED' },
       });
     }

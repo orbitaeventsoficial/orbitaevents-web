@@ -38,7 +38,7 @@ export default function IntegrationSetupWizard({
     <section className="rounded-2xl border border-cyan-500/30 bg-cyan-500/10 p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h2 className="text-lg font-semibold text-cyan-100">Setup ràpid d&apos;integracions</h2>
+          <h2 className="text-lg font-semibold text-cyan-100">Configuració ràpida d&apos;integracions</h2>
           <p className="text-xs text-cyan-100/80">3 passos per deixar email + calendari + feed operatius.</p>
         </div>
         <div className="text-xs text-cyan-100/90">
@@ -69,7 +69,7 @@ export default function IntegrationSetupWizard({
           <ul className="mt-2 space-y-1 text-xs text-slate-300">
             <li>Gmail OAuth: {gmailConnected ? `Connectat (${connectedEmail || 'compte detectat'})` : 'Pendent (falta refresh token)'}</li>
             <li>IMAP: {imapConfigured ? 'Configurat' : `Falten variables: ${missingImapVars.join(', ') || 'IMAP_HOST, IMAP_PORT, IMAP_USER, IMAP_PASS'}`}</li>
-            <li>Scopes recomanats Gmail: `gmail.readonly`, `gmail.send`</li>
+            <li>Scopes recomanats Gmail: `gmail.readonly`, `gmail.modify`</li>
           </ul>
           <div className="mt-3 flex flex-wrap gap-2">
             <a href="/api/gmail/oauth/start" className="rounded-lg border border-white/20 px-3 py-1.5 text-xs hover:bg-white/5">Connectar Gmail</a>
@@ -80,7 +80,7 @@ export default function IntegrationSetupWizard({
 
       {step === 2 && (
         <div className="mt-4 rounded-xl border border-cyan-300/30 bg-slate-950/40 p-4 text-sm text-slate-200">
-          <p className="font-semibold text-cyan-100">2. Calendar sync</p>
+          <p className="font-semibold text-cyan-100">2. Sincronització de calendari</p>
           <ul className="mt-2 space-y-1 text-xs text-slate-300">
             <li>OAuth Calendar: {googleCalendarConnected ? 'Connectat' : 'Pendent (falta refresh token)'}</li>
             <li>Calendar ID: {calendarIdConfigured ? 'Configurat' : 'Pendent (falta `integrations.googleCalendar.calendarId` o env)'}</li>
@@ -96,7 +96,7 @@ export default function IntegrationSetupWizard({
 
       {step === 3 && (
         <div className="mt-4 rounded-xl border border-cyan-300/30 bg-slate-950/40 p-4 text-sm text-slate-200">
-          <p className="font-semibold text-cyan-100">3. ICS feed (opcional)</p>
+          <p className="font-semibold text-cyan-100">3. Feed ICS (opcional)</p>
           <ul className="mt-2 space-y-1 text-xs text-slate-300">
             <li>Token ICS: {icsFeedConfigured ? 'Generat' : 'Pendent'}</li>
             <li>Quan estigui actiu, pots subscriure&apos;t des de Google Calendar / iPhone.</li>

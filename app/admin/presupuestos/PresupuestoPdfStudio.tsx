@@ -259,10 +259,7 @@ export default function PresupuestoPdfStudio({
     if (logoDataUrl) return;
 
     const candidates = [
-      '/img/ologo-text-dreta.png',
-      '/img/ologo-text-dreta.jpg',
-      '/img/logo-text-dreta.png',
-      '/img/logo-text-dreta.jpg',
+      '/img/logosoloplaneta.png',
     ];
 
     const tryLoadLogo = async () => {

@@ -297,46 +297,55 @@ async function resolveCustomerId(prismaAny: any, entityId: string): Promise<stri
   if (customer?.id) return customer.id;
 
   const lead = await safeQuery(
-    () => prismaAny.lead.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+    () => prismaAny.lead.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
     null
   );
   if (lead?.customerId) return lead.customerId;
 
   const booking = await safeQuery(
-    () => prismaAny.booking.findUnique({ where: { id: entityId }, select: { leadId: true } }),
+    () => prismaAny.booking.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
     null
   );
   if (booking?.leadId) {
     const bookingLead = await safeQuery(
-      () => prismaAny.lead.findUnique({ where: { id: booking.leadId }, select: { customerId: true } }),
+      () => prismaAny.lead.findUnique({ where: { id: booking.leadId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
       null
     );
     if (bookingLead?.customerId) return bookingLead.customerId;
   }
 
   const proposal = await safeQuery(
-    () => prismaAny.proposal.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+    () => prismaAny.proposal.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
     null
   );
   if (proposal?.customerId) return proposal.customerId;
 
   const task = await safeQuery(
-    () => prismaAny.task.findUnique({ where: { id: entityId }, select: { customerId: true } }),
+    () => prismaAny.task.findUnique({ where: { id: entityId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
     null
   );
   if (task?.customerId) return task.customerId;
 
   const [leadTask, leadActivity, leadDocument] = await Promise.all([
-    safeQuery(() => prismaAny.leadTask.findUnique({ where: { id: entityId }, select: { leadId: true } }), null),
-    safeQuery(() => prismaAny.leadActivity.findUnique({ where: { id: entityId }, select: { leadId: true } }), null),
-    safeQuery(() => prismaAny.leadDocument.findUnique({ where: { id: entityId }, select: { leadId: true } }), null),
+    safeQuery(
+      () => prismaAny.leadTask.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
+      null
+    ),
+    safeQuery(
+      () => prismaAny.leadActivity.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
+      null
+    ),
+    safeQuery(
+      () => prismaAny.leadDocument.findUnique({ where: { id: entityId }, select: { leadId: true } }) as Promise<{ leadId: string | null } | null>,
+      null
+    ),
   ]);
 
   const fallbackLeadId = leadTask?.leadId || leadActivity?.leadId || leadDocument?.leadId;
   if (!fallbackLeadId) return null;
 
   const fallbackLead = await safeQuery(
-    () => prismaAny.lead.findUnique({ where: { id: fallbackLeadId }, select: { customerId: true } }),
+    () => prismaAny.lead.findUnique({ where: { id: fallbackLeadId }, select: { customerId: true } }) as Promise<{ customerId: string | null } | null>,
     null
   );
 
