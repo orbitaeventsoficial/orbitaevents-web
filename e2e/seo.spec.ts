@@ -31,7 +31,7 @@ test.describe('SEO & Metadata', () => {
     const pages = [
       { path: '/', titlePattern: /òrbita events|dj|eventos/i },
       { path: '/contacto', titlePattern: /contact|contacto/i },
-      { path: '/servicios/bodas', titlePattern: /bodas|wedding/i },
+      { path: '/servicios/bodas', titlePattern: /bodas|boda|casaments|wedding/i },
     ];
 
     for (const { path, titlePattern } of pages) {

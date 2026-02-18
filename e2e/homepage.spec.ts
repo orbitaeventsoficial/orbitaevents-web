@@ -22,10 +22,10 @@ test.describe('Homepage', () => {
     await page.goto('/');
 
     // Check main navigation links exist (header or mobile nav)
-    const contactLink = page.locator('a[href*="/contacto"], a[href*="/contacte"]');
+    const contactLink = page.locator('a[href*="/contacto"]:visible, a[href*="/contacte"]:visible');
     await expect(contactLink.first()).toBeVisible({ timeout: 15000 });
 
-    const servicesLink = page.locator('a[href*="/servicios"], a[href*="/serveis"]');
+    const servicesLink = page.locator('a[href*="/servicios"]:visible, a[href*="/serveis"]:visible');
     await expect(servicesLink.first()).toBeVisible({ timeout: 15000 });
   });
 
@@ -42,7 +42,7 @@ test.describe('Homepage', () => {
       return;
     }
 
-    const servicesLink = page.locator('a[href*="/servicios"], a[href*="/serveis"]');
+    const servicesLink = page.locator('a[href*="/servicios"]:visible, a[href*="/serveis"]:visible');
     await expect(servicesLink.first()).toBeVisible({ timeout: 15000 });
   });
 
