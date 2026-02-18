@@ -16,7 +16,6 @@
 
 import { NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { prisma } from '@/lib/prisma';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 
 type Locale = 'es' | 'ca' | 'en';
@@ -94,21 +93,29 @@ interface StatsResponse {
 // CONSTANTS HARDCODED - Sempre correctes
 const COMPANY_START_YEAR = 2023;  // Òrbita Events fundada Agost 2023
 
-const getFallbackStats = (locale: Locale) => ({
-  yearsExperience: LOCALE_TEXT[locale].since,
-  coverage: LOCALE_TEXT[locale].coverage,
-  responseTime: '2h',              // Compromís real
-  yearStarted: COMPANY_START_YEAR,
-  peopleEntertained: 2000,
-  technicalIncidents: 0,
-  totalEvents: 50,                 // Creïble per 2 anys
-  totalWeddings: 15,               // ~7 per any
-  totalCorporate: 10,              // Events corporatius
-  totalParties: 23,                // Festes privades
-  averageRating: 5.0,              // Rating des de Google Reviews
-  googleRating: 5.0,               // Rating Google verificable
-  googleReviewsCount: 1,           // Reviews verificables reals
-});
+const getFallbackStats = (locale: Locale) => {
+  const startDate = new Date(Date.UTC(COMPANY_START_YEAR, 0, 1));
+  const yearsCount = Math.max(
+    1,
+    Math.floor((Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25))
+  );
+
+  return {
+    yearsExperience: formatYearsExperience(locale, yearsCount),
+    coverage: LOCALE_TEXT[locale].coverage,
+    responseTime: '2h',              // Compromís real
+    yearStarted: COMPANY_START_YEAR,
+    peopleEntertained: 0,
+    technicalIncidents: 0,
+    totalEvents: 0,
+    totalWeddings: 0,
+    totalCorporate: 0,
+    totalParties: 0,
+    averageRating: 0,
+    googleRating: null,
+    googleReviewsCount: null,
+  };
+};
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -130,6 +137,8 @@ export async function GET(request: Request) {
   }
 
   try {
+    const { prisma } = await import('@/lib/prisma');
+
     // 1. Obtener configuraciones desde Settings - Cache 15 min (rarament canvia)
     const settings = await cachedQuery(
       'public:stats:settings',

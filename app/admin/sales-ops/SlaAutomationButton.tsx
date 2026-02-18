@@ -47,7 +47,7 @@ export default function SlaAutomationButton() {
         disabled={running}
         className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
       >
-        {running ? 'Executant...' : 'Executar regles SLA'}
+        {running ? 'Executant...' : 'Executar regles 24h'}
       </button>
       {result && (
         <p className="text-xs text-emerald-300">

@@ -252,7 +252,7 @@ export default function SettingsNotificationsPage() {
                 {config.automation.lastSummary.sequences?.sentWhatsapp ?? 0}
               </p>
               <p>
-                SLA: {config.automation.lastSummary.sla?.createdTasks ?? 0} · Resp 24h:{' '}
+                Tasques 24h: {config.automation.lastSummary.sla?.createdTasks ?? 0} · Resp 24h:{' '}
                 {((config.automation.lastSummary.kpi24h?.responseRate ?? 0) * 100).toFixed(1)}%
               </p>
             </div>

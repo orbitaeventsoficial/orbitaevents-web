@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +25,7 @@ function now() {
 
 export async function GET(req: NextRequest) {
   try {
+    const { prisma } = await import('@/lib/prisma');
     const rawCode = (req.nextUrl.searchParams.get('code') || '').trim();
     if (!rawCode) {
       return NextResponse.json({ ok: true, valid: false, reason: 'EMPTY_CODE' } satisfies { ok: true } & DiscountValidation);
@@ -141,7 +141,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true, valid: false, reason: 'NOT_FOUND' } satisfies { ok: true } & DiscountValidation);
   } catch (error) {
     log.error('Error validant codi de descompte públic', error);
-    return NextResponse.json({ ok: false, error: 'Error validant codi' }, { status: 500 });
+    return NextResponse.json({ ok: true, valid: false, reason: 'SERVICE_UNAVAILABLE' } satisfies { ok: true } & DiscountValidation);
   }
 }
-

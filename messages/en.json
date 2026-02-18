@@ -964,7 +964,7 @@
     "years": {
       "label": "Years of experience",
       "description": "In the events sector",
-      "value": "From 2023"
+      "value": "3+ years of experience"
     },
     "coverageDetailed": {
       "label": "Coverage",
@@ -1432,7 +1432,7 @@
       }
     },
     "copyright": "All rights reserved.",
-    "since": "2+ years of experience · Since 2023",
+    "since": "3+ years of experience · Since 2023",
     "tagline": "The event that your people will not forget"
   },
   "footerLinks": {
@@ -6065,7 +6065,8 @@
     "monMagic": {
       "title": "Magic World:",
       "available": "Available all year round",
-      "bookNow": "Book your experience"
+      "bookNow": "Book your experience",
+      "soldOut": "Temporarily unavailable"
     },
     "cta": {
       "reserveNow": "Book now →"
@@ -6077,26 +6078,27 @@
     "location": "Barcelona and Girona.",
     "scroll": "DISCOVER",
     "socialProof": "5.0 · Verified opinions",
+    "whatsappMessage": "Hello! I'd like information for my event.",
     "badges": {
       "halloween": "Calendar 2026 open",
       "monMagic": "Magic World",
       "rating": "5.0/5 · 50+ events"
     },
     "morphingTexts": {
-      "unique": "UNFORGETTABLE.",
-      "magical": "WITH PRO MOBILE DJ.",
-      "brutal": "BRUTAL HALLOWEEN.",
-      "yours": "REAL MAGIC WORLD."
+      "unique": "TAILORED TO YOU.",
+      "magical": "WITH REAL ENERGY.",
+      "brutal": "THAT PEOPLE REMEMBER.",
+      "yours": "MADE TO SHINE."
     },
     "morphingTextsExtended": [
-      "CORPORATE.",
-      "WOW.",
-      "TU CARA ME SUENA.",
-      "HALLOWEEN.",
-      "MAGIC WORLD.",
-      "WITH KARAOKE.",
-      "MADE TO BE LEGENDARY.",
-      "FOR DREAM WEDDINGS."
+      "FOR AUTHENTIC WEDDINGS.",
+      "FOR PARTIES WITH ENERGY.",
+      "FOR COMPANIES THAT WANT IMPACT.",
+      "HALLOWEEN THAT HITS HARD.",
+      "MAGIC WORLD THAT SURPRISES.",
+      "WITH KARAOKE IF YOU WANT IT.",
+      "WITH DETAILS THAT STAND OUT.",
+      "WITHOUT STRESS FOR YOU."
     ]
   },
   "mobileServices": {

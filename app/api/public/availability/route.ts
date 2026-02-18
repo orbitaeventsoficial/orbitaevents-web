@@ -13,7 +13,6 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { log } from '@/lib/logger';
-import { prisma } from '@/lib/prisma';
 
 // Cache: revalidar cada hora (les disponibilitats no canvien sovint)
 export const revalidate = 3600;
@@ -187,6 +186,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const { prisma } = await import('@/lib/prisma');
+
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();

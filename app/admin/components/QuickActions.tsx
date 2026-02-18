@@ -164,12 +164,12 @@ export default function QuickActions() {
       {runAllSummary && (
         <div className="mt-3 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-2 text-xs text-indigo-200">
           Tot OK · Seqüències {runAllSummary.sequences.executed} (correu {runAllSummary.sequences.sentEmail}, WA {runAllSummary.sequences.sentWhatsapp}) ·
-          {' '}Tasques SLA {runAllSummary.sla.createdTasks}
+          {' '}Tasques 24h {runAllSummary.sla.createdTasks}
         </div>
       )}
       {dailySummary && (
         <div className="mt-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200">
-          Resum enviat · Seqüències {dailySummary.sequences.executed} · SLA {dailySummary.sla.createdTasks} ·
+          Resum enviat · Seqüències {dailySummary.sequences.executed} · Tasques 24h {dailySummary.sla.createdTasks} ·
           {' '}Resposta 24h {(dailySummary.kpi24h.responseRate * 100).toFixed(1)}%
         </div>
       )}

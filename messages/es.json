@@ -964,7 +964,7 @@
     "years": {
       "label": "Años de experiencia",
       "description": "En el sector eventos",
-      "value": "Desde 2023"
+      "value": "3+ años de experiencia"
     },
     "coverageDetailed": {
       "label": "Cobertura",
@@ -1432,7 +1432,7 @@
       }
     },
     "copyright": "Todos los derechos reservados.",
-    "since": "2+ años de experiencia · Desde 2023",
+    "since": "3+ años de experiencia · Desde 2023",
     "tagline": "El evento que tu gente no olvidará"
   },
   "footerLinks": {
@@ -1569,7 +1569,7 @@
     "callNow": "Llamar ahora",
     "whatsapp": "WhatsApp",
     "coverage": "Barcelona · Girona · Costa Brava",
-    "experience": "Des de 2023",
+    "experience": "Desde 2023",
     "locations": "BCN + Girona",
     "location": "Barcelona + Girona",
     "response": "Respuesta en 2h",
@@ -6065,7 +6065,8 @@
     "monMagic": {
       "title": "Mundo Mágico:",
       "available": "Disponible todo el año",
-      "bookNow": "Reserva tu experiencia"
+      "bookNow": "Reserva tu experiencia",
+      "soldOut": "No disponible temporalmente"
     },
     "cta": {
       "reserveNow": "Reserva ahora →"
@@ -6077,26 +6078,27 @@
     "location": "Barcelona y Girona.",
     "scroll": "DESCUBRE",
     "socialProof": "5.0 · Opiniones verificadas",
+    "whatsappMessage": "¡Hola! Quiero información para mi evento.",
     "badges": {
       "halloween": "Agenda 2026 abierta",
       "monMagic": "Mundo Mágico",
       "rating": "5.0/5 · 50+ eventos"
     },
     "morphingTexts": {
-      "unique": "INOLVIDABLES.",
-      "magical": "CON DISCOMÓVIL PRO.",
-      "brutal": "DE HALLOWEEN BRUTAL.",
-      "yours": "DE MUNDO MÁGICO REAL."
+      "unique": "A TU MEDIDA.",
+      "magical": "CON ALMA Y RITMO.",
+      "brutal": "QUE TODOS RECUERDAN.",
+      "yours": "HECHOS PARA BRILLAR."
     },
     "morphingTextsExtended": [
-      "CORPORATIVOS.",
-      "WOW.",
-      "TU CARA ME SUENA.",
-      "DE HALLOWEEN.",
-      "DE MUNDO MÁGICO.",
-      "CON KARAOKE.",
-      "QUE HACEN HISTORIA.",
-      "PARA BODAS DE ENSUEÑO."
+      "PARA BODAS AUTÉNTICAS.",
+      "PARA FIESTAS CON ENERGÍA.",
+      "PARA EMPRESAS CON IMPACTO.",
+      "HALLOWEEN QUE IMPRESIONA.",
+      "MUNDO MÁGICO QUE SORPRENDE.",
+      "CON KARAOKE SI LO QUIERES.",
+      "CON DETALLES QUE SE NOTAN.",
+      "Y SIN ESTRÉS PARA TI."
     ]
   },
   "mobileServices": {

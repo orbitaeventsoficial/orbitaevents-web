@@ -942,7 +942,7 @@
     "years": {
       "label": "Anys d'experiència",
       "description": "En el sector events",
-      "value": "Des de 2023"
+      "value": "3+ anys d'experiència"
     },
     "coverageDetailed": {
       "label": "Cobertura",
@@ -1229,7 +1229,7 @@
       }
     },
     "copyright": "Tots els drets reservats.",
-    "since": "2+ anys d'experiència · Des de 2023",
+    "since": "3+ anys d'experiència · Des de 2023",
     "tagline": "L'esdeveniment que la teva gent no oblidarà"
   },
   "contact": {
@@ -6237,7 +6237,8 @@
     "monMagic": {
       "title": "Món Màgic:",
       "available": "Disponible tot l'any",
-      "bookNow": "Reserva la teva experiència"
+      "bookNow": "Reserva la teva experiència",
+      "soldOut": "No disponible temporalment"
     },
     "cta": {
       "reserveNow": "Reserva ara →"
@@ -6249,26 +6250,27 @@
     "location": "Barcelona i Girona.",
     "scroll": "DESCOBREIX",
     "socialProof": "5.0 · Opinions verificades",
+    "whatsappMessage": "Hola! Vull informació per al meu esdeveniment.",
     "badges": {
       "halloween": "Agenda 2026 oberta",
       "monMagic": "Món Màgic",
       "rating": "5.0/5 · 50+ events"
     },
     "morphingTexts": {
-      "unique": "INOLVIDABLES.",
-      "magical": "AMB DISCOMÒBIL PRO.",
-      "brutal": "DE HALLOWEEN BRUTAL.",
-      "yours": "DE MÓN MÀGIC REAL."
+      "unique": "A LA TEVA MIDA.",
+      "magical": "AMB ÀNIMA I RITME.",
+      "brutal": "QUE LA GENT RECORDA.",
+      "yours": "FETS PER BRILLAR."
     },
     "morphingTextsExtended": [
-      "CORPORATIUS.",
-      "WOW.",
-      "TU CARA ME SUENA.",
-      "DE HALLOWEEN.",
-      "DE MÓN MÀGIC.",
-      "AMB KARAOKE.",
-      "QUE FAN HISTÒRIA.",
-      "PER A CASAMENTS DE SOMNI."
+      "PER A CASAMENTS AUTÈNTICS.",
+      "PER A FESTES QUE SUMEN.",
+      "PER A EMPRESES AMB IMPACTE.",
+      "HALLOWEEN QUE IMPRESSIONA.",
+      "MÓN MÀGIC QUE SORPRÈN.",
+      "AMB KARAOKE SI EL VOLS.",
+      "AMB DETALLS QUE ES NOTEN.",
+      "I SENSE ESTRÈS PER A TU."
     ]
   },
   "mobileServices": {

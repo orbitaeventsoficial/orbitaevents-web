@@ -9,7 +9,6 @@
 
 import { NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { prisma } from '@/lib/prisma';
 
 // Cache: revalidar cada 15 minutos
 export const revalidate = 900;
@@ -49,6 +48,7 @@ export async function GET() {
   }
 
   try {
+    const { prisma } = await import('@/lib/prisma');
     const settings = await prisma.setting.findMany({
       where: {
         category: 'offer',
