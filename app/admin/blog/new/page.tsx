@@ -15,6 +15,7 @@ export default function NewBlogPostPage() {
     tags: '',
     featuredImage: '',
     isPublished: false,
+    publishedAt: '',
     readingTime: 5,
     translations: {
       es: {
@@ -48,6 +49,7 @@ export default function NewBlogPostPage() {
         tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
         featuredImage: formData.featuredImage || undefined,
         isPublished: formData.isPublished,
+        publishedAt: formData.publishedAt ? new Date(formData.publishedAt).toISOString() : undefined,
         readingTime: formData.readingTime,
         translations: [
           {
@@ -242,21 +244,36 @@ export default function NewBlogPostPage() {
                 />
               </div>
 
-              <div className="flex items-end">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.isPublished}
-                    onChange={(e) =>
-                      setFormData({ ...formData, isPublished: e.target.checked })
-                    }
-                    aria-label="Publicar ahora"
-                    className="h-5 w-5 rounded"
-                  />
-                  <span className="text-sm font-medium text-white">Publicar ara</span>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-white">
+                  Data de publicació
                 </label>
+                <input
+                  type="date"
+                  value={formData.publishedAt}
+                  onChange={(e) => setFormData({ ...formData, publishedAt: e.target.value })}
+                  max={new Date().toISOString().split('T')[0]}
+                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white"
+                />
+                <p className="mt-1 text-xs text-white/50">Deixa buit per usar avui</p>
               </div>
             </div>
+
+            <div className="flex items-center">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.isPublished}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isPublished: e.target.checked })
+                  }
+                  aria-label="Publicar ahora"
+                  className="h-5 w-5 rounded"
+                />
+                <span className="text-sm font-medium text-white">Publicar ara</span>
+              </label>
+            </div>
+
           </div>
         </div>
 

@@ -88,14 +88,13 @@ function SidebarSection({
   defaultOpen?: boolean;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+  const [open, setOpen] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return defaultOpen;
     const raw = window.localStorage.getItem(`admin.section.${storageKey}`);
-    if (raw === '1') setOpen(true);
-    if (raw === '0') setOpen(false);
-  }, [storageKey]);
+    if (raw === '1') return true;
+    if (raw === '0') return false;
+    return defaultOpen;
+  });
 
   const toggle = useCallback(() => {
     setOpen((value) => {
@@ -229,7 +228,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const [newLeadsCount, setNewLeadsCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [recentHrefs, setRecentHrefs] = useState<string[]>([]);
-  const [soloMode, setSoloMode] = useState(false);
   const pathname = usePathname();
   const { enabled: helpModeEnabled, toggle: toggleHelpMode } = useAdminHelpMode();
 
@@ -343,7 +341,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const priorityItems = useMemo(() => ([
     { icon: '📥', label: 'Entrades', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
     { icon: '⚡', label: 'Entrada ràpida', href: '/admin/intake' },
-    { icon: '👤', label: 'Clients', href: '/admin/contactes' },
+    { icon: '👤', label: 'Clients', href: '/admin/clientes' },
     { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
     { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
     { icon: '🧾', label: 'Pressupost (PDF)', href: '/admin/presupuestos' },
@@ -351,7 +349,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   const favoriteItems = useMemo(() => ([
     { label: 'Entrades', href: '/admin/leads' },
-    { label: 'Clients', href: '/admin/contactes' },
+    { label: 'Clients', href: '/admin/clientes' },
     { label: 'Reserves', href: '/admin/bookings' },
     { label: 'Tasques', href: '/admin/tasks' },
   ]), []);
@@ -375,17 +373,17 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       items: [
         { icon: '💶', label: 'Finances', href: '/admin/finanzas' },
         { icon: '🎯', label: 'Operativa de vendes', href: '/admin/sales-ops' },
-        { icon: '⭐', label: 'Ressenyes', href: '/admin/ressenyes' },
+        { icon: '⭐', label: 'Ressenyes clients', href: '/admin/ressenyes' },
         { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event' },
         { icon: '📈', label: 'Analítica', href: '/admin/analytics' },
         { icon: '📊', label: 'Rendibilitat', href: '/admin/rentabilidad' },
         { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
-        { icon: '📝', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
+        { icon: '✍️', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
         { icon: '🤖', label: 'Correus automàtics', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
         { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
-        { icon: '⭐', label: 'Ressenyes de Google', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
-        { icon: '📝', label: 'Blog', href: '/admin/blog' },
+        { icon: '🌟', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
+        { icon: '📰', label: 'Blog', href: '/admin/blog' },
       ]
     },
     {
@@ -438,23 +436,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     });
   }, [pathname]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const saved = window.localStorage.getItem('admin.solo.mode');
-    if (saved === '0') setSoloMode(false);
-    if (saved === '1') setSoloMode(true);
-  }, []);
-
-  const toggleSoloMode = useCallback(() => {
-    setSoloMode((value) => {
-      const next = !value;
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem('admin.solo.mode', next ? '1' : '0');
-      }
-      return next;
-    });
-  }, []);
-
   const isActive = useCallback((href: string) => {
     return href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href);
   }, [pathname]);
@@ -462,11 +443,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const prefetchRoute = useCallback((href: string) => {
     router.prefetch(href);
   }, [router]);
-
-  const visibleNavSections = useMemo(
-    () => (soloMode ? [] : navSections),
-    [navSections, soloMode]
-  );
 
   // Obtenir nom de la pàgina actual per al breadcrumb
   const getPageName = useCallback(() => {
@@ -491,7 +467,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       integrations: 'Integracions',
       quotes: 'Plantilla pressupostos',
       inventory: 'Inventari',
-      contactes: 'Clients',
+      contactes: 'Fitxa client',
       clientes: 'Clients',
       mensajes: 'Missatges',
       ressenyes: 'Ressenyes',
@@ -617,21 +593,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             </div>
           )}
 
-          <div className="px-3 mb-3">
-            <button
-              type="button"
-              onClick={toggleSoloMode}
-              className={`w-full rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
-                soloMode
-                  ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
-                  : 'border-amber-500/40 bg-amber-500/10 text-amber-200'
-              }`}
-            >
-              {soloMode ? 'Mode Solo actiu (simple)' : 'Mode avançat actiu'}
-            </button>
-          </div>
-
-          {visibleNavSections.map((section) => (
+          {navSections.map((section) => (
             <SidebarSection
               key={section.title}
               title={section.title}
@@ -680,19 +642,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-1">
           <button
             type="button"
-            onClick={toggleSoloMode}
-            className={`rounded-xl border px-2 py-2 text-[11px] font-semibold transition-colors ${
-              soloMode
-                ? 'border-emerald-400/70 bg-emerald-500/20 text-emerald-200'
-                : 'border-amber-400/70 bg-amber-500/20 text-amber-200'
-            }`}
-            aria-label="Canviar mode solo"
-            aria-pressed={soloMode}
-          >
-            {soloMode ? 'Solo' : 'Avançat'}
-          </button>
-          <button
-            type="button"
             data-help-toggle="true"
             onClick={toggleHelpMode}
             className={`rounded-xl border px-2.5 py-2 text-xs font-semibold transition-colors ${
@@ -721,7 +670,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-            <span className="absolute top-2 right-2 w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+            {newLeadsCount > 0 && (
+              <span className="absolute top-2 right-2 w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+            )}
           </Link>
         </div>
       </header>
@@ -830,21 +781,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 </div>
               )}
 
-              <div className="px-3 mb-3">
-                <button
-                  type="button"
-                  onClick={toggleSoloMode}
-                  className={`w-full rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
-                    soloMode
-                      ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
-                      : 'border-amber-500/40 bg-amber-500/10 text-amber-200'
-                  }`}
-                >
-                  {soloMode ? 'Mode Solo actiu (simple)' : 'Mode avançat actiu'}
-                </button>
-              </div>
-
-              {visibleNavSections.map((section) => (
+              {navSections.map((section) => (
                 <SidebarSection
                   key={section.title}
                   title={section.title}
@@ -897,19 +834,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={toggleSoloMode}
-            className={`rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
-              soloMode
-                ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
-                : 'border-amber-500/40 bg-amber-500/10 text-amber-200'
-            }`}
-            aria-pressed={soloMode}
-            aria-label="Canviar mode solo"
-          >
-            {soloMode ? 'Mode Solo' : 'Mode avançat'}
-          </button>
-          <button
-            type="button"
             data-help-toggle="true"
             onClick={toggleHelpMode}
             className={`rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
@@ -937,7 +861,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             aria-label="Notificacions"
           >
             🔔
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+            {newLeadsCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+            )}
           </Link>
           <div className="h-6 w-px bg-slate-800" />
           <Link

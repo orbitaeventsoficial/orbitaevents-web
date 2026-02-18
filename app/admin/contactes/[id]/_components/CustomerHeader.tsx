@@ -178,7 +178,7 @@ export default function CustomerHeader({
             {/* Breadcrumb + Status */}
             <div className="flex items-center gap-2 flex-wrap">
               <Link
-                href="/admin/contactes"
+                href="/admin/clientes"
                 className="text-xs text-slate-400 hover:text-slate-200 transition-colors"
               >
                 ← Clients

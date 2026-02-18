@@ -24,13 +24,13 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }>
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Boda',
+  WEDDING: '💍 Casament',
   BIRTHDAY: '🎂 Aniversari',
   CORPORATE: '🎯 Corporatiu',
   COMMUNION: '⛪ Comunió',
   BAPTISM: '👶 Bateig',
   GRADUATION: '🎓 Graduació',
-  ANNIVERSARY: '🎉 Aniversari',
+  ANNIVERSARY: '🎉 Celebració',
   PRIVATE_PARTY: '🎵 Festa privada',
   OTHER: '📋 Altre',
 };
@@ -40,6 +40,13 @@ const PRIORITY_COLORS: Record<string, string> = {
   MEDIUM: 'bg-blue-500/20 text-blue-300',
   HIGH: 'bg-orange-500/20 text-orange-300',
   URGENT: 'bg-rose-500/20 text-rose-300',
+};
+
+const PRIORITY_LABELS: Record<string, string> = {
+  LOW: 'Baixa',
+  MEDIUM: 'Mitjana',
+  HIGH: 'Alta',
+  URGENT: 'Urgent',
 };
 
 function buildQuery(filters: {
@@ -425,7 +432,7 @@ export default async function LeadsPage({
               data.filters.status.includes(value as LeadStatus) ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
             }`}
           >
-            {value}
+            {STATUS_CONFIG[value]?.label || value}
           </Link>
         ))}
         {VALID_PRIORITY.map((value) => (
@@ -436,7 +443,7 @@ export default async function LeadsPage({
               data.filters.priority.includes(value as Priority) ? 'border-amber-500/40 bg-amber-500/10 text-amber-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
             }`}
           >
-            {value}
+            {PRIORITY_LABELS[value] || value}
           </Link>
         ))}
       </section>

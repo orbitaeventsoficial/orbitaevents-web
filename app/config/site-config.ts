@@ -36,12 +36,12 @@ export const SITE_CONFIG = {
       lng: 2.2874,
     },
 
-    // Horario de atencion
+    // Horari d'atenció
     schedule: {
-      weekdays: 'Lunes a Viernes: 08:00 - 20:00',
-      saturday: 'Sabado: 08:00 - 20:00',
-      sunday: 'Domingo: 08:00 - 20:00',
-      note: 'Eventos 24/7 previa reserva',
+      weekdays: 'Dilluns a Divendres: 08:00 - 20:00',
+      saturday: 'Dissabte: 08:00 - 20:00',
+      sunday: 'Diumenge: 08:00 - 20:00',
+      note: 'Esdeveniments 24/7 amb reserva prèvia',
     },
   },
 
@@ -66,8 +66,8 @@ export const SITE_CONFIG = {
     // Rating minimo para mostrar testimonios (1-5)
     minRatingToShow: 5,
 
-    // Texto alternativo cuando no hay resenas o API falla
-    fallbackText: 'Nuevos en Google - se el primero en dejarnos una resena!',
+    // Text alternatiu quan no hi ha ressenyes o falla l'API
+    fallbackText: 'Nous a Google - sigues el primer en deixar-nos una ressenya!',
   },
 
   // ============================================
@@ -101,24 +101,24 @@ export const SITE_CONFIG = {
     number: '+34699121023',
     numberDisplay: '+34 699 12 10 23',
 
-    // Mensajes predefinidos por contexto
+    // Missatges predefinits per context
     messages: {
-      general: 'Hola! Me interesa saber mas sobre vuestros servicios de eventos.',
-      bodas: 'Hola! Me gustaria informacion sobre vuestros servicios para bodas.',
-      discomovil: 'Hola! Estoy interesado en contratar una discomovil.',
-      empresas: 'Hola! Necesito un presupuesto para un evento corporativo.',
-      produccion: 'Hola! Me interesa una produccion tecnica completa.',
-      fiestas: 'Hola! Quiero animar mi fiesta con vuestros servicios.',
-      alquiler: 'Hola! Necesito alquilar equipamiento para un evento.',
+      general: 'Hola! M\'interessa saber més sobre els vostres serveis d\'esdeveniments.',
+      bodas: 'Hola! M\'agradaria informació sobre els vostres serveis per a casaments.',
+      discomovil: 'Hola! Estic interessat a contractar una discòbil.',
+      empresas: 'Hola! Necessito un pressupost per a un esdeveniment corporatiu.',
+      produccion: 'Hola! M\'interessa una producció tècnica completa.',
+      fiestas: 'Hola! Vull animar la meva festa amb els vostres serveis.',
+      alquiler: 'Hola! Necessito llogar equipament per a un esdeveniment.',
       configurador: (packName: string, precio: number) =>
-        `Hola! He configurado un pack "${packName}" (${precio} EUR). Podemos hablar sobre disponibilidad?`,
+        `Hola! He configurat un pack "${packName}" (${precio} EUR). Podem parlar sobre la disponibilitat?`,
     },
 
-    // Horario de respuesta automatica
+    // Horari de resposta automàtica
     autoReplySchedule: {
       enabled: false,
-      message: 'Gracias por contactarnos! Te responderemos en menos de 2 horas.',
-      officeHours: 'Todos los dias de 08:00-20:00',
+      message: 'Gràcies per contactar-nos! Et respondrem en menys de 2 hores.',
+      officeHours: 'Tots els dies de 08:00-20:00',
     },
   },
 
@@ -131,9 +131,8 @@ export const SITE_CONFIG = {
 
     // URLs de assets
     logo: '/img/logoplanetatextdreta.svg',
-    logoWhite: '/logo-orbita-white.png',
     favicon: '/favicon.ico',
-    ogImage: '/og-image.jpg',
+    ogImage: '/og-default.jpg',
 
     // Colores de marca
     colors: {
@@ -164,7 +163,7 @@ export const SITE_CONFIG = {
     responseTime: '2h',
 
     // Fecha de ultima actualizacion
-    lastUpdated: '2025-12-08',
+    lastUpdated: '2026-02-18',
   },
 
   // ============================================
@@ -201,7 +200,7 @@ export const SITE_CONFIG = {
     calendarEnabled: true,
     offersEnabled: true,
     liveChatEnabled: false,
-    blogEnabled: false,
+    blogEnabled: true,
   },
 } as const;
 

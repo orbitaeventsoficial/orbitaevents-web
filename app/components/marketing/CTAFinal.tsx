@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
-import { useTranslations, useLocale } from 'next-intl';
-import { usePublicStats } from '@/hooks/usePublicData';
+import { useTranslations } from 'next-intl';
+import { usePublicStats, useAvailability } from '@/hooks/usePublicData';
 import { WHATSAPP_NUMBER } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -35,38 +34,19 @@ const Icons = {
   ),
 };
 
-const MONTH_KEYS = [
-  'january', 'february', 'march', 'april', 'may', 'june',
-  'july', 'august', 'september', 'october', 'november', 'december',
-] as const;
-
-function useAvailability() {
-  const locale = useLocale();
-  const tCommon = useTranslations('common');
-  const [data, setData] = useState<{ month: string; saturdays: number; status: 'scarce' | 'limited' | 'available' }>({ month: '', saturdays: 0, status: 'available' });
-
-  useEffect(() => {
-    const mockAvailability: Record<number, number> = { 0: 3, 1: 4, 2: 3, 3: 2, 4: 1, 5: 2, 6: 3, 7: 4, 8: 2, 9: 3, 10: 2, 11: 1 };
-    const month = new Date().getMonth();
-    const sats = mockAvailability[month] || 2;
-    const monthKey = MONTH_KEYS[month];
-    setData({
-      month: tCommon(`months.${monthKey}`),
-      saturdays: sats,
-      status: sats <= 1 ? 'scarce' : sats <= 2 ? 'limited' : 'available'
-    });
-  }, [locale, tCommon]);
-
-  return data;
-}
-
 export default function CTAFinal() {
   const t = useTranslations('homeSections.ctaFinal');
-  const availability = useAvailability();
+  const { currentMonthAvailable, data: availData } = useAvailability();
   const { stats } = usePublicStats();
   const responseValue = stats.responseTime ? `<${stats.responseTime}` : '<2h';
 
-  const statusColors = {
+  const monthName = availData.monthlyAvailability[0]?.monthName || '';
+  const satStatus: 'scarce' | 'limited' | 'available' =
+    currentMonthAvailable <= 1 ? 'scarce' :
+    currentMonthAvailable <= 2 ? 'limited' :
+    'available';
+
+  const statusColors: Record<'scarce' | 'limited' | 'available', string> = {
     scarce: 'from-red-500 to-rose-500',
     limited: 'from-amber-500 to-orange-500',
     available: 'from-emerald-500 to-teal-500',
@@ -90,12 +70,12 @@ export default function CTAFinal() {
             viewport={{ once: true }}
             className="flex justify-center mb-6"
           >
-            <div className={`inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${statusColors[availability.status]} rounded-full text-white text-sm font-semibold`}>
+            <div className={`inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${statusColors[satStatus]} rounded-full text-white text-sm font-semibold`}>
               <Icons.Fire />
               <span>
-                {availability.saturdays} {availability.saturdays === 1 ? t('saturdaysSingular') : t('saturdaysPlural')} {availability.month}
+                {currentMonthAvailable} {currentMonthAvailable === 1 ? t('saturdaysSingular') : t('saturdaysPlural')} {monthName}
               </span>
-              <span className="text-white/80 text-xs">{t(`status.${availability.status}`)}</span>
+              <span className="text-white/80 text-xs">{t(`status.${satStatus}`)}</span>
             </div>
           </motion.div>
 

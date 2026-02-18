@@ -258,7 +258,12 @@
     "close": "Cerrar",
     "loading": "Cargando...",
     "error": "Error",
-    "success": "Éxito"
+    "success": "Éxito",
+    "trust": {
+      "responseTime": "Respuesta <2h",
+      "noCommitment": "Sin compromiso",
+      "respondsIn": "Responde en <2h"
+    }
   },
   "hero": {
     "elegant": {
@@ -5561,6 +5566,12 @@
     }
   },
   "googleReviews": {
+    "sectionTitle": "Lo que dicen",
+    "sectionTitleHighlight": "nuestros clientes",
+    "fallback": {
+      "description": "Cada experiencia que creamos merece ser compartida. Si has trabajado con nosotros, tu opinión ayuda a muchas familias a tomar la mejor decisión.",
+      "cta": "Deja tu opinión en Google"
+    },
     "title": "Opiniones en",
     "titleHighlight": "Google",
     "rating": "5.0",
@@ -6382,8 +6393,20 @@
   "blog": {
     "meta": {
       "title": "Blog - Consejos y Tendencias | Òrbita Events",
-      "description": "Descubre consejos, tendencias y novedades sobre eventos, bodas y música. El blog oficial de Òrbita Events."
-    }
+      "description": "Descubre consejos, tendencias y novedades sobre eventos, bodas y música. El blog oficial de Òrbita Events.",
+      "ogTitle": "Blog Òrbita Events — Consejos para tu Evento"
+    },
+    "badge": "Artículos y consejos",
+    "title1": "Todo lo que necesitas saber",
+    "title2": "para tu evento",
+    "subtitle": "Guías, tendencias y consejos profesionales para hacer de tu boda o fiesta una experiencia inolvidable.",
+    "empty": {
+      "title": "Próximamente, contenido de calidad",
+      "subtitle": "Estamos preparando artículos sobre DJ, sonido e iluminación para ayudarte a planificar tu evento.",
+      "cta": "Habla con nosotros"
+    },
+    "ctaText": "¿Listo para crear una experiencia única?",
+    "ctaButton": "Calcula tu presupuesto"
   },
   "gracias": {
     "meta": {

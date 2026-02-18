@@ -79,7 +79,7 @@ const JSON_LD_ORGANIZATION = {
     height: 80,
   },
   image: [
-    'https://orbitaevents.com/og-home.jpg',
+    'https://orbitaevents.com/og-default.jpg',
     'https://orbitaevents.com/img/portfolio/bodas/bodas-01.avif',
     'https://orbitaevents.com/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
   ],
@@ -132,8 +132,8 @@ const JSON_LD_ORGANIZATION = {
     },
   ],
   sameAs: [
-    'https://www.instagram.com/orbitaevents',
-    'https://www.tiktok.com/@orbitaevents',
+    'https://www.instagram.com/orbitaeventsoficial/',
+    'https://www.tiktok.com/@orbitaeventsoficial',
   ],
   // NOTE: aggregateRating removed to fix Google Rich Results error
   // "La ressenya té diverses puntuacions agregades" (multiple aggregate ratings)
@@ -269,7 +269,7 @@ export const metadata: Metadata = {
       'Creamos experiencias únicas: bodas, fiestas temáticas y eventos corporativos. DJ profesional + tematización completa. Desde 250 EUR. Valoración 5.0/5.',
     images: [
       {
-        url: '/og-home.jpg',
+        url: '/og-default.jpg',
         width: 1200,
         height: 630,
         alt: 'Orbita Events - DJ bodas Barcelona',
@@ -282,8 +282,8 @@ export const metadata: Metadata = {
     title: 'Experiencias inmersivas para eventos | Orbita Events',
     description:
       'Bodas, fiestas temáticas y eventos corporativos. DJ + tematización completa. Desde 250 EUR. Valoración 5.0/5.',
-    images: ['/og-home.jpg'],
-    creator: '@orbitaevents',
+    images: ['/og-default.jpg'],
+    creator: '@orbitaeventsoficial',
   },
   robots: {
     index: true,

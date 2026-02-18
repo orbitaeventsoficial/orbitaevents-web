@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import { WHATSAPP_NUMBER } from '@/lib/constants';
+import { useAvailability } from '@/hooks/usePublicData';
 
 // Tipus per traduccions
 type CalendarTranslations = ReturnType<typeof useTranslations<'calendar'>>;
@@ -81,15 +82,6 @@ const DAYS_SHORT: Record<CalendarLocale, string[]> = {
   en: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
 };
 
-// Simular disponibilidad (reemplazar con API real)
-const MOCK_BOOKED_SATURDAYS: Record<string, string[]> = {
-  '2025-01': ['2025-01-11', '2025-01-25'],
-  '2025-02': ['2025-02-01', '2025-02-15', '2025-02-22'],
-  '2025-03': ['2025-03-08', '2025-03-15', '2025-03-22', '2025-03-29'],
-  '2025-04': ['2025-04-05', '2025-04-12', '2025-04-19'],
-  '2025-05': ['2025-05-03', '2025-05-10', '2025-05-17', '2025-05-24'],
-  '2025-06': ['2025-06-07', '2025-06-14', '2025-06-21'],
-};
 
 // Traduccions per reasons
 const getReasonText = (reason: string | undefined, t: CalendarTranslations): string | undefined => {
@@ -103,14 +95,11 @@ const getReasonText = (reason: string | undefined, t: CalendarTranslations): str
 // UTILIDADES
 // ═══════════════════════════════════════════════════════════════════════════
 
-function generateMonthData(month: number, year: number, locale: CalendarLocale = 'es'): MonthData {
+function generateMonthData(month: number, year: number, locale: CalendarLocale = 'es', bookedDates: string[] = []): MonthData {
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
-  const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
-  const bookedDates = MOCK_BOOKED_SATURDAYS[monthKey] || [];
   
   const days: DayStatus[] = [];
   let totalSaturdays = 0;
@@ -513,23 +502,33 @@ export default function CalendarioUrgencia({
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [selectedDay, setSelectedDay] = useState<DayStatus | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const { data: availData } = useAvailability();
 
-  // Generar datos de los próximos 3 meses
+  // Generar datos de los próximos 3 meses con disponibilidad real
   useEffect(() => {
     setIsClient(true);
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
+    // Mapa de mes → fechas reservadas (de la API real)
+    const bookedDatesMap: Record<string, string[]> = {};
+    availData.monthlyAvailability.forEach((monthData) => {
+      bookedDatesMap[monthData.month] = monthData.saturdayDates
+        .filter((d) => d.status === 'booked' || d.status === 'blocked')
+        .map((d) => d.date);
+    });
+
     const monthsData: MonthData[] = [];
     for (let i = 0; i < 3; i++) {
       const m = (currentMonth + i) % 12;
       const y = currentYear + Math.floor((currentMonth + i) / 12);
-      monthsData.push(generateMonthData(m, y, locale));
+      const monthKey = `${y}-${String(m + 1).padStart(2, '0')}`;
+      monthsData.push(generateMonthData(m, y, locale, bookedDatesMap[monthKey] || []));
     }
 
     setMonths(monthsData);
-  }, [locale]);
+  }, [locale, availData]);
   
   // Calcular estadísticas globales
   const globalStats = useMemo(() => {
@@ -665,6 +664,7 @@ export function CalendarioCompacto() {
   const tCommon = useTranslations('common');
   const intlLocale = useLocale();
   const locale = (intlLocale === 'en' ? 'en' : intlLocale === 'ca' ? 'ca' : 'es') as CalendarLocale;
+  const { data: availData } = useAvailability();
 
   const [months, setMonths] = useState<MonthData[]>([]);
   const [isClient, setIsClient] = useState(false);
@@ -675,15 +675,23 @@ export function CalendarioCompacto() {
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
+    const bookedDatesMap: Record<string, string[]> = {};
+    availData.monthlyAvailability.forEach((monthData) => {
+      bookedDatesMap[monthData.month] = monthData.saturdayDates
+        .filter((d) => d.status === 'booked' || d.status === 'blocked')
+        .map((d) => d.date);
+    });
+
     const monthsData: MonthData[] = [];
     for (let i = 0; i < 3; i++) {
       const m = (currentMonth + i) % 12;
       const y = currentYear + Math.floor((currentMonth + i) / 12);
-      monthsData.push(generateMonthData(m, y, locale));
+      const monthKey = `${y}-${String(m + 1).padStart(2, '0')}`;
+      monthsData.push(generateMonthData(m, y, locale, bookedDatesMap[monthKey] || []));
     }
 
     setMonths(monthsData);
-  }, [locale]);
+  }, [locale, availData]);
 
   if (!isClient || months.length === 0) {
     return <div className="text-white/50 text-sm">{t('compact.loading')}</div>;

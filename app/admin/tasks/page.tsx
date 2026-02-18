@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import Link from 'next/link';
 import type { LeadTaskStatus, Prisma } from '@prisma/client';
 import TaskRowActions from './TaskRowActions';
@@ -98,7 +99,7 @@ export default async function TasksPage({
     }));
     total = count;
   } catch (error) {
-    console.error('[Tasks] Error carregant tasques universals, fallback legacy:', error);
+    log.error('[Tasks] Error carregant tasques universals, fallback legacy:', error);
     const where: Prisma.LeadTaskWhereInput = {
       ...(status ? { status: { equals: status } } : {}),
       ...(customerId ? { lead: { customerId } } : {}),

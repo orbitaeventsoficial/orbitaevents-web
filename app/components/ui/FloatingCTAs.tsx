@@ -15,6 +15,7 @@ import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
 // ═══════════════════════════════════════════════════════════════════════════
 
 export function ContactDesktop() {
+  const t = useTranslations('common');
   const [isVisible, setIsVisible] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -59,7 +60,7 @@ export function ContactDesktop() {
               >
                 <div className="flex items-center gap-2 text-sm">
                   <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-                  <span className="text-white/80">Respon en &lt;2h</span>
+                  <span className="text-white/80">{t('trust.respondsIn')}</span>
                 </div>
                 {/* Arrow */}
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full">
@@ -194,8 +195,8 @@ export function BottomBarMobile() {
 
               {/* Trust line */}
               <div className="flex items-center justify-center gap-4 mt-2 text-[11px] text-[#666]">
-                <span>✓ Resposta &lt;2h</span>
-                <span>✓ Sense compromís</span>
+                <span>✓ {t('trust.responseTime')}</span>
+                <span>✓ {t('trust.noCommitment')}</span>
               </div>
             </div>
           </motion.div>

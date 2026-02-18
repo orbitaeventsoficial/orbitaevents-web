@@ -258,7 +258,12 @@
     "loading": "Carregant...",
     "next": "Següent",
     "previous": "Anterior",
-    "success": "Èxit"
+    "success": "Èxit",
+    "trust": {
+      "responseTime": "Resposta <2h",
+      "noCommitment": "Sense compromís",
+      "respondsIn": "Respon en <2h"
+    }
   },
   "hero": {
     "elegant": {
@@ -5733,6 +5738,12 @@
     }
   },
   "googleReviews": {
+    "sectionTitle": "El que diuen",
+    "sectionTitleHighlight": "els nostres clients",
+    "fallback": {
+      "description": "Cada experiència que creem mereix ser compartida. Si has treballat amb nosaltres, la teva opinió ajuda moltes famílies a prendre la millor decisió.",
+      "cta": "Deixa la teva opinió a Google"
+    },
     "title": "Opinions a",
     "titleHighlight": "Google",
     "rating": "5.0",
@@ -6554,8 +6565,20 @@
   "blog": {
     "meta": {
       "title": "Blog - Consells i Tendències | Òrbita Events",
-      "description": "Descobreix consells, tendències i novetats sobre esdeveniments, casaments i música. El blog oficial d'Òrbita Events."
-    }
+      "description": "Descobreix consells, tendències i novetats sobre esdeveniments, casaments i música. El blog oficial d'Òrbita Events.",
+      "ogTitle": "Blog Òrbita Events — Consells per al teu Esdeveniment"
+    },
+    "badge": "Articles i consells",
+    "title1": "Tot el que necessites saber",
+    "title2": "per al teu esdeveniment",
+    "subtitle": "Guies, tendències i consells professionals per fer del teu casament o festa una experiència inoblidable.",
+    "empty": {
+      "title": "Aviat, contingut de qualitat",
+      "subtitle": "Estem preparant articles sobre DJ, so i llum per ajudar-te a planificar el teu esdeveniment.",
+      "cta": "Parla amb nosaltres"
+    },
+    "ctaText": "Preparat per crear una experiència única?",
+    "ctaButton": "Calcula el teu pressupost"
   },
   "gracias": {
     "meta": {

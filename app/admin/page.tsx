@@ -472,8 +472,7 @@ export default async function AdminDashboard() {
   ];
 
   // Activitat recent
-  const activities = [
-    { icon: '👋', text: "Benvingut al panell d'administració!", time: 'Ara' },
+  const activitiesRaw = [
     ...(recentLeads.length > 0 ? [{
       icon: '👥',
       text: `Nou lead: ${recentLeads[0]?.name || 'Desconegut'}`,
@@ -485,6 +484,7 @@ export default async function AdminDashboard() {
       time: ''
     }] : []),
   ];
+  const activities = activitiesRaw.length > 0 ? activitiesRaw : [{ icon: '✅', text: 'Tot al dia, sense activitat pendent', time: 'Ara' }];
 
   const pilotToday = [
     {
@@ -644,23 +644,6 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-4 sm:p-5">
-        <div className="mb-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-300">Navegació bidireccional</p>
-          <h2 className="text-base sm:text-lg font-semibold text-slate-100">Anar i tornar en 1 clic</h2>
-          <p className="mt-1 text-xs text-slate-400">Cada flux clau té camí d&apos;anada i de tornada.</p>
-        </div>
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-          <Link href="/admin/leads" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Entrades → Clients</Link>
-          <Link href="/admin/contactes" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Clients → Entrades</Link>
-          <Link href="/admin/bookings" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Reserves → Calendari</Link>
-          <Link href="/admin/calendario" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Calendari → Reserves</Link>
-          <Link href="/admin/presupuestos" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Pressupost → Lead</Link>
-          <Link href="/admin/leads" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Lead → Pressupost</Link>
-          <Link href="/admin/tasks" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Tasques → Entrades</Link>
-          <Link href="/admin/leads" className="rounded-xl border border-slate-700/60 bg-slate-800/60 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500/40">Entrades → Tasques</Link>
-        </div>
-      </section>
 
       <section className="rounded-2xl border border-violet-500/25 bg-gradient-to-br from-violet-500/10 to-slate-900/40 p-4 sm:p-5">
         <div className="mb-3">

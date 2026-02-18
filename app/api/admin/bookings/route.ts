@@ -37,6 +37,9 @@ const bookingSchema = z.object({
   discount: z.number().optional(),
   discountCode: z.string().optional(),
   notes: z.string().optional(),
+  distanceKm: z.number().min(0).optional(),
+  fuelCostPerKm: z.number().min(0).optional(),
+  travelCost: z.number().min(0).optional(),
 });
 
 // Generar referència única
@@ -231,6 +234,9 @@ export async function POST(req: NextRequest) {
         guestCount: data.guestCount,
         packId: data.packId,
         extraHours: data.extraHours || 0,
+        distanceKm: data.distanceKm ?? null,
+        fuelCostPerKm: data.fuelCostPerKm ?? null,
+        travelCost: data.travelCost ?? null,
         subtotal,
         discount,
         discountCode: data.discountCode,

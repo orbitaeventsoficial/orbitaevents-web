@@ -96,7 +96,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
     openGraph: {
       title: t('meta.ogTitle'),
       description: t('meta.ogDescription'),
-      images: [{ url: '/og-home.jpg', width: 1200, height: 630, alt: 'Òrbita Events' }],
+      images: [{ url: '/og-default.jpg', width: 1200, height: 630, alt: 'Òrbita Events' }],
     },
   };
 }

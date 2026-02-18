@@ -258,7 +258,12 @@
     "close": "Close",
     "loading": "Charging...",
     "error": "Mistake",
-    "success": "Success"
+    "success": "Success",
+    "trust": {
+      "responseTime": "Response <2h",
+      "noCommitment": "No commitment",
+      "respondsIn": "Responds in <2h"
+    }
   },
   "hero": {
     "elegant": {
@@ -5561,6 +5566,12 @@
     }
   },
   "googleReviews": {
+    "sectionTitle": "What",
+    "sectionTitleHighlight": "our clients say",
+    "fallback": {
+      "description": "Every experience we create deserves to be shared. If you've worked with us, your review helps many families make the best decision.",
+      "cta": "Leave your review on Google"
+    },
     "title": "Opinions on",
     "titleHighlight": "Google",
     "rating": "5.0",
@@ -6382,8 +6393,20 @@
   "blog": {
     "meta": {
       "title": "Blog - Tips and Trends | Orbita Events",
-      "description": "Discover tips, trends and news about events, weddings and music. The official blog of Òrbita Events."
-    }
+      "description": "Discover tips, trends and news about events, weddings and music. The official blog of Òrbita Events.",
+      "ogTitle": "Orbita Events Blog — Tips for Your Event"
+    },
+    "badge": "Articles and tips",
+    "title1": "Everything you need to know",
+    "title2": "for your event",
+    "subtitle": "Professional guides, trends and tips to make your wedding or party an unforgettable experience.",
+    "empty": {
+      "title": "Coming soon, quality content",
+      "subtitle": "We are preparing articles about DJ, sound and lighting to help you plan your event.",
+      "cta": "Talk to us"
+    },
+    "ctaText": "Ready to create a unique experience?",
+    "ctaButton": "Calculate your budget"
   },
   "gracias": {
     "meta": {
