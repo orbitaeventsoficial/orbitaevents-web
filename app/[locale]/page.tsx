@@ -148,19 +148,19 @@ export default function HomePage() {
         {/* 6. COM FUNCIONA - 3 passos */}
         <ProcessSection />
 
-        {/* 6. RESEÑAS GOOGLE - Prova social */}
+        {/* 7. RESEÑAS GOOGLE - Prova social */}
         <GoogleReviewsRotating />
 
-        {/* 7. LOGOS CLIENTES - Confían en nosotros */}
+        {/* 8. LOGOS CLIENTES - Confían en nosotros */}
         <TrustedByLogos />
 
-        {/* 8. GARANTÍA - Confiança */}
+        {/* 9. GARANTÍA - Confiança */}
         <GarantiaSection />
 
-        {/* 9. FAQ - Preguntes freqüents amb JSON-LD schema */}
+        {/* 10. FAQ - Preguntes freqüents amb JSON-LD schema */}
         <FAQSection />
 
-        {/* 10. CTA FINAL - Conversió */}
+        {/* 11. CTA FINAL - Conversió */}
         <CTAFinal />
       </main>
     </HomePageWrapper>
