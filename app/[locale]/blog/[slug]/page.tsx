@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation';
 import { Link } from '@/lib/navigation';
 import Image from 'next/image';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import BlogTracking from '@/app/components/blog/BlogTracking';
 
 export const revalidate = 3600;
 
@@ -160,6 +161,7 @@ export default async function BlogPostPage({
       />
 
       <main className="min-h-screen bg-[#0A0A0A]">
+        <BlogTracking page="post" slug={slug} />
         {/* Hero */}
         <section className="relative pt-24 pb-0 overflow-hidden">
           {post.featuredImage && (
@@ -245,6 +247,7 @@ export default async function BlogPostPage({
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/configurador"
+                data-blog-cta="blog_post_configurator"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:opacity-90 transition-opacity"
               >
                 {tBlog('post.ctaPrimary')}
@@ -254,6 +257,7 @@ export default async function BlogPostPage({
               </Link>
               <Link
                 href="/blog"
+                data-blog-cta="blog_post_back"
                 className="inline-flex items-center gap-2 px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-2xl transition-colors"
               >
                 ← {tBlog('post.backToBlog')}

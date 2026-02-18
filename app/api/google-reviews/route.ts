@@ -190,7 +190,7 @@ function getRelativeTime(date: Date): string {
 // ═══════════════════════════════════════════════════════════════════════════
 // OBTENIR RESSENYES DEL JSON ESTÀTIC (generat durant deploy)
 // ═══════════════════════════════════════════════════════════════════════════
-async function getReviewsFromJson(): Promise<{ reviews: GoogleReview[]; lastUpdated?: string }> {
+async function getReviewsFromJson(): Promise<{ reviews: GoogleReview[]; lastUpdated?: string; total?: number; rating?: number }> {
   try {
     const jsonPath = path.join(process.cwd(), 'public', 'data', 'google-reviews.json');
     const content = await fs.readFile(jsonPath, 'utf-8');
@@ -202,7 +202,7 @@ async function getReviewsFromJson(): Promise<{ reviews: GoogleReview[]; lastUpda
       language: 'ca',
     }));
     
-    return { reviews, lastUpdated: data.lastUpdated };
+    return { reviews, lastUpdated: data.lastUpdated, total: data.total, rating: data.rating };
   } catch (error) {
     // Fitxer no existeix, normal si no s'ha executat el script
     return { reviews: [] };
@@ -342,14 +342,20 @@ export async function GET() {
     if (filteredReviews.length > 0) {
       avgRating = filteredReviews.reduce((sum, r) => sum + r.rating, 0) / filteredReviews.length;
       avgRating = Math.round(avgRating * 10) / 10;
+    } else if (typeof jsonData.rating === 'number' && jsonData.rating > 0) {
+      avgRating = jsonData.rating;
     }
+
+    const totalReviews = filteredReviews.length > 0
+      ? filteredReviews.length
+      : (jsonData.total && jsonData.total > 0 ? jsonData.total : 0);
 
     const response: GoogleReviewsResponse = {
       rating: avgRating || 5.0,
-      user_ratings_total: filteredReviews.length,
+      user_ratings_total: totalReviews,
       reviews: filteredReviews,
       source,
-      googleReviewsUrl: SITE_CONFIG.reviews.googleBusinessUrl || '',
+      googleReviewsUrl: SITE_CONFIG.reviews.googleBusinessUrl || SITE_CONFIG.reviews.googleReviewUrl || '',
       lastUpdated: jsonData.lastUpdated,
     };
 
@@ -367,7 +373,7 @@ export async function GET() {
         user_ratings_total: 0,
         reviews: [],
         source: 'database',
-        googleReviewsUrl: SITE_CONFIG.reviews.googleBusinessUrl || '',
+        googleReviewsUrl: SITE_CONFIG.reviews.googleBusinessUrl || SITE_CONFIG.reviews.googleReviewUrl || '',
       },
       {
         status: 200,

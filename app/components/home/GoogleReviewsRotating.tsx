@@ -227,6 +227,11 @@ export default function GoogleReviewsRotating() {
             <p className="text-white/60 text-lg mb-8">
               {t('fallback.description')}
             </p>
+            {totalReviews > 0 && (
+              <p className="text-white/80 text-base mb-6">
+                ⭐ {averageRating.toFixed(1)} · {totalReviews} ressenyes a Google
+              </p>
+            )}
             <a
               href={SITE_CONFIG.reviews.googleReviewUrl}
               target="_blank"

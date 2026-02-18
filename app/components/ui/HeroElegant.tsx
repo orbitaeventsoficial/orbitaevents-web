@@ -17,6 +17,7 @@ export default function HeroElegant() {
   const tCommon = useTranslations('common');
   const rotatingTexts = t.raw('rotatingTexts') as string[];
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [heroVariant, setHeroVariant] = useState<'a' | 'b'>('a');
 
   // Rotar textos cada 5 segons (més lent per millor lectura)
   useEffect(() => {
@@ -25,6 +26,20 @@ export default function HeroElegant() {
     }, 5000);
     return () => clearInterval(interval);
   }, [rotatingTexts.length]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const key = 'hero-ab-variant-v1';
+    const stored = window.localStorage.getItem(key);
+    const variant = stored === 'a' || stored === 'b'
+      ? (stored as 'a' | 'b')
+      : (Math.random() < 0.5 ? 'a' : 'b');
+    setHeroVariant(variant);
+    if (!stored) {
+      window.localStorage.setItem(key, variant);
+    }
+    trackCTAClick(`hero_ab_impression_${variant}`, 'hero_elegant');
+  }, []);
 
   return (
     <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
@@ -102,8 +117,8 @@ export default function HeroElegant() {
 
           {/* Subtítol - CONCÍS */}
           <p className="text-lg md:text-xl text-white/70 mb-4 max-w-xl mx-auto">
-            {t('subtitle')}
-            <span className="hidden md:inline"> {t('subtitleLocation')}</span>
+            {heroVariant === 'a' ? t('subtitle') : t('subtitleAlt')}
+            <span className="hidden md:inline"> {heroVariant === 'a' ? t('subtitleLocation') : t('subtitleLocationAlt')}</span>
           </p>
 
           {/* Badge de Urgencia - Halloween / Món Màgic */}
@@ -121,7 +136,7 @@ export default function HeroElegant() {
               rel="noopener noreferrer"
               onClick={() => {
                 trackWhatsAppClick('hero_elegant');
-                trackCTAClick('hero_whatsapp_primary', 'hero_elegant');
+                trackCTAClick(`hero_whatsapp_primary_${heroVariant}`, 'hero_elegant');
               }}
               className="w-full sm:w-auto group relative inline-flex items-center justify-center gap-3 overflow-hidden px-8 py-4 rounded-2xl order-1"
             >
@@ -154,7 +169,7 @@ export default function HeroElegant() {
             {/* CTA Secundari - Configurador */}
             <Link
               href="/configurador"
-              onClick={() => trackCTAClick('hero_configurator_secondary', 'hero_elegant')}
+              onClick={() => trackCTAClick(`hero_configurator_secondary_${heroVariant}`, 'hero_elegant')}
               className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-medium px-8 py-4 rounded-xl border border-white/10 hover:border-white/20 transition-all order-2"
             >
               <span>{t('ctaContact')}</span>

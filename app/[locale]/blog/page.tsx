@@ -6,6 +6,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/lib/navigation';
 import Image from 'next/image';
+import BlogTracking from '@/app/components/blog/BlogTracking';
 
 export const revalidate = 3600;
 
@@ -87,6 +88,7 @@ function PostCard({
   return (
     <Link
       href={`/blog/${post.slug}`}
+      data-blog-cta={`blog_card_${post.slug}`}
       className="group block rounded-2xl border border-white/10 bg-white/5 hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 overflow-hidden"
     >
       <div className="relative h-48 bg-gradient-to-br from-zinc-900 to-zinc-800 overflow-hidden">
@@ -145,6 +147,7 @@ export default async function BlogPage({ params }: { params: { locale: string } 
 
   return (
     <main className="min-h-screen bg-[#0A0A0A]">
+      <BlogTracking page="index" />
       {/* Hero */}
       <section className="relative pt-32 pb-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 to-[#0A0A0A]" />
@@ -172,6 +175,7 @@ export default async function BlogPage({ params }: { params: { locale: string } 
             <p className="text-white/60 mb-8">{t('empty.subtitle')}</p>
             <Link
               href="/contacto"
+              data-blog-cta="blog_empty_contact"
               className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-zinc-900 font-bold rounded-xl transition-colors"
             >
               {t('empty.cta')}
@@ -195,6 +199,7 @@ export default async function BlogPage({ params }: { params: { locale: string } 
               <p className="text-white/60 mb-6">{t('ctaText')}</p>
               <Link
                 href="/configurador"
+                data-blog-cta="blog_footer_configurator"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:opacity-90 transition-opacity"
               >
                 {t('ctaButton')}
