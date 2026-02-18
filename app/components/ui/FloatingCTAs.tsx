@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
+import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FLOATING CTAs - Focus en WhatsApp
@@ -75,6 +76,10 @@ export function ContactDesktop() {
             href={WHATSAPP_URL_WITH_MESSAGE("Hola! M'agradaria informació sobre els vostres serveis d'events.")}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => {
+              trackWhatsAppClick('floating_desktop');
+              trackCTAClick('floating_whatsapp_desktop', 'floating_cta_desktop');
+            }}
             className="relative group block"
           >
             {/* Pulse ring */}
@@ -179,6 +184,10 @@ export function BottomBarMobile() {
                 <a
                   href={WHATSAPP_URL_WITH_MESSAGE("Hola! M'agradaria informació")}
                   target="_blank" rel="noopener noreferrer"
+                  onClick={() => {
+                    trackWhatsAppClick('floating_mobile');
+                    trackCTAClick('floating_whatsapp_mobile', 'floating_cta_mobile');
+                  }}
                   className="flex-1 bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold py-3.5 rounded-xl text-center active:scale-[0.98] transition-transform flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/25"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -190,6 +199,7 @@ export function BottomBarMobile() {
                 {/* Secundari - Formulari */}
                 <Link
                   href="/contacto"
+                  onClick={() => trackCTAClick('floating_contact_form_mobile', 'floating_cta_mobile')}
                   className="bg-zinc-800 text-white font-semibold py-3.5 px-4 rounded-xl flex items-center justify-center active:scale-[0.98] transition-transform border border-zinc-700"
                 >
                   {t('buttons.requestQuote')}

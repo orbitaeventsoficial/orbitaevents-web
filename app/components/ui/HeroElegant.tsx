@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import { useState, useEffect } from 'react';
+import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
+import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
 import HeroUrgencyBadge from './HeroUrgencyBadge';
 // ═══════════════════════════════════════════════════════════════════════════
@@ -12,6 +14,7 @@ import HeroUrgencyBadge from './HeroUrgencyBadge';
 
 export default function HeroElegant() {
   const t = useTranslations('hero.elegant');
+  const tCommon = useTranslations('common');
   const rotatingTexts = t.raw('rotatingTexts') as string[];
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -92,13 +95,6 @@ export default function HeroElegant() {
                     {rotatingTexts[currentIndex]}
                   </span>
 
-                  {/* Línia decorativa animada - CENTRADA */}
-                  <motion.span
-                    initial={{ scaleX: 0, opacity: 0 }}
-                    animate={{ scaleX: 1, opacity: 1 }}
-                    transition={{ delay: 0.3, duration: 0.4 }}
-                    className="block mx-auto mt-2 w-1/2 max-w-[200px] h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent"
-                  />
                 </motion.span>
               </AnimatePresence>
             </span>
@@ -115,12 +111,18 @@ export default function HeroElegant() {
             <HeroUrgencyBadge />
           </div>
 
-          {/* CTAs - Configurador + Portfolio */}
+          {/* CTAs - WhatsApp principal + Configurador */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 mb-6 md:mb-8">
 
-            {/* CTA Principal - Reserva avui (Configurador) - PREMIUM DESIGN */}
-            <Link
-              href="/configurador"
+            {/* CTA Principal - WhatsApp */}
+            <a
+              href={WHATSAPP_URL_WITH_MESSAGE("Hola! M'agradaria informació sobre el meu event")}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                trackWhatsAppClick('hero_elegant');
+                trackCTAClick('hero_whatsapp_primary', 'hero_elegant');
+              }}
               className="w-full sm:w-auto group relative inline-flex items-center justify-center gap-3 overflow-hidden px-8 py-4 rounded-2xl order-1"
             >
               {/* Glow de fondo pulsante */}
@@ -139,7 +141,7 @@ export default function HeroElegant() {
 
               {/* Contenido del botón */}
               <span className="relative z-10 text-zinc-900 font-black text-lg flex items-center gap-2">
-                <span>{t('ctaContact')}</span>
+                <span>{tCommon('buttons.whatsapp')}</span>
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -147,14 +149,15 @@ export default function HeroElegant() {
 
               {/* Shadow pulsante */}
               <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-            </Link>
+            </a>
 
-            {/* CTA Secundari - Veure què fem (Portfolio) */}
+            {/* CTA Secundari - Configurador */}
             <Link
-              href="/portfolio"
+              href="/configurador"
+              onClick={() => trackCTAClick('hero_configurator_secondary', 'hero_elegant')}
               className="w-full sm:w-auto group inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-medium px-8 py-4 rounded-xl border border-white/10 hover:border-white/20 transition-all order-2"
             >
-              <span>{t('ctaPrices')}</span>
+              <span>{t('ctaContact')}</span>
               <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>

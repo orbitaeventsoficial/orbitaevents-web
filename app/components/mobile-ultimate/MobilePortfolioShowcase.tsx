@@ -130,14 +130,14 @@ export default function MobilePortfolioShowcase() {
       {/* Category tabs — horizontal scroll */}
       <div
         ref={tabsRef}
-        className="flex gap-2.5 px-6 overflow-x-auto scrollbar-none pb-1 mb-6"
+        className="flex gap-2.5 px-6 overflow-x-auto scrollbar-none pb-1 mb-6 snap-x snap-mandatory"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {CATEGORIES.map((cat, i) => (
           <button
             key={cat.id}
             onClick={() => handleTabClick(cat.id, i)}
-            className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold border transition-all active:scale-95 ${
+            className={`flex-shrink-0 whitespace-nowrap snap-start px-4 py-2 rounded-full text-sm font-semibold border transition-all active:scale-95 ${
               activeId === cat.id
                 ? `${cat.bg} ${cat.border} ${cat.text}`
                 : 'bg-white/5 border-white/10 text-white/60'

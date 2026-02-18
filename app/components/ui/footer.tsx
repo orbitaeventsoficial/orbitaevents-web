@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Link } from '@/lib/navigation';
+import { Link, usePathname } from '@/lib/navigation';
 import { SITE_CONFIG } from '@/config/site-config';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -110,6 +110,7 @@ import { useAnalytics } from '@/lib/hooks/useAnalytics';
 // ========================================
 
 export default function Footer() {
+  const pathname = usePathname();
   const t = useTranslations('footer');
   const tCommon = useTranslations('common');
   const tStats = useTranslations('stats');
@@ -118,6 +119,8 @@ export default function Footer() {
   const rawCoverage = t.raw('coverageAreas');
   const localizedCoverage = Array.isArray(rawCoverage) ? rawCoverage : DEFAULT_COVERAGE;
   const [coverageAreas, setCoverageAreas] = useState<string[]>(localizedCoverage);
+  const normalizedPath = pathname.replace(/\/+$/, '') || '/';
+  const isHomePath = normalizedPath === '/' || /^\/(es|ca|en)$/.test(normalizedPath);
 
   useEffect(() => {
     let cancelled = false;
@@ -204,30 +207,32 @@ export default function Footer() {
         {/* ════════════════════════════════════════════════════════════════ */}
         {/* TRUST SIGNALS BAR - BRUTAL                                       */}
         {/* ════════════════════════════════════════════════════════════════ */}
-        <div className="py-10 border-b border-white/10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {trustSignals.map((signal, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className={`flex flex-col items-center gap-1.5 p-3 sm:p-5 rounded-2xl bg-gradient-to-br ${signal.color} border border-white/5 hover:border-white/20 transition-all duration-300 group hover:scale-105`}
-              >
-                <span className="text-xl sm:text-2xl group-hover:scale-125 transition-transform duration-300">
-                  {signal.icon}
-                </span>
-                <span className="text-lg sm:text-xl md:text-2xl font-bold text-white">
-                  {signal.metric}
-                </span>
-                <span className="text-[11px] sm:text-xs text-white/60 text-center">
-                  {signal.label}
-                </span>
-              </motion.div>
-            ))}
+        {!isHomePath && (
+          <div className="py-10 border-b border-white/10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {trustSignals.map((signal, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className={`flex flex-col items-center gap-1.5 p-3 sm:p-5 rounded-2xl bg-gradient-to-br ${signal.color} border border-white/5 hover:border-white/20 transition-all duration-300 group hover:scale-105`}
+                >
+                  <span className="text-xl sm:text-2xl group-hover:scale-125 transition-transform duration-300">
+                    {signal.icon}
+                  </span>
+                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-white">
+                    {signal.metric}
+                  </span>
+                  <span className="text-[11px] sm:text-xs text-white/60 text-center">
+                    {signal.label}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* ════════════════════════════════════════════════════════════════ */}
         {/* MAIN FOOTER CONTENT                                              */}

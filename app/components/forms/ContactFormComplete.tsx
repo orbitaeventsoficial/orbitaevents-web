@@ -20,7 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/config/site-config';
-import { trackLead } from '@/lib/analytics';
+import { trackLead, trackCTAClick } from '@/lib/analytics';
 import TurnstileWidget from '@/components/security/TurnstileWidget';
 
 // ============================================================
@@ -36,35 +36,17 @@ interface FormData {
   // Dades event
   eventType: string;
   eventDate: string;
-  guestCount: string;
   location: string;
-  budget: string;
 
   // Missatge
   message: string;
-  howFound: string;
 
   // Legals
   acceptPrivacy: boolean;
-  acceptMarketing: boolean;
 }
 
 interface FormErrors {
   [key: string]: string;
-}
-
-function parseGuestCountValue(value: string): number | undefined {
-  if (!value) return undefined;
-  if (/^\d+$/.test(value)) return Number(value);
-  const rangeMatch = value.match(/^(\d+)\s*-\s*(\d+)$/);
-  if (rangeMatch) {
-    const min = Number(rangeMatch[1]);
-    const max = Number(rangeMatch[2]);
-    return Math.round((min + max) / 2);
-  }
-  const plusMatch = value.match(/^(\d+)\+$/);
-  if (plusMatch) return Number(plusMatch[1]);
-  return undefined;
 }
 
 // ============================================================
@@ -79,21 +61,20 @@ function validateForm(data: FormData, t: (key: string) => string): FormErrors {
     errors.fullName = t('validation.fullNameRequired');
   } else if (data.fullName.trim().length < 3) {
     errors.fullName = t('validation.fullNameMinLength');
-  } else if (!data.fullName.includes(' ')) {
-    errors.fullName = t('validation.fullNameLastName');
   }
 
-  // Email
-  if (!data.email.trim()) {
-    errors.email = t('validation.emailRequired');
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+  // Contacte: email o telèfon (almenys un)
+  if (!data.email.trim() && !data.phone.trim()) {
+    errors.contact = t('validation.contactRequired');
+  }
+
+  // Email (si s'informa)
+  if (data.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     errors.email = t('validation.emailInvalid');
   }
 
-  // Telefon
-  if (!data.phone.trim()) {
-    errors.phone = t('validation.phoneRequired');
-  } else if (!/^[0-9+\s()-]{9,}$/.test(data.phone.replace(/\s/g, ''))) {
+  // Telèfon (si s'informa)
+  if (data.phone.trim() && !/^[0-9+\s()-]{9,}$/.test(data.phone.replace(/\s/g, ''))) {
     errors.phone = t('validation.phoneInvalid');
   }
 
@@ -102,14 +83,21 @@ function validateForm(data: FormData, t: (key: string) => string): FormErrors {
     errors.eventType = t('validation.eventTypeRequired');
   }
 
-  // Data (opcional pero si hi es, ha de ser futura)
-  if (data.eventDate) {
+  // Data (obligatòria i futura)
+  if (!data.eventDate) {
+    errors.eventDate = t('validation.dateRequired');
+  } else {
     const selectedDate = new Date(data.eventDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (selectedDate < today) {
       errors.eventDate = t('validation.dateFuture');
     }
+  }
+
+  // Ciutat / ubicació (obligatori)
+  if (!data.location.trim()) {
+    errors.location = t('validation.locationRequired');
   }
 
   // Privacitat (obligatori)
@@ -141,13 +129,9 @@ export default function ContactFormComplete({
     phone: '',
     eventType: preselectedService || '',
     eventDate: preselectedDate || '',
-    guestCount: '',
     location: '',
-    budget: '',
     message: '',
-    howFound: '',
     acceptPrivacy: false,
-    acceptMarketing: false,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -215,14 +199,13 @@ export default function ContactFormComplete({
     }
 
     setIsSubmitting(true);
+    trackCTAClick('contact_form_submit', 'contact_form_complete');
 
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
     const controller = new AbortController();
     timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    const guests = parseGuestCountValue(formData.guestCount);
-
-    try {
+  try {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -234,13 +217,8 @@ export default function ContactFormComplete({
           phone: formData.phone,
           event: formData.eventType,
           eventDate: formData.eventDate,
-          guests,
-          guestCount: formData.guestCount,
           location: formData.location,
-          budget: formData.budget,
           message: formData.message,
-          howFound: formData.howFound,
-          acceptMarketing: formData.acceptMarketing,
           timestamp: new Date().toISOString(),
           source: 'contact-form-complete',
           turnstileToken,
@@ -330,7 +308,7 @@ export default function ContactFormComplete({
         </div>
 
         {/* Email i Telefon */}
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className={`grid sm:grid-cols-2 gap-4 ${errors.contact ? 'error-field' : ''}`}>
           {/* Email */}
           <div className={errors.email && touched.email ? 'error-field' : ''}>
             <label htmlFor="email" className="block text-white/70 text-sm mb-2">
@@ -381,6 +359,9 @@ export default function ContactFormComplete({
             )}
           </div>
         </div>
+        {errors.contact && (
+          <p className="text-red-400 text-sm mt-1">{errors.contact}</p>
+        )}
       </div>
 
       {/* Seccio: Dades event */}
@@ -421,12 +402,12 @@ export default function ContactFormComplete({
           )}
         </div>
 
-        {/* Data i Convidats */}
+        {/* Data i ciutat */}
         <div className="grid sm:grid-cols-2 gap-4">
           {/* Data */}
-          <div>
+          <div className={errors.eventDate && touched.eventDate ? 'error-field' : ''}>
             <label htmlFor="eventDate" className="block text-white/70 text-sm mb-2">
-              {t('labels.eventDate')}
+              {t('labels.eventDate')} <span className="text-red-400">*</span>
             </label>
             <input
               type="date"
@@ -434,46 +415,21 @@ export default function ContactFormComplete({
               name="eventDate"
               value={formData.eventDate}
               onChange={(e) => updateField('eventDate', e.target.value)}
+              onBlur={() => { touchField('eventDate'); validateField('eventDate'); }}
               min={minDate}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                       text-white text-base outline-none focus:border-amber-500 focus:ring-2
-                       focus:ring-amber-500 transition-all"
+              className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base outline-none transition-all
+                       ${errors.eventDate && touched.eventDate ? 'border-red-500' : 'border-white/10 focus:border-amber-500'}
+                       focus:ring-2 focus:ring-amber-500`}
             />
-            {errors.eventDate && (
+            {errors.eventDate && touched.eventDate && (
               <p className="text-red-400 text-sm mt-1">{errors.eventDate}</p>
             )}
           </div>
 
-          {/* Convidats */}
-          <div>
-            <label htmlFor="guestCount" className="block text-white/70 text-sm mb-2">
-              {t('labels.guestCount')}
-            </label>
-            <select
-              id="guestCount"
-              name="guestCount"
-              value={formData.guestCount}
-              onChange={(e) => updateField('guestCount', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                       text-white text-base outline-none focus:border-amber-500 focus:ring-2
-                       focus:ring-amber-500 transition-all appearance-none cursor-pointer"
-            >
-              <option value="" className="bg-black">{t('placeholders.selectGuests')}</option>
-              <option value="1-50" className="bg-black">{t('guestOptions.1-50')}</option>
-              <option value="51-100" className="bg-black">{t('guestOptions.51-100')}</option>
-              <option value="101-200" className="bg-black">{t('guestOptions.101-200')}</option>
-              <option value="201-300" className="bg-black">{t('guestOptions.201-300')}</option>
-              <option value="300+" className="bg-black">{t('guestOptions.300+')}</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Ubicacio i Pressupost */}
-        <div className="grid sm:grid-cols-2 gap-4">
-          {/* Ubicacio */}
-          <div>
+          {/* Ubicació */}
+          <div className={errors.location && touched.location ? 'error-field' : ''}>
             <label htmlFor="location" className="block text-white/70 text-sm mb-2">
-              {t('labels.location')}
+              {t('labels.location')} <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -481,35 +437,15 @@ export default function ContactFormComplete({
               name="location"
               value={formData.location}
               onChange={(e) => updateField('location', e.target.value)}
+              onBlur={() => { touchField('location'); validateField('location'); }}
               placeholder={t('placeholders.location')}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                       text-white text-base placeholder:text-white/50 outline-none
-                       focus:border-amber-500 focus:ring-2 focus:ring-amber-500 transition-all"
+              className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white text-base placeholder:text-white/50 outline-none transition-all
+                       ${errors.location && touched.location ? 'border-red-500' : 'border-white/10 focus:border-amber-500'}
+                       focus:ring-2 focus:ring-amber-500`}
             />
-          </div>
-
-          {/* Pressupost */}
-          <div>
-            <label htmlFor="budget" className="block text-white/70 text-sm mb-2">
-              {t('labels.budget')}
-            </label>
-            <select
-              id="budget"
-              name="budget"
-              value={formData.budget}
-              onChange={(e) => updateField('budget', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                       text-white text-base outline-none focus:border-amber-500 focus:ring-2
-                       focus:ring-amber-500 transition-all appearance-none cursor-pointer"
-            >
-              <option value="" className="bg-black">{t('placeholders.selectBudget')}</option>
-              <option value="menys500" className="bg-black">{t('budgetOptions.menys500')}</option>
-              <option value="500-1000" className="bg-black">{t('budgetOptions.500-1000')}</option>
-              <option value="1000-2000" className="bg-black">{t('budgetOptions.1000-2000')}</option>
-              <option value="2000-3000" className="bg-black">{t('budgetOptions.2000-3000')}</option>
-              <option value="3000+" className="bg-black">{t('budgetOptions.3000+')}</option>
-              <option value="nosabe" className="bg-black">{t('budgetOptions.nosabe')}</option>
-            </select>
+            {errors.location && touched.location && (
+              <p className="text-red-400 text-sm mt-1">{errors.location}</p>
+            )}
           </div>
         </div>
       </div>
@@ -538,30 +474,6 @@ export default function ContactFormComplete({
           />
         </div>
 
-      </div>
-
-      {/* Com ens has trobat (opcional - al final) */}
-      <div className="pt-4">
-        <label htmlFor="howFound" className="block text-white/50 text-sm mb-2">
-          {t('labels.howFound')} <span className="text-white/50">(opcional)</span>
-        </label>
-        <select
-          id="howFound"
-          name="howFound"
-          value={formData.howFound}
-          onChange={(e) => updateField('howFound', e.target.value)}
-          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10
-                   text-white text-base outline-none focus:border-amber-500 focus:ring-2
-                   focus:ring-amber-500 transition-all appearance-none cursor-pointer"
-        >
-          <option value="" className="bg-black">{t('placeholders.selectHowFound')}</option>
-          <option value="google" className="bg-black">{t('howFoundOptions.google')}</option>
-          <option value="instagram" className="bg-black">{t('howFoundOptions.instagram')}</option>
-          <option value="tiktok" className="bg-black">{t('howFoundOptions.tiktok')}</option>
-          <option value="recomendacion" className="bg-black">{t('howFoundOptions.recomendacion')}</option>
-          <option value="evento" className="bg-black">{t('howFoundOptions.evento')}</option>
-          <option value="otro" className="bg-black">{t('howFoundOptions.otro')}</option>
-        </select>
       </div>
 
       {/* Seccio: Legal */}
@@ -609,31 +521,6 @@ export default function ContactFormComplete({
           )}
         </div>
 
-        {/* Checkbox marketing */}
-        <label htmlFor="acceptMarketing" className="flex items-start gap-3 cursor-pointer group">
-          <div className="relative mt-1 h-5 w-5 shrink-0">
-            <input
-              type="checkbox"
-              id="acceptMarketing"
-              name="acceptMarketing"
-              checked={formData.acceptMarketing}
-              onChange={(e) => updateField('acceptMarketing', e.target.checked)}
-              className="peer absolute inset-0 z-10 h-5 w-5 cursor-pointer appearance-none opacity-0"
-            />
-            <div className="w-5 h-5 rounded border-2 border-white/30 transition-all
-                         group-hover:border-white/50
-                         peer-checked:bg-amber-500 peer-checked:border-amber-500">
-              {formData.acceptMarketing && (
-                <svg className="w-full h-full text-black p-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-            </div>
-          </div>
-          <span className="text-white/70 text-sm">
-            {t('marketing.text')}
-          </span>
-        </label>
       </div>
 
       {/* Info RGPD */}

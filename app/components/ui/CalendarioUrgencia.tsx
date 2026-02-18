@@ -24,6 +24,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import { WHATSAPP_NUMBER } from '@/lib/constants';
 import { useAvailability } from '@/hooks/usePublicData';
+import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
 // Tipus per traduccions
 type CalendarTranslations = ReturnType<typeof useTranslations<'calendar'>>;
@@ -453,6 +454,7 @@ function DayModal({ day, monthName, onClose, t, locale }: DayModalProps) {
             <div className="space-y-3">
               <Link
                 href={`/configurador?fecha=${day.date}`}
+                onClick={() => trackCTAClick('calendar_modal_configurator', 'calendar_modal')}
                 className="block w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-xl transition-all text-center"
               >
                 {t('modal.reserveDate')}
@@ -461,6 +463,10 @@ function DayModal({ day, monthName, onClose, t, locale }: DayModalProps) {
               <a
                 href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('modal.whatsappMsg', { date: formattedDate }))}`}
                 target="_blank" rel="noopener noreferrer"
+                onClick={() => {
+                  trackWhatsAppClick('calendar_modal');
+                  trackCTAClick('calendar_modal_whatsapp', 'calendar_modal');
+                }}
                 className="block w-full py-3 px-4 bg-emerald-500/20 text-emerald-400 font-medium rounded-xl hover:bg-emerald-500/30 transition-all text-center"
               >
                 {t('modal.consultWhatsapp')}
@@ -632,13 +638,19 @@ export default function CalendarioUrgencia({
         <p className="text-amber-400/80 text-sm md:text-base mb-6 text-center">
           {t('cta.subtitle')}
         </p>
-        <Link
-          href="/contacto"
+        <a
+          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('modal.whatsappMsg', { date: '' }))}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => {
+            trackWhatsAppClick('calendar_urgency_footer');
+            trackCTAClick('calendar_urgency_whatsapp_footer', 'calendar_urgency');
+          }}
           className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold rounded-full transition-all shadow-lg hover:shadow-amber-500/25 hover:scale-105"
         >
           <span>🎯</span>
-          <span>{tCommon('buttons.requestQuote')}</span>
-        </Link>
+          <span>{tCommon('buttons.whatsapp')}</span>
+        </a>
       </div>
 
       {/* Modal de día seleccionado */}

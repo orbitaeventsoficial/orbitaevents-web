@@ -17,9 +17,9 @@ test.describe('Service Pages', () => {
       // Page should load successfully
       await expect(page).not.toHaveTitle(/404|not found/i);
 
-      // Should have an h1 heading
-      const heading = page.locator('h1').first();
-      await expect(heading).toBeVisible();
+      // Should have a visible main heading
+      const visibleHeading = page.locator('h1:visible').first();
+      await expect(visibleHeading).toBeVisible();
     });
   }
 

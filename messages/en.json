@@ -1743,7 +1743,10 @@
       "eventTypeRequired": "Select the type of event",
       "dateFuture": "The date must be in the future",
       "privacyRequired": "You must accept the privacy policy",
-      "captchaRequired": "Please complete the security check"
+      "captchaRequired": "Please complete the security check",
+      "contactRequired": "Enter email or phone number",
+      "dateRequired": "Select an approximate date",
+      "locationRequired": "Enter event city or area"
     },
     "privacy": {
       "text": "I have read and accept the",
@@ -5029,10 +5032,22 @@
       "sectionLabel": "By the numbers",
       "heading": "Why choose",
       "headingHighlight": "Òrbita Events?",
-      "events": { "label": "Events done", "sublabel": "and counting" },
-      "rating": { "label": "Google Rating", "sublabel": "without exceptions" },
-      "response": { "label": "Response time", "sublabel": "always guaranteed" },
-      "experience": { "label": "Years of experience", "sublabel": "in Catalonia" }
+      "events": {
+        "label": "Events done",
+        "sublabel": "and counting"
+      },
+      "rating": {
+        "label": "Google Rating",
+        "sublabel": "without exceptions"
+      },
+      "response": {
+        "label": "Response time",
+        "sublabel": "always guaranteed"
+      },
+      "experience": {
+        "label": "Years of experience",
+        "sublabel": "in Catalonia"
+      }
     },
     "process": {
       "sectionLabel": "The process",

@@ -10,6 +10,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
+import { WHATSAPP_NUMBER } from '@/lib/constants';
+import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
 const FAQ_KEYS = ['1', '2', '3', '4', '5', '6', '7'] as const;
 
@@ -149,15 +151,21 @@ export default function FAQSection() {
           className="mt-10 text-center"
         >
           <p className="text-white/40 text-sm mb-4">{t('cta.title')}</p>
-          <Link
-            href="/contacto"
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hola! Tinc un dubte sobre el vostre servei d'esdeveniments")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => {
+              trackWhatsAppClick('faq_section');
+              trackCTAClick('faq_whatsapp_cta', 'faq_section');
+            }}
             className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500/20 rounded-full text-amber-400 text-sm font-semibold transition-all"
           >
             {t('cta.button')}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-          </Link>
+          </a>
         </motion.div>
       </div>
     </section>

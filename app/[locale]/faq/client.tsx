@@ -100,13 +100,13 @@ export default function FAQClient({
       {/* Categories Tabs */}
       <section className="sticky top-16 z-20 bg-zinc-950/90 backdrop-blur-sm border-b border-white/10 py-4">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
             {categories.map((cat) => (
               <button
                 key={cat.key}
                 onClick={() => setActiveCategory(cat.key)}
                 className={`
-                  flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all
+                  flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap snap-start transition-all
                   ${activeCategory === cat.key
                     ? 'bg-amber-500 text-black'
                     : 'bg-white/5 text-white/70 hover:bg-white/10'

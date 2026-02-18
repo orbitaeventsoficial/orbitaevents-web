@@ -1396,7 +1396,10 @@
       "eventTypeRequired": "Selecciona el tipus d'event",
       "dateFuture": "La data ha de ser futura",
       "privacyRequired": "Has d'acceptar la política de privacitat",
-      "captchaRequired": "Si us plau completa la verificació de seguretat"
+      "captchaRequired": "Si us plau completa la verificació de seguretat",
+      "contactRequired": "Introdueix email o telèfon",
+      "dateRequired": "Selecciona una data aproximada",
+      "locationRequired": "Indica ciutat o zona de l'esdeveniment"
     },
     "privacy": {
       "text": "He llegit i accepto la",
@@ -5201,10 +5204,22 @@
       "sectionLabel": "En xifres",
       "heading": "Per què triar",
       "headingHighlight": "Òrbita Events?",
-      "events": { "label": "Events realitzats", "sublabel": "i comptant" },
-      "rating": { "label": "Valoració Google", "sublabel": "sense excepcions" },
-      "response": { "label": "Temps de resposta", "sublabel": "garantit sempre" },
-      "experience": { "label": "Anys d'experiència", "sublabel": "a Catalunya" }
+      "events": {
+        "label": "Events realitzats",
+        "sublabel": "i comptant"
+      },
+      "rating": {
+        "label": "Valoració Google",
+        "sublabel": "sense excepcions"
+      },
+      "response": {
+        "label": "Temps de resposta",
+        "sublabel": "garantit sempre"
+      },
+      "experience": {
+        "label": "Anys d'experiència",
+        "sublabel": "a Catalunya"
+      }
     },
     "process": {
       "sectionLabel": "El procés",

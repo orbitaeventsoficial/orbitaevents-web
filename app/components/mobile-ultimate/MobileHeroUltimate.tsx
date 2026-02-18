@@ -26,6 +26,7 @@ import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion
 import { useMobile } from './MobileAppShell';
 import { useTranslations } from 'next-intl';
 import { WHATSAPP_URL_WITH_MESSAGE } from '@/lib/constants';
+import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PARTICLES BACKGROUND - ULTRA ENHANCED
@@ -155,7 +156,6 @@ function MorphingText() {
         {texts[index]}
       </span>
 
-      <span className="block mx-auto mt-2 w-1/2 max-w-[200px] h-[3px] bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
     </span>
   );
 }
@@ -209,11 +209,17 @@ function FloatingCTAs() {
 
   return (
     <div className="flex flex-col gap-3 w-full px-5">
-      {/* Primary CTA - ULTRA ENHANCED */}
+      {/* Primary CTA - WhatsApp */}
       <motion.a
-        href={`/${locale}/contacto`}
+        href={WHATSAPP_URL_WITH_MESSAGE(tMobileHero('whatsappMessage'))}
+        target="_blank"
+        rel="noopener noreferrer"
         whileTap={{ scale: 0.96 }}
         onTapStart={() => haptic('medium')}
+        onClick={() => {
+          trackWhatsAppClick('mobile_hero');
+          trackCTAClick('mobile_hero_whatsapp_primary', 'mobile_hero');
+        }}
         className="relative group w-full overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -232,7 +238,7 @@ function FloatingCTAs() {
         />
 
         <div className="relative flex items-center justify-center gap-2 py-3.5 px-4 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl font-black text-black text-sm shadow-2xl">
-          <span className="relative z-10">{t('buttons.requestQuote')}</span>
+          <span className="relative z-10">{t('buttons.whatsapp')}</span>
           <motion.svg
             className="w-4 h-4 relative z-10"
             fill="none"
@@ -245,11 +251,12 @@ function FloatingCTAs() {
         </div>
       </motion.a>
 
-      {/* Secondary CTA - WhatsApp ENHANCED */}
+      {/* Secondary CTA - Configurador */}
       <motion.a
-        href={WHATSAPP_URL_WITH_MESSAGE(tMobileHero('whatsappMessage'))}
+        href={`/${locale}/configurador`}
         whileTap={{ scale: 0.96 }}
         onTapStart={() => haptic('light')}
+        onClick={() => trackCTAClick('mobile_hero_configurator_secondary', 'mobile_hero')}
         className="relative group flex items-center justify-center gap-2.5 py-4 px-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-md rounded-2xl border-2 border-green-500/30 font-bold text-white text-sm shadow-xl overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -265,7 +272,7 @@ function FloatingCTAs() {
         >
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
         </motion.svg>
-        <span className="relative z-10">{t('buttons.whatsapp')} directe</span>
+        <span className="relative z-10">{t('buttons.requestQuote')}</span>
       </motion.a>
     </div>
   );
@@ -373,7 +380,7 @@ export default function MobileHeroUltimate() {
             initial={{ opacity: 0, y: 40, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.7, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[3rem] leading-[1.05] font-black text-white mt-6 mb-6 text-center"
+            className="text-[clamp(2.35rem,11vw,3rem)] leading-[1.05] font-black text-white mt-6 mb-6 text-center"
             style={{
               textShadow: '0 4px 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(251, 191, 36, 0.2)',
             }}

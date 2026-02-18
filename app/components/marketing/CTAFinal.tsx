@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { usePublicStats, useAvailability } from '@/hooks/usePublicData';
 import { WHATSAPP_NUMBER } from '@/lib/constants';
+import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CTA FINAL BRUTAL v2.1 - i18n complet
@@ -109,6 +110,10 @@ export default function CTAFinal() {
             <a
               href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('whatsappMsg'))}`}
               target="_blank" rel="noopener noreferrer"
+              onClick={() => {
+                trackWhatsAppClick('cta_final');
+                trackCTAClick('cta_final_whatsapp_primary', 'cta_final');
+              }}
               className="group relative inline-flex items-center justify-center gap-3 px-8 py-5 bg-[#25D366] rounded-2xl transition-all overflow-hidden"
             >
               {/* Glow de fondo al hover */}
@@ -130,6 +135,7 @@ export default function CTAFinal() {
             {/* Configurador - SECUNDARI - mejorado */}
             <Link
               href="/configurador"
+              onClick={() => trackCTAClick('cta_final_configurator_secondary', 'cta_final')}
               className="group relative inline-flex items-center justify-center gap-2 px-8 py-5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-500/30 rounded-2xl transition-all overflow-hidden"
             >
               {/* Efecto de shine */}
