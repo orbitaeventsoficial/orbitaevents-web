@@ -105,6 +105,11 @@ function verifyAuth(request: NextRequest): boolean {
 }
 
 function getSupabaseAdmin() {
+  const supabaseDisabled = ['1', 'true', 'yes', 'on'].includes(
+    (process.env.DISABLE_SUPABASE || '').trim().toLowerCase()
+  );
+  if (supabaseDisabled) return null;
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 

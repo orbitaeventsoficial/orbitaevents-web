@@ -136,6 +136,7 @@ function MorphingText() {
 
   const [index, setIndex] = useState(0);
   useEffect(() => {
+    if (!texts.length) return;
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % texts.length);
     }, 4500);
@@ -203,6 +204,7 @@ function ScrollIndicator() {
 function FloatingCTAs() {
   const { haptic, locale } = useMobile();
   const t = useTranslations('common');
+  const tMobileHero = useTranslations('mobileHero');
   const reduceMotion = useReducedMotion();
 
   return (
@@ -245,7 +247,7 @@ function FloatingCTAs() {
 
       {/* Secondary CTA - WhatsApp ENHANCED */}
       <motion.a
-        href={WHATSAPP_URL_WITH_MESSAGE('Hola! Vull info sobre events temàtics')}
+        href={WHATSAPP_URL_WITH_MESSAGE(tMobileHero('whatsappMessage'))}
         whileTap={{ scale: 0.96 }}
         onTapStart={() => haptic('light')}
         className="relative group flex items-center justify-center gap-2.5 py-4 px-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-md rounded-2xl border-2 border-green-500/30 font-bold text-white text-sm shadow-xl overflow-hidden"

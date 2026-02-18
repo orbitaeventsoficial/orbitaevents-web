@@ -218,18 +218,46 @@ function resolveLocale(req: NextRequest, candidate?: string): Locale {
 // Validacio de dades amb Zod
 const contactSchema = (t: Record<string, string>) => z.object({
   name: z.string().min(2, t.nameTooShort).max(50),
-  contact: z.string().min(3, t.enterEmailOrPhone),
+  contact: z.string().min(3, t.enterEmailOrPhone).optional(),
+  email: z.string().email().optional(),
+  phone: z.string().min(7).optional(),
   event: z.string().min(1, t.selectEventType),
   message: z.string().optional(),
   packId: z.string().optional(),
   packName: z.string().optional(),
   estimatedPrice: z.number().optional(),
   eventDate: z.string().optional(),
-  guests: z.number().optional(),
+  guests: z.union([z.number(), z.string()]).optional(),
+  guestCount: z.union([z.number(), z.string()]).optional(),
   extras: z.array(z.string()).optional(),
   locale: z.string().optional(),
   turnstileToken: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (!data.contact && !data.email && !data.phone) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['contact'],
+      message: t.enterEmailOrPhone,
+    });
+  }
 });
+
+function parseGuestCount(value: number | string | undefined): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.trim();
+  if (!normalized) return undefined;
+  if (/^\d+$/.test(normalized)) return Number(normalized);
+  const range = normalized.match(/^(\d+)\s*-\s*(\d+)$/);
+  if (range) {
+    const min = Number(range[1]);
+    const max = Number(range[2]);
+    return Math.round((min + max) / 2);
+  }
+  const plus = normalized.match(/^(\d+)\+$/);
+  if (plus) return Number(plus[1]);
+  return undefined;
+}
 
 function mapEventType(eventStr: string): EventType {
   const normalized = eventStr.toLowerCase();
@@ -287,6 +315,8 @@ export async function POST(req: NextRequest) {
     const {
       name,
       contact,
+      email,
+      phone,
       event,
       message,
       packId,
@@ -294,13 +324,23 @@ export async function POST(req: NextRequest) {
       estimatedPrice,
       eventDate,
       guests,
+      guestCount,
       extras,
       locale: formLocale,
     } = parsed.data;
 
-    const isEmail = contact.includes('@');
-    const clientEmail: string | undefined = isEmail ? contact : undefined;
-    const clientPhone: string | undefined = isEmail ? undefined : contact.replace(/[^\d+]/g, '');
+    const normalizedContact = contact?.trim() || '';
+    const normalizedEmail = email?.trim() || '';
+    const normalizedPhone = phone?.trim() || '';
+    const resolvedEmail = normalizedEmail || (normalizedContact.includes('@') ? normalizedContact : '');
+    const resolvedPhoneRaw = normalizedPhone || (!resolvedEmail ? normalizedContact : '');
+    const clientEmail: string | undefined = resolvedEmail || undefined;
+    const clientPhone: string | undefined = resolvedPhoneRaw
+      ? resolvedPhoneRaw.replace(/[^\d+]/g, '')
+      : undefined;
+    const isEmail = Boolean(clientEmail);
+    const displayContact = clientEmail || clientPhone || normalizedContact;
+    const parsedGuests = parseGuestCount(guests ?? guestCount);
 
     const leadId = `OE-${Date.now().toString(36).toUpperCase()}`;
     const timestamp = new Date().toLocaleString(locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES', {
@@ -326,7 +366,7 @@ export async function POST(req: NextRequest) {
             phone: clientPhone || existingLead.phone,
             eventType: mapEventType(event),
             eventDate: eventDate ? new Date(eventDate) : existingLead.eventDate,
-            guestCount: guests || existingLead.guestCount,
+            guestCount: parsedGuests || existingLead.guestCount,
             budget: estimatedPrice ? `${estimatedPrice} EUR` : existingLead.budget,
             message: message || existingLead.message,
             interestedPackId: packId || existingLead.interestedPackId,
@@ -354,7 +394,7 @@ export async function POST(req: NextRequest) {
             phone: clientPhone,
             eventType: mapEventType(event),
             eventDate: eventDate ? new Date(eventDate) : null,
-            guestCount: guests,
+            guestCount: parsedGuests,
             budget: estimatedPrice ? `${estimatedPrice} EUR` : null,
             message,
             interestedPackId: packId,
@@ -450,7 +490,7 @@ export async function POST(req: NextRequest) {
             phone: clientPhone,
             eventType: mapEventType(event),
             eventDate: eventDate ? new Date(eventDate) : undefined,
-            guestCount: guests,
+            guestCount: parsedGuests,
             budget: estimatedPrice ? `${estimatedPrice} EUR` : undefined,
             message,
             source: determineSource(packId, packName),
@@ -504,7 +544,7 @@ export async function POST(req: NextRequest) {
 
       <div class="field">
         <div class="field-label">${isEmail ? t.adminEmail : t.adminPhone}</div>
-        <div class="field-value">${escapeHtml(contact)}</div>
+        <div class="field-value">${escapeHtml(displayContact)}</div>
       </div>
 
       <div class="field">
@@ -519,10 +559,10 @@ export async function POST(req: NextRequest) {
       </div>
       ` : ''}
 
-      ${guests ? `
+      ${parsedGuests ? `
       <div class="field">
         <div class="field-label">${t.adminGuests}</div>
-        <div class="field-value">${guests} ${t.adminPeople}</div>
+        <div class="field-value">${parsedGuests} ${t.adminPeople}</div>
       </div>
       ` : ''}
 

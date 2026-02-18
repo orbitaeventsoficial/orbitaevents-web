@@ -21,7 +21,6 @@ import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/config/site-config';
 import { trackLead } from '@/lib/analytics';
-import { fetchWithCsrf } from '@/lib/csrf';
 import TurnstileWidget from '@/components/security/TurnstileWidget';
 
 // ============================================================
@@ -52,6 +51,20 @@ interface FormData {
 
 interface FormErrors {
   [key: string]: string;
+}
+
+function parseGuestCountValue(value: string): number | undefined {
+  if (!value) return undefined;
+  if (/^\d+$/.test(value)) return Number(value);
+  const rangeMatch = value.match(/^(\d+)\s*-\s*(\d+)$/);
+  if (rangeMatch) {
+    const min = Number(rangeMatch[1]);
+    const max = Number(rangeMatch[2]);
+    return Math.round((min + max) / 2);
+  }
+  const plusMatch = value.match(/^(\d+)\+$/);
+  if (plusMatch) return Number(plusMatch[1]);
+  return undefined;
 }
 
 // ============================================================
@@ -196,6 +209,7 @@ export default function ContactFormComplete({
 
     // Validate Turnstile token
     if (!turnstileToken) {
+      setTouched((prev) => ({ ...prev, turnstile: true }));
       setErrors({ ...formErrors, turnstile: t('validation.captchaRequired') });
       return;
     }
@@ -206,17 +220,21 @@ export default function ContactFormComplete({
     const controller = new AbortController();
     timeoutId = setTimeout(() => controller.abort(), 15000);
 
+    const guests = parseGuestCountValue(formData.guestCount);
+
     try {
-      const response = await fetchWithCsrf('/api/contact', {
+      const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
         body: JSON.stringify({
           name: formData.fullName,
-          contact: formData.email,
+          contact: formData.email || formData.phone,
+          email: formData.email,
           phone: formData.phone,
           event: formData.eventType,
           eventDate: formData.eventDate,
+          guests,
           guestCount: formData.guestCount,
           location: formData.location,
           budget: formData.budget,
@@ -238,9 +256,11 @@ export default function ContactFormComplete({
 
         setSubmitStatus('success');
 
-        // Redirigir a página de gracias
+        // Redirigir a pagina de gracias mantenint locale
         setTimeout(() => {
-          window.location.href = '/gracias';
+          const segments = window.location.pathname.split('/').filter(Boolean);
+          const localePrefix = ['ca', 'es', 'en'].includes(segments[0]) ? `/${segments[0]}` : '';
+          window.location.href = `${localePrefix}/gracias`;
         }, 1000); // Pequeño delay para que se vea el success
       } else {
         throw new Error('Error al enviar');

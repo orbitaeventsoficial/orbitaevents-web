@@ -22,6 +22,7 @@ type BookingRow = {
   extraHours: number;
   extraHourPrice: number;
   extrasTotal: number;
+  travelCost: number;
   source: LeadSource | 'UNKNOWN';
 };
 
@@ -30,6 +31,7 @@ export type ProfitabilityRow = BookingRow & {
   acquisitionCost: number;
   netMargin: number;
   marginPct: number;
+  travelCost: number;
 };
 
 export type ProfitabilityReport = {
@@ -154,7 +156,8 @@ function toProfitabilityRow(row: BookingRow, config: ProfitabilityConfig): Profi
     row.packPrice * config.packCostRatio
     + row.extrasTotal * config.extraCostRatio
     + row.extraHours * row.extraHourPrice * config.extraHourCostRatio
-    + config.fixedOperationalCost;
+    + config.fixedOperationalCost
+    + row.travelCost;
 
   const acquisitionCost = config.channelCac[row.source] ?? config.channelCac.UNKNOWN;
   const netMargin = row.total - directCost - acquisitionCost;
@@ -198,6 +201,9 @@ export async function buildProfitabilityReport(): Promise<ProfitabilityReport> {
 
   const rows: ProfitabilityRow[] = bookings.map((booking) => {
     const extrasTotal = booking.extras.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    // travelCost may not exist until migration is run
+    const bAny = booking as Record<string, unknown>;
+    const travelCost = typeof bAny.travelCost === 'number' ? bAny.travelCost : 0;
     const base: BookingRow = {
       id: booking.id,
       reference: booking.reference,
@@ -209,6 +215,7 @@ export async function buildProfitabilityReport(): Promise<ProfitabilityReport> {
       extraHours: booking.extraHours,
       extraHourPrice: booking.pack.extraHourPrice,
       extrasTotal,
+      travelCost,
       source: booking.lead?.source || 'UNKNOWN',
     };
     return toProfitabilityRow(base, config);

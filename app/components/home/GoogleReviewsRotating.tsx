@@ -3,7 +3,7 @@
 // ÒRBITA EVENTS - GOOGLE REVIEWS 5★ ROTATIVAS
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// Solo muestra reseñas de Google con 5 estrellas
+// Muestra reseñas reales de Google sin sesgo por rating
 // - Carousel automático rotativo
 // - Datos dinámicos desde google-reviews.json
 // - Sin testimonios estáticos
@@ -91,7 +91,7 @@ function RatingStars({ rating }: { rating: number }) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function ReviewCard({ review }: { review: GoogleReview }) {
-  const { author_name, text, relative_time_description, profile_photo_url } = review;
+  const { author_name, text, rating, relative_time_description, profile_photo_url } = review;
 
   return (
     <motion.div
@@ -130,7 +130,7 @@ function ReviewCard({ review }: { review: GoogleReview }) {
         <div className="flex-1 min-w-0">
           <h4 className="font-bold text-white text-xl mb-2">{author_name}</h4>
           <div className="flex items-center gap-3 mb-2">
-            <RatingStars rating={5} />
+            <RatingStars rating={rating} />
           </div>
           <div className="flex items-center gap-2">
             <Icons.Google />
@@ -166,10 +166,7 @@ export default function GoogleReviewsRotating() {
         const response = await fetch('/data/google-reviews.json');
         const data: ReviewsData = await response.json();
 
-        // Filtrar solo reseñas de 5 estrellas
-        const fiveStarReviews = data.reviews.filter(review => review.rating === 5);
-
-        setReviews(fiveStarReviews);
+        setReviews(data.reviews);
         setAverageRating(data.rating);
         setTotalReviews(data.total);
       } catch (error) {
@@ -229,7 +226,7 @@ export default function GoogleReviewsRotating() {
             </span>
           </h2>
           <div className="flex items-center justify-center gap-3 mt-6">
-            <RatingStars rating={5} />
+            <RatingStars rating={Math.round(averageRating)} />
             <span className="text-white text-2xl font-bold">{averageRating.toFixed(1)}</span>
             <span className="text-white/60">· {totalReviews} reseñas en Google</span>
           </div>

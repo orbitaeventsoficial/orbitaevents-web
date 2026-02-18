@@ -317,7 +317,7 @@ export const viewport: Viewport = {
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
     { media: '(prefers-color-scheme: dark)', color: '#0a0a0b' },
   ],
-  colorScheme: 'dark',
+  colorScheme: 'light dark',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -384,7 +384,6 @@ export default async function LocaleLayout({
 
         {/* Preload critical resources for LCP - Hero */}
         <link rel="preload" href="/img/hero-poster.webp" as="image" type="image/webp" fetchPriority="high" />
-        <link rel="preload" href="/video/Herovideo.mp4" as="video" type="video/mp4" />
 
         {/* Favicons */}
         <link rel="icon" href="/favicon.ico" sizes="48x48" />

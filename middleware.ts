@@ -292,15 +292,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/umami') ||
     pathname.includes('.')
   ) {
-    const requestHeaders = new Headers(req.headers);
-    requestHeaders.set('x-admin-authenticated', '1');
-    requestHeaders.set('x-admin-auth-method', isBearerAuth ? 'bearer' : 'basic');
-
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
+    return NextResponse.next();
   }
 
   // Verificar si ya tiene locale en el path

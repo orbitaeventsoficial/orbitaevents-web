@@ -1,18 +1,98 @@
 <!doctype html>
-<html lang="es">
+<html lang="ca">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Política de Privacidad | Orbita Events</title>
-  <meta name="description" content="Política de privacidad de Orbita Events." />
+  <title>Política de privacitat OAuth | Orbita Events</title>
+  <meta name="description" content="Política de privacitat d'OAuth de Google per a Orbita Events." />
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: Arial, sans-serif; margin: 0; background: #0b1020; color: #e8ecf1; line-height: 1.6; }
+    main { max-width: 920px; margin: 0 auto; padding: 32px 20px 48px; }
+    h1, h2 { line-height: 1.25; }
+    h1 { margin-top: 0; }
+    h2 { margin-top: 28px; font-size: 1.2rem; }
+    p, li { color: #d7dde6; }
+    a { color: #7cc4ff; }
+    code { background: #141b30; padding: 2px 6px; border-radius: 6px; }
+    .card { background: #11182b; border: 1px solid #2a3553; border-radius: 12px; padding: 16px; }
+    .muted { color: #9eb0cb; }
+  </style>
 </head>
 <body>
   <main>
-    <h1>Política de Privacidad</h1>
-    <p>Última actualización: 14 de febrero de 2026</p>
-    <p>Orbita Events trata datos personales para responder solicitudes de contacto, gestionar presupuestos y prestar servicios.</p>
-    <p>Más información legal completa: <a href="https://orbitaevents.com/legal/privacidad">https://orbitaevents.com/legal/privacidad</a></p>
-    <p><a href="https://orbitaevents.com/oauth-home.html">Volver a la página principal</a></p>
+    <h1>Política de privacitat OAuth de Google</h1>
+    <p class="muted">Última actualització: 17 de febrer de 2026</p>
+
+    <div class="card">
+      <p>
+        Aquesta política explica com Orbita Events accedeix, utilitza, emmagatzema i comparteix dades d'usuari de Google
+        quan un administrador connecta integracions OAuth a <code>orbitaevents.com</code>.
+      </p>
+      <p>
+        Aquesta pàgina complementa la política general:
+        <a href="https://orbitaevents.com/legal/privacidad">https://orbitaevents.com/legal/privacidad</a>.
+      </p>
+    </div>
+
+    <h2>1. Dades a les quals accedim (Data Accessed)</h2>
+    <p>Només accedim a les dades necessàries per a les funcionalitats activades per l'usuari administrador:</p>
+    <ul>
+      <li><strong>Google Business Profile</strong> (<code>https://www.googleapis.com/auth/business.manage</code>): comptes i localitzacions de negoci per configurar integracions de ressenyes i perfil.</li>
+      <li><strong>Gmail</strong> (<code>https://www.googleapis.com/auth/gmail.readonly</code>, <code>https://www.googleapis.com/auth/gmail.modify</code>): metadades i contingut de correus per gestionar inbox comercial intern (lectura, classificació i estat).</li>
+      <li><strong>Google Calendar</strong> (<code>https://www.googleapis.com/auth/calendar.events</code>, <code>https://www.googleapis.com/auth/calendar.readonly</code>): llistat de calendaris i esdeveniments necessaris per sincronitzar reserves.</li>
+      <li><strong>Identificació bàsica de compte connectat</strong>: adreça de correu del compte i identificadors tècnics de calendari/compte per mantenir la connexió.</li>
+    </ul>
+
+    <h2>2. Com utilitzem les dades (Data Usage)</h2>
+    <ul>
+      <li>Configurar i mantenir connexions OAuth iniciades per l'administrador.</li>
+      <li>Mostrar i operar la safata comercial interna (Gmail) dins del panell d'administració.</li>
+      <li>Sincronitzar reserves i disponibilitat amb Google Calendar.</li>
+      <li>Configurar la integració de Google Business Profile per funcionalitats internes de negoci.</li>
+      <li>Monitoritzar estat tècnic de connexions (data de connexió, compte vinculat, errors d'integració).</li>
+    </ul>
+    <p><strong>No utilitzem dades de Google per publicitat.</strong></p>
+    <p><strong>No venem dades de Google a tercers.</strong></p>
+    <p><strong>No utilitzem dades de Google per entrenar models d'IA/ML generalistes.</strong></p>
+
+    <h2>3. Emmagatzematge i seguretat (Storage & Security)</h2>
+    <ul>
+      <li>Els <strong>refresh tokens</strong> i metadades d'integració es guarden al backend segur de l'aplicació.</li>
+      <li>Els <strong>access tokens</strong> s'utilitzen de forma temporal per fer crides API i no es publiquen al client.</li>
+      <li>L'accés al panell administratiu està restringit per autenticació d'admin.</li>
+      <li>Les comunicacions amb Google API es fan per HTTPS.</li>
+    </ul>
+
+    <h2>4. Compartició de dades (Data Sharing)</h2>
+    <p>Orbita Events no comparteix dades de Google amb tercers, excepte:</p>
+    <ul>
+      <li>Proveïdors d'infraestructura necessaris per allotjar i operar l'aplicació (hosting i base de dades).</li>
+      <li>Requeriments legals o ordres vàlides d'autoritat competent.</li>
+    </ul>
+
+    <h2>5. Retenció i eliminació (Retention & Deletion)</h2>
+    <ul>
+      <li>Les dades OAuth es mantenen mentre la integració estigui activa o sigui necessària per prestar el servei.</li>
+      <li>L'administrador pot desconnectar la integració i sol·licitar eliminació de credencials associades.</li>
+      <li>Per sol·licituds d'accés, rectificació o supressió: <a href="mailto:info@orbitaevents.com">info@orbitaevents.com</a>.</li>
+    </ul>
+
+    <h2>6. Compliment de polítiques Google</h2>
+    <p>
+      L'ús de dades obtingudes via Google API compleix la
+      <em>Google API Services User Data Policy</em>, inclosos els requisits d'<em>Limited Use</em>,
+      i els termes aplicables de Google APIs.
+    </p>
+
+    <h2>7. Contacte</h2>
+    <p>
+      Responsable: Orbita Events<br />
+      Correu: <a href="mailto:info@orbitaevents.com">info@orbitaevents.com</a><br />
+      Web: <a href="https://orbitaevents.com">https://orbitaevents.com</a>
+    </p>
+
+    <p><a href="https://orbitaevents.com/oauth-home.html">Tornar a la pàgina OAuth</a></p>
   </main>
 </body>
 </html>

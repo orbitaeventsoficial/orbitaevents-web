@@ -230,6 +230,45 @@ export function getInstagramUrl(instagram: string): string {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// DNI / NIF / NIE
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Normalitza un DNI/NIF/NIE per detectar duplicats
+ * - Uppercase
+ * - Elimina espais, guions, punts
+ * - "12.345.678-A" → "12345678A"
+ * - "X-1234567-L" → "X1234567L"
+ */
+export function normalizeDni(dni: string): string {
+  if (!dni) return '';
+  return dni.toUpperCase().replace(/[\s.\-]/g, '').trim();
+}
+
+/**
+ * Valida un DNI/NIF espanyol (8 dígits + lletra)
+ * o NIE (X/Y/Z + 7 dígits + lletra)
+ */
+export function isValidDni(dni: string): boolean {
+  const normalized = normalizeDni(dni);
+  if (!normalized) return false;
+  // NIF: 8 dígits + lletra
+  if (/^\d{8}[A-Z]$/.test(normalized)) {
+    const number = parseInt(normalized.slice(0, 8), 10);
+    const letters = 'TRWAGMYFPDXBNJZSQVHLCKE';
+    return normalized[8] === letters[number % 23];
+  }
+  // NIE: X/Y/Z + 7 dígits + lletra
+  if (/^[XYZ]\d{7}[A-Z]$/.test(normalized)) {
+    const prefix = normalized[0] === 'X' ? '0' : normalized[0] === 'Y' ? '1' : '2';
+    const number = parseInt(prefix + normalized.slice(1, 8), 10);
+    const letters = 'TRWAGMYFPDXBNJZSQVHLCKE';
+    return normalized[8] === letters[number % 23];
+  }
+  return false;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // CODIS DE DESCOMPTE
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -269,6 +308,7 @@ export interface CustomerData {
   phone?: string;
   name: string;
   instagram?: string;
+  dni?: string;
 }
 
 export interface NormalizedCustomerData extends CustomerData {
@@ -276,6 +316,7 @@ export interface NormalizedCustomerData extends CustomerData {
   phoneNormalized: string | null;
   nameNormalized: string;
   instagramNormalized: string | null;
+  dniNormalized: string | null;
   nameCleaned: string; // Nom capitalitzat correctament
 }
 
@@ -290,6 +331,8 @@ export function normalizeCustomerData(data: CustomerData): NormalizedCustomerDat
     nameCleaned: capitalizeName(data.name),
     instagram: data.instagram?.trim() || undefined,
     instagramNormalized: data.instagram ? normalizeInstagram(data.instagram) : null,
+    dni: data.dni?.trim() || undefined,
+    dniNormalized: data.dni ? normalizeDni(data.dni) : null,
   };
 }
 

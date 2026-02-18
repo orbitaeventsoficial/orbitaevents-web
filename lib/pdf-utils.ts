@@ -563,6 +563,9 @@ export async function generateQuotePDF(
     // Never truncate: if content doesn't fit, continue on a new page.
     if (y + space <= pageBottom) return true;
     doc.addPage();
+    // Dark background for the new page
+    doc.setFillColor(18, 20, 24);
+    doc.rect(0, 0, PAGE.width, PAGE.height, 'F');
     drawHeader(true);
     return y + space <= pageBottom;
   };
@@ -806,7 +809,12 @@ export async function generateQuotePDF(
   doc.setFontSize(7.5);
   doc.text(`${t.validUntilPrefix} ${validityDays} ${t.validUntilSuffix} · ${t.disclaimer}`, left, y);
 
-  drawFooter();
+  // Add footer to ALL pages (not just the last one)
+  const totalPages = doc.internal.pages.length - 1;
+  for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+    doc.setPage(pageNum);
+    drawFooter();
+  }
   return doc;
 }
 

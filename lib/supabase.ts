@@ -11,6 +11,9 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || '';
+const supabaseDisabled = ['1', 'true', 'yes', 'on'].includes(
+  (process.env.DISABLE_SUPABASE || '').trim().toLowerCase()
+);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -192,12 +195,13 @@ export interface AuditLog {
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Check if Supabase is configured
-const isSupabaseConfigured = supabaseUrl && supabaseAnonKey;
+const isSupabaseConfigured = !supabaseDisabled && !!supabaseUrl && !!supabaseAnonKey;
 
 // Debug logging (only in development)
 if (typeof window === 'undefined' && process.env.NODE_ENV === 'development') {
   const { log } = require('@/lib/logger');
   log.debug('Supabase configuration status', {
+    disabled: supabaseDisabled,
     urlConfigured: !!supabaseUrl,
     anonKeyConfigured: !!supabaseAnonKey,
     serviceKeyConfigured: !!supabaseServiceKey,

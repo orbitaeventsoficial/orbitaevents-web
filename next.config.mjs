@@ -8,8 +8,8 @@ const nextConfig = {
     ignoreDuringBuilds: false,
   },
   typescript: {
-    // Permite generar build aunque existan errores de tipos heredados en el proyecto
-    ignoreBuildErrors: true,
+    // Bloquea builds con errores de tipo para evitar regressions en produccion
+    ignoreBuildErrors: false,
   },
 
   images: {
@@ -40,6 +40,15 @@ const nextConfig = {
   async headers() {
     // Detectar si estamos en desarrollo
     const isDev = process.env.NODE_ENV === 'development';
+    const scriptSrc = [
+      "script-src 'self' 'unsafe-inline'",
+      ...(isDev ? ["'unsafe-eval'"] : []),
+      'https://www.googletagmanager.com',
+      'https://www.google-analytics.com',
+      'https://challenges.cloudflare.com',
+      'https://cloud.umami.is',
+    ].join(' ');
+    const allowedOrigin = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
 
     // Security headers comunes
     const securityHeaders = [
@@ -57,9 +66,8 @@ const nextConfig = {
           "base-uri 'self'",
           "object-src 'none'",
           "frame-ancestors 'none'",
-          // En desarrollo, agregar 'unsafe-eval' para Next.js hot reload
-          // También necesario para Cloudflare Turnstile CAPTCHA
-          `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com https://cloud.umami.is`,
+          // En desarrollo permitimos unsafe-eval para el hot reload de Next.js
+          scriptSrc,
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com",
           "img-src 'self' data: blob: https://orbitaevents.com https://*.supabase.co https://lh3.googleusercontent.com https://maps.googleapis.com https://*.googletagmanager.com https://*.google-analytics.com https://stats.g.doubleclick.net https://ssl.google-analytics.com https://www.google.es",
           "font-src 'self' https://fonts.gstatic.com",
@@ -99,8 +107,8 @@ const nextConfig = {
           ...securityHeaders,
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
           { key: 'Vary', value: 'Origin' },
-          // CORS: permitir solo requests del dominio principal
-          { key: 'Access-Control-Allow-Origin', value: 'https://orbitaevents.com' },
+          // CORS: permitir solo requests del dominio principal configurado
+          { key: 'Access-Control-Allow-Origin', value: allowedOrigin },
           { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
           { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-CSRF-Token' },
           { key: 'Access-Control-Max-Age', value: '86400' },

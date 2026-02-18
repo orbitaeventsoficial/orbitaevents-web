@@ -229,6 +229,7 @@ model ExtraInventory {
 
 model Customer {
   id                String   @id @default(cuid())
+  customerNumber    Int?     @unique @default(autoincrement()) // Número de client: CLI-0001
 
   // Dades normalitzades
   email             String   @unique
@@ -237,6 +238,10 @@ model Customer {
   phoneNormalized   String?  // només dígits, amb prefix internacional
   name              String
   nameNormalized    String   // lowercase, sense accents, per cerques
+
+  // Document d'identitat (opcional, únic si present)
+  dni               String?
+  dniNormalized     String?  @unique // uppercase, sense espais ni guions
 
   // Instagram (opcional)
   instagram         String?
@@ -275,6 +280,7 @@ model Customer {
   @@index([emailNormalized])
   @@index([phoneNormalized])
   @@index([nameNormalized])
+  @@index([dniNormalized])
   @@map("customers")
 }
 
@@ -606,6 +612,11 @@ model Booking {
   remainingAmount Float
   remainingPaid  Boolean       @default(false)
   remainingPaidAt DateTime?
+
+  // Travel / distance tracking
+  distanceKm     Float?        // km anada i tornada
+  fuelCostPerKm  Float?        @default(0.15) // cost €/km (gasolina + desgast)
+  travelCost     Float?        // cost total desplaçament (calculat o manual)
 
   // Status
   status         BookingStatus @default(PENDING)
