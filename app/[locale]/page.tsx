@@ -105,10 +105,19 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   const { locale } = params;
   const t = await getTranslations({ locale, namespace: 'homePage' });
 
+  const base = 'https://orbitaevents.com';
   return {
     title: t('meta.title'),
     description: t('meta.description'),
-    alternates: { canonical: `/${locale}` },
+    alternates: {
+      canonical: locale === 'ca' ? base : `${base}/${locale}`,
+      languages: {
+        'ca': base,
+        'es': `${base}/es`,
+        'en': `${base}/en`,
+        'x-default': base,
+      },
+    },
     openGraph: {
       title: t('meta.ogTitle'),
       description: t('meta.ogDescription'),

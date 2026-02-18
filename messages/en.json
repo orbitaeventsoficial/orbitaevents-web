@@ -6368,7 +6368,8 @@
       "sectionLabel": "Verified Google reviews",
       "sectionTitle": "What our clients say",
       "viewAll": "View all reviews",
-      "inGoogle": "reviews on Google"
+      "inGoogle": "reviews on Google",
+      "leaveReview": "Leave your review ⭐"
     },
     "trustedBy": {
       "sectionTitle": "Trusted by"

@@ -41,11 +41,18 @@ export async function generateMetadata({
     ? `Read real reviews from our clients. ${SITE_CONFIG.stats.reviewCount}+ verified Google reviews. Rating ${SITE_CONFIG.stats.avgRating}/5. DJ and events in Barcelona & Girona.`
     : `Lee las opiniones reales de nuestros clientes. ${SITE_CONFIG.stats.reviewCount}+ reseñas verificadas en Google. Valoración ${SITE_CONFIG.stats.avgRating}/5. DJ y eventos en Barcelona y Girona.`;
 
+  const base = 'https://orbitaevents.com';
   return {
     title,
     description,
     alternates: {
-      canonical: `/${locale}/opiniones`,
+      canonical: locale === 'ca' ? `${base}/opiniones` : `${base}/${locale}/opiniones`,
+      languages: {
+        'ca': `${base}/opiniones`,
+        'es': `${base}/es/opiniones`,
+        'en': `${base}/en/opiniones`,
+        'x-default': `${base}/opiniones`,
+      },
     },
     openGraph: {
       title,
