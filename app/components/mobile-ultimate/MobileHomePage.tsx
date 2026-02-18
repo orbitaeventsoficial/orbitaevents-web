@@ -34,6 +34,7 @@ import MobileServicesCards from './MobileServicesCards';
 import MobileCTAUrgency from './MobileCTAUrgency';
 import MobileStatsSection from './MobileStatsSection';
 import MobileProcessSection from './MobileProcessSection';
+import MobilePortfolioShowcase from './MobilePortfolioShowcase';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
@@ -620,6 +621,9 @@ export default function MobileHomePage() {
 
           {/* Services */}
           <MobileServicesCards />
+
+          {/* Portfolio — fotos reals dels events */}
+          <MobilePortfolioShowcase />
 
           {/* Com funciona — 3 passos */}
           <MobileProcessSection />

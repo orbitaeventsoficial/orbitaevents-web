@@ -77,6 +77,10 @@ const ProcessSection = dynamic(() => import('@/app/components/marketing/ProcessS
   ssr: false,
   loading: () => <SectionSkeleton />,
 });
+const PortfolioShowcase = dynamic(() => import('@/app/components/marketing/PortfolioShowcase'), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
 const GarantiaSection = dynamic(() => import('@/app/components/marketing/GarantiaSection'), {
   ssr: false,
 });
@@ -134,7 +138,10 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 5. COM FUNCIONA - 3 passos */}
+        {/* 5. PORTFOLIO - Fotos reals dels events */}
+        <PortfolioShowcase />
+
+        {/* 6. COM FUNCIONA - 3 passos */}
         <ProcessSection />
 
         {/* 6. RESEÑAS GOOGLE - Prova social */}
