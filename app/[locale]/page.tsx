@@ -69,6 +69,14 @@ const GoogleReviewsRotating = dynamic(() => import('@/app/components/home/Google
 const TrustedByLogos = dynamic(() => import('@/app/components/marketing/TrustedByLogos'), {
   ssr: false,
 });
+const StatsSection = dynamic(() => import('@/app/components/marketing/StatsSection'), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
+const ProcessSection = dynamic(() => import('@/app/components/marketing/ProcessSection'), {
+  ssr: false,
+  loading: () => <SectionSkeleton />,
+});
 const GarantiaSection = dynamic(() => import('@/app/components/marketing/GarantiaSection'), {
   ssr: false,
 });
@@ -116,20 +124,26 @@ export default function HomePage() {
         {/* 2. SERVEIS - Grid elegant 4 cards */}
         <ServicesGridElegant />
 
-        {/* 3. CALENDARIO - Urgència subtil */}
+        {/* 3. STATS - Per què triar Òrbita Events */}
+        <StatsSection />
+
+        {/* 4. CALENDARIO - Urgència subtil */}
         <section className="py-6 md:py-10 bg-[#0A0A0A]">
           <div className="container mx-auto px-6">
             <CalendarioUrgencia />
           </div>
         </section>
 
-        {/* 4. RESEÑAS GOOGLE - Prova social */}
+        {/* 5. COM FUNCIONA - 3 passos */}
+        <ProcessSection />
+
+        {/* 6. RESEÑAS GOOGLE - Prova social */}
         <GoogleReviewsRotating />
 
-        {/* 5. LOGOS CLIENTES - Confían en nosotros */}
+        {/* 7. LOGOS CLIENTES - Confían en nosotros */}
         <TrustedByLogos />
 
-        {/* 6. GARANTÍA - Confiança */}
+        {/* 8. GARANTÍA - Confiança */}
         <GarantiaSection />
 
         {/* 6. CTA FINAL - Conversió */}

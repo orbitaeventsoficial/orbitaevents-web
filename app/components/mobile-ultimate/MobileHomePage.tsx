@@ -32,6 +32,8 @@ import MobileErrorBoundary from './MobileErrorBoundary';
 import MobileHeroUltimate from './MobileHeroUltimate';
 import MobileServicesCards from './MobileServicesCards';
 import MobileCTAUrgency from './MobileCTAUrgency';
+import MobileStatsSection from './MobileStatsSection';
+import MobileProcessSection from './MobileProcessSection';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useMobile } from './MobileAppShell';
@@ -307,12 +309,12 @@ function MobileReviewsSection() {
   useEffect(() => {
     async function loadReviews() {
       try {
-        const response = await fetch('/data/google-reviews.json');
+        const response = await fetch('/api/google-reviews');
         const data = await response.json();
-        const fiveStarReviews = data.reviews.filter((r: GoogleReview) => r.rating === 5);
+        const fiveStarReviews = (data.reviews || []).filter((r: GoogleReview) => r.rating === 5);
         setReviews(fiveStarReviews);
-        setAverageRating(data.rating);
-        setTotalReviews(data.total);
+        setAverageRating(data.rating ?? 5);
+        setTotalReviews(data.user_ratings_total ?? 0);
       } catch {
         // silently fail
       }
@@ -610,11 +612,17 @@ export default function MobileHomePage() {
           {/* Quick Features */}
           <QuickFeatures />
 
+          {/* Stats animats — per què triar Òrbita */}
+          <MobileStatsSection />
+
           {/* Trusted By */}
           <TrustedBySection />
 
           {/* Services */}
           <MobileServicesCards />
+
+          {/* Com funciona — 3 passos */}
+          <MobileProcessSection />
 
           {/* Guarantees */}
           <GuaranteeSection />
