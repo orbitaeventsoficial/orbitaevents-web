@@ -269,7 +269,7 @@ export default function MobileServicesCards() {
       priceKey: 'empresas.price',
       badgeKey: '',
       badgeColor: '',
-      image: '/img/portfolio/eventos-empresa/eventos-empresa-01.avif',
+      image: '/img/portfolio/eventos-empresa/eventos-empresa-02.avif',
       gradient: 'from-blue-500/14 via-cyan-500/6 to-transparent',
       href: '/servicios/empresas',
       features: ['feature1', 'feature2', 'feature3'],
@@ -315,3 +315,4 @@ export default function MobileServicesCards() {
     </section>
   );
 }
+

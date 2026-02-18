@@ -14,7 +14,7 @@ export const PORTFOLIO_CATEGORIES = [
   {
     "slug": "eventos-empresa",
     "name": "Eventos empresa",
-    "cover": "/img/portfolio/eventos-empresa/eventos-empresa-01.avif"
+    "cover": "/img/portfolio/eventos-empresa/eventos-empresa-02.avif"
   },
   {
     "slug": "fiestas-infantiles",
@@ -169,7 +169,7 @@ export const PORTFOLIO_IMAGES = {
   ],
   "eventos-empresa": [
     {
-      "src": "/img/portfolio/eventos-empresa/eventos-empresa-01.avif",
+      "src": "/img/portfolio/eventos-empresa/eventos-empresa-02.avif",
       "alt": "Eventos empresa – Eventos empresa  01"
     },
     {
@@ -468,3 +468,4 @@ export const PORTFOLIO_IMAGES = {
     }
   ]
 };
+

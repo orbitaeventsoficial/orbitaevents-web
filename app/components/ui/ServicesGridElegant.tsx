@@ -12,7 +12,7 @@ const SERVICE_KEYS = ['casaments', 'festes', 'empreses'] as const;
 const SERVICE_IMAGES: Record<string, string> = {
   casaments: '/img/portfolio/bodas/bodas-01.avif',
   festes: '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
-  empreses: '/img/portfolio/eventos-empresa/eventos-empresa-01.avif',
+  empreses: '/img/portfolio/eventos-empresa/eventos-empresa-02.avif',
 };
 
 // Estilos por servicio
@@ -182,3 +182,4 @@ export default function ServicesGridElegant() {
     </section>
   );
 }
+

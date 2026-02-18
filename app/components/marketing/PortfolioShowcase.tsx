@@ -20,7 +20,7 @@ const CATEGORY_CONFIGS = [
       '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-01.avif',
       '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif',
       '/img/portfolio/bodas/bodas-01.avif',
-      '/img/portfolio/eventos-empresa/eventos-empresa-01.avif',
+      '/img/portfolio/eventos-empresa/eventos-empresa-02.avif',
       '/img/portfolio/fiestas-privadas/fiestas-privadas-01.avif',
       '/img/portfolio/discomovil/discomovil-05.avif',
       '/img/portfolio/fiestas-tematicas-halloween/fiestas-tematicas-halloween-05.avif',
@@ -172,3 +172,4 @@ export default function PortfolioShowcase() {
     </section>
   );
 }
+
