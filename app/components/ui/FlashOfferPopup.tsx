@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 
 /**
@@ -33,11 +33,6 @@ interface OfferConfig {
   finePrint: string;
   gradient: string;
   accentColor: string;
-  countdown: string;
-  minutes: string;
-  seconds: string;
-  close: string;
-  save: string;
 }
 
 // Solo oferta flash de 250€
@@ -78,73 +73,40 @@ function calculateTimeLeft(startTime: number): TimeLeft {
 
 export default function FlashOfferPopup() {
   const t = useTranslations('flashOffer');
-  const locale = useLocale();
   const offer = useMemo<OfferConfig>(() => {
-    const fallbackByLocale: Record<string, { title: string; description: string; cta: string; finePrint: string; countdown: string; minutes: string; seconds: string; close: string; save: string }> = {
-      es: {
-        title: 'Reserva antes de que se acabe el tiempo',
-        description: 'Fiesta privada completa: DJ + Sonido + Luces (hasta 50 personas)',
-        cta: `Quiero esta oferta por ${OFFER_BASE.value}€`,
-        finePrint: '*Oferta válida durante el tiempo indicado. Hasta 50 personas. Sujeto a disponibilidad.',
-        countdown: 'La oferta termina en:',
-        minutes: 'min',
-        seconds: 'seg',
-        close: 'Cerrar oferta',
-        save: `Ahorra ${OFFER_BASE.originalValue! - OFFER_BASE.value}€`,
-      },
-      ca: {
-        title: "Reserva abans que s'acabi el temps",
-        description: 'Festa privada completa: DJ + So + Llums (fins a 50 persones)',
-        cta: `Vull aquesta oferta per ${OFFER_BASE.value}€`,
-        finePrint: '*Oferta vàlida durant el temps indicat. Fins a 50 persones. Subjecte a disponibilitat.',
-        countdown: "L'oferta acaba en:",
-        minutes: 'min',
-        seconds: 'seg',
-        close: 'Tancar oferta',
-        save: `Estalvia ${OFFER_BASE.originalValue! - OFFER_BASE.value}€`,
-      },
-      en: {
-        title: 'Book before time runs out',
-        description: 'Complete private party: DJ + Sound + Lights (up to 50 people)',
-        cta: `Get this offer for ${OFFER_BASE.value}€`,
-        finePrint: '*Offer valid for the indicated time. Up to 50 people. Subject to availability.',
-        countdown: 'Offer ends in:',
-        minutes: 'min',
-        seconds: 'sec',
-        close: 'Close offer',
-        save: `Save ${OFFER_BASE.originalValue! - OFFER_BASE.value}€`,
-      },
-    };
-    const fallback = fallbackByLocale[locale] ?? fallbackByLocale.es;
-    const safeText = (value: string, fallbackValue: string) =>
-      !value || value.includes('flashOffer.') ? fallbackValue : value;
-
     const rawFeatures = t.raw('features');
     const features = Array.isArray(rawFeatures) ? rawFeatures : [];
-    const saveText = safeText(
-      t('save', { amount: OFFER_BASE.originalValue! - OFFER_BASE.value }),
-      fallback.save
-    );
-
     return {
       ...OFFER_BASE,
-      badge: safeText(t('badge'), '⚡ FLASH OFFER - LIMITED TIME'),
-      title: safeText(t('title'), fallback.title),
-      description: safeText(t('description'), fallback.description),
+      badge: t('badge'),
+      title: t('title'),
+      description: t('description'),
       features,
-      cta: safeText(t('cta', { price: OFFER_BASE.value }), fallback.cta),
-      finePrint: safeText(t('finePrint'), fallback.finePrint),
-      countdown: safeText(t('countdown'), fallback.countdown),
-      minutes: safeText(t('minutes'), fallback.minutes),
-      seconds: safeText(t('seconds'), fallback.seconds),
-      close: safeText(t('close'), fallback.close),
-      save: saveText,
+      cta: t('cta', { price: OFFER_BASE.value }),
+      finePrint: t('finePrint'),
     };
-  }, [locale, t]);
+  }, [t]);
   const [isVisible, setIsVisible] = useState(false);
   const [startTime, setStartTime] = useState<number>(0);
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ minutes: 15, seconds: 0 });
   const [isMounted, setIsMounted] = useState(false);
+  const saveText = t('save', { amount: (offer.originalValue ?? 0) - offer.value });
+  const closeLabel = t('close');
+  const countdownText = t('countdown');
+  const minutesText = t('minutes');
+  const secondsText = t('seconds');
+  const hasUnresolvedCopy = [
+    offer.badge,
+    offer.title,
+    offer.description,
+    offer.cta,
+    offer.finePrint,
+    saveText,
+    closeLabel,
+    countdownText,
+    minutesText,
+    secondsText,
+  ].some((value) => value.includes('flashOffer.'));
 
   // Marcar componente como montado (solo cliente)
   useEffect(() => {
@@ -207,6 +169,11 @@ export default function FlashOfferPopup() {
     return null;
   }
 
+  // Si faltan traducciones, no mostramos popup para evitar textos raros
+  if (hasUnresolvedCopy) {
+    return null;
+  }
+
   const accentClasses = offer.accentColor === 'amber'
     ? {
         badge: 'bg-amber-500/10 border-amber-500/20',
@@ -260,7 +227,7 @@ export default function FlashOfferPopup() {
                 <button
                   onClick={handleClose}
                   className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-white transition-colors z-10"
-                  aria-label={offer.close}
+                  aria-label={closeLabel}
                 >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -300,7 +267,7 @@ export default function FlashOfferPopup() {
                   </div>
                   {offer.originalValue && (
                     <span className="text-green-400 text-xs font-medium">
-                      {offer.save}
+                      {saveText}
                     </span>
                   )}
                 </div>
@@ -323,7 +290,7 @@ export default function FlashOfferPopup() {
                   {/* Text d'urgència */}
                   <div className="text-center mb-2">
                     <span className="text-red-400 text-sm font-bold uppercase tracking-wide animate-pulse">
-                      ⏰ {offer.countdown}
+                      ⏰ {countdownText}
                     </span>
                   </div>
 
@@ -337,13 +304,13 @@ export default function FlashOfferPopup() {
                         <span className="block text-2xl md:text-3xl font-bold text-red-400">
                           {timeLeft.minutes.toString().padStart(2, '0')}
                         </span>
-                        <span className="text-[10px] text-red-300/70 uppercase font-semibold">{offer.minutes}</span>
+                        <span className="text-[10px] text-red-300/70 uppercase font-semibold">{minutesText}</span>
                       </div>
                       <div className="bg-black/40 rounded-lg p-2 border border-red-500/30">
                         <span className="block text-2xl md:text-3xl font-bold text-red-400">
                           {timeLeft.seconds.toString().padStart(2, '0')}
                         </span>
-                        <span className="text-[10px] text-red-300/70 uppercase font-semibold">{offer.seconds}</span>
+                        <span className="text-[10px] text-red-300/70 uppercase font-semibold">{secondsText}</span>
                       </div>
                     </div>
                   </div>

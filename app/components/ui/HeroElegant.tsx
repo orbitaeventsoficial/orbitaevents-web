@@ -116,7 +116,7 @@ export default function HeroElegant() {
 
             {/* CTA Principal - WhatsApp */}
             <a
-              href={WHATSAPP_URL_WITH_MESSAGE("Hola! M'agradaria informació sobre el meu event")}
+              href={WHATSAPP_URL_WITH_MESSAGE(t('whatsappMessage'))}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {

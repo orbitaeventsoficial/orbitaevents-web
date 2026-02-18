@@ -7,6 +7,7 @@ import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Link } from '@/lib/navigation';
 import Image from 'next/image';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 export const revalidate = 3600;
 
@@ -51,9 +52,10 @@ export async function generateMetadata({
   params: { locale: string; slug: string };
 }) {
   const { locale, slug } = params;
+  const tBlog = await getTranslations({ locale, namespace: 'blog' });
   const post = await getPost(slug, locale);
   if (!post || !post.translations[0]) {
-    return { title: 'Blog | Òrbita Events' };
+    return { title: tBlog('meta.title') };
   }
   const t = post.translations[0];
   return {
@@ -111,6 +113,7 @@ export default async function BlogPostPage({
   params: { locale: string; slug: string };
 }) {
   const { locale, slug } = params;
+  const tBlog = await getTranslations({ locale, namespace: 'blog' });
   const post = await getPost(slug, locale);
 
   if (!post || !post.translations[0]) {
@@ -119,6 +122,7 @@ export default async function BlogPostPage({
 
   const translation = post.translations[0];
   const categoryColor = CATEGORY_COLORS[post.category] || CATEGORY_COLORS.general;
+  const yearsExperience = SITE_CONFIG.stats.yearsExperience;
 
   // JSON-LD for article
   const articleJsonLd = {
@@ -175,9 +179,9 @@ export default async function BlogPostPage({
           <div className="relative container mx-auto px-4 max-w-4xl pt-8 pb-12">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 text-sm text-white/50 mb-8">
-              <Link href="/" className="hover:text-white transition-colors">Inici</Link>
+              <Link href="/" className="hover:text-white transition-colors">{tBlog('post.breadcrumbHome')}</Link>
               <span>/</span>
-              <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
+              <Link href="/blog" className="hover:text-white transition-colors">{tBlog('post.breadcrumbBlog')}</Link>
               <span>/</span>
               <span className="text-white/80 truncate max-w-[200px]">{translation.title}</span>
             </nav>
@@ -188,14 +192,14 @@ export default async function BlogPostPage({
                 {post.category}
               </span>
               {post.readingTime && (
-                <span className="text-white/50 text-sm">⏱ {post.readingTime} min de lectura</span>
+                <span className="text-white/50 text-sm">⏱ {post.readingTime} {tBlog('post.readingTime', { count: post.readingTime })}</span>
               )}
               {post.publishedAt && (
                 <span className="text-white/50 text-sm">
                   📅 {formatDate(post.publishedAt, locale)}
                 </span>
               )}
-              <span className="text-white/50 text-sm">✍️ {post.author}</span>
+              <span className="text-white/50 text-sm">✍️ {tBlog('post.byAuthor', { author: post.author })}</span>
             </div>
 
             {/* Title */}
@@ -233,17 +237,17 @@ export default async function BlogPostPage({
           {/* CTA */}
           <div className="mt-16 p-8 rounded-3xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-center">
             <h3 className="text-2xl font-bold text-white mb-3">
-              Prepara el teu esdeveniment amb nosaltres
+              {tBlog('post.ctaTitle')}
             </h3>
             <p className="text-white/60 mb-6">
-              Més de {new Date().getFullYear() - 2023 + 2} anys creant experiències úniques a Catalunya
+              {tBlog('post.ctaSubtitle', { years: yearsExperience })}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/configurador"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-2xl hover:opacity-90 transition-opacity"
               >
-                Calcula el teu preu
+                {tBlog('post.ctaPrimary')}
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -252,7 +256,7 @@ export default async function BlogPostPage({
                 href="/blog"
                 className="inline-flex items-center gap-2 px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-2xl transition-colors"
               >
-                ← Tornar al blog
+                ← {tBlog('post.backToBlog')}
               </Link>
             </div>
           </div>

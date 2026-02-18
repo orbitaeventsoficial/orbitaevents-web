@@ -3673,7 +3673,7 @@
     }
   },
   "flashOffer": {
-    "badge": "⚡ OFERTA FLASH - TEMPS LIMITAT",
+    "badge": "⚡ OFERTA LIMITADA - TEMPS LIMITAT",
     "title": "Reserva abans que s'acabi el temps!",
     "description": "Festa privada completa: DJ + So + Llums (fins a 50 persones)",
     "features": [
@@ -6467,10 +6467,11 @@
       "lastOnes": "Últims caps de setmana disponibles"
     },
     "badges": {
-      "rating": "Rating",
+      "rating": "Valoració",
       "events": "Events",
       "response": "Resposta"
     },
+    "whatsappMessage": "Hola! Vull informació per al meu esdeveniment.",
     "months": {
       "october": "octubre"
     }
@@ -6640,7 +6641,19 @@
       "cta": "Parla amb nosaltres"
     },
     "ctaText": "Preparat per crear una experiència única?",
-    "ctaButton": "Calcula el teu pressupost"
+    "ctaButton": "Calcula el teu pressupost",
+    "readMore": "Llegir més",
+    "minutesUnit": "min",
+    "post": {
+      "breadcrumbHome": "Inici",
+      "breadcrumbBlog": "Blog",
+      "readingTime": "{count} min de lectura",
+      "byAuthor": "{author}",
+      "ctaTitle": "Prepara el teu esdeveniment amb nosaltres",
+      "ctaSubtitle": "Més de {years} anys creant experiències úniques a Catalunya",
+      "ctaPrimary": "Calcula el teu preu",
+      "backToBlog": "Tornar al blog"
+    }
   },
   "gracias": {
     "meta": {

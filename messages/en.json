@@ -6299,6 +6299,7 @@
       "events": "Events",
       "response": "Answer"
     },
+    "whatsappMessage": "Hello! I'd like information for my event.",
     "months": {
       "october": "October"
     }
@@ -6468,7 +6469,19 @@
       "cta": "Talk to us"
     },
     "ctaText": "Ready to create a unique experience?",
-    "ctaButton": "Calculate your budget"
+    "ctaButton": "Calculate your budget",
+    "readMore": "Read more",
+    "minutesUnit": "min",
+    "post": {
+      "breadcrumbHome": "Home",
+      "breadcrumbBlog": "Blog",
+      "readingTime": "{count} min read",
+      "byAuthor": "{author}",
+      "ctaTitle": "Plan your event with us",
+      "ctaSubtitle": "More than {years} years creating unique experiences in Catalonia",
+      "ctaPrimary": "Calculate your price",
+      "backToBlog": "Back to blog"
+    }
   },
   "gracias": {
     "meta": {

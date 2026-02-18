@@ -52,9 +52,6 @@ export default function ProcessSection() {
 
         {/* Steps grid */}
         <div className="relative grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {/* Connecting line (desktop only) */}
-          <div className="hidden md:block absolute top-10 left-[calc(16.67%+28px)] right-[calc(16.67%+28px)] h-px bg-gradient-to-r from-amber-500/30 via-purple-500/30 to-emerald-500/30" />
-
           {steps.map((step, i) => {
             const style = STEP_STYLES[i];
             return (

@@ -207,7 +207,7 @@ export default function MobileCTAUrgency() {
           <div className="space-y-2 mb-8">
             {/* Primary CTA - WhatsApp */}
             <motion.a
-              href={WHATSAPP_URL_WITH_MESSAGE('Hola! Vull info sobre events temàtics')}
+              href={WHATSAPP_URL_WITH_MESSAGE(t('whatsappMessage'))}
               target="_blank"
               rel="noopener noreferrer"
               whileTap={{ scale: 0.98 }}

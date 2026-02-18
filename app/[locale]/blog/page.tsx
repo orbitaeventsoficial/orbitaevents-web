@@ -65,7 +65,17 @@ function formatDate(dateStr: string, locale: string) {
   );
 }
 
-function PostCard({ post, locale }: { post: BlogPost; locale: string }) {
+function PostCard({
+  post,
+  locale,
+  readMoreLabel,
+  minutesUnit,
+}: {
+  post: BlogPost;
+  locale: string;
+  readMoreLabel: string;
+  minutesUnit: string;
+}) {
   const translation = post.translations[0];
   if (!translation) return null;
   const categoryColor = CATEGORY_COLORS[post.category] || CATEGORY_COLORS.general;
@@ -100,7 +110,7 @@ function PostCard({ post, locale }: { post: BlogPost; locale: string }) {
             {post.category}
           </span>
           {post.readingTime && (
-            <span className="text-white/40 text-xs">{post.readingTime} min</span>
+            <span className="text-white/40 text-xs">{post.readingTime} {minutesUnit}</span>
           )}
           {post.publishedAt && (
             <span className="text-white/40 text-xs ml-auto">
@@ -118,7 +128,7 @@ function PostCard({ post, locale }: { post: BlogPost; locale: string }) {
         </p>
 
         <div className="mt-4 flex items-center gap-1.5 text-amber-400 text-sm font-semibold group-hover:gap-3 transition-all">
-          <span>Llegir més</span>
+          <span>{readMoreLabel}</span>
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
@@ -171,7 +181,13 @@ export default async function BlogPage({ params }: { params: { locale: string } 
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {posts.map((post) => (
-                <PostCard key={post.id} post={post} locale={locale} />
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  locale={locale}
+                  readMoreLabel={t('readMore')}
+                  minutesUnit={t('minutesUnit')}
+                />
               ))}
             </div>
 

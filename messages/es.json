@@ -6295,10 +6295,11 @@
       "lastOnes": "Últimos fines de semana disponibles"
     },
     "badges": {
-      "rating": "Rating",
+      "rating": "Valoración",
       "events": "Eventos",
       "response": "Respuesta"
     },
+    "whatsappMessage": "¡Hola! Quiero información para mi evento.",
     "months": {
       "october": "octubre"
     }
@@ -6468,7 +6469,19 @@
       "cta": "Habla con nosotros"
     },
     "ctaText": "¿Listo para crear una experiencia única?",
-    "ctaButton": "Calcula tu presupuesto"
+    "ctaButton": "Calcula tu presupuesto",
+    "readMore": "Leer más",
+    "minutesUnit": "min",
+    "post": {
+      "breadcrumbHome": "Inicio",
+      "breadcrumbBlog": "Blog",
+      "readingTime": "{count} min de lectura",
+      "byAuthor": "{author}",
+      "ctaTitle": "Prepara tu evento con nosotros",
+      "ctaSubtitle": "Más de {years} años creando experiencias únicas en Cataluña",
+      "ctaPrimary": "Calcula tu precio",
+      "backToBlog": "Volver al blog"
+    }
   },
   "gracias": {
     "meta": {

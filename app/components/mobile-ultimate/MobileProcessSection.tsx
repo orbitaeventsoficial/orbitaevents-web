@@ -69,11 +69,6 @@ export default function MobileProcessSection() {
               }
               className="relative flex gap-4 pb-7 last:pb-0"
             >
-              {/* Connecting line */}
-              {i < steps.length - 1 && (
-                <div className="absolute left-7 top-14 bottom-0 w-px bg-gradient-to-b from-white/20 to-transparent" />
-              )}
-
               {/* Icon + number */}
               <div className="relative flex-shrink-0">
                 <div
