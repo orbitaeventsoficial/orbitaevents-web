@@ -236,7 +236,7 @@ export default async function SalesOpsPage() {
       avui: 'Previsió disponible, falta lectura setmanal fixa.',
       en30: 'Revisió setmanal d\'ingressos, marge i cobraments.',
       en90: 'Quadre executiu de marge per tipus d\'esdeveniment.',
-      href: '/admin/finanzas',
+      href: '/admin/economia',
       cta: 'Revisar finances',
     },
     {

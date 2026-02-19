@@ -556,11 +556,8 @@ export default async function AdminDashboard() {
           <Link href="/admin/bookings" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
             📋 Reserves
           </Link>
-          <Link href="/admin/finanzas" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
-            💶 Finances
-          </Link>
-          <Link href="/admin/rentabilidad" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
-            📊 Rendibilitat
+          <Link href="/admin/economia" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+            💶 Economia
           </Link>
           <Link href="/admin/calendario" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
             📅 Calendari

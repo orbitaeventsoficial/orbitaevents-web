@@ -131,7 +131,7 @@ export default function CatalogPage({
                 Obrir gestor de preus
               </Link>
               <Link
-                href="/admin/rentabilidad"
+                href="/admin/economia"
                 className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
               >
                 Revisar rendibilitat

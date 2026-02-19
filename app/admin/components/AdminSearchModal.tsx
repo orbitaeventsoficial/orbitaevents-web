@@ -219,8 +219,7 @@ export default function AdminSearchModal({
                   { href: '/admin/leads', label: '👥 Entrades' },
                   { href: '/admin/bookings', label: '📋 Reserves' },
                   { href: '/admin/sales-ops', label: '🎯 Sales Ops' },
-                  { href: '/admin/rentabilidad', label: '📊 Rendibilitat' },
-                  { href: '/admin/finanzas', label: '💶 Finances' },
+                  { href: '/admin/economia', label: '💶 Economia' },
                   { href: '/admin/analytics', label: '📈 Analítica' },
                   { href: '/admin/clientes', label: '👤 Clients' },
                 ].map((item) => (

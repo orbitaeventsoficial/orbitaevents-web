@@ -141,7 +141,7 @@ const PAGE_CONTEXTS: Record<string, PageContext> = {
         icon: '📊',
         title: 'Revisa marges',
         description: 'Assegura\'t de mantenir mínim 35% de marge net.',
-        action: { label: 'Veure marges', href: '/admin/rentabilidad' },
+        action: { label: 'Veure marges', href: '/admin/economia' },
       },
     ],
     shortcuts: [

@@ -371,12 +371,11 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       title: 'Eines',
       defaultOpen: false,
       items: [
-        { icon: '💶', label: 'Finances', href: '/admin/finanzas' },
+        { icon: '💶', label: 'Economia', href: '/admin/economia' },
         { icon: '🎯', label: 'Operativa de vendes', href: '/admin/sales-ops' },
         { icon: '⭐', label: 'Ressenyes clients', href: '/admin/ressenyes' },
         { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event' },
         { icon: '📈', label: 'Analítica', href: '/admin/analytics' },
-        { icon: '📊', label: 'Rendibilitat', href: '/admin/rentabilidad' },
         { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
         { icon: '✍️', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
