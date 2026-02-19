@@ -16,7 +16,7 @@ import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { locales, type Locale } from '@/i18n';
-import { inter, plusJakarta, jetbrains, sora } from '@/app/fonts';
+import { inter, plusJakarta, jetbrains } from '@/app/fonts';
 import Script from 'next/script';
 import { SITE_CONFIG } from '@/config/site-config';
 import { getAllPacks, getMinPriceByService } from '@/config/packs-config';
@@ -26,6 +26,8 @@ import '@/app/globals.css';
 import LayoutWrapper from '@/app/components/layout/LayoutWrapper';
 import { PWAProvider } from '@/app/components/pwa/PWAProvider';
 import ConsentScripts from '@/app/components/legal/ConsentScripts.client';
+import WebVitalsReporter from '@/app/components/analytics/WebVitalsReporter';
+import ExitIntentModal from '@/app/components/ui/ExitIntentModal';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // JSON-LD STRUCTURED DATA - SEO MILLORAT
@@ -348,7 +350,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} ${sora.variable} scroll-smooth`}
+      className={`${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
@@ -477,6 +479,8 @@ export default async function LocaleLayout({
           </PWAProvider>
         </NextIntlClientProvider>
         <ConsentScripts />
+        <WebVitalsReporter />
+        <ExitIntentModal />
       </body>
     </html>
   );

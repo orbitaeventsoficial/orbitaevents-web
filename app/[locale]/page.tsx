@@ -94,6 +94,10 @@ const FAQSection = dynamic(() => import('@/app/components/home/FAQSection'), {
 const HomePageWrapper = dynamic(() => import('@/app/components/HomePageWrapper'), {
   loading: () => <HeroSkeleton />,
 });
+const HomepageScrollTracker = dynamic(
+  () => import('@/app/components/analytics/HomepageScrollTracker'),
+  { ssr: false },
+);
 
 export const revalidate = 3600;
 
@@ -136,42 +140,63 @@ export default function HomePage() {
       {/* Desktop: Contingut elegant */}
       <main className="min-h-screen bg-[#0A0A0A]">
         {/* 1. HERO ELEGANT - Sofisticat amb vídeo */}
-        <HeroElegant />
+        <div data-section-id="hero">
+          <HeroElegant />
+        </div>
 
         {/* 2. SERVEIS - Grid elegant 4 cards */}
-        <ServicesGridElegant />
+        <div data-section-id="services">
+          <ServicesGridElegant />
+        </div>
 
         {/* 3. STATS - Per què triar Òrbita Events */}
-        <StatsSection />
+        <div data-section-id="stats">
+          <StatsSection />
+        </div>
 
         {/* 4. CALENDARIO - Urgència subtil */}
-        <section className="py-6 md:py-10 bg-[#0A0A0A]">
+        <section data-section-id="calendar" className="py-6 md:py-10 bg-[#0A0A0A]">
           <div className="container mx-auto px-6">
             <CalendarioUrgencia />
           </div>
         </section>
 
         {/* 5. PORTFOLIO - Fotos reals dels events */}
-        <PortfolioShowcase />
+        <div data-section-id="portfolio">
+          <PortfolioShowcase />
+        </div>
 
         {/* 6. COM FUNCIONA - 3 passos */}
-        <ProcessSection />
+        <div data-section-id="process">
+          <ProcessSection />
+        </div>
 
         {/* 7. RESEÑAS GOOGLE - Prova social */}
-        <GoogleReviewsRotating />
+        <div data-section-id="reviews">
+          <GoogleReviewsRotating />
+        </div>
 
         {/* 8. LOGOS CLIENTES - Confían en nosotros */}
-        <TrustedByLogos />
+        <div data-section-id="clients">
+          <TrustedByLogos />
+        </div>
 
         {/* 9. GARANTÍA - Confiança */}
-        <GarantiaSection />
+        <div data-section-id="garantia">
+          <GarantiaSection />
+        </div>
 
         {/* 10. FAQ - Preguntes freqüents amb JSON-LD schema */}
-        <FAQSection />
+        <div data-section-id="faq">
+          <FAQSection />
+        </div>
 
         {/* 11. CTA FINAL - Conversió */}
-        <CTAFinal />
+        <div data-section-id="cta">
+          <CTAFinal />
+        </div>
       </main>
+      <HomepageScrollTracker />
     </HomePageWrapper>
   );
 }

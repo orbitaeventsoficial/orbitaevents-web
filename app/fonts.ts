@@ -10,7 +10,7 @@
 //
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { Inter, Plus_Jakarta_Sans, JetBrains_Mono, Sora } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FONT PRINCIPAL - TEXT DE COS
@@ -52,22 +52,9 @@ export const jetbrains = JetBrains_Mono({
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FONT SORA - TÍTOLS PREMIUM
-// Sora: Moderna, geomètrica, amb personalitat
-// ═══════════════════════════════════════════════════════════════════════════
-export const sora = Sora({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-sora",
-  weight: ["300", "400", "500", "600", "700", "800"],
-  fallback: ["system-ui", "sans-serif"],
-  preload: true,
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
 // EXPORT COMBINAT PER AL LAYOUT
 // ═══════════════════════════════════════════════════════════════════════════
-export const fontVariables = `${inter.variable} ${plusJakarta.variable} ${jetbrains.variable} ${sora.variable}`;
+export const fontVariables = `${inter.variable} ${plusJakarta.variable} ${jetbrains.variable}`;
 
 // Per compatibilitat amb codi existent
 export const outfit = plusJakarta;

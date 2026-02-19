@@ -17,17 +17,17 @@ async function main() {
       slug: 'cuanto-cuesta-dj-boda-barcelona-2025',
       author: 'Orbita Events',
       category: 'bodas',
-      tags: ['bodas', 'precios', 'barcelona', 'dj', '2025'],
+      tags: ['bodas', 'precios', 'barcelona', 'dj', '2026'],
       isPublished: true,
-      publishedAt: new Date('2023-03-14'),
+      publishedAt: new Date('2026-01-14'),
       readingTime: 8,
       translations: [
         {
           locale: 'es',
-          title: 'Cuanto Cuesta un DJ para Boda en Barcelona en 2025: Guia Completa de Precios',
+          title: 'Cuanto Cuesta un DJ para Boda en Barcelona en 2026: Guia Completa de Precios',
           excerpt: 'Descubre los precios reales de contratar un DJ profesional para tu boda en Barcelona. Comparativa de packs, que incluye cada servicio y consejos para elegir la mejor opcion.',
-          metaTitle: 'Precio DJ Boda Barcelona 2025 | Guia Completa de Tarifas',
-          metaDescription: 'Conoce cuanto cuesta un DJ para boda en Barcelona en 2025. Precios desde 250 euros, comparativa de servicios y consejos para elegir el mejor DJ para tu enlace.',
+          metaTitle: 'Precio DJ Boda Barcelona 2026 | Guia Completa de Tarifas',
+          metaDescription: 'Conoce cuanto cuesta un DJ para boda en Barcelona en 2026. Precios desde 250 euros, comparativa de servicios y consejos para elegir el mejor DJ para tu enlace.',
           content: `<h2>Precio de un DJ para Boda en Barcelona: Todo lo que Necesitas Saber</h2>
 
 <p>Planificar una boda implica tomar muchas decisiones, y una de las mas importantes es la <strong>musica y el entretenimiento</strong>. El DJ sera el responsable de crear el ambiente perfecto durante toda la celebracion, desde el cocktail hasta el cierre de la fiesta. Pero, <strong>cuanto cuesta realmente contratar un DJ profesional para una boda en Barcelona en 2025?</strong></p>
@@ -147,10 +147,10 @@ async function main() {
         },
         {
           locale: 'ca',
-          title: 'Quant Costa un DJ per Casament a Barcelona el 2025: Guia Completa de Preus',
+          title: 'Quant Costa un DJ per Casament a Barcelona el 2026: Guia Completa de Preus',
           excerpt: 'Descobreix els preus reals de contractar un DJ professional per al teu casament a Barcelona. Comparativa de packs, que inclou cada servei i consells per triar la millor opcio.',
-          metaTitle: 'Preu DJ Casament Barcelona 2025 | Guia Completa de Tarifes',
-          metaDescription: 'Coneix quant costa un DJ per casament a Barcelona el 2025. Preus des de 250 euros, comparativa de serveis i consells per triar el millor DJ pel teu enllac.',
+          metaTitle: 'Preu DJ Casament Barcelona 2026 | Guia Completa de Tarifes',
+          metaDescription: 'Coneix quant costa un DJ per casament a Barcelona el 2026. Preus des de 250 euros, comparativa de serveis i consells per triar el millor DJ pel teu enllac.',
           content: `<h2>Preu d'un DJ per Casament a Barcelona: Tot el que Necessites Saber</h2>
 
 <p>Planificar un casament implica prendre moltes decisions, i una de les mes importants es la <strong>musica i l'entreteniment</strong>. El DJ sera el responsable de crear l'ambient perfecte durant tota la celebracio, des del cocktail fins al tancament de la festa. Pero, <strong>quant costa realment contractar un DJ professional per a un casament a Barcelona el 2025?</strong></p>
@@ -1355,17 +1355,17 @@ async function main() {
       slug: 'tendencias-bodas-barcelona-2025',
       author: 'Orbita Events',
       category: 'bodas',
-      tags: ['bodas', 'tendencias', 'barcelona', '2025', 'musica', 'decoracion'],
+      tags: ['bodas', 'tendencias', 'barcelona', '2026', 'musica', 'decoracion'],
       isPublished: true,
-      publishedAt: new Date('2024-05-27'),
+      publishedAt: new Date('2026-01-27'),
       readingTime: 10,
       translations: [
         {
           locale: 'es',
-          title: 'Tendencias de Bodas en Barcelona 2025: Musica, Decoracion y Experiencias',
-          excerpt: 'Descubre las tendencias mas destacadas para bodas en Barcelona en 2025. Desde micro-bodas hasta fiestas tematicas, pasando por la musica y los efectos que marcaran el ano.',
-          metaTitle: 'Tendencias Bodas Barcelona 2025 | Musica, Deco y Experiencias',
-          metaDescription: 'Las tendencias de bodas en Barcelona para 2025. Micro-bodas, sostenibilidad, fiestas tematicas, musica personalizada y experiencias inmersivas. Guia completa para tu boda.',
+          title: 'Tendencias de Bodas en Barcelona 2026: Musica, Decoracion y Experiencias',
+          excerpt: 'Descubre las tendencias mas destacadas para bodas en Barcelona en 2026. Desde micro-bodas hasta fiestas tematicas, pasando por la musica y los efectos que marcaran el ano.',
+          metaTitle: 'Tendencias Bodas Barcelona 2026 | Musica, Deco y Experiencias',
+          metaDescription: 'Las tendencias de bodas en Barcelona para 2026. Micro-bodas, sostenibilidad, fiestas tematicas, musica personalizada y experiencias inmersivas. Guia completa para tu boda.',
           content: `<h2>Tendencias de Bodas en Barcelona 2025: Lo que esta Marcando el Ano</h2>
 
 <p>El mundo de las bodas evoluciona constantemente, y 2025 esta trayendo cambios significativos en como las parejas celebran su union. En Barcelona, una ciudad que combina tradicion mediterranea con vanguardia, estas tendencias se manifiestan de formas unicas y emocionantes.</p>
@@ -1568,10 +1568,10 @@ async function main() {
         },
         {
           locale: 'ca',
-          title: 'Tendencies de Casaments a Barcelona 2025: Musica, Decoracio i Experiencies',
-          excerpt: 'Descobreix les tendencies mes destacades per casaments a Barcelona el 2025. Des de micro-casaments fins a festes tematiques, passant per la musica i els efectes que marcaran l\'any.',
-          metaTitle: 'Tendencies Casaments Barcelona 2025 | Musica, Deco i Experiencies',
-          metaDescription: 'Les tendencies de casaments a Barcelona per 2025. Micro-casaments, sostenibilitat, festes tematiques, musica personalitzada i experiencies immersives. Guia completa pel teu casament.',
+          title: 'Tendencies de Casaments a Barcelona 2026: Musica, Decoracio i Experiencies',
+          excerpt: 'Descobreix les tendencies mes destacades per casaments a Barcelona el 2026. Des de micro-casaments fins a festes tematiques, passant per la musica i els efectes que marcaran l\'any.',
+          metaTitle: 'Tendencies Casaments Barcelona 2026 | Musica, Deco i Experiencies',
+          metaDescription: 'Les tendencies de casaments a Barcelona per 2026. Micro-casaments, sostenibilitat, festes tematiques, musica personalitzada i experiencies immersives. Guia completa pel teu casament.',
           content: `<h2>Tendencies de Casaments a Barcelona 2025: El que esta Marcant l'Any</h2>
 
 <p>El mon dels casaments evoluciona constantment, i el 2025 esta portant canvis significatius en com les parelles celebren la seva unio. A Barcelona, una ciutat que combina tradicio mediterrania amb avantguarda, aquestes tendencies es manifesten de formes uniques i emocionants.</p>
@@ -2753,6 +2753,591 @@ async function main() {
 <p>Una de les preguntes mes frequents al contractar DJ per casament es: quantes hores necessito? La resposta depen de com sigui el vostre casament.</p>
 
 <p>Consulta la guia completa en castella o <a href="/ca/configurador">calcula el teu pressupost</a>.</p>`
+        }
+      ]
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 13. DJ CORPORATIU BARCELONA EMPRESES
+    // ═══════════════════════════════════════════════════════════════════════════
+    {
+      slug: 'dj-corporatiu-barcelona-empreses',
+      author: 'Orbita Events',
+      category: 'eventos',
+      tags: ['dj', 'corporatiu', 'empreses', 'barcelona', 'eventos', '2026'],
+      isPublished: true,
+      publishedAt: new Date('2026-01-20'),
+      readingTime: 7,
+      translations: [
+        {
+          locale: 'es',
+          title: 'DJ para Eventos Corporativos en Barcelona: Guia Completa 2026',
+          excerpt: 'Todo lo que necesitas saber para contratar un DJ profesional para tu evento corporativo en Barcelona. Precios, servicios y consejos para acertar con la musica de empresa.',
+          metaTitle: 'DJ Eventos Corporativos Barcelona 2026 | DJ Empresa Barcelona',
+          metaDescription: 'Contrata el mejor DJ para eventos corporativos en Barcelona. Guia completa 2026 con precios, tipos de servicio y consejos para acertar con la musica en tu evento de empresa.',
+          content: `<h2>DJ para Eventos Corporativos en Barcelona: Todo lo que Debes Saber</h2>
+
+<p>Los eventos corporativos son una oportunidad unica para reforzar la cultura de empresa, celebrar logros y crear vinculos entre equipos. La musica juega un papel fundamental en el ambiente de estos eventos, y elegir el DJ adecuado puede marcar la diferencia entre un evento memorable y uno que se olvida al dia siguiente.</p>
+
+<h2>Tipos de Eventos Corporativos donde un DJ Marca la Diferencia</h2>
+
+<ul>
+<li><strong>Cenas de empresa y galas:</strong> Musica ambiental durante la cena + animacion de la fiesta posterior</li>
+<li><strong>Convenciones y lanzamientos de producto:</strong> Musica de entrada, pausas y cierre</li>
+<li><strong>Team buildings y celebraciones de aniversario:</strong> Ambiente festivo y motivador</li>
+<li><strong>Fiestas de Navidad corporativas:</strong> El evento mas demandado del calendario</li>
+<li><strong>Inauguraciones y eventos de marca:</strong> Musica que refuerza la identidad corporativa</li>
+</ul>
+
+<h2>Por que un DJ Profesional para tu Evento de Empresa</h2>
+
+<h3>Profesionalidad y Puntualidad</h3>
+<p>En un entorno corporativo, la imagen lo es todo. Un DJ profesional llega con antelacion, viste adecuadamente para el evento y actua con discrecion y profesionalidad en todo momento.</p>
+
+<h3>Adaptacion al Perfil del Evento</h3>
+<p>No es lo mismo una cena de gala para directivos que una fiesta de equipo tras los resultados anuales. Un DJ con experiencia en eventos corporativos sabe adaptar la musica al tono del evento, al publico y al momento.</p>
+
+<h3>Coordinacion con el Equipo de Organizacion</h3>
+<p>Los eventos corporativos suelen tener guiones precisos: presentaciones, discursos, entregas de premios. El DJ coordina la musica con cada momento del programa para que todo fluya perfectamente.</p>
+
+<h2>Precios de DJ para Eventos Corporativos en Barcelona 2026</h2>
+
+<table>
+<tr><th>Tipo de Evento</th><th>Duracion</th><th>Precio Orientativo</th></tr>
+<tr><td>Evento pequeño (hasta 50 personas)</td><td>3-4 horas</td><td>300-450 euros</td></tr>
+<tr><td>Evento mediano (50-150 personas)</td><td>4-6 horas</td><td>450-700 euros</td></tr>
+<tr><td>Evento grande (150+ personas)</td><td>6+ horas</td><td>700-1200 euros</td></tr>
+</table>
+
+<p>Los precios pueden variar segun el equipamiento requerido, la ubicacion y los servicios adicionales como iluminacion especial o efectos.</p>
+
+<h2>Servicios Especiales para Eventos de Empresa</h2>
+
+<ul>
+<li><strong>Sistema de microfonia:</strong> Para presentaciones y discursos integrados con la musica</li>
+<li><strong>Musica de fondo para networking:</strong> Nivel justo para facilitar la conversacion</li>
+<li><strong>Playlist personalizada:</strong> Con la musica preferida de la empresa o del sector</li>
+<li><strong>Efectos especiales para momentos clave:</strong> Confeti, luces especiales para premios o lanzamientos</li>
+</ul>
+
+<h2>Que Busca una Empresa al Contratar un DJ</h2>
+
+<p>A diferencia de una boda o fiesta privada, las empresas valoran especialmente:</p>
+<ul>
+<li>Factura y facilidad administrativa (NIF, datos de empresa)</li>
+<li>Puntualidad y cumplimiento del briefing al pie de la letra</li>
+<li>Discrecion y adaptacion al codigo de vestimenta del evento</li>
+<li>Referencias de otros eventos corporativos</li>
+<li>Capacidad para gestionar el PA (sistema de sonido) durante las presentaciones</li>
+</ul>
+
+<h2>Consejos para Acertar con la Musica Corporativa</h2>
+
+<h3>1. Define el Tono del Evento</h3>
+<p>Antes de hablar con el DJ, define si el evento es formal, semiformal o festivo. Esto marcara completamente el estilo musical.</p>
+
+<h3>2. Considera la Diversidad del Publico</h3>
+<p>Los eventos de empresa suelen reunir personas de diferentes edades, departamentos y culturas. La musica debe ser inclusiva y no polarizante.</p>
+
+<h3>3. Planifica los Momentos Clave</h3>
+<p>Establece claramente cuando habra discursos, entregas de premios o momentos especiales. El DJ necesita saber exactamente cuantos minutos de silencio o musica suave se requieren.</p>
+
+<h2>Nuestro Servicio para Eventos Corporativos</h2>
+
+<p>En <a href="/es/servicios">Orbita Events</a> llevamos desde 2023 animando eventos corporativos en Barcelona y alrededores. Ofrecemos:</p>
+<ul>
+<li>DJ profesional con experiencia en entornos corporativos</li>
+<li>Equipo de sonido profesional 4000W adaptable a cualquier espacio</li>
+<li>Sistema de microfonia inalambrica incluido</li>
+<li>Reunion previa de briefing para alinearnos con tus objetivos</li>
+<li>Facturacion empresarial con IVA</li>
+</ul>
+
+<p><strong>Solicita presupuesto para tu evento corporativo</strong>: <a href="/es/contacto">contactanos</a> y te respondemos en menos de 2 horas.</p>`
+        },
+        {
+          locale: 'ca',
+          title: 'DJ per a Esdeveniments Corporatius a Barcelona: Guia Completa 2026',
+          excerpt: 'Tot el que necessites saber per contractar un DJ professional per al teu esdeveniment corporatiu a Barcelona. Preus, serveis i consells per encertar amb la musica d\'empresa.',
+          metaTitle: 'DJ Esdeveniments Corporatius Barcelona 2026 | DJ Empresa Barcelona',
+          metaDescription: 'Contracta el millor DJ per a esdeveniments corporatius a Barcelona. Guia completa 2026 amb preus, tipus de servei i consells per encertar amb la musica al teu esdeveniment d\'empresa.',
+          content: `<h2>DJ per a Esdeveniments Corporatius a Barcelona: Tot el que Has de Saber</h2>
+
+<p>Els esdeveniments corporatius son una oportunitat unica per reforcar la cultura d'empresa, celebrar assoliments i crear vincles entre equips. La musica juga un paper fonamental en l'ambient d'aquests esdeveniments, i triar el DJ adequat pot marcar la diferencia entre un esdeveniment memorable i un que s'oblida l'endema.</p>
+
+<h2>Tipus d'Esdeveniments Corporatius on un DJ Marca la Diferencia</h2>
+
+<ul>
+<li><strong>Sopars d'empresa i gales:</strong> Musica ambiental durant el sopar + animacio de la festa posterior</li>
+<li><strong>Convencions i llancaments de producte:</strong> Musica d'entrada, pauses i tancament</li>
+<li><strong>Team buildings i celebracions d'aniversari:</strong> Ambient festiu i motivador</li>
+<li><strong>Festes de Nadal corporatives:</strong> L'esdeveniment mes demanat del calendari</li>
+<li><strong>Inauguracions i esdeveniments de marca:</strong> Musica que reforci la identitat corporativa</li>
+</ul>
+
+<h2>Per que un DJ Professional per al teu Esdeveniment d'Empresa</h2>
+
+<h3>Professionalitat i Puntualitat</h3>
+<p>En un entorn corporatiu, la imatge ho es tot. Un DJ professional arriba amb anticipacio, vesteix adequadament per a l'esdeveniment i actua amb discrecio i professionalitat en tot moment.</p>
+
+<h3>Adaptacio al Perfil de l'Esdeveniment</h3>
+<p>No es el mateix un sopar de gala per a directius que una festa d'equip despres dels resultats anuals. Un DJ amb experiencia en esdeveniments corporatius sap adaptar la musica al to de l'esdeveniment, al public i al moment.</p>
+
+<h3>Coordinacio amb l'Equip d'Organitzacio</h3>
+<p>Els esdeveniments corporatius solen tenir guions precisos: presentacions, discursos, lliuraments de premis. El DJ coordina la musica amb cada moment del programa perque tot flueixi perfectament.</p>
+
+<h2>Preus de DJ per a Esdeveniments Corporatius a Barcelona 2026</h2>
+
+<table>
+<tr><th>Tipus d'Esdeveniment</th><th>Durada</th><th>Preu Orientatiu</th></tr>
+<tr><td>Esdeveniment petit (fins a 50 persones)</td><td>3-4 hores</td><td>300-450 euros</td></tr>
+<tr><td>Esdeveniment mitja (50-150 persones)</td><td>4-6 hores</td><td>450-700 euros</td></tr>
+<tr><td>Esdeveniment gran (150+ persones)</td><td>6+ hores</td><td>700-1200 euros</td></tr>
+</table>
+
+<h2>El nostre Servei per a Esdeveniments Corporatius</h2>
+
+<p>A <a href="/ca/servicios">Orbita Events</a> portem des de 2023 animant esdeveniments corporatius a Barcelona i rodalies. Oferim:</p>
+<ul>
+<li>DJ professional amb experiencia en entorns corporatius</li>
+<li>Equip de so professional 4000W adaptable a qualsevol espai</li>
+<li>Sistema de microfonia sense fils inclos</li>
+<li>Reunio previa de briefing per alinear-nos amb els teus objectius</li>
+<li>Facturacio empresarial amb IVA</li>
+</ul>
+
+<p><strong>Sol·licita pressupost per al teu esdeveniment corporatiu</strong>: <a href="/ca/contacto">contacta'ns</a> i et responem en menys de 2 hores.</p>`
+        }
+      ]
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 14. DJ GIRONA EVENTS FESTES
+    // ═══════════════════════════════════════════════════════════════════════════
+    {
+      slug: 'dj-girona-events-festes',
+      author: 'Orbita Events',
+      category: 'consejos',
+      tags: ['dj', 'girona', 'casament', 'events', 'festes', '2026'],
+      isPublished: true,
+      publishedAt: new Date('2026-01-28'),
+      readingTime: 6,
+      translations: [
+        {
+          locale: 'es',
+          title: 'Contratar DJ en Girona: Precios y Servicios para Bodas y Eventos 2026',
+          excerpt: 'Guia completa para contratar un DJ en Girona y la Costa Brava. Precios actualizados 2026, servicios disponibles y consejos para elegir el mejor DJ para tu boda o evento en Girona.',
+          metaTitle: 'DJ Girona 2026 | Contratar DJ Boda Girona y Costa Brava',
+          metaDescription: 'Contrata el mejor DJ en Girona para bodas, fiestas y eventos. Precios desde 300 euros, servicio profesional en toda la provincia de Girona y Costa Brava. Respuesta en 2 horas.',
+          content: `<h2>Contratar DJ en Girona: Guia Completa 2026</h2>
+
+<p>La provincia de Girona es uno de los destinos de boda mas codiciados de Cataluna. Con sus masias medievales, la Costa Brava y los Pirineos como telones de fondo, no es de extranar que cientos de parejas elijan Girona para celebrar el dia mas importante de sus vidas. Y la musica, como siempre, es el alma de la fiesta.</p>
+
+<h2>Por que Contratar un DJ en Girona para tu Boda o Evento</h2>
+
+<h3>Conocimiento del Territorio</h3>
+<p>Un DJ especializado en bodas y eventos en Girona conoce las particularidades de los principales espacios: La Masuca, Masia Can Roca, Hotel Santa Marta en la Costa Brava... Sabe como adaptar el equipo de sonido a espacios con acustica especial, al aire libre o en masias de piedra centenarias.</p>
+
+<h3>Desplazamiento y Logistica</h3>
+<p>Trabajando desde Granollers, cubrimos toda la provincia de Girona y la Costa Brava con desplazamiento incluido hasta 25 km. Para ubicaciones mas alejadas, ofrecemos un suplemento de desplazamiento transparente y razonable.</p>
+
+<h2>Precios DJ Girona 2026</h2>
+
+<table>
+<tr><th>Servicio</th><th>Duracion</th><th>Precio</th></tr>
+<tr><td>Pack Flash - Bodas y Fiestas</td><td>3 horas</td><td>desde 300 euros</td></tr>
+<tr><td>Pack Party Starter - Estandar</td><td>5 horas</td><td>desde 450 euros</td></tr>
+<tr><td>Pack Premium - Experiencia completa</td><td>7 horas</td><td>desde 700 euros</td></tr>
+</table>
+
+<p>Todos los packs incluyen equipo de sonido 4000W, iluminacion LED y maquina de humo.</p>
+
+<h2>Zonas que Cubrimos en Girona</h2>
+
+<ul>
+<li><strong>Ciudad de Girona y alrededores:</strong> Salt, Angles, Banyoles, Olot</li>
+<li><strong>Costa Brava:</strong> Platja d'Aro, Sant Feliu de Guixols, Tossa de Mar, Lloret de Mar, Blanes</li>
+<li><strong>Alt Emporda:</strong> Figueres, Roses, Castello d'Empuries, l'Escala</li>
+<li><strong>Garrotxa y Ripolles:</strong> Olot, Ripoll, Sant Joan de les Abadesses</li>
+</ul>
+
+<h2>Espacios Emblemáticos para Bodas en Girona</h2>
+
+<p>Algunos de los espacios mas populares donde hemos trabajado o donde prestamos servicio habitualmente:</p>
+
+<ul>
+<li>Masias rurales en el Alt Emporda</li>
+<li>Restaurantes con terraza en la Costa Brava</li>
+<li>Hoteles boutique en Girona ciudad</li>
+<li>Fincas privadas en la comarca de la Selva</li>
+</ul>
+
+<h2>Que nos Diferencia como DJ en Girona</h2>
+
+<ul>
+<li>Mas de 50 eventos en la provincia de Girona</li>
+<li>Equipo tecnico adaptable a espacios exteriores e interiores</li>
+<li>Generador propio para ubicaciones sin suministro electrico</li>
+<li>Valoracion media 5.0/5 de nuestros clientes</li>
+</ul>
+
+<p><strong>Solicita presupuesto para tu evento en Girona</strong>: <a href="/es/contacto">contactanos</a> ahora y recibe respuesta en menos de 2 horas.</p>`
+        },
+        {
+          locale: 'ca',
+          title: 'Contractar DJ a Girona: Preus i Serveis per a Casaments i Esdeveniments 2026',
+          excerpt: 'Guia completa per contractar un DJ a Girona i la Costa Brava. Preus actualitzats 2026, serveis disponibles i consells per triar el millor DJ per al teu casament o esdeveniment a Girona.',
+          metaTitle: 'DJ Girona 2026 | Contractar DJ Casament Girona i Costa Brava',
+          metaDescription: 'Contracta el millor DJ a Girona per a casaments, festes i esdeveniments. Preus des de 300 euros, servei professional a tota la provincia de Girona i Costa Brava. Resposta en 2 hores.',
+          content: `<h2>Contractar DJ a Girona: Guia Completa 2026</h2>
+
+<p>La provincia de Girona es un dels destins de casament mes cobejats de Catalunya. Amb les seves masies medievals, la Costa Brava i els Pirineus com a telons de fons, no es d'estranyar que centenars de parelles triïn Girona per celebrar el dia mes important de les seves vides. I la musica, com sempre, es l'anima de la festa.</p>
+
+<h2>Per que Contractar un DJ a Girona per al teu Casament o Esdeveniment</h2>
+
+<h3>Coneixement del Territori</h3>
+<p>Un DJ especialitzat en casaments i esdeveniments a Girona coneix les particularitats dels principals espais de la zona. Sap com adaptar l'equip de so a espais amb acustica especial, a l'aire lliure o en masies de pedra centenaries.</p>
+
+<h3>Desplacament i Logistica</h3>
+<p>Treballant des de Granollers, cobrim tota la provincia de Girona i la Costa Brava amb desplacament inclos fins a 25 km. Per a ubicacions mes llunyanes, oferim un suplement de desplacament transparent i raonable.</p>
+
+<h2>Preus DJ Girona 2026</h2>
+
+<table>
+<tr><th>Servei</th><th>Durada</th><th>Preu</th></tr>
+<tr><td>Pack Flash - Casaments i Festes</td><td>3 hores</td><td>des de 300 euros</td></tr>
+<tr><td>Pack Party Starter - Estandard</td><td>5 hores</td><td>des de 450 euros</td></tr>
+<tr><td>Pack Premium - Experiencia completa</td><td>7 hores</td><td>des de 700 euros</td></tr>
+</table>
+
+<h2>Zones que Cobrim a Girona</h2>
+
+<ul>
+<li><strong>Ciutat de Girona i voltants:</strong> Salt, Angles, Banyoles, Olot</li>
+<li><strong>Costa Brava:</strong> Platja d'Aro, Sant Feliu de Guixols, Tossa de Mar, Lloret de Mar, Blanes</li>
+<li><strong>Alt Emporda:</strong> Figueres, Roses, Castello d'Empuries, l'Escala</li>
+<li><strong>Garrotxa i Ripolles:</strong> Olot, Ripoll, Sant Joan de les Abadesses</li>
+</ul>
+
+<p><strong>Sol·licita pressupost per al teu esdeveniment a Girona</strong>: <a href="/ca/contacto">contacta'ns</a> ara i rep resposta en menys de 2 hores.</p>`
+        }
+      ]
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 15. ALQUILER EQUIPO SONIDO ILUMINACION BARCELONA
+    // ═══════════════════════════════════════════════════════════════════════════
+    {
+      slug: 'alquiler-equipo-sonido-iluminacion-barcelona',
+      author: 'Orbita Events',
+      category: 'tecnologia',
+      tags: ['sonido', 'iluminacion', 'alquiler', 'barcelona', 'equipo', '2026'],
+      isPublished: true,
+      publishedAt: new Date('2026-02-03'),
+      readingTime: 6,
+      translations: [
+        {
+          locale: 'es',
+          title: 'Alquiler de Equipo de Sonido e Iluminacion en Barcelona: Guia 2026',
+          excerpt: 'Descubre todo sobre el alquiler de equipos de sonido e iluminacion para eventos en Barcelona. Que equipo necesitas, precios orientativos y como incluirlo en tu pack de DJ.',
+          metaTitle: 'Alquiler Equipo Sonido e Iluminacion Barcelona 2026 | Orbita Events',
+          metaDescription: 'Alquiler de equipo de sonido e iluminacion profesional en Barcelona para bodas, fiestas y eventos. Sistemas 4000W, luces LED, efectos especiales. Incluido con DJ profesional.',
+          content: `<h2>Alquiler de Equipo de Sonido e Iluminacion en Barcelona</h2>
+
+<p>Cuando organizas un evento en Barcelona, una de las decisiones mas importantes es el equipo tecnico de sonido e iluminacion. La calidad del equipo determina directamente la experiencia de tus invitados: un sonido cristalino y una iluminacion espectacular transforman cualquier espacio en un escenario memorable.</p>
+
+<h2>Tipos de Equipo de Sonido para Eventos</h2>
+
+<h3>Sistemas PA Profesionales</h3>
+<p>Un sistema PA (Public Address) profesional es la columna vertebral de cualquier evento. Los principales factores a considerar:</p>
+<ul>
+<li><strong>Potencia:</strong> Para eventos de 50-100 personas necesitas minimo 2000W. Para 100-300 personas, 4000W o mas.</li>
+<li><strong>Calidad de altavoces:</strong> Marcas como QSC, JBL o Yamaha garantizan sonido profesional</li>
+<li><strong>Subwoofers:</strong> Para eventos donde el baile es protagonista, los graves son esenciales</li>
+<li><strong>Monitores:</strong> Para que el DJ o artistas en escena escuchen la mezcla correctamente</li>
+</ul>
+
+<h3>Sistemas de Microfonia</h3>
+<p>Esenciales para eventos con discursos, presentaciones o ceremonias:</p>
+<ul>
+<li>Microfono inalambrico de mano (para discursos y presentaciones)</li>
+<li>Microfono de solapa (para la ceremonia civil o religiosa)</li>
+<li>Sistema de microfonia multiple para grupos de speakers</li>
+</ul>
+
+<h2>Tipos de Iluminacion para Eventos</h2>
+
+<h3>Iluminacion Dinamica</h3>
+<ul>
+<li><strong>Cabezas moviles:</strong> Crean efectos de luz en constante movimiento sincronizados con la musica</li>
+<li><strong>Par LED RGBW:</strong> Colores cambiantes para crear ambiente en pistas de baile o decoracion</li>
+<li><strong>Strobo y efectos:</strong> Para momentos de maxima energia en la pista</li>
+</ul>
+
+<h3>Iluminacion Ambiental</h3>
+<ul>
+<li><strong>Uplighting:</strong> Focos dirigidos a paredes para crear ambiente de color</li>
+<li><strong>Luces decorativas:</strong> Colgantes, fairy lights, velas LED</li>
+<li><strong>Laser:</strong> Para momentos especiales o fiestas con ambiente de club</li>
+</ul>
+
+<h2>Efectos Especiales</h2>
+
+<ul>
+<li><strong>Maquina de humo:</strong> Para crear ambiente y hacer la luz mas visible</li>
+<li><strong>Maquina de humo bajo (low fog):</strong> El clasico "suelo de nubes" para el primer baile</li>
+<li><strong>Bengalas frias (cold sparks):</strong> Chispas de seguridad para momentos espectaculares</li>
+<li><strong>Canones de confeti:</strong> Para moments de celebracion maxima</li>
+<li><strong>Canones CO2:</strong> Chorros de vapor para efectos dramaticos</li>
+</ul>
+
+<h2>Precios Orientativos de Alquiler en Barcelona</h2>
+
+<table>
+<tr><th>Equipo</th><th>Precio Alquiler (sin operador)</th></tr>
+<tr><td>Sistema PA 2000W + 2 altavoces</td><td>150-250 euros/dia</td></tr>
+<tr><td>Sistema PA 4000W completo</td><td>300-450 euros/dia</td></tr>
+<tr><td>Pack iluminacion basica (6 Par LED)</td><td>100-200 euros/dia</td></tr>
+<tr><td>Pack iluminacion profesional (moviles + par)</td><td>250-400 euros/dia</td></tr>
+<tr><td>Maquina de humo</td><td>50-100 euros/dia</td></tr>
+<tr><td>Bengalas frias</td><td>150-300 euros/uso</td></tr>
+</table>
+
+<h2>La Opcion mas Inteligente: DJ + Equipo en Pack</h2>
+
+<p>Contratar el equipo de forma separada puede resultar mas caro y complicado que incluirlo en un pack con DJ. En <a href="/es/packs">Orbita Events</a>, todos nuestros packs incluyen:</p>
+<ul>
+<li>DJ profesional</li>
+<li>Sistema de sonido 4000W</li>
+<li>Iluminacion LED con cabezas moviles</li>
+<li>Maquina de humo</li>
+<li>Montaje y desmontaje</li>
+<li>Transporte incluido hasta 25 km</li>
+</ul>
+
+<p>Todo por un precio todo incluido desde 250 euros, sin sorpresas ni costes ocultos.</p>
+
+<p><strong>¿Necesitas equipo para tu evento?</strong> <a href="/es/contacto">Contactanos</a> y te preparamos un presupuesto personalizado.</p>`
+        },
+        {
+          locale: 'ca',
+          title: 'Lloguer d\'Equip de So i Il·luminacio a Barcelona: Guia 2026',
+          excerpt: 'Descobreix tot sobre el lloguer d\'equips de so i il·luminacio per a esdeveniments a Barcelona. Quin equip necessites, preus orientatius i com incloure\'l al teu pack de DJ.',
+          metaTitle: 'Lloguer Equip So i Il·luminacio Barcelona 2026 | Orbita Events',
+          metaDescription: 'Lloguer d\'equip de so i il·luminacio professional a Barcelona per a casaments, festes i esdeveniments. Sistemes 4000W, llums LED, efectes especials. Inclos amb DJ professional.',
+          content: `<h2>Lloguer d'Equip de So i Il·luminacio a Barcelona</h2>
+
+<p>Quan organitzes un esdeveniment a Barcelona, una de les decisions mes importants es l'equip tecnic de so i il·luminacio. La qualitat de l'equip determina directament l'experiencia dels teus convidats: un so cristal·li i una il·luminacio espectacular transformen qualsevol espai en un escenari memorable.</p>
+
+<h2>Tipus d'Equip de So per a Esdeveniments</h2>
+
+<h3>Sistemes PA Professionals</h3>
+<p>Un sistema PA professional es la columna vertebral de qualsevol esdeveniment. Els principals factors a considerar:</p>
+<ul>
+<li><strong>Potencia:</strong> Per a esdeveniments de 50-100 persones necessites com a minim 2000W. Per a 100-300 persones, 4000W o mes.</li>
+<li><strong>Qualitat dels altaveus:</strong> Marques com QSC, JBL o Yamaha garanteixen so professional</li>
+<li><strong>Subwoofers:</strong> Per a esdeveniments on el ball es protagonista, els baixos son essencials</li>
+</ul>
+
+<h2>Efectes Especials</h2>
+
+<ul>
+<li><strong>Maquina de fum:</strong> Per crear ambient i fer la llum mes visible</li>
+<li><strong>Maquina de fum baix:</strong> El classic "terra de nuvolS" per al primer ball</li>
+<li><strong>Bengales fredes (cold sparks):</strong> Espurnes de seguretat per a moments espectaculars</li>
+<li><strong>Canons de confeti:</strong> Per a moments de celebracio maxima</li>
+</ul>
+
+<h2>L'Opcio mes Intel·ligent: DJ + Equip en Pack</h2>
+
+<p>Contractar l'equip de forma separada pot resultar mes car i complicat que incloure'l en un pack amb DJ. A <a href="/ca/packs">Orbita Events</a>, tots els nostres packs inclouen:</p>
+<ul>
+<li>DJ professional</li>
+<li>Sistema de so 4000W</li>
+<li>Il·luminacio LED amb caps mobils</li>
+<li>Maquina de fum</li>
+<li>Muntatge i desmuntatge</li>
+<li>Transport inclos fins a 25 km</li>
+</ul>
+
+<p><strong>Necessites equip per al teu esdeveniment?</strong> <a href="/ca/contacto">Contacta'ns</a> i et preparem un pressupost personalitzat.</p>`
+        }
+      ]
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 16. CHECKLIST DJ CASAMENT BODA
+    // ═══════════════════════════════════════════════════════════════════════════
+    {
+      slug: 'checklist-dj-casament-boda',
+      author: 'Orbita Events',
+      category: 'consejos',
+      tags: ['checklist', 'dj', 'casament', 'boda', 'consells', '2026'],
+      isPublished: true,
+      publishedAt: new Date('2026-02-10'),
+      readingTime: 5,
+      translations: [
+        {
+          locale: 'es',
+          title: 'Checklist DJ Boda: 15 Preguntas Esenciales Antes de Contratar',
+          excerpt: 'Antes de firmar el contrato con tu DJ de boda, hazle estas 15 preguntas clave. Una checklist completa para asegurarte de elegir el profesional correcto para el dia mas importante.',
+          metaTitle: 'Checklist DJ Boda: 15 Preguntas que Debes Hacer Antes de Contratar',
+          metaDescription: 'Checklist completa con las 15 preguntas esenciales que debes hacer a tu DJ antes de contratar para tu boda. Evita sorpresas y asegurate de elegir el profesional correcto.',
+          content: `<h2>Checklist DJ Boda: Las 15 Preguntas que Debes Hacer</h2>
+
+<p>Elegir el DJ para tu boda es una de las decisiones mas importantes que tomaras durante la organizacion. La musica marcara el ambiente de toda la celebracion y sera lo que tus invitados recuerden durante anos. Para ayudarte a tomar la mejor decision, hemos creado esta checklist con las 15 preguntas esenciales que debes hacer antes de contratar a cualquier DJ.</p>
+
+<h2>Preguntas sobre Experiencia y Trayectoria</h2>
+
+<h3>1. ¿Cuantas bodas has animado en el ultimo ano?</h3>
+<p>Un DJ especializado en bodas deberia poder responder con una cifra concreta. En Orbita Events, llevamos mas de 50 bodas en los ultimos 2 anos. La experiencia especifica en bodas es muy diferente a la de un DJ de discoteca.</p>
+
+<h3>2. ¿Puedes mostrarme videos o fotos de bodas anteriores?</h3>
+<p>Un profesional tiene material de muestra. Fijaros en el equipo, el ambiente y como gestiona los momentos especiales.</p>
+
+<h3>3. ¿Has trabajado en el espacio donde se celebrara mi boda?</h3>
+<p>Si ya conoce la masia o el salon, esto es un punto a favor. Si no, un buen profesional pedira visitar el espacio con antelacion.</p>
+
+<h2>Preguntas sobre el Servicio</h2>
+
+<h3>4. ¿Que equipo de sonido utilizas? ¿Cual es la potencia?</h3>
+<p>Un DJ profesional conocera perfectamente su equipo y te podra dar especificaciones tecnicas. Minimo 4000W para bodas medianas-grandes.</p>
+
+<h3>5. ¿Que tipo de iluminacion incluye el servicio?</h3>
+<p>La diferencia entre iluminacion basica (focos fijos) y profesional (cabezas moviles, efectos DMX) es enorme en el resultado final.</p>
+
+<h3>6. ¿Esta disponible maquina de humo, bengalas frias u otros efectos?</h3>
+<p>Los efectos especiales para el primer baile o momentos clave pueden ser espectaculares. Pregunta si estan incluidos o tienen coste adicional.</p>
+
+<h3>7. ¿Cuantas horas cubre el precio base? ¿Que pasa si el evento se alarga?</h3>
+<p>Evita sorpresas al final de la noche. Clarifica el precio por hora extra desde el principio.</p>
+
+<h3>8. ¿Incluye el servicio microfono para los discursos?</h3>
+<p>Esencial para la boda civil, el discurso del novio/a o el brindis. Asegurate de que esta incluido.</p>
+
+<h2>Preguntas sobre Logistica</h2>
+
+<h3>9. ¿Cuanto tiempo antes llega para montar el equipo?</h3>
+<p>Un profesional deberia llegar con al menos 2 horas de antelacion para montar, probar y estar listo antes de que lleguen los invitados.</p>
+
+<h3>10. ¿Que pasa si hay un problema tecnico? ¿Tienes equipo de respaldo?</h3>
+<p>Esta es una pregunta clave. Un DJ profesional siempre tiene equipo de respaldo para situaciones de emergencia. Sin equipo de respaldo, es una sensal de alarma.</p>
+
+<h3>11. ¿Que suplemento hay por desplazamiento a nuestra ubicacion?</h3>
+<p>Si la boda es lejos de la base del DJ, puede haber un suplemento. Clarificalo para evitar sorpresas en la factura.</p>
+
+<h2>Preguntas sobre Musica y Personalizacion</h2>
+
+<h3>12. ¿Hacemos una reunion previa para hablar de la musica?</h3>
+<p>Fundamental. El DJ debe conocer vuestros gustos, las canciones especiales y los momentos clave de la noche antes del dia de la boda.</p>
+
+<h3>13. ¿Podemos dar una lista de canciones obligatorias y canciones vetadas?</h3>
+<p>Todo buen DJ acepta una lista de canciones que si quieres y canciones que bajo ningun concepto quieres escuchar en tu boda.</p>
+
+<h3>14. ¿Como adaptas la musica si ves que la pista esta vacia?</h3>
+<p>Esta pregunta revela la capacidad de reaccion del DJ. Un profesional sabe leer el ambiente y adaptar su seleccion en tiempo real.</p>
+
+<h2>Preguntas sobre Contrato y Condiciones</h2>
+
+<h3>15. ¿Firmas contrato? ¿Que cubre en caso de cancelacion?</h3>
+<p>Imprescindible. Un contrato protege tanto al cliente como al profesional. Debe incluir: fecha, horario, precio, servicios incluidos, condiciones de cancelacion y politica de deposito.</p>
+
+<h2>Checklist Rapida</h2>
+
+<ul>
+<li>☐ Experiencia especifica en bodas demostrable</li>
+<li>☐ Videos o referencias de bodas anteriores</li>
+<li>☐ Equipo de sonido de calidad (4000W+)</li>
+<li>☐ Iluminacion profesional incluida</li>
+<li>☐ Microfono para discursos</li>
+<li>☐ Equipo de respaldo confirmado</li>
+<li>☐ Reunion previa de planificacion</li>
+<li>☐ Lista de canciones personalizable</li>
+<li>☐ Contrato firmado</li>
+<li>☐ Seguro de responsabilidad civil</li>
+</ul>
+
+<h2>Como Valoramos Nosotros una Boda</h2>
+
+<p>En <a href="/es/servicios">Orbita Events</a> respondemos positivamente a todas estas preguntas. Llevamos el corazon puesto en cada boda y tratamos cada evento como si fuera el mas importante del ano, porque para vosotros lo es.</p>
+
+<p><strong>Hazle estas preguntas a cualquier DJ que esteis considerando</strong>, incluido a nosotros. Si las respuestas os convencen, habreis encontrado vuestro DJ. <a href="/es/contacto">Contactadnos</a> y os respondemos con total transparencia.</p>`
+        },
+        {
+          locale: 'ca',
+          title: 'Checklist DJ Casament: 15 Preguntes Essencials Abans de Contractar',
+          excerpt: 'Abans de signar el contracte amb el teu DJ de casament, fes-li aquestes 15 preguntes clau. Una checklist completa per assegurar-te de triar el professional correcte per al dia mes important.',
+          metaTitle: 'Checklist DJ Casament: 15 Preguntes que Has de Fer Abans de Contractar',
+          metaDescription: 'Checklist completa amb les 15 preguntes essencials que has de fer al teu DJ abans de contractar per al teu casament. Evita sorpreses i assegura\'t de triar el professional correcte.',
+          content: `<h2>Checklist DJ Casament: Les 15 Preguntes que Has de Fer</h2>
+
+<p>Triar el DJ per al teu casament es una de les decisions mes importants que prendras durant l'organitzacio. La musica marcara l'ambient de tota la celebracio i sera el que els teus convidats recordaran durant anys. Per ajudar-te a prendre la millor decisio, hem creat aquesta checklist amb les 15 preguntes essencials que has de fer abans de contractar qualsevol DJ.</p>
+
+<h2>Preguntes sobre Experiencia i Trajectoria</h2>
+
+<h3>1. Quants casaments has animat l'ultim any?</h3>
+<p>Un DJ especialitzat en casaments hauria de poder respondre amb una xifra concreta. L'experiencia especifica en casaments es molt diferent de la d'un DJ de discoteca.</p>
+
+<h3>2. Pots mostrar-me videos o fotos de casaments anteriors?</h3>
+<p>Un professional te material de mostra. Fixeu-vos en l'equip, l'ambient i com gestiona els moments especials.</p>
+
+<h3>3. Has treballat a l'espai on se celebrara el meu casament?</h3>
+<p>Si ja coneix la masia o el salo, aixo es un punt a favor. Si no, un bon professional demanara visitar l'espai amb anticipacio.</p>
+
+<h2>Preguntes sobre el Servei</h2>
+
+<h3>4. Quin equip de so fas servir? Quina es la potencia?</h3>
+<p>Un DJ professional coneixera perfectament el seu equip. Minim 4000W per a casaments mitjans-grans.</p>
+
+<h3>5. Quin tipus d'il·luminacio inclou el servei?</h3>
+<p>La diferencia entre il·luminacio basica i professional es enorme en el resultat final.</p>
+
+<h3>6. Esta disponible maquina de fum, bengales fredes o altres efectes?</h3>
+<p>Pregunta si estan inclosos o tenen cost addicional.</p>
+
+<h3>7. Quantes hores cobreix el preu base? Que passa si l'esdeveniment s'allarga?</h3>
+<p>Evita sorpreses al final de la nit. Clarifica el preu per hora extra des del principi.</p>
+
+<h3>8. Inclou el servei microfon per als discursos?</h3>
+<p>Essencial per a la boda civil, el discurs dels nuvis o el brindis.</p>
+
+<h2>Preguntes sobre Logistica</h2>
+
+<h3>9. Quant de temps abans arriba per muntar l'equip?</h3>
+<p>Un professional hauria d'arribar com a minim 2 hores abans per muntar, provar i estar llest.</p>
+
+<h3>10. Que passa si hi ha un problema tecnic? Tens equip de recanvi?</h3>
+<p>Pregunta clau. Un DJ professional sempre te equip de recanvi. Sense equip de recanvi, es un senyal d'alarma.</p>
+
+<h2>Preguntes sobre Musica i Personalitzacio</h2>
+
+<h3>11. Fem una reunio previa per parlar de la musica?</h3>
+<p>Fonamental. El DJ ha de coneixer els vostres gustos, les cancons especials i els moments clau de la nit.</p>
+
+<h3>12. Podem donar una llista de cancons obligatories i cancons vetades?</h3>
+<p>Tot bon DJ accepta una llista de cancons que si vols i cancons que no vols escolar mai.</p>
+
+<h2>Preguntes sobre Contracte i Condicions</h2>
+
+<h3>13. Signes contracte? Que cobreix en cas de cancel·lacio?</h3>
+<p>Imprescindible. Un contracte protegeix tant el client com el professional.</p>
+
+<h2>Checklist Rapida</h2>
+
+<ul>
+<li>☐ Experiencia especifica en casaments demostrable</li>
+<li>☐ Videos o referencies de casaments anteriors</li>
+<li>☐ Equip de so de qualitat (4000W+)</li>
+<li>☐ Il·luminacio professional inclosa</li>
+<li>☐ Microfon per a discursos</li>
+<li>☐ Equip de recanvi confirmat</li>
+<li>☐ Reunio previa de planificacio</li>
+<li>☐ Llista de cancons personalitzable</li>
+<li>☐ Contracte signat</li>
+<li>☐ Asseguranca de responsabilitat civil</li>
+</ul>
+
+<p><strong>Fes aquestes preguntes a qualsevol DJ que estigueu considerant</strong>, inclosos nosaltres. <a href="/ca/contacto">Contacta'ns</a> i et responem amb total transparencia.</p>`
         }
       ]
     }

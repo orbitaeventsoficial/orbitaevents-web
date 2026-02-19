@@ -23,6 +23,7 @@
     "normalize:filenames": "node scripts/normalize-filenames.mjs",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
+    "seed:blog": "npx tsx prisma/seed-blog.ts",
     "db:reset": "prisma db push --force-reset && prisma db seed",
     "monitor": "npx ts-node scripts/monitor.ts",
     "health": "curl -s https://orbitaevents.com/api/health | node -e \"const d=require('fs').readFileSync(0,'utf8');const h=JSON.parse(d);console.log('Status:',h.status,'| DB:',h.checks?.database?.status,'| Response:',h.responseTime+'ms')\"",
@@ -78,6 +79,7 @@
     "sonner": "^1.4.6",
     "tailwind-merge": "^2.3.0",
     "tailwindcss": "3.4.3",
+    "web-vitals": "^5.1.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
