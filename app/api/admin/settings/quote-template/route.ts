@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     log.error('Error loading quote template settings', error);
     return NextResponse.json(
-      { ok: false, error: 'No se pudo cargar la plantilla de presupuesto' },
+      { ok: false, error: 'No s\'ha pogut carregar la plantilla de pressupost' },
       { status: 500 }
     );
   }
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     log.error('Error updating quote template settings', error);
     return NextResponse.json(
-      { ok: false, error: 'No se pudo actualizar la plantilla de presupuesto' },
+      { ok: false, error: 'No s\'ha pogut actualitzar la plantilla de pressupost' },
       { status: 500 }
     );
   }

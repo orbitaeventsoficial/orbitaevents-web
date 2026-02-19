@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     log.error('Error updating profitability config', error);
     return NextResponse.json(
-      { ok: false, error: 'No se pudo actualizar configuración de rentabilidad' },
+      { ok: false, error: 'No s\'ha pogut actualitzar la configuració de rendibilitat' },
       { status: 500 }
     );
   }

@@ -2,6 +2,7 @@
 
 /**
  * NOU ELEMENT D'INVENTARI - Formulari de creació
+ * El codi s'auto-genera per la categoria si no es proporciona
  */
 
 import { useCallback, useState } from 'react';
@@ -9,16 +10,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 const CATEGORIES = [
-  { value: 'SOUND', label: 'So', icon: '🔊' },
-  { value: 'LIGHTING', label: 'Il·luminació', icon: '💡' },
-  { value: 'EFFECTS', label: 'Efectes', icon: '✨' },
-  { value: 'STRUCTURE', label: 'Estructura', icon: '🏗️' },
-  { value: 'CABLING', label: 'Cablejat', icon: '🔌' },
-  { value: 'TECH', label: 'Tecnologia', icon: '💻' },
-  { value: 'DECORATION_HP', label: 'Deco HP', icon: '🎃' },
-  { value: 'DECORATION_HW', label: 'Deco HW', icon: '🎄' },
-  { value: 'DECORATION_GEN', label: 'Deco General', icon: '🎨' },
-  { value: 'CONSUMABLE', label: 'Consumibles', icon: '📦' },
+  { value: 'SOUND', label: 'So', icon: '🔊', prefix: 'SON' },
+  { value: 'LIGHTING', label: 'Il·luminació', icon: '💡', prefix: 'LUM' },
+  { value: 'EFFECTS', label: 'Efectes', icon: '✨', prefix: 'EFX' },
+  { value: 'STRUCTURE', label: 'Estructura', icon: '🏗️', prefix: 'EST' },
+  { value: 'CABLING', label: 'Cablejat', icon: '🔌', prefix: 'CAB' },
+  { value: 'TECH', label: 'Tecnologia', icon: '💻', prefix: 'TEC' },
+  { value: 'DECORATION_HP', label: 'Deco HP', icon: '🎃', prefix: 'DHP' },
+  { value: 'DECORATION_HW', label: 'Deco HW', icon: '🎄', prefix: 'DHW' },
+  { value: 'DECORATION_GEN', label: 'Deco General', icon: '🎨', prefix: 'DGE' },
+  { value: 'CONSUMABLE', label: 'Consumibles', icon: '📦', prefix: 'CON' },
 ];
 
 const CONDITIONS = [
@@ -41,6 +42,9 @@ type FormData = {
   stockQuantity: string;
   minStock: string;
   notes: string;
+  purchaseDate: string;
+  purchasePrice: string;
+  expectedLifeHours: string;
 };
 
 const INITIAL: FormData = {
@@ -55,6 +59,9 @@ const INITIAL: FormData = {
   stockQuantity: '',
   minStock: '',
   notes: '',
+  purchaseDate: '',
+  purchasePrice: '',
+  expectedLifeHours: '2000',
 };
 
 export default function NewInventoryItemPage() {
@@ -67,9 +74,11 @@ export default function NewInventoryItemPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const selectedCat = CATEGORIES.find((c) => c.value === form.category);
+
   const handleSubmit = useCallback(async () => {
-    if (!form.code || !form.name || !form.value) {
-      setError('Codi, nom i valor són obligatoris');
+    if (!form.name || !form.value) {
+      setError('Nom i valor són obligatoris');
       return;
     }
 
@@ -77,8 +86,7 @@ export default function NewInventoryItemPage() {
     setError(null);
 
     try {
-      const body = {
-        code: form.code.trim().toUpperCase(),
+      const body: Record<string, unknown> = {
         name: form.name.trim(),
         description: form.description.trim() || undefined,
         category: form.category,
@@ -90,6 +98,16 @@ export default function NewInventoryItemPage() {
         minStock: form.minStock ? parseInt(form.minStock, 10) : undefined,
         notes: form.notes.trim() || undefined,
       };
+
+      // Codi: si es proporciona, enviar-lo; si no, s'auto-genera al backend
+      if (form.code.trim()) {
+        body.code = form.code.trim().toUpperCase();
+      }
+
+      // Camps d'amortització
+      if (form.purchaseDate) body.purchaseDate = form.purchaseDate;
+      if (form.purchasePrice) body.purchasePrice = parseFloat(form.purchasePrice);
+      if (form.expectedLifeHours) body.expectedLifeHours = parseFloat(form.expectedLifeHours);
 
       const res = await fetch('/api/admin/inventory', {
         method: 'POST',
@@ -131,17 +149,19 @@ export default function NewInventoryItemPage() {
         </div>
       )}
 
-      {/* Basic info */}
+      {/* Informació bàsica */}
       <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
         <h2 className="text-sm font-semibold text-slate-200">Informació bàsica</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs text-slate-400">Codi *</label>
+            <label className="text-xs text-slate-400">
+              Codi <span className="text-slate-500">(opcional, s&apos;auto-genera)</span>
+            </label>
             <input
               type="text"
               value={form.code}
               onChange={(e) => updateField('code', e.target.value)}
-              placeholder="ALT-001"
+              placeholder={selectedCat ? `${selectedCat.prefix}-001` : 'Auto'}
               className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 font-mono"
             />
           </div>
@@ -168,7 +188,7 @@ export default function NewInventoryItemPage() {
         </div>
       </div>
 
-      {/* Category */}
+      {/* Categoria */}
       <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
         <h2 className="text-sm font-semibold text-slate-200">Categoria</h2>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -190,7 +210,7 @@ export default function NewInventoryItemPage() {
         </div>
       </div>
 
-      {/* Technical details */}
+      {/* Detalls tècnics */}
       <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
         <h2 className="text-sm font-semibold text-slate-200">Detalls tècnics</h2>
         <div className="grid gap-4 sm:grid-cols-3">
@@ -205,7 +225,7 @@ export default function NewInventoryItemPage() {
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Valor (€) *</label>
+            <label className="text-xs text-slate-400">Valor actual (€) *</label>
             <input
               type="number"
               value={form.value}
@@ -271,6 +291,42 @@ export default function NewInventoryItemPage() {
         )}
       </div>
 
+      {/* Amortització */}
+      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
+        <h2 className="text-sm font-semibold text-slate-200">Amortització</h2>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div>
+            <label className="text-xs text-slate-400">Preu de compra (€)</label>
+            <input
+              type="number"
+              value={form.purchasePrice}
+              onChange={(e) => updateField('purchasePrice', e.target.value)}
+              placeholder="800"
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-slate-400">Data de compra</label>
+            <input
+              type="date"
+              value={form.purchaseDate}
+              onChange={(e) => updateField('purchaseDate', e.target.value)}
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-slate-400">Vida útil (hores)</label>
+            <input
+              type="number"
+              value={form.expectedLifeHours}
+              onChange={(e) => updateField('expectedLifeHours', e.target.value)}
+              placeholder="2000"
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Notes */}
       <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5">
         <label className="text-xs text-slate-400">Notes internes</label>
@@ -283,12 +339,12 @@ export default function NewInventoryItemPage() {
         />
       </div>
 
-      {/* Submit */}
+      {/* Enviar */}
       <div className="flex items-center gap-3 pb-8">
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={submitting || !form.code || !form.name || !form.value}
+          disabled={submitting || !form.name || !form.value}
           className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting ? 'Creant...' : 'Crear element'}

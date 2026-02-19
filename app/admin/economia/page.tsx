@@ -157,6 +157,21 @@ export default async function EconomiaPage() {
     log.error('Error generant informe de rendibilitat', error);
   }
 
+  // Valor d'inventari (actius de l'empresa)
+  let inventoryValue = 0;
+  let inventoryCount = 0;
+  try {
+    const invAgg = await prisma.inventoryItem.aggregate({
+      where: { status: { not: 'RETIRED' } },
+      _sum: { value: true },
+      _count: true,
+    });
+    inventoryValue = invAgg._sum.value || 0;
+    inventoryCount = invAgg._count || 0;
+  } catch {
+    // silently fail
+  }
+
   // History logs
   const historyLogs = await prisma.adminLog.findMany({
     where: {
@@ -214,6 +229,8 @@ export default async function EconomiaPage() {
       bySource={report?.bySource ?? []}
       config={report?.config ?? defaultConfig}
       historyEntries={historyEntries}
+      inventoryValue={inventoryValue}
+      inventoryCount={inventoryCount}
     />
   );
 }

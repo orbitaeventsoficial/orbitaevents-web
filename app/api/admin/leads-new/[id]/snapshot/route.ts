@@ -167,7 +167,7 @@ export async function POST(req: NextRequest, { params }: Params) {
       context: { leadId: params.id },
     });
     return NextResponse.json(
-      { ok: false, error: 'No se pudo procesar el snapshot técnico' },
+      { ok: false, error: 'No s\'ha pogut processar el snapshot tècnic' },
       { status: 500 }
     );
   }

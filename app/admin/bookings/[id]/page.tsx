@@ -10,6 +10,7 @@ import { deriveFlowStatus } from '@/lib/services/communicationStatusService';
 import CalendarSyncButton from './CalendarSyncButton';
 import PostEventEmailButton from './PostEventEmailButton';
 import BookingMarginCard from './BookingMarginCard';
+import BookingInventorySection from './BookingInventorySection';
 
 export const dynamic = 'force-dynamic';
 
@@ -490,6 +491,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </div>
         )}
       </section>
+
+      {/* Equipament assignat */}
+      <BookingInventorySection bookingId={booking.id} />
 
       {/* Pricing */}
       <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">

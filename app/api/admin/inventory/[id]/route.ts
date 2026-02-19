@@ -9,7 +9,7 @@ interface Params {
   params: { id: string };
 }
 
-// GET - Detall d'un element
+// GET - Detall d'un element amb totes les dades
 export async function GET(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);
   if (authError) return authError;
@@ -32,14 +32,14 @@ export async function GET(req: NextRequest, { params }: Params) {
                 eventDate: true,
                 clientName: true,
                 status: true,
+                eventStartTime: true,
+                eventEndTime: true,
               },
             },
           },
-          take: 20,
           orderBy: { booking: { eventDate: 'desc' } },
         },
         usageHistory: {
-          take: 20,
           orderBy: { usedAt: 'desc' },
         },
       },
@@ -52,9 +52,18 @@ export async function GET(req: NextRequest, { params }: Params) {
       );
     }
 
+    // Calcular hores acumulades
+    const totalHoursUsed = item.usageHistory.reduce(
+      (sum, u) => sum + (u.hoursUsed || 0),
+      0
+    );
+
     return NextResponse.json({
       ok: true,
-      item,
+      item: {
+        ...item,
+        totalHoursUsed,
+      },
     });
   } catch (error) {
     log.error('Error obtenint element:', error);
@@ -82,6 +91,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         { error: 'Element no trobat' },
         { status: 404 }
       );
+    }
+
+    // Processar data de compra si ve com a string
+    if (body.purchaseDate && typeof body.purchaseDate === 'string') {
+      body.purchaseDate = new Date(body.purchaseDate);
     }
 
     const item = await prisma.inventoryItem.update({

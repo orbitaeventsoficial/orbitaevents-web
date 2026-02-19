@@ -6,7 +6,7 @@ import { requireAuth, requirePermission } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-// GET - Obtener una FAQ por ID
+// GET - Obtenir una FAQ per ID
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -44,7 +44,7 @@ export async function GET(
   }
 }
 
-// PATCH - Actualizar FAQ
+// PATCH - Actualitzar FAQ
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -59,7 +59,7 @@ export async function PATCH(
     const body = await req.json();
     const { slug, category, order, isActive, translations } = body;
 
-    // Preparar datos de actualización
+    // Preparar dades d'actualització
     const updateData: any = {};
 
     if (slug !== undefined) updateData.slug = slug;
@@ -67,7 +67,7 @@ export async function PATCH(
     if (order !== undefined) updateData.order = order;
     if (isActive !== undefined) updateData.isActive = isActive;
 
-    // Actualizar traducciones si se proporcionan
+    // Actualitzar traduccions si es proporcionen
     if (translations && Array.isArray(translations)) {
       updateData.translations = {
         deleteMany: {},

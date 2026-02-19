@@ -400,7 +400,7 @@ export default function AdminContactesPage() {
           </svg>
           <input
             type="search"
-            placeholder="Buscar por nombre, email, teléfono, Instagram o código descuento"
+            placeholder="Cercar per nom, email, telèfon, Instagram o codi descompte"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             aria-label="Cercar client"

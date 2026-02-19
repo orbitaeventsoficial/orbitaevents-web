@@ -197,7 +197,7 @@ export default function PresupuestoPdfStudio({
   initialLeadId = '',
   initialProposalId = '',
   initialPreferredLocale = 'ca',
-  initialBrandName = 'Orbita Events',
+  initialBrandName = 'Òrbita Events',
   initialBrandWebsite = 'orbitaevents.com',
   initialBrandEmail = '',
   initialBrandPhone = '',
@@ -235,7 +235,7 @@ export default function PresupuestoPdfStudio({
   const [generating, setGenerating] = useState(false);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [brandName, setBrandName] = useState(initialBrandName || 'Orbita Events');
+  const [brandName, setBrandName] = useState(initialBrandName || 'Òrbita Events');
   const [brandWebsite, setBrandWebsite] = useState(initialBrandWebsite || 'orbitaevents.com');
   const [brandEmail, setBrandEmail] = useState(initialBrandEmail || '');
   const [brandPhone, setBrandPhone] = useState(initialBrandPhone || '');

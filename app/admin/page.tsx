@@ -330,9 +330,11 @@ export default async function AdminDashboard() {
   ]);
 
   // Calcular estadístiques inventari
-  const inventoryActive = inventoryStats.find((s: { status: string; _count: number }) => s.status === 'ACTIVE')?._count || 0;
+  const inventoryAvailable = inventoryStats.find((s: { status: string; _count: number }) => s.status === 'AVAILABLE')?._count || 0;
+  const inventoryInUse = inventoryStats.find((s: { status: string; _count: number }) => s.status === 'IN_USE')?._count || 0;
   const inventoryTotal = inventoryStats.reduce((acc: number, s: { _count: number }) => acc + s._count, 0);
   const inventoryMaintenance = inventoryStats.find((s: { status: string; _count: number }) => s.status === 'MAINTENANCE')?._count || 0;
+  const inventoryBroken = inventoryStats.find((s: { status: string; _count: number }) => s.status === 'BROKEN')?._count || 0;
 
   const rating = avgRating._avg.rating ? avgRating._avg.rating.toFixed(1) : '5.0';
   const conversionRate = leadsCount > 0 ? Math.round((wonLeads / leadsCount) * 100) : 0;
@@ -468,6 +470,13 @@ export default async function AdminDashboard() {
       description: `${postEventPending} esdeveniments sense correu enviat.`,
       href: '/admin/emails',
       action: 'Gestionar',
+    }] : []),
+    ...((inventoryMaintenance + inventoryBroken) > 0 ? [{
+      type: 'warning',
+      title: 'Equip requereix atenció',
+      description: `${inventoryMaintenance} en manteniment${inventoryBroken > 0 ? `, ${inventoryBroken} avariat` : ''}.`,
+      href: '/admin/inventory',
+      action: 'Revisar',
     }] : []),
   ];
 
@@ -1050,11 +1059,13 @@ export default async function AdminDashboard() {
           <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">⭐ {rating}</p>
           <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">Mitjana</p>
         </div>
-        <div className="p-3 sm:p-5 rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 backdrop-blur-sm">
+        <Link href="/admin/inventory" className="p-3 sm:p-5 rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 backdrop-blur-sm hover:border-cyan-400/40 transition-colors">
           <p className="text-slate-400 text-xs sm:text-sm font-medium">Inventari</p>
-          <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">{inventoryActive}/{inventoryTotal}</p>
-          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{inventoryMaintenance} mant.</p>
-        </div>
+          <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">{inventoryAvailable}/{inventoryTotal}</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">
+            {inventoryInUse > 0 && `${inventoryInUse} en ús · `}{inventoryMaintenance > 0 && `${inventoryMaintenance} mant.`}{inventoryBroken > 0 && ` · ${inventoryBroken} avariat`}{inventoryInUse === 0 && inventoryMaintenance === 0 && inventoryBroken === 0 && 'Tot disponible'}
+          </p>
+        </Link>
       </div>
 
       <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">

@@ -112,13 +112,13 @@ export default function CatalogPage({
                 href="/admin/inventory"
                 className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
               >
-                Obrir inventari
+                Obrir inventari complet
               </Link>
               <Link
-                href="/admin/pricing?legacy=1"
+                href="/admin/inventory/new"
                 className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
               >
-                Veure ús i rendiment
+                Afegir element nou
               </Link>
             </>
           )}

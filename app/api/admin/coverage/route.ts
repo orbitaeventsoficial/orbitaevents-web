@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Si no hay áreas, inicializar con áreas por defecto
+    // Si no hi ha àrees, inicialitzar amb àrees per defecte
     if (areas.length === 0) {
       areas = [
         { city: 'Barcelona', province: 'Barcelona', enabled: true },
@@ -218,7 +218,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Log del cambio
+    // Log del canvi
     await prisma.adminLog.create({
       data: {
         action: 'UPDATE',

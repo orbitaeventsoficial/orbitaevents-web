@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     log.error('Error generating profitability report', error);
     return NextResponse.json(
-      { ok: false, error: 'No se pudo generar el reporte de rentabilidad' },
+      { ok: false, error: 'No s\'ha pogut generar l\'informe de rendibilitat' },
       { status: 500 }
     );
   }

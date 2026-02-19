@@ -53,6 +53,9 @@ model InventoryItem {
   isConsumable  Boolean           @default(false)
   stockQuantity Int?
   minStock      Int?
+  purchaseDate    DateTime?
+  purchasePrice   Float?
+  expectedLifeHours Float?  @default(2000)
   imageUrl      String?
   notes         String?
 

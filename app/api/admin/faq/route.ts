@@ -1,5 +1,5 @@
 // app/api/admin/faq/route.ts
-// API para CRUD completo de FAQs
+// API per CRUD complet de FAQs
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
@@ -7,7 +7,7 @@ import { requireAuth, requirePermission } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-// GET - Obtener todas las FAQs
+// GET - Obtenir totes les FAQs
 export async function GET(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST - Crear nueva FAQ
+// POST - Crear nova FAQ
 export async function POST(req: NextRequest) {
   const authError = requireAuth(req);
   if (authError) return authError;
@@ -49,24 +49,24 @@ export async function POST(req: NextRequest) {
 
     if (!slug || !translations || translations.length === 0) {
       return NextResponse.json(
-        { ok: false, error: 'Slug y traducciones son requeridos' },
+        { ok: false, error: 'Slug i traduccions són requerits' },
         { status: 400 }
       );
     }
 
-    // Verificar que el slug no exista
+    // Verificar que el slug no existeixi
     const existing = await prisma.fAQ.findUnique({
       where: { slug },
     });
 
     if (existing) {
       return NextResponse.json(
-        { ok: false, error: 'Ya existe una FAQ con este slug' },
+        { ok: false, error: 'Ja existeix una FAQ amb aquest slug' },
         { status: 400 }
       );
     }
 
-    // Crear FAQ con traducciones
+    // Crear FAQ amb traduccions
     const faq = await prisma.fAQ.create({
       data: {
         slug,

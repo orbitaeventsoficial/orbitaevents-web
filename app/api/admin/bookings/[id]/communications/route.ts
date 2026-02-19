@@ -138,14 +138,14 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     if (payload.action === 'send_whatsapp') {
       const content = buildEmailContent(payload.flow, booking);
-      const text = `${content.subject}\n\nHola ${booking.clientName.split(' ')[0]}, seguimos en contacto por ${booking.reference}.`;
+      const text = `${content.subject}\n\nHola ${booking.clientName.split(' ')[0]}, seguim en contacte pel ${booking.reference}.`;
       const waResult = await sendWhatsAppText({
         to: booking.clientPhone,
         text,
       });
       if (!waResult.ok) {
         return NextResponse.json(
-          { ok: false, error: waResult.error || 'No se pudo enviar WhatsApp' },
+          { ok: false, error: waResult.error || 'No s\'ha pogut enviar WhatsApp' },
           { status: 500 }
         );
       }

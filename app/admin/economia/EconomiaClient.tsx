@@ -79,6 +79,8 @@ interface EconomiaClientProps {
   bySource: BySourceRow[];
   config: ProfitabilityConfig;
   historyEntries: HistoryEntry[];
+  inventoryValue: number;
+  inventoryCount: number;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -396,6 +398,30 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     max={props.monthCollected + props.outstandingTotal}
                     color="bg-gradient-to-r from-emerald-500 to-emerald-400"
                   />
+                </motion.section>
+              )}
+
+              {/* Inventory asset value */}
+              {props.inventoryCount > 0 && (
+                <motion.section
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-950/20 to-slate-950/60 p-5 shadow-lg"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Valor d&apos;inventari</p>
+                      <p className="mt-1 text-2xl font-black text-cyan-300">{money(props.inventoryValue)}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{props.inventoryCount} elements actius</p>
+                    </div>
+                    <Link
+                      href="/admin/inventory"
+                      className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-xs font-bold text-cyan-300 hover:bg-cyan-500/20 transition-colors"
+                    >
+                      Veure inventari
+                    </Link>
+                  </div>
                 </motion.section>
               )}
 

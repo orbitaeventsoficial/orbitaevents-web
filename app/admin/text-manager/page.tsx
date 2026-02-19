@@ -372,7 +372,7 @@ export default function TextManagerPage() {
       const allOk = results.every(r => r.ok);
 
       if (allOk) {
-        // Actualizar los estados con las traducciones
+        // Actualitzar els estats amb les traduccions
         setEsTexts(prev => ({ ...prev, ...allModifications.es }));
         setCaTexts(prev => ({ ...prev, ...allModifications.ca }));
         setEnTexts(prev => ({ ...prev, ...allModifications.en }));

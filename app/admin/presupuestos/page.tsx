@@ -14,7 +14,7 @@ const PresupuestoPdfStudio = dynamicImport(() => import('./PresupuestoPdfStudio'
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Editor PDF de pressupostos | Orbita Admin',
+  title: 'Editor PDF de pressupostos | Òrbita Admin',
   robots: {
     index: false,
     follow: false,
@@ -86,7 +86,7 @@ export default async function PresupuestosPage({
         initialLeadId={leadId}
         initialProposalId={proposalId}
         initialPreferredLocale={customer?.preferredLocale || 'ca'}
-        initialBrandName={String(brandSettings['quotes.brandName'] || 'Orbita Events')}
+        initialBrandName={String(brandSettings['quotes.brandName'] || 'Òrbita Events')}
         initialBrandWebsite={String(brandSettings['quotes.brandWebsite'] || 'orbitaevents.com')}
         initialBrandEmail={String(brandSettings['quotes.brandEmail'] || '')}
         initialBrandPhone={String(brandSettings['quotes.brandPhone'] || '')}

@@ -235,7 +235,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return handleApiError(error, {
       context: 'Fetching dashboard stats',
-      userMessage: 'Error al cargar las estadísticas del panel',
+      userMessage: 'Error carregant les estadístiques del panell',
     });
   }
 }

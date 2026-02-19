@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { requireAuth, requirePermission } from '@/lib/auth';
 import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
+import { calculateEventDuration } from '@/lib/inventory-utils';
 
 interface Params {
   params: { id: string };
@@ -80,12 +81,111 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       statsUpdated = true;
     }
 
-    // Si passa a CANCELLED, alliberar disponibilitat
+    // ═══════════════════════════════════════════════════════════════════
+    // AUTOMATISMES D'INVENTARI PER CANVI D'ESTAT
+    // ═══════════════════════════════════════════════════════════════════
+
+    // CONFIRMED: auto-assignar items del pack i marcar IN_USE
+    if (status === 'CONFIRMED' && oldStatus !== 'CONFIRMED') {
+      const bookingWithPack = await prisma.booking.findUnique({
+        where: { id },
+        include: {
+          pack: { include: { inventory: { include: { item: true } } } },
+          inventory: true,
+        },
+      });
+
+      if (bookingWithPack?.pack?.inventory) {
+        for (const packItem of bookingWithPack.pack.inventory) {
+          const alreadyAssigned = bookingWithPack.inventory.some(
+            (bi) => bi.itemId === packItem.itemId
+          );
+          if (!alreadyAssigned && packItem.item.status === 'AVAILABLE') {
+            await prisma.bookingInventory.create({
+              data: {
+                bookingId: id,
+                itemId: packItem.itemId,
+                quantity: packItem.quantity,
+                conditionBefore: packItem.item.condition,
+              },
+            });
+            await prisma.inventoryItem.update({
+              where: { id: packItem.itemId },
+              data: { status: 'IN_USE' },
+            });
+          }
+        }
+      }
+    }
+
+    // COMPLETED: registrar hores d'ús i tornar items a AVAILABLE
+    if (status === 'COMPLETED' && oldStatus !== 'COMPLETED') {
+      const bookingInv = await prisma.bookingInventory.findMany({
+        where: { bookingId: id },
+        include: { item: true },
+      });
+
+      const eventDuration = calculateEventDuration(
+        existing.eventStartTime,
+        existing.eventEndTime
+      );
+
+      for (const bi of bookingInv) {
+        if (eventDuration > 0) {
+          await prisma.inventoryUsage.create({
+            data: {
+              itemId: bi.itemId,
+              bookingId: id,
+              hoursUsed: eventDuration,
+              notes: `Bolo ${existing.reference}`,
+            },
+          });
+        }
+
+        const otherActive = await prisma.bookingInventory.count({
+          where: {
+            itemId: bi.itemId,
+            bookingId: { not: id },
+            booking: { status: { in: ['CONFIRMED', 'PREPARING'] } },
+          },
+        });
+
+        if (otherActive === 0) {
+          await prisma.inventoryItem.update({
+            where: { id: bi.itemId },
+            data: { status: 'AVAILABLE' },
+          });
+        }
+      }
+    }
+
+    // Si passa a CANCELLED, alliberar disponibilitat + inventari
     if (status === 'CANCELLED' && oldStatus !== 'CANCELLED') {
       await prisma.availability.updateMany({
         where: { bookingId: id },
         data: { status: 'AVAILABLE', bookingId: null },
       });
+
+      const bookingInv = await prisma.bookingInventory.findMany({
+        where: { bookingId: id },
+      });
+
+      for (const bi of bookingInv) {
+        const otherActive = await prisma.bookingInventory.count({
+          where: {
+            itemId: bi.itemId,
+            bookingId: { not: id },
+            booking: { status: { in: ['CONFIRMED', 'PREPARING'] } },
+          },
+        });
+
+        if (otherActive === 0) {
+          await prisma.inventoryItem.update({
+            where: { id: bi.itemId },
+            data: { status: 'AVAILABLE' },
+          });
+        }
+      }
     }
 
     // Actualitzar estat

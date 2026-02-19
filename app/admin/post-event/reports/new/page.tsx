@@ -12,6 +12,13 @@ export default function NewReportPage() {
 
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState<any>(null);
+  const [inventoryItems, setInventoryItems] = useState<Array<{
+    id: string;
+    inventoryItem: { id: string; code: string; name: string; category: string; condition: string };
+    checkedOut: boolean;
+    checkedIn: boolean;
+    conditionAfter: string | null;
+  }>>([]);
 
   useEffect(() => {
     if (bookingId) {
@@ -23,6 +30,15 @@ export default function NewReportPage() {
           }
         })
         .catch(err => log.error('Error loading booking', err));
+
+      fetch(`/api/admin/bookings/${bookingId}/inventory`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.assignedItems) {
+            setInventoryItems(data.assignedItems);
+          }
+        })
+        .catch(() => { /* inventory not available */ });
     }
   }, [bookingId]);
 
@@ -95,6 +111,32 @@ export default function NewReportPage() {
           <p className="text-sm text-cyan-300 mt-1">
             {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · {booking.eventLocation}
           </p>
+        </div>
+      )}
+
+      {/* Inventory used */}
+      {inventoryItems.length > 0 && (
+        <div className="bg-slate-950/60 border border-white/10 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-slate-200 mb-3">Equipament utilitzat ({inventoryItems.length})</h3>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {inventoryItems.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center gap-3 rounded-lg border border-white/5 bg-white/5 px-3 py-2"
+              >
+                <span className="text-xs font-mono font-bold text-cyan-400">{item.inventoryItem.code}</span>
+                <span className="text-sm text-slate-200 flex-1 truncate">{item.inventoryItem.name}</span>
+                {item.checkedIn && (
+                  <span className="text-[10px] rounded-full bg-emerald-500/20 text-emerald-300 px-2 py-0.5">Retornat</span>
+                )}
+                {item.conditionAfter && item.conditionAfter !== item.inventoryItem.condition && (
+                  <span className="text-[10px] rounded-full bg-amber-500/20 text-amber-300 px-2 py-0.5">
+                    {item.conditionAfter}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

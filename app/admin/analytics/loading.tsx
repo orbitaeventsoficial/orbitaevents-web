@@ -1,0 +1,20 @@
+export default function AnalyticsLoading() {
+  return (
+    <div className="animate-pulse space-y-5">
+      <div className="space-y-2">
+        <div className="h-7 w-44 rounded bg-slate-700/50" />
+        <div className="h-4 w-80 rounded bg-slate-700/30" />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-24 rounded-2xl border border-white/10 bg-slate-950/60" />
+        ))}
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="h-72 rounded-2xl border border-white/10 bg-slate-950/60" />
+        <div className="h-72 rounded-2xl border border-white/10 bg-slate-950/60" />
+      </div>
+      <div className="h-64 rounded-2xl border border-white/10 bg-slate-950/60" />
+    </div>
+  );
+}
