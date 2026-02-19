@@ -30,6 +30,9 @@ const updateBookingSchema = z.object({
   internalNotes: z.string().optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
+  distanceKm: z.number().min(0).optional(),
+  fuelCostPerKm: z.number().min(0).optional(),
+  travelCost: z.number().min(0).optional(),
 }).strict();
 
 // GET - Detall d'una reserva

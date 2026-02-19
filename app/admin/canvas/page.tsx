@@ -11,7 +11,7 @@ const PRESETS = [
 ];
 
 const EVENT_TYPES = [
-  { id: 'WEDDING', name: '💍 Boda' },
+  { id: 'WEDDING', name: '💍 Casament' },
   { id: 'BIRTHDAY', name: '🎂 Aniversari' },
   { id: 'CORPORATE', name: '🎯 Corporatiu' },
   { id: 'COMMUNION', name: '⛪ Comunió' },

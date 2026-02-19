@@ -177,6 +177,7 @@ function ScrollIndicator() {
   return (
     <motion.button
       onClick={handleClick}
+      aria-label={t('scroll')}
       className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       initial={reduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -308,8 +309,9 @@ export default function MobileHeroUltimate() {
   }, []);
 
   return (
-    <section 
+    <section
       ref={containerRef}
+      aria-label="Hero"
       className="relative h-[100dvh] w-full overflow-hidden"
       style={{ touchAction: 'pan-y' }}
     >

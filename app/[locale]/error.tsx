@@ -7,6 +7,7 @@ import { Link } from '@/lib/navigation';
 import { MessageCircle, Home, RefreshCcw, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { log } from '@/lib/logger';
 
 export default function Error({
   error,
@@ -18,7 +19,7 @@ export default function Error({
   const t = useTranslations('errorPage');
 
   useEffect(() => {
-    console.error('Error caught by error boundary:', error);
+    log.error('Error caught by error boundary:', error);
   }, [error]);
 
   return (

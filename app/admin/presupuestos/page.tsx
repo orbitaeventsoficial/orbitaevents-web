@@ -90,7 +90,7 @@ export default async function PresupuestosPage({
         initialBrandWebsite={String(brandSettings['quotes.brandWebsite'] || 'orbitaevents.com')}
         initialBrandEmail={String(brandSettings['quotes.brandEmail'] || '')}
         initialBrandPhone={String(brandSettings['quotes.brandPhone'] || '')}
-        initialBrandTagline={String(brandSettings['quotes.brandTagline'] || 'Tu evento. Tu estilo. Tu noche perfecta.')}
+        initialBrandTagline={String(brandSettings['quotes.brandTagline'] || 'El teu esdeveniment. El teu estil. La teva nit perfecta.')}
         initialBrandLogoDataUrl={String(brandSettings['quotes.logoDataUrl'] || '')}
       />
     </div>

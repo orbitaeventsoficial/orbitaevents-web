@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { getAllPacks } from '@/app/config/packs-config';
 
 interface Props {
   leadId: string;
@@ -21,14 +22,17 @@ const STATUS_OPTIONS = [
   { value: 'LOST', label: 'Perdut', color: 'bg-gray-400', icon: '❌' },
 ];
 
-const PACK_OPTIONS = [
-  { value: 'manual', label: 'Manual / Personalitzat ✍️', price: 0, hours: 0 },
-  { value: 'flash', label: 'Pack Flash ⚡', price: 450, hours: 4 },
-  { value: 'party-starter', label: 'Pack Party Starter 🎉', price: 650, hours: 5 },
-  { value: 'premium', label: 'Pack Premium ✨', price: 950, hours: 6 },
-  { value: 'corporate', label: 'Pack Corporate 🎯', price: 800, hours: 5 },
-  { value: 'wedding', label: 'Pack Boda 💍', price: 1200, hours: 8 },
-];
+function buildPackOptions() {
+  const allPacks = getAllPacks();
+  const manual = { value: 'manual', label: 'Manual / Personalitzat ✍️', price: 0, hours: 0 };
+  const packOptions = allPacks.map((p) => ({
+    value: p.slug,
+    label: `${p.name} (${p.service}) ${p.badge || ''}`.trim(),
+    price: p.priceValue,
+    hours: p.durationHours,
+  }));
+  return [manual, ...packOptions];
+}
 
 export default function LeadActionsEnhanced({ 
   leadId, 
@@ -43,10 +47,13 @@ export default function LeadActionsEnhanced({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [optimisticStatus, setOptimisticStatus] = useState(currentStatus);
-  
+
+  // Pack options from packs-config (real prices)
+  const PACK_OPTIONS = useMemo(() => buildPackOptions(), []);
+
   // Quote generation state
   const [showQuoteModal, setShowQuoteModal] = useState(false);
-  const [selectedPack, setSelectedPack] = useState(PACK_OPTIONS[0].value);
+  const [selectedPack, setSelectedPack] = useState('manual');
   const [customPriceInput, setCustomPriceInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [quoteHtml, setQuoteHtml] = useState<string | null>(null);

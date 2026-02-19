@@ -10,6 +10,7 @@
 
 import { getPacksByService, EXTRAS, type ExtraDefinition, type ServiceSlug, type PackDefinition } from '@/app/config/packs-config';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { log } from '@/lib/logger';
 import { ORBITA_LOGO_BASE64 } from './logo-base64';
 import { ORBITA_LOGO_TEXT_DRETA_BASE64 } from './logo-wordmark-base64';
 
@@ -831,7 +832,7 @@ export async function downloadImage(imageUrl: string, filename: string): Promise
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Error downloading image:', error);
+    log.error('Error downloading image:', error);
     throw error;
   }
 }

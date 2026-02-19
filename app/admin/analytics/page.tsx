@@ -78,14 +78,8 @@ async function getAnalyticsData() {
         },
         _sum: { total: true },
       }),
-      prisma.booking.groupBy({
-        by: ['eventDate'],
-        where: {
-          status: { in: ['COMPLETED', 'CONFIRMED'] },
-          eventDate: { gte: startOfYear },
-        },
-        _sum: { total: true },
-      }),
+      // Revenue by month placeholder (data not displayed in UI yet)
+      Promise.resolve([]),
       prisma.booking.aggregate({
         where: { status: { in: ['COMPLETED', 'CONFIRMED'] } },
         _avg: { total: true },

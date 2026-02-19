@@ -2755,7 +2755,7 @@ async function main() {
 <p>Consulta la guia completa en castella o <a href="/ca/configurador">calcula el teu pressupost</a>.</p>`
         }
       ]
-    }
+    },
 
     // ═══════════════════════════════════════════════════════════════════════════
     // 13. DJ CORPORATIU BARCELONA EMPRESES

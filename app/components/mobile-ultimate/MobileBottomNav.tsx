@@ -160,6 +160,8 @@ function QuoteMenu() {
       <motion.button
         onClick={toggleMenu}
         whileTap={{ scale: 0.94 }}
+        aria-label={isOpen ? t('fab.close') : t('fab.open')}
+        aria-expanded={isOpen}
         className="relative z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-orange-500 shadow-[0_10px_30px_rgba(251,191,36,0.45)]"
       >
         <motion.span
@@ -209,6 +211,8 @@ function NavItemComponent({ item, isActive, onClick, locale, t }: NavItemProps) 
   return (
     <motion.a
       href={href}
+      aria-label={t(item.labelKey)}
+      aria-current={isActive ? 'page' : undefined}
       onClick={(e) => {
         e.preventDefault();
         haptic('light');
@@ -290,6 +294,8 @@ export default function MobileBottomNav() {
 
   return (
     <motion.nav
+      aria-label="Navegació principal"
+      role="navigation"
       initial={reduceMotion ? false : { y: 100 }}
       animate={{ y: 0 }}
       transition={reduceMotion ? { duration: 0 } : { type: 'spring', damping: 25, delay: 0.5 }}

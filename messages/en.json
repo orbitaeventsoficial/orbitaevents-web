@@ -6326,8 +6326,17 @@
       "whatsapp": "WhatsApp",
       "quote": "Budget",
       "configurator": "Configurator",
-      "zones": "View Areas"
+      "zones": "View Areas",
+      "open": "Open quick actions",
+      "close": "Close quick actions"
     }
+  },
+  "pwa": {
+    "installTitle": "Install the app",
+    "installDescription": "Quick access and enhanced experience. Works offline!",
+    "install": "Install",
+    "installApp": "Install App",
+    "notNow": "Not now"
   },
   "mobileHome": {
     "quickFeatures": {

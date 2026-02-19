@@ -11,6 +11,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { log } from '@/lib/logger';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -173,53 +174,81 @@ export function PWAProvider({ children }: { children: ReactNode }) {
       {children}
 
       {/* Install Banner */}
-      <AnimatePresence>
-        {showInstallBanner && canInstall && (
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            className="fixed bottom-24 left-4 right-4 z-50 lg:left-auto lg:right-6 lg:bottom-6 lg:max-w-sm"
-          >
-            <div className="bg-zinc-900 rounded-2xl p-4 border border-white/10 shadow-2xl">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-xl flex-shrink-0">
-                  📱
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-white font-semibold mb-1">Instal·la l'app</h3>
-                  <p className="text-white/60 text-sm mb-3">
-                    Accés ràpid i experiència millorada. Funciona offline!
-                  </p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={installApp}
-                      className="px-4 py-2 bg-amber-500 text-black font-semibold rounded-xl text-sm active:scale-95 transition-transform"
-                    >
-                      Instal·lar
-                    </button>
-                    <button
-                      onClick={dismissInstallPrompt}
-                      className="px-4 py-2 bg-white/10 text-white/70 rounded-xl text-sm active:scale-95 transition-transform"
-                    >
-                      Ara no
-                    </button>
-                  </div>
-                </div>
-                <button
-                  onClick={dismissInstallPrompt}
-                  className="text-white/60 hover:text-white/60"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <PWAInstallBanner
+        showInstallBanner={showInstallBanner}
+        canInstall={canInstall}
+        installApp={installApp}
+        dismissInstallPrompt={dismissInstallPrompt}
+      />
     </PWAContext.Provider>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSTALL BANNER (i18n)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function PWAInstallBanner({
+  showInstallBanner,
+  canInstall,
+  installApp,
+  dismissInstallPrompt,
+}: {
+  showInstallBanner: boolean;
+  canInstall: boolean;
+  installApp: () => Promise<void>;
+  dismissInstallPrompt: () => void;
+}) {
+  const t = useTranslations('pwa');
+
+  return (
+    <AnimatePresence>
+      {showInstallBanner && canInstall && (
+        <motion.div
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 100 }}
+          className="fixed bottom-24 left-4 right-4 z-50 lg:left-auto lg:right-6 lg:bottom-6 lg:max-w-sm"
+        >
+          <div className="bg-zinc-900 rounded-2xl p-4 border border-white/10 shadow-2xl">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-xl flex-shrink-0">
+                📱
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-white font-semibold mb-1">{t('installTitle')}</h3>
+                <p className="text-white/60 text-sm mb-3">
+                  {t('installDescription')}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={installApp}
+                    className="px-4 py-2 bg-amber-500 text-black font-semibold rounded-xl text-sm active:scale-95 transition-transform"
+                  >
+                    {t('install')}
+                  </button>
+                  <button
+                    onClick={dismissInstallPrompt}
+                    className="px-4 py-2 bg-white/10 text-white/70 rounded-xl text-sm active:scale-95 transition-transform"
+                  >
+                    {t('notNow')}
+                  </button>
+                </div>
+              </div>
+              <button
+                onClick={dismissInstallPrompt}
+                aria-label={t('notNow')}
+                className="text-white/60 hover:text-white/60"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -229,6 +258,7 @@ export function PWAProvider({ children }: { children: ReactNode }) {
 
 export function PWAInstallButton({ className = '' }: { className?: string }) {
   const { canInstall, installApp, isInstalled } = usePWA();
+  const t = useTranslations('pwa');
 
   if (isInstalled || !canInstall) return null;
 
@@ -240,7 +270,7 @@ export function PWAInstallButton({ className = '' }: { className?: string }) {
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
       </svg>
-      Instal·lar App
+      {t('installApp')}
     </button>
   );
 }

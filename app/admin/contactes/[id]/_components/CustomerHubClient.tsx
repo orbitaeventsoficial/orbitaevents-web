@@ -1,6 +1,7 @@
 'use client';
 
 import { Component, createContext, useCallback, useContext, useState, useTransition, type ReactNode } from 'react';
+import { log } from '@/lib/logger';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
 import CustomerHeader from './CustomerHeader';
 import TimelinePanel from './TimelinePanel';
@@ -78,7 +79,7 @@ class PanelErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error(`Error al panell ${this.props.panelName}:`, error, errorInfo);
+    log.error(`Error al panell ${this.props.panelName}:`, error);
   }
 
   render() {

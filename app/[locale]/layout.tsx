@@ -298,6 +298,15 @@ export const metadata: Metadata = {
     google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
   },
   category: 'entertainment',
+  alternates: {
+    canonical: 'https://orbitaevents.com',
+    languages: {
+      'es': 'https://orbitaevents.com',
+      'ca': 'https://orbitaevents.com/ca',
+      'en': 'https://orbitaevents.com/en',
+      'x-default': 'https://orbitaevents.com',
+    },
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -378,8 +387,9 @@ export default async function LocaleLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
-        {/* Preload critical resources for LCP - Hero */}
+        {/* Preload critical resources for LCP - Hero (desktop + mobile) */}
         <link rel="preload" href="/img/hero-poster.webp" as="image" type="image/webp" fetchPriority="high" />
+        <link rel="preload" href="/img/hero-poster-mobile.webp" as="image" type="image/webp" media="(max-width: 768px)" fetchPriority="high" />
 
         {/* Favicons */}
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -405,14 +415,6 @@ export default async function LocaleLayout({
             '@type': 'WebSite',
             name: 'Orbita Events',
             url: 'https://orbitaevents.com',
-            potentialAction: {
-              '@type': 'SearchAction',
-              target: {
-                '@type': 'EntryPoint',
-                urlTemplate: 'https://orbitaevents.com/search?q={search_term_string}'
-              },
-              'query-input': 'required name=search_term_string'
-            }
           }) }}
         />
 

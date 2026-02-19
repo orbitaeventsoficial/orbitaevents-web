@@ -42,7 +42,7 @@ export default function HeroElegant() {
   }, []);
 
   return (
-    <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
+    <section aria-label="Hero" className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
 
       {/* Background Video */}
       <div className="absolute inset-0">

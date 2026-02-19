@@ -1,5 +1,6 @@
 // app/admin/inbox/page.tsx
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import InboxClient from './InboxClient';
@@ -48,7 +49,7 @@ async function getLeads() {
       CacheTTL.VERY_SHORT
     );
   } catch (error) {
-    console.error('[Inbox] Error carregant leads:', error);
+    log.error('[Inbox] Error carregant leads:', error);
     return [];
   }
 }
@@ -79,7 +80,7 @@ async function getStats() {
     );
     return { totalLeads, unreadLeads, todayLeads };
   } catch (error) {
-    console.error('[Inbox] Error carregant stats:', error);
+    log.error('[Inbox] Error carregant stats:', error);
     return { totalLeads: 0, unreadLeads: 0, todayLeads: 0 };
   }
 }
@@ -112,7 +113,7 @@ async function getQuotePacks(): Promise<QuotePackOption[]> {
       price: Number(pack.price || 0),
     })).filter((pack) => pack.id && pack.price > 0);
   } catch (error) {
-    console.error('[Inbox] Error carregant packs:', error);
+    log.error('[Inbox] Error carregant packs:', error);
     return [];
   }
 }

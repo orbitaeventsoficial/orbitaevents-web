@@ -48,7 +48,7 @@ const PRIORITY_LABELS: Record<string, string> = {
   URGENT: 'Urgent',
 };
 const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: 'Boda',
+  WEDDING: 'Casament',
   BIRTHDAY: 'Aniversari',
   CORPORATE: 'Corporatiu',
   COMMUNION: 'Comunió',

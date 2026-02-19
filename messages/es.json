@@ -6326,8 +6326,17 @@
       "whatsapp": "WhatsApp",
       "quote": "Presupuesto",
       "configurator": "Configurador",
-      "zones": "Ver Zonas"
+      "zones": "Ver Zonas",
+      "open": "Abrir acciones rápidas",
+      "close": "Cerrar acciones rápidas"
     }
+  },
+  "pwa": {
+    "installTitle": "Instala la app",
+    "installDescription": "Acceso rápido y experiencia mejorada. ¡Funciona offline!",
+    "install": "Instalar",
+    "installApp": "Instalar App",
+    "notNow": "Ahora no"
   },
   "mobileHome": {
     "quickFeatures": {

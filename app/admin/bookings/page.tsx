@@ -21,7 +21,7 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }>
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Boda',
+  WEDDING: '💍 Casament',
   BIRTHDAY: '🎂 Aniversari',
   CORPORATE: '🎯 Corporatiu',
   COMMUNION: '⛪ Comunió',

@@ -8,6 +8,8 @@ import { BookingStatusChanger } from './BookingStatusChanger';
 import CommunicationPanel from './CommunicationPanel';
 import { deriveFlowStatus } from '@/lib/services/communicationStatusService';
 import CalendarSyncButton from './CalendarSyncButton';
+import PostEventEmailButton from './PostEventEmailButton';
+import BookingMarginCard from './BookingMarginCard';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +22,7 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }>
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Boda',
+  WEDDING: '💍 Casament',
   BIRTHDAY: '🎂 Aniversari',
   CORPORATE: '🎯 Corporatiu',
   COMMUNION: '⛪ Comunió',
@@ -353,15 +355,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </div>
         )}
         <div className="mt-3 flex flex-wrap gap-2">
-          <form action="/api/admin/emails/send-post-event" method="POST">
-            <input type="hidden" name="bookingId" value={booking.id} />
-            <button
-              type="submit"
-              className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600"
-            >
-              Envia postesdeveniment al client
-            </button>
-          </form>
+          <PostEventEmailButton bookingId={booking.id} />
           <Link
             href={`/admin/post-event/reports/new?bookingId=${booking.id}`}
             className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
@@ -540,36 +534,27 @@ export default async function BookingDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Travel / Distance */}
+      {/* Margin + Travel Cost (editable) */}
       {(() => {
         const bAny = booking as Record<string, unknown>;
-        const distanceKm = typeof bAny.distanceKm === 'number' ? bAny.distanceKm : null;
-        const travelCost = typeof bAny.travelCost === 'number' ? bAny.travelCost : null;
-        if (!distanceKm && !travelCost) return null;
+        const packPrice = booking.pack?.price ? Number(booking.pack.price) : 0;
+        const extrasTotal = booking.extras?.reduce((sum, e) => sum + Number(e.price || 0), 0) ?? 0;
+        const extraHours = typeof bAny.extraHours === 'number' ? bAny.extraHours : 0;
+        const extraHourPrice = typeof bAny.extraHourPrice === 'number' ? bAny.extraHourPrice : 0;
+
         return (
-          <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-slate-200 mb-4">Desplaçament</h2>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {distanceKm != null && (
-                <div>
-                  <p className="text-xs font-medium uppercase text-slate-400">Distància</p>
-                  <p className="text-lg font-bold text-slate-200">{distanceKm} km</p>
-                </div>
-              )}
-              {typeof bAny.fuelCostPerKm === 'number' && (
-                <div>
-                  <p className="text-xs font-medium uppercase text-slate-400">Cost per km</p>
-                  <p className="text-lg font-bold text-slate-200">{bAny.fuelCostPerKm}€/km</p>
-                </div>
-              )}
-              {travelCost != null && (
-                <div>
-                  <p className="text-xs font-medium uppercase text-slate-400">Cost total viatge</p>
-                  <p className="text-lg font-bold text-amber-300">{formatCurrency(travelCost)}</p>
-                </div>
-              )}
-            </div>
-          </section>
+          <BookingMarginCard
+            bookingId={booking.id}
+            total={Number(booking.total)}
+            packPrice={packPrice}
+            extrasTotal={extrasTotal}
+            extraHours={extraHours}
+            extraHourPrice={extraHourPrice}
+            distanceKm={typeof bAny.distanceKm === 'number' ? bAny.distanceKm : null}
+            fuelCostPerKm={typeof bAny.fuelCostPerKm === 'number' ? bAny.fuelCostPerKm : null}
+            travelCost={typeof bAny.travelCost === 'number' ? bAny.travelCost : null}
+            source={booking.lead?.source || 'UNKNOWN'}
+          />
         );
       })()}
 

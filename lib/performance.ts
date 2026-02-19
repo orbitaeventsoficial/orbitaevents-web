@@ -3,6 +3,7 @@
  * Helpers for optimizing client-side performance
  */
 
+
 /**
  * Debounce function calls
  */
@@ -94,29 +95,5 @@ export function isSlowConnection(): boolean {
   return connection.saveData || connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g';
 }
 
-/**
- * Report Web Vitals
- */
-export function reportWebVitals(metric: any) {
-  if (process.env.NODE_ENV === 'production' && typeof window !== 'undefined') {
-    // Send to analytics
-    const body = JSON.stringify({
-      name: metric.name,
-      value: metric.value,
-      id: metric.id,
-      label: metric.label,
-    });
-
-    // Use sendBeacon if available
-    if ('sendBeacon' in navigator) {
-      navigator.sendBeacon('/api/analytics/web-vitals', body);
-    } else {
-      fetch('/api/analytics/web-vitals', {
-        method: 'POST',
-        body,
-        headers: { 'Content-Type': 'application/json' },
-        keepalive: true,
-      }).catch(console.error);
-    }
-  }
-}
+// NOTE: Web Vitals reporting is handled by WebVitalsReporter component
+// which sends metrics to GTM dataLayer + Umami. No server-side route needed.

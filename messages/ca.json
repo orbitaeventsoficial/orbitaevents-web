@@ -4421,9 +4421,87 @@
       "lastUpdate": "Última actualització"
     },
     "terminos": {
+      "title": "Termes i Condicions",
       "metadata": {
         "title": "Termes i Condicions | Òrbita Events",
         "description": "Termes i condicions d'ús dels serveis d'Òrbita Events."
+      },
+      "lastUpdate": "Última actualització:",
+      "section1": {
+        "title": "1. Identificació",
+        "intro": "Aquests termes i condicions regulen l'ús dels serveis oferts per:",
+        "empresa": "Empresa:",
+        "ubicacion": "Ubicació:",
+        "contacto": "Contacte:",
+        "datosCompletos": "Per a dades fiscals completes, contactar per email."
+      },
+      "section2": {
+        "title": "2. Serveis",
+        "content": "Òrbita Events ofereix serveis de DJ, il·luminació, efectes especials, tematització i producció tècnica per a esdeveniments com casaments, festes privades, esdeveniments corporatius i celebracions."
+      },
+      "section3": {
+        "title": "3. Reserves i Pagaments",
+        "proceso": {
+          "title": "3.1 Procés de Reserva",
+          "item1": "Sol·licitud de pressupost personalitzat",
+          "item2": "Acceptació del pressupost per part del client",
+          "item3": "Pagament del senyal per confirmar la reserva",
+          "item4": "Signatura del contracte de serveis"
+        },
+        "condiciones": {
+          "title": "3.2 Condicions de Pagament",
+          "senal": "Senyal:",
+          "senalDesc": "30% del total per confirmar la reserva",
+          "resto": "Resta:",
+          "restoDesc": "El dia de l'esdeveniment o segons acord",
+          "metodos": "Mètodes:",
+          "metodosDesc": "Transferència bancària, Bizum, efectiu"
+        }
+      },
+      "section4": {
+        "title": "4. Cancel·lacions",
+        "item1": "Més de 30 dies abans:",
+        "item2": "Entre 15-30 dies:",
+        "item3": "Menys de 15 dies:",
+        "item3Desc": "Cobrament del 100% del servei",
+        "item4": "Força major:",
+        "item4Desc": "S'acordaran condicions especials"
+      },
+      "section5": {
+        "title": "5. Obligacions del Client",
+        "item1": "Proporcionar informació veraç sobre l'esdeveniment",
+        "item2": "Garantir accés al lloc de l'esdeveniment per al muntatge",
+        "item3": "Disposar de subministrament elèctric adequat",
+        "item4": "Informar de qualsevol canvi amb antelació",
+        "item5": "Complir amb els pagaments acordats"
+      },
+      "section6": {
+        "title": "6. Obligacions d'Òrbita Events",
+        "item1": "Prestar els serveis contractats amb professionalitat",
+        "item2": "Disposar d'equip tècnic en perfecte estat",
+        "item3": "Comptar amb equipament de resposta",
+        "item4": "Complir amb els horaris acordats",
+        "item5": "Disposar d'assegurança de responsabilitat civil"
+      },
+      "section7": {
+        "title": "7. Limitació de Responsabilitat",
+        "intro": "Òrbita Events no serà responsable de:",
+        "item1": "Talls de subministrament elèctric aliens al nostre control",
+        "item2": "Danys causats per condicions meteorològiques adverses",
+        "item3": "Incidències causades per tercers",
+        "item4": "Esdeveniments de força major"
+      },
+      "section8": {
+        "title": "8. Propietat Intel·lectual",
+        "content": "Les fotografies i vídeos realitzats durant els esdeveniments podran ser utilitzats per Òrbita Events amb fins promocionals, llevat d'indicació expressa en contrari per part del client."
+      },
+      "section9": {
+        "title": "9. Resolució de Conflictes",
+        "content": "Per a qualsevol controvèrsia derivada d'aquests termes, les parts se sotmeten als Jutjats i Tribunals de {city}, renunciant a qualsevol altre fur que pogués correspondre'ls."
+      },
+      "section10": {
+        "title": "10. Contacte",
+        "intro": "Per a consultes sobre aquests termes:"
       }
     },
     "cookies": {
@@ -6498,8 +6576,17 @@
       "whatsapp": "WhatsApp",
       "quote": "Pressupost",
       "configurator": "Configurador",
-      "zones": "Veure Zones"
+      "zones": "Veure Zones",
+      "open": "Obrir accions ràpides",
+      "close": "Tancar accions ràpides"
     }
+  },
+  "pwa": {
+    "installTitle": "Instal·la l'app",
+    "installDescription": "Accés ràpid i experiència millorada. Funciona offline!",
+    "install": "Instal·lar",
+    "installApp": "Instal·lar App",
+    "notNow": "Ara no"
   },
   "mobileHome": {
     "quickFeatures": {
