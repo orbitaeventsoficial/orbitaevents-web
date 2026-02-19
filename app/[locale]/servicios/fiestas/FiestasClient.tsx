@@ -403,6 +403,39 @@ export default function FiestasClient() {
           </div>
         </div>
       </div>
+
+      {/* Zonas de cobertura */}
+      <div className="max-w-5xl mx-auto px-4 pb-8">
+        <h2 className="text-2xl font-bold text-center mb-8">
+          DJ fiestas por zonas de Catalunya
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Link
+            href="/servicios/dj-fiestas-barcelona"
+            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
+          >
+            <div className="text-2xl mb-2">🏙️</div>
+            <div className="font-semibold text-text-primary text-sm">DJ Fiestas Barcelona</div>
+            <div className="text-xs text-text-muted mt-1">Cumpleaños y celebraciones</div>
+          </Link>
+          <Link
+            href="/servicios/dj-fiestas-maresme"
+            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
+          >
+            <div className="text-2xl mb-2">🏖️</div>
+            <div className="font-semibold text-text-primary text-sm">DJ Fiestas Maresme</div>
+            <div className="text-xs text-text-muted mt-1">Mataró, Calella, Pineda</div>
+          </Link>
+          <Link
+            href="/servicios/dj-fiestas-costa-brava"
+            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
+          >
+            <div className="text-2xl mb-2">🌊</div>
+            <div className="font-semibold text-text-primary text-sm">DJ Fiestas Costa Brava</div>
+            <div className="text-xs text-text-muted mt-1">Lloret, Tossa, Platja d&apos;Aro</div>
+          </Link>
+        </div>
+      </div>
       </div>
     </div>
   );

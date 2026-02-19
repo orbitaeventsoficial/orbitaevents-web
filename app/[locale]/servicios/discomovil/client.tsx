@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
+import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Check, Star, FileText, Zap,
@@ -603,6 +604,47 @@ export default function DiscomovilClientV2() {
               </ul>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Zonas de cobertura */}
+      <section className="max-w-5xl mx-auto px-4 pb-20">
+        <h2 className="text-2xl font-bold text-text-primary text-center mb-8">
+          Discomóvil por zonas de Catalunya
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Link
+            href="/servicios/discomovil-barcelona"
+            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
+          >
+            <div className="text-2xl mb-2">🏙️</div>
+            <div className="font-semibold text-text-primary text-sm">Discomóvil Barcelona</div>
+            <div className="text-xs text-text-muted mt-1">Ciudad y área metropolitana</div>
+          </Link>
+          <Link
+            href="/servicios/discomovil-maresme"
+            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
+          >
+            <div className="text-2xl mb-2">🏖️</div>
+            <div className="font-semibold text-text-primary text-sm">Discomóvil Maresme</div>
+            <div className="text-xs text-text-muted mt-1">Mataró, Calella, Pineda</div>
+          </Link>
+          <Link
+            href="/servicios/discomovil-girona"
+            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
+          >
+            <div className="text-2xl mb-2">🏛️</div>
+            <div className="font-semibold text-text-primary text-sm">Discomóvil Girona</div>
+            <div className="text-xs text-text-muted mt-1">Girona, Empordà, Costa Brava</div>
+          </Link>
+          <Link
+            href="/servicios/discomovil-valles"
+            className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
+          >
+            <div className="text-2xl mb-2">🏡</div>
+            <div className="font-semibold text-text-primary text-sm">Discomóvil Vallès</div>
+            <div className="text-xs text-text-muted mt-1">Granollers, Sabadell, Terrassa</div>
+          </Link>
         </div>
       </section>
     </div>
