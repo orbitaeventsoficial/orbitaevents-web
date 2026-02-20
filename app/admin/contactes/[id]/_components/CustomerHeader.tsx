@@ -11,7 +11,7 @@ import { useHubContext } from './CustomerHubClient';
 // TYPES I CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks' | 'discounts';
+type TabKey = 'summary' | 'proposals' | 'bookings' | 'margin' | 'comms' | 'tasks' | 'discounts' | 'leads';
 
 const TABS: Array<{ key: TabKey; label: string; icon: string; badge?: (data: CustomerHubDTO) => number | null }> = [
   { key: 'summary', label: 'Resum', icon: '📊' },
@@ -40,6 +40,12 @@ const TABS: Array<{ key: TabKey; label: string; icon: string; badge?: (data: Cus
     label: 'Descomptes',
     icon: '🏷️',
     badge: (data) => (data.discountCodes || []).filter((dc) => dc.isActive && dc.currentUses < dc.maxUses && new Date(dc.validUntil) > new Date()).length || null,
+  },
+  {
+    key: 'leads',
+    label: 'Entrades',
+    icon: '📋',
+    badge: (data) => (data.leads || []).length || null,
   },
 ];
 

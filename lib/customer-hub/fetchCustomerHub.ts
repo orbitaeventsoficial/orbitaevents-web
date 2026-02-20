@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import type { CustomerHubDTO, DiscountCodeDTO, HubStatus, MessageDTO, TaskDTO } from './dto';
+import type { CustomerHubDTO, DiscountCodeDTO, HubStatus, LeadDTO, MessageDTO, TaskDTO } from './dto';
 import { resolveActiveDocument } from './proposalActive';
 import { buildTimeline } from './timeline';
 
@@ -44,6 +44,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
       include: {
         activities: { orderBy: { createdAt: 'desc' }, take: 60 },
         tasks: { orderBy: { createdAt: 'desc' }, take: 60 },
+        booking: { select: { id: true, reference: true, status: true, total: true } },
       },
     }),
     []
@@ -263,6 +264,20 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     usedAt: dc.usedAt?.toISOString(),
   }));
 
+  const leadsDTO: LeadDTO[] = leads.map((lead: any) => ({
+    id: lead.id,
+    name: lead.name,
+    email: lead.email,
+    eventType: lead.eventType,
+    eventDate: lead.eventDate?.toISOString(),
+    status: lead.status,
+    priority: lead.priority,
+    createdAt: lead.createdAt.toISOString(),
+    booking: lead.booking
+      ? { id: lead.booking.id, reference: lead.booking.reference, status: lead.booking.status, total: lead.booking.total }
+      : undefined,
+  }));
+
   return {
     customer: {
       id: customerBase.id,
@@ -286,6 +301,7 @@ export async function fetchCustomerHub(customerId: string): Promise<CustomerHubD
     messages,
     timeline,
     discountCodes,
+    leads: leadsDTO,
   };
 }
 

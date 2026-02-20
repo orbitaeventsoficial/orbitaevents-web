@@ -424,6 +424,17 @@ export default async function LeadDetailPage({ params }: Props) {
           />
 
           {/* Booking */}
+          {!lead.booking && (
+            <section className="rounded-xl border border-dashed border-slate-600/60 bg-slate-900/30 p-6 text-center">
+              <p className="text-sm text-slate-400 mb-3">Encara no hi ha cap reserva associada a aquesta entrada.</p>
+              <Link
+                href={`/admin/bookings/new?leadId=${lead.id}`}
+                className="inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-cyan-700 transition-colors"
+              >
+                📅 Crear reserva des d&apos;aquesta entrada
+              </Link>
+            </section>
+          )}
           {lead.booking && (
             <section className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
               <h2 className="text-lg font-semibold text-slate-100 mb-4">

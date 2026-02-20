@@ -98,6 +98,23 @@ export type ActiveDocumentDTO = {
   source: 'DRAFT' | 'SENT' | 'ACCEPTED' | 'NONE';
 };
 
+export type LeadDTO = {
+  id: string;
+  name: string;
+  email: string;
+  eventType: string;
+  eventDate?: string;
+  status: string;
+  priority: string;
+  createdAt: string;
+  booking?: {
+    id: string;
+    reference: string;
+    status: string;
+    total: number;
+  };
+};
+
 export type CustomerHubDTO = {
   customer: {
     id: string;
@@ -115,5 +132,6 @@ export type CustomerHubDTO = {
   messages: MessageDTO[];
   timeline: TimelineEventDTO[];
   discountCodes: DiscountCodeDTO[];
+  leads: LeadDTO[];
 };
 
