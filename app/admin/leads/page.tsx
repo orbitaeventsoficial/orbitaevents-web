@@ -290,12 +290,20 @@ export default async function LeadsPage({
             {data.counts.filtered} de {stats.total} contactes
           </p>
         </div>
-        <Link
-          href="/admin"
-          className="inline-flex items-center rounded-xl border border-slate-600/50 bg-slate-700/50 px-3 py-2 text-xs sm:text-sm font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
-        >
-          ← Tornar
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/intake"
+            className="inline-flex items-center rounded-xl border border-cyan-500/40 bg-cyan-500/15 px-3 py-2 text-xs sm:text-sm font-medium text-cyan-200 hover:bg-cyan-500/25 transition-colors"
+          >
+            + Entrada ràpida
+          </Link>
+          <Link
+            href="/admin"
+            className="inline-flex items-center rounded-xl border border-slate-600/50 bg-slate-700/50 px-3 py-2 text-xs sm:text-sm font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
+          >
+            ← Tornar
+          </Link>
+        </div>
       </header>
 
       {/* Stats Cards - 2x2 mobile */}

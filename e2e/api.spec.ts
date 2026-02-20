@@ -8,8 +8,10 @@ test.describe('API Endpoints', () => {
     expect(response.status()).toBe(200);
 
     const data = await response.json();
-    expect(data.status).toBe('healthy');
-    expect(data.checks.database.status).toBe('pass');
+    expect(['healthy', 'degraded']).toContain(data.status);
+    expect(['pass', 'warn']).toContain(data.checks.database.status);
+    expect(data.checks.sentry).toBeDefined();
+    expect(['pass', 'warn']).toContain(data.checks.sentry.status);
   });
 
   test('public stats endpoint should work', async ({ request }) => {

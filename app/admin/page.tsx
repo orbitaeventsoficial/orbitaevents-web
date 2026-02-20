@@ -78,6 +78,7 @@ export default async function AdminDashboard() {
   const smtpConfigured = Boolean(
     process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.SMTP_FROM
   );
+  const sentryConfigured = Boolean(process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN);
   const ga4 = await Promise.race([
     getGa4Report().catch(() => null),
     timeoutPromise(1200),
@@ -391,6 +392,7 @@ export default async function AdminDashboard() {
 
   const healthItems = [
     { label: 'DB', status: dbHealthy ? 'OK' : 'ERROR' },
+    { label: 'Sentry', status: sentryConfigured ? 'OK' : 'PENDENT' },
     { label: 'SMTP', status: smtpConfigured ? 'OK' : 'PENDENT' },
     { label: 'IMAP', status: imapConfigured ? 'OK' : 'PENDENT' },
     { label: 'GA4', status: ga4Status.ready ? 'OK' : 'PENDENT' },

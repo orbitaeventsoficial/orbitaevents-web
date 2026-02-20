@@ -21,6 +21,8 @@ const SOURCE_OPTIONS = [
   { value: 'OTHER', label: 'Altre', icon: '📋' },
 ];
 
+const SOURCE_LABELS = Object.fromEntries(SOURCE_OPTIONS.map((s) => [s.value, s.label])) as Record<string, string>;
+
 const EVENT_TYPES = [
   { value: 'WEDDING', label: 'Casament', icon: '💍' },
   { value: 'BIRTHDAY', label: 'Aniversari', icon: '🎂' },
@@ -146,7 +148,7 @@ export default function IntakePage() {
         name: form.name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim() || undefined,
-        source: form.source,
+        source: form.source || 'OTHER',
         eventType: form.eventType,
         eventDate: form.eventDate || undefined,
         eventLocation: form.eventLocation.trim() || undefined,
@@ -280,6 +282,7 @@ export default function IntakePage() {
               key={src.value}
               type="button"
               onClick={() => updateField('source', src.value)}
+              aria-pressed={form.source === src.value}
               className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
                 form.source === src.value
                   ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200 ring-1 ring-cyan-400/50'
@@ -288,9 +291,13 @@ export default function IntakePage() {
             >
               <span className="text-lg mr-1.5">{src.icon}</span>
               {src.label}
+              {form.source === src.value && <span className="ml-2 text-xs">✓</span>}
             </button>
           ))}
         </div>
+        <p className="mt-3 text-xs text-cyan-300">
+          Origen seleccionat: <span className="font-semibold">{SOURCE_LABELS[form.source] || form.source}</span>
+        </p>
       </div>
 
       {/* Main form */}
