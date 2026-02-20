@@ -281,7 +281,7 @@ export default async function LeadsPage({
   const currentQuery = buildQuery(data.filters);
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 pb-24 sm:space-y-6 sm:pb-8">
       {/* Header - Mobile optimized */}
       <header className="flex items-center justify-between">
         <div>
@@ -305,6 +305,24 @@ export default async function LeadsPage({
           </Link>
         </div>
       </header>
+
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-2">
+        <div className="grid grid-cols-2 gap-2">
+          <Link
+            href="/admin/leads"
+            className="rounded-xl border border-cyan-500/50 bg-cyan-500/15 px-3 py-2 text-center text-xs sm:text-sm font-semibold text-cyan-200"
+            aria-current="page"
+          >
+            Tauler Leads
+          </Link>
+          <Link
+            href="/admin/intake"
+            className="rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-center text-xs sm:text-sm font-medium text-slate-300 hover:bg-slate-700/60 transition-colors"
+          >
+            Entrada ràpida
+          </Link>
+        </div>
+      </section>
 
       {/* Stats Cards - 2x2 mobile */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">

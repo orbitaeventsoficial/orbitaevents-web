@@ -181,7 +181,7 @@ export default function IntakePage() {
   }, [form, duplicates]);
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="max-w-4xl space-y-6 pb-24 sm:pb-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -199,6 +199,24 @@ export default function IntakePage() {
           ← Entrades
         </Link>
       </div>
+
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-2">
+        <div className="grid grid-cols-2 gap-2">
+          <Link
+            href="/admin/leads"
+            className="rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-center text-xs sm:text-sm font-medium text-slate-300 hover:bg-slate-700/60 transition-colors"
+          >
+            Tauler Leads
+          </Link>
+          <Link
+            href="/admin/intake"
+            className="rounded-xl border border-cyan-500/50 bg-cyan-500/15 px-3 py-2 text-center text-xs sm:text-sm font-semibold text-cyan-200"
+            aria-current="page"
+          >
+            Entrada ràpida
+          </Link>
+        </div>
+      </section>
 
       {/* Success */}
       {success && (
