@@ -79,6 +79,8 @@ const INITIAL_FORM: FormData = {
   priority: 'MEDIUM',
 };
 
+const INTAKE_SOURCE_STORAGE_KEY = 'admin.intake.source';
+
 export default function IntakePage() {
   const router = useRouter();
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
@@ -88,8 +90,19 @@ export default function IntakePage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<{ id: string; name: string } | null>(null);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const storedSource = window.localStorage.getItem(INTAKE_SOURCE_STORAGE_KEY);
+    if (storedSource && SOURCE_OPTIONS.some((opt) => opt.value === storedSource)) {
+      setForm((prev) => ({ ...prev, source: storedSource }));
+    }
+  }, []);
+
   const updateField = (field: keyof FormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    if (field === 'source' && typeof window !== 'undefined') {
+      window.localStorage.setItem(INTAKE_SOURCE_STORAGE_KEY, value);
+    }
     setSuccess(null);
   };
 
@@ -171,7 +184,7 @@ export default function IntakePage() {
 
       const data = await res.json();
       setSuccess({ id: data.lead.id, name: data.lead.name });
-      setForm(INITIAL_FORM);
+      setForm((prev) => ({ ...INITIAL_FORM, source: prev.source }));
       setDuplicates([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
@@ -468,7 +481,12 @@ export default function IntakePage() {
         </button>
         <button
           type="button"
-          onClick={() => { setForm(INITIAL_FORM); setDuplicates([]); setError(null); setSuccess(null); }}
+          onClick={() => {
+            setForm((prev) => ({ ...INITIAL_FORM, source: prev.source }));
+            setDuplicates([]);
+            setError(null);
+            setSuccess(null);
+          }}
           className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-3 text-sm text-slate-300 hover:bg-slate-600/50 transition-colors"
         >
           Netejar
