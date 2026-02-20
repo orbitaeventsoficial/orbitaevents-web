@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
+import { getPipelineLeads } from '@/lib/services/leads/pipeline';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,6 +66,12 @@ export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
+    const pipelineMode = searchParams.get('pipeline') === 'true';
+    if (pipelineMode) {
+      const pipelineLimit = safeParseInt(searchParams.get('limit'), 200, 1, 500);
+      const leads = await getPipelineLeads(pipelineLimit);
+      return NextResponse.json({ ok: true, data: { leads } });
+    }
 
     // Si només vol el comptador de leads nous
     const countOnly = searchParams.get('countOnly') === 'true';

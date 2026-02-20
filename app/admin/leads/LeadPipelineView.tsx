@@ -62,10 +62,10 @@ export default function LeadPipelineView() {
 
   const fetchPipeline = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/leads?limit=200&pipeline=true', { credentials: 'include' });
+      const res = await fetch('/api/admin/leads-new?limit=200&pipeline=true', { credentials: 'include' });
       if (!res.ok) throw new Error('Error carregant pipeline');
       const data = await res.json();
-      const leads: PipelineLead[] = data?.data?.leads || [];
+      const leads: PipelineLead[] = data?.data?.leads || data?.leads || [];
 
       const grouped = COLUMNS.map((col) => ({
         ...col,

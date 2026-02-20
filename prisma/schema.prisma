@@ -275,6 +275,7 @@ model Customer {
   activityLog       CustomerActivity[]
   consentRecords    ConsentRecord[]
   dataRequests      DataRequest[]
+  portalAccesses    ClientPortalAccess[]
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -631,6 +632,7 @@ model Booking {
   clientFeedback     ClientFeedback?
   proposals          Proposal[]
   tasks              Task[]
+  portalAccesses     ClientPortalAccess[]
 
   // Post-event email automation
   postEventEmailSent   Boolean   @default(false)
@@ -650,6 +652,31 @@ model Booking {
   @@index([status, eventDate]) // Consultes combinades
   @@index([status, eventDate, postEventEmailSent]) // Per cron post-event
   @@map("bookings")
+}
+
+model ClientPortalAccess {
+  id              String    @id @default(cuid())
+  bookingId       String
+  booking         Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customerId      String?
+  customer        Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  tokenHash       String    @unique
+  tokenPrefix     String
+  locale          String    @default("ca")
+  personalization Json?
+  expiresAt       DateTime?
+  revokedAt       DateTime?
+  lastAccessedAt  DateTime?
+  lastAccessIp    String?
+  lastAccessUa    String?
+  createdBy       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([bookingId, revokedAt])
+  @@index([customerId, revokedAt])
+  @@index([expiresAt])
+  @@map("client_portal_access")
 }
 
 enum BookingStatus {

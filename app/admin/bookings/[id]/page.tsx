@@ -11,6 +11,8 @@ import CalendarSyncButton from './CalendarSyncButton';
 import PostEventEmailButton from './PostEventEmailButton';
 import BookingMarginCard from './BookingMarginCard';
 import BookingInventorySection from './BookingInventorySection';
+import ClientPortalAccessPanel from './ClientPortalAccessPanel';
+import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
 
 export const dynamic = 'force-dynamic';
 
@@ -203,6 +205,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           lastEventDate: true,
         },
       });
+  const activePortalAccess = await getActivePortalAccessForBooking(booking.id);
   const reviewFlowStatus = booking.reviewSubmittedAt || booking.clientSurvey
     ? 'RESPONDIDO'
     : booking.postEventEmailSent
@@ -495,6 +498,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
       {/* Equipament assignat */}
       <BookingInventorySection bookingId={booking.id} />
 
+      <ClientPortalAccessPanel
+        bookingId={booking.id}
+        initialActive={activePortalAccess}
+      />
+
       {/* Pricing */}
       <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">
         <h2 className="text-lg font-semibold text-slate-200 mb-4">Resum Econòmic</h2>
@@ -652,7 +660,6 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </div>
   );
 }
-
 
 
 
