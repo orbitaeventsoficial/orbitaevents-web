@@ -14,7 +14,7 @@ export const PORTFOLIO_CATEGORIES = [
   {
     "slug": "eventos-empresa",
     "name": "Eventos empresa",
-    "cover": "/img/portfolio/eventos-empresa/eventos-empresa-02.avif"
+    "cover": "/img/portfolio/eventos-empresa/eventos-empresa-01.avif"
   },
   {
     "slug": "fiestas-infantiles",
@@ -169,7 +169,7 @@ export const PORTFOLIO_IMAGES = {
   ],
   "eventos-empresa": [
     {
-      "src": "/img/portfolio/eventos-empresa/eventos-empresa-02.avif",
+      "src": "/img/portfolio/eventos-empresa/eventos-empresa-01.avif",
       "alt": "Eventos empresa – Eventos empresa  01"
     },
     {
@@ -199,10 +199,6 @@ export const PORTFOLIO_IMAGES = {
     {
       "src": "/img/portfolio/eventos-empresa/eventos-empresa-08.avif",
       "alt": "Eventos empresa – Eventos empresa  08"
-    },
-    {
-      "src": "/img/portfolio/eventos-empresa/eventos-empresa-09.avif",
-      "alt": "Eventos empresa – Eventos empresa  09"
     }
   ],
   "fiestas-infantiles": [
@@ -468,4 +464,3 @@ export const PORTFOLIO_IMAGES = {
     }
   ]
 };
-

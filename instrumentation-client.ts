@@ -1,12 +1,11 @@
-// instrumentation-client.ts
-import { initBotId } from 'botid/client/core';
+import * as Sentry from '@sentry/nextjs';
 
-// RUTAS A PROTEGER (API + Server Actions)
-initBotId({
-  protect: [
-    { path: '/api/checkout', method: 'POST' },
-    { path: '/api/reserva', method: 'POST' },
-    { path: '/api/packs/*', method: 'POST' }, // Wildcard: cualquier pack
-    { path: '/actions/reservar', method: 'POST' }, // Server Action
-  ],
+Sentry.init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  enabled: process.env.NODE_ENV === 'production',
+  tracesSampleRate: Number(process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE || 0.1),
+  replaysOnErrorSampleRate: Number(process.env.NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE || 1.0),
+  replaysSessionSampleRate: Number(process.env.NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE || 0.0),
 });
+
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

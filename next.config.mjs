@@ -1,3 +1,5 @@
+import { withSentryConfig } from '@sentry/nextjs';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -144,4 +146,9 @@ try {
 // Aplicar plugins en orden: next-intl
 const configWithIntl = withNextIntl(nextConfig);
 
-export default configWithIntl;
+export default withSentryConfig(configWithIntl, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: true,
+  telemetry: false,
+});

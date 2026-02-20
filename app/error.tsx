@@ -1,7 +1,9 @@
 "use client";
 // app/error.tsx - Error boundary for route segments
 // NO html/body tags - uses parent layout
+import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import * as Sentry from '@sentry/nextjs';
 
 export default function Error({
   error,
@@ -11,6 +13,10 @@ export default function Error({
   reset: () => void;
 }) {
   const t = useTranslations('errorPage');
+
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
 
   return (
     <div

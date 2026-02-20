@@ -8,6 +8,7 @@ import { MessageCircle, Home, RefreshCcw, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { log } from '@/lib/logger';
+import * as Sentry from '@sentry/nextjs';
 
 export default function Error({
   error,
@@ -19,6 +20,7 @@ export default function Error({
   const t = useTranslations('errorPage');
 
   useEffect(() => {
+    Sentry.captureException(error);
     log.error('Error caught by error boundary:', error);
   }, [error]);
 
