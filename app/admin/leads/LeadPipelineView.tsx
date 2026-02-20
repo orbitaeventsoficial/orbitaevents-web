@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 
 type PipelineFilters = {
@@ -78,55 +78,35 @@ const SOURCE_LABELS: Record<string, string> = {
   OTHER: 'Altre',
 };
 
-function applyFilters(leads: PipelineLead[], filters: PipelineFilters): PipelineLead[] {
-  const query = filters.q.trim().toLowerCase();
-  const fromDate = filters.from ? new Date(filters.from) : null;
-  const toDate = filters.to ? new Date(filters.to) : null;
-
-  return leads.filter((lead) => {
-    if (filters.status.length > 0 && !filters.status.includes(lead.status)) return false;
-    if (filters.priority.length > 0 && !filters.priority.includes(lead.priority)) return false;
-    if (filters.eventType.length > 0 && !filters.eventType.includes(lead.eventType)) return false;
-    if (filters.source.length > 0 && !filters.source.includes(lead.source)) return false;
-
-    if (query) {
-      const haystack = `${lead.name} ${lead.email} ${lead.phone || ''}`.toLowerCase();
-      if (!haystack.includes(query)) return false;
-    }
-
-    if (fromDate || toDate) {
-      if (!lead.eventDate) return false;
-      const eventDate = new Date(lead.eventDate);
-      if (fromDate && eventDate < fromDate) return false;
-      if (toDate) {
-        const end = new Date(toDate);
-        end.setHours(23, 59, 59, 999);
-        if (eventDate > end) return false;
-      }
-    }
-
-    return true;
-  });
-}
-
 export default function LeadPipelineView({ filters }: { filters: PipelineFilters }) {
   const [allLeads, setAllLeads] = useState<PipelineLead[]>([]);
   const [columns, setColumns] = useState<PipelineColumn[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const filterQuery = useMemo(() => {
+    const params = new URLSearchParams();
+    filters.status.forEach((value) => params.append('status', value));
+    filters.priority.forEach((value) => params.append('priority', value));
+    filters.eventType.forEach((value) => params.append('eventType', value));
+    filters.source.forEach((value) => params.append('source', value));
+    if (filters.q) params.set('search', filters.q);
+    if (filters.from) params.set('from', filters.from);
+    if (filters.to) params.set('to', filters.to);
+    return params.toString();
+  }, [filters]);
 
   const fetchPipeline = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/leads-new?limit=200&pipeline=true', { credentials: 'include' });
+      const qs = filterQuery ? `&${filterQuery}` : '';
+      const res = await fetch(`/api/admin/leads-new?limit=500&pipeline=true${qs}`, { credentials: 'include' });
       if (!res.ok) throw new Error('Error carregant pipeline');
       const data = await res.json();
       const leads: PipelineLead[] = data?.data?.leads || data?.leads || [];
       setAllLeads(leads);
 
-      const filtered = applyFilters(leads, filters);
       const grouped = COLUMNS.map((col) => ({
         ...col,
-        leads: filtered.filter((l: PipelineLead) => l.status === col.status),
+        leads: leads.filter((l: PipelineLead) => l.status === col.status),
       }));
       setColumns(grouped);
     } catch {
@@ -134,7 +114,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filterQuery]);
 
   useEffect(() => {
     fetchPipeline();

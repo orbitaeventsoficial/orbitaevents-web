@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 
 export type PipelineLead = {
   id: string;
@@ -19,10 +20,11 @@ export type PipelineLead = {
   } | null;
 };
 
-export async function getPipelineLeads(limit: number): Promise<PipelineLead[]> {
+export async function getPipelineLeads(limit: number, where?: Prisma.LeadWhereInput): Promise<PipelineLead[]> {
   const normalizedLimit = Math.max(1, Math.min(limit, 500));
 
   return prisma.lead.findMany({
+    where,
     orderBy: { createdAt: 'desc' },
     take: normalizedLimit,
     select: {
