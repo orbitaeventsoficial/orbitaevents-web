@@ -6,7 +6,7 @@ import LeadActions from './LeadActions';
 import LeadQuickStatus from './LeadQuickStatus';
 import LeadSavedViews from './LeadSavedViews';
 import LeadViewToggle from './LeadViewToggle';
-import type { EventType, LeadStatus, Priority, Prisma } from '@prisma/client';
+import type { EventType, LeadSource, LeadStatus, Priority, Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,10 +49,23 @@ const PRIORITY_LABELS: Record<string, string> = {
   URGENT: 'Urgent',
 };
 
+const SOURCE_LABELS: Record<string, string> = {
+  WEBSITE: 'Web',
+  CONFIGURATOR: 'Configurador',
+  PHONE: 'Telèfon',
+  WHATSAPP: 'WhatsApp',
+  INSTAGRAM: 'Instagram',
+  WALLAPOP: 'Wallapop',
+  REFERRAL: 'Boca-orella',
+  GOOGLE: 'Google',
+  OTHER: 'Altre',
+};
+
 function buildQuery(filters: {
   status: string[];
   priority: string[];
   eventType: string[];
+  source: string[];
   q: string;
   from: Date | null;
   to: Date | null;
@@ -61,6 +74,7 @@ function buildQuery(filters: {
   filters.status.forEach((value) => params.append('status', value));
   filters.priority.forEach((value) => params.append('priority', value));
   filters.eventType.forEach((value) => params.append('eventType', value));
+  filters.source.forEach((value) => params.append('source', value));
   if (filters.q) params.set('q', filters.q);
   if (filters.from) params.set('from', filters.from.toISOString().slice(0, 10));
   if (filters.to) params.set('to', filters.to.toISOString().slice(0, 10));
@@ -70,6 +84,7 @@ function buildQuery(filters: {
 const VALID_STATUS = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 'LOST'] as const satisfies readonly LeadStatus[];
 const VALID_PRIORITY = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'] as const satisfies readonly Priority[];
 const VALID_EVENT_TYPE = Object.keys(EVENT_TYPE_LABELS) as EventType[];
+const VALID_SOURCE = Object.keys(SOURCE_LABELS) as LeadSource[];
 
 function isLeadStatus(value: string): value is LeadStatus {
   return (VALID_STATUS as readonly string[]).includes(value);
@@ -81,6 +96,10 @@ function isPriority(value: string): value is Priority {
 
 function isEventType(value: string): value is EventType {
   return (VALID_EVENT_TYPE as readonly string[]).includes(value);
+}
+
+function isLeadSource(value: string): value is LeadSource {
+  return (VALID_SOURCE as readonly string[]).includes(value);
 }
 
 function toArray(value?: string | string[]): string[] {
@@ -98,6 +117,7 @@ type LeadFilters = {
   status: LeadStatus[];
   priority: Priority[];
   eventType: EventType[];
+  source: LeadSource[];
   q: string;
   from: Date | null;
   to: Date | null;
@@ -128,6 +148,7 @@ async function getLeads(filters: {
   status?: string | string[];
   priority?: string | string[];
   eventType?: string | string[];
+  source?: string | string[];
   q?: string;
   from?: string;
   to?: string;
@@ -137,6 +158,7 @@ async function getLeads(filters: {
     const status = toArray(filters.status).filter(isLeadStatus);
     const priority = toArray(filters.priority).filter(isPriority);
     const eventType = toArray(filters.eventType).filter(isEventType);
+    const source = toArray(filters.source).filter(isLeadSource);
     const from = parseDate(filters.from);
     const to = parseDate(filters.to);
     const pageRaw = Number.parseInt(filters.page || '1', 10);
@@ -147,6 +169,7 @@ async function getLeads(filters: {
       ...(status.length ? { status: { in: status } } : {}),
       ...(priority.length ? { priority: { in: priority } } : {}),
       ...(eventType.length ? { eventType: { in: eventType } } : {}),
+      ...(source.length ? { source: { in: source } } : {}),
       ...(filters.q
         ? {
             OR: [
@@ -171,6 +194,7 @@ async function getLeads(filters: {
       `status=${status.join(',') || 'all'}`,
       `priority=${priority.join(',') || 'all'}`,
       `eventType=${eventType.join(',') || 'all'}`,
+      `source=${source.join(',') || 'all'}`,
       `q=${filters.q || ''}`,
       `from=${from ? from.toISOString().slice(0, 10) : ''}`,
       `to=${to ? to.toISOString().slice(0, 10) : ''}`,
@@ -203,6 +227,7 @@ async function getLeads(filters: {
             createdAt: true,
             status: true,
             priority: true,
+            source: true,
             customerId: true,
             _count: {
               select: {
@@ -226,7 +251,7 @@ async function getLeads(filters: {
       CacheTTL.VERY_SHORT
     );
 
-    const normalizedFilters: LeadFilters = { status, priority, eventType, q: filters.q || '', from, to };
+    const normalizedFilters: LeadFilters = { status, priority, eventType, source, q: filters.q || '', from, to };
     return {
       leads,
       counts: {
@@ -248,7 +273,7 @@ async function getLeads(filters: {
     return {
       leads: [],
       counts: { filtered: 0, total: 0, new: 0, negotiation: 0, won: 0 },
-      filters: { status: [], priority: [], eventType: [], q: '', from: null, to: null } as LeadFilters,
+      filters: { status: [], priority: [], eventType: [], source: [], q: '', from: null, to: null } as LeadFilters,
       pagination: { page: 1, pageSize: 25, totalPages: 1 } as Pagination,
     };
   }
@@ -261,14 +286,15 @@ export default async function LeadsPage({
     status?: string | string[];
     priority?: string | string[];
     eventType?: string | string[];
+    source?: string | string[];
     q?: string;
     from?: string;
     to?: string;
     page?: string;
   };
 }) {
-  const { status, priority, eventType, q, from, to, page } = searchParams || {};
-  const data = await getLeads({ status, priority, eventType, q, from, to, page });
+  const { status, priority, eventType, source, q, from, to, page } = searchParams || {};
+  const data = await getLeads({ status, priority, eventType, source, q, from, to, page });
   const leads = data.leads;
 
   // Estadístiques ràpides
@@ -367,6 +393,19 @@ export default async function LeadsPage({
               <option value="">Tots</option>
               {VALID_EVENT_TYPE.map((value) => (
                 <option key={value} value={value}>{EVENT_TYPE_LABELS[value]}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-slate-400">Origen</label>
+            <select
+              name="source"
+              defaultValue={data.filters.source[0] || ''}
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            >
+              <option value="">Tots</option>
+              {VALID_SOURCE.map((value) => (
+                <option key={value} value={value}>{SOURCE_LABELS[value] || value}</option>
               ))}
             </select>
           </div>
@@ -472,6 +511,17 @@ export default async function LeadsPage({
             {PRIORITY_LABELS[value] || value}
           </Link>
         ))}
+        {VALID_SOURCE.map((value) => (
+          <Link
+            key={value}
+            href={`/admin/leads?source=${value}`}
+            className={`rounded-full border px-3 py-1 ${
+              data.filters.source.includes(value as LeadSource) ? 'border-fuchsia-500/40 bg-fuchsia-500/10 text-fuchsia-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            {SOURCE_LABELS[value] || value}
+          </Link>
+        ))}
       </section>
 
       {/* Mobile Card View */}
@@ -502,6 +552,7 @@ export default async function LeadsPage({
                         {lead.name}
                       </Link>
                       <p className="text-xs text-slate-400 truncate">{lead.email}</p>
+                      <p className="text-[11px] text-fuchsia-300/80">{SOURCE_LABELS[lead.source] || lead.source}</p>
                     </div>
                   </div>
                   <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConf.bg} ${statusConf.text}`}>
@@ -571,6 +622,7 @@ export default async function LeadsPage({
                 <th className="px-4 py-3 text-left font-medium text-slate-300">Client</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-300">Contacte</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-300">Tipus</th>
+                <th className="px-4 py-3 text-left font-medium text-slate-300">Origen</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-300">Data</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-300">Temps pendent</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-300">Estat</th>
@@ -581,7 +633,7 @@ export default async function LeadsPage({
             <tbody className="divide-y divide-slate-700/30">
               {leads.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-slate-400">
+                  <td colSpan={9} className="px-4 py-12 text-center text-slate-400">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-4xl">📭</span>
                       <p>Encara no hi ha entrades</p>
@@ -622,6 +674,7 @@ export default async function LeadsPage({
                         )}
                       </td>
                       <td className="px-4 py-3 text-slate-300 text-xs">{eventType}</td>
+                      <td className="px-4 py-3 text-xs text-fuchsia-200">{SOURCE_LABELS[lead.source] || lead.source}</td>
                       <td className="px-4 py-3 text-slate-300 text-xs">
                         {lead.eventDate
                           ? new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short', year: 'numeric' })
