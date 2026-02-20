@@ -41,6 +41,7 @@ function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, fi
 
 export default function BodasClientV2() {
   const t = useTranslations('pages.weddings');
+  const tConfigurator = useTranslations('configurator');
   const tMobile = useTranslations('pages.mobile'); // Per traduccions d'extres
   const locale = useLocale();
   const fallbackPacks = useMemo(() => getPacksByService('bodas'), []);
@@ -57,6 +58,35 @@ export default function BodasClientV2() {
   const [extrasCatalog, setExtrasCatalog] = useState<ExtraDefinition[]>(EXTRAS);
 
   const [showSummary, setShowSummary] = useState(false);
+
+  const getConfiguratorKey = (pack: PackDefinition, suffix: string) => {
+    const base = pack.i18nBaseKey || `configurator.step2.packs.${pack.id}`;
+    const normalizedBase = base.startsWith('configurator.') ? base.slice('configurator.'.length) : base;
+    return `${normalizedBase}.${suffix}`;
+  };
+
+  const getPackText = (pack: PackDefinition, field: 'name' | 'tagline') => {
+    const fallback = field === 'name' ? pack.name : pack.tagline;
+    try {
+      const key = getConfiguratorKey(pack, field);
+      const translated = tConfigurator(key);
+      return translated !== key ? translated : fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
+  const getPackFeatures = (pack: PackDefinition) => {
+    return (pack.features || []).map((feature, index) => {
+      try {
+        const key = getConfiguratorKey(pack, `features.f${index + 1}`);
+        const translated = tConfigurator(key);
+        return translated !== key ? translated : feature;
+      } catch {
+        return feature;
+      }
+    });
+  };
 
   useEffect(() => {
     let active = true;
@@ -132,7 +162,7 @@ export default function BodasClientV2() {
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'bodas_pack_select', {
         pack_id: pack.id,
-        pack_name: pack.name,
+        pack_name: getPackText(pack, 'name'),
         price: pack.priceValue,
       });
     }
@@ -259,9 +289,9 @@ export default function BodasClientV2() {
                 <span className="font-bold text-oe-gold">{t('recommended')}:</span>
               </div>
               <div className="text-lg text-text-primary">
-                <strong>{recommendedPack.name}</strong> - {recommendedPack.priceValue}€
+                <strong>{getPackText(recommendedPack, 'name')}</strong> - {recommendedPack.priceValue}€
               </div>
-              <p className="text-sm text-text-muted mt-1">{recommendedPack.tagline}</p>
+              <p className="text-sm text-text-muted mt-1">{getPackText(recommendedPack, 'tagline')}</p>
             </motion.div>
           )}
         </div>
@@ -317,8 +347,8 @@ export default function BodasClientV2() {
 
                 <div className="space-y-4 mt-4">
                   <div>
-                    <h3 className="text-2xl font-bold text-text-primary">{pack.name}</h3>
-                    <p className="text-sm text-text-muted">{pack.tagline}</p>
+                    <h3 className="text-2xl font-bold text-text-primary">{getPackText(pack, 'name')}</h3>
+                    <p className="text-sm text-text-muted">{getPackText(pack, 'tagline')}</p>
                   </div>
 
                   <div className="flex items-baseline gap-2">
@@ -332,7 +362,7 @@ export default function BodasClientV2() {
                   </div>
 
                   <ul className="space-y-2 pt-4 border-t border-white/10">
-                    {pack.features.slice(0, 5).map((feature, idx) => (
+                    {getPackFeatures(pack).slice(0, 5).map((feature, idx) => (
                       <li key={idx} className="text-sm text-text-muted flex items-start gap-2">
                         <Check className="w-4 h-4 text-oe-gold flex-shrink-0 mt-0.5" />
                         {feature}

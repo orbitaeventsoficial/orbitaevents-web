@@ -1797,7 +1797,76 @@
       "moreFeatures": "más allá...",
       "recommended": "Recomendado",
       "mostSold": "MÁS VENDIDO",
-      "premium": "PREMIUM"
+      "premium": "PREMIUM",
+      "packs": {
+        "bodas-basico": {
+          "name": "Essential (Baile Final)",
+          "tagline": "Tu fiesta final, exactamente como la imaginas",
+          "features": {
+            "f1": "DJ profesional 3 horas (Solo baile final)",
+            "f2": "Sonido PRO 4000W (2x EV ETX 2000W) + Pioneer DDJ REV7",
+            "f3": "Iluminación de pista (Multiefectos LED + 2x Focos Bash LED)",
+            "f4": "Máquina de humo"
+          }
+        },
+        "bodas-premium": {
+          "name": "Signature (Día Completo)",
+          "tagline": "Vivimos tu boda contigo desde el primer momento",
+          "features": {
+            "f1": "DJ profesional 5 horas (Ceremonia, Cóctel, Baile)",
+            "f2": "Sonido PRO 4000W + Pioneer DDJ REV7",
+            "f3": "Iluminación PRO: 4 Cabezas Móviles 150W LED",
+            "f4": "Iluminación ambiental (Bolas LED)",
+            "f5": "Máquina de humo"
+          }
+        },
+        "bodas-luxury": {
+          "name": "Royal Wedding (Full FX)",
+          "tagline": "La experiencia VIP que tus invitados jamás olvidarán",
+          "features": {
+            "f1": "DJ + TÉCNICO DE LUCES (2 personas, 6 horas)",
+            "f2": "Sonido audiófilo 4000W EV ETX 2000W",
+            "f3": "Show de luces sincronizado (4 Cabezas Móviles 150W LED)",
+            "f4": "Efecto máquina de humo bajo (Baile en las nubes)"
+          }
+        },
+        "empresas-cocktail": {
+          "name": "Corporate Cocktail",
+          "tagline": "Profesionalismo que refuerza tu marca",
+          "features": {
+            "f1": "DJ/Hilo musical 4 horas",
+            "f2": "Sonido ambiente cristalino (EV ETX)",
+            "f3": "Iluminación estática decorativa",
+            "f4": "1 micrófono inalámbrico",
+            "f5": "Factura y gestión administrativa"
+          }
+        },
+        "empresas-evento": {
+          "name": "Corporate Event",
+          "tagline": "Opción equilibrada para presentaciones y fiesta",
+          "features": {
+            "f1": "DJ + técnico 5 horas",
+            "f2": "Sonido 4000W para speech y música",
+            "f3": "Iluminación dinámica (cabezas móviles)",
+            "f4": "2 micrófonos inalámbricos",
+            "f5": "Coordinación de escaleta",
+            "f6": "Soporte para proyección (audio)"
+          }
+        },
+        "empresas-gala": {
+          "name": "Corporate Gala",
+          "tagline": "Producción completa con refuerzo técnico",
+          "features": {
+            "f1": "Servicio integral 6 horas",
+            "f2": "DJ + técnico de sonido dedicado",
+            "f3": "Sonido reforzado + microfonía avanzada (4 micros)",
+            "f4": "Diseño de iluminación corporativa",
+            "f5": "Coordinación con agencia/venue",
+            "f6": "Grabación de audio del evento",
+            "f7": "Montaje estético impecable"
+          }
+        }
+      }
     },
     "step3": {
       "title": "Detalles de tu evento",
@@ -1807,6 +1876,13 @@
       "guests": "Número de invitados",
       "extras": "Mejora tu experiencia",
       "extrasDiscount": "15% de descuento en extras",
+      "discountCode": "Código de descuento",
+      "discountCodePlaceholder": "Ej.: ORBITA10",
+      "validatingCode": "Validando...",
+      "applyCode": "Aplicar",
+      "removeCode": "Quitar",
+      "activeCode": "Código activo: {code} · caduca el {date}",
+      "discountCodeReason": "Código {code}",
       "noExtras": "No hay extras disponibles para este paquete. Contacta con nosotros para opciones personalizadas.",
       "popular": "Popular",
       "premiumExtra": "Premium",
@@ -1850,7 +1926,17 @@
       "errorCaptcha": "Por favor, completa la verificación de seguridad",
       "errorSend": "Error al enviar. Por favor, inténtalo de nuevo o llámanos directamente.",
       "downloadPDF": "Descargar Presupuesto PDF"
-    }
+    },
+    "discountCodeErrors": {
+      "expired": "Este código ha caducado.",
+      "inactive": "Este código no está activo.",
+      "unavailable": "Este código ya no se puede usar.",
+      "invalid": "Código no válido.",
+      "default": "No se pudo validar el código.",
+      "requestError": "Error validando el código. Inténtalo de nuevo."
+    },
+    "eventFallback": "evento",
+    "requestMessage": "Solicitud desde configurador. Descuento early bird aplicado: {amount}€"
   },
   "faq": {
     "title": "Preguntas que te haces (y las respuestas)",
@@ -2483,6 +2569,21 @@
         "decoration": "Decoración personalizada",
         "lightShow": "Show especial de luces",
         "consultation": "¡Consulta sin compromiso!"
+      },
+      "zones": {
+        "title": "DJ fiestas por zonas de Catalunya",
+        "barcelona": {
+          "name": "DJ Fiestas Barcelona",
+          "desc": "Cumpleaños y celebraciones"
+        },
+        "maresme": {
+          "name": "DJ Fiestas Maresme",
+          "desc": "Mataró, Calella, Pineda"
+        },
+        "costaBrava": {
+          "name": "DJ Fiestas Costa Brava",
+          "desc": "Lloret, Tossa, Platja d'Aro"
+        }
       },
       "more": "más..."
     },

@@ -1450,7 +1450,76 @@
       "moreFeatures": "més enllà...",
       "recommended": "Recomanat",
       "mostSold": "MILLOR VENDUT",
-      "premium": "PREMIUM"
+      "premium": "PREMIUM",
+      "packs": {
+        "bodas-basico": {
+          "name": "Essential (Ball Final)",
+          "tagline": "La teva festa final, exactament com la imagines",
+          "features": {
+            "f1": "DJ professional 3 hores (Només ball final)",
+            "f2": "So PRO 4000W (2x EV ETX 2000W) + Pioneer DDJ REV7",
+            "f3": "Il·luminació de pista (Multiefectes LED + 2x Focus Bash LED)",
+            "f4": "Màquina de fum"
+          }
+        },
+        "bodas-premium": {
+          "name": "Signature (Dia Complet)",
+          "tagline": "Vivim el teu casament amb tu des del primer moment",
+          "features": {
+            "f1": "DJ professional 5 hores (Cerimònia, Còctel, Ball)",
+            "f2": "So PRO 4000W + Pioneer DDJ REV7",
+            "f3": "Il·luminació PRO: 4 caps mòbils 150W LED",
+            "f4": "Il·luminació ambiental (Boles LED)",
+            "f5": "Màquina de fum"
+          }
+        },
+        "bodas-luxury": {
+          "name": "Royal Wedding (Full FX)",
+          "tagline": "L'experiència VIP que els teus convidats no oblidaran",
+          "features": {
+            "f1": "DJ + TÈCNIC DE LLUMS (2 persones, 6 hores)",
+            "f2": "So audiòfil 4000W EV ETX 2000W",
+            "f3": "Show de llums sincronitzat (4 caps mòbils 150W LED)",
+            "f4": "Efecte màquina de fum baix (Ball entre núvols)"
+          }
+        },
+        "empresas-cocktail": {
+          "name": "Corporate Cocktail",
+          "tagline": "Professionalitat que reforça la teva marca",
+          "features": {
+            "f1": "DJ/Fil musical 4 hores",
+            "f2": "So ambient nítid (EV ETX)",
+            "f3": "Il·luminació estàtica decorativa",
+            "f4": "1 micròfon sense fils",
+            "f5": "Factura i gestió administrativa"
+          }
+        },
+        "empresas-evento": {
+          "name": "Corporate Event",
+          "tagline": "Opció equilibrada per presentacions i festa",
+          "features": {
+            "f1": "DJ + tècnic 5 hores",
+            "f2": "So 4000W per speech i música",
+            "f3": "Il·luminació dinàmica (caps mòbils)",
+            "f4": "2 micròfons sense fils",
+            "f5": "Coordinació d'escaleta",
+            "f6": "Suport de projecció (àudio)"
+          }
+        },
+        "empresas-gala": {
+          "name": "Corporate Gala",
+          "tagline": "Producció completa amb reforç tècnic",
+          "features": {
+            "f1": "Servei integral 6 hores",
+            "f2": "DJ + tècnic de so dedicat",
+            "f3": "So reforçat + microfonia avançada (4 micros)",
+            "f4": "Disseny d'il·luminació corporativa",
+            "f5": "Coordinació amb agència/venue",
+            "f6": "Gravació d'àudio de l'esdeveniment",
+            "f7": "Muntatge estètic impecable"
+          }
+        }
+      }
     },
     "step3": {
       "title": "Detalls del teu esdeveniment",
@@ -1460,6 +1529,13 @@
       "guests": "Nombre de convidats",
       "extras": "Millora la teva experiència",
       "extrasDiscount": "15% de descompte en extres",
+      "discountCode": "Codi de descompte",
+      "discountCodePlaceholder": "Ex.: ORBITA10",
+      "validatingCode": "Validant...",
+      "applyCode": "Aplicar",
+      "removeCode": "Treure",
+      "activeCode": "Codi actiu: {code} · caduca el {date}",
+      "discountCodeReason": "Codi {code}",
       "noExtras": "No hi ha extres disponibles per a aquest paquet. Contacta amb nosaltres per obtenir opcions personalitzades.",
       "popular": "Popular",
       "premiumExtra": "Premium",
@@ -1503,7 +1579,17 @@
       "errorCaptcha": "Si us plau, completa la verificació de seguretat",
       "errorSend": "Error en enviar. Si us plau, torna-ho a provar o truca'ns directament.",
       "downloadPDF": "Descarregar Pressupost PDF"
-    }
+    },
+    "discountCodeErrors": {
+      "expired": "Aquest codi ha caducat.",
+      "inactive": "Aquest codi no està actiu.",
+      "unavailable": "Aquest codi ja no es pot utilitzar.",
+      "invalid": "Codi no vàlid.",
+      "default": "No s'ha pogut validar el codi.",
+      "requestError": "Error validant el codi. Torna-ho a provar."
+    },
+    "eventFallback": "esdeveniment",
+    "requestMessage": "Sol·licitud des del configurador. Descompte early bird aplicat: {amount}€"
   },
   "faq": {
     "title": "Preguntes que et fas (i les respostes)",
@@ -2071,6 +2157,21 @@
         "decoration": "Decoració personalitzada",
         "lightShow": "Show especial de llums",
         "consultation": "Consulta sense compromís!"
+      },
+      "zones": {
+        "title": "DJ festes per zones de Catalunya",
+        "barcelona": {
+          "name": "DJ Festes Barcelona",
+          "desc": "Aniversaris i celebracions"
+        },
+        "maresme": {
+          "name": "DJ Festes Maresme",
+          "desc": "Mataró, Calella, Pineda"
+        },
+        "costaBrava": {
+          "name": "DJ Festes Costa Brava",
+          "desc": "Lloret, Tossa, Platja d'Aro"
+        }
       },
       "more": "més..."
     },

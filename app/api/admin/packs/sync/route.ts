@@ -9,6 +9,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { getAllPacks } from '@/config/packs-config';
 import { log } from '@/lib/logger';
+import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,11 +73,11 @@ export async function POST(req: NextRequest) {
           const translationData = ['es', 'ca', 'en'].map(locale => ({
             packId,
             locale,
-            name: pack.name,
-            tagline: pack.tagline || '',
-            description: pack.emotion || pack.tagline || '',
-            features: pack.features || [],
-            badge: pack.badge || '',
+            name: resolvePackI18nKey(pack.name, locale),
+            tagline: resolvePackI18nKey(pack.tagline || '', locale),
+            description: resolvePackI18nKey(pack.emotion || pack.tagline || '', locale),
+            features: resolvePackI18nFeatures(pack.features || [], locale),
+            badge: resolvePackI18nKey(pack.badge || '', locale),
           }));
 
           await Promise.all(

@@ -29,6 +29,14 @@ import TurnstileWidget from '@/components/security/TurnstileWidget';
 
 type EventType = 'bodas' | 'discomovil' | 'fiestas' | 'alquiler' | 'empresas';
 
+const EVENT_TYPE_SERVICE_MAP: Record<EventType, ServiceSlug[]> = {
+  bodas: ['bodas'],
+  discomovil: ['discomovil', 'fiestas'],
+  fiestas: ['fiestas', 'discomovil'],
+  alquiler: ['alquiler'],
+  empresas: ['empresas'],
+};
+
 interface ConfigState {
   eventType: EventType | null;
   selectedPack: any | null;
@@ -72,6 +80,7 @@ export default function ConfiguradorClient() {
   const t = useTranslations('configurator');
   const tMobile = useTranslations('pages.mobile'); // Per traduccions d'extres
   const locale = useLocale() as 'ca' | 'es' | 'en';
+  const dateLocale = locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-US' : 'es-ES';
   const { track } = useAnalytics();
   const fallbackPacks = useMemo(() => getAllPacks(), []);
   const { packs: allPacks } = usePacks({
@@ -93,6 +102,35 @@ export default function ConfiguradorClient() {
   const [discountCodeLoading, setDiscountCodeLoading] = useState(false);
   const [discountCodeError, setDiscountCodeError] = useState('');
   const [appliedDiscountCode, setAppliedDiscountCode] = useState<AppliedDiscountCode | null>(null);
+
+  const getTranslatedText = (key: string, fallback: string): string => {
+    try {
+      const translated = t(key);
+      return translated !== key ? translated : fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
+  const getLocalizedPack = (pack: any) => {
+    const baseKey = pack.i18nBaseKey || `step2.packs.${pack.id}`;
+    const localizedFeatures = (pack.features || []).map((feature: string, index: number) =>
+      getTranslatedText(`${baseKey}.features.f${index + 1}`, feature)
+    );
+
+    return {
+      ...pack,
+      name: getTranslatedText(`${baseKey}.name`, pack.name),
+      tagline: getTranslatedText(`${baseKey}.tagline`, pack.tagline),
+      features: localizedFeatures,
+    };
+  };
+
+  const getPacksForEventType = (eventType: EventType | null) => {
+    if (!eventType) return [];
+    const allowedServices = EVENT_TYPE_SERVICE_MAP[eventType];
+    return allPacks.filter((pack) => allowedServices.includes(pack.service));
+  };
 
   // Set minDate on client to avoid hydration mismatch
   useEffect(() => {
@@ -132,16 +170,16 @@ export default function ConfiguradorClient() {
   const getDiscountCodeErrorText = (reason: string) => {
     switch (reason) {
       case 'EXPIRED':
-        return 'Este código ha caducado.';
+        return t('discountCodeErrors.expired');
       case 'INACTIVE':
-        return 'Este código no está activo.';
+        return t('discountCodeErrors.inactive');
       case 'MAX_USES_REACHED':
       case 'ALREADY_USED':
-        return 'Este código ya no se puede usar.';
+        return t('discountCodeErrors.unavailable');
       case 'NOT_FOUND':
-        return 'Código no válido.';
+        return t('discountCodeErrors.invalid');
       default:
-        return 'No se pudo validar el código.';
+        return t('discountCodeErrors.default');
     }
   };
 
@@ -176,7 +214,7 @@ export default function ConfiguradorClient() {
       });
     } catch {
       setAppliedDiscountCode(null);
-      setDiscountCodeError('Error validando el código. Inténtalo de nuevo.');
+      setDiscountCodeError(t('discountCodeErrors.requestError'));
     } finally {
       setDiscountCodeLoading(false);
     }
@@ -188,7 +226,7 @@ export default function ConfiguradorClient() {
     setDiscountCodeError('');
   };
 
-  // Detectar pack pre-seleccionado desde URL (viene de páginas de servicios)
+  // Detecta pack preseleccionat via URL (des de pàgines de servei)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const service = params.get('service') as EventType | null;
@@ -197,8 +235,8 @@ export default function ConfiguradorClient() {
     const extrasParam = params.get('extras');
 
     if (service && packId) {
-      // Cargar el pack seleccionado
-      const packs = allPacks.filter((pack) => pack.service === service);
+      // Carrega el pack seleccionat
+      const packs = getPacksForEventType(service);
       const selectedPack = packs.find(p => p.id === packId);
 
       if (selectedPack) {
@@ -214,7 +252,7 @@ export default function ConfiguradorClient() {
           appliedOffer: null,
         });
 
-        // Ir directamente al step 3 (detalles)
+        // Anar directament al pas 3 (detalls)
         setStep(3);
 
         track('Configurador_PreSelected', {
@@ -229,7 +267,7 @@ export default function ConfiguradorClient() {
     }
   }, [allPacks, track]);
 
-  // Scroll to top cuando cambias de paso o seleccionas pack
+  // Scroll al top quan canvies de pas o selecciones pack
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [step, config.selectedPack, config.eventType]);
@@ -254,14 +292,14 @@ export default function ConfiguradorClient() {
     }
   }, [availableExtras, config.eventType, config.extras]);
 
-  // 💰 CÁLCULO DE PRECIO CON DESCUENTOS
+  // 💰 Càlcul de preu amb descomptes
   const calculatePricing = () => {
     let basePrice = config.selectedPack?.priceValue || 0;
     let extrasPrice = 0;
     let discount = 0;
     let discountReason = '';
 
-    // Calcular extras
+    // Calcula extres
     config.extras.forEach((extraId) => {
       const extra = extrasCatalog.find((e) => e.id === extraId);
       if (extra?.price) extrasPrice += extra.price;
@@ -269,7 +307,7 @@ export default function ConfiguradorClient() {
 
     const subtotal = basePrice + extrasPrice;
 
-    // APLICAR DESCUENTOS (prioridad: mayor descuento gana)
+    // Aplica descomptes (prioritat: guanya el descompte més alt)
     const applicableOffers = [];
 
     // 1. Early Bird (reserva inmediata)
@@ -281,7 +319,7 @@ export default function ConfiguradorClient() {
       });
     }
 
-    // 2. Combo de extras (3 o más)
+    // 2. Combo d'extres (3 o més)
     if (config.extras.length >= (OFFERS.combo.minExtras || 3)) {
       applicableOffers.push({
         discount: Math.round((extrasPrice * (OFFERS.combo.discount || 0)) / 100),
@@ -290,7 +328,7 @@ export default function ConfiguradorClient() {
       });
     }
 
-    // 3. Temporada baja
+    // 3. Temporada baixa
     if (config.date) {
       const eventMonth = new Date(config.date).getMonth() + 1;
       const seasonalMonths: readonly number[] = OFFERS.seasonal.months ?? [];
@@ -303,7 +341,7 @@ export default function ConfiguradorClient() {
       }
     }
 
-    // 4. Código promocional válido (si existe)
+    // 4. Codi promocional vàlid (si existeix)
     if (appliedDiscountCode) {
       const codeDiscount =
         appliedDiscountCode.type === 'PERCENTAGE'
@@ -313,13 +351,13 @@ export default function ConfiguradorClient() {
       if (codeDiscount > 0) {
         applicableOffers.push({
           discount: codeDiscount,
-          reason: `Código ${appliedDiscountCode.code}`,
+          reason: t('step3.discountCodeReason', { code: appliedDiscountCode.code }),
           priority: 4,
         });
       }
     }
 
-    // Seleccionar el mejor descuento
+    // Selecciona el millor descompte
     if (applicableOffers.length > 0) {
       const bestOffer = applicableOffers.sort((a, b) => b.discount - a.discount)[0];
       discount = bestOffer.discount;
@@ -331,7 +369,7 @@ export default function ConfiguradorClient() {
     return { basePrice, extrasPrice, subtotal, discount, discountReason, total };
   };
 
-  // Generar URL del formulario con los datos del configurador (unused pero conservat per referència futura)
+  // Genera URL del formulari amb les dades del configurador (unused però conservat per referència futura)
   const _getContactUrl = (): string => {
     const pricing = calculatePricing();
     const extrasNames = config.extras
@@ -353,7 +391,7 @@ export default function ConfiguradorClient() {
     return `/contacto?${params.toString()}`;
   };
 
-  // PASO 1: Tipo de Evento
+  // PAS 1: Tipus d'esdeveniment
   const renderStep1 = () => {
     const services = [
       { slug: 'bodas', icon: '💒' },
@@ -373,7 +411,7 @@ export default function ConfiguradorClient() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service) => {
-            const packs = allPacks.filter((pack) => pack.service === service.slug);
+            const packs = getPacksForEventType(service.slug as EventType);
             const minPrice = packs.length > 0 ? Math.min(...packs.map((p) => p.priceValue)) : 0;
 
             return (
@@ -402,9 +440,9 @@ export default function ConfiguradorClient() {
     );
   };
 
-  // PASO 2: Selección de pack
+  // PAS 2: Selecció de pack
   const renderStep2 = () => {
-    const packs = allPacks.filter((pack) => pack.service === config.eventType);
+    const packs = getPacksForEventType(config.eventType);
     if (!packs || packs.length === 0) return null;
 
     const serviceName = t(`step1.eventTypes.${config.eventType || 'bodas'}`);
@@ -423,68 +461,70 @@ export default function ConfiguradorClient() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {packs.map((pack) => (
+          {packs.map((pack) => {
+            const localizedPack = getLocalizedPack(pack);
+            return (
             <div
-              key={pack.id}
+              key={localizedPack.id}
               className={`group p-8 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${
-                config.selectedPack?.id === pack.id
+                config.selectedPack?.id === localizedPack.id
                   ? 'border-oe-gold bg-oe-gold/5 shadow-oe-gold'
                   : 'border-border bg-bg-surface hover:border-oe-gold/50 hover:shadow-lg'
-              } ${pack.highlight ? 'ring-2 ring-oe-gold/50 shadow-oe-gold-lg' : ''}`}
+              } ${localizedPack.highlight ? 'ring-2 ring-oe-gold/50 shadow-oe-gold-lg' : ''}`}
             >
-              {pack.popular && (
+              {localizedPack.popular && (
                 <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-oe-gold via-yellow-300 to-oe-gold text-black text-xs font-bold mb-4 animate-pulse">
                   ⚡ {t('step2.mostSold')}
                 </div>
               )}
-              {pack.highlight && (
+              {localizedPack.highlight && (
                 <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-oe-gold via-oe-gold-bright to-oe-gold text-black text-xs font-bold mb-4 shadow-oe-gold animate-pulse">
                   ⭐ {t('step2.premium')}
                 </div>
               )}
 
-              <h3 className="text-2xl font-bold text-white mb-2">{pack.name}</h3>
-              <p className="text-text-muted text-sm mb-4">{pack.tagline}</p>
+              <h3 className="text-2xl font-bold text-white mb-2">{localizedPack.name}</h3>
+              <p className="text-text-muted text-sm mb-4">{localizedPack.tagline}</p>
 
               <div className="mb-6">
-                <div className="text-4xl font-black text-oe-gold mb-1">{pack.price}</div>
-                <div className="text-text-muted text-sm">{pack.duration}</div>
+                <div className="text-4xl font-black text-oe-gold mb-1">{localizedPack.price}</div>
+                <div className="text-text-muted text-sm">{localizedPack.duration}</div>
               </div>
 
               <ul className="space-y-2 mb-6">
-                {pack.features.slice(0, 4).map((feature) => (
-                  <li key={feature} className="flex items-start text-sm text-text-muted">
+                {localizedPack.features.slice(0, 4).map((feature: string, index: number) => (
+                  <li key={`${localizedPack.id}-feature-${index}`} className="flex items-start text-sm text-text-muted">
                     <Check className="w-4 h-4 text-oe-gold mr-2 mt-0.5 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
-                {pack.features.length > 4 && (
-                  <li className="text-xs text-oe-gold">+ {pack.features.length - 4} {t('step2.moreFeatures')}</li>
+                {localizedPack.features.length > 4 && (
+                  <li className="text-xs text-oe-gold">+ {localizedPack.features.length - 4} {t('step2.moreFeatures')}</li>
                 )}
               </ul>
 
               <button
                 onClick={() => {
-                  setConfig({ ...config, selectedPack: pack });
+                  setConfig({ ...config, selectedPack: localizedPack });
                   setStep(3);
-                  track('Configurador_Step2_PackSelected', { pack: pack.id, price: pack.priceValue });
+                  track('Configurador_Step2_PackSelected', { pack: localizedPack.id, price: localizedPack.priceValue });
                 }}
                 className={`w-full py-3 rounded-xl font-bold transition-all ${
-                  config.selectedPack?.id === pack.id
+                  config.selectedPack?.id === localizedPack.id
                     ? 'bg-oe-gold text-black'
                     : 'bg-bg-main text-white hover:bg-oe-gold hover:text-black'
                 }`}
               >
-                {config.selectedPack?.id === pack.id ? t('step2.selected') : t('step2.select')}
+                {config.selectedPack?.id === localizedPack.id ? t('step2.selected') : t('step2.select')}
               </button>
             </div>
-          ))}
+          )})}
         </div>
       </div>
     );
   };
 
-  // PASO 3: Detalles y Extras
+  // PAS 3: Detalls i extres
   const renderStep3 = () => {
     const pricing = calculatePricing();
 
@@ -501,7 +541,7 @@ export default function ConfiguradorClient() {
           <h2 className="text-4xl font-display font-black text-white mb-4">{t('step3.title')}</h2>
         </div>
 
-        {/* Fecha y Asistentes */}
+        {/* Data i assistents */}
         <div className="grid md:grid-cols-2 gap-6">
           <div className="p-6 rounded-xl bg-bg-surface border border-border">
             <label
@@ -632,11 +672,11 @@ export default function ConfiguradorClient() {
             </div>
         </div>
 
-        {/* Código de descuento */}
+        {/* Codi de descompte */}
         <div className="p-6 rounded-xl bg-bg-surface border border-border">
           <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
             <Tag className="w-5 h-5 text-oe-gold" />
-            Código de descuento
+            {t('step3.discountCode')}
           </h3>
           <div className="flex flex-col sm:flex-row gap-3">
             <input
@@ -646,7 +686,7 @@ export default function ConfiguradorClient() {
                 setDiscountCodeInput(e.target.value.toUpperCase());
                 setDiscountCodeError('');
               }}
-              placeholder="Ej: ORBITA10"
+              placeholder={t('step3.discountCodePlaceholder')}
               className="flex-1 px-4 py-3 rounded-lg bg-bg-main text-white border border-border focus:border-oe-gold outline-none"
             />
             <button
@@ -655,7 +695,7 @@ export default function ConfiguradorClient() {
               disabled={discountCodeLoading || !discountCodeInput.trim()}
               className="px-5 py-3 rounded-lg bg-oe-gold text-black font-bold disabled:opacity-50"
             >
-              {discountCodeLoading ? 'Validando...' : 'Aplicar'}
+              {discountCodeLoading ? t('step3.validatingCode') : t('step3.applyCode')}
             </button>
             {appliedDiscountCode && (
               <button
@@ -663,7 +703,7 @@ export default function ConfiguradorClient() {
                 onClick={clearDiscountCode}
                 className="px-4 py-3 rounded-lg border border-border text-white"
               >
-                Quitar
+                {t('step3.removeCode')}
               </button>
             )}
           </div>
@@ -672,13 +712,15 @@ export default function ConfiguradorClient() {
           )}
           {appliedDiscountCode && !discountCodeError && (
             <p className="mt-2 text-sm text-emerald-400">
-              Código activo: {appliedDiscountCode.code} · caduca el{' '}
-              {new Date(appliedDiscountCode.expiresAt).toLocaleDateString('es-ES')}
+              {t('step3.activeCode', {
+                code: appliedDiscountCode.code,
+                date: new Date(appliedDiscountCode.expiresAt).toLocaleDateString(dateLocale),
+              })}
             </p>
           )}
         </div>
 
-        {/* Resumen Precio */}
+        {/* Resum de preu */}
         <div className="p-8 rounded-2xl bg-gradient-to-br from-oe-gold/10 to-oe-gold/5 border-2 border-oe-gold/50">
           <h3 className="text-2xl font-bold text-white mb-4">{t('step3.summary')}</h3>
 
@@ -723,31 +765,31 @@ export default function ConfiguradorClient() {
     );
   };
 
-  // Estado para el formulario inline
+  // Estat del formulari inline
   const [formData, setFormData] = useState({ name: '', contact: '' });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [formError, setFormError] = useState('');
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
-  // 🔥 PASO 4 NUEVO: OFERTA DE CIERRE CON FORMULARIO INLINE
+  // 🔥 PAS 4 NOU: oferta de tancament amb formulari inline
   const renderStep4 = () => {
     const pricing = calculatePricing();
 
-    // Calcular el descuento early bird SIEMPRE (sobre subtotal, no sobre total ya descontado)
-    // Si ya tiene descuento aplicado, usar el mayor de los dos
+    // Calcula el descompte early bird SEMPRE (sobre subtotal)
+    // Si ja hi ha descompte aplicat, aplica el més alt
     const potentialEarlyBird = Math.round((pricing.subtotal * (OFFERS.earlyBird.discount || 10)) / 100);
 
-    // Usar el descuento mayor entre el existente y el early bird
+    // Usa el descompte més alt entre l'actual i l'early bird
     const earlyBirdDiscount = Math.max(pricing.discount, potentialEarlyBird);
 
-    // Precio sin ningún descuento (para mostrar "precio normal")
+    // Preu sense descompte (per mostrar "preu normal")
     const priceWithoutDiscount = pricing.subtotal;
 
-    // Precio final con el mejor descuento
+    // Preu final amb el millor descompte
     const finalPrice = pricing.subtotal - earlyBirdDiscount;
 
-    // Enviar solicitud directa
+    // Envia sol·licitud directa
     const handleDirectSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
 
@@ -762,7 +804,7 @@ export default function ConfiguradorClient() {
       }
 
       if (!turnstileToken) {
-        setFormError(t('step4.errorCaptcha') || 'Por favor, completa la verificación de seguridad');
+        setFormError(t('step4.errorCaptcha'));
         return;
       }
 
@@ -788,8 +830,8 @@ export default function ConfiguradorClient() {
           body: JSON.stringify({
             name: formData.name,
             contact: formData.contact,
-            event: config.eventType || 'evento',
-            message: `Solicitud desde configurador. Descuento early bird aplicado: ${earlyBirdDiscount}€`,
+            event: config.eventType || t('eventFallback'),
+            message: t('requestMessage', { amount: earlyBirdDiscount }),
             packId: config.selectedPack?.id,
             packName: config.selectedPack?.name,
             estimatedPrice: finalPrice,
@@ -801,7 +843,7 @@ export default function ConfiguradorClient() {
         });
 
         if (!response.ok) {
-          throw new Error('Error al enviar la solicitud');
+          throw new Error('REQUEST_SEND_ERROR');
         }
 
         setSent(true);
@@ -832,9 +874,9 @@ export default function ConfiguradorClient() {
           </p>
         </div>
 
-        {/* Comparación de precios */}
+        {/* Comparació de preus */}
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Sin oferta */}
+          {/* Sense oferta */}
           <div className="p-6 rounded-xl bg-bg-surface border border-border opacity-60">
             <div className="text-center">
               <p className="text-text-muted mb-2">{t('step4.laterPrice')}</p>
@@ -843,7 +885,7 @@ export default function ConfiguradorClient() {
             </div>
           </div>
 
-          {/* Con oferta */}
+          {/* Amb oferta */}
           <div className="p-6 rounded-xl bg-gradient-to-br from-oe-gold/20 to-oe-gold/5 border-2 border-oe-gold ring-4 ring-oe-gold/30">
             <div className="text-center">
               <div className="inline-block px-3 py-1 rounded-full bg-oe-gold text-black text-xs font-bold mb-3">
@@ -859,7 +901,7 @@ export default function ConfiguradorClient() {
           </div>
         </div>
 
-        {/* Urgencia visual */}
+        {/* Urgència visual */}
         <div className="p-6 rounded-xl bg-red-500/10 border border-red-500/50">
           <div className="flex items-start gap-4">
             <Clock className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" />
@@ -872,7 +914,7 @@ export default function ConfiguradorClient() {
           </div>
         </div>
 
-        {/* Garantía */}
+        {/* Garantia */}
         <div className="p-6 rounded-xl bg-green-500/10 border border-green-500/50">
           <div className="flex items-start gap-4">
             <Zap className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" />
@@ -885,7 +927,7 @@ export default function ConfiguradorClient() {
           </div>
         </div>
 
-        {/* FORMULARIO INLINE O MENSAJE DE ÉXITO */}
+        {/* Formulari inline o missatge d'èxit */}
         {sent ? (
           <motion.div
             className="p-8 rounded-2xl bg-gradient-to-br from-green-500/10 to-green-600/5 border-2 border-green-500/50 text-center"
@@ -914,7 +956,7 @@ export default function ConfiguradorClient() {
                   .filter(Boolean) as string[];
 
                   const doc = await generateQuotePDF({
-                    eventType: config.eventType || 'evento',
+                    eventType: config.eventType || t('eventFallback'),
                     pack: config.selectedPack,
                     date: config.date,
                     guests: config.guests,
@@ -939,7 +981,7 @@ export default function ConfiguradorClient() {
           </motion.div>
         ) : (
           <form onSubmit={handleDirectSubmit} className="space-y-6">
-            {/* Formulario de contacto rápido */}
+            {/* Formulari de contacte ràpid */}
             <div className="p-6 rounded-2xl bg-gradient-to-br from-oe-gold/5 to-oe-gold/10 border-2 border-oe-gold/30">
               <h3 className="text-2xl font-bold text-white mb-4 text-center">
                 🎉 {t('step4.lastStep')}

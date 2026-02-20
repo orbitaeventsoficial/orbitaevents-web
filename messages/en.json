@@ -1797,7 +1797,76 @@
       "moreFeatures": "beyond...",
       "recommended": "Recommended",
       "mostSold": "BEST SELLER",
-      "premium": "PREMIUM"
+      "premium": "PREMIUM",
+      "packs": {
+        "bodas-basico": {
+          "name": "Essential (Final Dance)",
+          "tagline": "Your final party, exactly as you imagine it",
+          "features": {
+            "f1": "Professional DJ 3 hours (Final dance only)",
+            "f2": "PRO Sound 4000W (2x EV ETX 2000W) + Pioneer DDJ REV7",
+            "f3": "Dance floor lighting (LED multieffects + 2x Bash LED spots)",
+            "f4": "Smoke machine"
+          }
+        },
+        "bodas-premium": {
+          "name": "Signature (Full Day)",
+          "tagline": "We live your wedding with you from the first moment",
+          "features": {
+            "f1": "Professional DJ 5 hours (Ceremony, Cocktail, Dance)",
+            "f2": "PRO Sound 4000W + Pioneer DDJ REV7",
+            "f3": "PRO lighting: 4 moving heads 150W LED",
+            "f4": "Ambient lighting (LED balls)",
+            "f5": "Smoke machine"
+          }
+        },
+        "bodas-luxury": {
+          "name": "Royal Wedding (Full FX)",
+          "tagline": "The VIP experience your guests will never forget",
+          "features": {
+            "f1": "DJ + LIGHT TECHNICIAN (2 people, 6 hours)",
+            "f2": "Audiophile sound 4000W EV ETX 2000W",
+            "f3": "Synchronized light show (4 moving heads 150W LED)",
+            "f4": "Low fog machine effect (Dancing in the clouds)"
+          }
+        },
+        "empresas-cocktail": {
+          "name": "Corporate Cocktail",
+          "tagline": "Professionalism that strengthens your brand",
+          "features": {
+            "f1": "DJ/background music 4 hours",
+            "f2": "Crystal-clear ambient sound (EV ETX)",
+            "f3": "Static decorative lighting",
+            "f4": "1 wireless microphone",
+            "f5": "Invoice and admin management"
+          }
+        },
+        "empresas-evento": {
+          "name": "Corporate Event",
+          "tagline": "Balanced option for presentations and party",
+          "features": {
+            "f1": "DJ + technician 5 hours",
+            "f2": "4000W sound for speech and music",
+            "f3": "Dynamic lighting (moving heads)",
+            "f4": "2 wireless microphones",
+            "f5": "Run-of-show coordination",
+            "f6": "Projection support (audio)"
+          }
+        },
+        "empresas-gala": {
+          "name": "Corporate Gala",
+          "tagline": "Full production with technical reinforcement",
+          "features": {
+            "f1": "Full 6-hour service",
+            "f2": "DJ + dedicated sound technician",
+            "f3": "Reinforced sound + advanced miking (4 mics)",
+            "f4": "Corporate lighting design",
+            "f5": "Agency/venue coordination",
+            "f6": "Event audio recording",
+            "f7": "Impeccable setup and aesthetics"
+          }
+        }
+      }
     },
     "step3": {
       "title": "Details of your event",
@@ -1807,6 +1876,13 @@
       "guests": "Number of guests",
       "extras": "Improve your experience",
       "extrasDiscount": "15% discount on extras",
+      "discountCode": "Discount code",
+      "discountCodePlaceholder": "Ex.: ORBITA10",
+      "validatingCode": "Validating...",
+      "applyCode": "Apply",
+      "removeCode": "Remove",
+      "activeCode": "Active code: {code} · expires on {date}",
+      "discountCodeReason": "Code {code}",
       "noExtras": "There are no extras available for this package. Contact us for custom options.",
       "popular": "Popular",
       "premiumExtra": "Premium",
@@ -1850,7 +1926,17 @@
       "errorCaptcha": "Please complete the security check",
       "errorSend": "Error sending. Please try again or call us directly.",
       "downloadPDF": "Download PDF Budget"
-    }
+    },
+    "discountCodeErrors": {
+      "expired": "This code has expired.",
+      "inactive": "This code is not active.",
+      "unavailable": "This code can no longer be used.",
+      "invalid": "Invalid code.",
+      "default": "The code could not be validated.",
+      "requestError": "Error validating the code. Please try again."
+    },
+    "eventFallback": "event",
+    "requestMessage": "Request from configurator. Early bird discount applied: {amount}€"
   },
   "faq": {
     "title": "Questions you ask yourself (and the answers)",
@@ -2483,6 +2569,21 @@
         "decoration": "Personalized decoration",
         "lightShow": "special light show",
         "consultation": "Consultation without obligation!"
+      },
+      "zones": {
+        "title": "Party DJ by areas in Catalonia",
+        "barcelona": {
+          "name": "Party DJ Barcelona",
+          "desc": "Birthdays and celebrations"
+        },
+        "maresme": {
+          "name": "Party DJ Maresme",
+          "desc": "Mataró, Calella, Pineda"
+        },
+        "costaBrava": {
+          "name": "Party DJ Costa Brava",
+          "desc": "Lloret, Tossa, Platja d'Aro"
+        }
       },
       "more": "further..."
     },

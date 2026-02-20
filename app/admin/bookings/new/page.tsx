@@ -425,17 +425,29 @@ export default function NewBookingPage() {
                 key={et.value}
                 type="button"
                 onClick={() => updateField('eventType', et.value)}
+                aria-pressed={form.eventType === et.value}
                 className={`rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
                   form.eventType === et.value
-                    ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200'
+                    ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200 ring-1 ring-cyan-400/60'
                     : 'border-slate-700/50 bg-slate-900/60 text-slate-400 hover:bg-slate-800'
                 }`}
               >
                 <span className="text-base">{et.icon}</span>
                 <span className="block mt-0.5">{et.label}</span>
+                {form.eventType === et.value && (
+                  <span className="mt-1 inline-block rounded-full bg-cyan-400/20 px-1.5 py-0.5 text-[10px] font-semibold text-cyan-200">
+                    Seleccionat ✓
+                  </span>
+                )}
               </button>
             ))}
           </div>
+          <p className="mt-2 text-xs text-cyan-300">
+            Tipus seleccionat:{' '}
+            <span className="font-semibold">
+              {EVENT_TYPES.find((et) => et.value === form.eventType)?.label ?? 'Altre'}
+            </span>
+          </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-4">

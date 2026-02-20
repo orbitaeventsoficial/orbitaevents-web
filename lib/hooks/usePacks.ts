@@ -39,9 +39,10 @@ export function usePacks(options: {
 
         const data = await res.json();
         if (!active) return;
+        const remotePacks = Array.isArray(data.packs) ? data.packs : [];
 
         setState({
-          packs: Array.isArray(data.packs) ? data.packs : fallback,
+          packs: remotePacks.length > 0 ? remotePacks : fallback,
           loading: false,
           error: null,
         });

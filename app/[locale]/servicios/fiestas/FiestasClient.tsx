@@ -37,6 +37,28 @@ export default function FiestasClient() {
   const [selectedPack, setSelectedPack] = useState<string | null>(null);
   const [showRecommendation, setShowRecommendation] = useState(false);
 
+  const getPackText = (pack: PackDefinition, field: 'name' | 'tagline' | 'ideal') => {
+    const fallback = field === 'name' ? pack.name : field === 'tagline' ? pack.tagline : (pack.ideal || '');
+    const key = `discoPacks.${pack.id}.${field}`;
+    try {
+      const translated = t(key);
+      return translated !== key ? translated : fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
+  const getPackFeatures = (pack: PackDefinition): string[] => {
+    try {
+      const key = `discoPacks.${pack.id}.features`;
+      const translated = t.raw(key);
+      if (Array.isArray(translated)) return translated as string[];
+    } catch {
+      // fallback below
+    }
+    return pack.features;
+  };
+
   const flashPack = allPacks.find((pack) => pack.isFlash);
   const regularPacks = allPacks.filter(p => !p.isFlash);
 
@@ -77,7 +99,7 @@ export default function FiestasClient() {
   const getContactUrl = (pack: PackDefinition) => {
     const params = new URLSearchParams({
       servicio: 'fiestas',
-      pack: pack.name,
+      pack: getPackText(pack, 'name'),
       precio: pack.priceValue.toString(),
       invitados: numGuests.toString(),
     });
@@ -162,7 +184,7 @@ export default function FiestasClient() {
           >
             <div className="flex items-center gap-2 text-oe-gold-light font-bold">
               <Zap className="w-5 h-5" fill="currentColor" />
-              {t('flashAccess')} {flashPack?.name || OFERTA_FLASH.nombre}!
+              {t('flashAccess')} {(flashPack ? getPackText(flashPack, 'name') : OFERTA_FLASH.nombre)}!
             </div>
             <p className="text-sm text-text-muted mt-1">
               {t('upToGuests', { max: flashMaxGuests })} {flashPack?.flashDiscount ?? OFERTA_FLASH.descuentoPorcentaje}% {t('discount')}
@@ -184,7 +206,7 @@ export default function FiestasClient() {
                 <span className="font-bold text-purple-300">{t('recommendedFor', { guests: numGuests })}</span>
               </div>
               <div className="text-lg">
-                <strong>{recommendedPack.name}</strong> - {recommendedPack.price}
+                <strong>{getPackText(recommendedPack, 'name')}</strong> - {recommendedPack.price}
               </div>
             </motion.div>
           )}
@@ -210,8 +232,8 @@ export default function FiestasClient() {
             <div className="grid md:grid-cols-2 gap-8 mt-4">
               {/* Info */}
               <div className="space-y-4">
-                <h3 className="text-4xl font-bold">{flashPack.name}</h3>
-                <p className="text-xl text-text-muted">{flashPack.tagline}</p>
+                <h3 className="text-4xl font-bold">{getPackText(flashPack, 'name')}</h3>
+                <p className="text-xl text-text-muted">{getPackText(flashPack, 'tagline')}</p>
 
                 {/* Precio */}
                 <div className="flex items-baseline gap-4">
@@ -243,7 +265,7 @@ export default function FiestasClient() {
               {/* Features + CTA */}
               <div className="space-y-6">
                 <ul className="space-y-3">
-                  {flashPack.features.map((feature, idx) => (
+                  {getPackFeatures(flashPack).map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <div className="w-6 h-6 rounded-full bg-oe-gold/20 border border-oe-gold flex items-center justify-center flex-shrink-0 mt-0.5">
                         <Check className="w-3 h-3 text-oe-gold-light" />
@@ -318,8 +340,8 @@ export default function FiestasClient() {
                 {/* Contenido */}
                 <div className="space-y-4 mt-4">
                   <div>
-                    <h3 className="text-2xl font-bold">{pack.name}</h3>
-                    <p className="text-sm text-text-muted">{pack.tagline}</p>
+                    <h3 className="text-2xl font-bold">{getPackText(pack, 'name')}</h3>
+                    <p className="text-sm text-text-muted">{getPackText(pack, 'tagline')}</p>
                   </div>
 
                   {/* Precio */}
@@ -343,15 +365,15 @@ export default function FiestasClient() {
 
                   {/* Features */}
                   <ul className="space-y-2 pt-4 border-t border-border">
-                    {pack.features.slice(0, 5).map((feature, idx) => (
+                    {getPackFeatures(pack).slice(0, 5).map((feature, idx) => (
                       <li key={idx} className="text-sm text-text-muted flex items-start gap-2">
                         <span className="text-oe-gold flex-shrink-0">✓</span>
                         {feature}
                       </li>
                     ))}
-                    {pack.features.length > 5 && (
+                    {getPackFeatures(pack).length > 5 && (
                       <li className="text-sm text-oe-gold">
-                        +{pack.features.length - 5} {t('more')}
+                        +{getPackFeatures(pack).length - 5} {t('more')}
                       </li>
                     )}
                   </ul>
@@ -407,7 +429,7 @@ export default function FiestasClient() {
       {/* Zonas de cobertura */}
       <div className="max-w-5xl mx-auto px-4 pb-8">
         <h2 className="text-2xl font-bold text-center mb-8">
-          DJ fiestas por zonas de Catalunya
+          {t('zones.title')}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
@@ -415,24 +437,24 @@ export default function FiestasClient() {
             className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
           >
             <div className="text-2xl mb-2">🏙️</div>
-            <div className="font-semibold text-text-primary text-sm">DJ Fiestas Barcelona</div>
-            <div className="text-xs text-text-muted mt-1">Cumpleaños y celebraciones</div>
+            <div className="font-semibold text-text-primary text-sm">{t('zones.barcelona.name')}</div>
+            <div className="text-xs text-text-muted mt-1">{t('zones.barcelona.desc')}</div>
           </Link>
           <Link
             href="/servicios/dj-fiestas-maresme"
             className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
           >
             <div className="text-2xl mb-2">🏖️</div>
-            <div className="font-semibold text-text-primary text-sm">DJ Fiestas Maresme</div>
-            <div className="text-xs text-text-muted mt-1">Mataró, Calella, Pineda</div>
+            <div className="font-semibold text-text-primary text-sm">{t('zones.maresme.name')}</div>
+            <div className="text-xs text-text-muted mt-1">{t('zones.maresme.desc')}</div>
           </Link>
           <Link
             href="/servicios/dj-fiestas-costa-brava"
             className="group p-4 rounded-xl bg-bg-surface border border-white/10 hover:border-oe-gold/50 transition-all text-center"
           >
             <div className="text-2xl mb-2">🌊</div>
-            <div className="font-semibold text-text-primary text-sm">DJ Fiestas Costa Brava</div>
-            <div className="text-xs text-text-muted mt-1">Lloret, Tossa, Platja d&apos;Aro</div>
+            <div className="font-semibold text-text-primary text-sm">{t('zones.costaBrava.name')}</div>
+            <div className="text-xs text-text-muted mt-1">{t('zones.costaBrava.desc')}</div>
           </Link>
         </div>
       </div>

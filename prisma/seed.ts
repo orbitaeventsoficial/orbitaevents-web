@@ -75,6 +75,12 @@ async function main() {
 
   console.log('📦 Creant inventari...');
 
+  // Eliminació permanent d'elements retirats/inexistents
+  const removedInventoryCodes = ['DIF-001', 'DIF-002'];
+  await prisma.inventoryItem.deleteMany({
+    where: { code: { in: removedInventoryCodes } },
+  });
+
   const inventoryItems = [
     // SO (Total: 4.700€ | Potència: 4.000W)
     { code: 'ALT-001', name: 'Altaveu EV ETX #1', category: 'SOUND', watts: 2000, value: 1200 },
@@ -91,8 +97,6 @@ async function main() {
     { code: 'LED-001', name: 'Multibox BeamZ LED multiefectes', category: 'LIGHTING', watts: null, value: 200 },
     { code: 'BSH-001', name: 'Focus Bash bateria LED #1', category: 'LIGHTING', watts: null, value: 180 },
     { code: 'BSH-002', name: 'Focus Bash bateria LED #2', category: 'LIGHTING', watts: null, value: 180 },
-    { code: 'DIF-001', name: 'Llum LED 60W + difusor cúpula #1', category: 'LIGHTING', watts: 60, value: 80 },
-    { code: 'DIF-002', name: 'Llum LED 60W + difusor cúpula #2', category: 'LIGHTING', watts: 60, value: 80 },
     { code: 'USB-001', name: 'Llum USB cabina', category: 'LIGHTING', watts: null, value: 15 },
 
     // EFECTES (Total: 265€)
@@ -320,7 +324,7 @@ async function main() {
   }
 
   // Pack Party Starter items (Flash + extras)
-  const partyStarterItems = [...flashItems, 'MOV-001', 'MOV-002', 'DIF-001', 'DIF-002', 'TRI-003', 'TRI-004', 'ALL-003'];
+  const partyStarterItems = [...flashItems, 'MOV-001', 'MOV-002', 'TRI-003', 'TRI-004', 'ALL-003'];
   for (const code of partyStarterItems) {
     const itemId = getItemId(code);
     if (itemId) {
