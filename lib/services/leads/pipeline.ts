@@ -6,6 +6,7 @@ export type PipelineLead = {
   email: string;
   phone: string | null;
   eventType: string;
+  source: string;
   eventDate: Date | null;
   status: string;
   priority: string;
@@ -30,6 +31,7 @@ export async function getPipelineLeads(limit: number): Promise<PipelineLead[]> {
       email: true,
       phone: true,
       eventType: true,
+      source: true,
       eventDate: true,
       status: true,
       priority: true,

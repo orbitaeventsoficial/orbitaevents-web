@@ -9,6 +9,7 @@ type PipelineLead = {
   email: string;
   phone: string | null;
   eventType: string;
+  source: string;
   eventDate: string | null;
   status: string;
   priority: string;
@@ -55,8 +56,24 @@ const PRIORITY_DOT: Record<string, string> = {
   URGENT: 'bg-rose-500',
 };
 
+const SOURCE_LABELS: Record<string, string> = {
+  WEBSITE: 'Web',
+  CONFIGURATOR: 'Configurador',
+  PHONE: 'Telèfon',
+  WHATSAPP: 'WhatsApp',
+  INSTAGRAM: 'Instagram',
+  WALLAPOP: 'Wallapop',
+  REFERRAL: 'Boca-orella',
+  GOOGLE: 'Google',
+  OTHER: 'Altre',
+};
+
+const SOURCE_OPTIONS = Object.keys(SOURCE_LABELS);
+
 export default function LeadPipelineView() {
+  const [allLeads, setAllLeads] = useState<PipelineLead[]>([]);
   const [columns, setColumns] = useState<PipelineColumn[]>([]);
+  const [sourceFilter, setSourceFilter] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
@@ -66,10 +83,12 @@ export default function LeadPipelineView() {
       if (!res.ok) throw new Error('Error carregant pipeline');
       const data = await res.json();
       const leads: PipelineLead[] = data?.data?.leads || data?.leads || [];
+      setAllLeads(leads);
 
+      const filtered = sourceFilter === 'ALL' ? leads : leads.filter((lead) => lead.source === sourceFilter);
       const grouped = COLUMNS.map((col) => ({
         ...col,
-        leads: leads.filter((l: PipelineLead) => l.status === col.status),
+        leads: filtered.filter((l: PipelineLead) => l.status === col.status),
       }));
       setColumns(grouped);
     } catch {
@@ -77,7 +96,7 @@ export default function LeadPipelineView() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [sourceFilter]);
 
   useEffect(() => {
     fetchPipeline();
@@ -110,7 +129,39 @@ export default function LeadPipelineView() {
   }
 
   return (
-    <div className="overflow-x-auto pb-4">
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setSourceFilter('ALL')}
+          className={`rounded-full border px-3 py-1 text-xs ${
+            sourceFilter === 'ALL'
+              ? 'border-fuchsia-500/40 bg-fuchsia-500/10 text-fuchsia-200'
+              : 'border-slate-700 text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          Tots ({allLeads.length})
+        </button>
+        {SOURCE_OPTIONS.map((source) => {
+          const count = allLeads.filter((lead) => lead.source === source).length;
+          return (
+            <button
+              key={source}
+              type="button"
+              onClick={() => setSourceFilter(source)}
+              className={`rounded-full border px-3 py-1 text-xs ${
+                sourceFilter === source
+                  ? 'border-fuchsia-500/40 bg-fuchsia-500/10 text-fuchsia-200'
+                  : 'border-slate-700 text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {SOURCE_LABELS[source] || source} ({count})
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="overflow-x-auto pb-4">
       <div className="flex gap-3 min-w-[1200px]">
         {columns.map((col) => (
           <div
@@ -150,6 +201,7 @@ export default function LeadPipelineView() {
         ))}
       </div>
     </div>
+    </div>
   );
 }
 
@@ -185,6 +237,7 @@ function PipelineCard({
 
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px]">
         <span>{EVENT_TYPE_LABELS[lead.eventType] || lead.eventType}</span>
+        <span className="text-fuchsia-300/90">{SOURCE_LABELS[lead.source] || lead.source}</span>
         {lead.eventDate && (
           <span className="text-slate-400">
             {new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
