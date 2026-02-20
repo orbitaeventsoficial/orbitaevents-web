@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('SEO & Metadata', () => {
+  const GOTO_OPTIONS = { waitUntil: 'domcontentloaded' as const, timeout: 60000 };
+
   test('homepage should have proper SEO meta tags', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', GOTO_OPTIONS);
 
     // Check meta description
     const metaDescription = page.locator('meta[name="description"]');
@@ -17,10 +19,10 @@ test.describe('SEO & Metadata', () => {
   });
 
   test('should have canonical URLs', async ({ page }) => {
-    const pages = ['/', '/contacto', '/servicios/bodas'];
+    const pages = ['/', '/ca/contacto', '/ca/servicios/bodas'];
 
     for (const path of pages) {
-      await page.goto(path);
+      await page.goto(path, GOTO_OPTIONS);
 
       const canonical = page.locator('link[rel="canonical"]');
       await expect(canonical).toHaveAttribute('href', /.+/);
@@ -30,18 +32,18 @@ test.describe('SEO & Metadata', () => {
   test('should have proper title tags', async ({ page }) => {
     const pages = [
       { path: '/', titlePattern: /òrbita events|dj|eventos/i },
-      { path: '/contacto', titlePattern: /contact|contacto/i },
-      { path: '/servicios/bodas', titlePattern: /bodas|boda|casaments|wedding/i },
+      { path: '/ca/contacto', titlePattern: /contact|contacto/i },
+      { path: '/ca/servicios/bodas', titlePattern: /bodas|boda|casaments|wedding/i },
     ];
 
     for (const { path, titlePattern } of pages) {
-      await page.goto(path);
+      await page.goto(path, GOTO_OPTIONS);
       await expect(page).toHaveTitle(titlePattern);
     }
   });
 
   test('should not have broken images on homepage', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', GOTO_OPTIONS);
 
     // Wait for images to load
     await page.waitForLoadState('domcontentloaded');
