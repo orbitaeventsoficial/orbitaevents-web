@@ -370,8 +370,6 @@ export default async function LeadsPage({
         </div>
       </section>
 
-      <LeadViewToggle>
-
       <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
         <form method="get" className="grid gap-3 lg:grid-cols-6">
           <div className="lg:col-span-2">
@@ -523,6 +521,18 @@ export default async function LeadsPage({
           </Link>
         ))}
       </section>
+
+      <LeadViewToggle
+        pipelineFilters={{
+          status: data.filters.status,
+          priority: data.filters.priority,
+          eventType: data.filters.eventType,
+          source: data.filters.source,
+          q: data.filters.q,
+          from: data.filters.from ? data.filters.from.toISOString().slice(0, 10) : null,
+          to: data.filters.to ? data.filters.to.toISOString().slice(0, 10) : null,
+        }}
+      >
 
       {/* Mobile Card View */}
       <section className="lg:hidden space-y-3">

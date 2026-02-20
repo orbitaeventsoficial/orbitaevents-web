@@ -3,6 +3,16 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
+type PipelineFilters = {
+  status: string[];
+  priority: string[];
+  eventType: string[];
+  source: string[];
+  q: string;
+  from?: string | null;
+  to?: string | null;
+};
+
 const LeadPipelineView = dynamic(() => import('./LeadPipelineView'), {
   loading: () => (
     <div className="flex items-center justify-center py-20">
@@ -11,7 +21,13 @@ const LeadPipelineView = dynamic(() => import('./LeadPipelineView'), {
   ),
 });
 
-export default function LeadViewToggle({ children }: { children: React.ReactNode }) {
+export default function LeadViewToggle({
+  children,
+  pipelineFilters,
+}: {
+  children: React.ReactNode;
+  pipelineFilters: PipelineFilters;
+}) {
   const [view, setView] = useState<'list' | 'pipeline'>('list');
 
   return (
@@ -41,7 +57,7 @@ export default function LeadViewToggle({ children }: { children: React.ReactNode
         </button>
       </div>
 
-      {view === 'list' ? children : <LeadPipelineView />}
+      {view === 'list' ? children : <LeadPipelineView filters={pipelineFilters} />}
     </>
   );
 }

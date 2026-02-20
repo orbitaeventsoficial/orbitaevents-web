@@ -3,6 +3,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
+type PipelineFilters = {
+  status: string[];
+  priority: string[];
+  eventType: string[];
+  source: string[];
+  q: string;
+  from?: string | null;
+  to?: string | null;
+};
+
 type PipelineLead = {
   id: string;
   name: string;
@@ -68,12 +78,40 @@ const SOURCE_LABELS: Record<string, string> = {
   OTHER: 'Altre',
 };
 
-const SOURCE_OPTIONS = Object.keys(SOURCE_LABELS);
+function applyFilters(leads: PipelineLead[], filters: PipelineFilters): PipelineLead[] {
+  const query = filters.q.trim().toLowerCase();
+  const fromDate = filters.from ? new Date(filters.from) : null;
+  const toDate = filters.to ? new Date(filters.to) : null;
 
-export default function LeadPipelineView() {
+  return leads.filter((lead) => {
+    if (filters.status.length > 0 && !filters.status.includes(lead.status)) return false;
+    if (filters.priority.length > 0 && !filters.priority.includes(lead.priority)) return false;
+    if (filters.eventType.length > 0 && !filters.eventType.includes(lead.eventType)) return false;
+    if (filters.source.length > 0 && !filters.source.includes(lead.source)) return false;
+
+    if (query) {
+      const haystack = `${lead.name} ${lead.email} ${lead.phone || ''}`.toLowerCase();
+      if (!haystack.includes(query)) return false;
+    }
+
+    if (fromDate || toDate) {
+      if (!lead.eventDate) return false;
+      const eventDate = new Date(lead.eventDate);
+      if (fromDate && eventDate < fromDate) return false;
+      if (toDate) {
+        const end = new Date(toDate);
+        end.setHours(23, 59, 59, 999);
+        if (eventDate > end) return false;
+      }
+    }
+
+    return true;
+  });
+}
+
+export default function LeadPipelineView({ filters }: { filters: PipelineFilters }) {
   const [allLeads, setAllLeads] = useState<PipelineLead[]>([]);
   const [columns, setColumns] = useState<PipelineColumn[]>([]);
-  const [sourceFilter, setSourceFilter] = useState<string>('ALL');
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
@@ -85,7 +123,7 @@ export default function LeadPipelineView() {
       const leads: PipelineLead[] = data?.data?.leads || data?.leads || [];
       setAllLeads(leads);
 
-      const filtered = sourceFilter === 'ALL' ? leads : leads.filter((lead) => lead.source === sourceFilter);
+      const filtered = applyFilters(leads, filters);
       const grouped = COLUMNS.map((col) => ({
         ...col,
         leads: filtered.filter((l: PipelineLead) => l.status === col.status),
@@ -96,7 +134,7 @@ export default function LeadPipelineView() {
     } finally {
       setLoading(false);
     }
-  }, [sourceFilter]);
+  }, [filters]);
 
   useEffect(() => {
     fetchPipeline();
@@ -130,35 +168,8 @@ export default function LeadPipelineView() {
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => setSourceFilter('ALL')}
-          className={`rounded-full border px-3 py-1 text-xs ${
-            sourceFilter === 'ALL'
-              ? 'border-fuchsia-500/40 bg-fuchsia-500/10 text-fuchsia-200'
-              : 'border-slate-700 text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Tots ({allLeads.length})
-        </button>
-        {SOURCE_OPTIONS.map((source) => {
-          const count = allLeads.filter((lead) => lead.source === source).length;
-          return (
-            <button
-              key={source}
-              type="button"
-              onClick={() => setSourceFilter(source)}
-              className={`rounded-full border px-3 py-1 text-xs ${
-                sourceFilter === source
-                  ? 'border-fuchsia-500/40 bg-fuchsia-500/10 text-fuchsia-200'
-                  : 'border-slate-700 text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {SOURCE_LABELS[source] || source} ({count})
-            </button>
-          );
-        })}
+      <div className="text-xs text-slate-400">
+        Pipeline filtrat: {columns.reduce((acc, col) => acc + col.leads.length, 0)} de {allLeads.length} entrades
       </div>
 
       <div className="overflow-x-auto pb-4">
