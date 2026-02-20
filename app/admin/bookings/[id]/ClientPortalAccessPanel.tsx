@@ -9,6 +9,11 @@ type ActivePortal = {
   personalization?: {
     headline?: string;
     introMessage?: string;
+    accentColor?: string;
+    showTimeline?: boolean;
+    showPayments?: boolean;
+    showDocuments?: boolean;
+    showPostEvent?: boolean;
   } | null;
   expiresAt: string | Date | null;
   createdAt: string | Date;
@@ -26,8 +31,13 @@ export default function ClientPortalAccessPanel({
   const [active, setActive] = useState<ActivePortal>(initialActive);
   const [locale, setLocale] = useState((initialActive?.locale || 'ca').toLowerCase());
   const [expiresInDays, setExpiresInDays] = useState(30);
-  const [headline, setHeadline] = useState('');
-  const [introMessage, setIntroMessage] = useState('');
+  const [headline, setHeadline] = useState(initialActive?.personalization?.headline || '');
+  const [introMessage, setIntroMessage] = useState(initialActive?.personalization?.introMessage || '');
+  const [accentColor, setAccentColor] = useState(initialActive?.personalization?.accentColor || '#06b6d4');
+  const [showTimeline, setShowTimeline] = useState(initialActive?.personalization?.showTimeline ?? true);
+  const [showPayments, setShowPayments] = useState(initialActive?.personalization?.showPayments ?? true);
+  const [showDocuments, setShowDocuments] = useState(initialActive?.personalization?.showDocuments ?? true);
+  const [showPostEvent, setShowPostEvent] = useState(initialActive?.personalization?.showPostEvent ?? true);
   const [generatedUrl, setGeneratedUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -58,6 +68,11 @@ export default function ClientPortalAccessPanel({
           personalization: {
             headline: headline.trim() || undefined,
             introMessage: introMessage.trim() || undefined,
+            accentColor: accentColor.trim() || undefined,
+            showTimeline,
+            showPayments,
+            showDocuments,
+            showPostEvent,
           },
         }),
       });
@@ -169,6 +184,35 @@ export default function ClientPortalAccessPanel({
             className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm"
           />
         </label>
+      </div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <label className="text-sm text-slate-300">
+          Color accent del portal
+          <input
+            value={accentColor}
+            onChange={(event) => setAccentColor(event.target.value)}
+            placeholder="#06b6d4"
+            className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm"
+          />
+        </label>
+        <div className="grid grid-cols-2 gap-2 rounded-lg border border-white/10 bg-slate-900/60 p-3 text-xs text-slate-300">
+          <label className="inline-flex items-center gap-2">
+            <input type="checkbox" checked={showTimeline} onChange={(e) => setShowTimeline(e.target.checked)} />
+            Timeline
+          </label>
+          <label className="inline-flex items-center gap-2">
+            <input type="checkbox" checked={showPayments} onChange={(e) => setShowPayments(e.target.checked)} />
+            Pagaments
+          </label>
+          <label className="inline-flex items-center gap-2">
+            <input type="checkbox" checked={showDocuments} onChange={(e) => setShowDocuments(e.target.checked)} />
+            Documents
+          </label>
+          <label className="inline-flex items-center gap-2">
+            <input type="checkbox" checked={showPostEvent} onChange={(e) => setShowPostEvent(e.target.checked)} />
+            Post-event
+          </label>
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">

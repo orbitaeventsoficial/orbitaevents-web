@@ -50,7 +50,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
     if (statusUpdating || nextStatus === currentStatus) return;
     setStatusUpdating(true);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
+      const res = await fetch(`/api/admin/leads-new/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),
@@ -118,3 +118,4 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
     </div>
   );
 }
+

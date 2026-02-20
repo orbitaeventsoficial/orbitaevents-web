@@ -103,6 +103,16 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+function toRgba(hex: string, alpha: number): string | null {
+  const clean = hex.trim().replace('#', '');
+  const valid = /^[0-9a-fA-F]{6}$/.test(clean) ? clean : /^[0-9a-fA-F]{3}$/.test(clean) ? clean.split('').map((c) => c + c).join('') : null;
+  if (!valid) return null;
+  const r = parseInt(valid.slice(0, 2), 16);
+  const g = parseInt(valid.slice(2, 4), 16);
+  const b = parseInt(valid.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function getPackTranslation(
   translations: Array<{ locale: string; name: string; tagline?: string | null }>,
   locale: string
@@ -137,6 +147,7 @@ export default async function ClientPortalPage({
   const personalization = (access.personalization || {}) as {
     headline?: string;
     introMessage?: string;
+    accentColor?: string;
     showTimeline?: boolean;
     showPayments?: boolean;
     showDocuments?: boolean;
@@ -147,6 +158,11 @@ export default async function ClientPortalPage({
   const showPayments = personalization.showPayments ?? true;
   const showDocuments = personalization.showDocuments ?? true;
   const showPostEvent = personalization.showPostEvent ?? true;
+  const accentHex = personalization.accentColor && /^#?[0-9a-fA-F]{3,6}$/.test(personalization.accentColor)
+    ? (personalization.accentColor.startsWith('#') ? personalization.accentColor : `#${personalization.accentColor}`)
+    : '#06b6d4';
+  const accentBorder = toRgba(accentHex, 0.45) || 'rgba(6, 182, 212, 0.45)';
+  const accentBg = toRgba(accentHex, 0.15) || 'rgba(6, 182, 212, 0.15)';
 
   const packTranslation = getPackTranslation(booking.pack.translations, locale);
   const proposals = booking.proposals as Array<{
@@ -170,8 +186,8 @@ export default async function ClientPortalPage({
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className="rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-xl">
-          <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">{t.booking} {booking.reference}</p>
+        <header className="rounded-2xl border bg-slate-900/60 p-6 shadow-xl" style={{ borderColor: accentBorder }}>
+          <p className="text-xs uppercase tracking-[0.2em]" style={{ color: accentHex }}>{t.booking} {booking.reference}</p>
           <h1 className="mt-2 text-2xl font-bold">{personalization.headline || t.defaultHeadline}</h1>
           <p className="mt-2 text-sm text-slate-300">{personalization.introMessage || t.defaultIntro}</p>
         </header>
@@ -268,7 +284,8 @@ export default async function ClientPortalPage({
                   href={latestProposal.pdfUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex rounded-lg border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-200 hover:bg-cyan-500/20"
+                  className="inline-flex rounded-lg border px-4 py-2 text-sm font-semibold text-slate-100 hover:brightness-110"
+                  style={{ borderColor: accentBorder, backgroundColor: accentBg }}
                 >
                   Obrir pressupost ({latestProposal.reference})
                 </a>
@@ -290,7 +307,7 @@ export default async function ClientPortalPage({
 
         <footer className="mt-8 text-center text-xs text-slate-400">
           <p>Orbita Events</p>
-          <Link href={`/${locale}`} className="text-cyan-300 hover:underline">
+          <Link href={`/${locale}`} className="hover:underline" style={{ color: accentHex }}>
             {t.backHome}
           </Link>
         </footer>

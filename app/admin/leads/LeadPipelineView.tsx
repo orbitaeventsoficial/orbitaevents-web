@@ -86,7 +86,7 @@ export default function LeadPipelineView() {
   const moveLeadStatus = async (leadId: string, newStatus: string) => {
     setUpdatingId(leadId);
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
+      const res = await fetch(`/api/admin/leads-new/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -244,3 +244,4 @@ function PipelineCard({
     </div>
   );
 }
+

@@ -6,9 +6,9 @@ interface RouteContext {
 }
 
 export async function GET(req: NextRequest, { params }: RouteContext) {
-  return handleLeadQuoteGet(req, params.id, true);
+  return handleLeadQuoteGet(req, params.id, false);
 }
 
 export async function POST(req: NextRequest, { params }: RouteContext) {
-  return handleLeadQuotePost(req, params.id, true);
+  return handleLeadQuotePost(req, params.id, false);
 }

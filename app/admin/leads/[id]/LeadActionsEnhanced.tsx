@@ -83,7 +83,7 @@ export default function LeadActionsEnhanced({
     setOptimisticStatus(newStatus);
 
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
+      const res = await fetch(`/api/admin/leads-new/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -118,7 +118,7 @@ export default function LeadActionsEnhanced({
     setError(null);
     
     try {
-      const res = await fetch(`/api/admin/leads/${leadId}/quote`, {
+      const res = await fetch(`/api/admin/leads-new/${leadId}/quote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -154,7 +154,7 @@ export default function LeadActionsEnhanced({
     if (typeof customPrice === 'number' && Number.isFinite(customPrice) && customPrice > 0) {
       params.set('customPrice', String(customPrice));
     }
-    window.open(`/api/admin/leads/${leadId}/quote?${params.toString()}`, '_blank');
+    window.open(`/api/admin/leads-new/${leadId}/quote?${params.toString()}`, '_blank');
   };
 
   const handlePrintQuote = () => {
@@ -358,6 +358,7 @@ export default function LeadActionsEnhanced({
     </div>
   );
 }
+
 
 
 
