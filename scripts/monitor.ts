@@ -168,6 +168,7 @@ async function checkHealthEndpoint() {
       console.log(`     Versió: ${health.version}`);
       console.log(`     Uptime: ${health.uptime}s`);
       console.log(`     DB: ${health.checks?.database?.status || 'N/A'}`);
+      console.log(`     Sentry: ${health.checks?.sentry?.status || 'N/A'}`);
     }
   } catch {
     // Silently ignore if health endpoint doesn't exist yet

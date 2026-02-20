@@ -12,6 +12,7 @@ interface HealthStatus {
     server: CheckResult;
     database: CheckResult;
     api: CheckResult;
+    sentry: CheckResult;
   };
   responseTime: number;
   environment?: string;
@@ -44,9 +45,23 @@ export async function GET() {
         server: { status: 'pass', message: 'Server responding' },
         database: { status: 'pass', message: 'Not checked' },
         api: { status: 'pass', message: 'API responding' },
+        sentry: { status: 'pass', message: 'Monitoring configured' },
       },
       responseTime: 0,
     };
+
+    const sentryConfigured = Boolean(
+      process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
+    );
+    if (!sentryConfigured) {
+      health.checks.sentry = {
+        status: process.env.NODE_ENV === 'production' ? 'warn' : 'pass',
+        message:
+          process.env.NODE_ENV === 'production'
+            ? 'Sentry DSN not configured'
+            : 'Sentry optional in non-production',
+      };
+    }
 
     try {
       const dbStartTime = Date.now();
@@ -100,6 +115,13 @@ export async function GET() {
         server: { status: 'pass', message: 'Server responding' },
         database: { status: 'warn', message: 'Database check unavailable' },
         api: { status: 'pass', message: 'API responding' },
+        sentry: {
+          status: process.env.NODE_ENV === 'production' ? 'warn' : 'pass',
+          message:
+            process.env.NODE_ENV === 'production'
+              ? 'Sentry status unavailable'
+              : 'Sentry optional in non-production',
+        },
       },
       responseTime: Date.now() - startTime,
     };

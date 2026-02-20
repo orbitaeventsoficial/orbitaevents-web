@@ -26,3 +26,6 @@ Turn existing platform features into search-visible assets with conversion inten
 - Ops: gathers event assets (photos, facts, approvals).
 - Marketing: writes draft using template and links map.
 - Tech: publishes and validates schema + Core Web Vitals.
+
+## Operational Checklist
+- See `docs/production-launch-checklist-2026-02-20.md` for production monitoring and weekly execution workflow.
