@@ -12,6 +12,7 @@ import { requireAuth } from '@/lib/auth';
 import { successResponse, ApiErrors } from '@/lib/api-response';
 import { verifyCsrf } from '@/lib/csrf';
 import { normalizeDni } from '@/lib/utils/normalize';
+import { findDuplicates } from '@/lib/services/deduplicationService';
 
 export const dynamic = 'force-dynamic';
 
@@ -236,7 +237,47 @@ export async function POST(request: NextRequest) {
       return created;
     });
 
-    return successResponse(customer, 'Client creat correctament', 201);
+    const duplicateWarnings = await findDuplicates(
+      {
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone || undefined,
+        instagram: customer.instagram || undefined,
+      },
+      customer.id
+    );
+
+    if (duplicateWarnings.length > 0) {
+      await prisma.customerActivity.create({
+        data: {
+          customerId: customer.id,
+          action: 'DUPLICATE_WARNING',
+          details: {
+            count: duplicateWarnings.length,
+            topScore: duplicateWarnings[0]?.matchScore || 0,
+            topCandidates: duplicateWarnings.slice(0, 3).map((dup) => ({
+              id: dup.customer.id,
+              name: dup.customer.name,
+              score: dup.matchScore,
+            })),
+          },
+        },
+      });
+    }
+
+    return successResponse(
+      {
+        ...customer,
+        duplicateWarnings: duplicateWarnings.slice(0, 5).map((dup) => ({
+          id: dup.customer.id,
+          name: dup.customer.name,
+          email: dup.customer.email,
+          score: dup.matchScore,
+        })),
+      },
+      'Client creat correctament',
+      201
+    );
   } catch (error) {
     log.error('Error creant client:', error);
     return ApiErrors.internal('Error creant client');

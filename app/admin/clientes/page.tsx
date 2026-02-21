@@ -39,12 +39,6 @@ interface CustomerStats {
   recentMonth: number;
 }
 
-interface DuplicateScanStats {
-  totalGroups: number;
-  totalDuplicates: number;
-  autoMergeRecommended: number;
-}
-
 const SOURCE_LABELS: Record<string, string> = {
   website: 'Web',
   configurator: 'Configurador',
@@ -150,8 +144,6 @@ export default function AdminContactesPage() {
     matchReasons: Array<{ field: string; type: string; score: number }>;
   }>>([]);
   const [checkingDuplicates, setCheckingDuplicates] = useState(false);
-  const [duplicateScanLoading, setDuplicateScanLoading] = useState(false);
-  const [duplicateScanResult, setDuplicateScanResult] = useState<DuplicateScanStats | null>(null);
 
   // Fetch customers
   const fetchCustomers = useCallback(async () => {
@@ -279,25 +271,6 @@ export default function AdminContactesPage() {
     return () => window.clearTimeout(timeout);
   }, [newCustomer]);
 
-  const runDuplicateScan = useCallback(async () => {
-    setDuplicateScanLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('/api/admin/duplicates?stats=true', {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        throw new Error('No s’han pogut detectar duplicats');
-      }
-      const payload = await response.json();
-      setDuplicateScanResult(payload?.data || { totalGroups: 0, totalDuplicates: 0, autoMergeRecommended: 0 });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error detectant duplicats');
-    } finally {
-      setDuplicateScanLoading(false);
-    }
-  }, []);
-
   // Add customer
   const handleAddCustomer = async () => {
     if (!newCustomer.name || !newCustomer.email) {
@@ -340,6 +313,9 @@ export default function AdminContactesPage() {
       }
 
       const result = await response.json();
+      const createdDuplicateWarnings = Array.isArray(result?.data?.duplicateWarnings)
+        ? result.data.duplicateWarnings
+        : [];
 
       // Refresh llista
       if (page === 1) {
@@ -364,6 +340,11 @@ export default function AdminContactesPage() {
       // Preguntar si iniciar procés
       setSelectedCustomer(result.data);
       setShowActionModal(true);
+      if (createdDuplicateWarnings.length > 0) {
+        setError(
+          `Possible duplicat detectat automàticament (${createdDuplicateWarnings.length}). Revisa'l abans de continuar.`
+        );
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error');
     } finally {
@@ -466,26 +447,7 @@ export default function AdminContactesPage() {
           </svg>
           Afegir Client
         </button>
-        <button
-          onClick={runDuplicateScan}
-          type="button"
-          className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-amber-500/40 bg-amber-500/12 text-amber-200 font-medium hover:bg-amber-500/20 transition-all"
-          disabled={duplicateScanLoading}
-        >
-          <span>🔍</span>
-          {duplicateScanLoading ? 'Detectant...' : 'Detectar duplicats'}
-        </button>
       </div>
-
-      {duplicateScanResult && (
-        <div className="rounded-xl border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-          <p>
-            Detecció completada: <strong>{duplicateScanResult.totalGroups}</strong> grups ·{' '}
-            <strong>{duplicateScanResult.totalDuplicates}</strong> duplicats ·{' '}
-            <strong>{duplicateScanResult.autoMergeRecommended}</strong> fusió recomanada.
-          </p>
-        </div>
-      )}
 
       {/* Filtres d'execució */}
       {!loading && customers.length > 0 && (
