@@ -7,6 +7,7 @@ import { requireAuth } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 const SETTING_KEY = 'theme.colors';
+const ADMIN_CSS_KEY = 'admin.css.custom';
 type Locale = 'ca' | 'es' | 'en';
 const MESSAGES: Record<Locale, Record<string, string>> = {
   ca: {
@@ -82,6 +83,78 @@ const DEFAULT_COLORS: ThemeColors = {
   warning: '#f59e0b',      // amber-500
   error: '#ef4444',        // red-500
 };
+
+function buildAdminCssFromTheme(colors: ThemeColors): string {
+  return `/* Auto-generated from /admin/theme */
+html.admin-mode .admin-layout-body,
+html.admin-mode .admin-layout-shell {
+  background: ${colors.background} !important;
+  color: ${colors.text} !important;
+}
+
+html.admin-mode .admin-sidebar,
+html.admin-mode .admin-mobile-header,
+html.admin-mode .admin-desktop-header,
+html.admin-mode .admin-bottom-nav {
+  background: ${colors.secondary} !important;
+  border-color: ${colors.border} !important;
+}
+
+html.admin-mode .admin-main-shell,
+html.admin-mode .admin-shell > :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl),
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel,
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card,
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card {
+  background: ${colors.primary} !important;
+  border-color: ${colors.border} !important;
+}
+
+html.admin-mode .admin-shell :is(h1, h2, h3, p, label, td, th, li, span),
+html.admin-mode .admin-shell .admin-cr-title,
+html.admin-mode .admin-shell .admin-cr-h2,
+html.admin-mode .admin-shell .admin-ui-card-title {
+  color: ${colors.text} !important;
+}
+
+html.admin-mode .admin-shell :is(.admin-cr-subtitle, .admin-cr-small, .admin-cr-meta, .admin-ui-card-subtitle, .text-slate-400, .text-slate-500, .text-slate-600) {
+  color: ${colors.textLight} !important;
+}
+
+html.admin-mode .admin-shell :is(button, [role='button'], a.inline-flex):not(.admin-keep-colors) {
+  background: ${colors.accent} !important;
+  border-color: ${colors.border} !important;
+  color: ${colors.background} !important;
+}
+
+html.admin-mode .admin-shell .admin-ui-btn--primary {
+  background: ${colors.accent} !important;
+  border-color: ${colors.accent} !important;
+  color: ${colors.background} !important;
+}
+
+html.admin-mode .admin-shell .admin-tone-success,
+html.admin-mode .admin-shell .admin-cr-tone-emerald {
+  color: ${colors.success} !important;
+  border-color: ${colors.success} !important;
+}
+
+html.admin-mode .admin-shell .admin-tone-warning,
+html.admin-mode .admin-shell .admin-cr-tone-amber {
+  color: ${colors.warning} !important;
+  border-color: ${colors.warning} !important;
+}
+
+html.admin-mode .admin-shell .admin-tone-danger,
+html.admin-mode .admin-shell .admin-cr-tone-rose {
+  color: ${colors.error} !important;
+  border-color: ${colors.error} !important;
+}
+
+html.admin-mode .admin-shell .admin-cr-alert--error { border-color: ${colors.error} !important; }
+html.admin-mode .admin-shell .admin-cr-alert--warning { border-color: ${colors.warning} !important; }
+html.admin-mode .admin-shell .admin-cr-alert--info { border-color: ${colors.accent} !important; }
+`;
+}
 
 // GET - Obtener colores del tema
 export async function GET(req: NextRequest) {
@@ -185,6 +258,22 @@ export async function POST(req: NextRequest) {
       },
       update: {
         value: JSON.stringify(finalColors),
+      },
+    });
+
+    // Sincronitzar amb el CSS real del panell admin perquè s'apliqui immediatament.
+    await prisma.setting.upsert({
+      where: { key: ADMIN_CSS_KEY },
+      create: {
+        key: ADMIN_CSS_KEY,
+        value: buildAdminCssFromTheme(finalColors),
+        type: 'STRING',
+        category: 'config',
+        label: 'Custom CSS admin',
+        description: 'CSS custom aplicat només al panell admin',
+      },
+      update: {
+        value: buildAdminCssFromTheme(finalColors),
       },
     });
 

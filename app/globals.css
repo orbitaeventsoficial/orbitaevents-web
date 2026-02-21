@@ -2525,7 +2525,7 @@ html.admin-mode .admin-shell :is(button, [role='button'], a.inline-flex):not(.ad
    ADMIN COMPACT MODE - high-density operational layout
    ========================================================================== */
 html.admin-mode .admin-shell.admin-compact {
-  font-size: 14px;
+  font-size: 15.5px;
 }
 
 html.admin-mode .admin-shell.admin-compact > * + * {
@@ -2582,13 +2582,13 @@ html.admin-mode .admin-shell.admin-compact :is(input, select, textarea):not([typ
 html.admin-mode .admin-shell.admin-compact table thead th {
   padding-top: 0.45rem !important;
   padding-bottom: 0.45rem !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
 }
 
 html.admin-mode .admin-shell.admin-compact table tbody td {
   padding-top: 0.45rem !important;
   padding-bottom: 0.45rem !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
 }
 
 html.admin-mode .admin-shell.admin-compact :is(h1, h2, h3) {
@@ -2596,11 +2596,11 @@ html.admin-mode .admin-shell.admin-compact :is(h1, h2, h3) {
 }
 
 html.admin-mode .admin-shell.admin-compact h1 {
-  font-size: clamp(1.35rem, 2.1vw, 1.9rem) !important;
+  font-size: clamp(1.55rem, 2.3vw, 2.1rem) !important;
 }
 
 html.admin-mode .admin-shell.admin-compact h2 {
-  font-size: clamp(1.1rem, 1.4vw, 1.35rem) !important;
+  font-size: clamp(1.2rem, 1.6vw, 1.45rem) !important;
 }
 
 /* ==========================================================================

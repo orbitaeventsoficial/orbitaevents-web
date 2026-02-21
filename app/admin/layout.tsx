@@ -117,37 +117,6 @@ function SidebarSection({
   );
 }
 
-function RecentChip({
-  href,
-  label,
-  isActive,
-  onClick,
-  onPrefetch,
-}: {
-  href: string;
-  label: string;
-  isActive: boolean;
-  onClick?: () => void;
-  onPrefetch?: (href: string) => void;
-}) {
-  return (
-    <Link
-      href={href}
-      prefetch={false}
-      onClick={onClick}
-      onMouseEnter={() => onPrefetch?.(href)}
-      onFocus={() => onPrefetch?.(href)}
-      className={`admin-recent-chip ${
-        isActive
-          ? 'admin-recent-chip--active'
-          : 'admin-recent-chip--idle'
-      }`}
-    >
-      {label}
-    </Link>
-  );
-}
-
 // Bottom Navigation Item para móvil
 function BottomNavItem({
   icon,
@@ -218,7 +187,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const [packPriceAlertsCount, setPackPriceAlertsCount] = useState(0);
   const [financeAlertsCount, setFinanceAlertsCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [recentHrefs, setRecentHrefs] = useState<string[]>([]);
+  const [customAdminCss, setCustomAdminCss] = useState('');
   const pathname = usePathname();
   const { enabled: helpModeEnabled, toggle: toggleHelpMode } = useAdminHelpMode();
 
@@ -260,6 +229,26 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    const loadCss = async () => {
+      try {
+        const res = await fetch('/api/admin/css', { credentials: 'include', cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json().catch(() => ({}));
+        if (!cancelled && typeof data?.css === 'string') {
+          setCustomAdminCss(data.css);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+    loadCss();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     setMounted(true);
     // Carrega en idle per no bloquejar render inicial.
     const run = () => {
@@ -279,6 +268,30 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     const timeoutId = globalThis.setTimeout(run, 250);
     return () => globalThis.clearTimeout(timeoutId);
   }, [fetchNewLeadsCount, fetchPackPriceAlertsCount, fetchFinanceAlertsCount]);
+
+  useEffect(() => {
+    const criticalRoutes = [
+      '/admin/leads',
+      '/admin/bookings',
+      '/admin/tasks',
+      '/admin/economia',
+      '/admin/catalog',
+    ];
+    const run = () => {
+      criticalRoutes.forEach((href) => router.prefetch(href));
+    };
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const idleId = (window as Window & { requestIdleCallback: (cb: IdleRequestCallback) => number })
+        .requestIdleCallback(() => run());
+      return () => {
+        if ('cancelIdleCallback' in window) {
+          (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(idleId);
+        }
+      };
+    }
+    const timeoutId = globalThis.setTimeout(run, 500);
+    return () => globalThis.clearTimeout(timeoutId);
+  }, [router]);
 
   useEffect(() => {
     // Tancar sidebar al canviar de pàgina.
@@ -404,6 +417,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
         { icon: '✍️', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
+        { icon: '🧩', label: 'CSS PRO', href: '/admin/css-manager', badge: 'PRO', badgeColor: 'green' as const },
         { icon: '🤖', label: 'Correus automàtics', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
         { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
         { icon: '🌟', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
@@ -419,46 +433,10 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         { icon: '🔗', label: 'Integracions', href: '/admin/settings/integrations' },
         { icon: '🎛️', label: 'Features', href: '/admin/features' },
         { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
-        { icon: '🎨', label: 'Tema', href: '/admin/theme' },
         { icon: '🌐', label: 'Traduccions', href: '/admin/translations' },
       ]
     },
   ]), []);
-
-  const navLabelMap = useMemo(() => {
-    const map = new Map<string, string>();
-    priorityItems.forEach((item) => map.set(item.href, item.label));
-    navSections.forEach((section) => {
-      section.items.forEach((item) => map.set(item.href, item.label));
-    });
-    return map;
-  }, [priorityItems, navSections]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const key = 'admin.recent.hrefs';
-    const saved = window.localStorage.getItem(key);
-    if (!saved) return;
-    try {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed)) {
-        setRecentHrefs(parsed.filter((v) => typeof v === 'string').slice(0, 6));
-      }
-    } catch {
-      // ignore broken cache
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!pathname?.startsWith('/admin')) return;
-    const key = 'admin.recent.hrefs';
-    setRecentHrefs((prev) => {
-      const next = [pathname, ...prev.filter((item) => item !== pathname)].slice(0, 6);
-      window.localStorage.setItem(key, JSON.stringify(next));
-      return next;
-    });
-  }, [pathname]);
 
   const notificationsCount = newLeadsCount + packPriceAlertsCount + financeAlertsCount;
 
@@ -502,13 +480,13 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       presupuestos: 'Editor PDF pressupost',
       coverage: 'Cobertura',
       features: 'Features',
-      theme: 'Tema',
       stats: 'Estadístiques',
       mapa: 'Mapa Admin',
       blog: 'Blog',
       canvas: 'Canvas',
       translations: 'Traduccions',
       'text-manager': 'Textos PRO',
+      'css-manager': 'CSS PRO',
       'post-event': 'Post-esdeveniment',
       'google-reviews': 'Ressenyes de Google',
       'google-ads': 'Google Ads',
@@ -550,6 +528,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           onSubmitCapture={blockInteractionInHelpMode}
           onPointerDownCapture={blockInteractionInHelpMode}
         >
+          {customAdminCss && (
+            <style id="admin-custom-css" dangerouslySetInnerHTML={{ __html: customAdminCss }} />
+          )}
           {helpModeEnabled && (
             <div className="admin-help-banner">
               Mode ajuda actiu: les accions estan bloquejades. Prem els icones d'ajuda per veure explicacions.
@@ -592,25 +573,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
               ))}
             </div>
           </div>
-
-          {recentHrefs.length > 0 && (
-            <div className="admin-sidebar-recent">
-              <p className="admin-sidebar-block-title">
-                Recents
-              </p>
-              <div className="admin-sidebar-chip-row">
-                {recentHrefs.map((href) => (
-                  <RecentChip
-                    key={href}
-                    href={href}
-                    label={navLabelMap.get(href) || href.replace('/admin/', '')}
-                    isActive={isActive(href)}
-                    onPrefetch={prefetchRoute}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
 
           {navSections.map((section) => (
             <SidebarSection
@@ -760,26 +722,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                   ))}
                 </div>
               </div>
-
-              {recentHrefs.length > 0 && (
-                <div className="admin-sidebar-recent">
-                  <p className="admin-sidebar-block-title">
-                    Recents
-                  </p>
-                  <div className="admin-sidebar-chip-row">
-                    {recentHrefs.slice(0, 4).map((href) => (
-                      <RecentChip
-                        key={href}
-                        href={href}
-                        label={navLabelMap.get(href) || href.replace('/admin/', '')}
-                        isActive={isActive(href)}
-                        onClick={() => setSidebarOpen(false)}
-                        onPrefetch={prefetchRoute}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {navSections.map((section) => (
                 <SidebarSection

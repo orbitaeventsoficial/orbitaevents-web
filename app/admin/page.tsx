@@ -65,7 +65,8 @@ function toDateKey(date: Date) {
 export default async function AdminDashboard() {
   const now = new Date();
   const dayKey = now.toISOString().slice(0, 10);
-  await cachedQuery(
+  // No bloqueja el primer render del dashboard.
+  void cachedQuery(
     `admin:dashboard:daily-checklist-sync:${dayKey}`,
     async () => {
       await generateDailyChecklistTasks().catch(() => null);
