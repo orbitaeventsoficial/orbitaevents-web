@@ -1911,6 +1911,217 @@ body.admin-mode .admin-shell {
   --admin-solid-border-1: #262626;
   --admin-solid-border-2: #1f1f1f;
   --admin-solid-border-3: #191919;
+  --admin-accent-gold: #f59e0b;
+  --admin-accent-cyan: #06b6d4;
+  --admin-accent-green: #10b981;
+  --admin-accent-rose: #f43f5e;
+  --admin-accent-violet: #8b5cf6;
+  --admin-metal-light: rgba(255, 255, 255, 0.22);
+  --admin-metal-mid: rgba(120, 120, 120, 0.24);
+  --admin-metal-dark: rgba(28, 28, 28, 0.96);
+  --admin-color-sheen: rgba(245, 158, 11, 0.36);
+  --admin-color-cyan: rgba(6, 182, 212, 0.28);
+  --admin-color-violet: rgba(139, 92, 246, 0.24);
+  --admin-color-emerald: rgba(16, 185, 129, 0.22);
+}
+
+/* API semàntica per targetes noves */
+html.admin-mode .admin-shell .admin-surface-1 {
+  background: var(--admin-solid-1) !important;
+  border-color: var(--admin-solid-border-1) !important;
+}
+
+html.admin-mode .admin-shell .admin-surface-2 {
+  background: var(--admin-solid-2) !important;
+  border-color: var(--admin-solid-border-2) !important;
+}
+
+html.admin-mode .admin-shell .admin-surface-3 {
+  background: var(--admin-solid-3) !important;
+  border-color: var(--admin-solid-border-3) !important;
+}
+
+/* Auto-estil per qualsevol targeta nova amb rounded + border dins admin */
+html.admin-mode .admin-shell :is(
+  div,
+  section,
+  article,
+  aside
+)[class*='rounded'][class*='border']:not(.admin-keep-colors) {
+  background:
+    linear-gradient(180deg, var(--admin-metal-light) 0%, var(--admin-metal-mid) 9%, transparent 22%),
+    linear-gradient(130deg, var(--admin-color-cyan), var(--admin-color-violet) 58%, var(--admin-color-emerald)),
+    var(--admin-solid-2) !important;
+  border-color: #3a3a3a !important;
+}
+
+/* Acabat premium: vora superior subtil a targetes */
+html.admin-mode .admin-shell :is(
+  section,
+  article,
+  aside,
+  .panel,
+  .card,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl
+):not(.admin-keep-colors) {
+  position: relative;
+}
+
+html.admin-mode .admin-shell :is(
+  section,
+  article,
+  aside,
+  .panel,
+  .card,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl
+):not(.admin-keep-colors)::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--admin-color-sheen) 35%,
+    var(--admin-color-cyan) 55%,
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* Botons globals admin: més clars i consistents */
+html.admin-mode .admin-shell :is(button, [role='button'], a.inline-flex):not(.admin-keep-colors) {
+  border-color: #5b4b38 !important;
+  color: #f4f4f5 !important;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.25) 0%,
+      rgba(245, 158, 11, 0.24) 10%,
+      rgba(39, 39, 39, 0.96) 100%
+    ) !important;
+}
+
+html.admin-mode .admin-shell :is(button, [role='button'], a.inline-flex):not(.admin-keep-colors):hover {
+  border-color: #b4873f !important;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(245, 158, 11, 0.32) 12%,
+      rgba(49, 49, 49, 0.98) 100%
+    ) !important;
+}
+
+/* Inputs globals: lectura i focus més premium */
+html.admin-mode .admin-shell :is(input, select, textarea):not([type='checkbox']):not([type='radio']):not(.admin-keep-colors) {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(180, 180, 180, 0.09) 0%,
+      rgba(6, 182, 212, 0.06) 18%,
+      rgba(20, 20, 20, 0.98) 38%
+    ),
+    #0f0f10 !important;
+  border-color: #4b4b52 !important;
+}
+
+html.admin-mode .admin-shell :is(input, select, textarea):focus {
+  border-color: rgba(245, 158, 11, 0.7) !important;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2) !important;
+}
+
+/* Badges semàntics reutilitzables per qualsevol pàgina nova */
+html.admin-mode .admin-shell .admin-tone-success {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  color: #a7f3d0 !important;
+}
+
+html.admin-mode .admin-shell .admin-tone-warning {
+  background: rgba(245, 158, 11, 0.16) !important;
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  color: #fde68a !important;
+}
+
+html.admin-mode .admin-shell .admin-tone-danger {
+  background: rgba(244, 63, 94, 0.16) !important;
+  border-color: rgba(244, 63, 94, 0.45) !important;
+  color: #fecdd3 !important;
+}
+
+html.admin-mode .admin-shell .admin-tone-info {
+  background: rgba(6, 182, 212, 0.16) !important;
+  border-color: rgba(6, 182, 212, 0.45) !important;
+  color: #a5f3fc !important;
+}
+
+/* Selecció de text premium (admin) */
+html.admin-mode ::selection,
+body.admin-mode ::selection {
+  background: rgba(245, 158, 11, 0.38) !important;
+  color: #fff7ed !important;
+  text-shadow: none !important;
+}
+
+html.admin-mode ::-moz-selection,
+body.admin-mode ::-moz-selection {
+  background: rgba(245, 158, 11, 0.38) !important;
+  color: #fff7ed !important;
+  text-shadow: none !important;
+}
+
+/* Tipografia i spacing visual més net per admin */
+html.admin-mode .admin-shell {
+  letter-spacing: -0.01em;
+}
+
+html.admin-mode .admin-shell :is(h1, h2, h3) {
+  line-height: 1.2 !important;
+}
+
+html.admin-mode .admin-shell :is(h1) {
+  font-weight: 800 !important;
+}
+
+html.admin-mode .admin-shell :is(h2, h3) {
+  font-weight: 700 !important;
+}
+
+/* Taules: lectura pro */
+html.admin-mode .admin-shell table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+html.admin-mode .admin-shell table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #141414 !important;
+}
+
+html.admin-mode .admin-shell table tbody tr {
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+html.admin-mode .admin-shell table tbody tr:hover {
+  background: #171717 !important;
+}
+
+/* Detall visual de links d'acció */
+html.admin-mode .admin-shell a {
+  text-underline-offset: 3px;
+}
+
+html.admin-mode .admin-shell a:hover {
+  text-decoration-color: rgba(245, 158, 11, 0.55);
 }
 
 /* Nivell 1 (contenidor principal de cada pàgina) */
