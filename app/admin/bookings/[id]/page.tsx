@@ -13,6 +13,7 @@ import BookingMarginCard from './BookingMarginCard';
 import BookingInventorySection from './BookingInventorySection';
 import ClientPortalAccessPanel from './ClientPortalAccessPanel';
 import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
+import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -553,6 +554,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
         const extrasTotal = booking.extras?.reduce((sum, e) => sum + Number(e.price || 0), 0) ?? 0;
         const extraHours = typeof bAny.extraHours === 'number' ? bAny.extraHours : 0;
         const extraHourPrice = typeof bAny.extraHourPrice === 'number' ? bAny.extraHourPrice : 0;
+        const inventoryHours = calculateEventDuration(booking.eventStartTime, booking.eventEndTime);
+        const inventoryCostReal = (booking.inventory || []).reduce((sum, assigned) => {
+          const perHour = calculateCostPerHour(assigned.item.purchasePrice, assigned.item.expectedLifeHours);
+          return sum + (perHour * (assigned.quantity || 1) * inventoryHours);
+        }, 0);
 
         return (
           <BookingMarginCard
@@ -568,6 +574,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
             source={booking.lead?.source || 'UNKNOWN'}
             eventLocation={booking.eventLocation}
             eventVenue={booking.eventVenue}
+            inventoryCostReal={inventoryCostReal > 0 ? Number(inventoryCostReal.toFixed(2)) : null}
+            inventoryHours={inventoryHours > 0 ? inventoryHours : null}
           />
         );
       })()}
@@ -662,6 +670,5 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </div>
   );
 }
-
 
 

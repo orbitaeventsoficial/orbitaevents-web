@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 
 type Pack = {
   id: string;
@@ -121,6 +122,7 @@ export default function NewBookingPage() {
   const [validatingCode, setValidatingCode] = useState(false);
   const [calculatingDistance, setCalculatingDistance] = useState(false);
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
+  const [fuelReferenceInfo, setFuelReferenceInfo] = useState<string | null>(null);
 
   const updateField = (field: keyof FormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -144,6 +146,16 @@ export default function NewBookingPage() {
         if (extrasRes.ok) {
           const eData = await extrasRes.json();
           setExtras(eData.extras || eData.data || []);
+        }
+
+        const fuelRes = await fetch('/api/admin/fuel/reference');
+        if (fuelRes.ok) {
+          const fuelData = await fuelRes.json();
+          const referenceValue = Number(fuelData?.costPerKm || 0);
+          if (referenceValue > 0) {
+            setForm((prev) => ({ ...prev, fuelCostPerKm: referenceValue.toFixed(4) }));
+            setFuelReferenceInfo(`Referència automàtica: ${referenceValue.toFixed(4)} €/km`);
+          }
         }
 
         // Pre-fill from lead
@@ -182,11 +194,23 @@ export default function NewBookingPage() {
   }, [leadId, dateParam]);
 
   // Travel cost calculation
-  const travelCost = useMemo(() => {
+  const internalTravelCost = useMemo(() => {
     const km = parseFloat(form.distanceKm) || 0;
-    const rate = parseFloat(form.fuelCostPerKm) || 0.19;
-    return km > 0 ? parseFloat((km * rate).toFixed(2)) : 0;
+    const rate = parseFloat(form.fuelCostPerKm) || DEFAULT_FUEL_COST_PER_KM;
+    return calculateTravelCost(km, rate, INCLUDED_TRAVEL_KM);
   }, [form.distanceKm, form.fuelCostPerKm]);
+  const travelCharge = useMemo(() => {
+    const km = parseFloat(form.distanceKm) || 0;
+    return calculateTravelCharge(km, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
+  }, [form.distanceKm]);
+  const billableKm = useMemo(() => {
+    const km = parseFloat(form.distanceKm) || 0;
+    return calculateBillableTravelKm(km, INCLUDED_TRAVEL_KM);
+  }, [form.distanceKm]);
+  const travelBlocks = useMemo(() => {
+    const km = parseFloat(form.distanceKm) || 0;
+    return calculateTravelBlocks(km, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM);
+  }, [form.distanceKm]);
 
   // Price calculation
   const pricing = useMemo(() => {
@@ -200,7 +224,7 @@ export default function NewBookingPage() {
       (sum, e) => sum + e.price * e.quantity,
       0
     );
-    const subtotal = packPrice + extraHoursPrice + extrasPrice;
+    const subtotal = packPrice + extraHoursPrice + extrasPrice + travelCharge;
     const discount = parseFloat(form.discount) || 0;
     const baseAfterDiscount = subtotal - discount;
     const vatRate = 21;
@@ -208,8 +232,8 @@ export default function NewBookingPage() {
     const total = baseAfterDiscount + vatAmount;
     const deposit = Math.round(total * 0.3);
 
-    return { packPrice, extraHoursPrice, extrasPrice, subtotal, discount, vatAmount, total, deposit };
-  }, [form.packId, form.extraHours, form.discount, selectedExtras, packs]);
+    return { packPrice, extraHoursPrice, extrasPrice, travelCharge, subtotal, discount, vatAmount, total, deposit };
+  }, [form.packId, form.extraHours, form.discount, selectedExtras, packs, travelCharge]);
 
   const toggleExtra = (extra: Extra) => {
     setSelectedExtras((prev) => {
@@ -339,7 +363,7 @@ export default function NewBookingPage() {
         notes: form.notes.trim() || undefined,
         distanceKm: parseFloat(form.distanceKm) || undefined,
         fuelCostPerKm: parseFloat(form.fuelCostPerKm) || undefined,
-        travelCost: travelCost || undefined,
+        travelCost: internalTravelCost || undefined,
       };
 
       const res = await fetch('/api/admin/bookings', {
@@ -360,7 +384,7 @@ export default function NewBookingPage() {
     } finally {
       setSubmitting(false);
     }
-  }, [form, selectedExtras, leadId, leadData, customerId, router, travelCost]);
+  }, [form, selectedExtras, leadId, leadData, customerId, router, internalTravelCost]);
 
   if (loading) {
     return (
@@ -681,34 +705,39 @@ export default function NewBookingPage() {
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">km</span>
             </div>
+            <p className="mt-1 text-[10px] text-emerald-300">
+              Inclòs al pack: {INCLUDED_TRAVEL_KM} km (anada + tornada)
+            </p>
           </div>
           <div>
-            <label className="text-xs text-slate-400">Cost per km</label>
-            <div className="mt-1 relative">
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.fuelCostPerKm}
-                onChange={(e) => updateField('fuelCostPerKm', e.target.value)}
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 pr-12 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">€/km</span>
+            <label className="text-xs text-slate-400">Trams aplicats</label>
+            <div className="mt-1 flex items-center rounded-xl border border-slate-700/30 bg-slate-900/30 px-3 py-2.5 h-[42px]">
+              <span className="text-sm font-semibold text-cyan-200">{travelBlocks}</span>
             </div>
-            <p className="mt-1 text-[10px] text-slate-600">Recomanat: 0.19 €/km (AEAT 2024)</p>
+            <p className="mt-1 text-[10px] text-slate-500">
+              {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra
+            </p>
+            {fuelReferenceInfo && (
+              <p className="mt-1 text-[10px] text-slate-500">{fuelReferenceInfo}</p>
+            )}
           </div>
           <div>
             <label className="text-xs text-slate-400">Cost desplaçament</label>
             <div className="mt-1 flex items-center rounded-xl border border-slate-700/30 bg-slate-900/30 px-3 py-2.5 h-[42px]">
-              {travelCost > 0 ? (
-                <span className="text-sm font-semibold text-amber-300">{travelCost.toFixed(2)} €</span>
+              {travelCharge > 0 ? (
+                <span className="text-sm font-semibold text-amber-300">{travelCharge.toFixed(2)} €</span>
               ) : (
                 <span className="text-sm text-slate-600">— €</span>
               )}
             </div>
-            {travelCost > 0 && (
+            {travelCharge > 0 && (
               <p className="mt-1 text-[10px] text-slate-500">
-                {parseFloat(form.distanceKm) || 0} km × {parseFloat(form.fuelCostPerKm) || 0.19} €/km
+                {billableKm} km extra → {travelBlocks} trams × {TRAVEL_BLOCK_EUR} €
+              </p>
+            )}
+            {travelCharge === 0 && (parseFloat(form.distanceKm) || 0) > 0 && (
+              <p className="mt-1 text-[10px] text-emerald-300">
+                Dins del tram inclòs ({INCLUDED_TRAVEL_KM} km), cost extra 0 €
               </p>
             )}
           </div>
@@ -809,19 +838,19 @@ export default function NewBookingPage() {
               <span>Total</span>
               <span>{pricing.total.toFixed(2)}€</span>
             </div>
-            {travelCost > 0 && (
+            {pricing.travelCharge > 0 && (
               <div className="flex justify-between text-slate-300">
-                <span>🚗 Desplaçament ({parseFloat(form.distanceKm) || 0} km)</span>
-                <span>+{travelCost.toFixed(2)}€</span>
+                <span>🚗 Desplaçament ({travelBlocks} trams)</span>
+                <span>+{pricing.travelCharge.toFixed(2)}€</span>
               </div>
             )}
             <div className="flex justify-between text-xs text-slate-400 pt-1">
               <span>Senyal (30%)</span>
               <span>{pricing.deposit.toFixed(2)}€</span>
             </div>
-            {travelCost > 0 && (
+            {internalTravelCost > 0 && (
               <p className="text-[11px] text-slate-500 pt-1 border-t border-slate-700/30">
-                * El desplaçament és un cost intern, no s&apos;inclou automàticament al total del client.
+                * Cost intern estimat de transport: {internalTravelCost.toFixed(2)} € (coeficient {DEFAULT_FUEL_COST_PER_KM.toFixed(2)} €/km sobre km extra).
               </p>
             )}
           </div>

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import SyncButton from './SyncButton';
 import { getAllPacks } from '@/config/packs-config';
 import { redirect } from 'next/navigation';
+import { computePackPricingHealth, getPackPricingModelConfig, type PackPricingHealth } from '@/lib/services/packPricingHealth';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +31,16 @@ async function getPacks() {
       include: {
         translations: true,
         inventory: {
-          include: { item: { select: { code: true, name: true } } },
+          include: {
+            item: {
+              select: {
+                code: true,
+                name: true,
+                purchasePrice: true,
+                expectedLifeHours: true,
+              },
+            },
+          },
         },
         _count: {
           select: { bookings: true },
@@ -55,6 +65,7 @@ export default async function PacksPage({
   }
 
   const packs = await getPacks();
+  const pricingConfig = await getPackPricingModelConfig();
   const configPacks = getAllPacks();
   const packsInSync = packs.length === configPacks.length;
   const packsByService = SERVICE_ORDER.map((service) => ({
@@ -63,6 +74,10 @@ export default async function PacksPage({
     packs: packs.filter((pack) => pack.service === service),
   })).filter((group) => group.packs.length > 0);
   const otherPacks = packs.filter((pack) => !pack.service || !SERVICE_ORDER.includes(pack.service));
+  const pricingHealthByPack = new Map<string, PackPricingHealth>(
+    packs.map((pack) => [pack.id, computePackPricingHealth(pack, pricingConfig)])
+  );
+  const pricingAlertsCount = Array.from(pricingHealthByPack.values()).filter((row) => row.hasAlert).length;
 
   return (
     <div className="space-y-6">
@@ -129,6 +144,10 @@ export default async function PacksPage({
             {packs.reduce((sum, p) => sum + p._count.bookings, 0)}
           </p>
         </div>
+        <div className={`rounded-2xl border backdrop-blur-sm p-4 ${pricingAlertsCount > 0 ? 'border-rose-500/30 bg-rose-500/10' : 'border-emerald-500/20 bg-emerald-500/10'}`}>
+          <p className={`text-xs font-medium uppercase ${pricingAlertsCount > 0 ? 'text-rose-300' : 'text-emerald-300'}`}>Alertes de preu pack</p>
+          <p className="mt-2 text-3xl font-bold text-slate-100">{pricingAlertsCount}</p>
+        </div>
       </section>
 
       {/* Packs per categoria */}
@@ -141,6 +160,13 @@ export default async function PacksPage({
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {group.packs.map((pack) => {
               const translation = pack.translations.find((t) => t.locale === 'es') || pack.translations[0];
+              const health = pricingHealthByPack.get(pack.id);
+              const divergence = health?.divergencePct ?? 0;
+              const divergenceColor = health?.hasAlert
+                ? 'text-rose-300 border-rose-400/35 bg-rose-950/20'
+                : Math.abs(divergence) >= pricingConfig.alertDivergencePct * 0.5
+                  ? 'text-orange-300 border-orange-400/35 bg-orange-950/20'
+                  : 'text-emerald-300 border-emerald-400/35 bg-emerald-950/20';
               return (
                 <div
                   key={pack.id}
@@ -189,6 +215,26 @@ export default async function PacksPage({
                         +{pack.extraHourPrice}€/hora extra
                       </span>
                     </div>
+                    {health && (
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
+                          <p className="text-slate-400">Preu recomanat</p>
+                          <p className="text-sm font-semibold text-cyan-200">{health.recommendedPrice.toFixed(2)}€</p>
+                        </div>
+                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
+                          <p className="text-slate-400">Preu públic</p>
+                          <p className="text-sm font-semibold text-slate-100">{health.publicPrice.toFixed(2)}€</p>
+                        </div>
+                        <div className={`col-span-2 rounded-lg border p-2 ${divergenceColor}`}>
+                          <p className="font-semibold">
+                            Divergència: {health.divergencePct >= 0 ? '+' : ''}{health.divergencePct.toFixed(1)}%
+                          </p>
+                          {health.hasAlert && (
+                            <p className="text-[11px] text-rose-200">⚠ Revisa preu: fora del llindar ({pricingConfig.alertDivergencePct}%)</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex items-center gap-2 text-slate-300">
@@ -255,6 +301,13 @@ export default async function PacksPage({
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {otherPacks.map((pack) => {
               const translation = pack.translations.find((t) => t.locale === 'es') || pack.translations[0];
+              const health = pricingHealthByPack.get(pack.id);
+              const divergence = health?.divergencePct ?? 0;
+              const divergenceColor = health?.hasAlert
+                ? 'text-rose-300 border-rose-400/35 bg-rose-950/20'
+                : Math.abs(divergence) >= pricingConfig.alertDivergencePct * 0.5
+                  ? 'text-orange-300 border-orange-400/35 bg-orange-950/20'
+                  : 'text-emerald-300 border-emerald-400/35 bg-emerald-950/20';
               return (
                 <div
                   key={pack.id}
@@ -303,6 +356,26 @@ export default async function PacksPage({
                         +{pack.extraHourPrice}€/hora extra
                       </span>
                     </div>
+                    {health && (
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
+                          <p className="text-slate-400">Preu recomanat</p>
+                          <p className="text-sm font-semibold text-cyan-200">{health.recommendedPrice.toFixed(2)}€</p>
+                        </div>
+                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
+                          <p className="text-slate-400">Preu públic</p>
+                          <p className="text-sm font-semibold text-slate-100">{health.publicPrice.toFixed(2)}€</p>
+                        </div>
+                        <div className={`col-span-2 rounded-lg border p-2 ${divergenceColor}`}>
+                          <p className="font-semibold">
+                            Divergència: {health.divergencePct >= 0 ? '+' : ''}{health.divergencePct.toFixed(1)}%
+                          </p>
+                          {health.hasAlert && (
+                            <p className="text-[11px] text-rose-200">⚠ Revisa preu: fora del llindar ({pricingConfig.alertDivergencePct}%)</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex items-center gap-2 text-slate-300">

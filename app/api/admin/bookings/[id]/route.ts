@@ -8,6 +8,8 @@ import { requireAuth, requirePermission } from '@/lib/auth';
 import { getRequestId } from '@/lib/request-context';
 import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
 import { calculateEventDuration } from '@/lib/inventory-utils';
+import { calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
+import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 
 interface Params {
   params: { id: string };
@@ -147,6 +149,26 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     delete body.endTime;
     delete body.totalPrice;
     delete body.internalNotes;
+
+    // Recalcular cost de desplaçament sempre que es toquin camps de viatge
+    const travelFieldTouched =
+      Object.prototype.hasOwnProperty.call(body, 'distanceKm') ||
+      Object.prototype.hasOwnProperty.call(body, 'fuelCostPerKm') ||
+      Object.prototype.hasOwnProperty.call(body, 'travelCost');
+
+    if (travelFieldTouched) {
+      const fuelReference = await getFuelCostPerKmReference();
+      const distanceKm = Object.prototype.hasOwnProperty.call(body, 'distanceKm')
+        ? sanitizeNonNegative(body.distanceKm as number, 0)
+        : sanitizeNonNegative(existing.distanceKm ?? 0, 0);
+      const fuelCostPerKm = Object.prototype.hasOwnProperty.call(body, 'fuelCostPerKm')
+        ? sanitizeNonNegative(body.fuelCostPerKm as number, fuelReference.costPerKm)
+        : sanitizeNonNegative(existing.fuelCostPerKm ?? fuelReference.costPerKm, DEFAULT_FUEL_COST_PER_KM);
+
+      body.distanceKm = distanceKm;
+      body.fuelCostPerKm = fuelCostPerKm;
+      body.travelCost = calculateTravelCost(distanceKm, fuelCostPerKm);
+    }
 
     const oldStatus = existing.status;
     const newStatus = body.status as string | undefined;

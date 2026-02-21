@@ -99,6 +99,8 @@ export default async function InventoryItemPage({ params }: PageProps) {
   const currentValue = calculateCurrentValue(item.purchasePrice, item.totalHoursUsed, item.expectedLifeHours);
   const costPerHour = calculateCostPerHour(item.purchasePrice, item.expectedLifeHours);
   const lifeRemaining = calculateLifeRemainingPercent(item.totalHoursUsed, item.expectedLifeHours);
+  const expectedLifeHours = item.expectedLifeHours || 2000;
+  const remainingHours = Math.max(0, expectedLifeHours - item.totalHoursUsed);
 
   return (
     <div className="space-y-6">
@@ -156,11 +158,19 @@ export default async function InventoryItemPage({ params }: PageProps) {
           <p className="mt-2 text-3xl font-bold text-slate-100">
             {item.purchasePrice ? `${costPerHour.toLocaleString('ca-ES')}€` : '—'}
           </p>
+          {item.purchasePrice && (
+            <p className="text-xs text-slate-500 mt-1">
+              {item.purchasePrice.toLocaleString('ca-ES')}€ / {expectedLifeHours.toLocaleString('ca-ES')}h
+            </p>
+          )}
         </div>
         <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-4">
           <p className="text-xs font-medium text-emerald-400 uppercase">Vida Restant</p>
           <p className="mt-2 text-3xl font-bold text-slate-100">
             {lifeRemaining}%
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            {remainingHours.toLocaleString('ca-ES')}h útils aproximades
           </p>
           {/* Barra de progrés */}
           <div className="mt-2 h-2 w-full rounded-full bg-slate-700">
@@ -172,6 +182,16 @@ export default async function InventoryItemPage({ params }: PageProps) {
               style={{ width: `${lifeRemaining}%` }}
             />
           </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-900/40 p-4">
+        <h2 className="text-sm font-semibold text-slate-200">Com es calcula l&apos;amortització</h2>
+        <div className="mt-2 grid gap-2 text-xs text-slate-400 sm:grid-cols-2">
+          <p>Cost/hora = Cost de compra ÷ Vida útil (hores).</p>
+          <p>Valor actual = Cost de compra × (% vida restant).</p>
+          <p>Hores restants = Vida útil estimada − Hores acumulades.</p>
+          <p>Aquest càlcul et dona una referència de cost real d&apos;ús per reserva.</p>
         </div>
       </section>
 

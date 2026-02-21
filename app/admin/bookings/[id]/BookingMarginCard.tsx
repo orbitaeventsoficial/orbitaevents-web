@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
+import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 
 interface BookingMarginProps {
   bookingId: string;
@@ -17,6 +18,8 @@ interface BookingMarginProps {
   source: string;
   eventLocation?: string | null;
   eventVenue?: string | null;
+  inventoryCostReal?: number | null;
+  inventoryHours?: number | null;
 }
 
 // Default ratios (must match profitabilityService defaults)
@@ -42,22 +45,34 @@ export default function BookingMarginCard({
   source,
   eventLocation,
   eventVenue,
+  inventoryCostReal,
+  inventoryHours,
 }: BookingMarginProps) {
   const router = useRouter();
 
   // Editable travel fields
   const [distanceKm, setDistanceKm] = useState(initialDistanceKm ?? 0);
-  const [fuelCostPerKm, setFuelCostPerKm] = useState(initialFuelCostPerKm ?? 0.19);
+  const [fuelCostPerKm] = useState(initialFuelCostPerKm ?? DEFAULT_FUEL_COST_PER_KM);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [calculatingDistance, setCalculatingDistance] = useState(false);
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
 
-  const calculatedTravelCost = Math.round(distanceKm * fuelCostPerKm * 100) / 100;
+  const billableKm = calculateBillableTravelKm(distanceKm, INCLUDED_TRAVEL_KM);
+  const travelBlocks = calculateTravelBlocks(distanceKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM);
+  const calculatedTravelCost = calculateTravelCost(distanceKm, fuelCostPerKm, INCLUDED_TRAVEL_KM);
+  const calculatedTravelCharge = calculateTravelCharge(distanceKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
+  const travelNetMargin = calculatedTravelCharge - calculatedTravelCost;
+  const travelMarginPct = calculatedTravelCharge > 0 ? (travelNetMargin / calculatedTravelCharge) * 100 : 0;
+
+  const packEstimatedCost = packPrice * DEFAULT_PACK_COST_RATIO;
+  const packCostUsed = typeof inventoryCostReal === 'number' && inventoryCostReal > 0
+    ? inventoryCostReal
+    : packEstimatedCost;
 
   // Margin calculation
   const directCost =
-    packPrice * DEFAULT_PACK_COST_RATIO +
+    packCostUsed +
     extrasTotal * DEFAULT_EXTRA_COST_RATIO +
     extraHours * extraHourPrice * DEFAULT_EXTRA_HOUR_COST_RATIO +
     DEFAULT_FIXED_OPERATIONAL_COST +
@@ -77,6 +92,21 @@ export default function BookingMarginCard({
     marginPct >= 30 ? 'border-amber-400/30 bg-amber-950/30' :
     marginPct >= 15 ? 'border-orange-400/30 bg-orange-950/30' :
     'border-rose-400/30 bg-rose-950/30';
+
+  const travelMarginColor =
+    travelMarginPct >= 45 ? 'text-emerald-300' :
+    travelMarginPct >= 20 ? 'text-orange-300' :
+    'text-rose-300';
+
+  const travelMarginCardBorder =
+    travelMarginPct >= 45 ? 'border-emerald-400/30' :
+    travelMarginPct >= 20 ? 'border-orange-400/30' :
+    'border-rose-400/30';
+
+  const travelMarginCardBg =
+    travelMarginPct >= 45 ? 'bg-emerald-950/20' :
+    travelMarginPct >= 20 ? 'bg-orange-950/20' :
+    'bg-rose-950/20';
 
   const handleSave = useCallback(async () => {
     setSaving(true);
@@ -138,8 +168,7 @@ export default function BookingMarginCard({
   }, [eventLocation, eventVenue]);
 
   const hasChanged =
-    distanceKm !== (initialDistanceKm ?? 0) ||
-    fuelCostPerKm !== (initialFuelCostPerKm ?? 0.19);
+    distanceKm !== (initialDistanceKm ?? 0);
 
   return (
     <section className={`rounded-xl border shadow-sm p-6 ${marginBg}`}>
@@ -170,8 +199,12 @@ export default function BookingMarginCard({
       {/* Cost breakdown */}
       <div className="text-sm text-slate-400 space-y-1 mb-6 border-t border-white/10 pt-4">
         <div className="flex justify-between">
-          <span>Pack ({(DEFAULT_PACK_COST_RATIO * 100).toFixed(0)}% de {formatCurrency(packPrice)})</span>
-          <span className="text-slate-300">{formatCurrency(packPrice * DEFAULT_PACK_COST_RATIO)}</span>
+          <span>
+            {typeof inventoryCostReal === 'number' && inventoryCostReal > 0
+              ? `Pack (inventari real${inventoryHours ? ` · ${inventoryHours.toFixed(1)}h` : ''})`
+              : `Pack (${(DEFAULT_PACK_COST_RATIO * 100).toFixed(0)}% de ${formatCurrency(packPrice)})`}
+          </span>
+          <span className="text-slate-300">{formatCurrency(packCostUsed)}</span>
         </div>
         {extrasTotal > 0 && (
           <div className="flex justify-between">
@@ -190,14 +223,27 @@ export default function BookingMarginCard({
           <span className="text-slate-300">{formatCurrency(DEFAULT_FIXED_OPERATIONAL_COST)}</span>
         </div>
         <div className="flex justify-between">
-          <span>Desplaçament ({distanceKm} km × {fuelCostPerKm}€/km)</span>
+          <span>Desplaçament ({travelBlocks} trams de {TRAVEL_BLOCK_KM} km)</span>
           <span className="text-amber-300">{formatCurrency(calculatedTravelCost)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Suplement client ({travelBlocks} trams)</span>
+          <span className="text-cyan-300">{formatCurrency(calculatedTravelCharge)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Marge transport</span>
+          <span className={travelMarginColor}>
+            {formatCurrency(travelNetMargin)} {calculatedTravelCharge > 0 ? `(${travelMarginPct.toFixed(1)}%)` : ''}
+          </span>
         </div>
       </div>
 
       {/* Editable travel fields */}
       <div className="border-t border-white/10 pt-4">
         <h3 className="text-sm font-semibold text-slate-300 mb-3">🚗 Desplaçament (editable)</h3>
+        <p className="mb-3 text-xs text-emerald-300">
+          Inclòs: {INCLUDED_TRAVEL_KM} km totals (25 anada + 25 tornada). Després: {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra.
+        </p>
         <div className="grid gap-3 sm:grid-cols-3">
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-1">Distància (km)</label>
@@ -211,21 +257,40 @@ export default function BookingMarginCard({
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">€/km (AEAT)</label>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={fuelCostPerKm}
-              onChange={(e) => setFuelCostPerKm(Number(e.target.value) || 0)}
-              className="w-full px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-slate-200 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            />
+            <label className="block text-xs font-medium text-slate-400 mb-1">Km extra</label>
+            <div className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-slate-200 text-sm">
+              {billableKm} km
+            </div>
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-1">Cost viatge</label>
             <div className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-amber-300 text-sm font-bold">
               {formatCurrency(calculatedTravelCost)}
             </div>
+            <p className="mt-1 text-[11px] text-slate-400">
+              {travelBlocks} trams × {TRAVEL_BLOCK_EUR} €
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-slate-400">Cost benzina intern</p>
+            <p className="text-sm font-semibold text-amber-300">{formatCurrency(calculatedTravelCost)}</p>
+            <p className="text-[11px] text-slate-500">{billableKm} km × {fuelCostPerKm.toFixed(2)} €/km</p>
+          </div>
+          <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+            <p className="text-[11px] uppercase tracking-wide text-slate-400">Ingressos transport</p>
+            <p className="text-sm font-semibold text-cyan-300">{formatCurrency(calculatedTravelCharge)}</p>
+            <p className="text-[11px] text-slate-500">{travelBlocks} trams × {TRAVEL_BLOCK_EUR} €</p>
+          </div>
+          <div className={`rounded-lg border p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
+            <p className="text-[11px] uppercase tracking-wide text-slate-400">Marge real transport</p>
+            <p className={`text-sm font-semibold ${travelMarginColor}`}>
+              {formatCurrency(travelNetMargin)}
+            </p>
+            <p className="text-[11px] text-slate-500">
+              {calculatedTravelCharge > 0 ? `${travelMarginPct.toFixed(1)}% de marge` : 'Sense suplement aplicat'}
+            </p>
           </div>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">

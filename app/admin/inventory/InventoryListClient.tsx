@@ -326,6 +326,11 @@ export default function InventoryListClient() {
                     <span>{item.value.toLocaleString('ca-ES')}€</span>
                     <span>{item.totalHoursUsed}h</span>
                   </div>
+                  {item.purchasePrice && (
+                    <p className="text-[11px] text-slate-500">
+                      Resten aprox. {Math.max(0, (item.expectedLifeHours || 2000) - item.totalHoursUsed).toFixed(0)}h útils
+                    </p>
+                  )}
                   {/* Barra de vida */}
                   <div className="h-1.5 w-full rounded-full bg-slate-700">
                     <div
@@ -393,7 +398,14 @@ export default function InventoryListClient() {
                         {item.value.toLocaleString('ca-ES')}€
                       </td>
                       <td className="px-4 py-3 text-slate-300">
-                        {item.totalHoursUsed > 0 ? `${item.totalHoursUsed}h` : '—'}
+                        <div className="text-xs">
+                          <p>{item.totalHoursUsed > 0 ? `${item.totalHoursUsed}h` : '—'}</p>
+                          {item.purchasePrice && (
+                            <p className="text-slate-500">
+                              ↓ {Math.max(0, (item.expectedLifeHours || 2000) - item.totalHoursUsed).toFixed(0)}h restants
+                            </p>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3">
                         <select

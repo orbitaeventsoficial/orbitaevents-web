@@ -7,6 +7,7 @@ import {
   markPortalAccessHit,
   normalizePortalLocale,
 } from '@/lib/services/clientPortalAccess';
+import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -41,9 +42,11 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     eventGuests: 'Convidats',
     travel: 'Desplaçament',
     travelDistance: 'Distància',
-    travelRate: 'Cost per km',
+    travelRate: 'Model de cost',
     travelEstimated: 'Cost estimat',
     travelRoundTripFrom: 'Anada i tornada des de',
+    travelIncluded: 'Inclòs',
+    travelExtraKm: 'Km extra',
     backHome: 'Anar al web principal',
   },
   es: {
@@ -68,9 +71,11 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     eventGuests: 'Invitados',
     travel: 'Desplazamiento',
     travelDistance: 'Distancia',
-    travelRate: 'Coste por km',
+    travelRate: 'Modelo de coste',
     travelEstimated: 'Coste estimado',
     travelRoundTripFrom: 'Ida y vuelta desde',
+    travelIncluded: 'Incluido',
+    travelExtraKm: 'Km extra',
     backHome: 'Ir a la web principal',
   },
   en: {
@@ -95,9 +100,11 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     eventGuests: 'Guests',
     travel: 'Travel',
     travelDistance: 'Distance',
-    travelRate: 'Cost per km',
+    travelRate: 'Cost model',
     travelEstimated: 'Estimated cost',
     travelRoundTripFrom: 'Round trip from',
+    travelIncluded: 'Included',
+    travelExtraKm: 'Extra km',
     backHome: 'Back to main site',
   },
 };
@@ -204,6 +211,10 @@ export default async function ClientPortalPage({
       translations: Array<{ locale: string; name: string; tagline?: string | null }>;
     };
   }>;
+  const totalTravelKm = typeof booking.distanceKm === 'number' ? booking.distanceKm : 0;
+  const billableTravelKm = calculateBillableTravelKm(totalTravelKm, INCLUDED_TRAVEL_KM);
+  const travelBlocks = calculateTravelBlocks(totalTravelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM);
+  const travelCharge = calculateTravelCharge(totalTravelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
@@ -238,16 +249,18 @@ export default async function ClientPortalPage({
             <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm">
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
                 <p className="text-slate-400">{t.travelDistance}</p>
-                <p>{formatDistanceKm(booking.distanceKm)} km</p>
+                <p>{formatDistanceKm(totalTravelKm)} km</p>
                 <p className="text-xs text-slate-500">{t.travelRoundTripFrom} Granollers</p>
+                <p className="text-xs text-emerald-300">{t.travelIncluded}: {INCLUDED_TRAVEL_KM} km</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
                 <p className="text-slate-400">{t.travelRate}</p>
-                <p>{typeof booking.fuelCostPerKm === 'number' ? `${booking.fuelCostPerKm.toFixed(2)} €/km` : '—'}</p>
+                <p>{TRAVEL_BLOCK_EUR} € / {TRAVEL_BLOCK_KM} km extra</p>
+                <p className="text-xs text-slate-400">{t.travelExtraKm}: {formatDistanceKm(billableTravelKm)} km ({travelBlocks} trams)</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/5 p-3">
                 <p className="text-slate-400">{t.travelEstimated}</p>
-                <p>{typeof booking.travelCost === 'number' ? formatCurrency(booking.travelCost) : '—'}</p>
+                <p>{formatCurrency(travelCharge)}</p>
               </div>
             </div>
           </section>

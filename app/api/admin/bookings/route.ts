@@ -8,6 +8,8 @@ import { getRequestId } from '@/lib/request-context';
 import { safeParseInt } from '@/lib/utils';
 import { z } from 'zod';
 import { BookingStatus, EventType } from '@prisma/client';
+import { calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
+import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 
 export const dynamic = 'force-dynamic';
 
@@ -207,7 +209,19 @@ export async function POST(req: NextRequest) {
     const packPrice = pack.price;
     const extraHoursPrice = (data.extraHours || 0) * pack.extraHourPrice;
     const extrasPrice = data.extras?.reduce((sum, e) => sum + e.price * (e.quantity || 1), 0) || 0;
-    const subtotal = packPrice + extraHoursPrice + extrasPrice;
+    const subtotalBase = packPrice + extraHoursPrice + extrasPrice;
+    const distanceKm = data.distanceKm != null ? sanitizeNonNegative(data.distanceKm, 0) : null;
+    const fuelReference = await getFuelCostPerKmReference();
+    const effectiveFuelCostPerKm = sanitizeNonNegative(
+      data.fuelCostPerKm ?? fuelReference.costPerKm,
+      DEFAULT_FUEL_COST_PER_KM
+    );
+    const fuelCostPerKm = effectiveFuelCostPerKm;
+    const travelCost = distanceKm != null
+      ? calculateTravelCost(distanceKm, fuelCostPerKm)
+      : null;
+    const travelCharge = distanceKm != null ? calculateTravelCharge(distanceKm) : 0;
+    const subtotal = subtotalBase + travelCharge;
     const discount = data.discount || 0;
     const vatRate = 21;
     const baseAfterDiscount = subtotal - discount;
@@ -234,9 +248,9 @@ export async function POST(req: NextRequest) {
         guestCount: data.guestCount,
         packId: data.packId,
         extraHours: data.extraHours || 0,
-        distanceKm: data.distanceKm ?? null,
-        fuelCostPerKm: data.fuelCostPerKm ?? null,
-        travelCost: data.travelCost ?? null,
+        distanceKm,
+        fuelCostPerKm,
+        travelCost,
         subtotal,
         discount,
         discountCode: data.discountCode,
