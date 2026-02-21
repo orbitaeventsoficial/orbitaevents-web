@@ -1899,3 +1899,98 @@ html.admin-mode .admin-shell.admin-unified :is(
   text-shadow: none !important;
   animation: none !important;
 }
+
+/* ==========================================================================
+   ADMIN GLOBAL ENFORCER - aplica visual unificat a TOT /admin
+   ========================================================================== */
+html.admin-mode .admin-shell,
+body.admin-mode .admin-shell {
+  --admin-solid-1: #111111;
+  --admin-solid-2: #0d0d0d;
+  --admin-solid-3: #090909;
+  --admin-solid-border-1: #262626;
+  --admin-solid-border-2: #1f1f1f;
+  --admin-solid-border-3: #191919;
+}
+
+/* Nivell 1 (contenidor principal de cada pàgina) */
+html.admin-mode .admin-shell > :is(
+  section,
+  article,
+  aside,
+  .panel,
+  .card,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl
+) {
+  background: var(--admin-solid-1) !important;
+  border-color: var(--admin-solid-border-1) !important;
+}
+
+/* Nivell 2 (targetes internes) */
+html.admin-mode .admin-shell > :is(
+  section,
+  article,
+  aside,
+  .panel,
+  .card,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl
+) :is(
+  section,
+  article,
+  aside,
+  .panel,
+  .card,
+  .rounded-lg,
+  .rounded-xl,
+  .rounded-2xl
+) {
+  background: var(--admin-solid-2) !important;
+  border-color: var(--admin-solid-border-2) !important;
+}
+
+/* Nivell 3 (microcards / subblocs) */
+html.admin-mode .admin-shell > :is(
+  section,
+  article,
+  aside,
+  .panel,
+  .card,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl
+) :is(
+  section,
+  article,
+  aside,
+  .panel,
+  .card,
+  .rounded-lg,
+  .rounded-xl,
+  .rounded-2xl
+) :is(
+  section,
+  article,
+  aside,
+  .panel,
+  .card,
+  .rounded-md,
+  .rounded-lg,
+  .rounded-xl
+) {
+  background: var(--admin-solid-3) !important;
+  border-color: var(--admin-solid-border-3) !important;
+}
+
+/* Força eliminar gradients de Tailwind dins admin */
+html.admin-mode .admin-shell :is(
+  [class*='bg-gradient'],
+  [class*='from-'],
+  [class*='via-'],
+  [class*='to-']
+) {
+  background-image: none !important;
+}
