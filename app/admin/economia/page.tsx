@@ -2,7 +2,8 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { buildProfitabilityReport, normalizeProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { deriveFlowStatus } from '@/lib/services/communicationStatusService';
-import { getPackPricingModelConfigEditable, type PackPricingModelConfig } from '@/lib/services/packPricingHealth';
+import { calculateCostPerHour } from '@/lib/inventory-utils';
+import { computePackPricingHealth, getPackPricingModelConfigEditable, type PackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import EconomiaClient from './EconomiaClient';
 
 export const dynamic = 'force-dynamic';
@@ -246,6 +247,94 @@ export default async function EconomiaPage() {
 
   const defaultConfig = normalizeProfitabilityConfig(null);
   const packPricingConfig = await getPackPricingModelConfigEditable();
+  const packsForPricing = await prisma.pack.findMany({
+    where: { isActive: true },
+    orderBy: [{ service: 'asc' }, { price: 'asc' }],
+    select: {
+      id: true,
+      slug: true,
+      service: true,
+      price: true,
+      extraHourPrice: true,
+      djHours: true,
+      maxGuests: true,
+      soundWatts: true,
+      translations: {
+        select: {
+          locale: true,
+          name: true,
+        },
+      },
+      inventory: {
+        select: {
+          quantity: true,
+          item: {
+            select: {
+              name: true,
+              purchasePrice: true,
+              expectedLifeHours: true,
+            },
+          },
+        },
+        orderBy: {
+          item: { name: 'asc' },
+        },
+      },
+    },
+  }).catch(() => []);
+
+  const packPricingRows = packsForPricing
+    .map((pack) => {
+      const health = computePackPricingHealth(pack, {
+        ...packPricingConfig,
+        specialistServices: new Set(packPricingConfig.specialistServices),
+      });
+      const inventoryCostPerHour = pack.inventory.reduce((sum, row) => {
+        const itemPerHour = calculateCostPerHour(row.item.purchasePrice, row.item.expectedLifeHours);
+        return sum + (itemPerHour * Math.max(1, row.quantity));
+      }, 0);
+      const directCost = (inventoryCostPerHour * Math.max(1, pack.djHours))
+        + (health.laborCostPerHourUsed * Math.max(1, pack.djHours))
+        + packPricingConfig.fixedPackCost;
+      const profit = health.publicPrice - directCost;
+      const marginPct = health.publicPrice > 0 ? (profit / health.publicPrice) : 0;
+      const extraHourCostEstimated = inventoryCostPerHour + health.laborCostPerHourUsed;
+      const extraHourProfit = health.publicExtraHourPrice - extraHourCostEstimated;
+      const extraHourMarginPct = health.publicExtraHourPrice > 0 ? (extraHourProfit / health.publicExtraHourPrice) : 0;
+      const preferredTranslation = pack.translations.find((row) => row.locale === 'ca')
+        || pack.translations.find((row) => row.locale === 'es')
+        || pack.translations[0];
+      return {
+        id: pack.id,
+        name: preferredTranslation?.name || pack.slug,
+        slug: pack.slug,
+        service: pack.service || 'general',
+        price: health.publicPrice,
+        recommendedPrice: health.recommendedPrice,
+        directCost,
+        profit,
+        marginPct,
+        extraHourPrice: health.publicExtraHourPrice,
+        recommendedExtraHourPrice: health.recommendedExtraHourPrice,
+        extraHourCostEstimated,
+        extraHourProfit,
+        extraHourMarginPct,
+        divergencePct: health.divergencePct,
+        extraHourDivergencePct: health.extraHourDivergencePct,
+        hasAlert: health.hasAlert,
+      };
+    })
+    .sort((a, b) => a.marginPct - b.marginPct);
+
+  const packPricingSummary = packPricingRows.reduce(
+    (acc, row) => {
+      if (row.marginPct >= packPricingConfig.marginTargetPct) acc.healthy += 1;
+      else if (row.marginPct >= packPricingConfig.marginTargetPct - 0.08) acc.warning += 1;
+      else acc.critical += 1;
+      return acc;
+    },
+    { healthy: 0, warning: 0, critical: 0 }
+  );
   const packPricingHistoryLogs = await prisma.adminLog.findMany({
     where: {
       entity: 'setting',
@@ -285,6 +374,8 @@ export default async function EconomiaPage() {
       bySource={report?.bySource ?? []}
       config={report?.config ?? defaultConfig}
       packPricingConfig={packPricingConfig}
+      packPricingRows={packPricingRows}
+      packPricingSummary={packPricingSummary}
       packPricingHistoryEntries={packPricingHistoryEntries}
       historyEntries={historyEntries}
       inventoryValue={inventoryValue}

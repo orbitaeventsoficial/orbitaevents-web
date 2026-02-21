@@ -66,6 +66,26 @@ interface HistoryEntry {
   after: ProfitabilityConfig;
 }
 
+interface PackPricingRow {
+  id: string;
+  name: string;
+  slug: string;
+  service: string;
+  price: number;
+  recommendedPrice: number;
+  directCost: number;
+  profit: number;
+  marginPct: number;
+  extraHourPrice: number;
+  recommendedExtraHourPrice: number;
+  extraHourCostEstimated: number;
+  extraHourProfit: number;
+  extraHourMarginPct: number;
+  divergencePct: number;
+  extraHourDivergencePct: number;
+  hasAlert: boolean;
+}
+
 interface EconomiaClientProps {
   outstandingTotal: number;
   overdueTotal: number;
@@ -82,6 +102,12 @@ interface EconomiaClientProps {
   bySource: BySourceRow[];
   config: ProfitabilityConfig;
   packPricingConfig: PackPricingModelConfig;
+  packPricingRows: PackPricingRow[];
+  packPricingSummary: {
+    healthy: number;
+    warning: number;
+    critical: number;
+  };
   packPricingHistoryEntries: Array<{
     id: string;
     createdAt: string;
@@ -124,6 +150,28 @@ function paymentStateBadge(paid: boolean) {
   return paid
     ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200'
     : 'border-rose-500/40 bg-rose-500/15 text-rose-200';
+}
+
+function packMarginBadge(marginPct: number, targetMarginPct: number) {
+  if (marginPct >= targetMarginPct) {
+    return {
+      label: 'Sa',
+      cls: 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200',
+      dot: 'bg-emerald-400',
+    };
+  }
+  if (marginPct >= (targetMarginPct - 0.08)) {
+    return {
+      label: 'Vigilar',
+      cls: 'border-amber-500/40 bg-amber-500/15 text-amber-200',
+      dot: 'bg-amber-400',
+    };
+  }
+  return {
+    label: 'Crític',
+    cls: 'border-rose-500/40 bg-rose-500/15 text-rose-200',
+    dot: 'bg-rose-400',
+  };
 }
 
 // ─── Tabs ────────────────────────────────────────────────────────────────────
@@ -897,6 +945,82 @@ export default function EconomiaClient(props: EconomiaClientProps) {
           {/* ═══════════ CONFIG ═══════════ */}
           {activeTab === 'config' && (
             <>
+              <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-sm">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-100">Semàfor de packs (clar)</h2>
+                    <p className="text-xs text-slate-400">
+                      Mostra PVP, hora extra, cost estimat i benefici real estimat per pack.
+                    </p>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Objectiu marge pack: <span className="font-semibold text-slate-200">{pct(props.packPricingConfig.marginTargetPct)}</span>
+                  </p>
+                </div>
+
+                <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                  <article className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-3">
+                    <p className="text-xs text-emerald-200">Sa</p>
+                    <p className="text-xl font-black text-emerald-100">{props.packPricingSummary.healthy}</p>
+                  </article>
+                  <article className="rounded-xl border border-amber-500/25 bg-amber-500/10 p-3">
+                    <p className="text-xs text-amber-200">Vigilar</p>
+                    <p className="text-xl font-black text-amber-100">{props.packPricingSummary.warning}</p>
+                  </article>
+                  <article className="rounded-xl border border-rose-500/25 bg-rose-500/10 p-3">
+                    <p className="text-xs text-rose-200">Crític</p>
+                    <p className="text-xl font-black text-rose-100">{props.packPricingSummary.critical}</p>
+                  </article>
+                </div>
+
+                <div className="mt-4 overflow-x-auto rounded-xl border border-white/10">
+                  <table className="min-w-[1250px] w-full text-sm">
+                    <thead className="bg-slate-900/80">
+                      <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+                        <th className="px-3 py-2">Pack</th>
+                        <th className="px-3 py-2">Semàfor</th>
+                        <th className="px-3 py-2 text-right">PVP</th>
+                        <th className="px-3 py-2 text-right">Cost estimat</th>
+                        <th className="px-3 py-2 text-right">Benefici</th>
+                        <th className="px-3 py-2 text-right">Marge</th>
+                        <th className="px-3 py-2 text-right">Hora extra</th>
+                        <th className="px-3 py-2 text-right">Cost/h extra</th>
+                        <th className="px-3 py-2 text-right">Benefici/h extra</th>
+                        <th className="px-3 py-2 text-right">Marge h extra</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/10 bg-slate-950/40">
+                      {props.packPricingRows.map((row) => {
+                        const badge = packMarginBadge(row.marginPct, props.packPricingConfig.marginTargetPct);
+                        return (
+                          <tr key={row.id} className="hover:bg-white/[0.03]">
+                            <td className="px-3 py-2">
+                              <Link href={`/admin/packs/${row.id}`} className="font-semibold text-slate-100 hover:text-cyan-200">
+                                {row.name}
+                              </Link>
+                              <p className="text-[11px] text-slate-500">{row.slug} · {row.service}</p>
+                            </td>
+                            <td className="px-3 py-2">
+                              <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${badge.cls}`}>
+                                <span className={`inline-block h-2 w-2 rounded-full ${badge.dot}`} />
+                                {badge.label}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2 text-right text-cyan-200">{money(row.price)}</td>
+                            <td className="px-3 py-2 text-right text-slate-200">{money(row.directCost)}</td>
+                            <td className={`px-3 py-2 text-right font-semibold ${row.profit >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>{money(row.profit)}</td>
+                            <td className="px-3 py-2 text-right text-slate-100">{pct(row.marginPct)}</td>
+                            <td className="px-3 py-2 text-right text-cyan-200">{money(row.extraHourPrice)}</td>
+                            <td className="px-3 py-2 text-right text-slate-300">{money(row.extraHourCostEstimated)}</td>
+                            <td className={`px-3 py-2 text-right font-semibold ${row.extraHourProfit >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>{money(row.extraHourProfit)}</td>
+                            <td className="px-3 py-2 text-right text-slate-200">{pct(row.extraHourMarginPct)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
               <PackPricingModelEditor initial={props.packPricingConfig} />
               <PackPricingModelHistory entries={props.packPricingHistoryEntries} />
               <ProfitabilityConfigEditor initial={props.config} />
