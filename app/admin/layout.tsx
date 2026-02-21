@@ -58,18 +58,21 @@ function SidebarItem({
       onFocus={() => onPrefetch?.(href)}
       aria-current={isActive ? 'page' : undefined}
       className={`
-        flex items-center gap-3 px-3 py-3 rounded-xl
-        transition-all duration-200 group active:scale-[0.98]
+        relative flex items-center gap-3 px-3 py-2.5 rounded-xl min-w-0
+        border transition-all duration-200 group active:scale-[0.98]
         ${isActive
-          ? 'bg-slate-800 text-white shadow-sm'
-          : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
+          ? 'border-amber-400/45 bg-amber-500/10 text-amber-100 shadow-sm shadow-amber-500/10'
+          : 'border-transparent text-slate-400 hover:text-slate-100 hover:bg-slate-800/70'
         }
       `}
     >
-      <span className="text-lg w-6 text-center">{icon}</span>
-      <span className="flex-1 font-medium text-sm">{label}</span>
+      {isActive && (
+        <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-full bg-amber-400" />
+      )}
+      <span className="text-lg w-6 text-center shrink-0">{icon}</span>
+      <span className="min-w-0 flex-1 truncate font-medium text-sm leading-tight">{label}</span>
       {badge && (
-        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${badgeStyles[badgeColor]}`}>
+        <span className={`shrink-0 px-2 py-0.5 text-xs font-semibold rounded-full ${badgeStyles[badgeColor]}`}>
           {badge}
         </span>
       )}
@@ -111,10 +114,10 @@ function SidebarSection({
       <button
         type="button"
         onClick={toggle}
-        className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[11px] font-semibold text-slate-400 uppercase tracking-wider hover:bg-slate-800/60"
+        className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800/60"
       >
         <span>{title}</span>
-        <span className={`transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
+        <span className={`text-slate-500 transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
       </button>
       {open && <div className="mt-1 space-y-1">{children}</div>}
     </div>
@@ -143,8 +146,8 @@ function FavoriteChip({
       onFocus={() => onPrefetch?.(href)}
       className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ${
         isActive
-          ? 'bg-amber-500/20 text-amber-200 border border-amber-500/40'
-          : 'bg-slate-800/70 text-slate-300 border border-slate-700 hover:bg-slate-800'
+          ? 'bg-amber-500/20 text-amber-100 border border-amber-500/45'
+          : 'bg-slate-800/80 text-slate-300 border border-slate-700/70 hover:bg-slate-800'
       }`}
     >
       {label}
@@ -529,9 +532,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           {helpModeEnabled && <AdminHelpLegend />}
           {helpModeEnabled && <AdminHelpInspector />}
           {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-zinc-900/95 backdrop-blur-sm border-r border-zinc-700/80 flex-col z-40">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-gradient-to-b from-zinc-900/95 via-zinc-900/95 to-slate-950/95 backdrop-blur-sm border-r border-zinc-700/80 flex-col z-40">
         {/* Logo */}
-        <div className="p-4 border-b border-slate-800">
+        <div className="p-4 border-b border-slate-800/90">
           <Link href="/admin" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30 p-1.5">
               <Image
@@ -554,7 +557,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         {/* Nav */}
         <nav className="flex-1 p-3 overflow-y-auto">
           <div className="mb-4">
-            <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+            <p className="px-3 mb-2 text-[11px] font-semibold text-slate-400">
               Prioritat
             </p>
             <div className="space-y-1">
@@ -565,7 +568,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="mb-4 px-3">
-            <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+            <p className="mb-2 text-[11px] font-semibold text-slate-400">
               Preferits
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -583,7 +586,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
           {recentHrefs.length > 0 && (
             <div className="mb-4 px-3">
-              <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+              <p className="mb-2 text-[11px] font-semibold text-slate-400">
                 Recents
               </p>
               <div className="flex flex-wrap gap-1.5">
@@ -615,9 +618,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Footer */}
-        <div className="p-3 border-t border-slate-800">
-          <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700">
-            <p className="text-[10px] text-slate-400 uppercase tracking-wider">Sistema</p>
+        <div className="p-3 border-t border-slate-800/90">
+          <div className="p-3 rounded-xl bg-slate-800/70 border border-slate-700/80">
+            <p className="text-[11px] text-slate-400">Sistema</p>
             <p className="text-sm text-slate-200 font-medium mt-1">Òrbita Admin</p>
             <p className="text-xs text-slate-400">v2.0 · Prisma + Supabase</p>
           </div>
@@ -639,11 +642,11 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           </svg>
         </button>
 
-        <div className="flex flex-col items-center">
+        <div className="flex min-w-0 flex-col items-center">
           <span className="text-slate-200 font-semibold text-sm">
             <span className="text-amber-300">Òrbita</span> Admin
           </span>
-          <span className="text-[10px] text-slate-400 font-medium">{getPageName()}</span>
+          <span className="max-w-[130px] truncate text-[10px] text-slate-400 font-medium">{getPageName()}</span>
         </div>
 
         <div className="flex items-center gap-1">
@@ -698,7 +701,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <aside
             id="admin-mobile-sidebar"
             aria-label="Menú admin"
-            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-zinc-900 border-r border-zinc-700/80 z-50 overflow-hidden
+            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-gradient-to-b from-zinc-900 to-slate-950 border-r border-zinc-700/80 z-50 overflow-hidden
               transform transition-transform duration-300 ease-out
               ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
           >
@@ -716,7 +719,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 </div>
                 <div>
                   <span className="text-slate-100 font-semibold text-sm">Òrbita Admin</span>
-                  <p className="text-[10px] text-slate-400">Panell de gestió</p>
+                  <p className="text-[11px] text-slate-400">Panell de gestió</p>
                 </div>
               </div>
               <button
@@ -734,7 +737,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             {/* Navegación */}
             <nav className="p-3 overflow-y-auto h-[calc(100%-140px)]">
               <div className="mb-4">
-                <p className="px-3 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                <p className="px-3 mb-2 text-[11px] font-semibold text-slate-400">
                   Prioritat
                 </p>
                 <div className="space-y-0.5">
@@ -751,7 +754,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
               </div>
 
               <div className="mb-4 px-3">
-                <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                <p className="mb-2 text-[11px] font-semibold text-slate-400">
                   Preferits
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -770,7 +773,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
               {recentHrefs.length > 0 && (
                 <div className="mb-4 px-3">
-                  <p className="mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                  <p className="mb-2 text-[11px] font-semibold text-slate-400">
                     Recents
                   </p>
                   <div className="flex flex-wrap gap-1.5">
@@ -887,7 +890,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="lg:pl-64 pt-14 lg:pt-16 pb-20 lg:pb-0 min-h-screen">
-        <div className="admin-shell admin-readable admin-unified p-3 sm:p-4 lg:p-6">
+        <div className="admin-shell admin-readable admin-unified mx-auto w-full max-w-[1700px] p-3 sm:p-4 lg:p-6">
           {children}
         </div>
       </main>

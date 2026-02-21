@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
 type PipelineFilters = {
@@ -30,21 +30,6 @@ export default function LeadViewToggle({
 }) {
   const [view, setView] = useState<'list' | 'pipeline'>('pipeline');
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const saved = window.localStorage.getItem('admin.leads.view');
-    if (saved === 'list' || saved === 'pipeline') {
-      setView(saved);
-    }
-  }, []);
-
-  const setViewAndPersist = (nextView: 'list' | 'pipeline') => {
-    setView(nextView);
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('admin.leads.view', nextView);
-    }
-  };
-
   return (
     <>
       <div className="flex items-center justify-center sm:justify-start gap-2">
@@ -54,7 +39,7 @@ export default function LeadViewToggle({
         <select
           id="lead-view-mode"
           value={view}
-          onChange={(e) => setViewAndPersist(e.target.value === 'pipeline' ? 'pipeline' : 'list')}
+          onChange={(e) => setView(e.target.value === 'pipeline' ? 'pipeline' : 'list')}
           className="rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-1.5 text-xs font-medium text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
         >
           <option value="pipeline">Pipeline</option>

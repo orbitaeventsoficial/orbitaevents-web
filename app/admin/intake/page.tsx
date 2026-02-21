@@ -8,7 +8,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 const SOURCE_OPTIONS = [
   { value: 'PHONE', label: 'Telèfon', icon: '📞' },
@@ -20,8 +19,6 @@ const SOURCE_OPTIONS = [
   { value: 'WEBSITE', label: 'Web', icon: '🌐' },
   { value: 'OTHER', label: 'Altre', icon: '📋' },
 ];
-
-const SOURCE_LABELS = Object.fromEntries(SOURCE_OPTIONS.map((s) => [s.value, s.label])) as Record<string, string>;
 
 const EVENT_TYPES = [
   { value: 'WEDDING', label: 'Casament', icon: '💍' },
@@ -82,7 +79,6 @@ const INITIAL_FORM: FormData = {
 const INTAKE_SOURCE_STORAGE_KEY = 'admin.intake.source';
 
 export default function IntakePage() {
-  const router = useRouter();
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
   const [duplicates, setDuplicates] = useState<DuplicateWarning[]>([]);
   const [checkingDuplicates, setCheckingDuplicates] = useState(false);
@@ -320,8 +316,10 @@ export default function IntakePage() {
                   : 'border-slate-700/50 bg-slate-900/60 text-slate-300 hover:bg-slate-800'
               }`}
             >
-              <span className="text-lg mr-1.5">{src.icon}</span>
-              {src.label}
+              <span className="inline-flex items-center justify-center gap-1.5">
+                <span className="text-lg leading-none">{src.icon}</span>
+                <span className="leading-none">{src.label}</span>
+              </span>
             </button>
           ))}
         </div>
@@ -403,8 +401,8 @@ export default function IntakePage() {
                     : 'border-slate-700/50 bg-slate-900/60 text-slate-400 hover:bg-slate-800'
                 }`}
               >
-                <span className="text-base">{et.icon}</span>
-                <span className="block mt-0.5">{et.label}</span>
+                <span className="text-base leading-none">{et.icon}</span>
+                <span className="block mt-1 leading-tight">{et.label}</span>
               </button>
             ))}
           </div>

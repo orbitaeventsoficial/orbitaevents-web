@@ -219,7 +219,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
             </div>
 
             {/* Cards */}
-            <div className="flex-1 p-2 space-y-2 max-h-[600px] overflow-y-auto">
+            <div className="flex-1 p-2 space-y-2">
               {dragOverStatus === col.status && (
                 <div className={`rounded-xl border border-dashed ${col.borderColor} px-2 py-1 text-center text-[10px] ${col.color}`}>
                   Deixa anar aquí
@@ -284,6 +284,7 @@ function PipelineCard({
   return (
     <div
       draggable={!isUpdating}
+      aria-label={`Lead ${lead.name}`}
       onDragStart={(event) => {
         event.dataTransfer.setData('text/plain', lead.id);
         event.dataTransfer.effectAllowed = 'move';

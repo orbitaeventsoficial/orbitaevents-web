@@ -66,7 +66,7 @@ const SECTIONS: Section[] = [
     id: 'services',
     name: 'Serveis',
     icon: '🎯',
-    description: 'Bodas, fiestas, corporativo, discomóvil',
+    description: 'Bodes, festes, corporatiu, discomòbil',
     color: 'from-green-500 to-emerald-500',
     paths: ['services.', 'weddings.', 'parties.', 'fiestas.', 'corporativo.', 'discomovil.']
   },
@@ -74,7 +74,7 @@ const SECTIONS: Section[] = [
     id: 'packs',
     name: 'Packs i preus',
     icon: '📦',
-    description: 'Descripciones de packs, features, precios',
+    description: 'Descripcions de packs, característiques i preus',
     color: 'from-orange-500 to-amber-500',
     paths: ['packs.', 'pricing.', 'configurator.']
   },
@@ -88,9 +88,9 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'testimonials',
-    name: 'Testimonios',
+    name: 'Testimonis',
     icon: '💬',
-    description: 'Reviews, opiniones, social proof',
+    description: 'Ressenyes, opinions i prova social',
     color: 'from-yellow-500 to-orange-500',
     paths: ['testimonials.', 'reviews.', 'opiniones.']
   },
@@ -98,15 +98,15 @@ const SECTIONS: Section[] = [
     id: 'faq',
     name: 'FAQ',
     icon: '❓',
-    description: 'Preguntas frecuentes',
+    description: 'Preguntes freqüents',
     color: 'from-indigo-500 to-purple-500',
     paths: ['faq.']
   },
   {
     id: 'contact',
-    name: 'Contacto',
+    name: 'Contacte',
     icon: '📧',
-    description: 'Formularios, validaciones, mensajes',
+    description: 'Formularis, validacions i missatges',
     color: 'from-teal-500 to-green-500',
     paths: ['contact.', 'common.validation.']
   },
@@ -114,7 +114,7 @@ const SECTIONS: Section[] = [
     id: 'footer',
     name: 'Footer',
     icon: '🦶',
-    description: 'Pie de página, enlaces legales',
+    description: 'Peu de pàgina i enllaços legals',
     color: 'from-slate-500 to-zinc-500',
     paths: ['footer.', 'legal.']
   },
@@ -146,7 +146,7 @@ const SECTIONS: Section[] = [
     id: 'portfolio',
     name: 'Portfolio',
     icon: '📸',
-    description: 'Galería, eventos, proyectos',
+    description: 'Galeria, esdeveniments i projectes',
     color: 'from-pink-500 to-rose-500',
     paths: ['portfolio.', 'gallery.']
   },
@@ -154,7 +154,7 @@ const SECTIONS: Section[] = [
     id: 'privacy',
     name: 'Privacidad & GDPR',
     icon: '🔒',
-    description: 'RGPD, derechos, cookies',
+    description: 'RGPD, drets i cookies',
     color: 'from-emerald-600 to-teal-600',
     paths: ['privacy.', 'gdpr.', 'cookies.', 'privacitat.']
   },
@@ -162,7 +162,7 @@ const SECTIONS: Section[] = [
     id: 'resources',
     name: 'Recursos',
     icon: '📁',
-    description: 'Descargas, catálogos, PDFs',
+    description: 'Descàrregues, catàlegs i PDFs',
     color: 'from-violet-500 to-purple-500',
     paths: ['resources.']
   },
@@ -170,7 +170,7 @@ const SECTIONS: Section[] = [
     id: 'common',
     name: 'Comú i sistema',
     icon: '🔧',
-    description: 'Meses, errores, loader, genéricos',
+    description: 'Mesos, errors, carregador i textos genèrics',
     color: 'from-stone-500 to-neutral-600',
     paths: ['common.', 'loader.', 'error.']
   }
@@ -588,7 +588,7 @@ export default function TextManagerPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-500 border-t-transparent mx-auto"></div>
           <p className="mt-4 text-slate-300 text-lg">Carregant textos...</p>
-          <p className="text-sm text-slate-400">Analizando estructura del JSON</p>
+          <p className="text-sm text-slate-400">Analitzant estructura del JSON</p>
         </div>
       </div>
     );
@@ -601,7 +601,7 @@ export default function TextManagerPage() {
       {/* ═══════════════════════════════════════════════════════════════════ */}
       <header className="sticky top-14 lg:top-16 z-40 bg-slate-900/95 border-b border-slate-700/60 shadow-sm backdrop-blur">
         {/* TABS DE IDIOMA */}
-        <div className="bg-gradient-to-r from-orange-50 to-rose-50 border-b border-orange-100">
+        <div className="border-b border-slate-700/60 bg-slate-900/80">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-center gap-3">
@@ -639,8 +639,8 @@ export default function TextManagerPage() {
                   </button>
                 </div>
               </div>
-              <div className="text-xs text-slate-400 bg-slate-900/70 px-3 py-1.5 rounded-lg border border-orange-200">
-                💡 Estàs editant: {LANGUAGE_META[activeLanguage].label}
+              <div className="text-xs text-amber-200 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/30">
+                💡 Estàs editant: {LANGUAGE_META[activeLanguage].label} · Auto-traducció ON
               </div>
             </div>
           </div>
@@ -792,7 +792,7 @@ export default function TextManagerPage() {
                 type="button"
                 className={`w-full p-3 rounded-xl text-left transition-all ${
                   !activeSection
-                    ? 'bg-gradient-to-r from-slate-200 to-slate-300 text-slate-100 shadow-lg'
+                    ? 'bg-gradient-to-r from-amber-500/30 to-orange-500/20 text-amber-100 border border-amber-400/40 shadow-lg'
                     : 'bg-slate-900/70 hover:bg-slate-900/60 text-slate-100'
                 }`}
               >

@@ -195,14 +195,7 @@ async function getLeads(filters: {
       `size=${pageSize}`,
     ].join('|');
 
-    const [
-      leads,
-      filteredCount,
-      totalCount,
-      newCount,
-      negotiationCount,
-      wonCount,
-    ] = await cachedQuery(
+    const [leads, filteredCount] = await cachedQuery(
       cacheKey,
       () => Promise.all([
         prisma.lead.findMany({
@@ -236,10 +229,6 @@ async function getLeads(filters: {
           },
         }),
         prisma.lead.count({ where }),
-        prisma.lead.count(),
-        prisma.lead.count({ where: { status: 'NEW' } }),
-        prisma.lead.count({ where: { status: { in: ['CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } } }),
-        prisma.lead.count({ where: { status: 'WON' } }),
       ]),
       CacheTTL.VERY_SHORT
     );
@@ -247,13 +236,6 @@ async function getLeads(filters: {
     const normalizedFilters: LeadFilters = { status, priority, eventType, source, q: filters.q || '', from, to };
     return {
       leads,
-      counts: {
-        filtered: filteredCount,
-        total: totalCount,
-        new: newCount,
-        negotiation: negotiationCount,
-        won: wonCount,
-      },
       filters: normalizedFilters,
       pagination: {
         page,
@@ -265,7 +247,6 @@ async function getLeads(filters: {
     log.error('Error obtenint leads:', e);
     return {
       leads: [],
-      counts: { filtered: 0, total: 0, new: 0, negotiation: 0, won: 0 },
       filters: { status: [], priority: [], eventType: [], source: [], q: '', from: null, to: null } as LeadFilters,
       pagination: { page: 1, pageSize: 25, totalPages: 1 } as Pagination,
     };
