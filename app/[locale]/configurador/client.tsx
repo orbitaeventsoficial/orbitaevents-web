@@ -2,7 +2,7 @@
 
 // app/configurador/client.tsx
 import { EXTRAS, OFFERS, getAllPacks, type ExtraDefinition, type ServiceSlug } from '@/config/packs-config';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import {
@@ -126,11 +126,11 @@ export default function ConfiguradorClient() {
     };
   };
 
-  const getPacksForEventType = (eventType: EventType | null) => {
+  const getPacksForEventType = useCallback((eventType: EventType | null) => {
     if (!eventType) return [];
     const allowedServices = EVENT_TYPE_SERVICE_MAP[eventType];
     return allPacks.filter((pack) => allowedServices.includes(pack.service));
-  };
+  }, [allPacks]);
 
   // Set minDate on client to avoid hydration mismatch
   useEffect(() => {
@@ -265,7 +265,7 @@ export default function ConfiguradorClient() {
     } else {
       track('View_Configurador');
     }
-  }, [allPacks, track]);
+  }, [getPacksForEventType, track]);
 
   // Scroll al top quan canvies de pas o selecciones pack
   useEffect(() => {
