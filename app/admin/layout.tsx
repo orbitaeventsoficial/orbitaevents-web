@@ -230,6 +230,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [newLeadsCount, setNewLeadsCount] = useState(0);
   const [packPriceAlertsCount, setPackPriceAlertsCount] = useState(0);
+  const [financeAlertsCount, setFinanceAlertsCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [recentHrefs, setRecentHrefs] = useState<string[]>([]);
   const pathname = usePathname();
@@ -260,12 +261,25 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const fetchFinanceAlertsCount = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/finance/alerts', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        setFinanceAlertsCount(data.count || 0);
+      }
+    } catch {
+      // Silently fail
+    }
+  }, []);
+
   useEffect(() => {
     setMounted(true);
     // Cargar conteo de leads nuevos al iniciar.
     fetchNewLeadsCount();
     fetchPackPriceAlertsCount();
-  }, [fetchNewLeadsCount, fetchPackPriceAlertsCount]);
+    fetchFinanceAlertsCount();
+  }, [fetchNewLeadsCount, fetchPackPriceAlertsCount, fetchFinanceAlertsCount]);
 
   useEffect(() => {
     // Tancar sidebar al canviar de pàgina.
@@ -277,11 +291,13 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     const intervalId = setInterval(() => {
       fetchNewLeadsCount();
       fetchPackPriceAlertsCount();
+      fetchFinanceAlertsCount();
     }, 45000);
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         fetchNewLeadsCount();
         fetchPackPriceAlertsCount();
+        fetchFinanceAlertsCount();
       }
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
@@ -289,7 +305,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       clearInterval(intervalId);
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
-  }, [fetchNewLeadsCount, fetchPackPriceAlertsCount]);
+  }, [fetchNewLeadsCount, fetchPackPriceAlertsCount, fetchFinanceAlertsCount]);
 
   useEffect(() => {
     document.documentElement.classList.add('admin-mode');
@@ -459,7 +475,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     });
   }, [pathname]);
 
-  const notificationsCount = newLeadsCount + packPriceAlertsCount;
+  const notificationsCount = newLeadsCount + packPriceAlertsCount + financeAlertsCount;
 
   const isActive = useCallback((href: string) => {
     return href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href);
