@@ -237,31 +237,38 @@ export async function POST(request: NextRequest) {
       return created;
     });
 
-    const duplicateWarnings = await findDuplicates(
-      {
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone || undefined,
-        instagram: customer.instagram || undefined,
-      },
-      customer.id
-    );
-
-    if (duplicateWarnings.length > 0) {
-      await prisma.customerActivity.create({
-        data: {
-          customerId: customer.id,
-          action: 'DUPLICATE_WARNING',
-          details: {
-            count: duplicateWarnings.length,
-            topScore: duplicateWarnings[0]?.matchScore || 0,
-            topCandidates: duplicateWarnings.slice(0, 3).map((dup) => ({
-              id: dup.customer.id,
-              name: dup.customer.name,
-              score: dup.matchScore,
-            })),
-          },
+    let duplicateWarnings: Awaited<ReturnType<typeof findDuplicates>> = [];
+    try {
+      duplicateWarnings = await findDuplicates(
+        {
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone || undefined,
+          instagram: customer.instagram || undefined,
         },
+        customer.id
+      );
+
+      if (duplicateWarnings.length > 0) {
+        await prisma.customerActivity.create({
+          data: {
+            customerId: customer.id,
+            action: 'DUPLICATE_WARNING',
+            details: {
+              count: duplicateWarnings.length,
+              topScore: duplicateWarnings[0]?.matchScore || 0,
+              topCandidates: duplicateWarnings.slice(0, 3).map((dup) => ({
+                id: dup.customer.id,
+                name: dup.customer.name,
+                score: dup.matchScore,
+              })),
+            },
+          },
+        });
+      }
+    } catch (dupError) {
+      log.warn('No s’ha pogut completar la detecció automàtica de duplicats', {
+        error: dupError instanceof Error ? dupError.message : String(dupError),
       });
     }
 
