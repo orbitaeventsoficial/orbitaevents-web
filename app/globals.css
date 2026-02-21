@@ -1853,3 +1853,49 @@ html.admin-mode .admin-shell :is(*::-webkit-scrollbar-track) {
     border-radius: 12px !important;
   }
 }
+
+/* ==========================================================================
+   ADMIN CARBON THEME - flat black, no gradients, no glow
+   ========================================================================== */
+html.admin-mode,
+body.admin-mode,
+html.admin-mode .admin-shell.admin-unified {
+  background: #050505 !important;
+  background-image: none !important;
+}
+
+html.admin-mode::before,
+body.admin-mode::before {
+  display: none !important;
+  content: none !important;
+}
+
+html.admin-mode .admin-shell.admin-unified :is(
+  section,
+  article,
+  aside,
+  .panel,
+  .card,
+  .rounded-lg,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl
+) {
+  background: #0b0b0b !important;
+  background-image: none !important;
+  border-color: #1f1f1f !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html.admin-mode .admin-shell.admin-unified :is(
+  .glow-gold,
+  .glow-gold-hover,
+  .text-glow,
+  .animate-glow-pulse
+) {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  animation: none !important;
+}

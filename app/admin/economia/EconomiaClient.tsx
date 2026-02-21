@@ -568,7 +568,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/20 text-sm">\u26a0\ufe0f</span>
-                    <h2 className="text-lg font-bold text-slate-100">Cobraments ven\u00e7uts</h2>
+                    <h2 className="text-lg font-bold text-slate-100">Fora de termini</h2>
                     {props.atRiskRows.length > 0 && (
                       <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-xs font-bold text-rose-300">
                         {props.atRiskRows.length}
@@ -583,7 +583,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   {props.atRiskRows.length === 0 ? (
                     <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 p-6 text-center">
                       <p className="text-emerald-400 font-semibold">Tot al dia!</p>
-                      <p className="text-sm text-emerald-400/70 mt-1">No hi ha cap cobrament ven\u00e7ut.</p>
+                      <p className="text-sm text-emerald-400/70 mt-1">
+                        No hi ha cap cobrament pendent amb data de venciment passada.
+                      </p>
                     </div>
                   ) : (
                     props.atRiskRows.map((row) => (
@@ -657,7 +659,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-lg">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/20 text-sm">\u23f0</span>
-                  <h2 className="text-lg font-bold text-slate-100">Pr\u00f2xims 7 dies</h2>
+                  <h2 className="text-lg font-bold text-slate-100">Venciments en 7 dies</h2>
                   {props.upcomingDueRows.length > 0 && (
                     <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-300">
                       {props.upcomingDueRows.length}
@@ -666,7 +668,12 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
                 <div className="space-y-2">
                   {props.upcomingDueRows.length === 0 ? (
-                    <p className="text-sm text-slate-400 p-4 text-center">Cap cobrament pr\u00f2xim aquesta setmana.</p>
+                    <div className="rounded-xl border border-white/10 bg-slate-900 p-4 text-center">
+                      <p className="text-sm font-semibold text-slate-200">No hi ha venciments aquesta setmana.</p>
+                      <p className="mt-1 text-xs text-slate-400">
+                        No tens cap cobrament pendent que caduqui entre avui i els pròxims 7 dies.
+                      </p>
+                    </div>
                   ) : (
                     props.upcomingDueRows.map((row) => (
                       <div key={row.id} className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors">

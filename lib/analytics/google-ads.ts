@@ -74,12 +74,24 @@ function toDateKey(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-function getConfig(): GoogleAdsConfig | null {
+async function getStoredRefreshToken(): Promise<string> {
+  try {
+    const setting = await prisma.setting.findUnique({
+      where: { key: 'integrations.googleAds.refreshToken' },
+      select: { value: true },
+    });
+    return setting?.value || '';
+  } catch {
+    return '';
+  }
+}
+
+async function getConfig(): Promise<GoogleAdsConfig | null> {
   const developerToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN || '';
   const customerId = (process.env.GOOGLE_ADS_CUSTOMER_ID || '').replace(/-/g, '');
   const clientId = process.env.GOOGLE_ADS_CLIENT_ID || process.env.GOOGLE_OAUTH_CLIENT_ID || '';
   const clientSecret = process.env.GOOGLE_ADS_CLIENT_SECRET || process.env.GOOGLE_OAUTH_CLIENT_SECRET || '';
-  const refreshToken = process.env.GOOGLE_ADS_REFRESH_TOKEN || '';
+  const refreshToken = process.env.GOOGLE_ADS_REFRESH_TOKEN || (await getStoredRefreshToken());
   const loginCustomerId = (process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || '').replace(/-/g, '');
 
   if (!developerToken || !customerId || !clientId || !clientSecret || !refreshToken) {
@@ -96,11 +108,14 @@ function getConfig(): GoogleAdsConfig | null {
   };
 }
 
-export function getGoogleAdsConfigStatus(): GoogleAdsConfigStatus {
+export async function getGoogleAdsConfigStatus(): Promise<GoogleAdsConfigStatus> {
+  const storedRefreshToken = await getStoredRefreshToken();
   const missing: string[] = [];
   if (!process.env.GOOGLE_ADS_DEVELOPER_TOKEN) missing.push('GOOGLE_ADS_DEVELOPER_TOKEN');
   if (!process.env.GOOGLE_ADS_CUSTOMER_ID) missing.push('GOOGLE_ADS_CUSTOMER_ID');
-  if (!process.env.GOOGLE_ADS_REFRESH_TOKEN) missing.push('GOOGLE_ADS_REFRESH_TOKEN');
+  if (!process.env.GOOGLE_ADS_REFRESH_TOKEN && !storedRefreshToken) {
+    missing.push('GOOGLE_ADS_REFRESH_TOKEN (o connexió OAuth des d’Integracions)');
+  }
   if (!process.env.GOOGLE_ADS_CLIENT_ID && !process.env.GOOGLE_OAUTH_CLIENT_ID) {
     missing.push('GOOGLE_ADS_CLIENT_ID (o GOOGLE_OAUTH_CLIENT_ID)');
   }
@@ -188,7 +203,7 @@ function sumTotals(rows: GoogleAdsSeriesRow[]): GoogleAdsTotals {
 }
 
 export async function getGoogleAdsReport(): Promise<GoogleAdsReport | null> {
-  const config = getConfig();
+  const config = await getConfig();
   if (!config) return null;
 
   const accessToken = await getAccessToken(config);
@@ -317,3 +332,4 @@ export async function getGoogleAdsReport(): Promise<GoogleAdsReport | null> {
     timeseries: currentSeries,
   };
 }
+import { prisma } from '@/lib/prisma';

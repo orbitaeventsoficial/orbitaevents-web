@@ -30,6 +30,8 @@ export default async function IntegrationsPage() {
           'integrations.googleCalendar.connectedEmail',
           'integrations.googleCalendar.connectedAt',
           'integrations.googleCalendar.calendarId',
+          'integrations.googleAds.refreshToken',
+          'integrations.googleAds.connectedAt',
           'emails.cron.lastStatus',
         ],
       },
@@ -86,6 +88,25 @@ export default async function IntegrationsPage() {
             className="mt-4 inline-flex rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700"
           >
             Connectar Google
+          </a>
+        </article>
+
+        <article className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-slate-100">Google Ads (OAuth)</h2>
+            <BoolBadge ok={Boolean(map['integrations.googleAds.refreshToken'])} />
+          </div>
+          <p className="mt-2 text-sm text-slate-300">
+            Connexió OAuth per carregar dades de campanyes i conversions a Analítica.
+          </p>
+          <p className="mt-1 text-xs text-slate-400">
+            Connectat: {map['integrations.googleAds.connectedAt'] ? new Date(map['integrations.googleAds.connectedAt']).toLocaleString('ca-ES') : '-'}
+          </p>
+          <a
+            href="/api/google-ads/oauth/start"
+            className="mt-4 inline-flex rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700"
+          >
+            {map['integrations.googleAds.refreshToken'] ? 'Reconnectar Google Ads' : 'Connectar Google Ads'}
           </a>
         </article>
 
@@ -169,6 +190,7 @@ export default async function IntegrationsPage() {
         <div className="mt-3 grid gap-2 text-xs text-slate-300 sm:grid-cols-2">
           <p>• Gmail token: {map['integrations.gmail.refreshToken'] ? 'OK' : 'Pendent'}</p>
           <p>• Google token: {map['integrations.google.refreshToken'] ? 'OK' : 'Pendent'}</p>
+          <p>• Google Ads token: {map['integrations.googleAds.refreshToken'] ? 'OK' : 'Pendent'}</p>
           <p>• Calendar token: {googleCalendarConnected ? 'OK' : 'Pendent'}</p>
           <p>• Calendar ID: {calendarIdConfigured ? 'OK' : 'Pendent'}</p>
           <p>• ICS token: {calendarFeedToken ? 'OK' : 'Pendent'}</p>

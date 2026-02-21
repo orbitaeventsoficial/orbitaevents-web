@@ -61,8 +61,8 @@ function SidebarItem({
         relative flex items-center gap-3 px-3 py-2.5 rounded-xl min-w-0
         border transition-all duration-200 group active:scale-[0.98]
         ${isActive
-          ? 'border-amber-400/50 bg-gradient-to-r from-amber-500/20 to-orange-500/10 text-amber-100 shadow-md shadow-amber-500/20'
-          : 'border-transparent text-slate-400 hover:text-slate-100 hover:border-slate-700/60 hover:bg-slate-800/70'
+          ? 'border-amber-400/50 bg-amber-900 text-amber-100'
+          : 'border-transparent text-slate-400 hover:text-slate-100 hover:border-slate-700/60 hover:bg-zinc-900'
         }
       `}
     >
@@ -379,7 +379,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         { icon: '⭐', label: 'Ressenyes clients', href: '/admin/ressenyes' },
         { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event' },
         { icon: '📈', label: 'Analítica', href: '/admin/analytics' },
-        { icon: '📣', label: 'Google Ads', href: '/admin/google-ads' },
+        { icon: '📣', label: 'Google Ads', href: '/admin/analytics#google-ads' },
         { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
         { icon: '✍️', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
@@ -535,11 +535,11 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           {helpModeEnabled && <AdminHelpLegend />}
           {helpModeEnabled && <AdminHelpInspector />}
           {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-gradient-to-b from-stone-950/95 via-stone-900/95 to-zinc-950/95 backdrop-blur-sm border-r border-amber-900/40 flex-col z-40 shadow-2xl shadow-black/35">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-black border-r border-zinc-800 flex-col z-40">
         {/* Logo */}
-        <div className="p-4 border-b border-slate-800/90">
+        <div className="h-16 px-4 border-b border-slate-800/90 flex items-center">
           <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30 p-1.5">
+            <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center p-1.5">
               <Image
                 src="/img/logosoloplaneta.svg"
                 alt="Òrbita"
@@ -631,7 +631,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile Header - Mejorado */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-stone-950/95 backdrop-blur-xl border-b border-amber-900/35 z-50 px-3 flex items-center justify-between safe-area-top">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-black border-b border-zinc-800 z-50 px-3 flex items-center justify-between safe-area-top">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
@@ -695,7 +695,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         <>
           {/* Backdrop */}
           <div
-            className={`lg:hidden fixed inset-0 bg-stone-950/55 backdrop-blur-sm z-40 transition-opacity duration-300
+            className={`lg:hidden fixed inset-0 bg-black/70 z-40 transition-opacity duration-300
               ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             onClick={() => setSidebarOpen(false)}
             role="presentation"
@@ -704,14 +704,14 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <aside
             id="admin-mobile-sidebar"
             aria-label="Menú admin"
-            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-gradient-to-b from-stone-900 to-zinc-950 border-r border-amber-900/35 z-50 overflow-hidden
+            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-black border-r border-zinc-800 z-50 overflow-hidden
               transform transition-transform duration-300 ease-out
               ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
           >
             {/* Header del sidebar */}
-            <div className="p-4 border-b border-amber-900/35 flex items-center justify-between bg-stone-900">
+            <div className="h-14 px-4 border-b border-amber-900/35 flex items-center justify-between bg-stone-900">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md p-1.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-600 flex items-center justify-center p-1.5">
                   <Image
                     src="/img/logosoloplaneta.svg"
                     alt="Òrbita"
@@ -821,7 +821,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 onClick={() => setSidebarOpen(false)}
                 className="flex items-center gap-3 p-3 rounded-xl bg-stone-800/80 border border-amber-900/35 active:scale-[0.98] transition-transform"
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-semibold shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-amber-600 flex items-center justify-center text-white font-semibold">
                   A
                 </div>
                 <div className="flex-1">
@@ -838,7 +838,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Desktop Header */}
-      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-amber-900/35 px-6 items-center justify-between bg-gradient-to-r from-stone-950/95 to-zinc-900/95 backdrop-blur-xl z-30">
+      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-[72px] px-6 items-center justify-between bg-black z-30 shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
         <div className="flex items-center gap-3 text-sm">
           <Link href="/admin" className="text-slate-400 hover:text-slate-200 transition-colors">Admin</Link>
           <span className="text-slate-600">/</span>
@@ -883,7 +883,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             href="/admin/settings"
             className="flex items-center gap-3 px-3 py-1.5 hover:bg-slate-800 rounded-xl transition-colors"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-sm font-medium shadow-sm">
+            <div className="w-8 h-8 rounded-full bg-amber-600 flex items-center justify-center text-white text-sm font-medium">
               A
             </div>
             <span className="text-slate-100 text-sm font-medium">Admin</span>
@@ -892,14 +892,14 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Main Content */}
-      <main className="lg:pl-64 pt-14 lg:pt-16 pb-20 lg:pb-0 min-h-screen">
+      <main className="lg:pl-64 pt-14 lg:pt-[72px] pb-20 lg:pb-0 min-h-screen">
         <div className="admin-shell admin-readable admin-unified mx-auto w-full max-w-[1700px] p-3 sm:p-4 lg:p-6">
           {children}
         </div>
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-stone-950/95 backdrop-blur-xl border-t border-amber-900/35 z-50 safe-area-bottom">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-black border-t border-zinc-800 z-50 safe-area-bottom">
         <div className="flex items-center justify-around h-full px-2 max-w-lg mx-auto">
           <BottomNavItem
             icon="📊"
