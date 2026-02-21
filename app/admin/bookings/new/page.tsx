@@ -21,6 +21,7 @@ type Pack = {
   soundWatts: number;
   includesFog: boolean;
   includesMic: boolean;
+  recommendedOperatorExtraHourPrice?: number;
   translations: Array<{ name: string; description: string }>;
 };
 
@@ -30,6 +31,7 @@ type Extra = {
   price: number;
   priceType: string;
   translations: Array<{ name: string }>;
+  isOperatorExtra?: boolean;
 };
 
 type LeadData = {
@@ -56,6 +58,7 @@ const EVENT_TYPES = [
   { value: 'PRIVATE_PARTY', label: 'Festa privada', icon: '🎵' },
   { value: 'OTHER', label: 'Altre', icon: '📋' },
 ];
+const OPERATOR_EXTRA_ID = '__operator_extra__';
 
 type FormData = {
   clientName: string;
@@ -145,7 +148,21 @@ export default function NewBookingPage() {
 
         if (extrasRes.ok) {
           const eData = await extrasRes.json();
-          setExtras(eData.extras || eData.data || []);
+          const rawConfig = Array.isArray(eData?.config)
+            ? eData.config
+            : Array.isArray(eData?.extras)
+              ? eData.extras
+              : Array.isArray(eData?.data)
+                ? eData.data
+                : [];
+          const normalizedExtras: Extra[] = rawConfig.map((item: any) => ({
+            id: String(item.id || item.slug || ''),
+            slug: String(item.slug || item.id || ''),
+            price: Number(item.price || 0),
+            priceType: String(item.priceType || 'FIXED'),
+            translations: [{ name: String(item.name || item.slug || 'Extra') }],
+          })).filter((item: Extra) => item.id);
+          setExtras(normalizedExtras);
         }
 
         const fuelRes = await fetch('/api/admin/fuel/reference');
@@ -253,6 +270,46 @@ export default function NewBookingPage() {
       [extraId]: { ...prev[extraId], quantity: Math.max(1, qty) },
     }));
   };
+
+  const selectedPack = useMemo(
+    () => packs.find((p) => p.id === form.packId) || null,
+    [packs, form.packId]
+  );
+
+  const operatorExtraPrice = useMemo(() => {
+    if (!selectedPack) return 0;
+    const recommended = Number(selectedPack.recommendedOperatorExtraHourPrice || 0);
+    if (recommended > 0) return Number(recommended.toFixed(2));
+    return Number(Math.max(25, selectedPack.extraHourPrice * 0.6).toFixed(2));
+  }, [selectedPack]);
+
+  const displayExtras = useMemo<Extra[]>(() => {
+    if (!selectedPack) return extras;
+    const operatorExtra: Extra = {
+      id: OPERATOR_EXTRA_ID,
+      slug: 'operator-support-hour',
+      price: operatorExtraPrice,
+      priceType: 'PER_HOUR',
+      translations: [{ name: 'Operari extra (hora)' }],
+      isOperatorExtra: true,
+    };
+    return [operatorExtra, ...extras];
+  }, [extras, operatorExtraPrice, selectedPack]);
+
+  useEffect(() => {
+    setSelectedExtras((prev) => {
+      const current = prev[OPERATOR_EXTRA_ID];
+      if (!current) return prev;
+      if (current.price === operatorExtraPrice) return prev;
+      return {
+        ...prev,
+        [OPERATOR_EXTRA_ID]: {
+          ...current,
+          price: operatorExtraPrice,
+        },
+      };
+    });
+  }, [operatorExtraPrice]);
 
   const validateDiscountCode = useCallback(async (code: string) => {
     if (!code.trim()) {
@@ -641,11 +698,11 @@ export default function NewBookingPage() {
       </div>
 
       {/* Extras */}
-      {extras.length > 0 && (
+      {displayExtras.length > 0 && (
         <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
           <h2 className="text-sm font-semibold text-slate-200">Extres</h2>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {extras.map((extra) => {
+            {displayExtras.map((extra) => {
               const name = extra.translations[0]?.name || extra.slug;
               const isSelected = !!selectedExtras[extra.id];
               return (
@@ -665,7 +722,7 @@ export default function NewBookingPage() {
                     <span className={`text-sm font-medium ${isSelected ? 'text-emerald-200' : 'text-slate-300'}`}>
                       {isSelected ? '✓ ' : ''}{name}
                     </span>
-                    <span className="ml-2 text-xs text-slate-400">{extra.price}€</span>
+                    <span className="ml-2 text-xs text-slate-400">{extra.price}€{extra.isOperatorExtra ? '/h' : ''}</span>
                   </button>
                   {isSelected && (
                     <input

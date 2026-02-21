@@ -12,6 +12,8 @@ import { calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, s
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 
 export const dynamic = 'force-dynamic';
+const OPERATOR_EXTRA_ID = '__operator_extra__';
+const OPERATOR_EXTRA_SLUG = 'operator-support-hour';
 
 const bookingSchema = z.object({
   leadId: z.string().optional(),
@@ -61,6 +63,50 @@ async function generateReference(): Promise<string> {
   }
 
   return `${prefix}${String(nextNumber).padStart(3, '0')}`;
+}
+
+async function ensureOperatorSupportExtraId(): Promise<string> {
+  const existing = await prisma.extra.findUnique({
+    where: { slug: OPERATOR_EXTRA_SLUG },
+    select: { id: true },
+  });
+  if (existing) return existing.id;
+
+  const created = await prisma.extra.create({
+    data: {
+      slug: OPERATOR_EXTRA_SLUG,
+      priceType: 'PER_HOUR',
+      price: 0,
+      isActive: true,
+      translations: {
+        create: [
+          { locale: 'ca', name: 'Operari de suport (hora)', description: 'Suport operatiu addicional per hora' },
+          { locale: 'es', name: 'Operario de soporte (hora)', description: 'Soporte operativo adicional por hora' },
+          { locale: 'en', name: 'Support operator (hour)', description: 'Additional operational support per hour' },
+        ],
+      },
+    },
+    select: { id: true },
+  });
+  return created.id;
+}
+
+async function resolveExtraId(input: string): Promise<string | null> {
+  if (input === OPERATOR_EXTRA_ID) {
+    return ensureOperatorSupportExtraId();
+  }
+
+  const byId = await prisma.extra.findUnique({
+    where: { id: input },
+    select: { id: true },
+  });
+  if (byId) return byId.id;
+
+  const bySlug = await prisma.extra.findUnique({
+    where: { slug: input },
+    select: { id: true },
+  });
+  return bySlug?.id || null;
 }
 
 // GET - Llistar reserves amb filtres
@@ -231,6 +277,20 @@ export async function POST(req: NextRequest) {
 
     const reference = await generateReference();
 
+    const resolvedExtras = data.extras
+      ? (await Promise.all(
+          data.extras.map(async (e) => {
+            const resolvedId = await resolveExtraId(e.extraId);
+            if (!resolvedId) return null;
+            return {
+              extraId: resolvedId,
+              quantity: e.quantity || 1,
+              price: e.price,
+            };
+          })
+        )).filter(Boolean) as Array<{ extraId: string; quantity: number; price: number }>
+      : [];
+
     const booking = await prisma.booking.create({
       data: {
         reference,
@@ -260,13 +320,7 @@ export async function POST(req: NextRequest) {
         depositAmount,
         remainingAmount: total - depositAmount,
         notes: data.notes,
-        extras: data.extras ? {
-          create: data.extras.map(e => ({
-            extraId: e.extraId,
-            quantity: e.quantity || 1,
-            price: e.price,
-          })),
-        } : undefined,
+        extras: resolvedExtras.length > 0 ? { create: resolvedExtras } : undefined,
       },
       include: {
         pack: true,

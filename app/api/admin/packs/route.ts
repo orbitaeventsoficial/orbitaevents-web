@@ -5,6 +5,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { translateTextForLocale } from '@/lib/services/translationService';
+import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/services/packPricingHealth';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,9 +88,19 @@ export async function GET(req: NextRequest) {
       orderBy: { order: 'asc' },
     });
 
+    const pricingConfig = await getPackPricingModelConfig();
+    const packsWithPricing = packs.map((pack) => {
+      const health = computePackPricingHealth(pack, pricingConfig);
+      return {
+        ...pack,
+        recommendedOperatorExtraHourPrice: health.recommendedOperatorExtraHourPrice,
+        recommendedExtraHourPrice: health.recommendedExtraHourPrice,
+      };
+    });
+
     return NextResponse.json({
       ok: true,
-      packs,
+      packs: packsWithPricing,
     });
   } catch (error) {
     log.error('Error obtenint packs:', error);
