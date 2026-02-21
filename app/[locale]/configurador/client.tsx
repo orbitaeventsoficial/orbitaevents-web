@@ -76,9 +76,27 @@ function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, fi
   }
 }
 
+function normalizePackBaseKey(baseKey: string): string {
+  const noConfigurator = baseKey.startsWith('configurator.') ? baseKey.slice('configurator.'.length) : baseKey;
+  if (noConfigurator.startsWith('pages.parties.discoPacks.')) {
+    return noConfigurator.replace('pages.parties.discoPacks.', 'services.mobile.discoPacks.');
+  }
+  return noConfigurator;
+}
+
+function humanizeKeyFallback(value: string): string {
+  if (!value || !isI18nKey(value)) return value;
+  const token = value.split('.').pop() || value;
+  return token
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
 export default function ConfiguradorClient() {
   const t = useTranslations('configurator');
+  const tRoot = useTranslations();
   const tMobile = useTranslations('pages.mobile'); // Per traduccions d'extres
+  const tServicesMobile = useTranslations('services.mobile');
   const locale = useLocale() as 'ca' | 'es' | 'en';
   const dateLocale = locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-US' : 'es-ES';
   const { track } = useAnalytics();
@@ -105,7 +123,27 @@ export default function ConfiguradorClient() {
 
   const getTranslatedText = (key: string, fallback: string): string => {
     try {
-      const translated = t(key);
+      if (key.startsWith('services.mobile.')) {
+        const nested = key.slice('services.mobile.'.length);
+        const translated = tServicesMobile(nested);
+        if (translated !== nested) return translated;
+      }
+      if (key.startsWith('pages.mobile.')) {
+        const nested = key.slice('pages.mobile.'.length);
+        const translated = tMobile(nested);
+        if (translated !== nested) return translated;
+      }
+      if (key.startsWith('configurator.')) {
+        const nested = key.slice('configurator.'.length);
+        const translated = t(nested);
+        if (translated !== nested) return translated;
+      }
+      if (key.startsWith('step2.')) {
+        const translated = t(key);
+        if (translated !== key) return translated;
+      }
+
+      const translated = tRoot(key as any);
       return translated !== key ? translated : fallback;
     } catch {
       return fallback;
@@ -113,15 +151,32 @@ export default function ConfiguradorClient() {
   };
 
   const getLocalizedPack = (pack: any) => {
+    const fallbackPack = fallbackPacks.find((item) => item.id === pack.id || item.slug === pack.slug);
+    const safeNameRaw = isI18nKey(pack.name || '') && fallbackPack ? fallbackPack.name : pack.name;
+    const safeTaglineRaw = isI18nKey(pack.tagline || '') && fallbackPack ? fallbackPack.tagline : pack.tagline;
+    const safeFeatures = (pack.features || []).map((feature: string, index: number) => {
+      if (isI18nKey(feature) && fallbackPack?.features?.[index]) {
+        return fallbackPack.features[index];
+      }
+      return feature;
+    });
+
     const baseKey = pack.i18nBaseKey || `step2.packs.${pack.id}`;
-    const localizedFeatures = (pack.features || []).map((feature: string, index: number) =>
-      getTranslatedText(`${baseKey}.features.f${index + 1}`, feature)
-    );
+    const normalizedBase = normalizePackBaseKey(baseKey);
+    const localizedFeatures = safeFeatures.map((feature: string, index: number) => {
+      const byF = getTranslatedText(`${normalizedBase}.features.f${index + 1}`, feature);
+      if (byF !== feature) return byF;
+      const byIndex = getTranslatedText(`${normalizedBase}.features.${index}`, feature);
+      return byIndex !== feature ? byIndex : humanizeKeyFallback(feature);
+    });
+
+    const translatedName = getTranslatedText(`${normalizedBase}.name`, safeNameRaw);
+    const translatedTagline = getTranslatedText(`${normalizedBase}.tagline`, safeTaglineRaw);
 
     return {
       ...pack,
-      name: getTranslatedText(`${baseKey}.name`, pack.name),
-      tagline: getTranslatedText(`${baseKey}.tagline`, pack.tagline),
+      name: humanizeKeyFallback(translatedName),
+      tagline: humanizeKeyFallback(translatedTagline),
       features: localizedFeatures,
     };
   };

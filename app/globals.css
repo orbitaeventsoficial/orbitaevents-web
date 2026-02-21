@@ -2381,3 +2381,114 @@ html.admin-mode .admin-shell :is(section, article, aside, .panel, .card, .rounde
   display: none !important;
   content: none !important;
 }
+
+/* ==========================================================================
+   ADMIN THEME RESET (SOLID + CORPORATE + WARM)
+   ========================================================================== */
+html.admin-mode,
+body.admin-mode,
+html.admin-mode .admin-shell.admin-unified {
+  background: #0c1118 !important;
+  background-image: none !important;
+}
+
+html.admin-mode .admin-shell {
+  --oe-admin-level-1: #162235; /* main panels */
+  --oe-admin-level-2: #1c2c44; /* cards */
+  --oe-admin-level-3: #223755; /* inner cards */
+  --oe-admin-border-1: #355074;
+  --oe-admin-border-2: #436089;
+  --oe-admin-border-3: #52729e;
+  --oe-admin-text-main: #f3f7ff;
+  --oe-admin-text-soft: #d5e1f2;
+  --oe-admin-text-muted: #a8bbd5;
+}
+
+/* Layout shell (sidebar + header + main chrome) */
+html.admin-mode :is(aside, header, nav).bg-\[\#0c0f13\] {
+  background-color: #101a28 !important;
+  border-color: #253a57 !important;
+}
+
+/* Level 1 */
+html.admin-mode .admin-shell > :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl) {
+  background: var(--oe-admin-level-1) !important;
+  border-color: var(--oe-admin-border-1) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28) !important;
+}
+
+/* Level 2 */
+html.admin-mode .admin-shell > :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl)
+  :is(section, article, aside, .panel, .card, div)[class*='rounded'][class*='border']:not(button):not(a):not(.admin-keep-colors) {
+  background: var(--oe-admin-level-2) !important;
+  border-color: var(--oe-admin-border-2) !important;
+}
+
+/* Level 3 */
+html.admin-mode .admin-shell > :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl)
+  :is(section, article, aside, .panel, .card, div)[class*='rounded'][class*='border']
+  :is(section, article, aside, .panel, .card, div)[class*='rounded'][class*='border']:not(button):not(a):not(.admin-keep-colors) {
+  background: var(--oe-admin-level-3) !important;
+  border-color: var(--oe-admin-border-3) !important;
+}
+
+/* Typography hierarchy */
+html.admin-mode .admin-shell h1 {
+  color: #ffd18b !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+}
+
+html.admin-mode .admin-shell h2 {
+  color: #ffdfaa !important;
+  font-weight: 700 !important;
+}
+
+html.admin-mode .admin-shell h3 {
+  color: #e5eefc !important;
+  font-weight: 700 !important;
+}
+
+html.admin-mode .admin-shell :is(p, label, td, th, li, dd, dt, span) {
+  color: var(--oe-admin-text-soft);
+}
+
+html.admin-mode .admin-shell :is(.text-slate-400, .text-slate-500, .text-slate-600) {
+  color: var(--oe-admin-text-muted) !important;
+}
+
+/* Semantic solid tones */
+html.admin-mode .admin-shell :is(.admin-tone-info, .bg-sky-500\/10, .bg-cyan-500\/10) {
+  background-color: rgba(56, 189, 248, 0.24) !important;
+  border-color: rgba(56, 189, 248, 0.55) !important;
+  color: #d9f3ff !important;
+}
+
+html.admin-mode .admin-shell :is(.admin-tone-success, .bg-emerald-500\/10, .bg-green-500\/10) {
+  background-color: rgba(34, 197, 94, 0.24) !important;
+  border-color: rgba(34, 197, 94, 0.56) !important;
+  color: #d7ffe5 !important;
+}
+
+html.admin-mode .admin-shell :is(.admin-tone-warning, .bg-amber-500\/10, .bg-orange-500\/10) {
+  background-color: rgba(245, 158, 11, 0.25) !important;
+  border-color: rgba(245, 158, 11, 0.58) !important;
+  color: #ffe6b8 !important;
+}
+
+html.admin-mode .admin-shell :is(.admin-tone-danger, .bg-rose-500\/10, .bg-red-500\/10) {
+  background-color: rgba(239, 68, 68, 0.24) !important;
+  border-color: rgba(239, 68, 68, 0.56) !important;
+  color: #ffd7d7 !important;
+}
+
+/* Keep controls readable */
+html.admin-mode .admin-shell :is(input, select, textarea):not([type='checkbox']):not([type='radio']) {
+  background: #122031 !important;
+  border-color: #345074 !important;
+  color: #f3f7ff !important;
+}
+
+html.admin-mode .admin-shell :is(input, select, textarea)::placeholder {
+  color: #9ab0cf !important;
+}

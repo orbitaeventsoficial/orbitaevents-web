@@ -58,7 +58,7 @@ export default async function HalloweenPage() {
           fill
           sizes="100vw"
           quality={70}
-          className="object-cover pointer-events-none"
+          className="object-cover object-top pointer-events-none"
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />

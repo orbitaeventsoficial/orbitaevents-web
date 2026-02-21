@@ -35,16 +35,18 @@ type PipelineColumn = {
   color: string;
   borderColor: string;
   bgColor: string;
+  cardBgColor: string;
+  cardBorderColor: string;
   leads: PipelineLead[];
 };
 
 const COLUMNS: Omit<PipelineColumn, 'leads'>[] = [
-  { status: 'NEW', label: 'Noves', color: 'text-sky-200', borderColor: 'border-sky-400/40', bgColor: 'bg-sky-500/12' },
-  { status: 'CONTACTED', label: 'Contactat', color: 'text-amber-200', borderColor: 'border-amber-400/40', bgColor: 'bg-amber-500/12' },
-  { status: 'QUOTE_SENT', label: 'Pressupost enviat', color: 'text-violet-200', borderColor: 'border-violet-400/40', bgColor: 'bg-violet-500/12' },
-  { status: 'NEGOTIATING', label: 'Negociant', color: 'text-orange-200', borderColor: 'border-orange-400/40', bgColor: 'bg-orange-500/12' },
-  { status: 'WON', label: 'Guanyat', color: 'text-emerald-200', borderColor: 'border-emerald-400/40', bgColor: 'bg-emerald-500/12' },
-  { status: 'LOST', label: 'Perdut', color: 'text-rose-200', borderColor: 'border-rose-400/35', bgColor: 'bg-rose-500/10' },
+  { status: 'NEW', label: 'Noves', color: 'text-sky-100', borderColor: 'border-sky-300/60', bgColor: 'bg-[#163a56]', cardBgColor: 'bg-[#102c43]', cardBorderColor: 'border-sky-300/45' },
+  { status: 'CONTACTED', label: 'Contactat', color: 'text-amber-100', borderColor: 'border-amber-300/60', bgColor: 'bg-[#5a3f16]', cardBgColor: 'bg-[#46300f]', cardBorderColor: 'border-amber-300/45' },
+  { status: 'QUOTE_SENT', label: 'Pressupost enviat', color: 'text-violet-100', borderColor: 'border-violet-300/60', bgColor: 'bg-[#413061]', cardBgColor: 'bg-[#34244f]', cardBorderColor: 'border-violet-300/45' },
+  { status: 'NEGOTIATING', label: 'Negociant', color: 'text-orange-100', borderColor: 'border-orange-300/60', bgColor: 'bg-[#5a3118]', cardBgColor: 'bg-[#452513]', cardBorderColor: 'border-orange-300/45' },
+  { status: 'WON', label: 'Guanyat', color: 'text-emerald-100', borderColor: 'border-emerald-300/60', bgColor: 'bg-[#174632]', cardBgColor: 'bg-[#123726]', cardBorderColor: 'border-emerald-300/45' },
+  { status: 'LOST', label: 'Perdut', color: 'text-rose-100', borderColor: 'border-rose-300/60', bgColor: 'bg-[#4c1f2b]', cardBgColor: 'bg-[#3b1821]', cardBorderColor: 'border-rose-300/45' },
 ];
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -244,6 +246,8 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
                   columnStatus={col.status}
                   columnLabel={col.label}
                   columnColorClass={col.color}
+                  cardBgColor={col.cardBgColor}
+                  cardBorderColor={col.cardBorderColor}
                   updatingId={updatingId}
                   onMoveStatus={moveLeadStatus}
                   onDragStart={setDraggingLeadId}
@@ -286,6 +290,8 @@ function PipelineCard({
   columnStatus,
   columnLabel,
   columnColorClass,
+  cardBgColor,
+  cardBorderColor,
   updatingId,
   onMoveStatus,
   onDragStart,
@@ -295,6 +301,8 @@ function PipelineCard({
   columnStatus: string;
   columnLabel: string;
   columnColorClass: string;
+  cardBgColor: string;
+  cardBorderColor: string;
   updatingId: string | null;
   onMoveStatus: (id: string, status: string) => Promise<void>;
   onDragStart: (leadId: string) => void;
@@ -317,14 +325,14 @@ function PipelineCard({
         onDragStart(lead.id);
       }}
       onDragEnd={onDragEnd}
-      className={`rounded-xl border border-slate-700/50 bg-slate-900/80 p-3 transition-all hover:border-slate-600/70 ${
+      className={`rounded-xl border ${cardBorderColor} ${cardBgColor} p-3 transition-all hover:brightness-110 ${
         isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'
       }`}
     >
       <div className="flex items-start justify-between gap-2">
         <Link
           href={`/admin/leads/${lead.id}`}
-          className="text-sm font-medium text-slate-100 hover:text-cyan-300 transition-colors line-clamp-1"
+          className="text-sm font-semibold text-white hover:text-amber-200 transition-colors line-clamp-1"
         >
           {lead.name}
         </Link>
@@ -334,7 +342,7 @@ function PipelineCard({
               type="button"
               onClick={() => onMoveStatus(lead.id, prevStatus)}
               disabled={isUpdating}
-              className="rounded px-1 py-0.5 text-[10px] text-slate-400 hover:bg-slate-700/50 hover:text-slate-200 transition-colors disabled:opacity-50"
+              className="rounded px-1 py-0.5 text-[10px] text-slate-300 hover:bg-black/20 hover:text-white transition-colors disabled:opacity-50"
               title={`Moure a ${COLUMNS[statusIndex - 1].label}`}
             >
               ←
@@ -345,7 +353,7 @@ function PipelineCard({
               type="button"
               onClick={() => onMoveStatus(lead.id, nextStatus)}
               disabled={isUpdating}
-              className="rounded px-1 py-0.5 text-[10px] text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors disabled:opacity-50"
+              className="rounded px-1 py-0.5 text-[10px] text-amber-200 hover:bg-black/20 hover:text-amber-100 transition-colors disabled:opacity-50"
               title={`Moure a ${COLUMNS[statusIndex + 1].label}`}
             >
               →
@@ -356,7 +364,7 @@ function PipelineCard({
       </div>
 
       <div className="mt-1">
-        <span className={`inline-flex rounded-full bg-slate-800/90 px-2 py-0.5 text-[10px] font-semibold ${columnColorClass}`}>
+        <span className={`inline-flex rounded-full bg-black/25 px-2 py-0.5 text-[10px] font-semibold ${columnColorClass}`}>
           {columnLabel}
         </span>
       </div>
@@ -365,7 +373,7 @@ function PipelineCard({
         <span>{EVENT_TYPE_LABELS[lead.eventType] || lead.eventType}</span>
         <span className="text-fuchsia-300/90">{SOURCE_LABELS[lead.source] || lead.source}</span>
         {lead.eventDate && (
-          <span className="text-slate-400">
+          <span className="text-slate-200/80">
             {new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
           </span>
         )}

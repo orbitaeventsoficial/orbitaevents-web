@@ -11,20 +11,20 @@ import { useLocale, useTranslations } from 'next-intl';
 // ═══════════════════════════════════════════════════════════════
 
 const IMATGES = {
-  hero: '/img/tematicas/mon-magic/hero/01-taula-panoramica-cartell.webp',
-  heroAlt: '/img/tematicas/mon-magic/hero/02-taula-veles-nuvols.webp',
-  sostre: '/img/tematicas/mon-magic/hero/03-sostre-veles-nuvols-led.webp',
-  sobreComplet: '/img/tematicas/mon-magic/productes/01-sobre-carta-oberta-complet.webp',
-  sobrePlat: '/img/tematicas/mon-magic/productes/02-sobre-personalitzat-plat.webp',
-  sobreDetall: '/img/tematicas/mon-magic/productes/03-sobre-detall-text.webp',
-  provaSocial: '/img/tematicas/mon-magic/productes/04-convidada-llegint-carta.webp',
-  sobrePergami: '/img/tematicas/mon-magic/productes/05-sobre-pergami-plat.webp',
-  mussol: '/img/tematicas/mon-magic/pergamins/01-hedwig-pergamins.webp',
-  pergaminsBilingue: '/img/tematicas/mon-magic/pergamins/02-gabia-cartell-bilingue.webp',
-  pergaminsCintes: '/img/tematicas/mon-magic/pergamins/03-pergamins-cintes-colors.webp',
-  veles: '/img/tematicas/mon-magic/decoracio/01-veles-flotants-detall.webp',
-  botigueta: '/img/tematicas/mon-magic/decoracio/02-honeydukes.webp',
-  escombres: '/img/tematicas/mon-magic/decoracio/06-escombres-quidditch-copa.webp',
+  hero: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-01.avif',
+  heroAlt: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-02.avif',
+  sostre: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-03.avif',
+  sobreComplet: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-04.avif',
+  sobrePlat: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-05.avif',
+  sobreDetall: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-06.avif',
+  provaSocial: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-07.avif',
+  sobrePergami: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-08.avif',
+  mussol: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-09.avif',
+  pergaminsBilingue: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-10.avif',
+  pergaminsCintes: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-11.avif',
+  veles: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-12.avif',
+  botigueta: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-13.avif',
+  escombres: '/img/portfolio/fiestas-tematicas-mon-magic/fiestas-tematicas-mon-magic-03.avif',
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -88,7 +88,9 @@ function ClientOnlyStars() {
   useEffect(() => {
     setMounted(true);
     // Generate stars only on client
-    const newStars = Array.from({ length: 50 }, () => ({
+    const shouldReduce = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const starsCount = shouldReduce ? 10 : 22;
+    const newStars = Array.from({ length: starsCount }, () => ({
       left: Math.random() * 100,
       top: Math.random() * 100,
       duration: 2 + Math.random() * 2,
@@ -148,6 +150,10 @@ const CANDLE_DATA = [
 ];
 
 function FloatingCandles() {
+  const reduceMotion =
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return null;
+
   const candles = CANDLE_DATA;
 
   return (

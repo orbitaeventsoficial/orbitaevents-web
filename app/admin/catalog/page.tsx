@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getPackPricingAlertsCount } from '@/lib/services/packPricingHealth';
+import { prisma } from '@/lib/prisma';
 
 type CatalogTab = 'packs' | 'extras' | 'inventory' | 'pricing';
 
@@ -41,7 +42,21 @@ export default async function CatalogPage({
   searchParams?: { tab?: string };
 }) {
   const activeTab = resolveTab(searchParams?.tab);
-  const pricingAlerts = await getPackPricingAlertsCount();
+  const pricingAlerts = await getPackPricingAlertsCount().catch(() => 0);
+  const packsPreview = activeTab === 'packs'
+    ? await prisma.pack.findMany({
+        where: { isActive: true },
+        orderBy: [{ service: 'asc' }, { price: 'asc' }],
+        take: 8,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          price: true,
+          service: true,
+        },
+      }).catch(() => [])
+    : [];
 
   return (
     <div className="space-y-6">
@@ -95,6 +110,21 @@ export default async function CatalogPage({
               >
                 Crear pack nou
               </Link>
+              {packsPreview.length > 0 && (
+                <div className="sm:col-span-2 mt-2 grid gap-2 sm:grid-cols-2">
+                  {packsPreview.map((pack) => (
+                    <Link
+                      key={pack.id}
+                      href={`/admin/packs/${pack.id}`}
+                      className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
+                    >
+                      <p className="font-semibold text-slate-100">{pack.name}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{pack.slug}</p>
+                      <p className="text-xs text-emerald-300 mt-1">{pack.price}€ · {pack.service || 'general'}</p>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </>
           )}
           {activeTab === 'extras' && (

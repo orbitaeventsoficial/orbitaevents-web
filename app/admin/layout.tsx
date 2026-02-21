@@ -275,10 +275,23 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    // Cargar conteo de leads nuevos al iniciar.
-    fetchNewLeadsCount();
-    fetchPackPriceAlertsCount();
-    fetchFinanceAlertsCount();
+    // Carrega en idle per no bloquejar render inicial.
+    const run = () => {
+      fetchNewLeadsCount();
+      fetchPackPriceAlertsCount();
+      fetchFinanceAlertsCount();
+    };
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const idleId = (window as Window & { requestIdleCallback: (cb: IdleRequestCallback) => number })
+        .requestIdleCallback(() => run());
+      return () => {
+        if ('cancelIdleCallback' in window) {
+          (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(idleId);
+        }
+      };
+    }
+    const timeoutId = window.setTimeout(run, 250);
+    return () => window.clearTimeout(timeoutId);
   }, [fetchNewLeadsCount, fetchPackPriceAlertsCount, fetchFinanceAlertsCount]);
 
   useEffect(() => {
@@ -287,12 +300,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   useEffect(() => {
-    // Evita fer una petició a cada navegació: refresc periòdic.
-    const intervalId = setInterval(() => {
-      fetchNewLeadsCount();
-      fetchPackPriceAlertsCount();
-      fetchFinanceAlertsCount();
-    }, 45000);
+    // Sense polling periòdic: només refresc quan la pestanya torna visible.
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         fetchNewLeadsCount();
@@ -302,7 +310,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
-      clearInterval(intervalId);
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, [fetchNewLeadsCount, fetchPackPriceAlertsCount, fetchFinanceAlertsCount]);
@@ -415,7 +422,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         { icon: '⭐', label: 'Ressenyes clients', href: '/admin/ressenyes' },
         { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event' },
         { icon: '📈', label: 'Analítica', href: '/admin/analytics' },
-        { icon: '📣', label: 'Google Ads', href: '/admin/analytics#google-ads' },
         { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
         { icon: '✍️', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
@@ -573,9 +579,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           {helpModeEnabled && <AdminHelpLegend />}
           {helpModeEnabled && <AdminHelpInspector />}
           {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-[#0c0f13] border-r border-zinc-700/80 flex-col z-40">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-[#101a28] border-r border-[#253a57] flex-col z-40">
         {/* Logo */}
-        <div className="h-[72px] px-4 flex items-center bg-[#0c0f13]">
+        <div className="h-[72px] px-4 flex items-center bg-[#101a28] border-b border-[#253a57]">
           <Link href="/admin" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#1f2835] border border-amber-600/35 flex items-center justify-center p-1.5">
               <Image
@@ -669,7 +675,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile Header - Mejorado */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[#0c0f13] border-b border-zinc-700/80 z-50 px-3 flex items-center justify-between safe-area-top">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[#101a28] border-b border-[#253a57] z-50 px-3 flex items-center justify-between safe-area-top">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
@@ -742,12 +748,12 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <aside
             id="admin-mobile-sidebar"
             aria-label="Menú admin"
-            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-[#0c0f13] border-r border-zinc-700/80 z-50 overflow-hidden
+            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-[#101a28] border-r border-[#253a57] z-50 overflow-hidden
               transform transition-transform duration-300 ease-out
               ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
           >
             {/* Header del sidebar */}
-            <div className="h-14 px-4 border-b border-zinc-700/70 flex items-center justify-between bg-[#0c0f13]">
+            <div className="h-14 px-4 border-b border-[#253a57] flex items-center justify-between bg-[#101a28]">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-amber-600 flex items-center justify-center p-1.5">
                   <Image
@@ -853,7 +859,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             </nav>
 
             {/* Footer del sidebar móvil */}
-            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-zinc-700/70 bg-[#0c0f13]">
+            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-[#253a57] bg-[#101a28]">
               <Link
                 href="/admin/settings"
                 onClick={() => setSidebarOpen(false)}
@@ -876,7 +882,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Desktop Header */}
-      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-[72px] px-6 items-center justify-between bg-[#0c0f13] border-b border-zinc-700/80 z-30">
+      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-[72px] px-6 items-center justify-between bg-[#101a28] border-b border-[#253a57] z-30">
         <div className="flex items-center gap-3 text-sm">
           <Link href="/admin" className="text-slate-400 hover:text-slate-200 transition-colors uppercase tracking-wide text-xs">Admin</Link>
           <span className="text-slate-600">/</span>
@@ -937,7 +943,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0c0f13] border-t border-zinc-700/80 z-50 safe-area-bottom">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#101a28] border-t border-[#253a57] z-50 safe-area-bottom">
         <div className="flex items-center justify-around h-full px-2 max-w-lg mx-auto">
           <BottomNavItem
             icon="📊"
