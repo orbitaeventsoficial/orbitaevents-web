@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ALL_SERVICES,
   EXTRAS,
@@ -11,6 +11,7 @@ import {
 } from '@/app/config/packs-config';
 import { generateQuotePDF } from '@/lib/pdf-utils';
 import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
+import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { z } from 'zod';
 
 type Locale = 'ca' | 'es' | 'en';
@@ -226,10 +227,14 @@ export default function PresupuestoPdfStudio({
   const [eventDate, setEventDate] = useState('');
   const [eventSchedule, setEventSchedule] = useState('');
   const [eventLocation, setEventLocation] = useState('');
+  const [travelKm, setTravelKm] = useState(0);
+  const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
+  const [calculatingDistance, setCalculatingDistance] = useState(false);
+  const lastDistanceDestinationRef = useRef('');
   const [guests, setGuests] = useState(80);
   const [validityDays, setValidityDays] = useState(15);
   const [conditionsText, setConditionsText] = useState(
-    "Reserva amb 30% per bloquejar la data.\nPagament final 7 dies abans de l'esdeveniment.\nDesplaçament inclòs fins a 50 km."
+    `Reserva amb 30% per bloquejar la data.\nPagament final 7 dies abans de l'esdeveniment.\nDesplaçament inclòs fins a ${INCLUDED_TRAVEL_KM} km.`
   );
   const [whyChooseUs, setWhyChooseUs] = useState(
     'Equip tecnic professional, resposta rapida i proposta adaptada perque tot surti perfecte sense complicacions.'
@@ -403,9 +408,59 @@ export default function PresupuestoPdfStudio({
     return base + custom;
   }, [mappedSelectedExtras, customExtras]);
 
+  const travelBlocks = useMemo(
+    () => calculateTravelBlocks(travelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM),
+    [travelKm]
+  );
+  const billableTravelKm = useMemo(
+    () => calculateBillableTravelKm(travelKm, INCLUDED_TRAVEL_KM),
+    [travelKm]
+  );
+  const travelCharge = useMemo(
+    () => calculateTravelCharge(travelKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR),
+    [travelKm]
+  );
+
   const total = useMemo(() => {
-    return Math.max(0, basePrice + extrasPrice - Math.max(0, discount));
-  }, [basePrice, extrasPrice, discount]);
+    return Math.max(0, basePrice + extrasPrice + travelCharge - Math.max(0, discount));
+  }, [basePrice, extrasPrice, travelCharge, discount]);
+
+  useEffect(() => {
+    const destination = eventLocation.trim();
+    if (destination.length < 3) {
+      setTravelKm(0);
+      setDistanceMessage(null);
+      lastDistanceDestinationRef.current = '';
+      return;
+    }
+    if (destination === lastDistanceDestinationRef.current) return;
+
+    const timer = window.setTimeout(async () => {
+      setCalculatingDistance(true);
+      try {
+        const res = await fetch('/api/admin/maps/distance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ destination }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data?.ok) throw new Error(data?.error || 'No s’ha pogut calcular la distància');
+        const nextKm = Number(data.roundTripKm || 0);
+        setTravelKm(nextKm);
+        setDistanceMessage(
+          `Ruta: ${data.oneWayKm || 0} km anada · ${data.roundTripKm || 0} km anada+tornada`
+        );
+        lastDistanceDestinationRef.current = destination;
+      } catch {
+        setTravelKm(0);
+        setDistanceMessage('No s’ha pogut calcular la ruta. Cost de desplaçament: 0 €.');
+      } finally {
+        setCalculatingDistance(false);
+      }
+    }, 550);
+
+    return () => window.clearTimeout(timer);
+  }, [eventLocation]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || draftLoaded) return;
@@ -615,6 +670,8 @@ export default function PresupuestoPdfStudio({
       },
       pricing: {
         extrasPrice,
+        travelKm,
+        travelCharge,
         discount,
         discountReason: discountReason.trim(),
         total,
@@ -649,6 +706,8 @@ export default function PresupuestoPdfStudio({
     eventLocation,
     guests,
     extrasPrice,
+    travelKm,
+    travelCharge,
     discount,
     discountReason,
     total,
@@ -664,7 +723,7 @@ export default function PresupuestoPdfStudio({
   ): Promise<string | null> => {
     if (!customerId || !selectedPack) return null;
 
-    const subtotal = Math.max(0, Number(basePrice) || 0) + extrasPrice;
+    const subtotal = Math.max(0, Number(basePrice) || 0) + extrasPrice + travelCharge;
     const discountSafe = Math.max(0, Number(discount) || 0);
     const vatRate = 21;
     const baseAfterDiscount = Math.max(0, subtotal - discountSafe);
@@ -707,6 +766,7 @@ export default function PresupuestoPdfStudio({
     selectedPack,
     basePrice,
     extrasPrice,
+    travelCharge,
     discount,
     locale,
     validityDays,
@@ -891,6 +951,14 @@ export default function PresupuestoPdfStudio({
           quantity: 1,
         })),
       ];
+      if (travelCharge > 0) {
+        payloadExtras.push({
+          name: `Desplaçament (${travelBlocks} trams, ${travelKm.toFixed(1)} km)`,
+          description: `${billableTravelKm.toFixed(1)} km extra sobre ${INCLUDED_TRAVEL_KM} km inclosos`,
+          price: travelCharge,
+          quantity: 1,
+        });
+      }
 
       const response = await fetch('/api/admin/emails/quote', {
         method: 'POST',
@@ -1128,6 +1196,9 @@ export default function PresupuestoPdfStudio({
               onChange={(e) => setEventLocation(e.target.value)}
               placeholder="Ex.: Masia Can X, Girona"
             />
+            <span className="mt-1 block text-xs text-slate-400">
+              {calculatingDistance ? 'Calculant ruta automàticament...' : distanceMessage || 'La ruta es calcula automàticament amb aquesta adreça.'}
+            </span>
           </label>
           <label className="text-sm text-slate-300">
             Convidats
@@ -1407,6 +1478,15 @@ export default function PresupuestoPdfStudio({
               <span>Extres</span>
               <span>{formatEUR(extrasPrice)}</span>
             </div>
+            <div className="flex items-center justify-between text-slate-200">
+              <span>Desplaçament</span>
+              <span>{formatEUR(travelCharge)}</span>
+            </div>
+            {travelCharge > 0 && (
+              <div className="text-xs text-slate-400">
+                {travelKm.toFixed(1)} km totals · {billableTravelKm.toFixed(1)} km extra · {travelBlocks} trams
+              </div>
+            )}
             <div className="flex items-center justify-between text-emerald-300">
               <span>Descompte</span>
               <span>-{formatEUR(discount)}</span>

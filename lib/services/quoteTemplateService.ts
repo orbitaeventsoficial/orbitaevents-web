@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 
 export const QUOTE_TEMPLATE_SETTING_KEY = 'quotes.template';
 
@@ -24,7 +25,7 @@ export const DEFAULT_QUOTE_TEMPLATE: QuoteTemplateSettings = {
     "Reserva: Es considera reserva ferma amb el pagament del 30% d'aval.",
     "Pagament final: El 70% restant s'abona 7 dies abans de l'esdeveniment.",
     "Cancel·lació: L'aval no és reemborsable un cop confirmada la reserva.",
-    'Desplaçament: Inclòs fins a 50km de Granollers. Consulteu per a distàncies superiors.',
+    `Desplaçament: Inclòs fins a ${INCLUDED_TRAVEL_KM} km de Granollers. Consulteu per a distàncies superiors.`,
     "Hores extres: Es facturaran al preu indicat si l'esdeveniment s'allarga.",
   ],
   sendAdminCopy: true,

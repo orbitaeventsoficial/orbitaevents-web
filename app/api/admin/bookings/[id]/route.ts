@@ -10,6 +10,7 @@ import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncSe
 import { calculateEventDuration } from '@/lib/inventory-utils';
 import { calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
+import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 
 interface Params {
   params: { id: string };
@@ -150,6 +151,29 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     delete body.totalPrice;
     delete body.internalNotes;
 
+    const locationFieldTouched =
+      Object.prototype.hasOwnProperty.call(body, 'eventLocation') ||
+      Object.prototype.hasOwnProperty.call(body, 'eventVenue');
+
+    if (locationFieldTouched && !Object.prototype.hasOwnProperty.call(body, 'distanceKm')) {
+      const destination = [
+        typeof body.eventVenue === 'string' ? body.eventVenue : (existing.eventVenue || ''),
+        typeof body.eventLocation === 'string' ? body.eventLocation : existing.eventLocation,
+      ]
+        .filter(Boolean)
+        .join(', ')
+        .trim();
+
+      if (destination) {
+        try {
+          const route = await calculateGoogleMapsDistance({ destination });
+          body.distanceKm = sanitizeNonNegative(route.roundTripKm, 0);
+        } catch {
+          // Si falla Maps, mantenim la distància existent
+        }
+      }
+    }
+
     // Recalcular cost de desplaçament sempre que es toquin camps de viatge
     const travelFieldTouched =
       Object.prototype.hasOwnProperty.call(body, 'distanceKm') ||
@@ -236,12 +260,21 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       });
 
       if (bookingWithPack?.pack?.inventory) {
+        const ACTIVE_BOOKING_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING'] as const;
         for (const packItem of bookingWithPack.pack.inventory) {
-          // Només assignar si no està ja assignat
           const alreadyAssigned = bookingWithPack.inventory.some(
             (bi) => bi.itemId === packItem.itemId
           );
-          if (!alreadyAssigned && packItem.item.status === 'AVAILABLE') {
+          if (!alreadyAssigned) {
+            const overlapping = await prisma.bookingInventory.count({
+              where: {
+                itemId: packItem.itemId,
+                bookingId: { not: id },
+                booking: { status: { in: ACTIVE_BOOKING_STATUSES as any } },
+              },
+            });
+            if (overlapping > 0) continue;
+
             await prisma.bookingInventory.create({
               data: {
                 bookingId: id,

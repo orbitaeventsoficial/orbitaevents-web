@@ -53,17 +53,50 @@ interface Assignment {
   item: InventoryItem;
 }
 
+interface PackTemplateItem {
+  itemId: string;
+  quantity: number;
+  isRequired: boolean;
+  item: InventoryItem;
+}
+
+interface InventoryBundle {
+  id: string;
+  name: string;
+  itemIds: string[];
+}
+
+interface SkippedDetail {
+  reason: 'NOT_FOUND' | 'ALREADY_ASSIGNED' | 'OVERLAP' | string;
+  itemId: string;
+  itemCode: string;
+  itemName: string;
+}
+
 export default function BookingInventorySection({ bookingId }: { bookingId: string }) {
   const [assigned, setAssigned] = useState<Assignment[]>([]);
   const [available, setAvailable] = useState<InventoryItem[]>([]);
+  const [packTemplate, setPackTemplate] = useState<PackTemplateItem[]>([]);
+  const [bundles, setBundles] = useState<InventoryBundle[]>([]);
+  const [selectedBundleId, setSelectedBundleId] = useState('');
   const [search, setSearch] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [showSearch, setShowSearch] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [skippedDetails, setSkippedDetails] = useState<SkippedDetail[]>([]);
 
-  const fetchData = useCallback(async (searchQuery?: string) => {
+  const reasonLabel = (reason: string) => {
+    if (reason === 'OVERLAP') return 'Ocupat en una altra reserva activa';
+    if (reason === 'ALREADY_ASSIGNED') return 'Ja assignat en aquesta reserva';
+    if (reason === 'NOT_FOUND') return 'No trobat';
+    return reason;
+  };
+
+  const fetchData = useCallback(async (query?: string) => {
     try {
       const params = new URLSearchParams();
-      if (searchQuery) params.set('search', searchQuery);
+      if (query) params.set('search', query);
 
       const res = await fetch(`/api/admin/bookings/${bookingId}/inventory?${params}`);
       if (!res.ok) return;
@@ -71,21 +104,29 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       const data = await res.json();
       setAssigned(data.assigned || []);
       setAvailable(data.available || []);
+      setPackTemplate(data.packTemplate?.items || []);
+      setBundles(data.bundles || []);
+      if (!selectedBundleId && Array.isArray(data.bundles) && data.bundles.length > 0) {
+        setSelectedBundleId(data.bundles[0].id);
+      }
     } catch {
-      // Silently fail
+      setMessage('No s\'ha pogut carregar l\'inventari de la reserva.');
     } finally {
       setLoading(false);
     }
   }, [bookingId]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const timer = setTimeout(() => {
+      void fetchData(searchQuery);
+    }, 220);
+    return () => clearTimeout(timer);
+  }, [fetchData, searchQuery]);
 
   const handleSearch = useCallback((value: string) => {
     setSearch(value);
-    fetchData(value);
-  }, [fetchData]);
+    setSearchQuery(value.trim());
+  }, []);
 
   const handleAssign = useCallback(async (itemId: string) => {
     try {
@@ -97,15 +138,74 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        alert(data?.error || 'Error assignant');
+        setMessage(data?.error || 'Error assignant');
+        setSkippedDetails([]);
         return;
       }
 
-      fetchData(search);
+      setMessage('Element afegit correctament.');
+      setSkippedDetails([]);
+      fetchData(searchQuery);
     } catch {
-      alert('Error assignant element');
+      setMessage('Error assignant element');
+      setSkippedDetails([]);
     }
-  }, [bookingId, search, fetchData]);
+  }, [bookingId, searchQuery, fetchData]);
+
+  const handleAssignPack = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/admin/bookings/${bookingId}/inventory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'pack' }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setMessage(data?.error || 'Error afegint l\'inventari del pack');
+        setSkippedDetails([]);
+        return;
+      }
+
+      const created = Number(data.created || 0);
+      const skipped = Array.isArray(data.skipped) ? data.skipped.length : 0;
+      const details = Array.isArray(data.skippedDetails) ? data.skippedDetails : [];
+      setSkippedDetails(details);
+      setMessage(`Pack afegit: ${created} element(s) assignat(s)${skipped > 0 ? ` · ${skipped} no disponibles` : ''}.`);
+      fetchData(searchQuery);
+    } catch {
+      setMessage('Error afegint inventari del pack');
+      setSkippedDetails([]);
+    }
+  }, [bookingId, fetchData, searchQuery]);
+
+  const handleAssignBundle = useCallback(async () => {
+    if (!selectedBundleId) {
+      setMessage('Selecciona un lot.');
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/bookings/${bookingId}/inventory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'bundle', bundleId: selectedBundleId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setMessage(data?.error || 'Error afegint lot');
+        setSkippedDetails([]);
+        return;
+      }
+      const created = Number(data.created || 0);
+      const skipped = Array.isArray(data.skipped) ? data.skipped.length : 0;
+      const details = Array.isArray(data.skippedDetails) ? data.skippedDetails : [];
+      setSkippedDetails(details);
+      setMessage(`Lot afegit: ${created} element(s) assignat(s)${skipped > 0 ? ` · ${skipped} no disponibles` : ''}.`);
+      fetchData(searchQuery);
+    } catch {
+      setMessage('Error afegint lot');
+      setSkippedDetails([]);
+    }
+  }, [selectedBundleId, bookingId, fetchData, searchQuery]);
 
   const handleRemove = useCallback(async (assignmentId: string) => {
     if (!confirm('Segur que vols treure aquest element?')) return;
@@ -121,11 +221,11 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
         return;
       }
 
-      fetchData(search);
+      fetchData(searchQuery);
     } catch {
       alert('Error eliminant');
     }
-  }, [bookingId, search, fetchData]);
+  }, [bookingId, searchQuery, fetchData]);
 
   const handleToggleCheckout = useCallback(async (assignment: Assignment) => {
     try {
@@ -139,11 +239,11 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       });
 
       if (!res.ok) return;
-      fetchData(search);
+      fetchData(searchQuery);
     } catch {
       // Silently fail
     }
-  }, [bookingId, search, fetchData]);
+  }, [bookingId, searchQuery, fetchData]);
 
   const handleCheckin = useCallback(async (assignment: Assignment, conditionAfter: string) => {
     try {
@@ -158,11 +258,11 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
       });
 
       if (!res.ok) return;
-      fetchData(search);
+      fetchData(searchQuery);
     } catch {
       // Silently fail
     }
-  }, [bookingId, search, fetchData]);
+  }, [bookingId, searchQuery, fetchData]);
 
   if (loading) {
     return (
@@ -184,14 +284,62 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
             </span>
           )}
         </h2>
-        <button
-          type="button"
-          onClick={() => setShowSearch(!showSearch)}
-          className="rounded-lg border border-slate-600/50 bg-slate-700/50 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
-        >
-          {showSearch ? 'Tancar cerca' : '+ Afegir equip'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleAssignPack}
+            disabled={packTemplate.length === 0}
+            className="rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-200 hover:bg-emerald-500/25 disabled:opacity-50 transition-colors"
+          >
+            + Afegir inventari del pack
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowSearch(!showSearch)}
+            className="rounded-lg border border-slate-600/50 bg-slate-700/50 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
+          >
+            {showSearch ? 'Tancar cerca' : '+ Afegir element'}
+          </button>
+        </div>
       </div>
+      {message && (
+        <p className="mb-3 text-xs text-slate-300">{message}</p>
+      )}
+      {skippedDetails.length > 0 && (
+        <div className="mb-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
+          <p className="mb-2 text-xs font-semibold text-amber-200">Elements no afegits</p>
+          <ul className="space-y-1">
+            {skippedDetails.map((detail) => (
+              <li key={`${detail.itemId}-${detail.reason}`} className="text-xs text-amber-100">
+                <code className="mr-1 rounded bg-amber-950/40 px-1 py-0.5">{detail.itemCode}</code>
+                {detail.itemName} · {reasonLabel(detail.reason)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {bundles.length > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <select
+            value={selectedBundleId}
+            onChange={(e) => setSelectedBundleId(e.target.value)}
+            className="rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-100"
+          >
+            {bundles.map((bundle) => (
+              <option key={bundle.id} value={bundle.id}>
+                {bundle.name} ({bundle.itemIds.length})
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={handleAssignBundle}
+            className="rounded-lg border border-indigo-500/40 bg-indigo-500/15 px-3 py-1.5 text-xs font-medium text-indigo-200 hover:bg-indigo-500/25 transition-colors"
+          >
+            + Afegir lot
+          </button>
+        </div>
+      )}
 
       {/* Elements assignats */}
       {assigned.length === 0 ? (

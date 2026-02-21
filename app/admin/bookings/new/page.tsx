@@ -6,7 +6,7 @@
  * Pot pre-omplir des d'un lead (leadId) o client (customerId)
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
@@ -126,6 +126,7 @@ export default function NewBookingPage() {
   const [calculatingDistance, setCalculatingDistance] = useState(false);
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
   const [fuelReferenceInfo, setFuelReferenceInfo] = useState<string | null>(null);
+  const lastDistanceDestinationRef = useRef('');
 
   const updateField = (field: keyof FormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -344,17 +345,11 @@ export default function NewBookingPage() {
     }
   }, [packs, form.packId, selectedExtras]);
 
-  const handleCalculateDistance = useCallback(async () => {
-    if (!form.eventLocation.trim()) {
-      setDistanceMessage('Introdueix la ubicació de l\'esdeveniment per calcular la distància.');
-      return;
-    }
-
+  const calculateDistanceForDestination = useCallback(async (destination: string) => {
     setCalculatingDistance(true);
     setDistanceMessage(null);
 
     try {
-      const destination = [form.eventVenue.trim(), form.eventLocation.trim()].filter(Boolean).join(', ');
       const res = await fetch('/api/admin/maps/distance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -366,7 +361,8 @@ export default function NewBookingPage() {
         throw new Error(data?.error || 'No s\'ha pogut calcular la distància');
       }
 
-      updateField('distanceKm', String(data.roundTripKm || 0));
+      setForm((prev) => ({ ...prev, distanceKm: String(data.roundTripKm || 0) }));
+      lastDistanceDestinationRef.current = destination;
       setDistanceMessage(
         `Ruta calculada: ${data.originResolved || 'Origen'} → ${data.destinationResolved || 'Destí'} (${data.oneWayKm || 0} km anada, ${data.roundTripKm || 0} km anada+tornada).`
       );
@@ -375,7 +371,23 @@ export default function NewBookingPage() {
     } finally {
       setCalculatingDistance(false);
     }
-  }, [form.eventLocation, form.eventVenue]);
+  }, []);
+
+  useEffect(() => {
+    const destination = [form.eventVenue.trim(), form.eventLocation.trim()].filter(Boolean).join(', ');
+    if (destination.length < 3) {
+      return;
+    }
+    if (destination === lastDistanceDestinationRef.current) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      void calculateDistanceForDestination(destination);
+    }, 550);
+
+    return () => clearTimeout(timer);
+  }, [form.eventLocation, form.eventVenue, calculateDistanceForDestination]);
 
   const handleSubmit = useCallback(async () => {
     if (!form.clientName || !form.clientEmail || !form.clientPhone) {
@@ -528,17 +540,8 @@ export default function NewBookingPage() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={handleCalculateDistance}
-            disabled={calculatingDistance || !form.eventLocation.trim()}
-            className="rounded-lg border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-50"
-          >
-            {calculatingDistance ? 'Calculant ruta...' : 'Calcular amb Google Maps'}
-          </button>
-          {distanceMessage && (
-            <p className="text-xs text-slate-300">{distanceMessage}</p>
-          )}
+          {calculatingDistance && <p className="text-xs text-cyan-300">Calculant ruta automàticament...</p>}
+          {distanceMessage && <p className="text-xs text-slate-300">{distanceMessage}</p>}
         </div>
       </div>
 

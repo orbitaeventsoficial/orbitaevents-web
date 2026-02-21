@@ -30,44 +30,44 @@ const PALETTES: Palette[] = [
   {
     id: 'corporate-neutral',
     name: 'Corporativa Neutra',
-    description: 'Sobria, legible y estable',
-    surface: '#1f2124',
-    panel: '#2b2e34',
-    border: '#4a4f59',
-    text: '#edf0f5',
-    muted: '#b7beca',
-    primary: '#98adc8',
-    success: '#92c8a2',
-    warning: '#d1bb8a',
-    danger: '#cf9baa',
+    description: 'Gris executiu, molt net',
+    surface: '#121417',
+    panel: '#1f2329',
+    border: '#4f5764',
+    text: '#f2f5fb',
+    muted: '#b8c0ce',
+    primary: '#79a8d8',
+    success: '#6fc59a',
+    warning: '#d7b36d',
+    danger: '#d88787',
   },
   {
     id: 'pastel-warm',
     name: 'Pastel Càlida',
-    description: 'Suave, humana, sin estridencias',
-    surface: '#231f20',
-    panel: '#322b2d',
-    border: '#5a4d50',
-    text: '#f5efee',
-    muted: '#cabebd',
-    primary: '#d1a99d',
-    success: '#9ac7a2',
-    warning: '#d7be8d',
-    danger: '#d4a1ad',
+    description: 'Arena + terracota suau',
+    surface: '#1e1715',
+    panel: '#2f2420',
+    border: '#6a5248',
+    text: '#fff1e8',
+    muted: '#d9c0b2',
+    primary: '#df9e7f',
+    success: '#8dc59b',
+    warning: '#e2b66d',
+    danger: '#dc8f8f',
   },
   {
     id: 'pastel-cool',
     name: 'Pastel Freda',
-    description: 'Fría limpia, sin neón ni lila',
-    surface: '#1f2327',
-    panel: '#2a3137',
-    border: '#4a5863',
-    text: '#edf3f7',
-    muted: '#b8c4cd',
-    primary: '#9db8c6',
-    success: '#94c7b6',
-    warning: '#d1c090',
-    danger: '#cfa1af',
+    description: 'Blau gel + acer',
+    surface: '#121821',
+    panel: '#1d2a38',
+    border: '#4c6b89',
+    text: '#eef6ff',
+    muted: '#b6cadf',
+    primary: '#7fb3e5',
+    success: '#75c7b0',
+    warning: '#d7be7a',
+    danger: '#d68fa5',
   },
   {
     id: 'olive-sand',
@@ -111,18 +111,125 @@ const PALETTES: Palette[] = [
     warning: '#d7b37d',
     danger: '#d39aa9',
   },
+  {
+    id: 'ocean-board',
+    name: 'Oceà Corporatiu',
+    description: 'Blau marí + cian net',
+    surface: '#0f1a2a',
+    panel: '#15304a',
+    border: '#3f6f9b',
+    text: '#e9f5ff',
+    muted: '#a8c6df',
+    primary: '#65b8ff',
+    success: '#67c89d',
+    warning: '#d9bb6b',
+    danger: '#d98b95',
+  },
+  {
+    id: 'forest-ops',
+    name: 'Forest Ops',
+    description: 'Verd operatiu + sorra',
+    surface: '#141d18',
+    panel: '#223127',
+    border: '#4c6c56',
+    text: '#eef8f0',
+    muted: '#b8cdbd',
+    primary: '#88c7a0',
+    success: '#63c48d',
+    warning: '#d8b773',
+    danger: '#d38f97',
+  },
+  {
+    id: 'graphite-gold',
+    name: 'Grafit + Or',
+    description: 'Executiva premium',
+    surface: '#141416',
+    panel: '#232327',
+    border: '#5a5b64',
+    text: '#f8f4e9',
+    muted: '#c9c1a8',
+    primary: '#d5b66d',
+    success: '#8bc39f',
+    warning: '#e0bd68',
+    danger: '#d98989',
+  },
+  {
+    id: 'ruby-stone',
+    name: 'Rubí + Pedra',
+    description: 'Càlida intensa, molt diferent',
+    surface: '#201417',
+    panel: '#341f25',
+    border: '#7a4d57',
+    text: '#ffeef1',
+    muted: '#d9b8bf',
+    primary: '#df8ea2',
+    success: '#86c7a2',
+    warning: '#e0b775',
+    danger: '#e1768e',
+  },
+  {
+    id: 'ink-lime',
+    name: 'Tinta + Lima',
+    description: 'Moderna, molt contrastada',
+    surface: '#121815',
+    panel: '#1f2a24',
+    border: '#4f6c5e',
+    text: '#effaf4',
+    muted: '#b8d2c5',
+    primary: '#9acb7a',
+    success: '#75ce98',
+    warning: '#d5bc76',
+    danger: '#d68f9f',
+  },
+  {
+    id: 'steel-coral',
+    name: 'Acer + Coral',
+    description: 'Corporativa amb accent viu',
+    surface: '#161b22',
+    panel: '#222c38',
+    border: '#4f637a',
+    text: '#edf4ff',
+    muted: '#b6c4d8',
+    primary: '#df8f84',
+    success: '#79c5a4',
+    warning: '#d7b871',
+    danger: '#dd7c86',
+  },
 ];
 
 function buildPaletteCss(palette: Palette): string {
   return `/* Palette: ${palette.name} */
-html.admin-mode .admin-layout-body { background: ${palette.surface} !important; color: ${palette.text} !important; }
-html.admin-mode .admin-sidebar,
-html.admin-mode .admin-mobile-header,
-html.admin-mode .admin-desktop-header,
-html.admin-mode .admin-bottom-nav { background: ${palette.panel} !important; border-color: ${palette.border} !important; }
+html.admin-mode .admin-layout-body,
+html.admin-mode .admin-layout-shell,
+html.admin-mode .admin-main,
+html.admin-mode .admin-main-shell {
+  background: ${palette.surface} !important;
+  color: ${palette.text} !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-sidebar,
+html.admin-mode .admin-layout-shell .admin-mobile-header,
+html.admin-mode .admin-layout-shell .admin-desktop-header,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar,
+html.admin-mode .admin-layout-shell .admin-bottom-nav,
+html.admin-mode .admin-layout-shell .admin-sidebar-foot-card,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar-head {
+  background: ${palette.panel} !important;
+  border-color: ${palette.border} !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-sidebar :is(a, p, span),
+html.admin-mode .admin-layout-shell .admin-desktop-header :is(a, p, span),
+html.admin-mode .admin-layout-shell .admin-mobile-header :is(a, p, span) {
+  color: ${palette.text} !important;
+}
+
 html.admin-mode .admin-shell .admin-control-room .admin-cr-panel,
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card,
-html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card { background: ${palette.panel} !important; border-color: ${palette.border} !important; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card {
+  background: ${palette.panel} !important;
+  border-color: ${palette.border} !important;
+}
 html.admin-mode .admin-shell .admin-control-room .admin-cr-title,
 html.admin-mode .admin-shell .admin-control-room .admin-cr-h2,
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card-title { color: ${palette.text} !important; }
@@ -151,13 +258,30 @@ export default function AdminCssManagerPage() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
+  function applyLiveCss(nextCss: string) {
+    if (typeof document === 'undefined') return;
+    let style = document.getElementById('admin-custom-css-live') as HTMLStyleElement | null;
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'admin-custom-css-live';
+      document.head.appendChild(style);
+    }
+    style.textContent = nextCss;
+    const globalStyle = document.getElementById('admin-custom-css') as HTMLStyleElement | null;
+    if (globalStyle) globalStyle.textContent = nextCss;
+  }
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const res = await fetch('/api/admin/css', { cache: 'no-store' });
         const data = await res.json().catch(() => ({}));
-        if (!cancelled) setCss(typeof data?.css === 'string' ? data.css : '');
+        if (!cancelled) {
+          const loadedCss = typeof data?.css === 'string' ? data.css : '';
+          setCss(loadedCss);
+          applyLiveCss(loadedCss);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -166,6 +290,10 @@ export default function AdminCssManagerPage() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!loading) applyLiveCss(css);
+  }, [css, loading]);
 
   async function save() {
     setSaving(true);
@@ -178,6 +306,10 @@ export default function AdminCssManagerPage() {
       });
       if (!res.ok) throw new Error('No s’ha pogut desar el CSS');
       setMsg('CSS desat i aplicat al panell admin.');
+      applyLiveCss(css);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('admin-css-updated', { detail: { css } }));
+      }
     } catch (error) {
       setMsg(error instanceof Error ? error.message : 'Error desant CSS');
     } finally {

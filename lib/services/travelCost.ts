@@ -3,6 +3,11 @@ export const DEFAULT_FUEL_COST_PER_KM = 0.19;
 export const TRAVEL_BLOCK_KM = 40;
 export const TRAVEL_BLOCK_EUR = 20;
 
+export function getIncludedTravelOneWayKm(includedKm = INCLUDED_TRAVEL_KM): number {
+  const safeIncluded = sanitizeNonNegative(includedKm, INCLUDED_TRAVEL_KM);
+  return round2(safeIncluded / 2);
+}
+
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
@@ -28,11 +33,11 @@ export function calculateTravelBlocks(totalKm: number, includedKm = INCLUDED_TRA
 export function calculateTravelCost(
   totalKm: number,
   fuelCostPerKm: number,
-  includedKm = INCLUDED_TRAVEL_KM,
+  _includedKm = INCLUDED_TRAVEL_KM,
 ): number {
-  const billableKm = calculateBillableTravelKm(totalKm, includedKm);
+  const safeTotalKm = sanitizeNonNegative(totalKm, 0);
   const rate = sanitizeNonNegative(fuelCostPerKm, DEFAULT_FUEL_COST_PER_KM);
-  return round2(billableKm * rate);
+  return round2(safeTotalKm * rate);
 }
 
 export function calculateTravelCharge(

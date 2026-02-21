@@ -105,10 +105,12 @@ export default function FiestasClient() {
 
   const getPackText = (pack: PackDefinition, field: 'name' | 'tagline' | 'ideal') => {
     const rawFallback = field === 'name' ? pack.name : field === 'tagline' ? pack.tagline : (pack.ideal || '');
-    const fallback =
-      rawFallback.startsWith('pages.')
-        ? (field === 'name' ? pack.id.replace(/-/g, ' ') : '')
-        : rawFallback;
+    const isKeyLike = /^(configurator|pages|services)\./.test(rawFallback);
+    const fallback = isKeyLike
+      ? (field === 'name'
+        ? pack.id.replace(/-/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase())
+        : '')
+      : rawFallback;
 
     const baseKey = normalizePackBaseKey(pack.i18nBaseKey || `step2.packs.${pack.id}`);
     const candidates = [

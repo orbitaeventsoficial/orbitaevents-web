@@ -96,11 +96,21 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       });
 
       if (bookingWithPack?.pack?.inventory) {
+        const ACTIVE_BOOKING_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING'] as const;
         for (const packItem of bookingWithPack.pack.inventory) {
           const alreadyAssigned = bookingWithPack.inventory.some(
             (bi) => bi.itemId === packItem.itemId
           );
-          if (!alreadyAssigned && packItem.item.status === 'AVAILABLE') {
+          if (!alreadyAssigned) {
+            const overlapping = await prisma.bookingInventory.count({
+              where: {
+                itemId: packItem.itemId,
+                bookingId: { not: id },
+                booking: { status: { in: ACTIVE_BOOKING_STATUSES as any } },
+              },
+            });
+            if (overlapping > 0) continue;
+
             await prisma.bookingInventory.create({
               data: {
                 bookingId: id,

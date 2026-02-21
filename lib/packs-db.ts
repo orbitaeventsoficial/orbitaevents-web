@@ -17,6 +17,7 @@ type DbPack = {
   price: number;
   originalPrice: number | null;
   djHours: number;
+  extraHourPrice?: number | null;
   minGuests: number | null;
   maxGuests: number | null;
   isFeatured: boolean;
@@ -61,6 +62,7 @@ function mapPack(pack: DbPack, locale: string): PackDefinition {
     features: resolvePackI18nFeatures(rawFeatures, locale),
     duration: `${durationHours} ${durationLabel}`,
     durationHours,
+    extraHourPrice: Number((pack as { extraHourPrice?: number | null }).extraHourPrice ?? 0) || undefined,
     popular: pack.isFeatured || false,
     badge: rawBadge ? resolvePackI18nKey(rawBadge, locale) : null,
     capacidadMinima: pack.minGuests ?? undefined,

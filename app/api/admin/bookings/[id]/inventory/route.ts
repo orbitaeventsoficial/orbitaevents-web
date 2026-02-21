@@ -5,6 +5,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { z } from 'zod';
+import { getInventoryBundles } from '@/lib/services/inventoryBundles';
 
 interface Params {
   params: { id: string };
@@ -17,6 +18,24 @@ export async function GET(req: NextRequest, { params }: Params) {
 
   try {
     const bookingId = params.id;
+
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        pack: {
+          include: {
+            inventory: {
+              include: { item: true },
+            },
+          },
+        },
+      },
+    });
+    if (!booking) {
+      return NextResponse.json({ error: 'Reserva no trobada' }, { status: 404 });
+    }
+
+    const ACTIVE_BOOKING_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING'] as const;
 
     // Obtenir items assignats a la reserva
     const assigned = await prisma.bookingInventory.findMany({
@@ -42,6 +61,14 @@ export async function GET(req: NextRequest, { params }: Params) {
             { name: { contains: search, mode: 'insensitive' } },
           ],
         }),
+        bookingItems: {
+          none: {
+            bookingId: { not: bookingId },
+            booking: {
+              status: { in: ACTIVE_BOOKING_STATUSES as any },
+            },
+          },
+        },
         // Excloure els ja assignats
         NOT: {
           id: { in: assigned.map((a) => a.itemId) },
@@ -55,6 +82,17 @@ export async function GET(req: NextRequest, { params }: Params) {
       ok: true,
       assigned,
       available,
+      packTemplate: {
+        packId: booking.packId,
+        packName: booking.pack.slug,
+        items: booking.pack.inventory.map((row) => ({
+          itemId: row.itemId,
+          quantity: row.quantity,
+          isRequired: row.isRequired,
+          item: row.item,
+        })),
+      },
+      bundles: await getInventoryBundles(),
     });
   } catch (error) {
     log.error('Error obtenint inventari de reserva:', error);
@@ -67,7 +105,9 @@ export async function GET(req: NextRequest, { params }: Params) {
 
 // POST - Assignar un element a la reserva
 const assignSchema = z.object({
-  itemId: z.string().min(1),
+  itemId: z.string().min(1).optional(),
+  bundleId: z.string().min(1).optional(),
+  mode: z.enum(['single', 'pack', 'bundle']).default('single'),
   quantity: z.number().int().min(1).default(1),
 });
 
@@ -87,7 +127,7 @@ export async function POST(req: NextRequest, { params }: Params) {
       );
     }
 
-    const { itemId, quantity } = parsed.data;
+    const { itemId, bundleId, quantity, mode } = parsed.data;
 
     // Verificar que la reserva existeix
     const booking = await prisma.booking.findUnique({
@@ -97,56 +137,186 @@ export async function POST(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: 'Reserva no trobada' }, { status: 404 });
     }
 
-    // Verificar que l'element existeix
-    const item = await prisma.inventoryItem.findUnique({
-      where: { id: itemId },
-    });
-    if (!item) {
-      return NextResponse.json({ error: 'Element no trobat' }, { status: 404 });
-    }
+    const ACTIVE_BOOKING_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING'] as const;
 
-    // Verificar que no està ja assignat
-    const existing = await prisma.bookingInventory.findUnique({
-      where: { bookingId_itemId: { bookingId, itemId } },
-    });
-    if (existing) {
-      return NextResponse.json({ error: 'Element ja assignat a aquesta reserva' }, { status: 409 });
-    }
+    const assignOne = async (targetItemId: string, targetQuantity: number) => {
+      const item = await prisma.inventoryItem.findUnique({
+        where: { id: targetItemId },
+      });
+      if (!item) {
+        return {
+          ok: false as const,
+          reason: 'NOT_FOUND' as const,
+          itemId: targetItemId,
+          itemCode: targetItemId.slice(0, 8),
+          itemName: 'Element no trobat',
+        };
+      }
 
-    // Crear l'assignació
-    const assignment = await prisma.bookingInventory.create({
-      data: {
-        bookingId,
-        itemId,
-        quantity,
-        conditionBefore: item.condition,
-      },
-      include: { item: true },
-    });
+      const existing = await prisma.bookingInventory.findUnique({
+        where: { bookingId_itemId: { bookingId, itemId: targetItemId } },
+      });
+      if (existing) {
+        return {
+          ok: false as const,
+          reason: 'ALREADY_ASSIGNED' as const,
+          itemId: targetItemId,
+          itemCode: item.code,
+          itemName: item.name,
+        };
+      }
 
-    // Marcar l'element com a IN_USE si la reserva està confirmada/preparant
-    if (['CONFIRMED', 'PREPARING'].includes(booking.status)) {
-      await prisma.inventoryItem.update({
-        where: { id: itemId },
-        data: { status: 'IN_USE' },
+      const overlapping = await prisma.bookingInventory.count({
+        where: {
+          itemId: targetItemId,
+          bookingId: { not: bookingId },
+          booking: {
+            status: { in: ACTIVE_BOOKING_STATUSES as any },
+          },
+        },
+      });
+      if (overlapping > 0) {
+        return {
+          ok: false as const,
+          reason: 'OVERLAP' as const,
+          itemId: targetItemId,
+          itemCode: item.code,
+          itemName: item.name,
+        };
+      }
+
+      const assignment = await prisma.bookingInventory.create({
+        data: {
+          bookingId,
+          itemId: targetItemId,
+          quantity: targetQuantity,
+          conditionBefore: item.condition,
+        },
+        include: { item: true },
+      });
+
+      if (['CONFIRMED', 'PREPARING'].includes(booking.status)) {
+        await prisma.inventoryItem.update({
+          where: { id: targetItemId },
+          data: { status: 'IN_USE' },
+        });
+      }
+
+      await prisma.adminLog.create({
+        data: {
+          action: 'CREATE',
+          entity: 'booking_inventory',
+          entityId: assignment.id,
+          details: {
+            bookingId,
+            bookingRef: booking.reference,
+            itemCode: item.code,
+            itemName: item.name,
+          },
+        },
+      });
+
+      return { ok: true, assignment } as const;
+    };
+
+    if (mode === 'pack') {
+      const packItems = await prisma.packInventory.findMany({
+        where: { packId: booking.packId },
+      });
+
+      if (packItems.length === 0) {
+        return NextResponse.json({ error: 'Aquest pack no té inventari configurat' }, { status: 400 });
+      }
+
+      const results = await Promise.all(
+        packItems.map((row) => assignOne(row.itemId, Math.max(1, row.quantity || 1)))
+      );
+      const created = results.filter((r) => r.ok).length;
+      const skippedDetails = results
+        .filter((r) => !r.ok)
+        .map((r) => {
+          const failed = r as {
+            ok: false;
+            reason: 'NOT_FOUND' | 'ALREADY_ASSIGNED' | 'OVERLAP';
+            itemId: string;
+            itemCode: string;
+            itemName: string;
+          };
+          return {
+            reason: failed.reason,
+            itemId: failed.itemId,
+            itemCode: failed.itemCode,
+            itemName: failed.itemName,
+          };
+        });
+
+      return NextResponse.json({
+        ok: true,
+        mode: 'pack',
+        created,
+        skipped: skippedDetails.map((s) => s.reason),
+        skippedDetails,
       });
     }
 
-    await prisma.adminLog.create({
-      data: {
-        action: 'CREATE',
-        entity: 'booking_inventory',
-        entityId: assignment.id,
-        details: {
-          bookingId,
-          bookingRef: booking.reference,
-          itemCode: item.code,
-          itemName: item.name,
-        },
-      },
-    });
+    if (mode === 'bundle') {
+      if (!bundleId) {
+        return NextResponse.json({ error: 'Falta bundleId' }, { status: 400 });
+      }
+      const bundles = await getInventoryBundles();
+      const bundle = bundles.find((b) => b.id === bundleId);
+      if (!bundle) {
+        return NextResponse.json({ error: 'Lot no trobat' }, { status: 404 });
+      }
+      if (bundle.itemIds.length === 0) {
+        return NextResponse.json({ error: 'Aquest lot no té elements' }, { status: 400 });
+      }
 
-    return NextResponse.json({ ok: true, assignment });
+      const results = await Promise.all(
+        bundle.itemIds.map((bundleItemId) => assignOne(bundleItemId, 1))
+      );
+      const created = results.filter((r) => r.ok).length;
+      const skippedDetails = results
+        .filter((r) => !r.ok)
+        .map((r) => {
+          const failed = r as {
+            ok: false;
+            reason: 'NOT_FOUND' | 'ALREADY_ASSIGNED' | 'OVERLAP';
+            itemId: string;
+            itemCode: string;
+            itemName: string;
+          };
+          return {
+            reason: failed.reason,
+            itemId: failed.itemId,
+            itemCode: failed.itemCode,
+            itemName: failed.itemName,
+          };
+        });
+
+      return NextResponse.json({
+        ok: true,
+        mode: 'bundle',
+        bundleId,
+        created,
+        skipped: skippedDetails.map((s) => s.reason),
+        skippedDetails,
+      });
+    }
+
+    if (!itemId) {
+      return NextResponse.json({ error: 'Falta itemId' }, { status: 400 });
+    }
+    const single = await assignOne(itemId, quantity);
+    if (!single.ok) {
+      const reason = single.reason;
+      if (reason === 'NOT_FOUND') return NextResponse.json({ error: 'Element no trobat' }, { status: 404 });
+      if (reason === 'ALREADY_ASSIGNED') return NextResponse.json({ error: 'Element ja assignat a aquesta reserva' }, { status: 409 });
+      if (reason === 'OVERLAP') return NextResponse.json({ error: 'Element ocupat en una altra reserva activa' }, { status: 409 });
+      return NextResponse.json({ error: 'No s’ha pogut assignar' }, { status: 400 });
+    }
+
+    return NextResponse.json({ ok: true, assignment: single.assignment });
   } catch (error) {
     log.error('Error assignant element a reserva:', error);
     return NextResponse.json(

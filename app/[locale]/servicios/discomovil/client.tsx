@@ -23,10 +23,21 @@ function getPackText(t: ReturnType<typeof useTranslations>, packId: string, fiel
   try {
     const key = `discoPacks.${packId}.${field}`;
     const translated = t(key);
-    // Si retorna la clau, usar fallback
-    return translated === key ? fallback : translated;
+    const candidate = translated === key ? fallback : translated;
+    if (!candidate.includes('.')) return candidate;
+    const token = field === 'name' || field === 'tagline' || field === 'ideal' ? packId : candidate;
+    return token
+      .replace(/[-_]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, (m) => m.toUpperCase());
   } catch {
-    return fallback;
+    if (!fallback.includes('.')) return fallback;
+    return packId
+      .replace(/[-_]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, (m) => m.toUpperCase());
   }
 }
 
@@ -36,7 +47,18 @@ function getPackFeatures(t: ReturnType<typeof useTranslations>, packId: string, 
     for (let i = 0; i < fallbackFeatures.length; i++) {
       const key = `discoPacks.${packId}.features.${i}`;
       const translated = t(key);
-      features.push(translated === key ? fallbackFeatures[i] : translated);
+      const candidate = translated === key ? fallbackFeatures[i] : translated;
+      if (!candidate.includes('.')) {
+        features.push(candidate);
+        continue;
+      }
+      const normalized = fallbackFeatures[i]
+        .replace(/.*\./, '')
+        .replace(/^f(\d+)$/i, 'Característica $1')
+        .replace(/[-_]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      features.push(normalized.charAt(0).toUpperCase() + normalized.slice(1));
     }
     return features;
   } catch {
@@ -128,7 +150,9 @@ export default function DiscomovilClientV2() {
     const extra = discoExtras.find(e => e.id === id);
     return sum + (extra?.price || 0);
   }, 0);
-  const extraHoursPrice = config.extraHours * 100; // 100€/hora
+  const selectedPackAny = config.selectedPack as (PackDefinition & { extraHourPrice?: number }) | null;
+  const extraHourUnitPrice = Number(selectedPackAny?.extraHourPrice || 100);
+  const extraHoursPrice = config.extraHours * extraHourUnitPrice;
   const totalPrice = packPrice + extrasPrice + extraHoursPrice;
 
   // Descuento por 3+ extras (15%)
@@ -409,7 +433,7 @@ export default function DiscomovilClientV2() {
             </div>
 
             <div className="text-center text-sm text-text-muted">
-              100€ {t('perHour')} · {t('maxHours')}
+              {extraHourUnitPrice}€ {t('perHour')} · {t('maxHours')}
             </div>
           </div>
         </motion.section>
@@ -529,7 +553,7 @@ export default function DiscomovilClientV2() {
                 <div className="flex items-center gap-4 sm:gap-6 flex-wrap text-white">
                   <div>
                     <div className="text-xs sm:text-sm text-[var(--oe-gold)] font-semibold">
-                      {config.selectedPack?.name}
+                      {config.selectedPack ? getPackText(t, config.selectedPack.id, 'name', config.selectedPack.name) : ''}
                     </div>
                     <div className="flex items-center gap-2 text-xs sm:text-sm text-white/70 mt-1">
                       <span>{config.numGuests} {t('people')}</span>

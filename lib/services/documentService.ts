@@ -5,6 +5,7 @@
  */
 
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
 
 // ============================================
 // UTILS - ESCAPE HTML
@@ -155,7 +156,7 @@ export function generateQuoteHTML(data: QuoteData, template: QuoteTemplateOverri
         "Reserva: la data queda confirmada amb el pagament del 30% d'aval.",
         "Pagament final: el 70% restant s'abona 7 dies abans de l'esdeveniment.",
         "Cancel·lació: l'aval no és reemborsable un cop confirmada la reserva.",
-        'Desplaçament: inclòs fins a 50 km de Granollers. Per a distàncies superiors, et passarem pressupost.',
+        `Desplaçament: inclòs fins a ${INCLUDED_TRAVEL_KM} km de Granollers. Per a distàncies superiors, et passarem pressupost.`,
         "Hores extres: si l'esdeveniment s'allarga, es facturaran al preu indicat.",
       ];
 

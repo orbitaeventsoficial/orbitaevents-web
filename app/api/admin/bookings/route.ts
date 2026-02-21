@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { BookingStatus, EventType } from '@prisma/client';
 import { calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
+import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
 
 export const dynamic = 'force-dynamic';
 const OPERATOR_EXTRA_ID = '__operator_extra__';
@@ -256,7 +257,18 @@ export async function POST(req: NextRequest) {
     const extraHoursPrice = (data.extraHours || 0) * pack.extraHourPrice;
     const extrasPrice = data.extras?.reduce((sum, e) => sum + e.price * (e.quantity || 1), 0) || 0;
     const subtotalBase = packPrice + extraHoursPrice + extrasPrice;
-    const distanceKm = data.distanceKm != null ? sanitizeNonNegative(data.distanceKm, 0) : null;
+    let distanceKm = data.distanceKm != null ? sanitizeNonNegative(data.distanceKm, 0) : null;
+    if (distanceKm == null) {
+      const destination = [data.eventVenue || '', data.eventLocation || ''].filter(Boolean).join(', ').trim();
+      if (destination) {
+        try {
+          const route = await calculateGoogleMapsDistance({ destination });
+          distanceKm = sanitizeNonNegative(route.roundTripKm, 0);
+        } catch {
+          distanceKm = null;
+        }
+      }
+    }
     const fuelReference = await getFuelCostPerKmReference();
     const effectiveFuelCostPerKm = sanitizeNonNegative(
       data.fuelCostPerKm ?? fuelReference.costPerKm,
@@ -327,6 +339,47 @@ export async function POST(req: NextRequest) {
         extras: { include: { extra: true } },
       },
     });
+
+    // Auto-assignar inventari del pack a la reserva (també per packs personalitzats amb lot)
+    try {
+      const ACTIVE_BOOKING_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING'] as const;
+      const packInventory = await prisma.packInventory.findMany({
+        where: { packId: booking.packId },
+        include: { item: true },
+      });
+
+      for (const row of packInventory) {
+        const overlapping = await prisma.bookingInventory.count({
+          where: {
+            itemId: row.itemId,
+            bookingId: { not: booking.id },
+            booking: { status: { in: ACTIVE_BOOKING_STATUSES as any } },
+          },
+        });
+        if (overlapping > 0) continue;
+
+        await prisma.bookingInventory.upsert({
+          where: { bookingId_itemId: { bookingId: booking.id, itemId: row.itemId } },
+          create: {
+            bookingId: booking.id,
+            itemId: row.itemId,
+            quantity: Math.max(1, Number(row.quantity || 1)),
+            conditionBefore: row.item.condition,
+          },
+          update: {
+            quantity: Math.max(1, Number(row.quantity || 1)),
+          },
+        });
+      }
+    } catch (assignError) {
+      log.warn('No s’ha pogut auto-assignar inventari del pack a la reserva', {
+        context: {
+          bookingId: booking.id,
+          packId: booking.packId,
+          error: assignError instanceof Error ? assignError.message : String(assignError),
+        },
+      });
+    }
 
     if (linkedCustomerId) {
       await prisma.customerActivity.create({

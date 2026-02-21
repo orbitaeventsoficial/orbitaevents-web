@@ -228,25 +228,32 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    const loadCss = async () => {
-      try {
-        const res = await fetch('/api/admin/css', { credentials: 'include', cache: 'no-store' });
-        if (!res.ok) return;
-        const data = await res.json().catch(() => ({}));
-        if (!cancelled && typeof data?.css === 'string') {
-          setCustomAdminCss(data.css);
-        }
-      } catch {
-        // Silently fail
+  const loadAdminCss = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/css', { credentials: 'include', cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json().catch(() => ({}));
+      if (typeof data?.css === 'string') {
+        setCustomAdminCss(data.css);
       }
-    };
-    loadCss();
-    return () => {
-      cancelled = true;
-    };
+    } catch {
+      // Silently fail
+    }
   }, []);
+
+  useEffect(() => {
+    loadAdminCss();
+  }, [loadAdminCss, pathname]);
+
+  useEffect(() => {
+    const onCssUpdated = () => {
+      loadAdminCss();
+    };
+    window.addEventListener('admin-css-updated', onCssUpdated);
+    return () => {
+      window.removeEventListener('admin-css-updated', onCssUpdated);
+    };
+  }, [loadAdminCss]);
 
   useEffect(() => {
     setMounted(true);
@@ -417,7 +424,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
         { icon: '✍️', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
-        { icon: '🧩', label: 'CSS PRO', href: '/admin/css-manager', badge: 'PRO', badgeColor: 'green' as const },
         { icon: '🤖', label: 'Correus automàtics', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
         { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
         { icon: '🌟', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
@@ -434,6 +440,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         { icon: '🎛️', label: 'Features', href: '/admin/features' },
         { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
         { icon: '🌐', label: 'Traduccions', href: '/admin/translations' },
+        { icon: '🧩', label: 'CSS PRO', href: '/admin/css-manager', badge: 'PRO', badgeColor: 'green' as const },
       ]
     },
   ]), []);

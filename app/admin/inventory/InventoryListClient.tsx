@@ -40,14 +40,22 @@ interface Stats {
 }
 
 type ViewMode = 'list' | 'grid';
+type InventoryBundle = { id: string; name: string; itemIds: string[] };
 
 export default function InventoryListClient() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [stats, setStats] = useState<Stats>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [bundles, setBundles] = useState<InventoryBundle[]>([]);
+  const [selectedBundleId, setSelectedBundleId] = useState('');
+  const [bundleItemSearch, setBundleItemSearch] = useState('');
+  const [bundleNameDraft, setBundleNameDraft] = useState('Equip 1');
+  const [bundleMessage, setBundleMessage] = useState<string | null>(null);
+  const [savingBundles, setSavingBundles] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('inventory-view') as ViewMode) || 'list';
@@ -58,7 +66,7 @@ export default function InventoryListClient() {
   const fetchData = useCallback(async () => {
     try {
       const params = new URLSearchParams();
-      if (search) params.set('search', search);
+      if (searchQuery) params.set('search', searchQuery);
       if (filterCategory) params.set('category', filterCategory);
       if (filterStatus) params.set('status', filterStatus);
 
@@ -73,11 +81,41 @@ export default function InventoryListClient() {
     } finally {
       setLoading(false);
     }
-  }, [search, filterCategory, filterStatus]);
+  }, [searchQuery, filterCategory, filterStatus]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setSearchQuery(search.trim());
+    }, 220);
+    return () => window.clearTimeout(timer);
+  }, [search]);
+
+  const loadBundles = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/inventory/bundles');
+      if (!res.ok) return;
+      const data = await res.json();
+      const next = Array.isArray(data?.bundles)
+        ? data.bundles.map((b: any) => ({
+            id: String(b.id),
+            name: String(b.name),
+            itemIds: Array.isArray(b.itemIds) ? b.itemIds.map((id: any) => String(id)) : [],
+          }))
+        : [];
+      setBundles(next);
+      if (!selectedBundleId && next.length > 0) setSelectedBundleId(next[0].id);
+    } catch {
+      setBundleMessage('No s’han pogut carregar els lots.');
+    }
+  }, [selectedBundleId]);
+
+  useEffect(() => {
+    void loadBundles();
+  }, [loadBundles]);
 
   const toggleView = useCallback((mode: ViewMode) => {
     setViewMode(mode);
@@ -101,6 +139,23 @@ export default function InventoryListClient() {
 
   const categories = Object.keys(CATEGORY_CONFIG);
   const statuses = Object.keys(STATUS_CONFIG);
+  const selectedBundle = useMemo(
+    () => bundles.find((b) => b.id === selectedBundleId) || null,
+    [bundles, selectedBundleId]
+  );
+  const selectedBundleItems = useMemo(
+    () => items.filter((item) => selectedBundle?.itemIds.includes(item.id)),
+    [items, selectedBundle]
+  );
+  const candidateItems = useMemo(() => {
+    const q = bundleItemSearch.trim().toLowerCase();
+    return items
+      .filter((item) => !selectedBundle?.itemIds.includes(item.id))
+      .filter((item) =>
+        !q || item.name.toLowerCase().includes(q) || item.code.toLowerCase().includes(q)
+      )
+      .slice(0, 20);
+  }, [items, selectedBundle, bundleItemSearch]);
 
   const handleStatusChange = useCallback(async (itemId: string, newStatus: string) => {
     try {
@@ -117,6 +172,76 @@ export default function InventoryListClient() {
       // Silently fail
     }
   }, [fetchData]);
+
+  const saveBundles = useCallback(async (nextBundles: InventoryBundle[]) => {
+    setBundles(nextBundles);
+    setSavingBundles(true);
+    try {
+      const res = await fetch('/api/admin/inventory/bundles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bundles: nextBundles }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        setBundleMessage(data?.error || 'No s’han pogut desar els lots.');
+        return;
+      }
+      setBundleMessage('Lots desats correctament.');
+    } catch {
+      setBundleMessage('No s’han pogut desar els lots.');
+    } finally {
+      setSavingBundles(false);
+    }
+  }, []);
+
+  const createBundle = useCallback(() => {
+    const name = bundleNameDraft.trim();
+    if (!name) return;
+    const id = `equip-${Date.now().toString(36)}`;
+    const next = [...bundles, { id, name, itemIds: [] }];
+    setSelectedBundleId(id);
+    setBundleNameDraft('');
+    void saveBundles(next);
+  }, [bundleNameDraft, bundles, saveBundles]);
+
+  const renameSelectedBundle = useCallback((name: string) => {
+    if (!selectedBundle) return;
+    const next = bundles.map((b) => (b.id === selectedBundle.id ? { ...b, name } : b));
+    setBundles(next);
+  }, [bundles, selectedBundle]);
+
+  const persistRenameSelectedBundle = useCallback(() => {
+    if (!selectedBundle) return;
+    void saveBundles(bundles);
+  }, [bundles, selectedBundle, saveBundles]);
+
+  const deleteSelectedBundle = useCallback(() => {
+    if (!selectedBundle) return;
+    const next = bundles.filter((b) => b.id !== selectedBundle.id);
+    setSelectedBundleId(next[0]?.id || '');
+    void saveBundles(next);
+  }, [bundles, selectedBundle, saveBundles]);
+
+  const addItemToBundle = useCallback((itemId: string) => {
+    if (!selectedBundle) return;
+    const next = bundles.map((b) =>
+      b.id === selectedBundle.id
+        ? { ...b, itemIds: Array.from(new Set([...b.itemIds, itemId])) }
+        : b
+    );
+    void saveBundles(next);
+  }, [bundles, selectedBundle, saveBundles]);
+
+  const removeItemFromBundle = useCallback((itemId: string) => {
+    if (!selectedBundle) return;
+    const next = bundles.map((b) =>
+      b.id === selectedBundle.id
+        ? { ...b, itemIds: b.itemIds.filter((id) => id !== itemId) }
+        : b
+    );
+    void saveBundles(next);
+  }, [bundles, selectedBundle, saveBundles]);
 
   if (loading) {
     return (
@@ -197,6 +322,79 @@ export default function InventoryListClient() {
             {totalValue.toLocaleString('ca-ES')}€
           </p>
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-4 space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-sm font-semibold text-slate-100">Equips / Lots</p>
+          {bundleMessage && <p className="text-xs text-slate-300">{bundleMessage}</p>}
+          {savingBundles && <p className="text-xs text-cyan-300">Desant...</p>}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={selectedBundleId}
+            onChange={(e) => setSelectedBundleId(e.target.value)}
+            className="rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100"
+          >
+            {bundles.map((bundle) => (
+              <option key={bundle.id} value={bundle.id}>
+                {bundle.name} ({bundle.itemIds.length})
+              </option>
+            ))}
+          </select>
+          <input
+            value={bundleNameDraft}
+            onChange={(e) => setBundleNameDraft(e.target.value)}
+            placeholder="Nou lot"
+            className="rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100"
+          />
+          <button type="button" onClick={createBundle} className="rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-3 py-2 text-xs text-emerald-200">
+            + Crear lot
+          </button>
+        </div>
+        {selectedBundle && (
+          <div className="grid gap-3 lg:grid-cols-2">
+            <div className="space-y-2">
+              <input
+                value={selectedBundle.name}
+                onChange={(e) => renameSelectedBundle(e.target.value)}
+                onBlur={persistRenameSelectedBundle}
+                className="w-full rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-sm text-slate-100"
+              />
+              <button type="button" onClick={deleteSelectedBundle} className="rounded-lg border border-rose-500/40 bg-rose-500/15 px-3 py-1.5 text-xs text-rose-200">
+                Eliminar lot
+              </button>
+            </div>
+            <div className="space-y-2">
+              <input
+                value={bundleItemSearch}
+                onChange={(e) => setBundleItemSearch(e.target.value)}
+                placeholder="Afegir element per nom o codi"
+                className="w-full rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100"
+              />
+              <div className="max-h-24 overflow-auto space-y-1">
+                {candidateItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => addItemToBundle(item.id)}
+                    className="w-full text-left rounded-lg border border-slate-700/50 bg-slate-900/60 px-2 py-1 text-xs text-slate-200 hover:bg-slate-800"
+                  >
+                    + {item.code} · {item.name}
+                  </button>
+                ))}
+              </div>
+              <div className="max-h-24 overflow-auto space-y-1">
+                {selectedBundleItems.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between rounded-lg border border-slate-700/50 bg-slate-900/50 px-2 py-1 text-xs">
+                    <span className="text-slate-200">{item.code} · {item.name}</span>
+                    <button type="button" onClick={() => removeItemFromBundle(item.id)} className="text-rose-300">Treure</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Alertes d'estoc baix */}

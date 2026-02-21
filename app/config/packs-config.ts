@@ -151,6 +151,8 @@ export interface PackDefinition {
   badge?: string | null;
   cta?: string;
   lowCost?: boolean;
+  extraHourPrice?: number;
+  recommendedOperatorExtraHourPrice?: number;
   
   // Capacidad de invitados
   capacidadMinima?: number;

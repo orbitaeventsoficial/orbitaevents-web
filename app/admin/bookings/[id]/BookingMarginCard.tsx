@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
-import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, getIncludedTravelOneWayKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 
 interface BookingMarginProps {
   bookingId: string;
@@ -65,11 +65,13 @@ export default function BookingMarginCard({
   const [saved, setSaved] = useState(false);
   const [calculatingDistance, setCalculatingDistance] = useState(false);
   const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
+  const lastDistanceDestinationRef = useRef('');
 
   const billableKm = calculateBillableTravelKm(distanceKm, INCLUDED_TRAVEL_KM);
   const travelBlocks = calculateTravelBlocks(distanceKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM);
   const calculatedTravelCost = calculateTravelCost(distanceKm, fuelCostPerKm, INCLUDED_TRAVEL_KM);
   const calculatedTravelCharge = calculateTravelCharge(distanceKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
+  const includedOneWayKm = getIncludedTravelOneWayKm(INCLUDED_TRAVEL_KM);
   const travelNetMargin = calculatedTravelCharge - calculatedTravelCost;
   const travelMarginPct = calculatedTravelCharge > 0 ? (travelNetMargin / calculatedTravelCharge) * 100 : 0;
 
@@ -149,13 +151,23 @@ export default function BookingMarginCard({
     }
   }, [bookingId, distanceKm, fuelCostPerKm, calculatedTravelCost, router]);
 
-  const handleCalculateDistance = useCallback(async () => {
-    const destination = [eventVenue || '', eventLocation || ''].filter(Boolean).join(', ').trim();
-    if (!destination) {
-      setDistanceMessage('Cal omplir la ubicació de l\'esdeveniment per calcular la ruta.');
-      return;
+  const persistDistance = useCallback(async (nextDistanceKm: number) => {
+    try {
+      await fetch(`/api/admin/bookings/${bookingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          distanceKm: nextDistanceKm,
+          fuelCostPerKm,
+          travelCost: calculateTravelCost(nextDistanceKm, fuelCostPerKm, INCLUDED_TRAVEL_KM),
+        }),
+      });
+    } catch {
+      // Silent: mantenim el valor local encara que falli la persistència
     }
+  }, [bookingId, fuelCostPerKm]);
 
+  const calculateDistanceForDestination = useCallback(async (destination: string) => {
     setCalculatingDistance(true);
     setDistanceMessage(null);
     try {
@@ -170,14 +182,29 @@ export default function BookingMarginCard({
         throw new Error(data?.error || 'No s\'ha pogut calcular la distància');
       }
 
-      setDistanceKm(Number(data.roundTripKm || 0));
+      const nextDistanceKm = Number(data.roundTripKm || 0);
+      setDistanceKm(nextDistanceKm);
+      lastDistanceDestinationRef.current = destination;
+      void persistDistance(nextDistanceKm);
       setDistanceMessage(`Ruta: ${data.oneWayKm || 0} km anada · ${data.roundTripKm || 0} km anada+tornada`);
     } catch (error) {
       setDistanceMessage(error instanceof Error ? error.message : 'Error calculant ruta');
     } finally {
       setCalculatingDistance(false);
     }
-  }, [eventLocation, eventVenue]);
+  }, [persistDistance]);
+
+  useEffect(() => {
+    const destination = [eventVenue || '', eventLocation || ''].filter(Boolean).join(', ').trim();
+    if (!destination) return;
+    if (destination === lastDistanceDestinationRef.current) return;
+
+    const timer = setTimeout(() => {
+      void calculateDistanceForDestination(destination);
+    }, 450);
+
+    return () => clearTimeout(timer);
+  }, [eventLocation, eventVenue, calculateDistanceForDestination]);
 
   const hasChanged =
     distanceKm !== (initialDistanceKm ?? 0);
@@ -290,7 +317,7 @@ export default function BookingMarginCard({
       <div className="border-t border-white/10 pt-4">
         <h3 className="text-sm font-semibold text-slate-300 mb-3">🚗 Desplaçament (editable)</h3>
         <p className="mb-3 text-xs text-emerald-300">
-          Inclòs: {INCLUDED_TRAVEL_KM} km totals (25 anada + 25 tornada). Després: {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra.
+          Inclòs: {INCLUDED_TRAVEL_KM} km totals ({includedOneWayKm} anada + {includedOneWayKm} tornada). Després: {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra.
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
           <div>
@@ -324,7 +351,7 @@ export default function BookingMarginCard({
           <div className="rounded-lg border border-white/10 bg-white/5 p-3">
             <p className="text-[11px] uppercase tracking-wide text-slate-400">Cost benzina intern</p>
             <p className="text-sm font-semibold text-amber-300">{formatCurrency(calculatedTravelCost)}</p>
-            <p className="text-[11px] text-slate-500">{billableKm} km × {fuelCostPerKm.toFixed(2)} €/km</p>
+            <p className="text-[11px] text-slate-500">{distanceKm.toFixed(1)} km × {fuelCostPerKm.toFixed(2)} €/km</p>
           </div>
           <div className="rounded-lg border border-white/10 bg-white/5 p-3">
             <p className="text-[11px] uppercase tracking-wide text-slate-400">Ingressos transport</p>
@@ -342,14 +369,7 @@ export default function BookingMarginCard({
           </div>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={handleCalculateDistance}
-            disabled={calculatingDistance || !(eventLocation || eventVenue)}
-            className="rounded-lg border border-amber-400/40 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/20 disabled:opacity-50"
-          >
-            {calculatingDistance ? 'Calculant...' : 'Calcular amb Google Maps'}
-          </button>
+          {calculatingDistance && <p className="text-xs text-amber-300">Calculant ruta automàticament...</p>}
           {distanceMessage && <p className="text-xs text-slate-300">{distanceMessage}</p>}
         </div>
         {hasChanged && (
