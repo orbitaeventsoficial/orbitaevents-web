@@ -600,67 +600,75 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     </div>
                   ) : (
                     props.atRiskRows.map((row) => (
-                      <motion.div
+                      <motion.details
                         key={row.id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="rounded-xl border border-white/10 bg-slate-900/50 p-3 hover:border-white/20 transition-colors"
+                        className="group rounded-xl border border-white/10 bg-slate-900/50 p-3 transition-colors open:border-rose-500/30 open:bg-rose-950/10"
                       >
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                          <div>
-                            <p className="text-sm font-bold text-slate-100">{row.reference} &middot; {row.clientName}</p>
-                            <p className="text-[11px] text-slate-500 mt-0.5">Codi reserva: {row.reference}</p>
-                            <p className="text-xs text-slate-400 mt-0.5">
-                              {new Date(row.eventDate).toLocaleDateString('ca-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                              &nbsp;&middot;&nbsp;
-                              <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase">{row.status}</span>
-                            </p>
-                          </div>
-                          <Link href={`/admin/bookings/${row.id}`} className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors">
-                            Obrir reserva
-                          </Link>
-                        </div>
-                        <div className="mb-2 flex flex-wrap gap-2">
-                          <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${paymentStateBadge(row.depositPaid)}`}>
-                            Bestreta {row.depositPaid ? 'pagada' : 'pendent'}
-                          </span>
-                          <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${paymentStateBadge(row.remainingPaid)}`}>
-                            Saldo {row.remainingPaid ? 'pagat' : 'pendent'}
-                          </span>
-                        </div>
-                        <div className="grid gap-2 sm:grid-cols-2 mb-3">
-                          <div className={`rounded-lg border p-3 ${row.depositPaid ? 'border-emerald-500/25 bg-emerald-500/8' : 'border-rose-500/20 bg-rose-500/5'}`}>
-                            <div className="flex items-center justify-between mb-1">
-                              <p className={`text-xs font-semibold ${row.depositPaid ? 'text-emerald-300' : 'text-rose-300'}`}>Bestreta</p>
-                              <p className={`text-sm font-bold ${row.depositPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.depositAmount)}</p>
+                        <summary className="list-none cursor-pointer">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-bold text-slate-100">{row.reference} · {row.clientName}</p>
+                              <p className="mt-0.5 text-xs text-slate-400">
+                                {new Date(row.eventDate).toLocaleDateString('ca-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                                &nbsp;·&nbsp;
+                                <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase">{row.status}</span>
+                              </p>
                             </div>
-                            <p className="text-[11px] text-slate-400 mb-2">
-                              Venciment: {new Date(row.depositDueAt).toLocaleDateString('ca-ES')}
-                            </p>
-                            <PaymentToggleButton bookingId={row.id} field="depositPaid" currentValue={row.depositPaid} />
-                          </div>
-                          <div className={`rounded-lg border p-3 ${row.remainingPaid ? 'border-emerald-500/25 bg-emerald-500/8' : 'border-rose-500/20 bg-rose-500/5'}`}>
-                            <div className="flex items-center justify-between mb-1">
-                              <p className={`text-xs font-semibold ${row.remainingPaid ? 'text-emerald-300' : 'text-rose-300'}`}>Saldo restant</p>
-                              <p className={`text-sm font-bold ${row.remainingPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.remainingAmount)}</p>
+                            <div className="flex flex-wrap items-center justify-end gap-2">
+                              <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${paymentStateBadge(row.depositPaid)}`}>
+                                Bestreta {row.depositPaid ? 'pagada' : 'pendent'}
+                              </span>
+                              <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${paymentStateBadge(row.remainingPaid)}`}>
+                                Saldo {row.remainingPaid ? 'pagat' : 'pendent'}
+                              </span>
+                              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-slate-300">
+                                Veure detall
+                              </span>
                             </div>
-                            <p className="text-[11px] text-slate-400 mb-2">
-                              Venciment: {new Date(row.remainingDueAt).toLocaleDateString('ca-ES')}
-                            </p>
-                            <PaymentToggleButton bookingId={row.id} field="remainingPaid" currentValue={row.remainingPaid} />
                           </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs text-slate-400">
+                        </summary>
+
+                        <div className="mt-3 border-t border-white/10 pt-3">
+                          <div className="mb-3 flex items-center justify-between gap-2">
+                            <p className="text-[11px] text-slate-500">Codi reserva: {row.reference}</p>
+                            <Link href={`/admin/bookings/${row.id}`} className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors">
+                              Obrir reserva
+                            </Link>
+                          </div>
+                          <div className="mb-3 grid gap-2 sm:grid-cols-2">
+                            <div className={`rounded-lg border p-3 ${row.depositPaid ? 'border-emerald-500/25 bg-emerald-500/8' : 'border-rose-500/20 bg-rose-500/5'}`}>
+                              <div className="flex items-center justify-between mb-1">
+                                <p className={`text-xs font-semibold ${row.depositPaid ? 'text-emerald-300' : 'text-rose-300'}`}>Bestreta</p>
+                                <p className={`text-sm font-bold ${row.depositPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.depositAmount)}</p>
+                              </div>
+                              <p className="text-[11px] text-slate-400 mb-2">
+                                Venciment: {new Date(row.depositDueAt).toLocaleDateString('ca-ES')}
+                              </p>
+                              <PaymentToggleButton bookingId={row.id} field="depositPaid" currentValue={row.depositPaid} />
+                            </div>
+                            <div className={`rounded-lg border p-3 ${row.remainingPaid ? 'border-emerald-500/25 bg-emerald-500/8' : 'border-rose-500/20 bg-rose-500/5'}`}>
+                              <div className="flex items-center justify-between mb-1">
+                                <p className={`text-xs font-semibold ${row.remainingPaid ? 'text-emerald-300' : 'text-rose-300'}`}>Saldo restant</p>
+                                <p className={`text-sm font-bold ${row.remainingPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.remainingAmount)}</p>
+                              </div>
+                              <p className="text-[11px] text-slate-400 mb-2">
+                                Venciment: {new Date(row.remainingDueAt).toLocaleDateString('ca-ES')}
+                              </p>
+                              <PaymentToggleButton bookingId={row.id} field="remainingPaid" currentValue={row.remainingPaid} />
+                            </div>
+                          </div>
+                          <p className="mb-2 text-xs text-slate-400">
                             Seguiment: <span className="font-semibold text-slate-300">{row.paymentFlowState}</span>
                           </p>
+                          <PaymentReminderActions
+                            bookingId={row.id}
+                            phone={row.clientPhone}
+                            message={`Hola ${row.clientName}, et recordem el cobrament pendent del teu esdeveniment ${row.reference}. Gr\u00e0cies.`}
+                          />
                         </div>
-                        <PaymentReminderActions
-                          bookingId={row.id}
-                          phone={row.clientPhone}
-                          message={`Hola ${row.clientName}, et recordem el cobrament pendent del teu esdeveniment ${row.reference}. Gr\u00e0cies.`}
-                        />
-                      </motion.div>
+                      </motion.details>
                     ))
                   )}
                 </div>
