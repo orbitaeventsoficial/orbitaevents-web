@@ -15,6 +15,8 @@ interface BookingMarginProps {
   fuelCostPerKm: number | null;
   travelCost: number | null;
   source: string;
+  eventLocation?: string | null;
+  eventVenue?: string | null;
 }
 
 // Default ratios (must match profitabilityService defaults)
@@ -38,6 +40,8 @@ export default function BookingMarginCard({
   fuelCostPerKm: initialFuelCostPerKm,
   travelCost: initialTravelCost,
   source,
+  eventLocation,
+  eventVenue,
 }: BookingMarginProps) {
   const router = useRouter();
 
@@ -46,6 +50,8 @@ export default function BookingMarginCard({
   const [fuelCostPerKm, setFuelCostPerKm] = useState(initialFuelCostPerKm ?? 0.19);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [calculatingDistance, setCalculatingDistance] = useState(false);
+  const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
 
   const calculatedTravelCost = Math.round(distanceKm * fuelCostPerKm * 100) / 100;
 
@@ -100,6 +106,36 @@ export default function BookingMarginCard({
       setSaving(false);
     }
   }, [bookingId, distanceKm, fuelCostPerKm, calculatedTravelCost, router]);
+
+  const handleCalculateDistance = useCallback(async () => {
+    const destination = [eventVenue || '', eventLocation || ''].filter(Boolean).join(', ').trim();
+    if (!destination) {
+      setDistanceMessage('Cal omplir la ubicació de l\'esdeveniment per calcular la ruta.');
+      return;
+    }
+
+    setCalculatingDistance(true);
+    setDistanceMessage(null);
+    try {
+      const res = await fetch('/api/admin/maps/distance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ destination }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || 'No s\'ha pogut calcular la distància');
+      }
+
+      setDistanceKm(Number(data.roundTripKm || 0));
+      setDistanceMessage(`Ruta: ${data.oneWayKm || 0} km anada · ${data.roundTripKm || 0} km anada+tornada`);
+    } catch (error) {
+      setDistanceMessage(error instanceof Error ? error.message : 'Error calculant ruta');
+    } finally {
+      setCalculatingDistance(false);
+    }
+  }, [eventLocation, eventVenue]);
 
   const hasChanged =
     distanceKm !== (initialDistanceKm ?? 0) ||
@@ -191,6 +227,17 @@ export default function BookingMarginCard({
               {formatCurrency(calculatedTravelCost)}
             </div>
           </div>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={handleCalculateDistance}
+            disabled={calculatingDistance || !(eventLocation || eventVenue)}
+            className="rounded-lg border border-amber-400/40 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/20 disabled:opacity-50"
+          >
+            {calculatingDistance ? 'Calculant...' : 'Calcular amb Google Maps'}
+          </button>
+          {distanceMessage && <p className="text-xs text-slate-300">{distanceMessage}</p>}
         </div>
         {hasChanged && (
           <button

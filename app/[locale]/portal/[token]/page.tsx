@@ -39,6 +39,11 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     eventDate: 'Data',
     eventLocation: 'Ubicació',
     eventGuests: 'Convidats',
+    travel: 'Desplaçament',
+    travelDistance: 'Distància',
+    travelRate: 'Cost per km',
+    travelEstimated: 'Cost estimat',
+    travelRoundTripFrom: 'Anada i tornada des de',
     backHome: 'Anar al web principal',
   },
   es: {
@@ -61,6 +66,11 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     eventDate: 'Fecha',
     eventLocation: 'Ubicación',
     eventGuests: 'Invitados',
+    travel: 'Desplazamiento',
+    travelDistance: 'Distancia',
+    travelRate: 'Coste por km',
+    travelEstimated: 'Coste estimado',
+    travelRoundTripFrom: 'Ida y vuelta desde',
     backHome: 'Ir a la web principal',
   },
   en: {
@@ -83,6 +93,11 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     eventDate: 'Date',
     eventLocation: 'Location',
     eventGuests: 'Guests',
+    travel: 'Travel',
+    travelDistance: 'Distance',
+    travelRate: 'Cost per km',
+    travelEstimated: 'Estimated cost',
+    travelRoundTripFrom: 'Round trip from',
     backHome: 'Back to main site',
   },
 };
@@ -101,6 +116,13 @@ function formatCurrency(amount: number): string {
     currency: 'EUR',
     minimumFractionDigits: 0,
   }).format(amount);
+}
+
+function formatDistanceKm(km: number): string {
+  return new Intl.NumberFormat('ca-ES', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  }).format(km);
 }
 
 function toRgba(hex: string, alpha: number): string | null {
@@ -209,6 +231,27 @@ export default async function ClientPortalPage({
             </div>
           </div>
         </section>
+
+        {(typeof booking.distanceKm === 'number' && booking.distanceKm > 0) && (
+          <section className="mt-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+            <h2 className="text-lg font-semibold">{t.travel}</h2>
+            <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm">
+              <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+                <p className="text-slate-400">{t.travelDistance}</p>
+                <p>{formatDistanceKm(booking.distanceKm)} km</p>
+                <p className="text-xs text-slate-500">{t.travelRoundTripFrom} Granollers</p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+                <p className="text-slate-400">{t.travelRate}</p>
+                <p>{typeof booking.fuelCostPerKm === 'number' ? `${booking.fuelCostPerKm.toFixed(2)} €/km` : '—'}</p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+                <p className="text-slate-400">{t.travelEstimated}</p>
+                <p>{typeof booking.travelCost === 'number' ? formatCurrency(booking.travelCost) : '—'}</p>
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="mt-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6">
           <h2 className="text-lg font-semibold">{t.services}</h2>

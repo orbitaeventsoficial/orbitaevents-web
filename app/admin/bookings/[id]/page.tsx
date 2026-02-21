@@ -566,6 +566,8 @@ export default async function BookingDetailPage({ params }: PageProps) {
             fuelCostPerKm={typeof bAny.fuelCostPerKm === 'number' ? bAny.fuelCostPerKm : null}
             travelCost={typeof bAny.travelCost === 'number' ? bAny.travelCost : null}
             source={booking.lead?.source || 'UNKNOWN'}
+            eventLocation={booking.eventLocation}
+            eventVenue={booking.eventVenue}
           />
         );
       })()}
@@ -660,7 +662,6 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </div>
   );
 }
-
 
 
 

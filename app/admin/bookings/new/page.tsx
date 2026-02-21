@@ -119,6 +119,8 @@ export default function NewBookingPage() {
     reason?: string;
   } | null>(null);
   const [validatingCode, setValidatingCode] = useState(false);
+  const [calculatingDistance, setCalculatingDistance] = useState(false);
+  const [distanceMessage, setDistanceMessage] = useState<string | null>(null);
 
   const updateField = (field: keyof FormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -260,6 +262,39 @@ export default function NewBookingPage() {
       setValidatingCode(false);
     }
   }, [packs, form.packId, selectedExtras]);
+
+  const handleCalculateDistance = useCallback(async () => {
+    if (!form.eventLocation.trim()) {
+      setDistanceMessage('Introdueix la ubicació de l\'esdeveniment per calcular la distància.');
+      return;
+    }
+
+    setCalculatingDistance(true);
+    setDistanceMessage(null);
+
+    try {
+      const destination = [form.eventVenue.trim(), form.eventLocation.trim()].filter(Boolean).join(', ');
+      const res = await fetch('/api/admin/maps/distance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ destination }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || 'No s\'ha pogut calcular la distància');
+      }
+
+      updateField('distanceKm', String(data.roundTripKm || 0));
+      setDistanceMessage(
+        `Ruta calculada: ${data.originResolved || 'Origen'} → ${data.destinationResolved || 'Destí'} (${data.oneWayKm || 0} km anada, ${data.roundTripKm || 0} km anada+tornada).`
+      );
+    } catch (error) {
+      setDistanceMessage(error instanceof Error ? error.message : 'Error calculant distància');
+    } finally {
+      setCalculatingDistance(false);
+    }
+  }, [form.eventLocation, form.eventVenue]);
 
   const handleSubmit = useCallback(async () => {
     if (!form.clientName || !form.clientEmail || !form.clientPhone) {
@@ -410,6 +445,19 @@ export default function NewBookingPage() {
               className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
             />
           </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={handleCalculateDistance}
+            disabled={calculatingDistance || !form.eventLocation.trim()}
+            className="rounded-lg border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-50"
+          >
+            {calculatingDistance ? 'Calculant ruta...' : 'Calcular amb Google Maps'}
+          </button>
+          {distanceMessage && (
+            <p className="text-xs text-slate-300">{distanceMessage}</p>
+          )}
         </div>
       </div>
 

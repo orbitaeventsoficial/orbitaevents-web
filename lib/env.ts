@@ -44,6 +44,8 @@ const serverSchema = z.object({
   SERPAPI_KEY: z.string().optional(),
   OUTSCRAPER_API_KEY: z.string().optional(),
   DEEPL_API_KEY: z.string().optional(),
+  GOOGLE_MAPS_API_KEY: z.string().optional(),
+  ORBITA_BASE_ADDRESS: z.string().optional(),
 
   // GA4 Admin Analytics (Optional)
   GA4_PROPERTY_ID: z.string().optional(),
