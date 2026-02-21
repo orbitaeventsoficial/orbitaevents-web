@@ -8,6 +8,8 @@ import PaymentReminderActions from '../finanzas/PaymentReminderActions';
 import ProfitabilityConfigEditor from '../rentabilidad/ProfitabilityConfigEditor';
 import ProfitabilityConfigHistory from '../rentabilidad/ProfitabilityConfigHistory';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
+import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
+import PackPricingModelEditor from './PackPricingModelEditor';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -78,6 +80,7 @@ interface EconomiaClientProps {
   riskProfitability: ProfitabilityRow[];
   bySource: BySourceRow[];
   config: ProfitabilityConfig;
+  packPricingConfig: PackPricingModelConfig;
   historyEntries: HistoryEntry[];
   inventoryValue: number;
   inventoryCount: number;
@@ -847,6 +850,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
           {/* ═══════════ CONFIG ═══════════ */}
           {activeTab === 'config' && (
             <>
+              <PackPricingModelEditor initial={props.packPricingConfig} />
               <ProfitabilityConfigEditor initial={props.config} />
               <ProfitabilityConfigHistory entries={props.historyEntries} />
             </>

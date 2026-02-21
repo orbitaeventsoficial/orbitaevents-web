@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { buildProfitabilityReport, normalizeProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { deriveFlowStatus } from '@/lib/services/communicationStatusService';
+import { getPackPricingModelConfigEditable } from '@/lib/services/packPricingHealth';
 import EconomiaClient from './EconomiaClient';
 
 export const dynamic = 'force-dynamic';
@@ -211,6 +212,7 @@ export default async function EconomiaPage() {
   });
 
   const defaultConfig = normalizeProfitabilityConfig(null);
+  const packPricingConfig = await getPackPricingModelConfigEditable();
 
   return (
     <EconomiaClient
@@ -228,6 +230,7 @@ export default async function EconomiaPage() {
       riskProfitability={report?.riskProfitability.map(serializeRow) ?? []}
       bySource={report?.bySource ?? []}
       config={report?.config ?? defaultConfig}
+      packPricingConfig={packPricingConfig}
       historyEntries={historyEntries}
       inventoryValue={inventoryValue}
       inventoryCount={inventoryCount}

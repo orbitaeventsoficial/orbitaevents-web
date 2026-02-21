@@ -64,6 +64,22 @@ type PricingModelConfig = {
   alertDivergencePct: number;
 };
 
+export type PackPricingModelConfig = {
+  marginTargetPct: number;
+  socialSecurityPct: number;
+  withholdingPct: number;
+  operatorNetCostPerHour: number;
+  specialistNetCostPerHour: number;
+  operatorCostPerHour: number;
+  specialistCostPerHour: number;
+  specialistServices: string[];
+  supportOperatorMinGuests: number;
+  supportOperatorMinDjHours: number;
+  supportOperatorMinWatts: number;
+  fixedPackCost: number;
+  alertDivergencePct: number;
+};
+
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
@@ -166,6 +182,105 @@ export async function getPackPricingModelConfig(): Promise<PricingModelConfig> {
     fixedPackCost: Math.max(0, fixedPackCostRaw ?? DEFAULT_FIXED_PACK_COST),
     alertDivergencePct: Math.max(1, alertDivergencePctRaw ?? DEFAULT_ALERT_DIVERGENCE_PCT),
   };
+}
+
+function normalizeSpecialistServices(raw: unknown): string[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) {
+    return raw
+      .map((value) => String(value || '').trim().toLowerCase())
+      .filter(Boolean);
+  }
+  return String(raw)
+    .split(',')
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function toEditablePackPricingModelConfig(config: PricingModelConfig): PackPricingModelConfig {
+  return {
+    marginTargetPct: config.marginTargetPct,
+    socialSecurityPct: config.socialSecurityPct,
+    withholdingPct: config.withholdingPct,
+    operatorNetCostPerHour: config.operatorNetCostPerHour,
+    specialistNetCostPerHour: config.specialistNetCostPerHour,
+    operatorCostPerHour: config.operatorCostPerHour,
+    specialistCostPerHour: config.specialistCostPerHour,
+    specialistServices: Array.from(config.specialistServices),
+    supportOperatorMinGuests: config.supportOperatorMinGuests,
+    supportOperatorMinDjHours: config.supportOperatorMinDjHours,
+    supportOperatorMinWatts: config.supportOperatorMinWatts,
+    fixedPackCost: config.fixedPackCost,
+    alertDivergencePct: config.alertDivergencePct,
+  };
+}
+
+export async function getPackPricingModelConfigEditable(): Promise<PackPricingModelConfig> {
+  const config = await getPackPricingModelConfig();
+  return toEditablePackPricingModelConfig(config);
+}
+
+export async function upsertPackPricingModelConfig(input: Partial<PackPricingModelConfig>): Promise<PackPricingModelConfig> {
+  const current = await getPackPricingModelConfigEditable();
+  const candidate: PackPricingModelConfig = {
+    marginTargetPct: clamp(Number(input.marginTargetPct ?? current.marginTargetPct), 0.1, 0.9),
+    socialSecurityPct: normalizePercent(Number(input.socialSecurityPct ?? current.socialSecurityPct), current.socialSecurityPct),
+    withholdingPct: normalizePercent(Number(input.withholdingPct ?? current.withholdingPct), current.withholdingPct),
+    operatorNetCostPerHour: Math.max(0, Number(input.operatorNetCostPerHour ?? current.operatorNetCostPerHour)),
+    specialistNetCostPerHour: Math.max(0, Number(input.specialistNetCostPerHour ?? current.specialistNetCostPerHour)),
+    operatorCostPerHour: Math.max(0, Number(input.operatorCostPerHour ?? current.operatorCostPerHour)),
+    specialistCostPerHour: Math.max(0, Number(input.specialistCostPerHour ?? current.specialistCostPerHour)),
+    specialistServices: normalizeSpecialistServices(input.specialistServices ?? current.specialistServices),
+    supportOperatorMinGuests: Math.max(1, Number(input.supportOperatorMinGuests ?? current.supportOperatorMinGuests)),
+    supportOperatorMinDjHours: Math.max(1, Number(input.supportOperatorMinDjHours ?? current.supportOperatorMinDjHours)),
+    supportOperatorMinWatts: Math.max(1, Number(input.supportOperatorMinWatts ?? current.supportOperatorMinWatts)),
+    fixedPackCost: Math.max(0, Number(input.fixedPackCost ?? current.fixedPackCost)),
+    alertDivergencePct: Math.max(1, Number(input.alertDivergencePct ?? current.alertDivergencePct)),
+  };
+
+  const payload: Array<{ key: string; value: string; label: string; description: string }> = [
+    { key: 'pricing.pack.marginTargetPct', value: String(candidate.marginTargetPct), label: 'Objectiu marge packs', description: 'Percentatge objectiu de marge net dels packs' },
+    { key: 'pricing.pack.socialSecurityPct', value: String(candidate.socialSecurityPct), label: 'SS empresa', description: 'Percentatge de seguretat social aplicat al cost laboral' },
+    { key: 'pricing.pack.irpfPct', value: String(candidate.withholdingPct), label: 'Retenció IRPF', description: 'Percentatge de retenció aplicat al cost laboral' },
+    { key: 'pricing.pack.operatorNetCostPerHour', value: String(candidate.operatorNetCostPerHour), label: 'Operari net hora', description: 'Cost net hora operari' },
+    { key: 'pricing.pack.specialistNetCostPerHour', value: String(candidate.specialistNetCostPerHour), label: 'Especialista net hora', description: 'Cost net hora especialista' },
+    { key: 'pricing.pack.operatorCostPerHour', value: String(candidate.operatorCostPerHour), label: 'Operari brut hora', description: 'Cost brut hora operari' },
+    { key: 'pricing.pack.specialistCostPerHour', value: String(candidate.specialistCostPerHour), label: 'Especialista brut hora', description: 'Cost brut hora especialista' },
+    { key: 'pricing.pack.specialistServices', value: candidate.specialistServices.join(','), label: 'Serveis especialista', description: 'Serveis que requereixen especialista' },
+    { key: 'pricing.pack.supportOperatorMinGuests', value: String(candidate.supportOperatorMinGuests), label: 'Llindar convidats operari', description: 'Convidats mínims per afegir operari de suport' },
+    { key: 'pricing.pack.supportOperatorMinDjHours', value: String(candidate.supportOperatorMinDjHours), label: 'Llindar hores DJ operari', description: 'Hores mínimes de DJ per afegir operari de suport' },
+    { key: 'pricing.pack.supportOperatorMinWatts', value: String(candidate.supportOperatorMinWatts), label: 'Llindar watts operari', description: 'Potència mínima per afegir operari de suport' },
+    { key: 'pricing.pack.fixedPackCost', value: String(candidate.fixedPackCost), label: 'Cost fix pack', description: 'Cost operatiu fix per pack' },
+    { key: 'pricing.pack.alertDivergencePct', value: String(candidate.alertDivergencePct), label: 'Llindar alerta divergència', description: 'Diferència % a partir de la qual salta alerta de PVP vs recomanat' },
+  ];
+
+  await prisma.$transaction(
+    payload.map((row) => {
+      const settingType = row.key === 'pricing.pack.specialistServices' ? 'STRING' : 'NUMBER';
+      return (
+      prisma.setting.upsert({
+        where: { key: row.key },
+        update: {
+          value: row.value,
+          type: settingType,
+          category: 'pricing',
+          label: row.label,
+          description: row.description,
+        },
+        create: {
+          key: row.key,
+          value: row.value,
+          type: settingType,
+          category: 'pricing',
+          label: row.label,
+          description: row.description,
+        },
+      })
+      );
+    })
+  );
+
+  return candidate;
 }
 
 function getSupportOperatorCount(pack: PackWithInventory, config: PricingModelConfig): number {
