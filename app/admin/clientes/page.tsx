@@ -57,6 +57,13 @@ function getNextStep(customer: Customer): { label: string; href: string; hint: s
 
 type ExecutionPriority = 'ALTA' | 'MITJANA' | 'BAIXA';
 
+const PRIORITY_FILTER_STYLES: Record<'ALL' | ExecutionPriority, string> = {
+  ALL: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
+  ALTA: 'border-rose-400/50 bg-rose-500/15 text-rose-200',
+  MITJANA: 'border-amber-400/50 bg-amber-500/15 text-amber-200',
+  BAIXA: 'border-emerald-400/50 bg-emerald-500/15 text-emerald-200',
+};
+
 function getExecutionPriority(customer: Customer): { level: ExecutionPriority; score: number; hint: string } {
   const createdAt = customer.created_at ? new Date(customer.created_at) : new Date();
   const daysSinceCreated = Math.max(0, Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24)));
@@ -422,15 +429,15 @@ export default function AdminContactesPage() {
 
       {/* Filtres d'execució */}
       {!loading && customers.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap justify-center gap-2">
           {(['ALL', 'ALTA', 'MITJANA', 'BAIXA'] as const).map((value) => (
             <button
               key={value}
               type="button"
               onClick={() => setPriorityFilter(value)}
-              className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+              className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors whitespace-nowrap ${
                 priorityFilter === value
-                  ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200'
+                  ? PRIORITY_FILTER_STYLES[value]
                   : 'border-slate-700 text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -464,16 +471,17 @@ export default function AdminContactesPage() {
       {/* Customers List */}
       {!loading && customers.length > 0 && (
         <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[980px] text-sm">
             <thead>
               <tr className="bg-slate-700/30 border-b border-slate-700/50">
-                <th scope="col" className="text-left p-4 text-slate-300 font-medium">Nom</th>
-                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden md:table-cell">Contacte</th>
-                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden lg:table-cell">Font</th>
-                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden sm:table-cell">Esdeveniments</th>
-                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden xl:table-cell">Prioritat</th>
-                <th scope="col" className="text-left p-4 text-slate-300 font-medium hidden xl:table-cell">Proper pas</th>
-                <th scope="col" className="text-left p-4 text-slate-300 font-medium">Accions</th>
+                <th scope="col" className="text-center p-4 text-slate-300 font-medium">Nom</th>
+                <th scope="col" className="text-center p-4 text-slate-300 font-medium hidden md:table-cell">Contacte</th>
+                <th scope="col" className="text-center p-4 text-slate-300 font-medium hidden lg:table-cell">Font</th>
+                <th scope="col" className="text-center p-4 text-slate-300 font-medium hidden sm:table-cell">Esdeveniments</th>
+                <th scope="col" className="text-center p-4 text-slate-300 font-medium hidden xl:table-cell">Prioritat</th>
+                <th scope="col" className="text-center p-4 text-slate-300 font-medium hidden xl:table-cell">Proper pas</th>
+                <th scope="col" className="text-center p-4 text-slate-300 font-medium">Accions</th>
               </tr>
             </thead>
             <tbody>
@@ -481,8 +489,8 @@ export default function AdminContactesPage() {
                 const nextStep = getNextStep(customer);
                 return (
                 <tr key={customer.id} className="border-b border-slate-700/30 hover:bg-slate-700/30 transition-colors">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
+                  <td className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center text-cyan-300 font-bold">
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
@@ -497,10 +505,10 @@ export default function AdminContactesPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 hidden md:table-cell">
+                  <td className="p-4 hidden md:table-cell text-center">
                     <div className="space-y-1">
                       {customer.email && (
-                        <p className="text-slate-400 text-sm flex items-center gap-2">
+                        <p className="text-slate-400 text-sm flex items-center justify-center gap-2">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                           </svg>
@@ -508,7 +516,7 @@ export default function AdminContactesPage() {
                         </p>
                       )}
                       {customer.phone && (
-                        <p className="text-slate-400 text-sm flex items-center gap-2">
+                        <p className="text-slate-400 text-sm flex items-center justify-center gap-2">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                           </svg>
@@ -517,7 +525,7 @@ export default function AdminContactesPage() {
                       )}
                     </div>
                   </td>
-                  <td className="p-4 hidden lg:table-cell">
+                  <td className="p-4 hidden lg:table-cell text-center">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       customer.source === 'manual' ? 'bg-purple-500/20 text-purple-300' :
                       customer.source === 'web' ? 'bg-emerald-500/20 text-emerald-300' :
@@ -527,10 +535,10 @@ export default function AdminContactesPage() {
                       {customer.source || 'desconeguda'}
                     </span>
                   </td>
-                  <td className="p-4 hidden sm:table-cell text-slate-400">
+                  <td className="p-4 hidden sm:table-cell text-slate-400 text-center">
                     {customer.total_events || 0}
                   </td>
-                  <td className="p-4 hidden xl:table-cell">
+                  <td className="p-4 hidden xl:table-cell text-center">
                     <span
                       className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ${
                         priority.level === 'ALTA'
@@ -544,7 +552,7 @@ export default function AdminContactesPage() {
                       {priority.level}
                     </span>
                   </td>
-                  <td className="p-4 hidden xl:table-cell">
+                  <td className="p-4 hidden xl:table-cell text-center">
                     <div className="space-y-1">
                       <Link
                         href={nextStep.href}
@@ -555,8 +563,8 @@ export default function AdminContactesPage() {
                       <p className="text-[11px] text-slate-500">{nextStep.hint}</p>
                     </div>
                   </td>
-                  <td className="p-4">
-                    <div className="flex flex-wrap gap-2">
+                  <td className="p-4 text-center">
+                    <div className="flex flex-wrap justify-center gap-2">
                       <button
                         onClick={() => {
                           setSelectedCustomer(customer);
@@ -607,11 +615,12 @@ export default function AdminContactesPage() {
               )})}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
       {!loading && customers.length > 0 && (
-        <div className="flex items-center justify-between text-xs text-slate-400">
+        <div className="flex flex-col items-center justify-center gap-2 text-xs text-slate-400 sm:flex-row sm:justify-between">
           <span>Pàgina {page} de {totalPages} · {filteredCustomers.length} visibles · {totalCustomers} clients</span>
           <div className="flex gap-2">
             <button

@@ -2,11 +2,15 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
 import LeadActions from './LeadActions';
+import LeadColorCustomizer from './LeadColorCustomizer';
+import LeadQuickPriority from './LeadQuickPriority';
 import LeadQuickStatus from './LeadQuickStatus';
 import LeadSavedViews from './LeadSavedViews';
 import LeadViewToggle from './LeadViewToggle';
 import type { EventType, LeadSource, LeadStatus, Priority, Prisma } from '@prisma/client';
+import { LEAD_COLOR_DEFAULT_VARS, PRIORITY_COLOR_OPTIONS, STATUS_COLOR_OPTIONS } from './colorTheme';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,14 +18,12 @@ export const metadata = {
   title: 'Entrades | Òrbita Admin',
 };
 
-const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
-  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Entrada nova' },
-  CONTACTED: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Contactat' },
-  QUOTE_SENT: { bg: 'bg-purple-500/20', text: 'text-purple-300', label: 'Pressupost enviat' },
-  NEGOTIATING: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'Negociació' },
-  WON: { bg: 'bg-emerald-500/20', text: 'text-emerald-300', label: 'Guanyat!' },
-  LOST: { bg: 'bg-slate-500/20', text: 'text-slate-400', label: 'Perdut' },
-};
+const STATUS_CONFIG = Object.fromEntries(
+  STATUS_COLOR_OPTIONS.map((option) => [
+    option.key,
+    { label: option.label, badgeClass: option.badgeClass, chipClass: option.chipClass },
+  ])
+) as Record<string, { label: string; badgeClass: string; chipClass: string }>;
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
   WEDDING: '💍 Casament',
@@ -35,19 +37,12 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   OTHER: '📋 Altre',
 };
 
-const PRIORITY_COLORS: Record<string, string> = {
-  LOW: 'bg-slate-500/20 text-slate-300',
-  MEDIUM: 'bg-blue-500/20 text-blue-300',
-  HIGH: 'bg-orange-500/20 text-orange-300',
-  URGENT: 'bg-rose-500/20 text-rose-300',
-};
-
-const PRIORITY_LABELS: Record<string, string> = {
-  LOW: 'Baixa',
-  MEDIUM: 'Mitjana',
-  HIGH: 'Alta',
-  URGENT: 'Urgent',
-};
+const PRIORITY_CONFIG = Object.fromEntries(
+  PRIORITY_COLOR_OPTIONS.map((option) => [
+    option.key,
+    { label: option.label, badgeClass: option.badgeClass, chipClass: option.chipClass },
+  ])
+) as Record<string, { label: string; badgeClass: string; chipClass: string }>;
 
 const SOURCE_LABELS: Record<string, string> = {
   WEBSITE: 'Web',
@@ -307,7 +302,11 @@ export default async function LeadsPage({
   const currentQuery = buildQuery(data.filters);
 
   return (
-    <div className="space-y-4 pb-24 sm:space-y-6 sm:pb-8">
+    <div
+      id="leads-theme-root"
+      className="space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8"
+      style={LEAD_COLOR_DEFAULT_VARS as CSSProperties}
+    >
       {/* Header - Mobile optimized */}
       <header className="flex items-center justify-between">
         <div>
@@ -371,22 +370,22 @@ export default async function LeadsPage({
       </section>
 
       <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
-        <form method="get" className="grid gap-3 lg:grid-cols-6">
+        <form method="get" className="grid gap-3 text-center lg:grid-cols-6">
           <div className="lg:col-span-2">
             <label className="text-xs text-slate-400">Cerca</label>
             <input
               name="q"
               defaultValue={data.filters.q}
               placeholder="Nom, email o telèfon"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-center text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Tipus event</label>
+            <label className="text-xs text-slate-400">Tipus d&apos;esdeveniment</label>
             <select
               name="eventType"
               defaultValue={data.filters.eventType[0] || ''}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-center text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
             >
               <option value="">Tots</option>
               {VALID_EVENT_TYPE.map((value) => (
@@ -399,7 +398,7 @@ export default async function LeadsPage({
             <select
               name="source"
               defaultValue={data.filters.source[0] || ''}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-center text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
             >
               <option value="">Tots</option>
               {VALID_SOURCE.map((value) => (
@@ -413,7 +412,7 @@ export default async function LeadsPage({
               type="date"
               name="from"
               defaultValue={data.filters.from ? data.filters.from.toISOString().slice(0, 10) : ''}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-center text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
             />
           </div>
           <div>
@@ -422,10 +421,10 @@ export default async function LeadsPage({
               type="date"
               name="to"
               defaultValue={data.filters.to ? data.filters.to.toISOString().slice(0, 10) : ''}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-center text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
             />
           </div>
-          <div className="flex items-end gap-2">
+          <div className="flex items-end justify-center gap-2">
             <button
               type="submit"
               className="w-full rounded-xl bg-cyan-500/20 px-3 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/30"
@@ -441,49 +440,65 @@ export default async function LeadsPage({
           </div>
           <div className="lg:col-span-3">
             <p className="text-[10px] uppercase text-slate-500">Estat</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {VALID_STATUS.map((value) => (
-                <label key={value} className="flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300">
-                  <input
-                    type="checkbox"
-                    name="status"
-                    value={value}
-                    defaultChecked={data.filters.status.includes(value)}
-                    className="accent-cyan-500"
-                  />
-                  {value}
-                </label>
-              ))}
+            <div className="mt-2 flex flex-wrap justify-center gap-2">
+              {VALID_STATUS.map((value) => {
+                const selected = data.filters.status.includes(value);
+                const statusConf = STATUS_CONFIG[value];
+                return (
+                  <label
+                    key={value}
+                    className={`flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-1 text-xs ${statusConf.chipClass} ${selected ? 'ring-1 ring-white/30' : 'opacity-80 hover:opacity-100'}`}
+                  >
+                    <input
+                      type="checkbox"
+                      name="status"
+                      value={value}
+                      defaultChecked={selected}
+                      className="accent-cyan-500"
+                    />
+                    {statusConf.label}
+                  </label>
+                );
+              })}
             </div>
           </div>
           <div className="lg:col-span-3">
             <p className="text-[10px] uppercase text-slate-500">Prioritat</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {VALID_PRIORITY.map((value) => (
-                <label key={value} className="flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300">
-                  <input
-                    type="checkbox"
-                    name="priority"
-                    value={value}
-                    defaultChecked={data.filters.priority.includes(value)}
-                    className="accent-amber-500"
-                  />
-                  {value}
-                </label>
-              ))}
+            <div className="mt-2 flex flex-wrap justify-center gap-2">
+              {VALID_PRIORITY.map((value) => {
+                const selected = data.filters.priority.includes(value);
+                const priorityConf = PRIORITY_CONFIG[value];
+                return (
+                  <label
+                    key={value}
+                    className={`flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-1 text-xs ${priorityConf.chipClass} ${selected ? 'ring-1 ring-white/30' : 'opacity-80 hover:opacity-100'}`}
+                  >
+                    <input
+                      type="checkbox"
+                      name="priority"
+                      value={value}
+                      defaultChecked={selected}
+                      className="accent-amber-500"
+                    />
+                    {priorityConf.label}
+                  </label>
+                );
+              })}
             </div>
           </div>
         </form>
       </section>
 
+      <LeadColorCustomizer />
+
       <LeadSavedViews currentQuery={currentQuery} />
 
-      <section className="flex flex-wrap items-center gap-2 text-xs">
+      <section className="flex flex-wrap items-center justify-center gap-2 text-xs">
         <Link
           href="/admin/leads"
-          className={`rounded-full border px-3 py-1 ${
-            data.filters.status.length === 0 && data.filters.priority.length === 0 ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
-          }`}
+            className={`whitespace-nowrap rounded-full border px-3 py-1 ${
+              data.filters.status.length === 0 && data.filters.priority.length === 0 ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+            }`}
         >
           Tots
         </Link>
@@ -491,8 +506,8 @@ export default async function LeadsPage({
           <Link
             key={value}
             href={`/admin/leads?status=${value}`}
-            className={`rounded-full border px-3 py-1 ${
-              data.filters.status.includes(value as LeadStatus) ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+            className={`whitespace-nowrap rounded-full px-3 py-1 ${STATUS_CONFIG[value]?.chipClass || 'border border-slate-700 text-slate-300'} ${
+              data.filters.status.includes(value as LeadStatus) ? 'ring-1 ring-white/30' : 'opacity-80 hover:opacity-100'
             }`}
           >
             {STATUS_CONFIG[value]?.label || value}
@@ -502,18 +517,18 @@ export default async function LeadsPage({
           <Link
             key={value}
             href={`/admin/leads?priority=${value}`}
-            className={`rounded-full border px-3 py-1 ${
-              data.filters.priority.includes(value as Priority) ? 'border-amber-500/40 bg-amber-500/10 text-amber-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
+            className={`whitespace-nowrap rounded-full px-3 py-1 ${PRIORITY_CONFIG[value]?.chipClass || 'border border-slate-700 text-slate-300'} ${
+              data.filters.priority.includes(value as Priority) ? 'ring-1 ring-white/30' : 'opacity-80 hover:opacity-100'
             }`}
           >
-            {PRIORITY_LABELS[value] || value}
+            {PRIORITY_CONFIG[value]?.label || value}
           </Link>
         ))}
         {VALID_SOURCE.map((value) => (
           <Link
             key={value}
             href={`/admin/leads?source=${value}`}
-            className={`rounded-full border px-3 py-1 ${
+            className={`whitespace-nowrap rounded-full border px-3 py-1 ${
               data.filters.source.includes(value as LeadSource) ? 'border-fuchsia-500/40 bg-fuchsia-500/10 text-fuchsia-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -565,7 +580,7 @@ export default async function LeadsPage({
                       <p className="text-[11px] text-fuchsia-300/80">{SOURCE_LABELS[lead.source] || lead.source}</p>
                     </div>
                   </div>
-                  <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConf.bg} ${statusConf.text}`}>
+                  <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConf.badgeClass}`}>
                     {statusConf.label}
                   </span>
                 </div>
@@ -604,10 +619,13 @@ export default async function LeadsPage({
                       </Link>
                     )}
                   </div>
-                  <LeadQuickStatus
-                    leadId={lead.id}
-                    currentStatus={lead.status}
-                  />
+                  <div className="flex items-center gap-2">
+                    <LeadQuickPriority leadId={lead.id} currentPriority={lead.priority} />
+                    <LeadQuickStatus
+                      leadId={lead.id}
+                      currentStatus={lead.status}
+                    />
+                  </div>
                 </div>
                 {lead.booking && (
                   <Link
@@ -626,18 +644,18 @@ export default async function LeadsPage({
       {/* Desktop Table View */}
       <section className="hidden lg:block rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[1120px] text-sm">
             <thead className="bg-slate-700/30 border-b border-slate-700/50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-slate-300">Client</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-300">Contacte</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-300">Tipus</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-300">Origen</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-300">Data</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-300">Temps pendent</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-300">Estat</th>
-                <th className="px-4 py-3 text-left font-medium text-slate-300">Prioritat</th>
-                <th className="px-4 py-3 text-right font-medium text-slate-300">Accions</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Client</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Contacte</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Tipus</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Origen</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Data</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Temps pendent</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Estat</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Prioritat</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Accions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/30">
@@ -654,13 +672,13 @@ export default async function LeadsPage({
                 leads.map((lead) => {
                   const statusConf = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
                   const eventType = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
-                  const priorityColor = PRIORITY_COLORS[lead.priority] || PRIORITY_COLORS.MEDIUM;
+                  const priorityConf = PRIORITY_CONFIG[lead.priority] || PRIORITY_CONFIG.MEDIUM;
 
                   return (
                     <tr key={lead.id} className="hover:bg-slate-700/30 transition-colors">
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1.5">
-                          <Link href={`/admin/leads/${lead.id}`} className="font-medium text-slate-100 hover:text-cyan-400">
+                      <td className="px-3 xl:px-4 py-3 text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <Link href={`/admin/leads/${lead.id}`} className="font-medium text-slate-100 hover:text-cyan-400 whitespace-nowrap">
                             {lead.name}
                           </Link>
                           {lead.customerId && (
@@ -670,53 +688,54 @@ export default async function LeadsPage({
                           )}
                         </div>
                         {lead.booking && (
-                          <Link href={`/admin/bookings/${lead.booking.id}`} className="text-xs text-emerald-400 hover:text-emerald-300 hover:underline block">
+                          <Link href={`/admin/bookings/${lead.booking.id}`} className="text-xs text-emerald-400 hover:text-emerald-300 hover:underline block text-center">
                             ✓ {lead.booking.reference}
                           </Link>
                         )}
                       </td>
-                      <td className="px-4 py-3">
-                        <a href={`mailto:${lead.email}`} className="text-cyan-400 hover:underline text-xs truncate block max-w-[180px]">
+                      <td className="px-3 xl:px-4 py-3 text-center">
+                        <a href={`mailto:${lead.email}`} className="text-cyan-400 hover:underline text-xs truncate block max-w-[220px] whitespace-nowrap mx-auto">
                           {lead.email}
                         </a>
                         {lead.phone && (
-                          <a href={`tel:${lead.phone}`} className="text-slate-400 text-xs">📱 {lead.phone}</a>
+                          <a href={`tel:${lead.phone}`} className="text-slate-400 text-xs whitespace-nowrap inline-block">📱 {lead.phone}</a>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-slate-300 text-xs">{eventType}</td>
-                      <td className="px-4 py-3 text-xs text-fuchsia-200">{SOURCE_LABELS[lead.source] || lead.source}</td>
-                      <td className="px-4 py-3 text-slate-300 text-xs">
+                      <td className="px-3 xl:px-4 py-3 text-slate-300 text-xs whitespace-nowrap text-center">{eventType}</td>
+                      <td className="px-3 xl:px-4 py-3 text-xs text-fuchsia-200 whitespace-nowrap text-center">{SOURCE_LABELS[lead.source] || lead.source}</td>
+                      <td className="px-3 xl:px-4 py-3 text-slate-300 text-xs whitespace-nowrap text-center">
                         {lead.eventDate
                           ? new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short', year: 'numeric' })
                           : '—'}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 xl:px-4 py-3 text-center">
                         {(() => {
                           const pending = getPendingTimeBadge(new Date(lead.createdAt), lead.status);
                           return (
-                            <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${pending.className}`}>
+                            <span className={`inline-flex whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${pending.className}`}>
                               {pending.label}
                             </span>
                           );
                         })()}
                       </td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text}`}>
+                      <td className="px-3 xl:px-4 py-3 text-center">
+                        <span className={`inline-flex whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.badgeClass}`}>
                           {statusConf.label}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${priorityColor}`}>
-                          {lead.priority}
+                      <td className="px-3 xl:px-4 py-3 text-center">
+                        <span className={`inline-flex whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${priorityConf.badgeClass}`}>
+                          {priorityConf.label}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-3 xl:px-4 py-3 text-center whitespace-nowrap">
                         <LeadActions
                           leadId={lead.id}
                           leadName={lead.name}
                           phone={lead.phone}
                           hasBooking={!!lead.booking}
                           currentStatus={lead.status}
+                          currentPriority={lead.priority}
                         />
                       </td>
                     </tr>

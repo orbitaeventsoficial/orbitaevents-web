@@ -20,7 +20,13 @@ export default function GenerateDailyChecklistButton() {
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || 'No s’ha pogut generar');
       }
-      setMessage(`Checklist d’avui: ${data.created} creats, ${data.skipped} ja existien.`);
+      if ((data.considered ?? 0) === 0) {
+        setMessage(`Checklist d’avui: cap tasca pendent real. Netejades ${data.staleCancelled ?? 0} antigues.`);
+      } else {
+        setMessage(
+          `Checklist d’avui: ${data.created} creats, ${data.skipped} ja existien, ${data.todayCancelled ?? 0} desactivades.`
+        );
+      }
       router.refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Error generant checklist');
@@ -43,4 +49,3 @@ export default function GenerateDailyChecklistButton() {
     </div>
   );
 }
-

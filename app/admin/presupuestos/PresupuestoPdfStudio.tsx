@@ -10,6 +10,7 @@ import {
   type ServiceSlug,
 } from '@/app/config/packs-config';
 import { generateQuotePDF } from '@/lib/pdf-utils';
+import { resolvePackI18nFeatures, resolvePackI18nKey } from '@/lib/pack-i18n';
 import { z } from 'zod';
 
 type Locale = 'ca' | 'es' | 'en';
@@ -18,6 +19,12 @@ type CustomExtra = {
   id: string;
   name: string;
   price: number;
+};
+
+type PricingCatalogState = {
+  packNamesBySlug: Record<string, string>;
+  extraNamesBySlug: Record<string, string>;
+  extraDescriptionsBySlug: Record<string, string>;
 };
 
 type StudioProps = {
@@ -248,6 +255,11 @@ export default function PresupuestoPdfStudio({
   const [autosaving, setAutosaving] = useState(false);
   const [autosaveTick, setAutosaveTick] = useState(0);
   const [allowBrandOverride, setAllowBrandOverride] = useState(false);
+  const [pricingCatalog, setPricingCatalog] = useState<PricingCatalogState>({
+    packNamesBySlug: {},
+    extraNamesBySlug: {},
+    extraDescriptionsBySlug: {},
+  });
   const isCustomerScoped = Boolean(customerId);
 
   useEffect(() => {
@@ -285,7 +297,57 @@ export default function PresupuestoPdfStudio({
     void tryLoadLogo();
   }, [logoDataUrl]);
 
-  const packs = useMemo(() => getPacksByService(eventType), [eventType]);
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPricingCatalog = async () => {
+      try {
+        const res = await fetch(`/api/admin/pricing?locale=${locale}`);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data?.ok || cancelled) return;
+
+        const packNamesBySlug = Object.fromEntries(
+          (data?.data?.packs || [])
+            .filter((pack: any) => typeof pack?.slug === 'string' && typeof pack?.name === 'string')
+            .map((pack: any) => [pack.slug, pack.name.trim()])
+        ) as Record<string, string>;
+
+        const extraNamesBySlug = Object.fromEntries(
+          (data?.data?.extras || [])
+            .filter((extra: any) => typeof extra?.slug === 'string' && typeof extra?.name === 'string')
+            .map((extra: any) => [extra.slug, extra.name.trim()])
+        ) as Record<string, string>;
+
+        const extraDescriptionsBySlug = Object.fromEntries(
+          (data?.data?.extras || [])
+            .filter((extra: any) => typeof extra?.slug === 'string' && typeof extra?.description === 'string')
+            .map((extra: any) => [extra.slug, String(extra.description || '').trim()])
+        ) as Record<string, string>;
+
+        setPricingCatalog({ packNamesBySlug, extraNamesBySlug, extraDescriptionsBySlug });
+      } catch {
+        // Keep config fallback silently.
+      }
+    };
+
+    void loadPricingCatalog();
+    return () => {
+      cancelled = true;
+    };
+  }, [locale]);
+
+  const packs = useMemo(() => {
+    return getPacksByService(eventType).map((pack) => ({
+      ...pack,
+      name:
+        pricingCatalog.packNamesBySlug[pack.slug] ||
+        resolvePackI18nKey(pack.name, locale),
+      tagline: resolvePackI18nKey(pack.tagline, locale),
+      emotion: resolvePackI18nKey(pack.emotion || '', locale),
+      features: resolvePackI18nFeatures(pack.features, locale),
+      badge: resolvePackI18nKey(pack.badge || '', locale) || pack.badge,
+    }));
+  }, [eventType, locale, pricingCatalog.packNamesBySlug]);
 
   const selectedPack = useMemo(() => {
     const found = packs.find((pack) => pack.id === packId);
@@ -297,10 +359,19 @@ export default function PresupuestoPdfStudio({
   const [durationHours, setDurationHours] = useState(selectedPack?.durationHours || 4);
   const [featuresText, setFeaturesText] = useState((selectedPack?.features || []).join('\n'));
 
-  const compatibleExtras = useMemo(
-    () => EXTRAS.filter((extra) => !extra.compatibleWith || extra.compatibleWith.includes(eventType)),
-    [eventType]
-  );
+  const compatibleExtras = useMemo(() => {
+    return EXTRAS
+      .filter((extra) => !extra.compatibleWith || extra.compatibleWith.includes(eventType))
+      .map((extra) => ({
+        ...extra,
+        name:
+          pricingCatalog.extraNamesBySlug[extra.id] ||
+          resolvePackI18nKey(extra.name, locale),
+        description:
+          pricingCatalog.extraDescriptionsBySlug[extra.id] ||
+          resolvePackI18nKey(extra.description, locale),
+      }));
+  }, [eventType, locale, pricingCatalog.extraNamesBySlug, pricingCatalog.extraDescriptionsBySlug]);
 
   const mappedSelectedExtras = useMemo(
     () => compatibleExtras.filter((extra) => selectedExtras.includes(extra.id)),
@@ -371,6 +442,18 @@ export default function PresupuestoPdfStudio({
       setDraftLoaded(true);
     }
   }, [draftLoaded]);
+
+  useEffect(() => {
+    if (packId === CUSTOM_PACK_ID || !selectedPack) return;
+    const looksLikeI18nKey = (value: string) =>
+      value.includes('.') && value.split('.').every((part) => part.trim().length > 0);
+
+    const hasI18nInPackName = looksLikeI18nKey(packName.trim());
+    const hasI18nInFeatures = toFeatureLines(featuresText).some((line) => looksLikeI18nKey(line));
+
+    if (hasI18nInPackName) setPackName(selectedPack.name);
+    if (hasI18nInFeatures) setFeaturesText(selectedPack.features.join('\n'));
+  }, [packId, selectedPack, packName, featuresText]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !draftLoaded) return;

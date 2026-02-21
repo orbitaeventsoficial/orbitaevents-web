@@ -10,12 +10,14 @@ interface LeadActionsProps {
   phone?: string | null;
   hasBooking: boolean;
   currentStatus: 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
+  currentPriority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 }
 
-export default function LeadActions({ leadId, leadName, phone, hasBooking, currentStatus }: LeadActionsProps) {
+export default function LeadActions({ leadId, leadName, phone, hasBooking, currentStatus, currentPriority }: LeadActionsProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
+  const [priorityUpdating, setPriorityUpdating] = useState(false);
 
   const handleDelete = async () => {
     if (hasBooking) {
@@ -67,6 +69,27 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
     }
   };
 
+  const handlePriorityChange = async (nextPriority: LeadActionsProps['currentPriority']) => {
+    if (priorityUpdating || nextPriority === currentPriority) return;
+    setPriorityUpdating(true);
+    try {
+      const res = await fetch(`/api/admin/leads-new/${leadId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priority: nextPriority }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || "Error actualitzant la prioritat");
+      }
+      router.refresh();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Error actualitzant la prioritat");
+    } finally {
+      setPriorityUpdating(false);
+    }
+  };
+
   return (
     <div className="flex items-center justify-end gap-2">
       <select
@@ -82,6 +105,18 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
         <option value="NEGOTIATING">Negociació</option>
         <option value="WON">Guanyat</option>
         <option value="LOST">Perdut</option>
+      </select>
+      <select
+        value={currentPriority}
+        onChange={(e) => handlePriorityChange(e.target.value as LeadActionsProps['currentPriority'])}
+        disabled={priorityUpdating}
+        className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-2 py-1.5 text-xs text-slate-200"
+        title="Canviar prioritat"
+      >
+        <option value="LOW">Baixa</option>
+        <option value="MEDIUM">Mitjana</option>
+        <option value="HIGH">Alta</option>
+        <option value="URGENT">Urgent</option>
       </select>
       {phone && (
         <a

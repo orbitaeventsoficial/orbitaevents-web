@@ -128,10 +128,10 @@ export default async function BookingsPage({
   const totalRevenue = stats.reduce((sum, s) => sum + (s._sum.total || 0), 0);
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 px-1 sm:space-y-6 sm:px-0">
       {/* Header - Mobile optimized */}
       <header className="flex items-center justify-between">
-        <div>
+        <div className="text-center">
           <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">Reserves</h1>
           <p className="text-xs sm:text-sm text-slate-400">
             {pagination.total} esdeveniments · {formatCurrency(totalRevenue)}
@@ -148,30 +148,30 @@ export default async function BookingsPage({
       {/* Stats Cards - Scrollable horizontal en móvil */}
       <section className="flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
         <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium text-slate-400 uppercase">Total</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{pagination.total}</p>
-          <p className="text-[10px] sm:text-xs text-slate-500 truncate">{formatCurrency(totalRevenue)}</p>
+          <p className="text-[10px] sm:text-xs font-medium text-slate-400 uppercase text-center">Total</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100 text-center">{pagination.total}</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 truncate text-center">{formatCurrency(totalRevenue)}</p>
         </div>
         <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium text-amber-400 uppercase">Pendents</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{statsMap.PENDING?.count || 0}</p>
+          <p className="text-[10px] sm:text-xs font-medium text-amber-400 uppercase text-center">Pendents</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100 text-center">{statsMap.PENDING?.count || 0}</p>
         </div>
         <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium text-emerald-400 uppercase">Confirmades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{statsMap.CONFIRMED?.count || 0}</p>
+          <p className="text-[10px] sm:text-xs font-medium text-emerald-400 uppercase text-center">Confirmades</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100 text-center">{statsMap.CONFIRMED?.count || 0}</p>
         </div>
         <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-teal-500/20 bg-gradient-to-br from-teal-500/10 to-teal-600/5 backdrop-blur-sm p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium text-teal-400 uppercase">Completades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{statsMap.COMPLETED?.count || 0}</p>
+          <p className="text-[10px] sm:text-xs font-medium text-teal-400 uppercase text-center">Completades</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100 text-center">{statsMap.COMPLETED?.count || 0}</p>
         </div>
         <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-rose-500/20 bg-gradient-to-br from-rose-500/10 to-rose-600/5 backdrop-blur-sm p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium text-rose-400 uppercase">Cancel·lades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100">{statsMap.CANCELLED?.count || 0}</p>
+          <p className="text-[10px] sm:text-xs font-medium text-rose-400 uppercase text-center">Cancel·lades</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100 text-center">{statsMap.CANCELLED?.count || 0}</p>
         </div>
       </section>
 
       {/* Info Alert - Compacto en móvil */}
-      <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 to-blue-600/5 backdrop-blur-sm p-3 sm:p-4">
+      <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 to-blue-600/5 backdrop-blur-sm p-3 text-center sm:p-4">
         <p className="text-xs sm:text-sm text-slate-200">
           <strong>Auto:</strong> Quan passa a <span className="font-semibold text-cyan-400">COMPLETED</span>, les stats públiques s&apos;actualitzen.
         </p>
@@ -260,17 +260,17 @@ export default async function BookingsPage({
       {/* Desktop Table View */}
       <section className="hidden lg:block rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[1060px] text-sm">
             <thead className="bg-slate-700/30 border-b border-slate-700/50">
               <tr>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Ref.</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Client</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Tipus</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Data</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Pack</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Total</th>
-                <th scope="col" className="px-4 py-3 text-left font-medium text-slate-300">Estat</th>
-                <th scope="col" className="px-4 py-3 text-right font-medium text-slate-300">Accions</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Ref.</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Client</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Tipus</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Data</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Pack</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Total</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Estat</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Accions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/30">
@@ -296,12 +296,12 @@ export default async function BookingsPage({
                           : 'hover:bg-slate-700/30'
                       }`}
                     >
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-center">
                         <Link href={`/admin/bookings/${booking.id}`} className="hover:opacity-80 transition-opacity">
                           <code className="text-xs font-mono bg-slate-700/50 text-cyan-300 px-2 py-1 rounded cursor-pointer">{booking.reference}</code>
                         </Link>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-center">
                         {booking.customerId ? (
                           <Link href={`/admin/contactes/${booking.customerId}`} className="font-medium text-slate-100 hover:text-cyan-300">
                             {booking.clientName}
@@ -316,14 +316,14 @@ export default async function BookingsPage({
                           </Link>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-slate-300 text-xs">{eventType}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-slate-300 text-xs text-center whitespace-nowrap">{eventType}</td>
+                      <td className="px-4 py-3 text-center">
                         <div className="font-medium text-slate-200 text-xs">{formatDate(booking.eventDate)}</div>
                         {booking.eventStartTime && (
                           <div className="text-xs text-slate-500">{booking.eventStartTime}</div>
                         )}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-center">
                         <span className="inline-flex rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs font-medium text-cyan-300">
                           {getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale)}
                         </span>
@@ -331,18 +331,18 @@ export default async function BookingsPage({
                           <span className="ml-1 text-xs text-slate-500">+{booking._count.extras}</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-100">
+                      <td className="px-4 py-3 font-medium text-slate-100 text-center">
                         {formatCurrency(booking.total)}
                         {!booking.depositPaid && (
                           <span className="block text-xs text-rose-400">Paga pendent</span>
                         )}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-center">
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text}`}>
                           {statusConf.label}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-3 text-center">
                         <BookingActions
                           id={booking.id}
                           status={booking.status}
@@ -360,7 +360,7 @@ export default async function BookingsPage({
       </section>
 
       {pagination.totalPages > 1 && (
-        <section className="flex items-center justify-between rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300">
+        <section className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 sm:flex-row sm:justify-between">
           <span>
             Pàgina {pagination.page} de {pagination.totalPages}
           </span>

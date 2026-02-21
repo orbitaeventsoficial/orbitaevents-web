@@ -1545,6 +1545,18 @@ body.admin-mode,
 html.admin-mode .admin-shell.admin-unified {
   background: #0b0d10 !important;
   background-color: #0b0d10 !important;
+  --admin-priority-all-bg: rgba(245, 158, 11, 0.16);
+  --admin-priority-all-border: rgba(245, 158, 11, 0.52);
+  --admin-priority-all-text: rgb(253, 230, 138);
+  --admin-priority-high-bg: rgba(244, 63, 94, 0.16);
+  --admin-priority-high-border: rgba(244, 63, 94, 0.52);
+  --admin-priority-high-text: rgb(254, 205, 211);
+  --admin-priority-medium-bg: rgba(245, 158, 11, 0.16);
+  --admin-priority-medium-border: rgba(245, 158, 11, 0.52);
+  --admin-priority-medium-text: rgb(253, 230, 138);
+  --admin-priority-low-bg: rgba(16, 185, 129, 0.16);
+  --admin-priority-low-border: rgba(16, 185, 129, 0.52);
+  --admin-priority-low-text: rgb(167, 243, 208);
 }
 
 html.admin-mode .admin-shell.admin-unified :is(
@@ -1614,8 +1626,43 @@ html.admin-mode .admin-shell :is(h1, h2, h3, h4, h5, h6) {
   letter-spacing: -0.01em;
 }
 
+html.admin-mode .admin-shell .admin-priority-chip {
+  border-width: 1px !important;
+  border-style: solid !important;
+  white-space: nowrap;
+}
+
+html.admin-mode .admin-shell .admin-priority-all {
+  background-color: var(--admin-priority-all-bg) !important;
+  border-color: var(--admin-priority-all-border) !important;
+  color: var(--admin-priority-all-text) !important;
+}
+
+html.admin-mode .admin-shell .admin-priority-high {
+  background-color: var(--admin-priority-high-bg) !important;
+  border-color: var(--admin-priority-high-border) !important;
+  color: var(--admin-priority-high-text) !important;
+}
+
+html.admin-mode .admin-shell .admin-priority-medium {
+  background-color: var(--admin-priority-medium-bg) !important;
+  border-color: var(--admin-priority-medium-border) !important;
+  color: var(--admin-priority-medium-text) !important;
+}
+
+html.admin-mode .admin-shell .admin-priority-low {
+  background-color: var(--admin-priority-low-bg) !important;
+  border-color: var(--admin-priority-low-border) !important;
+  color: var(--admin-priority-low-text) !important;
+}
+
 html.admin-mode .admin-shell :is(p, span, label, td, th, li, dd, dt) {
   overflow-wrap: anywhere;
+  text-align: center;
+}
+
+html.admin-mode .admin-shell :is(h1, h2, h3, h4, h5, h6) {
+  text-align: center;
 }
 
 html.admin-mode .admin-shell :is(input, textarea)::placeholder {

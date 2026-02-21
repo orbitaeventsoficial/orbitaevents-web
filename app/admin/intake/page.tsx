@@ -316,7 +316,7 @@ export default function IntakePage() {
               aria-pressed={form.source === src.value}
               className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
                 form.source === src.value
-                  ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200 ring-1 ring-cyan-400/50'
+                  ? 'border-amber-400 bg-amber-500/20 text-amber-100 ring-1 ring-amber-400/50'
                   : 'border-slate-700/50 bg-slate-900/60 text-slate-300 hover:bg-slate-800'
               }`}
             >
@@ -326,7 +326,7 @@ export default function IntakePage() {
             </button>
           ))}
         </div>
-        <p className="mt-3 text-xs text-cyan-300">
+        <p className="mt-3 text-xs text-amber-300">
           Origen seleccionat: <span className="font-semibold">{SOURCE_LABELS[form.source] || form.source}</span>
         </p>
       </div>
@@ -403,21 +403,21 @@ export default function IntakePage() {
                 aria-pressed={form.eventType === et.value}
                 className={`rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
                   form.eventType === et.value
-                    ? 'border-cyan-400 bg-cyan-500/20 text-cyan-200 ring-1 ring-cyan-400/60'
+                    ? 'border-amber-400 bg-amber-500/20 text-amber-100 ring-1 ring-amber-400/60'
                     : 'border-slate-700/50 bg-slate-900/60 text-slate-400 hover:bg-slate-800'
                 }`}
               >
                 <span className="text-base">{et.icon}</span>
                 <span className="block mt-0.5">{et.label}</span>
                 {form.eventType === et.value && (
-                  <span className="mt-1 inline-block rounded-full bg-cyan-400/20 px-1.5 py-0.5 text-[10px] font-semibold text-cyan-200">
+                  <span className="mt-1 inline-block rounded-full border border-amber-400/40 bg-amber-500/25 px-1.5 py-0.5 text-[10px] font-semibold text-amber-100">
                     Seleccionat ✓
                   </span>
                 )}
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-cyan-300">
+          <p className="mt-2 text-xs text-amber-300">
             Tipus seleccionat:{' '}
             <span className="font-semibold">
               {EVENT_TYPES.find((et) => et.value === form.eventType)?.label ?? 'Altre'}
