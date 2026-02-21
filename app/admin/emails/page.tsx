@@ -1,5 +1,6 @@
 // app/admin/emails/page.tsx
 import { prisma } from '@/lib/prisma';
+import { log } from '@/lib/logger';
 import Link from 'next/link';
 import EmailStatsCards from './EmailStatsCards';
 import EmailConfigPanel from './EmailConfigPanel';
@@ -20,68 +21,96 @@ async function getEmailStats() {
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-  // Leads amb email enviat
-  const leadsWithEmail = await prisma.lead.count({
-    where: {
-      email: { not: { contains: '@leads.orbitaevents.local' } },
-      createdAt: { gte: thirtyDaysAgo },
-    },
-  });
+  let hasQueryErrors = false;
+  const safe = async <T,>(label: string, fallback: T, fn: () => Promise<T>): Promise<T> => {
+    try {
+      return await fn();
+    } catch (error) {
+      hasQueryErrors = true;
+      log.error(`[admin/emails] Query failed: ${label}`, error as Error);
+      return fallback;
+    }
+  };
 
-  // Bookings amb post-event email enviat
-  const postEventSent = await prisma.booking.count({
-    where: { postEventEmailSent: true },
-  });
-
-  // Bookings pendents d'enviar post-event
   const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
-  const postEventPending = await prisma.booking.count({
-    where: {
-      status: 'COMPLETED',
-      eventDate: { lte: twoDaysAgo },
-      postEventEmailSent: false,
-      clientEmail: { not: { contains: '@leads.orbitaevents.local' } },
-    },
-  });
 
-  // Valoracions rebudes
-  const testimonials = await prisma.customerTestimonial.count({
-    where: { createdAt: { gte: thirtyDaysAgo } },
-  });
-
-  // Codis descompte generats
-  const discountCodes = await prisma.customerDiscountCode.count({
-    where: { createdAt: { gte: thirtyDaysAgo } },
-  });
-
-  // Últims emails (via activitat)
-  const recentActivity = await prisma.customerActivity.findMany({
-    where: {
-      action: { in: ['POST_EVENT_EMAIL_SENT', 'TESTIMONIAL_SUBMITTED', 'DISCOUNT_CODE_GENERATED', 'LEAD_EMAIL_SENT'] },
-      createdAt: { gte: sevenDaysAgo },
-    },
-    include: { customer: true },
-    orderBy: { createdAt: 'desc' },
-    take: 20,
-  });
-
-  const recentEmailActions = await prisma.customerActivity.count({
-    where: {
-      action: { in: ['POST_EVENT_EMAIL_SENT', 'LEAD_EMAIL_SENT'] },
-      createdAt: { gte: twentyFourHoursAgo },
-    },
-  });
-
-  const recentTestimonials = await prisma.customerActivity.count({
-    where: {
-      action: { in: ['TESTIMONIAL_SUBMITTED'] },
-      createdAt: { gte: sevenDaysAgo },
-    },
-  });
-
-  const cronSettings = await prisma.setting.findMany({
-    where: { key: { in: ['emails.cron.lastRun', 'emails.cron.lastStatus', 'emails.cron.lastSummary', 'emails.cron.lastMessage'] } },
-  });
+  const [
+    leadsWithEmail,
+    postEventSent,
+    postEventPending,
+    testimonials,
+    discountCodes,
+    recentActivity,
+    recentEmailActions,
+    recentTestimonials,
+    cronSettings,
+  ] = await Promise.all([
+    safe('leadsWithEmail', 0, () =>
+      prisma.lead.count({
+        where: {
+          email: { not: { contains: '@leads.orbitaevents.local' } },
+          createdAt: { gte: thirtyDaysAgo },
+        },
+      })
+    ),
+    safe('postEventSent', 0, () =>
+      prisma.booking.count({
+        where: { postEventEmailSent: true },
+      })
+    ),
+    safe('postEventPending', 0, () =>
+      prisma.booking.count({
+        where: {
+          status: 'COMPLETED',
+          eventDate: { lte: twoDaysAgo },
+          postEventEmailSent: false,
+          clientEmail: { not: { contains: '@leads.orbitaevents.local' } },
+        },
+      })
+    ),
+    safe('testimonials', 0, () =>
+      prisma.customerTestimonial.count({
+        where: { createdAt: { gte: thirtyDaysAgo } },
+      })
+    ),
+    safe('discountCodes', 0, () =>
+      prisma.customerDiscountCode.count({
+        where: { createdAt: { gte: thirtyDaysAgo } },
+      })
+    ),
+    safe('recentActivity', [] as Awaited<ReturnType<typeof prisma.customerActivity.findMany>>, () =>
+      prisma.customerActivity.findMany({
+        where: {
+          action: { in: ['POST_EVENT_EMAIL_SENT', 'TESTIMONIAL_SUBMITTED', 'DISCOUNT_CODE_GENERATED', 'LEAD_EMAIL_SENT'] },
+          createdAt: { gte: sevenDaysAgo },
+        },
+        include: { customer: true },
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+      })
+    ),
+    safe('recentEmailActions', 0, () =>
+      prisma.customerActivity.count({
+        where: {
+          action: { in: ['POST_EVENT_EMAIL_SENT', 'LEAD_EMAIL_SENT'] },
+          createdAt: { gte: twentyFourHoursAgo },
+        },
+      })
+    ),
+    safe('recentTestimonials', 0, () =>
+      prisma.customerActivity.count({
+        where: {
+          action: { in: ['TESTIMONIAL_SUBMITTED'] },
+          createdAt: { gte: sevenDaysAgo },
+        },
+      })
+    ),
+    safe('cronSettings', [] as Awaited<ReturnType<typeof prisma.setting.findMany>>, () =>
+      prisma.setting.findMany({
+        where: { key: { in: ['emails.cron.lastRun', 'emails.cron.lastStatus', 'emails.cron.lastSummary', 'emails.cron.lastMessage'] } },
+      })
+    ),
+  ]);
 
   const cronMap = cronSettings.reduce((acc, setting) => {
     acc[setting.key] = setting.value;
@@ -101,6 +130,7 @@ async function getEmailStats() {
     cronLastStatus: cronMap['emails.cron.lastStatus'] || null,
     cronLastMessage: cronMap['emails.cron.lastMessage'] || null,
     cronLastSummary: cronMap['emails.cron.lastSummary'] || null,
+    hasQueryErrors,
   };
 }
 
@@ -109,27 +139,32 @@ async function getPendingPostEventBookings() {
   const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  return prisma.booking.findMany({
-    where: {
-      status: 'COMPLETED',
-      eventDate: {
-        gte: sevenDaysAgo,
-        lte: twoDaysAgo,
+  try {
+    return await prisma.booking.findMany({
+      where: {
+        status: 'COMPLETED',
+        eventDate: {
+          gte: sevenDaysAgo,
+          lte: twoDaysAgo,
+        },
+        postEventEmailSent: false,
+        clientEmail: { not: { contains: '@leads.orbitaevents.local' } },
       },
-      postEventEmailSent: false,
-      clientEmail: { not: { contains: '@leads.orbitaevents.local' } },
-    },
-    select: {
-      id: true,
-      reference: true,
-      clientName: true,
-      clientEmail: true,
-      eventDate: true,
-      pack: { select: { translations: true } },
-    },
-    orderBy: { eventDate: 'desc' },
-    take: 20,
-  });
+      select: {
+        id: true,
+        reference: true,
+        clientName: true,
+        clientEmail: true,
+        eventDate: true,
+        pack: { select: { translations: true } },
+      },
+      orderBy: { eventDate: 'desc' },
+      take: 20,
+    });
+  } catch (error) {
+    log.error('[admin/emails] Query failed: pendingPostEventBookings', error as Error);
+    return [];
+  }
 }
 
 export default async function EmailsAdminPage() {
@@ -158,6 +193,14 @@ export default async function EmailsAdminPage() {
 
       {/* Stats Cards */}
       <EmailStatsCards stats={stats} />
+
+      {stats.hasQueryErrors && (
+        <section className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4">
+          <p className="text-sm text-amber-200">
+            ⚠️ Algunes dades no s&apos;han pogut carregar. El panell continua operatiu, però cal revisar migracions/estructura de BD.
+          </p>
+        </section>
+      )}
 
       {/* Logs / Automatitzacions */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -242,8 +285,9 @@ export default async function EmailsAdminPage() {
 
           {/* Recent Activity */}
           <RecentEmailsTable
-            activities={stats.recentActivity.map(activity => ({
+            activities={stats.recentActivity.map((activity: any) => ({
               ...activity,
+              customer: activity.customer ?? null,
               details: activity.details as Record<string, unknown> | undefined
             }))}
           />
