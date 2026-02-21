@@ -43,6 +43,17 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
     }
   }
 
+  function focusField(fieldId: string) {
+    if (typeof document === 'undefined') return;
+    const field = document.getElementById(fieldId) as HTMLInputElement | null;
+    if (!field) return;
+    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.setTimeout(() => {
+      field.focus();
+      field.select?.();
+    }, 120);
+  }
+
   const inputClass = 'w-full rounded-xl border border-stone-300 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500';
   const marginClass = statusBadge(form.marginTargetPct, 0.6, 0.75);
   const ssClass = statusBadge(form.socialSecurityPct, 0.38, 0.5);
@@ -65,15 +76,15 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <label className="text-xs text-slate-400">
               Objectiu marge (0-1)
-              <input type="number" step="0.01" min={0.1} max={0.9} className={inputClass} value={form.marginTargetPct} onChange={(e) => update('marginTargetPct', Number(e.target.value))} />
+              <input id="pack-model-marginTargetPct" type="number" step="0.01" min={0.1} max={0.9} className={inputClass} value={form.marginTargetPct} onChange={(e) => update('marginTargetPct', Number(e.target.value))} />
             </label>
             <label className="text-xs text-slate-400">
               SS empresa (0-1)
-              <input type="number" step="0.01" min={0} max={1} className={inputClass} value={form.socialSecurityPct} onChange={(e) => update('socialSecurityPct', Number(e.target.value))} />
+              <input id="pack-model-socialSecurityPct" type="number" step="0.01" min={0} max={1} className={inputClass} value={form.socialSecurityPct} onChange={(e) => update('socialSecurityPct', Number(e.target.value))} />
             </label>
             <label className="text-xs text-slate-400">
               IRPF (0-1)
-              <input type="number" step="0.01" min={0} max={1} className={inputClass} value={form.withholdingPct} onChange={(e) => update('withholdingPct', Number(e.target.value))} />
+              <input id="pack-model-withholdingPct" type="number" step="0.01" min={0} max={1} className={inputClass} value={form.withholdingPct} onChange={(e) => update('withholdingPct', Number(e.target.value))} />
             </label>
             <label className="text-xs text-slate-400">
               Operari net €/h
@@ -97,7 +108,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
             </label>
             <label className="text-xs text-slate-400">
               Llindar alerta divergència (%)
-              <input type="number" step="1" min={1} className={inputClass} value={form.alertDivergencePct} onChange={(e) => update('alertDivergencePct', Number(e.target.value))} />
+              <input id="pack-model-alertDivergencePct" type="number" step="1" min={1} className={inputClass} value={form.alertDivergencePct} onChange={(e) => update('alertDivergencePct', Number(e.target.value))} />
             </label>
             <label className="text-xs text-slate-400">
               Operari si convidats ≥
@@ -143,16 +154,40 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
           <div className="mt-3 space-y-2 text-xs">
             <div className="rounded-lg border border-white/10 bg-black/20 p-3">
               <p className="font-semibold text-slate-200">Objectiu marge: {pct(form.marginTargetPct)}</p>
-              <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${marginClass}`}>Semàfor marge</span>
+              <button
+                type="button"
+                onClick={() => focusField('pack-model-marginTargetPct')}
+                className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${marginClass}`}
+              >
+                Semàfor marge
+              </button>
             </div>
             <div className="rounded-lg border border-white/10 bg-black/20 p-3">
               <p className="font-semibold text-slate-200">SS: {pct(form.socialSecurityPct)} · IRPF: {pct(form.withholdingPct)}</p>
-              <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${ssClass}`}>Semàfor SS</span>
-              <span className={`ml-2 inline-flex rounded-full border px-2 py-0.5 font-semibold ${irpfClass}`}>Semàfor IRPF</span>
+              <button
+                type="button"
+                onClick={() => focusField('pack-model-socialSecurityPct')}
+                className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${ssClass}`}
+              >
+                Semàfor SS
+              </button>
+              <button
+                type="button"
+                onClick={() => focusField('pack-model-withholdingPct')}
+                className={`ml-2 inline-flex rounded-full border px-2 py-0.5 font-semibold ${irpfClass}`}
+              >
+                Semàfor IRPF
+              </button>
             </div>
             <div className="rounded-lg border border-white/10 bg-black/20 p-3">
               <p className="font-semibold text-slate-200">Llindar alerta: {form.alertDivergencePct.toFixed(0)}%</p>
-              <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${divergenceClass}`}>Semàfor divergència</span>
+              <button
+                type="button"
+                onClick={() => focusField('pack-model-alertDivergencePct')}
+                className={`mt-1 inline-flex rounded-full border px-2 py-0.5 font-semibold ${divergenceClass}`}
+              >
+                Semàfor divergència
+              </button>
             </div>
             <div className="rounded-lg border border-white/10 bg-black/20 p-3 text-slate-300">
               <p>Cost equip/hora usat al càlcul = inventari/h + personal/h + cost fix.</p>
@@ -164,4 +199,3 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
     </section>
   );
 }
-

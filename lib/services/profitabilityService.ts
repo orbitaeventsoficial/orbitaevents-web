@@ -186,37 +186,63 @@ function summarize(rows: ProfitabilityRow[]) {
 export async function buildProfitabilityReport(): Promise<ProfitabilityReport> {
   const config = await getProfitabilityConfig();
 
-  const bookings = await prisma.booking.findMany({
-    where: {
-      status: { in: ['CONFIRMED', 'PREPARING', 'COMPLETED'] },
-    },
-    orderBy: { eventDate: 'desc' },
-    include: {
-      pack: { select: { price: true, extraHourPrice: true } },
-      extras: { select: { price: true, quantity: true } },
-      lead: { select: { source: true } },
-    },
-    take: 1500,
-  });
+  let bookings: Array<Record<string, unknown>> = [];
+  try {
+    bookings = await prisma.booking.findMany({
+      where: {
+        status: { in: ['CONFIRMED', 'PREPARING', 'COMPLETED'] },
+      },
+      orderBy: { eventDate: 'desc' },
+      include: {
+        pack: { select: { price: true, extraHourPrice: true } },
+        extras: { select: { price: true, quantity: true } },
+        lead: { select: { source: true } },
+      },
+      take: 1500,
+    }) as unknown as Array<Record<string, unknown>>;
+  } catch {
+    // Fallback resilient: if lead/source enum or relation data is dirty,
+    // continue profitability calculation with source UNKNOWN.
+    bookings = await prisma.booking.findMany({
+      where: {
+        status: { in: ['CONFIRMED', 'PREPARING', 'COMPLETED'] },
+      },
+      orderBy: { eventDate: 'desc' },
+      include: {
+        pack: { select: { price: true, extraHourPrice: true } },
+        extras: { select: { price: true, quantity: true } },
+      },
+      take: 1500,
+    }) as unknown as Array<Record<string, unknown>>;
+  }
 
   const rows: ProfitabilityRow[] = bookings.map((booking) => {
-    const extrasTotal = booking.extras.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    // travelCost may not exist until migration is run
-    const bAny = booking as Record<string, unknown>;
-    const travelCost = typeof bAny.travelCost === 'number' ? bAny.travelCost : 0;
+    const packObj = (booking.pack && typeof booking.pack === 'object')
+      ? (booking.pack as { price?: number; extraHourPrice?: number })
+      : null;
+    const extrasObj = Array.isArray(booking.extras)
+      ? booking.extras as Array<{ price?: number; quantity?: number }>
+      : [];
+    const leadObj = (booking.lead && typeof booking.lead === 'object')
+      ? (booking.lead as { source?: string })
+      : null;
+    const extrasTotal = extrasObj.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 0), 0);
+    const travelCost = typeof booking.travelCost === 'number' ? booking.travelCost : 0;
+    const sourceValue = typeof leadObj?.source === 'string' ? leadObj.source : 'UNKNOWN';
+
     const base: BookingRow = {
-      id: booking.id,
-      reference: booking.reference,
-      status: booking.status,
-      eventDate: booking.eventDate,
-      clientName: booking.clientName,
-      total: booking.total,
-      packPrice: booking.pack.price,
-      extraHours: booking.extraHours,
-      extraHourPrice: booking.pack.extraHourPrice,
+      id: String(booking.id || ''),
+      reference: String(booking.reference || ''),
+      status: String(booking.status || 'UNKNOWN'),
+      eventDate: booking.eventDate instanceof Date ? booking.eventDate : new Date(),
+      clientName: String(booking.clientName || 'Client'),
+      total: Number(booking.total) || 0,
+      packPrice: Number(packObj?.price) || 0,
+      extraHours: Number(booking.extraHours) || 0,
+      extraHourPrice: Number(packObj?.extraHourPrice) || 0,
       extrasTotal,
       travelCost,
-      source: booking.lead?.source || 'UNKNOWN',
+      source: sourceValue as LeadSource | 'UNKNOWN',
     };
     return toProfitabilityRow(base, config);
   });

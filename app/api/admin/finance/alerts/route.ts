@@ -21,27 +21,43 @@ export async function GET(req: NextRequest) {
   const permissionError = requirePermission(req, 'read');
   if (permissionError) return permissionError;
 
-  const [report, profitabilityConfig, marginTargetSetting, packPricingConfig, packPricingAlertsCount] = await Promise.all([
-    buildProfitabilityReport(),
-    getProfitabilityConfig(),
+  const [
+    reportResult,
+    profitabilityConfigResult,
+    marginTargetSetting,
+    packPricingConfigResult,
+    packPricingAlertsCountResult,
+    autofixFailureAlertSetting,
+    systemAutofixFailureAlertSetting,
+  ] = await Promise.all([
+    buildProfitabilityReport().catch(() => null),
+    getProfitabilityConfig().catch(() => null),
     prisma.setting.findUnique({ where: { key: 'pricing.pack.marginTargetPct' }, select: { value: true } }),
-    getPackPricingModelConfigEditable(),
-    getPackPricingAlertsCount(),
+    getPackPricingModelConfigEditable().catch(() => null),
+    getPackPricingAlertsCount().catch(() => 0),
+    prisma.setting.findUnique({ where: { key: 'alerts.finance.autofixFailureCount' }, select: { value: true } }),
+    prisma.setting.findUnique({ where: { key: 'alerts.system.autofixFailureCount' }, select: { value: true } }),
   ]);
 
-  const lowMarginRiskCount = report.riskProfitability.length;
-  const profitabilityCritical = isCriticalProfitabilityConfig(profitabilityConfig);
+  const report = reportResult;
+  const profitabilityConfig = profitabilityConfigResult;
+  const packPricingConfig = packPricingConfigResult;
+  const packPricingAlertsCount = packPricingAlertsCountResult;
+  const lowMarginRiskCount = report?.riskProfitability?.length ?? 1;
+  const profitabilityCritical = profitabilityConfig ? isCriticalProfitabilityConfig(profitabilityConfig) : true;
   const marginTargetRaw = Number(marginTargetSetting?.value);
   const missingMarginTarget = !Number.isFinite(marginTargetRaw) || marginTargetRaw <= 0;
-  const packPricingCritical = (
+  const packPricingCritical = !packPricingConfig || (
     packPricingConfig.marginTargetPct <= 0 ||
     packPricingConfig.operatorCostPerHour <= 0 ||
     packPricingConfig.specialistCostPerHour <= 0 ||
     packPricingConfig.alertDivergencePct <= 0
   );
+  const autofixFailureCount = Number(autofixFailureAlertSetting?.value || '0') || 0;
+  const systemAutofixFailureCount = Number(systemAutofixFailureAlertSetting?.value || '0') || 0;
 
   const criticalCount = Number(profitabilityCritical) + Number(missingMarginTarget) + Number(packPricingCritical);
-  const count = lowMarginRiskCount + criticalCount + packPricingAlertsCount;
+  const count = lowMarginRiskCount + criticalCount + packPricingAlertsCount + autofixFailureCount + systemAutofixFailureCount;
 
   return NextResponse.json({
     ok: true,
@@ -50,6 +66,8 @@ export async function GET(req: NextRequest) {
       lowMarginRiskCount,
       packPricingAlertsCount,
       criticalCount,
+      autofixFailureCount,
+      systemAutofixFailureCount,
     },
   });
 }
