@@ -22,14 +22,12 @@ interface BookingMarginProps {
   inventoryHours?: number | null;
   inventoryRemainingHoursAvg?: number | null;
   inventoryRemainingHoursMin?: number | null;
+  packCostRatio: number;
+  extraCostRatio: number;
+  extraHourCostRatio: number;
+  fixedOperationalCost: number;
+  targetMarginPct: number;
 }
-
-// Default ratios (must match profitabilityService defaults)
-const DEFAULT_PACK_COST_RATIO = 0.36;
-const DEFAULT_EXTRA_COST_RATIO = 0.28;
-const DEFAULT_EXTRA_HOUR_COST_RATIO = 0.20;
-const DEFAULT_FIXED_OPERATIONAL_COST = 45;
-const TARGET_MARGIN_PCT = 35;
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('ca-ES', { style: 'currency', currency: 'EUR' }).format(value);
@@ -52,6 +50,11 @@ export default function BookingMarginCard({
   inventoryHours,
   inventoryRemainingHoursAvg,
   inventoryRemainingHoursMin,
+  packCostRatio,
+  extraCostRatio,
+  extraHourCostRatio,
+  fixedOperationalCost,
+  targetMarginPct,
 }: BookingMarginProps) {
   const router = useRouter();
 
@@ -70,24 +73,24 @@ export default function BookingMarginCard({
   const travelNetMargin = calculatedTravelCharge - calculatedTravelCost;
   const travelMarginPct = calculatedTravelCharge > 0 ? (travelNetMargin / calculatedTravelCharge) * 100 : 0;
 
-  const packEstimatedCost = packPrice * DEFAULT_PACK_COST_RATIO;
+  const packEstimatedCost = packPrice * packCostRatio;
   const packCostUsed = typeof inventoryCostReal === 'number' && inventoryCostReal > 0
     ? inventoryCostReal
     : packEstimatedCost;
-  const extrasCost = extrasTotal * DEFAULT_EXTRA_COST_RATIO;
-  const extraHoursCost = extraHours * extraHourPrice * DEFAULT_EXTRA_HOUR_COST_RATIO;
+  const extrasCost = extrasTotal * extraCostRatio;
+  const extraHoursCost = extraHours * extraHourPrice * extraHourCostRatio;
 
   // Margin calculation
   const directCost =
     packCostUsed +
     extrasCost +
     extraHoursCost +
-    DEFAULT_FIXED_OPERATIONAL_COST +
+    fixedOperationalCost +
     calculatedTravelCost;
 
   const netMargin = total - directCost;
   const marginPct = total > 0 ? (netMargin / total) * 100 : 0;
-  const targetMarginAmount = total * (TARGET_MARGIN_PCT / 100);
+  const targetMarginAmount = total * (targetMarginPct / 100);
   const marginDeltaVsTarget = netMargin - targetMarginAmount;
 
   const marginColor =
@@ -212,12 +215,12 @@ export default function BookingMarginCard({
           <div className="flex justify-between"><span>Cost pack (real/estimat)</span><span>{formatCurrency(packCostUsed)}</span></div>
           <div className="flex justify-between"><span>Cost extres</span><span>{formatCurrency(extrasCost)}</span></div>
           <div className="flex justify-between"><span>Cost hores extra</span><span>{formatCurrency(extraHoursCost)}</span></div>
-          <div className="flex justify-between"><span>Cost operacional fix</span><span>{formatCurrency(DEFAULT_FIXED_OPERATIONAL_COST)}</span></div>
+          <div className="flex justify-between"><span>Cost operacional fix</span><span>{formatCurrency(fixedOperationalCost)}</span></div>
           <div className="flex justify-between"><span>Cost benzina intern</span><span>{formatCurrency(calculatedTravelCost)}</span></div>
           <div className="flex justify-between border-t border-white/10 pt-1.5"><span>Cost directe total</span><span className="font-semibold">{formatCurrency(directCost)}</span></div>
           <div className="flex justify-between"><span>Ingressos reserva</span><span>{formatCurrency(total)}</span></div>
           <div className="flex justify-between"><span>Diferencial de marge (ingrés - cost)</span><span className={marginColor}>{formatCurrency(netMargin)}</span></div>
-          <div className="flex justify-between"><span>Marge objectiu ({TARGET_MARGIN_PCT}%)</span><span>{formatCurrency(targetMarginAmount)}</span></div>
+          <div className="flex justify-between"><span>Marge objectiu ({targetMarginPct.toFixed(1)}%)</span><span>{formatCurrency(targetMarginAmount)}</span></div>
           <div className="flex justify-between">
             <span>Diferencial vs objectiu</span>
             <span className={marginDeltaVsTarget >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
@@ -247,13 +250,13 @@ export default function BookingMarginCard({
           <span>
             {typeof inventoryCostReal === 'number' && inventoryCostReal > 0
               ? `Pack (inventari real${inventoryHours ? ` · ${inventoryHours.toFixed(1)}h` : ''})`
-              : `Pack (${(DEFAULT_PACK_COST_RATIO * 100).toFixed(0)}% de ${formatCurrency(packPrice)})`}
+              : `Pack (${(packCostRatio * 100).toFixed(0)}% de ${formatCurrency(packPrice)})`}
           </span>
           <span className="text-slate-300">{formatCurrency(packCostUsed)}</span>
         </div>
         {extrasTotal > 0 && (
           <div className="flex justify-between">
-            <span>Extras ({(DEFAULT_EXTRA_COST_RATIO * 100).toFixed(0)}% de {formatCurrency(extrasTotal)})</span>
+            <span>Extras ({(extraCostRatio * 100).toFixed(0)}% de {formatCurrency(extrasTotal)})</span>
             <span className="text-slate-300">{formatCurrency(extrasCost)}</span>
           </div>
         )}
@@ -265,7 +268,7 @@ export default function BookingMarginCard({
         )}
         <div className="flex justify-between">
           <span>Cost operacional fix</span>
-          <span className="text-slate-300">{formatCurrency(DEFAULT_FIXED_OPERATIONAL_COST)}</span>
+          <span className="text-slate-300">{formatCurrency(fixedOperationalCost)}</span>
         </div>
         <div className="flex justify-between">
           <span>Desplaçament ({travelBlocks} trams de {TRAVEL_BLOCK_KM} km)</span>

@@ -14,6 +14,7 @@ import BookingInventorySection from './BookingInventorySection';
 import ClientPortalAccessPanel from './ClientPortalAccessPanel';
 import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
 import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-utils';
+import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 
 export const dynamic = 'force-dynamic';
 
@@ -242,7 +243,13 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const packPrice = booking.pack?.price ? Number(booking.pack.price) : 0;
   const extrasTotal = booking.extras?.reduce((sum, e) => sum + Number(e.price || 0), 0) ?? 0;
   const extraHours = typeof bAny.extraHours === 'number' ? bAny.extraHours : 0;
-  const extraHourPrice = typeof bAny.extraHourPrice === 'number' ? bAny.extraHourPrice : 0;
+  const extraHourPrice = booking.pack?.extraHourPrice ? Number(booking.pack.extraHourPrice) : 0;
+  const profitabilityConfig = await getProfitabilityConfig();
+  const marginTargetSetting = await prisma.setting.findUnique({ where: { key: 'pricing.pack.marginTargetPct' } });
+  const marginTargetRaw = Number(marginTargetSetting?.value);
+  const targetMarginPct = Number.isFinite(marginTargetRaw)
+    ? (marginTargetRaw > 1 ? marginTargetRaw : marginTargetRaw * 100)
+    : 35;
   const inventoryHours = calculateEventDuration(booking.eventStartTime, booking.eventEndTime);
   const assignedItemIds = (booking.inventory || []).map((assigned) => assigned.itemId);
   const usageByItem = assignedItemIds.length > 0
@@ -596,6 +603,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
         inventoryHours={inventoryHours > 0 ? inventoryHours : null}
         inventoryRemainingHoursAvg={inventoryRemainingHoursAvg != null ? Number(inventoryRemainingHoursAvg.toFixed(1)) : null}
         inventoryRemainingHoursMin={inventoryRemainingHoursMin != null ? Number(inventoryRemainingHoursMin.toFixed(1)) : null}
+        packCostRatio={profitabilityConfig.packCostRatio}
+        extraCostRatio={profitabilityConfig.extraCostRatio}
+        extraHourCostRatio={profitabilityConfig.extraHourCostRatio}
+        fixedOperationalCost={profitabilityConfig.fixedOperationalCost}
+        targetMarginPct={targetMarginPct}
       />
 
       {/* Notes */}
