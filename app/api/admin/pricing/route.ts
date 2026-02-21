@@ -49,6 +49,12 @@ export async function GET(req: NextRequest) {
           },
         },
         bookingExtras: {
+          take: 8,
+          orderBy: {
+            booking: {
+              eventDate: 'desc',
+            },
+          },
           include: {
             booking: {
               select: {
@@ -105,7 +111,7 @@ export async function GET(req: NextRequest) {
       include: {
         usageHistory: {
           orderBy: { usedAt: 'desc' },
-          take: 10,
+          take: 3,
         },
         bookingItems: {
           include: {
@@ -123,7 +129,7 @@ export async function GET(req: NextRequest) {
               eventDate: 'desc',
             },
           },
-          take: 10,
+          take: 3,
         },
         _count: {
           select: {

@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const completedTranslations = await completePackTranslations(body.translations);
-    const { slug, price, originalPrice, extraHourPrice, djHours, soundWatts,
+    const { slug, service, price, originalPrice, extraHourPrice, djHours, soundWatts,
       includesFog, includesMic, minGuests, maxGuests } = body;
 
     if (!slug || !price || !djHours) {
@@ -133,6 +133,7 @@ export async function POST(req: NextRequest) {
     const pack = await prisma.pack.create({
       data: {
         slug,
+        service: service || null,
         price,
         originalPrice,
         extraHourPrice: extraHourPrice || 75,

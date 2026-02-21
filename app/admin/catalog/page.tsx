@@ -84,7 +84,7 @@ export default async function CatalogPage({
           {activeTab === 'packs' && (
             <>
               <Link
-                href="/admin/packs?legacy=1"
+                href="/admin/packs"
                 className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
               >
                 Obrir gestió de packs
@@ -106,7 +106,7 @@ export default async function CatalogPage({
                 Obrir catàleg d&apos;extres
               </Link>
               <Link
-                href="/admin/pricing?legacy=1"
+                href="/admin/pricing"
                 className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
               >
                 Revisar vendes d&apos;extres
@@ -132,7 +132,7 @@ export default async function CatalogPage({
           {activeTab === 'pricing' && (
             <>
               <Link
-                href="/admin/pricing?legacy=1"
+                href="/admin/pricing"
                 className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
               >
                 Obrir gestor de preus

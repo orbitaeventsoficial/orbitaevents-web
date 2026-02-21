@@ -2262,12 +2262,12 @@ html.admin-mode .admin-shell.admin-unified {
 }
 
 html.admin-mode .admin-shell {
-  --admin-level-1: linear-gradient(160deg, rgba(24, 42, 70, 0.96), rgba(45, 33, 74, 0.94) 55%, rgba(14, 59, 58, 0.92));
-  --admin-level-2: linear-gradient(165deg, rgba(20, 36, 58, 0.95), rgba(37, 29, 63, 0.93) 58%, rgba(14, 53, 52, 0.9));
-  --admin-level-3: linear-gradient(170deg, rgba(16, 30, 48, 0.93), rgba(31, 26, 50, 0.9) 60%, rgba(13, 43, 43, 0.88));
-  --admin-border-1: rgba(99, 139, 188, 0.62);
-  --admin-border-2: rgba(86, 123, 166, 0.58);
-  --admin-border-3: rgba(70, 99, 133, 0.54);
+  --admin-level-1: rgba(34, 24, 18, 0.97);
+  --admin-level-2: rgba(28, 20, 15, 0.96);
+  --admin-level-3: rgba(22, 16, 12, 0.95);
+  --admin-border-1: rgba(196, 132, 72, 0.55);
+  --admin-border-2: rgba(169, 111, 58, 0.48);
+  --admin-border-3: rgba(138, 91, 48, 0.42);
 }
 
 html.admin-mode .admin-shell > :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl) {
@@ -2292,16 +2292,20 @@ html.admin-mode .admin-shell > :is(section, article, aside, .panel, .card, .roun
 html.admin-mode .admin-shell h1 {
   font-size: clamp(1.45rem, 2.8vw, 2rem) !important;
   font-weight: 800 !important;
+  color: #ffe2b8 !important;
+  text-shadow: 0 1px 10px rgba(245, 158, 11, 0.2);
 }
 
 html.admin-mode .admin-shell h2 {
   font-size: clamp(1.1rem, 2.2vw, 1.5rem) !important;
   font-weight: 700 !important;
+  color: #ffd08a !important;
 }
 
 html.admin-mode .admin-shell h3 {
   font-size: clamp(1rem, 1.8vw, 1.2rem) !important;
   font-weight: 700 !important;
+  color: #f5efe6 !important;
 }
 
 html.admin-mode .admin-shell :is(button, [role='button'], a.inline-flex):not(.admin-keep-colors) {
@@ -2311,20 +2315,23 @@ html.admin-mode .admin-shell :is(button, [role='button'], a.inline-flex):not(.ad
 
 html.admin-mode .admin-shell .admin-tone-success,
 html.admin-mode .admin-shell .bg-emerald-500\/10 {
-  border-color: rgba(16, 185, 129, 0.45) !important;
-  background-color: rgba(16, 185, 129, 0.18) !important;
+  border-color: rgba(34, 197, 94, 0.5) !important;
+  background-color: rgba(34, 197, 94, 0.2) !important;
+  color: #bbf7d0 !important;
 }
 
 html.admin-mode .admin-shell .admin-tone-warning,
 html.admin-mode .admin-shell .bg-amber-500\/10 {
   border-color: rgba(245, 158, 11, 0.45) !important;
-  background-color: rgba(245, 158, 11, 0.18) !important;
+  background-color: rgba(245, 158, 11, 0.22) !important;
+  color: #fde68a !important;
 }
 
 html.admin-mode .admin-shell .admin-tone-danger,
 html.admin-mode .admin-shell .bg-rose-500\/10 {
-  border-color: rgba(244, 63, 94, 0.45) !important;
-  background-color: rgba(244, 63, 94, 0.18) !important;
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  color: #fecaca !important;
 }
 
 /* Front: més separació visual entre secció principal/secundària */
@@ -2335,7 +2342,7 @@ body:not(.admin-mode) main > section {
 body:not(.admin-mode) .card,
 body:not(.admin-mode) .card-elegant {
   border-color: rgba(215, 184, 110, 0.22);
-  background: linear-gradient(175deg, rgba(22, 22, 24, 0.96), rgba(16, 16, 19, 0.94));
+  background: rgba(20, 20, 22, 0.96);
 }
 
 body:not(.admin-mode) .card:hover,
@@ -2351,4 +2358,26 @@ body:not(.admin-mode) .card-elegant:hover {
   html.admin-mode .admin-shell > :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl) {
     border-radius: 12px !important;
   }
+
+  html.admin-mode .admin-shell h1 {
+    font-size: clamp(1.3rem, 4.2vw, 1.7rem) !important;
+  }
+
+  html.admin-mode .admin-shell h2 {
+    font-size: clamp(1.05rem, 3.5vw, 1.3rem) !important;
+  }
+
+  html.admin-mode .admin-shell h3 {
+    font-size: clamp(0.95rem, 3vw, 1.1rem) !important;
+  }
+}
+
+/* Kill metallic effect globally in admin (final) */
+html.admin-mode .admin-shell :is(div, section, article, aside)[class*='rounded'][class*='border']:not(.admin-keep-colors) {
+  background-image: none !important;
+}
+
+html.admin-mode .admin-shell :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl):not(.admin-keep-colors)::after {
+  display: none !important;
+  content: none !important;
 }

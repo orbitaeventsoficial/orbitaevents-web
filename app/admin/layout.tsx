@@ -61,13 +61,13 @@ function SidebarItem({
         relative flex items-center gap-3 px-3 py-2.5 rounded-xl min-w-0
         border transition-all duration-200 group active:scale-[0.98]
         ${isActive
-          ? 'border-amber-400/50 bg-amber-900 text-amber-100'
-          : 'border-transparent text-slate-400 hover:text-slate-100 hover:border-slate-700/60 hover:bg-zinc-900'
+          ? 'border-amber-500/35 bg-[#2a2016] text-amber-100'
+          : 'border-transparent text-slate-400 hover:text-slate-100 hover:border-slate-700/70 hover:bg-[#1a1f27]'
         }
       `}
     >
       {isActive && (
-        <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-full bg-amber-400" />
+        <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-full bg-amber-500" />
       )}
       <span className="text-lg w-6 text-center shrink-0">{icon}</span>
       <span className="min-w-0 flex-1 truncate font-medium text-sm leading-tight">{label}</span>
@@ -146,8 +146,8 @@ function FavoriteChip({
       onFocus={() => onPrefetch?.(href)}
       className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ${
         isActive
-          ? 'bg-amber-500/20 text-amber-100 border border-amber-500/45'
-          : 'bg-slate-800/80 text-slate-300 border border-slate-700/70 hover:bg-slate-800'
+          ? 'bg-amber-500/18 text-amber-100 border border-amber-500/40'
+          : 'bg-[#1a1f27] text-slate-300 border border-slate-700/70 hover:bg-[#202734]'
       }`}
     >
       {label}
@@ -575,9 +575,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           {/* Desktop Sidebar */}
       <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-[#0c0f13] border-r border-zinc-700/80 flex-col z-40">
         {/* Logo */}
-        <div className="h-[72px] px-4 flex items-center">
+        <div className="h-[72px] px-4 flex items-center bg-[#0c0f13]">
           <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center p-1.5">
+            <div className="w-10 h-10 rounded-xl bg-[#1f2835] border border-amber-600/35 flex items-center justify-center p-1.5">
               <Image
                 src="/img/logosoloplaneta.svg"
                 alt="Òrbita"
@@ -589,7 +589,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
               />
             </div>
             <div>
-              <span className="text-slate-200 font-semibold">Òrbita</span>
+              <span className="text-slate-100 font-semibold">Òrbita</span>
               <span className="text-amber-300 font-semibold ml-1">Admin</span>
             </div>
           </Link>
@@ -878,9 +878,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       {/* Desktop Header */}
       <header className="hidden lg:flex fixed top-0 left-64 right-0 h-[72px] px-6 items-center justify-between bg-[#0c0f13] border-b border-zinc-700/80 z-30">
         <div className="flex items-center gap-3 text-sm">
-          <Link href="/admin" className="text-slate-400 hover:text-slate-200 transition-colors">Admin</Link>
+          <Link href="/admin" className="text-slate-400 hover:text-slate-200 transition-colors uppercase tracking-wide text-xs">Admin</Link>
           <span className="text-slate-600">/</span>
-          <span className="text-slate-100 font-medium">{getPageName()}</span>
+          <span className="text-slate-100 font-semibold">{getPageName()}</span>
         </div>
         <div className="flex items-center gap-3">
           <button

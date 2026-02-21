@@ -6,7 +6,6 @@ import Link from 'next/link';
 import SyncButton from './SyncButton';
 import PackPriceQuickEditor from './PackPriceQuickEditor';
 import { getAllPacks } from '@/config/packs-config';
-import { redirect } from 'next/navigation';
 import { computePackPricingHealth, getPackPricingModelConfig, type PackPricingHealth } from '@/lib/services/packPricingHealth';
 
 export const dynamic = 'force-dynamic';
@@ -56,15 +55,7 @@ async function getPacks() {
   }
 }
 
-export default async function PacksPage({
-  searchParams,
-}: {
-  searchParams?: { legacy?: string };
-}) {
-  if (searchParams?.legacy !== '1') {
-    redirect('/admin/catalog?tab=packs');
-  }
-
+export default async function PacksPage() {
   const packs = await getPacks();
   const pricingConfig = await getPackPricingModelConfig();
   const configPacks = getAllPacks();

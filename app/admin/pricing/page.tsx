@@ -3,7 +3,6 @@ import { log } from '@/lib/logger';
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -138,9 +137,6 @@ function formatDate(dateString: string): string {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function PricingAdminPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const legacyMode = searchParams.get('legacy') === '1';
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'extras' | 'packs' | 'inventory'>('overview');
   const [extras, setExtras] = useState<ExtraData[]>([]);
@@ -155,16 +151,8 @@ export default function PricingAdminPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   useEffect(() => {
-    if (!legacyMode) {
-      router.replace('/admin/catalog?tab=pricing');
-      return;
-    }
-  }, [router, legacyMode]);
-
-  useEffect(() => {
-    if (!legacyMode) return;
     loadData();
-  }, [legacyMode]);
+  }, []);
 
   async function loadData() {
     setLoading(true);
@@ -390,7 +378,7 @@ export default function PricingAdminPage() {
                   Packs (NOMÉS LECTURA)
                 </div>
                 <p className="text-slate-400">
-                  Els packs es gestionen a /admin/catalog?tab=packs. Aquí només veus estadístiques.
+                  Els packs es gestionen a /admin/packs. Aquí només veus estadístiques.
                 </p>
               </div>
               <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
@@ -517,8 +505,8 @@ export default function PricingAdminPage() {
               <p className="font-semibold text-slate-200">Només lectura</p>
               <p className="text-sm text-slate-400">
                 Per editar packs, ves a{' '}
-                <Link href="/admin/catalog?tab=packs" className="text-cyan-400 hover:underline font-medium">
-                  /admin/catalog?tab=packs
+                <Link href="/admin/packs" className="text-cyan-400 hover:underline font-medium">
+                  /admin/packs
                 </Link>
               </p>
             </div>
@@ -595,7 +583,7 @@ export default function PricingAdminPage() {
                       <span className="font-semibold text-emerald-300 ml-1">{formatCurrency(pack.totalRevenue)}</span>
                     </div>
                   </div>
-                  <Link href="/admin/catalog?tab=packs" className="text-cyan-400 hover:text-cyan-300 text-sm font-medium">
+                  <Link href="/admin/packs" className="text-cyan-400 hover:text-cyan-300 text-sm font-medium">
                     Editar →
                   </Link>
                 </div>
