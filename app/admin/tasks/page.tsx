@@ -192,26 +192,32 @@ export default async function TasksPage({
         </div>
       </header>
 
-      <section className="flex flex-wrap items-center gap-2 text-xs">
-        {VALID_STATUS.map((value) => (
-          <Link
-            key={value}
-            href={`/admin/tasks?${new URLSearchParams({ ...(customerId ? { customerId } : {}), status: value }).toString()}`}
-            className={`rounded-full border px-3 py-1 ${
-              status === value ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
-            }`}
+      <section className="rounded-xl border border-slate-700/50 bg-slate-800/40 p-3">
+        <form method="GET" action="/admin/tasks" className="flex flex-wrap items-center gap-2">
+          {customerId && <input type="hidden" name="customerId" value={customerId} />}
+          <label htmlFor="task-status-filter" className="text-xs font-medium text-slate-300">
+            Estat
+          </label>
+          <select
+            id="task-status-filter"
+            name="status"
+            defaultValue={status || ''}
+            className="rounded-lg border border-slate-600/50 bg-slate-900/70 px-3 py-1.5 text-xs text-slate-100"
           >
-            {STATUS_LABELS[value] || value}
-          </Link>
-        ))}
-        <Link
-          href={customerId ? `/admin/tasks?customerId=${customerId}` : '/admin/tasks'}
-          className={`rounded-full border px-3 py-1 ${
-            !status ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Totes
-        </Link>
+            <option value="">Totes</option>
+            {VALID_STATUS.map((value) => (
+              <option key={value} value={value}>
+                {STATUS_LABELS[value] || value}
+              </option>
+            ))}
+          </select>
+          <button
+            type="submit"
+            className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/20"
+          >
+            Aplicar
+          </button>
+        </form>
       </section>
 
       <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">

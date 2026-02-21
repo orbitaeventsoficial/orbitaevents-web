@@ -70,6 +70,7 @@ const SECTIONS: MapSection[] = [
     items: [
       { href: '/admin', label: 'Tauler principal' },
       { href: '/admin/analytics', label: 'Analítica' },
+      { href: '/admin/google-ads', label: 'Google Ads' },
       { href: '/admin/economia', label: 'Economia' },
       { href: '/admin/finanzas', label: 'Finances' },
       { href: '/admin/rentabilidad', label: 'Rendibilitat' },

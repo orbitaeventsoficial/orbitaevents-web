@@ -30,6 +30,7 @@ type Ga4RealtimeRow = {
 
 type Ga4Report = {
   totals: Ga4Totals;
+  previousTotals: Ga4Totals;
   pages: Ga4Row[];
   sources: Ga4Row[];
   events: Ga4Row[];
@@ -172,6 +173,7 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
 
   const [
     totalsRes,
+    totalsPrevRes,
     pagesRes,
     sourcesRes,
     eventsRes,
@@ -184,6 +186,17 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
       safe(client.runReport({
         property,
         dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+        metrics: [
+          { name: 'activeUsers' },
+          { name: 'sessions' },
+          { name: 'screenPageViews' },
+          { name: 'eventCount' },
+          { name: 'averageSessionDuration' },
+        ],
+      })),
+      safe(client.runReport({
+        property,
+        dateRanges: [{ startDate: '60daysAgo', endDate: '31daysAgo' }],
         metrics: [
           { name: 'activeUsers' },
           { name: 'sessions' },
@@ -267,6 +280,7 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
   }
 
   const totalRow = totalsRes?.[0]?.rows?.[0];
+  const previousTotalRow = totalsPrevRes?.[0]?.rows?.[0];
 
   return {
     totals: {
@@ -275,6 +289,13 @@ export async function getGa4Report(): Promise<Ga4Report | null> {
       pageViews: toNumber(totalRow?.metricValues?.[2]?.value),
       eventCount: toNumber(totalRow?.metricValues?.[3]?.value),
       avgSessionDuration: toNumber(totalRow?.metricValues?.[4]?.value),
+    },
+    previousTotals: {
+      activeUsers: toNumber(previousTotalRow?.metricValues?.[0]?.value),
+      sessions: toNumber(previousTotalRow?.metricValues?.[1]?.value),
+      pageViews: toNumber(previousTotalRow?.metricValues?.[2]?.value),
+      eventCount: toNumber(previousTotalRow?.metricValues?.[3]?.value),
+      avgSessionDuration: toNumber(previousTotalRow?.metricValues?.[4]?.value),
     },
     pages: mapRows(pagesRes?.[0]?.rows || []),
     sources: mapRows(sourcesRes?.[0]?.rows || []),

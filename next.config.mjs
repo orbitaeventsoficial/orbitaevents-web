@@ -48,7 +48,6 @@ const nextConfig = {
       'https://www.googletagmanager.com',
       'https://www.google-analytics.com',
       'https://challenges.cloudflare.com',
-      'https://cloud.umami.is',
     ].join(' ');
     const allowedOrigin = process.env.NEXT_PUBLIC_SITE_URL || 'https://orbitaevents.com';
 
@@ -74,7 +73,7 @@ const nextConfig = {
           "img-src 'self' data: blob: https://orbitaevents.com https://*.supabase.co https://lh3.googleusercontent.com https://maps.googleapis.com https://*.googletagmanager.com https://*.google-analytics.com https://stats.g.doubleclick.net https://ssl.google-analytics.com https://www.google.es",
           "font-src 'self' https://fonts.gstatic.com",
           "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://challenges.cloudflare.com",
-          "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.es wss://ws-us3.pusher.com https://challenges.cloudflare.com https://cloud.umami.is",
+          "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://www.google.es wss://ws-us3.pusher.com https://challenges.cloudflare.com",
           "worker-src 'self' blob:",
         ].join('; ')
       },
@@ -116,14 +115,6 @@ const nextConfig = {
           { key: 'Access-Control-Max-Age', value: '86400' },
         ],
       },
-    ];
-  },
-
-  async rewrites() {
-    return [
-      // Script proxy (ad-blocker bypass)
-      { source: '/umami/script.js', destination: 'https://cloud.umami.is/script.js' },
-      // Note: /umami/api/send is handled by API route to forward real client IP
     ];
   },
 

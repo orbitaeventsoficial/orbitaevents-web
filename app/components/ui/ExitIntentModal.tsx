@@ -22,9 +22,6 @@ function trackExitIntent(action: string) {
       cta_location: 'exit_intent_modal',
     });
   }
-  if ((window as any).umami) {
-    (window as any).umami.track('exit_intent', { action });
-  }
 }
 
 export default function ExitIntentModal() {

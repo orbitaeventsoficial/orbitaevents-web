@@ -379,6 +379,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         { icon: '⭐', label: 'Ressenyes clients', href: '/admin/ressenyes' },
         { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event' },
         { icon: '📈', label: 'Analítica', href: '/admin/analytics' },
+        { icon: '📣', label: 'Google Ads', href: '/admin/google-ads' },
         { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
         { icon: '❓', label: 'FAQ', href: '/admin/faq' },
         { icon: '✍️', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
@@ -487,6 +488,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       'text-manager': 'Textos PRO',
       'post-event': 'Post-esdeveniment',
       'google-reviews': 'Ressenyes de Google',
+      'google-ads': 'Google Ads',
     };
     return pageNames[page] || page.charAt(0).toUpperCase() + page.slice(1);
   }, [pathname]);
@@ -533,7 +535,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           {helpModeEnabled && <AdminHelpLegend />}
           {helpModeEnabled && <AdminHelpInspector />}
           {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-gradient-to-b from-zinc-900/95 via-zinc-900/95 to-slate-950/95 backdrop-blur-sm border-r border-zinc-700/80 flex-col z-40 shadow-2xl shadow-black/35">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-gradient-to-b from-stone-950/95 via-stone-900/95 to-zinc-950/95 backdrop-blur-sm border-r border-amber-900/40 flex-col z-40 shadow-2xl shadow-black/35">
         {/* Logo */}
         <div className="p-4 border-b border-slate-800/90">
           <Link href="/admin" className="flex items-center gap-3">
@@ -629,7 +631,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile Header - Mejorado */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-zinc-900/95 backdrop-blur-xl border-b border-zinc-700/80 z-50 px-3 flex items-center justify-between safe-area-top">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-stone-950/95 backdrop-blur-xl border-b border-amber-900/35 z-50 px-3 flex items-center justify-between safe-area-top">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
@@ -693,7 +695,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         <>
           {/* Backdrop */}
           <div
-            className={`lg:hidden fixed inset-0 bg-zinc-950/50 backdrop-blur-sm z-40 transition-opacity duration-300
+            className={`lg:hidden fixed inset-0 bg-stone-950/55 backdrop-blur-sm z-40 transition-opacity duration-300
               ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             onClick={() => setSidebarOpen(false)}
             role="presentation"
@@ -702,12 +704,12 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <aside
             id="admin-mobile-sidebar"
             aria-label="Menú admin"
-            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-gradient-to-b from-zinc-900 to-slate-950 border-r border-zinc-700/80 z-50 overflow-hidden
+            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-gradient-to-b from-stone-900 to-zinc-950 border-r border-amber-900/35 z-50 overflow-hidden
               transform transition-transform duration-300 ease-out
               ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
           >
             {/* Header del sidebar */}
-            <div className="p-4 border-b border-zinc-700/80 flex items-center justify-between bg-zinc-900">
+            <div className="p-4 border-b border-amber-900/35 flex items-center justify-between bg-stone-900">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md p-1.5">
                   <Image
@@ -813,11 +815,11 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             </nav>
 
             {/* Footer del sidebar móvil */}
-            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-zinc-700/80 bg-zinc-900">
+            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-amber-900/35 bg-stone-900">
               <Link
                 href="/admin/settings"
                 onClick={() => setSidebarOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-800 border border-zinc-700 active:scale-[0.98] transition-transform"
+                className="flex items-center gap-3 p-3 rounded-xl bg-stone-800/80 border border-amber-900/35 active:scale-[0.98] transition-transform"
               >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-semibold shadow-sm">
                   A
@@ -836,7 +838,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Desktop Header */}
-      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-zinc-700/80 px-6 items-center justify-between bg-gradient-to-r from-zinc-900/95 to-slate-900/95 backdrop-blur-xl z-30">
+      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-amber-900/35 px-6 items-center justify-between bg-gradient-to-r from-stone-950/95 to-zinc-900/95 backdrop-blur-xl z-30">
         <div className="flex items-center gap-3 text-sm">
           <Link href="/admin" className="text-slate-400 hover:text-slate-200 transition-colors">Admin</Link>
           <span className="text-slate-600">/</span>
@@ -850,7 +852,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             className={`rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
               helpModeEnabled
                 ? 'border-amber-400/70 bg-amber-500/20 text-amber-300'
-                : 'border-zinc-700/80 bg-zinc-800/60 text-slate-300 hover:border-amber-500/30 hover:text-slate-100'
+                : 'border-amber-900/35 bg-stone-800/60 text-slate-300 hover:border-amber-500/35 hover:text-slate-100'
             }`}
             aria-pressed={helpModeEnabled}
             aria-label="Activar o desactivar mode ajuda"
@@ -860,7 +862,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="hidden md:flex items-center gap-2 rounded-xl border border-zinc-700/80 bg-zinc-800/60 px-3 py-2 text-xs text-slate-300 hover:border-amber-500/30 hover:text-slate-100 transition-colors"
+            className="hidden md:flex items-center gap-2 rounded-xl border border-amber-900/35 bg-stone-800/60 px-3 py-2 text-xs text-slate-300 hover:border-amber-500/35 hover:text-slate-100 transition-colors"
             aria-label="Cercar (Ctrl+K)"
           >
             🔍 Cercar
@@ -897,7 +899,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-700/80 z-50 safe-area-bottom">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-stone-950/95 backdrop-blur-xl border-t border-amber-900/35 z-50 safe-area-bottom">
         <div className="flex items-center justify-around h-full px-2 max-w-lg mx-auto">
           <BottomNavItem
             icon="📊"

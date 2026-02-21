@@ -31,11 +31,6 @@ export function useScrollTracking(selector = '[data-section-id]') {
             });
           }
 
-          // Umami
-          if ((window as any).umami) {
-            (window as any).umami.track('section_view', { section_id: sectionId });
-          }
-
           observer.unobserve(entry.target);
         });
       },

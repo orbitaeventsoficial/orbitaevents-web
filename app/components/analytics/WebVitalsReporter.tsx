@@ -2,7 +2,7 @@
 
 // app/components/analytics/WebVitalsReporter.tsx
 // ─────────────────────────────────────────────
-// Reporta Core Web Vitals a GTM dataLayer + Umami
+// Reporta Core Web Vitals a GTM/dataLayer.
 // Metrics: CLS, INP, LCP, FCP, TTFB
 
 import { useEffect } from 'react';
@@ -21,13 +21,6 @@ function sendToAnalytics(metric: Metric) {
     });
   }
 
-  // 2. Umami custom event (if available)
-  if (typeof window !== 'undefined' && (window as any).umami) {
-    (window as any).umami.track(`web_vitals_${metric.name.toLowerCase()}`, {
-      value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-      rating: metric.rating,
-    });
-  }
 }
 
 export default function WebVitalsReporter() {

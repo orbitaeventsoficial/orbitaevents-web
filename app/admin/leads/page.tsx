@@ -283,13 +283,13 @@ export default async function LeadsPage({
           <Link
             href="/admin/leads"
             aria-current="page"
-            className="admin-keep-colors rounded-xl border border-cyan-500/50 bg-cyan-500/15 px-3 py-2 text-center text-xs sm:text-sm font-semibold text-cyan-200"
+            className="admin-keep-colors rounded-xl border border-cyan-400/70 bg-gradient-to-r from-cyan-500/25 to-blue-500/20 px-3 py-2 text-center text-xs sm:text-sm font-semibold text-cyan-100 shadow-sm"
           >
             Tauler Leads
           </Link>
           <Link
             href="/admin/intake"
-            className="admin-keep-colors rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-center text-xs sm:text-sm font-medium text-slate-300 hover:bg-slate-700/60 transition-colors"
+            className="admin-keep-colors rounded-xl border border-violet-500/40 bg-violet-500/15 px-3 py-2 text-center text-xs sm:text-sm font-semibold text-violet-100 hover:bg-violet-500/25 transition-colors"
           >
             Entrada ràpida
           </Link>

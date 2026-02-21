@@ -20,6 +20,17 @@ const SOURCE_OPTIONS = [
   { value: 'OTHER', label: 'Altre', icon: '📋' },
 ];
 
+const SOURCE_SELECTED_STYLES: Record<string, string> = {
+  PHONE: 'border-sky-400/70 bg-sky-500/25 text-sky-100',
+  WHATSAPP: 'border-emerald-400/70 bg-emerald-500/25 text-emerald-100',
+  INSTAGRAM: 'border-pink-400/70 bg-pink-500/25 text-pink-100',
+  WALLAPOP: 'border-lime-400/70 bg-lime-500/25 text-lime-100',
+  REFERRAL: 'border-orange-400/70 bg-orange-500/25 text-orange-100',
+  GOOGLE: 'border-amber-400/70 bg-amber-500/25 text-amber-100',
+  WEBSITE: 'border-cyan-400/70 bg-cyan-500/25 text-cyan-100',
+  OTHER: 'border-slate-400/70 bg-slate-500/25 text-slate-100',
+};
+
 const EVENT_TYPES = [
   { value: 'WEDDING', label: 'Casament', icon: '💍' },
   { value: 'BIRTHDAY', label: 'Aniversari', icon: '🎂' },
@@ -312,7 +323,7 @@ export default function IntakePage() {
               aria-pressed={form.source === src.value}
               className={`admin-keep-colors rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
                 form.source === src.value
-                  ? 'border-amber-400/70 bg-amber-500/25 text-amber-100 shadow-sm'
+                  ? `${SOURCE_SELECTED_STYLES[src.value] || 'border-cyan-400/70 bg-cyan-500/25 text-cyan-100'} shadow-sm`
                   : 'border-slate-700/50 bg-slate-900/60 text-slate-300 hover:bg-slate-800'
               }`}
             >

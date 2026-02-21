@@ -2,7 +2,6 @@
 import { log } from '@/lib/logger';
 // Pàgina d'analytics i estadístiques
 import { prisma } from '@/lib/prisma';
-import { getUmamiReport } from '@/lib/analytics/umami';
 import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import Link from 'next/link';
 
@@ -199,28 +198,22 @@ const EVENT_TYPE_LABELS: Record<string, { label: string; icon: string }> = {
   OTHER: { label: 'Altres', icon: '📅' },
 };
 
+function pctDelta(current: number, previous: number): number | null {
+  if (!Number.isFinite(current) || !Number.isFinite(previous)) return null;
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return ((current - previous) / previous) * 100;
+}
+
 export default async function AnalyticsPage() {
   const data = await getAnalyticsData();
   const ops = await getOperationalKpis();
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID || 'No configurat';
-  const umamiDashboardUrl =
-    process.env.NEXT_PUBLIC_UMAMI_DASHBOARD_URL || 'https://analytics.orbitaevents.com';
-  const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? '';
-  const umamiApiKey = process.env.UMAMI_API_KEY || '';
-  const umamiBaseUrl = process.env.UMAMI_BASE_URL || 'https://cloud.umami.is';
-  const umamiApiReady = Boolean(umamiApiKey) && Boolean(umamiWebsiteId);
-  const umamiMissingVars = [
-    !umamiWebsiteId ? 'NEXT_PUBLIC_UMAMI_WEBSITE_ID' : null,
-    !umamiApiKey ? 'UMAMI_API_KEY' : null,
-  ].filter(Boolean) as string[];
   const ga4PropertyId = process.env.GA4_PROPERTY_ID || '';
   const ga4Status = getGa4ConfigStatus();
   const yearGrowth = data.revenue.lastYear > 0
     ? ((data.revenue.thisYear - data.revenue.lastYear) / data.revenue.lastYear * 100).toFixed(1)
     : '100.0';
   const gtmReady = gtmId !== 'No configurat';
-  const umamiReady = Boolean(umamiWebsiteId);
-  const umami = umamiApiReady ? await getUmamiReport(umamiWebsiteId) : null;
   const ga4Ready = ga4Status.ready;
   let ga4 = null;
   let ga4Error: string | null = null;
@@ -232,12 +225,20 @@ export default async function AnalyticsPage() {
       log.error('GA4 report failed', error);
     }
   }
-  const avgVisitMinutes = umami?.totals.totalTime
-    ? Math.max(1, Math.round(umami.totals.totalTime / 60 / Math.max(umami.totals.visits, 1)))
-    : 0;
   const avgSessionMinutes = ga4?.totals.avgSessionDuration
     ? Math.max(1, Math.round(ga4.totals.avgSessionDuration / 60))
     : 0;
+  const ga4Deltas = ga4
+    ? {
+        users: pctDelta(ga4.totals.activeUsers, ga4.previousTotals.activeUsers) ?? 0,
+        sessions: pctDelta(ga4.totals.sessions, ga4.previousTotals.sessions) ?? 0,
+        pageViews: pctDelta(ga4.totals.pageViews, ga4.previousTotals.pageViews) ?? 0,
+        events: pctDelta(ga4.totals.eventCount, ga4.previousTotals.eventCount) ?? 0,
+      }
+    : null;
+  const ga4SeriesMax = ga4
+    ? Math.max(1, ...ga4.timeseries.map((row) => Math.max(row.sessions, row.activeUsers)))
+    : 1;
 
   return (
     <div className="space-y-6">
@@ -307,13 +308,19 @@ export default async function AnalyticsPage() {
               Dades de trànsit, pàgines i esdeveniments amb la GA4 Data API.
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="rounded-full border border-slate-600/50 bg-slate-700/50 px-3 py-1 text-xs">
-              ID propietat {ga4PropertyId || '—'}
-            </span>
-            <span
-              className={`rounded-full border border-slate-600/50 px-3 py-1 text-xs ${
-                ga4Ready ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
+            <div className="flex items-center gap-3">
+              <span className="rounded-full border border-slate-600/50 bg-slate-700/50 px-3 py-1 text-xs">
+                ID propietat {ga4PropertyId || '—'}
+              </span>
+              <Link
+                href="/admin/google-ads"
+                className="rounded-full border border-amber-500/40 bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-200 hover:bg-amber-500/25"
+              >
+                Google Ads
+              </Link>
+              <span
+                className={`rounded-full border border-slate-600/50 px-3 py-1 text-xs ${
+                  ga4Ready ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
               }`}
             >
               {ga4Ready ? '● Actiu' : '● Pendent'}
@@ -344,22 +351,63 @@ export default async function AnalyticsPage() {
             <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
               <p className="text-xs uppercase text-slate-400">Usuaris actius</p>
               <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.activeUsers}</p>
+              {ga4Deltas && (
+                <p className={`mt-1 text-xs ${ga4Deltas.users >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                  {ga4Deltas.users >= 0 ? '↑' : '↓'} {Math.abs(ga4Deltas.users).toFixed(1)}% vs 30d anterior
+                </p>
+              )}
             </div>
             <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
               <p className="text-xs uppercase text-slate-400">Sessions</p>
               <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.sessions}</p>
+              {ga4Deltas && (
+                <p className={`mt-1 text-xs ${ga4Deltas.sessions >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                  {ga4Deltas.sessions >= 0 ? '↑' : '↓'} {Math.abs(ga4Deltas.sessions).toFixed(1)}% vs 30d anterior
+                </p>
+              )}
             </div>
             <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
               <p className="text-xs uppercase text-slate-400">Pageviews</p>
               <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.pageViews}</p>
+              {ga4Deltas && (
+                <p className={`mt-1 text-xs ${ga4Deltas.pageViews >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                  {ga4Deltas.pageViews >= 0 ? '↑' : '↓'} {Math.abs(ga4Deltas.pageViews).toFixed(1)}% vs 30d anterior
+                </p>
+              )}
             </div>
             <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
               <p className="text-xs uppercase text-slate-400">Esdeveniments</p>
               <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.eventCount}</p>
+              {ga4Deltas && (
+                <p className={`mt-1 text-xs ${ga4Deltas.events >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                  {ga4Deltas.events >= 0 ? '↑' : '↓'} {Math.abs(ga4Deltas.events).toFixed(1)}% vs 30d anterior
+                </p>
+              )}
             </div>
             <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
               <p className="text-xs uppercase text-slate-400">Temps mitjà (min)</p>
               <p className="mt-2 text-3xl font-semibold text-white">{avgSessionMinutes}</p>
+            </div>
+          </div>
+        )}
+
+        {ga4 && ga4.timeseries.length > 0 && (
+          <div className="mt-4 rounded-2xl border border-slate-600/50 bg-slate-700/30 p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-sm font-semibold text-slate-200">Tendència 30 dies</p>
+              <p className="text-xs text-slate-400">Sessions (cyan) · Usuaris (amber)</p>
+            </div>
+            <div className="flex h-28 items-end gap-1">
+              {ga4.timeseries.map((row) => {
+                const sessionsH = Math.max(3, Math.round((row.sessions / ga4SeriesMax) * 100));
+                const usersH = Math.max(3, Math.round((row.activeUsers / ga4SeriesMax) * 100));
+                return (
+                  <div key={row.date} className="flex flex-1 items-end gap-[2px]">
+                    <div className="w-1.5 rounded-sm bg-cyan-400/80" style={{ height: `${sessionsH}%` }} />
+                    <div className="w-1.5 rounded-sm bg-amber-300/80" style={{ height: `${usersH}%` }} />
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -653,165 +701,6 @@ export default async function AnalyticsPage() {
         </div>
       </section>
 
-      {/* Umami Analítica */}
-      <section className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm">
-        <div className="border-b border-slate-700/50 bg-slate-700/30 p-4">
-          <h2 className="text-lg font-semibold text-slate-100">Umami · Analítica</h2>
-          <p className="text-xs text-slate-400">Panell principal i estat de configuració</p>
-        </div>
-        <div className="p-4 space-y-4">
-          <div className="grid gap-3 lg:grid-cols-3">
-            <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-              <p className="text-xs font-medium uppercase text-slate-400">Tauler</p>
-              <p className="mt-2 text-sm font-semibold text-slate-200">{umamiDashboardUrl}</p>
-            </div>
-            <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-              <p className="text-xs font-medium uppercase text-slate-400">ID del web</p>
-              <p className="mt-2 text-sm font-semibold text-slate-200">{umamiWebsiteId || 'No configurat'}</p>
-            </div>
-            <div className="flex flex-col justify-between rounded-xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 p-4">
-              <p className="text-xs uppercase text-slate-400">Estat</p>
-              <p className="mt-2 text-lg font-semibold text-slate-100">{umamiReady ? 'Actiu' : 'Pendent'}</p>
-              <p className="mt-2 text-xs text-slate-400">
-                {umamiApiReady ? 'Recollint dades' : `Falten variables: ${umamiMissingVars.join(', ')}`}
-              </p>
-            </div>
-          </div>
-            <div className="mt-4 rounded-xl border border-slate-700/50 bg-slate-900/50 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">API base</p>
-            <p className="mt-2 text-sm font-semibold text-slate-200">{umamiBaseUrl}</p>
-          </div>
-          {umamiApiReady && !umami && (
-            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300">
-              No hem pogut carregar Umami. Revisa el token o torna-ho a provar més tard.
-            </div>
-          )}
-          {umami && (
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-                <p className="text-xs font-medium uppercase text-slate-400">Pageviews</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-100">{umami.totals.pageviews}</p>
-              </div>
-              <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-                <p className="text-xs font-medium uppercase text-slate-400">Visitants</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-100">{umami.totals.visitors}</p>
-              </div>
-              <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-                <p className="text-xs font-medium uppercase text-slate-400">Visites</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-100">{umami.totals.visits}</p>
-              </div>
-              <div className="rounded-xl border border-slate-600/50 bg-slate-700/30 p-4">
-                <p className="text-xs font-medium uppercase text-slate-400">Mitjana visita (min)</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-100">{avgVisitMinutes}</p>
-              </div>
-            </div>
-          )}
-          {umami && (
-            <div className="grid gap-4 lg:grid-cols-3">
-              <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
-                <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Pàgines principals
-                </div>
-                <div className="space-y-2 p-4 text-sm">
-                  {umami.topPages.slice(0, 6).map((row) => (
-                    <div key={row.label} className="flex items-center justify-between">
-                      <span className="truncate text-slate-200">{row.label}</span>
-                      <span className="text-slate-400">{row.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
-                <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Referències
-                </div>
-                <div className="space-y-2 p-4 text-sm">
-                  {umami.referrers.slice(0, 6).map((row) => (
-                    <div key={row.label} className="flex items-center justify-between">
-                      <span className="truncate text-slate-200">{row.label}</span>
-                      <span className="text-slate-400">{row.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
-                <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Països
-                </div>
-                <div className="space-y-2 p-4 text-sm">
-                  {umami.countries.slice(0, 6).map((row) => (
-                    <div key={row.label} className="flex items-center justify-between">
-                      <span className="truncate text-slate-200">{row.label}</span>
-                      <span className="text-slate-400">{row.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
-                <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Dispositius
-                </div>
-                <div className="space-y-2 p-4 text-sm">
-                  {umami.devices.slice(0, 6).map((row) => (
-                    <div key={row.label} className="flex items-center justify-between">
-                      <span className="truncate text-slate-200">{row.label}</span>
-                      <span className="text-slate-400">{row.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
-                <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Navegadors
-                </div>
-                <div className="space-y-2 p-4 text-sm">
-                  {umami.browsers.slice(0, 6).map((row) => (
-                    <div key={row.label} className="flex items-center justify-between">
-                      <span className="truncate text-slate-200">{row.label}</span>
-                      <span className="text-slate-400">{row.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-2xl border border-slate-600/50 bg-slate-700/30">
-                <div className="border-b border-slate-600/50 bg-slate-600/30 px-4 py-3 text-sm font-semibold text-slate-200">
-                  Esdeveniments
-                </div>
-                <div className="space-y-2 p-4 text-sm">
-                  {umami.events.slice(0, 6).map((row) => (
-                    <div key={row.label} className="flex items-center justify-between">
-                      <span className="truncate text-slate-200">{row.label}</span>
-                      <span className="text-slate-400">{row.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-          <div className="flex flex-wrap items-center gap-3">
-            <a
-              href={umamiDashboardUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center justify-center rounded-lg border border-slate-600/50 bg-slate-700/30 px-4 py-2 text-sm font-medium text-slate-200 hover:border-cyan-500/30 hover:text-cyan-300 transition"
-            >
-              Obrir panell Umami
-            </a>
-            <a
-              href="https://umami.is/docs"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center justify-center rounded-lg border border-slate-600/50 bg-slate-700/30 px-4 py-2 text-sm font-medium text-slate-200 hover:border-cyan-500/30 hover:text-cyan-300 transition"
-            >
-              Docs Umami
-            </a>
-          </div>
-          <div className="rounded-lg border border-slate-600/50 bg-slate-700/30 p-4 text-sm text-slate-300">
-            Aquesta és la font principal d&apos;analítica (trànsit, pàgines, esdeveniments i conversions) per al web.
-            Si l&apos;ID del web no està configurat, revisa les variables d&apos;entorn.
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

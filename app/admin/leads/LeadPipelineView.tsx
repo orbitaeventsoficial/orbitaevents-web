@@ -39,12 +39,12 @@ type PipelineColumn = {
 };
 
 const COLUMNS: Omit<PipelineColumn, 'leads'>[] = [
-  { status: 'NEW', label: 'Noves', color: 'text-blue-300', borderColor: 'border-blue-500/30', bgColor: 'bg-blue-500/5' },
-  { status: 'CONTACTED', label: 'Contactat', color: 'text-yellow-300', borderColor: 'border-yellow-500/30', bgColor: 'bg-yellow-500/5' },
-  { status: 'QUOTE_SENT', label: 'Pressupost enviat', color: 'text-purple-300', borderColor: 'border-purple-500/30', bgColor: 'bg-purple-500/5' },
-  { status: 'NEGOTIATING', label: 'Negociant', color: 'text-orange-300', borderColor: 'border-orange-500/30', bgColor: 'bg-orange-500/5' },
-  { status: 'WON', label: 'Guanyat', color: 'text-emerald-300', borderColor: 'border-emerald-500/30', bgColor: 'bg-emerald-500/5' },
-  { status: 'LOST', label: 'Perdut', color: 'text-slate-400', borderColor: 'border-slate-600/30', bgColor: 'bg-slate-800/30' },
+  { status: 'NEW', label: 'Noves', color: 'text-sky-200', borderColor: 'border-sky-400/40', bgColor: 'bg-sky-500/12' },
+  { status: 'CONTACTED', label: 'Contactat', color: 'text-amber-200', borderColor: 'border-amber-400/40', bgColor: 'bg-amber-500/12' },
+  { status: 'QUOTE_SENT', label: 'Pressupost enviat', color: 'text-violet-200', borderColor: 'border-violet-400/40', bgColor: 'bg-violet-500/12' },
+  { status: 'NEGOTIATING', label: 'Negociant', color: 'text-orange-200', borderColor: 'border-orange-400/40', bgColor: 'bg-orange-500/12' },
+  { status: 'WON', label: 'Guanyat', color: 'text-emerald-200', borderColor: 'border-emerald-400/40', bgColor: 'bg-emerald-500/12' },
+  { status: 'LOST', label: 'Perdut', color: 'text-rose-200', borderColor: 'border-rose-400/35', bgColor: 'bg-rose-500/10' },
 ];
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -212,7 +212,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
                 <h3 className={`text-sm font-semibold ${col.color} truncate`}>
                   {col.label}
                 </h3>
-                <span className={`rounded-full bg-slate-700/50 px-2 py-0.5 text-[10px] font-bold ${col.color}`}>
+                <span className={`rounded-full border ${col.borderColor} bg-slate-900/50 px-2 py-0.5 text-[10px] font-bold ${col.color}`}>
                   {col.leads.length}
                 </span>
               </div>
