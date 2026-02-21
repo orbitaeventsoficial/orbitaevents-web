@@ -10,6 +10,7 @@ import ProfitabilityConfigHistory from '../rentabilidad/ProfitabilityConfigHisto
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
 import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import PackPricingModelEditor from './PackPricingModelEditor';
+import PackPricingModelHistory from './PackPricingModelHistory';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -81,6 +82,13 @@ interface EconomiaClientProps {
   bySource: BySourceRow[];
   config: ProfitabilityConfig;
   packPricingConfig: PackPricingModelConfig;
+  packPricingHistoryEntries: Array<{
+    id: string;
+    createdAt: string;
+    role: string;
+    before: PackPricingModelConfig;
+    after: PackPricingModelConfig;
+  }>;
   historyEntries: HistoryEntry[];
   inventoryValue: number;
   inventoryCount: number;
@@ -851,6 +859,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
           {activeTab === 'config' && (
             <>
               <PackPricingModelEditor initial={props.packPricingConfig} />
+              <PackPricingModelHistory entries={props.packPricingHistoryEntries} />
               <ProfitabilityConfigEditor initial={props.config} />
               <ProfitabilityConfigHistory entries={props.historyEntries} />
             </>

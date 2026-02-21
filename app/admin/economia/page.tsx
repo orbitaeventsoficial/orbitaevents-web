@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { buildProfitabilityReport, normalizeProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { deriveFlowStatus } from '@/lib/services/communicationStatusService';
-import { getPackPricingModelConfigEditable } from '@/lib/services/packPricingHealth';
+import { getPackPricingModelConfigEditable, type PackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import EconomiaClient from './EconomiaClient';
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +15,39 @@ function addDays(date: Date, days: number) {
 
 function startOfMonth(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function normalizePackConfig(raw: unknown, fallback: PackPricingModelConfig): PackPricingModelConfig {
+  if (!raw || typeof raw !== 'object') return fallback;
+  const value = raw as Record<string, unknown>;
+  const parseNum = (key: keyof PackPricingModelConfig) => {
+    const n = Number(value[key]);
+    return Number.isFinite(n) ? n : fallback[key] as number;
+  };
+
+  const specialistServicesRaw = value.specialistServices;
+  const specialistServices = Array.isArray(specialistServicesRaw)
+    ? specialistServicesRaw.map((item) => String(item || '').trim().toLowerCase()).filter(Boolean)
+    : String(specialistServicesRaw ?? fallback.specialistServices.join(','))
+      .split(',')
+      .map((item) => item.trim().toLowerCase())
+      .filter(Boolean);
+
+  return {
+    marginTargetPct: Math.max(0.1, Math.min(0.9, parseNum('marginTargetPct'))),
+    socialSecurityPct: Math.max(0, Math.min(1, parseNum('socialSecurityPct'))),
+    withholdingPct: Math.max(0, Math.min(1, parseNum('withholdingPct'))),
+    operatorNetCostPerHour: Math.max(0, parseNum('operatorNetCostPerHour')),
+    specialistNetCostPerHour: Math.max(0, parseNum('specialistNetCostPerHour')),
+    operatorCostPerHour: Math.max(0, parseNum('operatorCostPerHour')),
+    specialistCostPerHour: Math.max(0, parseNum('specialistCostPerHour')),
+    specialistServices,
+    supportOperatorMinGuests: Math.max(1, parseNum('supportOperatorMinGuests')),
+    supportOperatorMinDjHours: Math.max(1, parseNum('supportOperatorMinDjHours')),
+    supportOperatorMinWatts: Math.max(1, parseNum('supportOperatorMinWatts')),
+    fixedPackCost: Math.max(0, parseNum('fixedPackCost')),
+    alertDivergencePct: Math.max(1, parseNum('alertDivergencePct')),
+  };
 }
 
 export default async function EconomiaPage() {
@@ -213,6 +246,27 @@ export default async function EconomiaPage() {
 
   const defaultConfig = normalizeProfitabilityConfig(null);
   const packPricingConfig = await getPackPricingModelConfigEditable();
+  const packPricingHistoryLogs = await prisma.adminLog.findMany({
+    where: {
+      entity: 'setting',
+      entityId: 'pricing.pack.modelConfig',
+      action: 'UPDATE',
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 120,
+  });
+  const packPricingHistoryEntries = packPricingHistoryLogs.map((logItem) => {
+    const details = (logItem.details && typeof logItem.details === 'object'
+      ? (logItem.details as Record<string, unknown>)
+      : {}) as Record<string, unknown>;
+    return {
+      id: logItem.id,
+      createdAt: logItem.createdAt.toISOString(),
+      role: typeof details.role === 'string' ? details.role : 'OWNER',
+      before: normalizePackConfig(details.before, packPricingConfig),
+      after: normalizePackConfig(details.after, packPricingConfig),
+    };
+  });
 
   return (
     <EconomiaClient
@@ -231,6 +285,7 @@ export default async function EconomiaPage() {
       bySource={report?.bySource ?? []}
       config={report?.config ?? defaultConfig}
       packPricingConfig={packPricingConfig}
+      packPricingHistoryEntries={packPricingHistoryEntries}
       historyEntries={historyEntries}
       inventoryValue={inventoryValue}
       inventoryCount={inventoryCount}
