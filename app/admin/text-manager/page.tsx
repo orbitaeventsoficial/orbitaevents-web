@@ -1,7 +1,7 @@
 'use client';
 import { log } from '@/lib/logger';
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -16,7 +16,7 @@ interface TextNode {
   isModified: boolean;
   isNew: boolean;
   characterCount: number;
-  locale: 'es' | 'ca';
+  locale: 'es' | 'ca' | 'en';
 }
 
 interface Section {
@@ -34,6 +34,12 @@ interface TranslationComparison {
   ca: string;
   hasTranslation: boolean;
 }
+
+const LANGUAGE_META: Record<'ca' | 'es' | 'en', { label: string; icon: string }> = {
+  ca: { label: 'Català', icon: '🏴' },
+  es: { label: 'Español', icon: '🇪🇸' },
+  en: { label: 'English', icon: '🇬🇧' },
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓ DE SECCIONS
@@ -196,13 +202,6 @@ export default function TextManagerPage() {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<'sections' | 'all' | 'search'>('sections');
   const [activeLanguage, setActiveLanguage] = useState<'es' | 'ca' | 'en'>('es');
-  const [resultsPage, setResultsPage] = useState(1);
-  const resultsPageSize = 100;
-  const listViewportRef = useRef<HTMLDivElement | null>(null);
-  const [virtualScrollTop, setVirtualScrollTop] = useState(0);
-  const [virtualViewportHeight, setVirtualViewportHeight] = useState(0);
-  const VIRTUAL_ROW_ESTIMATE = 320;
-  const VIRTUAL_OVERSCAN = 3;
 
   // Historial de canvis
   const [changeHistory, setChangeHistory] = useState<Array<{
@@ -313,19 +312,12 @@ export default function TextManagerPage() {
         return;
       }
 
-      // TRADUCCIÓN AUTOMÁTICA EN BATCH (1 request)
-      const allModifications: Record<string, Record<string, string>> = {
-        es: {},
-        ca: {},
-        en: {}
-      };
-
-      setSuccess('🔄 Traduciendo automáticamente...');
-
+      const allModifications: Record<string, Record<string, string>> = { es: {}, ca: {}, en: {} };
       const modifiedEntries = Object.entries(modifications);
-      const uniqueTexts = Array.from(new Set(
-        modifiedEntries.map(([, text]) => text.trim()).filter(Boolean)
-      ));
+      const uniqueTexts = Array.from(
+        new Set(modifiedEntries.map(([, text]) => text.trim()).filter(Boolean))
+      );
+
       let translationsByText: Record<string, Record<string, string>> = {};
       if (uniqueTexts.length > 0) {
         const translateResponse = await fetch('/api/admin/translate', {
@@ -335,20 +327,18 @@ export default function TextManagerPage() {
         });
         const translateData = await translateResponse.json().catch(() => ({}));
         if (translateResponse.ok && translateData?.ok) {
-          translationsByText = (translateData.translationsByText || {}) as Record<string, Record<string, string>>;
+          translationsByText = translateData.translationsByText || {};
         }
       }
 
       for (const [path, text] of modifiedEntries) {
-        const normalizedText = text.trim();
-        const translated = translationsByText[normalizedText] || {};
+        const translated = translationsByText[text.trim()] || {};
         allModifications.es[path] = translated.es || text;
         allModifications.ca[path] = translated.ca || text;
         allModifications.en[path] = translated.en || text;
       }
 
-      // Desar los 3 idiomas en paralelo
-      const savePromises = [
+      const responses = await Promise.all([
         fetch('/api/admin/text-manager', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -364,28 +354,22 @@ export default function TextManagerPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ modifications: allModifications.en, locale: 'en' })
         })
-      ];
-
-      const responses = await Promise.all(savePromises);
-      const results = await Promise.all(responses.map(r => r.json()));
-
-      const allOk = results.every(r => r.ok);
-
-      if (allOk) {
-        // Actualitzar els estats amb les traduccions
-        setEsTexts(prev => ({ ...prev, ...allModifications.es }));
-        setCaTexts(prev => ({ ...prev, ...allModifications.ca }));
-        setEnTexts(prev => ({ ...prev, ...allModifications.en }));
-
-        setOriginalEsTexts(prev => ({ ...prev, ...allModifications.es }));
-        setOriginalCaTexts(prev => ({ ...prev, ...allModifications.ca }));
-        setOriginalEnTexts(prev => ({ ...prev, ...allModifications.en }));
-
-        setSuccess(`✅ ${Object.keys(modifications).length} textos guardados y traducidos automáticamente a ES, CA y EN`);
-        setChangeHistory([]);
-      } else {
+      ]);
+      const results = await Promise.all(responses.map((r) => r.json().catch(() => ({}))));
+      if (!results.every((r) => r.ok)) {
         setError('Error desant alguns idiomes');
+        setSaving(false);
+        return;
       }
+
+      setEsTexts((prev) => ({ ...prev, ...allModifications.es }));
+      setCaTexts((prev) => ({ ...prev, ...allModifications.ca }));
+      setEnTexts((prev) => ({ ...prev, ...allModifications.en }));
+      setOriginalEsTexts((prev) => ({ ...prev, ...allModifications.es }));
+      setOriginalCaTexts((prev) => ({ ...prev, ...allModifications.ca }));
+      setOriginalEnTexts((prev) => ({ ...prev, ...allModifications.en }));
+      setSuccess(`✅ ${Object.keys(modifications).length} textos desats i traduïts a ES/CA/EN`);
+      setChangeHistory([]);
     } catch (err) {
       setError('Error de connexió en desar');
       log.error('Text manager save error', err);
@@ -476,56 +460,6 @@ export default function TextManagerPage() {
     return texts;
   }, [currentTexts, originalTexts, activeSection, debouncedSearchTerm, showOnlyModified, getSection]);
 
-  useEffect(() => {
-    setResultsPage(1);
-  }, [debouncedSearchTerm, activeSection, showOnlyModified, activeLanguage]);
-
-  const totalFilteredPages = useMemo(() => {
-    return Math.max(1, Math.ceil(filteredTexts.length / resultsPageSize));
-  }, [filteredTexts.length]);
-
-  const paginatedFilteredTexts = useMemo(() => {
-    const start = (resultsPage - 1) * resultsPageSize;
-    return filteredTexts.slice(start, start + resultsPageSize);
-  }, [filteredTexts, resultsPage]);
-
-  useEffect(() => {
-    if (resultsPage > totalFilteredPages) setResultsPage(totalFilteredPages);
-  }, [resultsPage, totalFilteredPages]);
-
-  useEffect(() => {
-    const updateViewport = () => {
-      if (!listViewportRef.current) return;
-      setVirtualViewportHeight(listViewportRef.current.clientHeight);
-    };
-    updateViewport();
-    window.addEventListener('resize', updateViewport);
-    return () => window.removeEventListener('resize', updateViewport);
-  }, [resultsPage, activeLanguage, showComparison]);
-
-  const shouldVirtualize = paginatedFilteredTexts.length > 50;
-  const virtualRange = useMemo(() => {
-    if (!shouldVirtualize) {
-      return { startIndex: 0, endIndex: paginatedFilteredTexts.length };
-    }
-    const visibleRows = Math.max(1, Math.ceil(virtualViewportHeight / VIRTUAL_ROW_ESTIMATE));
-    const startIndex = Math.max(0, Math.floor(virtualScrollTop / VIRTUAL_ROW_ESTIMATE) - VIRTUAL_OVERSCAN);
-    const endIndex = Math.min(
-      paginatedFilteredTexts.length,
-      startIndex + visibleRows + VIRTUAL_OVERSCAN * 2
-    );
-    return { startIndex, endIndex };
-  }, [paginatedFilteredTexts.length, shouldVirtualize, virtualViewportHeight, virtualScrollTop]);
-
-  const visibleEntries = useMemo(() => {
-    return paginatedFilteredTexts.slice(virtualRange.startIndex, virtualRange.endIndex);
-  }, [paginatedFilteredTexts, virtualRange.startIndex, virtualRange.endIndex]);
-
-  const topSpacerHeight = shouldVirtualize ? virtualRange.startIndex * VIRTUAL_ROW_ESTIMATE : 0;
-  const bottomSpacerHeight = shouldVirtualize
-    ? Math.max(0, (paginatedFilteredTexts.length - virtualRange.endIndex) * VIRTUAL_ROW_ESTIMATE)
-    : 0;
-
   const renderTextCard = (path: string, value: string) => {
     const isModified = value !== originalTexts[path];
     const otherLangValues = {
@@ -575,8 +509,8 @@ export default function TextManagerPage() {
           <textarea
             value={value}
             onChange={(e) => handleTextChange(path, e.target.value)}
-            rows={value.length > 100 ? 3 : value.length > 50 ? 2 : 1}
-            className={`w-full px-4 py-3 rounded-lg border transition-all resize-none font-sans ${
+            rows={Math.min(12, Math.max(2, value.split('\n').length + 1))}
+            className={`w-full px-4 py-3 rounded-lg border transition-all resize-y font-sans ${
               isModified
                 ? 'border-orange-500/40 bg-orange-500/10 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20'
                 : 'border-slate-700/60 bg-slate-900/60 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
@@ -665,14 +599,14 @@ export default function TextManagerPage() {
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* HEADER FIJO */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      <header className="sticky top-0 z-50 bg-slate-900/95 border-b border-slate-700/60 shadow-sm backdrop-blur">
+      <header className="sticky top-14 lg:top-16 z-40 bg-slate-900/95 border-b border-slate-700/60 shadow-sm backdrop-blur">
         {/* TABS DE IDIOMA */}
         <div className="bg-gradient-to-r from-orange-50 to-rose-50 border-b border-orange-100">
           <div className="max-w-7xl mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-slate-300">🌐 Idioma MASTER (es tradueix automàticament):</span>
-                <div className="flex gap-2">
+                <span className="text-sm font-semibold text-slate-300">🌐 Idioma de treball:</span>
+                <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setActiveLanguage('es')}
                     className={`px-4 py-2 rounded-lg font-semibold transition-all ${
@@ -681,7 +615,7 @@ export default function TextManagerPage() {
                         : 'bg-slate-900/70 text-slate-300 hover:bg-slate-700'
                     }`}
                   >
-                    🇪🇸 Español
+                    {LANGUAGE_META.es.icon} {LANGUAGE_META.es.label}
                   </button>
                   <button
                     onClick={() => setActiveLanguage('ca')}
@@ -691,7 +625,7 @@ export default function TextManagerPage() {
                         : 'bg-slate-900/70 text-slate-300 hover:bg-slate-700'
                     }`}
                   >
-                    🏴 Català
+                    {LANGUAGE_META.ca.icon} {LANGUAGE_META.ca.label}
                   </button>
                   <button
                     onClick={() => setActiveLanguage('en')}
@@ -701,19 +635,19 @@ export default function TextManagerPage() {
                         : 'bg-slate-900/70 text-slate-300 hover:bg-slate-700'
                     }`}
                   >
-                    🇬🇧 English
+                    {LANGUAGE_META.en.icon} {LANGUAGE_META.en.label}
                   </button>
                 </div>
               </div>
               <div className="text-xs text-slate-400 bg-slate-900/70 px-3 py-1.5 rounded-lg border border-orange-200">
-                💡 Escriu en qualsevol idioma i es tradueix automàticament als 3
+                💡 Estàs editant: {LANGUAGE_META[activeLanguage].label}
               </div>
             </div>
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             {/* Títol */}
             <div>
               <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
@@ -725,11 +659,11 @@ export default function TextManagerPage() {
             </div>
 
             {/* Buscador */}
-            <div className="flex-1 max-w-xl">
+            <div className="w-full lg:flex-1 lg:max-w-xl">
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Cercar textos... (path o contenido)"
+                  placeholder="Cercar textos... (path o contingut)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-4 py-2.5 pl-10 rounded-xl border border-slate-700/60 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
@@ -749,7 +683,7 @@ export default function TextManagerPage() {
             </div>
 
             {/* Acciones */}
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {/* Toggle modificats */}
               <button
                 onClick={() => setShowOnlyModified(!showOnlyModified)}
@@ -759,7 +693,7 @@ export default function TextManagerPage() {
                     : 'bg-slate-800 text-slate-300 hover:bg-slate-800'
                 }`}
               >
-                {showOnlyModified ? '✅ Solo modificats' : '📋 Mostrar todos'}
+                    {showOnlyModified ? '✅ Només modificats' : '📋 Mostrar tots'}
               </button>
 
               {/* Comparar idiomes */}
@@ -771,8 +705,9 @@ export default function TextManagerPage() {
                     : 'bg-slate-800 text-slate-300 hover:bg-slate-800'
                 }`}
               >
-                🌐 ES/CA
+                🌐 Comparar idiomes
               </button>
+
 
               {/* Revertir tot */}
               {modifiedCount > 0 && (
@@ -845,12 +780,12 @@ export default function TextManagerPage() {
       )}
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-6">
+        <div className="flex flex-col gap-6 xl:flex-row">
           {/* ═══════════════════════════════════════════════════════════════ */}
           {/* SIDEBAR - SECCIONS */}
           {/* ═══════════════════════════════════════════════════════════════ */}
-          <aside className="w-72 flex-shrink-0">
-            <div className="sticky top-28 space-y-2">
+          <aside className="w-full xl:w-72 xl:flex-shrink-0">
+            <div className="space-y-2 xl:sticky xl:top-32">
               {/* Mostrar tot */}
               <button
                 onClick={() => setActiveSection(null)}
@@ -915,7 +850,7 @@ export default function TextManagerPage() {
                   <h3 className="font-semibold text-slate-100 mb-3 flex items-center gap-2">
                     📜 Historial ({changeHistory.length})
                   </h3>
-                  <div className="max-h-48 overflow-y-auto space-y-2">
+                  <div className="space-y-2">
                     {changeHistory.slice(-10).reverse().map((change, i) => (
                       <div key={i} className="text-xs p-2 bg-slate-900/60 rounded-lg">
                         <code className="text-orange-600 break-all">
@@ -976,45 +911,11 @@ export default function TextManagerPage() {
                 <>
                   <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-700/60 bg-slate-900/70 px-3 py-2 text-xs text-slate-300">
                     <span>
-                      Mostrant {(resultsPage - 1) * resultsPageSize + 1}-
-                      {Math.min(resultsPage * resultsPageSize, filteredTexts.length)} de {filteredTexts.length}
+                      Mostrant 1-{filteredTexts.length} de {filteredTexts.length}
                     </span>
-                    {totalFilteredPages > 1 && (
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setResultsPage((prev) => Math.max(1, prev - 1))}
-                          disabled={resultsPage <= 1}
-                          className="rounded border border-slate-600 px-2 py-1 disabled:opacity-40"
-                        >
-                          Anterior
-                        </button>
-                        <span>Pàgina {resultsPage} de {totalFilteredPages}</span>
-                        <button
-                          type="button"
-                          onClick={() => setResultsPage((prev) => Math.min(totalFilteredPages, prev + 1))}
-                          disabled={resultsPage >= totalFilteredPages}
-                          className="rounded border border-slate-600 px-2 py-1 disabled:opacity-40"
-                        >
-                          Següent
-                        </button>
-                      </div>
-                    )}
                   </div>
 
-                {shouldVirtualize ? (
-                  <div
-                    ref={listViewportRef}
-                    onScroll={(event) => setVirtualScrollTop(event.currentTarget.scrollTop)}
-                    className="max-h-[72vh] overflow-y-auto pr-1 space-y-3"
-                  >
-                    <div style={{ height: topSpacerHeight }} />
-                    {visibleEntries.map(([path, value]) => renderTextCard(path, value))}
-                    <div style={{ height: bottomSpacerHeight }} />
-                  </div>
-                ) : (
-                  paginatedFilteredTexts.map(([path, value]) => renderTextCard(path, value))
-                )}
+                {filteredTexts.map(([path, value]) => renderTextCard(path, value))}
                 </>
               )}
             </div>
@@ -1048,6 +949,3 @@ export default function TextManagerPage() {
     </div>
   );
 }
-
-
-
