@@ -557,7 +557,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <html lang="ca" suppressHydrationWarning>
-      <body className="bg-slate-950 text-slate-200 antialiased" suppressHydrationWarning>
+      <body className="bg-[#0f1114] text-slate-200 antialiased" suppressHydrationWarning>
         <div
           className="min-h-screen"
           onClickCapture={blockInteractionInHelpMode}
@@ -573,9 +573,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           {helpModeEnabled && <AdminHelpLegend />}
           {helpModeEnabled && <AdminHelpInspector />}
           {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-black border-r border-zinc-800 flex-col z-40">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-[#0c0f13] border-r border-zinc-700/80 flex-col z-40">
         {/* Logo */}
-        <div className="h-16 px-4 border-b border-slate-800/90 flex items-center">
+        <div className="h-[72px] px-4 flex items-center">
           <Link href="/admin" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center p-1.5">
               <Image
@@ -669,7 +669,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile Header - Mejorado */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-black border-b border-zinc-800 z-50 px-3 flex items-center justify-between safe-area-top">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[#0c0f13] border-b border-zinc-700/80 z-50 px-3 flex items-center justify-between safe-area-top">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
@@ -742,12 +742,12 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <aside
             id="admin-mobile-sidebar"
             aria-label="Menú admin"
-            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-black border-r border-zinc-800 z-50 overflow-hidden
+            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-[#0c0f13] border-r border-zinc-700/80 z-50 overflow-hidden
               transform transition-transform duration-300 ease-out
               ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
           >
             {/* Header del sidebar */}
-            <div className="h-14 px-4 border-b border-amber-900/35 flex items-center justify-between bg-stone-900">
+            <div className="h-14 px-4 border-b border-zinc-700/70 flex items-center justify-between bg-[#0c0f13]">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-amber-600 flex items-center justify-center p-1.5">
                   <Image
@@ -818,7 +818,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                     Recents
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {recentHrefs.map((href) => (
+                    {recentHrefs.slice(0, 4).map((href) => (
                       <FavoriteChip
                         key={href}
                         href={href}
@@ -853,7 +853,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             </nav>
 
             {/* Footer del sidebar móvil */}
-            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-amber-900/35 bg-stone-900">
+            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-zinc-700/70 bg-[#0c0f13]">
               <Link
                 href="/admin/settings"
                 onClick={() => setSidebarOpen(false)}
@@ -876,7 +876,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Desktop Header */}
-      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-[72px] px-6 items-center justify-between bg-black z-30 shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
+      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-[72px] px-6 items-center justify-between bg-[#0c0f13] border-b border-zinc-700/80 z-30">
         <div className="flex items-center gap-3 text-sm">
           <Link href="/admin" className="text-slate-400 hover:text-slate-200 transition-colors">Admin</Link>
           <span className="text-slate-600">/</span>
@@ -937,7 +937,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-black border-t border-zinc-800 z-50 safe-area-bottom">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0c0f13] border-t border-zinc-700/80 z-50 safe-area-bottom">
         <div className="flex items-center justify-around h-full px-2 max-w-lg mx-auto">
           <BottomNavItem
             icon="📊"

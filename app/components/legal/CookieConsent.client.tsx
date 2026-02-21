@@ -180,32 +180,32 @@ export default function CookieConsent() {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6"
-        initial={{ y: 100, opacity: 0 }}
+        className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:w-[min(430px,calc(100vw-2rem))]"
+        initial={{ y: 48, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 100, opacity: 0 }}
+        exit={{ y: 48, opacity: 0 }}
         transition={{ type: 'spring', damping: 25 }}
       >
-        <div className="mx-auto max-w-5xl">
-          <div className="relative rounded-3xl border-2 border-oe-gold/30 bg-bg-surface/95 backdrop-blur-xl p-6 md:p-8 shadow-2xl">
+        <div className="mx-auto w-full">
+          <div className="relative rounded-2xl border border-oe-gold/35 bg-bg-surface/96 backdrop-blur-xl p-4 md:p-5 shadow-2xl">
             <button
               onClick={acceptNecessary}
-              className="absolute top-4 right-4 text-text-muted hover:text-white transition-colors"
+              className="absolute top-3 right-3 text-text-muted hover:text-white transition-colors"
               aria-label={t('close')}
             >
-              <X className="w-5 h-5" />
+              <X className="h-4 w-4" />
             </button>
 
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 rounded-full bg-oe-gold/10 flex items-center justify-center flex-shrink-0">
-                <Cookie className="w-6 h-6 text-oe-gold" />
+            <div className="mb-4 flex items-start gap-3">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-oe-gold/10">
+                <Cookie className="h-5 w-5 text-oe-gold" />
               </div>
 
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-white mb-2">
+                <h3 className="mb-1 text-base font-bold text-white">
                   {t('title')}
                 </h3>
-                <p className="text-sm text-text-muted leading-relaxed">
+                <p className="text-xs leading-relaxed text-text-muted">
                   {t('description')}{' '}
                   <Link href="/legal/cookies" className="text-oe-gold hover:underline">
                     {t('moreInfo')}
@@ -217,7 +217,7 @@ export default function CookieConsent() {
             <AnimatePresence>
               {showSettings && (
                 <motion.div
-                  className="mb-6 p-4 rounded-xl bg-bg-main border border-border"
+                  className="mb-4 rounded-xl border border-border bg-bg-main p-3"
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -285,17 +285,17 @@ export default function CookieConsent() {
               )}
             </AnimatePresence>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <button
                 onClick={acceptAll}
-                className="btn-primary flex-1 text-center justify-center"
+                className="btn-primary justify-center text-center"
               >
                 {t('acceptAll')}
               </button>
 
               <button
                 onClick={acceptNecessary}
-                className="btn-secondary flex-1 text-center justify-center"
+                className="btn-secondary justify-center text-center"
               >
                 {t('onlyNecessary')}
               </button>
@@ -303,7 +303,7 @@ export default function CookieConsent() {
               {!showSettings ? (
                 <button
                   onClick={() => setShowSettings(true)}
-                  className="btn-secondary flex-1 text-center justify-center gap-2"
+                  className="btn-secondary col-span-1 justify-center gap-2 text-center sm:col-span-2"
                 >
                   <Settings className="w-4 h-4" />
                   {t('customize')}
@@ -311,7 +311,7 @@ export default function CookieConsent() {
               ) : (
                 <button
                   onClick={savePreferences}
-                  className="btn-secondary flex-1 text-center justify-center"
+                  className="btn-secondary col-span-1 justify-center text-center sm:col-span-2"
                 >
                   {t('save')}
                 </button>

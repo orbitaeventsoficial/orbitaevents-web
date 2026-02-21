@@ -179,13 +179,20 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     );
   }
 
+  const totalLeads = columns.reduce((acc, col) => acc + col.leads.length, 0);
+
+  const openLeads = totalLeads - (columns.find((c) => c.status === 'WON')?.leads.length || 0) - (columns.find((c) => c.status === 'LOST')?.leads.length || 0);
+  const wonLeads = columns.find((c) => c.status === 'WON')?.leads.length || 0;
+  const lostLeads = columns.find((c) => c.status === 'LOST')?.leads.length || 0;
+  const winRate = wonLeads + lostLeads > 0 ? Math.round((wonLeads / (wonLeads + lostLeads)) * 100) : 0;
+
   return (
     <div className="space-y-3">
       <div className="text-xs text-slate-400">
-        Pipeline filtrat: {columns.reduce((acc, col) => acc + col.leads.length, 0)} de {allLeads.length} entrades
+        Pipeline filtrat: {totalLeads} de {allLeads.length} entrades
       </div>
 
-      <div className="pb-4">
+      <div className="pb-2">
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         {columns.map((col) => (
           <div
@@ -202,7 +209,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
               event.preventDefault();
               void handleDropOnColumn(col.status);
             }}
-            className={`min-w-0 rounded-2xl border ${col.borderColor} ${col.bgColor} flex flex-col transition-all ${
+            className={`min-w-0 rounded-2xl border ${col.borderColor} ${col.bgColor} flex min-h-[320px] flex-col transition-all ${
               dragOverStatus === col.status ? 'ring-2 ring-cyan-400/50 border-cyan-400/60' : ''
             }`}
           >
@@ -251,6 +258,25 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
         ))}
       </div>
     </div>
+
+      <section className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-xl border border-slate-700/60 bg-slate-900/50 p-3">
+          <p className="text-[10px] uppercase tracking-wide text-slate-400">Obertes</p>
+          <p className="mt-1 text-lg font-bold text-slate-100">{openLeads}</p>
+        </div>
+        <div className="rounded-xl border border-emerald-500/35 bg-emerald-500/10 p-3">
+          <p className="text-[10px] uppercase tracking-wide text-emerald-200">Guanyades</p>
+          <p className="mt-1 text-lg font-bold text-emerald-100">{wonLeads}</p>
+        </div>
+        <div className="rounded-xl border border-rose-500/35 bg-rose-500/10 p-3">
+          <p className="text-[10px] uppercase tracking-wide text-rose-200">Perdudes</p>
+          <p className="mt-1 text-lg font-bold text-rose-100">{lostLeads}</p>
+        </div>
+        <div className="rounded-xl border border-amber-500/35 bg-amber-500/10 p-3">
+          <p className="text-[10px] uppercase tracking-wide text-amber-200">Taxa guany</p>
+          <p className="mt-1 text-lg font-bold text-amber-100">{winRate}%</p>
+        </div>
+      </section>
     </div>
   );
 }

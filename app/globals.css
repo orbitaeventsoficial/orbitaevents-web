@@ -1538,14 +1538,14 @@ textarea:focus-visible {
 html.admin-mode,
 body.admin-mode,
 html.admin-mode .admin-shell.admin-unified {
-  --admin-bg-main: #121111;
-  --admin-bg-soft: #191614;
-  --admin-bg-elevated: #231f1b;
-  --admin-surface-1: rgba(35, 29, 24, 0.94);
-  --admin-surface-2: rgba(29, 24, 20, 0.92);
-  --admin-surface-3: rgba(22, 19, 17, 0.9);
-  --admin-border: #4a3a2f;
-  --admin-border-strong: #6c5543;
+  --admin-bg-main: #0f1114;
+  --admin-bg-soft: #141921;
+  --admin-bg-elevated: #1a2130;
+  --admin-surface-1: rgba(25, 35, 52, 0.92);
+  --admin-surface-2: rgba(34, 28, 56, 0.9);
+  --admin-surface-3: rgba(18, 44, 44, 0.88);
+  --admin-border: #34506f;
+  --admin-border-strong: #4f6f8f;
   --admin-text-main: #e8eef8;
   --admin-text-soft: #c5d1e2;
   --admin-text-muted: #9cadc6;
@@ -1564,9 +1564,9 @@ html.admin-mode .admin-shell.admin-unified {
   --admin-priority-low-border: rgba(16, 185, 129, 0.54);
   --admin-priority-low-text: #a7f3d0;
   background:
-    radial-gradient(circle at 18% -20%, rgba(245, 158, 11, 0.14), transparent 38%),
-    radial-gradient(circle at 85% -14%, rgba(16, 185, 129, 0.12), transparent 40%),
-    radial-gradient(circle at 50% 120%, rgba(244, 63, 94, 0.09), transparent 42%),
+    radial-gradient(circle at 16% -24%, rgba(59, 130, 246, 0.2), transparent 42%),
+    radial-gradient(circle at 84% -20%, rgba(168, 85, 247, 0.18), transparent 44%),
+    radial-gradient(circle at 52% 120%, rgba(20, 184, 166, 0.16), transparent 46%),
     var(--admin-bg-main) !important;
   background-color: var(--admin-bg-main) !important;
 }
@@ -1576,6 +1576,21 @@ html.admin-mode .admin-shell {
   max-width: 100%;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Jerarquia de tipografia: títols clarament diferenciats */
+html.admin-mode .admin-shell h1 {
+  color: #f8e7b2 !important;
+  letter-spacing: 0.01em;
+}
+
+html.admin-mode .admin-shell h2 {
+  color: #d6e4ff !important;
+  letter-spacing: 0.006em;
+}
+
+html.admin-mode .admin-shell h3 {
+  color: #b8d8d8 !important;
 }
 
 html.admin-mode .admin-shell.admin-unified :is(
@@ -1606,8 +1621,8 @@ html.admin-mode .admin-shell.admin-unified > :is(
   .rounded-2xl,
   .rounded-3xl
 ) {
-  background: linear-gradient(180deg, rgba(44, 35, 28, 0.96), rgba(34, 28, 24, 0.94)) !important;
-  border-color: #7a5e49 !important;
+  background: linear-gradient(165deg, rgba(29, 49, 79, 0.98), rgba(50, 36, 77, 0.96) 56%, rgba(19, 70, 66, 0.95)) !important;
+  border-color: #5776a0 !important;
   box-shadow:
     0 14px 30px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
@@ -1630,8 +1645,8 @@ html.admin-mode .admin-shell.admin-unified > :is(
   .rounded-xl,
   .rounded-2xl
 ):not([class*='bg-gradient']):not(.admin-keep-colors) {
-  background: linear-gradient(180deg, rgba(30, 25, 21, 0.94), rgba(23, 20, 18, 0.92)) !important;
-  border-color: #5f4a3a !important;
+  background: linear-gradient(168deg, rgba(20, 40, 66, 0.94), rgba(38, 31, 61, 0.93) 58%, rgba(18, 56, 56, 0.92)) !important;
+  border-color: #4f6788 !important;
   box-shadow:
     0 8px 20px rgba(0, 0, 0, 0.24),
     inset 0 1px 0 rgba(255, 255, 255, 0.02) !important;
@@ -1662,9 +1677,36 @@ html.admin-mode .admin-shell.admin-unified > :is(
   .rounded-lg,
   .rounded-xl
 ):not([class*='bg-gradient']):not(.admin-keep-colors) {
-  background: linear-gradient(180deg, rgba(21, 18, 16, 0.9), rgba(17, 15, 14, 0.88)) !important;
-  border-color: #4b3a2f !important;
+  background: linear-gradient(180deg, rgba(18, 33, 52, 0.9), rgba(28, 27, 47, 0.88)) !important;
+  border-color: #415671 !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Cards d'estat/filtres: solides però llegibles */
+html.admin-mode .admin-shell .rounded-full,
+html.admin-mode .admin-shell [role='tab'],
+html.admin-mode .admin-shell .chip {
+  border-color: rgba(99, 130, 167, 0.75) !important;
+  background-color: rgba(20, 34, 54, 0.9) !important;
+}
+
+/* Responsive visual tuning */
+@media (max-width: 1024px) {
+  html.admin-mode .admin-shell.admin-unified > :is(
+    section,
+    article,
+    aside,
+    .panel,
+    .card,
+    .rounded-2xl,
+    .rounded-3xl
+  ) {
+    border-radius: 12px !important;
+  }
+
+  html.admin-mode .admin-shell h1 {
+    font-size: clamp(1.35rem, 3.4vw, 1.8rem) !important;
+  }
 }
 
 html.admin-mode .admin-shell.admin-unified :is(
@@ -2204,4 +2246,109 @@ html.admin-mode .admin-shell :is(
   [class*='to-']
 ) {
   background-image: none !important;
+}
+
+/* ==========================================================================
+   FINAL VISUAL OVERRIDE (ADMIN + FRONT)
+   - Jerarquia clara H1/H2/H3
+   - Densitat més executiva
+   - Consistència d'estats i colors
+   ========================================================================== */
+html.admin-mode,
+body.admin-mode,
+html.admin-mode .admin-shell.admin-unified {
+  background: #0a0d12 !important;
+  background-image: none !important;
+}
+
+html.admin-mode .admin-shell {
+  --admin-level-1: linear-gradient(160deg, rgba(24, 42, 70, 0.96), rgba(45, 33, 74, 0.94) 55%, rgba(14, 59, 58, 0.92));
+  --admin-level-2: linear-gradient(165deg, rgba(20, 36, 58, 0.95), rgba(37, 29, 63, 0.93) 58%, rgba(14, 53, 52, 0.9));
+  --admin-level-3: linear-gradient(170deg, rgba(16, 30, 48, 0.93), rgba(31, 26, 50, 0.9) 60%, rgba(13, 43, 43, 0.88));
+  --admin-border-1: rgba(99, 139, 188, 0.62);
+  --admin-border-2: rgba(86, 123, 166, 0.58);
+  --admin-border-3: rgba(70, 99, 133, 0.54);
+}
+
+html.admin-mode .admin-shell > :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl) {
+  background: var(--admin-level-1) !important;
+  border-color: var(--admin-border-1) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26) !important;
+}
+
+html.admin-mode .admin-shell > :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl)
+  :is(section, article, aside, .panel, .card, .rounded-lg, .rounded-xl, .rounded-2xl):not(.admin-keep-colors) {
+  background: var(--admin-level-2) !important;
+  border-color: var(--admin-border-2) !important;
+}
+
+html.admin-mode .admin-shell > :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl)
+  :is(section, article, aside, .panel, .card, .rounded-lg, .rounded-xl, .rounded-2xl)
+  :is(section, article, aside, .panel, .card, .rounded-md, .rounded-lg, .rounded-xl):not(.admin-keep-colors) {
+  background: var(--admin-level-3) !important;
+  border-color: var(--admin-border-3) !important;
+}
+
+html.admin-mode .admin-shell h1 {
+  font-size: clamp(1.45rem, 2.8vw, 2rem) !important;
+  font-weight: 800 !important;
+}
+
+html.admin-mode .admin-shell h2 {
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem) !important;
+  font-weight: 700 !important;
+}
+
+html.admin-mode .admin-shell h3 {
+  font-size: clamp(1rem, 1.8vw, 1.2rem) !important;
+  font-weight: 700 !important;
+}
+
+html.admin-mode .admin-shell :is(button, [role='button'], a.inline-flex):not(.admin-keep-colors) {
+  border-color: rgba(176, 126, 44, 0.55) !important;
+  color: #f8f9fb !important;
+}
+
+html.admin-mode .admin-shell .admin-tone-success,
+html.admin-mode .admin-shell .bg-emerald-500\/10 {
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  background-color: rgba(16, 185, 129, 0.18) !important;
+}
+
+html.admin-mode .admin-shell .admin-tone-warning,
+html.admin-mode .admin-shell .bg-amber-500\/10 {
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  background-color: rgba(245, 158, 11, 0.18) !important;
+}
+
+html.admin-mode .admin-shell .admin-tone-danger,
+html.admin-mode .admin-shell .bg-rose-500\/10 {
+  border-color: rgba(244, 63, 94, 0.45) !important;
+  background-color: rgba(244, 63, 94, 0.18) !important;
+}
+
+/* Front: més separació visual entre secció principal/secundària */
+body:not(.admin-mode) main > section {
+  border-radius: 1.1rem;
+}
+
+body:not(.admin-mode) .card,
+body:not(.admin-mode) .card-elegant {
+  border-color: rgba(215, 184, 110, 0.22);
+  background: linear-gradient(175deg, rgba(22, 22, 24, 0.96), rgba(16, 16, 19, 0.94));
+}
+
+body:not(.admin-mode) .card:hover,
+body:not(.admin-mode) .card-elegant:hover {
+  border-color: rgba(240, 217, 154, 0.38);
+}
+
+@media (max-width: 1024px) {
+  html.admin-mode .admin-shell {
+    padding-inline: 0.65rem !important;
+  }
+
+  html.admin-mode .admin-shell > :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl) {
+    border-radius: 12px !important;
+  }
 }
