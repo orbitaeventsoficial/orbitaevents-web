@@ -1603,7 +1603,7 @@ html.admin-mode .admin-shell :is(
   [role='button'],
   a.inline-flex,
   a[class*='rounded']
-):not([class*='bg-gradient']) {
+):not([class*='bg-gradient']):not(.admin-feature-toggle) {
   background-color: #1a2028 !important;
   border: 1px solid #334155 !important;
   color: #e5e7eb !important;
@@ -1616,7 +1616,7 @@ html.admin-mode .admin-shell :is(
   [role='button'],
   a.inline-flex,
   a[class*='rounded']
-):not([class*='bg-gradient']):hover {
+):not([class*='bg-gradient']):not(.admin-feature-toggle):hover {
   background-color: #202834 !important;
   border-color: #475569 !important;
 }

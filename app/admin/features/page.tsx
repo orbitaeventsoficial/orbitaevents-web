@@ -116,14 +116,17 @@ export default function FeaturesPage() {
                 role="switch"
                 aria-checked={feature.enabled}
                 aria-busy={saving === feature.key}
-                className={`relative w-14 h-8 rounded-full transition-colors ${
-                  feature.enabled ? 'bg-emerald-500' : 'bg-slate-600'
-                } ${saving === feature.key ? 'opacity-50' : ''}`}
+                className={`admin-feature-toggle relative inline-flex h-9 min-w-[88px] items-center rounded-full border px-2 text-[11px] font-bold uppercase tracking-wide transition-colors ${
+                  feature.enabled
+                    ? 'border-emerald-400/70 bg-emerald-500/85 text-emerald-950'
+                    : 'border-rose-400/70 bg-rose-500/85 text-rose-950'
+                } ${saving === feature.key ? 'opacity-60 cursor-wait' : ''}`}
               >
+                <span className="pr-2">{feature.enabled ? 'ON' : 'OFF'}</span>
                 <div
-                    className={`absolute top-1 left-1 w-6 h-6 bg-slate-100 rounded-full transition-transform ${
-                      feature.enabled ? 'translate-x-6' : 'translate-x-0'
-                    }`}
+                  className={`pointer-events-none absolute left-1 top-1 h-7 w-7 rounded-full bg-white transition-transform ${
+                    feature.enabled ? 'translate-x-[50px]' : 'translate-x-0'
+                  }`}
                 />
               </button>
             </div>
