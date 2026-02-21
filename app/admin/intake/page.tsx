@@ -36,10 +36,10 @@ const EVENT_TYPES = [
 ];
 
 const PRIORITY_OPTIONS = [
-  { value: 'LOW', label: 'Baixa', color: 'bg-slate-500/20 text-slate-300 border-slate-500/30' },
-  { value: 'MEDIUM', label: 'Mitjana', color: 'bg-blue-500/20 text-blue-300 border-blue-500/30' },
-  { value: 'HIGH', label: 'Alta', color: 'bg-orange-500/20 text-orange-300 border-orange-500/30' },
-  { value: 'URGENT', label: 'Urgent', color: 'bg-rose-500/20 text-rose-300 border-rose-500/30' },
+  { value: 'LOW', label: 'Baixa', selected: 'border-slate-400/60 bg-slate-500/20 text-slate-200' },
+  { value: 'MEDIUM', label: 'Mitjana', selected: 'border-sky-400/60 bg-sky-500/20 text-sky-100' },
+  { value: 'HIGH', label: 'Alta', selected: 'border-orange-400/60 bg-orange-500/20 text-orange-100' },
+  { value: 'URGENT', label: 'Urgent', selected: 'border-rose-400/70 bg-rose-500/25 text-rose-100' },
 ];
 
 type DuplicateWarning = {
@@ -316,19 +316,15 @@ export default function IntakePage() {
               aria-pressed={form.source === src.value}
               className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
                 form.source === src.value
-                  ? 'border-amber-400 bg-amber-500/20 text-amber-100 ring-1 ring-amber-400/50'
+                  ? 'border-amber-400/70 bg-amber-500/25 text-amber-100 shadow-sm'
                   : 'border-slate-700/50 bg-slate-900/60 text-slate-300 hover:bg-slate-800'
               }`}
             >
               <span className="text-lg mr-1.5">{src.icon}</span>
               {src.label}
-              {form.source === src.value && <span className="ml-2 text-xs">✓</span>}
             </button>
           ))}
         </div>
-        <p className="mt-3 text-xs text-amber-300">
-          Origen seleccionat: <span className="font-semibold">{SOURCE_LABELS[form.source] || form.source}</span>
-        </p>
       </div>
 
       {/* Main form */}
@@ -368,15 +364,15 @@ export default function IntakePage() {
           </div>
           <div>
             <label className="text-xs text-slate-400">Prioritat</label>
-            <div className="mt-1 flex gap-2">
+            <div className="mt-1 grid grid-cols-4 gap-2">
               {PRIORITY_OPTIONS.map((p) => (
                 <button
                   key={p.value}
                   type="button"
                   onClick={() => updateField('priority', p.value)}
-                  className={`flex-1 rounded-lg border px-2 py-2 text-xs font-medium transition-all ${
+                  className={`rounded-lg border px-2 py-2 text-sm font-medium transition-all ${
                     form.priority === p.value
-                      ? `${p.color} ring-1`
+                      ? `${p.selected} shadow-sm`
                       : 'border-slate-700/50 text-slate-400 hover:bg-slate-800'
                   }`}
                 >
@@ -403,26 +399,15 @@ export default function IntakePage() {
                 aria-pressed={form.eventType === et.value}
                 className={`rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
                   form.eventType === et.value
-                    ? 'border-amber-400 bg-amber-500/20 text-amber-100 ring-1 ring-amber-400/60'
+                    ? 'border-amber-400/70 bg-amber-500/25 text-amber-100 shadow-sm'
                     : 'border-slate-700/50 bg-slate-900/60 text-slate-400 hover:bg-slate-800'
                 }`}
               >
                 <span className="text-base">{et.icon}</span>
                 <span className="block mt-0.5">{et.label}</span>
-                {form.eventType === et.value && (
-                  <span className="mt-1 inline-block rounded-full border border-amber-400/40 bg-amber-500/25 px-1.5 py-0.5 text-[10px] font-semibold text-amber-100">
-                    Seleccionat ✓
-                  </span>
-                )}
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-amber-300">
-            Tipus seleccionat:{' '}
-            <span className="font-semibold">
-              {EVENT_TYPES.find((et) => et.value === form.eventType)?.label ?? 'Altre'}
-            </span>
-          </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">

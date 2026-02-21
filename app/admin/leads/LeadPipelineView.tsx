@@ -83,6 +83,8 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   const [columns, setColumns] = useState<PipelineColumn[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [draggingLeadId, setDraggingLeadId] = useState<string | null>(null);
+  const [dragOverStatus, setDragOverStatus] = useState<string | null>(null);
   const filterQuery = useMemo(() => {
     const params = new URLSearchParams();
     filters.status.forEach((value) => params.append('status', value));
@@ -104,11 +106,12 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
       const leads: PipelineLead[] = data?.data?.leads || data?.leads || [];
       setAllLeads(leads);
 
-      const grouped = COLUMNS.map((col) => ({
-        ...col,
-        leads: leads.filter((l: PipelineLead) => l.status === col.status),
-      }));
-      setColumns(grouped);
+      setColumns(
+        COLUMNS.map((col) => ({
+          ...col,
+          leads: leads.filter((l: PipelineLead) => l.status === col.status),
+        }))
+      );
     } catch {
       // Keep existing state on error
     } finally {
@@ -120,7 +123,25 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     fetchPipeline();
   }, [fetchPipeline]);
 
+  const setLeadStatusInState = useCallback((leadId: string, status: string) => {
+    setAllLeads((prev) => {
+      const next = prev.map((lead) => (lead.id === leadId ? { ...lead, status } : lead));
+      setColumns(
+        COLUMNS.map((col) => ({
+          ...col,
+          leads: next.filter((l: PipelineLead) => l.status === col.status),
+        }))
+      );
+      return next;
+    });
+  }, []);
+
   const moveLeadStatus = async (leadId: string, newStatus: string) => {
+    const currentLead = allLeads.find((lead) => lead.id === leadId);
+    if (!currentLead || currentLead.status === newStatus) return;
+    const previousStatus = currentLead.status;
+
+    setLeadStatusInState(leadId, newStatus);
     setUpdatingId(leadId);
     try {
       const res = await fetch(`/api/admin/leads-new/${leadId}/status`, {
@@ -128,14 +149,26 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
-      if (res.ok) {
-        await fetchPipeline();
+      if (!res.ok) {
+        setLeadStatusInState(leadId, previousStatus);
       }
     } catch {
-      // Silent fail
+      setLeadStatusInState(leadId, previousStatus);
     } finally {
       setUpdatingId(null);
     }
+  };
+
+  const handleDropOnColumn = async (targetStatus: string) => {
+    if (!draggingLeadId) return;
+    const lead = allLeads.find((item) => item.id === draggingLeadId);
+    setDragOverStatus(null);
+    if (!lead || lead.status === targetStatus) {
+      setDraggingLeadId(null);
+      return;
+    }
+    await moveLeadStatus(draggingLeadId, targetStatus);
+    setDraggingLeadId(null);
   };
 
   if (loading) {
@@ -152,17 +185,31 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
         Pipeline filtrat: {columns.reduce((acc, col) => acc + col.leads.length, 0)} de {allLeads.length} entrades
       </div>
 
-      <div className="overflow-x-auto pb-4">
-      <div className="flex gap-3 min-w-[1200px]">
+      <div className="pb-4">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         {columns.map((col) => (
           <div
             key={col.status}
-            className={`flex-1 min-w-[200px] rounded-2xl border ${col.borderColor} ${col.bgColor} flex flex-col`}
+            onDragOver={(event) => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = 'move';
+              setDragOverStatus(col.status);
+            }}
+            onDragLeave={() => {
+              if (dragOverStatus === col.status) setDragOverStatus(null);
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
+              void handleDropOnColumn(col.status);
+            }}
+            className={`min-w-0 rounded-2xl border ${col.borderColor} ${col.bgColor} flex flex-col transition-all ${
+              dragOverStatus === col.status ? 'ring-2 ring-cyan-400/50 border-cyan-400/60' : ''
+            }`}
           >
             {/* Column header */}
             <div className="px-3 py-2.5 border-b border-slate-700/30">
               <div className="flex items-center justify-between">
-                <h3 className={`text-sm font-semibold ${col.color}`}>
+                <h3 className={`text-sm font-semibold ${col.color} truncate`}>
                   {col.label}
                 </h3>
                 <span className={`rounded-full bg-slate-700/50 px-2 py-0.5 text-[10px] font-bold ${col.color}`}>
@@ -173,6 +220,11 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
 
             {/* Cards */}
             <div className="flex-1 p-2 space-y-2 max-h-[600px] overflow-y-auto">
+              {dragOverStatus === col.status && (
+                <div className={`rounded-xl border border-dashed ${col.borderColor} px-2 py-1 text-center text-[10px] ${col.color}`}>
+                  Deixa anar aquí
+                </div>
+              )}
               {col.leads.length === 0 && (
                 <div className="rounded-xl border border-dashed border-slate-700/40 p-4 text-center text-xs text-slate-500">
                   Cap entrada
@@ -183,8 +235,15 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
                   key={lead.id}
                   lead={lead}
                   columnStatus={col.status}
+                  columnLabel={col.label}
+                  columnColorClass={col.color}
                   updatingId={updatingId}
                   onMoveStatus={moveLeadStatus}
+                  onDragStart={setDraggingLeadId}
+                  onDragEnd={() => {
+                    setDraggingLeadId(null);
+                    setDragOverStatus(null);
+                  }}
                 />
               ))}
             </div>
@@ -199,13 +258,21 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
 function PipelineCard({
   lead,
   columnStatus,
+  columnLabel,
+  columnColorClass,
   updatingId,
   onMoveStatus,
+  onDragStart,
+  onDragEnd,
 }: {
   lead: PipelineLead;
   columnStatus: string;
+  columnLabel: string;
+  columnColorClass: string;
   updatingId: string | null;
   onMoveStatus: (id: string, status: string) => Promise<void>;
+  onDragStart: (leadId: string) => void;
+  onDragEnd: () => void;
 }) {
   const isUpdating = updatingId === lead.id;
   const statusIndex = COLUMNS.findIndex((c) => c.status === columnStatus);
@@ -215,7 +282,18 @@ function PipelineCard({
   const prevStatus = canMoveBack ? COLUMNS[statusIndex - 1].status : null;
 
   return (
-    <div className={`rounded-xl border border-slate-700/50 bg-slate-900/80 p-3 transition-all hover:border-slate-600/70 ${isUpdating ? 'opacity-50' : ''}`}>
+    <div
+      draggable={!isUpdating}
+      onDragStart={(event) => {
+        event.dataTransfer.setData('text/plain', lead.id);
+        event.dataTransfer.effectAllowed = 'move';
+        onDragStart(lead.id);
+      }}
+      onDragEnd={onDragEnd}
+      className={`rounded-xl border border-slate-700/50 bg-slate-900/80 p-3 transition-all hover:border-slate-600/70 ${
+        isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'
+      }`}
+    >
       <div className="flex items-start justify-between gap-2">
         <Link
           href={`/admin/leads/${lead.id}`}
@@ -223,7 +301,37 @@ function PipelineCard({
         >
           {lead.name}
         </Link>
-        <span className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${PRIORITY_DOT[lead.priority] || PRIORITY_DOT.MEDIUM}`} title={lead.priority} />
+        <div className="flex items-center gap-1 shrink-0">
+          {prevStatus && (
+            <button
+              type="button"
+              onClick={() => onMoveStatus(lead.id, prevStatus)}
+              disabled={isUpdating}
+              className="rounded px-1 py-0.5 text-[10px] text-slate-400 hover:bg-slate-700/50 hover:text-slate-200 transition-colors disabled:opacity-50"
+              title={`Moure a ${COLUMNS[statusIndex - 1].label}`}
+            >
+              ←
+            </button>
+          )}
+          {nextStatus && (
+            <button
+              type="button"
+              onClick={() => onMoveStatus(lead.id, nextStatus)}
+              disabled={isUpdating}
+              className="rounded px-1 py-0.5 text-[10px] text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors disabled:opacity-50"
+              title={`Moure a ${COLUMNS[statusIndex + 1].label}`}
+            >
+              →
+            </button>
+          )}
+          <span className={`w-2 h-2 rounded-full ${PRIORITY_DOT[lead.priority] || PRIORITY_DOT.MEDIUM}`} title={lead.priority} />
+        </div>
+      </div>
+
+      <div className="mt-1">
+        <span className={`inline-flex rounded-full bg-slate-800/90 px-2 py-0.5 text-[10px] font-semibold ${columnColorClass}`}>
+          {columnLabel}
+        </span>
       </div>
 
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px]">
@@ -259,32 +367,6 @@ function PipelineCard({
         )}
       </div>
 
-      {/* Move buttons */}
-      <div className="mt-2 flex items-center gap-1">
-        {prevStatus && (
-          <button
-            type="button"
-            onClick={() => onMoveStatus(lead.id, prevStatus)}
-            disabled={isUpdating}
-            className="rounded px-1.5 py-0.5 text-[10px] text-slate-400 hover:bg-slate-700/50 hover:text-slate-200 transition-colors disabled:opacity-50"
-            title={`Moure a ${COLUMNS[statusIndex - 1].label}`}
-          >
-            ←
-          </button>
-        )}
-        <div className="flex-1" />
-        {nextStatus && (
-          <button
-            type="button"
-            onClick={() => onMoveStatus(lead.id, nextStatus)}
-            disabled={isUpdating}
-            className="rounded px-1.5 py-0.5 text-[10px] text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors disabled:opacity-50"
-            title={`Moure a ${COLUMNS[statusIndex + 1].label}`}
-          >
-            →
-          </button>
-        )}
-      </div>
     </div>
   );
 }

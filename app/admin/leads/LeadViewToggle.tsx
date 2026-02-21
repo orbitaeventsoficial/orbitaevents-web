@@ -28,7 +28,7 @@ export default function LeadViewToggle({
   children: React.ReactNode;
   pipelineFilters: PipelineFilters;
 }) {
-  const [view, setView] = useState<'list' | 'pipeline'>('list');
+  const [view, setView] = useState<'list' | 'pipeline'>('pipeline');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -47,29 +47,19 @@ export default function LeadViewToggle({
 
   return (
     <>
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setViewAndPersist('list')}
-          className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-all ${
-            view === 'list'
-              ? 'bg-slate-100 text-slate-900'
-              : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
-          }`}
+      <div className="flex items-center justify-center sm:justify-start gap-2">
+        <label htmlFor="lead-view-mode" className="text-xs font-medium text-slate-400">
+          Vista
+        </label>
+        <select
+          id="lead-view-mode"
+          value={view}
+          onChange={(e) => setViewAndPersist(e.target.value === 'pipeline' ? 'pipeline' : 'list')}
+          className="rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-1.5 text-xs font-medium text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
         >
-          Llista
-        </button>
-        <button
-          type="button"
-          onClick={() => setViewAndPersist('pipeline')}
-          className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-all ${
-            view === 'pipeline'
-              ? 'bg-slate-100 text-slate-900'
-              : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
-          }`}
-        >
-          Pipeline
-        </button>
+          <option value="pipeline">Pipeline</option>
+          <option value="list">Llista</option>
+        </select>
       </div>
 
       {view === 'list' ? children : <LeadPipelineView filters={pipelineFilters} />}
