@@ -44,6 +44,7 @@ type StudioProps = {
 
 const STUDIO_DRAFT_KEY = 'admin.presupuestos.pdfstudio.draft.v1';
 const CUSTOM_PACK_ID = '__custom_pack__';
+const OPERATOR_PDF_EXTRA_ID = '__operator_extra_pdf__';
 
 const STUDIO_COPY: Record<Locale, { hours: string; customServiceName: string; customExtraDescription: string; defaultClientName: string; sendQuote: string; sendingQuote: string; noDate: string; noSchedule: string; noLocation: string; clientLabel: string }> = {
   ca: {
@@ -354,13 +355,21 @@ export default function PresupuestoPdfStudio({
     return found || packs[0];
   }, [packId, packs]);
 
+  const operatorExtraPrice = useMemo(() => {
+    if (!selectedPack) return 0;
+    const hourlyBase = selectedPack.durationHours > 0
+      ? selectedPack.priceValue / selectedPack.durationHours
+      : selectedPack.priceValue;
+    return Math.max(25, Math.round(hourlyBase * 0.6));
+  }, [selectedPack]);
+
   const [packName, setPackName] = useState(selectedPack?.name || STUDIO_COPY.ca.customServiceName);
   const [basePrice, setBasePrice] = useState(selectedPack?.priceValue || 0);
   const [durationHours, setDurationHours] = useState(selectedPack?.durationHours || 4);
   const [featuresText, setFeaturesText] = useState((selectedPack?.features || []).join('\n'));
 
   const compatibleExtras = useMemo(() => {
-    return EXTRAS
+    const catalog = EXTRAS
       .filter((extra) => !extra.compatibleWith || extra.compatibleWith.includes(eventType))
       .map((extra) => ({
         ...extra,
@@ -371,7 +380,17 @@ export default function PresupuestoPdfStudio({
           pricingCatalog.extraDescriptionsBySlug[extra.id] ||
           resolvePackI18nKey(extra.description, locale),
       }));
-  }, [eventType, locale, pricingCatalog.extraNamesBySlug, pricingCatalog.extraDescriptionsBySlug]);
+    const operatorExtra: ExtraDefinition = {
+      id: OPERATOR_PDF_EXTRA_ID,
+      name: 'Operari extra (hora)',
+      description: 'Suport operatiu addicional per muntatge i execució',
+      price: operatorExtraPrice,
+      icon: '👷',
+      category: 'other',
+      compatibleWith: ALL_SERVICES,
+    };
+    return [operatorExtra, ...catalog];
+  }, [eventType, locale, operatorExtraPrice, pricingCatalog.extraNamesBySlug, pricingCatalog.extraDescriptionsBySlug]);
 
   const mappedSelectedExtras = useMemo(
     () => compatibleExtras.filter((extra) => selectedExtras.includes(extra.id)),
@@ -1247,7 +1266,11 @@ export default function PresupuestoPdfStudio({
                   onChange={() => toggleExtra(extra.id)}
                 />
                 <span className="flex-1">{extra.name}</span>
-                <span className="text-xs text-amber-300">{extra.price ? `+${extra.price}€` : 'Consultar'}</span>
+                <span className="text-xs text-amber-300">
+                  {extra.price
+                    ? `+${extra.price}€${extra.id === OPERATOR_PDF_EXTRA_ID ? '/h' : ''}`
+                    : 'Consultar'}
+                </span>
               </label>
             ))}
           </div>
