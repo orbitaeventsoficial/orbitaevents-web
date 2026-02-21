@@ -1,8 +1,11 @@
 'use client';
+/* eslint-disable @next/next/no-img-element */
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
+type EditorTab = 'economic' | 'content' | 'texts' | 'publish';
 
 interface PackTranslation {
   locale: string;
@@ -12,9 +15,27 @@ interface PackTranslation {
   features: string[];
 }
 
+interface InventoryItem {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  category: string;
+  purchasePrice: number | null;
+  expectedLifeHours: number | null;
+}
+
+interface PackInventoryRow {
+  itemId: string;
+  quantity: number;
+  isRequired: boolean;
+}
+
 interface Pack {
   id: string;
   slug: string;
+  service: string | null;
   price: number;
   originalPrice: number | null;
   extraHourPrice: number;
@@ -28,16 +49,61 @@ interface Pack {
   isFeatured: boolean;
   order: number;
   translations: PackTranslation[];
+  inventory: PackInventoryRow[];
 }
 
-export default function EditPackForm({ pack }: { pack: Pack }) {
+type PricingHint = {
+  recommendedPrice: number;
+  recommendedExtraHourPrice: number;
+  alertThreshold: number;
+};
+
+type PricingModel = {
+  marginTargetPct: number;
+  specialistCostPerHour: number;
+  operatorCostPerHour: number;
+  supportOperatorMinGuests: number;
+  supportOperatorMinDjHours: number;
+  supportOperatorMinWatts: number;
+  fixedPackCost: number;
+};
+
+const TABS: Array<{ id: EditorTab; label: string; icon: string }> = [
+  { id: 'economic', label: 'Economia', icon: '💰' },
+  { id: 'content', label: 'Contingut', icon: '🎛️' },
+  { id: 'texts', label: 'Textos', icon: '🌐' },
+  { id: 'publish', label: 'Publicació', icon: '✅' },
+];
+const LOCALES = ['ca', 'es', 'en'] as const;
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+const calcCostHour = (price: number | null, life: number | null) =>
+  !price || price <= 0 ? 0 : round2(price / (life && life > 0 ? life : 2000));
+const divPct = (pub: number, rec: number) => (rec > 0 ? ((pub - rec) / rec) * 100 : 0);
+const semClass = (d: number, t: number) => Math.abs(d) >= t ? 'border-rose-500/40 bg-rose-500/15 text-rose-200' : Math.abs(d) >= t * 0.5 ? 'border-amber-500/40 bg-amber-500/15 text-amber-200' : 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200';
+
+export default function EditPackForm({
+  pack,
+  inventoryItems,
+  pricingHint,
+  pricingModel,
+}: {
+  pack: Pack;
+  inventoryItems: InventoryItem[];
+  pricingHint: PricingHint;
+  pricingModel: PricingModel;
+}) {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<EditorTab>('economic');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [search, setSearch] = useState('');
+  const [dropZone, setDropZone] = useState<'available' | 'included' | null>(null);
 
   const [formData, setFormData] = useState({
     slug: pack.slug,
+    service: pack.service || '',
     price: pack.price,
     originalPrice: pack.originalPrice || '',
     extraHourPrice: pack.extraHourPrice,
@@ -51,555 +117,120 @@ export default function EditPackForm({ pack }: { pack: Pack }) {
     isFeatured: pack.isFeatured,
     order: pack.order,
   });
-
+  const [packInventory, setPackInventory] = useState<PackInventoryRow[]>(pack.inventory || []);
   const [translations, setTranslations] = useState<PackTranslation[]>(
-    pack.translations.length > 0
-      ? pack.translations
-      : [
-          { locale: 'es', name: '', description: '', tagline: '', features: [] },
-          { locale: 'ca', name: '', description: '', tagline: '', features: [] },
-          { locale: 'en', name: '', description: '', tagline: '', features: [] }
-        ]
+    LOCALES.map((locale) => pack.translations.find((t) => t.locale === locale) || { locale, name: '', description: '', tagline: '', features: [] })
   );
 
-  const fillMissingTranslations = async (current: PackTranslation[]): Promise<PackTranslation[]> => {
-    const ensureLocales = ['ca', 'es', 'en'];
-    const normalized = ensureLocales.map((locale) => {
-      const found = current.find((t) => t.locale === locale);
-      return found || { locale, name: '', description: '', tagline: '', features: [] };
-    });
+  const itemById = useMemo(() => new Map(inventoryItems.map((i) => [i.id, i])), [inventoryItems]);
+  const includedIds = useMemo(() => new Set(packInventory.map((r) => r.itemId)), [packInventory]);
+  const included = useMemo(() => packInventory.map((r) => ({ row: r, item: itemById.get(r.itemId) })).filter((x): x is { row: PackInventoryRow; item: InventoryItem } => Boolean(x.item)), [packInventory, itemById]);
+  const available = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return inventoryItems.filter((i) => !includedIds.has(i.id) && (!q || `${i.name} ${i.code} ${i.description || ''}`.toLowerCase().includes(q)));
+  }, [inventoryItems, includedIds, search]);
 
-    const base = normalized.find((t) => t.locale === 'ca' && t.name.trim())
-      || normalized.find((t) => t.name.trim());
-    if (!base) return normalized;
-
-    const targets = normalized.filter((t) => t.locale !== base.locale);
-    const needTargets = targets.filter(
-      (t) =>
-        !t.name.trim() ||
-        !String(t.description || '').trim() ||
-        !String(t.tagline || '').trim() ||
-        !(t.features || []).some((f) => f.trim())
-    );
-    if (needTargets.length === 0) return normalized;
-
-    const sourceTexts = [
-      base.name,
-      String(base.description || ''),
-      String(base.tagline || ''),
-      ...(base.features || []),
-    ].map((s) => s.trim()).filter(Boolean);
-
-    if (sourceTexts.length === 0) return normalized;
-
-    try {
-      const res = await fetch('/api/admin/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          texts: sourceTexts,
-          targetLanguages: needTargets.map((t) => t.locale),
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data?.ok) return normalized;
-
-      const translationsByText = (data?.translationsByText || {}) as Record<string, Record<string, string>>;
-      const translated = normalized.map((entry) => {
-        if (entry.locale === base.locale) return entry;
-        const lang = entry.locale;
-        const trName = translationsByText?.[base.name]?.[lang] || base.name;
-        const trDescription = base.description
-          ? (translationsByText?.[String(base.description)]?.[lang] || String(base.description))
-          : '';
-        const trTagline = base.tagline
-          ? (translationsByText?.[String(base.tagline)]?.[lang] || String(base.tagline))
-          : '';
-        const trFeatures = (base.features || []).map(
-          (feature) => translationsByText?.[feature]?.[lang] || feature
-        );
-
-        return {
-          ...entry,
-          name: entry.name.trim() ? entry.name : trName,
-          description: String(entry.description || '').trim() ? entry.description : trDescription,
-          tagline: String(entry.tagline || '').trim() ? entry.tagline : trTagline,
-          features: (entry.features || []).some((f) => f.trim()) ? entry.features : trFeatures,
-        };
-      });
-
-      return translated;
-    } catch {
-      return normalized;
-    }
-  };
-
-  const updateTranslation = (locale: string, field: keyof PackTranslation, value: string | string[]) => {
-    setTranslations(prev =>
-      prev.map(t =>
-        t.locale === locale ? { ...t, [field]: value } : t
-      )
-    );
-  };
-
-  const getTranslation = (locale: string) => {
-    return translations.find(t => t.locale === locale) || {
-      locale,
-      name: '',
-      description: '',
-      tagline: '',
-      features: []
+  const recommended = useMemo(() => {
+    const inventoryCostHour = included.reduce((s, x) => s + calcCostHour(x.item.purchasePrice, x.item.expectedLifeHours) * Math.max(1, x.row.quantity), 0);
+    const h = Math.max(1, Number(formData.djHours || 1));
+    const guests = Number(formData.maxGuests || 0);
+    const watts = Number(formData.soundWatts || 0);
+    const withOperator = h >= pricingModel.supportOperatorMinDjHours || guests >= pricingModel.supportOperatorMinGuests || watts >= pricingModel.supportOperatorMinWatts;
+    const laborCostHour = pricingModel.specialistCostPerHour + (withOperator ? pricingModel.operatorCostPerHour : 0);
+    const marginBase = Math.max(0.1, 1 - pricingModel.marginTargetPct);
+    return {
+      pack: round2(((inventoryCostHour + laborCostHour) * h + pricingModel.fixedPackCost) / marginBase),
+      extra: round2((inventoryCostHour + laborCostHour) / marginBase),
+      inventoryCostHour: round2(inventoryCostHour),
+      laborCostHour: round2(laborCostHour),
     };
+  }, [included, formData.djHours, formData.maxGuests, formData.soundWatts, pricingModel]);
+
+  const input = 'block w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2.5 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 sm:text-sm';
+  const packDiv = divPct(Number(formData.price), recommended.pack || pricingHint.recommendedPrice);
+  const extraDiv = divPct(Number(formData.extraHourPrice), recommended.extra || pricingHint.recommendedExtraHourPrice);
+
+  const onDragStart = (e: React.DragEvent<HTMLElement>, itemId: string, source: 'available' | 'included') => {
+    e.dataTransfer.setData('application/json', JSON.stringify({ itemId, source }));
+    e.dataTransfer.effectAllowed = 'move';
+  };
+  const dropIn = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault(); setDropZone(null);
+    const d = JSON.parse(e.dataTransfer.getData('application/json') || '{}') as { itemId?: string };
+    const itemId = typeof d.itemId === 'string' ? d.itemId : '';
+    if (!itemId) return;
+    setPackInventory((prev) => {
+      const i = prev.findIndex((r) => r.itemId === itemId);
+      if (i >= 0) return prev.map((r, idx) => idx === i ? { ...r, quantity: r.quantity + 1 } : r);
+      return [...prev, { itemId, quantity: 1, isRequired: true }];
+    });
+  };
+  const dropOut = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault(); setDropZone(null);
+    const d = JSON.parse(e.dataTransfer.getData('application/json') || '{}') as { itemId?: string; source?: string };
+    const itemId = typeof d.itemId === 'string' ? d.itemId : '';
+    if (!itemId || d.source !== 'included') return;
+    setPackInventory((prev) => prev.filter((r) => r.itemId !== itemId));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
+  const updateTranslation = (locale: string, field: keyof PackTranslation, value: string | string[]) =>
+    setTranslations((prev) => prev.map((t) => t.locale === locale ? { ...t, [field]: value } : t));
 
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault(); setLoading(true); setError(null); setSuccess(false);
     try {
-      const preparedTranslations = await fillMissingTranslations(translations);
-      setTranslations(preparedTranslations);
-
       const response = await fetch(`/api/admin/packs/${pack.id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           slug: formData.slug,
-          price: parseFloat(formData.price.toString()),
-          originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice.toString()) : null,
-          extraHourPrice: parseFloat(formData.extraHourPrice.toString()),
-          djHours: parseInt(formData.djHours.toString()),
-          soundWatts: parseInt(formData.soundWatts.toString()),
+          service: formData.service || null,
+          price: Number(formData.price),
+          originalPrice: formData.originalPrice ? Number(formData.originalPrice) : null,
+          extraHourPrice: Number(formData.extraHourPrice),
+          djHours: Number(formData.djHours),
+          soundWatts: Number(formData.soundWatts),
           includesFog: formData.includesFog,
           includesMic: formData.includesMic,
-          minGuests: formData.minGuests ? parseInt(formData.minGuests.toString()) : null,
-          maxGuests: formData.maxGuests ? parseInt(formData.maxGuests.toString()) : null,
+          minGuests: formData.minGuests ? Number(formData.minGuests) : null,
+          maxGuests: formData.maxGuests ? Number(formData.maxGuests) : null,
           isActive: formData.isActive,
           isFeatured: formData.isFeatured,
-          order: parseInt(formData.order.toString()),
-          translations: preparedTranslations,
+          order: Number(formData.order),
+          translations,
+          inventory: packInventory,
         }),
       });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Error actualitzant pack');
-      }
-
-      setSuccess(true);
-      router.refresh();
-
-      // Redirect després d'1 segon
-      setTimeout(() => {
-        router.push('/admin/packs');
-      }, 1000);
+      if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error || 'Error actualitzant pack');
+      setSuccess(true); router.refresh(); setTimeout(() => router.push('/admin/packs'), 900);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconegut');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const inputClasses = "block w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2.5 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 sm:text-sm";
+    } finally { setLoading(false); }
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Alerts */}
-      {error && (
-        <div className="rounded-xl bg-rose-500/10 p-4 border border-rose-500/30" role="alert">
-          <p className="text-sm text-rose-300">❌ {error}</p>
-        </div>
-      )}
+      <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5">
+        <h2 className="text-xl font-bold text-slate-100">Editor pro de pack</h2>
+        <p className="mt-1 text-sm text-slate-400">Drag & drop d'inventari dins/fora + autocalcul de preus recomanats.</p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-4">{TABS.map((t) => <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} className={`rounded-xl border px-3 py-2 text-sm font-semibold ${activeTab === t.id ? 'border-amber-400/50 bg-amber-500/15 text-amber-200' : 'border-slate-700/60 bg-slate-900/60 text-slate-300'}`}>{t.icon} {t.label}</button>)}</div>
+      </section>
 
-      {success && (
-        <div className="rounded-xl bg-emerald-500/10 p-4 border border-emerald-500/30" role="status" aria-live="polite">
-          <p className="text-sm text-emerald-300">✅ Pack actualitzat correctament!</p>
-        </div>
-      )}
+      {error && <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300">❌ {error}</div>}
+      {success && <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-300">✅ Pack actualitzat correctament</div>}
 
-      {/* Slug Section */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
-        <h3 className="text-lg font-semibold text-slate-100 mb-4">🔗 Slug (URL)</h3>
-        <div>
-          <label htmlFor="slug" className="block text-sm font-medium text-slate-300 mb-1">
-            Slug del Pack *
-          </label>
-          <input
-            type="text"
-            id="slug"
-            required
-            value={formData.slug}
-            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-            className={inputClasses}
-            placeholder="pack-basic"
-          />
-          <p className="mt-1 text-xs text-slate-500">
-            URL del pack (sense espais, només lletres, números i guions)
-          </p>
-        </div>
-      </div>
+      {activeTab === 'economic' && <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6"><h3 className="mb-4 text-lg font-semibold text-slate-100">💰 Economia i semàfors</h3><div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"><div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-3"><p className="text-xs text-slate-400">Preu recomanat pack</p><p className="text-lg font-semibold text-cyan-200">{recommended.pack.toFixed(2)}€</p></div><div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-3"><p className="text-xs text-slate-400">Hora extra recomanada</p><p className="text-lg font-semibold text-cyan-200">{recommended.extra.toFixed(2)}€</p></div><div className={`rounded-xl border p-3 ${semClass(packDiv, pricingHint.alertThreshold)}`}><p className="text-xs font-semibold">Semàfor pack</p><p className="text-sm font-bold">{packDiv >= 0 ? '+' : ''}{packDiv.toFixed(1)}%</p></div><div className={`rounded-xl border p-3 ${semClass(extraDiv, pricingHint.alertThreshold)}`}><p className="text-xs font-semibold">Semàfor hora extra</p><p className="text-sm font-bold">{extraDiv >= 0 ? '+' : ''}{extraDiv.toFixed(1)}%</p></div></div><div className="grid gap-4 sm:grid-cols-3"><div><label className="mb-1 block text-sm text-slate-300">PVP pack</label><input type="number" step="0.01" value={formData.price} onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) || 0 })} className={input} /></div><div><label className="mb-1 block text-sm text-slate-300">PVP hora extra</label><input type="number" step="0.01" value={formData.extraHourPrice} onChange={(e) => setFormData({ ...formData, extraHourPrice: Number(e.target.value) || 0 })} className={input} /></div><div><label className="mb-1 block text-sm text-slate-300">Cost inventari/h</label><div className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-2.5 text-sm text-slate-100">{recommended.inventoryCostHour.toFixed(2)}€ · Cost humà/h {recommended.laborCostHour.toFixed(2)}€</div></div></div></section>}
 
-      {/* Translations Section - Spanish */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
-        <h3 className="text-lg font-semibold text-slate-100 mb-4">🇪🇸 Traduccions - Espanyol</h3>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="name-es" className="block text-sm font-medium text-slate-300 mb-1">
-              Nom del Pack *
-            </label>
-            <input
-              type="text"
-              id="name-es"
-              required
-              value={getTranslation('es').name}
-              onChange={(e) => updateTranslation('es', 'name', e.target.value)}
-              className={inputClasses}
-              placeholder="Pack Básico"
-            />
-          </div>
+      {activeTab === 'content' && <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6"><h3 className="mb-4 text-lg font-semibold text-slate-100">🧩 Inventari del pack</h3><div className="mb-3 grid gap-3 sm:grid-cols-3"><input className={input} value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cerca element..." /><input className={input} value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="Slug" /><input className={input} value={formData.service} onChange={(e) => setFormData({ ...formData, service: e.target.value })} placeholder="Servei intern" /></div><div className="grid gap-4 lg:grid-cols-2"><div onDragOver={(e) => { e.preventDefault(); setDropZone('available'); }} onDragLeave={() => setDropZone((p) => p === 'available' ? null : p)} onDrop={dropOut} className={`rounded-xl border p-3 ${dropZone === 'available' ? 'border-rose-400/60 bg-rose-500/10' : 'border-slate-700/60 bg-slate-900/50'}`}><p className="mb-2 text-sm font-semibold text-slate-100">Disponibles ({available.length})</p><div className="max-h-[26rem] space-y-2 overflow-auto pr-1">{available.map((i) => <article key={i.id} draggable onDragStart={(e) => onDragStart(e, i.id, 'available')} className="cursor-grab rounded-lg border border-slate-700/60 bg-slate-950/70 p-2"><div className="flex items-start gap-3"><img src={i.imageUrl || '/placeholder.png'} alt={i.name} className="h-14 w-14 rounded-md border border-slate-700/60 bg-slate-900 object-cover" /><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-slate-100">{i.name}</p><p className="text-xs text-slate-400">{i.code}</p><p className="line-clamp-2 text-xs text-slate-300">{i.description || 'Sense descripció'}</p></div></div></article>)}</div></div><div onDragOver={(e) => { e.preventDefault(); setDropZone('included'); }} onDragLeave={() => setDropZone((p) => p === 'included' ? null : p)} onDrop={dropIn} className={`rounded-xl border p-3 ${dropZone === 'included' ? 'border-emerald-400/60 bg-emerald-500/10' : 'border-slate-700/60 bg-slate-900/50'}`}><p className="mb-2 text-sm font-semibold text-slate-100">Inclosos ({included.length})</p><div className="max-h-[26rem] space-y-2 overflow-auto pr-1">{included.map(({ row, item }) => <article key={item.id} draggable onDragStart={(e) => onDragStart(e, item.id, 'included')} className="cursor-grab rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2"><div className="flex items-start gap-3"><img src={item.imageUrl || '/placeholder.png'} alt={item.name} className="h-14 w-14 rounded-md border border-slate-700/60 bg-slate-900 object-cover" /><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-slate-100">{item.name}</p><p className="text-xs text-slate-300">{item.code} · {calcCostHour(item.purchasePrice, item.expectedLifeHours).toFixed(2)}€/h</p><p className="line-clamp-2 text-xs text-slate-300">{item.description || 'Sense descripció'}</p><div className="mt-2 flex flex-wrap items-center gap-2"><input type="number" min={1} value={row.quantity} onChange={(e) => setPackInventory((prev) => prev.map((x) => x.itemId === item.id ? { ...x, quantity: Math.max(1, Number(e.target.value) || 1) } : x))} className="w-20 rounded border border-slate-600/60 bg-slate-950 px-2 py-1 text-xs text-slate-100" /><label className="text-xs text-slate-300"><input type="checkbox" checked={row.isRequired} onChange={(e) => setPackInventory((prev) => prev.map((x) => x.itemId === item.id ? { ...x, isRequired: e.target.checked } : x))} /> Obligatori</label><button type="button" onClick={() => setPackInventory((prev) => prev.filter((x) => x.itemId !== item.id))} className="ml-auto rounded-md border border-rose-400/50 bg-rose-500/15 px-2 py-1 text-xs text-rose-100">Treure</button></div></div></div></article>)}{included.length === 0 && <p className="rounded-lg border border-dashed border-slate-700/60 p-4 text-center text-sm text-slate-400">Arrossega aquí els elements del pack.</p>}</div></div></div></section>}
 
-          <div>
-            <label htmlFor="tagline-es" className="block text-sm font-medium text-slate-300 mb-1">
-              Tagline
-            </label>
-            <input
-              type="text"
-              id="tagline-es"
-              value={getTranslation('es').tagline || ''}
-              onChange={(e) => updateTranslation('es', 'tagline', e.target.value)}
-              className={inputClasses}
-              placeholder="Perfecto para eventos pequeños"
-            />
-          </div>
+      {activeTab === 'texts' && <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6"><h3 className="mb-4 text-lg font-semibold text-slate-100">🌐 Textos</h3><div className="grid gap-4">{LOCALES.map((locale) => { const tr = translations.find((t) => t.locale === locale)!; return <div key={locale} className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-4"><h4 className="mb-2 text-sm font-semibold text-slate-100">{locale.toUpperCase()}</h4><input value={tr.name} onChange={(e) => updateTranslation(locale, 'name', e.target.value)} className={input} placeholder="Nom" /><textarea rows={3} value={tr.description || ''} onChange={(e) => updateTranslation(locale, 'description', e.target.value)} className={`${input} mt-2`} placeholder="Descripció" /></div>; })}</div></section>}
 
-          <div>
-            <label htmlFor="description-es" className="block text-sm font-medium text-slate-300 mb-1">
-              Descripció
-            </label>
-            <textarea
-              id="description-es"
-              rows={3}
-              value={getTranslation('es').description || ''}
-              onChange={(e) => updateTranslation('es', 'description', e.target.value)}
-              className={inputClasses}
-              placeholder="Descripción completa del pack..."
-            />
-          </div>
+      {activeTab === 'publish' && <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6"><h3 className="mb-4 text-lg font-semibold text-slate-100">✅ Publicació</h3><div className="grid gap-4 sm:grid-cols-3"><label className="text-sm text-slate-300"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} /> Actiu</label><label className="text-sm text-slate-300"><input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} /> Destacat</label><input type="number" value={formData.order} onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) || 0 })} className={input} placeholder="Ordre" /></div></section>}
 
-          <div>
-            <label htmlFor="features-es" className="block text-sm font-medium text-slate-300 mb-1">
-              Característiques (una per línia)
-            </label>
-            <textarea
-              id="features-es"
-              rows={5}
-              value={(getTranslation('es').features || []).join('\n')}
-              onChange={(e) => updateTranslation('es', 'features', e.target.value.split('\n').filter(f => f.trim()))}
-              className={`${inputClasses} font-mono text-xs`}
-              placeholder="DJ profesional&#10;Sistema de sonido&#10;Iluminación básica"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Translations Section - Catalan */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
-        <h3 className="text-lg font-semibold text-slate-100 mb-4">🏴 Traduccions - Català</h3>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="name-ca" className="block text-sm font-medium text-slate-300 mb-1">
-              Nom del Pack *
-            </label>
-            <input
-              type="text"
-              id="name-ca"
-              required
-              value={getTranslation('ca').name}
-              onChange={(e) => updateTranslation('ca', 'name', e.target.value)}
-              className={inputClasses}
-              placeholder="Pack Bàsic"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="tagline-ca" className="block text-sm font-medium text-slate-300 mb-1">
-              Tagline
-            </label>
-            <input
-              type="text"
-              id="tagline-ca"
-              value={getTranslation('ca').tagline || ''}
-              onChange={(e) => updateTranslation('ca', 'tagline', e.target.value)}
-              className={inputClasses}
-              placeholder="Perfecte per a esdeveniments petits"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="description-ca" className="block text-sm font-medium text-slate-300 mb-1">
-              Descripció
-            </label>
-            <textarea
-              id="description-ca"
-              rows={3}
-              value={getTranslation('ca').description || ''}
-              onChange={(e) => updateTranslation('ca', 'description', e.target.value)}
-              className={inputClasses}
-              placeholder="Descripció completa del pack..."
-            />
-          </div>
-
-          <div>
-            <label htmlFor="features-ca" className="block text-sm font-medium text-slate-300 mb-1">
-              Característiques (una per línia)
-            </label>
-            <textarea
-              id="features-ca"
-              rows={5}
-              value={(getTranslation('ca').features || []).join('\n')}
-              onChange={(e) => updateTranslation('ca', 'features', e.target.value.split('\n').filter(f => f.trim()))}
-              className={`${inputClasses} font-mono text-xs`}
-              placeholder="DJ professional&#10;Sistema de so&#10;Il·luminació bàsica"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Pricing Section */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
-        <h3 className="text-lg font-semibold text-slate-100 mb-4">💰 Preus</h3>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label htmlFor="price" className="block text-sm font-medium text-slate-300 mb-1">
-              Preu Base *
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                id="price"
-                step="0.01"
-                required
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                className={`${inputClasses} pr-8`}
-              />
-              <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 text-sm">
-                €
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="originalPrice" className="block text-sm font-medium text-slate-300 mb-1">
-              Preu Original
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                id="originalPrice"
-                step="0.01"
-                value={formData.originalPrice}
-                onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
-                className={`${inputClasses} pr-8`}
-                placeholder="Opcional"
-              />
-              <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 text-sm">
-                €
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="extraHourPrice" className="block text-sm font-medium text-slate-300 mb-1">
-              Preu Hora Extra *
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                id="extraHourPrice"
-                step="0.01"
-                required
-                value={formData.extraHourPrice}
-                onChange={(e) => setFormData({ ...formData, extraHourPrice: parseFloat(e.target.value) || 0 })}
-                className={`${inputClasses} pr-8`}
-              />
-              <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 text-sm">
-                €
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
-        <h3 className="text-lg font-semibold text-slate-100 mb-4">🎵 Característiques</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="djHours" className="block text-sm font-medium text-slate-300 mb-1">
-              Hores de DJ *
-            </label>
-            <input
-              type="number"
-              id="djHours"
-              required
-              min="1"
-              value={formData.djHours}
-              onChange={(e) => setFormData({ ...formData, djHours: parseInt(e.target.value) || 0 })}
-              className={inputClasses}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="soundWatts" className="block text-sm font-medium text-slate-300 mb-1">
-              Potència So (W) *
-            </label>
-            <input
-              type="number"
-              id="soundWatts"
-              required
-              min="0"
-              value={formData.soundWatts}
-              onChange={(e) => setFormData({ ...formData, soundWatts: parseInt(e.target.value) || 0 })}
-              className={inputClasses}
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="includesFog"
-              checked={formData.includesFog}
-              onChange={(e) => setFormData({ ...formData, includesFog: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
-            />
-            <label htmlFor="includesFog" className="text-sm text-slate-300">
-              🌫️ Inclou Màquina de Fum
-            </label>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="includesMic"
-              checked={formData.includesMic}
-              onChange={(e) => setFormData({ ...formData, includesMic: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
-            />
-            <label htmlFor="includesMic" className="text-sm text-slate-300">
-              🎤 Inclou Micròfon
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* Capacity Section */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
-        <h3 className="text-lg font-semibold text-slate-100 mb-4">👥 Capacitat</h3>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="minGuests" className="block text-sm font-medium text-slate-300 mb-1">
-              Mínim Convidats
-            </label>
-            <input
-              type="number"
-              id="minGuests"
-              min="0"
-              value={formData.minGuests}
-              onChange={(e) => setFormData({ ...formData, minGuests: e.target.value })}
-              className={inputClasses}
-              placeholder="Opcional"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="maxGuests" className="block text-sm font-medium text-slate-300 mb-1">
-              Màxim Convidats
-            </label>
-            <input
-              type="number"
-              id="maxGuests"
-              min="0"
-              value={formData.maxGuests}
-              onChange={(e) => setFormData({ ...formData, maxGuests: e.target.value })}
-              className={inputClasses}
-              placeholder="Opcional"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Status Section */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
-        <h3 className="text-lg font-semibold text-slate-100 mb-4">⚙️ Estat i Ordre</h3>
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isActive"
-              checked={formData.isActive}
-              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
-            />
-            <label htmlFor="isActive" className="text-sm text-slate-300">
-              ✅ Pack Actiu (Visible a la web)
-            </label>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isFeatured"
-              checked={formData.isFeatured}
-              onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-600 bg-slate-700 text-amber-500 focus:ring-amber-500"
-            />
-            <label htmlFor="isFeatured" className="text-sm text-slate-300">
-              ⭐ Pack Destacat
-            </label>
-          </div>
-
-          <div className="max-w-xs">
-            <label htmlFor="order" className="block text-sm font-medium text-slate-300 mb-1">
-              Ordre de Visualització
-            </label>
-            <input
-              type="number"
-              id="order"
-              required
-              value={formData.order}
-              onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-              className={inputClasses}
-            />
-            <p className="mt-1 text-xs text-slate-500">
-              Ordre menor = apareix primer
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex gap-3 justify-end">
-        <Link
-          href="/admin/packs"
-          className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-600/50 transition-colors"
-        >
-          Cancel·lar
-        </Link>
-        <button
-          type="submit"
-          disabled={loading}
-          aria-busy={loading}
-          className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-2 text-sm font-medium text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading ? 'Guardant...' : 'Desar canvis'}
-        </button>
+      <div className="sticky bottom-2 z-10 flex flex-wrap justify-end gap-3 rounded-xl border border-slate-700/60 bg-slate-950/90 p-3 backdrop-blur">
+        <Link href="/admin/packs" className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm font-medium text-slate-300">Cancel·lar</Link>
+        <button type="submit" disabled={loading} className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-2 text-sm font-medium text-white disabled:opacity-50">{loading ? 'Guardant...' : 'Desar canvis'}</button>
       </div>
     </form>
   );
 }
-

@@ -4,6 +4,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import SyncButton from './SyncButton';
+import PackPriceQuickEditor from './PackPriceQuickEditor';
 import { getAllPacks } from '@/config/packs-config';
 import { redirect } from 'next/navigation';
 import { computePackPricingHealth, getPackPricingModelConfig, type PackPricingHealth } from '@/lib/services/packPricingHealth';
@@ -222,28 +223,20 @@ export default async function PacksPage({
                           <p className="text-slate-400">Pack recomanat</p>
                           <p className="text-sm font-semibold text-cyan-200">{health.recommendedPrice.toFixed(2)}€</p>
                         </div>
-                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
-                          <p className="text-slate-400">Pack PVP</p>
-                          <p className="text-sm font-semibold text-slate-100">{health.publicPrice.toFixed(2)}€</p>
-                        </div>
+                        <PackPriceQuickEditor
+                          packId={pack.id}
+                          initialPrice={health.publicPrice}
+                          initialExtraHourPrice={health.publicExtraHourPrice}
+                          recommendedPrice={health.recommendedPrice}
+                          recommendedExtraHourPrice={health.recommendedExtraHourPrice}
+                          alertThreshold={pricingConfig.alertDivergencePct}
+                        />
                         <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
                           <p className="text-slate-400">Hora extra recomanada</p>
                           <p className="text-sm font-semibold text-cyan-200">{health.recommendedExtraHourPrice.toFixed(2)}€</p>
                         </div>
-                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
-                          <p className="text-slate-400">Hora extra PVP</p>
-                          <p className="text-sm font-semibold text-slate-100">{health.publicExtraHourPrice.toFixed(2)}€</p>
-                        </div>
                         <div className={`col-span-2 rounded-lg border p-2 ${divergenceColor}`}>
-                          <p className="font-semibold">
-                            Divergència pack: {health.divergencePct >= 0 ? '+' : ''}{health.divergencePct.toFixed(1)}%
-                          </p>
-                          <p className={health.extraHourAlert ? 'font-semibold text-rose-200' : 'text-slate-200'}>
-                            Divergència hora extra: {extraHourDivergence >= 0 ? '+' : ''}{extraHourDivergence.toFixed(1)}%
-                          </p>
-                          {health.hasAlert && (
-                            <p className="text-[11px] text-rose-200">⚠ Revisa pack/hora extra: fora del llindar ({pricingConfig.alertDivergencePct}%)</p>
-                          )}
+                          <p className="text-[11px]">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
                         </div>
                         <div className="col-span-2 rounded-lg border border-slate-700/60 bg-slate-900/70 p-2 text-[11px] text-slate-300">
                           Equip tècnic: {health.specialistCount} especialista + {health.operatorCount} operari · {health.laborNetCostPerHourUsed.toFixed(2)}€/h net · {health.laborCostPerHourUsed.toFixed(2)}€/h brut (SS {(health.socialSecurityPct * 100).toFixed(1)}%)
@@ -384,28 +377,20 @@ export default async function PacksPage({
                           <p className="text-slate-400">Pack recomanat</p>
                           <p className="text-sm font-semibold text-cyan-200">{health.recommendedPrice.toFixed(2)}€</p>
                         </div>
-                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
-                          <p className="text-slate-400">Pack PVP</p>
-                          <p className="text-sm font-semibold text-slate-100">{health.publicPrice.toFixed(2)}€</p>
-                        </div>
+                        <PackPriceQuickEditor
+                          packId={pack.id}
+                          initialPrice={health.publicPrice}
+                          initialExtraHourPrice={health.publicExtraHourPrice}
+                          recommendedPrice={health.recommendedPrice}
+                          recommendedExtraHourPrice={health.recommendedExtraHourPrice}
+                          alertThreshold={pricingConfig.alertDivergencePct}
+                        />
                         <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
                           <p className="text-slate-400">Hora extra recomanada</p>
                           <p className="text-sm font-semibold text-cyan-200">{health.recommendedExtraHourPrice.toFixed(2)}€</p>
                         </div>
-                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
-                          <p className="text-slate-400">Hora extra PVP</p>
-                          <p className="text-sm font-semibold text-slate-100">{health.publicExtraHourPrice.toFixed(2)}€</p>
-                        </div>
                         <div className={`col-span-2 rounded-lg border p-2 ${divergenceColor}`}>
-                          <p className="font-semibold">
-                            Divergència pack: {health.divergencePct >= 0 ? '+' : ''}{health.divergencePct.toFixed(1)}%
-                          </p>
-                          <p className={health.extraHourAlert ? 'font-semibold text-rose-200' : 'text-slate-200'}>
-                            Divergència hora extra: {extraHourDivergence >= 0 ? '+' : ''}{extraHourDivergence.toFixed(1)}%
-                          </p>
-                          {health.hasAlert && (
-                            <p className="text-[11px] text-rose-200">⚠ Revisa pack/hora extra: fora del llindar ({pricingConfig.alertDivergencePct}%)</p>
-                          )}
+                          <p className="text-[11px]">Llindar alerta: {pricingConfig.alertDivergencePct}%</p>
                         </div>
                         <div className="col-span-2 rounded-lg border border-slate-700/60 bg-slate-900/70 p-2 text-[11px] text-slate-300">
                           Equip tècnic: {health.specialistCount} especialista + {health.operatorCount} operari · {health.laborNetCostPerHourUsed.toFixed(2)}€/h net · {health.laborCostPerHourUsed.toFixed(2)}€/h brut (SS {(health.socialSecurityPct * 100).toFixed(1)}%)

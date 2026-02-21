@@ -229,6 +229,22 @@ export default function EconomiaClient(props: EconomiaClientProps) {
     props.atRiskRows.length + props.riskProfitability.length,
     [props.atRiskRows, props.riskProfitability]
   );
+  const overdueDepositCount = useMemo(
+    () => props.atRiskRows.filter((row) => row.overdueDeposit).length,
+    [props.atRiskRows]
+  );
+  const overdueRemainingCount = useMemo(
+    () => props.atRiskRows.filter((row) => row.overdueRemaining).length,
+    [props.atRiskRows]
+  );
+  const dueSoonDepositCount = useMemo(
+    () => props.upcomingDueRows.filter((row) => row.dueSoonDeposit).length,
+    [props.upcomingDueRows]
+  );
+  const dueSoonRemainingCount = useMemo(
+    () => props.upcomingDueRows.filter((row) => row.dueSoonRemaining).length,
+    [props.upcomingDueRows]
+  );
 
   return (
     <div className="space-y-5">
@@ -566,6 +582,21 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 <KpiCard label="Cobrat aquest mes" value={money(props.monthCollected)} color="text-emerald-300" borderColor="border-emerald-500/30" bgColor="bg-emerald-500/10" delay={0.15} />
               </div>
 
+              <section className="grid gap-3 rounded-xl border border-white/10 bg-slate-950/60 p-3 sm:grid-cols-2">
+                <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-rose-200">Fora de termini</p>
+                  <p className="mt-1 text-sm text-rose-100">
+                    Bestretes: <span className="font-bold">{overdueDepositCount}</span> · Saldo: <span className="font-bold">{overdueRemainingCount}</span>
+                  </p>
+                </div>
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-200">Pròxims 7 dies</p>
+                  <p className="mt-1 text-sm text-amber-100">
+                    Bestretes: <span className="font-bold">{dueSoonDepositCount}</span> · Saldo: <span className="font-bold">{dueSoonRemainingCount}</span>
+                  </p>
+                </div>
+              </section>
+
               <section className="rounded-xl border border-slate-700/60 bg-slate-900/45 px-4 py-3 text-xs text-slate-300">
                 <p>
                   <span className="font-semibold text-slate-100">Guia:</span> codi `OE-...` = referència interna de la reserva.
@@ -575,7 +606,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               </section>
 
               {/* Ven\u00e7uts */}
-              <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-lg">
+              <section className="rounded-2xl border border-rose-500/20 bg-slate-950/60 p-5 shadow-lg">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/20 text-sm">\u26a0\ufe0f</span>
@@ -675,7 +706,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               </section>
 
               {/* Pr\u00f2xims */}
-              <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-lg">
+              <section className="rounded-2xl border border-amber-500/20 bg-slate-950/60 p-5 shadow-lg">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/20 text-sm">\u23f0</span>
                   <h2 className="text-lg font-bold text-slate-100">Venciments en 7 dies</h2>

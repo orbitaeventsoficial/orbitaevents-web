@@ -92,6 +92,7 @@ export async function PATCH(
 
     // Preparar dades d'actualització
     const updateData: any = {
+      service: body.service,
       price: body.price,
       originalPrice: body.originalPrice,
       extraHourPrice: body.extraHourPrice,
@@ -125,6 +126,26 @@ export async function PATCH(
           tagline: t.tagline,
           features: t.features || [],
         }))
+      };
+    }
+
+    // Actualitzar inventari del pack (replace complet)
+    if (body.inventory && Array.isArray(body.inventory)) {
+      const normalizedInventory = body.inventory
+        .map((row: any) => ({
+          itemId: String(row?.itemId || '').trim(),
+          quantity: Math.max(1, Number(row?.quantity || 1)),
+          isRequired: row?.isRequired !== false,
+        }))
+        .filter((row: { itemId: string }) => row.itemId);
+
+      updateData.inventory = {
+        deleteMany: {},
+        create: normalizedInventory.map((row: { itemId: string; quantity: number; isRequired: boolean }) => ({
+          itemId: row.itemId,
+          quantity: row.quantity,
+          isRequired: row.isRequired,
+        })),
       };
     }
 

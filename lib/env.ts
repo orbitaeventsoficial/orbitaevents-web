@@ -25,7 +25,7 @@ const serverSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),
-  CONTACT_TO: z.string().email().optional(),
+  CONTACT_TO: z.string().optional(),
 
   // Supabase (Optional - media uploads won't work without it)
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
