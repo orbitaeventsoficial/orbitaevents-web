@@ -225,7 +225,7 @@ export default async function OpinionesPage({
         </section>
 
         {/* Google Reviews Carousel */}
-        <GoogleReviewsRotating />
+        <GoogleReviewsRotating showFooterCta={false} />
 
         {/* CTA dejar reseña */}
         <section className="container mx-auto px-4 py-16 max-w-3xl">

@@ -26,37 +26,72 @@ import { usePacks } from '@/lib/hooks/usePacks';
 
 export default function FiestasClient() {
   const t = useTranslations('pages.parties');
+  const tPages = useTranslations('pages');
   const locale = useLocale();
   const fallbackPacks = useMemo(() => getPacksByService('fiestas'), []);
-  const { packs: allPacks } = usePacks({
+  const fallbackDiscoPacks = useMemo(() => getPacksByService('discomovil'), []);
+  const { packs: fiestaPacks } = usePacks({
     service: 'fiestas',
     locale,
     fallback: fallbackPacks,
+  });
+  const { packs: discomovilPacks } = usePacks({
+    service: 'discomovil',
+    locale,
+    fallback: fallbackDiscoPacks,
   });
   const [numGuests, setNumGuests] = useState(60);
   const [selectedPack, setSelectedPack] = useState<string | null>(null);
   const [showRecommendation, setShowRecommendation] = useState(false);
 
-  const getPackText = (pack: PackDefinition, field: 'name' | 'tagline' | 'ideal') => {
-    const fallback = field === 'name' ? pack.name : field === 'tagline' ? pack.tagline : (pack.ideal || '');
-    const key = `discoPacks.${pack.id}.${field}`;
-    try {
-      const translated = t(key);
-      return translated !== key ? translated : fallback;
-    } catch {
-      return fallback;
+  const allPacks = useMemo(() => {
+    const merged = [...fiestaPacks, ...discomovilPacks];
+    const deduped = new Map<string, PackDefinition>();
+    for (const pack of merged) {
+      if (!deduped.has(pack.id)) deduped.set(pack.id, pack);
     }
+    return Array.from(deduped.values());
+  }, [fiestaPacks, discomovilPacks]);
+
+  const getPackText = (pack: PackDefinition, field: 'name' | 'tagline' | 'ideal') => {
+    const rawFallback = field === 'name' ? pack.name : field === 'tagline' ? pack.tagline : (pack.ideal || '');
+    const fallback =
+      rawFallback.startsWith('pages.')
+        ? (field === 'name' ? pack.id.replace(/-/g, ' ') : '')
+        : rawFallback;
+    const keyLegacy = `discoPacks.${pack.id}.${field}`;
+    const keyPages = `mobile.discoPacks.${pack.id}.${field}`;
+    try {
+      const translatedLegacy = t(keyLegacy);
+      if (translatedLegacy && translatedLegacy !== keyLegacy) return translatedLegacy;
+    } catch {
+      // continue
+    }
+    try {
+      const translatedPages = tPages(keyPages);
+      if (translatedPages && translatedPages !== keyPages) return translatedPages;
+    } catch {
+      // continue
+    }
+    return fallback;
   };
 
   const getPackFeatures = (pack: PackDefinition): string[] => {
     try {
-      const key = `discoPacks.${pack.id}.features`;
-      const translated = t.raw(key);
-      if (Array.isArray(translated)) return translated as string[];
+      const legacyKey = `discoPacks.${pack.id}.features`;
+      const translatedLegacy = t.raw(legacyKey);
+      if (Array.isArray(translatedLegacy)) return translatedLegacy as string[];
+    } catch {
+      // continue
+    }
+    try {
+      const pagesKey = `mobile.discoPacks.${pack.id}.features`;
+      const translatedPages = tPages.raw(pagesKey);
+      if (Array.isArray(translatedPages)) return translatedPages as string[];
     } catch {
       // fallback below
     }
-    return pack.features;
+    return pack.features.filter((feature) => !feature.startsWith('pages.'));
   };
 
   const flashPack = allPacks.find((pack) => pack.isFlash);

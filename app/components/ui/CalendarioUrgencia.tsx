@@ -186,6 +186,15 @@ function MiniMonth({ data, onDayClick, locale, t }: MiniMonthProps) {
   
   const colors = statusColors[data.stats.status];
   
+  const statusLabel =
+    data.stats.status === 'scarce'
+      ? data.stats.availableSaturdays === 0
+        ? t('labels.scarce')
+        : `${data.stats.availableSaturdays} ${t('labels.scarce')}`
+      : data.stats.status === 'limited'
+      ? `${data.stats.availableSaturdays} ${t('labels.limited')}`
+      : `${data.stats.availableSaturdays} ${t('labels.available')}`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -208,16 +217,14 @@ function MiniMonth({ data, onDayClick, locale, t }: MiniMonthProps) {
           {data.stats.status === 'scarce' && (
             <span className="flex items-center gap-1">
               <span className="animate-pulse">🔥</span>
-              {data.stats.availableSaturdays === 0
-                ? t('status.exhausted')
-                : t('status.lastOne', { count: data.stats.availableSaturdays })}
+              {statusLabel}
             </span>
           )}
           {data.stats.status === 'limited' && (
-            <span>{t('status.few', { count: data.stats.availableSaturdays })}</span>
+            <span>{statusLabel}</span>
           )}
           {data.stats.status === 'available' && (
-            <span>{t('status.available', { count: data.stats.availableSaturdays })}</span>
+            <span>{statusLabel}</span>
           )}
         </div>
       </div>
@@ -294,7 +301,7 @@ function MiniMonth({ data, onDayClick, locale, t }: MiniMonthProps) {
       <div className="flex items-center justify-center gap-4 mt-3 pt-3 border-t border-white/10">
         <div className="flex items-center gap-1.5 text-[10px] text-white/50">
           <span className="w-2 h-2 rounded bg-emerald-500/50" />
-          <span>{t('legend.free')}</span>
+          <span>{t('legend.available')}</span>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] text-white/50">
           <span className="w-2 h-2 rounded bg-red-500/30" />
@@ -625,7 +632,9 @@ export default function CalendarioUrgencia({
             onClick={() => setSelectedMonth(selectedMonth === null ? 0 : null)}
             className="text-amber-400 hover:text-amber-300 text-sm font-medium transition-colors"
           >
-            {selectedMonth !== null ? t('hideCalendar') : t('viewFullCalendar')}
+            {selectedMonth !== null
+              ? (locale === 'ca' ? 'Amaga calendari' : locale === 'en' ? 'Hide calendar' : 'Ocultar calendario')
+              : t('viewFullCalendar')}
           </button>
         </div>
       )}

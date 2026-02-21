@@ -152,7 +152,7 @@ function ReviewCard({ review }: { review: GoogleReview }) {
 // COMPONENTE PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════
 
-export default function GoogleReviewsRotating() {
+export default function GoogleReviewsRotating({ showFooterCta = true }: { showFooterCta?: boolean }) {
   const t = useTranslations('googleReviews');
   const locale = useLocale();
   const [reviews, setReviews] = useState<GoogleReview[]>([]);
@@ -359,23 +359,24 @@ export default function GoogleReviewsRotating() {
           )}
         </div>
 
-        {/* Footer CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mt-16"
-        >
-          <a
-            href={SITE_CONFIG.reviews.googleReviewUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white font-semibold transition-colors"
+        {showFooterCta && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mt-16"
           >
-            <Icons.Google />
-            <span>{t('leaveReviewLink')}</span>
-          </a>
-        </motion.div>
+            <a
+              href={SITE_CONFIG.reviews.googleReviewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white font-semibold transition-colors"
+            >
+              <Icons.Google />
+              <span>{t('leaveReviewLink')}</span>
+            </a>
+          </motion.div>
+        )}
       </div>
     </section>
   );
