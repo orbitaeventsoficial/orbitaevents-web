@@ -10,6 +10,18 @@ const ACCOUNT_API = 'https://mybusinessaccountmanagement.googleapis.com/v1/accou
 const LOCATION_API = 'https://businessprofile.googleapis.com/v1';
 const STATE_TTL_SECONDS = 10 * 60;
 
+function normalizeRedirectUri(uri: string): string {
+  return uri.trim().replace(/\/+$/, '');
+}
+
+function resolveRedirectUri(req: NextRequest): string {
+  const envUri = process.env.GOOGLE_OAUTH_REDIRECT_URI;
+  if (envUri && envUri.trim().length > 0) {
+    return normalizeRedirectUri(envUri);
+  }
+  return normalizeRedirectUri(new URL('/api/google/oauth/callback', req.url).toString());
+}
+
 function verifyState(state: string, secret: string): boolean {
   const parts = state.split('.');
   if (parts.length !== 2) return false;
@@ -54,9 +66,9 @@ async function fetchJson(url: string, token: string) {
 export async function GET(req: NextRequest) {
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
-  const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI;
+  const redirectUri = resolveRedirectUri(req);
 
-  if (!clientId || !clientSecret || !redirectUri) {
+  if (!clientId || !clientSecret) {
     return NextResponse.json(
       { ok: false, error: 'Missing Google OAuth configuration' },
       { status: 500 }

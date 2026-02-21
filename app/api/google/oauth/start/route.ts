@@ -5,6 +5,19 @@ import { requireAuth } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+function normalizeRedirectUri(uri: string): string {
+  return uri.trim().replace(/\/+$/, '');
+}
+
+function resolveRedirectUri(req: NextRequest): string {
+  const envUri = process.env.GOOGLE_OAUTH_REDIRECT_URI;
+  if (envUri && envUri.trim().length > 0) {
+    return normalizeRedirectUri(envUri);
+  }
+  return normalizeRedirectUri(new URL('/api/google/oauth/callback', req.url).toString());
+}
+
 function createState(secret: string): string {
   const ts = Math.floor(Date.now() / 1000);
   const nonce = crypto.randomBytes(16).toString('base64url');
@@ -19,9 +32,9 @@ export async function GET(req: NextRequest) {
 
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
-  const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI;
+  const redirectUri = resolveRedirectUri(req);
 
-  if (!clientId || !clientSecret || !redirectUri) {
+  if (!clientId || !clientSecret) {
     return NextResponse.json(
       { ok: false, error: 'Missing Google OAuth configuration' },
       { status: 500 }
