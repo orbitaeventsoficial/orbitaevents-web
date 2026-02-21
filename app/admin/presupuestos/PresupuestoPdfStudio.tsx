@@ -952,7 +952,7 @@ export default function PresupuestoPdfStudio({
 
   return (
     <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-      <div className="space-y-5 rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+      <div className="space-y-5 rounded-2xl border border-slate-700/60 bg-gradient-to-b from-slate-900/80 to-slate-900/60 p-5 shadow-[0_20px_50px_-30px_rgba(251,191,36,0.35)]">
         {isCustomerScoped && (
           <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200">
             Mode client actiu. Aquest pressupost es guarda automàticament a la fitxa del client.
@@ -974,7 +974,9 @@ export default function PresupuestoPdfStudio({
             </div>
           </div>
         )}
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border border-amber-500/25 bg-amber-500/5 p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-amber-200/90">Configuració del pressupost</p>
+          <div className="grid gap-4 md:grid-cols-2">
           <label className="text-sm text-slate-300">
             Idioma preferit del client
             <select className={inputClass} value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
@@ -1033,9 +1035,12 @@ export default function PresupuestoPdfStudio({
               Si tries servei personalitzat, pots definir nom, preu, hores i característiques manualment.
             </span>
           </label>
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border border-sky-500/25 bg-sky-500/5 p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-sky-200/90">Client i esdeveniment</p>
+          <div className="grid gap-4 md:grid-cols-2">
           <label className="text-sm text-slate-300 md:col-span-2">
             Logotip (PNG/JPG)
             <input
@@ -1109,9 +1114,12 @@ export default function PresupuestoPdfStudio({
             Convidats
             <input className={inputClass} type="number" min={0} value={guests} onChange={(e) => setGuests(Number(e.target.value) || 0)} />
           </label>
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border border-indigo-500/25 bg-indigo-500/5 p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-indigo-200/90">Marca i identitat</p>
+          <div className="grid gap-4 md:grid-cols-2">
           <label className="text-sm text-slate-300">
             Marca / Empresa
             <input
@@ -1157,9 +1165,12 @@ export default function PresupuestoPdfStudio({
               readOnly={isCustomerScoped && !allowBrandOverride}
             />
           </label>
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-2xl border border-violet-500/25 bg-violet-500/5 p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-violet-200/90">Pack i condicions</p>
+          <div className="grid gap-4 md:grid-cols-3">
           <label className="text-sm text-slate-300 md:col-span-2">
             Nom visible del pack
             <input className={inputClass} value={packName} onChange={(e) => setPackName(e.target.value)} />
@@ -1222,9 +1233,10 @@ export default function PresupuestoPdfStudio({
             Explicació comercial: per què triar-nos
             <textarea rows={3} className={inputClass} value={whyChooseUs} onChange={(e) => setWhyChooseUs(e.target.value)} />
           </label>
+          </div>
         </div>
 
-        <div className="space-y-3 rounded-xl border border-slate-700/60 bg-slate-950/40 p-4">
+        <div className="space-y-3 rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4">
           <h3 className="text-sm font-semibold text-slate-100">Extres del catàleg</h3>
           <div className="grid gap-2 sm:grid-cols-2">
             {compatibleExtras.map((extra) => (
@@ -1241,7 +1253,7 @@ export default function PresupuestoPdfStudio({
           </div>
         </div>
 
-        <div className="space-y-3 rounded-xl border border-slate-700/60 bg-slate-950/40 p-4">
+        <div className="space-y-3 rounded-xl border border-teal-500/25 bg-teal-500/5 p-4">
           <h3 className="text-sm font-semibold text-slate-100">Extres personalitzats</h3>
           <div className="grid gap-3 md:grid-cols-[1fr_160px_auto]">
             <input
@@ -1287,7 +1299,7 @@ export default function PresupuestoPdfStudio({
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-700/50 bg-slate-950/35 p-3">
           <button
             type="button"
             onClick={downloadPdf}
@@ -1324,26 +1336,26 @@ export default function PresupuestoPdfStudio({
         </div>
       </div>
 
-      <aside className="h-fit rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+      <aside className="h-fit rounded-2xl border border-slate-700/60 bg-gradient-to-b from-slate-900/80 to-slate-900/60 p-5 shadow-[0_20px_50px_-30px_rgba(34,211,238,0.35)]">
         <h2 className="text-lg font-semibold text-slate-100">Vista ràpida</h2>
         <p className="mt-1 text-sm text-slate-400">Resum del que sortirà al PDF.</p>
 
         <div className="mt-4 space-y-3 text-sm">
-          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+          <div className="rounded-xl border border-indigo-500/25 bg-indigo-500/5 p-3">
             <p className="text-slate-400">Marca</p>
             <p className="font-semibold text-slate-100">{brandName || 'Marca'}</p>
             <p className="text-slate-300">{brandWebsite || '-'}</p>
             <p className="text-slate-300">{brandEmail || '-'} · {brandPhone || '-'}</p>
           </div>
 
-          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+          <div className="rounded-xl border border-cyan-500/25 bg-cyan-500/5 p-3">
             <p className="text-slate-400">{studioText.clientLabel}</p>
             <p className="font-semibold text-slate-100">{clientName || studioText.defaultClientName}</p>
             <p className="text-slate-300">{clientContact || '-'}</p>
             <p className="text-slate-300">{clientEmail || '-'} · {clientPhone || '-'}</p>
           </div>
 
-          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+          <div className="rounded-xl border border-sky-500/25 bg-sky-500/5 p-3">
             <p className="text-slate-400">Esdeveniment</p>
             <p className="font-semibold text-slate-100">{SERVICE_LABEL[eventType]}</p>
             <p className="text-slate-300">{eventDate || studioText.noDate} · {guests} convidats</p>
@@ -1351,18 +1363,18 @@ export default function PresupuestoPdfStudio({
             <p className="text-slate-300">Validesa: {validityDays} dies</p>
           </div>
 
-          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+          <div className="rounded-xl border border-teal-500/25 bg-teal-500/5 p-3">
             <p className="text-slate-400">Narrativa comercial</p>
             <p className="text-slate-200 line-clamp-3">{whyChooseUs || '-'}</p>
           </div>
 
-          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+          <div className="rounded-xl border border-violet-500/25 bg-violet-500/5 p-3">
             <p className="text-slate-400">Pack</p>
             <p className="font-semibold text-slate-100">{packName || selectedPack?.name || '-'}</p>
             <p className="text-slate-300">{durationHours}h</p>
           </div>
 
-          <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 p-3">
+          <div className="rounded-xl border border-amber-500/25 bg-amber-500/5 p-3">
             <p className="text-slate-400 mb-2">Costos</p>
             <div className="flex items-center justify-between text-slate-200">
               <span>Base</span>

@@ -76,11 +76,17 @@ export default async function TasksPage({
     const where = {
       ...(status ? { status: { equals: status } } : {}),
       ...(customerId ? { customerId } : {}),
-      NOT: {
-        createdBy: 'system:daily-checklist',
-        status: { in: ['OPEN', 'IN_PROGRESS'] as LeadTaskStatus[] },
-        dueDate: { lt: todayStart },
-      },
+      NOT: [
+        {
+          createdBy: 'system:daily-checklist',
+          status: { in: ['OPEN', 'IN_PROGRESS'] as LeadTaskStatus[] },
+          dueDate: { lt: todayStart },
+        },
+        {
+          createdBy: 'system:daily-checklist',
+          status: 'CANCELLED' as LeadTaskStatus,
+        },
+      ],
     };
     const prismaAny = prisma as any;
     const [rows, count] = await Promise.all([
@@ -110,11 +116,17 @@ export default async function TasksPage({
     const where: Prisma.LeadTaskWhereInput = {
       ...(status ? { status: { equals: status } } : {}),
       ...(customerId ? { lead: { customerId } } : {}),
-      NOT: {
-        createdBy: 'system:daily-checklist',
-        status: { in: ['OPEN', 'IN_PROGRESS'] },
-        dueDate: { lt: todayStart },
-      },
+      NOT: [
+        {
+          createdBy: 'system:daily-checklist',
+          status: { in: ['OPEN', 'IN_PROGRESS'] },
+          dueDate: { lt: todayStart },
+        },
+        {
+          createdBy: 'system:daily-checklist',
+          status: 'CANCELLED',
+        },
+      ],
     };
     const [legacyRows, legacyCount] = await Promise.all([
       prisma.leadTask.findMany({

@@ -19,6 +19,9 @@ type CalendarDay = {
     estado: string | null;
     eventType: string | null;
     total: number | null;
+    eventStartTime: string | null;
+    eventEndTime: string | null;
+    packName: string | null;
   }[];
   bloqueos: {
     id: string;
@@ -70,6 +73,15 @@ export async function GET(request: NextRequest) {
         total: true,
         eventStartTime: true,
         eventEndTime: true,
+        pack: {
+          select: {
+            slug: true,
+            translations: {
+              where: { locale: { in: ['ca', 'es', 'en'] } },
+              select: { locale: true, name: true },
+            },
+          },
+        },
       },
       orderBy: {
         eventDate: 'asc',
@@ -117,6 +129,14 @@ export async function GET(request: NextRequest) {
           estado: booking.status,
           eventType: booking.eventType,
           total: booking.total,
+          eventStartTime: booking.eventStartTime,
+          eventEndTime: booking.eventEndTime,
+          packName:
+            booking.pack?.translations.find((t) => t.locale === 'ca')?.name ||
+            booking.pack?.translations.find((t) => t.locale === 'es')?.name ||
+            booking.pack?.translations.find((t) => t.locale === 'en')?.name ||
+            booking.pack?.slug ||
+            null,
         });
       }
     }

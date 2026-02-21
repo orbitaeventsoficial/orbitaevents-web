@@ -213,13 +213,13 @@ export default function IntakePage() {
         <div className="grid grid-cols-2 gap-2">
           <Link
             href="/admin/leads"
-            className="rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-center text-xs sm:text-sm font-medium text-slate-300 hover:bg-slate-700/60 transition-colors"
+            className="admin-keep-colors rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-center text-xs sm:text-sm font-medium text-slate-300 hover:bg-slate-700/60 transition-colors"
           >
             Tauler Leads
           </Link>
           <Link
             href="/admin/intake"
-            className="rounded-xl border border-cyan-500/50 bg-cyan-500/15 px-3 py-2 text-center text-xs sm:text-sm font-semibold text-cyan-200"
+            className="admin-keep-colors rounded-xl border border-cyan-500/50 bg-cyan-500/15 px-3 py-2 text-center text-xs sm:text-sm font-semibold text-cyan-200"
             aria-current="page"
           >
             Entrada ràpida
@@ -310,7 +310,7 @@ export default function IntakePage() {
               type="button"
               onClick={() => updateField('source', src.value)}
               aria-pressed={form.source === src.value}
-              className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
+              className={`admin-keep-colors rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
                 form.source === src.value
                   ? 'border-amber-400/70 bg-amber-500/25 text-amber-100 shadow-sm'
                   : 'border-slate-700/50 bg-slate-900/60 text-slate-300 hover:bg-slate-800'
@@ -368,7 +368,7 @@ export default function IntakePage() {
                   key={p.value}
                   type="button"
                   onClick={() => updateField('priority', p.value)}
-                  className={`rounded-lg border px-2 py-2 text-sm font-medium transition-all ${
+                  className={`admin-keep-colors rounded-lg border px-2 py-2 text-sm font-medium transition-all ${
                     form.priority === p.value
                       ? `${p.selected} shadow-sm`
                       : 'border-slate-700/50 text-slate-400 hover:bg-slate-800'
@@ -395,7 +395,7 @@ export default function IntakePage() {
                 type="button"
                 onClick={() => updateField('eventType', et.value)}
                 aria-pressed={form.eventType === et.value}
-                className={`rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
+                className={`admin-keep-colors rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
                   form.eventType === et.value
                     ? 'border-amber-400/70 bg-amber-500/25 text-amber-100 shadow-sm'
                     : 'border-slate-700/50 bg-slate-900/60 text-slate-400 hover:bg-slate-800'

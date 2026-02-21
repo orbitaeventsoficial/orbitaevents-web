@@ -89,7 +89,6 @@ const SECTIONS: MapSection[] = [
       { href: '/admin/settings/integrations', label: 'Integracions' },
       { href: '/admin/settings/notifications', label: 'Notificacions' },
       { href: '/admin/inbox/settings', label: 'Configuració IMAP' },
-      { href: '/admin/duplicats', label: 'Duplicats' },
     ],
   },
 ];
@@ -127,4 +126,3 @@ export default function AdminMapaPage() {
     </div>
   );
 }
-

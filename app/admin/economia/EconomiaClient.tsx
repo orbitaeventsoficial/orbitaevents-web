@@ -225,7 +225,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 Economia
               </h1>
               <p className="mt-1 text-sm text-slate-400">
-                Finances, cobraments, rendibilitat i costos &mdash; tot en un sol lloc.
+                Control de caixa, cobraments i marge en una sola pantalla.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -301,7 +301,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
                 <div className="lg:col-span-4 grid gap-3 grid-cols-2 xl:grid-cols-4">
                   <KpiCard
-                    label="Pendent total"
+                    label="Total pendent de cobrar"
                     value={money(props.outstandingTotal)}
                     color="text-slate-100"
                     borderColor="border-white/10"
@@ -309,9 +309,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     delay={0.05}
                   />
                   <KpiCard
-                    label="Ven\u00e7ut"
+                    label="Impagat fora de termini"
                     value={money(props.overdueTotal)}
-                    sub={props.atRiskRows.length > 0 ? `${props.atRiskRows.length} pagaments` : undefined}
+                    sub={props.atRiskRows.length > 0 ? `${props.atRiskRows.length} cobraments amb retard` : undefined}
                     color="text-rose-300"
                     borderColor="border-rose-500/30"
                     bgColor="bg-rose-500/10"
@@ -320,21 +320,26 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <KpiCard
                     label="Cobrat aquest mes"
                     value={money(props.monthCollected)}
+                    sub="Ingressos ja cobrats"
                     color="text-emerald-300"
                     borderColor="border-emerald-500/30"
                     bgColor="bg-emerald-500/10"
                     delay={0.15}
                   />
                   <KpiCard
-                    label="Ven\u00e7 en 7 dies"
+                    label="A cobrar en 7 dies"
                     value={money(props.dueSoonTotal)}
-                    sub={props.upcomingDueRows.length > 0 ? `${props.upcomingDueRows.length} pr\u00f2xims` : undefined}
+                    sub={props.upcomingDueRows.length > 0 ? `${props.upcomingDueRows.length} cobraments pròxims` : undefined}
                     color="text-amber-300"
                     borderColor="border-amber-500/30"
                     bgColor="bg-amber-500/10"
                     delay={0.2}
                   />
                 </div>
+              </div>
+
+              <div className="rounded-xl border border-slate-700/50 bg-slate-900/40 px-4 py-3 text-xs text-slate-300">
+                <strong className="text-slate-100">Com llegir aquest resum:</strong> pendent = import total per cobrar, fora de termini = cobrament que ja havia d&apos;estar pagat, a 7 dies = cobrament proper.
               </div>
 
               {/* Profitability KPIs */}
@@ -359,7 +364,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     delay={0.1}
                   />
                   <KpiCard
-                    label="Previsi\u00f3 d'ingressos"
+                    label="Ingressos previstos"
                     value={money(props.forecast.revenue)}
                     sub={`${props.forecast.bookings} en pipeline`}
                     color="text-slate-100"
@@ -368,7 +373,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     delay={0.15}
                   />
                   <KpiCard
-                    label="Previsi\u00f3 de marge"
+                    label="Marge previst"
                     value={money(props.forecast.netMargin)}
                     sub={`Mitj\u00e0 ${pct(props.forecast.avgMarginPct)}`}
                     color="text-amber-300"
@@ -390,7 +395,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-sm font-semibold text-slate-200">Progr\u00e9s de cobrament</p>
                     <p className="text-xs text-slate-400">
-                      {money(props.monthCollected)} cobrat de {money(props.monthCollected + props.outstandingTotal)} total
+                      Cobrat ara: {money(props.monthCollected)} · Total a gestionar: {money(props.monthCollected + props.outstandingTotal)}
                     </p>
                   </div>
                   <ProgressBar
@@ -448,7 +453,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             onClick={() => setActiveTab('cobraments')}
                             className="mt-3 rounded-xl bg-rose-500/20 px-4 py-2 text-xs font-bold text-rose-200 hover:bg-rose-500/30 border border-rose-500/30 transition-colors"
                           >
-                            Gestionar cobraments
+                            Obrir detall de cobraments
                           </button>
                         </div>
                       </div>
@@ -538,9 +543,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
           {activeTab === 'cobraments' && (
             <>
               <div className="grid gap-3 grid-cols-2 xl:grid-cols-4">
-                <KpiCard label="Pendent total" value={money(props.outstandingTotal)} color="text-slate-100" borderColor="border-white/10" bgColor="bg-slate-950/60" />
-                <KpiCard label="Ven\u00e7ut" value={money(props.overdueTotal)} color="text-rose-300" borderColor="border-rose-500/30" bgColor="bg-rose-500/10" delay={0.05} />
-                <KpiCard label="Ven\u00e7 en 7 dies" value={money(props.dueSoonTotal)} color="text-amber-300" borderColor="border-amber-500/30" bgColor="bg-amber-500/10" delay={0.1} />
+                <KpiCard label="Total pendent de cobrar" value={money(props.outstandingTotal)} color="text-slate-100" borderColor="border-white/10" bgColor="bg-slate-950/60" />
+                <KpiCard label="Impagat fora de termini" value={money(props.overdueTotal)} color="text-rose-300" borderColor="border-rose-500/30" bgColor="bg-rose-500/10" delay={0.05} />
+                <KpiCard label="A cobrar en 7 dies" value={money(props.dueSoonTotal)} color="text-amber-300" borderColor="border-amber-500/30" bgColor="bg-amber-500/10" delay={0.1} />
                 <KpiCard label="Cobrat aquest mes" value={money(props.monthCollected)} color="text-emerald-300" borderColor="border-emerald-500/30" bgColor="bg-emerald-500/10" delay={0.15} />
               </div>
 

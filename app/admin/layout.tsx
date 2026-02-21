@@ -343,12 +343,12 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   const priorityItems = useMemo(() => ([
     { icon: '📥', label: 'Entrades', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
-    { icon: '🧭', label: 'Mapa admin', href: '/admin/mapa' },
     { icon: '⚡', label: 'Entrada ràpida', href: '/admin/intake' },
     { icon: '👤', label: 'Clients', href: '/admin/clientes' },
     { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
     { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
     { icon: '🧾', label: 'Pressupost (PDF)', href: '/admin/presupuestos' },
+    { icon: '🧭', label: 'Mapa admin', href: '/admin/mapa' },
   ]), [newLeadsCount]);
 
   const favoriteItems = useMemo(() => ([
@@ -365,7 +365,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       items: [
         { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
         { icon: '📅', label: 'Calendari', href: '/admin/calendario' },
-        { icon: '🔍', label: 'Duplicats', href: '/admin/duplicats' },
         { icon: '📦', label: 'Inventari', href: '/admin/inventory' },
         { icon: '🎟️', label: 'Descomptes', href: '/admin/discount-codes' },
         { icon: '📥', label: 'Safata (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' as const },

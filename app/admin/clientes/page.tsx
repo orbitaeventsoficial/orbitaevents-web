@@ -39,6 +39,26 @@ interface CustomerStats {
   recentMonth: number;
 }
 
+interface DuplicateScanStats {
+  totalGroups: number;
+  totalDuplicates: number;
+  autoMergeRecommended: number;
+}
+
+const SOURCE_LABELS: Record<string, string> = {
+  website: 'Web',
+  configurator: 'Configurador',
+  phone: 'Telèfon',
+  whatsapp: 'WhatsApp',
+  instagram: 'Instagram',
+  wallapop: 'Wallapop',
+  referral: 'Boca-orella',
+  google: 'Google',
+  other: 'Altre',
+  manual: 'Manual',
+  testimonial_form: 'Ressenya',
+};
+
 function getNextStep(customer: Customer): { label: string; href: string; hint: string } {
   if ((customer.total_events || 0) > 0) {
     return {
@@ -130,6 +150,8 @@ export default function AdminContactesPage() {
     matchReasons: Array<{ field: string; type: string; score: number }>;
   }>>([]);
   const [checkingDuplicates, setCheckingDuplicates] = useState(false);
+  const [duplicateScanLoading, setDuplicateScanLoading] = useState(false);
+  const [duplicateScanResult, setDuplicateScanResult] = useState<DuplicateScanStats | null>(null);
 
   // Fetch customers
   const fetchCustomers = useCallback(async () => {
@@ -256,6 +278,25 @@ export default function AdminContactesPage() {
     }, 400);
     return () => window.clearTimeout(timeout);
   }, [newCustomer]);
+
+  const runDuplicateScan = useCallback(async () => {
+    setDuplicateScanLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/admin/duplicates?stats=true', {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('No s’han pogut detectar duplicats');
+      }
+      const payload = await response.json();
+      setDuplicateScanResult(payload?.data || { totalGroups: 0, totalDuplicates: 0, autoMergeRecommended: 0 });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error detectant duplicats');
+    } finally {
+      setDuplicateScanLoading(false);
+    }
+  }, []);
 
   // Add customer
   const handleAddCustomer = async () => {
@@ -425,7 +466,26 @@ export default function AdminContactesPage() {
           </svg>
           Afegir Client
         </button>
+        <button
+          onClick={runDuplicateScan}
+          type="button"
+          className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-amber-500/40 bg-amber-500/12 text-amber-200 font-medium hover:bg-amber-500/20 transition-all"
+          disabled={duplicateScanLoading}
+        >
+          <span>🔍</span>
+          {duplicateScanLoading ? 'Detectant...' : 'Detectar duplicats'}
+        </button>
       </div>
+
+      {duplicateScanResult && (
+        <div className="rounded-xl border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          <p>
+            Detecció completada: <strong>{duplicateScanResult.totalGroups}</strong> grups ·{' '}
+            <strong>{duplicateScanResult.totalDuplicates}</strong> duplicats ·{' '}
+            <strong>{duplicateScanResult.autoMergeRecommended}</strong> fusió recomanada.
+          </p>
+        </div>
+      )}
 
       {/* Filtres d'execució */}
       {!loading && customers.length > 0 && (
@@ -472,7 +532,7 @@ export default function AdminContactesPage() {
       {!loading && customers.length > 0 && (
         <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
           <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] text-sm">
+          <table className="w-full min-w-[1060px] text-sm">
             <thead>
               <tr className="bg-slate-700/30 border-b border-slate-700/50">
                 <th scope="col" className="text-center p-4 text-slate-300 font-medium">Nom</th>
@@ -490,29 +550,29 @@ export default function AdminContactesPage() {
                 return (
                 <tr key={customer.id} className="border-b border-slate-700/30 hover:bg-slate-700/30 transition-colors">
                   <td className="p-4 text-center">
-                    <div className="flex items-center justify-center gap-3">
+                    <div className="flex items-center justify-center gap-3 min-w-0">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center text-cyan-300 font-bold">
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
-                      <div>
-                        <p className="text-slate-100 font-medium flex items-center gap-2">
+                      <div className="min-w-0">
+                        <p className="text-slate-100 font-medium flex items-center justify-center gap-2 whitespace-nowrap">
                           {customer.name}
                           {customer.is_vip && (
                             <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-xs rounded-full font-medium">VIP</span>
                           )}
                         </p>
-                        {customer.city && <p className="text-slate-500 text-sm">{customer.city}</p>}
+                        {customer.city && <p className="text-slate-500 text-sm truncate">{customer.city}</p>}
                       </div>
                     </div>
                   </td>
                   <td className="p-4 hidden md:table-cell text-center">
-                    <div className="space-y-1">
+                    <div className="space-y-1 min-w-0">
                       {customer.email && (
                         <p className="text-slate-400 text-sm flex items-center justify-center gap-2">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                           </svg>
-                          {customer.email}
+                          <span className="max-w-[240px] truncate">{customer.email}</span>
                         </p>
                       )}
                       {customer.phone && (
@@ -532,7 +592,7 @@ export default function AdminContactesPage() {
                       customer.source === 'testimonial_form' ? 'bg-amber-500/20 text-amber-300' :
                       'bg-slate-500/20 text-slate-400'
                     }`}>
-                      {customer.source || 'desconeguda'}
+                      {SOURCE_LABELS[customer.source || ''] || customer.source || 'Desconeguda'}
                     </span>
                   </td>
                   <td className="p-4 hidden sm:table-cell text-slate-400 text-center">
@@ -587,27 +647,6 @@ export default function AdminContactesPage() {
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                      </Link>
-                      <Link
-                        href={`/admin/tasks?customerId=${customer.id}`}
-                        className="px-2 py-1 bg-amber-500/20 text-amber-300 rounded-lg hover:bg-amber-500/30 transition-all text-xs font-medium"
-                        title="Tasques del client"
-                      >
-                        Tasques
-                      </Link>
-                      <Link
-                        href={`/admin/leads?q=${encodeURIComponent(customer.email)}`}
-                        className="px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded-lg hover:bg-cyan-500/30 transition-all text-xs font-medium"
-                        title="Entrades relacionades"
-                      >
-                        Entrades
-                      </Link>
-                      <Link
-                        href={`/admin/presupuestos?customerId=${customer.id}`}
-                        className="px-2 py-1 bg-violet-500/20 text-violet-300 rounded-lg hover:bg-violet-500/30 transition-all text-xs font-medium"
-                        title="Pressupostos del client"
-                      >
-                        Pressupost
                       </Link>
                     </div>
                   </td>

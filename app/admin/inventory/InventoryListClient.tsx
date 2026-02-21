@@ -229,58 +229,50 @@ export default function InventoryListClient() {
           className="w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
         />
 
-        {/* Filtres per categoria */}
-        <div className="flex flex-wrap gap-1.5">
+        <div className="grid gap-2 sm:grid-cols-3">
+          <label className="flex items-center gap-2 rounded-xl border border-slate-700/50 bg-slate-800/50 px-3 py-2">
+            <span className="shrink-0 text-xs text-slate-400">Categoria</span>
+            <select
+              value={filterCategory ?? ''}
+              onChange={(e) => setFilterCategory(e.target.value || null)}
+              className="w-full rounded-lg border border-slate-600/50 bg-slate-900/70 px-2 py-1.5 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            >
+              <option value="">Totes</option>
+              {categories.map((cat) => {
+                const conf = CATEGORY_CONFIG[cat];
+                const count = stats[cat]?.count || 0;
+                return (
+                  <option key={cat} value={cat}>
+                    {conf.icon} {conf.label} ({count})
+                  </option>
+                );
+              })}
+            </select>
+          </label>
+
+          <label className="flex items-center gap-2 rounded-xl border border-slate-700/50 bg-slate-800/50 px-3 py-2">
+            <span className="shrink-0 text-xs text-slate-400">Estat</span>
+            <select
+              value={filterStatus ?? ''}
+              onChange={(e) => setFilterStatus(e.target.value || null)}
+              className="w-full rounded-lg border border-slate-600/50 bg-slate-900/70 px-2 py-1.5 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            >
+              <option value="">Tots</option>
+              {statuses.map((st) => (
+                <option key={st} value={st}>
+                  {STATUS_CONFIG[st].label}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <button
             type="button"
-            onClick={() => setFilterCategory(null)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-              !filterCategory
-                ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-400/30'
-                : 'bg-slate-700/50 text-slate-400 border border-slate-600/50 hover:bg-slate-600/50'
-            }`}
+            onClick={() => { setSearch(''); setFilterCategory(null); setFilterStatus(null); }}
+            className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-3 py-2 text-xs font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
           >
-            Totes
+            Netejar filtres
           </button>
-          {categories.map((cat) => {
-            const conf = CATEGORY_CONFIG[cat];
-            const count = stats[cat]?.count || 0;
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setFilterCategory(filterCategory === cat ? null : cat)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                  filterCategory === cat
-                    ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-400/30'
-                    : 'bg-slate-700/50 text-slate-400 border border-slate-600/50 hover:bg-slate-600/50'
-                }`}
-              >
-                {conf.icon} {conf.label} ({count})
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Filtres per estat */}
-        <div className="flex flex-wrap gap-1.5">
-          {statuses.map((st) => {
-            const conf = STATUS_CONFIG[st];
-            return (
-              <button
-                key={st}
-                type="button"
-                onClick={() => setFilterStatus(filterStatus === st ? null : st)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                  filterStatus === st
-                    ? `${conf.bg} ${conf.text} border border-current/30`
-                    : 'bg-slate-700/50 text-slate-400 border border-slate-600/50 hover:bg-slate-600/50'
-                }`}
-              >
-                {conf.label}
-              </button>
-            );
-          })}
         </div>
       </div>
 

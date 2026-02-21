@@ -218,7 +218,7 @@ export default async function SalesOpsPage() {
       avui: 'Deduplicació activa, però cal vigilància diària.',
       en30: 'Control diari de camps crítics incomplets.',
       en90: 'Regles intel·ligents de qualitat en entrada de dades.',
-      href: '/admin/duplicats',
+      href: '/admin/clientes',
       cta: 'Revisar duplicats',
     },
     {
@@ -261,7 +261,7 @@ export default async function SalesOpsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
+      <header className="rounded-2xl border border-slate-700/60 bg-gradient-to-br from-slate-900/80 via-slate-900/70 to-slate-800/60 p-6 shadow-sm">
         <h1 className="text-2xl font-semibold text-slate-100">Operativa comercial</h1>
         <p className="mt-1 text-sm text-slate-300">
           La teva màquina de vendes: priorització diària, control d&apos;embut i execució sense fricció.
@@ -273,26 +273,31 @@ export default async function SalesOpsPage() {
           <p className="text-sm">💼</p>
           <p className="text-xs text-slate-400">Embut brut</p>
           <p className="text-2xl font-semibold text-slate-100">{pipelineTotal.toLocaleString('ca-ES')}€</p>
+          <p className="mt-1 text-[11px] text-slate-500">Valor total de negoci obert</p>
         </div>
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
+        <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4 shadow-sm">
           <p className="text-sm">🔮</p>
-          <p className="text-xs text-slate-400">Previsió ponderada</p>
-          <p className="text-2xl font-semibold text-slate-100">{forecastTotal.toLocaleString('ca-ES')}€</p>
+          <p className="text-xs text-blue-200/80">Previsió ponderada</p>
+          <p className="text-2xl font-semibold text-blue-100">{forecastTotal.toLocaleString('ca-ES')}€</p>
+          <p className="mt-1 text-[11px] text-blue-200/70">Ingressos probables segons scoring</p>
         </div>
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
+        <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 shadow-sm">
           <p className="text-sm">📥</p>
-          <p className="text-xs text-slate-400">Entrades obertes</p>
-          <p className="text-2xl font-semibold text-slate-100">{scored.length}</p>
+          <p className="text-xs text-indigo-200/80">Entrades obertes</p>
+          <p className="text-2xl font-semibold text-indigo-100">{scored.length}</p>
+          <p className="mt-1 text-[11px] text-indigo-200/70">Leads actius pendent de tancament</p>
         </div>
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
+        <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 shadow-sm">
           <p className="text-sm">🎯</p>
-          <p className="text-xs text-slate-400">Puntuació mitjana</p>
-          <p className="text-2xl font-semibold text-slate-100">{avgScore.toFixed(1)}</p>
+          <p className="text-xs text-cyan-200/80">Puntuació mitjana</p>
+          <p className="text-2xl font-semibold text-cyan-100">{avgScore.toFixed(1)}</p>
+          <p className="mt-1 text-[11px] text-cyan-200/70">Qualitat global de l&apos;embut</p>
         </div>
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 shadow-sm">
           <p className="text-sm">⏱️</p>
           <p className="text-xs text-amber-300">Entrades sense resposta (&gt;24h)</p>
           <p className="text-2xl font-semibold text-amber-200">{slaSnapshot}</p>
+          <p className="mt-1 text-[11px] text-amber-200/75">Prioritat operativa del dia</p>
         </div>
       </section>
 
@@ -335,6 +340,13 @@ export default async function SalesOpsPage() {
         </div>
       </section>
 
+      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4">
+        <h2 className="text-sm font-semibold text-slate-100">Com llegir aquest panell</h2>
+        <p className="mt-1 text-xs text-slate-300">
+          Primer mira KPI i alertes, després executa accions (seqüències, SLA i informe), i finalment valida la conversió per origen/comercial.
+        </p>
+      </section>
+
       <section className="grid gap-3 xl:grid-cols-4">
         <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Què és l&apos;embut</p>
@@ -359,22 +371,24 @@ export default async function SalesOpsPage() {
           <h2 className="text-lg font-semibold text-slate-100">Auditoria exhaustiva (avui)</h2>
           <p className="text-xs text-slate-400">Diagnòstic, millora a 30 dies i escalat a 90 dies</p>
         </div>
-        <div className="mt-4 space-y-3">
+        <div className="mt-4 grid gap-3 xl:grid-cols-2">
           {auditRows.map((row) => (
-            <article key={row.area} className={`rounded-xl border p-4 ${statusPanel(row.status)}`}>
+            <article key={row.area} className={`h-full rounded-xl border p-4 ${statusPanel(row.status)}`}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold text-slate-100">{row.area}</h3>
                 <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${statusBadge(row.status)}`}>
                   {row.status === 'A_MILLORAR' ? 'A millorar' : row.status === 'CRITIC' ? 'Crític' : 'Fort'}
                 </span>
               </div>
-              <p className="mt-2 text-xs text-slate-300"><span className="text-slate-400">Avui:</span> {row.avui}</p>
-              <p className="mt-1 text-xs text-slate-300"><span className="text-slate-400">+30 dies:</span> {row.en30}</p>
-              <p className="mt-1 text-xs text-slate-300"><span className="text-slate-400">+90 dies:</span> {row.en90}</p>
+              <div className="mt-2 space-y-1.5 text-xs text-slate-300">
+                <p><span className="text-slate-400">Avui:</span> {row.avui}</p>
+                <p><span className="text-slate-400">+30 dies:</span> {row.en30}</p>
+                <p><span className="text-slate-400">+90 dies:</span> {row.en90}</p>
+              </div>
               <div className="mt-3">
                 <Link
                   href={row.href}
-                  className="rounded-lg border border-slate-500/80 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-700"
+                  className="inline-flex rounded-lg border border-slate-500/80 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-700"
                 >
                   {row.cta}
                 </Link>
@@ -385,9 +399,9 @@ export default async function SalesOpsPage() {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <article className="rounded-2xl border border-cyan-500/30 bg-cyan-500/10 p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-cyan-100">Pla d&apos;execució a 30 dies</h2>
-          <ol className="mt-3 space-y-2 text-sm text-cyan-50">
+        <article className="rounded-2xl border border-sky-500/25 bg-sky-500/8 p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-sky-100">Pla d&apos;execució a 30 dies</h2>
+          <ol className="mt-3 space-y-2 text-sm text-slate-100">
             <li>1. Temps de resposta: deixar cada dia a 0 les entrades de +24h.</li>
             <li>2. Tasques guia: treballar sempre des de la checklist diària.</li>
             <li>3. Pipeline: neteja setmanal de fases i estats sense activitat.</li>
@@ -396,9 +410,9 @@ export default async function SalesOpsPage() {
             <li>6. Reserva a calendari: verificar traçabilitat a tots els casos.</li>
           </ol>
         </article>
-        <article className="rounded-2xl border border-violet-500/30 bg-violet-500/10 p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-violet-100">Pla d&apos;escalat a 90 dies</h2>
-          <ol className="mt-3 space-y-2 text-sm text-violet-50">
+        <article className="rounded-2xl border border-indigo-500/25 bg-indigo-500/8 p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-indigo-100">Pla d&apos;escalat a 90 dies</h2>
+          <ol className="mt-3 space-y-2 text-sm text-slate-100">
             <li>1. Predicció: alertes abans que una entrada entri en risc.</li>
             <li>2. Automatització: seqüències per segment i tipus d&apos;esdeveniment.</li>
             <li>3. Quadre executiu: marge i previsió per canal en una sola vista.</li>
@@ -424,7 +438,7 @@ export default async function SalesOpsPage() {
               </thead>
               <tbody>
                 {bySource.map((row) => (
-                  <tr key={row.source} className="border-b border-slate-800">
+                  <tr key={row.source} className="border-b border-slate-800 odd:bg-slate-900/25">
                     <td className="py-2 font-medium text-slate-200">{row.source}</td>
                     <td className="py-2 text-slate-300">{row.total}</td>
                     <td className="py-2 text-slate-300">{row.won}</td>
@@ -450,7 +464,7 @@ export default async function SalesOpsPage() {
               </thead>
               <tbody>
                 {byAssignee.map((row) => (
-                  <tr key={row.assignee} className="border-b border-slate-800">
+                  <tr key={row.assignee} className="border-b border-slate-800 odd:bg-slate-900/25">
                     <td className="py-2 font-medium text-slate-200">{row.assignee}</td>
                     <td className="py-2 text-slate-300">{row.total}</td>
                     <td className="py-2 text-slate-300">{row.won}</td>

@@ -25,6 +25,7 @@ export async function generateDailyChecklistTasks() {
   const todayEnd = endOfToday();
   const weekAheadStart = startOfDayAfter(7);
   const yesterdayStart = startOfYesterday();
+  const retentionStart = startOfDayAfter(-14);
   const now = new Date();
 
   const [
@@ -117,6 +118,15 @@ export async function generateDailyChecklistTasks() {
     },
   });
 
+  // Retenció: eliminar històric de checklist automàtic antic per evitar inflar el panell.
+  const oldChecklistCleanup = await prisma.task.deleteMany({
+    where: {
+      createdBy: 'system:daily-checklist',
+      status: { in: ['CANCELLED', 'DONE'] },
+      dueDate: { lt: retentionStart },
+    },
+  });
+
   const existingToday = await prisma.task.findMany({
     where: {
       createdBy: 'system:daily-checklist',
@@ -172,6 +182,7 @@ export async function generateDailyChecklistTasks() {
     created,
     skipped,
     staleCancelled: staleCleanup.count,
+    oldDeleted: oldChecklistCleanup.count,
     todayCancelled: toCancelTodayIds.length,
     considered,
     totalTemplates: templates.length,

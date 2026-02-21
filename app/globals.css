@@ -1609,7 +1609,7 @@ html.admin-mode .admin-shell :is(
   [role='button'],
   a.inline-flex,
   a[class*='rounded']
-):not([class*='bg-gradient']):not(.admin-feature-toggle) {
+):not([class*='bg-gradient']):not(.admin-feature-toggle):not(.admin-keep-colors) {
   background-color: #1a2635 !important;
   border: 1px solid var(--admin-border-strong) !important;
   color: var(--admin-text-main) !important;
@@ -1623,7 +1623,7 @@ html.admin-mode .admin-shell :is(
   [role='button'],
   a.inline-flex,
   a[class*='rounded']
-):not([class*='bg-gradient']):not(.admin-feature-toggle):hover {
+):not([class*='bg-gradient']):not(.admin-feature-toggle):not(.admin-keep-colors):hover {
   background-color: #223146 !important;
   border-color: #4e6480 !important;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22) !important;
@@ -1672,7 +1672,7 @@ html.admin-mode .admin-shell h1 {
   text-shadow: 0 1px 14px rgba(56, 189, 248, 0.12);
 }
 
-html.admin-mode .admin-shell :is(p, span, label, td, th, li, dd, dt) {
+html.admin-mode .admin-shell :is(p, label, td, th, li, dd, dt) {
   color: var(--admin-text-soft) !important;
   overflow-wrap: anywhere;
   text-align: center;

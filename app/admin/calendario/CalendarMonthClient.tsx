@@ -12,6 +12,10 @@ type CalendarApiDay = {
     clienteNombre?: string | null;
     ubicacion?: string | null;
     estado?: string | null;
+    eventType?: string | null;
+    eventStartTime?: string | null;
+    eventEndTime?: string | null;
+    packName?: string | null;
   }[];
   bloqueos: {
     id: string;
@@ -37,6 +41,38 @@ type CalendarCell = {
 };
 
 const weekdayLabels = ['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg']; // dilluns primer
+
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  WEDDING: 'Casament',
+  BIRTHDAY: 'Aniversari',
+  CORPORATE: 'Corporatiu',
+  COMMUNION: 'Comunió',
+  BAPTISM: 'Bateig',
+  GRADUATION: 'Graduació',
+  CELEBRATION: 'Celebració',
+  PRIVATE_PARTY: 'Festa privada',
+  OTHER: 'Altre',
+};
+
+function resolveServiceLabel(booking: CalendarApiDay['reservas'][number]): string {
+  const pack = booking.packName?.trim();
+  if (pack) return pack;
+  const eventType = booking.eventType?.trim();
+  if (eventType && EVENT_TYPE_LABELS[eventType]) return EVENT_TYPE_LABELS[eventType];
+  if (eventType) return eventType;
+  return 'Servei';
+}
+
+function resolveTimeLabel(booking: CalendarApiDay['reservas'][number]): string {
+  const start = booking.eventStartTime?.trim();
+  const end = booking.eventEndTime?.trim();
+  if (start && end) return `${start} - ${end}`;
+  if (start) return start;
+  return new Date(booking.fechaEvento).toLocaleTimeString('ca-ES', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 function formatKey(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -407,17 +443,17 @@ export default function CalendarMonthClient() {
           const hasReservas = dayData.reservas.length > 0;
           const hasBloqueos = dayData.bloqueos.length > 0;
 
-          let bgClass = 'bg-slate-800/80';
-          let hoverClass = 'hover:bg-slate-700/80';
+          let bgClass = 'bg-slate-800/90';
+          let hoverClass = 'hover:bg-slate-700/90';
           if (hasReservas && !hasBloqueos) {
-            bgClass = 'bg-emerald-500/10';
-            hoverClass = 'hover:bg-emerald-500/20';
+            bgClass = 'bg-emerald-600/30';
+            hoverClass = 'hover:bg-emerald-600/40';
           } else if (!hasReservas && hasBloqueos) {
-            bgClass = 'bg-rose-500/10';
-            hoverClass = 'hover:bg-rose-500/20';
+            bgClass = 'bg-rose-600/30';
+            hoverClass = 'hover:bg-rose-600/40';
           } else if (hasReservas && hasBloqueos) {
-            bgClass = 'bg-amber-500/10';
-            hoverClass = 'hover:bg-amber-500/20';
+            bgClass = 'bg-amber-600/30';
+            hoverClass = 'hover:bg-amber-600/40';
           }
 
           const isSelected = selectedDateKey === cell.key;
@@ -451,34 +487,30 @@ export default function CalendarMonthClient() {
               </div>
               <div className="mt-1 flex-1 min-w-0">
                 {hasReservas && (
-                  <div className="line-clamp-2 text-[9px] sm:text-[10px] font-medium text-emerald-300/90">
-                    {dayData.reservas.slice(0, 2).map((r, index) => {
-                      const label = r.clienteNombre || 'Client';
-                      const separator = index > 0 ? ' · ' : '';
-                      if (r.leadId) {
-                        return (
-                          <span key={r.id}>
-                            {separator}
+                  <div className="space-y-0.5 text-[9px] sm:text-[10px]">
+                    {dayData.reservas.slice(0, 2).map((r) => (
+                      <div key={r.id} className="rounded-md bg-emerald-950/45 px-1 py-0.5 text-emerald-100">
+                        <div className="truncate font-semibold">
+                          {r.leadId ? (
                             <Link
                               href={`/admin/leads/${r.leadId}`}
                               onClick={(event) => event.stopPropagation()}
-                              className="hover:text-emerald-200 hover:underline"
+                              className="hover:text-emerald-100 hover:underline"
                             >
-                              {label}
+                              {r.clienteNombre || 'Client'}
                             </Link>
-                          </span>
-                        );
-                      }
-                      return (
-                        <span key={r.id}>
-                          {separator}
-                          {label}
-                        </span>
-                      );
-                    })}
-                    {dayData.reservas.length > 2
-                      ? ` +${dayData.reservas.length - 2}`
-                      : ''}
+                          ) : (
+                            r.clienteNombre || 'Client'
+                          )}
+                        </div>
+                        <div className="truncate text-emerald-200/90">
+                          {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
+                        </div>
+                      </div>
+                    ))}
+                    {dayData.reservas.length > 2 && (
+                      <div className="text-emerald-100/80">+{dayData.reservas.length - 2} més</div>
+                    )}
                   </div>
                 )}
 
@@ -569,10 +601,7 @@ export default function CalendarMonthClient() {
                             {' · '}
                           </>
                         )}
-                        {new Date(r.fechaEvento).toLocaleTimeString('ca-ES', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
+                        {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
                       </div>
                       <div className="mt-2 flex flex-wrap gap-2">
                         <Link
@@ -641,6 +670,18 @@ export default function CalendarMonthClient() {
               </div>
             </div>
           </div>
+
+          {selectedDayData.payload?.reservas?.[0] && (
+            <div className="mt-4 rounded-xl border border-cyan-500/25 bg-cyan-500/5 p-4">
+              <h3 className="text-sm font-semibold text-cyan-200">Fitxa de l&apos;esdeveniment</h3>
+              <div className="mt-2 grid gap-2 text-sm text-slate-200 sm:grid-cols-2">
+                <p><span className="text-slate-400">Client:</span> {selectedDayData.payload.reservas[0].clienteNombre || '-'}</p>
+                <p><span className="text-slate-400">Horari:</span> {resolveTimeLabel(selectedDayData.payload.reservas[0])}</p>
+                <p><span className="text-slate-400">Servei:</span> {resolveServiceLabel(selectedDayData.payload.reservas[0])}</p>
+                <p><span className="text-slate-400">Ubicació:</span> {selectedDayData.payload.reservas[0].ubicacion || '-'}</p>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
