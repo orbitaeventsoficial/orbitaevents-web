@@ -41,7 +41,17 @@
       "Bash(pwsh -NoProfile -Command \"Select-String -Path ''C:\\\\Users\\\\Lore\\\\Desktop\\\\orbitaevents\\\\messages\\\\ca.json'' -Pattern ''bodas'' | head -20\")",
       "Bash(pwsh -NoProfile -Command \"findstr \"\"services.bodas\"\" ''C:\\\\Users\\\\Lore\\\\Desktop\\\\orbitaevents\\\\messages\\\\ca.json'' 2>/dev/null | head -5\")",
       "Bash(pwsh -NoProfile -Command \"Get-ChildItem -Path ''C:\\\\Users\\\\Lore\\\\Desktop\\\\orbitaevents\\\\app\\\\admin'' -Directory | Select-Object Name\")",
-      "Bash(pwsh -NoProfile -Command:*)"
+      "Bash(pwsh -NoProfile -Command:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx railway:*)",
+      "Bash(npm ls:*)",
+      "Bash(npx @railway/cli status:*)",
+      "Bash(npx @railway/cli logs:*)",
+      "Bash(git status:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx prisma migrate deploy:*)",
+      "Bash(DATABASE_URL=\"postgresql://postgres.syjfkjxjaltcihpogfji:Orbitaevents040120%2B%2B%2B@aws-1-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require\" npx prisma migrate deploy:*)",
+      "Bash(test:*)"
     ]
   }
 }

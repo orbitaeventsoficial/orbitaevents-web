@@ -20,6 +20,8 @@ interface BookingMarginProps {
   eventVenue?: string | null;
   inventoryCostReal?: number | null;
   inventoryHours?: number | null;
+  inventoryRemainingHoursAvg?: number | null;
+  inventoryRemainingHoursMin?: number | null;
 }
 
 // Default ratios (must match profitabilityService defaults)
@@ -27,6 +29,7 @@ const DEFAULT_PACK_COST_RATIO = 0.36;
 const DEFAULT_EXTRA_COST_RATIO = 0.28;
 const DEFAULT_EXTRA_HOUR_COST_RATIO = 0.20;
 const DEFAULT_FIXED_OPERATIONAL_COST = 45;
+const TARGET_MARGIN_PCT = 35;
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('ca-ES', { style: 'currency', currency: 'EUR' }).format(value);
@@ -47,6 +50,8 @@ export default function BookingMarginCard({
   eventVenue,
   inventoryCostReal,
   inventoryHours,
+  inventoryRemainingHoursAvg,
+  inventoryRemainingHoursMin,
 }: BookingMarginProps) {
   const router = useRouter();
 
@@ -69,17 +74,21 @@ export default function BookingMarginCard({
   const packCostUsed = typeof inventoryCostReal === 'number' && inventoryCostReal > 0
     ? inventoryCostReal
     : packEstimatedCost;
+  const extrasCost = extrasTotal * DEFAULT_EXTRA_COST_RATIO;
+  const extraHoursCost = extraHours * extraHourPrice * DEFAULT_EXTRA_HOUR_COST_RATIO;
 
   // Margin calculation
   const directCost =
     packCostUsed +
-    extrasTotal * DEFAULT_EXTRA_COST_RATIO +
-    extraHours * extraHourPrice * DEFAULT_EXTRA_HOUR_COST_RATIO +
+    extrasCost +
+    extraHoursCost +
     DEFAULT_FIXED_OPERATIONAL_COST +
     calculatedTravelCost;
 
   const netMargin = total - directCost;
   const marginPct = total > 0 ? (netMargin / total) * 100 : 0;
+  const targetMarginAmount = total * (TARGET_MARGIN_PCT / 100);
+  const marginDeltaVsTarget = netMargin - targetMarginAmount;
 
   const marginColor =
     marginPct >= 50 ? 'text-emerald-300' :
@@ -196,6 +205,42 @@ export default function BookingMarginCard({
         </div>
       </div>
 
+      {/* Sumatori clar */}
+      <div className="mb-6 rounded-xl border border-white/10 bg-black/20 p-4">
+        <h3 className="text-sm font-semibold text-slate-200 mb-3">Sumatori de costos i marge</h3>
+        <div className="space-y-1.5 text-xs text-slate-300">
+          <div className="flex justify-between"><span>Cost pack (real/estimat)</span><span>{formatCurrency(packCostUsed)}</span></div>
+          <div className="flex justify-between"><span>Cost extres</span><span>{formatCurrency(extrasCost)}</span></div>
+          <div className="flex justify-between"><span>Cost hores extra</span><span>{formatCurrency(extraHoursCost)}</span></div>
+          <div className="flex justify-between"><span>Cost operacional fix</span><span>{formatCurrency(DEFAULT_FIXED_OPERATIONAL_COST)}</span></div>
+          <div className="flex justify-between"><span>Cost benzina intern</span><span>{formatCurrency(calculatedTravelCost)}</span></div>
+          <div className="flex justify-between border-t border-white/10 pt-1.5"><span>Cost directe total</span><span className="font-semibold">{formatCurrency(directCost)}</span></div>
+          <div className="flex justify-between"><span>Ingressos reserva</span><span>{formatCurrency(total)}</span></div>
+          <div className="flex justify-between"><span>Diferencial de marge (ingrés - cost)</span><span className={marginColor}>{formatCurrency(netMargin)}</span></div>
+          <div className="flex justify-between"><span>Marge objectiu ({TARGET_MARGIN_PCT}%)</span><span>{formatCurrency(targetMarginAmount)}</span></div>
+          <div className="flex justify-between">
+            <span>Diferencial vs objectiu</span>
+            <span className={marginDeltaVsTarget >= 0 ? 'text-emerald-300' : 'text-rose-300'}>
+              {formatCurrency(marginDeltaVsTarget)}
+            </span>
+          </div>
+          {typeof inventoryRemainingHoursAvg === 'number' && (
+            <div className="flex justify-between border-t border-white/10 pt-1.5">
+              <span>Vida útil mitjana material assignat</span>
+              <span>{inventoryRemainingHoursAvg.toFixed(0)}h restants</span>
+            </div>
+          )}
+          {typeof inventoryRemainingHoursMin === 'number' && (
+            <div className="flex justify-between">
+              <span>Element més crític (mínim)</span>
+              <span className={inventoryRemainingHoursMin < 200 ? 'text-rose-300' : 'text-slate-200'}>
+                {inventoryRemainingHoursMin.toFixed(0)}h restants
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Cost breakdown */}
       <div className="text-sm text-slate-400 space-y-1 mb-6 border-t border-white/10 pt-4">
         <div className="flex justify-between">
@@ -209,13 +254,13 @@ export default function BookingMarginCard({
         {extrasTotal > 0 && (
           <div className="flex justify-between">
             <span>Extras ({(DEFAULT_EXTRA_COST_RATIO * 100).toFixed(0)}% de {formatCurrency(extrasTotal)})</span>
-            <span className="text-slate-300">{formatCurrency(extrasTotal * DEFAULT_EXTRA_COST_RATIO)}</span>
+            <span className="text-slate-300">{formatCurrency(extrasCost)}</span>
           </div>
         )}
         {extraHours > 0 && (
           <div className="flex justify-between">
             <span>Hores extra ({extraHours}h × {formatCurrency(extraHourPrice)})</span>
-            <span className="text-slate-300">{formatCurrency(extraHours * extraHourPrice * DEFAULT_EXTRA_HOUR_COST_RATIO)}</span>
+            <span className="text-slate-300">{formatCurrency(extraHoursCost)}</span>
           </div>
         )}
         <div className="flex justify-between">

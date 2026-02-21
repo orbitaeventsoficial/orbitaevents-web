@@ -162,6 +162,7 @@ export default async function PacksPage({
               const translation = pack.translations.find((t) => t.locale === 'es') || pack.translations[0];
               const health = pricingHealthByPack.get(pack.id);
               const divergence = health?.divergencePct ?? 0;
+              const extraHourDivergence = health?.extraHourDivergencePct ?? 0;
               const divergenceColor = health?.hasAlert
                 ? 'text-rose-300 border-rose-400/35 bg-rose-950/20'
                 : Math.abs(divergence) >= pricingConfig.alertDivergencePct * 0.5
@@ -218,20 +219,40 @@ export default async function PacksPage({
                     {health && (
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
-                          <p className="text-slate-400">Preu recomanat</p>
+                          <p className="text-slate-400">Pack recomanat</p>
                           <p className="text-sm font-semibold text-cyan-200">{health.recommendedPrice.toFixed(2)}€</p>
                         </div>
                         <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
-                          <p className="text-slate-400">Preu públic</p>
+                          <p className="text-slate-400">Pack PVP</p>
                           <p className="text-sm font-semibold text-slate-100">{health.publicPrice.toFixed(2)}€</p>
+                        </div>
+                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
+                          <p className="text-slate-400">Hora extra recomanada</p>
+                          <p className="text-sm font-semibold text-cyan-200">{health.recommendedExtraHourPrice.toFixed(2)}€</p>
+                        </div>
+                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
+                          <p className="text-slate-400">Hora extra PVP</p>
+                          <p className="text-sm font-semibold text-slate-100">{health.publicExtraHourPrice.toFixed(2)}€</p>
                         </div>
                         <div className={`col-span-2 rounded-lg border p-2 ${divergenceColor}`}>
                           <p className="font-semibold">
-                            Divergència: {health.divergencePct >= 0 ? '+' : ''}{health.divergencePct.toFixed(1)}%
+                            Divergència pack: {health.divergencePct >= 0 ? '+' : ''}{health.divergencePct.toFixed(1)}%
+                          </p>
+                          <p className={health.extraHourAlert ? 'font-semibold text-rose-200' : 'text-slate-200'}>
+                            Divergència hora extra: {extraHourDivergence >= 0 ? '+' : ''}{extraHourDivergence.toFixed(1)}%
                           </p>
                           {health.hasAlert && (
-                            <p className="text-[11px] text-rose-200">⚠ Revisa preu: fora del llindar ({pricingConfig.alertDivergencePct}%)</p>
+                            <p className="text-[11px] text-rose-200">⚠ Revisa pack/hora extra: fora del llindar ({pricingConfig.alertDivergencePct}%)</p>
                           )}
+                        </div>
+                        <div className="col-span-2 rounded-lg border border-slate-700/60 bg-slate-900/70 p-2 text-[11px] text-slate-300">
+                          Equip tècnic: {health.specialistCount} especialista + {health.operatorCount} operari · {health.laborNetCostPerHourUsed.toFixed(2)}€/h net · {health.laborCostPerHourUsed.toFixed(2)}€/h brut (SS {(health.socialSecurityPct * 100).toFixed(1)}%)
+                        </div>
+                        <div className="col-span-2 rounded-lg border border-slate-700/60 bg-slate-900/70 p-2 text-[11px] text-slate-300">
+                          IRPF {(health.withholdingPct * 100).toFixed(1)}% → net estimat percebut: {health.laborNetAfterWithholdingPerHourUsed.toFixed(2)}€/h
+                        </div>
+                        <div className="col-span-2 rounded-lg border border-cyan-500/25 bg-cyan-500/10 p-2 text-[11px] text-cyan-100">
+                          Operari extra sempre disponible: {health.recommendedOperatorExtraHourPrice.toFixed(2)}€/h (recomanat)
                         </div>
                       </div>
                     )}
@@ -303,6 +324,7 @@ export default async function PacksPage({
               const translation = pack.translations.find((t) => t.locale === 'es') || pack.translations[0];
               const health = pricingHealthByPack.get(pack.id);
               const divergence = health?.divergencePct ?? 0;
+              const extraHourDivergence = health?.extraHourDivergencePct ?? 0;
               const divergenceColor = health?.hasAlert
                 ? 'text-rose-300 border-rose-400/35 bg-rose-950/20'
                 : Math.abs(divergence) >= pricingConfig.alertDivergencePct * 0.5
@@ -359,20 +381,40 @@ export default async function PacksPage({
                     {health && (
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
-                          <p className="text-slate-400">Preu recomanat</p>
+                          <p className="text-slate-400">Pack recomanat</p>
                           <p className="text-sm font-semibold text-cyan-200">{health.recommendedPrice.toFixed(2)}€</p>
                         </div>
                         <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
-                          <p className="text-slate-400">Preu públic</p>
+                          <p className="text-slate-400">Pack PVP</p>
                           <p className="text-sm font-semibold text-slate-100">{health.publicPrice.toFixed(2)}€</p>
+                        </div>
+                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
+                          <p className="text-slate-400">Hora extra recomanada</p>
+                          <p className="text-sm font-semibold text-cyan-200">{health.recommendedExtraHourPrice.toFixed(2)}€</p>
+                        </div>
+                        <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
+                          <p className="text-slate-400">Hora extra PVP</p>
+                          <p className="text-sm font-semibold text-slate-100">{health.publicExtraHourPrice.toFixed(2)}€</p>
                         </div>
                         <div className={`col-span-2 rounded-lg border p-2 ${divergenceColor}`}>
                           <p className="font-semibold">
-                            Divergència: {health.divergencePct >= 0 ? '+' : ''}{health.divergencePct.toFixed(1)}%
+                            Divergència pack: {health.divergencePct >= 0 ? '+' : ''}{health.divergencePct.toFixed(1)}%
+                          </p>
+                          <p className={health.extraHourAlert ? 'font-semibold text-rose-200' : 'text-slate-200'}>
+                            Divergència hora extra: {extraHourDivergence >= 0 ? '+' : ''}{extraHourDivergence.toFixed(1)}%
                           </p>
                           {health.hasAlert && (
-                            <p className="text-[11px] text-rose-200">⚠ Revisa preu: fora del llindar ({pricingConfig.alertDivergencePct}%)</p>
+                            <p className="text-[11px] text-rose-200">⚠ Revisa pack/hora extra: fora del llindar ({pricingConfig.alertDivergencePct}%)</p>
                           )}
+                        </div>
+                        <div className="col-span-2 rounded-lg border border-slate-700/60 bg-slate-900/70 p-2 text-[11px] text-slate-300">
+                          Equip tècnic: {health.specialistCount} especialista + {health.operatorCount} operari · {health.laborNetCostPerHourUsed.toFixed(2)}€/h net · {health.laborCostPerHourUsed.toFixed(2)}€/h brut (SS {(health.socialSecurityPct * 100).toFixed(1)}%)
+                        </div>
+                        <div className="col-span-2 rounded-lg border border-slate-700/60 bg-slate-900/70 p-2 text-[11px] text-slate-300">
+                          IRPF {(health.withholdingPct * 100).toFixed(1)}% → net estimat percebut: {health.laborNetAfterWithholdingPerHourUsed.toFixed(2)}€/h
+                        </div>
+                        <div className="col-span-2 rounded-lg border border-cyan-500/25 bg-cyan-500/10 p-2 text-[11px] text-cyan-100">
+                          Operari extra sempre disponible: {health.recommendedOperatorExtraHourPrice.toFixed(2)}€/h (recomanat)
                         </div>
                       </div>
                     )}

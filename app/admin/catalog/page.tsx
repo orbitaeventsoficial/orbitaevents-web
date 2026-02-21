@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getPackPricingAlertsCount } from '@/lib/services/packPricingHealth';
 
 type CatalogTab = 'packs' | 'extras' | 'inventory' | 'pricing';
 
@@ -34,12 +35,13 @@ function resolveTab(input?: string): CatalogTab {
 
 export const dynamic = 'force-dynamic';
 
-export default function CatalogPage({
+export default async function CatalogPage({
   searchParams,
 }: {
   searchParams?: { tab?: string };
 }) {
   const activeTab = resolveTab(searchParams?.tab);
+  const pricingAlerts = await getPackPricingAlertsCount();
 
   return (
     <div className="space-y-6">
@@ -48,6 +50,11 @@ export default function CatalogPage({
         <p className="mt-1 text-sm text-slate-400">
           Punt únic per operar packs, extres, inventari i regles de preu.
         </p>
+        {pricingAlerts > 0 && (
+          <p className="mt-2 inline-flex rounded-full border border-rose-500/40 bg-rose-500/10 px-3 py-1 text-xs font-semibold text-rose-200">
+            ⚠ {pricingAlerts} alertes de divergència de preu en packs
+          </p>
+        )}
       </header>
 
       <nav className="flex flex-wrap gap-2">

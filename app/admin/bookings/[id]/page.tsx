@@ -238,6 +238,37 @@ export default async function BookingDetailPage({ params }: PageProps) {
       channel: typeof details.channel === 'string' ? details.channel : '-',
     };
   });
+  const bAny = booking as Record<string, unknown>;
+  const packPrice = booking.pack?.price ? Number(booking.pack.price) : 0;
+  const extrasTotal = booking.extras?.reduce((sum, e) => sum + Number(e.price || 0), 0) ?? 0;
+  const extraHours = typeof bAny.extraHours === 'number' ? bAny.extraHours : 0;
+  const extraHourPrice = typeof bAny.extraHourPrice === 'number' ? bAny.extraHourPrice : 0;
+  const inventoryHours = calculateEventDuration(booking.eventStartTime, booking.eventEndTime);
+  const assignedItemIds = (booking.inventory || []).map((assigned) => assigned.itemId);
+  const usageByItem = assignedItemIds.length > 0
+    ? new Map(
+        (await prisma.inventoryUsage.groupBy({
+          by: ['itemId'],
+          where: { itemId: { in: assignedItemIds } },
+          _sum: { hoursUsed: true },
+        })).map((row) => [row.itemId, row._sum.hoursUsed || 0])
+      )
+    : new Map<string, number>();
+  const inventoryCostReal = (booking.inventory || []).reduce((sum, assigned) => {
+    const perHour = calculateCostPerHour(assigned.item.purchasePrice, assigned.item.expectedLifeHours);
+    return sum + (perHour * (assigned.quantity || 1) * inventoryHours);
+  }, 0);
+  const remainingHoursList = (booking.inventory || []).map((assigned) => {
+    const expectedLifeHours = assigned.item.expectedLifeHours || 2000;
+    const used = usageByItem.get(assigned.itemId) || 0;
+    return Math.max(0, expectedLifeHours - used);
+  });
+  const inventoryRemainingHoursAvg = remainingHoursList.length > 0
+    ? remainingHoursList.reduce((acc, n) => acc + n, 0) / remainingHoursList.length
+    : null;
+  const inventoryRemainingHoursMin = remainingHoursList.length > 0
+    ? Math.min(...remainingHoursList)
+    : null;
 
   return (
     <div className="space-y-6">
@@ -548,37 +579,24 @@ export default async function BookingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Margin + Travel Cost (editable) */}
-      {(() => {
-        const bAny = booking as Record<string, unknown>;
-        const packPrice = booking.pack?.price ? Number(booking.pack.price) : 0;
-        const extrasTotal = booking.extras?.reduce((sum, e) => sum + Number(e.price || 0), 0) ?? 0;
-        const extraHours = typeof bAny.extraHours === 'number' ? bAny.extraHours : 0;
-        const extraHourPrice = typeof bAny.extraHourPrice === 'number' ? bAny.extraHourPrice : 0;
-        const inventoryHours = calculateEventDuration(booking.eventStartTime, booking.eventEndTime);
-        const inventoryCostReal = (booking.inventory || []).reduce((sum, assigned) => {
-          const perHour = calculateCostPerHour(assigned.item.purchasePrice, assigned.item.expectedLifeHours);
-          return sum + (perHour * (assigned.quantity || 1) * inventoryHours);
-        }, 0);
-
-        return (
-          <BookingMarginCard
-            bookingId={booking.id}
-            total={Number(booking.total)}
-            packPrice={packPrice}
-            extrasTotal={extrasTotal}
-            extraHours={extraHours}
-            extraHourPrice={extraHourPrice}
-            distanceKm={typeof bAny.distanceKm === 'number' ? bAny.distanceKm : null}
-            fuelCostPerKm={typeof bAny.fuelCostPerKm === 'number' ? bAny.fuelCostPerKm : null}
-            travelCost={typeof bAny.travelCost === 'number' ? bAny.travelCost : null}
-            source={booking.lead?.source || 'UNKNOWN'}
-            eventLocation={booking.eventLocation}
-            eventVenue={booking.eventVenue}
-            inventoryCostReal={inventoryCostReal > 0 ? Number(inventoryCostReal.toFixed(2)) : null}
-            inventoryHours={inventoryHours > 0 ? inventoryHours : null}
-          />
-        );
-      })()}
+      <BookingMarginCard
+        bookingId={booking.id}
+        total={Number(booking.total)}
+        packPrice={packPrice}
+        extrasTotal={extrasTotal}
+        extraHours={extraHours}
+        extraHourPrice={extraHourPrice}
+        distanceKm={typeof bAny.distanceKm === 'number' ? bAny.distanceKm : null}
+        fuelCostPerKm={typeof bAny.fuelCostPerKm === 'number' ? bAny.fuelCostPerKm : null}
+        travelCost={typeof bAny.travelCost === 'number' ? bAny.travelCost : null}
+        source={booking.lead?.source || 'UNKNOWN'}
+        eventLocation={booking.eventLocation}
+        eventVenue={booking.eventVenue}
+        inventoryCostReal={inventoryCostReal > 0 ? Number(inventoryCostReal.toFixed(2)) : null}
+        inventoryHours={inventoryHours > 0 ? inventoryHours : null}
+        inventoryRemainingHoursAvg={inventoryRemainingHoursAvg != null ? Number(inventoryRemainingHoursAvg.toFixed(1)) : null}
+        inventoryRemainingHoursMin={inventoryRemainingHoursMin != null ? Number(inventoryRemainingHoursMin.toFixed(1)) : null}
+      />
 
       {/* Notes */}
       {booking.notes && (
@@ -670,5 +688,3 @@ export default async function BookingDetailPage({ params }: PageProps) {
     </div>
   );
 }
-
-

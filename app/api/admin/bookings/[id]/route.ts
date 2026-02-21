@@ -8,7 +8,7 @@ import { requireAuth, requirePermission } from '@/lib/auth';
 import { getRequestId } from '@/lib/request-context';
 import { syncBookingToGoogleCalendar } from '@/lib/services/googleCalendarSyncService';
 import { calculateEventDuration } from '@/lib/inventory-utils';
-import { calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
+import { calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 
 interface Params {
@@ -168,6 +168,21 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       body.distanceKm = distanceKm;
       body.fuelCostPerKm = fuelCostPerKm;
       body.travelCost = calculateTravelCost(distanceKm, fuelCostPerKm);
+
+      const travelCharge = calculateTravelCharge(distanceKm);
+      const baseWithoutTravel = Math.max(0, existing.subtotal - calculateTravelCharge(existing.distanceKm || 0));
+      const subtotal = baseWithoutTravel + travelCharge;
+      const discount = typeof body.discount === 'number' ? body.discount : existing.discount || 0;
+      const vatRate = typeof body.vatRate === 'number' ? body.vatRate : existing.vatRate || 21;
+      const baseAfterDiscount = Math.max(0, subtotal - discount);
+      const vatAmount = baseAfterDiscount * (vatRate / 100);
+      const total = baseAfterDiscount + vatAmount;
+
+      body.subtotal = subtotal;
+      body.vatAmount = vatAmount;
+      body.total = total;
+      body.depositAmount = Math.round(total * 0.3);
+      body.remainingAmount = total - Math.round(total * 0.3);
     }
 
     const oldStatus = existing.status;
