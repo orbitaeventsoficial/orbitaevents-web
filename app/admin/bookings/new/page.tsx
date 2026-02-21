@@ -432,22 +432,11 @@ export default function NewBookingPage() {
                     : 'border-slate-700/50 bg-slate-900/60 text-slate-400 hover:bg-slate-800'
                 }`}
               >
-                <span className="text-base">{et.icon}</span>
-                <span className="block mt-0.5">{et.label}</span>
-                {form.eventType === et.value && (
-                  <span className="mt-1 inline-block rounded-full bg-cyan-400/20 px-1.5 py-0.5 text-[10px] font-semibold text-cyan-200">
-                    Seleccionat ✓
-                  </span>
-                )}
+                <span className="text-base leading-none">{et.icon}</span>
+                <span className="mt-1 block leading-tight">{et.label}</span>
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-cyan-300">
-            Tipus seleccionat:{' '}
-            <span className="font-semibold">
-              {EVENT_TYPES.find((et) => et.value === form.eventType)?.label ?? 'Altre'}
-            </span>
-          </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-4">
@@ -527,7 +516,7 @@ export default function NewBookingPage() {
                 key={pack.id}
                 type="button"
                 onClick={() => updateField('packId', pack.id)}
-                className={`rounded-xl border p-4 text-left transition-all ${
+                className={`rounded-xl border p-4 text-center transition-all ${
                   isSelected
                     ? 'border-cyan-400 bg-cyan-500/15 ring-1 ring-cyan-400/50'
                     : 'border-slate-700/50 bg-slate-900/40 hover:bg-slate-800/60'
@@ -599,7 +588,7 @@ export default function NewBookingPage() {
                   <button
                     type="button"
                     onClick={() => toggleExtra(extra)}
-                    className="flex-1 text-left"
+                    className="flex-1 text-center"
                   >
                     <span className={`text-sm font-medium ${isSelected ? 'text-emerald-200' : 'text-slate-300'}`}>
                       {isSelected ? '✓ ' : ''}{name}

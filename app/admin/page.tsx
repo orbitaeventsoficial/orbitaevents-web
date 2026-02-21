@@ -539,7 +539,7 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-3">
+      <div className="rounded-2xl border border-slate-700/60 bg-gradient-to-br from-slate-900/85 to-slate-900/55 p-4 sm:p-5 flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-lg sm:text-xl font-semibold text-slate-100">Resum ràpid</h1>
@@ -557,20 +557,20 @@ export default async function AdminDashboard() {
             <Button variant="primary" icon="+" label="Nou lead" />
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          <Link href="/admin/inbox" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <Link href="/admin/inbox" className="rounded-2xl border border-slate-700/50 bg-slate-800/65 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
             📥 Inbox (IMAP)
           </Link>
-          <Link href="/admin/emails" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+          <Link href="/admin/emails" className="rounded-2xl border border-slate-700/50 bg-slate-800/65 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
             🤖 Correus automàtics
           </Link>
-          <Link href="/admin/bookings" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+          <Link href="/admin/bookings" className="rounded-2xl border border-slate-700/50 bg-slate-800/65 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
             📋 Reserves
           </Link>
-          <Link href="/admin/economia" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+          <Link href="/admin/economia" className="rounded-2xl border border-slate-700/50 bg-slate-800/65 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
             💶 Economia
           </Link>
-          <Link href="/admin/calendario" className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+          <Link href="/admin/calendario" className="rounded-2xl border border-slate-700/50 bg-slate-800/65 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
             📅 Calendari
           </Link>
         </div>

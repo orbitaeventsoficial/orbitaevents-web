@@ -1570,6 +1570,8 @@ html.admin-mode .admin-shell.admin-unified {
 html.admin-mode .admin-shell {
   color: var(--admin-text-main) !important;
   max-width: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 html.admin-mode .admin-shell.admin-unified :is(
@@ -1588,6 +1590,7 @@ html.admin-mode .admin-shell.admin-unified :is(
   border-style: solid !important;
   border-radius: 14px !important;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24) !important;
+  backdrop-filter: saturate(130%) blur(2px);
 }
 
 html.admin-mode .admin-shell :is(
@@ -1611,6 +1614,7 @@ html.admin-mode .admin-shell :is(
   border: 1px solid var(--admin-border-strong) !important;
   color: var(--admin-text-main) !important;
   border-radius: 10px !important;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
 html.admin-mode .admin-shell :is(
@@ -1622,6 +1626,8 @@ html.admin-mode .admin-shell :is(
 ):not([class*='bg-gradient']):not(.admin-feature-toggle):hover {
   background-color: #223146 !important;
   border-color: #4e6480 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22) !important;
+  transform: translateY(-1px);
 }
 
 html.admin-mode .admin-shell .admin-priority-chip {
@@ -1658,6 +1664,12 @@ html.admin-mode .admin-shell :is(h1, h2, h3, h4, h5, h6) {
   color: #f8fbff !important;
   letter-spacing: -0.01em;
   text-align: center;
+  text-wrap: balance;
+}
+
+html.admin-mode .admin-shell h1 {
+  color: #ffffff !important;
+  text-shadow: 0 1px 14px rgba(56, 189, 248, 0.12);
 }
 
 html.admin-mode .admin-shell :is(p, span, label, td, th, li, dd, dt) {
@@ -1702,6 +1714,28 @@ html.admin-mode .admin-shell :is(img, video, iframe) {
 
 html.admin-mode .admin-shell .overflow-x-auto {
   -webkit-overflow-scrolling: touch;
+}
+
+html.admin-mode .admin-shell :is(*::-webkit-scrollbar) {
+  width: 10px;
+  height: 10px;
+}
+
+html.admin-mode .admin-shell :is(*::-webkit-scrollbar-thumb) {
+  background: linear-gradient(180deg, rgba(71, 100, 128, 0.85), rgba(42, 54, 69, 0.9));
+  border-radius: 999px;
+  border: 2px solid rgba(11, 15, 20, 0.7);
+}
+
+html.admin-mode .admin-shell :is(*::-webkit-scrollbar-track) {
+  background: rgba(11, 15, 20, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.admin-mode .admin-shell * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 @media (max-width: 768px) {

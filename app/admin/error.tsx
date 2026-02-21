@@ -8,10 +8,10 @@ interface AdminErrorProps {
 export default function AdminError({ error, reset }: AdminErrorProps) {
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-slate-950/60 border border-amber-200 rounded-2xl p-8 text-center shadow-lg">
-        <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="max-w-md w-full rounded-2xl border border-rose-500/30 bg-gradient-to-b from-slate-900/95 to-slate-950/95 p-8 text-center shadow-xl shadow-black/35">
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-rose-500/40 bg-rose-500/15">
           <svg
-            className="w-8 h-8 text-rose-500"
+            className="w-8 h-8 text-rose-300"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -25,21 +25,21 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
           </svg>
         </div>
 
-        <h2 className="text-xl font-bold text-stone-800 mb-2">
+        <h2 className="mb-2 text-xl font-bold text-slate-100">
           Error al panell d&apos;administració
         </h2>
 
-        <p className="text-stone-500 mb-6">
+        <p className="mb-6 text-slate-300">
           S&apos;ha produït un error inesperat.
         </p>
 
         {process.env.NODE_ENV === 'development' && (
-          <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-6 text-left">
-            <p className="text-rose-700 text-sm font-mono break-all">
+          <div className="mb-6 rounded-xl border border-rose-500/40 bg-rose-500/10 p-4">
+            <p className="text-sm font-mono text-rose-200 break-all">
               {error.message}
             </p>
             {error.digest && (
-              <p className="text-rose-400 text-xs mt-2">
+              <p className="mt-2 text-xs text-rose-300/80">
                 Digest: {error.digest}
               </p>
             )}
@@ -50,14 +50,14 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
           <button
             onClick={reset}
             type="button"
-            className="px-5 py-2.5 bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 text-white font-medium rounded-xl transition-all shadow-sm"
+            className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 px-5 py-2.5 font-medium text-white transition-all hover:from-amber-400 hover:to-orange-500"
           >
             Torna-ho a provar
           </button>
 
           <a
             href="/admin"
-            className="px-5 py-2.5 bg-white/5 hover:bg-stone-200 text-stone-700 font-medium rounded-xl transition-colors"
+            className="rounded-xl border border-slate-600/60 bg-slate-800/70 px-5 py-2.5 font-medium text-slate-200 transition-colors hover:bg-slate-700/70"
           >
             Tornar a l&apos;inici
           </a>

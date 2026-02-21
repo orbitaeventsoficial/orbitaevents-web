@@ -72,7 +72,7 @@ export default async function ReportsPage() {
         </div>
         <Link
           href="/admin/post-event"
-          className="px-4 py-2 bg-white/5 text-slate-200 rounded-lg font-medium hover:bg-white/10"
+          className="rounded-lg border border-slate-700/60 bg-slate-800/70 px-4 py-2 font-medium text-slate-200 hover:bg-slate-700/70"
         >
           ← Tornar
         </Link>
@@ -80,15 +80,15 @@ export default async function ReportsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-400/30 rounded-xl p-4">
+        <div className="rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-amber-500/5 p-4">
           <div className="text-sm text-orange-300 font-medium">Esborranys</div>
           <div className="text-3xl font-bold text-orange-300 mt-1">{draftReports.length}</div>
         </div>
-        <div className="bg-gradient-to-br from-green-50 to-green-100 border border-emerald-400/30 rounded-xl p-4">
+        <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/15 to-emerald-500/5 p-4">
           <div className="text-sm text-emerald-300 font-medium">Completats</div>
           <div className="text-3xl font-bold text-emerald-300 mt-1">{completedReports.length}</div>
         </div>
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-cyan-400/30 rounded-xl p-4">
+        <div className="rounded-xl border border-cyan-500/30 bg-gradient-to-br from-cyan-500/15 to-cyan-500/5 p-4">
           <div className="text-sm text-cyan-300 font-medium">Total</div>
           <div className="text-3xl font-bold text-cyan-300 mt-1">{reports.length}</div>
         </div>
@@ -100,7 +100,7 @@ export default async function ReportsPage() {
           <div className="bg-orange-950/30 border-b border-orange-100 p-4">
             <h3 className="font-semibold text-orange-300">📝 Events sense informe ({availableBookings.length})</h3>
           </div>
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-700/40">
             {availableBookings.map((booking) => {
               const packName = getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale);
               return (

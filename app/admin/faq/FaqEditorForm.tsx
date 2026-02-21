@@ -1,0 +1,216 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+type Translation = {
+  locale: 'ca' | 'es' | 'en';
+  question: string;
+  answer: string;
+};
+
+type InitialFaq = {
+  id?: string;
+  slug: string;
+  category: string;
+  order: number;
+  isActive: boolean;
+  translations: Translation[];
+};
+
+const CATEGORIES = [
+  { value: 'general', label: 'General' },
+  { value: 'sound', label: 'So' },
+  { value: 'lighting', label: 'Il·luminació' },
+  { value: 'pricing', label: 'Preus' },
+  { value: 'booking', label: 'Reserves' },
+];
+
+const BASE_TRANSLATIONS: Translation[] = [
+  { locale: 'ca', question: '', answer: '' },
+  { locale: 'es', question: '', answer: '' },
+  { locale: 'en', question: '', answer: '' },
+];
+
+function normalizeTranslations(input: Translation[] | undefined): Translation[] {
+  const map = new Map<string, Translation>();
+  (input || []).forEach((t) => map.set(t.locale, t));
+  return BASE_TRANSLATIONS.map((base) => map.get(base.locale) || base);
+}
+
+export default function FaqEditorForm({
+  mode,
+  initial,
+}: {
+  mode: 'create' | 'edit';
+  initial?: InitialFaq;
+}) {
+  const router = useRouter();
+  const [slug, setSlug] = useState(initial?.slug || '');
+  const [category, setCategory] = useState(initial?.category || 'general');
+  const [order, setOrder] = useState<number>(initial?.order ?? 0);
+  const [isActive, setIsActive] = useState<boolean>(initial?.isActive ?? true);
+  const [translations, setTranslations] = useState<Translation[]>(
+    normalizeTranslations(initial?.translations)
+  );
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const canSubmit = useMemo(() => {
+    if (!slug.trim()) return false;
+    return translations.some((t) => t.question.trim() && t.answer.trim());
+  }, [slug, translations]);
+
+  const updateTranslation = (locale: Translation['locale'], key: 'question' | 'answer', value: string) => {
+    setTranslations((prev) =>
+      prev.map((t) => (t.locale === locale ? { ...t, [key]: value } : t))
+    );
+  };
+
+  const onSubmit = async () => {
+    if (!canSubmit) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const payload = {
+        slug: slug.trim(),
+        category,
+        order,
+        isActive,
+        translations: translations.map((t) => ({
+          locale: t.locale,
+          question: t.question.trim(),
+          answer: t.answer.trim(),
+        })),
+      };
+
+      const res = await fetch(
+        mode === 'create' ? '/api/admin/faq' : `/api/admin/faq/${initial?.id}`,
+        {
+          method: mode === 'create' ? 'POST' : 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || "No s'ha pogut desar la FAQ");
+      }
+
+      router.push('/admin/faq');
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error desconegut');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5">
+        <h2 className="text-sm font-semibold text-slate-100">Dades bàsiques</h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="text-xs text-slate-400">Slug</label>
+            <input
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              placeholder="faq-reserva-data"
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-slate-400">Categoria</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100"
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-slate-400">Ordre</label>
+            <input
+              type="number"
+              value={order}
+              onChange={(e) => setOrder(Number.parseInt(e.target.value || '0', 10))}
+              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              type="button"
+              onClick={() => setIsActive((v) => !v)}
+              className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
+                isActive
+                  ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200'
+                  : 'border-rose-500/40 bg-rose-500/15 text-rose-200'
+              }`}
+            >
+              {isActive ? 'Activa' : 'Inactiva'}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        {translations.map((t) => (
+          <div key={t.locale} className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5">
+            <h3 className="text-sm font-semibold text-slate-100">Idioma: {t.locale.toUpperCase()}</h3>
+            <div className="mt-3 space-y-3">
+              <div>
+                <label className="text-xs text-slate-400">Pregunta</label>
+                <input
+                  value={t.question}
+                  onChange={(e) => updateTranslation(t.locale, 'question', e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-slate-400">Resposta</label>
+                <textarea
+                  rows={4}
+                  value={t.answer}
+                  onChange={(e) => updateTranslation(t.locale, 'answer', e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {error && (
+        <div className="rounded-xl border border-rose-500/40 bg-rose-500/15 p-3 text-sm text-rose-200">
+          {error}
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={saving || !canSubmit}
+          className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+        >
+          {saving ? 'Desant...' : mode === 'create' ? 'Crear FAQ' : 'Desar canvis'}
+        </button>
+        <button
+          type="button"
+          onClick={() => router.push('/admin/faq')}
+          className="rounded-xl border border-slate-600/60 bg-slate-800/70 px-5 py-2.5 text-sm font-semibold text-slate-200"
+        >
+          Cancel·lar
+        </button>
+      </div>
+    </div>
+  );
+}
+

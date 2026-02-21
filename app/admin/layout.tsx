@@ -61,8 +61,8 @@ function SidebarItem({
         relative flex items-center gap-3 px-3 py-2.5 rounded-xl min-w-0
         border transition-all duration-200 group active:scale-[0.98]
         ${isActive
-          ? 'border-amber-400/45 bg-amber-500/10 text-amber-100 shadow-sm shadow-amber-500/10'
-          : 'border-transparent text-slate-400 hover:text-slate-100 hover:bg-slate-800/70'
+          ? 'border-amber-400/50 bg-gradient-to-r from-amber-500/20 to-orange-500/10 text-amber-100 shadow-md shadow-amber-500/20'
+          : 'border-transparent text-slate-400 hover:text-slate-100 hover:border-slate-700/60 hover:bg-slate-800/70'
         }
       `}
     >
@@ -114,7 +114,7 @@ function SidebarSection({
       <button
         type="button"
         onClick={toggle}
-        className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800/60"
+        className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800/70"
       >
         <span>{title}</span>
         <span className={`text-slate-500 transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
@@ -343,6 +343,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   const priorityItems = useMemo(() => ([
     { icon: '📥', label: 'Entrades', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
+    { icon: '🧭', label: 'Mapa admin', href: '/admin/mapa' },
     { icon: '⚡', label: 'Entrada ràpida', href: '/admin/intake' },
     { icon: '👤', label: 'Clients', href: '/admin/clientes' },
     { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
@@ -480,6 +481,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       features: 'Features',
       theme: 'Tema',
       stats: 'Estadístiques',
+      mapa: 'Mapa Admin',
       blog: 'Blog',
       canvas: 'Canvas',
       translations: 'Traduccions',
@@ -532,7 +534,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           {helpModeEnabled && <AdminHelpLegend />}
           {helpModeEnabled && <AdminHelpInspector />}
           {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-gradient-to-b from-zinc-900/95 via-zinc-900/95 to-slate-950/95 backdrop-blur-sm border-r border-zinc-700/80 flex-col z-40">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-gradient-to-b from-zinc-900/95 via-zinc-900/95 to-slate-950/95 backdrop-blur-sm border-r border-zinc-700/80 flex-col z-40 shadow-2xl shadow-black/35">
         {/* Logo */}
         <div className="p-4 border-b border-slate-800/90">
           <Link href="/admin" className="flex items-center gap-3">
@@ -835,7 +837,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Desktop Header */}
-      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-zinc-700/80 px-6 items-center justify-between bg-zinc-900/95 backdrop-blur-xl z-30">
+      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-16 border-b border-zinc-700/80 px-6 items-center justify-between bg-gradient-to-r from-zinc-900/95 to-slate-900/95 backdrop-blur-xl z-30">
         <div className="flex items-center gap-3 text-sm">
           <Link href="/admin" className="text-slate-400 hover:text-slate-200 transition-colors">Admin</Link>
           <span className="text-slate-600">/</span>
