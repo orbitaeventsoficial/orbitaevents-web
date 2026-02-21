@@ -8,6 +8,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import { getAllPacks } from '../app/config/packs-config';
+import { resolvePackI18nFeatures, resolvePackI18nKey } from '../lib/pack-i18n';
 
 const prisma = new PrismaClient();
 
@@ -19,6 +20,16 @@ const colors = {
   cyan: '\x1b[36m',
   magenta: '\x1b[35m',
 };
+
+function localizedPackFields(pack: any, locale: 'es' | 'ca' | 'en') {
+  return {
+    name: resolvePackI18nKey(pack.name, locale),
+    tagline: resolvePackI18nKey(pack.tagline || '', locale),
+    description: resolvePackI18nKey(pack.emotion || pack.tagline || '', locale),
+    features: resolvePackI18nFeatures(pack.features || [], locale),
+    badge: resolvePackI18nKey(pack.badge || '', locale),
+  };
+}
 
 async function main() {
   console.log(`${colors.cyan}═══════════════════════════════════════════════════${colors.reset}`);
@@ -56,7 +67,8 @@ async function main() {
           });
 
           // Actualizar/crear traducciones
-          for (const locale of ['es', 'ca', 'en']) {
+          for (const locale of ['es', 'ca', 'en'] as const) {
+            const localized = localizedPackFields(pack, locale);
             await prisma.packTranslation.upsert({
               where: {
                 packId_locale: {
@@ -67,18 +79,18 @@ async function main() {
               create: {
                 packId: existing.id,
                 locale: locale,
-                name: pack.name,
-                tagline: pack.tagline || '',
-                description: pack.emotion || pack.tagline || '',
-                features: pack.features || [],
-                badge: pack.badge || '',
+                name: localized.name,
+                tagline: localized.tagline,
+                description: localized.description,
+                features: localized.features,
+                badge: localized.badge,
               },
               update: {
-                name: pack.name,
-                tagline: pack.tagline || '',
-                description: pack.emotion || pack.tagline || '',
-                features: pack.features || [],
-                badge: pack.badge || '',
+                name: localized.name,
+                tagline: localized.tagline,
+                description: localized.description,
+                features: localized.features,
+                badge: localized.badge,
               }
             });
           }
@@ -100,16 +112,17 @@ async function main() {
           });
 
           // Crear traducciones
-          for (const locale of ['es', 'ca', 'en']) {
+          for (const locale of ['es', 'ca', 'en'] as const) {
+            const localized = localizedPackFields(pack, locale);
             await prisma.packTranslation.create({
               data: {
                 packId: newPack.id,
                 locale: locale,
-                name: pack.name,
-                tagline: pack.tagline || '',
-                description: pack.emotion || pack.tagline || '',
-                features: pack.features || [],
-                badge: pack.badge || '',
+                name: localized.name,
+                tagline: localized.tagline,
+                description: localized.description,
+                features: localized.features,
+                badge: localized.badge,
               }
             });
           }

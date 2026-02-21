@@ -27,6 +27,8 @@ import { usePacks } from '@/lib/hooks/usePacks';
 export default function FiestasClient() {
   const t = useTranslations('pages.parties');
   const tPages = useTranslations('pages');
+  const tConfigurator = useTranslations('configurator');
+  const tRoot = useTranslations();
   const locale = useLocale();
   const fallbackPacks = useMemo(() => getPacksByService('fiestas'), []);
   const fallbackDiscoPacks = useMemo(() => getPacksByService('discomovil'), []);
@@ -53,45 +55,94 @@ export default function FiestasClient() {
     return Array.from(deduped.values());
   }, [fiestaPacks, discomovilPacks]);
 
+  const normalizePackBaseKey = (baseKey: string) => {
+    const noConfigurator = baseKey.startsWith('configurator.')
+      ? baseKey.slice('configurator.'.length)
+      : baseKey;
+    if (noConfigurator.startsWith('pages.parties.discoPacks.')) {
+      return noConfigurator.replace('pages.parties.discoPacks.', 'services.mobile.discoPacks.');
+    }
+    return noConfigurator;
+  };
+
+  const humanizeKeyFallback = (value: string): string => {
+    if (!value || !value.includes('.')) return value;
+    const token = value.split('.').pop() || value;
+    return token
+      .replace(/[-_]/g, ' ')
+      .replace(/\b\w/g, (m) => m.toUpperCase());
+  };
+
+  const getTranslatedByCandidates = (candidates: string[], fallback: string): string => {
+    for (const key of candidates) {
+      try {
+        const translated = tRoot(key as any);
+        if (translated && translated !== key) return translated;
+      } catch {
+        // keep trying
+      }
+      if (key.startsWith('configurator.')) {
+        const nested = key.slice('configurator.'.length);
+        try {
+          const translated = tConfigurator(nested);
+          if (translated && translated !== nested) return translated;
+        } catch {
+          // keep trying
+        }
+      }
+      if (key.startsWith('pages.mobile.')) {
+        const nested = key.slice('pages.'.length);
+        try {
+          const translated = tPages(nested);
+          if (translated && translated !== nested) return translated;
+        } catch {
+          // keep trying
+        }
+      }
+    }
+    return fallback;
+  };
+
   const getPackText = (pack: PackDefinition, field: 'name' | 'tagline' | 'ideal') => {
     const rawFallback = field === 'name' ? pack.name : field === 'tagline' ? pack.tagline : (pack.ideal || '');
     const fallback =
       rawFallback.startsWith('pages.')
         ? (field === 'name' ? pack.id.replace(/-/g, ' ') : '')
         : rawFallback;
-    const keyLegacy = `discoPacks.${pack.id}.${field}`;
-    const keyPages = `mobile.discoPacks.${pack.id}.${field}`;
-    try {
-      const translatedLegacy = t(keyLegacy);
-      if (translatedLegacy && translatedLegacy !== keyLegacy) return translatedLegacy;
-    } catch {
-      // continue
-    }
-    try {
-      const translatedPages = tPages(keyPages);
-      if (translatedPages && translatedPages !== keyPages) return translatedPages;
-    } catch {
-      // continue
-    }
-    return fallback;
+
+    const baseKey = normalizePackBaseKey(pack.i18nBaseKey || `step2.packs.${pack.id}`);
+    const candidates = [
+      baseKey.startsWith('step2.') ? `configurator.${baseKey}.${field}` : '',
+      `${baseKey}.${field}`,
+      `services.mobile.discoPacks.${pack.id}.${field}`,
+      `pages.mobile.discoPacks.${pack.id}.${field}`,
+      `configurator.step2.packs.${pack.id}.${field}`,
+      `pages.parties.discoPacks.${pack.id}.${field}`,
+    ].filter(Boolean);
+
+    const translated = getTranslatedByCandidates(candidates, fallback);
+    return humanizeKeyFallback(translated);
   };
 
   const getPackFeatures = (pack: PackDefinition): string[] => {
-    try {
-      const legacyKey = `discoPacks.${pack.id}.features`;
-      const translatedLegacy = t.raw(legacyKey);
-      if (Array.isArray(translatedLegacy)) return translatedLegacy as string[];
-    } catch {
-      // continue
-    }
-    try {
-      const pagesKey = `mobile.discoPacks.${pack.id}.features`;
-      const translatedPages = tPages.raw(pagesKey);
-      if (Array.isArray(translatedPages)) return translatedPages as string[];
-    } catch {
-      // fallback below
-    }
-    return pack.features.filter((feature) => !feature.startsWith('pages.'));
+    const fallbackFeatures = pack.features.filter((feature) => !feature.startsWith('pages.'));
+    const baseKey = normalizePackBaseKey(pack.i18nBaseKey || `step2.packs.${pack.id}`);
+
+    return fallbackFeatures.map((feature, index) => {
+      const candidates = [
+        baseKey.startsWith('step2.') ? `configurator.${baseKey}.features.f${index + 1}` : '',
+        baseKey.startsWith('step2.') ? `configurator.${baseKey}.features.${index}` : '',
+        `${baseKey}.features.f${index + 1}`,
+        `${baseKey}.features.${index}`,
+        `services.mobile.discoPacks.${pack.id}.features.${index}`,
+        `services.mobile.discoPacks.${pack.id}.features.f${index + 1}`,
+        `pages.mobile.discoPacks.${pack.id}.features.${index}`,
+        `configurator.step2.packs.${pack.id}.features.f${index + 1}`,
+      ].filter(Boolean);
+
+      const translated = getTranslatedByCandidates(candidates, feature);
+      return humanizeKeyFallback(translated);
+    });
   };
 
   const flashPack = allPacks.find((pack) => pack.isFlash);

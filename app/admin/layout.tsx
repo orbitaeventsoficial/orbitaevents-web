@@ -43,10 +43,10 @@ function SidebarItem({
   onPrefetch?: (href: string) => void;
 }) {
   const badgeStyles = {
-    orange: 'bg-orange-500/20 text-orange-200',
-    blue: 'bg-sky-500/20 text-sky-200',
-    green: 'bg-emerald-500/20 text-emerald-200',
-    red: 'bg-rose-500/20 text-rose-200',
+    orange: 'admin-nav-badge admin-nav-badge--orange',
+    blue: 'admin-nav-badge admin-nav-badge--blue',
+    green: 'admin-nav-badge admin-nav-badge--green',
+    red: 'admin-nav-badge admin-nav-badge--red',
   };
 
   return (
@@ -57,22 +57,15 @@ function SidebarItem({
       onMouseEnter={() => onPrefetch?.(href)}
       onFocus={() => onPrefetch?.(href)}
       aria-current={isActive ? 'page' : undefined}
-      className={`
-        relative flex items-center gap-3 px-3 py-2.5 rounded-xl min-w-0
-        border transition-all duration-200 group active:scale-[0.98]
-        ${isActive
-          ? 'border-amber-500/35 bg-[#2a2016] text-amber-100'
-          : 'border-transparent text-slate-400 hover:text-slate-100 hover:border-slate-700/70 hover:bg-[#1a1f27]'
-        }
-      `}
+      className={`admin-nav-item ${isActive ? 'admin-nav-item--active' : 'admin-nav-item--idle'}`}
     >
       {isActive && (
-        <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-full bg-amber-500" />
+        <span className="admin-nav-item-marker" />
       )}
-      <span className="text-lg w-6 text-center shrink-0">{icon}</span>
-      <span className="min-w-0 flex-1 truncate font-medium text-sm leading-tight">{label}</span>
+      <span className="admin-nav-item-icon">{icon}</span>
+      <span className="admin-nav-item-label">{label}</span>
       {badge && (
-        <span className={`shrink-0 px-2 py-0.5 text-xs font-semibold rounded-full ${badgeStyles[badgeColor]}`}>
+        <span className={badgeStyles[badgeColor]}>
           {badge}
         </span>
       )}
@@ -110,21 +103,21 @@ function SidebarSection({
   }, [storageKey]);
 
   return (
-    <div className="mb-3">
+    <div className="admin-nav-section">
       <button
         type="button"
         onClick={toggle}
-        className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:bg-slate-800/70"
+        className="admin-nav-section-btn"
       >
         <span>{title}</span>
-        <span className={`text-slate-500 transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
+        <span className={`admin-nav-section-caret ${open ? 'admin-nav-section-caret--open' : ''}`}>⌄</span>
       </button>
-      {open && <div className="mt-1 space-y-1">{children}</div>}
+      {open && <div className="admin-nav-section-content">{children}</div>}
     </div>
   );
 }
 
-function FavoriteChip({
+function RecentChip({
   href,
   label,
   isActive,
@@ -144,10 +137,10 @@ function FavoriteChip({
       onClick={onClick}
       onMouseEnter={() => onPrefetch?.(href)}
       onFocus={() => onPrefetch?.(href)}
-      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+      className={`admin-recent-chip ${
         isActive
-          ? 'bg-amber-500/18 text-amber-100 border border-amber-500/40'
-          : 'bg-[#1a1f27] text-slate-300 border border-slate-700/70 hover:bg-[#202734]'
+          ? 'admin-recent-chip--active'
+          : 'admin-recent-chip--idle'
       }`}
     >
       {label}
@@ -177,28 +170,21 @@ function BottomNavItem({
       prefetch={false}
       onMouseEnter={() => onPrefetch?.(href)}
       onFocus={() => onPrefetch?.(href)}
-      className={`
-        flex flex-col items-center justify-center gap-0.5 py-2 px-1 rounded-xl
-        transition-all duration-200 active:scale-95 relative min-w-[60px]
-        ${isActive
-          ? 'text-amber-300'
-          : 'text-slate-500'
-        }
-      `}
+      className={`admin-bottom-nav-item ${isActive ? 'admin-bottom-nav-item--active' : 'admin-bottom-nav-item--idle'}`}
     >
-      <span className="text-xl relative">
+      <span className="admin-bottom-nav-icon-wrap">
         {icon}
         {badge && badge > 0 && (
-          <span className="absolute -top-1 -right-2 min-w-[16px] h-4 bg-amber-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+          <span className="admin-bottom-nav-badge">
             {badge > 99 ? '99+' : badge}
           </span>
         )}
       </span>
-      <span className={`text-[10px] font-medium ${isActive ? 'text-amber-300' : 'text-slate-500'}`}>
+      <span className="admin-bottom-nav-label">
         {label}
       </span>
       {isActive && (
-        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-amber-400 rounded-full" />
+        <span className="admin-bottom-nav-marker" />
       )}
     </Link>
   );
@@ -290,8 +276,8 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         }
       };
     }
-    const timeoutId = window.setTimeout(run, 250);
-    return () => window.clearTimeout(timeoutId);
+    const timeoutId = globalThis.setTimeout(run, 250);
+    return () => globalThis.clearTimeout(timeoutId);
   }, [fetchNewLeadsCount, fetchPackPriceAlertsCount, fetchFinanceAlertsCount]);
 
   useEffect(() => {
@@ -393,13 +379,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     { icon: '🧾', label: 'Pressupost (PDF)', href: '/admin/presupuestos' },
     { icon: '🧭', label: 'Mapa admin', href: '/admin/mapa' },
   ]), [newLeadsCount]);
-
-  const favoriteItems = useMemo(() => ([
-    { label: 'Entrades', href: '/admin/leads' },
-    { label: 'Clients', href: '/admin/clientes' },
-    { label: 'Reserves', href: '/admin/bookings' },
-    { label: 'Tasques', href: '/admin/tasks' },
-  ]), []);
 
   const navSections = useMemo(() => ([
     {
@@ -563,27 +542,27 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <html lang="ca" suppressHydrationWarning>
-      <body className="bg-[#0f1114] text-slate-200 antialiased" suppressHydrationWarning>
+      <body className="admin-layout-body" suppressHydrationWarning>
         <div
-          className="min-h-screen"
+          className="admin-layout-shell"
           onClickCapture={blockInteractionInHelpMode}
           onDoubleClickCapture={blockInteractionInHelpMode}
           onSubmitCapture={blockInteractionInHelpMode}
           onPointerDownCapture={blockInteractionInHelpMode}
         >
           {helpModeEnabled && (
-            <div className="fixed left-1/2 top-16 z-[70] -translate-x-1/2 rounded-full border border-amber-400/60 bg-amber-100 px-4 py-2 text-xs font-semibold text-amber-900 shadow-lg">
+            <div className="admin-help-banner">
               Mode ajuda actiu: les accions estan bloquejades. Prem els icones d'ajuda per veure explicacions.
             </div>
           )}
           {helpModeEnabled && <AdminHelpLegend />}
           {helpModeEnabled && <AdminHelpInspector />}
           {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-[#101a28] border-r border-[#253a57] flex-col z-40">
+          <aside className="admin-sidebar">
         {/* Logo */}
-        <div className="h-[72px] px-4 flex items-center bg-[#101a28] border-b border-[#253a57]">
-          <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#1f2835] border border-amber-600/35 flex items-center justify-center p-1.5">
+        <div className="admin-sidebar-head">
+          <Link href="/admin" className="admin-sidebar-brand">
+            <div className="admin-sidebar-logo-wrap">
               <Image
                 src="/img/logosoloplaneta.svg"
                 alt="Òrbita"
@@ -591,54 +570,37 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 height={40}
                 sizes="40px"
                 quality={80}
-                className="w-full h-full object-contain"
+                className="admin-logo-img"
               />
             </div>
             <div>
-              <span className="text-slate-100 font-semibold">Òrbita</span>
-              <span className="text-amber-300 font-semibold ml-1">Admin</span>
+              <span className="admin-sidebar-brand-main">Òrbita</span>
+              <span className="admin-sidebar-brand-accent">Admin</span>
             </div>
           </Link>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 p-3 overflow-y-auto">
-          <div className="mb-4">
-            <p className="px-3 mb-2 text-[11px] font-semibold text-slate-400">
+        <nav className="admin-sidebar-nav">
+          <div className="admin-sidebar-block">
+            <p className="admin-sidebar-block-title">
               Prioritat
             </p>
-            <div className="space-y-1">
+            <div className="admin-sidebar-block-list">
               {priorityItems.map((item) => (
                 <SidebarItem key={item.href} {...item} isActive={isActive(item.href)} onPrefetch={prefetchRoute} />
               ))}
             </div>
           </div>
 
-          <div className="mb-4 px-3">
-            <p className="mb-2 text-[11px] font-semibold text-slate-400">
-              Preferits
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {favoriteItems.map((item) => (
-                <FavoriteChip
-                  key={item.href}
-                  href={item.href}
-                  label={item.label}
-                  isActive={isActive(item.href)}
-                  onPrefetch={prefetchRoute}
-                />
-              ))}
-            </div>
-          </div>
-
           {recentHrefs.length > 0 && (
-            <div className="mb-4 px-3">
-              <p className="mb-2 text-[11px] font-semibold text-slate-400">
+            <div className="admin-sidebar-recent">
+              <p className="admin-sidebar-block-title">
                 Recents
               </p>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="admin-sidebar-chip-row">
                 {recentHrefs.map((href) => (
-                  <FavoriteChip
+                  <RecentChip
                     key={href}
                     href={href}
                     label={navLabelMap.get(href) || href.replace('/admin/', '')}
@@ -665,46 +627,46 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Footer */}
-        <div className="p-3 border-t border-slate-800/90">
-          <div className="p-3 rounded-xl bg-slate-800/70 border border-slate-700/80">
-            <p className="text-[11px] text-slate-400">Sistema</p>
-            <p className="text-sm text-slate-200 font-medium mt-1">Òrbita Admin</p>
-            <p className="text-xs text-slate-400">v2.0 · Prisma + Supabase</p>
+          <div className="admin-sidebar-foot">
+          <div className="admin-sidebar-foot-card">
+            <p className="admin-sidebar-foot-kicker">Sistema</p>
+            <p className="admin-sidebar-foot-title">Òrbita Admin</p>
+            <p className="admin-sidebar-foot-meta">v2.0 · Prisma + Supabase</p>
           </div>
         </div>
       </aside>
 
       {/* Mobile Header - Mejorado */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[#101a28] border-b border-[#253a57] z-50 px-3 flex items-center justify-between safe-area-top">
+      <header className="admin-mobile-header">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
           aria-label="Obrir menú admin"
           aria-expanded={sidebarOpen}
           aria-controls="admin-mobile-sidebar"
-          className="p-2.5 -ml-1 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
+          className="admin-icon-btn admin-icon-btn--left"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="admin-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
 
-        <div className="flex min-w-0 flex-col items-center">
-          <span className="text-slate-200 font-semibold text-sm">
-            <span className="text-amber-300">Òrbita</span> Admin
+        <div className="admin-mobile-title-wrap">
+          <span className="admin-mobile-title">
+            <span className="admin-mobile-title-accent">Òrbita</span> Admin
           </span>
-          <span className="max-w-[130px] truncate text-[10px] text-slate-400 font-medium">{getPageName()}</span>
+          <span className="admin-mobile-subtitle">{getPageName()}</span>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="admin-mobile-actions">
           <button
             type="button"
             data-help-toggle="true"
             onClick={toggleHelpMode}
-            className={`rounded-xl border px-2.5 py-2 text-xs font-semibold transition-colors ${
+            className={`admin-help-btn ${
               helpModeEnabled
-                ? 'border-amber-400/70 bg-amber-500/20 text-amber-200'
-                : 'border-slate-700/80 text-slate-200 hover:bg-slate-800 active:bg-slate-700'
+                ? 'admin-help-btn--active'
+                : 'admin-help-btn--idle'
             }`}
             aria-label="Activar o desactivar mode ajuda"
             aria-pressed={helpModeEnabled}
@@ -714,21 +676,21 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="p-2.5 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
+            className="admin-icon-btn"
             aria-label="Cercar (Ctrl+K)"
           >
             🔍
           </button>
           <Link
             href="/admin/settings/notifications"
-            className="p-2.5 -mr-1 text-slate-300 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors relative"
+            className="admin-icon-btn admin-icon-btn--notif"
             aria-label="Notificacions"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="admin-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             {notificationsCount > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+              <span className="admin-notif-dot" />
             )}
           </Link>
         </div>
@@ -739,7 +701,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
         <>
           {/* Backdrop */}
           <div
-            className={`lg:hidden fixed inset-0 bg-black/70 z-40 transition-opacity duration-300
+            className={`admin-mobile-backdrop
               ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             onClick={() => setSidebarOpen(false)}
             role="presentation"
@@ -748,46 +710,45 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <aside
             id="admin-mobile-sidebar"
             aria-label="Menú admin"
-            className={`lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-[#101a28] border-r border-[#253a57] z-50 overflow-hidden
-              transform transition-transform duration-300 ease-out
+            className={`admin-mobile-sidebar
               ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
           >
             {/* Header del sidebar */}
-            <div className="h-14 px-4 border-b border-[#253a57] flex items-center justify-between bg-[#101a28]">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-600 flex items-center justify-center p-1.5">
+            <div className="admin-mobile-sidebar-head">
+              <div className="admin-mobile-sidebar-brand">
+                <div className="admin-mobile-sidebar-logo">
                   <Image
                     src="/img/logosoloplaneta.svg"
                     alt="Òrbita"
                     width={36}
                     height={36}
-                    className="w-full h-full object-contain"
+                    className="admin-logo-img"
                   />
                 </div>
                 <div>
-                  <span className="text-slate-100 font-semibold text-sm">Òrbita Admin</span>
-                  <p className="text-[11px] text-slate-400">Panell de gestió</p>
+                  <span className="admin-mobile-sidebar-title">Òrbita Admin</span>
+                  <p className="admin-mobile-sidebar-subtitle">Panell de gestió</p>
                 </div>
               </div>
               <button
                 type="button"
                 aria-label="Tancar menú admin"
                 onClick={() => setSidebarOpen(false)}
-                className="p-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 active:bg-slate-700 rounded-xl transition-colors"
+                className="admin-icon-btn"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="admin-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
             {/* Navegación */}
-            <nav className="p-3 overflow-y-auto h-[calc(100%-140px)]">
-              <div className="mb-4">
-                <p className="px-3 mb-2 text-[11px] font-semibold text-slate-400">
+            <nav className="admin-mobile-sidebar-nav">
+              <div className="admin-sidebar-block">
+                <p className="admin-sidebar-block-title">
                   Prioritat
                 </p>
-                <div className="space-y-0.5">
+                <div className="admin-sidebar-block-list">
                   {priorityItems.map((item) => (
                     <SidebarItem
                       key={item.href}
@@ -800,32 +761,14 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 </div>
               </div>
 
-              <div className="mb-4 px-3">
-                <p className="mb-2 text-[11px] font-semibold text-slate-400">
-                  Preferits
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {favoriteItems.map((item) => (
-                    <FavoriteChip
-                      key={item.href}
-                      href={item.href}
-                      label={item.label}
-                      isActive={isActive(item.href)}
-                      onClick={() => setSidebarOpen(false)}
-                      onPrefetch={prefetchRoute}
-                    />
-                  ))}
-                </div>
-              </div>
-
               {recentHrefs.length > 0 && (
-                <div className="mb-4 px-3">
-                  <p className="mb-2 text-[11px] font-semibold text-slate-400">
+                <div className="admin-sidebar-recent">
+                  <p className="admin-sidebar-block-title">
                     Recents
                   </p>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="admin-sidebar-chip-row">
                     {recentHrefs.slice(0, 4).map((href) => (
-                      <FavoriteChip
+                      <RecentChip
                         key={href}
                         href={href}
                         label={navLabelMap.get(href) || href.replace('/admin/', '')}
@@ -859,20 +802,20 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             </nav>
 
             {/* Footer del sidebar móvil */}
-            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-[#253a57] bg-[#101a28]">
+            <div className="admin-mobile-sidebar-foot">
               <Link
                 href="/admin/settings"
                 onClick={() => setSidebarOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-xl bg-stone-800/80 border border-amber-900/35 active:scale-[0.98] transition-transform"
+                className="admin-mobile-sidebar-foot-link"
               >
-                <div className="w-10 h-10 rounded-full bg-amber-600 flex items-center justify-center text-white font-semibold">
+                <div className="admin-mobile-sidebar-foot-avatar">
                   A
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-100">Admin</p>
-                  <p className="text-xs text-slate-400">Configuració del compte</p>
+                <div className="admin-mobile-sidebar-foot-copy">
+                  <p className="admin-mobile-sidebar-foot-title">Admin</p>
+                  <p className="admin-mobile-sidebar-foot-subtitle">Configuració del compte</p>
                 </div>
-                <svg className="w-5 h-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="admin-cr-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -882,21 +825,21 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Desktop Header */}
-      <header className="hidden lg:flex fixed top-0 left-64 right-0 h-[72px] px-6 items-center justify-between bg-[#101a28] border-b border-[#253a57] z-30">
-        <div className="flex items-center gap-3 text-sm">
-          <Link href="/admin" className="text-slate-400 hover:text-slate-200 transition-colors uppercase tracking-wide text-xs">Admin</Link>
-          <span className="text-slate-600">/</span>
-          <span className="text-slate-100 font-semibold">{getPageName()}</span>
+      <header className="admin-desktop-header">
+        <div className="admin-desktop-breadcrumb">
+          <Link href="/admin" className="admin-desktop-breadcrumb-link">Admin</Link>
+          <span className="admin-desktop-breadcrumb-sep">/</span>
+          <span className="admin-desktop-breadcrumb-current">{getPageName()}</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="admin-desktop-actions">
           <button
             type="button"
             data-help-toggle="true"
             onClick={toggleHelpMode}
-            className={`rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
+            className={`admin-help-btn ${
               helpModeEnabled
-                ? 'border-amber-400/70 bg-amber-500/20 text-amber-300'
-                : 'border-amber-900/35 bg-stone-800/60 text-slate-300 hover:border-amber-500/35 hover:text-slate-100'
+                ? 'admin-help-btn--active'
+                : 'admin-help-btn--idle'
             }`}
             aria-pressed={helpModeEnabled}
             aria-label="Activar o desactivar mode ajuda"
@@ -906,45 +849,45 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="hidden md:flex items-center gap-2 rounded-xl border border-amber-900/35 bg-stone-800/60 px-3 py-2 text-xs text-slate-300 hover:border-amber-500/35 hover:text-slate-100 transition-colors"
+            className="admin-desktop-search-btn"
             aria-label="Cercar (Ctrl+K)"
           >
             🔍 Cercar
-            <span className="rounded-md border border-slate-700 px-2 py-0.5 text-[10px] text-slate-500">Ctrl/⌘K</span>
+            <span className="admin-desktop-kbd">Ctrl/⌘K</span>
           </button>
           <Link
             href="/admin/settings/notifications"
-            className="relative p-2.5 text-slate-300 hover:text-slate-100 hover:bg-slate-800 rounded-xl transition-colors"
+            className="admin-icon-btn admin-icon-btn--notif"
             aria-label="Notificacions"
           >
             🔔
             {notificationsCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+              <span className="admin-notif-dot" />
             )}
           </Link>
-          <div className="h-6 w-px bg-slate-800" />
+          <div className="admin-desktop-sep" />
           <Link
             href="/admin/settings"
-            className="flex items-center gap-3 px-3 py-1.5 hover:bg-slate-800 rounded-xl transition-colors"
+            className="admin-desktop-user"
           >
-            <div className="w-8 h-8 rounded-full bg-amber-600 flex items-center justify-center text-white text-sm font-medium">
+            <div className="admin-desktop-user-avatar">
               A
             </div>
-            <span className="text-slate-100 text-sm font-medium">Admin</span>
+            <span className="admin-desktop-user-label">Admin</span>
           </Link>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="lg:pl-64 pt-14 lg:pt-[72px] pb-20 lg:pb-0 min-h-screen">
-        <div className="admin-shell admin-readable admin-unified mx-auto w-full max-w-[1700px] p-3 sm:p-4 lg:p-6">
+      <main className="admin-main">
+        <div className="admin-shell admin-readable admin-unified admin-compact admin-main-shell">
           {children}
         </div>
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#101a28] border-t border-[#253a57] z-50 safe-area-bottom">
-        <div className="flex items-center justify-around h-full px-2 max-w-lg mx-auto">
+      <nav className="admin-bottom-nav">
+        <div className="admin-bottom-nav-inner">
           <BottomNavItem
             icon="📊"
             label="Tauler"

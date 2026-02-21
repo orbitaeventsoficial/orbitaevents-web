@@ -108,26 +108,6 @@ async function recordFailedAttempt(req: NextRequest): Promise<void> {
   }
 }
 
-async function clearFailedAttempts(req: NextRequest): Promise<void> {
-  const clientIp = getClientIp(req);
-  const key = `admin-auth:${clientIp}`;
-
-  // Try Upstash Redis first
-  if (USE_UPSTASH) {
-    try {
-      await fetch(`${UPSTASH_REDIS_REST_URL}/del/${key}`, {
-        headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` },
-      });
-      return;
-    } catch {
-      // Fall through to in-memory
-    }
-  }
-
-  // Fallback to in-memory
-  adminAuthAttempts.delete(clientIp);
-}
-
 function unauthorized() {
   return new NextResponse('Authentication required', {
     status: 401,
@@ -214,12 +194,6 @@ export async function middleware(req: NextRequest) {
 
   // Si es ruta protegida, aplicar auth básica amb rate limiting
   if (isProtected) {
-    // Rate limiting: bloquejar si massa intents
-    const isAllowed = await checkAdminRateLimit(req);
-    if (!isAllowed) {
-      return tooManyRequests();
-    }
-
     // Obtenir credencials des de variables d'entorn
     const ADMIN_USER = process.env.ADMIN_USER;
     const ADMIN_PASS = process.env.ADMIN_PASS || process.env.ADMIN_PASSWORD;
@@ -240,6 +214,8 @@ export async function middleware(req: NextRequest) {
       return unauthorized();
     }
 
+    let authValid = isBearerAuth;
+
     try {
       if (!isBearerAuth) {
         const base64Credentials = authHeader!.split(' ')[1]!;
@@ -252,14 +228,20 @@ export async function middleware(req: NextRequest) {
 
         // Verificar credencials
         if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
-          await recordFailedAttempt(req);
-          return unauthorized();
+          authValid = false;
+        } else {
+          authValid = true;
         }
       }
-
-      // Autenticació correcta - netejar intents fallits
-      await clearFailedAttempts(req);
     } catch {
+      authValid = false;
+    }
+
+    if (!authValid) {
+      const isAllowed = await checkAdminRateLimit(req);
+      if (!isAllowed) {
+        return tooManyRequests();
+      }
       await recordFailedAttempt(req);
       return unauthorized();
     }

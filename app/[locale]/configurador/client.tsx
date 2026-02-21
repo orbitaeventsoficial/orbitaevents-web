@@ -57,7 +57,7 @@ interface AppliedDiscountCode {
 
 // Helper per obtenir text traduït de l'extra
 function isI18nKey(value: string): boolean {
-  return value.startsWith('pages.') || value.startsWith('extras.');
+  return /^(configurator|pages|services|extras)\./.test(value);
 }
 
 function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, field: 'name' | 'description', fallback: string): string {
@@ -86,9 +86,21 @@ function normalizePackBaseKey(baseKey: string): string {
 
 function humanizeKeyFallback(value: string): string {
   if (!value || !isI18nKey(value)) return value;
-  const token = value.split('.').pop() || value;
+  const parts = value.split('.');
+  const last = parts[parts.length - 1] || value;
+  const prev = parts.length > 1 ? parts[parts.length - 2] : '';
+
+  if (/^f\d+$/i.test(last)) {
+    const n = last.slice(1);
+    return `Característica ${n}`;
+  }
+
+  const semantic = new Set(['name', 'tagline', 'ideal', 'description', 'title']);
+  const token = semantic.has(last) && prev ? prev : last;
   return token
     .replace(/[-_]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
     .replace(/\b\w/g, (m) => m.toUpperCase());
 }
 

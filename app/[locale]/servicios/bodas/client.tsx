@@ -20,7 +20,27 @@ interface ConfigState {
 
 // Helper per obtenir text traduït de l'extra
 function isI18nKey(value: string): boolean {
-  return value.startsWith('pages.') || value.startsWith('extras.');
+  return /^(configurator|pages|services|extras)\./.test(value);
+}
+
+function humanizeKeyFallback(value: string): string {
+  if (!value || !isI18nKey(value)) return value;
+  const parts = value.split('.');
+  const last = parts[parts.length - 1] || value;
+  const prev = parts.length > 1 ? parts[parts.length - 2] : '';
+
+  if (/^f\d+$/i.test(last)) {
+    const n = last.slice(1);
+    return `Característica ${n}`;
+  }
+
+  const semantic = new Set(['name', 'tagline', 'ideal', 'description', 'title']);
+  const token = semantic.has(last) && prev ? prev : last;
+  return token
+    .replace(/[-_]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (m) => m.toUpperCase());
 }
 
 function getExtraText(t: ReturnType<typeof useTranslations>, extraId: string, field: 'name' | 'description', fallback: string): string {
@@ -65,14 +85,14 @@ export default function BodasClientV2() {
     return `${normalizedBase}.${suffix}`;
   };
 
-  const getPackText = (pack: PackDefinition, field: 'name' | 'tagline') => {
-    const fallback = field === 'name' ? pack.name : pack.tagline;
+  const getPackText = (pack: PackDefinition, field: 'name' | 'tagline' | 'ideal') => {
+    const fallback = field === 'name' ? pack.name : field === 'tagline' ? pack.tagline : (pack.ideal || '');
     try {
       const key = getConfiguratorKey(pack, field);
       const translated = tConfigurator(key);
-      return translated !== key ? translated : fallback;
+      return humanizeKeyFallback(translated !== key ? translated : fallback);
     } catch {
-      return fallback;
+      return humanizeKeyFallback(fallback);
     }
   };
 
@@ -81,9 +101,9 @@ export default function BodasClientV2() {
       try {
         const key = getConfiguratorKey(pack, `features.f${index + 1}`);
         const translated = tConfigurator(key);
-        return translated !== key ? translated : feature;
+        return humanizeKeyFallback(translated !== key ? translated : feature);
       } catch {
-        return feature;
+        return humanizeKeyFallback(feature);
       }
     });
   };
@@ -358,7 +378,7 @@ export default function BodasClientV2() {
                   </div>
 
                   <div className="text-sm text-text-muted">
-                    👥 {pack.ideal}
+                    👥 {getPackText(pack, 'ideal')}
                   </div>
 
                   <ul className="space-y-2 pt-4 border-t border-white/10">
@@ -509,7 +529,7 @@ export default function BodasClientV2() {
                 <div className="flex items-center gap-4 sm:gap-6 flex-wrap text-white">
                   <div>
                     <div className="text-xs sm:text-sm text-[var(--oe-gold)] font-semibold">
-                      {config.selectedPack?.name}
+                      {config.selectedPack ? getPackText(config.selectedPack, 'name') : ''}
                     </div>
                     <div className="flex items-center gap-3 mt-1">
                       <span className="text-xs sm:text-sm text-white/70">

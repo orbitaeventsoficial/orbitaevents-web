@@ -69,15 +69,28 @@ function mapPack(pack: DbPack, locale: string): PackDefinition {
   };
 }
 
-function getFallback(service?: ServiceSlug): PackDefinition[] {
-  return service ? getPacksByService(service) : fallbackPacks;
+function localizeFallbackPack(pack: PackDefinition, locale: string): PackDefinition {
+  return {
+    ...pack,
+    name: resolvePackI18nKey(pack.name, locale),
+    tagline: resolvePackI18nKey(pack.tagline, locale),
+    emotion: resolvePackI18nKey(pack.emotion || pack.tagline || '', locale),
+    features: resolvePackI18nFeatures(pack.features || [], locale),
+    badge: pack.badge ? resolvePackI18nKey(pack.badge, locale) : null,
+    ideal: resolvePackI18nKey(pack.ideal || '', locale),
+  };
+}
+
+function getFallback(service: ServiceSlug | undefined, locale: string): PackDefinition[] {
+  const source = service ? getPacksByService(service) : fallbackPacks;
+  return source.map((pack) => localizeFallbackPack(pack, locale));
 }
 
 export async function getDbPacks(options: { service?: ServiceSlug; locale?: string } = {}) {
   const { service, locale = 'es' } = options;
 
   if (!process.env.DATABASE_URL) {
-    return getFallback(service);
+    return getFallback(service, locale);
   }
 
   try {
@@ -91,19 +104,20 @@ export async function getDbPacks(options: { service?: ServiceSlug; locale?: stri
     });
 
     if (!packs.length) {
-      return getFallback(service);
+      return getFallback(service, locale);
     }
 
     return packs.map((pack) => mapPack(pack as DbPack, locale));
   } catch (error) {
     log.error('Error obtenint packs DB:', error);
-    return getFallback(service);
+    return getFallback(service, locale);
   }
 }
 
 export async function getDbPackByCode(code: string, locale = 'es') {
   if (!process.env.DATABASE_URL) {
-    return fallbackPacks.find((p) => p.id === code || p.slug === code);
+    const fallback = fallbackPacks.find((p) => p.id === code || p.slug === code);
+    return fallback ? localizeFallbackPack(fallback, locale) : undefined;
   }
 
   try {

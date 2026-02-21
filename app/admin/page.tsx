@@ -63,9 +63,17 @@ function toDateKey(date: Date) {
 }
 
 export default async function AdminDashboard() {
-  await generateDailyChecklistTasks().catch(() => null);
-
   const now = new Date();
+  const dayKey = now.toISOString().slice(0, 10);
+  await cachedQuery(
+    `admin:dashboard:daily-checklist-sync:${dayKey}`,
+    async () => {
+      await generateDailyChecklistTasks().catch(() => null);
+      return true;
+    },
+    CacheTTL.MEDIUM
+  ).catch(() => false);
+
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
   const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -139,13 +147,17 @@ export default async function AdminDashboard() {
     // Total clients
     cachedQuery('admin:dashboard:customers:count', () => prisma.customer.count(), CacheTTL.MEDIUM).catch(() => 0),
     // Testimonis pendents
-    prisma.customerTestimonial.count({
-      where: { isApproved: false }
-    }).catch(() => 0),
+    cachedQuery(
+      'admin:dashboard:testimonials:pending',
+      () => prisma.customerTestimonial.count({ where: { isApproved: false } }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
     // Testimonis aprovats
-    prisma.customerTestimonial.count({
-      where: { isApproved: true }
-    }).catch(() => 0),
+    cachedQuery(
+      'admin:dashboard:testimonials:approved',
+      () => prisma.customerTestimonial.count({ where: { isApproved: true } }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
     // Últims leads
     cachedQuery(
       'admin:dashboard:recent-leads:5',
@@ -164,20 +176,25 @@ export default async function AdminDashboard() {
       CacheTTL.VERY_SHORT
     ).catch(() => []),
     // Pròximes reserves
-    prisma.booking.findMany({
-      where: {
-        eventDate: { gte: now },
-        status: 'CONFIRMED'
-      },
-      take: 5,
-      orderBy: { eventDate: 'asc' },
-      select: {
-        id: true,
-        clientName: true,
-        eventDate: true,
-        eventType: true,
-      }
-    }).catch(() => []),
+    cachedQuery(
+      'admin:dashboard:upcoming-bookings:5',
+      () =>
+        prisma.booking.findMany({
+          where: {
+            eventDate: { gte: now },
+            status: 'CONFIRMED'
+          },
+          take: 5,
+          orderBy: { eventDate: 'asc' },
+          select: {
+            id: true,
+            clientName: true,
+            eventDate: true,
+            eventType: true,
+          }
+        }),
+      CacheTTL.VERY_SHORT
+    ).catch(() => []),
     // Inventari
     cachedQuery(
       'admin:dashboard:inventory:group-status',
@@ -188,10 +205,15 @@ export default async function AdminDashboard() {
       CacheTTL.SHORT
     ).catch(() => []),
     // Valoració mitjana (ara dins del Promise.all)
-    prisma.customerTestimonial.aggregate({
-      where: { isApproved: true },
-      _avg: { rating: true }
-    }).catch(() => ({ _avg: { rating: null } })),
+    cachedQuery(
+      'admin:dashboard:testimonials:avg-rating',
+      () =>
+        prisma.customerTestimonial.aggregate({
+          where: { isApproved: true },
+          _avg: { rating: true }
+        }),
+      CacheTTL.SHORT
+    ).catch(() => ({ _avg: { rating: null } })),
     // Leads guanyats (ara dins del Promise.all)
     cachedQuery(
       'admin:dashboard:leads:won',
@@ -214,120 +236,190 @@ export default async function AdminDashboard() {
       }),
       CacheTTL.SHORT
     ).catch(() => []),
-    prisma.booking.count({
-      where: {
-        status: 'COMPLETED',
-        eventDate: { lte: twoDaysAgo },
-        postEventEmailSent: false,
-        clientEmail: { not: { contains: '@leads.orbitaevents.local' } },
-      },
-    }).catch(() => 0),
-    prisma.setting.findMany({
-      where: {
-        key: {
-          in: [
-            'emails.cron.lastRun',
-            'emails.cron.lastStatus',
-            'emails.cron.lastSummary',
-            'emails.cron.lastMessage',
-            'automation.commercial.lastRun',
-            'automation.commercial.lastStatus',
-          ],
-        },
-      },
-    }).catch(() => []),
+    cachedQuery(
+      `admin:dashboard:post-event:pending:${dayKey}`,
+      () =>
+        prisma.booking.count({
+          where: {
+            status: 'COMPLETED',
+            eventDate: { lte: twoDaysAgo },
+            postEventEmailSent: false,
+            clientEmail: { not: { contains: '@leads.orbitaevents.local' } },
+          },
+        }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
+    cachedQuery(
+      'admin:dashboard:cron:settings',
+      () =>
+        prisma.setting.findMany({
+          where: {
+            key: {
+              in: [
+                'emails.cron.lastRun',
+                'emails.cron.lastStatus',
+                'emails.cron.lastSummary',
+                'emails.cron.lastMessage',
+                'automation.commercial.lastRun',
+                'automation.commercial.lastStatus',
+              ],
+            },
+          },
+        }),
+      CacheTTL.SHORT
+    ).catch(() => []),
     prisma.$queryRaw`SELECT 1`.then(() => true).catch(() => false),
-    prisma.lead.findMany({
-      take: 6,
-      orderBy: { createdAt: 'desc' },
-      select: { id: true, name: true, createdAt: true, status: true },
-    }).catch(() => []),
-    prisma.booking.findMany({
-      take: 6,
-      orderBy: { createdAt: 'desc' },
-      select: { id: true, clientName: true, reference: true, createdAt: true, status: true },
-    }).catch(() => []),
-    prisma.customerActivity.findMany({
-      take: 6,
-      orderBy: { createdAt: 'desc' },
-      select: { id: true, action: true, createdAt: true, customer: { select: { name: true } } },
-    }).catch(() => []),
-    prisma.adminLog.findMany({
-      take: 6,
-      orderBy: { createdAt: 'desc' },
-      select: { id: true, action: true, entity: true, createdAt: true },
-    }).catch(() => []),
-    prisma.leadTask.findMany({
-      where: { status: { in: ['OPEN', 'IN_PROGRESS'] } },
-      take: 6,
-      orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
-      select: {
-        id: true,
-        title: true,
-        dueDate: true,
-        status: true,
-        lead: { select: { id: true, name: true } },
-      },
-    }).catch(() => []),
-    prisma.lead.count({
-      where: {
-        status: { in: ['NEW', 'CONTACTED'] },
-        createdAt: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) },
-      },
-    }).catch(() => 0),
-    prisma.lead.count({
-      where: {
-        status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] },
-        priority: { in: ['HIGH', 'URGENT'] },
-      },
-    }).catch(() => 0),
-    prisma.lead.count({
-      where: {
-        status: { in: ['QUOTE_SENT', 'NEGOTIATING'] },
-      },
-    }).catch(() => 0),
-    prisma.task.count({
-      where: {
-        createdBy: 'system:daily-checklist',
-        createdAt: { gte: todayStart, lte: todayEnd },
-        status: 'DONE',
-      },
-    }).catch(() => 0),
-    prisma.task.count({
-      where: {
-        createdBy: 'system:daily-checklist',
-        createdAt: { gte: todayStart, lte: todayEnd },
-        status: { in: ['OPEN', 'IN_PROGRESS'] },
-      },
-    }).catch(() => 0),
-    prisma.lead.findMany({
-      where: {
-        status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] },
-      },
-      orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
-      take: 6,
-      select: {
-        id: true,
-        name: true,
-        status: true,
-        priority: true,
-        createdAt: true,
-      },
-    }).catch(() => []),
-    prisma.booking.findMany({
-      where: {
-        status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] },
-      },
-      orderBy: [{ eventDate: 'asc' }, { createdAt: 'desc' }],
-      take: 6,
-      select: {
-        id: true,
-        reference: true,
-        clientName: true,
-        status: true,
-        eventDate: true,
-      },
-    }).catch(() => []),
+    cachedQuery(
+      'admin:dashboard:timeline:leads',
+      () =>
+        prisma.lead.findMany({
+          take: 6,
+          orderBy: { createdAt: 'desc' },
+          select: { id: true, name: true, createdAt: true, status: true },
+        }),
+      CacheTTL.VERY_SHORT
+    ).catch(() => []),
+    cachedQuery(
+      'admin:dashboard:timeline:bookings',
+      () =>
+        prisma.booking.findMany({
+          take: 6,
+          orderBy: { createdAt: 'desc' },
+          select: { id: true, clientName: true, reference: true, createdAt: true, status: true },
+        }),
+      CacheTTL.VERY_SHORT
+    ).catch(() => []),
+    cachedQuery(
+      'admin:dashboard:timeline:activity',
+      () =>
+        prisma.customerActivity.findMany({
+          take: 6,
+          orderBy: { createdAt: 'desc' },
+          select: { id: true, action: true, createdAt: true, customer: { select: { name: true } } },
+        }),
+      CacheTTL.VERY_SHORT
+    ).catch(() => []),
+    cachedQuery(
+      'admin:dashboard:timeline:admin-logs',
+      () =>
+        prisma.adminLog.findMany({
+          take: 6,
+          orderBy: { createdAt: 'desc' },
+          select: { id: true, action: true, entity: true, createdAt: true },
+        }),
+      CacheTTL.VERY_SHORT
+    ).catch(() => []),
+    cachedQuery(
+      'admin:dashboard:tasks:upcoming',
+      () =>
+        prisma.leadTask.findMany({
+          where: { status: { in: ['OPEN', 'IN_PROGRESS'] } },
+          take: 6,
+          orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
+          select: {
+            id: true,
+            title: true,
+            dueDate: true,
+            status: true,
+            lead: { select: { id: true, name: true } },
+          },
+        }),
+      CacheTTL.VERY_SHORT
+    ).catch(() => []),
+    cachedQuery(
+      `admin:dashboard:leads:stale:${dayKey}`,
+      () =>
+        prisma.lead.count({
+          where: {
+            status: { in: ['NEW', 'CONTACTED'] },
+            createdAt: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) },
+          },
+        }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
+    cachedQuery(
+      'admin:dashboard:leads:hot',
+      () =>
+        prisma.lead.count({
+          where: {
+            status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] },
+            priority: { in: ['HIGH', 'URGENT'] },
+          },
+        }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
+    cachedQuery(
+      'admin:dashboard:leads:quotes-in-flight',
+      () =>
+        prisma.lead.count({
+          where: {
+            status: { in: ['QUOTE_SENT', 'NEGOTIATING'] },
+          },
+        }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
+    cachedQuery(
+      `admin:dashboard:checklist:done:${dayKey}`,
+      () =>
+        prisma.task.count({
+          where: {
+            createdBy: 'system:daily-checklist',
+            createdAt: { gte: todayStart, lte: todayEnd },
+            status: 'DONE',
+          },
+        }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
+    cachedQuery(
+      `admin:dashboard:checklist:pending:${dayKey}`,
+      () =>
+        prisma.task.count({
+          where: {
+            createdBy: 'system:daily-checklist',
+            createdAt: { gte: todayStart, lte: todayEnd },
+            status: { in: ['OPEN', 'IN_PROGRESS'] },
+          },
+        }),
+      CacheTTL.SHORT
+    ).catch(() => 0),
+    cachedQuery(
+      'admin:dashboard:command:leads',
+      () =>
+        prisma.lead.findMany({
+          where: {
+            status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] },
+          },
+          orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
+          take: 6,
+          select: {
+            id: true,
+            name: true,
+            status: true,
+            priority: true,
+            createdAt: true,
+          },
+        }),
+      CacheTTL.VERY_SHORT
+    ).catch(() => []),
+    cachedQuery(
+      'admin:dashboard:command:bookings',
+      () =>
+        prisma.booking.findMany({
+          where: {
+            status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] },
+          },
+          orderBy: [{ eventDate: 'asc' }, { createdAt: 'desc' }],
+          take: 6,
+          select: {
+            id: true,
+            reference: true,
+            clientName: true,
+            status: true,
+            eventDate: true,
+          },
+        }),
+      CacheTTL.VERY_SHORT
+    ).catch(() => []),
   ]);
 
   // Calcular estadístiques inventari
@@ -537,19 +629,19 @@ export default async function AdminDashboard() {
   ] as const;
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="admin-control-room">
       {/* Header */}
-      <div className="rounded-2xl border border-slate-700/60 bg-gradient-to-br from-slate-900/85 to-slate-900/55 p-4 sm:p-5 flex flex-col gap-3">
-        <div className="flex items-center justify-between">
+      <div className="admin-cr-header">
+        <div className="admin-cr-header-top">
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-slate-100">Resum ràpid</h1>
-            <p className="text-slate-400 text-xs">Visió general del negoci</p>
+            <h1 className="admin-cr-title">Resum ràpid</h1>
+            <p className="admin-cr-subtitle">Visió general del negoci</p>
           </div>
-          <Link href="/admin/leads" className="sm:hidden">
+          <Link href="/admin/leads" className="admin-cr-mobile-only">
             <Button variant="primary" icon="+" label="Nou" />
           </Link>
         </div>
-        <div className="hidden sm:flex items-center gap-3">
+        <div className="admin-cr-desktop-actions">
           <Link href="/admin/analytics">
             <Button variant="secondary" icon="📈" label="Analítica" />
           </Link>
@@ -557,59 +649,59 @@ export default async function AdminDashboard() {
             <Button variant="primary" icon="+" label="Nou lead" />
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          <Link href="/admin/inbox" className="rounded-2xl border border-slate-700/50 bg-slate-800/65 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+        <div className="admin-cr-quick-links">
+          <Link href="/admin/inbox" className="admin-cr-quick-link">
             📥 Inbox (IMAP)
           </Link>
-          <Link href="/admin/emails" className="rounded-2xl border border-slate-700/50 bg-slate-800/65 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+          <Link href="/admin/emails" className="admin-cr-quick-link">
             🤖 Correus automàtics
           </Link>
-          <Link href="/admin/bookings" className="rounded-2xl border border-slate-700/50 bg-slate-800/65 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+          <Link href="/admin/bookings" className="admin-cr-quick-link">
             📋 Reserves
           </Link>
-          <Link href="/admin/economia" className="rounded-2xl border border-slate-700/50 bg-slate-800/65 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+          <Link href="/admin/economia" className="admin-cr-quick-link">
             💶 Economia
           </Link>
-          <Link href="/admin/calendario" className="rounded-2xl border border-slate-700/50 bg-slate-800/65 p-3 text-xs text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition-colors">
+          <Link href="/admin/calendario" className="admin-cr-quick-link">
             📅 Calendari
           </Link>
         </div>
       </div>
 
-      <section className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/12 to-cyan-500/8 p-4 sm:p-5">
-        <div className="mb-3 flex items-center justify-between">
+      <section className="admin-cr-panel admin-cr-panel--pilot">
+        <div className="admin-cr-panel-head">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-300">Mode Solo</p>
-            <h2 className="text-base sm:text-lg font-semibold text-slate-100">Pilot automàtic d&apos;avui</h2>
-            <p className="mt-1 text-xs text-slate-300">No és lineal: pots començar directament pel pas 2 o pas 3.</p>
+            <p className="admin-cr-kicker admin-cr-kicker--pilot">Mode Solo</p>
+            <h2 className="admin-cr-h2">Pilot automàtic d&apos;avui</h2>
+            <p className="admin-cr-small">No és lineal: pots començar directament pel pas 2 o pas 3.</p>
           </div>
-          <span className="rounded-full border border-emerald-400/40 bg-emerald-500/15 px-2.5 py-1 text-[10px] font-semibold text-emerald-200">
+          <span className="admin-cr-pill admin-cr-pill--pilot">
             4 passos clars
           </span>
         </div>
-        <div className="mb-3 flex flex-wrap gap-2">
-          <Link href="/admin/tasks" className="rounded-full border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-200">
+        <div className="admin-cr-chip-row">
+          <Link href="/admin/tasks" className="admin-cr-chip admin-cr-chip--amber">
             Comença per pas 2
           </Link>
-          <Link href="/admin/emails" className="rounded-full border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-200">
+          <Link href="/admin/emails" className="admin-cr-chip admin-cr-chip--rose">
             Comença per pas 3
           </Link>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="admin-cr-grid-4">
           {pilotToday.map((item) => {
             const toneClasses = item.tone === 'rose'
-              ? 'border-rose-500/30 bg-rose-500/10'
+              ? 'admin-cr-step--rose'
               : item.tone === 'amber'
-                ? 'border-amber-500/30 bg-amber-500/10'
+                ? 'admin-cr-step--amber'
                 : item.tone === 'sky'
-                  ? 'border-sky-500/30 bg-sky-500/10'
-                  : 'border-emerald-500/30 bg-emerald-500/10';
+                  ? 'admin-cr-step--sky'
+                  : 'admin-cr-step--emerald';
             return (
-              <Link key={item.id} href={item.href} className={`rounded-xl border p-3 transition-colors hover:border-cyan-400/50 ${toneClasses}`}>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{item.step}</p>
-                <p className="text-sm font-semibold text-slate-100">{item.title}</p>
-                <p className="mt-1 text-xs text-slate-300">{item.description}</p>
-                <span className="mt-3 inline-flex text-xs font-semibold text-white underline decoration-dotted">
+              <Link key={item.id} href={item.href} className={`admin-cr-step ${toneClasses}`}>
+                <p className="admin-cr-step-kicker">{item.step}</p>
+                <p className="admin-cr-step-title">{item.title}</p>
+                <p className="admin-cr-step-desc">{item.description}</p>
+                <span className="admin-cr-step-cta">
                   {item.cta}
                 </span>
               </Link>
@@ -618,32 +710,32 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-cyan-500/25 bg-gradient-to-br from-cyan-500/10 to-slate-900/40 p-4 sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <section className="admin-cr-panel admin-cr-panel--checklist">
+        <div className="admin-cr-panel-row">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-cyan-300">Checklist d&apos;avui</p>
-            <h2 className="text-base sm:text-lg font-semibold text-slate-100">Control diari de feina</h2>
-            <p className="mt-1 text-xs text-slate-400">Marca les tasques com a fetes i avança sense perdre el fil.</p>
+            <p className="admin-cr-kicker admin-cr-kicker--cyan">Checklist d&apos;avui</p>
+            <h2 className="admin-cr-h2">Control diari de feina</h2>
+            <p className="admin-cr-small admin-cr-small--muted">Marca les tasques com a fetes i avança sense perdre el fil.</p>
           </div>
           <Link
             href="/admin/tasks?status=OPEN"
-            className="inline-flex items-center rounded-xl border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-xs sm:text-sm font-semibold text-cyan-200 hover:bg-cyan-500/20"
+            className="admin-cr-action-link"
           >
             Obrir tasques pendents
           </Link>
         </div>
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
-            <p className="text-xs text-slate-400">Pendents</p>
-            <p className="mt-1 text-2xl font-bold text-amber-300">{checklistTodayPendingCount}</p>
+        <div className="admin-cr-grid-3">
+          <div className="admin-cr-stat-box admin-cr-stat-box--amber">
+            <p className="admin-cr-stat-label">Pendents</p>
+            <p className="admin-cr-stat-value admin-cr-stat-value--amber">{checklistTodayPendingCount}</p>
           </div>
-          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
-            <p className="text-xs text-slate-400">Fetes</p>
-            <p className="mt-1 text-2xl font-bold text-emerald-300">{checklistTodayDoneCount}</p>
+          <div className="admin-cr-stat-box admin-cr-stat-box--emerald">
+            <p className="admin-cr-stat-label">Fetes</p>
+            <p className="admin-cr-stat-value admin-cr-stat-value--emerald">{checklistTodayDoneCount}</p>
           </div>
-          <div className="rounded-xl border border-slate-600/50 bg-slate-800/60 p-3">
-            <p className="text-xs text-slate-400">Progrés</p>
-            <p className="mt-1 text-2xl font-bold text-slate-100">
+          <div className="admin-cr-stat-box">
+            <p className="admin-cr-stat-label">Progrés</p>
+            <p className="admin-cr-stat-value">
               {checklistTodayDoneCount + checklistTodayPendingCount > 0
                 ? `${Math.round((checklistTodayDoneCount / (checklistTodayDoneCount + checklistTodayPendingCount)) * 100)}%`
                 : '0%'}
@@ -653,29 +745,29 @@ export default async function AdminDashboard() {
       </section>
 
 
-      <section className="rounded-2xl border border-violet-500/25 bg-gradient-to-br from-violet-500/10 to-slate-900/40 p-4 sm:p-5">
-        <div className="mb-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-300">Centre de comandament</p>
-          <h2 className="text-base sm:text-lg font-semibold text-slate-100">Mou estats sense canviar de pantalla</h2>
-          <p className="mt-1 text-xs text-slate-400">Accions ràpides de Leads i Reserves des del tauler principal.</p>
+      <section className="admin-cr-panel admin-cr-panel--command">
+        <div className="admin-cr-panel-head-block">
+          <p className="admin-cr-kicker admin-cr-kicker--violet">Centre de comandament</p>
+          <h2 className="admin-cr-h2">Mou estats sense canviar de pantalla</h2>
+          <p className="admin-cr-small admin-cr-small--muted">Accions ràpides de Leads i Reserves des del tauler principal.</p>
         </div>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-3">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Leads actius</p>
-              <Link href="/admin/leads" className="text-[11px] text-cyan-300 hover:underline">Obrir Entrades</Link>
+        <div className="admin-cr-grid-2">
+          <div className="admin-cr-command-card">
+            <div className="admin-cr-command-head">
+              <p className="admin-cr-command-title">Leads actius</p>
+              <Link href="/admin/leads" className="admin-cr-link-inline">Obrir Entrades</Link>
             </div>
-            <div className="space-y-2">
+            <div className="admin-cr-list">
               {commandLeads.length === 0 ? (
-                <p className="text-xs text-slate-500">Sense leads actius.</p>
+                <p className="admin-cr-empty-text">Sense leads actius.</p>
               ) : (
                 commandLeads.map((lead) => (
-                  <div key={lead.id} className="flex items-center justify-between gap-2 rounded-lg border border-slate-700/50 bg-slate-900/50 px-2 py-2">
-                    <div className="min-w-0">
-                      <Link href={`/admin/leads/${lead.id}`} className="block truncate text-sm text-slate-100 hover:text-cyan-300">
+                  <div key={lead.id} className="admin-cr-list-row">
+                    <div className="admin-cr-list-content">
+                      <Link href={`/admin/leads/${lead.id}`} className="admin-cr-list-link">
                         {lead.name}
                       </Link>
-                      <p className="text-[11px] text-slate-500">Prioritat {lead.priority.toLowerCase()} · {timeAgo(new Date(lead.createdAt))}</p>
+                      <p className="admin-cr-meta">Prioritat {lead.priority.toLowerCase()} · {timeAgo(new Date(lead.createdAt))}</p>
                     </div>
                     <LeadStatusQuickActions
                       leadId={lead.id}
@@ -686,22 +778,22 @@ export default async function AdminDashboard() {
               )}
             </div>
           </div>
-          <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-3">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">Reserves actives</p>
-              <Link href="/admin/bookings" className="text-[11px] text-cyan-300 hover:underline">Obrir Reserves</Link>
+          <div className="admin-cr-command-card">
+            <div className="admin-cr-command-head">
+              <p className="admin-cr-command-title">Reserves actives</p>
+              <Link href="/admin/bookings" className="admin-cr-link-inline">Obrir Reserves</Link>
             </div>
-            <div className="space-y-2">
+            <div className="admin-cr-list">
               {commandBookings.length === 0 ? (
-                <p className="text-xs text-slate-500">Sense reserves actives.</p>
+                <p className="admin-cr-empty-text">Sense reserves actives.</p>
               ) : (
                 commandBookings.map((booking) => (
-                  <div key={booking.id} className="flex items-center justify-between gap-2 rounded-lg border border-slate-700/50 bg-slate-900/50 px-2 py-2">
-                    <div className="min-w-0">
-                      <Link href={`/admin/bookings/${booking.id}`} className="block truncate text-sm text-slate-100 hover:text-cyan-300">
+                  <div key={booking.id} className="admin-cr-list-row">
+                    <div className="admin-cr-list-content">
+                      <Link href={`/admin/bookings/${booking.id}`} className="admin-cr-list-link">
                         {booking.reference} · {booking.clientName}
                       </Link>
-                      <p className="text-[11px] text-slate-500">{formatEventDate(new Date(booking.eventDate))}</p>
+                      <p className="admin-cr-meta">{formatEventDate(new Date(booking.eventDate))}</p>
                     </div>
                     <BookingStatusQuickActions
                       bookingId={booking.id}
@@ -715,61 +807,61 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-4 sm:p-5">
-        <div className="mb-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-cyan-300">Radar d&apos;execució</p>
-          <h2 className="text-base sm:text-lg font-semibold text-slate-100">On posar el focus avui</h2>
-          <p className="mt-1 text-xs text-slate-400">Semàfors simples: vermell = urgent, groc = important, verd = controlat.</p>
+      <section className="admin-cr-panel admin-cr-panel--radar">
+        <div className="admin-cr-panel-head-block">
+          <p className="admin-cr-kicker admin-cr-kicker--cyan">Radar d&apos;execució</p>
+          <h2 className="admin-cr-h2">On posar el focus avui</h2>
+          <p className="admin-cr-small admin-cr-small--muted">Semàfors simples: vermell = urgent, groc = important, verd = controlat.</p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <Link href="/admin/leads" className="rounded-xl border border-slate-700/60 bg-slate-800/50 p-3 hover:border-rose-500/40">
-            <p className="text-xs text-slate-400">Temps sense resposta</p>
-            <p className={`mt-1 text-xl font-bold ${staleLeadsCount > 0 ? 'text-rose-300' : 'text-emerald-300'}`}>{staleLeadsCount}</p>
-            <p className="mt-1 text-xs text-slate-300">Leads amb més de 24h sense avançar. Primer punt a netejar cada dia.</p>
+        <div className="admin-cr-grid-3">
+          <Link href="/admin/leads" className="admin-cr-radar-card admin-cr-radar-card--rose">
+            <p className="admin-cr-stat-label">Temps sense resposta</p>
+            <p className={`admin-cr-radar-value ${staleLeadsCount > 0 ? 'admin-cr-tone-rose' : 'admin-cr-tone-emerald'}`}>{staleLeadsCount}</p>
+            <p className="admin-cr-small">Leads amb més de 24h sense avançar. Primer punt a netejar cada dia.</p>
           </Link>
-          <Link href="/admin/leads" className="rounded-xl border border-slate-700/60 bg-slate-800/50 p-3 hover:border-amber-500/40">
-            <p className="text-xs text-slate-400">Leads calents</p>
-            <p className={`mt-1 text-xl font-bold ${hotLeadsCount > 0 ? 'text-amber-300' : 'text-emerald-300'}`}>{hotLeadsCount}</p>
-            <p className="mt-1 text-xs text-slate-300">Prioritat alta/urgent. Són els que poden tancar abans.</p>
+          <Link href="/admin/leads" className="admin-cr-radar-card admin-cr-radar-card--amber">
+            <p className="admin-cr-stat-label">Leads calents</p>
+            <p className={`admin-cr-radar-value ${hotLeadsCount > 0 ? 'admin-cr-tone-amber' : 'admin-cr-tone-emerald'}`}>{hotLeadsCount}</p>
+            <p className="admin-cr-small">Prioritat alta/urgent. Són els que poden tancar abans.</p>
           </Link>
-          <Link href="/admin/presupuestos" className="rounded-xl border border-slate-700/60 bg-slate-800/50 p-3 hover:border-cyan-500/40">
-            <p className="text-xs text-slate-400">Pressupostos en joc</p>
-            <p className={`mt-1 text-xl font-bold ${quotesInFlightCount > 0 ? 'text-cyan-300' : 'text-emerald-300'}`}>{quotesInFlightCount}</p>
-            <p className="mt-1 text-xs text-slate-300">Enviats o negociant. Seguiment curt per convertir-los en reserva.</p>
+          <Link href="/admin/presupuestos" className="admin-cr-radar-card admin-cr-radar-card--cyan">
+            <p className="admin-cr-stat-label">Pressupostos en joc</p>
+            <p className={`admin-cr-radar-value ${quotesInFlightCount > 0 ? 'admin-cr-tone-cyan' : 'admin-cr-tone-emerald'}`}>{quotesInFlightCount}</p>
+            <p className="admin-cr-small">Enviats o negociant. Seguiment curt per convertir-los en reserva.</p>
           </Link>
         </div>
       </section>
 
       {testimonialsPending > 0 && (
-        <div className="flex flex-col gap-2 rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between backdrop-blur-sm">
+        <div className="admin-cr-banner admin-cr-banner--amber">
           <div>
-            <p className="text-xs sm:text-sm text-slate-400 font-medium">Testimonis pendents</p>
-            <p className="text-base sm:text-lg font-semibold text-slate-100">
+            <p className="admin-cr-banner-label">Testimonis pendents</p>
+            <p className="admin-cr-banner-value">
               {testimonialsPending} pendent{testimonialsPending > 1 ? 's' : ''} d&apos;aprovació
             </p>
           </div>
-          <Link href="/admin/ressenyes" className="self-start sm:self-auto">
+          <Link href="/admin/ressenyes" className="admin-cr-banner-action">
             <Button variant="secondary" icon="⭐" label="Revisar" />
           </Link>
         </div>
       )}
 
       {alerts.length > 0 && (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="admin-cr-alert-grid">
           {alerts.map((alert, index) => {
             const palette = alert.type === 'error'
-              ? 'border-rose-500/30 bg-rose-500/10 text-rose-200'
+              ? 'admin-cr-alert admin-cr-alert--error'
               : alert.type === 'warning'
-                ? 'border-amber-500/30 bg-amber-500/10 text-amber-200'
-                : 'border-sky-500/30 bg-sky-500/10 text-sky-200';
+                ? 'admin-cr-alert admin-cr-alert--warning'
+                : 'admin-cr-alert admin-cr-alert--info';
             return (
-              <div key={`${alert.title}-${index}`} className={`rounded-2xl border p-4 ${palette}`}>
-                <div className="flex items-start justify-between gap-3">
+              <div key={`${alert.title}-${index}`} className={palette}>
+                <div className="admin-cr-alert-row">
                   <div>
-                    <p className="text-sm font-semibold">{alert.title}</p>
-                    <p className="text-xs text-slate-300 mt-1">{alert.description}</p>
+                    <p className="admin-cr-alert-title">{alert.title}</p>
+                    <p className="admin-cr-alert-desc">{alert.description}</p>
                   </div>
-                  <Link href={alert.href} className="text-xs text-slate-100 underline decoration-dotted hover:text-white">
+                  <Link href={alert.href} className="admin-cr-link-inline">
                     {alert.action}
                   </Link>
                 </div>
@@ -781,49 +873,49 @@ export default async function AdminDashboard() {
 
       <QuickActions />
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-4">
-          <p className="text-xs uppercase text-slate-400">Salut sistema</p>
-          <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+      <section className="admin-cr-info-grid">
+        <div className="admin-cr-info-card">
+          <p className="admin-cr-kicker">Salut sistema</p>
+          <div className="admin-cr-health-grid">
             {healthItems.map((item) => (
-              <div key={item.label} className="rounded-lg border border-slate-700/50 bg-slate-900/50 px-2 py-2 text-center">
-                <p className="text-[10px] text-slate-500">{item.label}</p>
-                <p className={`text-xs font-semibold ${item.status === 'OK' ? 'text-emerald-300' : item.status === 'ERROR' ? 'text-rose-300' : 'text-amber-300'}`}>
+              <div key={item.label} className="admin-cr-health-item">
+                <p className="admin-cr-health-label">{item.label}</p>
+                <p className={`admin-cr-health-value ${item.status === 'OK' ? 'admin-cr-tone-emerald' : item.status === 'ERROR' ? 'admin-cr-tone-rose' : 'admin-cr-tone-amber'}`}>
                   {item.status}
                 </p>
               </div>
             ))}
           </div>
-          <p className="mt-3 text-[10px] text-slate-500">
+          <p className="admin-cr-footnote">
             Últim cron: {cronMap['emails.cron.lastRun'] ? new Date(cronMap['emails.cron.lastRun']).toLocaleString('ca-ES') : 'Mai'}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-4">
-          <p className="text-xs uppercase text-slate-400">Tasques pendents</p>
-          <div className="mt-3 space-y-2 text-xs">
+        <div className="admin-cr-info-card">
+          <p className="admin-cr-kicker">Tasques pendents</p>
+          <div className="admin-cr-list">
             {upcomingTasks.length === 0 ? (
-              <p className="text-slate-500">Sense tasques pendents</p>
+              <p className="admin-cr-empty-text">Sense tasques pendents</p>
             ) : (
               upcomingTasks.map((task) => (
-                <Link key={task.id} href={`/admin/leads/${task.lead.id}`} className="flex items-center justify-between rounded-lg border border-slate-700/50 bg-slate-900/50 px-2 py-2 text-slate-200 hover:border-cyan-500/40">
-                  <span className="truncate">{task.title}</span>
-                  <span className="text-[10px] text-slate-500">{task.lead.name}</span>
+                <Link key={task.id} href={`/admin/leads/${task.lead.id}`} className="admin-cr-list-row admin-cr-list-row--link">
+                  <span className="admin-cr-truncate">{task.title}</span>
+                  <span className="admin-cr-meta">{task.lead.name}</span>
                 </Link>
               ))
             )}
           </div>
         </div>
-        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-4">
-          <p className="text-xs uppercase text-slate-400">Timeline</p>
-          <div className="mt-3 space-y-2 text-xs">
+        <div className="admin-cr-info-card">
+          <p className="admin-cr-kicker">Timeline</p>
+          <div className="admin-cr-list">
             {timeline.length === 0 ? (
-              <p className="text-slate-500">Cap activitat recent</p>
+              <p className="admin-cr-empty-text">Cap activitat recent</p>
             ) : (
               timeline.map((item) => (
-                <Link key={item.id} href={item.href} className="flex items-center gap-2 rounded-lg border border-slate-700/50 bg-slate-900/50 px-2 py-2 text-slate-200 hover:border-cyan-500/40">
+                <Link key={item.id} href={item.href} className="admin-cr-list-row admin-cr-list-row--link admin-cr-list-row--timeline">
                   <span>{item.icon}</span>
-                  <span className="flex-1 truncate">{item.text}</span>
-                  <span className="text-[10px] text-slate-500">{item.time}</span>
+                  <span className="admin-cr-truncate">{item.text}</span>
+                  <span className="admin-cr-meta">{item.time}</span>
                 </Link>
               ))
             )}
@@ -832,7 +924,7 @@ export default async function AdminDashboard() {
       </section>
 
       {/* Mètriques essencials */}
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
+      <div className="admin-cr-kpi-grid">
         <MetricCard
           icon="📋"
           label="Reserves confirmades"
@@ -883,9 +975,9 @@ export default async function AdminDashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="admin-cr-chart-grid">
         <Card title="Trànsit web (30 dies)" subtitle="Sessions i usuaris" noPadding>
-          <div className="p-4 sm:p-6">
+          <div className="admin-cr-card-pad">
             <MiniLineChart
               series={[
                 { data: ga4SessionsSeries, stroke: '#22d3ee', label: 'Sessions', value: ga4Sessions || '-' },
@@ -893,12 +985,12 @@ export default async function AdminDashboard() {
               ]}
             />
             {!ga4 && (
-              <p className="mt-2 text-xs text-slate-500">GA4 pendent o sense dades.</p>
+              <p className="admin-cr-footnote">GA4 pendent o sense dades.</p>
             )}
           </div>
         </Card>
         <Card title="Entrades i conversió" subtitle="Consultes i tancaments" noPadding>
-          <div className="p-4 sm:p-6">
+          <div className="admin-cr-card-pad">
             <MiniLineChart
               series={[
                 { data: leadsSeries, stroke: '#34d399', label: 'Entrades', value: leadsThisMonth },
@@ -908,7 +1000,7 @@ export default async function AdminDashboard() {
           </div>
         </Card>
         <Card title="Reserves i facturació" subtitle="Esdeveniments confirmats" noPadding>
-          <div className="p-4 sm:p-6">
+          <div className="admin-cr-card-pad">
             <MiniLineChart
               series={[
                 { data: bookingsSeries, stroke: '#f472b6', label: 'Reserves', value: bookingsConfirmed },
@@ -920,9 +1012,9 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Contingut principal - Responsive */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="admin-cr-main-grid">
         {/* Pròxims esdeveniments */}
-        <div className="lg:col-span-2">
+        <div className="admin-cr-main-grid-wide">
           <Card
             title="Pròxims esdeveniments"
             subtitle={`${upcomingBookings.length} programats`}
@@ -934,34 +1026,34 @@ export default async function AdminDashboard() {
             noPadding
           >
             {upcomingBookings.length > 0 ? (
-              <div className="divide-y divide-slate-700/30">
+              <div className="admin-cr-divide-list">
                 {upcomingBookings.map((booking) => (
                   <Link
                     key={booking.id}
                     href={`/admin/bookings/${booking.id}`}
-                    className="px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4 hover:bg-slate-700/30 active:bg-slate-700/50 transition-colors"
+                    className="admin-cr-row-link"
                   >
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center shrink-0">
-                      <span className="text-slate-100 font-bold text-sm sm:text-base">
+                    <div className="admin-cr-avatar-box">
+                      <span className="admin-cr-avatar-text">
                         {new Date(booking.eventDate).getDate()}
                       </span>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-slate-100 font-medium text-sm sm:text-base truncate">{booking.clientName || 'Client'}</p>
-                      <p className="text-slate-400 text-xs sm:text-sm truncate">
+                    <div className="admin-cr-list-content">
+                      <p className="admin-cr-list-link">{booking.clientName || 'Client'}</p>
+                      <p className="admin-cr-meta admin-cr-truncate">
                         {formatEventDate(new Date(booking.eventDate))} · {booking.eventType || 'Esdeveniment'}
                       </p>
                     </div>
-                    <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="admin-cr-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
                 ))}
               </div>
             ) : (
-              <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-                <p className="text-slate-400 text-sm">No hi ha esdeveniments programats</p>
-                <Link href="/admin/bookings" className="text-cyan-400 hover:text-cyan-300 text-sm mt-2 inline-block font-medium">
+              <div className="admin-cr-empty-block">
+                <p className="admin-cr-small admin-cr-small--muted">No hi ha esdeveniments programats</p>
+                <Link href="/admin/bookings" className="admin-cr-link-inline">
                   Crear nova reserva →
                 </Link>
               </div>
@@ -970,16 +1062,16 @@ export default async function AdminDashboard() {
         </div>
 
       {/* Activitat recent */}
-        <div className="hidden sm:block">
+        <div className="admin-cr-desktop-only">
           <Card title="Activitat" subtitle="Últimes accions">
-            <div className="space-y-3 sm:space-y-4">
+            <div className="admin-cr-list">
               {activities.map((activity, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <span className="text-base sm:text-lg mt-0.5">{activity.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm text-slate-300">{activity.text}</p>
+                <div key={i} className="admin-cr-activity-row">
+                  <span className="admin-cr-activity-icon">{activity.icon}</span>
+                  <div className="admin-cr-list-content">
+                    <p className="admin-cr-small">{activity.text}</p>
                     {activity.time && (
-                      <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5">{activity.time}</p>
+                      <p className="admin-cr-meta">{activity.time}</p>
                     )}
                   </div>
                 </div>
@@ -1001,35 +1093,35 @@ export default async function AdminDashboard() {
         noPadding
       >
         {recentLeads.length > 0 ? (
-          <div className="divide-y divide-slate-700/30">
+          <div className="admin-cr-divide-list">
             {recentLeads.map((lead) => (
               <Link
                 key={lead.id}
                 href={`/admin/leads/${lead.id}`}
-                className="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between hover:bg-slate-700/30 active:bg-slate-700/50 transition-colors"
+                className="admin-cr-row-link"
               >
-                <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-slate-600/50 to-slate-700/50 border border-slate-600/50 flex items-center justify-center text-slate-200 font-medium text-sm sm:text-base shrink-0">
+                <div className="admin-cr-row-main">
+                  <div className="admin-cr-avatar-round">
                     {lead.name?.charAt(0).toUpperCase() || '?'}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-slate-100 font-medium text-sm sm:text-base truncate">{lead.name}</p>
-                    <p className="text-slate-400 text-xs sm:text-sm truncate hidden sm:block">{lead.email}</p>
-                    <p className="text-slate-500 text-xs sm:hidden">{timeAgo(new Date(lead.createdAt))}</p>
+                  <div className="admin-cr-list-content">
+                    <p className="admin-cr-list-link">{lead.name}</p>
+                    <p className="admin-cr-meta admin-cr-desktop-only-inline">{lead.email}</p>
+                    <p className="admin-cr-meta admin-cr-mobile-only-inline">{timeAgo(new Date(lead.createdAt))}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-2">
-                  <span className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium ${
-                    lead.status === 'NEW' ? 'bg-sky-500/20 text-sky-300' :
-                    lead.status === 'WON' ? 'bg-emerald-500/20 text-emerald-300' :
-                    'bg-slate-500/20 text-slate-300'
+                <div className="admin-cr-row-side">
+                  <span className={`admin-cr-status-chip ${
+                    lead.status === 'NEW' ? 'admin-cr-status-chip--new' :
+                    lead.status === 'WON' ? 'admin-cr-status-chip--won' :
+                    'admin-cr-status-chip--default'
                   }`}>
                     {lead.status}
                   </span>
-                  <span className="text-slate-500 text-sm hidden sm:block">
+                  <span className="admin-cr-meta admin-cr-desktop-only-inline">
                     {timeAgo(new Date(lead.createdAt))}
                   </span>
-                  <svg className="w-4 h-4 text-slate-500 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="admin-cr-chevron admin-cr-mobile-only-inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
@@ -1037,52 +1129,52 @@ export default async function AdminDashboard() {
             ))}
           </div>
         ) : (
-          <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-            <p className="text-slate-400 text-sm">Encara no hi ha entrades</p>
-            <p className="text-slate-500 text-xs mt-1">Les entrades apareixeran aquí</p>
+          <div className="admin-cr-empty-block">
+            <p className="admin-cr-small admin-cr-small--muted">Encara no hi ha entrades</p>
+            <p className="admin-cr-meta">Les entrades apareixeran aquí</p>
           </div>
         )}
       </Card>
 
       {/* Estadístiques ràpides */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-3 sm:p-5 rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-purple-600/5 backdrop-blur-sm">
-          <p className="text-slate-400 text-xs sm:text-sm font-medium">Conversió</p>
-          <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">{conversionRate}%</p>
-          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{wonLeads}/{leadsCount} entrades</p>
+      <div className="admin-cr-mini-grid">
+        <div className="admin-cr-mini-card admin-cr-mini-card--violet">
+          <p className="admin-cr-stat-label">Conversió</p>
+          <p className="admin-cr-mini-value">{conversionRate}%</p>
+          <p className="admin-cr-meta">{wonLeads}/{leadsCount} entrades</p>
         </div>
-        <div className="p-3 sm:p-5 rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm">
-          <p className="text-slate-400 text-xs sm:text-sm font-medium">Testimonis</p>
-          <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">{testimonialsApproved + testimonialsPending}</p>
-          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">{testimonialsPending} pendents</p>
+        <div className="admin-cr-mini-card admin-cr-mini-card--amber">
+          <p className="admin-cr-stat-label">Testimonis</p>
+          <p className="admin-cr-mini-value">{testimonialsApproved + testimonialsPending}</p>
+          <p className="admin-cr-meta">{testimonialsPending} pendents</p>
         </div>
-        <div className="p-3 sm:p-5 rounded-2xl border border-rose-500/20 bg-gradient-to-br from-rose-500/10 to-rose-600/5 backdrop-blur-sm">
-          <p className="text-slate-400 text-xs sm:text-sm font-medium">Valoració</p>
-          <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">⭐ {rating}</p>
-          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">Mitjana</p>
+        <div className="admin-cr-mini-card admin-cr-mini-card--rose">
+          <p className="admin-cr-stat-label">Valoració</p>
+          <p className="admin-cr-mini-value">⭐ {rating}</p>
+          <p className="admin-cr-meta">Mitjana</p>
         </div>
-        <Link href="/admin/inventory" className="p-3 sm:p-5 rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 backdrop-blur-sm hover:border-cyan-400/40 transition-colors">
-          <p className="text-slate-400 text-xs sm:text-sm font-medium">Inventari</p>
-          <p className="text-xl sm:text-2xl font-semibold text-slate-100 mt-0.5 sm:mt-1">{inventoryAvailable}/{inventoryTotal}</p>
-          <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">
+        <Link href="/admin/inventory" className="admin-cr-mini-card admin-cr-mini-card--cyan">
+          <p className="admin-cr-stat-label">Inventari</p>
+          <p className="admin-cr-mini-value">{inventoryAvailable}/{inventoryTotal}</p>
+          <p className="admin-cr-meta">
             {inventoryInUse > 0 && `${inventoryInUse} en ús · `}{inventoryMaintenance > 0 && `${inventoryMaintenance} mant.`}{inventoryBroken > 0 && ` · ${inventoryBroken} avariat`}{inventoryInUse === 0 && inventoryMaintenance === 0 && inventoryBroken === 0 && 'Tot disponible'}
           </p>
         </Link>
       </div>
 
-      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
-        <div className="px-4 py-3 border-b border-slate-700/50 bg-slate-700/30">
-          <h3 className="text-sm font-semibold text-slate-100">🧾 Auditoria recent</h3>
-          <p className="text-xs text-slate-400">Últimes accions d'admin</p>
+      <section className="admin-cr-audit">
+        <div className="admin-cr-audit-head">
+          <h3 className="admin-cr-step-title">🧾 Auditoria recent</h3>
+          <p className="admin-cr-small admin-cr-small--muted">Últimes accions d'admin</p>
         </div>
         {recentAdminLogs.length === 0 ? (
-          <div className="p-6 text-center text-slate-500 text-sm">Sense activitat recent</div>
+          <div className="admin-cr-empty-block">Sense activitat recent</div>
         ) : (
-          <div className="divide-y divide-slate-700/30">
+          <div className="admin-cr-divide-list">
             {recentAdminLogs.map((logItem) => (
-              <div key={logItem.id} className="px-4 py-3 flex items-center justify-between text-xs text-slate-300">
-                <span className="truncate">{logItem.action} · {logItem.entity}</span>
-                <span className="text-slate-500">{timeAgo(new Date(logItem.createdAt))}</span>
+              <div key={logItem.id} className="admin-cr-audit-row">
+                <span className="admin-cr-truncate">{logItem.action} · {logItem.entity}</span>
+                <span className="admin-cr-meta">{timeAgo(new Date(logItem.createdAt))}</span>
               </div>
             ))}
           </div>
