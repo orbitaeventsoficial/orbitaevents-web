@@ -72,7 +72,7 @@ export default async function PacksPage() {
   const pricingAlertsCount = Array.from(pricingHealthByPack.values()).filter((row) => row.hasAlert).length;
 
   return (
-    <div className="space-y-6">
+    <div className="admin-packs-page space-y-6">
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -100,13 +100,13 @@ export default async function PacksPage() {
       <nav className="flex flex-wrap gap-2">
         <Link
           href="/admin/packs"
-          className="inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold"
+          className="admin-packs-tab admin-packs-tab--active inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold"
         >
           Packs
         </Link>
         <Link
           href="/admin/packs/extras"
-          className="inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium"
+          className="admin-packs-tab admin-packs-tab--idle inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium"
         >
           Extres
         </Link>
@@ -118,25 +118,25 @@ export default async function PacksPage() {
           <p className="text-xs font-medium uppercase">Total Packs</p>
           <p className="mt-2 text-3xl font-bold">{packs.length}</p>
         </div>
-        <div className="rounded-2xl border p-4">
+        <div className="admin-packs-stat admin-packs-stat--ok rounded-2xl border p-4">
           <p className="text-xs font-medium uppercase">Actius</p>
           <p className="mt-2 text-3xl font-bold">
             {packs.filter((p) => p.isActive).length}
           </p>
         </div>
-        <div className="rounded-2xl border p-4">
+        <div className="admin-packs-stat admin-packs-stat--warn rounded-2xl border p-4">
           <p className="text-xs font-medium uppercase">Destacats</p>
           <p className="mt-2 text-3xl font-bold">
             {packs.filter((p) => p.isFeatured).length}
           </p>
         </div>
-        <div className="rounded-2xl border p-4">
+        <div className="admin-packs-stat admin-packs-stat--info rounded-2xl border p-4">
           <p className="text-xs font-medium uppercase">Total Reserves</p>
           <p className="mt-2 text-3xl font-bold">
             {packs.reduce((sum, p) => sum + p._count.bookings, 0)}
           </p>
         </div>
-        <div className={`rounded-2xl border p-4 ${pricingAlertsCount > 0 ? '' : ''}`}>
+        <div className={`admin-packs-stat rounded-2xl border p-4 ${pricingAlertsCount > 0 ? 'admin-packs-stat--danger' : 'admin-packs-stat--ok'}`}>
           <p className={`text-xs font-medium uppercase ${pricingAlertsCount > 0 ? 'text-rose-300' : 'text-emerald-300'}`}>Alertes de preu pack</p>
           <p className="mt-2 text-3xl font-bold">{pricingAlertsCount}</p>
         </div>
@@ -165,8 +165,8 @@ export default async function PacksPage() {
                   key={pack.id}
                   className={`rounded-2xl border backdrop-blur-sm overflow-hidden ${
                     pack.isFeatured
-                      ? ' '
-                      : ' '
+                      ? 'admin-packs-card admin-packs-card--featured'
+                      : 'admin-packs-card admin-packs-card--normal'
                   }`}
                 >
                   <div className="p-4 border-b">
@@ -279,13 +279,13 @@ export default async function PacksPage() {
                   <div className="px-4 py-3 border-t flex gap-2">
                     <Link
                       href={`/admin/packs/${pack.id}`}
-                    className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border transition-colors"
+                    className="admin-packs-btn flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
                       href={`/admin/packs/${pack.id}/inventory`}
-                    className="flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border transition-colors"
+                    className="admin-packs-btn flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border transition-colors"
                     >
                       📦 Inventari
                     </Link>
@@ -319,8 +319,8 @@ export default async function PacksPage() {
                   key={pack.id}
                   className={`rounded-2xl border backdrop-blur-sm overflow-hidden ${
                     pack.isFeatured
-                      ? ' '
-                      : ' '
+                      ? 'admin-packs-card admin-packs-card--featured'
+                      : 'admin-packs-card admin-packs-card--normal'
                   }`}
                 >
                   <div className="p-4 border-b">

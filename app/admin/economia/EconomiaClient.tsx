@@ -295,14 +295,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="admin-economia-page space-y-4">
       {/* ═══════════ HEADER ═══════════ */}
-      <header className="relative overflow-hidden rounded-xl border border-white/10 p-5 shadow-lg">
+      <header className="admin-economia-header relative overflow-hidden rounded-xl border border-white/10 p-5 shadow-lg">
         <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
         <div className="relative">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="ap-title text-2xl font-black tracking-tight">
+              <h1 className="admin-page-title text-2xl font-black tracking-tight">
                 Economia
               </h1>
               <p className="mt-1 text-xs">
@@ -330,7 +330,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
       </header>
 
       {/* ═══════════ TAB NAVIGATION ═══════════ */}
-      <nav className="flex gap-1 rounded-xl border border-white/10 p-1 shadow-md backdrop-blur-sm">
+      <nav className="admin-economia-tabs flex gap-1 rounded-xl border border-white/10 p-1 shadow-md backdrop-blur-sm">
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const showBadge = tab.id === 'cobraments' && props.atRiskRows.length > 0;
@@ -338,10 +338,10 @@ export default function EconomiaClient(props: EconomiaClientProps) {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative flex-1 rounded-xl px-3 py-3 text-sm font-bold transition-all duration-200 ${
+              className={`admin-economia-tab relative flex-1 rounded-xl px-3 py-3 text-sm font-bold transition-all duration-200 ${
                 isActive
-                  ? ' shadow-md border'
-                  : ' border border-transparent'
+                  ? 'admin-economia-tab--active shadow-md border'
+                  : 'admin-economia-tab--idle border border-transparent'
               }`}
             >
               <span className="mr-1">{tab.icon}</span>

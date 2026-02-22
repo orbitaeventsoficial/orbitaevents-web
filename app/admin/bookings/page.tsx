@@ -13,11 +13,11 @@ export const metadata = {
 };
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  PENDING: { label: 'Pendent', bg: 'bg-slate-500/20', text: 'text-slate-200' },
-  CONFIRMED: { label: 'Confirmada', bg: 'bg-slate-500/20', text: 'text-slate-200' },
-  PREPARING: { label: 'Preparant', bg: 'bg-slate-500/20', text: 'text-slate-200' },
-  COMPLETED: { label: 'Completada', bg: 'bg-slate-500/20', text: 'text-slate-200' },
-  CANCELLED: { label: 'Cancel·lada', bg: 'bg-slate-500/20', text: 'text-slate-200' },
+  PENDING: { label: 'Pendent', bg: 'bg-yellow-500/20', text: 'text-yellow-300' },
+  CONFIRMED: { label: 'Confirmada', bg: 'bg-emerald-500/20', text: 'text-emerald-300' },
+  PREPARING: { label: 'Preparant', bg: 'bg-blue-500/20', text: 'text-blue-300' },
+  COMPLETED: { label: 'Completada', bg: 'bg-teal-500/20', text: 'text-teal-300' },
+  CANCELLED: { label: 'Cancel·lada', bg: 'bg-rose-500/20', text: 'text-rose-300' },
 };
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -128,19 +128,19 @@ export default async function BookingsPage({
   const totalRevenue = stats.reduce((sum, s) => sum + (s._sum.total || 0), 0);
 
   return (
-    <div className="ap-page space-y-4 px-1 sm:space-y-6 sm:px-0">
+    <div className="admin-page-container admin-bookings-page space-y-4 px-1 sm:space-y-6 sm:px-0">
       {/* Header - Mobile optimized */}
-      <header className="ap-header">
+      <header className="admin-page-header">
         <div>
-          <h1 className="ap-title">Reserves</h1>
-          <p className="ap-subtitle">
+          <h1 className="admin-page-title">Reserves</h1>
+          <p className="admin-page-subtitle">
             {pagination.total} esdeveniments · {formatCurrency(totalRevenue)}
           </p>
         </div>
-        <div className="ap-header-actions">
+        <div className="admin-page-header-actions">
         <Link
           href="/admin/bookings/new"
-          className="ap-btn ap-btn--primary inline-flex items-center px-3 py-2 text-xs sm:text-sm font-medium"
+          className="admin-page-header-link inline-flex items-center px-3 py-2 text-xs sm:text-sm font-medium"
         >
           + Nova
         </Link>
@@ -148,25 +148,25 @@ export default async function BookingsPage({
       </header>
 
       {/* Stats Cards - Scrollable horizontal en móvil */}
-      <section className="ap-grid ap-grid--4 flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
-        <div className="ap-card shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+      <section className="admin-bookings-stats flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
+        <div className="admin-bookings-stat admin-bookings-stat--total shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Total</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{pagination.total}</p>
           <p className="text-[10px] sm:text-xs truncate text-center">{formatCurrency(totalRevenue)}</p>
         </div>
-        <div className="ap-card shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--pending shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Pendents</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.PENDING?.count || 0}</p>
         </div>
-        <div className="ap-card shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--confirmed shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Confirmades</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.CONFIRMED?.count || 0}</p>
         </div>
-        <div className="ap-card shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--completed shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Completades</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.COMPLETED?.count || 0}</p>
         </div>
-        <div className="ap-card shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--cancelled shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Cancel·lades</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.CANCELLED?.count || 0}</p>
         </div>
@@ -200,7 +200,7 @@ export default async function BookingsPage({
                 key={booking.id}
                 className={`block rounded-2xl border backdrop-blur-sm p-4 transition-colors ${
                   isPast && booking.status !== 'COMPLETED'
-                    ? 'border-slate-500/40'
+                    ? 'border-orange-500/30'
                     : 'border-slate-700/50 bg-slate-800/60 hover:bg-slate-700/40'
                 }`}
               >

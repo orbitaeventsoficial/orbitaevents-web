@@ -116,7 +116,7 @@ export default function FeaturesPage() {
                 role="switch"
                 aria-checked={feature.enabled}
                 aria-busy={saving === feature.key}
-                className={`relative inline-flex h-9 min-w-[88px] items-center rounded-full border px-2 text-[11px] font-bold uppercase tracking-wide transition-colors ${
+                className={`admin-feature-toggle relative inline-flex h-9 min-w-[88px] items-center rounded-full border px-2 text-[11px] font-bold uppercase tracking-wide transition-colors ${
                   feature.enabled
                     ? 'border-emerald-400/70 bg-emerald-500/85 text-emerald-950'
                     : 'border-rose-400/70 bg-rose-500/85 text-rose-950'

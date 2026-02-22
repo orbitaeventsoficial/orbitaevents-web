@@ -201,14 +201,14 @@ export default function IntakePage() {
   }, [form, duplicates]);
 
   return (
-    <div className="ap-page space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8">
+    <div className="admin-page-container space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="ap-title">
+          <h1 className="admin-page-title">
             Entrada ràpida
           </h1>
-          <p className="ap-subtitle mt-1">
+          <p className="admin-page-subtitle mt-1">
             Crea una entrada des de qualsevol canal amb detecció de duplicats
           </p>
         </div>
@@ -224,13 +224,13 @@ export default function IntakePage() {
         <div className="grid grid-cols-2 gap-2">
           <Link
             href="/admin/leads"
-            className="rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-medium transition-colors"
+            className="admin-keep-colors rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-medium transition-colors"
           >
             Tauler Leads
           </Link>
           <Link
             href="/admin/intake"
-            className="rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold"
+            className="admin-keep-colors rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold"
             aria-current="page"
           >
             Entrada ràpida
@@ -321,7 +321,7 @@ export default function IntakePage() {
               type="button"
               onClick={() => updateField('source', src.value)}
               aria-pressed={form.source === src.value}
-              className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
+              className={`admin-keep-colors rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
                 form.source === src.value
                   ? `${SOURCE_SELECTED_STYLES[src.value] || 'border-cyan-400/70 bg-cyan-500/25 text-cyan-100'} shadow-sm`
                   : 'border-slate-700/50 bg-slate-900/60 text-slate-300 hover:bg-slate-800'
@@ -379,7 +379,7 @@ export default function IntakePage() {
                   key={p.value}
                   type="button"
                   onClick={() => updateField('priority', p.value)}
-                  className={`rounded-lg border px-2 py-2 text-sm font-medium transition-all ${
+                  className={`admin-keep-colors rounded-lg border px-2 py-2 text-sm font-medium transition-all ${
                     form.priority === p.value
                       ? `${p.selected} shadow-sm`
                       : 'border-slate-700/50 text-slate-400 hover:bg-slate-800'
@@ -406,7 +406,7 @@ export default function IntakePage() {
                 type="button"
                 onClick={() => updateField('eventType', et.value)}
                 aria-pressed={form.eventType === et.value}
-                className={`rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
+                className={`admin-keep-colors rounded-xl border px-2 py-2 text-xs font-medium transition-all ${
                   form.eventType === et.value
                     ? 'border-amber-400/70 bg-amber-500/25 text-amber-100 shadow-sm'
                     : 'border-slate-700/50 bg-slate-900/60 text-slate-400 hover:bg-slate-800'

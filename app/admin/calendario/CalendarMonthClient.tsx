@@ -434,7 +434,7 @@ export default function CalendarMonthClient() {
       </div>
 
       {/* Graella del calendari */}
-      <div className="grid grid-cols-7 gap-[1px] overflow-hidden rounded-2xl border">
+      <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-hidden rounded-2xl border">
         {cells.map((cell) => {
           const dayData =
             data?.days?.[cell.key] ??
@@ -464,7 +464,7 @@ export default function CalendarMonthClient() {
               type="button"
               onClick={() => setSelectedDateKey(cell.key)}
               className={[
-                ' flex h-[132px] sm:h-[152px] md:h-[168px] flex-col overflow-hidden p-1.5 sm:p-2 text-left text-sm transition-all',
+                'admin-calendar-cell flex h-[132px] sm:h-[152px] md:h-[168px] flex-col overflow-hidden p-1.5 sm:p-2 text-left text-sm transition-all',
                 bgClass,
                 hoverClass,
                 !cell.inCurrentMonth ? 'opacity-30' : '',

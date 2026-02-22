@@ -275,16 +275,16 @@ export default async function LeadsPage({
   return (
     <div
       id="leads-theme-root"
-      className="ap-page space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8"
+      className="admin-page-container admin-leads-page space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8"
       style={LEAD_COLOR_DEFAULT_VARS as CSSProperties}
     >
-      <header className="ap-header">
+      <header className="admin-page-header">
         <div>
-          <h1 className="ap-title">Entrades</h1>
-          <p className="ap-subtitle">Tauler comercial, seguiment i pipeline operatiu.</p>
+          <h1 className="admin-page-title">Entrades</h1>
+          <p className="admin-page-subtitle">Tauler comercial, seguiment i pipeline operatiu.</p>
         </div>
-        <div className="ap-header-actions">
-          <Link href="/admin/intake" className="ap-btn ap-btn--primary">
+        <div className="admin-page-header-actions">
+          <Link href="/admin/intake" className="admin-page-header-link">
             Entrada ràpida
           </Link>
         </div>
@@ -295,13 +295,13 @@ export default async function LeadsPage({
           <Link
             href="/admin/leads"
             aria-current="page"
-            className="ap-tab ap-tab--active rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold"
+            className="admin-keep-colors admin-leads-tab admin-leads-tab--active rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold"
           >
             Tauler Leads
           </Link>
           <Link
             href="/admin/intake"
-            className="ap-tab ap-tab--idle rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold transition-colors"
+            className="admin-keep-colors admin-leads-tab admin-leads-tab--idle rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold transition-colors"
           >
             Entrada ràpida
           </Link>

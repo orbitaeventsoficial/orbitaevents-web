@@ -53,11 +53,11 @@ export default async function PresupuestosPage({
   const brandSettings = Object.fromEntries(brandSettingsRows.map((row) => [row.key, row.value]));
 
   return (
-    <div className="ap-page space-y-6">
-      <header className="ap-header">
+    <div className="admin-page-container admin-presupuestos-page space-y-6">
+      <header className="admin-page-header">
         <div>
-          <h1 className="ap-title">Editor avançat de pressupost PDF</h1>
-          <p className="ap-subtitle">
+          <h1 className="admin-page-title">Editor avançat de pressupost PDF</h1>
+          <p className="admin-page-subtitle">
             Personalitza client, pack, extres, descomptes i text per generar el PDF al moment.
           </p>
           {customer && (
@@ -66,14 +66,14 @@ export default async function PresupuestosPage({
             </p>
           )}
         </div>
-        <div className="ap-header-actions">
-          <Link href="/admin/settings" className="ap-btn ap-btn--primary text-sm">
+        <div className="admin-page-header-actions">
+          <Link href="/admin/settings" className="admin-page-header-link text-sm">
             ← Configuració
           </Link>
           {customer && (
             <Link
               href={`/admin/contactes/${customer.id}`}
-              className="ap-btn ap-btn--primary rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+              className="admin-page-header-link rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
             >
               👤 Fitxa Client
             </Link>

@@ -38,12 +38,12 @@ type PipelineColumn = {
 };
 
 const COLUMNS: Omit<PipelineColumn, 'leads'>[] = [
-  { status: 'NEW', label: 'Noves', toneClass: '', cardToneClass: '' },
-  { status: 'CONTACTED', label: 'Contactat', toneClass: '', cardToneClass: '' },
-  { status: 'QUOTE_SENT', label: 'Pressupost enviat', toneClass: '', cardToneClass: '' },
-  { status: 'NEGOTIATING', label: 'Negociant', toneClass: '', cardToneClass: '' },
-  { status: 'WON', label: 'Guanyat', toneClass: '', cardToneClass: '' },
-  { status: 'LOST', label: 'Perdut', toneClass: '', cardToneClass: '' },
+  { status: 'NEW', label: 'Noves', toneClass: 'admin-leads-tone admin-leads-tone--new', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--new' },
+  { status: 'CONTACTED', label: 'Contactat', toneClass: 'admin-leads-tone admin-leads-tone--contacted', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--contacted' },
+  { status: 'QUOTE_SENT', label: 'Pressupost enviat', toneClass: 'admin-leads-tone admin-leads-tone--quote', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--quote' },
+  { status: 'NEGOTIATING', label: 'Negociant', toneClass: 'admin-leads-tone admin-leads-tone--negotiating', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--negotiating' },
+  { status: 'WON', label: 'Guanyat', toneClass: 'admin-leads-tone admin-leads-tone--won', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--won' },
+  { status: 'LOST', label: 'Perdut', toneClass: 'admin-leads-tone admin-leads-tone--lost', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--lost' },
 ];
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -60,9 +60,9 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
 
 const PRIORITY_DOT: Record<string, string> = {
   LOW: 'bg-slate-500',
-  MEDIUM: 'bg-slate-500',
-  HIGH: 'bg-slate-500',
-  URGENT: 'bg-slate-500',
+  MEDIUM: 'bg-blue-500',
+  HIGH: 'bg-orange-500',
+  URGENT: 'bg-rose-500',
 };
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -209,16 +209,16 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
               void handleDropOnColumn(col.status);
             }}
             className={`min-w-0 rounded-2xl border flex min-h-[320px] flex-col transition-all ${col.toneClass} ${
-              dragOverStatus === col.status ? 'ring-2 ring-white/30' : ''
+              dragOverStatus === col.status ? 'ring-2 ring-cyan-400/50' : ''
             }`}
           >
             {/* Column header */}
             <div className="px-3 py-2.5 border-b">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold truncate">
+                <h3 className="admin-leads-column-title text-sm font-semibold truncate">
                   {col.label}
                 </h3>
-                <span className="rounded-full border px-2 py-0.5 text-[10px] font-bold">
+                <span className="admin-leads-column-count rounded-full border px-2 py-0.5 text-[10px] font-bold">
                   {col.leads.length}
                 </span>
               </div>
@@ -227,7 +227,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
             {/* Cards */}
             <div className="flex-1 p-2 space-y-2">
               {dragOverStatus === col.status && (
-                <div className="rounded-xl border border-dashed px-2 py-1 text-center text-[10px]">
+                <div className="admin-leads-dropzone rounded-xl border border-dashed px-2 py-1 text-center text-[10px]">
                   Deixa anar aquí
                 </div>
               )}
@@ -259,21 +259,21 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     </div>
 
       <section className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border p-3">
-          <p className="text-[10px] uppercase tracking-wide">Obertes</p>
-          <p className="mt-1 text-lg font-bold">{openLeads}</p>
+        <div className="admin-leads-metric admin-leads-metric--open rounded-xl border p-3">
+          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Obertes</p>
+          <p className="admin-leads-metric-value mt-1 text-lg font-bold">{openLeads}</p>
         </div>
-        <div className="rounded-xl border p-3">
-          <p className="text-[10px] uppercase tracking-wide">Guanyades</p>
-          <p className="mt-1 text-lg font-bold">{wonLeads}</p>
+        <div className="admin-leads-metric admin-leads-metric--won rounded-xl border p-3">
+          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Guanyades</p>
+          <p className="admin-leads-metric-value mt-1 text-lg font-bold">{wonLeads}</p>
         </div>
-        <div className="rounded-xl border p-3">
-          <p className="text-[10px] uppercase tracking-wide">Perdudes</p>
-          <p className="mt-1 text-lg font-bold">{lostLeads}</p>
+        <div className="admin-leads-metric admin-leads-metric--lost rounded-xl border p-3">
+          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Perdudes</p>
+          <p className="admin-leads-metric-value mt-1 text-lg font-bold">{lostLeads}</p>
         </div>
-        <div className="rounded-xl border p-3">
-          <p className="text-[10px] uppercase tracking-wide">Taxa guany</p>
-          <p className="mt-1 text-lg font-bold">{winRate}%</p>
+        <div className="admin-leads-metric admin-leads-metric--winrate rounded-xl border p-3">
+          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Taxa guany</p>
+          <p className="admin-leads-metric-value mt-1 text-lg font-bold">{winRate}%</p>
         </div>
       </section>
     </div>
@@ -355,7 +355,7 @@ function PipelineCard({
       </div>
 
       <div className="mt-1">
-        <span className="inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold">
+        <span className="admin-leads-column-chip inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold">
           {columnLabel}
         </span>
       </div>

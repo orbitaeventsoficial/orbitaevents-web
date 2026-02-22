@@ -1035,11 +1035,11 @@ export default function PresupuestoPdfStudio({
   }
 
   const inputClass =
-    ' w-full rounded-xl border px-3 py-2 text-sm outline-none focus-visible:ring-2';
+    'admin-quote-input w-full rounded-xl border px-3 py-2 text-sm outline-none focus-visible:ring-2';
 
   return (
-    <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-      <div className="space-y-5 rounded-2xl border p-5">
+    <section className="admin-quote-studio grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <div className="admin-quote-studio-form space-y-5 rounded-2xl border p-5">
         {isCustomerScoped && (
           <div className="rounded-xl border px-3 py-2 text-xs">
             Mode client actiu. Aquest pressupost es guarda automàticament a la fitxa del client.
@@ -1393,12 +1393,12 @@ export default function PresupuestoPdfStudio({
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 rounded-xl border p-3">
+        <div className="admin-quote-actions flex flex-wrap items-center gap-3 rounded-xl border p-3">
           <button
             type="button"
             onClick={downloadPdf}
             disabled={generating || sending || !selectedPack}
-            className="rounded-xl border px-5 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
+            className="admin-quote-action rounded-xl border px-5 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
           >
             {generating ? 'Generant PDF...' : 'Descarregar PDF'}
           </button>
@@ -1406,7 +1406,7 @@ export default function PresupuestoPdfStudio({
             type="button"
             onClick={printPdf}
             disabled={generating || sending || !selectedPack}
-            className="rounded-xl border px-5 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
+            className="admin-quote-action rounded-xl border px-5 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
           >
             {generating ? 'Generant PDF...' : 'Imprimir PDF'}
           </button>
@@ -1414,14 +1414,14 @@ export default function PresupuestoPdfStudio({
             type="button"
             onClick={sendQuoteEmail}
             disabled={generating || sending || !selectedPack || !clientEmail.trim()}
-            className="rounded-xl border px-5 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
+            className="admin-quote-action rounded-xl border px-5 py-2.5 text-sm font-semibold disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2"
           >
             {sending ? studioText.sendingQuote : studioText.sendQuote}
           </button>
           <button
             type="button"
             onClick={clearDraft}
-            className="rounded-xl border px-4 py-2.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2"
+            className="admin-quote-action rounded-xl border px-4 py-2.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2"
           >
             Netejar esborrany
           </button>
@@ -1430,7 +1430,7 @@ export default function PresupuestoPdfStudio({
         </div>
       </div>
 
-      <aside className="h-fit rounded-2xl border p-5">
+      <aside className="admin-quote-studio-preview h-fit rounded-2xl border p-5">
         <h2 className="text-lg font-semibold">Vista ràpida</h2>
         <p className="mt-1 text-sm">Resum del que sortirà al PDF.</p>
 

@@ -78,6 +78,7 @@ const SECTIONS: MapSection[] = [
       { href: '/admin/discount-codes', label: 'Codis descompte' },
       { href: '/admin/coverage', label: 'Cobertura' },
       { href: '/admin/features', label: 'Funcionalitats' },
+      { href: '/admin/theme', label: 'Tema' },
       { href: '/admin/translations', label: 'Traduccions' },
       { href: '/admin/text-manager', label: 'Textos PRO' },
       { href: '/admin/google-reviews', label: 'Google Reviews' },
