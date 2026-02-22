@@ -4143,3 +4143,62 @@ html.admin-mode .admin-main-shell .admin-quote-template .admin-quote-template-sa
 html.admin-mode .admin-main-shell .admin-quote-template .admin-quote-template-save:hover {
   background: color-mix(in oklab, var(--admin-primary) 36%, var(--admin-panel) 64%) !important;
 }
+
+/* Final hard override: admin must stay flat (no gradients) */
+html.admin-mode .admin-shell :is(
+  div,
+  section,
+  article,
+  aside,
+  .panel,
+  .card,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl
+):not(.admin-keep-colors) {
+  background-image: none !important;
+}
+
+html.admin-mode .admin-shell :is(
+  button,
+  [role='button'],
+  a.inline-flex
+):not(.admin-keep-colors) {
+  background-image: none !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+  background: color-mix(in oklab, var(--admin-panel) 78%, var(--admin-surface) 22%) !important;
+}
+
+html.admin-mode .admin-shell :is(
+  button,
+  [role='button'],
+  a.inline-flex
+):not(.admin-keep-colors):hover {
+  background-image: none !important;
+  border-color: color-mix(in oklab, var(--admin-primary) 62%, var(--admin-border) 38%) !important;
+  color: var(--admin-text) !important;
+  background: color-mix(in oklab, var(--admin-panel) 62%, var(--admin-primary) 38%) !important;
+}
+
+/* Leads KPI cards: explicit solid colors */
+html.admin-mode .admin-main-shell .admin-leads-metric--open {
+  background: #2a3444 !important;
+  border-color: #5b6c83 !important;
+  color: #eef4ff !important;
+}
+html.admin-mode .admin-main-shell .admin-leads-metric--won {
+  background: #234a36 !important;
+  border-color: #4d8f6b !important;
+  color: #ebfff5 !important;
+}
+html.admin-mode .admin-main-shell .admin-leads-metric--lost {
+  background: #532734 !important;
+  border-color: #9e546a !important;
+  color: #ffedf2 !important;
+}
+html.admin-mode .admin-main-shell .admin-leads-metric--winrate {
+  background: #5a3f20 !important;
+  border-color: #a77a3f !important;
+  color: #fff4e5 !important;
+}
