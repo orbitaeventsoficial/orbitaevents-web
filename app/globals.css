@@ -4351,3 +4351,37 @@ html.admin-mode .admin-main-shell .admin-leads-tone--lost {
   border-color: var(--admin-cat-status-cancelled-border) !important;
   color: var(--admin-cat-status-cancelled-text) !important;
 }
+
+/* Quote studio: force solid corporate surfaces */
+html.admin-mode .admin-main-shell .admin-quote-studio .admin-quote-studio-form,
+html.admin-mode .admin-main-shell .admin-quote-studio .admin-quote-studio-preview,
+html.admin-mode .admin-main-shell .admin-quote-studio .rounded-2xl.border,
+html.admin-mode .admin-main-shell .admin-quote-studio .rounded-xl.border {
+  background-image: none !important;
+  background: color-mix(in oklab, var(--admin-panel) 90%, var(--admin-surface) 10%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+  box-shadow: none !important;
+}
+
+html.admin-mode .admin-main-shell .admin-quote-studio .admin-quote-input {
+  background: color-mix(in oklab, var(--admin-surface) 84%, #000 16%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-quote-studio .admin-quote-input:focus,
+html.admin-mode .admin-main-shell .admin-quote-studio .admin-quote-input:focus-visible {
+  border-color: color-mix(in oklab, var(--admin-primary) 70%, white 30%) !important;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--admin-primary) 70%, white 30%) !important;
+}
+
+html.admin-mode .admin-main-shell .admin-quote-studio .admin-quote-action {
+  background: var(--admin-cat-action-bg) !important;
+  border-color: var(--admin-cat-action-border) !important;
+  color: var(--admin-cat-action-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-quote-studio .admin-quote-action:hover {
+  background: var(--admin-cat-action-bg-hover) !important;
+  border-color: var(--admin-cat-action-border-hover) !important;
+  color: var(--admin-cat-action-text) !important;
+}
