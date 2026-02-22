@@ -3916,3 +3916,57 @@ html.admin-mode .admin-main-shell .admin-economia-page .admin-economia-tab--idle
   background: color-mix(in oklab, var(--admin-panel) 65%, var(--admin-primary) 35%) !important;
   color: var(--admin-text) !important;
 }
+
+/* Final corporate pass across all /admin */
+html.admin-mode .admin-sidebar,
+html.admin-mode .admin-mobile-header,
+html.admin-mode .admin-mobile-sidebar,
+html.admin-mode .admin-desktop-header,
+html.admin-mode .admin-bottom-nav {
+  background: var(--admin-surface) !important;
+  border-color: var(--admin-border) !important;
+}
+
+html.admin-mode .admin-main-shell :is(
+  section,
+  article,
+  aside,
+  div
+):is(.rounded-xl, .rounded-2xl, .rounded-3xl):not(.rounded-full):not([class*='bg-transparent']) {
+  background: color-mix(in oklab, var(--admin-panel) 92%, var(--admin-surface) 8%) !important;
+  border-color: var(--admin-border) !important;
+}
+
+html.admin-mode .admin-main-shell :is(button, [role='button'], a.inline-flex, a[class*='rounded']) {
+  border-color: var(--admin-border) !important;
+  background: color-mix(in oklab, var(--admin-panel) 78%, var(--admin-surface) 22%) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell :is(button, [role='button'], a.inline-flex, a[class*='rounded']):hover {
+  background: color-mix(in oklab, var(--admin-panel) 60%, var(--admin-primary) 40%) !important;
+}
+
+html.admin-mode .admin-main-shell :is(input, select, textarea):not([type='checkbox']):not([type='radio']) {
+  background: color-mix(in oklab, var(--admin-surface) 84%, #000 16%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell :is(input, select, textarea)::placeholder {
+  color: color-mix(in oklab, var(--admin-muted) 85%, #fff 15%) !important;
+}
+
+html.admin-mode .admin-main-shell table {
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell table thead tr,
+html.admin-mode .admin-main-shell table thead th {
+  background: color-mix(in oklab, var(--admin-surface) 80%, #000 20%) !important;
+  color: var(--admin-muted) !important;
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell table tbody tr {
+  border-color: color-mix(in oklab, var(--admin-border) 70%, #000 30%) !important;
+}
+html.admin-mode .admin-main-shell table tbody tr:hover {
+  background: color-mix(in oklab, var(--admin-panel) 72%, var(--admin-primary) 28%) !important;
+}
