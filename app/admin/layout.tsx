@@ -6,6 +6,7 @@ import Image from 'next/image';
 import dynamicImport from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminHelpModeProvider, useAdminHelpMode } from './components/AdminHelpMode';
+import './admin-theme.css';
 
 const AdminSearchModal = dynamicImport(() => import('./components/AdminSearchModal'), {
   ssr: false,
