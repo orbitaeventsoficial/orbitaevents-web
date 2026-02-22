@@ -3602,7 +3602,7 @@ html.admin-mode .admin-layout-shell {
   --admin-border: #4b586b;
   --admin-text: #eef3f8;
   --admin-muted: #b1bccb;
-  --admin-primary: #6f8eae;
+  --admin-primary: #8894a3;
   --admin-success: #6f9681;
   --admin-warning: #9a7a62;
   --admin-danger: #9e6b73;
@@ -3752,7 +3752,7 @@ html.admin-mode .admin-main-shell :is(
   [class*='text-violet-'],
   [class*='text-purple-']
 ) {
-  color: var(--admin-primary) !important;
+  color: color-mix(in oklab, var(--admin-primary) 72%, var(--admin-text) 28%) !important;
 }
 html.admin-mode .admin-main-shell :is(
   [class*='text-emerald-'],

@@ -72,7 +72,7 @@ export default async function PacksPage() {
   const pricingAlertsCount = Array.from(pricingHealthByPack.values()).filter((row) => row.hasAlert).length;
 
   return (
-    <div className="space-y-6">
+    <div className="admin-packs-page space-y-6">
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -100,13 +100,13 @@ export default async function PacksPage() {
       <nav className="flex flex-wrap gap-2">
         <Link
           href="/admin/packs"
-          className="inline-flex items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-200"
+          className="admin-packs-tab admin-packs-tab--active inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold"
         >
           Packs
         </Link>
         <Link
           href="/admin/packs/extras"
-          className="inline-flex items-center rounded-full border border-slate-600/50 bg-slate-700/40 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-600/50"
+          className="admin-packs-tab admin-packs-tab--idle inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium"
         >
           Extres
         </Link>
@@ -118,25 +118,25 @@ export default async function PacksPage() {
           <p className="text-xs font-medium text-slate-400 uppercase">Total Packs</p>
           <p className="mt-2 text-3xl font-bold text-slate-100">{packs.length}</p>
         </div>
-        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-4">
+        <div className="admin-packs-stat admin-packs-stat--ok rounded-2xl border p-4">
           <p className="text-xs font-medium text-emerald-400 uppercase">Actius</p>
           <p className="mt-2 text-3xl font-bold text-slate-100">
             {packs.filter((p) => p.isActive).length}
           </p>
         </div>
-        <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm p-4">
+        <div className="admin-packs-stat admin-packs-stat--warn rounded-2xl border p-4">
           <p className="text-xs font-medium text-amber-400 uppercase">Destacats</p>
           <p className="mt-2 text-3xl font-bold text-slate-100">
             {packs.filter((p) => p.isFeatured).length}
           </p>
         </div>
-        <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 backdrop-blur-sm p-4">
+        <div className="admin-packs-stat admin-packs-stat--info rounded-2xl border p-4">
           <p className="text-xs font-medium text-cyan-400 uppercase">Total Reserves</p>
           <p className="mt-2 text-3xl font-bold text-slate-100">
             {packs.reduce((sum, p) => sum + p._count.bookings, 0)}
           </p>
         </div>
-        <div className={`rounded-2xl border backdrop-blur-sm p-4 ${pricingAlertsCount > 0 ? 'border-rose-500/30 bg-rose-500/10' : 'border-emerald-500/20 bg-emerald-500/10'}`}>
+        <div className={`admin-packs-stat rounded-2xl border p-4 ${pricingAlertsCount > 0 ? 'admin-packs-stat--danger' : 'admin-packs-stat--ok'}`}>
           <p className={`text-xs font-medium uppercase ${pricingAlertsCount > 0 ? 'text-rose-300' : 'text-emerald-300'}`}>Alertes de preu pack</p>
           <p className="mt-2 text-3xl font-bold text-slate-100">{pricingAlertsCount}</p>
         </div>
@@ -165,8 +165,8 @@ export default async function PacksPage() {
                   key={pack.id}
                   className={`rounded-2xl border backdrop-blur-sm overflow-hidden ${
                     pack.isFeatured
-                      ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-600/5'
-                      : 'border-slate-700/50 bg-slate-800/60'
+                      ? 'admin-packs-card admin-packs-card--featured'
+                      : 'admin-packs-card admin-packs-card--normal'
                   }`}
                 >
                   <div className="p-4 border-b border-slate-700/30">
@@ -279,13 +279,13 @@ export default async function PacksPage() {
                   <div className="px-4 py-3 bg-slate-700/30 border-t border-slate-700/30 flex gap-2">
                     <Link
                       href={`/admin/packs/${pack.id}`}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-white/50/50 transition-colors"
+                    className="admin-packs-btn flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border transition-colors"
                     >
                       ✏️ Editar
                     </Link>
                     <Link
                       href={`/admin/packs/${pack.id}/inventory`}
-                      className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-600/50 px-3 py-2 text-sm font-medium text-slate-200 border border-slate-500/50 hover:bg-white/50/50 transition-colors"
+                    className="admin-packs-btn flex-1 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium border transition-colors"
                     >
                       📦 Inventari
                     </Link>
@@ -319,8 +319,8 @@ export default async function PacksPage() {
                   key={pack.id}
                   className={`rounded-2xl border backdrop-blur-sm overflow-hidden ${
                     pack.isFeatured
-                      ? 'border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-600/5'
-                      : 'border-slate-700/50 bg-slate-800/60'
+                      ? 'admin-packs-card admin-packs-card--featured'
+                      : 'admin-packs-card admin-packs-card--normal'
                   }`}
                 >
                   <div className="p-4 border-b border-slate-700/30">
