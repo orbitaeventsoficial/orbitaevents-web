@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requirePermission } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { hasForbiddenAdminCss, sanitizeAdminCss } from '@/lib/admin-css';
 
 const CSS_KEY = 'admin.css.custom';
 
@@ -30,12 +31,14 @@ export async function PUT(req: NextRequest) {
   if (permissionError) return permissionError;
 
   const body = await req.json().catch(() => null) as { css?: string } | null;
-  const css = typeof body?.css === 'string' ? body.css : '';
+  const rawCss = typeof body?.css === 'string' ? body.css : '';
+  const sanitizedCss = sanitizeAdminCss(rawCss);
+  const hadForbiddenRules = hasForbiddenAdminCss(rawCss);
 
   await prisma.setting.upsert({
     where: { key: CSS_KEY },
     update: {
-      value: css,
+      value: sanitizedCss,
       type: 'STRING',
       category: 'config',
       label: 'Custom CSS admin',
@@ -43,7 +46,7 @@ export async function PUT(req: NextRequest) {
     },
     create: {
       key: CSS_KEY,
-      value: css,
+      value: sanitizedCss,
       type: 'STRING',
       category: 'config',
       label: 'Custom CSS admin',
@@ -56,10 +59,9 @@ export async function PUT(req: NextRequest) {
       action: 'UPDATE',
       entity: 'setting',
       entityId: CSS_KEY,
-      details: { key: CSS_KEY, size: css.length },
+      details: { key: CSS_KEY, size: sanitizedCss.length, hadForbiddenRules },
     },
   });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, sanitized: hadForbiddenRules });
 }
-
