@@ -61,10 +61,10 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
   }
 
   const inputClass =
-    'w-full rounded-xl border border-slate-700/60 bg-slate-900/60 px-4 py-2.5 text-sm text-slate-100 focus:border-amber-500 focus:ring-1 focus:ring-amber-500';
+    'admin-quote-template-input w-full rounded-xl border px-4 py-2.5 text-sm';
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+    <section className="admin-quote-template rounded-2xl border p-5">
       <div className="grid gap-4 lg:grid-cols-2">
         <label className="text-sm text-slate-300">
           Títol principal
@@ -149,7 +149,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           type="button"
           onClick={save}
           disabled={saving}
-          className="rounded-xl border border-amber-500/40 bg-amber-500/15 px-4 py-2 text-sm font-semibold text-amber-200 hover:bg-amber-500/20 disabled:opacity-60"
+          className="admin-quote-template-save rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60"
         >
           {saving ? 'Desant...' : 'Desar plantilla'}
         </button>

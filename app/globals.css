@@ -3954,6 +3954,13 @@ html.admin-mode .admin-main-shell :is(input, select, textarea):not([type='checkb
 html.admin-mode .admin-main-shell :is(input, select, textarea)::placeholder {
   color: color-mix(in oklab, var(--admin-muted) 85%, #fff 15%) !important;
 }
+html.admin-mode .admin-main-shell * {
+  --tw-ring-color: color-mix(in oklab, var(--admin-primary) 72%, white 28%) !important;
+}
+html.admin-mode .admin-main-shell :is(input, select, textarea, button, a, [role='button']):focus,
+html.admin-mode .admin-main-shell :is(input, select, textarea, button, a, [role='button']):focus-visible {
+  outline-color: color-mix(in oklab, var(--admin-primary) 72%, white 28%) !important;
+}
 
 html.admin-mode .admin-main-shell table {
   border-color: var(--admin-border) !important;
@@ -4071,4 +4078,27 @@ html.admin-mode .admin-main-shell .admin-catalog-page .admin-catalog-tab--idle {
 html.admin-mode .admin-main-shell .admin-catalog-page .admin-catalog-tab--idle:hover {
   background: color-mix(in oklab, var(--admin-panel) 68%, var(--admin-primary) 32%) !important;
   color: var(--admin-text) !important;
+}
+
+/* Quote template editor */
+html.admin-mode .admin-main-shell .admin-quote-template {
+  background: color-mix(in oklab, var(--admin-panel) 92%, var(--admin-surface) 8%) !important;
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell .admin-quote-template .admin-quote-template-input {
+  background: color-mix(in oklab, var(--admin-surface) 84%, #000 16%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-quote-template .admin-quote-template-input:focus {
+  border-color: color-mix(in oklab, var(--admin-primary) 72%, white 28%) !important;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--admin-primary) 72%, white 28%) !important;
+}
+html.admin-mode .admin-main-shell .admin-quote-template .admin-quote-template-save {
+  border-color: var(--admin-border) !important;
+  background: color-mix(in oklab, var(--admin-primary) 24%, var(--admin-panel) 76%) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-quote-template .admin-quote-template-save:hover {
+  background: color-mix(in oklab, var(--admin-primary) 36%, var(--admin-panel) 64%) !important;
 }
