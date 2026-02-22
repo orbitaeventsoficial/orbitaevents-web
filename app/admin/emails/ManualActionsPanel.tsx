@@ -17,7 +17,7 @@ export default function ManualActionsPanel() {
     setCronResult(null);
 
     try {
-      // Use admin-protected endpoint instead of exposing CRON_SECRET
+      // Use  endpoint instead of exposing CRON_SECRET
       const res = await fetch('/api/admin/emails/run-cron', {
         method: 'POST',
       });

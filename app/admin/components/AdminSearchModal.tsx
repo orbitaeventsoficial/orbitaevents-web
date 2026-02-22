@@ -115,7 +115,7 @@ export default function AdminSearchModal({
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby="admin-search-title"
+        aria-labelledby=""
         className="mx-auto max-w-2xl overflow-hidden rounded-2xl border shadow-2xl"
       >
         <div className="flex items-center gap-3 border-b px-4 py-3">
@@ -138,7 +138,7 @@ export default function AdminSearchModal({
         </div>
 
         <div className="max-h-[70vh] overflow-y-auto">
-          <div className="px-4 py-3 text-xs" id="admin-search-title">
+          <div className="px-4 py-3 text-xs" id="">
             Escriu almenys 2 caràcters
           </div>
 

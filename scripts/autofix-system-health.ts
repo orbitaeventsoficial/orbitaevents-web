@@ -1,5 +1,4 @@
 import { prisma } from '../lib/prisma';
-import { hasForbiddenAdminCss, sanitizeAdminCss } from '../lib/admin-css';
 import { calculateCostPerHour } from '../lib/inventory-utils';
 import {
   buildProfitabilityReport,
@@ -349,62 +348,6 @@ async function runChecks(): Promise<CheckResult[]> {
       fixed: false,
       title: 'Backlog operatiu',
       details: error instanceof Error ? error.message : 'Error revisando backlog operativo',
-    });
-  }
-
-  // 8) Admin custom CSS safety (no gradients in admin runtime CSS)
-  try {
-    const setting = await prisma.setting.findUnique({
-      where: { key: 'admin.css.custom' },
-      select: { value: true },
-    });
-
-    const currentCss = String(setting?.value || '');
-    const hasForbidden = hasForbiddenAdminCss(currentCss);
-
-    if (!hasForbidden) {
-      results.push({
-        id: 'admin-css-safety',
-        ok: true,
-        fixed: false,
-        title: 'Admin CSS runtime',
-        details: 'OK',
-      });
-    } else {
-      const sanitized = sanitizeAdminCss(currentCss);
-      await prisma.setting.upsert({
-        where: { key: 'admin.css.custom' },
-        update: {
-          value: sanitized,
-          type: 'STRING',
-          category: 'config',
-          label: 'Custom CSS admin',
-          description: 'CSS custom aplicat només al panell admin',
-        },
-        create: {
-          key: 'admin.css.custom',
-          value: sanitized,
-          type: 'STRING',
-          category: 'config',
-          label: 'Custom CSS admin',
-          description: 'CSS custom aplicat només al panell admin',
-        },
-      });
-      results.push({
-        id: 'admin-css-safety',
-        ok: true,
-        fixed: true,
-        title: 'Admin CSS runtime',
-        details: 'Autofix aplicat: eliminats gradients del CSS custom guardat',
-      });
-    }
-  } catch (error) {
-    results.push({
-      id: 'admin-css-safety',
-      ok: false,
-      fixed: false,
-      title: 'Admin CSS runtime',
-      details: error instanceof Error ? error.message : 'Error revisant CSS custom d’admin',
     });
   }
 

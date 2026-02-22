@@ -86,7 +86,7 @@ export default function AdminRessenyesPage() {
   }
 
   return (
-    <div className="admin-reviews-page space-y-6">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Ressenyes</h1>
         <p className="text-sm">Aprova o amaga opinions rebudes del web.</p>
@@ -96,10 +96,10 @@ export default function AdminRessenyesPage() {
         <button
           type="button"
           onClick={() => setActiveTab('pending')}
-          className={`admin-reviews-tab px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
+          className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
             activeTab === 'pending'
-              ? 'admin-reviews-tab--active'
-              : 'admin-reviews-tab--idle'
+              ? ''
+              : ''
           }`}
         >
           Pendents ({pending.length})
@@ -107,10 +107,10 @@ export default function AdminRessenyesPage() {
         <button
           type="button"
           onClick={() => setActiveTab('approved')}
-          className={`admin-reviews-tab px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
+          className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
             activeTab === 'approved'
-              ? 'admin-reviews-tab--active'
-              : 'admin-reviews-tab--idle'
+              ? ''
+              : ''
           }`}
         >
           Aprovades ({approved.length})
@@ -142,7 +142,7 @@ export default function AdminRessenyesPage() {
                 <button
                   type="button"
                   onClick={() => updateStatus(t.id, 'hide')}
-                  className="admin-reviews-action admin-reviews-action--neutral px-4 py-2 rounded-full border text-sm font-semibold transition-colors"
+                  className="px-4 py-2 rounded-full border text-sm font-semibold transition-colors"
                   aria-busy={busyId === t.id}
                 >
                   Amagar
@@ -151,7 +151,7 @@ export default function AdminRessenyesPage() {
                 <button
                   type="button"
                   onClick={() => updateStatus(t.id, 'approve')}
-                  className="admin-reviews-action admin-reviews-action--ok px-4 py-2 rounded-full border text-sm font-semibold transition-colors"
+                  className="px-4 py-2 rounded-full border text-sm font-semibold transition-colors"
                   aria-busy={busyId === t.id}
                 >
                   Aprovar
@@ -160,7 +160,7 @@ export default function AdminRessenyesPage() {
               <button
                 type="button"
                 onClick={() => updateStatus(t.id, 'delete')}
-                className="admin-reviews-action admin-reviews-action--danger px-4 py-2 rounded-full border text-sm font-semibold transition-colors"
+                className="px-4 py-2 rounded-full border text-sm font-semibold transition-colors"
                 aria-busy={busyId === t.id}
               >
                 Eliminar

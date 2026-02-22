@@ -41,7 +41,7 @@ export default function GenerateDailyChecklistButton() {
         type="button"
         onClick={handleGenerate}
         disabled={loading}
-        className="admin-tasks-action inline-flex items-center rounded-xl border px-3 py-2 text-xs sm:text-sm font-semibold disabled:opacity-60"
+        className="inline-flex items-center rounded-xl border px-3 py-2 text-xs sm:text-sm font-semibold disabled:opacity-60"
       >
         {loading ? 'Generant...' : 'Generar checklist d’avui'}
       </button>

@@ -301,7 +301,7 @@ export default async function AdminDashboard() {
       CacheTTL.VERY_SHORT
     ).catch(() => []),
     cachedQuery(
-      'admin:dashboard:timeline:admin-logs',
+      'admin:dashboard:timeline:',
       () =>
         prisma.adminLog.findMany({
           take: 6,
@@ -630,19 +630,19 @@ export default async function AdminDashboard() {
   ] as const;
 
   return (
-    <div className="admin-control-room">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="admin-cr-header">
-        <div className="admin-cr-header-top">
+      <div className="">
+        <div className="">
           <div>
-            <h1 className="admin-cr-title">Resum ràpid</h1>
-            <p className="admin-cr-subtitle">Visió general del negoci</p>
+            <h1 className="">Resum ràpid</h1>
+            <p className="">Visió general del negoci</p>
           </div>
-          <Link href="/admin/leads" className="admin-cr-mobile-only">
+          <Link href="/admin/leads" className="">
             <Button variant="primary" icon="+" label="Nou" />
           </Link>
         </div>
-        <div className="admin-cr-desktop-actions">
+        <div className="">
           <Link href="/admin/analytics">
             <Button variant="secondary" icon="📈" label="Analítica" />
           </Link>
@@ -650,59 +650,59 @@ export default async function AdminDashboard() {
             <Button variant="primary" icon="+" label="Nou lead" />
           </Link>
         </div>
-        <div className="admin-cr-quick-links">
-          <Link href="/admin/inbox" className="admin-cr-quick-link">
+        <div className="">
+          <Link href="/admin/inbox" className="">
             📥 Inbox (IMAP)
           </Link>
-          <Link href="/admin/emails" className="admin-cr-quick-link">
+          <Link href="/admin/emails" className="">
             🤖 Correus automàtics
           </Link>
-          <Link href="/admin/bookings" className="admin-cr-quick-link">
+          <Link href="/admin/bookings" className="">
             📋 Reserves
           </Link>
-          <Link href="/admin/economia" className="admin-cr-quick-link">
+          <Link href="/admin/economia" className="">
             💶 Economia
           </Link>
-          <Link href="/admin/calendario" className="admin-cr-quick-link">
+          <Link href="/admin/calendario" className="">
             📅 Calendari
           </Link>
         </div>
       </div>
 
-      <section className="admin-cr-panel admin-cr-panel--pilot">
-        <div className="admin-cr-panel-head">
+      <section className="">
+        <div className="">
           <div>
-            <p className="admin-cr-kicker admin-cr-kicker--pilot">Mode Solo</p>
-            <h2 className="admin-cr-h2">Pilot automàtic d&apos;avui</h2>
-            <p className="admin-cr-small">No és lineal: pots començar directament pel pas 2 o pas 3.</p>
+            <p className="">Mode Solo</p>
+            <h2 className="">Pilot automàtic d&apos;avui</h2>
+            <p className="">No és lineal: pots començar directament pel pas 2 o pas 3.</p>
           </div>
-          <span className="admin-cr-pill admin-cr-pill--pilot">
+          <span className="">
             4 passos clars
           </span>
         </div>
-        <div className="admin-cr-chip-row">
-          <Link href="/admin/tasks" className="admin-cr-chip admin-cr-chip--amber">
+        <div className="">
+          <Link href="/admin/tasks" className="">
             Comença per pas 2
           </Link>
-          <Link href="/admin/emails" className="admin-cr-chip admin-cr-chip--rose">
+          <Link href="/admin/emails" className="">
             Comença per pas 3
           </Link>
         </div>
-        <div className="admin-cr-grid-4">
+        <div className="">
           {pilotToday.map((item) => {
             const toneClasses = item.tone === 'rose'
-              ? 'admin-cr-step--rose'
+              ? ''
               : item.tone === 'amber'
-                ? 'admin-cr-step--amber'
+                ? ''
                 : item.tone === 'sky'
-                  ? 'admin-cr-step--sky'
-                  : 'admin-cr-step--emerald';
+                  ? ''
+                  : '';
             return (
-              <Link key={item.id} href={item.href} className={`admin-cr-step ${toneClasses}`}>
-                <p className="admin-cr-step-kicker">{item.step}</p>
-                <p className="admin-cr-step-title">{item.title}</p>
-                <p className="admin-cr-step-desc">{item.description}</p>
-                <span className="admin-cr-step-cta">
+              <Link key={item.id} href={item.href} className={`${toneClasses}`}>
+                <p className="">{item.step}</p>
+                <p className="">{item.title}</p>
+                <p className="">{item.description}</p>
+                <span className="">
                   {item.cta}
                 </span>
               </Link>
@@ -711,32 +711,32 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="admin-cr-panel admin-cr-panel--checklist">
-        <div className="admin-cr-panel-row">
+      <section className="">
+        <div className="">
           <div>
-            <p className="admin-cr-kicker admin-cr-kicker--cyan">Checklist d&apos;avui</p>
-            <h2 className="admin-cr-h2">Control diari de feina</h2>
-            <p className="admin-cr-small admin-cr-small--muted">Marca les tasques com a fetes i avança sense perdre el fil.</p>
+            <p className="">Checklist d&apos;avui</p>
+            <h2 className="">Control diari de feina</h2>
+            <p className="">Marca les tasques com a fetes i avança sense perdre el fil.</p>
           </div>
           <Link
             href="/admin/tasks?status=OPEN"
-            className="admin-cr-action-link"
+            className=""
           >
             Obrir tasques pendents
           </Link>
         </div>
-        <div className="admin-cr-grid-3">
-          <div className="admin-cr-stat-box admin-cr-stat-box--amber">
-            <p className="admin-cr-stat-label">Pendents</p>
-            <p className="admin-cr-stat-value admin-cr-stat-value--amber">{checklistTodayPendingCount}</p>
+        <div className="">
+          <div className="">
+            <p className="">Pendents</p>
+            <p className="">{checklistTodayPendingCount}</p>
           </div>
-          <div className="admin-cr-stat-box admin-cr-stat-box--emerald">
-            <p className="admin-cr-stat-label">Fetes</p>
-            <p className="admin-cr-stat-value admin-cr-stat-value--emerald">{checklistTodayDoneCount}</p>
+          <div className="">
+            <p className="">Fetes</p>
+            <p className="">{checklistTodayDoneCount}</p>
           </div>
-          <div className="admin-cr-stat-box">
-            <p className="admin-cr-stat-label">Progrés</p>
-            <p className="admin-cr-stat-value">
+          <div className="">
+            <p className="">Progrés</p>
+            <p className="">
               {checklistTodayDoneCount + checklistTodayPendingCount > 0
                 ? `${Math.round((checklistTodayDoneCount / (checklistTodayDoneCount + checklistTodayPendingCount)) * 100)}%`
                 : '0%'}
@@ -746,29 +746,29 @@ export default async function AdminDashboard() {
       </section>
 
 
-      <section className="admin-cr-panel admin-cr-panel--command">
-        <div className="admin-cr-panel-head-block">
-          <p className="admin-cr-kicker admin-cr-kicker--violet">Centre de comandament</p>
-          <h2 className="admin-cr-h2">Mou estats sense canviar de pantalla</h2>
-          <p className="admin-cr-small admin-cr-small--muted">Accions ràpides de Leads i Reserves des del tauler principal.</p>
+      <section className="">
+        <div className="">
+          <p className="">Centre de comandament</p>
+          <h2 className="">Mou estats sense canviar de pantalla</h2>
+          <p className="">Accions ràpides de Leads i Reserves des del tauler principal.</p>
         </div>
-        <div className="admin-cr-grid-2">
-          <div className="admin-cr-command-card">
-            <div className="admin-cr-command-head">
-              <p className="admin-cr-command-title">Leads actius</p>
-              <Link href="/admin/leads" className="admin-cr-link-inline">Obrir Entrades</Link>
+        <div className="">
+          <div className="">
+            <div className="">
+              <p className="">Leads actius</p>
+              <Link href="/admin/leads" className="">Obrir Entrades</Link>
             </div>
-            <div className="admin-cr-list">
+            <div className="">
               {commandLeads.length === 0 ? (
-                <p className="admin-cr-empty-text">Sense leads actius.</p>
+                <p className="">Sense leads actius.</p>
               ) : (
                 commandLeads.map((lead) => (
-                  <div key={lead.id} className="admin-cr-list-row">
-                    <div className="admin-cr-list-content">
-                      <Link href={`/admin/leads/${lead.id}`} className="admin-cr-list-link">
+                  <div key={lead.id} className="">
+                    <div className="">
+                      <Link href={`/admin/leads/${lead.id}`} className="">
                         {lead.name}
                       </Link>
-                      <p className="admin-cr-meta">Prioritat {lead.priority.toLowerCase()} · {timeAgo(new Date(lead.createdAt))}</p>
+                      <p className="">Prioritat {lead.priority.toLowerCase()} · {timeAgo(new Date(lead.createdAt))}</p>
                     </div>
                     <LeadStatusQuickActions
                       leadId={lead.id}
@@ -779,22 +779,22 @@ export default async function AdminDashboard() {
               )}
             </div>
           </div>
-          <div className="admin-cr-command-card">
-            <div className="admin-cr-command-head">
-              <p className="admin-cr-command-title">Reserves actives</p>
-              <Link href="/admin/bookings" className="admin-cr-link-inline">Obrir Reserves</Link>
+          <div className="">
+            <div className="">
+              <p className="">Reserves actives</p>
+              <Link href="/admin/bookings" className="">Obrir Reserves</Link>
             </div>
-            <div className="admin-cr-list">
+            <div className="">
               {commandBookings.length === 0 ? (
-                <p className="admin-cr-empty-text">Sense reserves actives.</p>
+                <p className="">Sense reserves actives.</p>
               ) : (
                 commandBookings.map((booking) => (
-                  <div key={booking.id} className="admin-cr-list-row">
-                    <div className="admin-cr-list-content">
-                      <Link href={`/admin/bookings/${booking.id}`} className="admin-cr-list-link">
+                  <div key={booking.id} className="">
+                    <div className="">
+                      <Link href={`/admin/bookings/${booking.id}`} className="">
                         {booking.reference} · {booking.clientName}
                       </Link>
-                      <p className="admin-cr-meta">{formatEventDate(new Date(booking.eventDate))}</p>
+                      <p className="">{formatEventDate(new Date(booking.eventDate))}</p>
                     </div>
                     <BookingStatusQuickActions
                       bookingId={booking.id}
@@ -808,61 +808,61 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <section className="admin-cr-panel admin-cr-panel--radar">
-        <div className="admin-cr-panel-head-block">
-          <p className="admin-cr-kicker admin-cr-kicker--cyan">Radar d&apos;execució</p>
-          <h2 className="admin-cr-h2">On posar el focus avui</h2>
-          <p className="admin-cr-small admin-cr-small--muted">Semàfors simples: vermell = urgent, groc = important, verd = controlat.</p>
+      <section className="">
+        <div className="">
+          <p className="">Radar d&apos;execució</p>
+          <h2 className="">On posar el focus avui</h2>
+          <p className="">Semàfors simples: vermell = urgent, groc = important, verd = controlat.</p>
         </div>
-        <div className="admin-cr-grid-3">
-          <Link href="/admin/leads" className="admin-cr-radar-card admin-cr-radar-card--rose">
-            <p className="admin-cr-stat-label">Temps sense resposta</p>
-            <p className={`admin-cr-radar-value ${staleLeadsCount > 0 ? 'admin-cr-tone-rose' : 'admin-cr-tone-emerald'}`}>{staleLeadsCount}</p>
-            <p className="admin-cr-small">Leads amb més de 24h sense avançar. Primer punt a netejar cada dia.</p>
+        <div className="">
+          <Link href="/admin/leads" className="">
+            <p className="">Temps sense resposta</p>
+            <p className={`${staleLeadsCount > 0 ? '' : ''}`}>{staleLeadsCount}</p>
+            <p className="">Leads amb més de 24h sense avançar. Primer punt a netejar cada dia.</p>
           </Link>
-          <Link href="/admin/leads" className="admin-cr-radar-card admin-cr-radar-card--amber">
-            <p className="admin-cr-stat-label">Leads calents</p>
-            <p className={`admin-cr-radar-value ${hotLeadsCount > 0 ? 'admin-cr-tone-amber' : 'admin-cr-tone-emerald'}`}>{hotLeadsCount}</p>
-            <p className="admin-cr-small">Prioritat alta/urgent. Són els que poden tancar abans.</p>
+          <Link href="/admin/leads" className="">
+            <p className="">Leads calents</p>
+            <p className={`${hotLeadsCount > 0 ? '' : ''}`}>{hotLeadsCount}</p>
+            <p className="">Prioritat alta/urgent. Són els que poden tancar abans.</p>
           </Link>
-          <Link href="/admin/presupuestos" className="admin-cr-radar-card admin-cr-radar-card--cyan">
-            <p className="admin-cr-stat-label">Pressupostos en joc</p>
-            <p className={`admin-cr-radar-value ${quotesInFlightCount > 0 ? 'admin-cr-tone-cyan' : 'admin-cr-tone-emerald'}`}>{quotesInFlightCount}</p>
-            <p className="admin-cr-small">Enviats o negociant. Seguiment curt per convertir-los en reserva.</p>
+          <Link href="/admin/presupuestos" className="">
+            <p className="">Pressupostos en joc</p>
+            <p className={`${quotesInFlightCount > 0 ? '' : ''}`}>{quotesInFlightCount}</p>
+            <p className="">Enviats o negociant. Seguiment curt per convertir-los en reserva.</p>
           </Link>
         </div>
       </section>
 
       {testimonialsPending > 0 && (
-        <div className="admin-cr-banner admin-cr-banner--amber">
+        <div className="">
           <div>
-            <p className="admin-cr-banner-label">Testimonis pendents</p>
-            <p className="admin-cr-banner-value">
+            <p className="">Testimonis pendents</p>
+            <p className="">
               {testimonialsPending} pendent{testimonialsPending > 1 ? 's' : ''} d&apos;aprovació
             </p>
           </div>
-          <Link href="/admin/ressenyes" className="admin-cr-banner-action">
+          <Link href="/admin/ressenyes" className="">
             <Button variant="secondary" icon="⭐" label="Revisar" />
           </Link>
         </div>
       )}
 
       {alerts.length > 0 && (
-        <div className="admin-cr-alert-grid">
+        <div className="">
           {alerts.map((alert, index) => {
             const palette = alert.type === 'error'
-              ? 'admin-cr-alert admin-cr-alert--error'
+              ? ' '
               : alert.type === 'warning'
-                ? 'admin-cr-alert admin-cr-alert--warning'
-                : 'admin-cr-alert admin-cr-alert--info';
+                ? ' '
+                : ' ';
             return (
               <div key={`${alert.title}-${index}`} className={palette}>
-                <div className="admin-cr-alert-row">
+                <div className="">
                   <div>
-                    <p className="admin-cr-alert-title">{alert.title}</p>
-                    <p className="admin-cr-alert-desc">{alert.description}</p>
+                    <p className="">{alert.title}</p>
+                    <p className="">{alert.description}</p>
                   </div>
-                  <Link href={alert.href} className="admin-cr-link-inline">
+                  <Link href={alert.href} className="">
                     {alert.action}
                   </Link>
                 </div>
@@ -874,49 +874,49 @@ export default async function AdminDashboard() {
 
       <QuickActions />
 
-      <section className="admin-cr-info-grid">
-        <div className="admin-cr-info-card">
-          <p className="admin-cr-kicker">Salut sistema</p>
-          <div className="admin-cr-health-grid">
+      <section className="">
+        <div className="">
+          <p className="">Salut sistema</p>
+          <div className="">
             {healthItems.map((item) => (
-              <div key={item.label} className="admin-cr-health-item">
-                <p className="admin-cr-health-label">{item.label}</p>
-                <p className={`admin-cr-health-value ${item.status === 'OK' ? 'admin-cr-tone-emerald' : item.status === 'ERROR' ? 'admin-cr-tone-rose' : 'admin-cr-tone-amber'}`}>
+              <div key={item.label} className="">
+                <p className="">{item.label}</p>
+                <p className={`${item.status === 'OK' ? '' : item.status === 'ERROR' ? '' : ''}`}>
                   {item.status}
                 </p>
               </div>
             ))}
           </div>
-          <p className="admin-cr-footnote">
+          <p className="">
             Últim cron: {cronMap['emails.cron.lastRun'] ? new Date(cronMap['emails.cron.lastRun']).toLocaleString('ca-ES') : 'Mai'}
           </p>
         </div>
-        <div className="admin-cr-info-card">
-          <p className="admin-cr-kicker">Tasques pendents</p>
-          <div className="admin-cr-list">
+        <div className="">
+          <p className="">Tasques pendents</p>
+          <div className="">
             {upcomingTasks.length === 0 ? (
-              <p className="admin-cr-empty-text">Sense tasques pendents</p>
+              <p className="">Sense tasques pendents</p>
             ) : (
               upcomingTasks.map((task) => (
-                <Link key={task.id} href={`/admin/leads/${task.lead.id}`} className="admin-cr-list-row admin-cr-list-row--link">
-                  <span className="admin-cr-truncate">{task.title}</span>
-                  <span className="admin-cr-meta">{task.lead.name}</span>
+                <Link key={task.id} href={`/admin/leads/${task.lead.id}`} className="">
+                  <span className="">{task.title}</span>
+                  <span className="">{task.lead.name}</span>
                 </Link>
               ))
             )}
           </div>
         </div>
-        <div className="admin-cr-info-card">
-          <p className="admin-cr-kicker">Timeline</p>
-          <div className="admin-cr-list">
+        <div className="">
+          <p className="">Timeline</p>
+          <div className="">
             {timeline.length === 0 ? (
-              <p className="admin-cr-empty-text">Cap activitat recent</p>
+              <p className="">Cap activitat recent</p>
             ) : (
               timeline.map((item) => (
-                <Link key={item.id} href={item.href} className="admin-cr-list-row admin-cr-list-row--link admin-cr-list-row--timeline">
+                <Link key={item.id} href={item.href} className="">
                   <span>{item.icon}</span>
-                  <span className="admin-cr-truncate">{item.text}</span>
-                  <span className="admin-cr-meta">{item.time}</span>
+                  <span className="">{item.text}</span>
+                  <span className="">{item.time}</span>
                 </Link>
               ))
             )}
@@ -925,7 +925,7 @@ export default async function AdminDashboard() {
       </section>
 
       {/* Mètriques essencials */}
-      <div className="admin-cr-kpi-grid">
+      <div className="">
         <MetricCard
           icon="📋"
           label="Reserves confirmades"
@@ -976,9 +976,9 @@ export default async function AdminDashboard() {
         />
       </div>
 
-      <div className="admin-cr-chart-grid">
+      <div className="">
         <Card title="Trànsit web (30 dies)" subtitle="Sessions i usuaris" noPadding>
-          <div className="admin-cr-card-pad">
+          <div className="">
             <MiniLineChart
               series={[
                 { data: ga4SessionsSeries, stroke: '#22d3ee', label: 'Sessions', value: ga4Sessions || '-' },
@@ -986,12 +986,12 @@ export default async function AdminDashboard() {
               ]}
             />
             {!ga4 && (
-              <p className="admin-cr-footnote">GA4 pendent o sense dades.</p>
+              <p className="">GA4 pendent o sense dades.</p>
             )}
           </div>
         </Card>
         <Card title="Entrades i conversió" subtitle="Consultes i tancaments" noPadding>
-          <div className="admin-cr-card-pad">
+          <div className="">
             <MiniLineChart
               series={[
                 { data: leadsSeries, stroke: '#34d399', label: 'Entrades', value: leadsThisMonth },
@@ -1001,7 +1001,7 @@ export default async function AdminDashboard() {
           </div>
         </Card>
         <Card title="Reserves i facturació" subtitle="Esdeveniments confirmats" noPadding>
-          <div className="admin-cr-card-pad">
+          <div className="">
             <MiniLineChart
               series={[
                 { data: bookingsSeries, stroke: '#f472b6', label: 'Reserves', value: bookingsConfirmed },
@@ -1013,9 +1013,9 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Contingut principal - Responsive */}
-      <div className="admin-cr-main-grid">
+      <div className="">
         {/* Pròxims esdeveniments */}
-        <div className="admin-cr-main-grid-wide">
+        <div className="">
           <Card
             title="Pròxims esdeveniments"
             subtitle={`${upcomingBookings.length} programats`}
@@ -1027,34 +1027,34 @@ export default async function AdminDashboard() {
             noPadding
           >
             {upcomingBookings.length > 0 ? (
-              <div className="admin-cr-divide-list">
+              <div className="">
                 {upcomingBookings.map((booking) => (
                   <Link
                     key={booking.id}
                     href={`/admin/bookings/${booking.id}`}
-                    className="admin-cr-row-link"
+                    className=""
                   >
-                    <div className="admin-cr-avatar-box">
-                      <span className="admin-cr-avatar-text">
+                    <div className="">
+                      <span className="">
                         {new Date(booking.eventDate).getDate()}
                       </span>
                     </div>
-                    <div className="admin-cr-list-content">
-                      <p className="admin-cr-list-link">{booking.clientName || 'Client'}</p>
-                      <p className="admin-cr-meta admin-cr-truncate">
+                    <div className="">
+                      <p className="">{booking.clientName || 'Client'}</p>
+                      <p className="">
                         {formatEventDate(new Date(booking.eventDate))} · {booking.eventType || 'Esdeveniment'}
                       </p>
                     </div>
-                    <svg className="admin-cr-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
                 ))}
               </div>
             ) : (
-              <div className="admin-cr-empty-block">
-                <p className="admin-cr-small admin-cr-small--muted">No hi ha esdeveniments programats</p>
-                <Link href="/admin/bookings" className="admin-cr-link-inline">
+              <div className="">
+                <p className="">No hi ha esdeveniments programats</p>
+                <Link href="/admin/bookings" className="">
                   Crear nova reserva →
                 </Link>
               </div>
@@ -1063,16 +1063,16 @@ export default async function AdminDashboard() {
         </div>
 
       {/* Activitat recent */}
-        <div className="admin-cr-desktop-only">
+        <div className="">
           <Card title="Activitat" subtitle="Últimes accions">
-            <div className="admin-cr-list">
+            <div className="">
               {activities.map((activity, i) => (
-                <div key={i} className="admin-cr-activity-row">
-                  <span className="admin-cr-activity-icon">{activity.icon}</span>
-                  <div className="admin-cr-list-content">
-                    <p className="admin-cr-small">{activity.text}</p>
+                <div key={i} className="">
+                  <span className="">{activity.icon}</span>
+                  <div className="">
+                    <p className="">{activity.text}</p>
                     {activity.time && (
-                      <p className="admin-cr-meta">{activity.time}</p>
+                      <p className="">{activity.time}</p>
                     )}
                   </div>
                 </div>
@@ -1094,35 +1094,35 @@ export default async function AdminDashboard() {
         noPadding
       >
         {recentLeads.length > 0 ? (
-          <div className="admin-cr-divide-list">
+          <div className="">
             {recentLeads.map((lead) => (
               <Link
                 key={lead.id}
                 href={`/admin/leads/${lead.id}`}
-                className="admin-cr-row-link"
+                className=""
               >
-                <div className="admin-cr-row-main">
-                  <div className="admin-cr-avatar-round">
+                <div className="">
+                  <div className="">
                     {lead.name?.charAt(0).toUpperCase() || '?'}
                   </div>
-                  <div className="admin-cr-list-content">
-                    <p className="admin-cr-list-link">{lead.name}</p>
-                    <p className="admin-cr-meta admin-cr-desktop-only-inline">{lead.email}</p>
-                    <p className="admin-cr-meta admin-cr-mobile-only-inline">{timeAgo(new Date(lead.createdAt))}</p>
+                  <div className="">
+                    <p className="">{lead.name}</p>
+                    <p className="">{lead.email}</p>
+                    <p className="">{timeAgo(new Date(lead.createdAt))}</p>
                   </div>
                 </div>
-                <div className="admin-cr-row-side">
-                  <span className={`admin-cr-status-chip ${
-                    lead.status === 'NEW' ? 'admin-cr-status-chip--new' :
-                    lead.status === 'WON' ? 'admin-cr-status-chip--won' :
-                    'admin-cr-status-chip--default'
+                <div className="">
+                  <span className={`${
+                    lead.status === 'NEW' ? '' :
+                    lead.status === 'WON' ? '' :
+                    ''
                   }`}>
                     {lead.status}
                   </span>
-                  <span className="admin-cr-meta admin-cr-desktop-only-inline">
+                  <span className="">
                     {timeAgo(new Date(lead.createdAt))}
                   </span>
-                  <svg className="admin-cr-chevron admin-cr-mobile-only-inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
@@ -1130,52 +1130,52 @@ export default async function AdminDashboard() {
             ))}
           </div>
         ) : (
-          <div className="admin-cr-empty-block">
-            <p className="admin-cr-small admin-cr-small--muted">Encara no hi ha entrades</p>
-            <p className="admin-cr-meta">Les entrades apareixeran aquí</p>
+          <div className="">
+            <p className="">Encara no hi ha entrades</p>
+            <p className="">Les entrades apareixeran aquí</p>
           </div>
         )}
       </Card>
 
       {/* Estadístiques ràpides */}
-      <div className="admin-cr-mini-grid">
-        <div className="admin-cr-mini-card admin-cr-mini-card--violet">
-          <p className="admin-cr-stat-label">Conversió</p>
-          <p className="admin-cr-mini-value">{conversionRate}%</p>
-          <p className="admin-cr-meta">{wonLeads}/{leadsCount} entrades</p>
+      <div className="">
+        <div className="">
+          <p className="">Conversió</p>
+          <p className="">{conversionRate}%</p>
+          <p className="">{wonLeads}/{leadsCount} entrades</p>
         </div>
-        <div className="admin-cr-mini-card admin-cr-mini-card--amber">
-          <p className="admin-cr-stat-label">Testimonis</p>
-          <p className="admin-cr-mini-value">{testimonialsApproved + testimonialsPending}</p>
-          <p className="admin-cr-meta">{testimonialsPending} pendents</p>
+        <div className="">
+          <p className="">Testimonis</p>
+          <p className="">{testimonialsApproved + testimonialsPending}</p>
+          <p className="">{testimonialsPending} pendents</p>
         </div>
-        <div className="admin-cr-mini-card admin-cr-mini-card--rose">
-          <p className="admin-cr-stat-label">Valoració</p>
-          <p className="admin-cr-mini-value">⭐ {rating}</p>
-          <p className="admin-cr-meta">Mitjana</p>
+        <div className="">
+          <p className="">Valoració</p>
+          <p className="">⭐ {rating}</p>
+          <p className="">Mitjana</p>
         </div>
-        <Link href="/admin/inventory" className="admin-cr-mini-card admin-cr-mini-card--cyan">
-          <p className="admin-cr-stat-label">Inventari</p>
-          <p className="admin-cr-mini-value">{inventoryAvailable}/{inventoryTotal}</p>
-          <p className="admin-cr-meta">
-            {inventoryInUse > 0 && `${inventoryInUse} en ús · `}{inventoryMaintenance > 0 && `${inventoryMaintenance} mant.`}{inventoryBroken > 0 && ` · ${inventoryBroken} avariat`}{inventoryInUse === 0 && inventoryMaintenance === 0 && inventoryBroken === 0 && 'Tot disponible'}
+        <Link href="/admin/inventory" className="">
+          <p className="">Inventari</p>
+          <p className="">{inventoryAvailable}/{inventoryTotal}</p>
+          <p className="">
+            {inventoryInUse > 0 && `${inventoryInUse} en ús ·`}{inventoryMaintenance > 0 && `${inventoryMaintenance} mant.`}{inventoryBroken > 0 && ` · ${inventoryBroken} avariat`}{inventoryInUse === 0 && inventoryMaintenance === 0 && inventoryBroken === 0 && 'Tot disponible'}
           </p>
         </Link>
       </div>
 
-      <section className="admin-cr-audit">
-        <div className="admin-cr-audit-head">
-          <h3 className="admin-cr-step-title">🧾 Auditoria recent</h3>
-          <p className="admin-cr-small admin-cr-small--muted">Últimes accions d'admin</p>
+      <section className="">
+        <div className="">
+          <h3 className="">🧾 Auditoria recent</h3>
+          <p className="">Últimes accions d'admin</p>
         </div>
         {recentAdminLogs.length === 0 ? (
-          <div className="admin-cr-empty-block">Sense activitat recent</div>
+          <div className="">Sense activitat recent</div>
         ) : (
-          <div className="admin-cr-divide-list">
+          <div className="">
             {recentAdminLogs.map((logItem) => (
-              <div key={logItem.id} className="admin-cr-audit-row">
-                <span className="admin-cr-truncate">{logItem.action} · {logItem.entity}</span>
-                <span className="admin-cr-meta">{timeAgo(new Date(logItem.createdAt))}</span>
+              <div key={logItem.id} className="">
+                <span className="">{logItem.action} · {logItem.entity}</span>
+                <span className="">{timeAgo(new Date(logItem.createdAt))}</span>
               </div>
             ))}
           </div>
