@@ -53,30 +53,32 @@ export default async function PresupuestosPage({
   const brandSettings = Object.fromEntries(brandSettingsRows.map((row) => [row.key, row.value]));
 
   return (
-    <div className="space-y-6">
-      <header className="rounded-2xl border p-6 shadow-sm">
-        <div className="flex items-center gap-3 flex-wrap">
-          <Link href="/admin/settings" className="text-sm">
+    <div className="admin-page-container admin-presupuestos-page space-y-6">
+      <header className="admin-page-header">
+        <div>
+          <h1 className="admin-page-title">Editor avançat de pressupost PDF</h1>
+          <p className="admin-page-subtitle">
+            Personalitza client, pack, extres, descomptes i text per generar el PDF al moment.
+          </p>
+          {customer && (
+            <p className="mt-2 text-xs">
+              Guardant a fitxa: <Link href={`/admin/contactes/${customer.id}`} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
+            </p>
+          )}
+        </div>
+        <div className="admin-page-header-actions">
+          <Link href="/admin/settings" className="admin-page-header-link text-sm">
             ← Configuració
           </Link>
           {customer && (
             <Link
               href={`/admin/contactes/${customer.id}`}
-              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-colors"
+              className="admin-page-header-link rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
             >
               👤 Fitxa Client
             </Link>
           )}
         </div>
-        <h1 className="mt-2 text-2xl font-semibold">Editor avançat de pressupost PDF</h1>
-        <p className="mt-1 text-sm">
-          Personalitza client, pack, extres, descomptes i text per generar el PDF al moment.
-        </p>
-        {customer && (
-          <p className="mt-2 text-xs">
-            Guardant a fitxa: <Link href={`/admin/contactes/${customer.id}`} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
-          </p>
-        )}
       </header>
 
       <PresupuestoPdfStudio

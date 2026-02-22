@@ -4524,3 +4524,38 @@ html.admin-mode .admin-main-shell .overflow-x-auto {
     gap: 0.625rem;
   }
 }
+
+/* Shared page header contract for all admin pages */
+html.admin-mode .admin-main-shell .admin-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: clamp(0.75rem, 1.2vw, 1rem);
+  border: 1px solid var(--admin-border);
+  border-radius: 0.9rem;
+  background: color-mix(in oklab, var(--admin-panel) 90%, var(--admin-surface) 10%) !important;
+}
+
+html.admin-mode .admin-main-shell .admin-page-header-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+html.admin-mode .admin-main-shell .admin-page-header-link {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--admin-border);
+  border-radius: 0.65rem;
+  background: var(--admin-cat-action-bg) !important;
+  color: var(--admin-cat-action-text) !important;
+}
+
+html.admin-mode .admin-main-shell .admin-page-header-link:hover {
+  border-color: var(--admin-cat-action-border-hover);
+  background: var(--admin-cat-action-bg-hover) !important;
+  color: var(--admin-cat-action-text) !important;
+}

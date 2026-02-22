@@ -128,21 +128,23 @@ export default async function BookingsPage({
   const totalRevenue = stats.reduce((sum, s) => sum + (s._sum.total || 0), 0);
 
   return (
-    <div className="space-y-4 px-1 sm:space-y-6 sm:px-0">
+    <div className="admin-page-container admin-bookings-page space-y-4 px-1 sm:space-y-6 sm:px-0">
       {/* Header - Mobile optimized */}
-      <header className="flex items-center justify-between">
-        <div className="text-center">
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Reserves</h1>
-          <p className="text-xs sm:text-sm">
+      <header className="admin-page-header">
+        <div>
+          <h1 className="admin-page-title">Reserves</h1>
+          <p className="admin-page-subtitle">
             {pagination.total} esdeveniments · {formatCurrency(totalRevenue)}
           </p>
         </div>
+        <div className="admin-page-header-actions">
         <Link
           href="/admin/bookings/new"
-          className="inline-flex items-center rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-white active:scale-[0.98] transition-all shadow-lg"
+          className="admin-page-header-link inline-flex items-center px-3 py-2 text-xs sm:text-sm font-medium"
         >
           + Nova
         </Link>
+        </div>
       </header>
 
       {/* Stats Cards - Scrollable horizontal en móvil */}
