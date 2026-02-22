@@ -114,7 +114,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
     } finally {
       setLoading(false);
     }
-  }, [bookingId]);
+  }, [bookingId, selectedBundleId]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

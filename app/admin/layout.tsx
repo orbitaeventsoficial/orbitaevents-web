@@ -18,40 +18,6 @@ const AdminHelpInspector = dynamicImport(() => import('./components/AdminHelpIns
   ssr: false,
 });
 
-const ENFORCED_ADMIN_FLAT_CSS = `
-html.admin-mode .admin-layout-shell,
-html.admin-mode .admin-layout-shell *,
-html.admin-mode .admin-main-shell,
-html.admin-mode .admin-main-shell * {
-  background-image: none !important;
-}
-
-html.admin-mode .admin-layout-shell .admin-sidebar,
-html.admin-mode .admin-layout-shell .admin-mobile-sidebar,
-html.admin-mode .admin-layout-shell .admin-desktop-header,
-html.admin-mode .admin-layout-shell .admin-mobile-header,
-html.admin-mode .admin-layout-shell .admin-bottom-nav {
-  background: var(--admin-surface) !important;
-  border-color: var(--admin-border) !important;
-}
-
-html.admin-mode .admin-layout-shell .admin-nav-item--idle,
-html.admin-mode .admin-layout-shell .admin-nav-section-btn,
-html.admin-mode .admin-layout-shell .admin-recent-chip--idle {
-  background: color-mix(in oklab, var(--admin-panel) 82%, var(--admin-surface) 18%) !important;
-  border-color: var(--admin-border) !important;
-  color: var(--admin-text) !important;
-}
-
-html.admin-mode .admin-layout-shell .admin-nav-item--idle:hover,
-html.admin-mode .admin-layout-shell .admin-nav-section-btn:hover,
-html.admin-mode .admin-layout-shell .admin-recent-chip--idle:hover {
-  background: color-mix(in oklab, var(--admin-panel) 64%, var(--admin-primary) 36%) !important;
-  border-color: color-mix(in oklab, var(--admin-primary) 62%, var(--admin-border) 38%) !important;
-  color: var(--admin-text) !important;
-}
-`;
-
 /**
  * 🎨 ADMIN LAYOUT - Òrbita Events
  * Estil sobri i professional amb focus en llegibilitat
@@ -591,7 +557,6 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           {customAdminCss && (
             <style id="admin-custom-css" dangerouslySetInnerHTML={{ __html: customAdminCss }} />
           )}
-          <style id="admin-flat-enforced" dangerouslySetInnerHTML={{ __html: ENFORCED_ADMIN_FLAT_CSS }} />
           {helpModeEnabled && (
             <div className="admin-help-banner">
               Mode ajuda actiu: les accions estan bloquejades. Prem els icones d'ajuda per veure explicacions.

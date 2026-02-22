@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import Link from 'next/link';
 import type { LeadTaskStatus, Prisma } from '@prisma/client';
+import { AdminEmptyState, AdminPage, AdminSection } from '@/app/admin/components/AdminPage';
 import TaskRowActions from './TaskRowActions';
 import GenerateDailyChecklistButton from './GenerateDailyChecklistButton';
 
@@ -167,42 +168,28 @@ export default async function TasksPage({
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Tasques</h1>
-          <p className="text-xs sm:text-sm">
-            {total} tasques {customerId ? 'del client' : ''}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
+    <AdminPage
+      title="Tasques"
+      subtitle={`${total} tasques${customerId ? ' del client' : ''}`}
+      back={customerId ? { href: `/admin/contactes/${customerId}?tab=tasks`, label: 'Client' } : undefined}
+      actions={
+        <>
           <GenerateDailyChecklistButton />
-          <Link
-            href={customerId ? `/admin/tasks/new?customerId=${customerId}` : '/admin/tasks/new'}
-            className="admin-tasks-action inline-flex items-center rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold transition-colors"
-          >
-            Nova tasca
+          <Link href={customerId ? `/admin/tasks/new?customerId=${customerId}` : '/admin/tasks/new'} className="ap-btn ap-btn--primary">
+            + Nova tasca
           </Link>
-          <Link
-            href={customerId ? `/admin/contactes/${customerId}?tab=tasks` : '/admin'}
-            className="inline-flex items-center rounded-xl border px-3 py-2 text-xs sm:text-sm font-medium transition-colors"
-          >
-            ← Tornar
-          </Link>
-        </div>
-      </header>
-
-      <section className="rounded-xl border p-3">
+        </>
+      }
+    >
+      {/* Filtre d'estat */}
+      <AdminSection compact>
         <form method="GET" action="/admin/tasks" className="flex flex-wrap items-center gap-2">
           {customerId && <input type="hidden" name="customerId" value={customerId} />}
-          <label htmlFor="task-status-filter" className="text-xs font-medium">
-            Estat
-          </label>
+          <label htmlFor="task-status-filter" className="ap-subtitle">Estat</label>
           <select
             id="task-status-filter"
             name="status"
             defaultValue={status || ''}
-            className="rounded-lg border px-3 py-1.5 text-xs"
           >
             <option value="">Totes</option>
             {VALID_STATUS.map((value) => (
@@ -211,38 +198,37 @@ export default async function TasksPage({
               </option>
             ))}
           </select>
-          <button
-            type="submit"
-            className="admin-tasks-action rounded-lg border px-3 py-1.5 text-xs font-semibold"
-          >
-            Aplicar
-          </button>
+          <button type="submit" className="ap-btn ap-btn--secondary">Aplicar</button>
         </form>
-      </section>
+      </AdminSection>
 
-      <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+      {/* Llista de tasques */}
+      <AdminSection flush>
         {tasks.length === 0 ? (
-          <div className="p-8 text-center">
-            <span className="text-4xl">📝</span>
-            <p className="mt-2">No hi ha tasques</p>
-          </div>
+          <AdminEmptyState
+            icon="📝"
+            title="No hi ha tasques"
+            description="Crea una nova tasca per començar"
+            action={
+              <Link href="/admin/tasks/new" className="ap-btn ap-btn--primary">
+                + Nova tasca
+              </Link>
+            }
+          />
         ) : (
-          <div className="divide-y divide-slate-700/30">
+          <div className="ap-table-body" style={{ borderColor: 'var(--at-border-sub)' }}>
             {tasks.map((task) => {
               const destinationHref = resolveDestination(task);
               return (
-                <article key={task.id} className="flex items-center justify-between gap-3 px-4 py-3 transition-colors">
-                  <Link
-                    href={destinationHref}
-                    className="min-w-0 flex-1"
-                  >
+                <article key={task.id} className="flex items-center justify-between gap-3 px-4 py-3" style={{ transition: 'background var(--at-transition)' }}>
+                  <Link href={destinationHref} className="min-w-0 flex-1">
                     <p className="text-sm truncate">{task.title}</p>
-                    <p className="text-xs">
+                    <p className="ap-subtitle">
                       {(task.customer?.name || task.lead?.name || 'Sense relació')} · {STATUS_LABELS[task.status] || task.status}
                     </p>
                   </Link>
                   <div className="flex shrink-0 items-center gap-3">
-                    <span className="text-xs">
+                    <span className="ap-subtitle">
                       {task.dueDate ? new Date(task.dueDate).toLocaleDateString('ca-ES') : 'Sense data'}
                     </span>
                     <TaskRowActions
@@ -256,27 +242,28 @@ export default async function TasksPage({
             })}
           </div>
         )}
-      </section>
+      </AdminSection>
 
+      {/* Paginació */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center justify-between ap-subtitle">
           <span>Pàgina {page} de {totalPages}</span>
-          <div className="flex gap-2">
+          <div className="ap-header-actions">
             <Link
               href={buildHref(Math.max(1, page - 1))}
-              className={`rounded-lg border px-3 py-1 ${page === 1 ? 'border-slate-800 text-slate-600 pointer-events-none' : 'border-slate-700 hover:text-slate-200'}`}
+              className={`ap-btn ap-btn--secondary ${page === 1 ? 'pointer-events-none opacity-40' : ''}`}
             >
               ← Anterior
             </Link>
             <Link
               href={buildHref(Math.min(totalPages, page + 1))}
-              className={`rounded-lg border px-3 py-1 ${page === totalPages ? 'border-slate-800 text-slate-600 pointer-events-none' : 'border-slate-700 hover:text-slate-200'}`}
+              className={`ap-btn ap-btn--secondary ${page === totalPages ? 'pointer-events-none opacity-40' : ''}`}
             >
               Següent →
             </Link>
           </div>
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }
