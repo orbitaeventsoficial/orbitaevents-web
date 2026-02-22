@@ -4184,41 +4184,92 @@ html.admin-mode .admin-shell :is(
 /* Admin CSS categories (editable token map) */
 html.admin-mode .admin-layout-shell {
   /* Category: surface */
-  --admin-cat-surface-base: #2a3444;
-  --admin-cat-surface-border: #5b6c83;
-  --admin-cat-surface-text: #eef4ff;
+  --admin-cat-surface-base: #2f3338;
+  --admin-cat-surface-border: #5d6570;
+  --admin-cat-surface-text: #eef1f4;
 
   /* Category: action */
-  --admin-cat-action-bg: color-mix(in oklab, var(--admin-panel) 78%, var(--admin-surface) 22%);
-  --admin-cat-action-border: var(--admin-border);
-  --admin-cat-action-text: var(--admin-text);
-  --admin-cat-action-bg-hover: color-mix(in oklab, var(--admin-panel) 62%, var(--admin-primary) 38%);
-  --admin-cat-action-border-hover: color-mix(in oklab, var(--admin-primary) 62%, var(--admin-border) 38%);
+  --admin-cat-action-bg: #4b4f57;
+  --admin-cat-action-border: #717885;
+  --admin-cat-action-text: #f2f4f7;
+  --admin-cat-action-bg-hover: #5a606a;
+  --admin-cat-action-border-hover: #878f9c;
 
   /* Category: status */
-  --admin-cat-status-pending-bg: #5a3f20;
-  --admin-cat-status-pending-border: #a77a3f;
-  --admin-cat-status-pending-text: #fff4e5;
+  --admin-cat-status-pending-bg: #5c4a2e;
+  --admin-cat-status-pending-border: #a38658;
+  --admin-cat-status-pending-text: #f9f1e4;
 
-  --admin-cat-status-confirmed-bg: #2b3f59;
-  --admin-cat-status-confirmed-border: #5578a8;
-  --admin-cat-status-confirmed-text: #eef4ff;
+  --admin-cat-status-confirmed-bg: #4a4d42;
+  --admin-cat-status-confirmed-border: #8a8f74;
+  --admin-cat-status-confirmed-text: #f2f4ea;
 
-  --admin-cat-status-completed-bg: #234a36;
-  --admin-cat-status-completed-border: #4d8f6b;
-  --admin-cat-status-completed-text: #ebfff5;
+  --admin-cat-status-completed-bg: #3f5244;
+  --admin-cat-status-completed-border: #7b9a86;
+  --admin-cat-status-completed-text: #edf6f0;
 
-  --admin-cat-status-cancelled-bg: #532734;
-  --admin-cat-status-cancelled-border: #9e546a;
-  --admin-cat-status-cancelled-text: #ffedf2;
+  --admin-cat-status-cancelled-bg: #4b3f35;
+  --admin-cat-status-cancelled-border: #8f7a66;
+  --admin-cat-status-cancelled-text: #f6eee5;
 
-  --admin-cat-status-quote-bg: #3d3157;
-  --admin-cat-status-quote-border: #7f68ab;
-  --admin-cat-status-quote-text: #f2ebff;
+  --admin-cat-status-quote-bg: #4d453d;
+  --admin-cat-status-quote-border: #8f826f;
+  --admin-cat-status-quote-text: #f3eee6;
 
-  --admin-cat-status-negotiating-bg: #5b341f;
-  --admin-cat-status-negotiating-border: #b0704d;
-  --admin-cat-status-negotiating-text: #ffefe6;
+  --admin-cat-status-negotiating-bg: #5a4a38;
+  --admin-cat-status-negotiating-border: #a08867;
+  --admin-cat-status-negotiating-text: #fbf1e5;
+
+  /* Category: layout */
+  --admin-cat-layout-shell-bg: var(--admin-surface);
+  --admin-cat-layout-panel-bg: color-mix(in oklab, var(--admin-panel) 82%, var(--admin-surface) 18%);
+  --admin-cat-layout-border: var(--admin-border);
+
+  /* Category: leads */
+  --admin-cat-leads-new-bg: var(--admin-cat-status-confirmed-bg);
+  --admin-cat-leads-new-border: var(--admin-cat-status-confirmed-border);
+  --admin-cat-leads-new-text: var(--admin-cat-status-confirmed-text);
+  --admin-cat-leads-contacted-bg: var(--admin-cat-status-pending-bg);
+  --admin-cat-leads-contacted-border: var(--admin-cat-status-pending-border);
+  --admin-cat-leads-contacted-text: var(--admin-cat-status-pending-text);
+  --admin-cat-leads-quote-bg: var(--admin-cat-status-quote-bg);
+  --admin-cat-leads-quote-border: var(--admin-cat-status-quote-border);
+  --admin-cat-leads-quote-text: var(--admin-cat-status-quote-text);
+  --admin-cat-leads-negotiating-bg: var(--admin-cat-status-negotiating-bg);
+  --admin-cat-leads-negotiating-border: var(--admin-cat-status-negotiating-border);
+  --admin-cat-leads-negotiating-text: var(--admin-cat-status-negotiating-text);
+  --admin-cat-leads-won-bg: var(--admin-cat-status-completed-bg);
+  --admin-cat-leads-won-border: var(--admin-cat-status-completed-border);
+  --admin-cat-leads-won-text: var(--admin-cat-status-completed-text);
+  --admin-cat-leads-lost-bg: var(--admin-cat-status-cancelled-bg);
+  --admin-cat-leads-lost-border: var(--admin-cat-status-cancelled-border);
+  --admin-cat-leads-lost-text: var(--admin-cat-status-cancelled-text);
+
+  /* Category: bookings */
+  --admin-cat-bookings-total-bg: var(--admin-cat-surface-base);
+  --admin-cat-bookings-total-border: var(--admin-cat-surface-border);
+  --admin-cat-bookings-total-text: var(--admin-cat-surface-text);
+  --admin-cat-bookings-pending-bg: var(--admin-cat-status-pending-bg);
+  --admin-cat-bookings-pending-border: var(--admin-cat-status-pending-border);
+  --admin-cat-bookings-pending-text: var(--admin-cat-status-pending-text);
+  --admin-cat-bookings-confirmed-bg: var(--admin-cat-status-confirmed-bg);
+  --admin-cat-bookings-confirmed-border: var(--admin-cat-status-confirmed-border);
+  --admin-cat-bookings-confirmed-text: var(--admin-cat-status-confirmed-text);
+  --admin-cat-bookings-completed-bg: var(--admin-cat-status-completed-bg);
+  --admin-cat-bookings-completed-border: var(--admin-cat-status-completed-border);
+  --admin-cat-bookings-completed-text: var(--admin-cat-status-completed-text);
+  --admin-cat-bookings-cancelled-bg: var(--admin-cat-status-cancelled-bg);
+  --admin-cat-bookings-cancelled-border: var(--admin-cat-status-cancelled-border);
+  --admin-cat-bookings-cancelled-text: var(--admin-cat-status-cancelled-text);
+
+  /* Category: quote */
+  --admin-cat-quote-surface: color-mix(in oklab, var(--admin-panel) 90%, var(--admin-surface) 10%);
+  --admin-cat-quote-input: color-mix(in oklab, var(--admin-surface) 84%, #000 16%);
+
+  /* Category: tasks */
+  --admin-cat-tasks-action-bg: var(--admin-cat-action-bg);
+  --admin-cat-tasks-action-border: var(--admin-cat-action-border);
+  --admin-cat-tasks-action-text: var(--admin-cat-action-text);
 }
 
 /* Leads KPI cards: explicit solid colors */
@@ -4291,29 +4342,29 @@ html.admin-mode .admin-main-shell .admin-bookings-stat {
   border-width: 1px;
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--total {
-  background: var(--admin-cat-surface-base) !important;
-  border-color: var(--admin-cat-surface-border) !important;
-  color: var(--admin-cat-surface-text) !important;
+  background: var(--admin-cat-bookings-total-bg) !important;
+  border-color: var(--admin-cat-bookings-total-border) !important;
+  color: var(--admin-cat-bookings-total-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--pending {
-  background: var(--admin-cat-status-pending-bg) !important;
-  border-color: var(--admin-cat-status-pending-border) !important;
-  color: var(--admin-cat-status-pending-text) !important;
+  background: var(--admin-cat-bookings-pending-bg) !important;
+  border-color: var(--admin-cat-bookings-pending-border) !important;
+  color: var(--admin-cat-bookings-pending-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--confirmed {
-  background: var(--admin-cat-status-confirmed-bg) !important;
-  border-color: var(--admin-cat-status-confirmed-border) !important;
-  color: var(--admin-cat-status-confirmed-text) !important;
+  background: var(--admin-cat-bookings-confirmed-bg) !important;
+  border-color: var(--admin-cat-bookings-confirmed-border) !important;
+  color: var(--admin-cat-bookings-confirmed-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--completed {
-  background: var(--admin-cat-status-completed-bg) !important;
-  border-color: var(--admin-cat-status-completed-border) !important;
-  color: var(--admin-cat-status-completed-text) !important;
+  background: var(--admin-cat-bookings-completed-bg) !important;
+  border-color: var(--admin-cat-bookings-completed-border) !important;
+  color: var(--admin-cat-bookings-completed-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--cancelled {
-  background: var(--admin-cat-status-cancelled-bg) !important;
-  border-color: var(--admin-cat-status-cancelled-border) !important;
-  color: var(--admin-cat-status-cancelled-text) !important;
+  background: var(--admin-cat-bookings-cancelled-bg) !important;
+  border-color: var(--admin-cat-bookings-cancelled-border) !important;
+  color: var(--admin-cat-bookings-cancelled-text) !important;
 }
 
 /* Leads pipeline columns: solid status colors */
@@ -4322,34 +4373,34 @@ html.admin-mode .admin-main-shell .admin-leads-tone {
   border-width: 1px;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--new {
-  background: var(--admin-cat-status-confirmed-bg) !important;
-  border-color: var(--admin-cat-status-confirmed-border) !important;
-  color: var(--admin-cat-status-confirmed-text) !important;
+  background: var(--admin-cat-leads-new-bg) !important;
+  border-color: var(--admin-cat-leads-new-border) !important;
+  color: var(--admin-cat-leads-new-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--contacted {
-  background: var(--admin-cat-status-pending-bg) !important;
-  border-color: var(--admin-cat-status-pending-border) !important;
-  color: var(--admin-cat-status-pending-text) !important;
+  background: var(--admin-cat-leads-contacted-bg) !important;
+  border-color: var(--admin-cat-leads-contacted-border) !important;
+  color: var(--admin-cat-leads-contacted-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--quote {
-  background: var(--admin-cat-status-quote-bg) !important;
-  border-color: var(--admin-cat-status-quote-border) !important;
-  color: var(--admin-cat-status-quote-text) !important;
+  background: var(--admin-cat-leads-quote-bg) !important;
+  border-color: var(--admin-cat-leads-quote-border) !important;
+  color: var(--admin-cat-leads-quote-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--negotiating {
-  background: var(--admin-cat-status-negotiating-bg) !important;
-  border-color: var(--admin-cat-status-negotiating-border) !important;
-  color: var(--admin-cat-status-negotiating-text) !important;
+  background: var(--admin-cat-leads-negotiating-bg) !important;
+  border-color: var(--admin-cat-leads-negotiating-border) !important;
+  color: var(--admin-cat-leads-negotiating-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--won {
-  background: var(--admin-cat-status-completed-bg) !important;
-  border-color: var(--admin-cat-status-completed-border) !important;
-  color: var(--admin-cat-status-completed-text) !important;
+  background: var(--admin-cat-leads-won-bg) !important;
+  border-color: var(--admin-cat-leads-won-border) !important;
+  color: var(--admin-cat-leads-won-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--lost {
-  background: var(--admin-cat-status-cancelled-bg) !important;
-  border-color: var(--admin-cat-status-cancelled-border) !important;
-  color: var(--admin-cat-status-cancelled-text) !important;
+  background: var(--admin-cat-leads-lost-bg) !important;
+  border-color: var(--admin-cat-leads-lost-border) !important;
+  color: var(--admin-cat-leads-lost-text) !important;
 }
 
 /* Quote studio: force solid corporate surfaces */
@@ -4660,4 +4711,57 @@ html.admin-mode .admin-main-shell :is(.text-sm) {
 
 html.admin-mode .admin-main-shell :is(.text-slate-300, .text-slate-400, .text-slate-500, .text-slate-600) {
   color: var(--admin-muted) !important;
+}
+
+/* Semantic color accents (keep UI informative) */
+html.admin-mode .admin-main-shell .admin-color-info,
+html.admin-mode .admin-main-shell .admin-tone-info {
+  color: color-mix(in oklab, var(--admin-primary) 72%, white 28%) !important;
+  border-color: color-mix(in oklab, var(--admin-primary) 62%, white 38%) !important;
+}
+
+html.admin-mode .admin-main-shell .admin-color-success,
+html.admin-mode .admin-main-shell .admin-tone-success {
+  color: var(--admin-cat-status-completed-text) !important;
+  border-color: var(--admin-cat-status-completed-border) !important;
+  background: color-mix(in oklab, var(--admin-cat-status-completed-bg) 24%, var(--admin-panel) 76%) !important;
+}
+
+html.admin-mode .admin-main-shell .admin-color-warning,
+html.admin-mode .admin-main-shell .admin-tone-warning {
+  color: var(--admin-cat-status-pending-text) !important;
+  border-color: var(--admin-cat-status-pending-border) !important;
+  background: color-mix(in oklab, var(--admin-cat-status-pending-bg) 24%, var(--admin-panel) 76%) !important;
+}
+
+html.admin-mode .admin-main-shell .admin-color-danger,
+html.admin-mode .admin-main-shell .admin-tone-danger {
+  color: var(--admin-cat-status-cancelled-text) !important;
+  border-color: var(--admin-cat-status-cancelled-border) !important;
+  background: color-mix(in oklab, var(--admin-cat-status-cancelled-bg) 24%, var(--admin-panel) 76%) !important;
+}
+
+/* Keep state chips/cards clearly colored */
+html.admin-mode .admin-main-shell :is(
+  .admin-leads-tone--new,
+  .admin-leads-tone--contacted,
+  .admin-leads-tone--quote,
+  .admin-leads-tone--negotiating,
+  .admin-leads-tone--won,
+  .admin-leads-tone--lost,
+  .admin-bookings-stat--pending,
+  .admin-bookings-stat--confirmed,
+  .admin-bookings-stat--completed,
+  .admin-bookings-stat--cancelled
+) * {
+  color: inherit !important;
+}
+
+/* CTA/primary actions keep accent color */
+html.admin-mode .admin-main-shell .admin-page-header-link,
+html.admin-mode .admin-main-shell .admin-quote-action,
+html.admin-mode .admin-main-shell .admin-tasks-action {
+  background: var(--admin-cat-action-bg) !important;
+  border-color: var(--admin-cat-action-border) !important;
+  color: var(--admin-cat-action-text) !important;
 }
