@@ -179,7 +179,7 @@ export default async function TasksPage({
           <GenerateDailyChecklistButton />
           <Link
             href={customerId ? `/admin/tasks/new?customerId=${customerId}` : '/admin/tasks/new'}
-            className="admin-tasks-gold-btn inline-flex items-center rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold transition-colors"
+            className="admin-tasks-action inline-flex items-center rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold transition-colors"
           >
             Nova tasca
           </Link>
@@ -213,7 +213,7 @@ export default async function TasksPage({
           </select>
           <button
             type="submit"
-            className="admin-tasks-gold-btn rounded-lg border px-3 py-1.5 text-xs font-semibold"
+            className="admin-tasks-action rounded-lg border px-3 py-1.5 text-xs font-semibold"
           >
             Aplicar
           </button>

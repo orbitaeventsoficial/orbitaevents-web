@@ -4203,14 +4203,14 @@ html.admin-mode .admin-main-shell .admin-leads-metric--winrate {
   color: #fff4e5 !important;
 }
 
-/* Tasks page: explicit gold actions requested */
-html.admin-mode .admin-main-shell .admin-tasks-gold-btn {
-  background: #a57a2a !important;
-  border-color: #c79a43 !important;
-  color: #fff8ea !important;
+/* Tasks page actions via CSS (neutral corporate) */
+html.admin-mode .admin-main-shell .admin-tasks-action {
+  background: color-mix(in oklab, var(--admin-panel) 78%, var(--admin-surface) 22%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
 }
-html.admin-mode .admin-main-shell .admin-tasks-gold-btn:hover {
-  background: #8f6a24 !important;
-  border-color: #b88d3c !important;
-  color: #fff8ea !important;
+html.admin-mode .admin-main-shell .admin-tasks-action:hover {
+  background: color-mix(in oklab, var(--admin-panel) 62%, var(--admin-primary) 38%) !important;
+  border-color: color-mix(in oklab, var(--admin-primary) 62%, var(--admin-border) 38%) !important;
+  color: var(--admin-text) !important;
 }
