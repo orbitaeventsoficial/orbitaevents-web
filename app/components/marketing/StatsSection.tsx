@@ -112,7 +112,7 @@ function StatCard({
         {config.suffix}
       </div>
       <p className="text-white font-bold text-lg mt-2">{label}</p>
-      <p className="text-white/40 text-sm mt-1">{sublabel}</p>
+      <p className="text-white/60 text-sm mt-1">{sublabel}</p>
     </motion.div>
   );
 }

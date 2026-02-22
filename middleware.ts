@@ -135,15 +135,12 @@ function tooManyRequests() {
 // ═══════════════════════════════════════════════════════════════════════════════
 // BOT BLOCKING - Bloqueja bots abusius per reduir requests
 // ═══════════════════════════════════════════════════════════════════════════════
-const BLOCKED_BOTS = [
-  'AhrefsBot', 'SemrushBot', 'DotBot', 'MJ12bot', 'BLEXBot',
-  'DataForSeoBot', 'serpstatbot', 'Bytespider', 'PetalBot',
-  'YandexBot', 'MegaIndex', 'Sogou', 'Baiduspider',
-];
+// Pre-compiled regex for O(1) bot detection instead of O(n) array loop
+const BLOCKED_BOTS_RE = /AhrefsBot|SemrushBot|DotBot|MJ12bot|BLEXBot|DataForSeoBot|serpstatbot|Bytespider|PetalBot|YandexBot|MegaIndex|Sogou|Baiduspider/;
 
 function isBlockedBot(userAgent: string | null): boolean {
   if (!userAgent) return false;
-  return BLOCKED_BOTS.some(bot => userAgent.includes(bot));
+  return BLOCKED_BOTS_RE.test(userAgent);
 }
 
 export async function middleware(req: NextRequest) {
@@ -153,32 +150,28 @@ export async function middleware(req: NextRequest) {
   const normalizedPath =
     pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
 
-  const legacyRedirects: Record<string, string> = {
-    '/contacte': '/ca/contacto',
-  };
-
-  const redirectTarget = legacyRedirects[normalizedPath];
-  if (redirectTarget) {
-    const url = req.nextUrl.clone();
-    url.pathname = redirectTarget;
-    return NextResponse.redirect(url, 301);
-  }
-
-  // 🚫 Bloquejar bots abusius immediatament
+  // 1. Block abusive bots immediately (cheapest check first)
   if (isBlockedBot(userAgent)) {
     return new NextResponse('Forbidden', { status: 403 });
   }
 
+  // 2. Strip www subdomain
   if (host === 'www.orbitaevents.com') {
     const url = req.nextUrl.clone();
     url.hostname = 'orbitaevents.com';
     return NextResponse.redirect(url, 301);
   }
 
-  // Legacy Catalan slug: redirect to current about page
-  if (pathname === '/sobre-nosaltres') {
+  // 3. Legacy redirects (permanent 301)
+  const legacyRedirects: Record<string, string> = {
+    '/contacte': '/ca/contacto',
+    '/sobre-nosaltres': '/ca/about',
+  };
+
+  const redirectTarget = legacyRedirects[normalizedPath];
+  if (redirectTarget) {
     const url = req.nextUrl.clone();
-    url.pathname = '/ca/about';
+    url.pathname = redirectTarget;
     return NextResponse.redirect(url, 301);
   }
 

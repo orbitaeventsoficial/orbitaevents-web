@@ -34,7 +34,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     messageSaved: 'Tema guardado correctamente',
     updatingTheme: 'Error actualizando tema',
     label: 'Colores del Tema',
-    description: 'Paleta de colores personalizada de Órbita Events',
+    description: 'Paleta de colores personalizada de Òrbita Events',
   },
   en: {
     parsingTheme: 'Error parsing theme colors:',

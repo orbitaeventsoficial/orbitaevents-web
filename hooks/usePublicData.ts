@@ -14,6 +14,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { log } from '@/lib/logger';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -152,7 +153,7 @@ export function useAvailability(): UseAvailabilityReturn {
         setError(json.error || 'Error desconocido');
       }
     } catch (err) {
-      console.error('Error fetching availability:', err);
+      log.error('Error fetching availability', err);
       setError('Error de conexión');
     } finally {
       setIsLoading(false);
@@ -265,7 +266,7 @@ export function usePublicStats(): UseStatsReturn {
         setError(json.error || 'Error desconocido');
       }
     } catch (err) {
-      console.error('Error fetching stats:', err);
+      log.error('Error fetching stats', err);
       setError('Error de conexión');
     } finally {
       setIsLoading(false);
@@ -424,7 +425,7 @@ export function useOffer(): UseOfferReturn {
         setError(null);
       }
     } catch (err) {
-      console.error('Error fetching offer:', err);
+      log.error('Error fetching offer', err);
       setError('Error de conexión');
     } finally {
       setIsLoading(false);
@@ -495,7 +496,7 @@ export function usePrices(): UsePricesReturn {
         setError(null);
       }
     } catch (err) {
-      console.error('Error fetching prices:', err);
+      log.error('Error fetching prices', err);
       setError('Error de conexión');
     } finally {
       setIsLoading(false);

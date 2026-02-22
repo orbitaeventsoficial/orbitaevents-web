@@ -62,15 +62,15 @@ test.describe('API Endpoints', () => {
     expect(response.status()).toBe(401);
   });
 
-  test('leads-new status endpoint should require authentication', async ({ request }) => {
-    const response = await request.patch('/api/admin/leads-new/test-id/status', {
+  test('leads status endpoint should require authentication', async ({ request }) => {
+    const response = await request.patch('/api/admin/leads/test-id/status', {
       data: { status: 'QUALIFIED' },
     });
     expect([401, 403]).toContain(response.status());
   });
 
-  test('leads-new quote endpoint should require authentication', async ({ request }) => {
-    const response = await request.get('/api/admin/leads-new/test-id/quote');
+  test('leads quote endpoint should require authentication', async ({ request }) => {
+    const response = await request.get('/api/admin/leads/test-id/quote');
     expect([401, 403]).toContain(response.status());
   });
 

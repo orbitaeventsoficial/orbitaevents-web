@@ -1,21 +1,25 @@
-// ============================================================
-// LAYOUT SENSORIAL - SENSE HEADER NI FOOTER
-// ============================================================
-// Experiència immersiva sense distraccions
-// ============================================================
+import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
-export default function SensorialLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  // Layout completament buit - sense header, sense footer, sense res
-  return <>{children}</>;
+export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
+  const { locale } = params;
+  const t = await getTranslations({ locale, namespace: 'sensorial' });
+  const base = 'https://orbitaevents.com';
+
+  return {
+    title: t('metaTitle'),
+    description: t('metaDescription'),
+    alternates: {
+      canonical: locale === 'ca' ? `${base}/sensorial` : `${base}/${locale}/sensorial`,
+      languages: { ca: `${base}/sensorial`, es: `${base}/es/sensorial`, en: `${base}/en/sensorial` },
+    },
+    openGraph: {
+      title: t('metaTitle'),
+      description: t('metaDescription'),
+    },
+  };
 }
 
-// Metadata específica per sensorial
-export const metadata = {
-  title: 'Espai Sensorial | Òrbita Events',
-  description: 'Un espai digital per relaxar-te, meditar i desconnectar. Experiències immersives amb so, partícules i respiració guiada.',
-  robots: 'noindex', // No indexar aquesta pàgina a Google
-};
+export default function SensorialLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

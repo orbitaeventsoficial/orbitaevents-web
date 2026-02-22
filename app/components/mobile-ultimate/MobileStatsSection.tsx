@@ -128,7 +128,7 @@ function StatCard({ config, label, sublabel, delay, started }: StatCardProps) {
       </div>
 
       <p className="text-white font-semibold text-sm mt-1.5">{label}</p>
-      <p className="text-white/40 text-xs mt-0.5">{sublabel}</p>
+      <p className="text-white/60 text-xs mt-0.5">{sublabel}</p>
     </motion.div>
   );
 }

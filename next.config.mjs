@@ -4,6 +4,7 @@ import { withSentryConfig } from '@sentry/nextjs';
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  productionBrowserSourceMaps: false,
 
   eslint: {
     // Detectar errores durante el build para mantener calidad de codigo

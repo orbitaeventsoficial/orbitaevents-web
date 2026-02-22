@@ -31,7 +31,7 @@ export default function LeadTechnicalSnapshotPanel({
     setBusy(action);
     setMessage(null);
     try {
-      const res = await fetch(`/api/admin/leads-new/${leadId}/snapshot`, {
+      const res = await fetch(`/api/admin/leads/${leadId}/snapshot`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

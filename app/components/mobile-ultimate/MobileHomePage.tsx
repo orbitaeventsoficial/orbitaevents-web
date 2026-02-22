@@ -408,7 +408,7 @@ function MobileReviewsSection() {
                       </svg>
                     ))}
                   </div>
-                  <span className="text-xs text-white/40">{review.relative_time_description}</span>
+                  <span className="text-xs text-white/60">{review.relative_time_description}</span>
                 </div>
               </div>
               {/* Google badge */}

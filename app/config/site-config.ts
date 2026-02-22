@@ -11,8 +11,8 @@ export const SITE_CONFIG = {
   // INFORMACION DEL NEGOCIO
   // ============================================
   business: {
-    name: 'Orbita Events',
-    legalName: 'Orbita Events',
+    name: 'Òrbita Events',
+    legalName: 'Òrbita Events',
     cif: '',
 
     // Contacto principal (unificado)
@@ -22,11 +22,11 @@ export const SITE_CONFIG = {
 
     // Direccion fisica (solo ciudad para privacidad)
     address: {
-      street: '',
+      street: 'Granollers',
       city: 'Granollers',
-      region: 'Barcelona, Catalunya',
-      postalCode: '',
-      country: 'Espana',
+      region: 'Barcelona',
+      postalCode: '08400',
+      country: 'ES',
       countryCode: 'ES',
     },
 
@@ -36,12 +36,18 @@ export const SITE_CONFIG = {
       lng: 2.2874,
     },
 
-    // Horari d'atenció
+    // Horari d'atenció (display strings)
     schedule: {
       weekdays: 'Dilluns a Divendres: 08:00 - 20:00',
       saturday: 'Dissabte: 08:00 - 20:00',
       sunday: 'Diumenge: 08:00 - 20:00',
       note: 'Esdeveniments 24/7 amb reserva prèvia',
+    },
+
+    // Horari en format ISO (per Schema.org openingHoursSpecification)
+    hours: {
+      weekdays: { open: '09:00', close: '20:00' },
+      saturday: { open: '10:00', close: '14:00' },
     },
   },
 
@@ -91,6 +97,13 @@ export const SITE_CONFIG = {
     linkedin: {
       url: null,
       enabled: false,
+    },
+
+    // URLs canòniques per JSON-LD sameAs
+    urls: {
+      instagram: 'https://www.instagram.com/orbitaeventsoficial/',
+      tiktok: 'https://www.tiktok.com/@orbitaeventsoficial',
+      google: 'https://g.page/orbitaevents',
     },
   },
 

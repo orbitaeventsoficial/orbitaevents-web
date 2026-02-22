@@ -15,6 +15,7 @@ import Image from 'next/image';
 import { Link } from '@/lib/navigation';
 import { PORTFOLIO_IMAGES } from '@/config/portfolio-images';
 import { getTranslations } from 'next-intl/server';
+import { WHATSAPP_NUMBER } from '@/lib/constants';
 import HalloweenDecorationSection from '@/app/components/ui/HalloweenDecorationSection';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -87,7 +88,7 @@ export default async function HalloweenPage() {
               <span>👻</span> {t('cta.reserve')}
             </Link>
             <Link
-              href={`https://wa.me/34699121023?text=${encodeURIComponent(tWhatsapp('halloween'))}`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tWhatsapp('halloween'))}`}
               className="px-6 py-3 border border-white/30 hover:border-white/60 text-white font-medium rounded-full transition-colors inline-flex items-center gap-2"
             >
               <span>💬</span> {t('cta.whatsapp')}
@@ -274,7 +275,7 @@ export default async function HalloweenPage() {
               <span>👻</span> {t('cta.reserve2025')}
             </Link>
             <Link
-              href={`https://wa.me/34699121023?text=${encodeURIComponent(tWhatsapp('halloween'))}`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tWhatsapp('halloween'))}`}
               target="_blank" rel="noopener noreferrer"
               className="px-8 py-4 border border-white/30 hover:border-white/60 text-white font-semibold rounded-full transition-colors inline-flex items-center justify-center gap-2"
             >

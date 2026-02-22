@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyDataRequest } from '@/lib/services/privacyService';
 import { escapeHtml } from '@/lib/utils/sanitize';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -389,7 +390,7 @@ function generateErrorPage(error: string, t: VerifyMessages): string {
 
         <div class="error-msg">${escapeHtml(error)}</div>
 
-        <p>${t.needHelp} <strong>info@orbitaevents.com</strong></p>
+        <p>${t.needHelp} <strong>${SITE_CONFIG.business.email}</strong></p>
 
         <a href="/" class="btn">${t.backHome}</a>
       </div>

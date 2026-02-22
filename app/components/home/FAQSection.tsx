@@ -103,7 +103,7 @@ export default function FAQSection() {
                       animate={{ rotate: isOpen ? 180 : 0 }}
                       transition={reduceMotion ? { duration: 0 } : { duration: 0.25 }}
                       className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
-                        isOpen ? 'bg-amber-500/20 text-amber-400' : 'bg-white/10 text-white/40'
+                        isOpen ? 'bg-amber-500/20 text-amber-400' : 'bg-white/10 text-white/60'
                       }`}
                     >
                       <svg
@@ -150,7 +150,7 @@ export default function FAQSection() {
           viewport={{ once: true }}
           className="mt-10 text-center"
         >
-          <p className="text-white/40 text-sm mb-4">{t('cta.title')}</p>
+          <p className="text-white/60 text-sm mb-4">{t('cta.title')}</p>
           <a
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hola! Tinc un dubte sobre el vostre servei d'esdeveniments")}`}
             target="_blank"

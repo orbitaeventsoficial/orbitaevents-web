@@ -17,8 +17,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { locales, type Locale } from '@/i18n';
 import { inter, plusJakarta, jetbrains } from '@/app/fonts';
-import Script from 'next/script';
-import { SITE_CONFIG } from '@/config/site-config';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import { getAllPacks, getMinPriceByService } from '@/config/packs-config';
 import '@/app/globals.css';
 
@@ -127,10 +126,7 @@ const JSON_LD_ORGANIZATION = {
       closes: '20:00',
     },
   ],
-  sameAs: [
-    'https://www.instagram.com/orbitaeventsoficial/',
-    'https://www.tiktok.com/@orbitaeventsoficial',
-  ],
+  sameAs: Object.values(SITE_CONFIG.social.urls),
   // NOTE: aggregateRating removed to fix Google Rich Results error
   // "La ressenya té diverses puntuacions agregades" (multiple aggregate ratings)
   // Google detects LocalBusiness schema multiple times due to RSC hydration
@@ -363,22 +359,11 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* GTM consent defaults — inline script (tiny, no external fetch, no render-block) */}
         {process.env.NEXT_PUBLIC_GTM_ID && (
-          <Script
-            id="gtag-consent-default"
-            strategy="beforeInteractive"
+          <script
             dangerouslySetInnerHTML={{
-              __html: `
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('consent','default',{
-                  analytics_storage:'denied',
-                  ad_storage:'denied',
-                  ad_user_data:'denied',
-                  ad_personalization:'denied',
-                  wait_for_update:500
-                });
-              `,
+              __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});`,
             }}
           />
         )}

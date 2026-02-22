@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
-import { SITE_CONFIG } from '@/config/site-config';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import { getRequestId } from '@/lib/request-context';
 
 export const dynamic = 'force-dynamic';

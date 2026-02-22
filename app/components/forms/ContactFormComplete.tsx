@@ -19,7 +19,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
 import { useTranslations } from 'next-intl';
-import { SITE_CONFIG } from '@/config/site-config';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import { trackLead, trackCTAClick } from '@/lib/analytics';
 import TurnstileWidget from '@/components/security/TurnstileWidget';
 

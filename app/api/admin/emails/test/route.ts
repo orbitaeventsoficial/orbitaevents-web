@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
 import { sendEmail } from '@/lib/email';
-import { SITE_CONFIG } from '@/config/site-config';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { requireAuth } from '@/lib/auth';
 

@@ -1,5 +1,3 @@
-import React from 'react';
-
 type Series = {
   data: number[];
   stroke: string;
@@ -54,12 +52,12 @@ export function MiniLineChart({ series, height = 56 }: { series: Series[]; heigh
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-14">
         <defs>
           <linearGradient id="grid-fade-dark" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(71,85,105,0.35)" />
-            <stop offset="100%" stopColor="rgba(71,85,105,0)" />
+            <stop offset="0%" stopColor="var(--at-subtle)" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="var(--at-subtle)" stopOpacity="0" />
           </linearGradient>
         </defs>
         <rect x="0" y="0" width={width} height={height} fill="url(#grid-fade-dark)" opacity="0.3" />
-        <line x1="0" y1={height - 1} x2={width} y2={height - 1} stroke="rgba(71,85,105,0.4)" strokeWidth="0.5" />
+        <line x1="0" y1={height - 1} x2={width} y2={height - 1} stroke="var(--at-subtle)" strokeOpacity="0.4" strokeWidth="0.5" />
         {series.map((s, idx) => {
           const normalized = normalizeSeries(s.data);
           const points = buildPoints(normalized, height - 2, width);

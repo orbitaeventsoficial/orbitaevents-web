@@ -14,16 +14,10 @@ function isBusinessHours(): boolean {
   return hour >= 8 && hour < 20;
 }
 
-// Retorna el missatge fora d'horari amb l'hora exacta d'obertura
-function getOffHoursMessage(): string {
-  const now = new Date();
-  const hour = now.getHours();
-  if (hour >= 20) {
-    // Avui ha tancat — obrim demà a les 8h
-    return "Tanquem a les 20h — t'escriurem demà a les 8h 👋";
-  }
-  // Encara no hem obert (0-7h)
-  return "Obrim avui a les 8h — escriu-nos! 💬";
+// Retorna la clau i18n fora d'horari
+function getOffHoursKey(): string {
+  const hour = new Date().getHours();
+  return hour >= 20 ? 'floatingCTA.offHoursAfter' : 'floatingCTA.offHoursBefore';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -84,7 +78,7 @@ export function ContactDesktop() {
                   trackCTAClick('floating_phone_desktop', 'floating_cta_desktop');
                 }}
                 className="relative group block"
-                aria-label="Truca'ns ara"
+                aria-label={t('floatingCTA.callNow')}
               >
                 <div className="relative w-12 h-12 bg-zinc-800 hover:bg-zinc-700 border border-white/10 hover:border-amber-500/50 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-all duration-300">
                   <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -113,7 +107,7 @@ export function ContactDesktop() {
                   <div className="flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 bg-[#25D366] rounded-full animate-pulse" />
                     <span className="text-white/80">
-                      {businessHours ? 'Respon en menys de 2h 💬' : getOffHoursMessage()}
+                      {businessHours ? t('floatingCTA.responseTime') : t(getOffHoursKey())}
                     </span>
                   </div>
                   <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full">
@@ -125,7 +119,7 @@ export function ContactDesktop() {
 
             {/* Botó WhatsApp */}
             <a
-              href={WHATSAPP_URL_WITH_MESSAGE("Hola! M'agradaria informació sobre els vostres serveis d'events.")}
+              href={WHATSAPP_URL_WITH_MESSAGE(t('floatingCTA.whatsappGreeting'))}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
@@ -250,7 +244,7 @@ export function BottomBarMobile() {
                       trackCTAClick('floating_phone_mobile_business', 'floating_cta_mobile');
                     }}
                     className="bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-semibold py-3.5 px-4 rounded-xl flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform border border-zinc-700 shrink-0"
-                    aria-label="Truca'ns ara"
+                    aria-label={t('floatingCTA.callNow')}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
@@ -260,7 +254,7 @@ export function BottomBarMobile() {
 
                 {/* Botó Principal - WhatsApp */}
                 <a
-                  href={WHATSAPP_URL_WITH_MESSAGE("Hola! M'agradaria informació")}
+                  href={WHATSAPP_URL_WITH_MESSAGE(t('floatingCTA.whatsappShort'))}
                   target="_blank" rel="noopener noreferrer"
                   onClick={() => {
                     trackWhatsAppClick('floating_mobile');

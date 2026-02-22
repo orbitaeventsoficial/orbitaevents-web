@@ -14,6 +14,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { log } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 import { SITE_CONFIG } from '@/app/config/site-config';
@@ -174,7 +175,7 @@ export default function GoogleReviewsRotating({ showFooterCta = true }: { showFo
         setTotalReviews(data.user_ratings_total);
         setLastUpdated(data.lastUpdated);
       } catch (error) {
-        console.error('Error loading reviews:', error);
+        log.error('Error loading reviews', error);
       }
     }
 

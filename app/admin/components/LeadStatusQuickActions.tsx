@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { log } from '@/lib/logger';
 
 type LeadStatus = 'NEW' | 'CONTACTED' | 'QUOTE_SENT' | 'NEGOTIATING' | 'WON' | 'LOST';
 
@@ -19,15 +20,15 @@ export default function LeadStatusQuickActions({
     if (saving || nextStatus === currentStatus) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/leads-new/${leadId}/status`, {
+      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),
       });
       if (!res.ok) throw new Error();
       router.refresh();
-    } catch {
-      // silent in compact dashboard control
+    } catch (err) {
+      log.error('Failed to update lead status', err);
     } finally {
       setSaving(false);
     }

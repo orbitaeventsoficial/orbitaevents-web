@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { getGoogleAdsConfigStatus, getGoogleAdsReport } from '@/lib/analytics/google-ads';
 import Link from 'next/link';
+import { EVENT_TYPE_PLAIN, EVENT_TYPE_ICONS, SOURCE_LABELS } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -178,26 +179,10 @@ async function getOperationalKpis() {
   }
 }
 
-const SOURCE_LABELS: Record<string, string> = {
-  WEBSITE: 'Web',
-  CONFIGURATOR: 'Configurador',
-  PHONE: 'Telèfon',
-  WHATSAPP: 'WhatsApp',
-  INSTAGRAM: 'Instagram',
-  WALLAPOP: 'Wallapop',
-  REFERRAL: 'Referit',
-  GOOGLE: 'Google',
-  OTHER: 'Altres',
-};
 
-const EVENT_TYPE_LABELS: Record<string, { label: string; icon: string }> = {
-  WEDDING: { label: 'Bodes', icon: '💍' },
-  BIRTHDAY: { label: 'Aniversaris', icon: '🎂' },
-  CORPORATE: { label: 'Corporatius', icon: '💼' },
-  COMMUNION: { label: 'Comunions', icon: '⛪' },
-  PRIVATE_PARTY: { label: 'Festes privades', icon: '🎉' },
-  OTHER: { label: 'Altres', icon: '📅' },
-};
+const ANALYTICS_EVENT_LABELS: Record<string, { label: string; icon: string }> = Object.fromEntries(
+  Object.keys(EVENT_TYPE_PLAIN).map((k) => [k, { label: EVENT_TYPE_PLAIN[k], icon: EVENT_TYPE_ICONS[k] || '📅' }])
+);
 
 function pctDelta(current: number, previous: number): number | null {
   if (!Number.isFinite(current) || !Number.isFinite(previous)) return null;
@@ -739,7 +724,7 @@ export default async function AnalyticsPage() {
         <div className="p-4">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
             {data.bookings.byEventType.map((type) => {
-              const config = EVENT_TYPE_LABELS[type.eventType] || { label: type.eventType, icon: '📅' };
+              const config = ANALYTICS_EVENT_LABELS[type.eventType] || { label: type.eventType, icon: '📅' };
               return (
                 <div
                   key={type.eventType}

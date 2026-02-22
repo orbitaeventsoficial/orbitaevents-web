@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { EVENT_TYPE_PLAIN } from '@/lib/constants';
 
 type CalendarApiDay = {
   reservas: {
@@ -42,23 +43,16 @@ type CalendarCell = {
 
 const weekdayLabels = ['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg']; // dilluns primer
 
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: 'Casament',
-  BIRTHDAY: 'Aniversari',
-  CORPORATE: 'Corporatiu',
-  COMMUNION: 'Comunió',
-  BAPTISM: 'Bateig',
-  GRADUATION: 'Graduació',
+const CALENDAR_EVENT_LABELS: Record<string, string> = {
+  ...EVENT_TYPE_PLAIN,
   CELEBRATION: 'Celebració',
-  PRIVATE_PARTY: 'Festa privada',
-  OTHER: 'Altre',
 };
 
 function resolveServiceLabel(booking: CalendarApiDay['reservas'][number]): string {
   const pack = booking.packName?.trim();
   if (pack) return pack;
   const eventType = booking.eventType?.trim();
-  if (eventType && EVENT_TYPE_LABELS[eventType]) return EVENT_TYPE_LABELS[eventType];
+  if (eventType && CALENDAR_EVENT_LABELS[eventType]) return CALENDAR_EVENT_LABELS[eventType];
   if (eventType) return eventType;
   return 'Servei';
 }

@@ -1,6 +1,6 @@
 // app/components/seo/ServiceJsonLD.tsx
 // 🔥 MANOLO VERSION - Optimizado para conversión SEO
-import { SITE_CONFIG } from '@/config/site-config';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 type AggregateRating = {
   '@type': 'AggregateRating';
@@ -59,7 +59,7 @@ export default function ServiceJsonLD({
         description: offer.description,
         availability: offer.availability || availability,
         url: offer.url || url,
-        seller: { '@type': 'Organization' as const, name: 'Órbita Events' },
+        seller: { '@type': 'Organization' as const, name: SITE_CONFIG.business.name },
       }))
     : {
         '@type': 'Offer' as const,
@@ -67,7 +67,7 @@ export default function ServiceJsonLD({
         priceCurrency,
         ...(priceFrom ? { price: priceFrom } : {}),
         availability,
-        seller: { '@type': 'Organization' as const, name: 'Órbita Events' },
+        seller: { '@type': 'Organization' as const, name: SITE_CONFIG.business.name },
       };
 
   const data = {
@@ -86,13 +86,10 @@ export default function ServiceJsonLD({
     offers: offersData,
     provider: {
       '@type': 'Organization',
-      name: 'Órbita Events',
+      name: SITE_CONFIG.business.name,
       url: base,
-      logo: `${base}/og.jpg`,
-      sameAs: [
-        'https://instagram.com/orbitaeventsoficial',
-        'https://tiktok.com/@orbitaeventsoficial',
-      ],
+      logo: `${base}${SITE_CONFIG.web.logo}`,
+      sameAs: Object.values(SITE_CONFIG.social.urls),
       contactPoint: {
         '@type': 'ContactPoint',
         telephone: SITE_CONFIG.business.phone,
@@ -102,18 +99,18 @@ export default function ServiceJsonLD({
       },
       address: {
         '@type': 'PostalAddress',
-        streetAddress: 'Granollers',
-        addressLocality: 'Granollers',
-        addressRegion: 'Barcelona',
-        postalCode: '08400',
-        addressCountry: 'ES',
+        streetAddress: SITE_CONFIG.business.address.street,
+        addressLocality: SITE_CONFIG.business.address.city,
+        addressRegion: SITE_CONFIG.business.address.region,
+        postalCode: SITE_CONFIG.business.address.postalCode,
+        addressCountry: SITE_CONFIG.business.address.countryCode,
       },
       openingHoursSpecification: [
         {
           '@type': 'OpeningHoursSpecification',
           dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-          opens: '09:00',
-          closes: '20:00',
+          opens: SITE_CONFIG.business.hours.weekdays.open,
+          closes: SITE_CONFIG.business.hours.weekdays.close,
         },
       ],
     },

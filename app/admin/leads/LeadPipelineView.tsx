@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
+import { EVENT_TYPE_ICONS, SOURCE_LABELS } from '@/lib/constants';
 
 type PipelineFilters = {
   status: string[];
@@ -46,17 +47,6 @@ const COLUMNS: Omit<PipelineColumn, 'leads'>[] = [
   { status: 'LOST', label: 'Perdut', toneClass: 'admin-leads-tone admin-leads-tone--lost', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--lost' },
 ];
 
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍',
-  BIRTHDAY: '🎂',
-  CORPORATE: '🎯',
-  COMMUNION: '⛪',
-  BAPTISM: '👶',
-  GRADUATION: '🎓',
-  ANNIVERSARY: '🎉',
-  PRIVATE_PARTY: '🎵',
-  OTHER: '📋',
-};
 
 const PRIORITY_DOT: Record<string, string> = {
   LOW: 'bg-slate-500',
@@ -65,17 +55,6 @@ const PRIORITY_DOT: Record<string, string> = {
   URGENT: 'bg-rose-500',
 };
 
-const SOURCE_LABELS: Record<string, string> = {
-  WEBSITE: 'Web',
-  CONFIGURATOR: 'Configurador',
-  PHONE: 'Telèfon',
-  WHATSAPP: 'WhatsApp',
-  INSTAGRAM: 'Instagram',
-  WALLAPOP: 'Wallapop',
-  REFERRAL: 'Boca-orella',
-  GOOGLE: 'Google',
-  OTHER: 'Altre',
-};
 
 export default function LeadPipelineView({ filters }: { filters: PipelineFilters }) {
   const [allLeads, setAllLeads] = useState<PipelineLead[]>([]);
@@ -99,7 +78,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   const fetchPipeline = useCallback(async () => {
     try {
       const qs = filterQuery ? `&${filterQuery}` : '';
-      const res = await fetch(`/api/admin/leads-new?limit=500&pipeline=true${qs}`, { credentials: 'include' });
+      const res = await fetch(`/api/admin/leads?limit=500&pipeline=true${qs}`, { credentials: 'include' });
       if (!res.ok) throw new Error('Error carregant pipeline');
       const data = await res.json();
       const leads: PipelineLead[] = data?.data?.leads || data?.leads || [];
@@ -143,7 +122,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     setLeadStatusInState(leadId, newStatus);
     setUpdatingId(leadId);
     try {
-      const res = await fetch(`/api/admin/leads-new/${leadId}/status`, {
+      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -361,7 +340,7 @@ function PipelineCard({
       </div>
 
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px]">
-        <span>{EVENT_TYPE_LABELS[lead.eventType] || lead.eventType}</span>
+        <span>{EVENT_TYPE_ICONS[lead.eventType] || lead.eventType}</span>
         <span className="">{SOURCE_LABELS[lead.source] || lead.source}</span>
         {lead.eventDate && (
           <span className="">

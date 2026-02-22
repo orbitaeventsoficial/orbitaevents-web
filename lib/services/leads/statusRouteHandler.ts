@@ -157,7 +157,7 @@ export async function handleLeadStatusPatch(req: NextRequest, leadId: string, de
     const response = NextResponse.json({ ok: true, lead: updatedLead });
     if (deprecated) {
       response.headers.set('x-api-deprecated', 'true');
-      response.headers.set('x-api-replacement', `/api/admin/leads-new/${leadId}/status`);
+      response.headers.set('x-api-replacement', `/api/admin/leads/${leadId}/status`);
     }
 
     return response;

@@ -1,10 +1,25 @@
 // app/portfolio/page.tsx
+import { Metadata } from 'next';
 import { Link } from '@/lib/navigation';
 import Image from "next/image";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import { PORTFOLIO_CATEGORIES } from "@/config/portfolio-images";
 import { getTranslations } from 'next-intl/server';
 
+export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
+  const { locale } = params;
+  const t = await getTranslations({ locale, namespace: 'pages.portfolio' });
+  const base = 'https://orbitaevents.com';
+
+  return {
+    title: t('title'),
+    description: t('subtitle'),
+    alternates: {
+      canonical: locale === 'ca' ? `${base}/portfolio` : `${base}/${locale}/portfolio`,
+      languages: { ca: `${base}/portfolio`, es: `${base}/es/portfolio`, en: `${base}/en/portfolio` },
+    },
+  };
+}
 
 export default async function PortfolioHome({ params }: { params: { locale: string } }) {
   const { locale } = params;

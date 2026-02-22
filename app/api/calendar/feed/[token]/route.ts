@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -81,7 +82,7 @@ export async function GET(
     ].filter(Boolean).join('\n');
 
     lines.push('BEGIN:VEVENT');
-    lines.push(`UID:booking-${booking.id}@orbitaevents.com`);
+    lines.push(`UID:booking-${booking.id}@${SITE_CONFIG.web.domain}`);
     lines.push(`DTSTAMP:${toIcsDateTime(new Date(booking.updatedAt))}`);
     lines.push(`DTSTART:${toIcsDateTime(start)}`);
     lines.push(`DTEND:${toIcsDateTime(endDate)}`);

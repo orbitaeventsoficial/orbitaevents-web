@@ -264,6 +264,14 @@
       "responseTime": "Respuesta <2h",
       "noCommitment": "Sin compromiso",
       "respondsIn": "Responde en <2h"
+    },
+    "floatingCTA": {
+      "offHoursAfter": "Cerramos a las 20h — te escribiremos mañana a las 8h 👋",
+      "offHoursBefore": "Abrimos hoy a las 8h — ¡escríbenos! 💬",
+      "responseTime": "Responde en menos de 2h 💬",
+      "whatsappGreeting": "¡Hola! Me gustaría información sobre vuestros servicios de eventos.",
+      "whatsappShort": "¡Hola! Me gustaría información",
+      "callNow": "Llámanos ahora"
     }
   },
   "hero": {
@@ -1465,7 +1473,9 @@
       "blog": "Blog",
       "configurator": "Configurador",
       "sensorial": "Espacio Sensorial",
-      "monMagic": "Temática Mundo Mágico"
+      "monMagic": "Temática Mundo Mágico",
+      "resources": "Descargas",
+      "search": "Buscar"
     },
     "legal": {
       "privacy": "Política de Privacidad",
@@ -3531,6 +3541,8 @@
     }
   },
   "sensorial": {
+    "metaTitle": "Espacio Sensorial | Òrbita Events",
+    "metaDescription": "Espacio digital interactivo diseñado para personas con sensibilidad sensorial. Explora temas, sonidos y elementos interactivos.",
     "loading": "Preparando un espacio especial para ti...",
     "grabElements": "¡Agarra los elementos con el dedo o el ratón!",
     "brandName": "Òrbita Events",

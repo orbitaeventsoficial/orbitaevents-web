@@ -19,7 +19,7 @@ export default function LeadQuickStatus({
     if (saving || nextStatus === currentStatus) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/leads-new/${leadId}/status`, {
+      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),

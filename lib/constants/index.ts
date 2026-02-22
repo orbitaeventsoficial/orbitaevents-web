@@ -13,55 +13,116 @@ export const WHATSAPP_URL_WITH_MESSAGE = (message: string) =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
 // ═══════════════════════════════════════════════════════════════════════════
-// LEAD STATUS
+// LEAD STATUS (dark theme)
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const LEAD_STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
-  NEW: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Nou Lead' },
-  CONTACTED: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Contactat' },
-  QUOTE_SENT: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Pressupost enviat' },
-  NEGOTIATING: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Negociació' },
-  WON: { bg: 'bg-green-100', text: 'text-green-700', label: 'Guanyat!' },
-  LOST: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Perdut' },
+  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Nova entrada' },
+  CONTACTED: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Contactat' },
+  QUOTE_SENT: { bg: 'bg-purple-500/20', text: 'text-purple-300', label: 'Pressupost enviat' },
+  NEGOTIATING: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'Negociació' },
+  WON: { bg: 'bg-green-500/20', text: 'text-green-300', label: 'Guanyat!' },
+  LOST: { bg: 'bg-slate-500/20', text: 'text-slate-300', label: 'Perdut' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// BOOKING STATUS
+// BOOKING STATUS (dark theme)
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const BOOKING_STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
-  PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pendent' },
-  CONFIRMED: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Confirmat' },
-  DEPOSIT_PAID: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Dipòsit pagat' },
-  COMPLETED: { bg: 'bg-green-100', text: 'text-green-700', label: 'Completat' },
-  CANCELLED: { bg: 'bg-red-100', text: 'text-red-700', label: 'Cancel·lat' },
+  PENDING: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Pendent' },
+  CONFIRMED: { bg: 'bg-emerald-500/20', text: 'text-emerald-300', label: 'Confirmada' },
+  PREPARING: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Preparant' },
+  COMPLETED: { bg: 'bg-teal-500/20', text: 'text-teal-300', label: 'Completada' },
+  CANCELLED: { bg: 'bg-rose-500/20', text: 'text-rose-300', label: 'Cancel·lada' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
 // EVENT TYPES
 // ═══════════════════════════════════════════════════════════════════════════
 
+/** Emoji + label (default display) */
 export const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Boda',
+  WEDDING: '💍 Casament',
   BIRTHDAY: '🎂 Aniversari',
   CORPORATE: '🎯 Corporatiu',
   COMMUNION: '⛪ Comunió',
   BAPTISM: '👶 Bateig',
   GRADUATION: '🎓 Graduació',
-  ANNIVERSARY: '🎉 Aniversari',
+  ANNIVERSARY: '🎉 Celebració',
   PRIVATE_PARTY: '🎵 Festa privada',
   OTHER: '📋 Altre',
 };
 
+/** Emoji only (for compact views like pipeline cards) */
+export const EVENT_TYPE_ICONS: Record<string, string> = {
+  WEDDING: '💍',
+  BIRTHDAY: '🎂',
+  CORPORATE: '🎯',
+  COMMUNION: '⛪',
+  BAPTISM: '👶',
+  GRADUATION: '🎓',
+  ANNIVERSARY: '🎉',
+  PRIVATE_PARTY: '🎵',
+  OTHER: '📋',
+};
+
+/** Plain text labels without emoji (for selects and forms) */
+export const EVENT_TYPE_PLAIN: Record<string, string> = {
+  WEDDING: 'Casament',
+  BIRTHDAY: 'Aniversari',
+  CORPORATE: 'Corporatiu',
+  COMMUNION: 'Comunió',
+  BAPTISM: 'Bateig',
+  GRADUATION: 'Graduació',
+  ANNIVERSARY: 'Celebració',
+  PRIVATE_PARTY: 'Festa privada',
+  OTHER: 'Altre',
+};
+
 // ═══════════════════════════════════════════════════════════════════════════
-// PRIORITY
+// SOURCE LABELS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const PRIORITY_CONFIG: Record<string, { bg: string; label: string }> = {
-  LOW: { bg: 'bg-stone-100 text-slate-600', label: 'Baixa' },
-  MEDIUM: { bg: 'bg-blue-100 text-blue-700', label: 'Mitja' },
-  HIGH: { bg: 'bg-orange-100 text-orange-700', label: 'Alta' },
-  URGENT: { bg: 'bg-red-100 text-red-700', label: 'Urgent' },
+export const SOURCE_LABELS: Record<string, string> = {
+  WEBSITE: 'Web',
+  CONFIGURATOR: 'Configurador',
+  PHONE: 'Telèfon',
+  WHATSAPP: 'WhatsApp',
+  INSTAGRAM: 'Instagram',
+  WALLAPOP: 'Wallapop',
+  REFERRAL: 'Boca-orella',
+  GOOGLE: 'Google',
+  OTHER: 'Altre',
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PRIORITY (dark theme)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const PRIORITY_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
+  LOW: { bg: 'bg-slate-500/20', text: 'text-slate-300', label: 'Baixa' },
+  MEDIUM: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Mitjana' },
+  HIGH: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'Alta' },
+  URGENT: { bg: 'bg-red-500/20', text: 'text-red-300', label: 'Urgent' },
+};
+
+/** Plain text priority labels (for selects and forms) */
+export const PRIORITY_LABELS: Record<string, string> = {
+  LOW: 'Baixa',
+  MEDIUM: 'Mitjana',
+  HIGH: 'Alta',
+  URGENT: 'Urgent',
+};
+
+/** Plain text lead status labels (for selects and forms) */
+export const LEAD_STATUS_LABELS: Record<string, string> = {
+  NEW: 'Nou lead',
+  CONTACTED: 'Contactat',
+  QUOTE_SENT: 'Pressupost enviat',
+  NEGOTIATING: 'En negociació',
+  WON: 'Guanyat',
+  LOST: 'Perdut',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -98,4 +159,9 @@ export function formatCurrency(amount: number | null | undefined): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
+}
+
+/** Case-insensitive event type label lookup (DB uses UPPER, forms may use lower) */
+export function getEventLabel(eventType: string, fallback?: string): string {
+  return EVENT_TYPE_PLAIN[eventType] || EVENT_TYPE_PLAIN[eventType.toUpperCase()] || fallback || eventType;
 }

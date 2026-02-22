@@ -8,7 +8,7 @@
 // - Delay mínim 3s a la pàgina abans d'activar
 
 import { useEffect, useRef, useState } from 'react';
-import { SITE_CONFIG } from '@/config/site-config';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 const SESSION_KEY = 'exit_intent_shown';
 const MIN_TIME_ON_PAGE_MS = 3000;

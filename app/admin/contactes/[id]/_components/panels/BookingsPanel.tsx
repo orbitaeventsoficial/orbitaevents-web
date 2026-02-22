@@ -1,26 +1,11 @@
 import type { CustomerHubDTO, BookingDTO } from '@/lib/customer-hub/dto';
 import { labelEstatReserva } from '@/lib/customer-hub/labels';
 import Link from 'next/link';
+import { EVENT_TYPE_LABELS, BOOKING_STATUS_CONFIG } from '@/lib/constants';
 
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Casament',
-  BIRTHDAY: '🎂 Aniversari',
-  CORPORATE: '🎯 Corporatiu',
-  COMMUNION: '⛪ Comunió',
-  BAPTISM: '👶 Bateig',
-  GRADUATION: '🎓 Graduació',
-  ANNIVERSARY: '💑 Aniversari',
-  PRIVATE_PARTY: '🎉 Festa Privada',
-  OTHER: '📋 Altre',
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  CONFIRMED: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300',
-  TENTATIVE: 'border-amber-500/50 bg-amber-500/10 text-amber-300',
-  PREPARING: 'border-sky-500/50 bg-sky-500/10 text-sky-300',
-  COMPLETED: 'border-violet-500/50 bg-violet-500/10 text-violet-300',
-  CANCELLED: 'border-rose-500/50 bg-rose-500/10 text-rose-300',
-};
+const STATUS_COLORS: Record<string, string> = Object.fromEntries(
+  Object.entries(BOOKING_STATUS_CONFIG).map(([k, v]) => [k, `border-current ${v.bg} ${v.text}`])
+);
 
 function PaymentIndicator({ booking }: { booking: BookingDTO }) {
   const deposit = booking.depositAmount ?? 0;

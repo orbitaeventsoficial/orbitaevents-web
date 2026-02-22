@@ -4,6 +4,7 @@ import { Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Check, ArrowRight, Star, Clock, Shield } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import Image from 'next/image';
 
 export interface ZoneConfig {
@@ -126,7 +127,7 @@ export default function ZoneLandingPage({ config }: Props) {
               <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="tel:+34699121023"
+              href={`tel:${SITE_CONFIG.business.phone}`}
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 text-white font-bold rounded-full border border-white/20 hover:bg-white/20 transition-all duration-300"
             >
               <Phone className="w-5 h-5" />
@@ -335,13 +336,13 @@ export default function ZoneLandingPage({ config }: Props) {
             </Link>
           </div>
           <div className="mt-6 flex justify-center gap-6 text-sm text-white/60">
-            <a href="tel:+34699121023" className="flex items-center gap-2 hover:text-white">
+            <a href={`tel:${SITE_CONFIG.business.phone}`} className="flex items-center gap-2 hover:text-white">
               <Phone className="w-4 h-4" />
-              699 121 023
+              {SITE_CONFIG.business.phoneDisplay}
             </a>
-            <a href="mailto:info@orbitaevents.com" className="flex items-center gap-2 hover:text-white">
+            <a href={`mailto:${SITE_CONFIG.business.email}`} className="flex items-center gap-2 hover:text-white">
               <Mail className="w-4 h-4" />
-              info@orbitaevents.com
+              {SITE_CONFIG.business.email}
             </a>
           </div>
         </div>

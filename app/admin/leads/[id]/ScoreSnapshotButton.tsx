@@ -10,7 +10,7 @@ export default function ScoreSnapshotButton({ leadId }: { leadId: string }) {
     setSaving(true);
     setMsg(null);
     try {
-      const res = await fetch(`/api/admin/leads-new/${leadId}/score`, {
+      const res = await fetch(`/api/admin/leads/${leadId}/score`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),

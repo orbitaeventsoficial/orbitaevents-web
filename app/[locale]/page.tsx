@@ -54,41 +54,29 @@ const HeroElegant = dynamic(() => import('@/app/components/ui/HeroElegant'), {
   loading: () => <HeroSkeleton />,
 });
 
-// Below-the-fold: Lazy loaded sin SSR para mejor performance
+// Below-the-fold: Lazy loaded with SSR for SEO + skeleton fallback
 const ServicesGridElegant = dynamic(() => import('@/app/components/ui/ServicesGridElegant'), {
-  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const CalendarioUrgencia = dynamic(() => import('@/app/components/ui/CalendarioUrgencia'), {
-  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const GoogleReviewsRotating = dynamic(() => import('@/app/components/home/GoogleReviewsRotating'), {
-  ssr: false,
+  ssr: false, // Uses localStorage
 });
-const TrustedByLogos = dynamic(() => import('@/app/components/marketing/TrustedByLogos'), {
-  ssr: false,
-});
+const TrustedByLogos = dynamic(() => import('@/app/components/marketing/TrustedByLogos'));
 const StatsSection = dynamic(() => import('@/app/components/marketing/StatsSection'), {
-  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const ProcessSection = dynamic(() => import('@/app/components/marketing/ProcessSection'), {
-  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const PortfolioShowcase = dynamic(() => import('@/app/components/marketing/PortfolioShowcase'), {
-  ssr: false,
   loading: () => <SectionSkeleton />,
 });
-const GarantiaSection = dynamic(() => import('@/app/components/marketing/GarantiaSection'), {
-  ssr: false,
-});
-const CTAFinal = dynamic(() => import('@/app/components/marketing/CTAFinal'), {
-  ssr: false,
-});
+const GarantiaSection = dynamic(() => import('@/app/components/marketing/GarantiaSection'));
+const CTAFinal = dynamic(() => import('@/app/components/marketing/CTAFinal'));
 const FAQSection = dynamic(() => import('@/app/components/home/FAQSection'), {
-  ssr: false,
   loading: () => <SectionSkeleton />,
 });
 const HomePageWrapper = dynamic(() => import('@/app/components/HomePageWrapper'), {

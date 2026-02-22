@@ -195,7 +195,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   // Cargar conteo de leads nuevos
   const fetchNewLeadsCount = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/leads-new?countOnly=true', { credentials: 'include' });
+      const res = await fetch('/api/admin/leads?countOnly=true', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setNewLeadsCount(data.count || 0);

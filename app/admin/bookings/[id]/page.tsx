@@ -16,27 +16,9 @@ import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAcce
 import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 
+import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS } from '@/lib/constants';
+
 export const dynamic = 'force-dynamic';
-
-const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  PENDING: { label: 'Pendent', bg: 'bg-yellow-500/15', text: 'text-yellow-300' },
-  CONFIRMED: { label: 'Confirmada', bg: 'bg-emerald-500/15', text: 'text-emerald-300' },
-  PREPARING: { label: 'Preparant', bg: 'bg-cyan-500/15', text: 'text-cyan-300' },
-  COMPLETED: { label: 'Completada', bg: 'bg-emerald-500/15', text: 'text-emerald-300' },
-  CANCELLED: { label: 'Cancel·lada', bg: 'bg-rose-500/15', text: 'text-rose-300' },
-};
-
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Casament',
-  BIRTHDAY: '🎂 Aniversari',
-  CORPORATE: '🎯 Corporatiu',
-  COMMUNION: '⛪ Comunió',
-  BAPTISM: '👶 Bateig',
-  GRADUATION: '🎓 Graduació',
-  ANNIVERSARY: '💑 Aniversari',
-  PRIVATE_PARTY: '🎉 Festa Privada',
-  OTHER: '📋 Altre',
-};
 
 interface PageProps {
   params: { id: string };

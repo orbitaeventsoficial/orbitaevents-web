@@ -28,6 +28,7 @@ interface BlogPost {
   tags: string[];
   featuredImage?: string;
   publishedAt?: string;
+  updatedAt?: string;
   readingTime?: number;
   translations: BlogTranslation[];
 }
@@ -125,31 +126,33 @@ export default async function BlogPostPage({
   const categoryColor = CATEGORY_COLORS[post.category] || CATEGORY_COLORS.general;
   const yearsExperience = SITE_CONFIG.stats.yearsExperience;
 
-  // JSON-LD for article
+  // JSON-LD for blog post (BlogPosting schema)
+  const canonicalUrl = `https://orbitaevents.com/${locale}/blog/${slug}`;
   const articleJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': 'BlogPosting',
     headline: translation.title,
     description: translation.excerpt,
+    datePublished: post.publishedAt,
+    ...(post.updatedAt ? { dateModified: post.updatedAt } : {}),
     author: {
       '@type': 'Organization',
-      name: post.author || 'Òrbita Events',
+      name: SITE_CONFIG.business.name,
       url: 'https://orbitaevents.com',
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Òrbita Events',
+      name: SITE_CONFIG.business.name,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://orbitaevents.com/img/logoplanetatextdreta.svg',
+        url: 'https://orbitaevents.com/img/orbitawordmark.svg',
       },
     },
-    datePublished: post.publishedAt,
     image: post.featuredImage || 'https://orbitaevents.com/og-default.jpg',
-    url: `https://orbitaevents.com/${locale}/blog/${slug}`,
+    url: canonicalUrl,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://orbitaevents.com/${locale}/blog/${slug}`,
+      '@id': canonicalUrl,
     },
   };
 

@@ -3,6 +3,8 @@
  * Documenta totes les API routes del projecte
  */
 
+import { SITE_CONFIG } from '@/app/config/site-config';
+
 export const openAPISchema = {
   openapi: '3.1.0',
   info: {
@@ -10,9 +12,9 @@ export const openAPISchema = {
     version: '1.0.0',
     description: 'API per gestionar events, reserves i configuració del web Òrbita Events',
     contact: {
-      name: 'Òrbita Events',
-      email: 'info@orbitaevents.com',
-      url: 'https://orbitaevents.com',
+      name: SITE_CONFIG.business.name,
+      email: SITE_CONFIG.business.email,
+      url: SITE_CONFIG.web.url,
     },
   },
   servers: [

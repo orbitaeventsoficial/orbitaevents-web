@@ -178,7 +178,7 @@ export default function NewBookingPage() {
 
         // Pre-fill from lead
         if (leadId) {
-          const leadRes = await fetch(`/api/admin/leads-new/${leadId}`);
+          const leadRes = await fetch(`/api/admin/leads/${leadId}`);
           if (leadRes.ok) {
             const lData = await leadRes.json();
             const lead = lData.lead || lData.data;

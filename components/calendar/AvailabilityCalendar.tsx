@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { log } from '@/lib/logger';
 
 interface AvailabilityDate {
   date: string; // YYYY-MM-DD
@@ -86,7 +87,7 @@ export function AvailabilityCalendar({
           setError(data.error || 'Failed to load availability');
         }
       } catch (err) {
-        console.error('Error fetching availability:', err);
+        log.error('Error fetching availability', err);
         setError('Failed to load availability');
       } finally {
         setLoading(false);

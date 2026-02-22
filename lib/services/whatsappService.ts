@@ -1,4 +1,5 @@
 import { log } from '@/lib/logger';
+import { normalizePhone } from '@/lib/utils/normalize';
 
 export interface WhatsAppSendInput {
   to: string;
@@ -9,10 +10,6 @@ export interface WhatsAppSendResult {
   ok: boolean;
   providerMessageId?: string;
   error?: string;
-}
-
-function normalizePhone(input: string): string {
-  return input.replace(/[^\d]/g, '');
 }
 
 export async function sendWhatsAppText(input: WhatsAppSendInput): Promise<WhatsAppSendResult> {

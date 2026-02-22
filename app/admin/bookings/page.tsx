@@ -5,31 +5,12 @@ import { prisma } from '@/lib/prisma';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import BookingActions from './BookingActions';
+import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Reserves | Òrbita Admin',
-};
-
-const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  PENDING: { label: 'Pendent', bg: 'bg-yellow-500/20', text: 'text-yellow-300' },
-  CONFIRMED: { label: 'Confirmada', bg: 'bg-emerald-500/20', text: 'text-emerald-300' },
-  PREPARING: { label: 'Preparant', bg: 'bg-blue-500/20', text: 'text-blue-300' },
-  COMPLETED: { label: 'Completada', bg: 'bg-teal-500/20', text: 'text-teal-300' },
-  CANCELLED: { label: 'Cancel·lada', bg: 'bg-rose-500/20', text: 'text-rose-300' },
-};
-
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Casament',
-  BIRTHDAY: '🎂 Aniversari',
-  CORPORATE: '🎯 Corporatiu',
-  COMMUNION: '⛪ Comunió',
-  BAPTISM: '👶 Bateig',
-  GRADUATION: '🎓 Graduació',
-  ANNIVERSARY: '💑 Aniversari',
-  PRIVATE_PARTY: '🎉 Festa Privada',
-  OTHER: '📋 Altre',
 };
 
 async function getBookings(pageParam?: string) {

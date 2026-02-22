@@ -3,6 +3,7 @@
 // y el root layout usa componentes que requieren next-intl
 
 import caMessages from '@/messages/ca.json';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 export default function NotFound() {
   const t = (caMessages as Record<string, any>).notFound || {};
@@ -10,7 +11,7 @@ export default function NotFound() {
   return (
     <html lang="ca">
       <head>
-        <title>{`404 - ${t.title} | Òrbita Events`}</title>
+        <title>{`404 - ${t.title} | ${SITE_CONFIG.business.name}`}</title>
         <meta name="robots" content="noindex" />
         <style>{`
           * { margin: 0; padding: 0; box-sizing: border-box; }

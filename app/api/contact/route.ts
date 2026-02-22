@@ -2,7 +2,7 @@
 // API de contacto - Crea leads en el modelo nuevo
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
-import { SITE_CONFIG } from '@/config/site-config';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import { z } from 'zod';
 import { sendEmailWithTimeout } from '@/lib/email';
 import { prisma } from '@/lib/prisma';

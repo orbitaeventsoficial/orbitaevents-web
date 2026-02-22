@@ -82,10 +82,9 @@ export default function ConsentScripts() {
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
-              window.dataLayer = window.dataLayer || [];
               if (typeof window.gtag !== 'function') {
-                function gtag(){dataLayer.push(arguments);}
-                window.gtag = gtag;
+                window.dataLayer = window.dataLayer || [];
+                window.gtag = function(){dataLayer.push(arguments)};
               }
               window.gtag('config', '${googleAdsId}');
             `,

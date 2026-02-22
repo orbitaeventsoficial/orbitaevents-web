@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/navigation';
+import { WHATSAPP_NUMBER } from '@/lib/constants';
 
 interface FAQ {
   question: string;
@@ -194,7 +195,7 @@ export default function FAQClient({
             <p className="text-xl text-white/80 mb-6">{ctaQuestion}</p>
 
             <a
-              href={`https://wa.me/34699121023?text=${encodeURIComponent(ctaWhatsappMessage)}`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(ctaWhatsappMessage)}`}
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-3 px-8 py-4 bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold rounded-2xl transition-all hover:scale-105 hover:shadow-[0_8px_30px_rgba(37,211,102,0.4)]"
             >

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useLocale } from 'next-intl';
 import { Link } from '@/lib/navigation';
+import { log } from '@/lib/logger';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -714,7 +715,7 @@ export default function OpinionesClient() {
           setTotalReviews(googleCount);
         }
       } catch (error) {
-        console.error('Error loading reviews:', error);
+        log.error('Error loading reviews', error);
       } finally {
         setLoading(false);
       }

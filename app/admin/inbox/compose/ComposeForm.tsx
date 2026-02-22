@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { EVENT_TYPE_LABELS } from '@/lib/constants';
 
 interface Lead {
   id: string;
@@ -38,15 +39,6 @@ interface Props {
   initialTemplate?: string;
 }
 
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Casament',
-  BIRTHDAY: '🎂 Aniversari',
-  CORPORATE: '🎯 Corporatiu',
-  COMMUNION: '⛪ Comunió',
-  BAPTISM: '👶 Bateig',
-  PRIVATE_PARTY: '🎉 Festa',
-  OTHER: '📋 Altre',
-};
 
 export default function ComposeForm({ leads, packs, initialCustomer, initialTemplate }: Props) {
   const router = useRouter();

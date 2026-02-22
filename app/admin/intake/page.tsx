@@ -178,7 +178,7 @@ export default function IntakePage() {
         priority: form.priority,
       };
 
-      const res = await fetch('/api/admin/leads-new', {
+      const res = await fetch('/api/admin/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

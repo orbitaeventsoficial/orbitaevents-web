@@ -3,6 +3,7 @@
 import caMessages from '@/messages/ca.json';
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
+import { SITE_CONFIG } from '@/app/config/site-config';
 
 export default function GlobalError({
   error,
@@ -22,7 +23,7 @@ export default function GlobalError({
       <body className="bg-black text-white">
         <div className="flex min-h-screen items-center justify-center px-6 py-16">
           <div className="max-w-md text-center">
-            <p className="text-sm uppercase tracking-[0.2em] text-white/50">Òrbita Events</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-white/50">{SITE_CONFIG.business.name}</p>
             <h1 className="mt-4 text-3xl font-semibold">{t.title}</h1>
             <p className="mt-3 text-white/70">
               {t.defaultMessage}

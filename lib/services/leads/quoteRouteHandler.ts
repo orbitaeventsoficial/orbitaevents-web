@@ -1,5 +1,5 @@
 /**
- * Lead quote handlers (shared by legacy and leads-new routes)
+ * Lead quote handlers (shared by legacy and leads routes)
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { log } from '@/lib/logger';
@@ -135,7 +135,7 @@ export async function handleLeadQuoteGet(req: NextRequest, leadId: string, depre
 
     if (deprecated) {
       response.headers.set('x-api-deprecated', 'true');
-      response.headers.set('x-api-replacement', `/api/admin/leads-new/${leadId}/quote`);
+      response.headers.set('x-api-replacement', `/api/admin/leads/${leadId}/quote`);
     }
 
     return response;
@@ -202,7 +202,7 @@ export async function handleLeadQuotePost(req: NextRequest, leadId: string, depr
       query.set('customHours', String(body.customHours));
     }
 
-    const quoteUrl = `${baseUrl}/api/admin/leads-new/${leadId}/quote?${query.toString()}`;
+    const quoteUrl = `${baseUrl}/api/admin/leads/${leadId}/quote?${query.toString()}`;
     const documentTitle = `Pressupost ${quoteNumber}`;
 
     await prisma.leadDocument.create({
@@ -250,7 +250,7 @@ export async function handleLeadQuotePost(req: NextRequest, leadId: string, depr
 
     if (deprecated) {
       response.headers.set('x-api-deprecated', 'true');
-      response.headers.set('x-api-replacement', `/api/admin/leads-new/${leadId}/quote`);
+      response.headers.set('x-api-replacement', `/api/admin/leads/${leadId}/quote`);
     }
 
     return response;

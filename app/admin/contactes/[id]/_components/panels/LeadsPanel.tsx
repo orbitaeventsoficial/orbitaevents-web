@@ -1,26 +1,6 @@
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
 import Link from 'next/link';
-
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Casament',
-  BIRTHDAY: '🎂 Aniversari',
-  CORPORATE: '🎯 Corporatiu',
-  COMMUNION: '⛪ Comunió',
-  BAPTISM: '👶 Bateig',
-  GRADUATION: '🎓 Graduació',
-  ANNIVERSARY: '🎉 Celebració',
-  PRIVATE_PARTY: '🎵 Festa privada',
-  OTHER: '📋 Altre',
-};
-
-const STATUS_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
-  NEW: { bg: 'bg-blue-500/20', text: 'text-blue-300', label: 'Nova entrada' },
-  CONTACTED: { bg: 'bg-yellow-500/20', text: 'text-yellow-300', label: 'Contactat' },
-  QUOTE_SENT: { bg: 'bg-purple-500/20', text: 'text-purple-300', label: 'Pressupost enviat' },
-  NEGOTIATING: { bg: 'bg-orange-500/20', text: 'text-orange-300', label: 'Negociació' },
-  WON: { bg: 'bg-green-500/20', text: 'text-green-300', label: 'Guanyat' },
-  LOST: { bg: 'bg-slate-500/20', text: 'text-slate-300', label: 'Perdut' },
-};
+import { EVENT_TYPE_LABELS, LEAD_STATUS_CONFIG as STATUS_CONFIG } from '@/lib/constants';
 
 export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
   return (

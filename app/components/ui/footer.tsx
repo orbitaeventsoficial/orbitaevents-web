@@ -6,7 +6,7 @@
 "use client";
 
 import { Link, usePathname } from '@/lib/navigation';
-import { SITE_CONFIG } from '@/config/site-config';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
@@ -93,6 +93,8 @@ const RECURSOS_LINKS = [
   { nameKey: 'portfolio', href: '/portfolio' },
   { nameKey: 'about', href: '/about' },
   { nameKey: 'reviews', href: '/opiniones' },
+  { nameKey: 'faq', href: '/faq' },
+  { nameKey: 'blog', href: '/blog' },
 ];
 
 const LEGAL_LINKS = [
@@ -238,7 +240,7 @@ export default function Footer() {
         {/* MAIN FOOTER CONTENT                                              */}
         {/* ════════════════════════════════════════════════════════════════ */}
         <div className="py-16">
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-8">
 
             {/* ════════════════════════════════════════════════════════════ */}
             {/* COLUMN 1: BRAND & CONTACT                                    */}
@@ -356,7 +358,30 @@ export default function Footer() {
             </div>
 
             {/* ════════════════════════════════════════════════════════════ */}
-            {/* COLUMN 4: CONTACTE & CTA                                     */}
+            {/* COLUMN 4: RECURSOS                                             */}
+            {/* ════════════════════════════════════════════════════════════ */}
+            <div>
+              <h3 className="text-white font-bold text-lg mb-5 flex items-center gap-2">
+                <span className="w-1.5 h-6 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-full" />
+                {t('sections.resources')}
+              </h3>
+              <ul className="space-y-3">
+                {RECURSOS_LINKS.map((link) => (
+                  <li key={link.nameKey}>
+                    <Link
+                      href={link.href}
+                      onClick={() => handleLinkClick('recursos', link.nameKey)}
+                      className="text-white/60 hover:text-blue-400 text-sm transition-colors inline-flex items-center gap-2 group"
+                    >
+                      {tFooterLinks(`resources.${link.nameKey}`)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* ════════════════════════════════════════════════════════════ */}
+            {/* COLUMN 5: CONTACTE & CTA                                     */}
             {/* ════════════════════════════════════════════════════════════ */}
             <div>
               <h3 className="text-white font-bold text-lg mb-5 flex items-center gap-2">

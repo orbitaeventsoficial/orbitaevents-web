@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Pencil, Trash2, Plus } from 'lucide-react';
 import { log } from '@/lib/logger';
 
 interface BlogPost {
@@ -129,7 +129,7 @@ export default function BlogAdminPage() {
             type="button"
             className="flex items-center gap-2 rounded-xl px-4 py-2 text-white font-medium shadow-lg transition-colors"
           >
-            <PlusIcon className="h-5 w-5" />
+            <Plus className="h-5 w-5" />
             Nou post
           </button>
         </div>
@@ -246,7 +246,7 @@ export default function BlogAdminPage() {
                             className="rounded-lg p-2 transition-colors"
                             title="Editar"
                           >
-                            <PencilIcon className="h-5 w-5" />
+                            <Pencil className="h-5 w-5" />
                           </button>
                           <button
                             onClick={() => handleDelete(post.id)}
@@ -254,7 +254,7 @@ export default function BlogAdminPage() {
                             className="rounded-lg p-2 transition-colors"
                             title="Eliminar"
                           >
-                            <TrashIcon className="h-5 w-5" />
+                            <Trash2 className="h-5 w-5" />
                           </button>
                         </div>
                       </td>

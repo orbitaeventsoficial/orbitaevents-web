@@ -488,7 +488,7 @@ export default function SensorialClient() {
           transition={{ delay: 1 }}
         >
           <motion.p
-            className="text-3xl sm:text-5xl font-light text-white/50"
+            className="text-3xl sm:text-5xl font-normal text-white/50"
             animate={{ opacity: [0.2, 0.4, 0.2] }}
             transition={{ duration: 4, repeat: Infinity }}
           >

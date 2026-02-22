@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { SITE_CONFIG } from '@/app/config/site-config';
-import { EVENT_TYPE_LABELS } from '@/lib/constants/labels';
+import { getEventLabel } from '@/lib/constants';
 import { log } from '@/lib/logger';
 
 interface Review {
@@ -192,10 +192,10 @@ export default function ReviewsSection({
               </div>
               
               {/* Event Type Badge */}
-              {review.eventType && EVENT_TYPE_LABELS[review.eventType] && (
+              {review.eventType && getEventLabel(review.eventType) !== review.eventType && (
                 <div className="mb-3">
                   <span className="text-xs px-2 py-1 bg-amber-500/20 text-amber-400 rounded-full">
-                    {EVENT_TYPE_LABELS[review.eventType]}
+                    {getEventLabel(review.eventType)}
                   </span>
                 </div>
               )}

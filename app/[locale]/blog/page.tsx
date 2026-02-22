@@ -6,6 +6,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/lib/navigation';
 import Image from 'next/image';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import BlogTracking from '@/app/components/blog/BlogTracking';
 
 export const revalidate = 3600;
@@ -145,7 +146,47 @@ export default async function BlogPage({ params }: { params: { locale: string } 
   const t = await getTranslations({ locale, namespace: 'blog' });
   const posts = await getPosts(locale);
 
+  // JSON-LD CollectionPage schema for blog index
+  const canonicalUrl = `https://orbitaevents.com/${locale}/blog`;
+  const collectionJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: t('meta.title'),
+    description: t('meta.description'),
+    url: canonicalUrl,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': canonicalUrl,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_CONFIG.business.name,
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://orbitaevents.com/img/orbitawordmark.svg',
+      },
+    },
+    ...(posts.length > 0
+      ? {
+          mainEntity: {
+            '@type': 'ItemList',
+            itemListElement: posts.map((post, index) => ({
+              '@type': 'ListItem',
+              position: index + 1,
+              url: `https://orbitaevents.com/${locale}/blog/${post.slug}`,
+              name: post.translations[0]?.title || post.slug,
+            })),
+          },
+        }
+      : {}),
+  };
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+      />
     <main className="min-h-screen bg-[#0A0A0A]">
       <BlogTracking page="index" />
       {/* Hero */}
@@ -212,5 +253,6 @@ export default async function BlogPage({ params }: { params: { locale: string } 
         )}
       </section>
     </main>
+    </>
   );
 }

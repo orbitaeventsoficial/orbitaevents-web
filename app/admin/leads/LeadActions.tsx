@@ -31,7 +31,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
 
     setIsDeleting(true);
     try {
-      const res = await fetch(`/api/admin/leads-new/${leadId}`, {
+      const res = await fetch(`/api/admin/leads/${leadId}`, {
         method: 'DELETE',
       });
 
@@ -52,7 +52,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
     if (statusUpdating || nextStatus === currentStatus) return;
     setStatusUpdating(true);
     try {
-      const res = await fetch(`/api/admin/leads-new/${leadId}/status`, {
+      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),
@@ -73,7 +73,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
     if (priorityUpdating || nextPriority === currentPriority) return;
     setPriorityUpdating(true);
     try {
-      const res = await fetch(`/api/admin/leads-new/${leadId}`, {
+      const res = await fetch(`/api/admin/leads/${leadId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priority: nextPriority }),

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Link } from '@/lib/navigation';
-import { SITE_CONFIG } from '@/config/site-config';
+import { SITE_CONFIG } from '@/app/config/site-config';
 import { Ghost, Skull, Moon, Sparkles, Star, CheckCircle, Calendar, MessageCircle, ArrowRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 

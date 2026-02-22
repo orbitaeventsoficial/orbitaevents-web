@@ -19,7 +19,7 @@ export default function LeadQuickPriority({
     if (saving || nextPriority === currentPriority) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/leads-new/${leadId}`, {
+      const res = await fetch(`/api/admin/leads/${leadId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priority: nextPriority }),

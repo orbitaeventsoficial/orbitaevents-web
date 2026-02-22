@@ -51,17 +51,38 @@ export default async function FAQPage({ params }: { params: { locale: string } }
     };
   });
 
+  // Build FAQ schema for SEO
+  const allFaqs = categoryData.flatMap(cat => cat.faqs);
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: allFaqs.map(faq => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
-    <FAQClient
-      badge={t('badge')}
-      title={t('title')}
-      titleHighlight={t('titleHighlight')}
-      subtitle={t('subtitle')}
-      ctaQuestion={t('cta.question')}
-      ctaButton={t('cta.button')}
-      ctaWhatsappMessage={t('cta.whatsappMessage')}
-      ctaResponseTime={t('cta.responseTime')}
-      categories={categoryData}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <FAQClient
+        badge={t('badge')}
+        title={t('title')}
+        titleHighlight={t('titleHighlight')}
+        subtitle={t('subtitle')}
+        ctaQuestion={t('cta.question')}
+        ctaButton={t('cta.button')}
+        ctaWhatsappMessage={t('cta.whatsappMessage')}
+        ctaResponseTime={t('cta.responseTime')}
+        categories={categoryData}
+      />
+    </>
   );
 }

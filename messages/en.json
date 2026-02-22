@@ -264,6 +264,14 @@
       "responseTime": "Response <2h",
       "noCommitment": "No commitment",
       "respondsIn": "Responds in <2h"
+    },
+    "floatingCTA": {
+      "offHoursAfter": "We close at 8pm — we'll get back to you tomorrow at 8am 👋",
+      "offHoursBefore": "We open today at 8am — write to us! 💬",
+      "responseTime": "Responds in less than 2h 💬",
+      "whatsappGreeting": "Hi! I'd like information about your event services.",
+      "whatsappShort": "Hi! I'd like information",
+      "callNow": "Call us now"
     }
   },
   "hero": {
@@ -1465,7 +1473,9 @@
       "blog": "blog",
       "configurator": "Configurator",
       "sensorial": "Sensory Space",
-      "monMagic": "Magic World Theme"
+      "monMagic": "Magic World Theme",
+      "resources": "Downloads",
+      "search": "Search"
     },
     "legal": {
       "privacy": "Privacy Policy",
@@ -3531,6 +3541,8 @@
     }
   },
   "sensorial": {
+    "metaTitle": "Sensory Space | Òrbita Events",
+    "metaDescription": "Interactive digital space designed for people with sensory sensitivity. Explore themes, sounds and interactive elements.",
     "loading": "Preparing a special space for you...",
     "grabElements": "Grab items with your finger or mouse!",
     "brandName": "Orbita Events",

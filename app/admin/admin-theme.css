@@ -19,6 +19,9 @@ html.admin-mode {
   --at-success: #2f7d44;
   --at-warning: #b7741f;
   --at-danger: #7f2f3a;
+
+  --at-contacted: #636b75;
+  --at-quote: #755e3f;
 }
 
 html.admin-mode .admin-layout-shell {
@@ -150,12 +153,12 @@ html.admin-mode .admin-main-shell .admin-leads-tone--new {
   border-color: var(--at-info) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--contacted {
-  background: color-mix(in oklab, #636b75 25%, var(--at-panel) 75%) !important;
-  border-color: #636b75 !important;
+  background: color-mix(in oklab, var(--at-contacted) 25%, var(--at-panel) 75%) !important;
+  border-color: var(--at-contacted) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--quote {
-  background: color-mix(in oklab, #755e3f 25%, var(--at-panel) 75%) !important;
-  border-color: #755e3f !important;
+  background: color-mix(in oklab, var(--at-quote) 25%, var(--at-panel) 75%) !important;
+  border-color: var(--at-quote) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--negotiating {
   background: color-mix(in oklab, var(--at-warning) 24%, var(--at-panel) 76%) !important;

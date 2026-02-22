@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import ContactFormComplete from '@/app/components/forms/ContactFormComplete';
+import { WHATSAPP_NUMBER } from '@/lib/constants';
 import CalendarioUrgencia from '@/app/components/ui/CalendarioUrgencia';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -101,7 +102,7 @@ function ContactContent() {
 
               {/* WhatsApp quick contact */}
               <a
-                href={`https://wa.me/34699121023?text=${encodeURIComponent(t('page.whatsappMessage'))}`}
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('page.whatsappMessage'))}`}
                 target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 px-6 py-3 bg-[#25D366] hover:bg-[#20BD5A] rounded-full transition-all hover:shadow-[0_8px_30px_rgba(37,211,102,0.3)] text-white font-semibold text-sm"
               >

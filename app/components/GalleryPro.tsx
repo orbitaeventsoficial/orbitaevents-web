@@ -71,7 +71,7 @@ export function SimpleGallery({ images }: { images: GalleryImage[] }) {
           onClick={() => setSelectedImage(null)}
         >
           <button
-            className="absolute top-4 right-4 text-white text-4xl font-light hover:text-orange-500 transition-colors"
+            className="absolute top-4 right-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors"
             onClick={() => setSelectedImage(null)}
             aria-label="Cerrar"
           >
@@ -81,7 +81,7 @@ export function SimpleGallery({ images }: { images: GalleryImage[] }) {
           {/* Navegación anterior */}
           {selectedImage > 0 && (
             <button
-              className="absolute left-4 text-white text-4xl font-light hover:text-orange-500 transition-colors"
+              className="absolute left-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedImage(selectedImage - 1);
@@ -111,7 +111,7 @@ export function SimpleGallery({ images }: { images: GalleryImage[] }) {
           {/* Navegación siguiente */}
           {selectedImage < images.length - 1 && (
             <button
-              className="absolute right-4 text-white text-4xl font-light hover:text-orange-500 transition-colors"
+              className="absolute right-4 text-white text-4xl font-normal hover:text-orange-500 transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedImage(selectedImage + 1);

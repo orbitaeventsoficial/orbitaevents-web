@@ -31,7 +31,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     updated: 'Áreas de cobertura actualizadas correctamente',
     updatingAreas: 'Error actualizando áreas de cobertura',
     label: 'Áreas de Cobertura',
-    description: 'Ciudades y provincias donde opera Órbita Events',
+    description: 'Ciudades y provincias donde opera Òrbita Events',
   },
   en: {
     parsingAreas: 'Error parsing coverage areas:',

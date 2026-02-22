@@ -8,8 +8,13 @@
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { escapeHtml } from '@/lib/utils/sanitize';
-import { EVENT_TYPE_LABELS, SOURCE_LABELS } from '@/lib/constants/labels';
+import { getEventLabel, SOURCE_LABELS } from '@/lib/constants';
 import { log } from '@/lib/logger';
+
+/** Case-insensitive label lookup for source labels */
+function lookupSource(key: string): string {
+  return SOURCE_LABELS[key] || SOURCE_LABELS[key.toUpperCase()] || key;
+}
 
 // ============================================
 // TIPUS
@@ -87,8 +92,8 @@ async function sendLeadEmailNotification(lead: LeadNotificationData): Promise<No
       return { success: false, channel: 'email', error: 'SMTP no configurat' };
     }
 
-    const eventLabel = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
-    const sourceLabel = SOURCE_LABELS[lead.source] || lead.source;
+    const eventLabel = getEventLabel(lead.eventType);
+    const sourceLabel = lookupSource(lead.source);
     const timestamp = new Date().toLocaleString('es-ES', {
       timeZone: 'Europe/Madrid',
       dateStyle: 'full',
@@ -131,7 +136,7 @@ async function sendLeadWhatsAppNotification(lead: LeadNotificationData): Promise
     // Si no, generem un webhook que pot obrir WhatsApp
     // Això és útil per notificar via un servei extern com IFTTT, Make, etc.
     if (process.env.WHATSAPP_WEBHOOK_URL) {
-      const eventLabel = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
+      const eventLabel = getEventLabel(lead.eventType);
 
       const message = `🚀 *NOU LEAD ÒRBITA*
 
@@ -187,7 +192,7 @@ ${lead.estimatedPrice ? `💵 Estimat: ${lead.estimatedPrice}€` : ''}
 // WhatsApp Business API (Cloud API)
 async function sendWhatsAppAPI(lead: LeadNotificationData): Promise<NotificationResult> {
   try {
-    const eventLabel = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
+    const eventLabel = getEventLabel(lead.eventType);
 
     // Format per WhatsApp Business API template
     const response = await fetch(`${process.env.WHATSAPP_API_URL}/messages`, {
@@ -225,7 +230,7 @@ async function sendWhatsAppAPI(lead: LeadNotificationData): Promise<Notification
 
 // Generar link de WhatsApp per notificació manual
 function generateWhatsAppLink(lead: LeadNotificationData): string {
-  const eventLabel = EVENT_TYPE_LABELS[lead.eventType] || lead.eventType;
+  const eventLabel = getEventLabel(lead.eventType);
   const message = `🚀 NOU LEAD: ${lead.name} - ${eventLabel}
 📱 ${lead.phone || 'Sense telèfon'}
 📧 ${lead.email}

@@ -118,7 +118,7 @@ function ValoracioContent() {
     <div className="min-h-screen bg-gradient-to-b from-black via-neutral-900 to-black text-white">
       {/* Header */}
       <header className="py-8 text-center border-b border-amber-500/20">
-        <h1 className="text-3xl font-light">
+        <h1 className="text-3xl font-normal">
           <span className="font-bold text-amber-400">ÒRBITA</span> EVENTS
         </h1>
         <p className="text-neutral-400 mt-2">La teva opinió és molt important per a nosaltres</p>

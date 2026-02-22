@@ -129,7 +129,7 @@ export default function InfoTooltip({ text, alwaysEnabled = false, side = 'right
     <div
       ref={panelRef}
       role="tooltip"
-      className="fixed z-[99999] w-[320px] max-w-[calc(100vw-24px)] rounded-xl border border-white/10 bg-[#0b0f14] px-3 py-2 text-left text-xs leading-4 text-white shadow-2xl"
+      className="fixed z-[99999] w-[320px] max-w-[calc(100vw-24px)] rounded-xl border border-white/10 bg-[var(--at-bg)] px-3 py-2 text-left text-xs leading-4 text-white shadow-2xl"
       style={{
         top: pos?.top ?? -9999,
         left: pos?.left ?? -9999,

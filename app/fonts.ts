@@ -20,7 +20,7 @@ export const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   fallback: ["system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
   preload: true,
 });
@@ -33,7 +33,7 @@ export const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-display",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["500", "600", "700"],
   fallback: ["system-ui", "sans-serif"],
   preload: true,
 });
@@ -46,7 +46,7 @@ export const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-mono",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "700"],
   fallback: ["Consolas", "Monaco", "monospace"],
   preload: false, // No crítica per first paint
 });

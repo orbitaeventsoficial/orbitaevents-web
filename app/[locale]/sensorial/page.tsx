@@ -4,8 +4,6 @@
 // Un espai digital dissenyat per persones amb sensibilitat
 // sensorial. Creat amb amor i respecte.
 // ============================================================
-// Copiar a: app/[locale]/sensorial/page.tsx
-// ============================================================
 
 'use client';
 

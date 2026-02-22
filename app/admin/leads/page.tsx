@@ -23,17 +23,7 @@ const STATUS_CONFIG = Object.fromEntries(
   ])
 ) as Record<string, { label: string; badgeClass: string; chipClass: string }>;
 
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: '💍 Casament',
-  BIRTHDAY: '🎂 Aniversari',
-  CORPORATE: '🎯 Corporatiu',
-  COMMUNION: '⛪ Comunió',
-  BAPTISM: '👶 Bateig',
-  GRADUATION: '🎓 Graduació',
-  ANNIVERSARY: '🎉 Celebració',
-  PRIVATE_PARTY: '🎵 Festa privada',
-  OTHER: '📋 Altre',
-};
+import { EVENT_TYPE_LABELS, SOURCE_LABELS } from '@/lib/constants';
 
 const PRIORITY_CONFIG = Object.fromEntries(
   PRIORITY_COLOR_OPTIONS.map((option) => [
@@ -42,17 +32,6 @@ const PRIORITY_CONFIG = Object.fromEntries(
   ])
 ) as Record<string, { label: string; badgeClass: string; chipClass: string }>;
 
-const SOURCE_LABELS: Record<string, string> = {
-  WEBSITE: 'Web',
-  CONFIGURATOR: 'Configurador',
-  PHONE: 'Telèfon',
-  WHATSAPP: 'WhatsApp',
-  INSTAGRAM: 'Instagram',
-  WALLAPOP: 'Wallapop',
-  REFERRAL: 'Boca-orella',
-  GOOGLE: 'Google',
-  OTHER: 'Altre',
-};
 
 function buildQuery(filters: {
   status: string[];

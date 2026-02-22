@@ -236,7 +236,7 @@ export default function HeroPortalLogo({
 
           {/* Texto "LA MÀGIA COMENÇA" */}
           <motion.p
-            className="absolute font-light tracking-[0.3em] uppercase text-center"
+            className="absolute font-normal tracking-[0.3em] uppercase text-center"
             style={{
               fontSize: config.textSize,
               top: isMobile ? '24%' : '15%',
@@ -260,7 +260,7 @@ export default function HeroPortalLogo({
           {/* Indicador de skip en móvil */}
           {isMobile && phase === 'text' && (
             <motion.p
-              className="absolute bottom-8 text-white/40 text-xs tracking-widest uppercase"
+              className="absolute bottom-8 text-white/60 text-xs tracking-widest uppercase"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.6 }}
               transition={{ delay: 0.3 }}

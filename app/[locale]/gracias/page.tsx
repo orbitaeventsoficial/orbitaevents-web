@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/lib/navigation';
 import { CheckCircle, Clock, MessageCircle } from 'lucide-react';
+import { WHATSAPP_NUMBER } from '@/lib/constants';
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const t = await getTranslations({ locale: params.locale, namespace: 'gracias' });
@@ -59,7 +60,7 @@ export default async function GraciasPage() {
               <h3 className="text-lg font-bold text-white">{t('urgent.title')}</h3>
             </div>
             <a
-              href="https://wa.me/34699121023?text=Hola,%20acabo%20de%20enviar%20el%20formulario"
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hola,%20acabo%20de%20enviar%20el%20formulario`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-green-400 hover:text-green-300 transition-colors inline-flex items-center gap-2"

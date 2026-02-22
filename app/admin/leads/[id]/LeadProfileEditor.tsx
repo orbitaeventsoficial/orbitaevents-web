@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import InfoTooltip from '../../components/InfoTooltip';
 import { ADMIN_HELP } from '../../help-content';
+import { LEAD_STATUS_LABELS as STATUS_LABELS, PRIORITY_LABELS, EVENT_TYPE_PLAIN as EVENT_TYPE_LABELS, SOURCE_LABELS } from '@/lib/constants';
 
 type LeadProfile = {
   id: string;
@@ -33,42 +34,6 @@ const STATUS_OPTIONS = ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING', 'WON', 
 const PRIORITY_OPTIONS = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
 const EVENT_TYPES = ['WEDDING', 'BIRTHDAY', 'CORPORATE', 'COMMUNION', 'BAPTISM', 'GRADUATION', 'ANNIVERSARY', 'PRIVATE_PARTY', 'OTHER'];
 const SOURCE_OPTIONS = ['WEBSITE', 'CONFIGURATOR', 'PHONE', 'WHATSAPP', 'INSTAGRAM', 'WALLAPOP', 'REFERRAL', 'GOOGLE', 'OTHER'];
-const STATUS_LABELS: Record<string, string> = {
-  NEW: 'Nou lead',
-  CONTACTED: 'Contactat',
-  QUOTE_SENT: 'Pressupost enviat',
-  NEGOTIATING: 'En negociació',
-  WON: 'Guanyat',
-  LOST: 'Perdut',
-};
-const PRIORITY_LABELS: Record<string, string> = {
-  LOW: 'Baixa',
-  MEDIUM: 'Mitjana',
-  HIGH: 'Alta',
-  URGENT: 'Urgent',
-};
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: 'Casament',
-  BIRTHDAY: 'Aniversari',
-  CORPORATE: 'Corporatiu',
-  COMMUNION: 'Comunió',
-  BAPTISM: 'Bateig',
-  GRADUATION: 'Graduació',
-  ANNIVERSARY: 'Aniversari',
-  PRIVATE_PARTY: 'Festa privada',
-  OTHER: 'Altre',
-};
-const SOURCE_LABELS: Record<string, string> = {
-  WEBSITE: 'Web',
-  CONFIGURATOR: 'Configurador',
-  PHONE: 'Telèfon',
-  WHATSAPP: 'WhatsApp',
-  INSTAGRAM: 'Instagram',
-  WALLAPOP: 'Wallapop',
-  REFERRAL: 'Recomanació',
-  GOOGLE: 'Google',
-  OTHER: 'Altres',
-};
 
 export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
   const router = useRouter();
@@ -112,7 +77,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
     setDeleting(true);
     setStatus(null);
     try {
-      const res = await fetch(`/api/admin/leads-new/${lead.id}`, {
+      const res = await fetch(`/api/admin/leads/${lead.id}`, {
         method: 'DELETE',
       });
       if (!res.ok) {
@@ -157,7 +122,7 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
         preferredLocale: form.preferredLocale || 'ca',
       };
 
-      const res = await fetch(`/api/admin/leads-new/${lead.id}`, {
+      const res = await fetch(`/api/admin/leads/${lead.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

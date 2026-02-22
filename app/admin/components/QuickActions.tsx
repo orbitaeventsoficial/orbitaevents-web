@@ -106,13 +106,13 @@ export default function QuickActions() {
   }
 
   return (
-    <section className="rounded-2xl border backdrop-blur-sm p-4">
+    <section className="rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-sky-500/12 via-cyan-500/10 to-emerald-500/12 backdrop-blur-sm p-4">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs uppercase">Accions ràpides</p>
           <p className="text-sm mt-1">Operacions freqüents</p>
         </div>
-        <Link href="/admin/emails" className="text-xs">
+        <Link href="/admin/emails" className="text-xs text-cyan-200 hover:text-cyan-100 transition-colors">
           Obre correus automàtics →
         </Link>
       </div>
@@ -120,13 +120,13 @@ export default function QuickActions() {
       <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           href="/admin/inbox/compose"
-          className="rounded-xl border px-3 py-2 text-xs"
+          className="rounded-xl border border-cyan-300/35 bg-gradient-to-r from-sky-500/20 to-cyan-500/20 px-3 py-2 text-xs"
         >
           ✉️ Nou email
         </Link>
         <Link
           href="/admin/leads"
-          className="rounded-xl border px-3 py-2 text-xs"
+          className="rounded-xl border border-cyan-300/35 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 px-3 py-2 text-xs"
         >
           👥 Veure entrades
         </Link>
@@ -134,7 +134,7 @@ export default function QuickActions() {
           type="button"
           onClick={runCron}
           disabled={loading}
-          className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60"
+          className="rounded-xl border border-emerald-300/35 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 px-3 py-2 text-xs disabled:opacity-60"
         >
           {loading ? '⏳ Executant...' : '⏱️ Executar post-event'}
         </button>
@@ -142,7 +142,7 @@ export default function QuickActions() {
           type="button"
           onClick={runAll}
           disabled={loading}
-          className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60"
+          className="rounded-xl border border-cyan-300/35 bg-gradient-to-r from-sky-500/25 via-cyan-500/25 to-emerald-500/25 px-3 py-2 text-xs disabled:opacity-60"
         >
           {loading ? '⏳ Executant...' : '🚀 Executar-ho tot (1 clic)'}
         </button>
@@ -150,7 +150,7 @@ export default function QuickActions() {
           type="button"
           onClick={runDailySummaryNow}
           disabled={loading}
-          className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60"
+          className="rounded-xl border border-cyan-300/35 bg-gradient-to-r from-blue-500/25 to-emerald-500/25 px-3 py-2 text-xs disabled:opacity-60"
         >
           {loading ? '⏳ Executant...' : '📊 Resum diari ara'}
         </button>

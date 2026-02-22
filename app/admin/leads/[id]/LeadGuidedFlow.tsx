@@ -106,7 +106,7 @@ export default function LeadGuidedFlow({
     setStatus(nextStatus);
 
     try {
-      const res = await fetch(`/api/admin/leads-new/${leadId}/status`, {
+      const res = await fetch(`/api/admin/leads/${leadId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),
@@ -137,7 +137,7 @@ export default function LeadGuidedFlow({
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 2);
     try {
-      const res = await fetch(`/api/admin/leads-new/${leadId}/tasks`, {
+      const res = await fetch(`/api/admin/leads/${leadId}/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

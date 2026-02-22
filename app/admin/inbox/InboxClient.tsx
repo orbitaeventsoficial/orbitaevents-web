@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useDeferredValue, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import DOMPurify from 'dompurify';
-import { EVENT_TYPE_LABELS } from '@/lib/constants/labels';
+import { getEventLabel } from '@/lib/constants';
 import { log } from '@/lib/logger';
 
 interface LeadData {
@@ -104,7 +104,7 @@ export default function InboxClient({
       type: 'lead' as const,
       from: lead.email,
       fromName: lead.name,
-      subject: `📋 ${EVENT_TYPE_LABELS[lead.eventType || ''] || 'Sol·licitud'}`,
+      subject: `📋 ${getEventLabel(lead.eventType || '', 'Sol·licitud')}`,
       preview: lead.message || 'Sense missatge',
       date: new Date(lead.createdAt),
       read: lead.status !== 'NEW',
@@ -528,7 +528,7 @@ export default function InboxClient({
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="">Tipus d&apos;event:</span>
-                      <p className="font-medium">{EVENT_TYPE_LABELS[selectedEmail.leadData.eventType || ''] || 'No especificat'}</p>
+                      <p className="font-medium">{getEventLabel(selectedEmail.leadData.eventType || '', 'No especificat')}</p>
                     </div>
                     {selectedEmail.leadData.eventDate && (
                       <div>

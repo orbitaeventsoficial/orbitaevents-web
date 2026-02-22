@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { log } from '@/lib/logger';
 
 type BookingStatus = 'PENDING' | 'CONFIRMED' | 'PREPARING' | 'COMPLETED' | 'CANCELLED';
 
@@ -26,8 +27,8 @@ export default function BookingStatusQuickActions({
       });
       if (!res.ok) throw new Error();
       router.refresh();
-    } catch {
-      // silent in compact dashboard control
+    } catch (err) {
+      log.error('Failed to update booking status', err);
     } finally {
       setSaving(false);
     }
