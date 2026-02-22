@@ -201,14 +201,14 @@ export default function IntakePage() {
   }, [form, duplicates]);
 
   return (
-    <div className="max-w-4xl space-y-6 pb-24 sm:pb-8">
+    <div className="admin-page-container space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
+          <h1 className="admin-page-title">
             Entrada ràpida
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="admin-page-subtitle mt-1">
             Crea una entrada des de qualsevol canal amb detecció de duplicats
           </p>
         </div>

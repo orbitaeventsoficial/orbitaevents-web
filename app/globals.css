@@ -3416,3 +3416,483 @@ html.admin-mode .admin-bottom-nav-marker { position: absolute; left: 50%; bottom
     padding: 0.75rem 1rem;
   }
 }
+
+/* Admin pages: shared titles and containers */
+html.admin-mode .admin-main-shell .admin-page-container {
+  width: 100%;
+  max-width: none;
+}
+html.admin-mode .admin-main-shell .admin-page-title {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.1vw, 1.95rem);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #f3f7ff;
+}
+html.admin-mode .admin-main-shell .admin-page-subtitle {
+  font-size: 0.96rem;
+  font-weight: 500;
+  color: #b8c6d8;
+}
+html.admin-mode .admin-main-shell :is(h1, h2, h3) {
+  color: #f3f7ff;
+  letter-spacing: -0.01em;
+}
+
+/* Leads tabs and pipeline tones (solid colors) */
+html.admin-mode .admin-main-shell .admin-leads-tab {
+  border-color: #4a5f7d;
+}
+html.admin-mode .admin-main-shell .admin-leads-tab--active {
+  background: #1f4f73;
+  border-color: #68a8da;
+  color: #e8f6ff;
+}
+html.admin-mode .admin-main-shell .admin-leads-tab--idle {
+  background: #2f2a43;
+  border-color: #675e8e;
+  color: #e7e2fb;
+}
+html.admin-mode .admin-main-shell .admin-leads-tab--idle:hover {
+  background: #3b3355;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone {
+  border-width: 1px;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--new {
+  background: #173a57;
+  border-color: #72add6;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--contacted {
+  background: #57401d;
+  border-color: #d4b279;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--quote {
+  background: #3d2f57;
+  border-color: #a992d3;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--negotiating {
+  background: #5a351b;
+  border-color: #d29f72;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--won {
+  background: #1f5b3d;
+  border-color: #7ed1a6;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--lost {
+  background: #562634;
+  border-color: #cf8c9e;
+}
+html.admin-mode .admin-main-shell .admin-leads-column-title,
+html.admin-mode .admin-main-shell .admin-leads-column-count,
+html.admin-mode .admin-main-shell .admin-leads-dropzone,
+html.admin-mode .admin-main-shell .admin-leads-column-chip {
+  color: #f4f8ff;
+}
+html.admin-mode .admin-main-shell .admin-leads-column-count {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(18, 25, 38, 0.45);
+}
+html.admin-mode .admin-main-shell .admin-leads-dropzone {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(15, 20, 30, 0.22);
+}
+html.admin-mode .admin-main-shell .admin-leads-column-chip {
+  background: rgba(0, 0, 0, 0.22);
+}
+html.admin-mode .admin-main-shell .admin-leads-card-tone {
+  border-width: 1px;
+}
+html.admin-mode .admin-main-shell .admin-leads-card-tone--new {
+  background: #133247;
+  border-color: #6ea2c6;
+}
+html.admin-mode .admin-main-shell .admin-leads-card-tone--contacted {
+  background: #4b3617;
+  border-color: #c7a56f;
+}
+html.admin-mode .admin-main-shell .admin-leads-card-tone--quote {
+  background: #35254a;
+  border-color: #9c88bf;
+}
+html.admin-mode .admin-main-shell .admin-leads-card-tone--negotiating {
+  background: #4b2c16;
+  border-color: #c89468;
+}
+html.admin-mode .admin-main-shell .admin-leads-card-tone--won {
+  background: #184a32;
+  border-color: #72c496;
+}
+html.admin-mode .admin-main-shell .admin-leads-card-tone--lost {
+  background: #47202b;
+  border-color: #c07c8f;
+}
+html.admin-mode .admin-main-shell .admin-leads-metric {
+  border-width: 1px;
+}
+html.admin-mode .admin-main-shell .admin-leads-metric--open {
+  background: #1f2937;
+  border-color: #576178;
+  color: #e5edf8;
+}
+html.admin-mode .admin-main-shell .admin-leads-metric--won {
+  background: #1f5b3d;
+  border-color: #7ed1a6;
+  color: #e9fff3;
+}
+html.admin-mode .admin-main-shell .admin-leads-metric--lost {
+  background: #5a2230;
+  border-color: #d28b9d;
+  color: #ffeef2;
+}
+html.admin-mode .admin-main-shell .admin-leads-metric--winrate {
+  background: #5a3b1e;
+  border-color: #d6b074;
+  color: #fff5e6;
+}
+html.admin-mode .admin-main-shell .admin-leads-metric-label {
+  opacity: 0.9;
+}
+
+/* CSS manager: force solid cards/buttons */
+html.admin-mode .admin-main-shell .admin-css-panel {
+  background: #1b2433;
+  border-color: #455974;
+}
+html.admin-mode .admin-main-shell .admin-css-editor {
+  background: #111a27;
+  border-color: #3f516a;
+  color: #edf4ff;
+}
+html.admin-mode .admin-main-shell .admin-css-editor::placeholder {
+  color: #8fa5c0;
+}
+html.admin-mode .admin-main-shell .admin-css-palette-card {
+  background: #202b3d;
+  border-color: #4a5f7d;
+}
+html.admin-mode .admin-main-shell .admin-css-btn {
+  font-weight: 700;
+}
+html.admin-mode .admin-main-shell .admin-css-btn--neutral {
+  background: #2a3a52;
+  border-color: #4e6890;
+  color: #edf4ff;
+}
+html.admin-mode .admin-main-shell .admin-css-btn--neutral:hover {
+  background: #344865;
+}
+html.admin-mode .admin-main-shell .admin-css-btn--save {
+  background: #1f5c43;
+  border-color: #5fbd8c;
+  color: #e8fff3;
+}
+html.admin-mode .admin-main-shell .admin-css-btn--save:hover {
+  background: #287652;
+}
+
+/* Admin theme tokens: consumed by CSS PRO palettes */
+html.admin-mode .admin-layout-shell {
+  --admin-font-family: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --admin-font-size-base: clamp(15px, 0.88vw, 16px);
+  --admin-line-height: 1.45;
+  --admin-surface: #0f1c33;
+  --admin-panel: #1b2e4a;
+  --admin-border: #3f5f88;
+  --admin-text: #f3f7ff;
+  --admin-muted: #a8bbd5;
+  --admin-primary: #67d6ff;
+  --admin-success: #64e8b0;
+  --admin-warning: #ffcf6b;
+  --admin-danger: #ff9bb6;
+}
+
+html.admin-mode .admin-main-shell,
+html.admin-mode .admin-main-shell :is(input, select, textarea, button, a, p, span, li, td, th, label, dt, dd) {
+  font-family: var(--admin-font-family) !important;
+}
+html.admin-mode .admin-main-shell {
+  font-size: var(--admin-font-size-base) !important;
+  line-height: var(--admin-line-height) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell h1 {
+  font-size: clamp(1.7rem, 1.5rem + 0.65vw, 2.2rem) !important;
+  line-height: 1.14 !important;
+  font-weight: 750 !important;
+}
+html.admin-mode .admin-main-shell h2 {
+  font-size: clamp(1.25rem, 1.15rem + 0.3vw, 1.55rem) !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+}
+html.admin-mode .admin-main-shell h3 {
+  font-size: clamp(1.05rem, 1rem + 0.15vw, 1.2rem) !important;
+  line-height: 1.25 !important;
+  font-weight: 650 !important;
+}
+html.admin-mode .admin-main-shell :is(p, label, td, th, li, dd, dt) {
+  font-size: clamp(0.9rem, 0.86rem + 0.08vw, 0.98rem) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-sidebar-logo-wrap,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar-logo,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar-foot-avatar,
+html.admin-mode .admin-layout-shell .admin-desktop-user-avatar,
+html.admin-mode .admin-layout-shell .admin-bottom-nav-badge {
+  background: color-mix(in oklab, var(--admin-primary) 45%, var(--admin-panel) 55%) !important;
+  border-color: color-mix(in oklab, var(--admin-primary) 65%, white 35%) !important;
+}
+
+html.admin-mode .admin-main-shell .admin-page-title,
+html.admin-mode .admin-main-shell :is(h1, h2, h3) {
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-page-subtitle {
+  color: var(--admin-muted) !important;
+}
+
+html.admin-mode .admin-main-shell .admin-leads-tab--active {
+  background: color-mix(in oklab, var(--admin-primary) 35%, var(--admin-panel) 65%) !important;
+  border-color: color-mix(in oklab, var(--admin-primary) 72%, white 28%) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-leads-tab--idle {
+  background: color-mix(in oklab, var(--admin-panel) 86%, #000 14%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-leads-tab--idle:hover {
+  background: color-mix(in oklab, var(--admin-panel) 74%, var(--admin-primary) 26%) !important;
+}
+
+html.admin-mode .admin-main-shell .admin-css-panel,
+html.admin-mode .admin-main-shell .admin-css-palette-card {
+  background: var(--admin-panel) !important;
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell .admin-css-editor {
+  background: color-mix(in oklab, var(--admin-surface) 82%, #000 18%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-css-btn--neutral {
+  background: color-mix(in oklab, var(--admin-panel) 80%, var(--admin-primary) 20%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-css-btn--neutral:hover {
+  background: color-mix(in oklab, var(--admin-panel) 62%, var(--admin-primary) 38%) !important;
+}
+html.admin-mode .admin-main-shell .admin-css-btn--save {
+  background: color-mix(in oklab, var(--admin-success) 52%, var(--admin-panel) 48%) !important;
+  border-color: var(--admin-success) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-css-btn--save:hover {
+  background: color-mix(in oklab, var(--admin-success) 65%, var(--admin-panel) 35%) !important;
+}
+
+/* Control room cards follow active palette */
+html.admin-mode .admin-shell .admin-control-room .admin-cr-panel,
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card,
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card-head,
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card {
+  background: var(--admin-panel) !important;
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card:hover {
+  border-color: var(--admin-primary) !important;
+}
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card-title,
+html.admin-mode .admin-shell .admin-control-room .admin-cr-title,
+html.admin-mode .admin-shell .admin-control-room .admin-cr-h2 {
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card-subtitle,
+html.admin-mode .admin-shell .admin-control-room .admin-cr-subtitle,
+html.admin-mode .admin-shell .admin-control-room .admin-cr-small,
+html.admin-mode .admin-shell .admin-control-room .admin-cr-meta {
+  color: var(--admin-muted) !important;
+}
+
+/* Global admin color bridge: utility classes -> theme vars */
+html.admin-mode .admin-main-shell [class*='bg-gradient'],
+html.admin-mode .admin-main-shell [class*='from-'],
+html.admin-mode .admin-main-shell [class*='to-'] {
+  background-image: none !important;
+}
+
+html.admin-mode .admin-main-shell :is(
+  [class*='text-cyan-'],
+  [class*='text-blue-'],
+  [class*='text-sky-'],
+  [class*='text-indigo-'],
+  [class*='text-violet-'],
+  [class*='text-purple-']
+) {
+  color: var(--admin-primary) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='text-emerald-'],
+  [class*='text-green-'],
+  [class*='text-teal-']
+) {
+  color: var(--admin-success) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='text-amber-'],
+  [class*='text-yellow-'],
+  [class*='text-orange-']
+) {
+  color: var(--admin-warning) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='text-rose-'],
+  [class*='text-red-'],
+  [class*='text-fuchsia-'],
+  [class*='text-pink-']
+) {
+  color: var(--admin-danger) !important;
+}
+
+html.admin-mode .admin-main-shell :is(
+  [class*='border-cyan-'],
+  [class*='border-blue-'],
+  [class*='border-sky-'],
+  [class*='border-indigo-'],
+  [class*='border-violet-'],
+  [class*='border-purple-']
+) {
+  border-color: color-mix(in oklab, var(--admin-primary) 72%, white 28%) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='border-emerald-'],
+  [class*='border-green-'],
+  [class*='border-teal-']
+) {
+  border-color: color-mix(in oklab, var(--admin-success) 72%, white 28%) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='border-amber-'],
+  [class*='border-yellow-'],
+  [class*='border-orange-']
+) {
+  border-color: color-mix(in oklab, var(--admin-warning) 72%, white 28%) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='border-rose-'],
+  [class*='border-red-'],
+  [class*='border-fuchsia-'],
+  [class*='border-pink-']
+) {
+  border-color: color-mix(in oklab, var(--admin-danger) 72%, white 28%) !important;
+}
+
+html.admin-mode .admin-main-shell :is(
+  [class*='bg-cyan-'],
+  [class*='bg-blue-'],
+  [class*='bg-sky-'],
+  [class*='bg-indigo-'],
+  [class*='bg-violet-'],
+  [class*='bg-purple-']
+) {
+  background: color-mix(in oklab, var(--admin-primary) 15%, var(--admin-panel) 85%) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='bg-emerald-'],
+  [class*='bg-green-'],
+  [class*='bg-teal-']
+) {
+  background: color-mix(in oklab, var(--admin-success) 15%, var(--admin-panel) 85%) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='bg-amber-'],
+  [class*='bg-yellow-'],
+  [class*='bg-orange-']
+) {
+  background: color-mix(in oklab, var(--admin-warning) 16%, var(--admin-panel) 84%) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='bg-rose-'],
+  [class*='bg-red-'],
+  [class*='bg-fuchsia-'],
+  [class*='bg-pink-']
+) {
+  background: color-mix(in oklab, var(--admin-danger) 16%, var(--admin-panel) 84%) !important;
+}
+
+html.admin-mode .admin-main-shell :is(
+  [class*='text-slate-50'],
+  [class*='text-slate-100'],
+  [class*='text-slate-200']
+) {
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='text-slate-300'],
+  [class*='text-slate-400'],
+  [class*='text-slate-500'],
+  [class*='text-slate-600']
+) {
+  color: var(--admin-muted) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='border-slate-'],
+  [class*='border-white/10'],
+  [class*='border-white\\/10']
+) {
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell :is(
+  [class*='bg-slate-'],
+  [class*='bg-white/5'],
+  [class*='bg-white\\/5'],
+  [class*='bg-white/10'],
+  [class*='bg-white\\/10']
+) {
+  background: color-mix(in oklab, var(--admin-panel) 90%, var(--admin-surface) 10%) !important;
+}
+
+/* Sidebar selected state and search controls must follow theme */
+html.admin-mode .admin-layout-shell .admin-nav-item--active {
+  background: color-mix(in oklab, var(--admin-primary) 28%, var(--admin-panel) 72%) !important;
+  border-color: color-mix(in oklab, var(--admin-primary) 70%, white 30%) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-layout-shell .admin-nav-item-marker {
+  background: var(--admin-primary) !important;
+}
+html.admin-mode .admin-layout-shell .admin-desktop-search-btn {
+  border-color: var(--admin-border) !important;
+  background: color-mix(in oklab, var(--admin-panel) 80%, var(--admin-primary) 20%) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-layout-shell .admin-desktop-kbd {
+  border-color: var(--admin-border) !important;
+  color: var(--admin-muted) !important;
+  background: color-mix(in oklab, var(--admin-panel) 90%, #000 10%) !important;
+}
+
+/* Economia page */
+html.admin-mode .admin-main-shell .admin-economia-page .admin-economia-header {
+  background: color-mix(in oklab, var(--admin-panel) 85%, var(--admin-surface) 15%) !important;
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell .admin-economia-page .admin-economia-tabs {
+  background: color-mix(in oklab, var(--admin-panel) 88%, var(--admin-surface) 12%) !important;
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell .admin-economia-page .admin-economia-tab--active {
+  background: color-mix(in oklab, var(--admin-warning) 32%, var(--admin-panel) 68%) !important;
+  border-color: color-mix(in oklab, var(--admin-warning) 70%, white 30%) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-economia-page .admin-economia-tab--idle {
+  color: var(--admin-muted) !important;
+}
+html.admin-mode .admin-main-shell .admin-economia-page .admin-economia-tab--idle:hover {
+  background: color-mix(in oklab, var(--admin-panel) 65%, var(--admin-primary) 35%) !important;
+  color: var(--admin-text) !important;
+}

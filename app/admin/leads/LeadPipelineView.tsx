@@ -32,21 +32,18 @@ type PipelineLead = {
 type PipelineColumn = {
   status: string;
   label: string;
-  color: string;
-  borderColor: string;
-  bgColor: string;
-  cardBgColor: string;
-  cardBorderColor: string;
+  toneClass: string;
+  cardToneClass: string;
   leads: PipelineLead[];
 };
 
 const COLUMNS: Omit<PipelineColumn, 'leads'>[] = [
-  { status: 'NEW', label: 'Noves', color: 'text-sky-100', borderColor: 'border-sky-300/60', bgColor: 'bg-[#163a56]', cardBgColor: 'bg-[#102c43]', cardBorderColor: 'border-sky-300/45' },
-  { status: 'CONTACTED', label: 'Contactat', color: 'text-amber-100', borderColor: 'border-amber-300/60', bgColor: 'bg-[#5a3f16]', cardBgColor: 'bg-[#46300f]', cardBorderColor: 'border-amber-300/45' },
-  { status: 'QUOTE_SENT', label: 'Pressupost enviat', color: 'text-violet-100', borderColor: 'border-violet-300/60', bgColor: 'bg-[#413061]', cardBgColor: 'bg-[#34244f]', cardBorderColor: 'border-violet-300/45' },
-  { status: 'NEGOTIATING', label: 'Negociant', color: 'text-orange-100', borderColor: 'border-orange-300/60', bgColor: 'bg-[#5a3118]', cardBgColor: 'bg-[#452513]', cardBorderColor: 'border-orange-300/45' },
-  { status: 'WON', label: 'Guanyat', color: 'text-emerald-100', borderColor: 'border-emerald-300/60', bgColor: 'bg-[#174632]', cardBgColor: 'bg-[#123726]', cardBorderColor: 'border-emerald-300/45' },
-  { status: 'LOST', label: 'Perdut', color: 'text-rose-100', borderColor: 'border-rose-300/60', bgColor: 'bg-[#4c1f2b]', cardBgColor: 'bg-[#3b1821]', cardBorderColor: 'border-rose-300/45' },
+  { status: 'NEW', label: 'Noves', toneClass: 'admin-leads-tone admin-leads-tone--new', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--new' },
+  { status: 'CONTACTED', label: 'Contactat', toneClass: 'admin-leads-tone admin-leads-tone--contacted', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--contacted' },
+  { status: 'QUOTE_SENT', label: 'Pressupost enviat', toneClass: 'admin-leads-tone admin-leads-tone--quote', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--quote' },
+  { status: 'NEGOTIATING', label: 'Negociant', toneClass: 'admin-leads-tone admin-leads-tone--negotiating', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--negotiating' },
+  { status: 'WON', label: 'Guanyat', toneClass: 'admin-leads-tone admin-leads-tone--won', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--won' },
+  { status: 'LOST', label: 'Perdut', toneClass: 'admin-leads-tone admin-leads-tone--lost', cardToneClass: 'admin-leads-card-tone admin-leads-card-tone--lost' },
 ];
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -211,17 +208,17 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
               event.preventDefault();
               void handleDropOnColumn(col.status);
             }}
-            className={`min-w-0 rounded-2xl border ${col.borderColor} ${col.bgColor} flex min-h-[320px] flex-col transition-all ${
-              dragOverStatus === col.status ? 'ring-2 ring-cyan-400/50 border-cyan-400/60' : ''
+            className={`min-w-0 rounded-2xl border flex min-h-[320px] flex-col transition-all ${col.toneClass} ${
+              dragOverStatus === col.status ? 'ring-2 ring-cyan-400/50' : ''
             }`}
           >
             {/* Column header */}
             <div className="px-3 py-2.5 border-b border-slate-700/30">
               <div className="flex items-center justify-between">
-                <h3 className={`text-sm font-semibold ${col.color} truncate`}>
+                <h3 className="admin-leads-column-title text-sm font-semibold truncate">
                   {col.label}
                 </h3>
-                <span className={`rounded-full border ${col.borderColor} bg-slate-900/50 px-2 py-0.5 text-[10px] font-bold ${col.color}`}>
+                <span className="admin-leads-column-count rounded-full border px-2 py-0.5 text-[10px] font-bold">
                   {col.leads.length}
                 </span>
               </div>
@@ -230,7 +227,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
             {/* Cards */}
             <div className="flex-1 p-2 space-y-2">
               {dragOverStatus === col.status && (
-                <div className={`rounded-xl border border-dashed ${col.borderColor} px-2 py-1 text-center text-[10px] ${col.color}`}>
+                <div className="admin-leads-dropzone rounded-xl border border-dashed px-2 py-1 text-center text-[10px]">
                   Deixa anar aquí
                 </div>
               )}
@@ -245,9 +242,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
                   lead={lead}
                   columnStatus={col.status}
                   columnLabel={col.label}
-                  columnColorClass={col.color}
-                  cardBgColor={col.cardBgColor}
-                  cardBorderColor={col.cardBorderColor}
+                  cardToneClass={col.cardToneClass}
                   updatingId={updatingId}
                   onMoveStatus={moveLeadStatus}
                   onDragStart={setDraggingLeadId}
@@ -264,21 +259,21 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     </div>
 
       <section className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/50 p-3">
-          <p className="text-[10px] uppercase tracking-wide text-slate-400">Obertes</p>
-          <p className="mt-1 text-lg font-bold text-slate-100">{openLeads}</p>
+        <div className="admin-leads-metric admin-leads-metric--open rounded-xl border p-3">
+          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Obertes</p>
+          <p className="admin-leads-metric-value mt-1 text-lg font-bold">{openLeads}</p>
         </div>
-        <div className="rounded-xl border border-emerald-500/35 bg-emerald-500/10 p-3">
-          <p className="text-[10px] uppercase tracking-wide text-emerald-200">Guanyades</p>
-          <p className="mt-1 text-lg font-bold text-emerald-100">{wonLeads}</p>
+        <div className="admin-leads-metric admin-leads-metric--won rounded-xl border p-3">
+          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Guanyades</p>
+          <p className="admin-leads-metric-value mt-1 text-lg font-bold">{wonLeads}</p>
         </div>
-        <div className="rounded-xl border border-rose-500/35 bg-rose-500/10 p-3">
-          <p className="text-[10px] uppercase tracking-wide text-rose-200">Perdudes</p>
-          <p className="mt-1 text-lg font-bold text-rose-100">{lostLeads}</p>
+        <div className="admin-leads-metric admin-leads-metric--lost rounded-xl border p-3">
+          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Perdudes</p>
+          <p className="admin-leads-metric-value mt-1 text-lg font-bold">{lostLeads}</p>
         </div>
-        <div className="rounded-xl border border-amber-500/35 bg-amber-500/10 p-3">
-          <p className="text-[10px] uppercase tracking-wide text-amber-200">Taxa guany</p>
-          <p className="mt-1 text-lg font-bold text-amber-100">{winRate}%</p>
+        <div className="admin-leads-metric admin-leads-metric--winrate rounded-xl border p-3">
+          <p className="admin-leads-metric-label text-[10px] uppercase tracking-wide">Taxa guany</p>
+          <p className="admin-leads-metric-value mt-1 text-lg font-bold">{winRate}%</p>
         </div>
       </section>
     </div>
@@ -289,9 +284,7 @@ function PipelineCard({
   lead,
   columnStatus,
   columnLabel,
-  columnColorClass,
-  cardBgColor,
-  cardBorderColor,
+  cardToneClass,
   updatingId,
   onMoveStatus,
   onDragStart,
@@ -300,9 +293,7 @@ function PipelineCard({
   lead: PipelineLead;
   columnStatus: string;
   columnLabel: string;
-  columnColorClass: string;
-  cardBgColor: string;
-  cardBorderColor: string;
+  cardToneClass: string;
   updatingId: string | null;
   onMoveStatus: (id: string, status: string) => Promise<void>;
   onDragStart: (leadId: string) => void;
@@ -325,7 +316,7 @@ function PipelineCard({
         onDragStart(lead.id);
       }}
       onDragEnd={onDragEnd}
-      className={`rounded-xl border ${cardBorderColor} ${cardBgColor} p-3 transition-all hover:brightness-110 ${
+      className={`rounded-xl border p-3 transition-all hover:brightness-105 ${cardToneClass} ${
         isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'
       }`}
     >
@@ -364,7 +355,7 @@ function PipelineCard({
       </div>
 
       <div className="mt-1">
-        <span className={`inline-flex rounded-full bg-black/25 px-2 py-0.5 text-[10px] font-semibold ${columnColorClass}`}>
+        <span className="admin-leads-column-chip inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold">
           {columnLabel}
         </span>
       </div>

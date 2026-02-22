@@ -195,16 +195,98 @@ const PALETTES: Palette[] = [
     warning: '#d7b871',
     danger: '#dd7c86',
   },
+  {
+    id: 'midnight-gold',
+    name: 'Mitjanit + Or',
+    description: 'Executiva premium, contrast alt',
+    surface: '#0f1218',
+    panel: '#1b2230',
+    border: '#485774',
+    text: '#f7f0de',
+    muted: '#c7ba98',
+    primary: '#d5a84a',
+    success: '#65b38f',
+    warning: '#e0b35b',
+    danger: '#c97b7b',
+  },
+  {
+    id: 'navy-crimson',
+    name: 'Navy + Crimson',
+    description: 'Corporativa potent, molt diferent',
+    surface: '#111827',
+    panel: '#1f2937',
+    border: '#4b5563',
+    text: '#f3f4f6',
+    muted: '#c1c7d0',
+    primary: '#be123c',
+    success: '#16a34a',
+    warning: '#ca8a04',
+    danger: '#dc2626',
+  },
+  {
+    id: 'petrol-copper',
+    name: 'Petroli + Coure',
+    description: 'Sèria i tècnica, amb accent càlid',
+    surface: '#0f1b22',
+    panel: '#172a33',
+    border: '#40606f',
+    text: '#e9f4f8',
+    muted: '#afc7d2',
+    primary: '#c57d45',
+    success: '#52a982',
+    warning: '#cf9f44',
+    danger: '#c96d6d',
+  },
+  {
+    id: 'graphite-cobalt',
+    name: 'Grafit + Cobalt',
+    description: 'Perfil empresa modern, net i contundent',
+    surface: '#16181d',
+    panel: '#222630',
+    border: '#4f596b',
+    text: '#eef2fb',
+    muted: '#bac3d4',
+    primary: '#3563e9',
+    success: '#2ca87e',
+    warning: '#d49a33',
+    danger: '#c95a6e',
+  },
+  {
+    id: 'economic-elegant',
+    name: 'Econòmic Elegant',
+    description: 'Perfil econòmic, sobri i professional',
+    surface: '#171a1f',
+    panel: '#232933',
+    border: '#4a5568',
+    text: '#f1f5f9',
+    muted: '#b8c2cf',
+    primary: '#4f7ea8',
+    success: '#5b9c7c',
+    warning: '#c79a53',
+    danger: '#b46a76',
+  },
 ];
 
 function buildPaletteCss(palette: Palette): string {
   return `/* Palette: ${palette.name} */
+html.admin-mode .admin-layout-shell {
+  --admin-surface: ${palette.surface};
+  --admin-panel: ${palette.panel};
+  --admin-border: ${palette.border};
+  --admin-text: ${palette.text};
+  --admin-muted: ${palette.muted};
+  --admin-primary: ${palette.primary};
+  --admin-success: ${palette.success};
+  --admin-warning: ${palette.warning};
+  --admin-danger: ${palette.danger};
+}
+
 html.admin-mode .admin-layout-body,
 html.admin-mode .admin-layout-shell,
 html.admin-mode .admin-main,
 html.admin-mode .admin-main-shell {
-  background: ${palette.surface} !important;
-  color: ${palette.text} !important;
+  background: var(--admin-surface) !important;
+  color: var(--admin-text) !important;
 }
 
 html.admin-mode .admin-layout-shell .admin-sidebar,
@@ -214,36 +296,56 @@ html.admin-mode .admin-layout-shell .admin-mobile-sidebar,
 html.admin-mode .admin-layout-shell .admin-bottom-nav,
 html.admin-mode .admin-layout-shell .admin-sidebar-foot-card,
 html.admin-mode .admin-layout-shell .admin-mobile-sidebar-head {
-  background: ${palette.panel} !important;
-  border-color: ${palette.border} !important;
+  background: var(--admin-panel) !important;
+  border-color: var(--admin-border) !important;
 }
 
 html.admin-mode .admin-layout-shell .admin-sidebar :is(a, p, span),
 html.admin-mode .admin-layout-shell .admin-desktop-header :is(a, p, span),
 html.admin-mode .admin-layout-shell .admin-mobile-header :is(a, p, span) {
-  color: ${palette.text} !important;
+  color: var(--admin-text) !important;
 }
 
 html.admin-mode .admin-shell .admin-control-room .admin-cr-panel,
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card,
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card-head,
 html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card {
-  background: ${palette.panel} !important;
-  border-color: ${palette.border} !important;
+  background: var(--admin-panel) !important;
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card:hover {
+  border-color: var(--admin-primary) !important;
 }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-title,
 html.admin-mode .admin-shell .admin-control-room .admin-cr-h2,
-html.admin-mode .admin-shell .admin-control-room .admin-ui-card-title { color: ${palette.text} !important; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-card-title { color: var(--admin-text) !important; }
 html.admin-mode .admin-shell .admin-control-room .admin-cr-subtitle,
 html.admin-mode .admin-shell .admin-control-room .admin-cr-small,
 html.admin-mode .admin-shell .admin-control-room .admin-ui-card-subtitle,
-html.admin-mode .admin-shell .admin-control-room .admin-cr-meta { color: ${palette.muted} !important; }
-html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--primary { background: ${palette.primary} !important; border-color: ${palette.primary} !important; color: ${palette.surface} !important; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-emerald { color: ${palette.success} !important; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-amber { color: ${palette.warning} !important; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-rose { color: ${palette.danger} !important; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--error { border-color: ${palette.danger} !important; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--warning { border-color: ${palette.warning} !important; }
-html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--info { border-color: ${palette.primary} !important; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-meta { color: var(--admin-muted) !important; }
+html.admin-mode .admin-shell .admin-control-room .admin-ui-btn--primary { background: var(--admin-primary) !important; border-color: var(--admin-primary) !important; color: var(--admin-surface) !important; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-emerald { color: var(--admin-success) !important; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-amber { color: var(--admin-warning) !important; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-tone-rose { color: var(--admin-danger) !important; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--error { border-color: var(--admin-danger) !important; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--warning { border-color: var(--admin-warning) !important; }
+html.admin-mode .admin-shell .admin-control-room .admin-cr-alert--info { border-color: var(--admin-primary) !important; }
+
+/* Dashboard metric cards that had fixed hover colors */
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--cyan,
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--sky {
+  border-color: color-mix(in oklab, var(--admin-primary) 70%, white 30%) !important;
+}
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--emerald {
+  border-color: var(--admin-success) !important;
+}
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--amber {
+  border-color: var(--admin-warning) !important;
+}
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--rose,
+html.admin-mode .admin-shell .admin-control-room .admin-ui-metric-card--purple {
+  border-color: var(--admin-danger) !important;
+}
 
 /* Responsive tweak: más aire visual en móvil */
 @media (max-width: 768px) {
@@ -318,21 +420,21 @@ export default function AdminCssManagerPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <header className="rounded-2xl border border-white/10 bg-slate-950/60 p-5">
-        <h1 className="text-2xl font-semibold text-slate-100">CSS PRO</h1>
-        <p className="mt-1 text-sm text-slate-400">
+    <div className="admin-page-container admin-css-manager-page space-y-4">
+      <header className="admin-css-panel rounded-2xl border p-5">
+        <h1 className="admin-page-title">CSS PRO</h1>
+        <p className="admin-page-subtitle mt-1">
           Editor de CSS del panell admin. S&apos;aplica en viu a tot `/admin`.
         </p>
       </header>
 
-      <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5">
+      <section className="admin-css-panel rounded-2xl border p-5">
         <div className="mb-3 flex items-center justify-between">
-          <p className="text-sm font-semibold text-slate-200">Custom CSS</p>
+          <p className="text-sm font-semibold text-slate-100">Custom CSS</p>
           <button
             type="button"
             onClick={() => setCss(EXAMPLE_CSS)}
-            className="rounded-lg border border-slate-600/50 bg-slate-800/70 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-700/70"
+            className="admin-keep-colors admin-css-btn admin-css-btn--neutral rounded-lg border px-3 py-1.5 text-xs"
           >
             Carregar exemple
           </button>
@@ -341,16 +443,16 @@ export default function AdminCssManagerPage() {
           value={css}
           onChange={(e) => setCss(e.target.value)}
           disabled={loading}
-          className="min-h-[420px] w-full rounded-xl border border-slate-700/60 bg-slate-900/70 p-3 font-mono text-xs text-slate-100"
+          className="admin-css-editor min-h-[420px] w-full rounded-xl border p-3 font-mono text-xs"
           placeholder="Escriu aquí el teu CSS..."
         />
         <div className="mt-4">
-          <p className="mb-2 text-sm font-semibold text-slate-200">Paletes suggerides (responsives)</p>
+          <p className="mb-2 text-sm font-semibold text-slate-100">Paletes suggerides (responsives)</p>
           <div className="grid gap-2 md:grid-cols-3">
             {PALETTES.map((palette) => (
-              <article key={palette.id} className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-3">
+              <article key={palette.id} className="admin-css-palette-card rounded-xl border p-3">
                 <p className="text-sm font-semibold text-slate-100">{palette.name}</p>
-                <p className="text-xs text-slate-400">{palette.description}</p>
+                <p className="text-xs text-slate-300">{palette.description}</p>
                 <div className="mt-2 flex gap-1">
                   <span className="h-5 w-5 rounded" style={{ background: palette.surface }} />
                   <span className="h-5 w-5 rounded" style={{ background: palette.panel }} />
@@ -362,7 +464,7 @@ export default function AdminCssManagerPage() {
                 <button
                   type="button"
                   onClick={() => setCss(buildPaletteCss(palette))}
-                  className="mt-3 rounded-lg border border-slate-600/50 bg-slate-800/70 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-700/70"
+                  className="admin-keep-colors admin-css-btn admin-css-btn--neutral mt-3 rounded-lg border px-3 py-1.5 text-xs"
                 >
                   Aplicar paleta
                 </button>
@@ -375,11 +477,11 @@ export default function AdminCssManagerPage() {
             type="button"
             onClick={save}
             disabled={saving || loading}
-            className="rounded-lg border border-emerald-500/40 bg-emerald-500/20 px-4 py-2 text-sm font-semibold text-emerald-100 hover:bg-emerald-500/30 disabled:opacity-60"
+            className="admin-keep-colors admin-css-btn admin-css-btn--save rounded-lg border px-4 py-2 text-sm font-semibold disabled:opacity-60"
           >
             {saving ? 'Desant...' : 'Desar CSS'}
           </button>
-          {msg && <p className="text-sm text-slate-300">{msg}</p>}
+          {msg && <p className="text-sm text-slate-200">{msg}</p>}
         </div>
       </section>
     </div>

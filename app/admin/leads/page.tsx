@@ -275,7 +275,7 @@ export default async function LeadsPage({
   return (
     <div
       id="leads-theme-root"
-      className="space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8"
+      className="admin-page-container admin-leads-page space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8"
       style={LEAD_COLOR_DEFAULT_VARS as CSSProperties}
     >
       <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-2">
@@ -283,13 +283,13 @@ export default async function LeadsPage({
           <Link
             href="/admin/leads"
             aria-current="page"
-            className="admin-keep-colors rounded-xl border border-cyan-400/70 bg-gradient-to-r from-cyan-500/25 to-blue-500/20 px-3 py-2 text-center text-xs sm:text-sm font-semibold text-cyan-100 shadow-sm"
+            className="admin-keep-colors admin-leads-tab admin-leads-tab--active rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold"
           >
             Tauler Leads
           </Link>
           <Link
             href="/admin/intake"
-            className="admin-keep-colors rounded-xl border border-violet-500/40 bg-violet-500/15 px-3 py-2 text-center text-xs sm:text-sm font-semibold text-violet-100 hover:bg-violet-500/25 transition-colors"
+            className="admin-keep-colors admin-leads-tab admin-leads-tab--idle rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold transition-colors"
           >
             Entrada ràpida
           </Link>
@@ -328,7 +328,7 @@ export default async function LeadsPage({
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-300 font-semibold shrink-0">
+                    <div className="w-10 h-10 rounded-full border border-cyan-500/35 bg-cyan-900/50 flex items-center justify-center text-cyan-200 font-semibold shrink-0">
                       {lead.name?.charAt(0).toUpperCase() || '?'}
                     </div>
                     <div className="min-w-0 flex-1">
