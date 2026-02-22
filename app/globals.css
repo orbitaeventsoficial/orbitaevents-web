@@ -4385,3 +4385,87 @@ html.admin-mode .admin-main-shell .admin-quote-studio .admin-quote-action:hover 
   border-color: var(--admin-cat-action-border-hover) !important;
   color: var(--admin-cat-action-text) !important;
 }
+
+/* Layout final pass: desktop/mobile shell, sidebar and nav fully token-driven */
+html.admin-mode .admin-layout-shell .admin-sidebar-head,
+html.admin-mode .admin-layout-shell .admin-sidebar-nav,
+html.admin-mode .admin-layout-shell .admin-sidebar-foot,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar-head,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar-nav,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar-foot,
+html.admin-mode .admin-layout-shell .admin-desktop-header {
+  background: var(--admin-surface) !important;
+  border-color: var(--admin-border) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-sidebar-brand,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar-brand,
+html.admin-mode .admin-layout-shell .admin-sidebar-foot-card,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar-foot-link,
+html.admin-mode .admin-layout-shell .admin-desktop-search-btn,
+html.admin-mode .admin-layout-shell .admin-desktop-user {
+  background: color-mix(in oklab, var(--admin-panel) 82%, var(--admin-surface) 18%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-sidebar-brand-main,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar-title,
+html.admin-mode .admin-layout-shell .admin-desktop-user-label,
+html.admin-mode .admin-layout-shell .admin-mobile-title {
+  color: var(--admin-text) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-sidebar-brand-accent,
+html.admin-mode .admin-layout-shell .admin-mobile-title-accent {
+  color: color-mix(in oklab, var(--admin-primary) 74%, white 26%) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-sidebar-block-title,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar-subtitle,
+html.admin-mode .admin-layout-shell .admin-sidebar-foot-kicker,
+html.admin-mode .admin-layout-shell .admin-sidebar-foot-meta,
+html.admin-mode .admin-layout-shell .admin-desktop-breadcrumb-link,
+html.admin-mode .admin-layout-shell .admin-desktop-breadcrumb-sep,
+html.admin-mode .admin-layout-shell .admin-mobile-subtitle {
+  color: var(--admin-muted) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-desktop-breadcrumb-current,
+html.admin-mode .admin-layout-shell .admin-sidebar-foot-title {
+  color: var(--admin-text) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-nav-item--active {
+  background: color-mix(in oklab, var(--admin-primary) 30%, var(--admin-panel) 70%) !important;
+  border-color: color-mix(in oklab, var(--admin-primary) 68%, white 32%) !important;
+  color: var(--admin-text) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-nav-item-marker,
+html.admin-mode .admin-layout-shell .admin-bottom-nav-marker {
+  background: var(--admin-primary) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-nav-section-caret,
+html.admin-mode .admin-layout-shell .admin-desktop-kbd {
+  color: var(--admin-muted) !important;
+  border-color: var(--admin-border) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-icon-btn,
+html.admin-mode .admin-layout-shell .admin-help-btn--idle {
+  background: color-mix(in oklab, var(--admin-panel) 84%, var(--admin-surface) 16%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-layout-shell .admin-icon-btn:hover,
+html.admin-mode .admin-layout-shell .admin-help-btn--idle:hover {
+  background: color-mix(in oklab, var(--admin-panel) 64%, var(--admin-primary) 36%) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-help-btn--active {
+  background: color-mix(in oklab, var(--admin-primary) 26%, var(--admin-panel) 74%) !important;
+  border-color: color-mix(in oklab, var(--admin-primary) 68%, white 32%) !important;
+  color: var(--admin-text) !important;
+}
