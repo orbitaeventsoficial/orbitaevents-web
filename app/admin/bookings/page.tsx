@@ -146,25 +146,25 @@ export default async function BookingsPage({
       </header>
 
       {/* Stats Cards - Scrollable horizontal en móvil */}
-      <section className="flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+      <section className="admin-bookings-stats flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
+        <div className="admin-bookings-stat admin-bookings-stat--total shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Total</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{pagination.total}</p>
           <p className="text-[10px] sm:text-xs truncate text-center">{formatCurrency(totalRevenue)}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--pending shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Pendents</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.PENDING?.count || 0}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--confirmed shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Confirmades</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.CONFIRMED?.count || 0}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--completed shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Completades</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.COMPLETED?.count || 0}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+        <div className="admin-bookings-stat admin-bookings-stat--cancelled shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
           <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Cancel·lades</p>
           <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.CANCELLED?.count || 0}</p>
         </div>
@@ -198,7 +198,7 @@ export default async function BookingsPage({
                 key={booking.id}
                 className={`block rounded-2xl border backdrop-blur-sm p-4 transition-colors ${
                   isPast && booking.status !== 'COMPLETED'
-                    ? 'border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-orange-600/5'
+                    ? 'border-orange-500/30'
                     : 'border-slate-700/50 bg-slate-800/60 hover:bg-slate-700/40'
                 }`}
               >

@@ -4,6 +4,7 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const ADMIN_DIR = path.join(ROOT, 'app', 'admin');
+const GLOBALS_CSS = path.join(ROOT, 'app', 'globals.css');
 const TARGET_EXT = new Set(['.ts', '.tsx']);
 const MODE = process.argv.includes('--fix') ? 'fix' : 'check';
 const STRICT_UI = process.argv.includes('--strict-ui');
@@ -76,6 +77,7 @@ async function run() {
   const leakLogs = [];
   const uiRiskLogs = [];
   let totalUiRisks = 0;
+  let totalCssRisks = 0;
 
   for (const file of files) {
     const original = await fs.readFile(file, 'utf8');
@@ -140,8 +142,32 @@ async function run() {
     }
   }
 
+  try {
+    const css = await fs.readFile(GLOBALS_CSS, 'utf8');
+    const blocks = css.match(/html\.admin-mode[\s\S]*?\{[\s\S]*?\}/g) || [];
+    const cssRiskLines = [];
+    for (const block of blocks) {
+      if (!/(linear-gradient|radial-gradient|conic-gradient)/.test(block)) continue;
+      const start = css.indexOf(block);
+      const line = lineFromIndex(css, Math.max(0, start));
+      totalCssRisks += 1;
+      cssRiskLines.push(`app/globals.css:${line}`);
+    }
+    if (cssRiskLines.length > 0) {
+      const sample = cssRiskLines.slice(0, 40);
+      for (const item of sample) {
+        console.log(`[admin-theme-autofix] ${item} [css-gradient] selector admin-mode amb gradient.`);
+      }
+      if (cssRiskLines.length > sample.length) {
+        console.log(`[admin-theme-autofix] ... ${cssRiskLines.length - sample.length} more css gradient matches omitted.`);
+      }
+    }
+  } catch {
+    // best effort, don't block.
+  }
+
   if (totalLeaks === 0) {
-    if (MODE === 'check' && totalUiRisks > 0) {
+    if (MODE === 'check' && (totalUiRisks > 0 || totalCssRisks > 0)) {
       const sample = uiRiskLogs.slice(0, 80);
       for (const risk of sample) {
         console.log(`[admin-theme-autofix] ${risk.file}:${risk.line} [${risk.kind}] ${risk.detail}`);
@@ -150,10 +176,14 @@ async function run() {
         console.log(`[admin-theme-autofix] ... ${uiRiskLogs.length - sample.length} more UI risks omitted.`);
       }
       if (STRICT_UI) {
-        console.error(`[admin-theme-autofix] FAIL: ${totalUiRisks} UI overflow/margin risk(s) detectats.`);
+        console.error(
+          `[admin-theme-autofix] FAIL: ${totalUiRisks} UI overflow/margin risk(s), ${totalCssRisks} css gradient risk(s).`
+        );
         process.exit(2);
       }
-      console.warn(`[admin-theme-autofix] WARN: ${totalUiRisks} UI overflow/margin risk(s) detectats.`);
+      console.warn(
+        `[admin-theme-autofix] WARN: ${totalUiRisks} UI overflow/margin risk(s), ${totalCssRisks} css gradient risk(s).`
+      );
     }
     console.log(`[admin-theme-autofix] OK: no hardcoded color utilities in class contexts (${MODE}).`);
     return;

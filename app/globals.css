@@ -4203,6 +4203,36 @@ html.admin-mode .admin-main-shell .admin-leads-metric--winrate {
   color: #fff4e5 !important;
 }
 
+/* Sidebar/layout hard override: no gradients in navigation chrome */
+html.admin-mode .admin-layout-shell,
+html.admin-mode .admin-layout-shell * {
+  background-image: none !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-sidebar,
+html.admin-mode .admin-layout-shell .admin-mobile-sidebar,
+html.admin-mode .admin-layout-shell .admin-desktop-header,
+html.admin-mode .admin-layout-shell .admin-mobile-header,
+html.admin-mode .admin-layout-shell .admin-bottom-nav {
+  background: var(--admin-surface) !important;
+  border-color: var(--admin-border) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-nav-item--idle,
+html.admin-mode .admin-layout-shell .admin-nav-section-btn,
+html.admin-mode .admin-layout-shell .admin-recent-chip--idle {
+  background: color-mix(in oklab, var(--admin-panel) 82%, var(--admin-surface) 18%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+
+html.admin-mode .admin-layout-shell .admin-nav-item--idle:hover,
+html.admin-mode .admin-layout-shell .admin-nav-section-btn:hover,
+html.admin-mode .admin-layout-shell .admin-recent-chip--idle:hover {
+  background: color-mix(in oklab, var(--admin-panel) 64%, var(--admin-primary) 36%) !important;
+  border-color: color-mix(in oklab, var(--admin-primary) 62%, var(--admin-border) 38%) !important;
+}
+
 /* Tasks page actions via CSS (neutral corporate) */
 html.admin-mode .admin-main-shell .admin-tasks-action {
   background: color-mix(in oklab, var(--admin-panel) 78%, var(--admin-surface) 22%) !important;
@@ -4213,4 +4243,35 @@ html.admin-mode .admin-main-shell .admin-tasks-action:hover {
   background: color-mix(in oklab, var(--admin-panel) 62%, var(--admin-primary) 38%) !important;
   border-color: color-mix(in oklab, var(--admin-primary) 62%, var(--admin-border) 38%) !important;
   color: var(--admin-text) !important;
+}
+
+/* Bookings KPI cards: force solid tones (no blue/green gradients) */
+html.admin-mode .admin-main-shell .admin-bookings-stat {
+  background-image: none !important;
+  border-width: 1px;
+}
+html.admin-mode .admin-main-shell .admin-bookings-stat--total {
+  background: #2a3444 !important;
+  border-color: #5b6c83 !important;
+  color: #eef4ff !important;
+}
+html.admin-mode .admin-main-shell .admin-bookings-stat--pending {
+  background: #5a3f20 !important;
+  border-color: #a77a3f !important;
+  color: #fff4e5 !important;
+}
+html.admin-mode .admin-main-shell .admin-bookings-stat--confirmed {
+  background: #2b3f59 !important;
+  border-color: #5578a8 !important;
+  color: #eef4ff !important;
+}
+html.admin-mode .admin-main-shell .admin-bookings-stat--completed {
+  background: #234a36 !important;
+  border-color: #4d8f6b !important;
+  color: #ebfff5 !important;
+}
+html.admin-mode .admin-main-shell .admin-bookings-stat--cancelled {
+  background: #532734 !important;
+  border-color: #9e546a !important;
+  color: #ffedf2 !important;
 }
