@@ -4202,3 +4202,15 @@ html.admin-mode .admin-main-shell .admin-leads-metric--winrate {
   border-color: #a77a3f !important;
   color: #fff4e5 !important;
 }
+
+/* Tasks page: explicit gold actions requested */
+html.admin-mode .admin-main-shell .admin-tasks-gold-btn {
+  background: #a57a2a !important;
+  border-color: #c79a43 !important;
+  color: #fff8ea !important;
+}
+html.admin-mode .admin-main-shell .admin-tasks-gold-btn:hover {
+  background: #8f6a24 !important;
+  border-color: #b88d3c !important;
+  color: #fff8ea !important;
+}
