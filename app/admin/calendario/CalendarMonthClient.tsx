@@ -434,7 +434,7 @@ export default function CalendarMonthClient() {
       </div>
 
       {/* Graella del calendari */}
-      <div className="grid grid-cols-7 gap-[1px] overflow-hidden rounded-2xl border">
+      <div className="admin-calendar-grid grid grid-cols-7 gap-[1px] overflow-hidden rounded-2xl border">
         {cells.map((cell) => {
           const dayData =
             data?.days?.[cell.key] ??
@@ -464,7 +464,7 @@ export default function CalendarMonthClient() {
               type="button"
               onClick={() => setSelectedDateKey(cell.key)}
               className={[
-                'flex min-h-[72px] sm:min-h-[88px] flex-col p-1.5 sm:p-2 text-left text-sm transition-all',
+                'admin-calendar-cell flex h-[132px] sm:h-[152px] md:h-[168px] flex-col overflow-hidden p-1.5 sm:p-2 text-left text-sm transition-all',
                 bgClass,
                 hoverClass,
                 !cell.inCurrentMonth ? 'opacity-30' : '',
@@ -485,9 +485,9 @@ export default function CalendarMonthClient() {
                   {cell.date.getDate()}
                 </span>
               </div>
-              <div className="mt-1 flex-1 min-w-0">
+              <div className="mt-1 flex-1 min-h-0 min-w-0 overflow-hidden">
                 {hasReservas && (
-                  <div className="space-y-0.5 text-[9px] sm:text-[10px]">
+                  <div className="space-y-0.5 text-[9px] sm:text-[10px] overflow-hidden">
                     {dayData.reservas.slice(0, 2).map((r) => (
                       <div key={r.id} className="rounded-md px-1 py-0.5">
                         <div className="truncate font-semibold">
