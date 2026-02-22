@@ -4275,3 +4275,39 @@ html.admin-mode .admin-main-shell .admin-bookings-stat--cancelled {
   border-color: #9e546a !important;
   color: #ffedf2 !important;
 }
+
+/* Leads pipeline columns: solid status colors */
+html.admin-mode .admin-main-shell .admin-leads-tone {
+  background-image: none !important;
+  border-width: 1px;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--new {
+  background: #2b3f59 !important;
+  border-color: #5578a8 !important;
+  color: #eef4ff !important;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--contacted {
+  background: #5a3f20 !important;
+  border-color: #a77a3f !important;
+  color: #fff4e5 !important;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--quote {
+  background: #3d3157 !important;
+  border-color: #7f68ab !important;
+  color: #f2ebff !important;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--negotiating {
+  background: #5b341f !important;
+  border-color: #b0704d !important;
+  color: #ffefe6 !important;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--won {
+  background: #234a36 !important;
+  border-color: #4d8f6b !important;
+  color: #ebfff5 !important;
+}
+html.admin-mode .admin-main-shell .admin-leads-tone--lost {
+  background: #532734 !important;
+  border-color: #9e546a !important;
+  color: #ffedf2 !important;
+}
