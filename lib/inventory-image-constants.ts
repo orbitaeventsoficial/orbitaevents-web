@@ -27,8 +27,8 @@ export const INVENTORY_IMAGE_MAX_FILE_SIZE = 10 * 1024 * 1024;
 export const INVENTORY_BUCKET_CONFIG = {
   public: true,
   fileSizeLimit: INVENTORY_IMAGE_MAX_FILE_SIZE,
-  allowedMimeTypes: ['image/webp', 'image/jpeg', 'image/png'],
-} as const;
+  allowedMimeTypes: ['image/webp', 'image/jpeg', 'image/png'] as string[],
+};
 
 /** Temps màxim en ms per a peticions de fetch externes (scripts) */
 export const INVENTORY_IMAGE_REQUEST_TIMEOUT_MS = 25_000;

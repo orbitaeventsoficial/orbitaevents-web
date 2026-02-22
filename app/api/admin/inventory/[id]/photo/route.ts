@@ -157,7 +157,10 @@ export async function DELETE(req: NextRequest, { params }: Params) {
         .from(INVENTORY_BUCKET)
         .remove([filePath]);
       if (removeError) {
-        log.warn("No s'ha pogut eliminar la imatge del Storage (continuem):", removeError);
+        log.warn("No s'ha pogut eliminar la imatge del Storage (continuem):", {
+          message: removeError.message,
+          name: removeError.name,
+        });
       }
     }
 
