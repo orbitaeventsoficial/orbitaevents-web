@@ -6,27 +6,27 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
-
-const BUCKET = 'inventory';
-const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
-const MAX_DIMENSION = 800;
-const WEBP_QUALITY = 82;
+import {
+  INVENTORY_BUCKET,
+  INVENTORY_BUCKET_CONFIG,
+  INVENTORY_IMAGE_MAX_DIMENSION,
+  INVENTORY_IMAGE_MAX_FILE_SIZE,
+  INVENTORY_IMAGE_WEBP_QUALITY,
+  inventoryImagePath,
+  isInventoryBucketUrl,
+} from '@/lib/inventory-image-constants';
 
 let bucketEnsured = false;
 
-/** Crea el bucket si no existeix (una sola vegada per instància) */
+/** Crea el bucket si no existeix (una sola vegada per instància de servidor) */
 async function ensureBucket() {
   if (bucketEnsured || !supabaseAdmin) return;
   try {
     const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-    const exists = buckets?.some((b) => b.name === BUCKET);
+    const exists = buckets?.some((b) => b.name === INVENTORY_BUCKET);
     if (!exists) {
-      await supabaseAdmin.storage.createBucket(BUCKET, {
-        public: true,
-        fileSizeLimit: MAX_SIZE,
-        allowedMimeTypes: ['image/webp', 'image/jpeg', 'image/png'],
-      });
-      log.info(`Bucket "${BUCKET}" creat automàticament a Supabase Storage`);
+      await supabaseAdmin.storage.createBucket(INVENTORY_BUCKET, INVENTORY_BUCKET_CONFIG);
+      log.info(`Bucket "${INVENTORY_BUCKET}" creat automàticament a Supabase Storage`);
     }
     bucketEnsured = true;
   } catch (err) {
@@ -44,12 +44,12 @@ async function normalizeInventoryImage(file: File): Promise<Buffer> {
   return sharp(input)
     .rotate()
     .resize({
-      width: MAX_DIMENSION,
-      height: MAX_DIMENSION,
+      width: INVENTORY_IMAGE_MAX_DIMENSION,
+      height: INVENTORY_IMAGE_MAX_DIMENSION,
       fit: 'inside',
       withoutEnlargement: true,
     })
-    .webp({ quality: WEBP_QUALITY })
+    .webp({ quality: INVENTORY_IMAGE_WEBP_QUALITY })
     .toBuffer();
 }
 
@@ -61,7 +61,6 @@ export async function POST(req: NextRequest, { params }: Params) {
   try {
     const { id } = params;
 
-    // Verificar que l'element existeix
     const item = await prisma.inventoryItem.findUnique({
       where: { id },
       select: { id: true, code: true, imageUrl: true },
@@ -78,31 +77,27 @@ export async function POST(req: NextRequest, { params }: Params) {
       );
     }
 
-    // Assegurar que el bucket existeix
     await ensureBucket();
 
-    // Llegir el fitxer del FormData
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
 
     if (!file) {
-      return NextResponse.json({ error: 'No s\'ha enviat cap fitxer' }, { status: 400 });
+      return NextResponse.json({ error: "No s'ha enviat cap fitxer" }, { status: 400 });
     }
 
-    if (file.size > MAX_SIZE) {
+    if (file.size > INVENTORY_IMAGE_MAX_FILE_SIZE) {
       return NextResponse.json({ error: 'El fitxer supera 10 MB' }, { status: 400 });
     }
 
-    // Generar path: inventory/{code}.webp
-    const filePath = `${item.code.toLowerCase()}.webp`;
+    const filePath = inventoryImagePath(item.code);
 
     // Eliminar foto anterior si existeix al mateix path
-    await supabaseAdmin.storage.from(BUCKET).remove([filePath]);
+    await supabaseAdmin.storage.from(INVENTORY_BUCKET).remove([filePath]);
 
-    // Normalitzar sempre al servidor per garantir format/tamany consistents.
     const buffer = await normalizeInventoryImage(file);
     const { error: uploadError } = await supabaseAdmin.storage
-      .from(BUCKET)
+      .from(INVENTORY_BUCKET)
       .upload(filePath, buffer, {
         contentType: 'image/webp',
         upsert: true,
@@ -116,14 +111,12 @@ export async function POST(req: NextRequest, { params }: Params) {
       );
     }
 
-    // Obtenir URL pública
     const { data: urlData } = supabaseAdmin.storage
-      .from(BUCKET)
+      .from(INVENTORY_BUCKET)
       .getPublicUrl(filePath);
 
     const imageUrl = urlData.publicUrl;
 
-    // Actualitzar l'element amb la nova URL
     await prisma.inventoryItem.update({
       where: { id },
       data: { imageUrl },
@@ -156,13 +149,18 @@ export async function DELETE(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: 'Element no trobat' }, { status: 404 });
     }
 
-    // Eliminar de Supabase Storage
-    if (supabaseAdmin && item.imageUrl) {
-      const filePath = `${item.code.toLowerCase()}.webp`;
-      await supabaseAdmin.storage.from(BUCKET).remove([filePath]);
+    // Eliminar de Supabase Storage — només si la URL pertany al nostre bucket.
+    // Evita intentar eliminar imatges externes (URLs d'altres dominis o fonts antigues).
+    if (supabaseAdmin && item.imageUrl && isInventoryBucketUrl(item.imageUrl)) {
+      const filePath = inventoryImagePath(item.code);
+      const { error: removeError } = await supabaseAdmin.storage
+        .from(INVENTORY_BUCKET)
+        .remove([filePath]);
+      if (removeError) {
+        log.warn("No s'ha pogut eliminar la imatge del Storage (continuem):", removeError);
+      }
     }
 
-    // Netejar URL a la BD
     await prisma.inventoryItem.update({
       where: { id },
       data: { imageUrl: null },

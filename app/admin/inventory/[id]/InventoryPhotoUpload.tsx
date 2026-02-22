@@ -11,9 +11,11 @@ import { useCallback, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
-const MAX_DIMENSION = 800;
-const WEBP_QUALITY = 0.82;
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB input (alignat amb API)
+// Constants alineades amb lib/inventory-image-constants.ts
+// (importació directa no possible aquí perquè és codi de client-browser)
+const MAX_DIMENSION = 800;       // INVENTORY_IMAGE_MAX_DIMENSION
+const WEBP_QUALITY = 0.82;       // INVENTORY_IMAGE_WEBP_QUALITY_CLIENT (escala 0-1 per canvas.toBlob)
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // INVENTORY_IMAGE_MAX_FILE_SIZE (10 MB)
 
 interface Props {
   itemId: string;

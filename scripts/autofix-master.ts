@@ -53,7 +53,7 @@ async function setSystemAlertCount(value: number) {
       type: 'NUMBER',
       category: 'alerts',
       label: 'System autofix failure count',
-      description: 'Número d’incidències obertes detectades per autofix-master',
+      description: "Número d'incidències obertes detectades per autofix-master",
     },
     create: {
       key: SYSTEM_ALERT_KEY,
@@ -61,14 +61,24 @@ async function setSystemAlertCount(value: number) {
       type: 'NUMBER',
       category: 'alerts',
       label: 'System autofix failure count',
-      description: 'Número d’incidències obertes detectades per autofix-master',
+      description: "Número d'incidències obertes detectades per autofix-master",
     },
   });
 }
 
+/**
+ * Crea una tasca d'alerta si no n'existeix cap d'oberta amb el mateix títol.
+ * Usa un cast explícit perquè el model Task pot no estar tipat al client
+ * generat si el schema no ha estat regenerat (executa `prisma generate`).
+ */
 async function ensureTask(title: string, description: string) {
-  const prismaAny = prisma as any;
-  const existing = await prismaAny.task.findFirst({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = prisma as unknown as Record<string, any>;
+  if (!db['task']) {
+    console.warn('[autofix-master] Model Task no disponible. Regenera el client: npx prisma generate');
+    return;
+  }
+  const existing = await db['task'].findFirst({
     where: {
       title,
       status: { in: ['OPEN', 'IN_PROGRESS'] },
@@ -76,7 +86,7 @@ async function ensureTask(title: string, description: string) {
     select: { id: true },
   });
   if (existing) return;
-  await prismaAny.task.create({
+  await db['task'].create({
     data: {
       title,
       description,
