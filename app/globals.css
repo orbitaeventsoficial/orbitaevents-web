@@ -3594,18 +3594,18 @@ html.admin-mode .admin-main-shell .admin-css-btn--save:hover {
 
 /* Admin theme tokens: consumed by CSS PRO palettes */
 html.admin-mode .admin-layout-shell {
-  --admin-font-family: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --admin-font-size-base: clamp(15px, 0.88vw, 16px);
-  --admin-line-height: 1.45;
-  --admin-surface: #0f1c33;
-  --admin-panel: #1b2e4a;
-  --admin-border: #3f5f88;
-  --admin-text: #f3f7ff;
-  --admin-muted: #a8bbd5;
-  --admin-primary: #67d6ff;
-  --admin-success: #64e8b0;
-  --admin-warning: #ffcf6b;
-  --admin-danger: #ff9bb6;
+  --admin-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --admin-font-size-base: clamp(16px, 0.95vw, 17px);
+  --admin-line-height: 1.5;
+  --admin-surface: #171c24;
+  --admin-panel: #232b36;
+  --admin-border: #4b586b;
+  --admin-text: #eef3f8;
+  --admin-muted: #b1bccb;
+  --admin-primary: #6f8eae;
+  --admin-success: #6f9681;
+  --admin-warning: #9a7a62;
+  --admin-danger: #9e6b73;
 }
 
 html.admin-mode .admin-main-shell,
@@ -3618,22 +3618,22 @@ html.admin-mode .admin-main-shell {
   color: var(--admin-text) !important;
 }
 html.admin-mode .admin-main-shell h1 {
-  font-size: clamp(1.7rem, 1.5rem + 0.65vw, 2.2rem) !important;
-  line-height: 1.14 !important;
-  font-weight: 750 !important;
+  font-size: clamp(1.8rem, 1.6rem + 0.72vw, 2.25rem) !important;
+  line-height: 1.16 !important;
+  font-weight: 680 !important;
 }
 html.admin-mode .admin-main-shell h2 {
-  font-size: clamp(1.25rem, 1.15rem + 0.3vw, 1.55rem) !important;
-  line-height: 1.2 !important;
-  font-weight: 700 !important;
+  font-size: clamp(1.3rem, 1.18rem + 0.34vw, 1.62rem) !important;
+  line-height: 1.24 !important;
+  font-weight: 620 !important;
 }
 html.admin-mode .admin-main-shell h3 {
-  font-size: clamp(1.05rem, 1rem + 0.15vw, 1.2rem) !important;
-  line-height: 1.25 !important;
-  font-weight: 650 !important;
+  font-size: clamp(1.1rem, 1.04rem + 0.18vw, 1.24rem) !important;
+  line-height: 1.28 !important;
+  font-weight: 600 !important;
 }
 html.admin-mode .admin-main-shell :is(p, label, td, th, li, dd, dt) {
-  font-size: clamp(0.9rem, 0.86rem + 0.08vw, 0.98rem) !important;
+  font-size: clamp(0.95rem, 0.92rem + 0.1vw, 1.02rem) !important;
 }
 
 html.admin-mode .admin-layout-shell .admin-sidebar-logo-wrap,
@@ -3885,8 +3885,8 @@ html.admin-mode .admin-main-shell .admin-economia-page .admin-economia-tabs {
   border-color: var(--admin-border) !important;
 }
 html.admin-mode .admin-main-shell .admin-economia-page .admin-economia-tab--active {
-  background: color-mix(in oklab, var(--admin-warning) 32%, var(--admin-panel) 68%) !important;
-  border-color: color-mix(in oklab, var(--admin-warning) 70%, white 30%) !important;
+  background: color-mix(in oklab, var(--admin-primary) 30%, var(--admin-panel) 70%) !important;
+  border-color: color-mix(in oklab, var(--admin-primary) 68%, white 32%) !important;
   color: var(--admin-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-economia-page .admin-economia-tab--idle {
