@@ -1,6 +1,7 @@
 // app/api/admin/inventory/[id]/photo/route.ts
 // API per pujar fotos d'inventari a Supabase Storage
 import { NextRequest, NextResponse } from 'next/server';
+import sharp from 'sharp';
 import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
@@ -8,6 +9,8 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 const BUCKET = 'inventory';
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_DIMENSION = 800;
+const WEBP_QUALITY = 82;
 
 let bucketEnsured = false;
 
@@ -33,6 +36,21 @@ async function ensureBucket() {
 
 interface Params {
   params: { id: string };
+}
+
+async function normalizeInventoryImage(file: File): Promise<Buffer> {
+  const input = Buffer.from(await file.arrayBuffer());
+
+  return sharp(input)
+    .rotate()
+    .resize({
+      width: MAX_DIMENSION,
+      height: MAX_DIMENSION,
+      fit: 'inside',
+      withoutEnlargement: true,
+    })
+    .webp({ quality: WEBP_QUALITY })
+    .toBuffer();
 }
 
 // POST - Pujar foto (multipart/form-data)
@@ -81,8 +99,8 @@ export async function POST(req: NextRequest, { params }: Params) {
     // Eliminar foto anterior si existeix al mateix path
     await supabaseAdmin.storage.from(BUCKET).remove([filePath]);
 
-    // Pujar el fitxer (ja ve convertit a WebP des del client)
-    const buffer = Buffer.from(await file.arrayBuffer());
+    // Normalitzar sempre al servidor per garantir format/tamany consistents.
+    const buffer = await normalizeInventoryImage(file);
     const { error: uploadError } = await supabaseAdmin.storage
       .from(BUCKET)
       .upload(filePath, buffer, {

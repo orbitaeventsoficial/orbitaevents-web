@@ -35,6 +35,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'maps.googleapis.com',
       },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+      },
     ],
   },
 
@@ -143,3 +147,4 @@ export default withSentryConfig(configWithIntl, {
   silent: true,
   telemetry: false,
 });
+

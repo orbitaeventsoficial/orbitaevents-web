@@ -10,12 +10,40 @@ type Step = {
   args: string[];
 };
 
-const STEPS: Step[] = [
+function envEnabled(name: string): boolean {
+  const raw = (process.env[name] || '').trim().toLowerCase();
+  return raw === '1' || raw === 'true' || raw === 'yes' || raw === 'on';
+}
+
+const STEPS_BASE: Step[] = [
   { id: 'system-health', cmd: 'npx', args: ['tsx', 'scripts/autofix-system-health.ts'] },
   { id: 'finance-health', cmd: 'npx', args: ['tsx', 'scripts/autofix-finance-health.ts'] },
   { id: 'i18n-packs', cmd: 'npm', args: ['run', 'i18n:packs:fix-or-alert'] },
+  { id: 'admin-theme-autofix', cmd: 'npm', args: ['run', 'theme:admin:fix'] },
   { id: 'admin-theme-hardcode', cmd: 'npm', args: ['run', 'theme:admin:check'] },
 ];
+
+function buildSteps(): Step[] {
+  const steps: Step[] = [...STEPS_BASE];
+
+  if (envEnabled('AUTOFIX_INVENTORY_IMAGES')) {
+    steps.push({
+      id: 'inventory-images',
+      cmd: 'node',
+      args: ['scripts/sync-inventory-images.mjs', '--apply', '--only-missing'],
+    });
+  }
+
+  if (envEnabled('AUTOFIX_I18N_SMOKE')) {
+    steps.push({
+      id: 'i18n-smoke-web',
+      cmd: 'npm',
+      args: ['run', 'qa:smoke:i18n'],
+    });
+  }
+
+  return steps;
+}
 
 async function setSystemAlertCount(value: number) {
   await prisma.setting.upsert({
@@ -72,8 +100,13 @@ function runStep(step: Step) {
 async function main() {
   const startedAt = new Date().toISOString();
   const failed: string[] = [];
+  const steps = buildSteps();
 
-  for (const step of STEPS) {
+  console.log(
+    `[autofix-master] steps: ${steps.map((s) => s.id).join(', ')}`
+  );
+
+  for (const step of steps) {
     const ok = runStep(step);
     if (!ok) failed.push(step.id);
   }

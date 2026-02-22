@@ -495,6 +495,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     const segments = pathname.split('/').filter(Boolean);
     if (segments.length <= 1) return 'Tauler';
     const page = segments[segments.length - 1];
+    const parent = segments[segments.length - 2] || '';
     const pageNames: Record<string, string> = {
       leads: 'Entrades',
       bookings: 'Reserves',
@@ -532,6 +533,23 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       'google-reviews': 'Ressenyes de Google',
       'google-ads': 'Google Ads',
     };
+    const isDynamicId =
+      /^[a-f0-9]{24}$/i.test(page) || // Mongo-like id
+      /^[a-f0-9-]{32,36}$/i.test(page) || // UUID variants
+      /^[a-z0-9]{20,}$/i.test(page); // CUID/ULID-like
+
+    if (isDynamicId) {
+      const detailByParent: Record<string, string> = {
+        contactes: 'Fitxa client',
+        inventory: 'Fitxa inventari',
+        bookings: 'Fitxa reserva',
+        leads: 'Fitxa entrada',
+        clientes: 'Fitxa client',
+        packs: 'Fitxa pack',
+      };
+      return detailByParent[parent] || 'Detall';
+    }
+
     return pageNames[page] || page.charAt(0).toUpperCase() + page.slice(1);
   }, [pathname]);
 

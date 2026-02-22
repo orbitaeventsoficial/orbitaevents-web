@@ -13,7 +13,7 @@ import Image from 'next/image';
 
 const MAX_DIMENSION = 800;
 const WEBP_QUALITY = 0.82;
-const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB input
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB input (alignat amb API)
 
 interface Props {
   itemId: string;
@@ -100,7 +100,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setError('La imatge no pot superar 15 MB');
+      setError('La imatge no pot superar 10 MB');
       return;
     }
 
