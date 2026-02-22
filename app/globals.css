@@ -3636,6 +3636,26 @@ html.admin-mode .admin-main-shell :is(p, label, td, th, li, dd, dt) {
   font-size: clamp(0.95rem, 0.92rem + 0.1vw, 1.02rem) !important;
 }
 
+html.admin-mode .admin-main-shell .text-xs {
+  font-size: clamp(0.84rem, 0.82rem + 0.05vw, 0.9rem) !important;
+}
+html.admin-mode .admin-main-shell .text-sm {
+  font-size: clamp(0.95rem, 0.92rem + 0.08vw, 1.02rem) !important;
+}
+html.admin-mode .admin-main-shell .text-base {
+  font-size: clamp(1rem, 0.97rem + 0.1vw, 1.06rem) !important;
+}
+html.admin-mode .admin-main-shell .text-lg {
+  font-size: clamp(1.12rem, 1.08rem + 0.14vw, 1.2rem) !important;
+}
+
+html.admin-mode .admin-main-shell [class*='backdrop-blur'] {
+  backdrop-filter: none !important;
+}
+html.admin-mode .admin-main-shell [class*='shadow-'] {
+  box-shadow: none !important;
+}
+
 html.admin-mode .admin-layout-shell .admin-sidebar-logo-wrap,
 html.admin-mode .admin-layout-shell .admin-mobile-sidebar-logo,
 html.admin-mode .admin-layout-shell .admin-mobile-sidebar-foot-avatar,
