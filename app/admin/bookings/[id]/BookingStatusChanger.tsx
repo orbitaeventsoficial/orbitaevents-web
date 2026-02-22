@@ -108,39 +108,39 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
 
       {/* Error */}
       {error && (
-        <div className="mt-2 p-2 bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm rounded-xl" role="alert">
+        <div className="mt-2 p-2 border text-sm rounded-xl" role="alert">
           {error}
         </div>
       )}
 
       {/* Confirmation Modal for COMPLETED */}
       {showConfirmComplete && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50" role="presentation">
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50" role="presentation">
           <div
-            className="bg-slate-800 border border-slate-700/50 rounded-2xl p-6 max-w-md mx-4 shadow-xl"
+            className="border rounded-2xl p-6 max-w-md mx-4 shadow-xl"
             role="dialog"
             aria-modal="true"
             aria-labelledby="confirm-complete-title"
           >
-            <h3 id="confirm-complete-title" className="text-lg font-semibold text-slate-100 mb-2">
+            <h3 id="confirm-complete-title" className="text-lg font-semibold mb-2">
               Marcar com a Completat?
             </h3>
-            <p className="text-slate-400 mb-4">
+            <p className="mb-4">
               Aquesta acció actualitzarà automàticament les estadístiques públiques:
             </p>
-            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-4">
-              <p className="text-sm text-emerald-300">
+            <div className="border rounded-xl p-4 mb-4">
+              <p className="text-sm">
                 <strong>+1</strong> event realitzat<br />
                 <strong>+{guestCount}</strong> persones feliçes
               </p>
             </div>
-            <p className="text-xs text-slate-500 mb-4">
+            <p className="text-xs mb-4">
               Aquests números apareixeran a la web pública.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowConfirmComplete(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-300 transition-colors"
+                className="px-4 py-2 text-sm font-medium transition-colors"
                 disabled={isLoading}
                 type="button"
               >
@@ -151,7 +151,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
                 disabled={isLoading}
                 type="button"
                 aria-busy={isLoading}
-                className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-medium rounded-xl hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 shadow-lg shadow-emerald-500/20 transition-colors"
+                className="px-4 py-2 text-white text-sm font-medium rounded-xl disabled:opacity-50 shadow-lg transition-colors"
               >
                 {isLoading ? 'Actualitzant...' : 'Sí, Completar Event'}
               </button>

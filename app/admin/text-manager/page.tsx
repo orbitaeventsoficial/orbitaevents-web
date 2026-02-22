@@ -480,11 +480,11 @@ export default function TextManagerPage() {
         <div className="p-4">
           <div className="flex items-start justify-between gap-4 mb-3">
             <div className="flex-1 min-w-0">
-              <code className="text-sm text-slate-400 break-all font-mono bg-slate-800 px-2 py-1 rounded">
+              <code className="text-sm break-all font-mono px-2 py-1 rounded">
                 {path}
               </code>
               {isModified && (
-                <span className="ml-2 text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                <span className="ml-2 text-xs px-2 py-0.5 rounded-full">
                   ✏️ Modificat
                 </span>
               )}
@@ -494,13 +494,13 @@ export default function TextManagerPage() {
               {isModified && (
                 <button
                   onClick={() => handleRevert(path)}
-                  className="text-xs px-3 py-1 rounded-lg border border-slate-600 bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
+                  className="text-xs px-3 py-1 rounded-lg border transition-colors"
                   title="Revertir canvis"
                 >
                   ↩️ Revertir
                 </button>
               )}
-              <span className="text-xs text-slate-400">
+              <span className="text-xs">
                 {value.length} caràcters
               </span>
             </div>
@@ -521,34 +521,34 @@ export default function TextManagerPage() {
           {showComparison && (
             <div className="mt-3 space-y-2">
               {activeLanguage !== 'es' && otherLangValues.es && (
-                <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10">
-                  <div className="flex items-center gap-2 text-xs text-rose-300 mb-1">
+                <div className="p-3 rounded-lg border">
+                  <div className="flex items-center gap-2 text-xs mb-1">
                     <span className="font-semibold">🇪🇸 Espanyol:</span>
                   </div>
-                  <p className="text-sm text-rose-200">{otherLangValues.es}</p>
+                  <p className="text-sm">{otherLangValues.es}</p>
                 </div>
               )}
               {activeLanguage !== 'ca' && otherLangValues.ca && (
-                <div className="p-3 rounded-lg border border-blue-500/30 bg-blue-500/10">
-                  <div className="flex items-center gap-2 text-xs text-blue-300 mb-1">
+                <div className="p-3 rounded-lg border">
+                  <div className="flex items-center gap-2 text-xs mb-1">
                     <span className="font-semibold">🏴 Català:</span>
                   </div>
-                  <p className="text-sm text-blue-200">{otherLangValues.ca}</p>
+                  <p className="text-sm">{otherLangValues.ca}</p>
                 </div>
               )}
               {activeLanguage !== 'en' && otherLangValues.en && (
-                <div className="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10">
-                  <div className="flex items-center gap-2 text-xs text-emerald-300 mb-1">
+                <div className="p-3 rounded-lg border">
+                  <div className="flex items-center gap-2 text-xs mb-1">
                     <span className="font-semibold">🇬🇧 English:</span>
                   </div>
-                  <p className="text-sm text-emerald-200">{otherLangValues.en}</p>
+                  <p className="text-sm">{otherLangValues.en}</p>
                 </div>
               )}
             </div>
           )}
 
           {isModified && (
-            <div className="mt-2 p-2 rounded-lg text-xs text-slate-400 border border-slate-700 bg-slate-900/60">
+            <div className="mt-2 p-2 rounded-lg text-xs border">
               <span className="font-medium">Original:</span>{' '}
               <span className="italic">{originalTexts[path]}</span>
             </div>
@@ -584,28 +584,28 @@ export default function TextManagerPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-500 border-t-transparent mx-auto"></div>
-          <p className="mt-4 text-slate-300 text-lg">Carregant textos...</p>
-          <p className="text-sm text-slate-400">Analitzant estructura del JSON</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-transparent mx-auto"></div>
+          <p className="mt-4 text-lg">Carregant textos...</p>
+          <p className="text-sm">Analitzant estructura del JSON</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen">
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* HEADER FIJO */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      <header className="sticky top-14 lg:top-16 z-40 bg-slate-900/95 border-b border-slate-700/60 shadow-sm backdrop-blur">
+      <header className="sticky top-14 lg:top-16 z-40 border-b shadow-sm backdrop-blur">
         {/* TABS DE IDIOMA */}
-        <div className="border-b border-slate-700/60 bg-slate-900/80">
+        <div className="border-b">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-slate-300">🌐 Idioma de treball:</span>
+                <span className="text-sm font-semibold">🌐 Idioma de treball:</span>
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setActiveLanguage('es')}
@@ -639,7 +639,7 @@ export default function TextManagerPage() {
                   </button>
                 </div>
               </div>
-              <div className="text-xs text-amber-200 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/30">
+              <div className="text-xs px-3 py-1.5 rounded-lg border">
                 💡 Estàs editant: {LANGUAGE_META[activeLanguage].label} · Auto-traducció ON
               </div>
             </div>
@@ -650,10 +650,10 @@ export default function TextManagerPage() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             {/* Títol */}
             <div>
-              <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
+              <h1 className="text-2xl font-bold flex items-center gap-2">
                 📝 Text Manager PRO
               </h1>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm">
                 {Object.keys(currentTexts).length} textos · {modifiedCount} modificats
               </p>
             </div>
@@ -666,15 +666,15 @@ export default function TextManagerPage() {
                   placeholder="Cercar textos... (path o contingut)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-slate-700/60 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
+                  className="w-full px-4 py-2.5 pl-10 rounded-xl border focus:ring-2 transition-all"
                 />
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2">
                   🔍
                 </span>
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
                   >
                     ✕
                   </button>
@@ -713,7 +713,7 @@ export default function TextManagerPage() {
               {modifiedCount > 0 && (
                 <button
                   onClick={handleRevertAll}
-                  className="px-4 py-2 rounded-lg text-sm font-medium border border-rose-500/40 bg-rose-500/15 text-rose-300 hover:bg-rose-500/20 transition-all"
+                  className="px-4 py-2 rounded-lg text-sm font-medium border transition-all"
                 >
                   ↩️ Revertir ({modifiedCount})
                 </button>
@@ -751,26 +751,26 @@ export default function TextManagerPage() {
       {(error || success) && (
         <div className="max-w-7xl mx-auto px-4 mt-4">
           {error && (
-            <div className="p-4 rounded-xl border border-rose-500/40 bg-rose-500/15 text-rose-300 flex items-center justify-between" role="alert">
+            <div className="p-4 rounded-xl border flex items-center justify-between" role="alert">
               <span>❌ {error}</span>
               <button
                 onClick={() => setError(null)}
                 type="button"
                 aria-label="Tancar error"
-                className="text-rose-300 hover:text-rose-200"
+                className=""
               >
                 ✕
               </button>
             </div>
           )}
           {success && (
-            <div className="p-4 rounded-xl border border-emerald-500/40 bg-emerald-500/15 text-emerald-300 flex items-center justify-between" role="status" aria-live="polite">
+            <div className="p-4 rounded-xl border flex items-center justify-between" role="status" aria-live="polite">
               <span>{success}</span>
               <button
                 onClick={() => setSuccess(null)}
                 type="button"
                 aria-label="Tancar confirmacio"
-                className="text-emerald-300 hover:text-emerald-200"
+                className=""
               >
                 ✕
               </button>
@@ -846,17 +846,17 @@ export default function TextManagerPage() {
 
               {/* Historial */}
               {changeHistory.length > 0 && (
-                <div className="mt-6 p-4 bg-slate-900/70 rounded-xl border border-slate-700/60">
-                  <h3 className="font-semibold text-slate-100 mb-3 flex items-center gap-2">
+                <div className="mt-6 p-4 rounded-xl border">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
                     📜 Historial ({changeHistory.length})
                   </h3>
                   <div className="space-y-2">
                     {changeHistory.slice(-10).reverse().map((change, i) => (
-                      <div key={i} className="text-xs p-2 bg-slate-900/60 rounded-lg">
-                        <code className="text-orange-600 break-all">
+                      <div key={i} className="text-xs p-2 rounded-lg">
+                        <code className="break-all">
                           {change.path.split('.').slice(-2).join('.')}
                         </code>
-                        <div className="text-slate-400 mt-1">
+                        <div className="mt-1">
                           {change.timestamp.toLocaleTimeString()}
                         </div>
                       </div>
@@ -895,13 +895,13 @@ export default function TextManagerPage() {
             {/* Llista de textos */}
             <div className="space-y-3">
               {filteredTexts.length === 0 ? (
-                <div className="text-center py-12 text-slate-400">
+                <div className="text-center py-12">
                   <div className="text-4xl mb-4">🔍</div>
                   <p>No s\'han trobat textos</p>
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm('')}
-                      className="mt-2 text-orange-500 hover:underline"
+                      className="mt-2 hover:underline"
                     >
                       Netejar cerca
                     </button>
@@ -909,7 +909,7 @@ export default function TextManagerPage() {
                 </div>
               ) : (
                 <>
-                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-700/60 bg-slate-900/70 px-3 py-2 text-xs text-slate-300">
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-xs">
                     <span>
                       Mostrant 1-{filteredTexts.length} de {filteredTexts.length}
                     </span>
@@ -931,7 +931,7 @@ export default function TextManagerPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-8 py-4 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-2"
+            className="px-8 py-4 text-white rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-2"
           >
             {saving ? (
               <>

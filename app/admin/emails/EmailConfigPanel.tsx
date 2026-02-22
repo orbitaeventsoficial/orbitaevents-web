@@ -48,32 +48,32 @@ export default function EmailConfigPanel() {
   };
 
   return (
-    <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-700/30">
-        <h2 className="font-semibold text-slate-100">⚙️ Configuració</h2>
+    <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+      <div className="px-6 py-4 border-b">
+        <h2 className="font-semibold">⚙️ Configuració</h2>
       </div>
 
       <div className="p-6 space-y-5">
         <div>
-          <label className="text-sm font-medium text-slate-300 block mb-1">
+          <label className="text-sm font-medium block mb-1">
             URL Google Reviews
           </label>
           <input
             type="text"
             value={config.googleReviewUrl}
             onChange={(e) => setConfig({ ...config, googleReviewUrl: e.target.value })}
-            className="w-full px-3 py-2 text-sm rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            className="w-full px-3 py-2 text-sm rounded-xl border focus:ring-1"
           />
         </div>
 
         <div>
-          <label className="text-sm font-medium text-slate-300 block mb-1">
+          <label className="text-sm font-medium block mb-1">
             Dies de retard post-esdeveniment
           </label>
           <select
             value={config.postEventDelay}
             onChange={(e) => setConfig({ ...config, postEventDelay: Number(e.target.value) })}
-            className="w-full px-3 py-2 text-sm rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            className="w-full px-3 py-2 text-sm rounded-xl border focus:ring-1"
           >
             <option value={1}>1 dia</option>
             <option value={2}>2 dies</option>
@@ -87,9 +87,9 @@ export default function EmailConfigPanel() {
               type="checkbox"
               checked={config.enablePostEvent}
               onChange={(e) => setConfig({ ...config, enablePostEvent: e.target.checked })}
-              className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
+              className="w-5 h-5 rounded"
             />
-            <span className="text-sm text-slate-300">Correu post-esdeveniment automàtic</span>
+            <span className="text-sm">Correu post-esdeveniment automàtic</span>
           </label>
 
           <label className="flex items-center gap-3 cursor-pointer">
@@ -97,9 +97,9 @@ export default function EmailConfigPanel() {
               type="checkbox"
               checked={config.enableCanvas}
               onChange={(e) => setConfig({ ...config, enableCanvas: e.target.checked })}
-              className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
+              className="w-5 h-5 rounded"
             />
-            <span className="text-sm text-slate-300">Correu de canvas + descompte</span>
+            <span className="text-sm">Correu de canvas + descompte</span>
           </label>
 
           <label className="flex items-center gap-3 cursor-pointer">
@@ -107,37 +107,37 @@ export default function EmailConfigPanel() {
               type="checkbox"
               checked={config.enableLeadConfirmation}
               onChange={(e) => setConfig({ ...config, enableLeadConfirmation: e.target.checked })}
-              className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-cyan-500 focus:ring-cyan-500"
+              className="w-5 h-5 rounded"
             />
-            <span className="text-sm text-slate-300">Confirmació d’entrada (al client)</span>
+            <span className="text-sm">Confirmació d’entrada (al client)</span>
           </label>
         </div>
 
         <div>
-          <p className="text-sm font-medium text-slate-300 mb-2">Percentatges de descompte</p>
+          <p className="text-sm font-medium mb-2">Percentatges de descompte</p>
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="flex items-center justify-between bg-slate-700/50 px-3 py-2 rounded-lg text-slate-300">
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg">
               <span>Base:</span>
-              <span className="font-bold text-slate-100">{config.discountBase}%</span>
+              <span className="font-bold">{config.discountBase}%</span>
             </div>
-            <div className="flex items-center justify-between bg-slate-700/50 px-3 py-2 rounded-lg text-slate-300">
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg">
               <span>+Foto:</span>
-              <span className="font-bold text-slate-100">{config.discountPhoto}%</span>
+              <span className="font-bold">{config.discountPhoto}%</span>
             </div>
-            <div className="flex items-center justify-between bg-slate-700/50 px-3 py-2 rounded-lg text-slate-300">
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg">
               <span>+Video:</span>
-              <span className="font-bold text-slate-100">{config.discountVideo}%</span>
+              <span className="font-bold">{config.discountVideo}%</span>
             </div>
-            <div className="flex items-center justify-between bg-slate-700/50 px-3 py-2 rounded-lg text-slate-300">
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg">
               <span>+Google:</span>
-              <span className="font-bold text-slate-100">{config.discountGoogle}%</span>
+              <span className="font-bold">{config.discountGoogle}%</span>
             </div>
           </div>
         </div>
 
         {error && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30" role="alert">
-            <p className="text-sm text-rose-300">❌ {error}</p>
+          <div className="p-3 rounded-lg border" role="alert">
+            <p className="text-sm">❌ {error}</p>
           </div>
         )}
 

@@ -90,11 +90,11 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
   return (
     <section className="space-y-4">
       {/* Header */}
-      <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+      <div className="rounded-2xl border p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-slate-100">Pressupostos</h2>
-            <p className="text-sm text-slate-400">
+            <h2 className="text-lg font-semibold">Pressupostos</h2>
+            <p className="text-sm">
               {data.proposals.length} pressupost{data.proposals.length !== 1 ? 's' : ''} · 
               {drafts.length > 0 && ` ${drafts.length} esborrany`}
               {sent.length > 0 && ` · ${sent.length} pendent${sent.length !== 1 ? 's' : ''}`}
@@ -102,14 +102,14 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
           </div>
           <Link
             href={`/admin/presupuestos?customerId=${data.customer.id}`}
-            className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-600 transition-colors"
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors"
           >
             + Nou pressupost
           </Link>
         </div>
 
         {error && (
-          <div className="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+          <div className="mt-3 rounded-lg border px-3 py-2 text-sm">
             {error}
           </div>
         )}
@@ -163,11 +163,11 @@ export default function ProposalsPanel({ data }: { data: CustomerHubDTO }) {
 
       {/* Sense pressupostos */}
       {data.proposals.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/30 p-8 text-center">
-          <p className="text-slate-400">No hi ha pressupostos per aquest client.</p>
+        <div className="rounded-2xl border border-dashed p-8 text-center">
+          <p className="">No hi ha pressupostos per aquest client.</p>
           <Link
             href={`/admin/presupuestos?customerId=${data.customer.id}`}
-            className="mt-4 inline-block rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-600"
+            className="mt-4 inline-block rounded-lg px-4 py-2 text-sm font-semibold text-white"
           >
             Crear primer pressupost
           </Link>
@@ -207,16 +207,16 @@ function ProposalGroup({
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
 
   return (
-    <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 overflow-hidden">
+    <div className="rounded-2xl border overflow-hidden">
       <button
         type="button"
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-slate-800/30 transition-colors"
+        className="w-full flex items-center justify-between px-5 py-3 text-left transition-colors"
       >
-        <span className="flex items-center gap-2 text-sm font-medium text-slate-200">
+        <span className="flex items-center gap-2 text-sm font-medium">
           <span>{icon}</span>
           {title}
-          <span className="rounded-full bg-slate-700 px-2 py-0.5 text-xs text-slate-300">
+          <span className="rounded-full px-2 py-0.5 text-xs">
             {proposals.length}
           </span>
         </span>
@@ -226,7 +226,7 @@ function ProposalGroup({
       </button>
 
       {!isCollapsed && (
-        <div className="border-t border-slate-700/40 p-3 space-y-2">
+        <div className="border-t p-3 space-y-2">
           {proposals.map((proposal) => (
             <ProposalCard
               key={proposal.id}
@@ -272,32 +272,32 @@ function ProposalCard({
   const canMarkExpired = proposal.status === 'SENT' || proposal.status === 'VIEWED';
 
   return (
-    <div className="rounded-xl border border-slate-700/70 bg-slate-800/60 p-4">
+    <div className="rounded-xl border p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold text-slate-100">{proposal.reference}</p>
+            <p className="text-sm font-semibold">{proposal.reference}</p>
             <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${style.bg} ${style.text} ${style.border}`}>
               {labelEstatPressupost(proposal.status)}
             </span>
           </div>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs">
             Creat {new Date(proposal.createdAt).toLocaleDateString('ca-ES')} · 
-            <span className="font-medium text-slate-200"> {proposal.total.toFixed(2)}€</span>
+            <span className="font-medium"> {proposal.total.toFixed(2)}€</span>
           </p>
           {proposal.sentAt && (
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px]">
               Enviat {new Date(proposal.sentAt).toLocaleDateString('ca-ES')}
             </p>
           )}
           {proposal.acceptedAt && (
-            <p className="text-[11px] text-emerald-400">
+            <p className="text-[11px]">
               ✓ Acceptat {new Date(proposal.acceptedAt).toLocaleDateString('ca-ES')}
             </p>
           )}
         </div>
 
-        <div className="text-lg font-semibold text-slate-100">
+        <div className="text-lg font-semibold">
           {proposal.total.toFixed(0)}€
         </div>
       </div>
@@ -306,7 +306,7 @@ function ProposalCard({
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Link
           href={`/admin/presupuestos?proposalId=${proposal.id}&customerId=${customerId}`}
-          className="rounded border border-slate-600 px-2.5 py-1.5 text-xs text-slate-200 hover:bg-slate-700 transition-colors"
+          className="rounded border px-2.5 py-1.5 text-xs transition-colors"
         >
           ✏️ Editar
         </Link>
@@ -316,20 +316,20 @@ function ProposalCard({
             type="button"
             onClick={onConfirm}
             disabled={isBusy}
-            className="rounded border border-cyan-500/40 px-2.5 py-1.5 text-xs text-cyan-300 hover:bg-cyan-500/10 transition-colors disabled:opacity-50"
+            className="rounded border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50"
           >
             📤 Enviar
           </button>
         )}
 
         {canSend && isConfirming && (
-          <div className="flex items-center gap-1 rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-2 py-1">
-            <span className="text-xs text-cyan-200">Confirmes l'enviament?</span>
+          <div className="flex items-center gap-1 rounded-lg border px-2 py-1">
+            <span className="text-xs">Confirmes l'enviament?</span>
             <button
               type="button"
               onClick={onSend}
               disabled={isBusy}
-              className="rounded bg-cyan-500 px-2 py-0.5 text-xs font-semibold text-white hover:bg-cyan-600 disabled:opacity-50"
+              className="rounded px-2 py-0.5 text-xs font-semibold text-white disabled:opacity-50"
             >
               {isBusy ? '...' : 'Sí'}
             </button>
@@ -337,7 +337,7 @@ function ProposalCard({
               type="button"
               onClick={onCancelConfirm}
               disabled={isBusy}
-              className="rounded px-2 py-0.5 text-xs text-cyan-300 hover:bg-cyan-500/20"
+              className="rounded px-2 py-0.5 text-xs"
             >
               No
             </button>
@@ -349,7 +349,7 @@ function ProposalCard({
             type="button"
             onClick={() => onUpdateStatus('ACCEPTED')}
             disabled={isBusy}
-            className="rounded border border-emerald-500/40 px-2.5 py-1.5 text-xs text-emerald-300 hover:bg-emerald-500/10 transition-colors disabled:opacity-50"
+            className="rounded border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50"
           >
             {busyId === `status-${proposal.id}-ACCEPTED` ? '...' : '✅ Acceptat'}
           </button>
@@ -360,7 +360,7 @@ function ProposalCard({
             type="button"
             onClick={() => onUpdateStatus('EXPIRED')}
             disabled={isBusy}
-            className="rounded border border-amber-500/40 px-2.5 py-1.5 text-xs text-amber-300 hover:bg-amber-500/10 transition-colors disabled:opacity-50"
+            className="rounded border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50"
           >
             {busyId === `status-${proposal.id}-EXPIRED` ? '...' : '⏰ Caducat'}
           </button>
@@ -371,7 +371,7 @@ function ProposalCard({
             type="button"
             onClick={() => onUpdateStatus('REJECTED')}
             disabled={isBusy}
-            className="rounded border border-rose-500/40 px-2.5 py-1.5 text-xs text-rose-300 hover:bg-rose-500/10 transition-colors disabled:opacity-50"
+            className="rounded border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50"
           >
             {busyId === `status-${proposal.id}-REJECTED` ? '...' : '❌ Rebutjat'}
           </button>

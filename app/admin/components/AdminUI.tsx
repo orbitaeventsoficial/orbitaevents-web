@@ -200,8 +200,8 @@ export function DataCard({ title, value, subtitle, trend, icon, color = 'default
       <div className="flex items-start justify-between">
         <div>
           <p className={`text-[10px] sm:text-xs font-medium uppercase ${textColor}`}>{title}</p>
-          <p className="mt-1 text-2xl sm:text-3xl font-bold text-slate-100">{value}</p>
-          {subtitle && <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>}
+          <p className="mt-1 text-2xl sm:text-3xl font-bold">{value}</p>
+          {subtitle && <p className="mt-0.5 text-xs">{subtitle}</p>}
         </div>
         {icon && <span className="text-2xl">{icon}</span>}
       </div>
@@ -211,7 +211,7 @@ export function DataCard({ title, value, subtitle, trend, icon, color = 'default
           <span className={trend.value >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
             {trend.value >= 0 ? '↑' : '↓'} {Math.abs(trend.value)}%
           </span>
-          <span className="text-xs text-slate-500">{trend.label}</span>
+          <span className="text-xs">{trend.label}</span>
         </div>
       )}
     </div>
@@ -241,16 +241,16 @@ type EmptyStateProps = {
 
 export function EmptyState({ icon = '📭', title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-700/50 bg-slate-800/30 p-8 text-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border p-8 text-center">
       <span className="text-5xl mb-4">{icon}</span>
-      <h3 className="text-lg font-semibold text-slate-200">{title}</h3>
-      {description && <p className="mt-2 text-sm text-slate-400 max-w-sm">{description}</p>}
+      <h3 className="text-lg font-semibold">{title}</h3>
+      {description && <p className="mt-2 text-sm max-w-sm">{description}</p>}
       
       {action && (
         'href' in action ? (
           <Link
             href={action.href}
-            className="mt-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-sm font-medium text-white"
+            className="mt-4 rounded-xl px-4 py-2 text-sm font-medium text-white"
           >
             {action.label}
           </Link>
@@ -258,7 +258,7 @@ export function EmptyState({ icon = '📭', title, description, action }: EmptyS
           <button
             type="button"
             onClick={action.onClick}
-            className="mt-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-sm font-medium text-white"
+            className="mt-4 rounded-xl px-4 py-2 text-sm font-medium text-white"
           >
             {action.label}
           </button>
@@ -305,16 +305,16 @@ export function ConfirmModal({
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
-        <h3 className="text-lg font-semibold text-slate-100">{title}</h3>
-        <p className="mt-2 text-sm text-slate-400">{message}</p>
+      <div className="relative z-10 w-full max-w-md rounded-2xl border p-6 shadow-2xl">
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <p className="mt-2 text-sm">{message}</p>
 
         <div className="mt-6 flex justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="rounded-xl border border-slate-600 bg-slate-700/50 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 disabled:opacity-50"
+            className="rounded-xl border px-4 py-2 text-sm font-medium disabled:opacity-50"
           >
             {cancelLabel}
           </button>
@@ -357,12 +357,12 @@ export function Toast({ type, message, onClose }: ToastProps) {
   return (
     <div className={`fixed bottom-4 right-4 z-[101] flex items-center gap-3 rounded-xl border ${style.bg} px-4 py-3 shadow-2xl backdrop-blur-sm`}>
       <span className="text-lg">{style.icon}</span>
-      <p className="text-sm text-slate-200">{message}</p>
+      <p className="text-sm">{message}</p>
       {onClose && (
         <button
           type="button"
           onClick={onClose}
-          className="ml-2 text-slate-400 hover:text-slate-200"
+          className="ml-2"
         >
           ✕
         </button>
@@ -377,10 +377,10 @@ export function Toast({ type, message, onClose }: ToastProps) {
 
 export function KeyboardHint({ keys, description }: { keys: string[]; description: string }) {
   return (
-    <div className="flex items-center gap-2 text-xs text-slate-500">
+    <div className="flex items-center gap-2 text-xs">
       <div className="flex gap-1">
         {keys.map((key, i) => (
-          <kbd key={i} className="rounded border border-slate-700 bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">
+          <kbd key={i} className="rounded border px-1.5 py-0.5 font-mono text-[10px]">
             {key}
           </kbd>
         ))}
@@ -402,9 +402,9 @@ export function Skeleton({ className = '' }: { className?: string }) {
 
 export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
   return (
-    <div className="rounded-2xl border border-slate-700/50 bg-slate-800/40 overflow-hidden">
+    <div className="rounded-2xl border overflow-hidden">
       {/* Header */}
-      <div className="flex gap-4 border-b border-slate-700/50 bg-slate-800/60 px-4 py-3">
+      <div className="flex gap-4 border-b px-4 py-3">
         {Array.from({ length: cols }).map((_, i) => (
           <Skeleton key={i} className="h-4 flex-1" />
         ))}
@@ -412,7 +412,7 @@ export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: nu
       
       {/* Rows */}
       {Array.from({ length: rows }).map((_, rowIndex) => (
-        <div key={rowIndex} className="flex gap-4 border-b border-slate-700/30 px-4 py-4">
+        <div key={rowIndex} className="flex gap-4 border-b px-4 py-4">
           {Array.from({ length: cols }).map((_, colIndex) => (
             <Skeleton key={colIndex} className="h-4 flex-1" />
           ))}

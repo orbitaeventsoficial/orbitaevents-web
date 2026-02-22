@@ -3986,6 +3986,47 @@ html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-tab--active
   background: color-mix(in oklab, var(--admin-primary) 22%, var(--admin-panel) 78%) !important;
   color: var(--admin-text) !important;
 }
+
+/* Layout autofix: text overflow + safety margins */
+html.admin-mode .admin-main-shell,
+html.admin-mode .admin-main-shell * {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+html.admin-mode .admin-main-shell > * {
+  max-width: 100%;
+}
+
+html.admin-mode .admin-main-shell .admin-page-container {
+  padding-inline: clamp(0.9rem, 1.2vw, 1.4rem);
+}
+
+html.admin-mode .admin-main-shell :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  label,
+  li,
+  dd,
+  dt,
+  td,
+  th,
+  a,
+  button
+) {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+html.admin-mode .admin-main-shell .overflow-x-auto {
+  max-width: 100%;
+}
 html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-tab--idle {
   background: color-mix(in oklab, var(--admin-panel) 84%, var(--admin-surface) 16%) !important;
   color: var(--admin-muted) !important;

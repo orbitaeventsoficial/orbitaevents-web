@@ -140,24 +140,24 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
   }
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-100">Històric de configuració</h2>
+    <section className="rounded-2xl border border-white/10 p-5 shadow-sm">
+      <h2 className="text-lg font-semibold">Històric de configuració</h2>
       <div className="mt-2 flex justify-end">
         <button
           type="button"
           onClick={exportCsv}
-          className="rounded-md border border-white/10 bg-slate-950/60 px-2.5 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5"
+          className="rounded-md border border-white/10 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/5"
         >
           Exportar CSV (filtrat)
         </button>
       </div>
       <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        <label className="text-xs text-slate-400">
+        <label className="text-xs">
           Rol
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value as 'ALL' | 'OWNER' | 'MANAGER' | 'VIEWER')}
-            className="mt-1 w-full rounded-md border border-stone-300 bg-slate-950/60 px-2 py-1.5 text-xs text-slate-200"
+            className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs"
           >
             <option value="ALL">Tots</option>
             <option value="OWNER">OWNER</option>
@@ -165,61 +165,61 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
             <option value="VIEWER">VIEWER</option>
           </select>
         </label>
-        <label className="text-xs text-slate-400">
+        <label className="text-xs">
           Des de
           <input
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="mt-1 w-full rounded-md border border-stone-300 bg-slate-950/60 px-2 py-1.5 text-xs text-slate-200"
+            className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs"
           />
         </label>
-        <label className="text-xs text-slate-400">
+        <label className="text-xs">
           Fins a
           <input
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="mt-1 w-full rounded-md border border-stone-300 bg-slate-950/60 px-2 py-1.5 text-xs text-slate-200"
+            className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs"
           />
         </label>
-        <label className="text-xs text-slate-400">
+        <label className="text-xs">
           Cercar canvis
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="canal, ràtio, cost..."
-            className="mt-1 w-full rounded-md border border-stone-300 bg-slate-950/60 px-2 py-1.5 text-xs text-slate-200"
+            className="mt-1 w-full rounded-md border px-2 py-1.5 text-xs"
           />
         </label>
       </div>
       <div className="mt-3 space-y-2">
         {filteredEntries.length === 0 ? (
-          <p className="text-sm text-slate-400">Encara no hi ha versions desades.</p>
+          <p className="text-sm">Encara no hi ha versions desades.</p>
         ) : (
           filteredEntries.map((entry) => (
             <div key={entry.id} className="rounded-lg border border-white/10 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-slate-100">
+                <p className="text-sm font-semibold">
                   {new Date(entry.createdAt).toLocaleString('ca-ES')}
                 </p>
                 <button
                   type="button"
                   onClick={() => restore(entry)}
                   disabled={restoringId === entry.id}
-                  className="rounded-md border border-white/10 bg-slate-950/60 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-white/5 disabled:opacity-60"
+                  className="rounded-md border border-white/10 px-2 py-1 text-xs font-semibold hover:bg-white/5 disabled:opacity-60"
                 >
                   {restoringId === entry.id ? 'Restaurant...' : 'Restaurar'}
                 </button>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs">
                 Rol: {entry.role} · Cost fix: {entry.after.fixedOperationalCost}€ ·
                 {' '}Pack ratio: {(entry.after.packCostRatio * 100).toFixed(1)}%
               </p>
               <div className="mt-2 rounded-md bg-white/5 p-2">
-                <p className="text-xs font-semibold text-slate-200">Canvis</p>
-                <div className="mt-1 grid gap-1 text-xs text-slate-300 sm:grid-cols-2">
+                <p className="text-xs font-semibold">Canvis</p>
+                <div className="mt-1 grid gap-1 text-xs sm:grid-cols-2">
                   {changedNumber(entry.before.packCostRatio, entry.after.packCostRatio) && (
                     <p>
                       packCostRatio: {(entry.before.packCostRatio * 100).toFixed(1)}% → {(entry.after.packCostRatio * 100).toFixed(1)}%
@@ -245,7 +245,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
                     </p>
                   )}
                 </div>
-                <div className="mt-2 grid gap-1 text-xs text-slate-300 sm:grid-cols-2">
+                <div className="mt-2 grid gap-1 text-xs sm:grid-cols-2">
                   {Object.keys(entry.after.channelCac)
                     .filter((channel) => changedNumber(entry.before.channelCac[channel] || 0, entry.after.channelCac[channel] || 0))
                     .map((channel) => (
@@ -262,14 +262,14 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
                   && Object.keys(entry.after.channelCac).every(
                     (channel) => !changedNumber(entry.before.channelCac[channel] || 0, entry.after.channelCac[channel] || 0)
                   ) && (
-                    <p className="mt-1 text-xs text-slate-400">No s\'han detectat canvis (possible desat identic).</p>
+                    <p className="mt-1 text-xs">No s\'han detectat canvis (possible desat identic).</p>
                   )}
               </div>
             </div>
           ))
         )}
       </div>
-      {msg && <p className="mt-3 text-sm text-slate-400">{msg}</p>}
+      {msg && <p className="mt-3 text-sm">{msg}</p>}
     </section>
   );
 }

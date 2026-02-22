@@ -79,12 +79,12 @@ export function MiniLineChart({ series, height = 56 }: { series: Series[]; heigh
           );
         })}
       </svg>
-      <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-slate-400">
+      <div className="mt-2 flex flex-wrap gap-3 text-[11px]">
         {series.map((s, idx) => (
           <div key={`${s.label || 'legend'}-${idx}`} className="flex items-center gap-2">
             <span className="inline-flex h-2 w-2 rounded-full" style={{ background: s.stroke }} />
-            <span className="uppercase tracking-wide text-[10px] text-slate-500">{s.label}</span>
-            {s.value !== undefined && <span className="text-slate-200 font-medium">{s.value}</span>}
+            <span className="uppercase tracking-wide text-[10px]">{s.label}</span>
+            {s.value !== undefined && <span className="font-medium">{s.value}</span>}
           </div>
         ))}
       </div>

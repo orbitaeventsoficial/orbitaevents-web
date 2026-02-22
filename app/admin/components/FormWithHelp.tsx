@@ -32,7 +32,7 @@ function HelpIndicator({ item, onHover }: { item: HelpItem; onHover: (item: Help
 
   return (
     <span
-      className="ml-1.5 inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-amber-500/20 text-[10px] font-bold text-amber-400 transition-all hover:bg-amber-500/30"
+      className="ml-1.5 inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full text-[10px] font-bold transition-all"
       onMouseEnter={() => onHover(item)}
       onMouseLeave={() => onHover(null)}
     >
@@ -47,11 +47,11 @@ function HelpIndicator({ item, onHover }: { item: HelpItem; onHover: (item: Help
 
 function HelpPopup({ item }: { item: HelpItem }) {
   return (
-    <div className="absolute left-0 top-full z-50 mt-1 w-64 rounded-xl border border-amber-500/30 bg-slate-900 p-3 shadow-2xl">
-      <p className="text-sm font-semibold text-amber-300">{item.term}</p>
-      <p className="mt-1 text-xs text-slate-300">{item.description}</p>
+    <div className="absolute left-0 top-full z-50 mt-1 w-64 rounded-xl border p-3 shadow-2xl">
+      <p className="text-sm font-semibold">{item.term}</p>
+      <p className="mt-1 text-xs">{item.description}</p>
       {item.example && (
-        <p className="mt-2 rounded bg-slate-800 px-2 py-1 text-[11px] text-slate-400">
+        <p className="mt-2 rounded px-2 py-1 text-[11px]">
           💡 {item.example}
         </p>
       )}
@@ -79,9 +79,9 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
 
     return (
       <div className="relative">
-        <label className="mb-1.5 flex items-center text-xs font-medium text-slate-300">
+        <label className="mb-1.5 flex items-center text-xs font-medium">
           {label}
-          {props.required && <span className="ml-1 text-rose-400">*</span>}
+          {props.required && <span className="ml-1">*</span>}
           {helpItem && <HelpIndicator item={helpItem} onHover={setHoveredHelp} />}
         </label>
         
@@ -103,11 +103,11 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
         />
 
         {hint && !error && (
-          <p className="mt-1 text-[11px] text-slate-500">{hint}</p>
+          <p className="mt-1 text-[11px]">{hint}</p>
         )}
         
         {error && (
-          <p className="mt-1 text-[11px] text-rose-400">{error}</p>
+          <p className="mt-1 text-[11px]">{error}</p>
         )}
 
         {hoveredHelp && <HelpPopup item={hoveredHelp} />}
@@ -138,9 +138,9 @@ export const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
 
     return (
       <div className="relative">
-        <label className="mb-1.5 flex items-center text-xs font-medium text-slate-300">
+        <label className="mb-1.5 flex items-center text-xs font-medium">
           {label}
-          {props.required && <span className="ml-1 text-rose-400">*</span>}
+          {props.required && <span className="ml-1">*</span>}
           {helpItem && <HelpIndicator item={helpItem} onHover={setHoveredHelp} />}
         </label>
         
@@ -168,7 +168,7 @@ export const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
         </select>
 
         {error && (
-          <p className="mt-1 text-[11px] text-rose-400">{error}</p>
+          <p className="mt-1 text-[11px]">{error}</p>
         )}
 
         {hoveredHelp && <HelpPopup item={hoveredHelp} />}
@@ -199,9 +199,9 @@ export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
 
     return (
       <div className="relative">
-        <label className="mb-1.5 flex items-center text-xs font-medium text-slate-300">
+        <label className="mb-1.5 flex items-center text-xs font-medium">
           {label}
-          {props.required && <span className="ml-1 text-rose-400">*</span>}
+          {props.required && <span className="ml-1">*</span>}
           {helpItem && <HelpIndicator item={helpItem} onHover={setHoveredHelp} />}
         </label>
         
@@ -223,11 +223,11 @@ export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
         />
 
         {hint && !error && (
-          <p className="mt-1 text-[11px] text-slate-500">{hint}</p>
+          <p className="mt-1 text-[11px]">{hint}</p>
         )}
         
         {error && (
-          <p className="mt-1 text-[11px] text-rose-400">{error}</p>
+          <p className="mt-1 text-[11px]">{error}</p>
         )}
 
         {hoveredHelp && <HelpPopup item={hoveredHelp} />}
@@ -254,17 +254,17 @@ export function FormSection({ title, description, children, collapsible = false,
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-2xl border border-slate-700/50 bg-slate-800/40 p-4">
+    <div className="rounded-2xl border p-4">
       <div
         className={`flex items-center justify-between ${collapsible ? 'cursor-pointer' : ''}`}
         onClick={() => collapsible && setIsOpen(!isOpen)}
       >
         <div>
-          <h3 className="text-sm font-semibold text-slate-200">{title}</h3>
-          {description && <p className="mt-0.5 text-xs text-slate-500">{description}</p>}
+          <h3 className="text-sm font-semibold">{title}</h3>
+          {description && <p className="mt-0.5 text-xs">{description}</p>}
         </div>
         {collapsible && (
-          <button type="button" className="text-slate-400 hover:text-slate-200">
+          <button type="button" className="">
             {isOpen ? '▲' : '▼'}
           </button>
         )}
@@ -307,14 +307,14 @@ export function FormActions({
   showDelete = false,
 }: FormActionsProps) {
   return (
-    <div className="flex items-center justify-between border-t border-slate-700/50 pt-4">
+    <div className="flex items-center justify-between border-t pt-4">
       <div>
         {showDelete && onDelete && (
           <button
             type="button"
             onClick={onDelete}
             disabled={deleting}
-            className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-400 transition-all hover:bg-rose-500/20 disabled:opacity-50"
+            className="rounded-xl border px-4 py-2 text-sm font-medium transition-all disabled:opacity-50"
           >
             {deleting ? 'Eliminant...' : deleteLabel}
           </button>
@@ -326,7 +326,7 @@ export function FormActions({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-xl border border-slate-600 bg-slate-700/50 px-4 py-2 text-sm font-medium text-slate-300 transition-all hover:bg-slate-700"
+            className="rounded-xl border px-4 py-2 text-sm font-medium transition-all"
           >
             {cancelLabel}
           </button>
@@ -337,7 +337,7 @@ export function FormActions({
             type="button"
             onClick={onSave}
             disabled={saving}
-            className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 transition-all hover:from-amber-400 hover:to-orange-400 disabled:opacity-50"
+            className="rounded-xl px-6 py-2 text-sm font-semibold text-white shadow-lg transition-all disabled:opacity-50"
           >
             {saving ? 'Desant...' : saveLabel}
           </button>
@@ -401,22 +401,22 @@ export function InlineEdit({ value, onSave, label, placeholder, type = 'text' }:
           onKeyDown={handleKeyDown}
           onBlur={handleSave}
           autoFocus
-          className="flex-1 rounded-lg border border-amber-500/50 bg-slate-800 px-2 py-1 text-sm text-slate-100 outline-none"
+          className="flex-1 rounded-lg border px-2 py-1 text-sm outline-none"
           placeholder={placeholder}
         />
-        {saving && <span className="text-xs text-slate-400">Desant...</span>}
+        {saving && <span className="text-xs">Desant...</span>}
       </div>
     );
   }
 
   return (
     <div className="group flex items-center gap-2">
-      {label && <span className="text-xs text-slate-500">{label}:</span>}
-      <span className="text-sm text-slate-200">{value || <em className="text-slate-500">{placeholder || 'No definit'}</em>}</span>
+      {label && <span className="text-xs">{label}:</span>}
+      <span className="text-sm">{value || <em className="">{placeholder || 'No definit'}</em>}</span>
       <button
         type="button"
         onClick={() => setIsEditing(true)}
-        className="invisible rounded p-1 text-slate-500 hover:bg-slate-700 hover:text-slate-300 group-hover:visible"
+        className="invisible rounded p-1 group-hover:visible"
       >
         ✏️
       </button>

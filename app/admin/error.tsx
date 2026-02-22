@@ -8,10 +8,10 @@ interface AdminErrorProps {
 export default function AdminError({ error, reset }: AdminErrorProps) {
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-4">
-      <div className="max-w-md w-full rounded-2xl border border-rose-500/30 bg-gradient-to-b from-slate-900/95 to-slate-950/95 p-8 text-center shadow-xl shadow-black/35">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-rose-500/40 bg-rose-500/15">
+      <div className="max-w-md w-full rounded-2xl border p-8 text-center shadow-xl shadow-black/35">
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border">
           <svg
-            className="w-8 h-8 text-rose-300"
+            className="w-8 h-8"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -25,21 +25,21 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
           </svg>
         </div>
 
-        <h2 className="mb-2 text-xl font-bold text-slate-100">
+        <h2 className="mb-2 text-xl font-bold">
           Error al panell d&apos;administració
         </h2>
 
-        <p className="mb-6 text-slate-300">
+        <p className="mb-6">
           S&apos;ha produït un error inesperat.
         </p>
 
         {process.env.NODE_ENV === 'development' && (
-          <div className="mb-6 rounded-xl border border-rose-500/40 bg-rose-500/10 p-4">
-            <p className="text-sm font-mono text-rose-200 break-all">
+          <div className="mb-6 rounded-xl border p-4">
+            <p className="text-sm font-mono break-all">
               {error.message}
             </p>
             {error.digest && (
-              <p className="mt-2 text-xs text-rose-300/80">
+              <p className="mt-2 text-xs">
                 Digest: {error.digest}
               </p>
             )}
@@ -50,14 +50,14 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
           <button
             onClick={reset}
             type="button"
-            className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 px-5 py-2.5 font-medium text-white transition-all hover:from-amber-400 hover:to-orange-500"
+            className="rounded-xl px-5 py-2.5 font-medium text-white transition-all"
           >
             Torna-ho a provar
           </button>
 
           <a
             href="/admin"
-            className="rounded-xl border border-slate-600/60 bg-slate-800/70 px-5 py-2.5 font-medium text-slate-200 transition-colors hover:bg-slate-700/70"
+            className="rounded-xl border px-5 py-2.5 font-medium transition-colors"
           >
             Tornar a l&apos;inici
           </a>

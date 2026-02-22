@@ -458,7 +458,7 @@ export default function NewBookingPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -468,10 +468,10 @@ export default function NewBookingPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
+          <h1 className="text-2xl font-semibold tracking-tight">
             Nova reserva
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm mt-1">
             {leadData
               ? `Des de l'entrada de ${leadData.name}`
               : 'Crear una reserva manualment'}
@@ -479,7 +479,7 @@ export default function NewBookingPage() {
         </div>
         <Link
           href="/admin/bookings"
-          className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-3 py-2 text-sm text-slate-200 hover:bg-slate-600/50 transition-colors"
+          className="rounded-xl border px-3 py-2 text-sm transition-colors"
         >
           ← Reserves
         </Link>
@@ -487,14 +487,14 @@ export default function NewBookingPage() {
 
       {/* Lead context banner */}
       {leadData && (
-        <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4 flex items-center justify-between">
-          <div className="text-sm text-cyan-200">
+        <div className="rounded-xl border p-4 flex items-center justify-between">
+          <div className="text-sm">
             Entrada vinculada: <strong>{leadData.name}</strong> · {leadData.email}
             {leadData.budget && ` · Pressupost: ${leadData.budget}`}
           </div>
           <Link
             href={`/admin/leads/${leadData.id}`}
-            className="text-xs text-cyan-400 hover:text-cyan-300"
+            className="text-xs"
           >
             Veure entrada →
           </Link>
@@ -502,55 +502,55 @@ export default function NewBookingPage() {
       )}
 
       {error && (
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4">
-          <p className="text-rose-300 text-sm">{error}</p>
+        <div className="rounded-xl border p-4">
+          <p className="text-sm">{error}</p>
         </div>
       )}
 
       {/* Client data */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-200">Dades del client</h2>
+      <div className="rounded-2xl border p-5 space-y-4">
+        <h2 className="text-sm font-semibold">Dades del client</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs text-slate-400">Nom *</label>
+            <label className="text-xs">Nom *</label>
             <input
               type="text"
               value={form.clientName}
               onChange={(e) => updateField('clientName', e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Email *</label>
+            <label className="text-xs">Email *</label>
             <input
               type="email"
               value={form.clientEmail}
               onChange={(e) => updateField('clientEmail', e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Telèfon *</label>
+            <label className="text-xs">Telèfon *</label>
             <input
               type="tel"
               value={form.clientPhone}
               onChange={(e) => updateField('clientPhone', e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {calculatingDistance && <p className="text-xs text-cyan-300">Calculant ruta automàticament...</p>}
-          {distanceMessage && <p className="text-xs text-slate-300">{distanceMessage}</p>}
+          {calculatingDistance && <p className="text-xs">Calculant ruta automàticament...</p>}
+          {distanceMessage && <p className="text-xs">{distanceMessage}</p>}
         </div>
       </div>
 
       {/* Event details */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-200">Detalls de l&apos;esdeveniment</h2>
+      <div className="rounded-2xl border p-5 space-y-4">
+        <h2 className="text-sm font-semibold">Detalls de l&apos;esdeveniment</h2>
 
         <div>
-          <label className="text-xs text-slate-400">Tipus</label>
+          <label className="text-xs">Tipus</label>
           <div className="mt-2 grid grid-cols-3 sm:grid-cols-5 gap-2">
             {EVENT_TYPES.map((et) => (
               <button
@@ -573,71 +573,71 @@ export default function NewBookingPage() {
 
         <div className="grid gap-4 sm:grid-cols-4">
           <div>
-            <label className="text-xs text-slate-400">Data *</label>
+            <label className="text-xs">Data *</label>
             <input
               type="date"
               value={form.eventDate}
               onChange={(e) => updateField('eventDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Hora inici</label>
+            <label className="text-xs">Hora inici</label>
             <input
               type="time"
               value={form.eventStartTime}
               onChange={(e) => updateField('eventStartTime', e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Hora final</label>
+            <label className="text-xs">Hora final</label>
             <input
               type="time"
               value={form.eventEndTime}
               onChange={(e) => updateField('eventEndTime', e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Convidats</label>
+            <label className="text-xs">Convidats</label>
             <input
               type="number"
               value={form.guestCount}
               onChange={(e) => updateField('guestCount', e.target.value)}
               placeholder="100"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs text-slate-400">Ubicació *</label>
+            <label className="text-xs">Ubicació *</label>
             <input
               type="text"
               value={form.eventLocation}
               onChange={(e) => updateField('eventLocation', e.target.value)}
               placeholder="Ciutat o comarca"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Espai / Lloc concret</label>
+            <label className="text-xs">Espai / Lloc concret</label>
             <input
               type="text"
               value={form.eventVenue}
               onChange={(e) => updateField('eventVenue', e.target.value)}
               placeholder="Nom de la finca, restaurant..."
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
         </div>
       </div>
 
       {/* Pack selection */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-200">Selecciona pack *</h2>
+      <div className="rounded-2xl border p-5 space-y-4">
+        <h2 className="text-sm font-semibold">Selecciona pack *</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {packs.map((pack) => {
             const name = pack.translations[0]?.name || pack.slug;
@@ -655,28 +655,28 @@ export default function NewBookingPage() {
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-slate-100">{name}</span>
-                  <span className="text-sm font-bold text-cyan-300">{pack.price}€</span>
+                  <span className="text-sm font-semibold">{name}</span>
+                  <span className="text-sm font-bold">{pack.price}€</span>
                 </div>
-                <p className="mt-1 text-xs text-slate-400 line-clamp-2">{desc}</p>
+                <p className="mt-1 text-xs line-clamp-2">{desc}</p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  <span className="text-[10px] bg-slate-700/60 text-slate-300 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded">
                     {pack.djHours}h DJ
                   </span>
-                  <span className="text-[10px] bg-slate-700/60 text-slate-300 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded">
                     {pack.soundWatts}W
                   </span>
                   {pack.includesFog && (
-                    <span className="text-[10px] bg-slate-700/60 text-slate-300 px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded">
                       Fum
                     </span>
                   )}
                   {pack.includesMic && (
-                    <span className="text-[10px] bg-slate-700/60 text-slate-300 px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded">
                       Micro
                     </span>
                   )}
-                  <span className="text-[10px] bg-slate-700/60 text-slate-300 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded">
                     +{pack.extraHourPrice}€/h extra
                   </span>
                 </div>
@@ -687,14 +687,14 @@ export default function NewBookingPage() {
 
         {form.packId && (
           <div>
-            <label className="text-xs text-slate-400">Hores extra</label>
+            <label className="text-xs">Hores extra</label>
             <input
               type="number"
               min="0"
               max="10"
               value={form.extraHours}
               onChange={(e) => updateField('extraHours', e.target.value)}
-              className="mt-1 w-24 rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-24 rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
         )}
@@ -702,8 +702,8 @@ export default function NewBookingPage() {
 
       {/* Extras */}
       {displayExtras.length > 0 && (
-        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-          <h2 className="text-sm font-semibold text-slate-200">Extres</h2>
+        <div className="rounded-2xl border p-5 space-y-4">
+          <h2 className="text-sm font-semibold">Extres</h2>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {displayExtras.map((extra) => {
               const name = extra.translations[0]?.name || extra.slug;
@@ -725,7 +725,7 @@ export default function NewBookingPage() {
                     <span className={`text-sm font-medium ${isSelected ? 'text-emerald-200' : 'text-slate-300'}`}>
                       {isSelected ? '✓ ' : ''}{name}
                     </span>
-                    <span className="ml-2 text-xs text-slate-400">{extra.price}€{extra.isOperatorExtra ? '/h' : ''}</span>
+                    <span className="ml-2 text-xs">{extra.price}€{extra.isOperatorExtra ? '/h' : ''}</span>
                   </button>
                   {isSelected && (
                     <input
@@ -734,7 +734,7 @@ export default function NewBookingPage() {
                       max="20"
                       value={selectedExtras[extra.id].quantity}
                       onChange={(e) => updateExtraQuantity(extra.id, parseInt(e.target.value, 10) || 1)}
-                      className="w-14 rounded-lg border border-slate-600/50 bg-slate-900/60 px-2 py-1 text-xs text-slate-100 text-center"
+                      className="w-14 rounded-lg border px-2 py-1 text-xs text-center"
                     />
                   )}
                 </div>
@@ -745,14 +745,14 @@ export default function NewBookingPage() {
       )}
 
       {/* Desplaçament */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
+      <div className="rounded-2xl border p-5 space-y-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm font-semibold text-slate-200">Desplaçament</h2>
-          <span className="text-xs text-slate-500">(opcional)</span>
+          <h2 className="text-sm font-semibold">Desplaçament</h2>
+          <span className="text-xs">(opcional)</span>
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs text-slate-400">Km totals (anada + tornada)</label>
+            <label className="text-xs">Km totals (anada + tornada)</label>
             <div className="mt-1 relative">
               <input
                 type="number"
@@ -761,42 +761,42 @@ export default function NewBookingPage() {
                 value={form.distanceKm}
                 onChange={(e) => updateField('distanceKm', e.target.value)}
                 placeholder="0"
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 pr-10 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                className="w-full rounded-xl border px-3 py-2.5 pr-10 text-sm focus:ring-1"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">km</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs">km</span>
             </div>
-            <p className="mt-1 text-[10px] text-emerald-300">
+            <p className="mt-1 text-[10px]">
               Inclòs al pack: {INCLUDED_TRAVEL_KM} km (anada + tornada)
             </p>
           </div>
           <div>
-            <label className="text-xs text-slate-400">Trams aplicats</label>
-            <div className="mt-1 flex items-center rounded-xl border border-slate-700/30 bg-slate-900/30 px-3 py-2.5 h-[42px]">
-              <span className="text-sm font-semibold text-cyan-200">{travelBlocks}</span>
+            <label className="text-xs">Trams aplicats</label>
+            <div className="mt-1 flex items-center rounded-xl border px-3 py-2.5 h-[42px]">
+              <span className="text-sm font-semibold">{travelBlocks}</span>
             </div>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-1 text-[10px]">
               {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra
             </p>
             {fuelReferenceInfo && (
-              <p className="mt-1 text-[10px] text-slate-500">{fuelReferenceInfo}</p>
+              <p className="mt-1 text-[10px]">{fuelReferenceInfo}</p>
             )}
           </div>
           <div>
-            <label className="text-xs text-slate-400">Cost desplaçament</label>
-            <div className="mt-1 flex items-center rounded-xl border border-slate-700/30 bg-slate-900/30 px-3 py-2.5 h-[42px]">
+            <label className="text-xs">Cost desplaçament</label>
+            <div className="mt-1 flex items-center rounded-xl border px-3 py-2.5 h-[42px]">
               {travelCharge > 0 ? (
-                <span className="text-sm font-semibold text-amber-300">{travelCharge.toFixed(2)} €</span>
+                <span className="text-sm font-semibold">{travelCharge.toFixed(2)} €</span>
               ) : (
-                <span className="text-sm text-slate-600">— €</span>
+                <span className="text-sm">— €</span>
               )}
             </div>
             {travelCharge > 0 && (
-              <p className="mt-1 text-[10px] text-slate-500">
+              <p className="mt-1 text-[10px]">
                 {billableKm} km extra → {travelBlocks} trams × {TRAVEL_BLOCK_EUR} €
               </p>
             )}
             {travelCharge === 0 && (parseFloat(form.distanceKm) || 0) > 0 && (
-              <p className="mt-1 text-[10px] text-emerald-300">
+              <p className="mt-1 text-[10px]">
                 Dins del tram inclòs ({INCLUDED_TRAVEL_KM} km), cost extra 0 €
               </p>
             )}
@@ -805,34 +805,34 @@ export default function NewBookingPage() {
       </div>
 
       {/* Discount + Notes */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-200">Descompte i notes</h2>
+      <div className="rounded-2xl border p-5 space-y-4">
+        <h2 className="text-sm font-semibold">Descompte i notes</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs text-slate-400">Descompte (€)</label>
+            <label className="text-xs">Descompte (€)</label>
             <input
               type="number"
               min="0"
               value={form.discount}
               onChange={(e) => updateField('discount', e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Codi descompte</label>
+            <label className="text-xs">Codi descompte</label>
             <div className="mt-1 flex gap-2">
               <input
                 type="text"
                 value={form.discountCode}
                 onChange={(e) => { updateField('discountCode', e.target.value.toUpperCase()); setDiscountValidation(null); }}
                 placeholder="Ex: BODA2026"
-                className="flex-1 rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 font-mono"
+                className="flex-1 rounded-xl border px-3 py-2.5 text-sm focus:ring-1 font-mono"
               />
               <button
                 type="button"
                 onClick={() => validateDiscountCode(form.discountCode)}
                 disabled={validatingCode || !form.discountCode}
-                className="rounded-xl border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-xs font-medium text-cyan-300 hover:bg-cyan-500/20 disabled:opacity-50 transition-colors"
+                className="rounded-xl border px-3 py-2 text-xs font-medium disabled:opacity-50 transition-colors"
               >
                 {validatingCode ? '...' : 'Validar'}
               </button>
@@ -848,68 +848,68 @@ export default function NewBookingPage() {
           <div className="sm:col-span-1" />
         </div>
         <div>
-          <label className="text-xs text-slate-400">Notes internes</label>
+          <label className="text-xs">Notes internes</label>
           <textarea
             value={form.notes}
             onChange={(e) => updateField('notes', e.target.value)}
             rows={3}
             placeholder="Notes internes sobre la reserva..."
-            className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 resize-none"
+            className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 resize-none"
           />
         </div>
       </div>
 
       {/* Pricing summary */}
       {pricing && (
-        <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/5 to-cyan-500/5 p-5">
-          <h2 className="text-sm font-semibold text-slate-200 mb-3">Resum de preus</h2>
+        <div className="rounded-2xl border p-5">
+          <h2 className="text-sm font-semibold mb-3">Resum de preus</h2>
           <div className="space-y-1.5 text-sm">
-            <div className="flex justify-between text-slate-300">
+            <div className="flex justify-between">
               <span>Pack</span>
               <span>{pricing.packPrice.toFixed(2)}€</span>
             </div>
             {pricing.extraHoursPrice > 0 && (
-              <div className="flex justify-between text-slate-300">
+              <div className="flex justify-between">
                 <span>Hores extra</span>
                 <span>+{pricing.extraHoursPrice.toFixed(2)}€</span>
               </div>
             )}
             {pricing.extrasPrice > 0 && (
-              <div className="flex justify-between text-slate-300">
+              <div className="flex justify-between">
                 <span>Extres</span>
                 <span>+{pricing.extrasPrice.toFixed(2)}€</span>
               </div>
             )}
-            <div className="flex justify-between text-slate-400 border-t border-slate-700/50 pt-1.5">
+            <div className="flex justify-between border-t pt-1.5">
               <span>Subtotal</span>
               <span>{pricing.subtotal.toFixed(2)}€</span>
             </div>
             {pricing.discount > 0 && (
-              <div className="flex justify-between text-amber-300">
+              <div className="flex justify-between">
                 <span>Descompte</span>
                 <span>-{pricing.discount.toFixed(2)}€</span>
               </div>
             )}
-            <div className="flex justify-between text-slate-400">
+            <div className="flex justify-between">
               <span>IVA (21%)</span>
               <span>+{pricing.vatAmount.toFixed(2)}€</span>
             </div>
-            <div className="flex justify-between text-lg font-bold text-emerald-300 border-t border-slate-700/50 pt-2">
+            <div className="flex justify-between text-lg font-bold border-t pt-2">
               <span>Total</span>
               <span>{pricing.total.toFixed(2)}€</span>
             </div>
             {pricing.travelCharge > 0 && (
-              <div className="flex justify-between text-slate-300">
+              <div className="flex justify-between">
                 <span>🚗 Desplaçament ({travelBlocks} trams)</span>
                 <span>+{pricing.travelCharge.toFixed(2)}€</span>
               </div>
             )}
-            <div className="flex justify-between text-xs text-slate-400 pt-1">
+            <div className="flex justify-between text-xs pt-1">
               <span>Senyal (30%)</span>
               <span>{pricing.deposit.toFixed(2)}€</span>
             </div>
             {internalTravelCost > 0 && (
-              <p className="text-[11px] text-slate-500 pt-1 border-t border-slate-700/30">
+              <p className="text-[11px] pt-1 border-t">
                 * Cost intern estimat de transport: {internalTravelCost.toFixed(2)} € (coeficient {DEFAULT_FUEL_COST_PER_KM.toFixed(2)} €/km sobre km extra).
               </p>
             )}
@@ -923,13 +923,13 @@ export default function NewBookingPage() {
           type="button"
           onClick={handleSubmit}
           disabled={submitting || !form.clientName || !form.clientEmail || !form.packId}
-          className="rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-400 hover:to-cyan-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting ? 'Creant reserva...' : 'Crear reserva'}
         </button>
         <Link
           href="/admin/bookings"
-          className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-3 text-sm text-slate-300 hover:bg-slate-600/50 transition-colors"
+          className="rounded-xl border px-4 py-3 text-sm transition-colors"
         >
           Cancel·lar
         </Link>

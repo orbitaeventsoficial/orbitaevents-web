@@ -116,57 +116,57 @@ export default function AdminSearchModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="admin-search-title"
-        className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900 shadow-2xl"
+        className="mx-auto max-w-2xl overflow-hidden rounded-2xl border shadow-2xl"
       >
-        <div className="flex items-center gap-3 border-b border-slate-800 px-4 py-3">
-          <span className="text-slate-400">🔍</span>
+        <div className="flex items-center gap-3 border-b px-4 py-3">
+          <span className="">🔍</span>
           <input
             ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Cerca entrades, reserves o clients..."
             aria-label="Cercar al panell d’administració"
-            className="w-full bg-transparent text-sm text-slate-100 placeholder:text-slate-500 outline-none"
+            className="w-full bg-transparent text-sm outline-none"
           />
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-2 py-1 text-xs text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+            className="rounded-lg px-2 py-1 text-xs"
           >
             Esc
           </button>
         </div>
 
         <div className="max-h-[70vh] overflow-y-auto">
-          <div className="px-4 py-3 text-xs text-slate-500" id="admin-search-title">
+          <div className="px-4 py-3 text-xs" id="admin-search-title">
             Escriu almenys 2 caràcters
           </div>
 
           {loading && (
-            <div className="px-4 pb-4 text-xs text-slate-400">Carregant resultats...</div>
+            <div className="px-4 pb-4 text-xs">Carregant resultats...</div>
           )}
 
           {error && (
-            <div className="px-4 pb-4 text-xs text-rose-300">{error}</div>
+            <div className="px-4 pb-4 text-xs">{error}</div>
           )}
 
           {!loading && !error && query.trim().length >= 2 && !hasResults && (
-            <div className="px-4 pb-4 text-xs text-slate-400">Sense resultats.</div>
+            <div className="px-4 pb-4 text-xs">Sense resultats.</div>
           )}
 
           {results.leads.length > 0 && (
-            <div className="border-t border-slate-800 px-4 py-3">
-              <p className="text-[11px] uppercase tracking-wider text-slate-500">Entrades</p>
+            <div className="border-t px-4 py-3">
+              <p className="text-[11px] uppercase tracking-wider">Entrades</p>
               <div className="mt-2 space-y-2">
                 {results.leads.map((lead) => (
                   <Link
                     key={lead.id}
                     href={`/admin/leads/${lead.id}`}
                     onClick={onClose}
-                    className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/40 px-3 py-2 text-sm text-slate-200 hover:border-cyan-500/40 hover:bg-slate-800/70"
+                    className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
                   >
                     <span className="truncate">{lead.name}</span>
-                    <span className="text-[11px] text-slate-500">{lead.status}</span>
+                    <span className="text-[11px]">{lead.status}</span>
                   </Link>
                 ))}
               </div>
@@ -174,18 +174,18 @@ export default function AdminSearchModal({
           )}
 
           {results.bookings.length > 0 && (
-            <div className="border-t border-slate-800 px-4 py-3">
-              <p className="text-[11px] uppercase tracking-wider text-slate-500">Reserves</p>
+            <div className="border-t px-4 py-3">
+              <p className="text-[11px] uppercase tracking-wider">Reserves</p>
               <div className="mt-2 space-y-2">
                 {results.bookings.map((booking) => (
                   <Link
                     key={booking.id}
                     href={`/admin/bookings/${booking.id}`}
                     onClick={onClose}
-                    className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/40 px-3 py-2 text-sm text-slate-200 hover:border-cyan-500/40 hover:bg-slate-800/70"
+                    className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
                   >
                     <span className="truncate">{booking.reference} · {booking.clientName}</span>
-                    <span className="text-[11px] text-slate-500">{labelEstatReserva(booking.status)}</span>
+                    <span className="text-[11px]">{labelEstatReserva(booking.status)}</span>
                   </Link>
                 ))}
               </div>
@@ -193,18 +193,18 @@ export default function AdminSearchModal({
           )}
 
           {results.customers.length > 0 && (
-            <div className="border-t border-slate-800 px-4 py-3">
-              <p className="text-[11px] uppercase tracking-wider text-slate-500">Clients</p>
+            <div className="border-t px-4 py-3">
+              <p className="text-[11px] uppercase tracking-wider">Clients</p>
               <div className="mt-2 space-y-2">
                 {results.customers.map((customer) => (
                   <Link
                     key={customer.id}
                     href={`/admin/contactes/${customer.id}`}
                     onClick={onClose}
-                    className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/40 px-3 py-2 text-sm text-slate-200 hover:border-cyan-500/40 hover:bg-slate-800/70"
+                    className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
                   >
                     <span className="truncate">{customer.name}</span>
-                    <span className="text-[11px] text-slate-500">{customer.totalEvents} esdeveniments</span>
+                    <span className="text-[11px]">{customer.totalEvents} esdeveniments</span>
                   </Link>
                 ))}
               </div>
@@ -212,8 +212,8 @@ export default function AdminSearchModal({
           )}
 
           {!hasResults && query.trim().length < 2 && (
-            <div className="border-t border-slate-800 px-4 py-4">
-              <p className="text-[11px] uppercase tracking-wider text-slate-500">Accessos ràpids</p>
+            <div className="border-t px-4 py-4">
+              <p className="text-[11px] uppercase tracking-wider">Accessos ràpids</p>
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 {[
                   { href: '/admin/leads', label: '👥 Entrades' },
@@ -227,7 +227,7 @@ export default function AdminSearchModal({
                     key={item.href}
                     href={item.href}
                     onClick={onClose}
-                    className="rounded-lg border border-slate-800 bg-slate-800/40 px-3 py-2 text-sm text-slate-200 hover:border-cyan-500/40 hover:bg-slate-800/70"
+                    className="rounded-lg border px-3 py-2 text-sm"
                   >
                     {item.label}
                   </Link>

@@ -68,7 +68,7 @@ export default function PaymentReminderActions({
         type="button"
         onClick={sendEmailReminder}
         disabled={loading}
-        className="rounded-md bg-slate-800 px-2 py-1 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
+        className="rounded-md px-2 py-1 text-xs font-semibold text-white disabled:opacity-60"
       >
         {loading ? '...' : 'Email'}
       </button>
@@ -76,7 +76,7 @@ export default function PaymentReminderActions({
         href={waLink}
         target="_blank"
         rel="noreferrer"
-        className="rounded-md bg-green-500 px-2 py-1 text-xs font-semibold text-white hover:bg-green-600"
+        className="rounded-md px-2 py-1 text-xs font-semibold text-white"
       >
         Obrir WA
       </a>
@@ -84,7 +84,7 @@ export default function PaymentReminderActions({
         type="button"
         onClick={sendWhatsAppApi}
         disabled={loading}
-        className="rounded-md bg-emerald-600 px-2 py-1 text-xs font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
+        className="rounded-md px-2 py-1 text-xs font-semibold text-white disabled:opacity-60"
       >
         WA API
       </button>
@@ -92,7 +92,7 @@ export default function PaymentReminderActions({
         type="button"
         onClick={markWhatsAppSent}
         disabled={loading}
-        className="rounded-md border border-white/10 bg-slate-950/60 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-white/5 disabled:opacity-60"
+        className="rounded-md border border-white/10 px-2 py-1 text-xs font-semibold hover:bg-white/5 disabled:opacity-60"
       >
         Marcar WA enviat
       </button>

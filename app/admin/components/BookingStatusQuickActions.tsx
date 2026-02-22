@@ -38,7 +38,7 @@ export default function BookingStatusQuickActions({
       value={currentStatus}
       onChange={(e) => onChange(e.target.value as BookingStatus)}
       disabled={saving}
-      className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-2 py-1 text-[11px] text-slate-200"
+      className="rounded-lg border px-2 py-1 text-[11px]"
       title="Canviar estat reserva"
     >
       <option value="PENDING">Pendent</option>

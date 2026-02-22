@@ -66,7 +66,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
   return (
     <section className="admin-quote-template rounded-2xl border p-5">
       <div className="grid gap-4 lg:grid-cols-2">
-        <label className="text-sm text-slate-300">
+        <label className="text-sm">
           Títol principal
           <input
             className={inputClass}
@@ -75,7 +75,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-slate-300">
+        <label className="text-sm">
           Dies de validesa
           <input
             type="number"
@@ -87,7 +87,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-slate-300 lg:col-span-2">
+        <label className="text-sm lg:col-span-2">
           Subtítol capçalera
           <input
             className={inputClass}
@@ -96,7 +96,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-slate-300">
+        <label className="text-sm">
           Títol CTA
           <input
             className={inputClass}
@@ -105,7 +105,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-slate-300">
+        <label className="text-sm">
           Subtítol CTA
           <input
             className={inputClass}
@@ -114,7 +114,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="text-sm text-slate-300 lg:col-span-2">
+        <label className="text-sm lg:col-span-2">
           Condicions (una per línia)
           <textarea
             rows={8}
@@ -124,7 +124,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           />
         </label>
 
-        <label className="flex items-center gap-2 text-sm text-slate-300">
+        <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
             checked={form.sendAdminCopy}
@@ -133,7 +133,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
           Enviar còpia interna automàtica de cada pressupost
         </label>
 
-        <label className="text-sm text-slate-300">
+        <label className="text-sm">
           Email de còpia interna
           <input
             type="email"
@@ -153,7 +153,7 @@ export default function QuoteTemplateEditor({ initial }: { initial: QuoteTemplat
         >
           {saving ? 'Desant...' : 'Desar plantilla'}
         </button>
-        {message && <p className="text-sm text-slate-300">{message}</p>}
+        {message && <p className="text-sm">{message}</p>}
       </div>
     </section>
   );

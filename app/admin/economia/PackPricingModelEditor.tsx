@@ -66,65 +66,65 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
 
   return (
     <section className="admin-pack-model rounded-2xl border p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-100">Model econòmic de packs</h2>
-      <p className="mt-1 text-xs text-slate-400">
+      <h2 className="text-lg font-semibold">Model econòmic de packs</h2>
+      <p className="mt-1 text-xs">
         Aquesta configuració calcula PVP recomanat, hora extra recomanada i alertes de divergència a packs.
       </p>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[1.6fr,1fr]">
         <div className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               Objectiu marge (0-1)
               <input id="pack-model-marginTargetPct" type="number" step="0.01" min={0.1} max={0.9} className={inputClass} value={form.marginTargetPct} onChange={(e) => update('marginTargetPct', Number(e.target.value))} />
             </label>
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               SS empresa (0-1)
               <input id="pack-model-socialSecurityPct" type="number" step="0.01" min={0} max={1} className={inputClass} value={form.socialSecurityPct} onChange={(e) => update('socialSecurityPct', Number(e.target.value))} />
             </label>
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               IRPF (0-1)
               <input id="pack-model-withholdingPct" type="number" step="0.01" min={0} max={1} className={inputClass} value={form.withholdingPct} onChange={(e) => update('withholdingPct', Number(e.target.value))} />
             </label>
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               Operari net €/h
               <input type="number" step="0.1" min={0} className={inputClass} value={form.operatorNetCostPerHour} onChange={(e) => update('operatorNetCostPerHour', Number(e.target.value))} />
             </label>
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               Operari brut €/h
               <input type="number" step="0.1" min={0} className={inputClass} value={form.operatorCostPerHour} onChange={(e) => update('operatorCostPerHour', Number(e.target.value))} />
             </label>
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               Especialista net €/h
               <input type="number" step="0.1" min={0} className={inputClass} value={form.specialistNetCostPerHour} onChange={(e) => update('specialistNetCostPerHour', Number(e.target.value))} />
             </label>
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               Especialista brut €/h
               <input type="number" step="0.1" min={0} className={inputClass} value={form.specialistCostPerHour} onChange={(e) => update('specialistCostPerHour', Number(e.target.value))} />
             </label>
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               Cost fix per pack (€)
               <input type="number" step="1" min={0} className={inputClass} value={form.fixedPackCost} onChange={(e) => update('fixedPackCost', Number(e.target.value))} />
             </label>
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               Llindar alerta divergència (%)
               <input id="pack-model-alertDivergencePct" type="number" step="1" min={1} className={inputClass} value={form.alertDivergencePct} onChange={(e) => update('alertDivergencePct', Number(e.target.value))} />
             </label>
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               Operari si convidats ≥
               <input type="number" step="1" min={1} className={inputClass} value={form.supportOperatorMinGuests} onChange={(e) => update('supportOperatorMinGuests', Number(e.target.value))} />
             </label>
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               Operari si hores DJ ≥
               <input type="number" step="1" min={1} className={inputClass} value={form.supportOperatorMinDjHours} onChange={(e) => update('supportOperatorMinDjHours', Number(e.target.value))} />
             </label>
-            <label className="text-xs text-slate-400">
+            <label className="text-xs">
               Operari si watts ≥
               <input type="number" step="100" min={1} className={inputClass} value={form.supportOperatorMinWatts} onChange={(e) => update('supportOperatorMinWatts', Number(e.target.value))} />
             </label>
           </div>
 
-          <label className="block text-xs text-slate-400">
+          <label className="block text-xs">
             Serveis amb especialista (CSV)
             <input
               type="text"
@@ -145,15 +145,15 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
             >
               {saving ? 'Desant...' : 'Desar model packs'}
             </button>
-            {msg && <p className="text-sm text-slate-400">{msg}</p>}
+            {msg && <p className="text-sm">{msg}</p>}
           </div>
         </div>
 
         <aside className="admin-pack-model-aside rounded-xl border p-4">
-          <h3 className="text-sm font-semibold text-slate-100">Lectura ràpida de coeficients</h3>
+          <h3 className="text-sm font-semibold">Lectura ràpida de coeficients</h3>
           <div className="mt-3 space-y-2 text-xs">
             <div className="admin-pack-model-note rounded-lg border p-3">
-              <p className="font-semibold text-slate-200">Objectiu marge: {pct(form.marginTargetPct)}</p>
+              <p className="font-semibold">Objectiu marge: {pct(form.marginTargetPct)}</p>
               <button
                 type="button"
                 onClick={() => focusField('pack-model-marginTargetPct')}
@@ -163,7 +163,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
               </button>
             </div>
             <div className="admin-pack-model-note rounded-lg border p-3">
-              <p className="font-semibold text-slate-200">SS: {pct(form.socialSecurityPct)} · IRPF: {pct(form.withholdingPct)}</p>
+              <p className="font-semibold">SS: {pct(form.socialSecurityPct)} · IRPF: {pct(form.withholdingPct)}</p>
               <button
                 type="button"
                 onClick={() => focusField('pack-model-socialSecurityPct')}
@@ -180,7 +180,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
               </button>
             </div>
             <div className="admin-pack-model-note rounded-lg border p-3">
-              <p className="font-semibold text-slate-200">Llindar alerta: {form.alertDivergencePct.toFixed(0)}%</p>
+              <p className="font-semibold">Llindar alerta: {form.alertDivergencePct.toFixed(0)}%</p>
               <button
                 type="button"
                 onClick={() => focusField('pack-model-alertDivergencePct')}
@@ -189,7 +189,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
                 Semàfor divergència
               </button>
             </div>
-            <div className="admin-pack-model-note rounded-lg border p-3 text-slate-300">
+            <div className="admin-pack-model-note rounded-lg border p-3">
               <p>Cost equip/hora usat al càlcul = inventari/h + personal/h + cost fix.</p>
               <p className="mt-1">PVP recomanat = cost / (1 - objectiu marge).</p>
             </div>

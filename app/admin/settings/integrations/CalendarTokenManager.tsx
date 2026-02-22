@@ -40,22 +40,22 @@ export default function CalendarTokenManager({
     <div className="mt-3 space-y-2">
       {url ? (
         <>
-          <p className="break-all rounded-lg bg-slate-50 p-2 text-xs text-slate-600">{url}</p>
-          <p className="text-xs text-slate-500">
+          <p className="break-all rounded-lg p-2 text-xs">{url}</p>
+          <p className="text-xs">
             A Google Calendar: Configuració → Afegir calendari → &quot;Des de URL&quot;.
           </p>
         </>
       ) : (
-        <p className="text-xs text-amber-700">
+        <p className="text-xs">
           Encara no hi ha feed generat.
         </p>
       )}
-      {error && <p className="text-xs text-rose-700">{error}</p>}
+      {error && <p className="text-xs">{error}</p>}
       <button
         type="button"
         onClick={regenerate}
         disabled={loading}
-        className="inline-flex rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
+        className="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
       >
         {loading ? 'Generant...' : 'Generar / Regenerar token'}
       </button>

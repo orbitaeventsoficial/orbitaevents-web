@@ -96,7 +96,7 @@ function getMarginSignal(currentPrice: number, recommendedPrice: number, thresho
       tone: 'green' as const,
       label: 'Verd',
       cardClass: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-100',
-      dotClass: 'bg-emerald-400',
+      dotClass: '',
       message: 'Dins del marge objectiu. Pots mantenir aquest preu.',
     };
   }
@@ -105,7 +105,7 @@ function getMarginSignal(currentPrice: number, recommendedPrice: number, thresho
       tone: 'orange' as const,
       label: 'Taronja',
       cardClass: 'border-amber-500/45 bg-amber-500/10 text-amber-100',
-      dotClass: 'bg-amber-400',
+      dotClass: '',
       message: 'Marge just. Recomanació: pujar una mica el preu.',
     };
   }
@@ -113,7 +113,7 @@ function getMarginSignal(currentPrice: number, recommendedPrice: number, thresho
     tone: 'red' as const,
     label: 'Roig',
     cardClass: 'border-rose-500/45 bg-rose-500/10 text-rose-100',
-    dotClass: 'bg-rose-400',
+    dotClass: '',
     message: 'Per sota del marge. Cal pujar preu o reduir cost.',
   };
 }
@@ -382,28 +382,28 @@ export default function EditPackForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5">
-        <h2 className="text-xl font-bold text-slate-100">Editor pro de pack</h2>
-        <p className="mt-1 text-sm text-slate-400">Drag & drop d'inventari dins/fora + autocalcul de preus recomanats.</p>
+      <section className="rounded-2xl border border-white/10 p-5">
+        <h2 className="text-xl font-bold">Editor pro de pack</h2>
+        <p className="mt-1 text-sm">Drag & drop d'inventari dins/fora + autocalcul de preus recomanats.</p>
         <div className="mt-4 grid gap-2 sm:grid-cols-4">{TABS.map((t) => <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} className={`rounded-xl border px-3 py-2 text-sm font-semibold ${activeTab === t.id ? 'border-amber-400/50 bg-amber-500/15 text-amber-200' : 'border-slate-700/60 bg-slate-900/60 text-slate-300'}`}>{t.icon} {t.label}</button>)}</div>
       </section>
 
-      {error && <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300">❌ {error}</div>}
-      {info && <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-4 text-sm text-cyan-200">ℹ️ {info}</div>}
-      {success && <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-300">✅ Pack actualitzat correctament</div>}
+      {error && <div className="rounded-xl border p-4 text-sm">❌ {error}</div>}
+      {info && <div className="rounded-xl border p-4 text-sm">ℹ️ {info}</div>}
+      {success && <div className="rounded-xl border p-4 text-sm">✅ Pack actualitzat correctament</div>}
 
       {activeTab === 'economic' && (
-        <section className="rounded-2xl border border-slate-700 bg-slate-900 p-6">
-          <h3 className="mb-4 text-lg font-semibold text-slate-100">💰 Economia i semàfors</h3>
+        <section className="rounded-2xl border p-6">
+          <h3 className="mb-4 text-lg font-semibold">💰 Economia i semàfors</h3>
 
           <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-3">
-              <p className="text-xs text-slate-400">Preu recomanat pack</p>
-              <p className="text-lg font-semibold text-cyan-200">{eur(recommended.pack)}</p>
+            <div className="rounded-xl border p-3">
+              <p className="text-xs">Preu recomanat pack</p>
+              <p className="text-lg font-semibold">{eur(recommended.pack)}</p>
             </div>
-            <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-3">
-              <p className="text-xs text-slate-400">Hora extra recomanada</p>
-              <p className="text-lg font-semibold text-cyan-200">{eur(recommended.extra)}</p>
+            <div className="rounded-xl border p-3">
+              <p className="text-xs">Hora extra recomanada</p>
+              <p className="text-lg font-semibold">{eur(recommended.extra)}</p>
             </div>
             <div className={`rounded-xl border p-3 ${semClass(packDiv, pricingHint.alertThreshold)}`}>
               <p className="text-xs font-semibold">Semàfor pack</p>
@@ -430,35 +430,35 @@ export default function EditPackForm({
                 setFormData((prev) => ({ ...prev, price: Math.max(1, round2(recommended.pack)), extraHourPrice: Math.max(1, round2(recommended.extra)) }));
                 setInfo('Preus recomanats aplicats una vegada.');
               }}
-              className="rounded-lg border border-cyan-500/40 bg-cyan-500/15 px-3 py-1.5 text-xs font-semibold text-cyan-100"
+              className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
             >
               Aplicar recomanat ara
             </button>
           </div>
 
           <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-3">
-              <p className="text-xs text-slate-400">Hores DJ (contador)</p>
+            <div className="rounded-xl border p-3">
+              <p className="text-xs">Hores DJ (contador)</p>
               <div className="mt-2 flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setFormData((prev) => ({ ...prev, djHours: Math.max(1, Number(prev.djHours) - 1) }))}
-                  className="h-8 w-8 rounded-lg border border-slate-600/50 bg-slate-800/80 text-slate-200"
+                  className="h-8 w-8 rounded-lg border"
                 >
                   -
                 </button>
-                <div className="min-w-[64px] text-center text-lg font-semibold text-slate-100">{formData.djHours}h</div>
+                <div className="min-w-[64px] text-center text-lg font-semibold">{formData.djHours}h</div>
                 <button
                   type="button"
                   onClick={() => setFormData((prev) => ({ ...prev, djHours: Math.min(24, Number(prev.djHours) + 1) }))}
-                  className="h-8 w-8 rounded-lg border border-slate-600/50 bg-slate-800/80 text-slate-200"
+                  className="h-8 w-8 rounded-lg border"
                 >
                   +
                 </button>
               </div>
             </div>
-            <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-3">
-              <p className="text-xs text-slate-400">Aforament max</p>
+            <div className="rounded-xl border p-3">
+              <p className="text-xs">Aforament max</p>
               <input
                 type="number"
                 min={0}
@@ -467,8 +467,8 @@ export default function EditPackForm({
                 className={`${input} mt-2`}
               />
             </div>
-            <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-3">
-              <p className="text-xs text-slate-400">Potència so (W)</p>
+            <div className="rounded-xl border p-3">
+              <p className="text-xs">Potència so (W)</p>
               <input
                 type="number"
                 min={0}
@@ -477,9 +477,9 @@ export default function EditPackForm({
                 className={`${input} mt-2`}
               />
             </div>
-            <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-3">
-              <p className="text-xs text-slate-400">Cost base estimat pack</p>
-              <p className="mt-2 text-lg font-semibold text-slate-100">{eur(baseCostPack)}</p>
+            <div className="rounded-xl border p-3">
+              <p className="text-xs">Cost base estimat pack</p>
+              <p className="mt-2 text-lg font-semibold">{eur(baseCostPack)}</p>
             </div>
           </div>
 
@@ -533,30 +533,30 @@ export default function EditPackForm({
             </div>
           </div>
 
-          <div className="mt-4 rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-2.5 text-sm text-slate-100">
+          <div className="mt-4 rounded-xl border px-4 py-2.5 text-sm">
             Cost inventari/h {eur(recommended.inventoryCostHour)} · Cost humà/h {eur(recommended.laborCostHour)}
           </div>
 
-          <div className="mt-4 rounded-xl border border-slate-700/60 bg-slate-900/60 p-4">
+          <div className="mt-4 rounded-xl border p-4">
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-100">Composició visual del pack</p>
-              <p className="text-xs text-slate-400">{included.length} elements</p>
+              <p className="text-sm font-semibold">Composició visual del pack</p>
+              <p className="text-xs">{included.length} elements</p>
             </div>
             {included.length === 0 ? (
-              <p className="text-sm text-slate-400">Aquest pack encara no té inventari assignat.</p>
+              <p className="text-sm">Aquest pack encara no té inventari assignat.</p>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {included.map(({ row, item }) => (
-                  <article key={item.id} className="flex items-center gap-3 rounded-lg border border-slate-700/60 bg-slate-950/60 p-2">
+                  <article key={item.id} className="flex items-center gap-3 rounded-lg border p-2">
                     <img
                       src={item.imageUrl || '/placeholder.png'}
                       alt={item.name}
-                      className="h-14 w-14 rounded-md border border-slate-700/60 bg-slate-900 object-cover"
+                      className="h-14 w-14 rounded-md border object-cover"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-slate-100">{item.name}</p>
-                      <p className="text-xs text-slate-400">{item.code}</p>
-                      <p className="text-xs text-cyan-200">x{row.quantity} · {eur(calcCostHour(item.purchasePrice, item.expectedLifeHours))}/h</p>
+                      <p className="truncate text-sm font-semibold">{item.name}</p>
+                      <p className="text-xs">{item.code}</p>
+                      <p className="text-xs">x{row.quantity} · {eur(calcCostHour(item.purchasePrice, item.expectedLifeHours))}/h</p>
                     </div>
                   </article>
                 ))}
@@ -567,30 +567,30 @@ export default function EditPackForm({
       )}
 
             {activeTab === 'content' && (
-        <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6">
-          <h3 className="mb-4 text-lg font-semibold text-slate-100">🧩 Inventari del pack</h3>
-          <p className="mb-3 text-xs text-slate-400">
+        <section className="rounded-2xl border p-6">
+          <h3 className="mb-4 text-lg font-semibold">🧩 Inventari del pack</h3>
+          <p className="mb-3 text-xs">
             Visual amb foto + drag and drop: arrossega de "Disponibles" a "Inclosos" per composar el pack.
           </p>
 
           <div className="mb-3 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-3">
-              <p className="text-xs text-slate-400">Elements</p>
-              <p className="text-lg font-semibold text-slate-100">{included.length}</p>
+            <div className="rounded-lg border p-3">
+              <p className="text-xs">Elements</p>
+              <p className="text-lg font-semibold">{included.length}</p>
             </div>
-            <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-3">
-              <p className="text-xs text-slate-400">Unitats totals</p>
-              <p className="text-lg font-semibold text-slate-100">{totalUnits}</p>
+            <div className="rounded-lg border p-3">
+              <p className="text-xs">Unitats totals</p>
+              <p className="text-lg font-semibold">{totalUnits}</p>
             </div>
-            <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-3">
-              <p className="text-xs text-slate-400">Cost inventari/h</p>
-              <p className="text-lg font-semibold text-cyan-200">{eur(recommended.inventoryCostHour)}</p>
+            <div className="rounded-lg border p-3">
+              <p className="text-xs">Cost inventari/h</p>
+              <p className="text-lg font-semibold">{eur(recommended.inventoryCostHour)}</p>
             </div>
           </div>
 
           {bundles.length > 0 && (
-            <div className="mb-3 rounded-xl border border-indigo-400 bg-indigo-950/40 p-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-indigo-200">Lots d'equip</p>
+            <div className="mb-3 rounded-xl border p-3">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide">Lots d'equip</p>
               <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                 {bundles.map((bundle) => {
                   const active = selectedBundleId === bundle.id;
@@ -612,7 +612,7 @@ export default function EditPackForm({
                   type="button"
                   onClick={() => addBundleToPack(selectedBundleId)}
                   disabled={!selectedBundleId}
-                  className="rounded-lg border border-indigo-300 bg-indigo-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-600 disabled:opacity-50"
+                  className="rounded-lg border px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
                 >
                   + Afegir lot seleccionat al pack
                 </button>
@@ -624,21 +624,21 @@ export default function EditPackForm({
             <button
               type="button"
               onClick={() => autoComposeInventory('base')}
-              className="rounded-lg border border-cyan-300 bg-cyan-700 px-3 py-1.5 text-xs font-semibold text-white"
+              className="rounded-lg border px-3 py-1.5 text-xs font-semibold text-white"
             >
               Compositor automàtic BASE
             </button>
             <button
               type="button"
               onClick={() => autoComposeInventory('pro')}
-              className="rounded-lg border border-violet-300 bg-violet-700 px-3 py-1.5 text-xs font-semibold text-white"
+              className="rounded-lg border px-3 py-1.5 text-xs font-semibold text-white"
             >
               Compositor automàtic PRO
             </button>
             <button
               type="button"
               onClick={() => { setPackInventory([]); setInfo('Inventari del pack netejat.'); }}
-              className="rounded-lg border border-rose-300 bg-rose-700 px-3 py-1.5 text-xs font-semibold text-white"
+              className="rounded-lg border px-3 py-1.5 text-xs font-semibold text-white"
             >
               Buidar composició
             </button>
@@ -657,16 +657,16 @@ export default function EditPackForm({
               onDrop={dropOut}
               className={`rounded-xl border p-3 ${dropZone === 'available' ? 'border-rose-400/60 bg-rose-500/10' : 'border-slate-700/60 bg-slate-900/50'}`}
             >
-              <p className="mb-2 text-sm font-semibold text-slate-100">Disponibles ({available.length})</p>
+              <p className="mb-2 text-sm font-semibold">Disponibles ({available.length})</p>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {available.map((i) => (
-                  <article key={i.id} draggable onDragStart={(e) => onDragStart(e, i.id, 'available')} className="cursor-grab rounded-lg border border-slate-700/60 bg-slate-950/70 p-2">
+                  <article key={i.id} draggable onDragStart={(e) => onDragStart(e, i.id, 'available')} className="cursor-grab rounded-lg border p-2">
                     <div className="flex items-start gap-3">
-                      <img src={i.imageUrl || '/placeholder.png'} alt={i.name} className="h-14 w-14 rounded-md border border-slate-700/60 bg-slate-900 object-cover" />
+                      <img src={i.imageUrl || '/placeholder.png'} alt={i.name} className="h-14 w-14 rounded-md border object-cover" />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-slate-100">{i.name}</p>
-                        <p className="text-xs text-slate-400">{i.code}</p>
-                        <p className="line-clamp-2 text-xs text-slate-300">{i.description || 'Sense descripció'}</p>
+                        <p className="truncate text-sm font-semibold">{i.name}</p>
+                        <p className="text-xs">{i.code}</p>
+                        <p className="line-clamp-2 text-xs">{i.description || 'Sense descripció'}</p>
                       </div>
                     </div>
                   </article>
@@ -680,25 +680,25 @@ export default function EditPackForm({
               onDrop={dropIn}
               className={`rounded-xl border p-3 ${dropZone === 'included' ? 'border-emerald-400/60 bg-emerald-500/10' : 'border-slate-700/60 bg-slate-900/50'}`}
             >
-              <p className="mb-2 text-sm font-semibold text-slate-100">Inclosos ({included.length})</p>
+              <p className="mb-2 text-sm font-semibold">Inclosos ({included.length})</p>
               <div className="max-h-[26rem] space-y-2 overflow-auto pr-1">
                 {included.map(({ row, item }) => (
-                  <article key={item.id} draggable onDragStart={(e) => onDragStart(e, item.id, 'included')} className="cursor-grab rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2">
+                  <article key={item.id} draggable onDragStart={(e) => onDragStart(e, item.id, 'included')} className="cursor-grab rounded-lg border p-2">
                     <div className="flex items-start gap-3">
-                      <img src={item.imageUrl || '/placeholder.png'} alt={item.name} className="h-14 w-14 rounded-md border border-slate-700/60 bg-slate-900 object-cover" />
+                      <img src={item.imageUrl || '/placeholder.png'} alt={item.name} className="h-14 w-14 rounded-md border object-cover" />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-slate-100">{item.name}</p>
-                        <p className="text-xs text-slate-300">{item.code} · {calcCostHour(item.purchasePrice, item.expectedLifeHours).toFixed(2)}€/h</p>
-                        <p className="line-clamp-2 text-xs text-slate-300">{item.description || 'Sense descripció'}</p>
+                        <p className="truncate text-sm font-semibold">{item.name}</p>
+                        <p className="text-xs">{item.code} · {calcCostHour(item.purchasePrice, item.expectedLifeHours).toFixed(2)}€/h</p>
+                        <p className="line-clamp-2 text-xs">{item.description || 'Sense descripció'}</p>
                         <div className="mt-2 flex flex-wrap items-center gap-2">
                           <input
                             type="number"
                             min={1}
                             value={row.quantity}
                             onChange={(e) => setPackInventory((prev) => prev.map((x) => x.itemId === item.id ? { ...x, quantity: Math.max(1, Number(e.target.value) || 1) } : x))}
-                            className="w-20 rounded border border-slate-600/60 bg-slate-950 px-2 py-1 text-xs text-slate-100"
+                            className="w-20 rounded border px-2 py-1 text-xs"
                           />
-                          <label className="text-xs text-slate-300">
+                          <label className="text-xs">
                             <input
                               type="checkbox"
                               checked={row.isRequired}
@@ -709,7 +709,7 @@ export default function EditPackForm({
                           <button
                             type="button"
                             onClick={() => setPackInventory((prev) => prev.filter((x) => x.itemId !== item.id))}
-                            className="ml-auto rounded-md border border-rose-400/50 bg-rose-500/15 px-2 py-1 text-xs text-rose-100"
+                            className="ml-auto rounded-md border px-2 py-1 text-xs"
                           >
                             Treure
                           </button>
@@ -719,7 +719,7 @@ export default function EditPackForm({
                   </article>
                 ))}
                 {included.length === 0 && (
-                  <p className="rounded-lg border border-dashed border-slate-700/60 p-4 text-center text-sm text-slate-400">
+                  <p className="rounded-lg border border-dashed p-4 text-center text-sm">
                     Arrossega aquí els elements del pack.
                   </p>
                 )}
@@ -730,16 +730,16 @@ export default function EditPackForm({
       )}
 
       {activeTab === 'texts' && (
-        <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6">
-          <h3 className="mb-4 text-lg font-semibold text-slate-100">🌐 Textos</h3>
-          <p className="mb-3 text-xs text-slate-400">Nom del pack editable + tagline + features per idioma.</p>
+        <section className="rounded-2xl border p-6">
+          <h3 className="mb-4 text-lg font-semibold">🌐 Textos</h3>
+          <p className="mb-3 text-xs">Nom del pack editable + tagline + features per idioma.</p>
           <div className="grid gap-4">
             {LOCALES.map((locale) => {
               const tr = translations.find((t) => t.locale === locale)!;
               const featuresValue = (tr.features || []).join('\n');
               return (
-                <div key={locale} className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-4">
-                  <h4 className="mb-2 text-sm font-semibold text-slate-100">{locale.toUpperCase()}</h4>
+                <div key={locale} className="rounded-xl border p-4">
+                  <h4 className="mb-2 text-sm font-semibold">{locale.toUpperCase()}</h4>
                   <input
                     value={tr.name}
                     onChange={(e) => updateTranslation(locale, 'name', e.target.value)}
@@ -773,11 +773,11 @@ export default function EditPackForm({
         </section>
       )}
 
-      {activeTab === 'publish' && <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6"><h3 className="mb-4 text-lg font-semibold text-slate-100">✅ Publicació</h3><div className="grid gap-4 sm:grid-cols-3"><label className="text-sm text-slate-300"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} /> Actiu</label><label className="text-sm text-slate-300"><input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} /> Destacat</label><input type="number" value={formData.order} onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) || 0 })} className={input} placeholder="Ordre" /></div></section>}
+      {activeTab === 'publish' && <section className="rounded-2xl border p-6"><h3 className="mb-4 text-lg font-semibold">✅ Publicació</h3><div className="grid gap-4 sm:grid-cols-3"><label className="text-sm"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} /> Actiu</label><label className="text-sm"><input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} /> Destacat</label><input type="number" value={formData.order} onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) || 0 })} className={input} placeholder="Ordre" /></div></section>}
 
-      <div className="sticky bottom-2 z-10 flex flex-wrap justify-end gap-3 rounded-xl border border-slate-700/60 bg-slate-950/90 p-3 backdrop-blur">
-        <Link href="/admin/packs" className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm font-medium text-slate-300">Cancel·lar</Link>
-        <button type="submit" disabled={loading} className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-2 text-sm font-medium text-white disabled:opacity-50">{loading ? 'Guardant...' : 'Desar canvis'}</button>
+      <div className="sticky bottom-2 z-10 flex flex-wrap justify-end gap-3 rounded-xl border p-3 backdrop-blur">
+        <Link href="/admin/packs" className="rounded-xl border px-4 py-2 text-sm font-medium">Cancel·lar</Link>
+        <button type="submit" disabled={loading} className="rounded-xl px-6 py-2 text-sm font-medium text-white disabled:opacity-50">{loading ? 'Guardant...' : 'Desar canvis'}</button>
       </div>
     </form>
   );

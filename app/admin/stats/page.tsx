@@ -90,7 +90,7 @@ export default function StatsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
-        <div className="animate-spin w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -100,25 +100,25 @@ export default function StatsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-200">
+        <h1 className="text-2xl font-semibold tracking-tight">
           📊 Estadístiques Públiques
         </h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm">
           Gestiona les estadístiques que es mostren al lloc web
         </p>
       </header>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-cyan-400/30 bg-cyan-950/30 p-4">
-          <div className="text-sm font-medium text-cyan-300">Valors automàtics</div>
-          <div className="mt-1 text-3xl font-bold text-cyan-200">{stats.length - manualStats}</div>
-          <div className="mt-1 text-xs text-cyan-300">Calculats des de la BD</div>
+        <div className="rounded-xl border p-4">
+          <div className="text-sm font-medium">Valors automàtics</div>
+          <div className="mt-1 text-3xl font-bold">{stats.length - manualStats}</div>
+          <div className="mt-1 text-xs">Calculats des de la BD</div>
         </div>
-        <div className="rounded-xl border border-orange-400/30 bg-orange-950/30 p-4">
-          <div className="text-sm font-medium text-orange-300">Valors manuals</div>
-          <div className="mt-1 text-3xl font-bold text-orange-200">{manualStats}</div>
-          <div className="mt-1 text-xs text-orange-300">Configurats manualment</div>
+        <div className="rounded-xl border p-4">
+          <div className="text-sm font-medium">Valors manuals</div>
+          <div className="mt-1 text-3xl font-bold">{manualStats}</div>
+          <div className="mt-1 text-xs">Configurats manualment</div>
         </div>
       </div>
 
@@ -137,12 +137,12 @@ export default function StatsPage() {
               <div className="flex items-start gap-3">
                 <span className="text-3xl">{stat.icon}</span>
                 <div>
-                  <h3 className="font-semibold text-slate-200">{stat.label}</h3>
-                  <p className="text-sm text-slate-400 mt-0.5">{stat.description}</p>
+                  <h3 className="font-semibold">{stat.label}</h3>
+                  <p className="text-sm mt-0.5">{stat.description}</p>
                 </div>
               </div>
               {stat.isManual && (
-                <span className="px-2 py-1 bg-orange-500/15 text-orange-300 text-xs rounded font-medium">
+                <span className="px-2 py-1 text-xs rounded font-medium">
                   Manual
                 </span>
               )}
@@ -150,16 +150,16 @@ export default function StatsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="bg-white/5 rounded-lg p-3">
-                <div className="text-xs text-slate-400 mb-1">Valor Actual</div>
-                <div className="text-2xl font-bold text-slate-200">{stat.value}</div>
+                <div className="text-xs mb-1">Valor Actual</div>
+                <div className="text-2xl font-bold">{stat.value}</div>
               </div>
               <div className="bg-white/5 rounded-lg p-3">
-                <div className="text-xs text-slate-400 mb-1">Valor Calculat</div>
-                <div className="text-2xl font-bold text-cyan-300">{stat.calculated}</div>
+                <div className="text-xs mb-1">Valor Calculat</div>
+                <div className="text-2xl font-bold">{stat.calculated}</div>
               </div>
               <div className="bg-white/5 rounded-lg p-3">
-                <div className="text-xs text-slate-400 mb-1">Valor Manual</div>
-                <div className="text-2xl font-bold text-orange-300">
+                <div className="text-xs mb-1">Valor Manual</div>
+                <div className="text-2xl font-bold">
                   {stat.fallback || '—'}
                 </div>
               </div>
@@ -171,7 +171,7 @@ export default function StatsPage() {
                   type="number"
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
-                  className="flex-1 px-4 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  className="flex-1 px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
                   step="0.1"
                 />
                 <button
@@ -179,14 +179,14 @@ export default function StatsPage() {
                   disabled={saving}
                   type="button"
                   aria-busy={saving}
-                  className="px-6 py-2 bg-gradient-to-r from-amber-500 to-rose-500 text-white rounded-lg font-medium hover:from-amber-600 hover:to-rose-600 disabled:opacity-50"
+                  className="px-6 py-2 text-white rounded-lg font-medium disabled:opacity-50"
                 >
                   {saving ? 'Desant...' : 'Desar'}
                 </button>
                 <button
                   onClick={() => setEditingStat(null)}
                   type="button"
-                  className="px-4 py-2 bg-white/5 text-slate-300 rounded-lg font-medium hover:bg-white/10"
+                  className="px-4 py-2 bg-white/5 rounded-lg font-medium hover:bg-white/10"
                 >
                   Cancel·lar
                 </button>
@@ -196,7 +196,7 @@ export default function StatsPage() {
                 <button
                   onClick={() => startEdit(stat)}
                   type="button"
-                  className="flex-1 px-4 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg font-medium hover:bg-white/10"
+                  className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg font-medium hover:bg-white/10"
                 >
                   ✏️ Editar Valor Manual
                 </button>
@@ -206,7 +206,7 @@ export default function StatsPage() {
                     disabled={saving}
                     type="button"
                     aria-busy={saving}
-                    className="px-4 py-2 bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 rounded-lg font-medium hover:bg-cyan-500/20 disabled:opacity-50"
+                    className="px-4 py-2 border rounded-lg font-medium disabled:opacity-50"
                   >
                     🔄 Usar Valor Automàtic
                   </button>
@@ -218,9 +218,9 @@ export default function StatsPage() {
       </div>
 
       {/* Info */}
-      <div className="rounded-xl border border-cyan-400/30 bg-cyan-950/30 p-4">
-        <h3 className="mb-2 text-sm font-semibold text-cyan-200">ℹ️ Com funciona</h3>
-        <ul className="space-y-1 text-sm text-cyan-300">
+      <div className="rounded-xl border p-4">
+        <h3 className="mb-2 text-sm font-semibold">ℹ️ Com funciona</h3>
+        <ul className="space-y-1 text-sm">
           <li>• Els <strong>valors automàtics</strong> es calculen des de les reserves completades</li>
           <li>• Pots establir <strong>valors manuals</strong> si vols mostrar números diferents</li>
           <li>• Els valors manuals es prioritzen sobre els calculats</li>

@@ -214,23 +214,23 @@ export default function IntakePage() {
         </div>
         <Link
           href="/admin/leads"
-          className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-3 py-2 text-sm text-slate-200 hover:bg-slate-600/50 transition-colors"
+          className="rounded-xl border px-3 py-2 text-sm transition-colors"
         >
           ← Entrades
         </Link>
       </div>
 
-      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-2">
+      <section className="rounded-2xl border p-2">
         <div className="grid grid-cols-2 gap-2">
           <Link
             href="/admin/leads"
-            className="admin-keep-colors rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-center text-xs sm:text-sm font-medium text-slate-300 hover:bg-slate-700/60 transition-colors"
+            className="admin-keep-colors rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-medium transition-colors"
           >
             Tauler Leads
           </Link>
           <Link
             href="/admin/intake"
-            className="admin-keep-colors rounded-xl border border-cyan-500/50 bg-cyan-500/15 px-3 py-2 text-center text-xs sm:text-sm font-semibold text-cyan-200"
+            className="admin-keep-colors rounded-xl border px-3 py-2 text-center text-xs sm:text-sm font-semibold"
             aria-current="page"
           >
             Entrada ràpida
@@ -240,21 +240,21 @@ export default function IntakePage() {
 
       {/* Success */}
       {success && (
-        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
-          <p className="text-emerald-200 font-medium">
+        <div className="rounded-2xl border p-5">
+          <p className="font-medium">
             Entrada creada correctament per a {success.name}
           </p>
           <div className="mt-3 flex gap-2">
             <Link
               href={`/admin/leads/${success.id}`}
-              className="rounded-xl bg-emerald-500/20 border border-emerald-500/40 px-4 py-2 text-sm font-semibold text-emerald-200 hover:bg-emerald-500/30 transition-colors"
+              className="rounded-xl border px-4 py-2 text-sm font-semibold transition-colors"
             >
               Obrir entrada →
             </Link>
             <button
               type="button"
               onClick={() => setSuccess(null)}
-              className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm text-slate-200 hover:bg-slate-600/50 transition-colors"
+              className="rounded-xl border px-4 py-2 text-sm transition-colors"
             >
               Crear una altra
             </button>
@@ -264,15 +264,15 @@ export default function IntakePage() {
 
       {/* Error */}
       {error && (
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4">
-          <p className="text-rose-300 text-sm">{error}</p>
+        <div className="rounded-xl border p-4">
+          <p className="text-sm">{error}</p>
         </div>
       )}
 
       {/* Duplicate warnings */}
       {duplicates.length > 0 && (
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
-          <p className="text-sm font-semibold text-amber-200 flex items-center gap-2">
+        <div className="rounded-2xl border p-4">
+          <p className="text-sm font-semibold flex items-center gap-2">
             {checkingDuplicates && <span className="animate-spin">⟳</span>}
             Possibles duplicats detectats ({duplicates.length})
           </p>
@@ -281,11 +281,11 @@ export default function IntakePage() {
               <Link
                 key={dup.id}
                 href={`/admin/contactes/${dup.id}`}
-                className="flex items-center justify-between rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 hover:bg-amber-500/15 transition-colors"
+                className="flex items-center justify-between rounded-xl border p-3 transition-colors"
               >
                 <div>
-                  <p className="text-sm font-medium text-amber-100">{dup.name}</p>
-                  <p className="text-xs text-amber-300/70">
+                  <p className="text-sm font-medium">{dup.name}</p>
+                  <p className="text-xs">
                     {dup.email}{dup.phone ? ` · ${dup.phone}` : ''}
                   </p>
                 </div>
@@ -299,7 +299,7 @@ export default function IntakePage() {
                   </span>
                   <div className="flex gap-1">
                     {dup.matchReasons.map((r, i) => (
-                      <span key={i} className="text-[10px] bg-slate-700/50 text-slate-400 px-1.5 py-0.5 rounded">
+                      <span key={i} className="text-[10px] px-1.5 py-0.5 rounded">
                         {r.field}
                       </span>
                     ))}
@@ -312,8 +312,8 @@ export default function IntakePage() {
       )}
 
       {/* Source selector */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5">
-        <label className="text-sm font-semibold text-slate-200">Canal d&apos;entrada</label>
+      <div className="rounded-2xl border p-5">
+        <label className="text-sm font-semibold">Canal d&apos;entrada</label>
         <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
           {SOURCE_OPTIONS.map((src) => (
             <button
@@ -337,42 +337,42 @@ export default function IntakePage() {
       </div>
 
       {/* Main form */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-200">Dades del client</h2>
+      <div className="rounded-2xl border p-5 space-y-4">
+        <h2 className="text-sm font-semibold">Dades del client</h2>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs text-slate-400">Nom *</label>
+            <label className="text-xs">Nom *</label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
               placeholder="Nom i cognom"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Email *</label>
+            <label className="text-xs">Email *</label>
             <input
               type="email"
               value={form.email}
               onChange={(e) => updateField('email', e.target.value)}
               placeholder="client@exemple.com"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Telèfon</label>
+            <label className="text-xs">Telèfon</label>
             <input
               type="tel"
               value={form.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               placeholder="+34 600 000 000"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Prioritat</label>
+            <label className="text-xs">Prioritat</label>
             <div className="mt-1 grid grid-cols-4 gap-2">
               {PRIORITY_OPTIONS.map((p) => (
                 <button
@@ -394,11 +394,11 @@ export default function IntakePage() {
       </div>
 
       {/* Event details */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-200">Detalls de l&apos;esdeveniment</h2>
+      <div className="rounded-2xl border p-5 space-y-4">
+        <h2 className="text-sm font-semibold">Detalls de l&apos;esdeveniment</h2>
 
         <div>
-          <label className="text-xs text-slate-400">Tipus d&apos;esdeveniment</label>
+          <label className="text-xs">Tipus d&apos;esdeveniment</label>
           <div className="mt-2 grid grid-cols-3 sm:grid-cols-5 gap-2">
             {EVENT_TYPES.map((et) => (
               <button
@@ -421,56 +421,56 @@ export default function IntakePage() {
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs text-slate-400">Data</label>
+            <label className="text-xs">Data</label>
             <input
               type="date"
               value={form.eventDate}
               onChange={(e) => updateField('eventDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Ubicació</label>
+            <label className="text-xs">Ubicació</label>
             <input
               type="text"
               value={form.eventLocation}
               onChange={(e) => updateField('eventLocation', e.target.value)}
               placeholder="Lloc de celebració"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-xs text-slate-400">Convidats</label>
+              <label className="text-xs">Convidats</label>
               <input
                 type="number"
                 value={form.guestCount}
                 onChange={(e) => updateField('guestCount', e.target.value)}
                 placeholder="100"
-                className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
               />
             </div>
             <div>
-              <label className="text-xs text-slate-400">Pressupost</label>
+              <label className="text-xs">Pressupost</label>
               <input
                 type="text"
                 value={form.budget}
                 onChange={(e) => updateField('budget', e.target.value)}
                 placeholder="2.000€"
-                className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
               />
             </div>
           </div>
         </div>
 
         <div>
-          <label className="text-xs text-slate-400">Missatge / Notes</label>
+          <label className="text-xs">Missatge / Notes</label>
           <textarea
             value={form.message}
             onChange={(e) => updateField('message', e.target.value)}
             rows={3}
             placeholder="Detalls addicionals, què necessita el client, context de la conversa..."
-            className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 resize-none"
+            className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 resize-none"
           />
         </div>
       </div>
@@ -481,7 +481,7 @@ export default function IntakePage() {
           type="button"
           onClick={handleSubmit}
           disabled={submitting || !form.name || !form.email}
-          className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting ? 'Creant entrada...' : 'Crear entrada'}
         </button>
@@ -493,7 +493,7 @@ export default function IntakePage() {
             setError(null);
             setSuccess(null);
           }}
-          className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-3 text-sm text-slate-300 hover:bg-slate-600/50 transition-colors"
+          className="rounded-xl border px-4 py-3 text-sm transition-colors"
         >
           Netejar
         </button>

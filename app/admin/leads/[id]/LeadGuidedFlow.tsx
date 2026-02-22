@@ -172,32 +172,32 @@ export default function LeadGuidedFlow({
   }, [currentIndex, isLost, hasBooking, bookingId, leadId]);
 
   return (
-    <section className="rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 p-5 shadow-sm">
+    <section className="rounded-2xl border p-5 shadow-sm">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-slate-100">Pipeline comercial</h2>
-          <p className="text-sm text-slate-400">
+          <h2 className="text-base font-semibold">Pipeline comercial</h2>
+          <p className="text-sm">
             Progr\u00e9s: {progress.stepsDone}/{progress.total} passos completats
           </p>
         </div>
         {isLost && (
-          <div className="rounded-full border border-rose-500/40 bg-rose-500/10 px-3 py-1 text-xs font-semibold text-rose-300">
+          <div className="rounded-full border px-3 py-1 text-xs font-semibold">
             PERDUT
           </div>
         )}
       </div>
 
       {/* Progress bar */}
-      <div className="mt-3 h-2 w-full rounded-full bg-slate-700/50 overflow-hidden">
+      <div className="mt-3 h-2 w-full rounded-full overflow-hidden">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-500"
+          className="h-full rounded-full transition-all duration-500"
           style={{ width: `${progress.pct}%` }}
         />
       </div>
 
       {error && (
-        <p className="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+        <p className="mt-3 rounded-lg border px-3 py-2 text-xs">
           {error}
         </p>
       )}
@@ -246,7 +246,7 @@ export default function LeadGuidedFlow({
           nextAction.href ? (
             <Link
               href={nextAction.href}
-              className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-all"
+              className="rounded-xl px-4 py-2 text-xs font-semibold text-white shadow-lg transition-all"
             >
               {nextAction.label} →
             </Link>
@@ -255,7 +255,7 @@ export default function LeadGuidedFlow({
               type="button"
               onClick={nextAction.action}
               disabled={isPending}
-              className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-all disabled:opacity-50"
+              className="rounded-xl px-4 py-2 text-xs font-semibold text-white shadow-lg transition-all disabled:opacity-50"
             >
               {nextAction.label} →
             </button>
@@ -266,7 +266,7 @@ export default function LeadGuidedFlow({
           type="button"
           onClick={createFollowUpTask}
           disabled={creatingTask}
-          className="rounded-xl border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-200 hover:bg-amber-500/20 disabled:opacity-60 transition-colors"
+          className="rounded-xl border px-3 py-2 text-xs font-semibold disabled:opacity-60 transition-colors"
         >
           {creatingTask ? 'Creant...' : '+ Tasca de seguiment'}
         </button>
@@ -274,7 +274,7 @@ export default function LeadGuidedFlow({
         {openTasksCount > 0 && (
           <a
             href="#lead-tasks"
-            className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-colors"
+            className="rounded-xl border px-3 py-2 text-xs font-semibold transition-colors"
           >
             Tasques ({openTasksCount})
           </a>
@@ -285,7 +285,7 @@ export default function LeadGuidedFlow({
             type="button"
             onClick={() => updateStatus('LOST')}
             disabled={isPending}
-            className="rounded-xl border border-rose-500/30 bg-rose-500/5 px-3 py-2 text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors disabled:opacity-50"
+            className="rounded-xl border px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50"
           >
             Marcar perdut
           </button>
@@ -296,7 +296,7 @@ export default function LeadGuidedFlow({
             type="button"
             onClick={() => updateStatus('NEW')}
             disabled={isPending}
-            className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-xs font-medium text-emerald-400 hover:bg-emerald-500/10 transition-colors disabled:opacity-50"
+            className="rounded-xl border px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50"
           >
             Reobrir entrada
           </button>

@@ -132,65 +132,65 @@ export default function NewInventoryItemPage() {
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">Nou element</h1>
-          <p className="text-sm text-slate-400 mt-1">Afegeix equipament a l&apos;inventari</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Nou element</h1>
+          <p className="text-sm mt-1">Afegeix equipament a l&apos;inventari</p>
         </div>
         <Link
           href="/admin/inventory"
-          className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-3 py-2 text-sm text-slate-200 hover:bg-slate-600/50 transition-colors"
+          className="rounded-xl border px-3 py-2 text-sm transition-colors"
         >
           ← Inventari
         </Link>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4">
-          <p className="text-rose-300 text-sm">{error}</p>
+        <div className="rounded-xl border p-4">
+          <p className="text-sm">{error}</p>
         </div>
       )}
 
       {/* Informació bàsica */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-200">Informació bàsica</h2>
+      <div className="rounded-2xl border p-5 space-y-4">
+        <h2 className="text-sm font-semibold">Informació bàsica</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs text-slate-400">
-              Codi <span className="text-slate-500">(opcional, s&apos;auto-genera)</span>
+            <label className="text-xs">
+              Codi <span className="">(opcional, s&apos;auto-genera)</span>
             </label>
             <input
               type="text"
               value={form.code}
               onChange={(e) => updateField('code', e.target.value)}
               placeholder={selectedCat ? `${selectedCat.prefix}-001` : 'Auto'}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 font-mono"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 font-mono"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Nom *</label>
+            <label className="text-xs">Nom *</label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
               placeholder="Altaveu JBL PRX 15"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
         </div>
         <div>
-          <label className="text-xs text-slate-400">Descripció</label>
+          <label className="text-xs">Descripció</label>
           <textarea
             value={form.description}
             onChange={(e) => updateField('description', e.target.value)}
             rows={2}
             placeholder="Descripció de l'equip..."
-            className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 resize-none"
+            className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 resize-none"
           />
         </div>
       </div>
 
       {/* Categoria */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-200">Categoria</h2>
+      <div className="rounded-2xl border p-5 space-y-4">
+        <h2 className="text-sm font-semibold">Categoria</h2>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
           {CATEGORIES.map((cat) => (
             <button
@@ -211,31 +211,31 @@ export default function NewInventoryItemPage() {
       </div>
 
       {/* Detalls tècnics */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-200">Detalls tècnics</h2>
+      <div className="rounded-2xl border p-5 space-y-4">
+        <h2 className="text-sm font-semibold">Detalls tècnics</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs text-slate-400">Potència (W)</label>
+            <label className="text-xs">Potència (W)</label>
             <input
               type="number"
               value={form.watts}
               onChange={(e) => updateField('watts', e.target.value)}
               placeholder="1000"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Valor actual (€) *</label>
+            <label className="text-xs">Valor actual (€) *</label>
             <input
               type="number"
               value={form.value}
               onChange={(e) => updateField('value', e.target.value)}
               placeholder="500"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Condició</label>
+            <label className="text-xs">Condició</label>
             <div className="mt-1 flex gap-1.5">
               {CONDITIONS.map((c) => (
                 <button
@@ -261,30 +261,30 @@ export default function NewInventoryItemPage() {
               type="checkbox"
               checked={form.isConsumable}
               onChange={(e) => updateField('isConsumable', e.target.checked)}
-              className="w-4 h-4 rounded border-slate-600 bg-slate-900 text-cyan-500 focus:ring-cyan-500"
+              className="w-4 h-4 rounded"
             />
-            <span className="text-sm text-slate-300">Es consumible</span>
+            <span className="text-sm">Es consumible</span>
           </label>
         </div>
 
         {form.isConsumable && (
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-xs text-slate-400">Estoc actual</label>
+              <label className="text-xs">Estoc actual</label>
               <input
                 type="number"
                 value={form.stockQuantity}
                 onChange={(e) => updateField('stockQuantity', e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
               />
             </div>
             <div>
-              <label className="text-xs text-slate-400">Estoc mínim</label>
+              <label className="text-xs">Estoc mínim</label>
               <input
                 type="number"
                 value={form.minStock}
                 onChange={(e) => updateField('minStock', e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
               />
             </div>
           </div>
@@ -292,50 +292,50 @@ export default function NewInventoryItemPage() {
       </div>
 
       {/* Amortització */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-200">Amortització</h2>
+      <div className="rounded-2xl border p-5 space-y-4">
+        <h2 className="text-sm font-semibold">Amortització</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="text-xs text-slate-400">Preu de compra (€)</label>
+            <label className="text-xs">Preu de compra (€)</label>
             <input
               type="number"
               value={form.purchasePrice}
               onChange={(e) => updateField('purchasePrice', e.target.value)}
               placeholder="800"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Data de compra</label>
+            <label className="text-xs">Data de compra</label>
             <input
               type="date"
               value={form.purchaseDate}
               onChange={(e) => updateField('purchaseDate', e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Vida útil (hores)</label>
+            <label className="text-xs">Vida útil (hores)</label>
             <input
               type="number"
               value={form.expectedLifeHours}
               onChange={(e) => updateField('expectedLifeHours', e.target.value)}
               placeholder="2000"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             />
           </div>
         </div>
       </div>
 
       {/* Notes */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5">
-        <label className="text-xs text-slate-400">Notes internes</label>
+      <div className="rounded-2xl border p-5">
+        <label className="text-xs">Notes internes</label>
         <textarea
           value={form.notes}
           onChange={(e) => updateField('notes', e.target.value)}
           rows={2}
           placeholder="Notes sobre manteniment, ubicació, etc."
-          className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 resize-none"
+          className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1 resize-none"
         />
       </div>
 
@@ -345,13 +345,13 @@ export default function NewInventoryItemPage() {
           type="button"
           onClick={handleSubmit}
           disabled={submitting || !form.name || !form.value}
-          className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting ? 'Creant...' : 'Crear element'}
         </button>
         <Link
           href="/admin/inventory"
-          className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-3 text-sm text-slate-300 hover:bg-slate-600/50 transition-colors"
+          className="rounded-xl border px-4 py-3 text-sm transition-colors"
         >
           Cancel·lar
         </Link>

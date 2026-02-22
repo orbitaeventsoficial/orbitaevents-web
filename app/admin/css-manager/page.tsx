@@ -430,7 +430,7 @@ export default function AdminCssManagerPage() {
 
       <section className="admin-css-panel rounded-2xl border p-5">
         <div className="mb-3 flex items-center justify-between">
-          <p className="text-sm font-semibold text-slate-100">Custom CSS</p>
+          <p className="text-sm font-semibold">Custom CSS</p>
           <button
             type="button"
             onClick={() => setCss(EXAMPLE_CSS)}
@@ -447,12 +447,12 @@ export default function AdminCssManagerPage() {
           placeholder="Escriu aquí el teu CSS..."
         />
         <div className="mt-4">
-          <p className="mb-2 text-sm font-semibold text-slate-100">Paletes suggerides (responsives)</p>
+          <p className="mb-2 text-sm font-semibold">Paletes suggerides (responsives)</p>
           <div className="grid gap-2 md:grid-cols-3">
             {PALETTES.map((palette) => (
               <article key={palette.id} className="admin-css-palette-card rounded-xl border p-3">
-                <p className="text-sm font-semibold text-slate-100">{palette.name}</p>
-                <p className="text-xs text-slate-300">{palette.description}</p>
+                <p className="text-sm font-semibold">{palette.name}</p>
+                <p className="text-xs">{palette.description}</p>
                 <div className="mt-2 flex gap-1">
                   <span className="h-5 w-5 rounded" style={{ background: palette.surface }} />
                   <span className="h-5 w-5 rounded" style={{ background: palette.panel }} />
@@ -481,7 +481,7 @@ export default function AdminCssManagerPage() {
           >
             {saving ? 'Desant...' : 'Desar CSS'}
           </button>
-          {msg && <p className="text-sm text-slate-200">{msg}</p>}
+          {msg && <p className="text-sm">{msg}</p>}
         </div>
       </section>
     </div>

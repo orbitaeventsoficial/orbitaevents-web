@@ -374,7 +374,7 @@ export function HelpTooltip({ id, children, inline = false }: HelpTooltipProps) 
     >
       {children}
       {enabled && (
-        <span className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-amber-500/20 text-[10px] text-amber-400">
+        <span className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px]">
           ?
         </span>
       )}
@@ -385,13 +385,13 @@ export function HelpTooltip({ id, children, inline = false }: HelpTooltipProps) 
     mounted && showTip && enabled ? (
       createPortal(
         <div
-          className="fixed z-[99999] max-w-xs rounded-xl border border-amber-500/30 bg-slate-900 p-3 shadow-2xl"
+          className="fixed z-[99999] max-w-xs rounded-xl border p-3 shadow-2xl"
           style={{ top: pos.top, left: pos.left }}
         >
-          <p className="text-sm font-semibold text-amber-300">{item.term}</p>
-          <p className="mt-1 text-xs text-slate-300">{item.description}</p>
+          <p className="text-sm font-semibold">{item.term}</p>
+          <p className="mt-1 text-xs">{item.description}</p>
           {item.example && (
-            <p className="mt-2 rounded bg-slate-800 px-2 py-1 text-[11px] text-slate-400">
+            <p className="mt-2 rounded px-2 py-1 text-[11px]">
               💡 {item.example}
             </p>
           )}
@@ -458,12 +458,12 @@ function HelpLegendPanel() {
   if (!showLegend) return null;
 
   return createPortal(
-    <div className="fixed inset-y-0 right-0 z-[99998] flex flex-col w-80 border-l border-slate-700 bg-slate-900/98 backdrop-blur-xl shadow-2xl">
+    <div className="fixed inset-y-0 right-0 z-[99998] flex flex-col w-80 border-l backdrop-blur-xl shadow-2xl">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-700 px-4 py-3">
+      <div className="flex items-center justify-between border-b px-4 py-3">
         <div>
-          <h2 className="text-sm font-semibold text-slate-100">💡 Glossari d'Ajuda</h2>
-          <p className="text-[11px] text-slate-400">Passa el ratolí pels camps per veure ajuda</p>
+          <h2 className="text-sm font-semibold">💡 Glossari d'Ajuda</h2>
+          <p className="text-[11px]">Passa el ratolí pels camps per veure ajuda</p>
         </div>
         <button
           type="button"
@@ -471,25 +471,25 @@ function HelpLegendPanel() {
             setShowLegend(false);
             setEnabled(false);
           }}
-          className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+          className="rounded-lg p-2"
         >
           ✕
         </button>
       </div>
 
       {/* Search */}
-      <div className="border-b border-slate-700/50 p-3">
+      <div className="border-b p-3">
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cercar terme..."
-          className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500"
+          className="w-full rounded-lg border px-3 py-2 text-sm"
         />
       </div>
 
       {/* Category filters */}
-      <div className="flex flex-wrap gap-1 border-b border-slate-700/50 p-3">
+      <div className="flex flex-wrap gap-1 border-b p-3">
         <button
           type="button"
           onClick={() => setSelectedCategory('all')}
@@ -521,7 +521,7 @@ function HelpLegendPanel() {
       <div className="flex-1 overflow-y-auto p-3">
         {Object.entries(groupedItems).map(([category, items]) => (
           <div key={category} className="mb-4">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider">
               {CATEGORY_LABELS[category as HelpItem['category']]?.icon}{' '}
               {CATEGORY_LABELS[category as HelpItem['category']]?.label}
             </p>
@@ -535,10 +535,10 @@ function HelpLegendPanel() {
                       : 'border-slate-700/50 bg-slate-800/50 hover:border-slate-600'
                   }`}
                 >
-                  <p className="text-xs font-semibold text-slate-200">{item.term}</p>
-                  <p className="mt-1 text-[11px] text-slate-400">{item.description}</p>
+                  <p className="text-xs font-semibold">{item.term}</p>
+                  <p className="mt-1 text-[11px]">{item.description}</p>
                   {item.example && (
-                    <p className="mt-1.5 rounded bg-slate-900/50 px-2 py-1 text-[10px] text-slate-500">
+                    <p className="mt-1.5 rounded px-2 py-1 text-[10px]">
                       💡 {item.example}
                     </p>
                   )}
@@ -549,15 +549,15 @@ function HelpLegendPanel() {
         ))}
 
         {filteredItems.length === 0 && (
-          <p className="py-8 text-center text-sm text-slate-500">
+          <p className="py-8 text-center text-sm">
             No s'han trobat termes
           </p>
         )}
       </div>
 
       {/* Footer */}
-      <div className="border-t border-slate-700 p-3">
-        <p className="text-[10px] text-slate-500 text-center">
+      <div className="border-t p-3">
+        <p className="text-[10px] text-center">
           Prem Esc o el botó ✕ per tancar
         </p>
       </div>
@@ -581,19 +581,19 @@ type FieldLabelProps = {
 export function FieldLabel({ htmlFor, helpId, required, children }: FieldLabelProps) {
   if (helpId) {
     return (
-      <label htmlFor={htmlFor} className="block text-xs font-medium text-slate-300">
+      <label htmlFor={htmlFor} className="block text-xs font-medium">
         <HelpTooltip id={helpId} inline>
           {children}
-          {required && <span className="ml-1 text-rose-400">*</span>}
+          {required && <span className="ml-1">*</span>}
         </HelpTooltip>
       </label>
     );
   }
 
   return (
-    <label htmlFor={htmlFor} className="block text-xs font-medium text-slate-300">
+    <label htmlFor={htmlFor} className="block text-xs font-medium">
       {children}
-      {required && <span className="ml-1 text-rose-400">*</span>}
+      {required && <span className="ml-1">*</span>}
     </label>
   );
 }

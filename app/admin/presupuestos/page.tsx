@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 const PresupuestoPdfStudio = dynamicImport(() => import('./PresupuestoPdfStudio'), {
   ssr: false,
   loading: () => (
-    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 text-sm text-slate-300">
+    <section className="rounded-2xl border p-6 text-sm">
       Carregant editor de pressupostos...
     </section>
   ),
@@ -54,26 +54,26 @@ export default async function PresupuestosPage({
 
   return (
     <div className="space-y-6">
-      <header className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
+      <header className="rounded-2xl border p-6 shadow-sm">
         <div className="flex items-center gap-3 flex-wrap">
-          <Link href="/admin/settings" className="text-sm text-slate-300 hover:text-slate-100">
+          <Link href="/admin/settings" className="text-sm">
             ← Configuració
           </Link>
           {customer && (
             <Link
               href={`/admin/contactes/${customer.id}`}
-              className="rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-cyan-700 transition-colors"
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-colors"
             >
               👤 Fitxa Client
             </Link>
           )}
         </div>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-100">Editor avançat de pressupost PDF</h1>
-        <p className="mt-1 text-sm text-slate-300">
+        <h1 className="mt-2 text-2xl font-semibold">Editor avançat de pressupost PDF</h1>
+        <p className="mt-1 text-sm">
           Personalitza client, pack, extres, descomptes i text per generar el PDF al moment.
         </p>
         {customer && (
-          <p className="mt-2 text-xs text-cyan-200">
+          <p className="mt-2 text-xs">
             Guardant a fitxa: <Link href={`/admin/contactes/${customer.id}`} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
           </p>
         )}

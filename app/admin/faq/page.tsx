@@ -49,15 +49,15 @@ export default async function FAQPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">FAQ</h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <h1 className="text-2xl font-semibold tracking-tight">FAQ</h1>
+          <p className="mt-1 text-sm">
             Gestiona les preguntes freqüents del web
           </p>
         </div>
         <div className="flex gap-2">
           <Link
             href="/admin/faq/new"
-            className="inline-flex items-center rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
+            className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium transition-colors"
           >
             + Nova Pregunta
           </Link>
@@ -66,25 +66,25 @@ export default async function FAQPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
-          <p className="text-xs font-medium text-slate-400 uppercase">Total Preguntes</p>
-          <p className="mt-2 text-3xl font-bold text-slate-100">{faqs.length}</p>
+        <div className="rounded-2xl border backdrop-blur-sm p-4">
+          <p className="text-xs font-medium uppercase">Total Preguntes</p>
+          <p className="mt-2 text-3xl font-bold">{faqs.length}</p>
         </div>
-        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-4">
-          <p className="text-xs font-medium text-emerald-400 uppercase">Actives</p>
-          <p className="mt-2 text-3xl font-bold text-slate-100">
+        <div className="rounded-2xl border backdrop-blur-sm p-4">
+          <p className="text-xs font-medium uppercase">Actives</p>
+          <p className="mt-2 text-3xl font-bold">
             {faqs.filter((f) => f.isActive).length}
           </p>
         </div>
-        <div className="rounded-2xl border border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-orange-600/5 backdrop-blur-sm p-4">
-          <p className="text-xs font-medium text-orange-400 uppercase">Categories</p>
-          <p className="mt-2 text-3xl font-bold text-slate-100">
+        <div className="rounded-2xl border backdrop-blur-sm p-4">
+          <p className="text-xs font-medium uppercase">Categories</p>
+          <p className="mt-2 text-3xl font-bold">
             {Object.keys(faqsByCategory).length}
           </p>
         </div>
-        <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-blue-600/5 backdrop-blur-sm p-4">
-          <p className="text-xs font-medium text-cyan-400 uppercase">Idiomes</p>
-          <p className="mt-2 text-3xl font-bold text-slate-100">
+        <div className="rounded-2xl border backdrop-blur-sm p-4">
+          <p className="text-xs font-medium uppercase">Idiomes</p>
+          <p className="mt-2 text-3xl font-bold">
             {new Set(faqs.flatMap(f => f.translations.map(t => t.locale))).size}
           </p>
         </div>
@@ -105,7 +105,7 @@ export default async function FAQPage() {
             >
               <span>{config.icon}</span>
               {config.label}
-              <span className="text-xs bg-slate-600/50 px-1.5 py-0.5 rounded-full">
+              <span className="text-xs px-1.5 py-0.5 rounded-full">
                 {count}
               </span>
             </span>
@@ -123,13 +123,13 @@ export default async function FAQPage() {
         return (
           <section
             key={category}
-            className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden"
+            className="rounded-2xl border backdrop-blur-sm overflow-hidden"
           >
-            <div className="bg-slate-700/30 border-b border-slate-700/50 p-4">
-              <h2 className="font-semibold text-slate-100 flex items-center gap-2">
+            <div className="border-b p-4">
+              <h2 className="font-semibold flex items-center gap-2">
                 <span>{config.icon}</span>
                 {config.label}
-                <span className="text-sm font-normal text-slate-400">
+                <span className="text-sm font-normal">
                   ({categoryFaqs.length} preguntes)
                 </span>
               </h2>
@@ -140,29 +140,29 @@ export default async function FAQPage() {
                 return (
                   <div
                     key={faq.id}
-                    className="p-4 hover:bg-slate-700/30 transition-colors"
+                    className="p-4 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-slate-500">#{faq.order}</span>
-                          <h3 className="font-medium text-slate-100 truncate">
+                          <span className="text-sm font-medium">#{faq.order}</span>
+                          <h3 className="font-medium truncate">
                             {translation?.question || faq.slug}
                           </h3>
                           {!faq.isActive && (
-                            <span className="inline-flex items-center rounded-full bg-slate-500/20 px-2 py-0.5 text-xs font-medium text-slate-400">
+                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium">
                               Inactiva
                             </span>
                           )}
                         </div>
-                        <p className="mt-1 text-sm text-slate-400 line-clamp-2">
+                        <p className="mt-1 text-sm line-clamp-2">
                           {translation?.answer}
                         </p>
                         <div className="mt-2 flex gap-2">
                           {faq.translations.map((t) => (
                             <span
                               key={t.locale}
-                              className="inline-flex items-center rounded bg-slate-700/50 px-1.5 py-0.5 text-xs text-slate-300"
+                              className="inline-flex items-center rounded px-1.5 py-0.5 text-xs"
                             >
                               {t.locale.toUpperCase()}
                             </span>
@@ -172,7 +172,7 @@ export default async function FAQPage() {
                       <div className="flex items-center gap-2 shrink-0">
                         <Link
                           href={`/admin/faq/${faq.id}`}
-                          className="inline-flex items-center rounded-lg bg-slate-700/50 px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
+                          className="inline-flex items-center rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors"
                         >
                           Editar
                         </Link>
@@ -187,10 +187,10 @@ export default async function FAQPage() {
       })}
 
       {faqs.length === 0 && (
-        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-12 text-center">
+        <div className="rounded-2xl border backdrop-blur-sm p-12 text-center">
           <span className="text-4xl">❓</span>
-          <p className="mt-4 text-slate-300">No hi ha preguntes freqüents</p>
-          <p className="text-sm text-slate-500">Crea la primera pregunta per començar</p>
+          <p className="mt-4">No hi ha preguntes freqüents</p>
+          <p className="text-sm">Crea la primera pregunta per començar</p>
         </div>
       )}
     </div>

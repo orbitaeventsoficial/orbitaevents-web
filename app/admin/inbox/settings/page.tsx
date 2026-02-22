@@ -25,8 +25,8 @@ export default async function InboxSettingsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-100">Configurar safata d'entrada</h1>
-        <p className="mt-1 text-sm text-slate-300">
+        <h1 className="text-2xl font-semibold tracking-tight">Configurar safata d'entrada</h1>
+        <p className="mt-1 text-sm">
           Safata simplificada: només correus de <strong>orbitaevents.com</strong>.
         </p>
       </header>
@@ -34,42 +34,42 @@ export default async function InboxSettingsPage() {
       <section className={`rounded-xl border p-6 shadow-sm ${
         configured ? 'border-emerald-400/30 bg-emerald-950/30' : 'border-amber-400/30 bg-amber-950/30'
       }`}>
-        <h2 className="mb-2 text-lg font-semibold text-slate-100">Estat de connexió</h2>
+        <h2 className="mb-2 text-lg font-semibold">Estat de connexió</h2>
         <p className={`text-sm ${configured ? 'text-emerald-300' : 'text-amber-300'}`}>
           {configured ? 'IMAP configurat i operatiu' : 'IMAP no configurat'}
         </p>
       </section>
 
-      <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold text-slate-100">Configuració actual</h2>
+      <section className="rounded-xl border border-white/10 p-6 shadow-sm">
+        <h2 className="mb-4 text-lg font-semibold">Configuració actual</h2>
         <div className="grid gap-3 text-sm">
           <div className="flex justify-between border-b border-white/10 pb-2">
-            <span className="text-xs uppercase text-slate-400">IMAP_HOST</span>
-            <span className="text-slate-200">{imapHost || '—'}</span>
+            <span className="text-xs uppercase">IMAP_HOST</span>
+            <span className="">{imapHost || '—'}</span>
           </div>
           <div className="flex justify-between border-b border-white/10 pb-2">
-            <span className="text-xs uppercase text-slate-400">IMAP_PORT</span>
-            <span className="text-slate-200">{imapPort || '—'}</span>
+            <span className="text-xs uppercase">IMAP_PORT</span>
+            <span className="">{imapPort || '—'}</span>
           </div>
           <div className="flex justify-between border-b border-white/10 pb-2">
-            <span className="text-xs uppercase text-slate-400">IMAP_USER</span>
-            <span className="text-slate-200">{imapUser || '—'}</span>
+            <span className="text-xs uppercase">IMAP_USER</span>
+            <span className="">{imapUser || '—'}</span>
           </div>
           <div className="flex justify-between border-b border-white/10 pb-2">
-            <span className="text-xs uppercase text-slate-400">IMAP_SECURE</span>
-            <span className="text-slate-200">{imapSecure}</span>
+            <span className="text-xs uppercase">IMAP_SECURE</span>
+            <span className="">{imapSecure}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-xs uppercase text-slate-400">IMAP_PASS</span>
-            <span className="text-slate-200">{process.env.IMAP_PASS ? '••••••••' : '—'}</span>
+            <span className="text-xs uppercase">IMAP_PASS</span>
+            <span className="">{process.env.IMAP_PASS ? '••••••••' : '—'}</span>
           </div>
         </div>
       </section>
 
       {!configured && (
-        <section className="rounded-xl border border-amber-400/30 bg-amber-950/30 p-6 shadow-sm">
-          <h2 className="mb-3 text-lg font-semibold text-amber-200">Variables requerides</h2>
-          <div className="rounded-lg bg-slate-950/70 p-4 font-mono text-xs text-amber-200">
+        <section className="rounded-xl border p-6 shadow-sm">
+          <h2 className="mb-3 text-lg font-semibold">Variables requerides</h2>
+          <div className="rounded-lg p-4 font-mono text-xs">
             <div>IMAP_HOST=imap.dondominio.com</div>
             <div>IMAP_PORT=993</div>
             <div>IMAP_USER=info@orbitaevents.com</div>
@@ -79,9 +79,9 @@ export default async function InboxSettingsPage() {
         </section>
       )}
 
-      <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
-        <h2 className="mb-2 text-lg font-semibold text-slate-100">Com funciona</h2>
-        <ul className="space-y-2 text-sm text-slate-300">
+      <section className="rounded-xl border border-white/10 p-6 shadow-sm">
+        <h2 className="mb-2 text-lg font-semibold">Com funciona</h2>
+        <ul className="space-y-2 text-sm">
           <li>• Només es mostren correus enviats o rebuts per <strong>orbitaevents.com</strong>.</li>
           <li>• No es fa servir Gmail ni serveis de Google.</li>
           <li>• El panell s&apos;actualitza via IMAP de DonDominio.</li>

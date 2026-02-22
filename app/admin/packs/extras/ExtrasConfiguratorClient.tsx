@@ -113,7 +113,7 @@ export default function ExtrasConfiguratorClient() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6 text-slate-300">
+      <div className="rounded-2xl border p-6">
         Carregant configuració d\'extres...
       </div>
     );
@@ -123,12 +123,12 @@ export default function ExtrasConfiguratorClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-100">Extres del configurador</h2>
-          <p className="text-sm text-slate-400">
+          <h2 className="text-xl font-semibold">Extres del configurador</h2>
+          <p className="text-sm">
             Defineix nom, descripció i preu una sola vegada. Després activa cada extra per família.
           </p>
           {isDefault && (
-            <p className="mt-2 text-xs text-amber-300">
+            <p className="mt-2 text-xs">
               Estàs veient els valors per defecte del config.
             </p>
           )}
@@ -137,7 +137,7 @@ export default function ExtrasConfiguratorClient() {
           <button
             type="button"
             onClick={() => setExtras((prev) => [...prev, defaultExtra()])}
-            className="inline-flex items-center rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
+            className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium transition-colors"
           >
             + Nou extra
           </button>
@@ -145,7 +145,7 @@ export default function ExtrasConfiguratorClient() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex items-center rounded-xl bg-emerald-500/80 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
+            className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
             {saving ? 'Guardant…' : 'Desar canvis'}
           </button>
@@ -153,7 +153,7 @@ export default function ExtrasConfiguratorClient() {
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+        <div className="rounded-xl border p-3 text-sm">
           {error}
         </div>
       )}
@@ -162,43 +162,43 @@ export default function ExtrasConfiguratorClient() {
         {extras.map((extra, index) => (
           <div
             key={`${extra.id}-${index}`}
-            className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5"
+            className="rounded-2xl border p-5"
           >
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="grid flex-1 gap-3 sm:grid-cols-2">
-                <label className="text-xs font-medium text-slate-400">
+                <label className="text-xs font-medium">
                   ID
                   <input
                     value={extra.id}
                     onChange={(e) => updateExtra(index, { id: e.target.value })}
-                    className="mt-1 w-full rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-sm text-slate-200"
+                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
                     placeholder="id-extra"
                   />
                 </label>
-                <label className="text-xs font-medium text-slate-400">
+                <label className="text-xs font-medium">
                   Icona
                   <input
                     value={extra.icon || ''}
                     onChange={(e) => updateExtra(index, { icon: e.target.value })}
-                    className="mt-1 w-full rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-sm text-slate-200"
+                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
                     placeholder="✨"
                   />
                 </label>
-                <label className="text-xs font-medium text-slate-400">
+                <label className="text-xs font-medium">
                   Nom
                   <input
                     value={extra.name}
                     onChange={(e) => updateExtra(index, { name: e.target.value })}
-                    className="mt-1 w-full rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-sm text-slate-200"
+                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
                     placeholder="Nom de l\'extra"
                   />
                 </label>
-                <label className="text-xs font-medium text-slate-400">
+                <label className="text-xs font-medium">
                   Categoria
                   <select
                     value={extra.category || 'other'}
                     onChange={(e) => updateExtra(index, { category: e.target.value as ExtraDefinition['category'] })}
-                    className="mt-1 w-full rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-sm text-slate-200"
+                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
                   >
                     {CATEGORY_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -207,17 +207,17 @@ export default function ExtrasConfiguratorClient() {
                     ))}
                   </select>
                 </label>
-                <label className="text-xs font-medium text-slate-400 sm:col-span-2">
+                <label className="text-xs font-medium sm:col-span-2">
                   Descripció
                   <input
                     value={extra.description || ''}
                     onChange={(e) => updateExtra(index, { description: e.target.value })}
-                    className="mt-1 w-full rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-sm text-slate-200"
+                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
                     placeholder="Descripció breu"
                   />
                 </label>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  <label className="text-xs font-medium text-slate-400">
+                  <label className="text-xs font-medium">
                     Preu (€)
                     <input
                       type="number"
@@ -228,10 +228,10 @@ export default function ExtrasConfiguratorClient() {
                         })
                       }
                       disabled={Boolean(extra.consultarPrecio)}
-                      className="mt-1 w-full rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 disabled:opacity-50"
+                      className="mt-1 w-full rounded-lg border px-3 py-2 text-sm disabled:opacity-50"
                     />
                   </label>
-                  <label className="flex items-center gap-2 text-xs font-medium text-slate-400">
+                  <label className="flex items-center gap-2 text-xs font-medium">
                     <input
                       type="checkbox"
                       checked={Boolean(extra.consultarPrecio)}
@@ -245,7 +245,7 @@ export default function ExtrasConfiguratorClient() {
                     Preu a consultar
                   </label>
                 </div>
-                <div className="flex flex-wrap gap-4 text-xs text-slate-300">
+                <div className="flex flex-wrap gap-4 text-xs">
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -268,14 +268,14 @@ export default function ExtrasConfiguratorClient() {
               <button
                 type="button"
                 onClick={() => setExtras((prev) => prev.filter((_, i) => i !== index))}
-                className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-200 hover:bg-red-500/20"
+                className="rounded-xl border px-3 py-2 text-xs font-semibold"
               >
                 Eliminar
               </button>
             </div>
 
             <div className="mt-4">
-              <p className="text-xs font-semibold uppercase text-slate-400 mb-2">Families disponibles</p>
+              <p className="text-xs font-semibold uppercase mb-2">Families disponibles</p>
               <div className="flex flex-wrap gap-2">
                 {serviceList.map((service) => {
                   const active = extra.compatibleWith?.includes(service);

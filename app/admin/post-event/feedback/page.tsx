@@ -44,25 +44,25 @@ export default async function FeedbackPage() {
     <div className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-200">
+          <h1 className="text-2xl font-semibold tracking-tight">
             💌 Feedback al Client
           </h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm">
             Envia agraïments i incentius als clients després de l&apos;event
           </p>
         </div>
         <Link
           href="/admin/post-event"
-          className="px-4 py-2 bg-white/5 text-slate-200 rounded-lg font-medium hover:bg-white/10"
+          className="px-4 py-2 bg-white/5 rounded-lg font-medium hover:bg-white/10"
         >
           ← Tornar
         </Link>
       </header>
 
       {/* Info Card */}
-      <div className="bg-cyan-950/30 border border-cyan-400/30 rounded-xl p-6">
-        <h3 className="font-semibold text-cyan-200 mb-2">💡 Què incloure al feedback?</h3>
-        <ul className="text-sm text-cyan-300 space-y-1">
+      <div className="border rounded-xl p-6">
+        <h3 className="font-semibold mb-2">💡 Què incloure al feedback?</h3>
+        <ul className="text-sm space-y-1">
           <li>• 💌 Missatge personalitzat d&apos;agraïment</li>
           <li>• 📸 Foto icònica de l&apos;event (si disponible)</li>
           <li>• 🎁 Codi descompte 10% per proper event</li>
@@ -73,9 +73,9 @@ export default async function FeedbackPage() {
 
       {/* Bookings List */}
       {bookings.length === 0 ? (
-        <div className="bg-slate-950/60 border border-white/10 rounded-xl p-12 text-center">
+        <div className="border border-white/10 rounded-xl p-12 text-center">
           <div className="text-4xl mb-4">💌</div>
-          <p className="text-slate-400">No hi ha esdeveniments completats recentment</p>
+          <p className="">No hi ha esdeveniments completats recentment</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -86,37 +86,37 @@ export default async function FeedbackPage() {
             return (
               <div
                 key={booking.id}
-                className="bg-slate-950/60 border border-white/10 rounded-xl p-4 hover:bg-white/5 transition-colors"
+                className="border border-white/10 rounded-xl p-4 hover:bg-white/5 transition-colors"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-slate-200">
+                      <h3 className="font-semibold">
                         {booking.clientName}
                       </h3>
                       {hasSurvey && (
-                        <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-300 rounded text-xs font-medium">
+                        <span className="px-2 py-0.5 rounded text-xs font-medium">
                           ✓ Enquesta rebuda
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm">
                       {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · {packName} · {booking.eventLocation}
                     </p>
-                    <p className="text-sm text-slate-300 mt-1">
+                    <p className="text-sm mt-1">
                       📧 {booking.clientEmail} · 📞 {booking.clientPhone || 'N/A'}
                     </p>
                   </div>
                   <div className="flex gap-2">
                     <Link
                       href={`mailto:${booking.clientEmail}?subject=Gràcies per confiar en Òrbita Events!&body=Hola ${booking.clientName},%0D%0A%0D%0AGràcies per confiar en nosaltres per al vostre event del ${new Date(booking.eventDate).toLocaleDateString('ca-ES')}!`}
-                      className="px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-green-600"
+                      className="px-4 py-2 text-white rounded-lg text-sm font-medium"
                     >
                       ✉️ Envia correu
                     </Link>
                     <Link
                       href={`/admin/bookings/${booking.id}`}
-                      className="px-4 py-2 bg-white/5 text-slate-200 rounded-lg text-sm font-medium hover:bg-white/10"
+                      className="px-4 py-2 bg-white/5 rounded-lg text-sm font-medium hover:bg-white/10"
                     >
                       Veure
                     </Link>

@@ -84,8 +84,8 @@ export default async function SettingsPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">Configuració</h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <h1 className="text-2xl font-semibold tracking-tight">Configuració</h1>
+          <p className="mt-1 text-sm">
             Gestiona les configuracions del sistema i estadístiques públiques
           </p>
         </div>
@@ -93,18 +93,18 @@ export default async function SettingsPage() {
       </header>
 
       {/* Info Alert */}
-      <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm p-4">
-        <p className="text-sm text-amber-200">
+      <div className="rounded-2xl border backdrop-blur-sm p-4">
+        <p className="text-sm">
           <strong>Nota:</strong> Les estadístiques públiques (esdeveniments, persones) s&apos;actualitzen
-          automàticament quan una reserva passa a <span className="font-semibold text-amber-300">COMPLETED</span>.
+          automàticament quan una reserva passa a <span className="font-semibold">COMPLETED</span>.
           Pots editar-les manualment si cal ajustar els números inicials.
         </p>
       </div>
       {Object.keys(settings).length === 0 ? (
-        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-12 text-center">
+        <div className="rounded-2xl border backdrop-blur-sm p-12 text-center">
           <span className="text-4xl">⚙️</span>
-          <p className="mt-4 text-slate-300">No hi ha configuracions</p>
-          <p className="text-sm text-slate-500">Executa el seed per carregar dades inicials</p>
+          <p className="mt-4">No hi ha configuracions</p>
+          <p className="text-sm">Executa el seed per carregar dades inicials</p>
         </div>
       ) : (
         <SettingsClient groupedSettings={settings} categoryConfig={CATEGORY_CONFIG} />
@@ -114,47 +114,47 @@ export default async function SettingsPage() {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           href="/admin/presupuestos"
-          className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-sm p-6 hover:border-emerald-400/40 hover:bg-emerald-500/15 transition-all"
+          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
         >
           <div className="text-2xl mb-2">🧾</div>
-          <h3 className="font-semibold text-slate-100">Editor PDF de pressupost</h3>
-          <p className="text-sm text-slate-300">Personalitza client, pack, extres i descarrega el PDF a l’instant</p>
+          <h3 className="font-semibold">Editor PDF de pressupost</h3>
+          <p className="text-sm">Personalitza client, pack, extres i descarrega el PDF a l’instant</p>
         </Link>
 
         <Link
           href="/admin/settings/quotes"
-          className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6 hover:border-slate-600/50 hover:bg-slate-700/40 transition-all"
+          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
         >
           <div className="text-2xl mb-2">📄</div>
-          <h3 className="font-semibold text-slate-100">Plantilla de pressupostos</h3>
-          <p className="text-sm text-slate-400">Text, condicions i còpia interna dels pressupostos</p>
+          <h3 className="font-semibold">Plantilla de pressupostos</h3>
+          <p className="text-sm">Text, condicions i còpia interna dels pressupostos</p>
         </Link>
 
         <Link
           href="/admin/catalog?tab=packs"
-          className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6 hover:border-slate-600/50 hover:bg-slate-700/40 transition-all"
+          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
         >
           <div className="text-2xl mb-2">📦</div>
-          <h3 className="font-semibold text-slate-100">Catàleg</h3>
-          <p className="text-sm text-slate-400">Packs, extres, inventari i regles de preu</p>
+          <h3 className="font-semibold">Catàleg</h3>
+          <p className="text-sm">Packs, extres, inventari i regles de preu</p>
         </Link>
 
         <Link
           href="/admin/text-manager"
-          className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6 hover:border-slate-600/50 hover:bg-slate-700/40 transition-all"
+          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
         >
           <div className="text-2xl mb-2">🌐</div>
-          <h3 className="font-semibold text-slate-100">Traduccions</h3>
-          <p className="text-sm text-slate-400">Gestiona el contingut multiidioma</p>
+          <h3 className="font-semibold">Traduccions</h3>
+          <p className="text-sm">Gestiona el contingut multiidioma</p>
         </Link>
 
         <Link
           href="/admin/faq"
-          className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6 hover:border-slate-600/50 hover:bg-slate-700/40 transition-all"
+          className="rounded-2xl border backdrop-blur-sm p-6 transition-all"
         >
           <div className="text-2xl mb-2">❓</div>
-          <h3 className="font-semibold text-slate-100">FAQs</h3>
-          <p className="text-sm text-slate-400">Edita les preguntes freqüents</p>
+          <h3 className="font-semibold">FAQs</h3>
+          <p className="text-sm">Edita les preguntes freqüents</p>
         </Link>
       </section>
     </div>

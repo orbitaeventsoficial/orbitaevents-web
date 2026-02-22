@@ -305,7 +305,7 @@ export default function InboxClient({
   return (
     <div className="flex-1 flex overflow-hidden">
       {/* Sidebar filters */}
-      <aside className="w-56 border-r border-slate-700/50 bg-slate-800/40 p-4 hidden lg:block">
+      <aside className="w-56 border-r p-4 hidden lg:block">
         <div className="space-y-1 mb-6">
           <button
             onClick={() => setActiveTab('all')}
@@ -335,7 +335,7 @@ export default function InboxClient({
             >
               📧 Emails ({imapEmails.length})
               {imapUnread > 0 && (
-                <span className="ml-2 px-2 py-0.5 bg-cyan-500/20 text-cyan-300 text-xs rounded-full">
+                <span className="ml-2 px-2 py-0.5 text-xs rounded-full">
                   {imapUnread}
                 </span>
               )}
@@ -343,7 +343,7 @@ export default function InboxClient({
           )}
         </div>
 
-        <hr className="my-4 border-slate-700/50" />
+        <hr className="my-4" />
 
         <nav className="space-y-1">
           <button
@@ -367,10 +367,10 @@ export default function InboxClient({
         </nav>
 
         {imapConfigured && (
-          <div className="mt-4 p-3 bg-slate-700/30 border border-slate-700/50 rounded-lg">
-            <p className="text-sm text-slate-300 font-medium">Només Òrbita</p>
-            <p className="text-xs text-slate-500 mt-1">
-              Es mostren només emails de <span className="text-slate-300">orbitaevents.com</span>
+          <div className="mt-4 p-3 border rounded-lg">
+            <p className="text-sm font-medium">Només Òrbita</p>
+            <p className="text-xs mt-1">
+              Es mostren només emails de <span className="">orbitaevents.com</span>
             </p>
           </div>
         )}
@@ -380,31 +380,31 @@ export default function InboxClient({
             onClick={loadImapEmails}
             disabled={loadingImap}
             type="button"
-            className="w-full mt-4 px-3 py-2 bg-slate-700/50 border border-slate-700/50 rounded-lg text-sm text-slate-300 hover:bg-slate-600/50 transition-colors disabled:opacity-50"
+            className="w-full mt-4 px-3 py-2 border rounded-lg text-sm transition-colors disabled:opacity-50"
           >
             {loadingImap ? '⏳ Carregant...' : '🔄 Actualitzar'}
           </button>
         )}
 
         {imapError && (
-          <div className="mt-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg">
-            <p className="text-xs text-rose-300">{imapError}</p>
+          <div className="mt-4 p-3 border rounded-lg">
+            <p className="text-xs">{imapError}</p>
           </div>
         )}
       </aside>
 
       {/* Email list */}
-      <div className="w-96 border-r border-slate-700/50 flex flex-col bg-slate-800/60">
-        <div className="p-3 border-b border-slate-700/50">
+      <div className="w-96 border-r flex flex-col">
+        <div className="p-3 border-b">
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">🔍</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2">🔍</span>
             <input
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cercar..."
               aria-label="Cercar emails"
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="w-full pl-10 pr-4 py-2 rounded-lg border text-sm focus:ring-1"
             />
           </div>
         </div>
@@ -425,7 +425,7 @@ export default function InboxClient({
                 onClick={() => setFlashMessage(null)}
                 type="button"
                 aria-label="Tancar missatge"
-                className="text-xs text-slate-400 hover:text-slate-200"
+                className="text-xs"
               >
                 ✕
               </button>
@@ -435,12 +435,12 @@ export default function InboxClient({
 
         <div className="flex-1 overflow-y-auto">
           {loadingImap && imapEmails.length === 0 ? (
-            <div className="p-8 text-center text-slate-400">
-              <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full mx-auto mb-4" />
+            <div className="p-8 text-center">
+              <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full mx-auto mb-4" />
               <p>Carregant emails...</p>
             </div>
           ) : filteredEmails.length === 0 ? (
-            <div className="p-8 text-center text-slate-400">
+            <div className="p-8 text-center">
               <span className="text-4xl">📭</span>
               <p className="mt-2">No hi ha missatges</p>
             </div>
@@ -457,14 +457,14 @@ export default function InboxClient({
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      {!email.read && <span className="w-2 h-2 bg-cyan-500 rounded-full flex-shrink-0" />}
+                      {!email.read && <span className="w-2 h-2 rounded-full flex-shrink-0" />}
                       <span className={`text-xs px-1.5 py-0.5 rounded ${
                         email.type === 'lead' ? 'bg-purple-500/20 text-purple-300' : 'bg-emerald-500/20 text-emerald-300'
                       }`}>
                         {email.type === 'lead' ? 'Entrada web' : 'Correu IMAP'}
                       </span>
                       {!email.read && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded">
                           Nou
                         </span>
                       )}
@@ -472,11 +472,11 @@ export default function InboxClient({
                         {email.fromName}
                       </p>
                     </div>
-                    <p className="text-sm text-slate-400 truncate mt-0.5">{email.subject}</p>
-                    <p className="text-xs text-slate-500 truncate mt-1">{email.preview || email.subject}</p>
+                    <p className="text-sm truncate mt-0.5">{email.subject}</p>
+                    <p className="text-xs truncate mt-1">{email.preview || email.subject}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                    <span className="text-xs text-slate-500">{formatDate(email.date)}</span>
+                    <span className="text-xs">{formatDate(email.date)}</span>
                   </div>
                 </div>
               </button>
@@ -486,10 +486,10 @@ export default function InboxClient({
       </div>
 
       {/* Email detail */}
-      <div className="flex-1 flex flex-col bg-slate-800/40">
+      <div className="flex-1 flex flex-col">
         {selectedEmail ? (
           <>
-            <div className="p-6 border-b border-slate-700/50">
+            <div className="p-6 border-b">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
@@ -504,18 +504,18 @@ export default function InboxClient({
                       </span>
                     )}
                   </div>
-                  <h2 className="text-xl font-semibold text-slate-100">{selectedEmail.subject}</h2>
+                  <h2 className="text-xl font-semibold">{selectedEmail.subject}</h2>
                   <div className="flex items-center gap-3 mt-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500/30 to-blue-600/30 flex items-center justify-center text-cyan-300 font-bold">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold">
                       {selectedEmail.fromName.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-medium text-slate-100">{selectedEmail.fromName}</p>
-                      <p className="text-sm text-slate-400">{selectedEmail.from}</p>
+                      <p className="font-medium">{selectedEmail.fromName}</p>
+                      <p className="text-sm">{selectedEmail.from}</p>
                     </div>
                   </div>
                 </div>
-                <span className="text-sm text-slate-500">
+                <span className="text-sm">
                   {new Date(selectedEmail.date).toLocaleString('ca-ES')}
                 </span>
               </div>
@@ -523,42 +523,42 @@ export default function InboxClient({
 
             <div className="flex-1 overflow-y-auto p-6">
               {selectedEmail.leadData && (
-                <div className="bg-slate-700/30 rounded-xl p-6 mb-6 border border-slate-700/50">
-                  <h3 className="font-semibold text-slate-100 mb-4">📋 Detalls de la sol·licitud</h3>
+                <div className="rounded-xl p-6 mb-6 border">
+                  <h3 className="font-semibold mb-4">📋 Detalls de la sol·licitud</h3>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-slate-400">Tipus d&apos;event:</span>
-                      <p className="font-medium text-slate-200">{EVENT_TYPE_LABELS[selectedEmail.leadData.eventType || ''] || 'No especificat'}</p>
+                      <span className="">Tipus d&apos;event:</span>
+                      <p className="font-medium">{EVENT_TYPE_LABELS[selectedEmail.leadData.eventType || ''] || 'No especificat'}</p>
                     </div>
                     {selectedEmail.leadData.eventDate && (
                       <div>
-                        <span className="text-slate-400">Data:</span>
-                        <p className="font-medium text-slate-200">{new Date(selectedEmail.leadData.eventDate).toLocaleDateString('ca-ES')}</p>
+                        <span className="">Data:</span>
+                        <p className="font-medium">{new Date(selectedEmail.leadData.eventDate).toLocaleDateString('ca-ES')}</p>
                       </div>
                     )}
                     {selectedEmail.leadData.guestCount && (
                       <div>
-                        <span className="text-slate-400">Convidats:</span>
-                        <p className="font-medium text-slate-200">{selectedEmail.leadData.guestCount} persones</p>
+                        <span className="">Convidats:</span>
+                        <p className="font-medium">{selectedEmail.leadData.guestCount} persones</p>
                       </div>
                     )}
                     {selectedEmail.leadData.budget && (
                       <div>
-                        <span className="text-slate-400">Pressupost:</span>
-                        <p className="font-medium text-slate-200">{selectedEmail.leadData.budget}</p>
+                        <span className="">Pressupost:</span>
+                        <p className="font-medium">{selectedEmail.leadData.budget}</p>
                       </div>
                     )}
                     {selectedEmail.leadData.eventLocation && (
                       <div>
-                        <span className="text-slate-400">Ubicació:</span>
-                        <p className="font-medium text-slate-200">{selectedEmail.leadData.eventLocation}</p>
+                        <span className="">Ubicació:</span>
+                        <p className="font-medium">{selectedEmail.leadData.eventLocation}</p>
                       </div>
                     )}
                     {selectedEmail.leadData.phone && (
                       <div>
-                        <span className="text-slate-400">Telèfon:</span>
+                        <span className="">Telèfon:</span>
                         <p className="font-medium">
-                          <a href={`tel:${selectedEmail.leadData.phone}`} className="text-cyan-400 hover:underline">
+                          <a href={`tel:${selectedEmail.leadData.phone}`} className="hover:underline">
                             {selectedEmail.leadData.phone}
                           </a>
                         </p>
@@ -569,36 +569,36 @@ export default function InboxClient({
               )}
 
               <div className="prose prose-invert max-w-none">
-                <h4 className="text-sm font-medium text-slate-400 mb-2">Missatge:</h4>
+                <h4 className="text-sm font-medium mb-2">Missatge:</h4>
                 {loadingSelected && selectedEmail.type === 'imap' && (
-                  <p className="text-xs text-slate-500 mb-2">Carregant contingut complet...</p>
+                  <p className="text-xs mb-2">Carregant contingut complet...</p>
                 )}
                 {selectedEmail.imapData?.bodyHtml ? (
                   <div
                     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedEmail.imapData.bodyHtml) }}
-                    className="text-slate-200 bg-slate-700/30 p-4 rounded-lg border border-slate-700/50"
+                    className="p-4 rounded-lg border"
                   />
                 ) : (
-                  <p className="text-slate-200 whitespace-pre-wrap">
+                  <p className="whitespace-pre-wrap">
                     {selectedEmail.leadData?.message || selectedEmail.imapData?.bodyText || selectedEmail.preview || 'Sense missatge'}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="p-4 border-t border-slate-700/50 bg-slate-800/60">
+            <div className="p-4 border-t">
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleReply(selectedEmail)}
                   type="button"
-                  className="flex-1 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors font-medium"
+                  className="flex-1 px-4 py-2 rounded-xl text-white shadow-lg transition-colors font-medium"
                 >
                   ↩️ Respondre
                 </button>
                 <button
                   onClick={() => setShowQuote(true)}
                   type="button"
-                  className="px-4 py-2 bg-amber-500/20 text-amber-300 rounded-xl border border-amber-500/30 hover:bg-amber-500/30 transition-colors"
+                  className="px-4 py-2 rounded-xl border transition-colors"
                 >
                   📄 Pressupost
                 </button>
@@ -607,13 +607,13 @@ export default function InboxClient({
                     <a
                       href={`https://wa.me/${selectedEmail.leadData.phone.replace(/\D/g, '')}`}
                       target="_blank" rel="noopener noreferrer"
-                      className="px-4 py-2 bg-emerald-500/20 text-emerald-300 rounded-xl border border-emerald-500/30 hover:bg-emerald-500/30 transition-colors"
+                      className="px-4 py-2 rounded-xl border transition-colors"
                     >
                       💬 WhatsApp
                     </a>
                     <a
                       href={`tel:${selectedEmail.leadData.phone}`}
-                      className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-xl border border-blue-500/30 hover:bg-blue-500/30 transition-colors"
+                      className="px-4 py-2 rounded-xl border transition-colors"
                     >
                       📞 Trucar
                     </a>
@@ -623,7 +623,7 @@ export default function InboxClient({
                   <button
                     onClick={() => router.push(`/admin/leads/${selectedEmail.id}`)}
                     type="button"
-                    className="px-4 py-2 border border-slate-600/50 text-slate-300 rounded-xl hover:bg-slate-700/50 transition-colors"
+                    className="px-4 py-2 border rounded-xl transition-colors"
                   >
                     📋 Veure lead
                   </button>
@@ -633,14 +633,14 @@ export default function InboxClient({
                     <button
                       onClick={() => handleImportLeadFromEmail(selectedEmail)}
                       type="button"
-                      className="px-4 py-2 border border-cyan-500/30 text-cyan-300 rounded-xl hover:bg-cyan-500/10 transition-colors"
+                      className="px-4 py-2 border rounded-xl transition-colors"
                     >
                       ➕ Crear/actualitzar lead
                     </button>
                     <button
                       onClick={() => handleDeleteImapEmail(selectedEmail)}
                       type="button"
-                      className="px-4 py-2 border border-rose-500/30 text-rose-300 rounded-xl hover:bg-rose-500/10 transition-colors"
+                      className="px-4 py-2 border rounded-xl transition-colors"
                     >
                       🗑️ Eliminar email
                     </button>
@@ -650,7 +650,7 @@ export default function InboxClient({
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-slate-500">
+          <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <span className="text-6xl">📬</span>
               <p className="mt-4">Selecciona un missatge per veure&apos;l</p>
@@ -772,20 +772,20 @@ function ComposeModal({
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" role="presentation">
       <div
-        className="bg-slate-800 border border-slate-700/50 rounded-2xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col"
+        className="border rounded-2xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col"
         role="dialog"
         aria-modal="true"
         aria-labelledby="compose-title"
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/50">
-          <h2 id="compose-title" className="text-lg font-semibold text-slate-100">
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <h2 id="compose-title" className="text-lg font-semibold">
             {replyTo ? `↩️ Respondre a ${replyTo.fromName}` : '✏️ Nou email'}
           </h2>
           <button
             onClick={onClose}
             type="button"
             aria-label="Tancar modal"
-            className="p-2 hover:bg-slate-700/50 rounded-lg text-slate-400"
+            className="p-2 rounded-lg"
           >
             ✕
           </button>
@@ -793,36 +793,36 @@ function ComposeModal({
 
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1">Per a</label>
+            <label className="block text-sm font-medium mb-1">Per a</label>
             <input
               type="email"
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="w-full px-4 py-2 rounded-xl border focus:ring-1"
               placeholder="email@exemple.com"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1">Assumpte</label>
+            <label className="block text-sm font-medium mb-1">Assumpte</label>
             <input
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="w-full px-4 py-2 rounded-xl border focus:ring-1"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1">Missatge</label>
+            <label className="block text-sm font-medium mb-1">Missatge</label>
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={10}
-              className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 resize-none"
+              className="w-full px-4 py-3 rounded-xl border focus:ring-1 resize-none"
               placeholder="Escriu el teu missatge..."
             />
           </div>
-          <div className="rounded-xl border border-slate-700/50 bg-slate-700/20 p-4">
-            <label className="flex items-center gap-2 text-sm font-medium text-slate-300">
+          <div className="rounded-xl border p-4">
+            <label className="flex items-center gap-2 text-sm font-medium">
               <input
                 type="checkbox"
                 checked={attachQuote}
@@ -833,7 +833,7 @@ function ComposeModal({
             {attachQuote && (
               <div className="mt-3 grid gap-3 md:grid-cols-2">
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Pack</label>
+                  <label className="block text-xs mb-1">Pack</label>
                   <select
                     value={quotePackId}
                     onChange={(e) => {
@@ -841,7 +841,7 @@ function ComposeModal({
                       setQuotePackId(e.target.value);
                       if (next) setQuotePrice(next.price);
                     }}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-600/50 bg-slate-800/80 text-slate-100 text-sm"
+                    className="w-full px-3 py-2 rounded-lg border text-sm"
                   >
                     {PACK_OPTIONS.map((pack) => (
                       <option key={pack.id} value={pack.id}>
@@ -851,12 +851,12 @@ function ComposeModal({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Preu base (€)</label>
+                  <label className="block text-xs mb-1">Preu base (€)</label>
                   <input
                     type="number"
                     value={quotePrice}
                     onChange={(e) => setQuotePrice(Number(e.target.value) || 0)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-600/50 bg-slate-800/80 text-slate-100 text-sm"
+                    className="w-full px-3 py-2 rounded-lg border text-sm"
                   />
                 </div>
               </div>
@@ -864,10 +864,10 @@ function ComposeModal({
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-700/50 bg-slate-700/30" aria-live="polite">
-          {error && <span className="text-xs text-rose-300 mr-auto" role="alert">{error}</span>}
-          {success && <span className="text-xs text-emerald-300 mr-auto" role="status">{success}</span>}
-          <button onClick={onClose} type="button" className="px-4 py-2 text-slate-400 hover:text-slate-200">Cancel·lar</button>
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t" aria-live="polite">
+          {error && <span className="text-xs mr-auto" role="alert">{error}</span>}
+          {success && <span className="text-xs mr-auto" role="status">{success}</span>}
+          <button onClick={onClose} type="button" className="px-4 py-2">Cancel·lar</button>
           <button
             onClick={handleSend}
             disabled={sending || !to || !subject || !body || (attachQuote && quotePrice <= 0)}
@@ -951,19 +951,19 @@ function QuoteModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" role="presentation">
-      <div className="bg-slate-800 border border-slate-700/50 rounded-2xl shadow-xl max-w-xl w-full" role="dialog" aria-modal="true" aria-labelledby="quote-title">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/50">
-          <h2 id="quote-title" className="text-lg font-semibold text-slate-100">📄 Pressupost personalitzat</h2>
-          <button onClick={onClose} type="button" className="p-2 hover:bg-slate-700/50 rounded-lg text-slate-400">✕</button>
+      <div className="border rounded-2xl shadow-xl max-w-xl w-full" role="dialog" aria-modal="true" aria-labelledby="quote-title">
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <h2 id="quote-title" className="text-lg font-semibold">📄 Pressupost personalitzat</h2>
+          <button onClick={onClose} type="button" className="p-2 rounded-lg">✕</button>
         </div>
 
         <div className="p-6 space-y-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Destinatari</label>
-            <input value={recipient} disabled className="w-full px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-300 text-sm" />
+            <label className="block text-sm mb-1">Destinatari</label>
+            <input value={recipient} disabled className="w-full px-4 py-2 rounded-xl border text-sm" />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Pack</label>
+            <label className="block text-sm mb-1">Pack</label>
             <select
               value={packId}
               onChange={(e) => {
@@ -971,7 +971,7 @@ function QuoteModal({
                 setPackId(e.target.value);
                 if (next) setPrice(next.price);
               }}
-              className="w-full px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 text-sm"
+              className="w-full px-4 py-2 rounded-xl border text-sm"
             >
               {PACK_OPTIONS.map((pack) => (
                 <option key={pack.id} value={pack.id}>{pack.label}</option>
@@ -979,34 +979,34 @@ function QuoteModal({
             </select>
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Preu base (€)</label>
+            <label className="block text-sm mb-1">Preu base (€)</label>
             <input
               type="number"
               value={price}
               onChange={(e) => setPrice(Number(e.target.value) || 0)}
-              className="w-full px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 text-sm"
+              className="w-full px-4 py-2 rounded-xl border text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Missatge personalitzat</label>
+            <label className="block text-sm mb-1">Missatge personalitzat</label>
             <textarea
               value={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
               rows={4}
-              className="w-full px-4 py-2 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 text-sm"
+              className="w-full px-4 py-2 rounded-xl border text-sm"
               placeholder="Detalls per al client..."
             />
           </div>
-          {error && <p className="text-xs text-rose-300" role="alert">{error}</p>}
+          {error && <p className="text-xs" role="alert">{error}</p>}
         </div>
 
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-700/50">
-          <button onClick={onClose} type="button" className="px-4 py-2 text-slate-400 hover:text-slate-200">Cancel·lar</button>
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t">
+          <button onClick={onClose} type="button" className="px-4 py-2">Cancel·lar</button>
           <button
             onClick={handleSendQuote}
             disabled={sending || !recipient || !packId || price <= 0}
             type="button"
-            className="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white disabled:opacity-50"
+            className="px-6 py-2 rounded-xl text-white disabled:opacity-50"
           >
             {sending ? 'Enviant...' : 'Envia pressupost'}
           </button>

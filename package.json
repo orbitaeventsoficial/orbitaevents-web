@@ -19,6 +19,8 @@
     "i18n:packs:fix-or-alert": "npm run i18n:packs:sync && npm run i18n:packs:guard",
     "autofix:finance:health": "npx tsx scripts/autofix-finance-health.ts",
     "autofix:system:health": "npx tsx scripts/autofix-system-health.ts",
+    "theme:admin:check": "node scripts/admin-theme-autofix.mjs --check",
+    "theme:admin:fix": "node scripts/admin-theme-autofix.mjs --fix",
     "autofix:master": "npx tsx scripts/autofix-master.ts",
     "autofix": "npm run autofix:master",
     "qa:scan:web": "node scripts/scan-i18n-leaks.mjs",

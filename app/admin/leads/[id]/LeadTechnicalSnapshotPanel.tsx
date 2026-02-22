@@ -75,8 +75,8 @@ export default function LeadTechnicalSnapshotPanel({
   }
 
   return (
-    <details open className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
-      <summary className="cursor-pointer text-sm font-semibold text-slate-200">
+    <details open className="rounded-xl border border-white/10 p-6 shadow-sm">
+      <summary className="cursor-pointer text-sm font-semibold">
         Snapshot técnico (JSON)
       </summary>
 
@@ -85,14 +85,14 @@ export default function LeadTechnicalSnapshotPanel({
           <button
             type="button"
             onClick={copySnapshot}
-            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5"
+            className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium hover:bg-white/5"
           >
             Copiar JSON
           </button>
           <button
             type="button"
             onClick={downloadSnapshot}
-            className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5"
+            className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium hover:bg-white/5"
           >
             Descarregar .json
           </button>
@@ -100,7 +100,7 @@ export default function LeadTechnicalSnapshotPanel({
             type="button"
             onClick={() => runAction('save_document')}
             disabled={busy !== null}
-            className="rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
+            className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
           >
             {busy === 'save_document' ? 'Desant...' : 'Desar en documents'}
           </button>
@@ -112,22 +112,22 @@ export default function LeadTechnicalSnapshotPanel({
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
             placeholder="Correu intern"
-            className="w-full rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-200"
+            className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm"
           />
           <button
             type="button"
             onClick={() => runAction('send_email')}
             disabled={busy !== null}
-            className="rounded-lg bg-amber-500 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-60"
+            className="rounded-lg px-3 py-2 text-xs font-semibold text-white disabled:opacity-60"
           >
             {busy === 'send_email' ? 'Enviant...' : 'Enviar per correu intern'}
           </button>
         </div>
 
-        {message ? <p className="text-xs text-slate-300">{message}</p> : null}
+        {message ? <p className="text-xs">{message}</p> : null}
       </div>
 
-      <pre className="mt-4 max-h-80 overflow-auto rounded-lg bg-slate-950 p-3 text-xs text-slate-200">
+      <pre className="mt-4 max-h-80 overflow-auto rounded-lg p-3 text-xs">
         {snapshotJson}
       </pre>
     </details>

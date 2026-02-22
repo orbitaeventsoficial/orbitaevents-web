@@ -33,11 +33,11 @@ export default function ScoreSnapshotButton({ leadId }: { leadId: string }) {
         type="button"
         onClick={saveSnapshot}
         disabled={saving}
-        className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5 disabled:opacity-60"
+        className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/5 disabled:opacity-60"
       >
         {saving ? 'Desant...' : 'Desar snapshot score'}
       </button>
-      {msg && <p className="mt-1 text-xs text-slate-300">{msg}</p>}
+      {msg && <p className="mt-1 text-xs">{msg}</p>}
     </div>
   );
 }

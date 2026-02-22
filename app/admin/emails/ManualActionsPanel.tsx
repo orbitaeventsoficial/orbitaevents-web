@@ -114,16 +114,16 @@ export default function ManualActionsPanel() {
   }
 
   return (
-    <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-700/30">
-        <h2 className="font-semibold text-slate-100">🔧 Accions Manuals</h2>
+    <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+      <div className="px-6 py-4 border-b">
+        <h2 className="font-semibold">🔧 Accions Manuals</h2>
       </div>
 
       <div className="p-6 space-y-6">
         {/* Run Cron Manually */}
         <div>
-          <h3 className="text-sm font-medium text-slate-200 mb-2">Executar Cron Post-Event</h3>
-          <p className="text-xs text-slate-400 mb-3">
+          <h3 className="text-sm font-medium mb-2">Executar Cron Post-Event</h3>
+          <p className="text-xs mb-3">
             Envia correus a tots els esdeveniments completats pendents
           </p>
           <button
@@ -139,7 +139,7 @@ export default function ManualActionsPanel() {
           >
             {runningCron ? (
               <span className="flex items-center justify-center gap-2">
-                <span className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                <span className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" />
                 Executant...
               </span>
             ) : (
@@ -156,12 +156,12 @@ export default function ManualActionsPanel() {
           )}
         </div>
 
-        <hr className="border-slate-700/30" />
+        <hr className="" />
 
         {/* Testimonials Reminder */}
         <div>
-          <h3 className="text-sm font-medium text-slate-200 mb-2">Recordatori de testimonis</h3>
-          <p className="text-xs text-slate-400 mb-3">
+          <h3 className="text-sm font-medium mb-2">Recordatori de testimonis</h3>
+          <p className="text-xs mb-3">
             Envia un resum amb testimonis pendents d'aprovació
           </p>
           <button
@@ -187,12 +187,12 @@ export default function ManualActionsPanel() {
           )}
         </div>
 
-        <hr className="border-slate-700/30" />
+        <hr className="" />
 
         {/* Send Test Email */}
         <div>
-          <h3 className="text-sm font-medium text-slate-200 mb-2">Envia correu de prova</h3>
-          <p className="text-xs text-slate-400 mb-3">
+          <h3 className="text-sm font-medium mb-2">Envia correu de prova</h3>
+          <p className="text-xs mb-3">
             Envia un email de prova per verificar la configuració SMTP
           </p>
           <div className="flex gap-2">
@@ -202,7 +202,7 @@ export default function ManualActionsPanel() {
               onChange={(e) => setTestEmail(e.target.value)}
               placeholder="email@exemple.com"
               aria-label="Email de prova"
-              className="flex-1 px-3 py-2 text-sm rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="flex-1 px-3 py-2 text-sm rounded-xl border focus:ring-1"
             />
             <button
               onClick={sendTestEmail}
@@ -228,29 +228,29 @@ export default function ManualActionsPanel() {
           )}
         </div>
 
-        <hr className="border-slate-700/30" />
+        <hr className="" />
 
         {/* Quick Links */}
         <div>
-          <h3 className="text-sm font-medium text-slate-200 mb-3">Enllaços Ràpids</h3>
+          <h3 className="text-sm font-medium mb-3">Enllaços Ràpids</h3>
           <div className="space-y-2">
             <a
               href="/api/canvas/rating?name=Prova&rating=10&code=TEST15&discount=15"
               target="_blank" rel="noopener noreferrer"
-              className="block w-full text-center px-3 py-2 text-sm bg-purple-500/20 text-purple-300 rounded-xl hover:bg-purple-500/30 transition-colors border border-purple-500/20"
+              className="block w-full text-center px-3 py-2 text-sm rounded-xl transition-colors border"
             >
               🎨 Previsualitzar Canvas
             </a>
             <a
               href="/ca/valoracio?ref=TEST-001"
               target="_blank" rel="noopener noreferrer"
-              className="block w-full text-center px-3 py-2 text-sm bg-blue-500/20 text-blue-300 rounded-xl hover:bg-blue-500/30 transition-colors border border-blue-500/20"
+              className="block w-full text-center px-3 py-2 text-sm rounded-xl transition-colors border"
             >
               ⭐ Veure pàgina valoració
             </a>
             <a
               href="/admin/google-reviews"
-              className="block w-full text-center px-3 py-2 text-sm bg-slate-700/50 text-slate-300 rounded-xl hover:bg-slate-600/50 transition-colors border border-slate-600/50"
+              className="block w-full text-center px-3 py-2 text-sm rounded-xl transition-colors border"
             >
               📋 Gestionar ressenyes
             </a>

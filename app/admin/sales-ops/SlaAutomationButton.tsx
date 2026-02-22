@@ -45,16 +45,16 @@ export default function SlaAutomationButton() {
         type="button"
         onClick={run}
         disabled={running}
-        className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
+        className="rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
       >
         {running ? 'Executant...' : 'Executar regles 24h'}
       </button>
       {result && (
-        <p className="text-xs text-emerald-300">
+        <p className="text-xs">
           OK: leads inactius {result.staleLeads}, tasques creades {result.createdTasks}, prioritats elevades {result.escalatedPriority}.
         </p>
       )}
-      {error && <p className="text-xs text-rose-300">{error}</p>}
+      {error && <p className="text-xs">{error}</p>}
     </div>
   );
 }

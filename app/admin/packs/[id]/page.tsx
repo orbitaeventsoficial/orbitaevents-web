@@ -85,14 +85,14 @@ export default async function EditPackPage({ params }: { params: Promise<{ id: s
         <div>
           <Link
             href="/admin/packs"
-            className="text-sm text-slate-500 hover:text-slate-200 mb-2 inline-flex items-center gap-1"
+            className="text-sm mb-2 inline-flex items-center gap-1"
           >
             ← Tornar a Packs
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-200">
+          <h1 className="text-2xl font-semibold tracking-tight">
             Editar Pack
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm">
             Modifica els detalls del pack {pack.slug}
           </p>
         </div>

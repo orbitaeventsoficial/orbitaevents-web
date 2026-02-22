@@ -173,7 +173,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -187,7 +187,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
 
   return (
     <div className="space-y-3">
-      <div className="text-xs text-slate-400">
+      <div className="text-xs">
         Pipeline filtrat: {totalLeads} de {allLeads.length} entrades
       </div>
 
@@ -213,7 +213,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
             }`}
           >
             {/* Column header */}
-            <div className="px-3 py-2.5 border-b border-slate-700/30">
+            <div className="px-3 py-2.5 border-b">
               <div className="flex items-center justify-between">
                 <h3 className="admin-leads-column-title text-sm font-semibold truncate">
                   {col.label}
@@ -232,7 +232,7 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
                 </div>
               )}
               {col.leads.length === 0 && (
-                <div className="rounded-xl border border-dashed border-slate-700/40 p-4 text-center text-xs text-slate-500">
+                <div className="rounded-xl border border-dashed p-4 text-center text-xs">
                   Cap entrada
                 </div>
               )}
@@ -323,7 +323,7 @@ function PipelineCard({
       <div className="flex items-start justify-between gap-2">
         <Link
           href={`/admin/leads/${lead.id}`}
-          className="text-sm font-semibold text-white hover:text-amber-200 transition-colors line-clamp-1"
+          className="text-sm font-semibold text-white transition-colors line-clamp-1"
         >
           {lead.name}
         </Link>
@@ -333,7 +333,7 @@ function PipelineCard({
               type="button"
               onClick={() => onMoveStatus(lead.id, prevStatus)}
               disabled={isUpdating}
-              className="rounded px-1 py-0.5 text-[10px] text-slate-300 hover:bg-black/20 hover:text-white transition-colors disabled:opacity-50"
+              className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 hover:text-white transition-colors disabled:opacity-50"
               title={`Moure a ${COLUMNS[statusIndex - 1].label}`}
             >
               ←
@@ -344,7 +344,7 @@ function PipelineCard({
               type="button"
               onClick={() => onMoveStatus(lead.id, nextStatus)}
               disabled={isUpdating}
-              className="rounded px-1 py-0.5 text-[10px] text-amber-200 hover:bg-black/20 hover:text-amber-100 transition-colors disabled:opacity-50"
+              className="rounded px-1 py-0.5 text-[10px] hover:bg-black/20 transition-colors disabled:opacity-50"
               title={`Moure a ${COLUMNS[statusIndex + 1].label}`}
             >
               →
@@ -362,14 +362,14 @@ function PipelineCard({
 
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px]">
         <span>{EVENT_TYPE_LABELS[lead.eventType] || lead.eventType}</span>
-        <span className="text-fuchsia-300/90">{SOURCE_LABELS[lead.source] || lead.source}</span>
+        <span className="">{SOURCE_LABELS[lead.source] || lead.source}</span>
         {lead.eventDate && (
-          <span className="text-slate-200/80">
+          <span className="">
             {new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
           </span>
         )}
         {lead.budget && (
-          <span className="text-emerald-400 font-medium">{lead.budget}</span>
+          <span className="font-medium">{lead.budget}</span>
         )}
       </div>
 
@@ -378,7 +378,7 @@ function PipelineCard({
         {lead.customerId && (
           <Link
             href={`/admin/contactes/${lead.customerId}`}
-            className="text-[10px] text-cyan-400 hover:text-cyan-300"
+            className="text-[10px]"
           >
             👤
           </Link>
@@ -386,7 +386,7 @@ function PipelineCard({
         {lead.booking && (
           <Link
             href={`/admin/bookings/${lead.booking.id}`}
-            className="text-[10px] text-emerald-400 hover:text-emerald-300 font-medium"
+            className="text-[10px] font-medium"
           >
             {lead.booking.reference}
           </Link>

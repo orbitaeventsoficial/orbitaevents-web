@@ -54,14 +54,14 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
   };
 
   return (
-    <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-700/30">
-        <h2 className="font-semibold text-slate-100">📊 Activitat Recent</h2>
-        <p className="text-xs text-slate-400 mt-1">Ultims 7 dies</p>
+    <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+      <div className="px-6 py-4 border-b">
+        <h2 className="font-semibold">📊 Activitat Recent</h2>
+        <p className="text-xs mt-1">Ultims 7 dies</p>
       </div>
 
       {activities.length === 0 ? (
-        <div className="p-8 text-center text-slate-400">
+        <div className="p-8 text-center">
           <span className="text-4xl">📭</span>
           <p className="mt-2">Cap activitat recent</p>
         </div>
@@ -78,7 +78,7 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
             return (
               <div
                 key={activity.id}
-                className="px-6 py-3 flex items-center gap-4 hover:bg-slate-700/20 transition-colors"
+                className="px-6 py-3 flex items-center gap-4 transition-colors"
               >
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${actionInfo.bg}`}
@@ -86,12 +86,12 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
                   {actionInfo.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-200 truncate">
+                  <p className="text-sm font-medium truncate">
                     {activity.customer?.name || 'Usuari desconegut'}
                   </p>
                   <p className={`text-xs ${actionInfo.text}`}>{actionInfo.label}</p>
                 </div>
-                <div className="text-xs text-slate-500">
+                <div className="text-xs">
                   {formatDate(activity.createdAt)}
                 </div>
               </div>

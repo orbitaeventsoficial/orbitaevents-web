@@ -78,46 +78,46 @@ export default function LeadNotesPanel({
   };
 
   return (
-    <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
+    <section className="rounded-xl border border-white/10 p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold text-slate-200">Notes ({notes.length})</h2>
+        <h2 className="text-lg font-semibold">Notes ({notes.length})</h2>
         <button
           type="button"
           onClick={cleanDuplicates}
           disabled={cleaning}
-          className="rounded-md border border-amber-500/40 bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-200 hover:bg-amber-500/25 disabled:opacity-60"
+          className="rounded-md border px-2.5 py-1 text-xs font-medium disabled:opacity-60"
         >
           {cleaning ? 'Netejant...' : 'Netejar duplicats'}
         </button>
       </div>
       {error && (
-        <p className="mb-3 rounded-lg border border-rose-500/40 bg-rose-500/15 px-3 py-2 text-sm text-rose-200">{error}</p>
+        <p className="mb-3 rounded-lg border px-3 py-2 text-sm">{error}</p>
       )}
       {success && (
-        <p className="mb-3 rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-3 py-2 text-sm text-emerald-200">{success}</p>
+        <p className="mb-3 rounded-lg border px-3 py-2 text-sm">{success}</p>
       )}
 
       {notes.length === 0 ? (
-        <p className="text-sm text-slate-400 py-4 text-center">Encara no hi ha notes</p>
+        <p className="text-sm py-4 text-center">Encara no hi ha notes</p>
       ) : (
         <div className="space-y-4">
           {notes.map((note) => (
-            <div key={note.id} className="rounded-lg border border-slate-700/60 bg-slate-800/70 p-3 transition-colors hover:bg-slate-800">
+            <div key={note.id} className="rounded-lg border p-3 transition-colors">
               <div className="flex items-center justify-between gap-3 mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-300">{formatNoteDate(note.createdAt)}</span>
-                  {note.createdBy && <span className="text-xs text-slate-300">per {note.createdBy}</span>}
+                  <span className="text-xs">{formatNoteDate(note.createdAt)}</span>
+                  {note.createdBy && <span className="text-xs">per {note.createdBy}</span>}
                 </div>
                 <button
                   type="button"
                   onClick={() => deleteNote(note.id)}
                   disabled={deletingId === note.id}
-                  className="rounded-md border border-rose-500/40 bg-rose-500/15 px-2.5 py-1 text-xs font-medium text-rose-200 hover:bg-rose-500/25 disabled:opacity-60"
+                  className="rounded-md border px-2.5 py-1 text-xs font-medium disabled:opacity-60"
                 >
                   {deletingId === note.id ? 'Eliminant...' : 'Eliminar'}
                 </button>
               </div>
-              <p className="whitespace-pre-wrap text-sm text-slate-100">{note.content}</p>
+              <p className="whitespace-pre-wrap text-sm">{note.content}</p>
             </div>
           ))}
         </div>

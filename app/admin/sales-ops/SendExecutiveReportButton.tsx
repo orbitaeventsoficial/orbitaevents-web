@@ -33,11 +33,11 @@ export default function SendExecutiveReportButton() {
         type="button"
         onClick={sendReport}
         disabled={sending}
-        className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
+        className="rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
       >
         {sending ? 'Enviant...' : 'Envia informe executiu'}
       </button>
-      {msg && <p className="text-xs text-slate-300">{msg}</p>}
+      {msg && <p className="text-xs">{msg}</p>}
     </div>
   );
 }

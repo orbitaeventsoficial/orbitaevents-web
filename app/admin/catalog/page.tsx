@@ -69,23 +69,23 @@ function resolveHealthTone(marginPct: number, targetMarginPct: number): {
     return {
       tone: 'green',
       label: 'Sa',
-      badgeClass: 'border-emerald-500/40 bg-emerald-500/15 text-emerald-200',
-      dotClass: 'bg-emerald-400',
+      badgeClass: '',
+      dotClass: '',
     };
   }
   if (marginPct >= warnMargin) {
     return {
       tone: 'amber',
       label: 'Vigilar',
-      badgeClass: 'border-amber-500/45 bg-amber-500/15 text-amber-100',
-      dotClass: 'bg-amber-400',
+      badgeClass: '',
+      dotClass: '',
     };
   }
   return {
     tone: 'red',
     label: 'Crític',
-    badgeClass: 'border-rose-500/45 bg-rose-500/15 text-rose-100',
-    dotClass: 'bg-rose-400',
+    badgeClass: '',
+    dotClass: '',
   };
 }
 
@@ -195,13 +195,13 @@ export default async function CatalogPage({
 
   return (
     <div className="admin-catalog-page space-y-6">
-      <header className="rounded-2xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-100">Catàleg</h1>
-        <p className="mt-1 text-sm text-slate-400">
+      <header className="rounded-2xl border border-white/10 p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold">Catàleg</h1>
+        <p className="mt-1 text-sm">
           Punt únic per operar packs, extres, inventari i regles de preu.
         </p>
         {pricingAlerts > 0 && (
-          <p className="mt-2 inline-flex rounded-full border border-rose-500/40 bg-rose-500/10 px-3 py-1 text-xs font-semibold text-rose-200">
+          <p className="mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-semibold">
             ⚠ {pricingAlerts} alertes de divergència de preu en packs
           </p>
         )}
@@ -226,22 +226,22 @@ export default async function CatalogPage({
         })}
       </nav>
 
-      <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-100">{TAB_META[activeTab].title}</h2>
-        <p className="mt-1 text-sm text-slate-400">{TAB_META[activeTab].description}</p>
+      <section className="rounded-2xl border border-white/10 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold">{TAB_META[activeTab].title}</h2>
+        <p className="mt-1 text-sm">{TAB_META[activeTab].description}</p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {activeTab === 'packs' && (
             <>
               <Link
                 href="/admin/packs"
-                className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
+                className="rounded-xl border px-4 py-3 text-sm"
               >
                 Obrir gestió de packs
               </Link>
               <Link
                 href="/admin/packs/new"
-                className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
+                className="rounded-xl border px-4 py-3 text-sm"
               >
                 Crear pack nou
               </Link>
@@ -251,12 +251,12 @@ export default async function CatalogPage({
                     <Link
                       key={pack.id}
                       href={`/admin/packs/${pack.id}`}
-                      className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
+                      className="rounded-xl border px-4 py-3 text-sm"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="font-semibold text-slate-100">{pack.name}</p>
-                          <p className="text-xs text-slate-400 mt-0.5">{pack.slug} · {pack.service}</p>
+                          <p className="font-semibold">{pack.name}</p>
+                          <p className="text-xs mt-0.5">{pack.slug} · {pack.service}</p>
                         </div>
                         <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${pack.semaforo.badgeClass}`}>
                           <span className={`inline-block h-2 w-2 rounded-full ${pack.semaforo.dotClass}`} />
@@ -265,18 +265,18 @@ export default async function CatalogPage({
                       </div>
                       <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                         <div>
-                          <p className="text-slate-400">Preu</p>
-                          <p className="text-cyan-200 font-semibold">{formatCurrency(pack.publicPrice)}</p>
+                          <p className="">Preu</p>
+                          <p className="font-semibold">{formatCurrency(pack.publicPrice)}</p>
                         </div>
                         <div>
-                          <p className="text-slate-400">Benefici</p>
+                          <p className="">Benefici</p>
                           <p className={pack.profit >= 0 ? 'text-emerald-200 font-semibold' : 'text-rose-200 font-semibold'}>
                             {formatCurrency(pack.profit)}
                           </p>
                         </div>
                       </div>
                       {pack.inventory.length > 0 && (
-                        <p className="mt-2 text-xs text-slate-300">
+                        <p className="mt-2 text-xs">
                           Components: {pack.inventory.slice(0, 2).map((item) => item.label).join(' · ')}
                           {pack.inventory.length > 2 ? ` +${pack.inventory.length - 2}` : ''}
                         </p>
@@ -291,13 +291,13 @@ export default async function CatalogPage({
             <>
               <Link
                 href="/admin/packs/extras"
-                className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
+                className="rounded-xl border px-4 py-3 text-sm"
               >
                 Obrir catàleg d&apos;extres
               </Link>
               <Link
                 href="/admin/pricing"
-                className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
+                className="rounded-xl border px-4 py-3 text-sm"
               >
                 Revisar vendes d&apos;extres
               </Link>
@@ -307,13 +307,13 @@ export default async function CatalogPage({
             <>
               <Link
                 href="/admin/inventory"
-                className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
+                className="rounded-xl border px-4 py-3 text-sm"
               >
                 Obrir inventari complet
               </Link>
               <Link
                 href="/admin/inventory/new"
-                className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
+                className="rounded-xl border px-4 py-3 text-sm"
               >
                 Afegir element nou
               </Link>
@@ -322,43 +322,43 @@ export default async function CatalogPage({
           {activeTab === 'pricing' && (
             <>
               <div className="sm:col-span-2 mt-1 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <article className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-emerald-200">Sa</p>
-                  <p className="mt-1 text-2xl font-bold text-emerald-100">{greenCount}</p>
-                  <p className="text-xs text-emerald-200/80">Marge &gt;= objectiu ({formatPct(targetMarginPct)})</p>
+                <article className="rounded-xl border px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide">Sa</p>
+                  <p className="mt-1 text-2xl font-bold">{greenCount}</p>
+                  <p className="text-xs">Marge &gt;= objectiu ({formatPct(targetMarginPct)})</p>
                 </article>
-                <article className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-100">Vigilar</p>
-                  <p className="mt-1 text-2xl font-bold text-amber-100">{amberCount}</p>
-                  <p className="text-xs text-amber-100/80">Marge proper al límit</p>
+                <article className="rounded-xl border px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide">Vigilar</p>
+                  <p className="mt-1 text-2xl font-bold">{amberCount}</p>
+                  <p className="text-xs">Marge proper al límit</p>
                 </article>
-                <article className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-rose-100">Crític</p>
-                  <p className="mt-1 text-2xl font-bold text-rose-100">{redCount}</p>
-                  <p className="text-xs text-rose-100/80">Requereix pujar preu o baixar cost</p>
+                <article className="rounded-xl border px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide">Crític</p>
+                  <p className="mt-1 text-2xl font-bold">{redCount}</p>
+                  <p className="text-xs">Requereix pujar preu o baixar cost</p>
                 </article>
-                <article className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">Marge mitjà</p>
-                  <p className="mt-1 text-2xl font-bold text-cyan-100">{formatPct(avgMargin)}</p>
-                  <p className="text-xs text-cyan-100/80">Objectiu global: {formatPct(targetMarginPct)}</p>
+                <article className="rounded-xl border px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide">Marge mitjà</p>
+                  <p className="mt-1 text-2xl font-bold">{formatPct(avgMargin)}</p>
+                  <p className="text-xs">Objectiu global: {formatPct(targetMarginPct)}</p>
                 </article>
               </div>
               <Link
                 href="/admin/pricing"
-                className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
+                className="rounded-xl border px-4 py-3 text-sm"
               >
                 Obrir gestor de preus
               </Link>
               <Link
                 href="/admin/economia"
-                className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800/70"
+                className="rounded-xl border px-4 py-3 text-sm"
               >
                 Revisar rendibilitat
               </Link>
               <div className="sm:col-span-2 mt-1 overflow-hidden rounded-xl border border-white/10">
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[1120px] text-sm">
-                    <thead className="bg-slate-900/80 text-xs uppercase tracking-wide text-slate-400">
+                    <thead className="text-xs uppercase tracking-wide">
                       <tr>
                         <th className="px-3 py-2 text-left">Pack</th>
                         <th className="px-3 py-2 text-left">Semàfor</th>
@@ -372,16 +372,16 @@ export default async function CatalogPage({
                         <th className="px-3 py-2 text-left">Components</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/10 bg-slate-950/40">
+                    <tbody className="divide-y divide-white/10">
                       {sortedRows.map((row) => (
-                        <tr key={row.id} className="hover:bg-slate-900/50">
+                        <tr key={row.id} className="">
                           <td className="px-3 py-2">
-                            <Link href={`/admin/packs/${row.id}`} className="font-semibold text-slate-100 hover:text-cyan-200">
+                            <Link href={`/admin/packs/${row.id}`} className="font-semibold">
                               {row.name}
                             </Link>
-                            <p className="text-xs text-slate-400">{row.slug} · {row.service}</p>
+                            <p className="text-xs">{row.slug} · {row.service}</p>
                             {row.features.length > 0 && (
-                              <p className="text-xs text-slate-500 mt-0.5">
+                              <p className="text-xs mt-0.5">
                                 {row.features.slice(0, 2).join(' · ')}
                                 {row.features.length > 2 ? ` +${row.features.length - 2}` : ''}
                               </p>
@@ -393,18 +393,18 @@ export default async function CatalogPage({
                               {row.semaforo.label}
                             </span>
                           </td>
-                          <td className="px-3 py-2 text-right text-cyan-100">{formatCurrency(row.publicPrice)}</td>
-                          <td className="px-3 py-2 text-right text-slate-200">{formatCurrency(row.directCost)}</td>
+                          <td className="px-3 py-2 text-right">{formatCurrency(row.publicPrice)}</td>
+                          <td className="px-3 py-2 text-right">{formatCurrency(row.directCost)}</td>
                           <td className={`px-3 py-2 text-right font-semibold ${row.profit >= 0 ? 'text-emerald-200' : 'text-rose-200'}`}>
                             {formatCurrency(row.profit)}
                           </td>
-                          <td className="px-3 py-2 text-right text-slate-100">{formatPct(row.marginPct)}</td>
-                          <td className="px-3 py-2 text-right text-slate-300">{formatPct(row.costRatioPct)}</td>
-                          <td className="px-3 py-2 text-right text-slate-200">{formatCurrency(row.recommendedPrice)}</td>
+                          <td className="px-3 py-2 text-right">{formatPct(row.marginPct)}</td>
+                          <td className="px-3 py-2 text-right">{formatPct(row.costRatioPct)}</td>
+                          <td className="px-3 py-2 text-right">{formatCurrency(row.recommendedPrice)}</td>
                           <td className={`px-3 py-2 text-right font-semibold ${Math.abs(row.divergencePct) >= 20 ? 'text-amber-200' : 'text-slate-300'}`}>
                             {formatPct(row.divergencePct)}
                           </td>
-                          <td className="px-3 py-2 text-xs text-slate-300">
+                          <td className="px-3 py-2 text-xs">
                             {row.inventory.length > 0
                               ? `${row.inventory.slice(0, 2).map((item) => item.label).join(' · ')}${row.inventory.length > 2 ? ` +${row.inventory.length - 2}` : ''}`
                               : 'Sense components'}

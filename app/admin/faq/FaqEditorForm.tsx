@@ -109,24 +109,24 @@ export default function FaqEditorForm({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5">
-        <h2 className="text-sm font-semibold text-slate-100">Dades bàsiques</h2>
+      <section className="rounded-2xl border p-5">
+        <h2 className="text-sm font-semibold">Dades bàsiques</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs text-slate-400">Slug</label>
+            <label className="text-xs">Slug</label>
             <input
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
               placeholder="faq-reserva-data"
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">Categoria</label>
+            <label className="text-xs">Categoria</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
             >
               {CATEGORIES.map((c) => (
                 <option key={c.value} value={c.value}>
@@ -136,12 +136,12 @@ export default function FaqEditorForm({
             </select>
           </div>
           <div>
-            <label className="text-xs text-slate-400">Ordre</label>
+            <label className="text-xs">Ordre</label>
             <input
               type="number"
               value={order}
               onChange={(e) => setOrder(Number.parseInt(e.target.value || '0', 10))}
-              className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100"
+              className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
             />
           </div>
           <div className="flex items-end">
@@ -162,24 +162,24 @@ export default function FaqEditorForm({
 
       <section className="space-y-4">
         {translations.map((t) => (
-          <div key={t.locale} className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5">
-            <h3 className="text-sm font-semibold text-slate-100">Idioma: {t.locale.toUpperCase()}</h3>
+          <div key={t.locale} className="rounded-2xl border p-5">
+            <h3 className="text-sm font-semibold">Idioma: {t.locale.toUpperCase()}</h3>
             <div className="mt-3 space-y-3">
               <div>
-                <label className="text-xs text-slate-400">Pregunta</label>
+                <label className="text-xs">Pregunta</label>
                 <input
                   value={t.question}
                   onChange={(e) => updateTranslation(t.locale, 'question', e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100"
+                  className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
                 />
               </div>
               <div>
-                <label className="text-xs text-slate-400">Resposta</label>
+                <label className="text-xs">Resposta</label>
                 <textarea
                   rows={4}
                   value={t.answer}
                   onChange={(e) => updateTranslation(t.locale, 'answer', e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-slate-600/50 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100"
+                  className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm"
                 />
               </div>
             </div>
@@ -188,7 +188,7 @@ export default function FaqEditorForm({
       </section>
 
       {error && (
-        <div className="rounded-xl border border-rose-500/40 bg-rose-500/15 p-3 text-sm text-rose-200">
+        <div className="rounded-xl border p-3 text-sm">
           {error}
         </div>
       )}
@@ -198,14 +198,14 @@ export default function FaqEditorForm({
           type="button"
           onClick={onSubmit}
           disabled={saving || !canSubmit}
-          className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+          className="rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
         >
           {saving ? 'Desant...' : mode === 'create' ? 'Crear FAQ' : 'Desar canvis'}
         </button>
         <button
           type="button"
           onClick={() => router.push('/admin/faq')}
-          className="rounded-xl border border-slate-600/60 bg-slate-800/70 px-5 py-2.5 text-sm font-semibold text-slate-200"
+          className="rounded-xl border px-5 py-2.5 text-sm font-semibold"
         >
           Cancel·lar
         </button>

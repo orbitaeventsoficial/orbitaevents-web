@@ -53,26 +53,26 @@ export default function NewTaskPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <header className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6">
-        <h1 className="text-xl font-semibold text-slate-100">Nova tasca</h1>
-        <p className="mt-1 text-sm text-slate-400">Crea una tasca operativa vinculada al client.</p>
+      <header className="rounded-2xl border p-6">
+        <h1 className="text-xl font-semibold">Nova tasca</h1>
+        <p className="mt-1 text-sm">Crea una tasca operativa vinculada al client.</p>
       </header>
 
-      <form onSubmit={onSubmit} className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 space-y-4">
-        <label className="flex flex-col gap-1 text-sm text-slate-300">
+      <form onSubmit={onSubmit} className="rounded-2xl border p-6 space-y-4">
+        <label className="flex flex-col gap-1 text-sm">
           Títol
           <input
-            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100"
+            className="rounded-lg border px-3 py-2"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
           />
         </label>
 
-        <label className="flex flex-col gap-1 text-sm text-slate-300">
+        <label className="flex flex-col gap-1 text-sm">
           Descripció
           <textarea
-            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100"
+            className="rounded-lg border px-3 py-2"
             rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -80,20 +80,20 @@ export default function NewTaskPage() {
         </label>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="flex flex-col gap-1 text-sm text-slate-300">
+          <label className="flex flex-col gap-1 text-sm">
             Data límit
             <input
               type="date"
-              className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100"
+              className="rounded-lg border px-3 py-2"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
             />
           </label>
 
-          <label className="flex flex-col gap-1 text-sm text-slate-300">
+          <label className="flex flex-col gap-1 text-sm">
             Prioritat
             <select
-              className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100"
+              className="rounded-lg border px-3 py-2"
               value={priority}
               onChange={(e) => setPriority(e.target.value as 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT')}
             >
@@ -106,7 +106,7 @@ export default function NewTaskPage() {
         </div>
 
         {error && (
-          <p className="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+          <p className="rounded-lg border px-3 py-2 text-sm">
             {error}
           </p>
         )}
@@ -115,13 +115,13 @@ export default function NewTaskPage() {
           <button
             type="submit"
             disabled={saving || !title.trim()}
-            className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-60"
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
             {saving ? 'Guardant...' : 'Crear tasca'}
           </button>
           <Link
             href={customerId ? `/admin/contactes/${customerId}?tab=tasks` : '/admin/tasks'}
-            className="rounded-lg border border-slate-600 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-800"
+            className="rounded-lg border px-4 py-2 text-sm font-medium"
           >
             Cancel·lar
           </Link>

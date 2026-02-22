@@ -73,12 +73,12 @@ export default function PackPriceQuickEditor({
 
   return (
     <>
-      <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
-        <p className="text-slate-400">Pack PVP (editable)</p>
+      <div className="rounded-lg border p-2">
+        <p className="">Pack PVP (editable)</p>
         <input className={inputClass} value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" />
       </div>
-      <div className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-2">
-        <p className="text-slate-400">Hora extra PVP (editable)</p>
+      <div className="rounded-lg border p-2">
+        <p className="">Hora extra PVP (editable)</p>
         <input className={inputClass} value={extraHourPrice} onChange={(e) => setExtraHourPrice(e.target.value)} inputMode="decimal" />
       </div>
       <div className={`col-span-2 rounded-lg border p-2 ${overallClass}`}>

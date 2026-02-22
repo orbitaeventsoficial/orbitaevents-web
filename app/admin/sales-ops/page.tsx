@@ -261,66 +261,66 @@ export default async function SalesOpsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="rounded-2xl border border-slate-700/60 bg-gradient-to-br from-slate-900/80 via-slate-900/70 to-slate-800/60 p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-100">Operativa comercial</h1>
-        <p className="mt-1 text-sm text-slate-300">
+      <header className="rounded-2xl border p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold">Operativa comercial</h1>
+        <p className="mt-1 text-sm">
           La teva màquina de vendes: priorització diària, control d&apos;embut i execució sense fricció.
         </p>
       </header>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
+        <div className="rounded-xl border p-4 shadow-sm">
           <p className="text-sm">💼</p>
-          <p className="text-xs text-slate-400">Embut brut</p>
-          <p className="text-2xl font-semibold text-slate-100">{pipelineTotal.toLocaleString('ca-ES')}€</p>
-          <p className="mt-1 text-[11px] text-slate-500">Valor total de negoci obert</p>
+          <p className="text-xs">Embut brut</p>
+          <p className="text-2xl font-semibold">{pipelineTotal.toLocaleString('ca-ES')}€</p>
+          <p className="mt-1 text-[11px]">Valor total de negoci obert</p>
         </div>
-        <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4 shadow-sm">
+        <div className="rounded-xl border p-4 shadow-sm">
           <p className="text-sm">🔮</p>
-          <p className="text-xs text-blue-200/80">Previsió ponderada</p>
-          <p className="text-2xl font-semibold text-blue-100">{forecastTotal.toLocaleString('ca-ES')}€</p>
-          <p className="mt-1 text-[11px] text-blue-200/70">Ingressos probables segons scoring</p>
+          <p className="text-xs">Previsió ponderada</p>
+          <p className="text-2xl font-semibold">{forecastTotal.toLocaleString('ca-ES')}€</p>
+          <p className="mt-1 text-[11px]">Ingressos probables segons scoring</p>
         </div>
-        <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 shadow-sm">
+        <div className="rounded-xl border p-4 shadow-sm">
           <p className="text-sm">📥</p>
-          <p className="text-xs text-indigo-200/80">Entrades obertes</p>
-          <p className="text-2xl font-semibold text-indigo-100">{scored.length}</p>
-          <p className="mt-1 text-[11px] text-indigo-200/70">Leads actius pendent de tancament</p>
+          <p className="text-xs">Entrades obertes</p>
+          <p className="text-2xl font-semibold">{scored.length}</p>
+          <p className="mt-1 text-[11px]">Leads actius pendent de tancament</p>
         </div>
-        <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 shadow-sm">
+        <div className="rounded-xl border p-4 shadow-sm">
           <p className="text-sm">🎯</p>
-          <p className="text-xs text-cyan-200/80">Puntuació mitjana</p>
-          <p className="text-2xl font-semibold text-cyan-100">{avgScore.toFixed(1)}</p>
-          <p className="mt-1 text-[11px] text-cyan-200/70">Qualitat global de l&apos;embut</p>
+          <p className="text-xs">Puntuació mitjana</p>
+          <p className="text-2xl font-semibold">{avgScore.toFixed(1)}</p>
+          <p className="mt-1 text-[11px]">Qualitat global de l&apos;embut</p>
         </div>
-        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 shadow-sm">
+        <div className="rounded-xl border p-4 shadow-sm">
           <p className="text-sm">⏱️</p>
-          <p className="text-xs text-amber-300">Entrades sense resposta (&gt;24h)</p>
-          <p className="text-2xl font-semibold text-amber-200">{slaSnapshot}</p>
-          <p className="mt-1 text-[11px] text-amber-200/75">Prioritat operativa del dia</p>
+          <p className="text-xs">Entrades sense resposta (&gt;24h)</p>
+          <p className="text-2xl font-semibold">{slaSnapshot}</p>
+          <p className="mt-1 text-[11px]">Prioritat operativa del dia</p>
         </div>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
-          <p className="text-xs text-slate-400">Comunicacions 30d</p>
-          <p className="text-2xl font-semibold text-slate-100">{commSent30d}</p>
+        <div className="rounded-xl border p-4 shadow-sm">
+          <p className="text-xs">Comunicacions 30d</p>
+          <p className="text-2xl font-semibold">{commSent30d}</p>
         </div>
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
-          <p className="text-xs text-slate-400">Respostes 30d</p>
-          <p className="text-2xl font-semibold text-slate-100">{commResponded30d} · {toPct(responseRate30d)}</p>
+        <div className="rounded-xl border p-4 shadow-sm">
+          <p className="text-xs">Respostes 30d</p>
+          <p className="text-2xl font-semibold">{commResponded30d} · {toPct(responseRate30d)}</p>
         </div>
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4 shadow-sm">
-          <p className="text-xs text-slate-400">Seqüències auto 30d</p>
-          <p className="text-2xl font-semibold text-slate-100">{sequenceExec30d}</p>
+        <div className="rounded-xl border p-4 shadow-sm">
+          <p className="text-xs">Seqüències auto 30d</p>
+          <p className="text-2xl font-semibold">{sequenceExec30d}</p>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
+      <section className="rounded-2xl border p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-slate-100">Automatització del temps de resposta (24h)</h2>
-            <p className="text-sm text-slate-300">
+            <h2 className="text-lg font-semibold">Automatització del temps de resposta (24h)</h2>
+            <p className="text-sm">
               Si una entrada passa de 24h sense resposta, el sistema crea tasca i eleva prioritat.
             </p>
           </div>
@@ -329,7 +329,7 @@ export default async function SalesOpsPage() {
               href="/api/admin/reports/executive"
               target="_blank"
               rel="noreferrer"
-              className="rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700"
+              className="rounded-lg border px-4 py-2 text-sm font-semibold"
             >
               Exportar informe executiu (JSON)
             </a>
@@ -340,55 +340,55 @@ export default async function SalesOpsPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-4">
-        <h2 className="text-sm font-semibold text-slate-100">Com llegir aquest panell</h2>
-        <p className="mt-1 text-xs text-slate-300">
+      <section className="rounded-2xl border p-4">
+        <h2 className="text-sm font-semibold">Com llegir aquest panell</h2>
+        <p className="mt-1 text-xs">
           Primer mira KPI i alertes, després executa accions (seqüències, SLA i informe), i finalment valida la conversió per origen/comercial.
         </p>
       </section>
 
       <section className="grid gap-3 xl:grid-cols-4">
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Què és l&apos;embut</p>
-          <p className="mt-2 text-sm text-slate-200">Valor total de totes les oportunitats obertes ara mateix.</p>
+        <div className="rounded-xl border p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide">Què és l&apos;embut</p>
+          <p className="mt-2 text-sm">Valor total de totes les oportunitats obertes ara mateix.</p>
         </div>
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Previsió ponderada</p>
-          <p className="mt-2 text-sm text-slate-200">Ingressos esperats segons probabilitat real de tancament.</p>
+        <div className="rounded-xl border p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide">Previsió ponderada</p>
+          <p className="mt-2 text-sm">Ingressos esperats segons probabilitat real de tancament.</p>
         </div>
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Temps de resposta 24h</p>
-          <p className="mt-2 text-sm text-slate-200">Entrades noves que no pots deixar més d&apos;un dia sense tocar.</p>
+        <div className="rounded-xl border p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide">Temps de resposta 24h</p>
+          <p className="mt-2 text-sm">Entrades noves que no pots deixar més d&apos;un dia sense tocar.</p>
         </div>
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Taxa de resposta</p>
-          <p className="mt-2 text-sm text-slate-200">Quantes comunicacions acaben amb resposta del client.</p>
+        <div className="rounded-xl border p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide">Taxa de resposta</p>
+          <p className="mt-2 text-sm">Quantes comunicacions acaben amb resposta del client.</p>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
+      <section className="rounded-2xl border p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold text-slate-100">Auditoria exhaustiva (avui)</h2>
-          <p className="text-xs text-slate-400">Diagnòstic, millora a 30 dies i escalat a 90 dies</p>
+          <h2 className="text-lg font-semibold">Auditoria exhaustiva (avui)</h2>
+          <p className="text-xs">Diagnòstic, millora a 30 dies i escalat a 90 dies</p>
         </div>
         <div className="mt-4 grid gap-3 xl:grid-cols-2">
           {auditRows.map((row) => (
             <article key={row.area} className={`h-full rounded-xl border p-4 ${statusPanel(row.status)}`}>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-sm font-semibold text-slate-100">{row.area}</h3>
+                <h3 className="text-sm font-semibold">{row.area}</h3>
                 <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${statusBadge(row.status)}`}>
                   {row.status === 'A_MILLORAR' ? 'A millorar' : row.status === 'CRITIC' ? 'Crític' : 'Fort'}
                 </span>
               </div>
-              <div className="mt-2 space-y-1.5 text-xs text-slate-300">
-                <p><span className="text-slate-400">Avui:</span> {row.avui}</p>
-                <p><span className="text-slate-400">+30 dies:</span> {row.en30}</p>
-                <p><span className="text-slate-400">+90 dies:</span> {row.en90}</p>
+              <div className="mt-2 space-y-1.5 text-xs">
+                <p><span className="">Avui:</span> {row.avui}</p>
+                <p><span className="">+30 dies:</span> {row.en30}</p>
+                <p><span className="">+90 dies:</span> {row.en90}</p>
               </div>
               <div className="mt-3">
                 <Link
                   href={row.href}
-                  className="inline-flex rounded-lg border border-slate-500/80 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-700"
+                  className="inline-flex rounded-lg border px-3 py-1.5 text-xs font-semibold"
                 >
                   {row.cta}
                 </Link>
@@ -399,9 +399,9 @@ export default async function SalesOpsPage() {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <article className="rounded-2xl border border-sky-500/25 bg-sky-500/8 p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-sky-100">Pla d&apos;execució a 30 dies</h2>
-          <ol className="mt-3 space-y-2 text-sm text-slate-100">
+        <article className="rounded-2xl border p-5 shadow-sm">
+          <h2 className="text-lg font-semibold">Pla d&apos;execució a 30 dies</h2>
+          <ol className="mt-3 space-y-2 text-sm">
             <li>1. Temps de resposta: deixar cada dia a 0 les entrades de +24h.</li>
             <li>2. Tasques guia: treballar sempre des de la checklist diària.</li>
             <li>3. Pipeline: neteja setmanal de fases i estats sense activitat.</li>
@@ -410,9 +410,9 @@ export default async function SalesOpsPage() {
             <li>6. Reserva a calendari: verificar traçabilitat a tots els casos.</li>
           </ol>
         </article>
-        <article className="rounded-2xl border border-indigo-500/25 bg-indigo-500/8 p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-indigo-100">Pla d&apos;escalat a 90 dies</h2>
-          <ol className="mt-3 space-y-2 text-sm text-slate-100">
+        <article className="rounded-2xl border p-5 shadow-sm">
+          <h2 className="text-lg font-semibold">Pla d&apos;escalat a 90 dies</h2>
+          <ol className="mt-3 space-y-2 text-sm">
             <li>1. Predicció: alertes abans que una entrada entri en risc.</li>
             <li>2. Automatització: seqüències per segment i tipus d&apos;esdeveniment.</li>
             <li>3. Quadre executiu: marge i previsió per canal en una sola vista.</li>
@@ -424,12 +424,12 @@ export default async function SalesOpsPage() {
       </section>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-100">Conversió per origen</h2>
+        <section className="rounded-2xl border p-5 shadow-sm">
+          <h2 className="text-lg font-semibold">Conversió per origen</h2>
           <div className="mt-4 overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-700 text-left text-xs uppercase text-slate-400">
+                <tr className="border-b text-left text-xs uppercase">
                   <th className="py-2">Origen</th>
                   <th className="py-2">Total</th>
                   <th className="py-2">Tancats</th>
@@ -438,11 +438,11 @@ export default async function SalesOpsPage() {
               </thead>
               <tbody>
                 {bySource.map((row) => (
-                  <tr key={row.source} className="border-b border-slate-800 odd:bg-slate-900/25">
-                    <td className="py-2 font-medium text-slate-200">{row.source}</td>
-                    <td className="py-2 text-slate-300">{row.total}</td>
-                    <td className="py-2 text-slate-300">{row.won}</td>
-                    <td className="py-2 text-slate-300">{toPct(row.winRate)}</td>
+                  <tr key={row.source} className="border-b">
+                    <td className="py-2 font-medium">{row.source}</td>
+                    <td className="py-2">{row.total}</td>
+                    <td className="py-2">{row.won}</td>
+                    <td className="py-2">{toPct(row.winRate)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -450,12 +450,12 @@ export default async function SalesOpsPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-100">Conversió per comercial</h2>
+        <section className="rounded-2xl border p-5 shadow-sm">
+          <h2 className="text-lg font-semibold">Conversió per comercial</h2>
           <div className="mt-4 overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-700 text-left text-xs uppercase text-slate-400">
+                <tr className="border-b text-left text-xs uppercase">
                   <th className="py-2">Comercial</th>
                   <th className="py-2">Total</th>
                   <th className="py-2">Tancats</th>
@@ -464,11 +464,11 @@ export default async function SalesOpsPage() {
               </thead>
               <tbody>
                 {byAssignee.map((row) => (
-                  <tr key={row.assignee} className="border-b border-slate-800 odd:bg-slate-900/25">
-                    <td className="py-2 font-medium text-slate-200">{row.assignee}</td>
-                    <td className="py-2 text-slate-300">{row.total}</td>
-                    <td className="py-2 text-slate-300">{row.won}</td>
-                    <td className="py-2 text-slate-300">{toPct(row.winRate)}</td>
+                  <tr key={row.assignee} className="border-b">
+                    <td className="py-2 font-medium">{row.assignee}</td>
+                    <td className="py-2">{row.total}</td>
+                    <td className="py-2">{row.won}</td>
+                    <td className="py-2">{toPct(row.winRate)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -477,31 +477,31 @@ export default async function SalesOpsPage() {
         </section>
       </div>
 
-      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-100">Entrades en risc (prioritzar avui)</h2>
+      <section className="rounded-2xl border p-5 shadow-sm">
+        <h2 className="text-lg font-semibold">Entrades en risc (prioritzar avui)</h2>
         <div className="mt-4 space-y-2">
           {riskLeads.length === 0 ? (
-            <p className="text-sm text-slate-300">Sense riscos rellevants.</p>
+            <p className="text-sm">Sense riscos rellevants.</p>
           ) : (
             riskLeads.map((lead) => (
-              <div key={lead.id} className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-3">
+              <div key={lead.id} className="rounded-xl border p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-slate-100">
+                  <p className="text-sm font-semibold">
                     {lead.name} · {lead.status} · puntuació {lead.scoring.score}
                   </p>
-                  <p className="text-xs text-slate-300">
+                  <p className="text-xs">
                     Prob. {toPct(lead.scoring.probability)} · {lead.weighted.toLocaleString('ca-ES')}€
                   </p>
                 </div>
                 {lead.scoring.riskFlags.length > 0 && (
-                  <p className="mt-1 text-xs text-rose-300">
+                  <p className="mt-1 text-xs">
                     Riscos: {lead.scoring.riskFlags.join(', ')}
                   </p>
                 )}
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Link
                     href={`/admin/leads/${lead.id}`}
-                    className="rounded-lg border border-slate-600 bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-100 hover:bg-slate-700"
+                    className="rounded-lg border px-2.5 py-1 text-xs font-medium"
                   >
                     Obrir entrada
                   </Link>
@@ -510,7 +510,7 @@ export default async function SalesOpsPage() {
                       href={`https://wa.me/${lead.phone.replace(/[^\d]/g, '')}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-lg bg-green-500 px-2.5 py-1 text-xs font-semibold text-white hover:bg-green-600"
+                      className="rounded-lg px-2.5 py-1 text-xs font-semibold text-white"
                     >
                       WhatsApp
                     </a>

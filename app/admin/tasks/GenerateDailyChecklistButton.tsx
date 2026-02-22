@@ -41,11 +41,11 @@ export default function GenerateDailyChecklistButton() {
         type="button"
         onClick={handleGenerate}
         disabled={loading}
-        className="inline-flex items-center rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs sm:text-sm font-semibold text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-60"
+        className="inline-flex items-center rounded-xl border px-3 py-2 text-xs sm:text-sm font-semibold disabled:opacity-60"
       >
         {loading ? 'Generant...' : 'Generar checklist d’avui'}
       </button>
-      {message && <p className="text-[11px] text-slate-400">{message}</p>}
+      {message && <p className="text-[11px]">{message}</p>}
     </div>
   );
 }

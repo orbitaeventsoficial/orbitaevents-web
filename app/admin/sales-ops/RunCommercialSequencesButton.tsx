@@ -34,11 +34,11 @@ export default function RunCommercialSequencesButton() {
         type="button"
         onClick={run}
         disabled={running}
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
+        className="rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
       >
         {running ? 'Executant...' : 'Executar seqüències comercials'}
       </button>
-      {msg && <p className="text-xs text-slate-300">{msg}</p>}
+      {msg && <p className="text-xs">{msg}</p>}
     </div>
   );
 }

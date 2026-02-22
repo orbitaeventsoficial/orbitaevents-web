@@ -16,9 +16,9 @@ export default function MarginExtrasPanel({
   const margin = typeof subtotal === 'number' && typeof total === 'number' ? total - subtotal : undefined;
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
-      <h2 className="text-lg font-semibold text-slate-100">Extres / Marge</h2>
-      <p className="mt-1 text-sm text-slate-400">
+    <section className="rounded-2xl border p-5">
+      <h2 className="text-lg font-semibold">Extres / Marge</h2>
+      <p className="mt-1 text-sm">
         Document actiu: {data.active.source} {active?.reference ? `· ${active.reference}` : ''}
       </p>
 
@@ -29,12 +29,12 @@ export default function MarginExtrasPanel({
         <Metric label="Marge estimat" value={money(margin)} />
       </div>
 
-      <div className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200 flex items-center justify-between">
+      <div className="mt-4 rounded-lg border p-3 text-xs flex items-center justify-between">
         <span>Per editar extres i cost real, obre l&apos;Studio amb el proposal actiu.</span>
         {active && (
           <Link
             href={`/admin/presupuestos?proposalId=${active.id}&customerId=${data.customer.id}`}
-            className="rounded-lg bg-amber-500/20 border border-amber-500/40 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/30 transition-colors ml-3 shrink-0"
+            className="rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ml-3 shrink-0"
           >
             Obrir Studio →
           </Link>
@@ -46,9 +46,9 @@ export default function MarginExtrasPanel({
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-slate-700/70 bg-slate-800/60 p-3">
-      <p className="text-xs text-slate-400">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-slate-100">{value}</p>
+    <div className="rounded-xl border p-3">
+      <p className="text-xs">{label}</p>
+      <p className="mt-1 text-lg font-semibold">{value}</p>
     </div>
   );
 }

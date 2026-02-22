@@ -278,76 +278,76 @@ export default async function AnalyticsPage() {
   return (
     <div className="space-y-6">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-black p-6 text-white">
+      <section className="relative overflow-hidden rounded-2xl border bg-black p-6 text-white">
         <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Òrbita Analítica</p>
+            <p className="text-xs uppercase tracking-[0.2em]">Òrbita Analítica</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">Panell de rendiment</h1>
-            <p className="mt-2 max-w-xl text-sm text-slate-300">
+            <p className="mt-2 max-w-xl text-sm">
               Totes les mètriques essencials en un sol lloc: vendes, entrades, qualitat i creixement.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="rounded-full border border-slate-600/50 bg-slate-700/50 px-3 py-1 text-xs">
+            <span className="rounded-full border px-3 py-1 text-xs">
               Any {new Date().getFullYear()}
             </span>
-            <span className="rounded-full border border-slate-600/50 bg-slate-700/50 px-3 py-1 text-xs">
+            <span className="rounded-full border px-3 py-1 text-xs">
               {Number(yearGrowth) >= 0 ? '📈' : '📉'} {yearGrowth}% YoY
             </span>
           </div>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-zinc-800 bg-black p-6 text-white">
+      <section className="rounded-2xl border bg-black p-6 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-300">Operativa comercial</p>
+            <p className="text-xs uppercase tracking-[0.2em]">Operativa comercial</p>
             <h2 className="mt-1 text-xl font-semibold">KPI accionables</h2>
           </div>
           <Link
             href={`/admin/leads?from=${ops.last7Days.toISOString().slice(0, 10)}&page=1`}
-            className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20"
+            className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
           >
             Veure entrades d&apos;aquesta setmana
           </Link>
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-4">
-          <div className="rounded-xl border border-slate-600/50 bg-slate-800 p-4">
-            <p className="text-xs uppercase text-slate-400">Entrades 7 dies</p>
+          <div className="rounded-xl border p-4">
+            <p className="text-xs uppercase">Entrades 7 dies</p>
             <p className="mt-2 text-3xl font-semibold">{ops.leads7d}</p>
           </div>
-          <div className="rounded-xl border border-slate-600/50 bg-slate-800 p-4">
-            <p className="text-xs uppercase text-slate-400">% entrades a pressupost</p>
+          <div className="rounded-xl border p-4">
+            <p className="text-xs uppercase">% entrades a pressupost</p>
             <p className="mt-2 text-3xl font-semibold">{ops.conversionToQuotePct.toFixed(1)}%</p>
           </div>
-          <div className="rounded-xl border border-slate-600/50 bg-slate-800 p-4">
-            <p className="text-xs uppercase text-slate-400">% pressupostos acceptats</p>
+          <div className="rounded-xl border p-4">
+            <p className="text-xs uppercase">% pressupostos acceptats</p>
             <p className="mt-2 text-3xl font-semibold">{ops.proposalsAcceptedPct.toFixed(1)}%</p>
           </div>
-          <div className="rounded-xl border border-slate-600/50 bg-slate-800 p-4">
-            <p className="text-xs uppercase text-slate-400">1r contacte mitjà</p>
+          <div className="rounded-xl border p-4">
+            <p className="text-xs uppercase">1r contacte mitjà</p>
             <p className="mt-2 text-3xl font-semibold">{Math.max(0, Math.round(ops.avgFirstContactHours))}h</p>
           </div>
         </div>
       </section>
 
       {/* GA4 */}
-      <section className="overflow-hidden rounded-2xl border border-zinc-800 bg-black p-6 text-white">
+      <section className="overflow-hidden rounded-2xl border bg-black p-6 text-white">
         <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-cyan-300">GA4</p>
+            <p className="text-xs uppercase tracking-[0.3em]">GA4</p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight">Panell de control</h2>
-            <p className="mt-2 max-w-xl text-sm text-slate-300">
+            <p className="mt-2 max-w-xl text-sm">
               Dades de trànsit, pàgines i esdeveniments amb la GA4 Data API.
             </p>
           </div>
             <div className="flex items-center gap-3">
-              <span className="rounded-full border border-slate-600/50 bg-slate-700/50 px-3 py-1 text-xs">
+              <span className="rounded-full border px-3 py-1 text-xs">
                 ID propietat {ga4PropertyId || '—'}
               </span>
               <Link
                 href="#google-ads"
-                className="rounded-full border border-amber-500/40 bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-200 hover:bg-amber-500/25"
+                className="rounded-full border px-3 py-1 text-xs font-semibold"
               >
                 Google Ads
               </Link>
@@ -362,27 +362,27 @@ export default async function AnalyticsPage() {
         </div>
 
         {!ga4Ready && (
-          <div className="mt-6 rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
+          <div className="mt-6 rounded-xl border p-4 text-sm">
             Configuració incompleta. {ga4Status.reason || 'Revisa les variables de GA4 a Railway.'}
           </div>
         )}
 
         {ga4Ready && ga4Error && (
-          <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
+          <div className="mt-6 rounded-xl border p-4 text-sm">
             Error GA4: {ga4Error}
           </div>
         )}
 
         {ga4Ready && !ga4 && !ga4Error && (
-          <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
+          <div className="mt-6 rounded-xl border p-4 text-sm">
             GA4 actiu però sense dades. Revisa permisos del compte de servei o la quota de l&apos;API.
           </div>
         )}
 
         {ga4 && (
           <div className="mt-6 grid gap-4 lg:grid-cols-4">
-            <div className="rounded-xl border border-slate-600/50 bg-slate-800 p-4">
-              <p className="text-xs uppercase text-slate-400">Usuaris actius</p>
+            <div className="rounded-xl border p-4">
+              <p className="text-xs uppercase">Usuaris actius</p>
               <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.activeUsers}</p>
               {ga4Deltas && (
                 <p className={`mt-1 text-xs ${ga4Deltas.users >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
@@ -390,8 +390,8 @@ export default async function AnalyticsPage() {
                 </p>
               )}
             </div>
-            <div className="rounded-xl border border-slate-600/50 bg-slate-800 p-4">
-              <p className="text-xs uppercase text-slate-400">Sessions</p>
+            <div className="rounded-xl border p-4">
+              <p className="text-xs uppercase">Sessions</p>
               <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.sessions}</p>
               {ga4Deltas && (
                 <p className={`mt-1 text-xs ${ga4Deltas.sessions >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
@@ -399,8 +399,8 @@ export default async function AnalyticsPage() {
                 </p>
               )}
             </div>
-            <div className="rounded-xl border border-slate-600/50 bg-slate-800 p-4">
-              <p className="text-xs uppercase text-slate-400">Pageviews</p>
+            <div className="rounded-xl border p-4">
+              <p className="text-xs uppercase">Pageviews</p>
               <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.pageViews}</p>
               {ga4Deltas && (
                 <p className={`mt-1 text-xs ${ga4Deltas.pageViews >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
@@ -408,8 +408,8 @@ export default async function AnalyticsPage() {
                 </p>
               )}
             </div>
-            <div className="rounded-xl border border-slate-600/50 bg-slate-800 p-4">
-              <p className="text-xs uppercase text-slate-400">Esdeveniments</p>
+            <div className="rounded-xl border p-4">
+              <p className="text-xs uppercase">Esdeveniments</p>
               <p className="mt-2 text-3xl font-semibold text-white">{ga4.totals.eventCount}</p>
               {ga4Deltas && (
                 <p className={`mt-1 text-xs ${ga4Deltas.events >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
@@ -417,18 +417,18 @@ export default async function AnalyticsPage() {
                 </p>
               )}
             </div>
-            <div className="rounded-xl border border-slate-600/50 bg-slate-800 p-4">
-              <p className="text-xs uppercase text-slate-400">Temps mitjà (min)</p>
+            <div className="rounded-xl border p-4">
+              <p className="text-xs uppercase">Temps mitjà (min)</p>
               <p className="mt-2 text-3xl font-semibold text-white">{avgSessionMinutes}</p>
             </div>
           </div>
         )}
 
         {ga4 && ga4.timeseries.length > 0 && (
-          <div className="mt-4 rounded-2xl border border-slate-600/50 bg-slate-800 p-4">
+          <div className="mt-4 rounded-2xl border p-4">
             <div className="mb-2 flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-200">Tendència 30 dies</p>
-              <p className="text-xs text-slate-400">Sessions (cyan) · Usuaris (amber)</p>
+              <p className="text-sm font-semibold">Tendència 30 dies</p>
+              <p className="text-xs">Sessions (cyan) · Usuaris (amber)</p>
             </div>
             <div className="flex h-28 items-end gap-1">
               {ga4.timeseries.map((row) => {
@@ -436,8 +436,8 @@ export default async function AnalyticsPage() {
                 const usersH = Math.max(3, Math.round((row.activeUsers / ga4SeriesMax) * 100));
                 return (
                   <div key={row.date} className="flex flex-1 items-end gap-[2px]">
-                    <div className="w-1.5 rounded-sm bg-cyan-400/80" style={{ height: `${sessionsH}%` }} />
-                    <div className="w-1.5 rounded-sm bg-amber-300/80" style={{ height: `${usersH}%` }} />
+                    <div className="w-1.5 rounded-sm" style={{ height: `${sessionsH}%` }} />
+                    <div className="w-1.5 rounded-sm" style={{ height: `${usersH}%` }} />
                   </div>
                 );
               })}
@@ -447,45 +447,45 @@ export default async function AnalyticsPage() {
 
         {ga4 && (
           <div className="mt-6 grid gap-4 lg:grid-cols-3">
-            <div className="rounded-2xl border border-slate-600/50 bg-slate-800">
-              <div className="border-b border-slate-600/50 px-4 py-3 text-sm font-semibold text-slate-200">Pàgines principals</div>
-              <div className="space-y-2 p-4 text-sm text-slate-300">
+            <div className="rounded-2xl border">
+              <div className="border-b px-4 py-3 text-sm font-semibold">Pàgines principals</div>
+              <div className="space-y-2 p-4 text-sm">
                 {ga4.pages.map((row) => (
                   <div key={row.dimension} className="flex items-center justify-between">
                     <span className="truncate">{row.dimension}</span>
-                    <span className="text-slate-400">{row.value}</span>
+                    <span className="">{row.value}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl border border-slate-600/50 bg-slate-800">
-              <div className="border-b border-slate-600/50 px-4 py-3 text-sm font-semibold text-slate-200">Fonts</div>
-              <div className="space-y-2 p-4 text-sm text-slate-300">
+            <div className="rounded-2xl border">
+              <div className="border-b px-4 py-3 text-sm font-semibold">Fonts</div>
+              <div className="space-y-2 p-4 text-sm">
                 {ga4.sources.map((row) => (
                   <div key={row.dimension} className="flex items-center justify-between">
                     <span className="truncate">{row.dimension}</span>
-                    <span className="text-slate-400">{row.value}</span>
+                    <span className="">{row.value}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl border border-slate-600/50 bg-slate-800">
-              <div className="border-b border-slate-600/50 px-4 py-3 text-sm font-semibold text-slate-200">
+            <div className="rounded-2xl border">
+              <div className="border-b px-4 py-3 text-sm font-semibold">
                 Temps real (top)
               </div>
-              <div className="space-y-2 p-4 text-sm text-slate-300">
+              <div className="space-y-2 p-4 text-sm">
                 <div className="flex items-center justify-between">
                   <span>Actius ara</span>
-                  <span className="text-cyan-300">{ga4.realtime.activeUsers}</span>
+                  <span className="">{ga4.realtime.activeUsers}</span>
                 </div>
                 {ga4.realtime.pages.map((row) => (
                   <div key={row.dimension} className="flex items-center justify-between">
                     <span className="truncate">{row.dimension}</span>
-                    <span className="text-slate-400">{row.value}</span>
+                    <span className="">{row.value}</span>
                   </div>
                 ))}
                 {ga4.realtimeFallback && (
-                  <p className="pt-2 text-xs text-amber-300">
+                  <p className="pt-2 text-xs">
                     Temps real parcial: només usuaris actius disponibles.
                   </p>
                 )}
@@ -495,22 +495,22 @@ export default async function AnalyticsPage() {
         )}
 
         {ga4 && (
-          <div className="mt-4 rounded-2xl border border-slate-600/50 bg-slate-800">
-            <div className="border-b border-slate-600/50 px-4 py-3 text-sm font-semibold text-slate-200">
+          <div className="mt-4 rounded-2xl border">
+            <div className="border-b px-4 py-3 text-sm font-semibold">
               Paraules de cerca (GA4)
             </div>
-            <div className="space-y-2 p-4 text-sm text-slate-300">
+            <div className="space-y-2 p-4 text-sm">
               {ga4.searchTerms.length === 0 && (
-                <p className="text-slate-400">Sense dades de cerca interna.</p>
+                <p className="">Sense dades de cerca interna.</p>
               )}
               {ga4.searchTerms.map((row) => (
                 <div key={`${row.dimension}-${row.value}`} className="flex items-center justify-between">
                   <span className="truncate">{row.dimension || '—'}</span>
-                  <span className="text-slate-400">{row.value}</span>
+                  <span className="">{row.value}</span>
                 </div>
               ))}
             </div>
-            <div className="border-t border-slate-600/50 px-4 py-2 text-xs text-slate-500">
+            <div className="border-t px-4 py-2 text-xs">
               GA4 mostra cerques internes (si existeixen). Per paraules SEO cal Search Console.
             </div>
           </div>
@@ -518,19 +518,19 @@ export default async function AnalyticsPage() {
       </section>
 
       {/* Google Ads */}
-      <section id="google-ads" className="overflow-hidden rounded-2xl border border-zinc-800 bg-black p-6 text-white">
+      <section id="google-ads" className="overflow-hidden rounded-2xl border bg-black p-6 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-amber-300">Google Ads</p>
+            <p className="text-xs uppercase tracking-[0.3em]">Google Ads</p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight">Paid media</h2>
-            <p className="mt-2 text-sm text-slate-300">Dades de campanyes, cost i conversions dins del mateix panell.</p>
+            <p className="mt-2 text-sm">Dades de campanyes, cost i conversions dins del mateix panell.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <a
               href={process.env.NEXT_PUBLIC_GOOGLE_ADS_URL || 'https://ads.google.com'}
               target="_blank"
               rel="noreferrer"
-              className="rounded-lg border border-amber-500 bg-amber-600 px-3 py-1.5 text-xs font-semibold text-amber-50 hover:bg-amber-500"
+              className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
             >
               Obrir Google Ads
             </a>
@@ -545,13 +545,13 @@ export default async function AnalyticsPage() {
         </div>
 
         {!googleAdsStatus.ready && (
-          <div className="mt-4 rounded-xl border border-amber-600 bg-amber-900 p-4 text-sm text-amber-100">
+          <div className="mt-4 rounded-xl border p-4 text-sm">
             {googleAdsStatus.reason}: {googleAdsStatus.missing.join(', ')}
           </div>
         )}
 
         {googleAdsError && (
-          <div className="mt-4 rounded-xl border border-rose-600 bg-rose-900 p-4 text-sm text-rose-100">
+          <div className="mt-4 rounded-xl border p-4 text-sm">
             Error Google Ads: {googleAdsError}
           </div>
         )}
@@ -559,29 +559,29 @@ export default async function AnalyticsPage() {
         {googleAds && (
           <>
             <div className="mt-4 grid gap-4 lg:grid-cols-4">
-              <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
-                <p className="text-xs uppercase text-slate-400">Clicks (30d)</p>
+              <div className="rounded-xl border p-4">
+                <p className="text-xs uppercase">Clicks (30d)</p>
                 <p className="mt-2 text-3xl font-semibold">{googleAds.totals.clicks}</p>
                 <p className={`mt-1 text-xs ${adsDeltas && adsDeltas.clicks >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
                   {adsDeltas && adsDeltas.clicks >= 0 ? '↑' : '↓'} {Math.abs(adsDeltas?.clicks || 0).toFixed(1)}%
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
-                <p className="text-xs uppercase text-slate-400">Impressions (30d)</p>
+              <div className="rounded-xl border p-4">
+                <p className="text-xs uppercase">Impressions (30d)</p>
                 <p className="mt-2 text-3xl font-semibold">{googleAds.totals.impressions}</p>
                 <p className={`mt-1 text-xs ${adsDeltas && adsDeltas.impressions >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
                   {adsDeltas && adsDeltas.impressions >= 0 ? '↑' : '↓'} {Math.abs(adsDeltas?.impressions || 0).toFixed(1)}%
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
-                <p className="text-xs uppercase text-slate-400">Cost (30d)</p>
+              <div className="rounded-xl border p-4">
+                <p className="text-xs uppercase">Cost (30d)</p>
                 <p className="mt-2 text-3xl font-semibold">{formatCurrency(adsCost, adsCurrency)}</p>
                 <p className={`mt-1 text-xs ${adsDeltas && adsDeltas.cost <= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
                   {adsDeltas && adsDeltas.cost <= 0 ? '↓' : '↑'} {Math.abs(adsDeltas?.cost || 0).toFixed(1)}%
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
-                <p className="text-xs uppercase text-slate-400">Conversions (30d)</p>
+              <div className="rounded-xl border p-4">
+                <p className="text-xs uppercase">Conversions (30d)</p>
                 <p className="mt-2 text-3xl font-semibold">{googleAds.totals.conversions.toFixed(1)}</p>
                 <p className={`mt-1 text-xs ${adsDeltas && adsDeltas.conversions >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
                   {adsDeltas && adsDeltas.conversions >= 0 ? '↑' : '↓'} {Math.abs(adsDeltas?.conversions || 0).toFixed(1)}%
@@ -590,12 +590,12 @@ export default async function AnalyticsPage() {
             </div>
 
             {googleAds.timeseries.length > 0 && (
-              <div className="mt-4 rounded-xl border border-slate-700 bg-slate-800 p-4">
-                <p className="mb-2 text-sm font-semibold text-slate-200">Tendència clicks (30 dies)</p>
+              <div className="mt-4 rounded-xl border p-4">
+                <p className="mb-2 text-sm font-semibold">Tendència clicks (30 dies)</p>
                 <div className="flex h-24 items-end gap-1">
                   {googleAds.timeseries.map((row) => {
                     const h = Math.max(4, Math.round((row.clicks / adsSeriesMax) * 100));
-                    return <div key={row.date} className="flex-1 rounded-sm bg-amber-500" style={{ height: `${h}%` }} />;
+                    return <div key={row.date} className="flex-1 rounded-sm" style={{ height: `${h}%` }} />;
                   })}
                 </div>
               </div>
@@ -606,44 +606,44 @@ export default async function AnalyticsPage() {
 
       {/* KPI Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5  p-5">
-          <div className="flex items-center justify-between text-xs font-medium uppercase text-slate-400">
+        <div className="rounded-2xl border p-5">
+          <div className="flex items-center justify-between text-xs font-medium uppercase">
             <span>Facturació any</span>
-            <span className="text-cyan-400">Ingressos</span>
+            <span className="">Ingressos</span>
           </div>
-          <p className="mt-3 text-3xl font-semibold text-slate-100">
+          <p className="mt-3 text-3xl font-semibold">
             {data.revenue.thisYear.toLocaleString('ca-ES')}€
           </p>
           <p className={`mt-2 text-xs ${Number(yearGrowth) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
             {Number(yearGrowth) >= 0 ? '↑' : '↓'} {yearGrowth}% vs any anterior
           </p>
         </div>
-        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5  p-5">
-          <div className="flex items-center justify-between text-xs font-medium uppercase text-slate-400">
+        <div className="rounded-2xl border p-5">
+          <div className="flex items-center justify-between text-xs font-medium uppercase">
             <span>Reserves any</span>
-            <span className="text-emerald-400">Reserves</span>
+            <span className="">Reserves</span>
           </div>
-          <p className="mt-3 text-3xl font-semibold text-slate-100">{data.bookings.thisYear}</p>
-          <p className="mt-2 text-xs text-slate-500">{data.bookings.total} totals</p>
+          <p className="mt-3 text-3xl font-semibold">{data.bookings.thisYear}</p>
+          <p className="mt-2 text-xs">{data.bookings.total} totals</p>
         </div>
-        <div className="rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-purple-600/5  p-5">
-          <div className="flex items-center justify-between text-xs font-medium uppercase text-slate-400">
+        <div className="rounded-2xl border p-5">
+          <div className="flex items-center justify-between text-xs font-medium uppercase">
             <span>Tiquet mitjà</span>
-            <span className="text-purple-400">AVG</span>
+            <span className="">AVG</span>
           </div>
-          <p className="mt-3 text-3xl font-semibold text-slate-100">
+          <p className="mt-3 text-3xl font-semibold">
             {data.revenue.avgBooking.toLocaleString('ca-ES', { maximumFractionDigits: 0 })}€
           </p>
         </div>
-        <div className="rounded-2xl border border-rose-500/20 bg-gradient-to-br from-rose-500/10 to-rose-600/5  p-5">
-          <div className="flex items-center justify-between text-xs font-medium uppercase text-slate-400">
+        <div className="rounded-2xl border p-5">
+          <div className="flex items-center justify-between text-xs font-medium uppercase">
             <span>NPS Score</span>
-            <span className="text-rose-400">Qualitat</span>
+            <span className="">Qualitat</span>
           </div>
-          <p className="mt-3 text-3xl font-semibold text-slate-100">
+          <p className="mt-3 text-3xl font-semibold">
             {data.satisfaction.nps.toFixed(1)}
           </p>
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs">
             ⭐ {data.satisfaction.rating.toFixed(1)} valoració
           </p>
         </div>
@@ -652,10 +652,10 @@ export default async function AnalyticsPage() {
       {/* Entrades Section */}
       <section className="grid gap-6 lg:grid-cols-2">
         {/* Entrades per Font */}
-        <div className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900 ">
-          <div className="border-b border-slate-700/50 bg-slate-800 p-4">
-            <h3 className="font-semibold text-slate-100">Entrades per origen</h3>
-            <p className="mt-1 text-xs text-slate-400">{data.leads.thisYear} entrades aquest any</p>
+        <div className="overflow-hidden rounded-2xl border">
+          <div className="border-b p-4">
+            <h3 className="font-semibold">Entrades per origen</h3>
+            <p className="mt-1 text-xs">{data.leads.thisYear} entrades aquest any</p>
           </div>
           <div className="p-4 space-y-3">
             {data.leads.bySource.map((source) => {
@@ -665,16 +665,16 @@ export default async function AnalyticsPage() {
               return (
                 <div key={source.source}>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-200">
+                    <span className="">
                       {SOURCE_LABELS[source.source] || source.source}
                     </span>
-                    <span className="text-slate-400">
+                    <span className="">
                       {source._count} ({percentage}%)
                     </span>
                   </div>
-                  <div className="mt-1 h-2 bg-slate-700/50 rounded-full overflow-hidden">
+                  <div className="mt-1 h-2 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-cyan-500 rounded-full"
+                      className="h-full rounded-full"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -682,16 +682,16 @@ export default async function AnalyticsPage() {
               );
             })}
             {data.leads.bySource.length === 0 && (
-              <p className="text-center text-slate-500 py-4">No hi ha dades</p>
+              <p className="text-center py-4">No hi ha dades</p>
             )}
           </div>
         </div>
 
         {/* Conversió d'entrades */}
-        <div className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900 ">
-          <div className="border-b border-slate-700/50 bg-slate-800 p-4">
-            <h3 className="font-semibold text-slate-100">Conversió d&apos;entrades</h3>
-            <p className="mt-1 text-xs text-slate-400">Estat de les entrades</p>
+        <div className="overflow-hidden rounded-2xl border">
+          <div className="border-b p-4">
+            <h3 className="font-semibold">Conversió d&apos;entrades</h3>
+            <p className="mt-1 text-xs">Estat de les entrades</p>
           </div>
           <div className="p-4 space-y-3">
             {data.leads.conversionByMonth.map((status) => {
@@ -710,12 +710,12 @@ export default async function AnalyticsPage() {
               return (
                 <div key={status.status}>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-200">{config.label}</span>
-                    <span className="text-slate-400">
+                    <span className="">{config.label}</span>
+                    <span className="">
                       {status._count} ({percentage}%)
                     </span>
                   </div>
-                  <div className="mt-1 h-2 bg-slate-700/50 rounded-full overflow-hidden">
+                  <div className="mt-1 h-2 rounded-full overflow-hidden">
                     <div
                       className={`h-full ${config.color} rounded-full`}
                       style={{ width: `${percentage}%` }}
@@ -725,16 +725,16 @@ export default async function AnalyticsPage() {
               );
             })}
             {data.leads.conversionByMonth.length === 0 && (
-              <p className="text-center text-slate-500 py-4">No hi ha dades</p>
+              <p className="text-center py-4">No hi ha dades</p>
             )}
           </div>
         </div>
       </section>
 
       {/* Esdeveniments per tipus */}
-      <section className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900 ">
-        <div className="border-b border-slate-700/50 bg-slate-800 p-4">
-          <h3 className="font-semibold text-slate-100">Reserves per tipus d&apos;esdeveniment</h3>
+      <section className="overflow-hidden rounded-2xl border">
+        <div className="border-b p-4">
+          <h3 className="font-semibold">Reserves per tipus d&apos;esdeveniment</h3>
         </div>
         <div className="p-4">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
@@ -743,32 +743,32 @@ export default async function AnalyticsPage() {
               return (
                 <div
                   key={type.eventType}
-                  className="rounded-xl border border-slate-600/50 bg-slate-800 p-4 text-center"
+                  className="rounded-xl border p-4 text-center"
                 >
                   <span className="text-3xl">{config.icon}</span>
-                  <p className="text-2xl font-bold text-slate-100 mt-2">{type._count}</p>
-                  <p className="text-xs text-slate-400">{config.label}</p>
+                  <p className="text-2xl font-bold mt-2">{type._count}</p>
+                  <p className="text-xs">{config.label}</p>
                 </div>
               );
             })}
             {data.bookings.byEventType.length === 0 && (
-              <p className="col-span-full text-center text-slate-500 py-4">No hi ha dades</p>
+              <p className="col-span-full text-center py-4">No hi ha dades</p>
             )}
           </div>
         </div>
       </section>
 
       {/* GTM Control Center */}
-      <section className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900 ">
-        <div className="border-b border-slate-700/50 bg-slate-800 p-4">
-          <h2 className="text-lg font-semibold text-slate-100">GTM · Centre de control</h2>
-          <p className="text-xs text-slate-400">Gestió d&apos;etiquetes, activadors i accessos ràpids</p>
+      <section className="overflow-hidden rounded-2xl border">
+        <div className="border-b p-4">
+          <h2 className="text-lg font-semibold">GTM · Centre de control</h2>
+          <p className="text-xs">Gestió d&apos;etiquetes, activadors i accessos ràpids</p>
         </div>
         <div className="p-4 space-y-4">
-          <div className="flex flex-col gap-3 rounded-xl border border-slate-600/50 bg-slate-800 p-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-3 rounded-xl border p-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xs font-medium uppercase text-slate-400">Container ID</p>
-              <p className="mt-2 text-lg font-semibold text-slate-100">{gtmId}</p>
+              <p className="text-xs font-medium uppercase">Container ID</p>
+              <p className="mt-2 text-lg font-semibold">{gtmId}</p>
             </div>
             <span
               className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${
@@ -784,7 +784,7 @@ export default async function AnalyticsPage() {
               href="https://tagmanager.google.com/"
               target="_blank"
               rel="noreferrer"
-              className="rounded-lg border border-slate-600/50 bg-slate-800 p-4 text-sm text-slate-200 hover:border-cyan-500/30 hover:text-cyan-300 transition"
+              className="rounded-lg border p-4 text-sm transition"
             >
               Obrir Google Tag Manager
             </a>
@@ -792,7 +792,7 @@ export default async function AnalyticsPage() {
               href="https://tagassistant.google.com/"
               target="_blank"
               rel="noreferrer"
-              className="rounded-lg border border-slate-600/50 bg-slate-800 p-4 text-sm text-slate-200 hover:border-cyan-500/30 hover:text-cyan-300 transition"
+              className="rounded-lg border p-4 text-sm transition"
             >
               Tag Assistant (Preview)
             </a>
@@ -800,7 +800,7 @@ export default async function AnalyticsPage() {
               href="https://support.google.com/tagmanager/answer/6102821"
               target="_blank"
               rel="noreferrer"
-              className="rounded-lg border border-slate-600/50 bg-slate-800 p-4 text-sm text-slate-200 hover:border-cyan-500/30 hover:text-cyan-300 transition"
+              className="rounded-lg border p-4 text-sm transition"
             >
               Guia d&apos;etiquetes i activadors
             </a>
@@ -808,13 +808,13 @@ export default async function AnalyticsPage() {
               href="https://support.google.com/tagmanager/answer/6107166"
               target="_blank"
               rel="noreferrer"
-              className="rounded-lg border border-slate-600/50 bg-slate-800 p-4 text-sm text-slate-200 hover:border-cyan-500/30 hover:text-cyan-300 transition"
+              className="rounded-lg border p-4 text-sm transition"
             >
               Esdeveniments i dataLayer
             </a>
           </div>
 
-          <div className="rounded-lg border border-slate-600/50 bg-slate-800 p-4 text-sm text-slate-300">
+          <div className="rounded-lg border p-4 text-sm">
             Les mètriques de trànsit i clics depenen del destí de Google Tag Manager (per exemple, GA4).
             Si vols veure analítica dins del panell, connecta un destí compatible o indica quin proveïdor vols usar.
           </div>

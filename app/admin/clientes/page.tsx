@@ -396,26 +396,26 @@ export default function AdminContactesPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
+          <h1 className="text-2xl font-semibold tracking-tight">
             Gestió de Clients
           </h1>
-          <p className="text-sm text-slate-400 mt-1">CRM - Afegeix clients i inicia processos</p>
+          <p className="text-sm mt-1">CRM - Afegeix clients i inicia processos</p>
         </div>
 
         {/* Stats */}
         {stats && (
           <div className="flex gap-3 flex-wrap">
-            <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm px-4 py-3 text-center">
-              <p className="text-2xl font-bold text-slate-100">{stats.total}</p>
-              <p className="text-xs text-slate-400">Total</p>
+            <div className="rounded-2xl border backdrop-blur-sm px-4 py-3 text-center">
+              <p className="text-2xl font-bold">{stats.total}</p>
+              <p className="text-xs">Total</p>
             </div>
-            <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm px-4 py-3 text-center">
-              <p className="text-2xl font-bold text-slate-100">{stats.vip}</p>
-              <p className="text-xs text-amber-400">VIP</p>
+            <div className="rounded-2xl border backdrop-blur-sm px-4 py-3 text-center">
+              <p className="text-2xl font-bold">{stats.vip}</p>
+              <p className="text-xs">VIP</p>
             </div>
-            <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm px-4 py-3 text-center">
-              <p className="text-2xl font-bold text-slate-100">{stats.withEvents}</p>
-              <p className="text-xs text-emerald-400">Amb esdeveniments</p>
+            <div className="rounded-2xl border backdrop-blur-sm px-4 py-3 text-center">
+              <p className="text-2xl font-bold">{stats.withEvents}</p>
+              <p className="text-xs">Amb esdeveniments</p>
             </div>
           </div>
         )}
@@ -424,7 +424,7 @@ export default function AdminContactesPage() {
       {/* Search & Add */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -433,14 +433,14 @@ export default function AdminContactesPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             aria-label="Cercar client"
-            className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+            className="w-full pl-10 pr-4 py-3 rounded-xl border focus:ring-1 transition-all"
           />
         </div>
 
         <button
           onClick={() => setShowAddModal(true)}
           type="button"
-          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-all"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl text-white font-medium shadow-lg transition-all"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -471,66 +471,66 @@ export default function AdminContactesPage() {
 
       {/* Error */}
       {error && (
-        <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4" role="alert">
-          <p className="text-rose-300">{error}</p>
+        <div className="border rounded-xl p-4" role="alert">
+          <p className="">{error}</p>
         </div>
       )}
 
       {/* Loading */}
       {loading && (
         <div className="flex items-center justify-center py-20" role="status" aria-live="polite">
-          <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
         </div>
       )}
 
       {/* Empty */}
       {!loading && customers.length === 0 && (
         <div className="text-center py-20" role="status" aria-live="polite">
-          <p className="text-slate-400 text-lg">No hi ha clients</p>
+          <p className="text-lg">No hi ha clients</p>
         </div>
       )}
 
       {/* Customers List */}
       {!loading && customers.length > 0 && (
-        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+        <div className="rounded-2xl border backdrop-blur-sm overflow-hidden">
           <div className="overflow-x-auto">
           <table className="w-full min-w-[1060px] text-sm">
             <thead>
-              <tr className="bg-slate-700/30 border-b border-slate-700/50">
-                <th scope="col" className="text-center p-4 text-slate-300 font-medium">Nom</th>
-                <th scope="col" className="text-center p-4 text-slate-300 font-medium hidden md:table-cell">Contacte</th>
-                <th scope="col" className="text-center p-4 text-slate-300 font-medium hidden lg:table-cell">Font</th>
-                <th scope="col" className="text-center p-4 text-slate-300 font-medium hidden sm:table-cell">Esdeveniments</th>
-                <th scope="col" className="text-center p-4 text-slate-300 font-medium hidden xl:table-cell">Prioritat</th>
-                <th scope="col" className="text-center p-4 text-slate-300 font-medium hidden xl:table-cell">Proper pas</th>
-                <th scope="col" className="text-center p-4 text-slate-300 font-medium">Accions</th>
+              <tr className="border-b">
+                <th scope="col" className="text-center p-4 font-medium">Nom</th>
+                <th scope="col" className="text-center p-4 font-medium hidden md:table-cell">Contacte</th>
+                <th scope="col" className="text-center p-4 font-medium hidden lg:table-cell">Font</th>
+                <th scope="col" className="text-center p-4 font-medium hidden sm:table-cell">Esdeveniments</th>
+                <th scope="col" className="text-center p-4 font-medium hidden xl:table-cell">Prioritat</th>
+                <th scope="col" className="text-center p-4 font-medium hidden xl:table-cell">Proper pas</th>
+                <th scope="col" className="text-center p-4 font-medium">Accions</th>
               </tr>
             </thead>
             <tbody>
               {filteredCustomers.map(({ customer, priority }) => {
                 const nextStep = getNextStep(customer);
                 return (
-                <tr key={customer.id} className="border-b border-slate-700/30 hover:bg-slate-700/30 transition-colors">
+                <tr key={customer.id} className="border-b transition-colors">
                   <td className="p-4 text-center">
                     <div className="flex items-center justify-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center text-cyan-300 font-bold">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold">
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-slate-100 font-medium flex items-center justify-center gap-2 whitespace-nowrap">
+                        <p className="font-medium flex items-center justify-center gap-2 whitespace-nowrap">
                           {customer.name}
                           {customer.is_vip && (
-                            <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-xs rounded-full font-medium">VIP</span>
+                            <span className="px-2 py-0.5 text-xs rounded-full font-medium">VIP</span>
                           )}
                         </p>
-                        {customer.city && <p className="text-slate-500 text-sm truncate">{customer.city}</p>}
+                        {customer.city && <p className="text-sm truncate">{customer.city}</p>}
                       </div>
                     </div>
                   </td>
                   <td className="p-4 hidden md:table-cell text-center">
                     <div className="space-y-1 min-w-0">
                       {customer.email && (
-                        <p className="text-slate-400 text-sm flex items-center justify-center gap-2">
+                        <p className="text-sm flex items-center justify-center gap-2">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                           </svg>
@@ -538,7 +538,7 @@ export default function AdminContactesPage() {
                         </p>
                       )}
                       {customer.phone && (
-                        <p className="text-slate-400 text-sm flex items-center justify-center gap-2">
+                        <p className="text-sm flex items-center justify-center gap-2">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                           </svg>
@@ -557,7 +557,7 @@ export default function AdminContactesPage() {
                       {SOURCE_LABELS[customer.source || ''] || customer.source || 'Desconeguda'}
                     </span>
                   </td>
-                  <td className="p-4 hidden sm:table-cell text-slate-400 text-center">
+                  <td className="p-4 hidden sm:table-cell text-center">
                     {customer.total_events || 0}
                   </td>
                   <td className="p-4 hidden xl:table-cell text-center">
@@ -578,11 +578,11 @@ export default function AdminContactesPage() {
                     <div className="space-y-1">
                       <Link
                         href={nextStep.href}
-                        className="inline-flex rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-2 py-1 text-xs font-semibold text-cyan-300 hover:bg-cyan-500/20"
+                        className="inline-flex rounded-lg border px-2 py-1 text-xs font-semibold"
                       >
                         {nextStep.label}
                       </Link>
-                      <p className="text-[11px] text-slate-500">{nextStep.hint}</p>
+                      <p className="text-[11px]">{nextStep.hint}</p>
                     </div>
                   </td>
                   <td className="p-4 text-center">
@@ -593,7 +593,7 @@ export default function AdminContactesPage() {
                           setShowActionModal(true);
                         }}
                         type="button"
-                        className="p-2 bg-emerald-500/20 text-emerald-300 rounded-lg hover:bg-emerald-500/30 transition-all"
+                        className="p-2 rounded-lg transition-all"
                         title="Iniciar procés"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -603,7 +603,7 @@ export default function AdminContactesPage() {
                         </button>
                       <Link
                         href={`/admin/contactes/${customer.id}`}
-                        className="p-2 bg-slate-700/50 text-slate-300 rounded-lg hover:bg-slate-600/50 transition-all"
+                        className="p-2 rounded-lg transition-all"
                         title="Fitxa 360"
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -621,14 +621,14 @@ export default function AdminContactesPage() {
       )}
 
       {!loading && customers.length > 0 && (
-        <div className="flex flex-col items-center justify-center gap-2 text-xs text-slate-400 sm:flex-row sm:justify-between">
+        <div className="flex flex-col items-center justify-center gap-2 text-xs sm:flex-row sm:justify-between">
           <span>Pàgina {page} de {totalPages} · {filteredCustomers.length} visibles · {totalCustomers} clients</span>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => setPage((prev) => Math.max(1, prev - 1))}
               disabled={page === 1}
-              className="rounded-lg border border-slate-700 px-3 py-1 disabled:pointer-events-none disabled:opacity-40 hover:text-slate-200"
+              className="rounded-lg border px-3 py-1 disabled:pointer-events-none disabled:opacity-40"
             >
               ← Anterior
             </button>
@@ -636,7 +636,7 @@ export default function AdminContactesPage() {
               type="button"
               onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={page === totalPages}
-              className="rounded-lg border border-slate-700 px-3 py-1 disabled:pointer-events-none disabled:opacity-40 hover:text-slate-200"
+              className="rounded-lg border px-3 py-1 disabled:pointer-events-none disabled:opacity-40"
             >
               Següent →
             </button>
@@ -663,25 +663,25 @@ export default function AdminContactesPage() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="add-contact-title"
-              className="bg-slate-800 border border-slate-700/50 rounded-2xl p-6 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto"
+              className="border rounded-2xl p-6 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto"
             >
-              <h2 id="add-contact-title" className="text-2xl font-bold text-slate-100 mb-6">Afegir Client</h2>
+              <h2 id="add-contact-title" className="text-2xl font-bold mb-6">Afegir Client</h2>
 
               {/* Duplicate warnings */}
               {duplicateWarnings.length > 0 && (
-                <div className="mb-5 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">
-                  <p className="text-sm font-semibold text-amber-300 mb-2">
+                <div className="mb-5 rounded-xl border p-4">
+                  <p className="text-sm font-semibold mb-2">
                     Possibles duplicats detectats
                   </p>
                   {duplicateWarnings.map((dup) => (
                     <Link
                       key={dup.id}
                       href={`/admin/contactes/${dup.id}`}
-                      className="flex items-center justify-between rounded-lg bg-amber-500/5 border border-amber-500/20 px-3 py-2 mb-1.5 last:mb-0 hover:bg-amber-500/15 transition-colors"
+                      className="flex items-center justify-between rounded-lg border px-3 py-2 mb-1.5 last:mb-0 transition-colors"
                     >
                       <div>
-                        <p className="text-sm font-medium text-slate-100">{dup.name}</p>
-                        <p className="text-xs text-slate-400">{dup.email}{dup.phone ? ` · ${dup.phone}` : ''}</p>
+                        <p className="text-sm font-medium">{dup.name}</p>
+                        <p className="text-xs">{dup.email}{dup.phone ? ` · ${dup.phone}` : ''}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
@@ -691,79 +691,79 @@ export default function AdminContactesPage() {
                         }`}>
                           {dup.matchScore}%
                         </span>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs">
                           {dup.matchReasons.map((r) => r.field).join(', ')}
                         </span>
                       </div>
                     </Link>
                   ))}
-                  {checkingDuplicates && <p className="text-xs text-amber-400 mt-2">Comprovant...</p>}
+                  {checkingDuplicates && <p className="text-xs mt-2">Comprovant...</p>}
                 </div>
               )}
 
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
-                    <label className="block text-sm text-slate-400 mb-2">Nom *</label>
+                    <label className="block text-sm mb-2">Nom *</label>
                     <input
                       type="text"
                       value={newCustomer.name}
                       onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
                       placeholder="Maria García"
                     />
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-sm text-slate-400 mb-2">Email *</label>
+                    <label className="block text-sm mb-2">Email *</label>
                     <input
                       type="email"
                       value={newCustomer.email}
                       onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
                       placeholder="maria@email.com"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-slate-400 mb-2">Telèfon</label>
+                    <label className="block text-sm mb-2">Telèfon</label>
                     <input
                       type="tel"
                       value={newCustomer.phone}
                       onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
                       placeholder="699 123 456"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-slate-400 mb-2">DNI / NIF / NIE</label>
+                    <label className="block text-sm mb-2">DNI / NIF / NIE</label>
                     <input
                       type="text"
                       value={newCustomer.dni}
                       onChange={(e) => setNewCustomer({ ...newCustomer, dni: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
                       placeholder="12345678A"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-slate-400 mb-2">Instagram</label>
+                    <label className="block text-sm mb-2">Instagram</label>
                     <input
                       type="text"
                       value={newCustomer.instagram}
                       onChange={(e) => setNewCustomer({ ...newCustomer, instagram: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
                       placeholder="@usuari"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-slate-400 mb-2">Font</label>
+                    <label className="block text-sm mb-2">Font</label>
                     <select
                       value={newCustomer.source}
                       onChange={(e) => setNewCustomer({ ...newCustomer, source: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
+                      className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all"
                     >
                       <option value="PHONE">Telèfon</option>
                       <option value="WHATSAPP">WhatsApp</option>
@@ -779,11 +779,11 @@ export default function AdminContactesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">Notes</label>
+                  <label className="block text-sm mb-2">Notes</label>
                   <textarea
                     value={newCustomer.notes}
                     onChange={(e) => setNewCustomer({ ...newCustomer, notes: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-600/50 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all resize-none"
+                    className="w-full px-4 py-3 rounded-xl border focus:ring-1 transition-all resize-none"
                     rows={2}
                     placeholder="Notes internes..."
                   />
@@ -794,7 +794,7 @@ export default function AdminContactesPage() {
                 <button
                   onClick={() => { setShowAddModal(false); setDuplicateWarnings([]); }}
                   type="button"
-                  className="flex-1 py-3 border border-slate-600/50 text-slate-300 rounded-xl hover:bg-slate-700/50 transition-all"
+                  className="flex-1 py-3 border rounded-xl transition-all"
                 >
                   Cancel·lar
                 </button>
@@ -803,7 +803,7 @@ export default function AdminContactesPage() {
                   disabled={actionLoading || !newCustomer.name || !newCustomer.email}
                   type="button"
                   aria-busy={actionLoading}
-                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold shadow-lg shadow-cyan-500/20 disabled:opacity-50 hover:from-cyan-400 hover:to-blue-500 transition-all"
+                  className="flex-1 py-3 rounded-xl text-white font-bold shadow-lg disabled:opacity-50 transition-all"
                 >
                   {actionLoading ? 'Afegint...' : 'Afegir'}
                 </button>
@@ -832,11 +832,11 @@ export default function AdminContactesPage() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="start-process-title"
-              className="bg-slate-800 border border-slate-700/50 rounded-2xl p-6 sm:p-8 max-w-md w-full"
+              className="border rounded-2xl p-6 sm:p-8 max-w-md w-full"
             >
-              <h2 id="start-process-title" className="text-2xl font-bold text-slate-100 mb-2">🚀 Iniciar Procés</h2>
-              <p className="text-slate-400 mb-6">
-                Per <span className="text-cyan-400">{selectedCustomer.name}</span>
+              <h2 id="start-process-title" className="text-2xl font-bold mb-2">🚀 Iniciar Procés</h2>
+              <p className="mb-6">
+                Per <span className="">{selectedCustomer.name}</span>
               </p>
 
               <div className="space-y-3">
@@ -845,13 +845,13 @@ export default function AdminContactesPage() {
                   disabled={actionLoading}
                   type="button"
                   aria-busy={actionLoading}
-                  className="w-full p-4 bg-slate-700/30 border border-slate-700/50 rounded-xl text-left hover:border-amber-500/30 transition-all group disabled:opacity-50"
+                  className="w-full p-4 border rounded-xl text-left transition-all group disabled:opacity-50"
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-3xl">⭐</span>
                     <div>
-                      <p className="text-slate-100 font-medium group-hover:text-amber-400">Demanar Opinió</p>
-                      <p className="text-slate-500 text-sm">Envia un correu demanant una opinió</p>
+                      <p className="font-medium">Demanar Opinió</p>
+                      <p className="text-sm">Envia un correu demanant una opinió</p>
                     </div>
                   </div>
                 </button>
@@ -861,13 +861,13 @@ export default function AdminContactesPage() {
                   disabled={actionLoading}
                   type="button"
                   aria-busy={actionLoading}
-                  className="w-full p-4 bg-slate-700/30 border border-slate-700/50 rounded-xl text-left hover:border-emerald-500/30 transition-all group disabled:opacity-50"
+                  className="w-full p-4 border rounded-xl text-left transition-all group disabled:opacity-50"
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-3xl">🎉</span>
                     <div>
-                      <p className="text-slate-100 font-medium group-hover:text-emerald-400">Post-esdeveniment complet</p>
-                      <p className="text-slate-500 text-sm">Canvas 10/10 + Gràcies + Demanar opinió</p>
+                      <p className="font-medium">Post-esdeveniment complet</p>
+                      <p className="text-sm">Canvas 10/10 + Gràcies + Demanar opinió</p>
                     </div>
                   </div>
                 </button>
@@ -877,13 +877,13 @@ export default function AdminContactesPage() {
                   disabled={actionLoading}
                   type="button"
                   aria-busy={actionLoading}
-                  className="w-full p-4 bg-slate-700/30 border border-slate-700/50 rounded-xl text-left hover:border-purple-500/30 transition-all group disabled:opacity-50"
+                  className="w-full p-4 border rounded-xl text-left transition-all group disabled:opacity-50"
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-3xl">👋</span>
                     <div>
-                      <p className="text-slate-100 font-medium group-hover:text-purple-400">Benvinguda</p>
-                      <p className="text-slate-500 text-sm">Email de benvinguda + Info empresa</p>
+                      <p className="font-medium">Benvinguda</p>
+                      <p className="text-sm">Email de benvinguda + Info empresa</p>
                     </div>
                   </div>
                 </button>
@@ -893,13 +893,13 @@ export default function AdminContactesPage() {
                   disabled={actionLoading}
                   type="button"
                   aria-busy={actionLoading}
-                  className="w-full p-4 bg-slate-700/30 border border-slate-700/50 rounded-xl text-left hover:border-pink-500/30 transition-all group disabled:opacity-50"
+                  className="w-full p-4 border rounded-xl text-left transition-all group disabled:opacity-50"
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-3xl">🎁</span>
                     <div>
-                      <p className="text-slate-100 font-medium group-hover:text-pink-400">Promoció</p>
-                      <p className="text-slate-500 text-sm">Envia oferta o descompte especial</p>
+                      <p className="font-medium">Promoció</p>
+                      <p className="text-sm">Envia oferta o descompte especial</p>
                     </div>
                   </div>
                 </button>
@@ -908,7 +908,7 @@ export default function AdminContactesPage() {
               <button
                 onClick={() => setShowActionModal(false)}
                 type="button"
-                className="w-full mt-6 py-3 border border-slate-600/50 text-slate-400 rounded-xl hover:bg-slate-700/50 transition-all"
+                className="w-full mt-6 py-3 border rounded-xl transition-all"
               >
                 Cancel·lar
               </button>

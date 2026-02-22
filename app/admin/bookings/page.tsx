@@ -132,14 +132,14 @@ export default async function BookingsPage({
       {/* Header - Mobile optimized */}
       <header className="flex items-center justify-between">
         <div className="text-center">
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">Reserves</h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Reserves</h1>
+          <p className="text-xs sm:text-sm">
             {pagination.total} esdeveniments · {formatCurrency(totalRevenue)}
           </p>
         </div>
         <Link
           href="/admin/bookings/new"
-          className="inline-flex items-center rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-3 py-2 text-xs sm:text-sm font-medium text-white hover:from-cyan-400 hover:to-blue-500 active:scale-[0.98] transition-all shadow-lg shadow-cyan-500/20"
+          className="inline-flex items-center rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-white active:scale-[0.98] transition-all shadow-lg"
         >
           + Nova
         </Link>
@@ -147,43 +147,43 @@ export default async function BookingsPage({
 
       {/* Stats Cards - Scrollable horizontal en móvil */}
       <section className="flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium text-slate-400 uppercase text-center">Total</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100 text-center">{pagination.total}</p>
-          <p className="text-[10px] sm:text-xs text-slate-500 truncate text-center">{formatCurrency(totalRevenue)}</p>
+        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+          <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Total</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{pagination.total}</p>
+          <p className="text-[10px] sm:text-xs truncate text-center">{formatCurrency(totalRevenue)}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 backdrop-blur-sm p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium text-amber-400 uppercase text-center">Pendents</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100 text-center">{statsMap.PENDING?.count || 0}</p>
+        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+          <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Pendents</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.PENDING?.count || 0}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium text-emerald-400 uppercase text-center">Confirmades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100 text-center">{statsMap.CONFIRMED?.count || 0}</p>
+        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+          <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Confirmades</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.CONFIRMED?.count || 0}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-teal-500/20 bg-gradient-to-br from-teal-500/10 to-teal-600/5 backdrop-blur-sm p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium text-teal-400 uppercase text-center">Completades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100 text-center">{statsMap.COMPLETED?.count || 0}</p>
+        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+          <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Completades</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.COMPLETED?.count || 0}</p>
         </div>
-        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border border-rose-500/20 bg-gradient-to-br from-rose-500/10 to-rose-600/5 backdrop-blur-sm p-3 sm:p-5">
-          <p className="text-[10px] sm:text-xs font-medium text-rose-400 uppercase text-center">Cancel·lades</p>
-          <p className="mt-1 text-xl sm:text-3xl font-bold text-slate-100 text-center">{statsMap.CANCELLED?.count || 0}</p>
+        <div className="shrink-0 w-28 sm:w-auto rounded-2xl border backdrop-blur-sm p-3 sm:p-5">
+          <p className="text-[10px] sm:text-xs font-medium uppercase text-center">Cancel·lades</p>
+          <p className="mt-1 text-xl sm:text-3xl font-bold text-center">{statsMap.CANCELLED?.count || 0}</p>
         </div>
       </section>
 
       {/* Info Alert - Compacto en móvil */}
-      <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 to-blue-600/5 backdrop-blur-sm p-3 text-center sm:p-4">
-        <p className="text-xs sm:text-sm text-slate-200">
-          <strong>Auto:</strong> Quan passa a <span className="font-semibold text-cyan-400">COMPLETED</span>, les stats públiques s&apos;actualitzen.
+      <div className="rounded-2xl border backdrop-blur-sm p-3 text-center sm:p-4">
+        <p className="text-xs sm:text-sm">
+          <strong>Auto:</strong> Quan passa a <span className="font-semibold">COMPLETED</span>, les stats públiques s&apos;actualitzen.
         </p>
       </div>
 
       {/* Mobile Card View */}
       <section className="lg:hidden space-y-3">
         {bookings.length === 0 ? (
-          <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-8 text-center">
+          <div className="rounded-2xl border backdrop-blur-sm p-8 text-center">
             <span className="text-4xl">📅</span>
-            <p className="mt-2 text-slate-300">Encara no hi ha reserves</p>
-            <Link href="/admin/bookings/new" className="text-cyan-400 hover:text-cyan-300 text-sm mt-2 inline-block font-medium">
+            <p className="mt-2">Encara no hi ha reserves</p>
+            <Link href="/admin/bookings/new" className="text-sm mt-2 inline-block font-medium">
               Crear primera reserva →
             </Link>
           </div>
@@ -206,7 +206,7 @@ export default async function BookingsPage({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <Link href={`/admin/bookings/${booking.id}`}>
-                        <code className="text-[10px] font-mono bg-slate-700/50 text-slate-300 px-1.5 py-0.5 rounded">{booking.reference}</code>
+                        <code className="text-[10px] font-mono px-1.5 py-0.5 rounded">{booking.reference}</code>
                       </Link>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConf.bg} ${statusConf.text}`}>
                         {statusConf.label}
@@ -215,31 +215,31 @@ export default async function BookingsPage({
                     {booking.customerId ? (
                       <Link
                         href={`/admin/contactes/${booking.customerId}`}
-                        className="font-medium text-slate-100 mt-2 truncate block hover:text-cyan-300"
+                        className="font-medium mt-2 truncate block"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {booking.clientName} 👤
                       </Link>
                     ) : (
-                      <p className="font-medium text-slate-100 mt-2 truncate">{booking.clientName}</p>
+                      <p className="font-medium mt-2 truncate">{booking.clientName}</p>
                     )}
-                    <p className="text-xs text-slate-400 truncate">{booking.eventLocation}</p>
+                    <p className="text-xs truncate">{booking.eventLocation}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="font-bold text-slate-100">{formatCurrency(booking.total)}</p>
+                    <p className="font-bold">{formatCurrency(booking.total)}</p>
                     {!booking.depositPaid && (
-                      <p className="text-[10px] text-rose-400 font-medium">Paga pendent</p>
+                      <p className="text-[10px] font-medium">Paga pendent</p>
                     )}
                   </div>
                 </div>
-                <div className="mt-3 pt-3 border-t border-slate-700/30 flex items-center justify-between text-xs">
+                <div className="mt-3 pt-3 border-t flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-300">{eventType}</span>
-                    <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-medium">
+                    <span className="">{eventType}</span>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-medium">
                       {getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale)}
                     </span>
                   </div>
-                  <span className="text-slate-400 font-medium">
+                  <span className="font-medium">
                     {new Date(booking.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
                   </span>
                 </div>
@@ -258,25 +258,25 @@ export default async function BookingsPage({
       </section>
 
       {/* Desktop Table View */}
-      <section className="hidden lg:block rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+      <section className="hidden lg:block rounded-2xl border backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1060px] text-sm">
-            <thead className="bg-slate-700/30 border-b border-slate-700/50">
+            <thead className="border-b">
               <tr>
-                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Ref.</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Client</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Tipus</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Data</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Pack</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Total</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Estat</th>
-                <th scope="col" className="px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Accions</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Ref.</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Client</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Tipus</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Data</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Pack</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Total</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Estat</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Accions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/30">
               {bookings.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-slate-400">
+                  <td colSpan={8} className="px-4 py-12 text-center">
                     <span className="text-4xl">📅</span>
                     <p className="mt-2">Encara no hi ha reserves</p>
                   </td>
@@ -298,43 +298,43 @@ export default async function BookingsPage({
                     >
                       <td className="px-4 py-3 text-center">
                         <Link href={`/admin/bookings/${booking.id}`} className="hover:opacity-80 transition-opacity">
-                          <code className="text-xs font-mono bg-slate-700/50 text-cyan-300 px-2 py-1 rounded cursor-pointer">{booking.reference}</code>
+                          <code className="text-xs font-mono px-2 py-1 rounded cursor-pointer">{booking.reference}</code>
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-center">
                         {booking.customerId ? (
-                          <Link href={`/admin/contactes/${booking.customerId}`} className="font-medium text-slate-100 hover:text-cyan-300">
+                          <Link href={`/admin/contactes/${booking.customerId}`} className="font-medium">
                             {booking.clientName}
                           </Link>
                         ) : (
-                          <div className="font-medium text-slate-100">{booking.clientName}</div>
+                          <div className="font-medium">{booking.clientName}</div>
                         )}
-                        <div className="text-xs text-slate-400 truncate max-w-[150px]">{booking.eventLocation}</div>
+                        <div className="text-xs truncate max-w-[150px]">{booking.eventLocation}</div>
                         {booking.lead && (
-                          <Link href={`/admin/leads/${booking.lead.id}`} className="text-[10px] text-cyan-400 hover:text-cyan-300 hover:underline">
+                          <Link href={`/admin/leads/${booking.lead.id}`} className="text-[10px] hover:underline">
                             Entrada: {booking.lead.name}
                           </Link>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-slate-300 text-xs text-center whitespace-nowrap">{eventType}</td>
+                      <td className="px-4 py-3 text-xs text-center whitespace-nowrap">{eventType}</td>
                       <td className="px-4 py-3 text-center">
-                        <div className="font-medium text-slate-200 text-xs">{formatDate(booking.eventDate)}</div>
+                        <div className="font-medium text-xs">{formatDate(booking.eventDate)}</div>
                         {booking.eventStartTime && (
-                          <div className="text-xs text-slate-500">{booking.eventStartTime}</div>
+                          <div className="text-xs">{booking.eventStartTime}</div>
                         )}
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className="inline-flex rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs font-medium text-cyan-300">
+                        <span className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium">
                           {getPackName(booking.pack.translations, booking.pack.slug, booking.lead?.preferredLocale)}
                         </span>
                         {booking._count.extras > 0 && (
-                          <span className="ml-1 text-xs text-slate-500">+{booking._count.extras}</span>
+                          <span className="ml-1 text-xs">+{booking._count.extras}</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-100 text-center">
+                      <td className="px-4 py-3 font-medium text-center">
                         {formatCurrency(booking.total)}
                         {!booking.depositPaid && (
-                          <span className="block text-xs text-rose-400">Paga pendent</span>
+                          <span className="block text-xs">Paga pendent</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -360,7 +360,7 @@ export default async function BookingsPage({
       </section>
 
       {pagination.totalPages > 1 && (
-        <section className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300 sm:flex-row sm:justify-between">
+        <section className="flex flex-col items-center justify-center gap-2 rounded-2xl border p-3 text-xs sm:flex-row sm:justify-between">
           <span>
             Pàgina {pagination.page} de {pagination.totalPages}
           </span>
@@ -368,22 +368,22 @@ export default async function BookingsPage({
             {pagination.page > 1 ? (
               <Link
                 href={`/admin/bookings?page=${pagination.page - 1}`}
-                className="rounded-lg border border-slate-600/50 px-3 py-1 hover:bg-slate-700/50"
+                className="rounded-lg border px-3 py-1"
               >
                 ← Anterior
               </Link>
             ) : (
-              <span className="rounded-lg border border-slate-700/50 px-3 py-1 text-slate-500">← Anterior</span>
+              <span className="rounded-lg border px-3 py-1">← Anterior</span>
             )}
             {pagination.page < pagination.totalPages ? (
               <Link
                 href={`/admin/bookings?page=${pagination.page + 1}`}
-                className="rounded-lg border border-slate-600/50 px-3 py-1 hover:bg-slate-700/50"
+                className="rounded-lg border px-3 py-1"
               >
                 Següent →
               </Link>
             ) : (
-              <span className="rounded-lg border border-slate-700/50 px-3 py-1 text-slate-500">Següent →</span>
+              <span className="rounded-lg border px-3 py-1">Següent →</span>
             )}
           </div>
         </section>

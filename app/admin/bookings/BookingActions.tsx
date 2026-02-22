@@ -72,7 +72,7 @@ export default function BookingActions({
         value={status}
         onChange={(e) => handleStatusChange(e.target.value)}
         disabled={isUpdatingStatus}
-        className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-2 py-1.5 text-xs text-slate-200"
+        className="rounded-lg border px-2 py-1.5 text-xs"
         title="Canviar estat"
       >
         <option value="PENDING">Pendent</option>
@@ -83,21 +83,21 @@ export default function BookingActions({
       </select>
       <Link
         href={calendarHref}
-        className="inline-flex items-center rounded-lg bg-indigo-500/20 px-3 py-1.5 text-xs font-medium text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/30 transition-colors"
+        className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors"
       >
         Calendari
       </Link>
       {customerId && (
         <Link
           href={`/admin/contactes/${customerId}`}
-          className="inline-flex items-center rounded-lg bg-violet-500/20 px-3 py-1.5 text-xs font-medium text-violet-300 hover:bg-violet-500/30 border border-violet-500/30 transition-colors"
+          className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors"
         >
           Client
         </Link>
       )}
       <Link
         href={`/admin/bookings/${id}`}
-        className="inline-flex items-center rounded-lg bg-slate-700/50 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-600/50 border border-slate-600/50 transition-colors"
+        className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors"
       >
         Veure
       </Link>
@@ -107,7 +107,7 @@ export default function BookingActions({
           disabled={isDeleting}
           type="button"
           aria-busy={isDeleting}
-          className="inline-flex items-center rounded-lg bg-rose-500/20 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/30 border border-rose-500/30 transition-colors disabled:opacity-50"
+          className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors disabled:opacity-50"
         >
           {isDeleting ? 'Eliminant...' : 'Eliminar'}
         </button>

@@ -171,18 +171,18 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
   }, [itemId, router]);
 
   return (
-    <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-5 space-y-4">
-      <h2 className="text-sm font-semibold text-slate-200">Foto</h2>
+    <div className="rounded-2xl border p-5 space-y-4">
+      <h2 className="text-sm font-semibold">Foto</h2>
 
       {error && (
-        <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-2">
-          <p className="text-rose-300 text-xs">{error}</p>
+        <div className="rounded-lg border p-2">
+          <p className="text-xs">{error}</p>
         </div>
       )}
 
       {preview ? (
         <div className="space-y-2">
-          <div className="relative aspect-square rounded-xl overflow-hidden bg-slate-900/60 border border-slate-700/50">
+          <div className="relative aspect-square rounded-xl overflow-hidden border">
             <Image
               src={preview}
               alt={itemCode}
@@ -195,7 +195,7 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
                 type="button"
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                className="rounded-lg bg-slate-900/80 px-2 py-1 text-xs text-slate-200 hover:bg-slate-800 backdrop-blur-sm"
+                className="rounded-lg px-2 py-1 text-xs backdrop-blur-sm"
               >
                 Canviar
               </button>
@@ -203,14 +203,14 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
                 type="button"
                 onClick={handleRemovePhoto}
                 disabled={uploading}
-                className="rounded-lg bg-rose-900/80 px-2 py-1 text-xs text-rose-200 hover:bg-rose-800 backdrop-blur-sm"
+                className="rounded-lg px-2 py-1 text-xs backdrop-blur-sm"
               >
                 Treure
               </button>
             </div>
           </div>
           {sizeInfo && (
-            <p className="text-[10px] text-slate-500 text-center">{sizeInfo}</p>
+            <p className="text-[10px] text-center">{sizeInfo}</p>
           )}
         </div>
       ) : (
@@ -228,13 +228,13 @@ export default function InventoryPhotoUpload({ itemId, itemCode, currentImageUrl
           {uploading ? (
             <>
               <span className="text-3xl mb-2 animate-pulse">...</span>
-              <p className="text-sm text-cyan-300">Convertint i pujant...</p>
+              <p className="text-sm">Convertint i pujant...</p>
             </>
           ) : (
             <>
               <span className="text-4xl mb-2">📷</span>
-              <p className="text-sm text-slate-400">Arrossega una foto o fes clic</p>
-              <p className="text-[10px] text-slate-500 mt-1">Qualsevol format · Auto-converteix a WebP</p>
+              <p className="text-sm">Arrossega una foto o fes clic</p>
+              <p className="text-[10px] mt-1">Qualsevol format · Auto-converteix a WebP</p>
             </>
           )}
         </div>

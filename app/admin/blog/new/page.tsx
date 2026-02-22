@@ -385,7 +385,7 @@ export default function NewBlogPostPage() {
             type="submit"
             disabled={loading}
             aria-busy={loading}
-            className="rounded-lg bg-purple-600 px-6 py-3 text-white hover:bg-purple-700 disabled:opacity-50"
+            className="rounded-lg px-6 py-3 text-white disabled:opacity-50"
           >
             {loading ? 'Desant...' : 'Crear post'}
           </button>

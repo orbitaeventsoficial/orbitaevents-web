@@ -124,14 +124,14 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       )}
 
       {/* Informació de contacte */}
-      <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+      <div className="rounded-2xl border p-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-100">Informació de contacte</h2>
+          <h2 className="text-lg font-semibold">Informació de contacte</h2>
           {!editing ? (
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="rounded-lg border border-slate-600 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800"
+              className="rounded-lg border px-3 py-1.5 text-xs"
             >
               ✏️ Editar
             </button>
@@ -141,7 +141,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 type="button"
                 onClick={cancelEdit}
                 disabled={saving}
-                className="rounded-lg border border-slate-600 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800 disabled:opacity-50"
+                className="rounded-lg border px-3 py-1.5 text-xs disabled:opacity-50"
               >
                 Cancel·la
               </button>
@@ -149,7 +149,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-lg bg-cyan-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-cyan-600 disabled:opacity-50"
+                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
               >
                 {saving ? 'Desant...' : 'Desa'}
               </button>
@@ -158,7 +158,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
         </div>
 
         {error && (
-          <p className="mt-2 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+          <p className="mt-2 rounded-lg border px-3 py-2 text-xs">
             {error}
           </p>
         )}
@@ -200,9 +200,9 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       </div>
 
       {/* Estadístiques */}
-      <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
-        <h2 className="text-lg font-semibold text-slate-100">Resum operatiu</h2>
-        <p className="mt-1 text-sm text-slate-400">
+      <div className="rounded-2xl border p-5">
+        <h2 className="text-lg font-semibold">Resum operatiu</h2>
+        <p className="mt-1 text-sm">
           Client des de {new Date(data.customer.createdAt).toLocaleDateString('ca-ES', { month: 'long', year: 'numeric' })}
         </p>
 
@@ -243,14 +243,14 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
           content={
             nextTask && (
               <>
-                <p className="text-sm font-medium text-slate-100">{nextTask.title}</p>
+                <p className="text-sm font-medium">{nextTask.title}</p>
                 {nextTask.dueDate && (
-                  <p className="mt-1 text-xs text-slate-400">
+                  <p className="mt-1 text-xs">
                     Venciment: {new Date(nextTask.dueDate).toLocaleDateString('ca-ES')}
                   </p>
                 )}
                 {nextTask.priority === 'HIGH' && (
-                  <span className="mt-2 inline-block rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
+                  <span className="mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold">
                     URGENT
                   </span>
                 )}
@@ -260,7 +260,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
           action={
             <a
               href={`/admin/tasks/new?customerId=${data.customer.id}`}
-              className="text-xs text-cyan-300 hover:text-cyan-200"
+              className="text-xs"
             >
               + Nova tasca
             </a>
@@ -275,19 +275,19 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
             nextEvents.length > 0 && (
               <div className="space-y-3">
                 {nextEvents.map((ev) => (
-                  <div key={ev.id} className="rounded-lg border border-slate-700/40 bg-slate-800/30 p-2">
+                  <div key={ev.id} className="rounded-lg border p-2">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-slate-100">
+                      <p className="text-sm font-medium">
                         {ev.reference || 'Reserva'}
                       </p>
                       <a
                         href={`/admin/bookings/${ev.id}`}
-                        className="text-[11px] text-cyan-300 hover:text-cyan-200"
+                        className="text-[11px]"
                       >
                         Obrir →
                       </a>
                     </div>
-                    <p className="mt-0.5 text-xs text-slate-400">
+                    <p className="mt-0.5 text-xs">
                       {ev.date && new Date(ev.date).toLocaleDateString('ca-ES', {
                         weekday: 'long',
                         day: 'numeric',
@@ -296,7 +296,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                       {ev.startTime && ` · ${ev.startTime}`}
                     </p>
                     {ev.location && (
-                      <p className="text-[11px] text-slate-500">📍 {ev.location}</p>
+                      <p className="text-[11px]">📍 {ev.location}</p>
                     )}
                   </div>
                 ))}
@@ -306,7 +306,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
           action={
             <a
               href={`/admin/bookings/new?customerId=${data.customer.id}`}
-              className="text-xs text-cyan-300 hover:text-cyan-200"
+              className="text-xs"
             >
               + Nova reserva
             </a>
@@ -315,8 +315,8 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       </div>
 
       {/* Accions ràpides contextuals */}
-      <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
-        <h3 className="text-sm font-semibold text-slate-300">Accions ràpides</h3>
+      <div className="rounded-2xl border p-5">
+        <h3 className="text-sm font-semibold">Accions ràpides</h3>
         <div className="mt-3 flex flex-wrap gap-2">
           {draftProposals > 0 && (
             <QuickAction
@@ -379,8 +379,8 @@ function InfoField({
   if (!editing) {
     return (
       <div>
-        <p className="text-xs text-slate-400">{label}</p>
-        <p className="mt-1 text-sm text-slate-100">{value || '—'}</p>
+        <p className="text-xs">{label}</p>
+        <p className="mt-1 text-sm">{value || '—'}</p>
       </div>
     );
   }
@@ -388,11 +388,11 @@ function InfoField({
   if (type === 'select' && options) {
     return (
       <div>
-        <label className="text-xs text-slate-400">{label}</label>
+        <label className="text-xs">{label}</label>
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-slate-100"
+          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -406,12 +406,12 @@ function InfoField({
 
   return (
     <div>
-      <label className="text-xs text-slate-400">{label}</label>
+      <label className="text-xs">{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-slate-100"
+        className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
       />
     </div>
   );
@@ -438,9 +438,9 @@ function StatCard({
 
   return (
     <div className={`rounded-xl border p-3 ${colorStyles[color]}`}>
-      <p className="text-xs text-slate-400">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-slate-100">{value}</p>
-      {detail && <p className="mt-0.5 text-[11px] text-slate-500">{detail}</p>}
+      <p className="text-xs">{label}</p>
+      <p className="mt-1 text-2xl font-semibold">{value}</p>
+      {detail && <p className="mt-0.5 text-[11px]">{detail}</p>}
     </div>
   );
 }
@@ -459,14 +459,14 @@ function ActionCard({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4">
+    <div className="rounded-2xl border p-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-wider text-slate-400">{title}</p>
+        <p className="text-xs uppercase tracking-wider">{title}</p>
         {action}
       </div>
       <div className="mt-3">
         {isEmpty ? (
-          <p className="text-sm text-slate-500">{emptyText}</p>
+          <p className="text-sm">{emptyText}</p>
         ) : (
           content
         )}

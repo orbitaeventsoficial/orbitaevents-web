@@ -176,7 +176,7 @@ export default function CustomerHeader({
   }, [id, refresh]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-700/70 bg-zinc-900/95 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b backdrop-blur">
       <div className="mx-auto max-w-7xl px-4 py-3 space-y-3">
         {/* Top row: Navigation + Status + Name */}
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -185,7 +185,7 @@ export default function CustomerHeader({
             <div className="flex items-center gap-2 flex-wrap">
               <Link
                 href="/admin/clientes"
-                className="text-xs text-slate-400 hover:text-slate-200 transition-colors"
+                className="text-xs transition-colors"
               >
                 ← Clients
               </Link>
@@ -208,7 +208,7 @@ export default function CustomerHeader({
                       className="fixed inset-0 z-40"
                       onClick={() => setMenuOpen(false)}
                     />
-                    <div className="absolute left-0 top-full z-50 mt-1 rounded-lg border border-slate-700 bg-slate-800 py-1 shadow-xl min-w-[140px]">
+                    <div className="absolute left-0 top-full z-50 mt-1 rounded-lg border py-1 shadow-xl min-w-[140px]">
                       {(['LEAD', 'NEGOTIATION', 'CONFIRMED', 'POSTEVENT', 'LOST'] as HubStatus[]).map((s) => {
                         const style = STATUS_STYLES[s];
                         const isActive = s === status;
@@ -234,22 +234,22 @@ export default function CustomerHeader({
               </div>
 
               {/* Last contact indicator */}
-              <span className="text-[10px] text-slate-500">
+              <span className="text-[10px]">
                 · Últim contacte: {lastContactText}
               </span>
             </div>
 
             {/* Client name */}
-            <h1 className="mt-1 truncate text-xl font-semibold text-slate-100">
+            <h1 className="mt-1 truncate text-xl font-semibold">
               {data.customer.name}
             </h1>
 
             {/* Contact info */}
-            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
+            <div className="flex flex-wrap items-center gap-2 text-sm">
               {data.customer.email && (
                 <a
                   href={`mailto:${data.customer.email}`}
-                  className="hover:text-slate-200 transition-colors"
+                  className="transition-colors"
                 >
                   {data.customer.email}
                 </a>
@@ -259,7 +259,7 @@ export default function CustomerHeader({
                   <span>·</span>
                   <a
                     href={`tel:${data.customer.phone}`}
-                    className="hover:text-slate-200 transition-colors"
+                    className="transition-colors"
                   >
                     {data.customer.phone}
                   </a>
@@ -270,7 +270,7 @@ export default function CustomerHeader({
                   href={`https://wa.me/${data.customer.phone.replace(/\D/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-1 text-emerald-400 hover:text-emerald-300"
+                  className="ml-1"
                   title="Obrir WhatsApp"
                 >
                   💬
@@ -336,8 +336,8 @@ export default function CustomerHeader({
 
         {/* Estat del procés + següent acció */}
         <div className="grid gap-3 lg:grid-cols-2">
-          <div className="rounded-xl border border-slate-700/70 bg-slate-800/50 p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">On està aquest client</p>
+          <div className="rounded-xl border p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider">On està aquest client</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {stageOrder.map((stage, idx) => {
                 const isCurrent = stage === status;
@@ -360,12 +360,12 @@ export default function CustomerHeader({
             </div>
           </div>
 
-          <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-cyan-300">Següent millor acció</p>
-            <p className="mt-1 text-sm text-slate-100">{nextAction.description}</p>
+          <div className="rounded-xl border p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider">Següent millor acció</p>
+            <p className="mt-1 text-sm">{nextAction.description}</p>
             <Link
               href={nextAction.href}
-              className="mt-2 inline-flex rounded-lg border border-cyan-500/40 bg-cyan-500/20 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/30"
+              className="mt-2 inline-flex rounded-lg border px-3 py-1.5 text-xs font-semibold"
             >
               {nextAction.label}
             </Link>
@@ -410,7 +410,7 @@ export default function CustomerHeader({
           <select
             value={tab}
             onChange={(e) => setTab(e.target.value as TabKey)}
-            className="w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2.5 text-sm text-slate-100 appearance-none"
+            className="w-full rounded-lg border px-3 py-2.5 text-sm appearance-none"
           >
             {TABS.map((item) => {
               const badge = item.badge?.(data);
@@ -478,7 +478,7 @@ function KpiChip({
           : 'border-slate-700/70 bg-slate-900/60'
       }`}
     >
-      <p className="text-[11px] uppercase tracking-wider text-slate-400">{label}</p>
+      <p className="text-[11px] uppercase tracking-wider">{label}</p>
       <p
         className={`mt-1 text-sm font-semibold ${
           highlight ? 'text-cyan-200' : 'text-slate-100'

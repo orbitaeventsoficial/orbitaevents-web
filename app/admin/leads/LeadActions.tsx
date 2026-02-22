@@ -96,7 +96,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
         value={currentStatus}
         onChange={(e) => handleStatusChange(e.target.value as LeadActionsProps['currentStatus'])}
         disabled={statusUpdating}
-        className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-2 py-1.5 text-xs text-slate-200"
+        className="rounded-lg border px-2 py-1.5 text-xs"
         title="Canviar estat"
       >
         <option value="NEW">Entrada nova</option>
@@ -110,7 +110,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
         value={currentPriority}
         onChange={(e) => handlePriorityChange(e.target.value as LeadActionsProps['currentPriority'])}
         disabled={priorityUpdating}
-        className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-2 py-1.5 text-xs text-slate-200"
+        className="rounded-lg border px-2 py-1.5 text-xs"
         title="Canviar prioritat"
       >
         <option value="LOW">Baixa</option>
@@ -124,7 +124,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
             `Hola ${leadName}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`
           )}`}
           target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center rounded-lg bg-emerald-500/20 px-3 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/30 transition-colors border border-emerald-500/30"
+          className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition-colors border"
           title="Envia per WhatsApp"
         >
           💬 WA
@@ -132,7 +132,7 @@ export default function LeadActions({ leadId, leadName, phone, hasBooking, curre
       )}
       <Link
         href={`/admin/leads/${leadId}`}
-        className="inline-flex items-center rounded-lg bg-slate-700/50 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-600/50 border border-slate-600/50 transition-colors"
+        className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors"
       >
         Veure
       </Link>

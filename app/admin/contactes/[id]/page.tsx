@@ -60,21 +60,21 @@ function CustomerHubSkeleton() {
   return (
     <div className="animate-pulse space-y-4">
       {/* Header skeleton */}
-      <header className="sticky top-0 z-30 border-b border-slate-700/70 bg-zinc-900/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 py-3 space-y-3">
           {/* Top row */}
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className="h-4 w-16 rounded bg-slate-700/50" />
-                <div className="h-5 w-20 rounded-full bg-slate-700/50" />
+                <div className="h-4 w-16 rounded" />
+                <div className="h-5 w-20 rounded-full" />
               </div>
-              <div className="h-7 w-48 rounded bg-slate-700/50" />
-              <div className="h-4 w-64 rounded bg-slate-700/30" />
+              <div className="h-7 w-48 rounded" />
+              <div className="h-4 w-64 rounded" />
             </div>
             <div className="flex gap-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-9 w-24 rounded-lg bg-slate-700/50" />
+                <div key={i} className="h-9 w-24 rounded-lg" />
               ))}
             </div>
           </div>
@@ -82,14 +82,14 @@ function CustomerHubSkeleton() {
           {/* KPIs */}
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-16 rounded-xl bg-slate-800/50" />
+              <div key={i} className="h-16 rounded-xl" />
             ))}
           </div>
 
           {/* Tabs */}
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-9 w-28 rounded-lg bg-slate-800/50" />
+              <div key={i} className="h-9 w-28 rounded-lg" />
             ))}
           </div>
         </div>
@@ -100,23 +100,23 @@ function CustomerHubSkeleton() {
         {/* Main panel */}
         <div className="lg:col-span-8 space-y-4">
           {/* Section 1 */}
-          <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
-            <div className="h-6 w-1/3 rounded bg-slate-700/50" />
-            <div className="mt-2 h-4 w-2/3 rounded bg-slate-700/30" />
+          <div className="rounded-2xl border p-5">
+            <div className="h-6 w-1/3 rounded" />
+            <div className="mt-2 h-4 w-2/3 rounded" />
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-14 rounded-lg bg-slate-800/50" />
+                <div key={i} className="h-14 rounded-lg" />
               ))}
             </div>
           </div>
 
           {/* Section 2 */}
-          <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
-            <div className="h-6 w-1/4 rounded bg-slate-700/50" />
-            <div className="mt-2 h-4 w-1/2 rounded bg-slate-700/30" />
+          <div className="rounded-2xl border p-5">
+            <div className="h-6 w-1/4 rounded" />
+            <div className="mt-2 h-4 w-1/2 rounded" />
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-24 rounded-xl bg-slate-800/50" />
+                <div key={i} className="h-24 rounded-xl" />
               ))}
             </div>
           </div>
@@ -124,23 +124,23 @@ function CustomerHubSkeleton() {
           {/* Section 3 */}
           <div className="grid gap-4 sm:grid-cols-2">
             {[1, 2].map((i) => (
-              <div key={i} className="h-32 rounded-2xl border border-slate-700/60 bg-slate-900/70" />
+              <div key={i} className="h-32 rounded-2xl border" />
             ))}
           </div>
         </div>
 
         {/* Timeline */}
         <div className="lg:col-span-4">
-          <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4">
-            <div className="h-5 w-1/2 rounded bg-slate-700/50" />
+          <div className="rounded-2xl border p-4">
+            <div className="h-5 w-1/2 rounded" />
             <div className="mt-3 flex gap-1">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-6 w-16 rounded-full bg-slate-800/50" />
+                <div key={i} className="h-6 w-16 rounded-full" />
               ))}
             </div>
             <div className="mt-4 space-y-3">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-16 rounded-lg bg-slate-800/50" />
+                <div key={i} className="h-16 rounded-lg" />
               ))}
             </div>
           </div>

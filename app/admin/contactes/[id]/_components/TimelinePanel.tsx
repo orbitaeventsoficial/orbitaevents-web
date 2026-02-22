@@ -134,14 +134,14 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
   }, []);
 
   return (
-    <aside className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4 lg:sticky lg:top-[220px]">
+    <aside className="rounded-2xl border p-4 lg:sticky lg:top-[220px]">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">
+          <h2 className="text-sm font-semibold uppercase tracking-wide">
             Cronologia
           </h2>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px]">
             {filteredTimeline.length} esdeveniments
           </p>
         </div>
@@ -173,8 +173,8 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
           displayedGroups.map((group) => (
             <div key={group.date}>
               {/* Day header */}
-              <div className="sticky top-0 z-10 bg-slate-900/95 py-1">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              <div className="sticky top-0 z-10 py-1">
+                <p className="text-[10px] font-semibold uppercase tracking-wider">
                   {group.label}
                 </p>
               </div>
@@ -195,7 +195,7 @@ export default function TimelinePanel({ timeline }: { timeline: TimelineEventDTO
         <button
           type="button"
           onClick={toggleExpand}
-          className="mt-3 w-full rounded-lg border border-slate-700 bg-slate-800/50 py-2 text-xs text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
+          className="mt-3 w-full rounded-lg border py-2 text-xs transition-colors"
         >
           {expanded ? 'Mostra menys ↑' : `Mostra més (${groupedTimeline.length - 5} dies més) ↓`}
         </button>
@@ -219,10 +219,10 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
       <div className="flex items-start gap-2">
         <span className="text-sm">{icon}</span>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-slate-200 truncate">
+          <p className="text-xs font-medium truncate">
             {event.title}
           </p>
-          <p className="mt-0.5 text-[10px] text-slate-500">
+          <p className="mt-0.5 text-[10px]">
             {formatTime(event.at)}
           </p>
         </div>
@@ -231,7 +231,7 @@ function EventCard({ event }: { event: TimelineEventDTO }) {
       {event.link && (
         <Link
           href={event.link.href}
-          className="mt-1.5 inline-block text-[10px] text-cyan-400 hover:text-cyan-300 transition-colors"
+          className="mt-1.5 inline-block text-[10px] transition-colors"
         >
           {event.link.label} →
         </Link>
@@ -250,8 +250,8 @@ function EmptyState({ filter }: { filter: TimelineFilter }) {
   };
 
   return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-800/30 p-4 text-center">
-      <p className="text-sm text-slate-500">{messages[filter]}</p>
+    <div className="rounded-lg border p-4 text-center">
+      <p className="text-sm">{messages[filter]}</p>
     </div>
   );
 }

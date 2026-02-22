@@ -190,7 +190,7 @@ export default function EditBlogPostPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[320px]" role="status" aria-live="polite">
-        <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -199,13 +199,13 @@ export default function EditBlogPostPage() {
     <div className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">Editar post</h1>
-          <p className="mt-1 text-sm text-slate-400">Actualitza contingut, SEO i estat de publicació</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Editar post</h1>
+          <p className="mt-1 text-sm">Actualitza contingut, SEO i estat de publicació</p>
         </div>
         <button
           type="button"
           onClick={() => router.push('/admin/blog')}
-          className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm text-slate-200 hover:bg-slate-600/50 transition-colors"
+          className="rounded-xl border px-4 py-2 text-sm transition-colors"
         >
           Tornar
         </button>
@@ -226,62 +226,62 @@ export default function EditBlogPostPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6">
-          <h2 className="text-lg font-semibold text-slate-100 mb-4">Configuració</h2>
+        <section className="rounded-2xl border p-6">
+          <h2 className="text-lg font-semibold mb-4">Configuració</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="block text-sm text-slate-400 mb-1">Slug</label>
+              <label className="block text-sm mb-1">Slug</label>
               <input
                 value={formData.slug}
                 onChange={(e) => setFormData((prev) => ({ ...prev, slug: e.target.value }))}
                 required
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100"
+                className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Autor</label>
+              <label className="block text-sm mb-1">Autor</label>
               <input
                 value={formData.author}
                 onChange={(e) => setFormData((prev) => ({ ...prev, author: e.target.value }))}
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100"
+                className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Categoria</label>
+              <label className="block text-sm mb-1">Categoria</label>
               <input
                 value={formData.category}
                 onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100"
+                className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm text-slate-400 mb-1">Etiquetes (separades per comes)</label>
+              <label className="block text-sm mb-1">Etiquetes (separades per comes)</label>
               <input
                 value={formData.tags}
                 onChange={(e) => setFormData((prev) => ({ ...prev, tags: e.target.value }))}
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100"
+                className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm text-slate-400 mb-1">URL imatge destacada</label>
+              <label className="block text-sm mb-1">URL imatge destacada</label>
               <input
                 value={formData.featuredImage}
                 onChange={(e) => setFormData((prev) => ({ ...prev, featuredImage: e.target.value }))}
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100"
+                className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Temps lectura (min)</label>
+              <label className="block text-sm mb-1">Temps lectura (min)</label>
               <input
                 type="number"
                 min={1}
                 value={formData.readingTime}
                 onChange={(e) => setFormData((prev) => ({ ...prev, readingTime: Number(e.target.value || 5) }))}
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100"
+                className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div className="flex items-end">
-              <label className="inline-flex items-center gap-2 text-sm text-slate-200">
+              <label className="inline-flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
                   checked={formData.isPublished}
@@ -293,9 +293,9 @@ export default function EditBlogPostPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6">
+        <section className="rounded-2xl border p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-100">Contingut</h2>
+            <h2 className="text-lg font-semibold">Contingut</h2>
             <div className="flex gap-2">
               <button
                 type="button"
@@ -324,49 +324,49 @@ export default function EditBlogPostPage() {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Títol</label>
+              <label className="block text-sm mb-1">Títol</label>
               <input
                 value={formData.translations[activeLocale].title}
                 onChange={(e) => updateTranslation(activeLocale, 'title', e.target.value)}
                 required
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100"
+                className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Extracte</label>
+              <label className="block text-sm mb-1">Extracte</label>
               <textarea
                 value={formData.translations[activeLocale].excerpt}
                 onChange={(e) => updateTranslation(activeLocale, 'excerpt', e.target.value)}
                 rows={3}
                 required
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100"
+                className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Contingut</label>
+              <label className="block text-sm mb-1">Contingut</label>
               <textarea
                 value={formData.translations[activeLocale].content}
                 onChange={(e) => updateTranslation(activeLocale, 'content', e.target.value)}
                 rows={12}
                 required
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100"
+                className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Meta títol (SEO)</label>
+              <label className="block text-sm mb-1">Meta títol (SEO)</label>
               <input
                 value={formData.translations[activeLocale].metaTitle}
                 onChange={(e) => updateTranslation(activeLocale, 'metaTitle', e.target.value)}
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100"
+                className="w-full rounded-xl border px-4 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Meta descripció (SEO)</label>
+              <label className="block text-sm mb-1">Meta descripció (SEO)</label>
               <textarea
                 value={formData.translations[activeLocale].metaDescription}
                 onChange={(e) => updateTranslation(activeLocale, 'metaDescription', e.target.value)}
                 rows={2}
-                className="w-full rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100"
+                className="w-full rounded-xl border px-4 py-2"
               />
             </div>
           </div>
@@ -376,14 +376,14 @@ export default function EditBlogPostPage() {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-2.5 text-white font-medium disabled:opacity-50"
+            className="rounded-xl px-6 py-2.5 text-white font-medium disabled:opacity-50"
           >
             {saving ? 'Desant...' : 'Desar canvis'}
           </button>
           <button
             type="button"
             onClick={() => router.push('/admin/blog')}
-            className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-6 py-2.5 text-slate-200"
+            className="rounded-xl border px-6 py-2.5"
           >
             Cancel·lar
           </button>

@@ -45,12 +45,12 @@ export default function SendPostEventButton({ bookingId }: { bookingId: string }
         onClick={handleClick}
         disabled={loading}
         aria-busy={loading}
-        className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium rounded-xl shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        className="px-4 py-2 text-white text-sm font-medium rounded-xl shadow-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {loading ? 'Enviant...' : 'Envia ara'}
       </button>
       {error && (
-        <span className="text-xs text-rose-400" role="alert">
+        <span className="text-xs" role="alert">
           {error}
         </span>
       )}

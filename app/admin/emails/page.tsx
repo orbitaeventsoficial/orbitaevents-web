@@ -176,16 +176,16 @@ export default async function EmailsAdminPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
+          <h1 className="text-2xl font-semibold tracking-tight">
             📧 Emails Automàtics
           </h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm">
             Control i configuració del sistema d&apos;emails automàtics
           </p>
         </div>
         <Link
           href="/admin"
-          className="inline-flex items-center rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
+          className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium transition-colors"
         >
           ← Tornar al panell
         </Link>
@@ -195,8 +195,8 @@ export default async function EmailsAdminPage() {
       <EmailStatsCards stats={stats} />
 
       {stats.hasQueryErrors && (
-        <section className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4">
-          <p className="text-sm text-amber-200">
+        <section className="rounded-2xl border p-4">
+          <p className="text-sm">
             ⚠️ Algunes dades no s&apos;han pogut carregar. El panell continua operatiu, però cal revisar migracions/estructura de BD.
           </p>
         </section>
@@ -204,33 +204,33 @@ export default async function EmailsAdminPage() {
 
       {/* Logs / Automatitzacions */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 p-5">
-          <p className="text-xs uppercase text-slate-400">Emails 24h</p>
-          <p className="mt-2 text-2xl font-semibold text-slate-100">{stats.recentEmailActions}</p>
-          <p className="text-xs text-slate-500 mt-1">Enviats automàticament</p>
+        <div className="rounded-2xl border p-5">
+          <p className="text-xs uppercase">Emails 24h</p>
+          <p className="mt-2 text-2xl font-semibold">{stats.recentEmailActions}</p>
+          <p className="text-xs mt-1">Enviats automàticament</p>
         </div>
-        <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 p-5">
-          <p className="text-xs uppercase text-slate-400">Testimonis 7d</p>
-          <p className="mt-2 text-2xl font-semibold text-slate-100">{stats.recentTestimonials}</p>
-          <p className="text-xs text-slate-500 mt-1">Respostes rebudes</p>
+        <div className="rounded-2xl border p-5">
+          <p className="text-xs uppercase">Testimonis 7d</p>
+          <p className="mt-2 text-2xl font-semibold">{stats.recentTestimonials}</p>
+          <p className="text-xs mt-1">Respostes rebudes</p>
         </div>
-        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-5">
-          <p className="text-xs uppercase text-slate-400">Post-event pendents</p>
-          <p className="mt-2 text-2xl font-semibold text-slate-100">{stats.postEventPending}</p>
-          <p className="text-xs text-slate-500 mt-1">Per enviar</p>
+        <div className="rounded-2xl border p-5">
+          <p className="text-xs uppercase">Post-event pendents</p>
+          <p className="mt-2 text-2xl font-semibold">{stats.postEventPending}</p>
+          <p className="text-xs mt-1">Per enviar</p>
         </div>
-        <div className="rounded-2xl border border-slate-600/50 bg-slate-800/60 p-5">
-          <p className="text-xs uppercase text-slate-400">Últim cron</p>
-          <p className="mt-2 text-sm text-slate-300">
+        <div className="rounded-2xl border p-5">
+          <p className="text-xs uppercase">Últim cron</p>
+          <p className="mt-2 text-sm">
             {stats.cronLastRun
               ? new Date(stats.cronLastRun).toLocaleString('ca-ES', { dateStyle: 'medium', timeStyle: 'short' })
               : 'Mai executat'}
           </p>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs mt-1">
             Estat: {stats.cronLastStatus || '—'}
           </p>
           {stats.cronLastMessage && (
-            <p className="text-[10px] text-rose-300 mt-1">
+            <p className="text-[10px] mt-1">
               {stats.cronLastMessage}
             </p>
           )}
@@ -245,34 +245,34 @@ export default async function EmailsAdminPage() {
         {/* Columna Principal (2/3) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Pending Post-Event Emails */}
-          <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-700/50 bg-amber-500/10 flex items-center justify-between">
+          <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
+            <div className="px-6 py-4 border-b flex items-center justify-between">
               <div>
-                <h2 className="font-semibold text-slate-100">
+                <h2 className="font-semibold">
                   ⏳ Emails Post-Event Pendents
                 </h2>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs mt-1">
                   Events completats fa 1-7 dies sense email enviat
                 </p>
               </div>
-              <span className="bg-amber-500/20 text-amber-300 text-sm font-bold px-3 py-1 rounded-full">
+              <span className="text-sm font-bold px-3 py-1 rounded-full">
                 {pendingBookings.length}
               </span>
             </div>
 
             {pendingBookings.length === 0 ? (
-              <div className="p-8 text-center text-slate-400">
+              <div className="p-8 text-center">
                 <span className="text-4xl">✅</span>
                 <p className="mt-2">Tots els emails post-event estan enviats!</p>
               </div>
             ) : (
               <div className="divide-y divide-slate-700/30">
                 {pendingBookings.map((booking) => (
-                  <div key={booking.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-700/30 transition-colors">
+                  <div key={booking.id} className="px-6 py-4 flex items-center justify-between transition-colors">
                     <div>
-                      <p className="font-medium text-slate-100">{booking.clientName}</p>
-                      <p className="text-sm text-slate-400">{booking.clientEmail}</p>
-                      <p className="text-xs text-slate-500 mt-1">
+                      <p className="font-medium">{booking.clientName}</p>
+                      <p className="text-sm">{booking.clientEmail}</p>
+                      <p className="text-xs mt-1">
                         Event: {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · Ref: {booking.reference}
                       </p>
                     </div>
@@ -302,20 +302,20 @@ export default async function EmailsAdminPage() {
           <ManualActionsPanel />
 
           {/* Google Reviews Link */}
-          <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
-            <h3 className="font-semibold text-slate-100 mb-4">⭐ Google Reviews</h3>
-            <p className="text-sm text-slate-400 mb-4">
+          <section className="rounded-2xl border backdrop-blur-sm p-6">
+            <h3 className="font-semibold mb-4">⭐ Google Reviews</h3>
+            <p className="text-sm mb-4">
               Enllaç directe per als clients que vulguin deixar ressenya a Google:
             </p>
-            <div className="bg-slate-700/30 rounded-xl p-3 break-all">
-              <code className="text-xs text-slate-300">
+            <div className="rounded-xl p-3 break-all">
+              <code className="text-xs">
                 https://g.page/r/CXcgbvANsXSzEBI/review
               </code>
             </div>
             <a
               href="https://g.page/r/CXcgbvANsXSzEBI/review"
               target="_blank" rel="noopener noreferrer"
-              className="mt-4 block w-full text-center px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors text-sm font-medium"
+              className="mt-4 block w-full text-center px-4 py-2 rounded-xl text-white shadow-lg transition-colors text-sm font-medium"
             >
               🔗 Obrir enllaç Google
             </a>

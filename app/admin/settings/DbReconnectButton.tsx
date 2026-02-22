@@ -35,7 +35,7 @@ export default function DbReconnectButton() {
         type="button"
         onClick={reconnect}
         disabled={loading}
-        className="rounded-xl border border-amber-500/40 bg-amber-500/15 px-4 py-2 text-sm font-semibold text-amber-200 hover:bg-amber-500/20 disabled:opacity-60"
+        className="rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60"
       >
         {loading ? 'Reiniciant connexio...' : 'Reiniciar connexio BBDD'}
       </button>

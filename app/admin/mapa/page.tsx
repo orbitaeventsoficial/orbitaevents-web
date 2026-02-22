@@ -97,17 +97,17 @@ const SECTIONS: MapSection[] = [
 export default function AdminMapaPage() {
   return (
     <div className="space-y-6">
-      <header className="rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/12 to-cyan-500/10 p-5">
-        <h1 className="text-2xl font-bold text-slate-100">🧭 Mapa Admin</h1>
-        <p className="mt-2 text-sm text-slate-300">
+      <header className="rounded-2xl border p-5">
+        <h1 className="text-2xl font-bold">🧭 Mapa Admin</h1>
+        <p className="mt-2 text-sm">
           Accés directe a totes les pantalles útils del panell. Cap secció queda orfe.
         </p>
       </header>
 
       <div className="grid gap-4 lg:grid-cols-2">
         {SECTIONS.map((section) => (
-          <section key={section.title} className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4">
-            <h2 className="mb-3 text-lg font-semibold text-slate-100">
+          <section key={section.title} className="rounded-2xl border p-4">
+            <h2 className="mb-3 text-lg font-semibold">
               {section.icon} {section.title}
             </h2>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -115,7 +115,7 @@ export default function AdminMapaPage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="rounded-xl border border-slate-700/70 bg-slate-800/70 px-3 py-2 text-sm font-medium text-slate-200 transition-colors hover:border-amber-400/40 hover:bg-slate-700/70"
+                  className="rounded-xl border px-3 py-2 text-sm font-medium transition-colors"
                 >
                   {item.label}
                 </Link>

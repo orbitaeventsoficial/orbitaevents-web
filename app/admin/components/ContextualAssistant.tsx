@@ -276,13 +276,13 @@ export function ContextualAssistant() {
 
       {/* Panel de consells */}
       {isOpen && (
-        <div className="fixed bottom-20 right-4 z-50 w-80 max-h-[70vh] overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900/98 shadow-2xl backdrop-blur-xl">
+        <div className="fixed bottom-20 right-4 z-50 w-80 max-h-[70vh] overflow-y-auto rounded-2xl border shadow-2xl backdrop-blur-xl">
           {/* Header */}
-          <div className="sticky top-0 border-b border-slate-700/50 bg-slate-900 px-4 py-3">
-            <h3 className="text-sm font-semibold text-slate-200">
+          <div className="sticky top-0 border-b px-4 py-3">
+            <h3 className="text-sm font-semibold">
               💡 Consells: {context.title}
             </h3>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px]">
               Recomanacions per aquesta secció
             </p>
           </div>
@@ -292,18 +292,18 @@ export function ContextualAssistant() {
             {visibleTips.map((tip, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-slate-700/50 bg-slate-800/50 p-3"
+                className="rounded-xl border p-3"
               >
                 <div className="flex items-start gap-3">
                   <span className="text-lg">{tip.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-200">{tip.title}</p>
-                    <p className="mt-1 text-xs text-slate-400">{tip.description}</p>
+                    <p className="text-sm font-medium">{tip.title}</p>
+                    <p className="mt-1 text-xs">{tip.description}</p>
                     
                     {tip.action && (
                       <a
                         href={tip.action.href}
-                        className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-amber-400 hover:text-amber-300"
+                        className="mt-2 inline-flex items-center gap-1 text-xs font-medium"
                       >
                         {tip.action.label} →
                       </a>
@@ -312,7 +312,7 @@ export function ContextualAssistant() {
                   <button
                     type="button"
                     onClick={() => dismissTip(tip.title)}
-                    className="text-slate-500 hover:text-slate-300"
+                    className=""
                     title="No mostrar més"
                   >
                     ✕
@@ -324,19 +324,19 @@ export function ContextualAssistant() {
 
           {/* Shortcuts */}
           {context.shortcuts.length > 0 && (
-            <div className="border-t border-slate-700/50 px-4 py-3">
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            <div className="border-t px-4 py-3">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider">
                 Dreceres de teclat
               </p>
               <div className="space-y-1.5">
                 {context.shortcuts.map((shortcut, i) => (
                   <div key={i} className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400">{shortcut.description}</span>
+                    <span className="">{shortcut.description}</span>
                     <div className="flex gap-1">
                       {shortcut.keys.map((key, j) => (
                         <kbd
                           key={j}
-                          className="rounded border border-slate-700 bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-300"
+                          className="rounded border px-1.5 py-0.5 font-mono text-[10px]"
                         >
                           {key}
                         </kbd>
@@ -349,14 +349,14 @@ export function ContextualAssistant() {
           )}
 
           {/* Footer */}
-          <div className="border-t border-slate-700/50 px-4 py-2">
+          <div className="border-t px-4 py-2">
             <button
               type="button"
               onClick={() => {
                 localStorage.removeItem('admin.dismissed.tips');
                 setDismissed([]);
               }}
-              className="text-[10px] text-slate-500 hover:text-slate-300"
+              className="text-[10px]"
             >
               Restaurar tots els consells
             </button>
@@ -450,29 +450,29 @@ export function OnboardingChecklist() {
   if (dismissed || pendingItems.length === 0) return null;
 
   return (
-    <div className="mb-6 rounded-2xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-orange-500/5 p-4">
+    <div className="mb-6 rounded-2xl border p-4">
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-amber-200">
+          <h3 className="text-sm font-semibold">
             🚀 Comença amb Òrbita Admin
           </h3>
-          <p className="mt-1 text-xs text-amber-200/60">
+          <p className="mt-1 text-xs">
             {progress}% completat · {pendingItems.length} passos pendents
           </p>
         </div>
         <button
           type="button"
           onClick={dismiss}
-          className="text-amber-200/50 hover:text-amber-200"
+          className=""
         >
           ✕
         </button>
       </div>
 
       {/* Progress bar */}
-      <div className="mt-3 h-1.5 rounded-full bg-amber-950/50">
+      <div className="mt-3 h-1.5 rounded-full">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all"
+          className="h-full rounded-full transition-all"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -483,19 +483,19 @@ export function OnboardingChecklist() {
           <a
             href={pendingItems[0].href}
             onClick={() => markComplete(pendingItems[0].id)}
-            className="flex-1 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 transition-all hover:bg-amber-500/20"
+            className="flex-1 rounded-xl border p-3 transition-all"
           >
-            <p className="text-sm font-medium text-amber-100">
+            <p className="text-sm font-medium">
               {pendingItems[0].title}
             </p>
-            <p className="mt-0.5 text-xs text-amber-200/60">
+            <p className="mt-0.5 text-xs">
               {pendingItems[0].description}
             </p>
           </a>
           <button
             type="button"
             onClick={() => markComplete(pendingItems[0].id)}
-            className="rounded-lg border border-amber-500/30 bg-amber-500/20 px-3 py-2 text-xs font-medium text-amber-200 hover:bg-amber-500/30"
+            className="rounded-lg border px-3 py-2 text-xs font-medium"
           >
             Fet ✓
           </button>

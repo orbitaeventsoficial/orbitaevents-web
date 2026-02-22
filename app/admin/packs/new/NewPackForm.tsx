@@ -49,10 +49,10 @@ export default function NewPackForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-6">
+    <form onSubmit={handleSubmit} className="rounded-2xl border p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm text-slate-300">Slug</label>
+          <label className="mb-1 block text-sm">Slug</label>
           <input
             value={form.slug}
             onChange={(e) => setForm({ ...form, slug: e.target.value })}
@@ -62,7 +62,7 @@ export default function NewPackForm() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm text-slate-300">Nom (CA)</label>
+          <label className="mb-1 block text-sm">Nom (CA)</label>
           <input
             value={form.nameCa}
             onChange={(e) => setForm({ ...form, nameCa: e.target.value })}
@@ -71,7 +71,7 @@ export default function NewPackForm() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm text-slate-300">Servei</label>
+          <label className="mb-1 block text-sm">Servei</label>
           <select
             value={form.service}
             onChange={(e) => setForm({ ...form, service: e.target.value })}
@@ -85,7 +85,7 @@ export default function NewPackForm() {
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-sm text-slate-300">Preu (€)</label>
+          <label className="mb-1 block text-sm">Preu (€)</label>
           <input
             type="number"
             value={form.price}
@@ -96,7 +96,7 @@ export default function NewPackForm() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm text-slate-300">Hores DJ</label>
+          <label className="mb-1 block text-sm">Hores DJ</label>
           <input
             type="number"
             value={form.djHours}
@@ -108,17 +108,17 @@ export default function NewPackForm() {
         </div>
       </div>
 
-      {error && <p className="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</p>}
+      {error && <p className="mt-3 rounded-lg border px-3 py-2 text-sm">{error}</p>}
 
       <div className="mt-5 flex gap-3">
         <button
           type="submit"
           disabled={loading}
-          className="rounded-xl border border-amber-500/40 bg-amber-500/20 px-4 py-2 text-sm font-semibold text-amber-100 disabled:opacity-60"
+          className="rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-60"
         >
           {loading ? 'Creant...' : 'Crear pack'}
         </button>
-        <Link href="/admin/packs" className="rounded-xl border border-slate-600/60 bg-slate-800/70 px-4 py-2 text-sm text-slate-200">
+        <Link href="/admin/packs" className="rounded-xl border px-4 py-2 text-sm">
           Cancel·lar
         </Link>
       </div>

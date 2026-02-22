@@ -56,9 +56,9 @@ export default async function IntegrationsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-100">Centre d&apos;integracions</h1>
-        <p className="mt-1 text-sm text-slate-300">
+      <header className="rounded-2xl border p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold">Centre d&apos;integracions</h1>
+        <p className="mt-1 text-sm">
           Sincronitza CRM, emails i calendari amb Google i mòbil.
         </p>
       </header>
@@ -75,119 +75,119 @@ export default async function IntegrationsPage() {
       />
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <article className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
+        <article className="rounded-2xl border p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-100">Google Business</h2>
+            <h2 className="text-lg font-semibold">Google Business</h2>
             <BoolBadge ok={Boolean(map['integrations.google.refreshToken'])} />
           </div>
-          <p className="mt-2 text-sm text-slate-300">
+          <p className="mt-2 text-sm">
             Connexió per dades de Google Reviews i ecosistema Google.
           </p>
           <a
             href="/api/google/oauth/start"
-            className="mt-4 inline-flex rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700"
+            className="mt-4 inline-flex rounded-lg border px-4 py-2 text-sm font-semibold"
           >
             Connectar Google
           </a>
         </article>
 
-        <article className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
+        <article className="rounded-2xl border p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-100">Google Ads (OAuth)</h2>
+            <h2 className="text-lg font-semibold">Google Ads (OAuth)</h2>
             <BoolBadge ok={Boolean(map['integrations.googleAds.refreshToken'])} />
           </div>
-          <p className="mt-2 text-sm text-slate-300">
+          <p className="mt-2 text-sm">
             Connexió OAuth per carregar dades de campanyes i conversions a Analítica.
           </p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs">
             Connectat: {map['integrations.googleAds.connectedAt'] ? new Date(map['integrations.googleAds.connectedAt']).toLocaleString('ca-ES') : '-'}
           </p>
           <a
             href="/api/google-ads/oauth/start"
-            className="mt-4 inline-flex rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700"
+            className="mt-4 inline-flex rounded-lg border px-4 py-2 text-sm font-semibold"
           >
             {map['integrations.googleAds.refreshToken'] ? 'Reconnectar Google Ads' : 'Connectar Google Ads'}
           </a>
         </article>
 
-        <article className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
+        <article className="rounded-2xl border p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-100">Gmail (OAuth)</h2>
+            <h2 className="text-lg font-semibold">Gmail (OAuth)</h2>
             <BoolBadge ok={Boolean(map['integrations.gmail.refreshToken'])} />
           </div>
-          <p className="mt-2 text-sm text-slate-300">
+          <p className="mt-2 text-sm">
             Lectura i operativa de bústia Gmail des de l&apos;admin.
           </p>
-          <p className="mt-1 text-xs text-slate-400">Compte: {map['integrations.gmail.email'] || '-'}</p>
+          <p className="mt-1 text-xs">Compte: {map['integrations.gmail.email'] || '-'}</p>
           <a
             href="/api/gmail/oauth/start"
-            className="mt-4 inline-flex rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700"
+            className="mt-4 inline-flex rounded-lg border px-4 py-2 text-sm font-semibold"
           >
             Connectar Gmail
           </a>
         </article>
 
-        <article className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
+        <article className="rounded-2xl border p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-100">Safata IMAP</h2>
+            <h2 className="text-lg font-semibold">Safata IMAP</h2>
             <BoolBadge ok={imapConfigured} />
           </div>
-          <p className="mt-2 text-sm text-slate-300">
+          <p className="mt-2 text-sm">
             Captura i importació d&apos;emails a leads CRM.
           </p>
           {!imapConfigured && (
-            <p className="mt-1 text-xs text-amber-300">
+            <p className="mt-1 text-xs">
               Falten: {missingImapVars.join(', ')}
             </p>
           )}
           <Link
             href="/admin/inbox/settings"
-            className="mt-4 inline-flex rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700"
+            className="mt-4 inline-flex rounded-lg border px-4 py-2 text-sm font-semibold"
           >
             Configurar IMAP
           </Link>
         </article>
 
-        <article className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
+        <article className="rounded-2xl border p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-100">Sincronització Google Calendar</h2>
+            <h2 className="text-lg font-semibold">Sincronització Google Calendar</h2>
             <BoolBadge ok={googleCalendarConnected} />
           </div>
-          <p className="mt-2 text-sm text-slate-300">
+          <p className="mt-2 text-sm">
             Sincronització automàtica de reserves confirmades/preparació i baixa automàtica en cancel·lar.
           </p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs">
             Calendari: {map['integrations.googleCalendar.calendarId'] || process.env.GOOGLE_CALENDAR_ID || 'primary'}
             {' '}· Compte: {map['integrations.googleCalendar.connectedEmail'] || '-'}
           </p>
           {!calendarIdConfigured && (
-            <p className="mt-1 text-xs text-amber-300">
+            <p className="mt-1 text-xs">
               Falta calendarId (setting `integrations.googleCalendar.calendarId` o env `GOOGLE_CALENDAR_ID`)
             </p>
           )}
           <a
             href="/api/google-calendar/oauth/start"
-            className="mt-4 inline-flex rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-700"
+            className="mt-4 inline-flex rounded-lg border px-4 py-2 text-sm font-semibold"
           >
             {googleCalendarConnected ? 'Reconnectar Google Calendar' : 'Connectar Google Calendar'}
           </a>
         </article>
 
-        <article className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
+        <article className="rounded-2xl border p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-100">Feed de calendari (ICS)</h2>
+            <h2 className="text-lg font-semibold">Feed de calendari (ICS)</h2>
             <BoolBadge ok={Boolean(calendarFeedToken)} />
           </div>
-          <p className="mt-2 text-sm text-slate-300">
+          <p className="mt-2 text-sm">
             Subscripció del calendari de reserves a Google Calendar, iPhone o Android.
           </p>
           <CalendarTokenManager baseUrl={baseUrl} initialToken={calendarFeedToken || null} />
         </article>
       </section>
 
-      <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-100">Checklist tècnic</h2>
-        <div className="mt-3 grid gap-2 text-xs text-slate-300 sm:grid-cols-2">
+      <section className="rounded-2xl border p-5 shadow-sm">
+        <h2 className="text-lg font-semibold">Checklist tècnic</h2>
+        <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
           <p>• Gmail token: {map['integrations.gmail.refreshToken'] ? 'OK' : 'Pendent'}</p>
           <p>• Google token: {map['integrations.google.refreshToken'] ? 'OK' : 'Pendent'}</p>
           <p>• Google Ads token: {map['integrations.googleAds.refreshToken'] ? 'OK' : 'Pendent'}</p>

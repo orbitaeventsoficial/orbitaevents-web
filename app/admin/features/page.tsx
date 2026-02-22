@@ -59,7 +59,7 @@ export default function FeaturesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
-        <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -69,44 +69,44 @@ export default function FeaturesPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
+        <h1 className="text-2xl font-semibold tracking-tight">
           🎛️ Activació de funcionalitats
         </h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm">
           Activa o desactiva funcionalitats del web
         </p>
       </header>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-blue-600/5 backdrop-blur-sm p-4">
-          <div className="text-xs font-medium text-cyan-400 uppercase">Total funcionalitats</div>
-          <div className="text-3xl font-bold text-slate-100 mt-2">{features.length}</div>
+        <div className="rounded-2xl border backdrop-blur-sm p-4">
+          <div className="text-xs font-medium uppercase">Total funcionalitats</div>
+          <div className="text-3xl font-bold mt-2">{features.length}</div>
         </div>
-        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-sm p-4">
-          <div className="text-xs font-medium text-emerald-400 uppercase">Actives</div>
-          <div className="text-3xl font-bold text-slate-100 mt-2">{activeCount}</div>
+        <div className="rounded-2xl border backdrop-blur-sm p-4">
+          <div className="text-xs font-medium uppercase">Actives</div>
+          <div className="text-3xl font-bold mt-2">{activeCount}</div>
         </div>
-        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
-              <div className="text-xs font-medium text-slate-400 uppercase">Desactivades</div>
-          <div className="text-3xl font-bold text-slate-100 mt-2">{features.length - activeCount}</div>
+        <div className="rounded-2xl border backdrop-blur-sm p-4">
+              <div className="text-xs font-medium uppercase">Desactivades</div>
+          <div className="text-3xl font-bold mt-2">{features.length - activeCount}</div>
         </div>
       </div>
 
       {/* Features List */}
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-100 mb-4">Funcionalitats</h2>
+      <div className="rounded-2xl border backdrop-blur-sm p-6">
+        <h2 className="text-lg font-semibold mb-4">Funcionalitats</h2>
         <div className="space-y-3">
           {features.map((feature) => (
             <div
               key={feature.key}
-              className="bg-slate-700/30 border border-slate-700/50 rounded-xl p-4 flex items-center justify-between"
+              className="border rounded-xl p-4 flex items-center justify-between"
             >
               <div className="flex items-start gap-3 flex-1">
                 <span className="text-2xl">{feature.icon}</span>
                 <div className="flex-1">
-                  <h3 className="font-medium text-slate-100">{feature.label}</h3>
-                  <p className="text-sm text-slate-400 mt-0.5">{feature.description}</p>
+                  <h3 className="font-medium">{feature.label}</h3>
+                  <p className="text-sm mt-0.5">{feature.description}</p>
                 </div>
               </div>
               <button

@@ -79,13 +79,13 @@ export default function LeadColorCustomizer() {
   };
 
   return (
-    <details className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-4">
-      <summary className="cursor-pointer text-sm font-medium text-slate-200">
+    <details className="rounded-2xl border p-4">
+      <summary className="cursor-pointer text-sm font-medium">
         Personalitzar colors d&apos;estat i prioritat
       </summary>
       <div className="mt-4 space-y-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">Estats</p>
+          <p className="text-xs uppercase tracking-wide">Estats</p>
           <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {STATUS_COLOR_OPTIONS.map((option) => (
               <label key={option.key} className={`flex items-center justify-between rounded-xl px-3 py-2 text-xs ${option.chipClass}`}>
@@ -102,7 +102,7 @@ export default function LeadColorCustomizer() {
           </div>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-400">Prioritats</p>
+          <p className="text-xs uppercase tracking-wide">Prioritats</p>
           <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {PRIORITY_COLOR_OPTIONS.map((option) => (
               <label key={option.key} className={`flex items-center justify-between rounded-xl px-3 py-2 text-xs ${option.chipClass}`}>
@@ -122,7 +122,7 @@ export default function LeadColorCustomizer() {
           <button
             type="button"
             onClick={resetColors}
-            className="rounded-lg border border-slate-600/60 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-700/60"
+            className="rounded-lg border px-3 py-1.5 text-xs"
           >
             Restablir colors per defecte
           </button>

@@ -266,20 +266,20 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
   if (loading) {
     return (
-      <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-slate-200 mb-4">Equipament assignat</h2>
-        <p className="text-sm text-slate-400">Carregant...</p>
+      <section className="rounded-xl border border-white/10 shadow-sm p-6">
+        <h2 className="text-lg font-semibold mb-4">Equipament assignat</h2>
+        <p className="text-sm">Carregant...</p>
       </section>
     );
   }
 
   return (
-    <section className="rounded-xl border border-white/10 bg-slate-950/60 shadow-sm p-6">
+    <section className="rounded-xl border border-white/10 shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-slate-200">
+        <h2 className="text-lg font-semibold">
           Equipament assignat
           {assigned.length > 0 && (
-            <span className="text-sm font-normal text-slate-400 ml-2">
+            <span className="text-sm font-normal ml-2">
               ({assigned.length} elements)
             </span>
           )}
@@ -289,29 +289,29 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
             type="button"
             onClick={handleAssignPack}
             disabled={packTemplate.length === 0}
-            className="rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-200 hover:bg-emerald-500/25 disabled:opacity-50 transition-colors"
+            className="rounded-lg border px-3 py-1.5 text-xs font-medium disabled:opacity-50 transition-colors"
           >
             + Afegir inventari del pack
           </button>
           <button
             type="button"
             onClick={() => setShowSearch(!showSearch)}
-            className="rounded-lg border border-slate-600/50 bg-slate-700/50 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
+            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
           >
             {showSearch ? 'Tancar cerca' : '+ Afegir element'}
           </button>
         </div>
       </div>
       {message && (
-        <p className="mb-3 text-xs text-slate-300">{message}</p>
+        <p className="mb-3 text-xs">{message}</p>
       )}
       {skippedDetails.length > 0 && (
-        <div className="mb-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
-          <p className="mb-2 text-xs font-semibold text-amber-200">Elements no afegits</p>
+        <div className="mb-3 rounded-lg border p-3">
+          <p className="mb-2 text-xs font-semibold">Elements no afegits</p>
           <ul className="space-y-1">
             {skippedDetails.map((detail) => (
-              <li key={`${detail.itemId}-${detail.reason}`} className="text-xs text-amber-100">
-                <code className="mr-1 rounded bg-amber-950/40 px-1 py-0.5">{detail.itemCode}</code>
+              <li key={`${detail.itemId}-${detail.reason}`} className="text-xs">
+                <code className="mr-1 rounded px-1 py-0.5">{detail.itemCode}</code>
                 {detail.itemName} · {reasonLabel(detail.reason)}
               </li>
             ))}
@@ -323,7 +323,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
           <select
             value={selectedBundleId}
             onChange={(e) => setSelectedBundleId(e.target.value)}
-            className="rounded-lg border border-slate-600/50 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-100"
+            className="rounded-lg border px-3 py-1.5 text-xs"
           >
             {bundles.map((bundle) => (
               <option key={bundle.id} value={bundle.id}>
@@ -334,7 +334,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
           <button
             type="button"
             onClick={handleAssignBundle}
-            className="rounded-lg border border-indigo-500/40 bg-indigo-500/15 px-3 py-1.5 text-xs font-medium text-indigo-200 hover:bg-indigo-500/25 transition-colors"
+            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
           >
             + Afegir lot
           </button>
@@ -343,7 +343,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
 
       {/* Elements assignats */}
       {assigned.length === 0 ? (
-        <p className="text-sm text-slate-400 mb-4">Encara no hi ha equipament assignat</p>
+        <p className="text-sm mb-4">Encara no hi ha equipament assignat</p>
       ) : (
         <div className="space-y-2 mb-4">
           {assigned.map((a) => (
@@ -352,17 +352,17 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
               className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <code className="text-xs font-mono bg-slate-700/50 text-slate-300 px-2 py-0.5 rounded shrink-0">
+                <code className="text-xs font-mono px-2 py-0.5 rounded shrink-0">
                   {a.item.code}
                 </code>
                 <div className="min-w-0">
                   <Link
                     href={`/admin/inventory/${a.item.id}`}
-                    className="text-sm font-medium text-slate-200 hover:text-cyan-300 transition-colors truncate block"
+                    className="text-sm font-medium transition-colors truncate block"
                   >
                     {a.item.name}
                   </Link>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs">
                     {CATEGORY_LABELS[a.item.category] || a.item.category}
                     {a.item.watts ? ` · ${a.item.watts}W` : ''}
                   </p>
@@ -390,7 +390,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                       if (e.target.value) handleCheckin(a, e.target.value);
                     }}
                     defaultValue=""
-                    className="rounded-lg border border-slate-600/50 bg-slate-700/50 px-2 py-1 text-xs text-slate-200"
+                    className="rounded-lg border px-2 py-1 text-xs"
                   >
                     <option value="" disabled>Retorn...</option>
                     {CONDITION_OPTIONS.map((c) => (
@@ -400,7 +400,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                 )}
 
                 {a.checkedIn && (
-                  <span className="text-xs text-emerald-300 bg-emerald-500/20 px-2 py-1 rounded-lg">
+                  <span className="text-xs px-2 py-1 rounded-lg">
                     Retornat
                   </span>
                 )}
@@ -409,7 +409,7 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                 <button
                   type="button"
                   onClick={() => handleRemove(a.id)}
-                  className="rounded-lg bg-rose-500/10 px-2 py-1 text-xs text-rose-300 hover:bg-rose-500/20 transition-colors"
+                  className="rounded-lg px-2 py-1 text-xs transition-colors"
                 >
                   Treure
                 </button>
@@ -427,12 +427,12 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Cercar per nom o codi..."
-            className="w-full rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            className="w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-1"
             autoFocus
           />
 
           {available.length === 0 ? (
-            <p className="text-sm text-slate-400">No hi ha elements disponibles</p>
+            <p className="text-sm">No hi ha elements disponibles</p>
           ) : (
             <div className="max-h-64 overflow-y-auto space-y-1">
               {available.map((item) => (
@@ -441,18 +441,18 @@ export default function BookingInventorySection({ bookingId }: { bookingId: stri
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <code className="text-xs font-mono bg-slate-700/50 text-slate-300 px-1.5 py-0.5 rounded">
+                    <code className="text-xs font-mono px-1.5 py-0.5 rounded">
                       {item.code}
                     </code>
-                    <span className="text-sm text-slate-200 truncate">{item.name}</span>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-sm truncate">{item.name}</span>
+                    <span className="text-xs">
                       {CATEGORY_LABELS[item.category] || item.category}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleAssign(item.id)}
-                    className="rounded-lg bg-cyan-500/20 border border-cyan-400/30 px-2 py-1 text-xs font-medium text-cyan-200 hover:bg-cyan-500/30 transition-colors shrink-0"
+                    className="rounded-lg border px-2 py-1 text-xs font-medium transition-colors shrink-0"
                   >
                     Afegir
                   </button>

@@ -46,7 +46,7 @@ export default function CalendarSyncButton({ bookingId }: { bookingId: string })
         type="button"
         onClick={syncNow}
         disabled={loading}
-        className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/5 disabled:opacity-60"
+        className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/5 disabled:opacity-60"
       >
         {loading ? 'Sincronitzant...' : 'Sincronitza Google Calendar ara'}
       </button>

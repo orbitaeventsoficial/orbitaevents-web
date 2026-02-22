@@ -93,8 +93,8 @@ export default async function PostEventPage() {
       {/* Header */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">Post-Event</h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <h1 className="text-2xl font-semibold tracking-tight">Post-Event</h1>
+          <p className="mt-1 text-sm">
             Gestiona informes, enquestes i feedback dels esdeveniments
           </p>
         </div>
@@ -102,43 +102,43 @@ export default async function PostEventPage() {
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-orange-500/30 bg-orange-500/10 p-4 shadow-sm">
-          <p className="text-xs font-medium text-orange-300 uppercase">Informes Pendents</p>
-          <p className="mt-2 text-3xl font-bold text-orange-200">{data.pendingReports}</p>
-          <p className="text-xs text-orange-400 mt-1">Esborrany</p>
+        <div className="rounded-xl border p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase">Informes Pendents</p>
+          <p className="mt-2 text-3xl font-bold">{data.pendingReports}</p>
+          <p className="text-xs mt-1">Esborrany</p>
         </div>
-        <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 shadow-sm">
-          <p className="text-xs font-medium text-blue-300 uppercase">Enquestes per enviar</p>
-          <p className="mt-2 text-3xl font-bold text-blue-200">{data.pendingSurveys}</p>
-          <p className="text-xs text-blue-400 mt-1">Sense enquesta enviada</p>
+        <div className="rounded-xl border p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase">Enquestes per enviar</p>
+          <p className="mt-2 text-3xl font-bold">{data.pendingSurveys}</p>
+          <p className="text-xs mt-1">Sense enquesta enviada</p>
         </div>
-        <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-4 shadow-sm">
-          <p className="text-xs font-medium text-green-300 uppercase">Informes Completats</p>
-          <p className="mt-2 text-3xl font-bold text-green-200">{data.completedReports}</p>
+        <div className="rounded-xl border p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase">Informes Completats</p>
+          <p className="mt-2 text-3xl font-bold">{data.completedReports}</p>
         </div>
-        <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4 shadow-sm">
-          <p className="text-xs font-medium text-purple-300 uppercase">Enquestes Rebudes</p>
-          <p className="mt-2 text-3xl font-bold text-purple-200">{data.completedSurveys}</p>
+        <div className="rounded-xl border p-4 shadow-sm">
+          <p className="text-xs font-medium uppercase">Enquestes Rebudes</p>
+          <p className="mt-2 text-3xl font-bold">{data.completedSurveys}</p>
         </div>
       </section>
 
       {/* Workflow Cards */}
       <section className="grid gap-6 lg:grid-cols-3">
         {/* Step 1: Informe Intern */}
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 shadow-sm overflow-hidden">
-          <div className="bg-orange-500/10 border-b border-orange-500/30 p-4">
+        <div className="rounded-xl border shadow-sm overflow-hidden">
+          <div className="border-b p-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-full text-white flex items-center justify-center font-bold">
                 1
               </div>
               <div>
-                <h3 className="font-semibold text-slate-100">Informe Intern</h3>
-                <p className="text-xs text-slate-400">Completa després de l&apos;event</p>
+                <h3 className="font-semibold">Informe Intern</h3>
+                <p className="text-xs">Completa després de l&apos;event</p>
               </div>
             </div>
           </div>
           <div className="p-4">
-            <ul className="space-y-2 text-sm text-slate-300">
+            <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <span>📋</span> Timing real de l&apos;event
               </li>
@@ -157,7 +157,7 @@ export default async function PostEventPage() {
             </ul>
             <Link
               href="/admin/post-event/reports"
-              className="mt-4 w-full inline-flex items-center justify-center rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+              className="mt-4 w-full inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-white"
             >
               Veure informes
             </Link>
@@ -165,20 +165,20 @@ export default async function PostEventPage() {
         </div>
 
         {/* Step 2: Enquesta Client */}
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 shadow-sm overflow-hidden">
-          <div className="bg-blue-500/10 border-b border-blue-500/30 p-4">
+        <div className="rounded-xl border shadow-sm overflow-hidden">
+          <div className="border-b p-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-full text-white flex items-center justify-center font-bold">
                 2
               </div>
               <div>
-                <h3 className="font-semibold text-slate-100">Enquesta Client</h3>
-                <p className="text-xs text-slate-400">S&apos;envia automàticament</p>
+                <h3 className="font-semibold">Enquesta Client</h3>
+                <p className="text-xs">S&apos;envia automàticament</p>
               </div>
             </div>
           </div>
           <div className="p-4">
-            <ul className="space-y-2 text-sm text-slate-300">
+            <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <span>⭐</span> Valoració general
               </li>
@@ -197,7 +197,7 @@ export default async function PostEventPage() {
             </ul>
             <Link
               href="/admin/post-event/surveys"
-              className="mt-4 w-full inline-flex items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+              className="mt-4 w-full inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-white"
             >
               Veure enquestes
             </Link>
@@ -205,20 +205,20 @@ export default async function PostEventPage() {
         </div>
 
         {/* Step 3: Feedback Client */}
-        <div className="rounded-xl border border-slate-700/60 bg-slate-900/70 shadow-sm overflow-hidden">
-          <div className="bg-green-500/10 border-b border-green-500/30 p-4">
+        <div className="rounded-xl border shadow-sm overflow-hidden">
+          <div className="border-b p-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-full text-white flex items-center justify-center font-bold">
                 3
               </div>
               <div>
-                <h3 className="font-semibold text-slate-100">Feedback al Client</h3>
-                <p className="text-xs text-slate-400">Envia agraïment</p>
+                <h3 className="font-semibold">Feedback al Client</h3>
+                <p className="text-xs">Envia agraïment</p>
               </div>
             </div>
           </div>
           <div className="p-4">
-            <ul className="space-y-2 text-sm text-slate-300">
+            <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <span>💌</span> Missatge personalitzat
               </li>
@@ -234,7 +234,7 @@ export default async function PostEventPage() {
             </ul>
             <Link
               href="/admin/post-event/feedback"
-              className="mt-4 w-full inline-flex items-center justify-center rounded-md bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600"
+              className="mt-4 w-full inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-white"
             >
               Veure feedback
             </Link>
@@ -243,11 +243,11 @@ export default async function PostEventPage() {
       </section>
 
       {/* Recent Completed Events */}
-      <section className="rounded-xl border border-slate-700/60 bg-slate-900/70 shadow-sm overflow-hidden">
-        <div className="bg-slate-800/80 border-b border-slate-700 p-4">
-          <h2 className="font-semibold text-slate-100 flex items-center gap-2">
+      <section className="rounded-xl border shadow-sm overflow-hidden">
+        <div className="border-b p-4">
+          <h2 className="font-semibold flex items-center gap-2">
             📅 Events Completats Sense Informe
-            <span className="text-sm font-normal text-slate-400">
+            <span className="text-sm font-normal">
               ({data.recentBookings.length})
             </span>
           </h2>
@@ -259,17 +259,17 @@ export default async function PostEventPage() {
             return (
               <div
                 key={booking.id}
-                className="p-4 hover:bg-slate-800/70 transition-colors flex items-center justify-between"
+                className="p-4 transition-colors flex items-center justify-between"
               >
                 <div>
-                  <p className="font-medium text-slate-100">{booking.clientName}</p>
-                  <p className="text-sm text-slate-400">
+                  <p className="font-medium">{booking.clientName}</p>
+                  <p className="text-sm">
                     {booking.eventDate.toLocaleDateString('ca-ES')} · {packName} · {booking.eventLocation}
                   </p>
                 </div>
                 <Link
                   href={`/admin/post-event/reports/new?bookingId=${booking.id}`}
-                  className="inline-flex items-center rounded-md bg-orange-500/20 px-3 py-1.5 text-xs font-medium text-orange-200 hover:bg-orange-500/30"
+                  className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium"
                 >
                   📝 Crear informe
                 </Link>
@@ -277,7 +277,7 @@ export default async function PostEventPage() {
             );
           })}
           {data.recentBookings.length === 0 && (
-            <div className="p-8 text-center text-slate-400">
+            <div className="p-8 text-center">
               ✅ Tots els esdeveniments completats tenen informe
             </div>
           )}

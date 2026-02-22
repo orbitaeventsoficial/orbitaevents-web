@@ -106,13 +106,13 @@ export default function QuickActions() {
   }
 
   return (
-    <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
+    <section className="rounded-2xl border backdrop-blur-sm p-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase text-slate-400">Accions ràpides</p>
-          <p className="text-sm text-slate-200 mt-1">Operacions freqüents</p>
+          <p className="text-xs uppercase">Accions ràpides</p>
+          <p className="text-sm mt-1">Operacions freqüents</p>
         </div>
-        <Link href="/admin/emails" className="text-xs text-cyan-300 hover:text-cyan-200">
+        <Link href="/admin/emails" className="text-xs">
           Obre correus automàtics →
         </Link>
       </div>
@@ -120,13 +120,13 @@ export default function QuickActions() {
       <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           href="/admin/inbox/compose"
-          className="rounded-xl border border-slate-700/50 bg-slate-900/50 px-3 py-2 text-xs text-slate-200 hover:border-cyan-500/40 hover:text-cyan-200"
+          className="rounded-xl border px-3 py-2 text-xs"
         >
           ✉️ Nou email
         </Link>
         <Link
           href="/admin/leads"
-          className="rounded-xl border border-slate-700/50 bg-slate-900/50 px-3 py-2 text-xs text-slate-200 hover:border-cyan-500/40 hover:text-cyan-200"
+          className="rounded-xl border px-3 py-2 text-xs"
         >
           👥 Veure entrades
         </Link>
@@ -134,7 +134,7 @@ export default function QuickActions() {
           type="button"
           onClick={runCron}
           disabled={loading}
-          className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200 hover:bg-amber-500/20 disabled:opacity-60"
+          className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60"
         >
           {loading ? '⏳ Executant...' : '⏱️ Executar post-event'}
         </button>
@@ -142,7 +142,7 @@ export default function QuickActions() {
           type="button"
           onClick={runAll}
           disabled={loading}
-          className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-2 text-xs text-indigo-200 hover:bg-indigo-500/20 disabled:opacity-60"
+          className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60"
         >
           {loading ? '⏳ Executant...' : '🚀 Executar-ho tot (1 clic)'}
         </button>
@@ -150,31 +150,31 @@ export default function QuickActions() {
           type="button"
           onClick={runDailySummaryNow}
           disabled={loading}
-          className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-60"
+          className="rounded-xl border px-3 py-2 text-xs disabled:opacity-60"
         >
           {loading ? '⏳ Executant...' : '📊 Resum diari ara'}
         </button>
       </div>
 
       {summary && (
-        <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+        <div className="mt-3 rounded-xl border px-3 py-2 text-xs">
           Cron OK · Enviats {summary.sent} · Errors {summary.errors}
         </div>
       )}
       {runAllSummary && (
-        <div className="mt-3 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-2 text-xs text-indigo-200">
+        <div className="mt-3 rounded-xl border px-3 py-2 text-xs">
           Tot OK · Seqüències {runAllSummary.sequences.executed} (correu {runAllSummary.sequences.sentEmail}, WA {runAllSummary.sequences.sentWhatsapp}) ·
           {' '}Tasques 24h {runAllSummary.sla.createdTasks}
         </div>
       )}
       {dailySummary && (
-        <div className="mt-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200">
+        <div className="mt-3 rounded-xl border px-3 py-2 text-xs">
           Resum enviat · Seqüències {dailySummary.sequences.executed} · Tasques 24h {dailySummary.sla.createdTasks} ·
           {' '}Resposta 24h {(dailySummary.kpi24h.responseRate * 100).toFixed(1)}%
         </div>
       )}
       {error && (
-        <div className="mt-3 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+        <div className="mt-3 rounded-xl border px-3 py-2 text-xs">
           {error}
         </div>
       )}

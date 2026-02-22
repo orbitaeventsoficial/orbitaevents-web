@@ -97,7 +97,7 @@ export const card = {
 } as const;
 
 export const button = {
-  primary: 'rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 px-4 py-2 text-white shadow-lg shadow-amber-600/20 hover:from-amber-500 hover:to-orange-500 active:from-amber-700 active:to-orange-700',
+  primary: 'rounded-xl px-4 py-2 text-white shadow-lg',
   secondary: 'rounded-xl border border-[#d4c7b2] bg-[#f7f2e8] px-4 py-2 text-[#3b342d] hover:bg-[#efe6d7]',
   ghost: 'rounded-xl bg-transparent px-4 py-2 text-[#6f6457] hover:bg-[#efe6d7] hover:text-[#3b342d]',
 } as const;

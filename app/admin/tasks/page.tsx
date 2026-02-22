@@ -170,8 +170,8 @@ export default async function TasksPage({
     <div className="space-y-4 sm:space-y-6">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-100">Tasques</h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Tasques</h1>
+          <p className="text-xs sm:text-sm">
             {total} tasques {customerId ? 'del client' : ''}
           </p>
         </div>
@@ -179,30 +179,30 @@ export default async function TasksPage({
           <GenerateDailyChecklistButton />
           <Link
             href={customerId ? `/admin/tasks/new?customerId=${customerId}` : '/admin/tasks/new'}
-            className="inline-flex items-center rounded-xl bg-amber-500 px-3 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-amber-600 transition-colors"
+            className="inline-flex items-center rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-white transition-colors"
           >
             Nova tasca
           </Link>
           <Link
             href={customerId ? `/admin/contactes/${customerId}?tab=tasks` : '/admin'}
-            className="inline-flex items-center rounded-xl border border-slate-600/50 bg-slate-700/50 px-3 py-2 text-xs sm:text-sm font-medium text-slate-200 hover:bg-slate-600/50 transition-colors"
+            className="inline-flex items-center rounded-xl border px-3 py-2 text-xs sm:text-sm font-medium transition-colors"
           >
             ← Tornar
           </Link>
         </div>
       </header>
 
-      <section className="rounded-xl border border-slate-700/50 bg-slate-800/40 p-3">
+      <section className="rounded-xl border p-3">
         <form method="GET" action="/admin/tasks" className="flex flex-wrap items-center gap-2">
           {customerId && <input type="hidden" name="customerId" value={customerId} />}
-          <label htmlFor="task-status-filter" className="text-xs font-medium text-slate-300">
+          <label htmlFor="task-status-filter" className="text-xs font-medium">
             Estat
           </label>
           <select
             id="task-status-filter"
             name="status"
             defaultValue={status || ''}
-            className="rounded-lg border border-slate-600/50 bg-slate-900/70 px-3 py-1.5 text-xs text-slate-100"
+            className="rounded-lg border px-3 py-1.5 text-xs"
           >
             <option value="">Totes</option>
             {VALID_STATUS.map((value) => (
@@ -213,16 +213,16 @@ export default async function TasksPage({
           </select>
           <button
             type="submit"
-            className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/20"
+            className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
           >
             Aplicar
           </button>
         </form>
       </section>
 
-      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+      <section className="rounded-2xl border backdrop-blur-sm overflow-hidden">
         {tasks.length === 0 ? (
-          <div className="p-8 text-center text-slate-400">
+          <div className="p-8 text-center">
             <span className="text-4xl">📝</span>
             <p className="mt-2">No hi ha tasques</p>
           </div>
@@ -231,18 +231,18 @@ export default async function TasksPage({
             {tasks.map((task) => {
               const destinationHref = resolveDestination(task);
               return (
-                <article key={task.id} className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-700/30 transition-colors">
+                <article key={task.id} className="flex items-center justify-between gap-3 px-4 py-3 transition-colors">
                   <Link
                     href={destinationHref}
                     className="min-w-0 flex-1"
                   >
-                    <p className="text-sm text-slate-100 truncate">{task.title}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-sm truncate">{task.title}</p>
+                    <p className="text-xs">
                       {(task.customer?.name || task.lead?.name || 'Sense relació')} · {STATUS_LABELS[task.status] || task.status}
                     </p>
                   </Link>
                   <div className="flex shrink-0 items-center gap-3">
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs">
                       {task.dueDate ? new Date(task.dueDate).toLocaleDateString('ca-ES') : 'Sense data'}
                     </span>
                     <TaskRowActions
@@ -259,7 +259,7 @@ export default async function TasksPage({
       </section>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-xs text-slate-400">
+        <div className="flex items-center justify-between text-xs">
           <span>Pàgina {page} de {totalPages}</span>
           <div className="flex gap-2">
             <Link

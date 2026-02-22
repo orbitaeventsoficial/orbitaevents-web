@@ -201,7 +201,7 @@ function KpiCard({ label, value, sub, color, borderColor, bgColor, delay = 0 }: 
       transition={{ duration: 0.35, delay }}
       className={`rounded-xl border ${borderColor} ${bgColor} p-4 shadow-md backdrop-blur-sm`}
     >
-      <p className="text-xs font-medium uppercase tracking-wider text-slate-400">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-wider">{label}</p>
       <p className={`mt-1 text-2xl font-black tracking-tight ${color}`}>{value}</p>
       {sub && <p className={`mt-0.5 text-xs ${color} opacity-80`}>{sub}</p>}
     </motion.div>
@@ -244,9 +244,9 @@ function HealthScore({ overdueTotal, outstandingTotal, marginPct }: { overdueTot
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-slate-950/60 p-6 shadow-lg"
+      className="flex flex-col items-center justify-center rounded-2xl border border-white/10 p-6 shadow-lg"
     >
-      <p className="text-xs font-medium uppercase tracking-wider text-slate-400 mb-3">Salut financera</p>
+      <p className="text-xs font-medium uppercase tracking-wider mb-3">Salut financera</p>
       <div className="relative w-28 h-28">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
           <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-white/5" />
@@ -298,14 +298,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
     <div className="admin-economia-page space-y-4">
       {/* ═══════════ HEADER ═══════════ */}
       <header className="admin-economia-header relative overflow-hidden rounded-xl border border-white/10 p-5 shadow-lg">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
         <div className="relative">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="admin-page-title text-2xl font-black tracking-tight">
                 Economia
               </h1>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs">
                 Control de caixa, cobraments i marge en una sola pantalla.
               </p>
             </div>
@@ -314,13 +314,13 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 href="/api/admin/reports/profitability"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors"
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold hover:bg-white/10 transition-colors"
               >
                 Exportar JSON
               </a>
               <Link
                 href="/admin/sales-ops"
-                className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition-colors"
+                className="rounded-xl border px-4 py-2 text-xs font-semibold transition-colors"
               >
                 Operativa de vendes
               </Link>
@@ -348,7 +348,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               <span className="hidden sm:inline">{tab.label}</span>
               <span className="sm:hidden">{tab.mobileLabel}</span>
               {showBadge && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-black text-white shadow-lg shadow-rose-500/30">
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-black text-white shadow-lg">
                   {props.atRiskRows.length}
                 </span>
               )}
@@ -419,8 +419,8 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-slate-700/50 bg-slate-900/40 px-3 py-2 text-xs text-slate-300">
-                <strong className="text-slate-100">Com llegir aquest resum:</strong> pendent = import total per cobrar, fora de termini = cobrament que ja havia d&apos;estar pagat, a 7 dies = cobrament proper.
+              <div className="rounded-xl border px-3 py-2 text-xs">
+                <strong className="">Com llegir aquest resum:</strong> pendent = import total per cobrar, fora de termini = cobrament que ja havia d&apos;estar pagat, a 7 dies = cobrament proper.
               </div>
 
               {/* Profitability KPIs */}
@@ -471,11 +471,11 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="rounded-xl border border-white/10 bg-slate-950/60 p-4 shadow-md"
+                  className="rounded-xl border border-white/10 p-4 shadow-md"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-sm font-semibold text-slate-200">Progrés de cobrament</p>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-sm font-semibold">Progrés de cobrament</p>
+                    <p className="text-xs">
                       Cobrat ara: {money(props.monthCollected)} · Total a gestionar: {money(props.monthCollected + props.outstandingTotal)}
                     </p>
                   </div>
@@ -493,17 +493,17 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="rounded-xl border border-cyan-500/20 bg-gradient-to-br from-cyan-950/20 to-slate-950/60 p-4 shadow-md"
+                  className="rounded-xl border p-4 shadow-md"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Valor d&apos;inventari</p>
-                      <p className="mt-1 text-2xl font-black text-cyan-300">{money(props.inventoryValue)}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">{props.inventoryCount} elements actius</p>
+                      <p className="text-xs font-medium uppercase tracking-wider">Valor d&apos;inventari</p>
+                      <p className="mt-1 text-2xl font-black">{money(props.inventoryValue)}</p>
+                      <p className="text-xs mt-0.5">{props.inventoryCount} elements actius</p>
                     </div>
                     <Link
                       href="/admin/inventory"
-                      className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-xs font-bold text-cyan-300 hover:bg-cyan-500/20 transition-colors"
+                      className="rounded-xl border px-4 py-2 text-xs font-bold transition-colors"
                     >
                       Veure inventari
                     </Link>
@@ -519,20 +519,20 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       initial={{ opacity: 0, x: -12 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.35 }}
-                      className="rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-950/30 to-rose-900/10 p-5 shadow-lg"
+                      className="rounded-2xl border p-5 shadow-lg"
                     >
                       <div className="flex items-start gap-3">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/20 text-lg">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg">
                           ⚠️
                         </span>
                         <div className="flex-1">
-                          <h2 className="text-base font-bold text-rose-200">Cobraments vençuts</h2>
-                          <p className="text-sm text-rose-300/80 mt-0.5">
+                          <h2 className="text-base font-bold">Cobraments vençuts</h2>
+                          <p className="text-sm mt-0.5">
                             {props.atRiskRows.length} pagament{props.atRiskRows.length !== 1 ? 's' : ''} pendent{props.atRiskRows.length !== 1 ? 's' : ''} &middot; {money(props.overdueTotal)}
                           </p>
                           <button
                             onClick={() => setActiveTab('cobraments')}
-                            className="mt-3 rounded-xl bg-rose-500/20 px-4 py-2 text-xs font-bold text-rose-200 hover:bg-rose-500/30 border border-rose-500/30 transition-colors"
+                            className="mt-3 rounded-xl px-4 py-2 text-xs font-bold border transition-colors"
                           >
                             Obrir detall de cobraments
                           </button>
@@ -545,20 +545,20 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       initial={{ opacity: 0, x: 12 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.4 }}
-                      className="rounded-2xl border border-orange-500/30 bg-gradient-to-br from-orange-950/30 to-orange-900/10 p-5 shadow-lg"
+                      className="rounded-2xl border p-5 shadow-lg"
                     >
                       <div className="flex items-start gap-3">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-lg">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg">
                           📉
                         </span>
                         <div className="flex-1">
-                          <h2 className="text-base font-bold text-orange-200">Esdeveniments amb marge baix</h2>
-                          <p className="text-sm text-orange-300/80 mt-0.5">
+                          <h2 className="text-base font-bold">Esdeveniments amb marge baix</h2>
+                          <p className="text-sm mt-0.5">
                             {props.riskProfitability.length} esdeveniment{props.riskProfitability.length !== 1 ? 's' : ''} per sota del 15% de marge
                           </p>
                           <button
                             onClick={() => setActiveTab('rendibilitat')}
-                            className="mt-3 rounded-xl bg-orange-500/20 px-4 py-2 text-xs font-bold text-orange-200 hover:bg-orange-500/30 border border-orange-500/30 transition-colors"
+                            className="mt-3 rounded-xl px-4 py-2 text-xs font-bold border transition-colors"
                           >
                             Veure rendibilitat
                           </button>
@@ -575,13 +575,13 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.45 }}
-                  className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-lg"
+                  className="rounded-2xl border border-white/10 p-5 shadow-lg"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-base font-bold text-slate-100">Top 5 &mdash; Millors marges</h2>
+                    <h2 className="text-base font-bold">Top 5 &mdash; Millors marges</h2>
                     <button
                       onClick={() => setActiveTab('rendibilitat')}
-                      className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+                      className="text-xs font-semibold transition-colors"
                     >
                       Veure tots &rarr;
                     </button>
@@ -593,14 +593,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         href={`/admin/bookings/${row.id}`}
                         className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
                       >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-sm font-black text-emerald-400">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-black">
                           {i + 1}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-slate-100 truncate group-hover:text-amber-200 transition-colors">
+                          <p className="text-sm font-semibold truncate transition-colors">
                             {row.reference} &middot; {row.clientName}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs">
                             {new Date(row.eventDate).toLocaleDateString('ca-ES')} &middot; {row.source}
                           </p>
                         </div>
@@ -630,50 +630,50 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                 <KpiCard label="Cobrat aquest mes" value={money(props.monthCollected)} color="text-emerald-300" borderColor="border-emerald-500/30" bgColor="bg-emerald-500/10" delay={0.15} />
               </div>
 
-              <section className="grid gap-3 rounded-xl border border-white/10 bg-slate-950/60 p-3 sm:grid-cols-2">
-                <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-rose-200">Fora de termini</p>
-                  <p className="mt-1 text-sm text-rose-100">
+              <section className="grid gap-3 rounded-xl border border-white/10 p-3 sm:grid-cols-2">
+                <div className="rounded-lg border p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide">Fora de termini</p>
+                  <p className="mt-1 text-sm">
                     Bestretes: <span className="font-bold">{overdueDepositCount}</span> · Saldo: <span className="font-bold">{overdueRemainingCount}</span>
                   </p>
                 </div>
-                <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-200">Pròxims 7 dies</p>
-                  <p className="mt-1 text-sm text-amber-100">
+                <div className="rounded-lg border p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide">Pròxims 7 dies</p>
+                  <p className="mt-1 text-sm">
                     Bestretes: <span className="font-bold">{dueSoonDepositCount}</span> · Saldo: <span className="font-bold">{dueSoonRemainingCount}</span>
                   </p>
                 </div>
               </section>
 
-              <section className="rounded-xl border border-slate-700/60 bg-slate-900/45 px-4 py-3 text-xs text-slate-300">
+              <section className="rounded-xl border px-4 py-3 text-xs">
                 <p>
-                  <span className="font-semibold text-slate-100">Guia:</span> codi `OE-...` = referència interna de la reserva.
-                  <span className="font-semibold text-slate-100"> Bestreta</span> = primer pagament per confirmar la data.
-                  <span className="font-semibold text-slate-100"> Saldo restant</span> = import final pendent.
+                  <span className="font-semibold">Guia:</span> codi `OE-...` = referència interna de la reserva.
+                  <span className="font-semibold"> Bestreta</span> = primer pagament per confirmar la data.
+                  <span className="font-semibold"> Saldo restant</span> = import final pendent.
                 </p>
               </section>
 
               {/* Vençuts */}
-              <section className="rounded-2xl border border-rose-500/20 bg-slate-950/60 p-5 shadow-lg">
+              <section className="rounded-2xl border p-5 shadow-lg">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/20 text-sm">⚠️</span>
-                    <h2 className="text-lg font-bold text-slate-100">Fora de termini</h2>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm">⚠️</span>
+                    <h2 className="text-lg font-bold">Fora de termini</h2>
                     {props.atRiskRows.length > 0 && (
-                      <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-xs font-bold text-rose-300">
+                      <span className="rounded-full px-2 py-0.5 text-xs font-bold">
                         {props.atRiskRows.length}
                       </span>
                     )}
                   </div>
-                  <Link href="/admin/bookings" className="text-xs text-slate-400 hover:text-slate-200 transition-colors">
+                  <Link href="/admin/bookings" className="text-xs transition-colors">
                     Totes les reserves &rarr;
                   </Link>
                 </div>
                 <div className="grid gap-2 lg:grid-cols-2">
                   {props.atRiskRows.length === 0 ? (
-                    <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 p-6 text-center">
-                      <p className="text-emerald-400 font-semibold">Tot al dia!</p>
-                      <p className="text-sm text-emerald-400/70 mt-1">
+                    <div className="rounded-xl border p-6 text-center">
+                      <p className="font-semibold">Tot al dia!</p>
+                      <p className="text-sm mt-1">
                         No hi ha cap cobrament pendent amb data de venciment passada.
                       </p>
                     </div>
@@ -683,13 +683,13 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         key={row.id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="group rounded-xl border border-white/10 bg-slate-900/50 p-3 transition-colors open:border-rose-500/30 open:bg-rose-950/10"
+                        className="group rounded-xl border border-white/10 p-3 transition-colors"
                       >
                         <summary className="list-none cursor-pointer">
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div className="min-w-0">
-                              <p className="truncate text-sm font-bold text-slate-100">{row.reference} · {row.clientName}</p>
-                              <p className="mt-0.5 text-xs text-slate-400">
+                              <p className="truncate text-sm font-bold">{row.reference} · {row.clientName}</p>
+                              <p className="mt-0.5 text-xs">
                                 {new Date(row.eventDate).toLocaleDateString('ca-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                                 &nbsp;·&nbsp;
                                 <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase">{row.status}</span>
@@ -702,7 +702,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${paymentStateBadge(row.remainingPaid)}`}>
                                 Saldo {row.remainingPaid ? 'pagat' : 'pendent'}
                               </span>
-                              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-slate-300">
+                              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold">
                                 Veure detall
                               </span>
                             </div>
@@ -711,8 +711,8 @@ export default function EconomiaClient(props: EconomiaClientProps) {
 
                         <div className="mt-3 border-t border-white/10 pt-3">
                           <div className="mb-3 flex items-center justify-between gap-2">
-                            <p className="text-[11px] text-slate-500">Codi reserva: {row.reference}</p>
-                            <Link href={`/admin/bookings/${row.id}`} className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors">
+                            <p className="text-[11px]">Codi reserva: {row.reference}</p>
+                            <Link href={`/admin/bookings/${row.id}`} className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold hover:bg-white/10 transition-colors">
                               Obrir reserva
                             </Link>
                           </div>
@@ -722,7 +722,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                                 <p className={`text-xs font-semibold ${row.depositPaid ? 'text-emerald-300' : 'text-rose-300'}`}>Bestreta</p>
                                 <p className={`text-sm font-bold ${row.depositPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.depositAmount)}</p>
                               </div>
-                              <p className="text-[11px] text-slate-400 mb-2">
+                              <p className="text-[11px] mb-2">
                                 Venciment: {new Date(row.depositDueAt).toLocaleDateString('ca-ES')}
                               </p>
                               <PaymentToggleButton bookingId={row.id} field="depositPaid" currentValue={row.depositPaid} />
@@ -732,14 +732,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                                 <p className={`text-xs font-semibold ${row.remainingPaid ? 'text-emerald-300' : 'text-rose-300'}`}>Saldo restant</p>
                                 <p className={`text-sm font-bold ${row.remainingPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.remainingAmount)}</p>
                               </div>
-                              <p className="text-[11px] text-slate-400 mb-2">
+                              <p className="text-[11px] mb-2">
                                 Venciment: {new Date(row.remainingDueAt).toLocaleDateString('ca-ES')}
                               </p>
                               <PaymentToggleButton bookingId={row.id} field="remainingPaid" currentValue={row.remainingPaid} />
                             </div>
                           </div>
-                          <p className="mb-2 text-xs text-slate-400">
-                            Seguiment: <span className="font-semibold text-slate-300">{row.paymentFlowState}</span>
+                          <p className="mb-2 text-xs">
+                            Seguiment: <span className="font-semibold">{row.paymentFlowState}</span>
                           </p>
                           <PaymentReminderActions
                             bookingId={row.id}
@@ -754,21 +754,21 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               </section>
 
               {/* Pròxims */}
-              <section className="rounded-2xl border border-amber-500/20 bg-slate-950/60 p-5 shadow-lg">
+              <section className="rounded-2xl border p-5 shadow-lg">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/20 text-sm">⏰</span>
-                  <h2 className="text-lg font-bold text-slate-100">Venciments en 7 dies</h2>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm">⏰</span>
+                  <h2 className="text-lg font-bold">Venciments en 7 dies</h2>
                   {props.upcomingDueRows.length > 0 && (
-                    <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-300">
+                    <span className="rounded-full px-2 py-0.5 text-xs font-bold">
                       {props.upcomingDueRows.length}
                     </span>
                   )}
                 </div>
                 <div className="space-y-2">
                   {props.upcomingDueRows.length === 0 ? (
-                    <div className="rounded-xl border border-white/10 bg-slate-900 p-4 text-center">
-                      <p className="text-sm font-semibold text-slate-200">Cap venciment en 7 dies.</p>
-                      <p className="mt-1 text-xs text-slate-400">
+                    <div className="rounded-xl border border-white/10 p-4 text-center">
+                      <p className="text-sm font-semibold">Cap venciment en 7 dies.</p>
+                      <p className="mt-1 text-xs">
                         No tens cap cobrament pendent que caduqui entre avui i els pròxims 7 dies.
                       </p>
                     </div>
@@ -776,14 +776,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                     props.upcomingDueRows.map((row) => (
                       <div key={row.id} className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-slate-100 truncate">{row.reference} &middot; {row.clientName}</p>
-                          <p className="text-xs text-slate-400">{new Date(row.eventDate).toLocaleDateString('ca-ES')}</p>
+                          <p className="text-sm font-semibold truncate">{row.reference} &middot; {row.clientName}</p>
+                          <p className="text-xs">{new Date(row.eventDate).toLocaleDateString('ca-ES')}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          {row.dueSoonDeposit && <p className="text-xs text-amber-300">Bestreta: {money(row.depositAmount)}</p>}
-                          {row.dueSoonRemaining && <p className="text-xs text-amber-300">Saldo: {money(row.remainingAmount)}</p>}
+                          {row.dueSoonDeposit && <p className="text-xs">Bestreta: {money(row.depositAmount)}</p>}
+                          {row.dueSoonRemaining && <p className="text-xs">Saldo: {money(row.remainingAmount)}</p>}
                         </div>
-                        <Link href={`/admin/bookings/${row.id}`} className="shrink-0 text-xs text-slate-400 hover:text-slate-200">
+                        <Link href={`/admin/bookings/${row.id}`} className="shrink-0 text-xs">
                           &rarr;
                         </Link>
                       </div>
@@ -798,9 +798,9 @@ export default function EconomiaClient(props: EconomiaClientProps) {
           {activeTab === 'rendibilitat' && (
             <>
               {!props.hasReport && (
-                <section className="rounded-2xl border border-amber-300/30 bg-gradient-to-br from-amber-950/30 to-amber-900/10 p-6 shadow-lg">
-                  <h2 className="text-lg font-bold text-amber-200">Sense dades disponibles</h2>
-                  <p className="mt-1 text-sm text-amber-100/80">
+                <section className="rounded-2xl border p-6 shadow-lg">
+                  <h2 className="text-lg font-bold">Sense dades disponibles</h2>
+                  <p className="mt-1 text-sm">
                     {props.reportError
                       ? 'Hi ha hagut un error calculant la rendibilitat. Revisa la Configuració o torna-ho a provar.'
                       : 'Encara no hi ha prou esdeveniments completats per generar l’informe.'}
@@ -819,14 +819,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
 
                   {/* Top + Risc */}
                   <div className="grid gap-5 xl:grid-cols-2">
-                    <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-lg">
+                    <section className="rounded-2xl border border-white/10 p-5 shadow-lg">
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20 text-sm">🏆</span>
-                        <h2 className="text-base font-bold text-slate-100">Top esdeveniments per marge</h2>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm">🏆</span>
+                        <h2 className="text-base font-bold">Top esdeveniments per marge</h2>
                       </div>
                       <div className="space-y-2">
                         {props.topProfitability.length === 0 ? (
-                          <p className="text-sm text-slate-400 text-center p-4">Encara no hi ha esdeveniments completats.</p>
+                          <p className="text-sm text-center p-4">Encara no hi ha esdeveniments completats.</p>
                         ) : (
                           props.topProfitability.slice(0, 12).map((row, i) => (
                             <Link
@@ -834,14 +834,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                               href={`/admin/bookings/${row.id}`}
                               className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors group"
                             >
-                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-xs font-black text-emerald-400">
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-black">
                                 {i + 1}
                               </span>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-slate-100 truncate group-hover:text-emerald-200 transition-colors">
+                                <p className="text-sm font-semibold truncate transition-colors">
                                   {row.reference} &middot; {row.clientName}
                                 </p>
-                                <p className="text-xs text-slate-400">{new Date(row.eventDate).toLocaleDateString('ca-ES')} &middot; {row.source}</p>
+                                <p className="text-xs">{new Date(row.eventDate).toLocaleDateString('ca-ES')} &middot; {row.source}</p>
                               </div>
                               <div className="text-right shrink-0">
                                 <p className={`text-sm font-bold ${marginColor(row.marginPct)}`}>{money(row.netMargin)}</p>
@@ -858,39 +858,39 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       </div>
                     </section>
 
-                    <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-lg">
+                    <section className="rounded-2xl border border-white/10 p-5 shadow-lg">
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/20 text-sm">⚠️</span>
-                        <h2 className="text-base font-bold text-slate-100">Esdeveniments en risc</h2>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm">⚠️</span>
+                        <h2 className="text-base font-bold">Esdeveniments en risc</h2>
                         {props.riskProfitability.length > 0 && (
-                          <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-xs font-bold text-rose-300">
+                          <span className="rounded-full px-2 py-0.5 text-xs font-bold">
                             {props.riskProfitability.length}
                           </span>
                         )}
                       </div>
                       <div className="space-y-2">
                         {props.riskProfitability.length === 0 ? (
-                          <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 p-6 text-center">
-                            <p className="text-emerald-400 font-semibold">Sense alertes!</p>
-                            <p className="text-sm text-emerald-400/70 mt-1">Tots els marges són saludables.</p>
+                          <div className="rounded-xl border p-6 text-center">
+                            <p className="font-semibold">Sense alertes!</p>
+                            <p className="text-sm mt-1">Tots els marges són saludables.</p>
                           </div>
                         ) : (
                           props.riskProfitability.slice(0, 12).map((row) => (
                             <Link
                               key={row.id}
                               href={`/admin/bookings/${row.id}`}
-                              className="flex items-center gap-3 rounded-xl border border-rose-500/10 p-3 hover:bg-rose-500/5 transition-colors group"
+                              className="flex items-center gap-3 rounded-xl border p-3 transition-colors group"
                             >
-                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-rose-500/15 text-xs">📉</span>
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs">📉</span>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-slate-100 truncate group-hover:text-rose-200 transition-colors">
+                                <p className="text-sm font-semibold truncate transition-colors">
                                   {row.reference} &middot; {row.clientName}
                                 </p>
-                                <p className="text-xs text-slate-400">{new Date(row.eventDate).toLocaleDateString('ca-ES')} &middot; {row.source}</p>
+                                <p className="text-xs">{new Date(row.eventDate).toLocaleDateString('ca-ES')} &middot; {row.source}</p>
                               </div>
                               <div className="text-right shrink-0">
-                                <p className="text-sm font-bold text-rose-400">{money(row.netMargin)}</p>
-                                <p className="text-xs text-rose-400">{pct(row.marginPct)}</p>
+                                <p className="text-sm font-bold">{money(row.netMargin)}</p>
+                                <p className="text-xs">{pct(row.marginPct)}</p>
                               </div>
                             </Link>
                           ))
@@ -900,15 +900,15 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                   </div>
 
                   {/* Taula per canal */}
-                  <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-lg">
+                  <section className="rounded-2xl border border-white/10 p-5 shadow-lg">
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/20 text-sm">📊</span>
-                      <h2 className="text-base font-bold text-slate-100">Rendibilitat per canal d&apos;adquisició</h2>
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm">📊</span>
+                      <h2 className="text-base font-bold">Rendibilitat per canal d&apos;adquisició</h2>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="min-w-full text-sm">
                         <thead>
-                          <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wider text-slate-500">
+                          <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wider">
                             <th className="py-3 pr-4">Canal</th>
                             <th className="py-3 pr-4">Esdeveniments</th>
                             <th className="py-3 pr-4">Ingressos</th>
@@ -919,10 +919,10 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         <tbody>
                           {props.bySource.map((row) => (
                             <tr key={row.source} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                              <td className="py-3 pr-4 font-semibold text-slate-200">{row.source}</td>
-                              <td className="py-3 pr-4 text-slate-300">{row.bookings}</td>
-                              <td className="py-3 pr-4 text-slate-300">{money(row.revenue)}</td>
-                              <td className="py-3 pr-4 text-slate-300">{money(row.netMargin)}</td>
+                              <td className="py-3 pr-4 font-semibold">{row.source}</td>
+                              <td className="py-3 pr-4">{row.bookings}</td>
+                              <td className="py-3 pr-4">{money(row.revenue)}</td>
+                              <td className="py-3 pr-4">{money(row.netMargin)}</td>
                               <td className="py-3">
                                 <div className="flex items-center gap-2">
                                   <div className="h-1.5 w-16 rounded-full bg-white/5 overflow-hidden">
@@ -945,38 +945,38 @@ export default function EconomiaClient(props: EconomiaClientProps) {
           {/* ═══════════ CONFIG ═══════════ */}
           {activeTab === 'config' && (
             <>
-              <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-sm">
+              <section className="rounded-2xl border border-white/10 p-5 shadow-sm">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold text-slate-100">Semàfor de packs (clar)</h2>
-                    <p className="text-xs text-slate-400">
+                    <h2 className="text-lg font-semibold">Semàfor de packs (clar)</h2>
+                    <p className="text-xs">
                       Mostra PVP, hora extra, cost estimat i benefici real estimat per pack.
                     </p>
                   </div>
-                  <p className="text-xs text-slate-400">
-                    Objectiu marge pack: <span className="font-semibold text-slate-200">{pct(props.packPricingConfig.marginTargetPct)}</span>
+                  <p className="text-xs">
+                    Objectiu marge pack: <span className="font-semibold">{pct(props.packPricingConfig.marginTargetPct)}</span>
                   </p>
                 </div>
 
                 <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                  <article className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-3">
-                    <p className="text-xs text-emerald-200">Sa</p>
-                    <p className="text-xl font-black text-emerald-100">{props.packPricingSummary.healthy}</p>
+                  <article className="rounded-xl border p-3">
+                    <p className="text-xs">Sa</p>
+                    <p className="text-xl font-black">{props.packPricingSummary.healthy}</p>
                   </article>
-                  <article className="rounded-xl border border-amber-500/25 bg-amber-500/10 p-3">
-                    <p className="text-xs text-amber-200">Vigilar</p>
-                    <p className="text-xl font-black text-amber-100">{props.packPricingSummary.warning}</p>
+                  <article className="rounded-xl border p-3">
+                    <p className="text-xs">Vigilar</p>
+                    <p className="text-xl font-black">{props.packPricingSummary.warning}</p>
                   </article>
-                  <article className="rounded-xl border border-rose-500/25 bg-rose-500/10 p-3">
-                    <p className="text-xs text-rose-200">Crític</p>
-                    <p className="text-xl font-black text-rose-100">{props.packPricingSummary.critical}</p>
+                  <article className="rounded-xl border p-3">
+                    <p className="text-xs">Crític</p>
+                    <p className="text-xl font-black">{props.packPricingSummary.critical}</p>
                   </article>
                 </div>
 
                 <div className="mt-4 overflow-x-auto rounded-xl border border-white/10">
                   <table className="min-w-[1250px] w-full text-sm">
-                    <thead className="bg-slate-900/80">
-                      <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+                    <thead className="">
+                      <tr className="text-left text-[11px] uppercase tracking-wider">
                         <th className="px-3 py-2">Pack</th>
                         <th className="px-3 py-2">Semàfor</th>
                         <th className="px-3 py-2 text-right">PVP</th>
@@ -989,16 +989,16 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                         <th className="px-3 py-2 text-right">Marge h extra</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/10 bg-slate-950/40">
+                    <tbody className="divide-y divide-white/10">
                       {props.packPricingRows.map((row) => {
                         const badge = packMarginBadge(row.marginPct, props.packPricingConfig.marginTargetPct);
                         return (
                           <tr key={row.id} className="hover:bg-white/[0.03]">
                             <td className="px-3 py-2">
-                              <Link href={`/admin/packs/${row.id}`} className="font-semibold text-slate-100 hover:text-cyan-200">
+                              <Link href={`/admin/packs/${row.id}`} className="font-semibold">
                                 {row.name}
                               </Link>
-                              <p className="text-[11px] text-slate-500">{row.slug} · {row.service}</p>
+                              <p className="text-[11px]">{row.slug} · {row.service}</p>
                             </td>
                             <td className="px-3 py-2">
                               <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${badge.cls}`}>
@@ -1006,14 +1006,14 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                                 {badge.label}
                               </span>
                             </td>
-                            <td className="px-3 py-2 text-right text-cyan-200">{money(row.price)}</td>
-                            <td className="px-3 py-2 text-right text-slate-200">{money(row.directCost)}</td>
+                            <td className="px-3 py-2 text-right">{money(row.price)}</td>
+                            <td className="px-3 py-2 text-right">{money(row.directCost)}</td>
                             <td className={`px-3 py-2 text-right font-semibold ${row.profit >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>{money(row.profit)}</td>
-                            <td className="px-3 py-2 text-right text-slate-100">{pct(row.marginPct)}</td>
-                            <td className="px-3 py-2 text-right text-cyan-200">{money(row.extraHourPrice)}</td>
-                            <td className="px-3 py-2 text-right text-slate-300">{money(row.extraHourCostEstimated)}</td>
+                            <td className="px-3 py-2 text-right">{pct(row.marginPct)}</td>
+                            <td className="px-3 py-2 text-right">{money(row.extraHourPrice)}</td>
+                            <td className="px-3 py-2 text-right">{money(row.extraHourCostEstimated)}</td>
                             <td className={`px-3 py-2 text-right font-semibold ${row.extraHourProfit >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>{money(row.extraHourProfit)}</td>
-                            <td className="px-3 py-2 text-right text-slate-200">{pct(row.extraHourMarginPct)}</td>
+                            <td className="px-3 py-2 text-right">{pct(row.extraHourMarginPct)}</td>
                           </tr>
                         );
                       })}

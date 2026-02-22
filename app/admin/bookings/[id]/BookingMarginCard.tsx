@@ -211,34 +211,34 @@ export default function BookingMarginCard({
 
   return (
     <section className={`rounded-xl border shadow-sm p-6 ${marginBg}`}>
-      <h2 className="text-lg font-semibold text-slate-200 mb-4">
+      <h2 className="text-lg font-semibold mb-4">
         📊 Marge i Costos
       </h2>
 
       {/* KPI row */}
       <div className="grid gap-4 sm:grid-cols-4 mb-6">
         <div>
-          <p className="text-xs font-medium uppercase text-slate-400">Ingrés total</p>
-          <p className="text-lg font-bold text-slate-200">{formatCurrency(total)}</p>
+          <p className="text-xs font-medium uppercase">Ingrés total</p>
+          <p className="text-lg font-bold">{formatCurrency(total)}</p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase text-slate-400">Cost directe</p>
-          <p className="text-lg font-bold text-slate-200">{formatCurrency(directCost)}</p>
+          <p className="text-xs font-medium uppercase">Cost directe</p>
+          <p className="text-lg font-bold">{formatCurrency(directCost)}</p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase text-slate-400">Marge net</p>
+          <p className="text-xs font-medium uppercase">Marge net</p>
           <p className={`text-lg font-bold ${marginColor}`}>{formatCurrency(netMargin)}</p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase text-slate-400">% Marge</p>
+          <p className="text-xs font-medium uppercase">% Marge</p>
           <p className={`text-2xl font-black ${marginColor}`}>{marginPct.toFixed(1)}%</p>
         </div>
       </div>
 
       {/* Sumatori clar */}
       <div className="mb-6 rounded-xl border border-white/10 bg-black/20 p-4">
-        <h3 className="text-sm font-semibold text-slate-200 mb-3">Sumatori de costos i marge</h3>
-        <div className="space-y-1.5 text-xs text-slate-300">
+        <h3 className="text-sm font-semibold mb-3">Sumatori de costos i marge</h3>
+        <div className="space-y-1.5 text-xs">
           <div className="flex justify-between"><span>Cost pack (real/estimat)</span><span>{formatCurrency(packCostUsed)}</span></div>
           <div className="flex justify-between"><span>Cost extres</span><span>{formatCurrency(extrasCost)}</span></div>
           <div className="flex justify-between"><span>Cost hores extra</span><span>{formatCurrency(extraHoursCost)}</span></div>
@@ -272,38 +272,38 @@ export default function BookingMarginCard({
       </div>
 
       {/* Cost breakdown */}
-      <div className="text-sm text-slate-400 space-y-1 mb-6 border-t border-white/10 pt-4">
+      <div className="text-sm space-y-1 mb-6 border-t border-white/10 pt-4">
         <div className="flex justify-between">
           <span>
             {typeof inventoryCostReal === 'number' && inventoryCostReal > 0
               ? `Pack (inventari real${inventoryHours ? ` · ${inventoryHours.toFixed(1)}h` : ''})`
               : `Pack (${(packCostRatio * 100).toFixed(0)}% de ${formatCurrency(packPrice)})`}
           </span>
-          <span className="text-slate-300">{formatCurrency(packCostUsed)}</span>
+          <span className="">{formatCurrency(packCostUsed)}</span>
         </div>
         {extrasTotal > 0 && (
           <div className="flex justify-between">
             <span>Extras ({(extraCostRatio * 100).toFixed(0)}% de {formatCurrency(extrasTotal)})</span>
-            <span className="text-slate-300">{formatCurrency(extrasCost)}</span>
+            <span className="">{formatCurrency(extrasCost)}</span>
           </div>
         )}
         {extraHours > 0 && (
           <div className="flex justify-between">
             <span>Hores extra ({extraHours}h × {formatCurrency(extraHourPrice)})</span>
-            <span className="text-slate-300">{formatCurrency(extraHoursCost)}</span>
+            <span className="">{formatCurrency(extraHoursCost)}</span>
           </div>
         )}
         <div className="flex justify-between">
           <span>Cost operacional fix</span>
-          <span className="text-slate-300">{formatCurrency(fixedOperationalCost)}</span>
+          <span className="">{formatCurrency(fixedOperationalCost)}</span>
         </div>
         <div className="flex justify-between">
           <span>Desplaçament ({travelBlocks} trams de {TRAVEL_BLOCK_KM} km)</span>
-          <span className="text-amber-300">{formatCurrency(calculatedTravelCost)}</span>
+          <span className="">{formatCurrency(calculatedTravelCost)}</span>
         </div>
         <div className="flex justify-between">
           <span>Suplement client ({travelBlocks} trams)</span>
-          <span className="text-cyan-300">{formatCurrency(calculatedTravelCharge)}</span>
+          <span className="">{formatCurrency(calculatedTravelCharge)}</span>
         </div>
         <div className="flex justify-between">
           <span>Marge transport</span>
@@ -315,68 +315,68 @@ export default function BookingMarginCard({
 
       {/* Editable travel fields */}
       <div className="border-t border-white/10 pt-4">
-        <h3 className="text-sm font-semibold text-slate-300 mb-3">🚗 Desplaçament (editable)</h3>
-        <p className="mb-3 text-xs text-emerald-300">
+        <h3 className="text-sm font-semibold mb-3">🚗 Desplaçament (editable)</h3>
+        <p className="mb-3 text-xs">
           Inclòs: {INCLUDED_TRAVEL_KM} km totals ({includedOneWayKm} anada + {includedOneWayKm} tornada). Després: {TRAVEL_BLOCK_EUR} € per cada {TRAVEL_BLOCK_KM} km extra.
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Distància (km)</label>
+            <label className="block text-xs font-medium mb-1">Distància (km)</label>
             <input
               type="number"
               min="0"
               step="1"
               value={distanceKm}
               onChange={(e) => setDistanceKm(Number(e.target.value) || 0)}
-              className="w-full px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-slate-200 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-sm focus:ring-2"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Km extra</label>
-            <div className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-slate-200 text-sm">
+            <label className="block text-xs font-medium mb-1">Km extra</label>
+            <div className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-sm">
               {billableKm} km
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">Cost viatge</label>
-            <div className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-amber-300 text-sm font-bold">
+            <label className="block text-xs font-medium mb-1">Cost viatge</label>
+            <div className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-sm font-bold">
               {formatCurrency(calculatedTravelCost)}
             </div>
-            <p className="mt-1 text-[11px] text-slate-400">
+            <p className="mt-1 text-[11px]">
               {travelBlocks} trams × {TRAVEL_BLOCK_EUR} €
             </p>
           </div>
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-            <p className="text-[11px] uppercase tracking-wide text-slate-400">Cost benzina intern</p>
-            <p className="text-sm font-semibold text-amber-300">{formatCurrency(calculatedTravelCost)}</p>
-            <p className="text-[11px] text-slate-500">{distanceKm.toFixed(1)} km × {fuelCostPerKm.toFixed(2)} €/km</p>
+            <p className="text-[11px] uppercase tracking-wide">Cost benzina intern</p>
+            <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCost)}</p>
+            <p className="text-[11px]">{distanceKm.toFixed(1)} km × {fuelCostPerKm.toFixed(2)} €/km</p>
           </div>
           <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-            <p className="text-[11px] uppercase tracking-wide text-slate-400">Ingressos transport</p>
-            <p className="text-sm font-semibold text-cyan-300">{formatCurrency(calculatedTravelCharge)}</p>
-            <p className="text-[11px] text-slate-500">{travelBlocks} trams × {TRAVEL_BLOCK_EUR} €</p>
+            <p className="text-[11px] uppercase tracking-wide">Ingressos transport</p>
+            <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCharge)}</p>
+            <p className="text-[11px]">{travelBlocks} trams × {TRAVEL_BLOCK_EUR} €</p>
           </div>
           <div className={`rounded-lg border p-3 ${travelMarginCardBorder} ${travelMarginCardBg}`}>
-            <p className="text-[11px] uppercase tracking-wide text-slate-400">Marge real transport</p>
+            <p className="text-[11px] uppercase tracking-wide">Marge real transport</p>
             <p className={`text-sm font-semibold ${travelMarginColor}`}>
               {formatCurrency(travelNetMargin)}
             </p>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px]">
               {calculatedTravelCharge > 0 ? `${travelMarginPct.toFixed(1)}% de marge` : 'Sense suplement aplicat'}
             </p>
           </div>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          {calculatingDistance && <p className="text-xs text-amber-300">Calculant ruta automàticament...</p>}
-          {distanceMessage && <p className="text-xs text-slate-300">{distanceMessage}</p>}
+          {calculatingDistance && <p className="text-xs">Calculant ruta automàticament...</p>}
+          {distanceMessage && <p className="text-xs">{distanceMessage}</p>}
         </div>
         {hasChanged && (
           <button
             onClick={handleSave}
             disabled={saving}
-            className="mt-3 px-4 py-2 bg-amber-500 text-black rounded-lg text-sm font-semibold hover:bg-amber-400 disabled:opacity-50 transition-colors"
+            className="mt-3 px-4 py-2 text-black rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
           >
             {saved ? '✅ Desat!' : saving ? '⏳ Desant...' : '💾 Desar canvis'}
           </button>

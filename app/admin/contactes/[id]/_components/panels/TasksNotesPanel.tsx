@@ -56,22 +56,22 @@ export default function TasksNotesPanel({ data }: { data: CustomerHubDTO }) {
   };
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+    <section className="rounded-2xl border p-5">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="text-lg font-semibold text-slate-100">Tasques / Notes</h2>
-          <p className="text-sm text-slate-400">Checklist operativa vinculada al client.</p>
+          <h2 className="text-lg font-semibold">Tasques / Notes</h2>
+          <p className="text-sm">Checklist operativa vinculada al client.</p>
         </div>
         <Link
           href={`/admin/tasks/new?customerId=${data.customer.id}`}
-          className="rounded-lg bg-amber-500 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-600"
+          className="rounded-lg px-3 py-2 text-xs font-semibold text-white"
         >
           Nova tasca
         </Link>
       </div>
 
       {error && (
-        <p className="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 p-2 text-xs text-rose-200">
+        <p className="mt-3 rounded-lg border p-2 text-xs">
           {error}
         </p>
       )}
@@ -114,17 +114,17 @@ function TaskColumn({
 }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-wider text-slate-400">{title}</p>
+      <p className="text-xs uppercase tracking-wider">{title}</p>
       <div className="mt-2 space-y-2">
         {items.length === 0 ? (
-          <p className="rounded-lg border border-slate-700/60 bg-slate-800/50 p-3 text-xs text-slate-400">
+          <p className="rounded-lg border p-3 text-xs">
             Sense tasques.
           </p>
         ) : (
           items.map((task) => (
-            <article key={task.id} className="rounded-lg border border-slate-700/60 bg-slate-800/60 p-3">
-              <p className="text-sm text-slate-100">{task.title}</p>
-              <p className="mt-1 text-[11px] text-slate-500">
+            <article key={task.id} className="rounded-lg border p-3">
+              <p className="text-sm">{task.title}</p>
+              <p className="mt-1 text-[11px]">
                 {task.dueDate
                   ? new Date(task.dueDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short', year: 'numeric' })
                   : 'Sense venciment'}
@@ -134,7 +134,7 @@ function TaskColumn({
                   type="button"
                   onClick={() => onToggleDone(task.id)}
                   disabled={busyTaskId === task.id}
-                  className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700 disabled:opacity-60"
+                  className="rounded border px-2 py-1 text-xs disabled:opacity-60"
                 >
                   {busyTaskId === task.id ? 'Guardant...' : doneColumn ? 'Reobrir' : 'Marcar feta'}
                 </button>
@@ -142,12 +142,12 @@ function TaskColumn({
                   type="button"
                   onClick={() => onDelete(task.id)}
                   disabled={busyTaskId === task.id}
-                  className="rounded border border-rose-600/50 px-2 py-1 text-xs text-rose-300 hover:bg-rose-500/10 disabled:opacity-60"
+                  className="rounded border px-2 py-1 text-xs disabled:opacity-60"
                 >
                   Eliminar
                 </button>
                 {task.leadId && (
-                  <Link href={`/admin/leads/${task.leadId}`} className="text-xs text-cyan-300 hover:text-cyan-200">
+                  <Link href={`/admin/leads/${task.leadId}`} className="text-xs">
                     Obrir entrada
                   </Link>
                 )}

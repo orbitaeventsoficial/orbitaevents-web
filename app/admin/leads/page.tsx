@@ -124,17 +124,17 @@ type Pagination = {
 
 function getPendingTimeBadge(createdAt: Date, status: LeadStatus) {
   if (status === 'WON' || status === 'LOST') {
-    return { label: 'Tancat', className: 'bg-slate-500/20 text-slate-300' };
+    return { label: 'Tancat', className: '' };
   }
 
   const hours = Math.floor((Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60));
   if (hours >= 24) {
-    return { label: `${hours}h (urgent)`, className: 'bg-rose-500/20 text-rose-300' };
+    return { label: `${hours}h (urgent)`, className: '' };
   }
   if (hours >= 8) {
-    return { label: `${hours}h (aviat)`, className: 'bg-amber-500/20 text-amber-300' };
+    return { label: `${hours}h (aviat)`, className: '' };
   }
-  return { label: `${Math.max(0, hours)}h (controlat)`, className: 'bg-emerald-500/20 text-emerald-300' };
+  return { label: `${Math.max(0, hours)}h (controlat)`, className: '' };
 }
 
 async function getLeads(filters: {
@@ -278,7 +278,7 @@ export default async function LeadsPage({
       className="admin-page-container admin-leads-page space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8"
       style={LEAD_COLOR_DEFAULT_VARS as CSSProperties}
     >
-      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-2">
+      <section className="rounded-2xl border p-2">
         <div className="grid grid-cols-2 gap-2">
           <Link
             href="/admin/leads"
@@ -311,10 +311,10 @@ export default async function LeadsPage({
       {/* Mobile Card View */}
       <section className="lg:hidden space-y-3">
         {leads.length === 0 ? (
-          <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-8 text-center">
+          <div className="rounded-2xl border backdrop-blur-sm p-8 text-center">
             <span className="text-4xl">📭</span>
-            <p className="mt-2 text-slate-300">Encara no hi ha entrades</p>
-            <p className="text-xs text-slate-500">Els contactes apareixeran aquí</p>
+            <p className="mt-2">Encara no hi ha entrades</p>
+            <p className="text-xs">Els contactes apareixeran aquí</p>
           </div>
         ) : (
           leads.map((lead) => {
@@ -324,26 +324,26 @@ export default async function LeadsPage({
             return (
               <article
                 key={lead.id}
-                className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4 hover:bg-slate-700/40 transition-colors"
+                className="rounded-2xl border backdrop-blur-sm p-4 transition-colors"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="w-10 h-10 rounded-full border border-cyan-500/35 bg-cyan-900/50 flex items-center justify-center text-cyan-200 font-semibold shrink-0">
+                    <div className="w-10 h-10 rounded-full border flex items-center justify-center font-semibold shrink-0">
                       {lead.name?.charAt(0).toUpperCase() || '?'}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <Link href={`/admin/leads/${lead.id}`} className="font-medium text-slate-100 truncate block hover:text-cyan-300">
+                      <Link href={`/admin/leads/${lead.id}`} className="font-medium truncate block">
                         {lead.name}
                       </Link>
-                      <p className="text-xs text-slate-400 truncate">{lead.email}</p>
-                      <p className="text-[11px] text-fuchsia-300/80">{SOURCE_LABELS[lead.source] || lead.source}</p>
+                      <p className="text-xs truncate">{lead.email}</p>
+                      <p className="text-[11px]">{SOURCE_LABELS[lead.source] || lead.source}</p>
                     </div>
                   </div>
                   <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConf.badgeClass}`}>
                     {statusConf.label}
                   </span>
                 </div>
-                <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
+                <div className="mt-3 flex items-center justify-between text-xs">
                   <span>{eventType}</span>
                   <span>
                     {lead.eventDate
@@ -365,14 +365,14 @@ export default async function LeadsPage({
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/admin/leads/${lead.id}`}
-                      className="rounded-lg border border-cyan-500/40 px-2 py-1 text-[11px] font-medium text-cyan-300 hover:bg-cyan-500/10"
+                      className="rounded-lg border px-2 py-1 text-[11px] font-medium"
                     >
                       Obrir fitxa
                     </Link>
                     {lead.customerId && (
                       <Link
                         href={`/admin/contactes/${lead.customerId}`}
-                        className="rounded-lg border border-violet-500/40 px-2 py-1 text-[11px] font-medium text-violet-300 hover:bg-violet-500/10"
+                        className="rounded-lg border px-2 py-1 text-[11px] font-medium"
                       >
                         Client
                       </Link>
@@ -389,7 +389,7 @@ export default async function LeadsPage({
                 {lead.booking && (
                   <Link
                     href={`/admin/bookings/${lead.booking.id}`}
-                    className="mt-2 block text-xs text-emerald-400 font-medium hover:text-emerald-300 hover:underline"
+                    className="mt-2 block text-xs font-medium hover:underline"
                   >
                     ✓ Reserva: {lead.booking.reference}
                   </Link>
@@ -401,26 +401,26 @@ export default async function LeadsPage({
       </section>
 
       {/* Desktop Table View */}
-      <section className="hidden lg:block rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+      <section className="hidden lg:block rounded-2xl border backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1120px] text-sm">
-            <thead className="bg-slate-700/30 border-b border-slate-700/50">
+            <thead className="border-b">
               <tr>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Client</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Contacte</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Tipus</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Origen</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Data</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Temps pendent</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Estat</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Prioritat</th>
-                <th className="px-3 xl:px-4 py-3 text-center font-medium text-slate-300 whitespace-nowrap">Accions</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Client</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Contacte</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Tipus</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Origen</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Data</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Temps pendent</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Estat</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Prioritat</th>
+                <th className="px-3 xl:px-4 py-3 text-center font-medium whitespace-nowrap">Accions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/30">
               {leads.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center text-slate-400">
+                  <td colSpan={9} className="px-4 py-12 text-center">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-4xl">📭</span>
                       <p>Encara no hi ha entrades</p>
@@ -434,35 +434,35 @@ export default async function LeadsPage({
                   const priorityConf = PRIORITY_CONFIG[lead.priority] || PRIORITY_CONFIG.MEDIUM;
 
                   return (
-                    <tr key={lead.id} className="hover:bg-slate-700/30 transition-colors">
+                    <tr key={lead.id} className="transition-colors">
                       <td className="px-3 xl:px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          <Link href={`/admin/leads/${lead.id}`} className="font-medium text-slate-100 hover:text-cyan-400 whitespace-nowrap">
+                          <Link href={`/admin/leads/${lead.id}`} className="font-medium whitespace-nowrap">
                             {lead.name}
                           </Link>
                           {lead.customerId && (
-                            <Link href={`/admin/contactes/${lead.customerId}`} className="text-cyan-400 hover:text-cyan-300" title="Fitxa client">
+                            <Link href={`/admin/contactes/${lead.customerId}`} className="" title="Fitxa client">
                               👤
                             </Link>
                           )}
                         </div>
                         {lead.booking && (
-                          <Link href={`/admin/bookings/${lead.booking.id}`} className="text-xs text-emerald-400 hover:text-emerald-300 hover:underline block text-center">
+                          <Link href={`/admin/bookings/${lead.booking.id}`} className="text-xs hover:underline block text-center">
                             ✓ {lead.booking.reference}
                           </Link>
                         )}
                       </td>
                       <td className="px-3 xl:px-4 py-3 text-center">
-                        <a href={`mailto:${lead.email}`} className="text-cyan-400 hover:underline text-xs truncate block max-w-[220px] whitespace-nowrap mx-auto">
+                        <a href={`mailto:${lead.email}`} className="hover:underline text-xs truncate block max-w-[220px] whitespace-nowrap mx-auto">
                           {lead.email}
                         </a>
                         {lead.phone && (
-                          <a href={`tel:${lead.phone}`} className="text-slate-400 text-xs whitespace-nowrap inline-block">📱 {lead.phone}</a>
+                          <a href={`tel:${lead.phone}`} className="text-xs whitespace-nowrap inline-block">📱 {lead.phone}</a>
                         )}
                       </td>
-                      <td className="px-3 xl:px-4 py-3 text-slate-300 text-xs whitespace-nowrap text-center">{eventType}</td>
-                      <td className="px-3 xl:px-4 py-3 text-xs text-fuchsia-200 whitespace-nowrap text-center">{SOURCE_LABELS[lead.source] || lead.source}</td>
-                      <td className="px-3 xl:px-4 py-3 text-slate-300 text-xs whitespace-nowrap text-center">
+                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap text-center">{eventType}</td>
+                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap text-center">{SOURCE_LABELS[lead.source] || lead.source}</td>
+                      <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap text-center">
                         {lead.eventDate
                           ? new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short', year: 'numeric' })
                           : '—'}
@@ -507,7 +507,7 @@ export default async function LeadsPage({
       </section>
 
       {data.pagination.totalPages > 1 && (
-        <section className="flex items-center justify-between rounded-2xl border border-slate-700/50 bg-slate-800/60 p-3 text-xs text-slate-300">
+        <section className="flex items-center justify-between rounded-2xl border p-3 text-xs">
           <span>
             Pàgina {data.pagination.page} de {data.pagination.totalPages}
           </span>
@@ -519,12 +519,12 @@ export default async function LeadsPage({
                   params.set('page', String(data.pagination.page - 1));
                   return params.toString();
                 })()}`}
-                className="rounded-lg border border-slate-600/50 px-3 py-1 hover:bg-slate-700/50"
+                className="rounded-lg border px-3 py-1"
               >
                 ← Anterior
               </Link>
             ) : (
-              <span className="rounded-lg border border-slate-700/50 px-3 py-1 text-slate-500">← Anterior</span>
+              <span className="rounded-lg border px-3 py-1">← Anterior</span>
             )}
             {data.pagination.page < data.pagination.totalPages ? (
               <Link
@@ -533,12 +533,12 @@ export default async function LeadsPage({
                   params.set('page', String(data.pagination.page + 1));
                   return params.toString();
                 })()}`}
-                className="rounded-lg border border-slate-600/50 px-3 py-1 hover:bg-slate-700/50"
+                className="rounded-lg border px-3 py-1"
               >
                 Següent →
               </Link>
             ) : (
-              <span className="rounded-lg border border-slate-700/50 px-3 py-1 text-slate-500">Següent →</span>
+              <span className="rounded-lg border px-3 py-1">Següent →</span>
             )}
           </div>
         </section>

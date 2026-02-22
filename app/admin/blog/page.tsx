@@ -109,8 +109,8 @@ export default function BlogAdminPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-100">Gestió de Blog</h1>
-          <p className="mt-1 text-sm text-slate-400">{total} posts en total</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Gestió de Blog</h1>
+          <p className="mt-1 text-sm">{total} posts en total</p>
         </div>
 
         <div className="flex gap-3">
@@ -118,7 +118,7 @@ export default function BlogAdminPage() {
             value={locale}
             onChange={(e) => setLocale(e.target.value)}
             aria-label="Idioma"
-            className="rounded-xl border border-slate-600/50 bg-slate-800/80 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+            className="rounded-xl border px-4 py-2 focus:ring-1"
           >
             <option value="es">Castellà</option>
             <option value="ca">Català</option>
@@ -127,7 +127,7 @@ export default function BlogAdminPage() {
           <button
             onClick={() => (window.location.href = '/admin/blog/new')}
             type="button"
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-white font-medium shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors"
+            className="flex items-center gap-2 rounded-xl px-4 py-2 text-white font-medium shadow-lg transition-colors"
           >
             <PlusIcon className="h-5 w-5" />
             Nou post
@@ -151,7 +151,7 @@ export default function BlogAdminPage() {
               onClick={() => setFlashMessage(null)}
               type="button"
               aria-label="Tancar missatge"
-              className="text-xs text-slate-400 hover:text-slate-200"
+              className="text-xs"
             >
               ✕
             </button>
@@ -161,41 +161,41 @@ export default function BlogAdminPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20" role="status" aria-live="polite">
-          <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" />
         </div>
       ) : posts.length === 0 ? (
-        <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-12 text-center">
-          <p className="text-slate-400">Encara no hi ha posts</p>
+        <div className="rounded-2xl border backdrop-blur-sm p-12 text-center">
+          <p className="">Encara no hi ha posts</p>
           <button
             onClick={() => (window.location.href = '/admin/blog/new')}
             type="button"
-            className="mt-4 text-cyan-400 hover:text-cyan-300"
+            className="mt-4"
           >
             Crea el primer
           </button>
         </div>
       ) : (
         <>
-          <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+          <div className="rounded-2xl border backdrop-blur-sm overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-slate-700/30 border-b border-slate-700/50">
+              <thead className="border-b">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
+                  <th scope="col" className="px-6 py-3 text-left font-medium">
                     Títol
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
+                  <th scope="col" className="px-6 py-3 text-left font-medium">
                     Categoria
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
+                  <th scope="col" className="px-6 py-3 text-left font-medium">
                     Estat
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
+                  <th scope="col" className="px-6 py-3 text-left font-medium">
                     Visites
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left font-medium text-slate-300">
+                  <th scope="col" className="px-6 py-3 text-left font-medium">
                     Data
                   </th>
-                  <th scope="col" className="px-6 py-3 text-right font-medium text-slate-300">
+                  <th scope="col" className="px-6 py-3 text-right font-medium">
                     Accions
                   </th>
                 </tr>
@@ -204,17 +204,17 @@ export default function BlogAdminPage() {
                 {posts.map((post) => {
                   const translation = post.translations[0];
                   return (
-                    <tr key={post.id} className="hover:bg-slate-700/30 transition-colors">
+                    <tr key={post.id} className="transition-colors">
                       <td className="px-6 py-4">
                         <div>
-                          <div className="font-medium text-slate-100">
+                          <div className="font-medium">
                             {translation?.title || 'Sense títol'}
                           </div>
-                          <div className="text-sm text-slate-500">/{post.slug}</div>
+                          <div className="text-sm">/{post.slug}</div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="rounded-full bg-purple-500/20 px-3 py-1 text-xs text-purple-300">
+                        <span className="rounded-full px-3 py-1 text-xs">
                           {post.category}
                         </span>
                       </td>
@@ -232,8 +232,8 @@ export default function BlogAdminPage() {
                           {post.isPublished ? 'Publicat' : 'Esborrany'}
                         </button>
                       </td>
-                      <td className="px-6 py-4 text-slate-400">{post.viewCount}</td>
-                      <td className="px-6 py-4 text-sm text-slate-400">
+                      <td className="px-6 py-4">{post.viewCount}</td>
+                      <td className="px-6 py-4 text-sm">
                         {new Date(post.createdAt).toLocaleDateString('ca-ES')}
                       </td>
                       <td className="px-6 py-4">
@@ -243,7 +243,7 @@ export default function BlogAdminPage() {
                               (window.location.href = `/admin/blog/edit/${post.id}`)
                             }
                             type="button"
-                            className="rounded-lg p-2 text-cyan-400 hover:bg-slate-700/50 transition-colors"
+                            className="rounded-lg p-2 transition-colors"
                             title="Editar"
                           >
                             <PencilIcon className="h-5 w-5" />
@@ -251,7 +251,7 @@ export default function BlogAdminPage() {
                           <button
                             onClick={() => handleDelete(post.id)}
                             type="button"
-                            className="rounded-lg p-2 text-rose-400 hover:bg-slate-700/50 transition-colors"
+                            className="rounded-lg p-2 transition-colors"
                             title="Eliminar"
                           >
                             <TrashIcon className="h-5 w-5" />
@@ -271,18 +271,18 @@ export default function BlogAdminPage() {
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
                 type="button"
-                className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-slate-200 disabled:opacity-50 hover:bg-slate-600/50 transition-colors"
+                className="rounded-xl border px-4 py-2 disabled:opacity-50 transition-colors"
               >
                 Anterior
               </button>
-              <span className="flex items-center px-4 text-slate-400">
+              <span className="flex items-center px-4">
                 Pàgina {page} de {totalPages}
               </span>
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page === totalPages}
                 type="button"
-                className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2 text-slate-200 disabled:opacity-50 hover:bg-slate-600/50 transition-colors"
+                className="rounded-xl border px-4 py-2 disabled:opacity-50 transition-colors"
               >
                 Següent
               </button>

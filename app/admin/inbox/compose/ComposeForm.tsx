@@ -211,7 +211,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-2 p-1 bg-slate-800/60 rounded-xl w-fit border border-slate-700/50">
+      <div className="flex gap-2 p-1 rounded-xl w-fit border">
         <button
           onClick={() => setMode('email')}
           type="button"
@@ -234,11 +234,11 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
         </button>
       </div>
 
-      <div className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden">
+      <div className="rounded-2xl border backdrop-blur-sm overflow-hidden">
         <div className="p-6 space-y-6">
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label className="block text-sm font-medium mb-2">
               Selecciona entrada (opcional)
             </label>
             <select
@@ -257,34 +257,34 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
           </div>
 
           {selectedLead && (
-            <div className="bg-slate-700/30 rounded-xl p-4 border border-slate-700/50">
-              <h4 className="font-medium text-slate-200 mb-3">📋 Detalls de l'entrada</h4>
+            <div className="rounded-xl p-4 border">
+              <h4 className="font-medium mb-3">📋 Detalls de l'entrada</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
-                  <span className="text-slate-400">Tipus:</span>
-                  <p className="font-medium text-slate-200">{EVENT_TYPE_LABELS[selectedLead.eventType || ''] || 'No especificat'}</p>
+                  <span className="">Tipus:</span>
+                  <p className="font-medium">{EVENT_TYPE_LABELS[selectedLead.eventType || ''] || 'No especificat'}</p>
                 </div>
                 <div>
-                  <span className="text-slate-400">Data:</span>
-                  <p className="font-medium text-slate-200">
+                  <span className="">Data:</span>
+                  <p className="font-medium">
                     {selectedLead.eventDate
                       ? new Date(selectedLead.eventDate).toLocaleDateString('ca-ES')
                       : 'No especificat'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400">Ubicació:</span>
-                  <p className="font-medium text-slate-200">{selectedLead.eventLocation || 'No especificat'}</p>
+                  <span className="">Ubicació:</span>
+                  <p className="font-medium">{selectedLead.eventLocation || 'No especificat'}</p>
                 </div>
                 <div>
-                  <span className="text-slate-400">Convidats:</span>
-                  <p className="font-medium text-slate-200">{selectedLead.guestCount || 'No especificat'}</p>
+                  <span className="">Convidats:</span>
+                  <p className="font-medium">{selectedLead.guestCount || 'No especificat'}</p>
                 </div>
               </div>
               {selectedLead.message && (
-                <div className="mt-3 pt-3 border-t border-slate-700/50">
-                  <span className="text-slate-400 text-sm">Missatge:</span>
-                  <p className="text-sm text-slate-300 mt-1">{selectedLead.message}</p>
+                <div className="mt-3 pt-3 border-t">
+                  <span className="text-sm">Missatge:</span>
+                  <p className="text-sm mt-1">{selectedLead.message}</p>
                 </div>
               )}
             </div>
@@ -294,7 +294,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
             <>
               {!selectedLeadId && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label className="block text-sm font-medium mb-2">
                     Correu del client *
                   </label>
                   <input
@@ -308,7 +308,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
               )}
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium mb-2">
                   Pack recomanat *
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -326,8 +326,8 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
                           : 'border-slate-600/50 hover:border-slate-500/50 bg-slate-700/30'
                       }`}
                     >
-                        <p className="font-semibold text-slate-100">{name}</p>
-                        <p className="text-cyan-400 font-bold mt-1">{pack.price.toLocaleString('es-ES')}€</p>
+                        <p className="font-semibold">{name}</p>
+                        <p className="font-bold mt-1">{pack.price.toLocaleString('es-ES')}€</p>
                       </button>
                     );
                   })}
@@ -336,7 +336,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
               {/* Price */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium mb-2">
                   Preu total (€) *
                 </label>
                 <input
@@ -350,7 +350,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
               {/* Extras */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium mb-2">
                   Extras inclosos
                 </label>
                 <textarea
@@ -364,7 +364,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
               {/* Custom message */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium mb-2">
                   Missatge personalitzat (opcional)
                 </label>
                 <textarea
@@ -378,7 +378,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
               {/* Notes */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium mb-2">
                   Notes addicionals
                 </label>
                 <textarea
@@ -392,7 +392,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
 
               {/* Locale */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium mb-2">
                   Idioma del pressupost
                 </label>
                 <div className="flex gap-2">
@@ -421,7 +421,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
             // Normal email form
             <>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Per a *</label>
+                <label className="block text-sm font-medium mb-2">Per a *</label>
                 <input
                   type="email"
                   value={to}
@@ -432,7 +432,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Assumpte *</label>
+                <label className="block text-sm font-medium mb-2">Assumpte *</label>
                 <input
                   type="text"
                   value={subject}
@@ -443,7 +443,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Missatge *</label>
+                <label className="block text-sm font-medium mb-2">Missatge *</label>
                 <textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
@@ -457,17 +457,17 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 bg-slate-700/30 border-t border-slate-700/50">
+        <div className="flex items-center justify-between px-6 py-4 border-t">
           <div>
             {error && (
-              <p className="text-rose-400 text-sm" role="alert">❌ {error}</p>
+              <p className="text-sm" role="alert">❌ {error}</p>
             )}
           </div>
           <div className="flex gap-3">
             <button
               onClick={() => router.push('/admin/inbox')}
               type="button"
-              className="px-4 py-2 text-slate-400 hover:text-slate-300 transition-colors"
+              className="px-4 py-2 transition-colors"
             >
               Cancel·lar
             </button>

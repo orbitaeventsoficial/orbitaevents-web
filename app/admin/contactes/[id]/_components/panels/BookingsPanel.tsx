@@ -45,15 +45,15 @@ function PaymentIndicator({ booking }: { booking: BookingDTO }) {
 
 export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+    <section className="rounded-2xl border p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-100">Reserves / Dates</h2>
-          <p className="text-sm text-slate-400">Planificació d&apos;esdeveniments del client.</p>
+          <h2 className="text-lg font-semibold">Reserves / Dates</h2>
+          <p className="text-sm">Planificació d&apos;esdeveniments del client.</p>
         </div>
         <Link
           href={`/admin/bookings/new?customerId=${data.customer.id}`}
-          className="rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-600"
+          className="rounded-lg px-3 py-2 text-xs font-semibold text-white"
         >
           Nova reserva
         </Link>
@@ -61,7 +61,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
 
       <div className="mt-4 space-y-3">
         {data.bookings.length === 0 ? (
-          <p className="rounded-lg border border-slate-700/60 bg-slate-800/50 p-3 text-sm text-slate-400">
+          <p className="rounded-lg border p-3 text-sm">
             Sense reserves. Crea la primera reserva del client.
           </p>
         ) : (
@@ -69,10 +69,10 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
             const statusColor = STATUS_COLORS[booking.status] || 'border-slate-600 bg-slate-700/20 text-slate-300';
 
             return (
-              <div key={booking.id} className="rounded-xl border border-slate-700/70 bg-slate-800/60 p-4">
+              <div key={booking.id} className="rounded-xl border p-4">
                 {/* Header: referència + badge */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-slate-100">{booking.reference || booking.id.slice(0, 8)}</p>
+                  <p className="text-sm font-semibold">{booking.reference || booking.id.slice(0, 8)}</p>
                   <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusColor}`}>
                     {labelEstatReserva(booking.status)}
                   </span>
@@ -81,15 +81,15 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                 {/* Event type + data + horari */}
                 <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                   {booking.eventType && (
-                    <span className="text-slate-200">{EVENT_TYPE_LABELS[booking.eventType] || booking.eventType}</span>
+                    <span className="">{EVENT_TYPE_LABELS[booking.eventType] || booking.eventType}</span>
                   )}
-                  <span className="text-slate-400">
+                  <span className="">
                     {booking.date
                       ? new Date(booking.date).toLocaleDateString('ca-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
                       : 'Sense data'}
                   </span>
                   {(booking.startTime || booking.endTime) && (
-                    <span className="text-slate-500">
+                    <span className="">
                       {booking.startTime || '?'} – {booking.endTime || '?'}
                     </span>
                   )}
@@ -97,7 +97,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
 
                 {/* Ubicació */}
                 {(booking.location || booking.venue) && (
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs">
                     📍 {booking.venue || booking.location}
                   </p>
                 )}
@@ -105,17 +105,17 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                 {/* Pack + convidats */}
                 <div className="mt-2 flex flex-wrap gap-2">
                   {booking.packName && (
-                    <span className="rounded-md bg-indigo-500/10 px-2 py-0.5 text-[11px] text-indigo-300">
+                    <span className="rounded-md px-2 py-0.5 text-[11px]">
                       🎵 {booking.packName}
                     </span>
                   )}
                   {booking.guestCount && (
-                    <span className="rounded-md bg-slate-700/50 px-2 py-0.5 text-[11px] text-slate-400">
+                    <span className="rounded-md px-2 py-0.5 text-[11px]">
                       👥 {booking.guestCount} convidats
                     </span>
                   )}
                   {booking.discountCode && (
-                    <span className="rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-300">
+                    <span className="rounded-md px-2 py-0.5 text-[11px]">
                       🏷️ {booking.discountCode}
                     </span>
                   )}
@@ -127,10 +127,10 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                 )}
 
                 {/* Link a fitxa event */}
-                <div className="mt-3 border-t border-slate-700/50 pt-2">
+                <div className="mt-3 border-t pt-2">
                   <Link
                     href={`/admin/bookings/${booking.id}`}
-                    className="inline-flex items-center gap-1 rounded-lg bg-cyan-500/10 px-3 py-1.5 text-xs font-medium text-cyan-300 transition-colors hover:bg-cyan-500/20"
+                    className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
                   >
                     Obrir fitxa d&apos;esdeveniment →
                   </Link>

@@ -90,17 +90,17 @@ class PanelErrorBoundary extends Component<
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="rounded-2xl border border-rose-500/40 bg-rose-500/10 p-5">
-            <p className="text-sm font-semibold text-rose-200">
+          <div className="rounded-2xl border p-5">
+            <p className="text-sm font-semibold">
               Error carregant {this.props.panelName}
             </p>
-            <p className="mt-1 text-xs text-rose-300/70">
+            <p className="mt-1 text-xs">
               {this.state.error?.message || 'Error desconegut'}
             </p>
             <button
               type="button"
               onClick={() => this.setState({ hasError: false })}
-              className="mt-3 rounded-lg border border-rose-500/40 px-3 py-1.5 text-xs text-rose-200 hover:bg-rose-500/20"
+              className="mt-3 rounded-lg border px-3 py-1.5 text-xs"
             >
               Torna a intentar
             </button>
@@ -119,12 +119,12 @@ class PanelErrorBoundary extends Component<
 
 function PanelSkeleton() {
   return (
-    <div className="animate-pulse rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
-      <div className="h-6 w-1/3 rounded bg-slate-700/50" />
-      <div className="mt-2 h-4 w-2/3 rounded bg-slate-700/30" />
+    <div className="animate-pulse rounded-2xl border p-5">
+      <div className="h-6 w-1/3 rounded" />
+      <div className="mt-2 h-4 w-2/3 rounded" />
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-20 rounded-xl bg-slate-800/50" />
+          <div key={i} className="h-20 rounded-xl" />
         ))}
       </div>
     </div>
@@ -133,11 +133,11 @@ function PanelSkeleton() {
 
 function TimelineSkeleton() {
   return (
-    <aside className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4">
-      <div className="h-5 w-1/2 rounded bg-slate-700/50" />
+    <aside className="rounded-2xl border p-4">
+      <div className="h-5 w-1/2 rounded" />
       <div className="mt-3 space-y-2">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-16 rounded-lg bg-slate-800/50" />
+          <div key={i} className="h-16 rounded-lg" />
         ))}
       </div>
     </aside>
@@ -257,7 +257,7 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
         {/* Refresh error banner */}
         {refreshError && (
           <div className="mx-auto max-w-7xl px-4">
-            <div className="rounded-lg border border-rose-500/40 bg-rose-500/10 px-4 py-2 text-sm text-rose-200">
+            <div className="rounded-lg border px-4 py-2 text-sm">
               {refreshError}
               <button
                 type="button"
@@ -273,7 +273,7 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
         {/* Refreshing indicator */}
         {isPending && (
           <div className="mx-auto max-w-7xl px-4">
-            <div className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-4 py-2 text-sm text-cyan-200">
+            <div className="rounded-lg border px-4 py-2 text-sm">
               <span className="mr-2 inline-block animate-spin">⟳</span>
               Actualitzant dades...
             </div>
@@ -297,7 +297,7 @@ export default function CustomerHubClient({ initial }: { initial: CustomerHubDTO
           type="button"
           onClick={refresh}
           disabled={isPending}
-          className="fixed bottom-20 right-4 z-40 rounded-full bg-slate-800 p-3 shadow-lg transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 lg:hidden"
+          className="fixed bottom-20 right-4 z-40 rounded-full p-3 shadow-lg transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 lg:hidden"
           aria-label="Refrescar dades"
         >
           <span className={isPending ? 'inline-block animate-spin' : ''}>🔄</span>

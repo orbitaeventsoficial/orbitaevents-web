@@ -38,7 +38,7 @@ export default function LeadStatusQuickActions({
       value={currentStatus}
       onChange={(e) => onChange(e.target.value as LeadStatus)}
       disabled={saving}
-      className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-2 py-1 text-[11px] text-slate-200"
+      className="rounded-lg border px-2 py-1 text-[11px]"
       title="Canviar estat lead"
     >
       <option value="NEW">Entrada nova</option>

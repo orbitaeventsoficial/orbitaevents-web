@@ -24,11 +24,11 @@ export default function CustomerTabSelector({
   const router = useRouter();
   return (
     <label className="block sm:hidden">
-      <span className="mb-1 block text-xs text-slate-400">Vista de la fitxa</span>
+      <span className="mb-1 block text-xs">Vista de la fitxa</span>
       <select
         value={currentTab}
         onChange={(e) => router.push(`/admin/clientes/${customerId}?tab=${e.target.value}`)}
-        className="w-full rounded-xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm text-slate-100"
+        className="w-full rounded-xl border border-white/10 px-3 py-2 text-sm"
       >
         {Object.entries(TAB_LABELS).map(([value, label]) => (
           <option key={value} value={value}>

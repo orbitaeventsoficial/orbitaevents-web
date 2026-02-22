@@ -68,21 +68,21 @@ export default function CommunicationPanel({
   ];
 
   return (
-    <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-100">Comunicacions multicanal</h2>
+    <section className="rounded-xl border border-white/10 p-6 shadow-sm">
+      <h2 className="text-lg font-semibold">Comunicacions multicanal</h2>
       <div className="mt-3 space-y-3">
         {flows.map((flow) => {
           const status = initialStatuses[flow.key];
           return (
             <div key={flow.key} className="rounded-lg border border-white/10 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-slate-100">{flow.label}</p>
-                <p className="text-xs text-slate-400">
+                <p className="text-sm font-semibold">{flow.label}</p>
+                <p className="text-xs">
                   Estat: <strong>{formatStatus(status.state)}</strong>{' '}
                   {status.lastChannel ? `· últim canal ${status.lastChannel}` : ''}
                 </p>
               </div>
-              <div className="mt-1 text-[11px] text-slate-400">
+              <div className="mt-1 text-[11px]">
                 <span>Últim enviament: {formatDateTime(status.sentAt)}</span>
                 <span className="mx-2">·</span>
                 <span>Última resposta: {formatDateTime(status.respondedAt)}</span>
@@ -92,7 +92,7 @@ export default function CommunicationPanel({
                   type="button"
                   onClick={() => run('send_email', flow.key)}
                   disabled={loading === flow.key}
-                  className="rounded-md bg-slate-800 px-2 py-1 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
+                  className="rounded-md px-2 py-1 text-xs font-semibold text-white disabled:opacity-60"
                 >
                   Correu
                 </button>
@@ -100,7 +100,7 @@ export default function CommunicationPanel({
                   href={waLink(flow.key)}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-md bg-green-500 px-2 py-1 text-xs font-semibold text-white hover:bg-green-600"
+                  className="rounded-md px-2 py-1 text-xs font-semibold text-white"
                 >
                   Obrir WhatsApp
                 </a>
@@ -108,7 +108,7 @@ export default function CommunicationPanel({
                   type="button"
                   onClick={() => run('send_whatsapp', flow.key)}
                   disabled={loading === flow.key}
-                  className="rounded-md bg-emerald-600 px-2 py-1 text-xs font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
+                  className="rounded-md px-2 py-1 text-xs font-semibold text-white disabled:opacity-60"
                 >
                   Envia per API de WhatsApp
                 </button>
@@ -116,7 +116,7 @@ export default function CommunicationPanel({
                   type="button"
                   onClick={() => run('log_sent', flow.key, 'whatsapp')}
                   disabled={loading === flow.key}
-                  className="rounded-md border border-white/10 bg-slate-950/60 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-white/5 disabled:opacity-60"
+                  className="rounded-md border border-white/10 px-2 py-1 text-xs font-semibold hover:bg-white/5 disabled:opacity-60"
                 >
                   Marcar enviat
                 </button>
@@ -124,7 +124,7 @@ export default function CommunicationPanel({
                   type="button"
                   onClick={() => run('mark_responded', flow.key)}
                   disabled={loading === flow.key}
-                  className="rounded-md border border-emerald-300 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-60"
+                  className="rounded-md border px-2 py-1 text-xs font-semibold disabled:opacity-60"
                 >
                   Marcar respost
                 </button>

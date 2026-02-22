@@ -171,17 +171,17 @@ export default function LeadActionsEnhanced({
   return (
     <div className="space-y-6">
       {/* Canviar Estat */}
-      <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-slate-200 mb-4">📊 Canviar estat</h3>
+      <section className="rounded-xl border border-white/10 p-6 shadow-sm">
+        <h3 className="text-sm font-semibold mb-4">📊 Canviar estat</h3>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
+          <div className="mb-4 p-3 rounded-lg border text-sm" role="alert">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-4 p-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm" role="status">
+          <div className="mb-4 p-3 rounded-lg border text-sm" role="status">
             {success}
           </div>
         )}
@@ -206,7 +206,7 @@ export default function LeadActionsEnhanced({
                 {status.label}
               </span>
               {status.value === optimisticStatus && (
-                <span className="ml-auto text-xs text-slate-400">Actual</span>
+                <span className="ml-auto text-xs">Actual</span>
               )}
             </button>
           ))}
@@ -214,19 +214,19 @@ export default function LeadActionsEnhanced({
       </section>
 
       {/* Generar Pressupost */}
-      <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-slate-200 mb-4">📄 Pressupost</h3>
+      <section className="rounded-xl border border-white/10 p-6 shadow-sm">
+        <h3 className="text-sm font-semibold mb-4">📄 Pressupost</h3>
         
         <div className="space-y-4">
           {/* Selector de Pack */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-2">
+            <label className="block text-xs font-medium mb-2">
               Selecciona Pack
             </label>
             <select
               value={selectedPack}
               onChange={(e) => setSelectedPack(e.target.value)}
-              className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:ring-2"
             >
               {PACK_OPTIONS.map((pack) => (
                 <option key={pack.value} value={pack.value}>
@@ -240,7 +240,7 @@ export default function LeadActionsEnhanced({
 
           {/* Preu personalitzat */}
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-2">
+            <label className="block text-xs font-medium mb-2">
               Preu personalitzat {isManualMode ? '(obligatori)' : '(opcional)'}
             </label>
             <input
@@ -254,23 +254,23 @@ export default function LeadActionsEnhanced({
                   : `${selectedPackInfo?.price}€ (per defecte). Ex: 200 o 200,00`
               }
               disabled={!isManualMode}
-              className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-white/5 disabled:text-slate-400"
+              className="w-full px-3 py-2 border border-white/10 rounded-lg text-sm focus:ring-2 disabled:bg-white/5"
             />
           </div>
 
           {/* Resum */}
-          <div className="p-3 bg-slate-50 rounded-lg">
+          <div className="p-3 rounded-lg">
             <div className="flex justify-between text-sm">
-              <span className="text-slate-300">Base:</span>
+              <span className="">Base:</span>
               <span className="font-medium">{effectivePrice}€</span>
             </div>
             <div className="flex justify-between text-sm mt-1">
-              <span className="text-slate-300">IVA (21%):</span>
+              <span className="">IVA (21%):</span>
               <span className="font-medium">{(effectivePrice * 0.21).toFixed(2)}€</span>
             </div>
             <div className="flex justify-between text-sm mt-2 pt-2 border-t border-white/10">
-              <span className="font-semibold text-slate-200">Total:</span>
-              <span className="font-bold text-amber-600">{(effectivePrice * 1.21).toFixed(2)}€</span>
+              <span className="font-semibold">Total:</span>
+              <span className="font-bold">{(effectivePrice * 1.21).toFixed(2)}€</span>
             </div>
           </div>
 
@@ -280,7 +280,7 @@ export default function LeadActionsEnhanced({
               onClick={handlePreviewQuote}
               disabled={isManualMode && effectivePrice <= 0}
               type="button"
-              className="flex-1 px-4 py-2 border border-white/10 rounded-lg text-sm font-medium text-slate-200 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 border border-white/10 rounded-lg text-sm font-medium hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               👁️ Vista prèvia
             </button>
@@ -289,7 +289,7 @@ export default function LeadActionsEnhanced({
               disabled={isGenerating || (isManualMode && effectivePrice <= 0)}
               type="button"
               aria-busy={isGenerating}
-              className="flex-1 px-4 py-2 bg-amber-500 rounded-lg text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-50"
+              className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white disabled:opacity-50"
             >
               {isGenerating ? '⏳ Generant...' : '📤 Genera'}
             </button>
@@ -299,7 +299,7 @@ export default function LeadActionsEnhanced({
             <button
               onClick={handlePrintQuote}
               type="button"
-              className="w-full px-4 py-2 border border-amber-500 rounded-lg text-sm font-medium text-amber-600 hover:bg-amber-50"
+              className="w-full px-4 py-2 border rounded-lg text-sm font-medium"
             >
               🖨️ Imprimir / Descarregar PDF
             </button>
@@ -308,8 +308,8 @@ export default function LeadActionsEnhanced({
       </section>
 
       {/* Accions Ràpides */}
-      <section className="rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-slate-200 mb-4">⚡ Accions ràpides</h3>
+      <section className="rounded-xl border border-white/10 p-6 shadow-sm">
+        <h3 className="text-sm font-semibold mb-4">⚡ Accions ràpides</h3>
         
         <div className="space-y-2">
           {clientPhone && (
@@ -318,7 +318,7 @@ export default function LeadActionsEnhanced({
                 `Hola ${clientName}! Sóc de Òrbita Events. He preparat el pressupost per al teu event, te l'envio ara mateix 📄✨`
               )}`}
               target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-3 w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              className="flex items-center gap-3 w-full px-4 py-3 text-white rounded-lg transition-colors"
             >
               <span className="text-xl">💬</span>
               <div className="text-left">
@@ -332,7 +332,7 @@ export default function LeadActionsEnhanced({
             href={`mailto:${clientEmail}?subject=${encodeURIComponent(`Pressupost Òrbita Events - ${eventType}`)}&body=${encodeURIComponent(
               `Hola ${clientName},\n\nGràcies pel teu interès en Òrbita Events! Adjunto el pressupost per al teu event.\n\nQualsevol dubte, estic a la teva disposició.\n\nSalutacions,\nÒrbita Events\n${clientPhone ? `📱 ${clientPhone}` : ''}`
             )}`}
-            className="flex items-center gap-3 w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="flex items-center gap-3 w-full px-4 py-3 text-white rounded-lg transition-colors"
           >
             <span className="text-xl">✉️</span>
             <div className="text-left">
@@ -344,7 +344,7 @@ export default function LeadActionsEnhanced({
           {clientPhone && (
             <a
               href={`tel:${clientPhone}`}
-              className="flex items-center gap-3 w-full px-4 py-3 bg-white/5 text-slate-200 rounded-lg hover:bg-stone-200 transition-colors"
+              className="flex items-center gap-3 w-full px-4 py-3 bg-white/5 rounded-lg transition-colors"
             >
               <span className="text-xl">📞</span>
               <div className="text-left">

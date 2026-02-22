@@ -14,7 +14,7 @@ export default function CalendarioPage() {
           <h1 className="text-2xl font-semibold tracking-tight">
             Calendari d&apos;ocupació
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm">
             Vista mensual de reserves i dies bloquejats.
           </p>
         </div>

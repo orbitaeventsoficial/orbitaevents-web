@@ -71,21 +71,21 @@ export default function CanvasGeneratorPage() {
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-200">🎨 Generador de Canvas</h1>
-        <p className="text-slate-400 mt-1">
+        <h1 className="text-2xl font-bold">🎨 Generador de Canvas</h1>
+        <p className="mt-1">
           Crea imatges promocionals amb foto de l&apos;event i codi de descompte
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form */}
-        <div className="bg-slate-950/60 rounded-2xl shadow-sm border border-white/10 p-6">
-          <h2 className="text-lg font-semibold text-slate-200 mb-6">⚙️ Configuració</h2>
+        <div className="rounded-2xl shadow-sm border border-white/10 p-6">
+          <h2 className="text-lg font-semibold mb-6">⚙️ Configuració</h2>
 
           <div className="space-y-5">
             {/* Nom client */}
             <div>
-              <label className="block text-sm font-medium text-slate-200 mb-1">
+              <label className="block text-sm font-medium mb-1">
                 Nom del client
               </label>
               <input
@@ -93,13 +93,13 @@ export default function CanvasGeneratorPage() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Maria i Joan"
-                className="w-full px-4 py-2.5 border border-white/10 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                className="w-full px-4 py-2.5 border border-white/10 rounded-xl focus:ring-2"
               />
             </div>
 
             {/* Codi descompte */}
             <div>
-              <label className="block text-sm font-medium text-slate-200 mb-1">
+              <label className="block text-sm font-medium mb-1">
                 Codi de descompte
               </label>
               <input
@@ -107,13 +107,13 @@ export default function CanvasGeneratorPage() {
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                 placeholder="MARIA15-ABC"
-                className="w-full px-4 py-2.5 border border-white/10 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 uppercase"
+                className="w-full px-4 py-2.5 border border-white/10 rounded-xl focus:ring-2 uppercase"
               />
             </div>
 
             {/* Percentatge */}
             <div>
-              <label className="block text-sm font-medium text-slate-200 mb-1">
+              <label className="block text-sm font-medium mb-1">
                 Descompte (%)
               </label>
               <div className="flex gap-2">
@@ -135,13 +135,13 @@ export default function CanvasGeneratorPage() {
 
             {/* Tipus event */}
             <div>
-              <label className="block text-sm font-medium text-slate-200 mb-1">
+              <label className="block text-sm font-medium mb-1">
                 Tipus d&apos;event
               </label>
               <select
                 value={formData.eventType}
                 onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
-                className="w-full px-4 py-2.5 border border-white/10 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                className="w-full px-4 py-2.5 border border-white/10 rounded-xl focus:ring-2"
               >
                 {EVENT_TYPES.map((type) => (
                   <option key={type.id} value={type.id}>
@@ -153,7 +153,7 @@ export default function CanvasGeneratorPage() {
 
             {/* URL foto */}
             <div>
-              <label className="block text-sm font-medium text-slate-200 mb-1">
+              <label className="block text-sm font-medium mb-1">
                 URL de la foto de l&apos;event (opcional)
               </label>
               <input
@@ -161,16 +161,16 @@ export default function CanvasGeneratorPage() {
                 value={formData.photoUrl}
                 onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
                 placeholder="https://..."
-                className="w-full px-4 py-2.5 border border-white/10 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                className="w-full px-4 py-2.5 border border-white/10 rounded-xl focus:ring-2"
               />
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs mt-1">
                 Deixa buit per usar fons gradient daurat
               </p>
             </div>
 
             {/* Format */}
             <div>
-              <label className="block text-sm font-medium text-slate-200 mb-2">
+              <label className="block text-sm font-medium mb-2">
                 Format de sortida
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -184,8 +184,8 @@ export default function CanvasGeneratorPage() {
                         : 'border-white/10 hover:border-white/10'
                     }`}
                   >
-                    <span className="font-medium text-slate-200">{preset.name}</span>
-                    <span className="block text-xs text-slate-400 mt-0.5">
+                    <span className="font-medium">{preset.name}</span>
+                    <span className="block text-xs mt-0.5">
                       {preset.width}x{preset.height}
                     </span>
                   </button>
@@ -198,13 +198,13 @@ export default function CanvasGeneratorPage() {
           <div className="flex gap-3 mt-8">
             <button
               onClick={handlePreview}
-              className="flex-1 py-3 bg-amber-500 text-white font-medium rounded-xl hover:bg-amber-600 transition-colors"
+              className="flex-1 py-3 text-white font-medium rounded-xl transition-colors"
             >
               👁️ Previsualitzar
             </button>
             <button
               onClick={handleCopyUrl}
-              className="px-4 py-3 bg-white/5 text-slate-200 font-medium rounded-xl hover:bg-white/5 transition-colors"
+              className="px-4 py-3 bg-white/5 font-medium rounded-xl hover:bg-white/5 transition-colors"
             >
               {copied ? '✓ Copiat!' : '🔗 URL'}
             </button>
@@ -212,11 +212,11 @@ export default function CanvasGeneratorPage() {
         </div>
 
         {/* Preview */}
-        <div className="bg-slate-950/60 rounded-2xl shadow-sm border border-white/10 p-6">
+        <div className="rounded-2xl shadow-sm border border-white/10 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-slate-200">👁️ Previsualització</h2>
+            <h2 className="text-lg font-semibold">👁️ Previsualització</h2>
             {selectedPreset && (
-              <span className="text-sm text-slate-400">
+              <span className="text-sm">
                 {selectedPreset.width}x{selectedPreset.height}px
               </span>
             )}
@@ -238,7 +238,7 @@ export default function CanvasGeneratorPage() {
                 className="w-full h-full object-contain"
               />
             ) : (
-              <div className="text-center text-slate-400 p-8">
+              <div className="text-center p-8">
                 <span className="text-5xl mb-4 block">🖼️</span>
                 <p>Clica &quot;Previsualitzar&quot; per veure el resultat</p>
               </div>
@@ -250,14 +250,14 @@ export default function CanvasGeneratorPage() {
             <div className="mt-6 space-y-3">
               <button
                 onClick={handleDownload}
-                className="w-full py-3 bg-emerald-500 text-white font-medium rounded-xl hover:bg-green-600 transition-colors"
+                className="w-full py-3 text-white font-medium rounded-xl transition-colors"
               >
                 ⬇️ Descarregar imatge
               </button>
               
               <div className="p-3 bg-white/5 rounded-xl">
-                <p className="text-xs text-slate-400 mb-1">URL directa:</p>
-                <code className="text-xs text-slate-200 break-all block">
+                <p className="text-xs mb-1">URL directa:</p>
+                <code className="text-xs break-all block">
                   {previewUrl.slice(0, 80)}...
                 </code>
               </div>
@@ -267,9 +267,9 @@ export default function CanvasGeneratorPage() {
       </div>
 
       {/* Help section */}
-      <div className="mt-8 bg-amber-950/30 border border-amber-400/30 rounded-2xl p-6">
-        <h3 className="font-semibold text-amber-200 mb-3">💡 Com usar</h3>
-        <ul className="text-sm text-amber-300 space-y-2">
+      <div className="mt-8 border rounded-2xl p-6">
+        <h3 className="font-semibold mb-3">💡 Com usar</h3>
+        <ul className="text-sm space-y-2">
           <li>1. Omple les dades del client i el codi de descompte</li>
           <li>2. Afegeix la URL d&apos;una foto de l&apos;event (opcional)</li>
           <li>3. Selecciona el format segons on el vulguis compartir</li>

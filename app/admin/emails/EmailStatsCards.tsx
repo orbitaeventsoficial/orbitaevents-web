@@ -71,8 +71,8 @@ export default function EmailStatsCards({ stats }: { stats: Stats }) {
               {card.label}
             </span>
           </div>
-          <p className="text-3xl font-bold text-slate-100">{card.value}</p>
-          <p className="text-xs text-slate-500 mt-1">{card.sublabel}</p>
+          <p className="text-3xl font-bold">{card.value}</p>
+          <p className="text-xs mt-1">{card.sublabel}</p>
         </div>
       ))}
     </div>

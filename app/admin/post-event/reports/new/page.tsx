@@ -84,9 +84,9 @@ export default function NewReportPage() {
   if (!bookingId) {
     return (
       <div className="space-y-6">
-        <div className="bg-rose-950/30 border border-rose-400/30 rounded-xl p-6">
-          <p className="text-rose-300">❌ No s&apos;ha especificat cap reserva</p>
-          <Link href="/admin/post-event" className="text-rose-300 hover:underline mt-2 inline-block">
+        <div className="border rounded-xl p-6">
+          <p className="">❌ No s&apos;ha especificat cap reserva</p>
+          <Link href="/admin/post-event" className="hover:underline mt-2 inline-block">
             Tornar a Post-event
           </Link>
         </div>
@@ -97,18 +97,18 @@ export default function NewReportPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-200">
+        <h1 className="text-2xl font-semibold tracking-tight">
           📝 Nou Informe Post-event
         </h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm">
           Completa aquest informe després de l&apos;event
         </p>
       </header>
 
       {booking && (
-        <div className="bg-cyan-950/30 border border-cyan-400/30 rounded-xl p-4">
-          <h3 className="font-semibold text-cyan-200">Event: {booking.clientName}</h3>
-          <p className="text-sm text-cyan-300 mt-1">
+        <div className="border rounded-xl p-4">
+          <h3 className="font-semibold">Event: {booking.clientName}</h3>
+          <p className="text-sm mt-1">
             {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · {booking.eventLocation}
           </p>
         </div>
@@ -116,21 +116,21 @@ export default function NewReportPage() {
 
       {/* Inventory used */}
       {inventoryItems.length > 0 && (
-        <div className="bg-slate-950/60 border border-white/10 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-slate-200 mb-3">Equipament utilitzat ({inventoryItems.length})</h3>
+        <div className="border border-white/10 rounded-xl p-5">
+          <h3 className="text-sm font-semibold mb-3">Equipament utilitzat ({inventoryItems.length})</h3>
           <div className="grid gap-2 sm:grid-cols-2">
             {inventoryItems.map((item) => (
               <div
                 key={item.id}
                 className="flex items-center gap-3 rounded-lg border border-white/5 bg-white/5 px-3 py-2"
               >
-                <span className="text-xs font-mono font-bold text-cyan-400">{item.inventoryItem.code}</span>
-                <span className="text-sm text-slate-200 flex-1 truncate">{item.inventoryItem.name}</span>
+                <span className="text-xs font-mono font-bold">{item.inventoryItem.code}</span>
+                <span className="text-sm flex-1 truncate">{item.inventoryItem.name}</span>
                 {item.checkedIn && (
-                  <span className="text-[10px] rounded-full bg-emerald-500/20 text-emerald-300 px-2 py-0.5">Retornat</span>
+                  <span className="text-[10px] rounded-full px-2 py-0.5">Retornat</span>
                 )}
                 {item.conditionAfter && item.conditionAfter !== item.inventoryItem.condition && (
-                  <span className="text-[10px] rounded-full bg-amber-500/20 text-amber-300 px-2 py-0.5">
+                  <span className="text-[10px] rounded-full px-2 py-0.5">
                     {item.conditionAfter}
                   </span>
                 )}
@@ -140,17 +140,17 @@ export default function NewReportPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-slate-950/60 border border-white/10 rounded-xl p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="border border-white/10 rounded-xl p-6 space-y-6">
         {/* Event Summary */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-2">
+          <label className="block text-sm font-medium mb-2">
             Resum de l&apos;Event *
           </label>
           <textarea
             name="eventSummary"
             required
             rows={4}
-            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500"
+            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
             placeholder="Descriu com va anar l'event en general..."
           />
         </div>
@@ -158,33 +158,33 @@ export default function NewReportPage() {
         {/* Timing */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-200 mb-2">
+            <label className="block text-sm font-medium mb-2">
               Hora muntatge
             </label>
             <input
               type="time"
               name="setupTime"
-              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500"
+              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-200 mb-2">
+            <label className="block text-sm font-medium mb-2">
               Hora inici
             </label>
             <input
               type="time"
               name="startTime"
-              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500"
+              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-200 mb-2">
+            <label className="block text-sm font-medium mb-2">
               Hora final
             </label>
             <input
               type="time"
               name="endTime"
-              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500"
+              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
             />
           </div>
         </div>
@@ -192,7 +192,7 @@ export default function NewReportPage() {
         {/* Quality Ratings */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-200 mb-2">
+            <label className="block text-sm font-medium mb-2">
               Qualitat del So (1-5)
             </label>
             <input
@@ -200,11 +200,11 @@ export default function NewReportPage() {
               name="soundQuality"
               min="1"
               max="5"
-              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500"
+              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-200 mb-2">
+            <label className="block text-sm font-medium mb-2">
               Nivell Pista (1-5)
             </label>
             <input
@@ -212,58 +212,58 @@ export default function NewReportPage() {
               name="danceFloorLevel"
               min="1"
               max="5"
-              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500"
+              className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
             />
           </div>
         </div>
 
         {/* Music Styles */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-2">
+          <label className="block text-sm font-medium mb-2">
             Estils Musicals
           </label>
           <input
             type="text"
             name="musicStyles"
-            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500"
+            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
             placeholder="Reggaeton, House, Comercial..."
           />
         </div>
 
         {/* Incidents */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-2">
+          <label className="block text-sm font-medium mb-2">
             Incidències
           </label>
           <textarea
             name="incidents"
             rows={3}
-            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500"
+            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
             placeholder="Descriu qualsevol incidència o problema..."
           />
         </div>
 
         {/* Notes */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-2">
+          <label className="block text-sm font-medium mb-2">
             Notes Addicionals
           </label>
           <textarea
             name="notes"
             rows={3}
-            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500"
+            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
             placeholder="Qualsevol altra informació rellevant..."
           />
         </div>
 
         {/* Status */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-2">
+          <label className="block text-sm font-medium mb-2">
             Estat
           </label>
           <select
             name="status"
-            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500"
+            className="w-full px-4 py-2 border border-white/10 rounded-lg focus:ring-2"
           >
             <option value="DRAFT">Esborrany</option>
             <option value="COMPLETED">Completat</option>
@@ -275,13 +275,13 @@ export default function NewReportPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-rose-500 text-white rounded-lg font-medium hover:from-amber-600 hover:to-rose-600 disabled:opacity-50"
+            className="flex-1 px-6 py-3 text-white rounded-lg font-medium disabled:opacity-50"
           >
             {loading ? 'Guardant...' : '💾 Desar Informe'}
           </button>
           <Link
             href="/admin/post-event"
-            className="px-6 py-3 bg-white/5 text-slate-200 rounded-lg font-medium hover:bg-white/10"
+            className="px-6 py-3 bg-white/5 rounded-lg font-medium hover:bg-white/10"
           >
             Cancel·lar
           </Link>

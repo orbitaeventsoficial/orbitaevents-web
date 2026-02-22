@@ -148,7 +148,7 @@ export default function SettingsClient({
   return (
     <div className="space-y-8">
       {error && (
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-300" role="alert">
+        <div className="rounded-xl border p-4 text-sm" role="alert">
           {error}
         </div>
       )}
@@ -163,14 +163,14 @@ export default function SettingsClient({
         return (
           <section
             key={category}
-            className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm overflow-hidden"
+            className="rounded-2xl border backdrop-blur-sm overflow-hidden"
           >
-            <div className="bg-slate-700/30 border-b border-slate-700/50 p-4">
+            <div className="border-b p-4">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{config.icon}</span>
                 <div>
-                  <h2 className="font-semibold text-slate-100">{config.label}</h2>
-                  <p className="text-sm text-slate-400">{config.description}</p>
+                  <h2 className="font-semibold">{config.label}</h2>
+                  <p className="text-sm">{config.description}</p>
                 </div>
               </div>
             </div>
@@ -184,12 +184,12 @@ export default function SettingsClient({
                 return (
                   <div
                     key={setting.id}
-                    className="p-4 hover:bg-slate-700/20 transition-colors"
+                    className="p-4 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <code className="text-xs font-mono bg-slate-700/50 text-slate-300 px-2 py-0.5 rounded">
+                          <code className="text-xs font-mono px-2 py-0.5 rounded">
                             {setting.key}
                           </code>
                           <span
@@ -207,10 +207,10 @@ export default function SettingsClient({
                           </span>
                         </div>
                         {setting.label && (
-                          <p className="mt-1 font-medium text-slate-200">{setting.label}</p>
+                          <p className="mt-1 font-medium">{setting.label}</p>
                         )}
                         {setting.description && (
-                          <p className="text-sm text-slate-400">{setting.description}</p>
+                          <p className="text-sm">{setting.description}</p>
                         )}
                       </div>
 
@@ -219,7 +219,7 @@ export default function SettingsClient({
                           <div className="space-y-2">
                             {setting.type === 'BOOLEAN' ? (
                               <select
-                                className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-3 py-1.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                                className="rounded-lg border px-3 py-1.5 text-sm focus:ring-1"
                                 value={draftValue || 'false'}
                                 onChange={(e) => setDraftValue(e.target.value)}
                               >
@@ -228,13 +228,13 @@ export default function SettingsClient({
                               </select>
                             ) : setting.type === 'JSON' ? (
                               <textarea
-                                className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-3 py-1.5 text-sm text-slate-100 w-64 h-24 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                                className="rounded-lg border px-3 py-1.5 text-sm w-64 h-24 focus:ring-1"
                                 value={draftValue}
                                 onChange={(e) => setDraftValue(e.target.value)}
                               />
                             ) : (
                               <input
-                                className="rounded-lg border border-slate-600/50 bg-slate-800/80 px-3 py-1.5 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                                className="rounded-lg border px-3 py-1.5 text-sm focus:ring-1"
                                 type={setting.type === 'NUMBER' ? 'number' : 'text'}
                                 value={draftValue}
                                 onChange={(e) => setDraftValue(e.target.value)}
@@ -243,7 +243,7 @@ export default function SettingsClient({
 
                             <div className="flex items-center justify-end gap-2">
                               <button
-                                className="text-xs px-3 py-1.5 rounded-lg border border-slate-600/50 bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 transition-colors"
+                                className="text-xs px-3 py-1.5 rounded-lg border transition-colors"
                                 onClick={cancelEdit}
                                 disabled={isSaving}
                                 type="button"
@@ -251,7 +251,7 @@ export default function SettingsClient({
                                 Cancel·lar
                               </button>
                               <button
-                                className="text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-400 hover:to-blue-500 transition-colors"
+                                className="text-xs px-3 py-1.5 rounded-lg text-white shadow-lg transition-colors"
                                 onClick={() => saveSetting(setting)}
                                 disabled={isSaving}
                                 type="button"
@@ -263,15 +263,15 @@ export default function SettingsClient({
                           </div>
                         ) : (
                           <>
-                            <p className="text-lg font-semibold text-slate-100">
+                            <p className="text-lg font-semibold">
                               {formatDisplay(current)}
                             </p>
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs">
                               Actualitzat:{' '}
                               {new Date(current.updatedAt).toLocaleDateString('ca-ES')}
                             </p>
                             <button
-                              className="mt-2 text-xs px-3 py-1.5 rounded-lg border border-slate-600/50 bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 transition-colors"
+                              className="mt-2 text-xs px-3 py-1.5 rounded-lg border transition-colors"
                               onClick={() => startEdit(current)}
                               type="button"
                             >

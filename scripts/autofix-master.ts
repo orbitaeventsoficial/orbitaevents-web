@@ -14,6 +14,7 @@ const STEPS: Step[] = [
   { id: 'system-health', cmd: 'npx', args: ['tsx', 'scripts/autofix-system-health.ts'] },
   { id: 'finance-health', cmd: 'npx', args: ['tsx', 'scripts/autofix-finance-health.ts'] },
   { id: 'i18n-packs', cmd: 'npm', args: ['run', 'i18n:packs:fix-or-alert'] },
+  { id: 'admin-theme-hardcode', cmd: 'npm', args: ['run', 'theme:admin:check'] },
 ];
 
 async function setSystemAlertCount(value: number) {
@@ -124,4 +125,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect().catch(() => undefined);
   });
-

@@ -43,7 +43,7 @@ export default function TaskRowActions({
     <div className="flex items-center gap-2">
       <Link
         href={destinationHref}
-        className="rounded border border-cyan-500/40 px-2 py-1 text-xs font-medium text-cyan-300 hover:bg-cyan-500/10"
+        className="rounded border px-2 py-1 text-xs font-medium"
       >
         Obrir destí
       </Link>
@@ -51,7 +51,7 @@ export default function TaskRowActions({
         type="button"
         onClick={toggleStatus}
         disabled={saving}
-        className="rounded border border-amber-500/40 px-2 py-1 text-xs font-medium text-amber-300 hover:bg-amber-500/10 disabled:opacity-60"
+        className="rounded border px-2 py-1 text-xs font-medium disabled:opacity-60"
       >
         {saving ? 'Guardant...' : isDone ? 'Reobrir' : 'Marcar feta'}
       </button>

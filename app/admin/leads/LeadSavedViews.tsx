@@ -80,16 +80,16 @@ export default function LeadSavedViews({ currentQuery }: { currentQuery: string 
   }, []);
 
   return (
-    <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-sm p-4">
+    <section className="rounded-2xl border backdrop-blur-sm p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase text-slate-400">Vistes guardades</p>
-          <p className="text-xs text-slate-500">Guarda filtres habituals</p>
+          <p className="text-xs uppercase">Vistes guardades</p>
+          <p className="text-xs">Guarda filtres habituals</p>
         </div>
         <button
           type="button"
           onClick={loadViews}
-          className="text-xs text-slate-400 hover:text-slate-200"
+          className="text-xs"
         >
           🔄 Refrescar
         </button>
@@ -100,40 +100,40 @@ export default function LeadSavedViews({ currentQuery }: { currentQuery: string 
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Nom de la vista"
-          className="flex-1 rounded-xl border border-slate-600/50 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+          className="flex-1 rounded-xl border px-3 py-2 text-xs focus:ring-1"
         />
         <button
           type="button"
           onClick={saveView}
           disabled={!name.trim() || !currentQuery || loading}
-          className="rounded-xl bg-cyan-500/20 px-4 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/30 disabled:opacity-50"
+          className="rounded-xl px-4 py-2 text-xs font-semibold disabled:opacity-50"
         >
           Desar
         </button>
       </div>
 
       {error && (
-        <div className="mt-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+        <div className="mt-2 rounded-xl border px-3 py-2 text-xs">
           {error}
         </div>
       )}
 
       <div className="mt-3 space-y-2">
         {loading && views.length === 0 && (
-          <p className="text-xs text-slate-400">Carregant...</p>
+          <p className="text-xs">Carregant...</p>
         )}
         {!loading && views.length === 0 && (
-          <p className="text-xs text-slate-500">Encara no hi ha vistes.</p>
+          <p className="text-xs">Encara no hi ha vistes.</p>
         )}
         {views.map((view) => (
-          <div key={view.id} className="flex items-center justify-between gap-2 rounded-xl border border-slate-700/50 bg-slate-900/50 px-3 py-2 text-xs text-slate-200">
-            <Link href={`/admin/leads?${view.query}`} className="truncate hover:text-cyan-200">
+          <div key={view.id} className="flex items-center justify-between gap-2 rounded-xl border px-3 py-2 text-xs">
+            <Link href={`/admin/leads?${view.query}`} className="truncate">
               {view.name}
             </Link>
             <button
               type="button"
               onClick={() => deleteView(view.id)}
-              className="text-slate-500 hover:text-rose-300"
+              className=""
               aria-label={`Eliminar ${view.name}`}
             >
               ✕

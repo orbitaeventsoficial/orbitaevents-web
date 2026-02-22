@@ -130,10 +130,10 @@ export default async function InboxPage() {
   return (
     <div className="h-[calc(100vh-80px)] flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-950/60">
+      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
         <div>
-          <h1 className="text-xl font-semibold text-slate-200">📬 Inbox</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-xl font-semibold">📬 Inbox</h1>
+          <p className="text-sm">
             {stats.unreadLeads} leads nous · {stats.todayLeads} avui
             {imapConfigured && ' · 📧 Correu connectat'}
           </p>
@@ -141,13 +141,13 @@ export default async function InboxPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/inbox/compose"
-            className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-medium text-sm"
+            className="px-4 py-2 text-white rounded-lg transition-colors font-medium text-sm"
           >
             ✏️ Nou email
           </Link>
           <Link
             href="/admin/inbox/settings"
-            className="px-4 py-2 border border-white/10 text-slate-200 rounded-lg hover:bg-white/5 transition-colors text-sm"
+            className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition-colors text-sm"
           >
             ⚙️ Configuració
           </Link>
@@ -156,18 +156,18 @@ export default async function InboxPage() {
 
       {/* Avís si IMAP no està configurat */}
       {!imapConfigured && (
-        <div className="mx-6 mt-4 p-4 bg-amber-950/30 border border-amber-400/30 rounded-xl">
+        <div className="mx-6 mt-4 p-4 border rounded-xl">
           <div className="flex items-start gap-3">
             <span className="text-2xl">⚠️</span>
             <div>
-              <h3 className="font-semibold text-amber-200">Correu no configurat</h3>
-              <p className="text-sm text-amber-300 mt-1">
+              <h3 className="font-semibold">Correu no configurat</h3>
+              <p className="text-sm mt-1">
                 Per veure emails reals del teu domini, configura les variables IMAP a Railway:
               </p>
-              <code className="block mt-2 p-2 bg-amber-500/15 rounded text-xs text-amber-200">
+              <code className="block mt-2 p-2 rounded text-xs">
                 IMAP_HOST, IMAP_PORT, IMAP_USER, IMAP_PASS
               </code>
-              <p className="text-sm text-amber-300 mt-2">
+              <p className="text-sm mt-2">
                 Mentrestant, pots veure els <strong>leads del formulari web</strong> aquí sota.
               </p>
             </div>

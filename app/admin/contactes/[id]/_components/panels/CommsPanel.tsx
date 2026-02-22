@@ -39,51 +39,51 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
   };
 
   return (
-    <section className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
-      <h2 className="text-lg font-semibold text-slate-100">Comunicacions</h2>
-      <p className="mt-1 text-sm text-slate-400">Historial de correus, notes i seguiment.</p>
+    <section className="rounded-2xl border p-5">
+      <h2 className="text-lg font-semibold">Comunicacions</h2>
+      <p className="mt-1 text-sm">Historial de correus, notes i seguiment.</p>
 
-      <div className="mt-3 rounded-xl border border-slate-700/70 bg-slate-800/60 p-3">
-        <p className="text-xs text-slate-400">Accions ràpides</p>
+      <div className="mt-3 rounded-xl border p-3">
+        <p className="text-xs">Accions ràpides</p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Link
             href={`/admin/inbox/compose?customerId=${data.customer.id}&template=primer-contacte`}
-            className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
+            className="rounded border px-2 py-1 text-xs"
           >
             Plantilla 1r contacte
           </Link>
           <Link
             href={`/admin/inbox/compose?customerId=${data.customer.id}&template=enviament-pressupost`}
-            className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
+            className="rounded border px-2 py-1 text-xs"
           >
             Envia pressupost
           </Link>
           <Link
             href={`/admin/inbox/compose?customerId=${data.customer.id}&template=recordatori`}
-            className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
+            className="rounded border px-2 py-1 text-xs"
           >
             Recordatori
           </Link>
           <Link
             href={`/admin/tasks/new?customerId=${data.customer.id}`}
-            className="rounded border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
+            className="rounded border px-2 py-1 text-xs"
           >
             Crear tasca de seguiment
           </Link>
         </div>
       </div>
 
-      <div className="mt-3 rounded-xl border border-slate-700/70 bg-slate-800/60 p-3">
-        <p className="text-xs text-slate-400">Afegir nota interna</p>
+      <div className="mt-3 rounded-xl border p-3">
+        <p className="text-xs">Afegir nota interna</p>
         <textarea
-          className="mt-2 w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100"
+          className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"
           rows={3}
           placeholder="Escriu una nota de seguiment..."
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
         {error && (
-          <p className="mt-2 rounded-md border border-rose-500/40 bg-rose-500/10 px-2 py-1 text-xs text-rose-200">
+          <p className="mt-2 rounded-md border px-2 py-1 text-xs">
             {error}
           </p>
         )}
@@ -92,7 +92,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
             type="button"
             onClick={saveNote}
             disabled={saving || !note.trim()}
-            className="rounded bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-60"
+            className="rounded px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
           >
             {saving ? 'Guardant...' : 'Desa nota'}
           </button>
@@ -101,15 +101,15 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
 
       <div className="mt-4 space-y-2">
         {data.messages.length === 0 ? (
-          <p className="rounded-lg border border-slate-700/60 bg-slate-800/50 p-3 text-sm text-slate-400">
+          <p className="rounded-lg border p-3 text-sm">
             No hi ha comunicacions encara.
           </p>
         ) : (
           data.messages.slice(0, 40).map((message) => (
-            <article key={message.id} className="rounded-xl border border-slate-700/70 bg-slate-800/60 p-3">
-              <p className="text-xs font-semibold text-slate-200">{message.subject || message.channel}</p>
-              {message.bodyPreview && <p className="mt-1 text-xs text-slate-400">{message.bodyPreview}</p>}
-              <p className="mt-1 text-[11px] text-slate-500">
+            <article key={message.id} className="rounded-xl border p-3">
+              <p className="text-xs font-semibold">{message.subject || message.channel}</p>
+              {message.bodyPreview && <p className="mt-1 text-xs">{message.bodyPreview}</p>}
+              <p className="mt-1 text-[11px]">
                 {new Date(message.createdAt).toLocaleDateString('ca-ES', {
                   day: '2-digit',
                   month: 'short',
