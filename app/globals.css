@@ -4181,26 +4181,66 @@ html.admin-mode .admin-shell :is(
   background: color-mix(in oklab, var(--admin-panel) 62%, var(--admin-primary) 38%) !important;
 }
 
+/* Admin CSS categories (editable token map) */
+html.admin-mode .admin-layout-shell {
+  /* Category: surface */
+  --admin-cat-surface-base: #2a3444;
+  --admin-cat-surface-border: #5b6c83;
+  --admin-cat-surface-text: #eef4ff;
+
+  /* Category: action */
+  --admin-cat-action-bg: color-mix(in oklab, var(--admin-panel) 78%, var(--admin-surface) 22%);
+  --admin-cat-action-border: var(--admin-border);
+  --admin-cat-action-text: var(--admin-text);
+  --admin-cat-action-bg-hover: color-mix(in oklab, var(--admin-panel) 62%, var(--admin-primary) 38%);
+  --admin-cat-action-border-hover: color-mix(in oklab, var(--admin-primary) 62%, var(--admin-border) 38%);
+
+  /* Category: status */
+  --admin-cat-status-pending-bg: #5a3f20;
+  --admin-cat-status-pending-border: #a77a3f;
+  --admin-cat-status-pending-text: #fff4e5;
+
+  --admin-cat-status-confirmed-bg: #2b3f59;
+  --admin-cat-status-confirmed-border: #5578a8;
+  --admin-cat-status-confirmed-text: #eef4ff;
+
+  --admin-cat-status-completed-bg: #234a36;
+  --admin-cat-status-completed-border: #4d8f6b;
+  --admin-cat-status-completed-text: #ebfff5;
+
+  --admin-cat-status-cancelled-bg: #532734;
+  --admin-cat-status-cancelled-border: #9e546a;
+  --admin-cat-status-cancelled-text: #ffedf2;
+
+  --admin-cat-status-quote-bg: #3d3157;
+  --admin-cat-status-quote-border: #7f68ab;
+  --admin-cat-status-quote-text: #f2ebff;
+
+  --admin-cat-status-negotiating-bg: #5b341f;
+  --admin-cat-status-negotiating-border: #b0704d;
+  --admin-cat-status-negotiating-text: #ffefe6;
+}
+
 /* Leads KPI cards: explicit solid colors */
 html.admin-mode .admin-main-shell .admin-leads-metric--open {
-  background: #2a3444 !important;
-  border-color: #5b6c83 !important;
-  color: #eef4ff !important;
+  background: var(--admin-cat-surface-base) !important;
+  border-color: var(--admin-cat-surface-border) !important;
+  color: var(--admin-cat-surface-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-metric--won {
-  background: #234a36 !important;
-  border-color: #4d8f6b !important;
-  color: #ebfff5 !important;
+  background: var(--admin-cat-status-completed-bg) !important;
+  border-color: var(--admin-cat-status-completed-border) !important;
+  color: var(--admin-cat-status-completed-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-metric--lost {
-  background: #532734 !important;
-  border-color: #9e546a !important;
-  color: #ffedf2 !important;
+  background: var(--admin-cat-status-cancelled-bg) !important;
+  border-color: var(--admin-cat-status-cancelled-border) !important;
+  color: var(--admin-cat-status-cancelled-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-metric--winrate {
-  background: #5a3f20 !important;
-  border-color: #a77a3f !important;
-  color: #fff4e5 !important;
+  background: var(--admin-cat-status-pending-bg) !important;
+  border-color: var(--admin-cat-status-pending-border) !important;
+  color: var(--admin-cat-status-pending-text) !important;
 }
 
 /* Sidebar/layout hard override: no gradients in navigation chrome */
@@ -4235,14 +4275,14 @@ html.admin-mode .admin-layout-shell .admin-recent-chip--idle:hover {
 
 /* Tasks page actions via CSS (neutral corporate) */
 html.admin-mode .admin-main-shell .admin-tasks-action {
-  background: color-mix(in oklab, var(--admin-panel) 78%, var(--admin-surface) 22%) !important;
-  border-color: var(--admin-border) !important;
-  color: var(--admin-text) !important;
+  background: var(--admin-cat-action-bg) !important;
+  border-color: var(--admin-cat-action-border) !important;
+  color: var(--admin-cat-action-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-tasks-action:hover {
-  background: color-mix(in oklab, var(--admin-panel) 62%, var(--admin-primary) 38%) !important;
-  border-color: color-mix(in oklab, var(--admin-primary) 62%, var(--admin-border) 38%) !important;
-  color: var(--admin-text) !important;
+  background: var(--admin-cat-action-bg-hover) !important;
+  border-color: var(--admin-cat-action-border-hover) !important;
+  color: var(--admin-cat-action-text) !important;
 }
 
 /* Bookings KPI cards: force solid tones (no blue/green gradients) */
@@ -4251,29 +4291,29 @@ html.admin-mode .admin-main-shell .admin-bookings-stat {
   border-width: 1px;
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--total {
-  background: #2a3444 !important;
-  border-color: #5b6c83 !important;
-  color: #eef4ff !important;
+  background: var(--admin-cat-surface-base) !important;
+  border-color: var(--admin-cat-surface-border) !important;
+  color: var(--admin-cat-surface-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--pending {
-  background: #5a3f20 !important;
-  border-color: #a77a3f !important;
-  color: #fff4e5 !important;
+  background: var(--admin-cat-status-pending-bg) !important;
+  border-color: var(--admin-cat-status-pending-border) !important;
+  color: var(--admin-cat-status-pending-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--confirmed {
-  background: #2b3f59 !important;
-  border-color: #5578a8 !important;
-  color: #eef4ff !important;
+  background: var(--admin-cat-status-confirmed-bg) !important;
+  border-color: var(--admin-cat-status-confirmed-border) !important;
+  color: var(--admin-cat-status-confirmed-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--completed {
-  background: #234a36 !important;
-  border-color: #4d8f6b !important;
-  color: #ebfff5 !important;
+  background: var(--admin-cat-status-completed-bg) !important;
+  border-color: var(--admin-cat-status-completed-border) !important;
+  color: var(--admin-cat-status-completed-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-bookings-stat--cancelled {
-  background: #532734 !important;
-  border-color: #9e546a !important;
-  color: #ffedf2 !important;
+  background: var(--admin-cat-status-cancelled-bg) !important;
+  border-color: var(--admin-cat-status-cancelled-border) !important;
+  color: var(--admin-cat-status-cancelled-text) !important;
 }
 
 /* Leads pipeline columns: solid status colors */
@@ -4282,32 +4322,32 @@ html.admin-mode .admin-main-shell .admin-leads-tone {
   border-width: 1px;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--new {
-  background: #2b3f59 !important;
-  border-color: #5578a8 !important;
-  color: #eef4ff !important;
+  background: var(--admin-cat-status-confirmed-bg) !important;
+  border-color: var(--admin-cat-status-confirmed-border) !important;
+  color: var(--admin-cat-status-confirmed-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--contacted {
-  background: #5a3f20 !important;
-  border-color: #a77a3f !important;
-  color: #fff4e5 !important;
+  background: var(--admin-cat-status-pending-bg) !important;
+  border-color: var(--admin-cat-status-pending-border) !important;
+  color: var(--admin-cat-status-pending-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--quote {
-  background: #3d3157 !important;
-  border-color: #7f68ab !important;
-  color: #f2ebff !important;
+  background: var(--admin-cat-status-quote-bg) !important;
+  border-color: var(--admin-cat-status-quote-border) !important;
+  color: var(--admin-cat-status-quote-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--negotiating {
-  background: #5b341f !important;
-  border-color: #b0704d !important;
-  color: #ffefe6 !important;
+  background: var(--admin-cat-status-negotiating-bg) !important;
+  border-color: var(--admin-cat-status-negotiating-border) !important;
+  color: var(--admin-cat-status-negotiating-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--won {
-  background: #234a36 !important;
-  border-color: #4d8f6b !important;
-  color: #ebfff5 !important;
+  background: var(--admin-cat-status-completed-bg) !important;
+  border-color: var(--admin-cat-status-completed-border) !important;
+  color: var(--admin-cat-status-completed-text) !important;
 }
 html.admin-mode .admin-main-shell .admin-leads-tone--lost {
-  background: #532734 !important;
-  border-color: #9e546a !important;
-  color: #ffedf2 !important;
+  background: var(--admin-cat-status-cancelled-bg) !important;
+  border-color: var(--admin-cat-status-cancelled-border) !important;
+  color: var(--admin-cat-status-cancelled-text) !important;
 }
