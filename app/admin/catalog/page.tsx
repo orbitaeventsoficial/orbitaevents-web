@@ -194,7 +194,7 @@ export default async function CatalogPage({
     : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="admin-catalog-page space-y-6">
       <header className="rounded-2xl border border-white/10 bg-slate-950/60 p-6 shadow-sm">
         <h1 className="text-2xl font-semibold text-slate-100">Catàleg</h1>
         <p className="mt-1 text-sm text-slate-400">
@@ -214,10 +214,10 @@ export default async function CatalogPage({
             <Link
               key={tab}
               href={`/admin/catalog?tab=${tab}`}
-              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              className={`admin-catalog-tab rounded-full border px-4 py-2 text-sm font-semibold transition ${
                 isActive
-                  ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
-                  : 'border-slate-700/70 bg-slate-900/50 text-slate-300 hover:bg-slate-800/70'
+                  ? 'admin-catalog-tab--active'
+                  : 'admin-catalog-tab--idle'
               }`}
             >
               {TAB_META[tab].label}

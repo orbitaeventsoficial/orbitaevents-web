@@ -8,9 +8,9 @@ function pct(value: number) {
 }
 
 function statusBadge(value: number, warn: number, danger: number) {
-  if (value >= danger) return 'border-rose-500/40 bg-rose-500/15 text-rose-300';
-  if (value >= warn) return 'border-amber-500/40 bg-amber-500/15 text-amber-300';
-  return 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300';
+  if (value >= danger) return 'admin-pack-model-chip admin-pack-model-chip--danger';
+  if (value >= warn) return 'admin-pack-model-chip admin-pack-model-chip--warn';
+  return 'admin-pack-model-chip admin-pack-model-chip--ok';
 }
 
 export default function PackPricingModelEditor({ initial }: { initial: PackPricingModelConfig }) {
@@ -54,18 +54,18 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
     }, 120);
   }
 
-  const inputClass = 'w-full rounded-xl border border-stone-300 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500';
+  const inputClass = 'admin-pack-model-input w-full rounded-xl border px-3 py-2 text-sm';
   const marginClass = statusBadge(form.marginTargetPct, 0.6, 0.75);
   const ssClass = statusBadge(form.socialSecurityPct, 0.38, 0.5);
   const irpfClass = statusBadge(form.withholdingPct, 0.18, 0.26);
   const divergenceClass = form.alertDivergencePct >= 30
-    ? 'border-rose-500/40 bg-rose-500/15 text-rose-300'
+    ? 'admin-pack-model-chip admin-pack-model-chip--danger'
     : form.alertDivergencePct >= 20
-      ? 'border-amber-500/40 bg-amber-500/15 text-amber-300'
-      : 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300';
+      ? 'admin-pack-model-chip admin-pack-model-chip--warn'
+      : 'admin-pack-model-chip admin-pack-model-chip--ok';
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 shadow-sm">
+    <section className="admin-pack-model rounded-2xl border p-5 shadow-sm">
       <h2 className="text-lg font-semibold text-slate-100">Model econòmic de packs</h2>
       <p className="mt-1 text-xs text-slate-400">
         Aquesta configuració calcula PVP recomanat, hora extra recomanada i alertes de divergència a packs.
@@ -141,7 +141,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
               type="button"
               onClick={save}
               disabled={saving}
-              className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
+              className="admin-pack-model-save rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-60"
             >
               {saving ? 'Desant...' : 'Desar model packs'}
             </button>
@@ -149,10 +149,10 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
           </div>
         </div>
 
-        <aside className="rounded-xl border border-white/10 bg-slate-900/50 p-4">
+        <aside className="admin-pack-model-aside rounded-xl border p-4">
           <h3 className="text-sm font-semibold text-slate-100">Lectura ràpida de coeficients</h3>
           <div className="mt-3 space-y-2 text-xs">
-            <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+            <div className="admin-pack-model-note rounded-lg border p-3">
               <p className="font-semibold text-slate-200">Objectiu marge: {pct(form.marginTargetPct)}</p>
               <button
                 type="button"
@@ -162,7 +162,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
                 Semàfor marge
               </button>
             </div>
-            <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+            <div className="admin-pack-model-note rounded-lg border p-3">
               <p className="font-semibold text-slate-200">SS: {pct(form.socialSecurityPct)} · IRPF: {pct(form.withholdingPct)}</p>
               <button
                 type="button"
@@ -179,7 +179,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
                 Semàfor IRPF
               </button>
             </div>
-            <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+            <div className="admin-pack-model-note rounded-lg border p-3">
               <p className="font-semibold text-slate-200">Llindar alerta: {form.alertDivergencePct.toFixed(0)}%</p>
               <button
                 type="button"
@@ -189,7 +189,7 @@ export default function PackPricingModelEditor({ initial }: { initial: PackPrici
                 Semàfor divergència
               </button>
             </div>
-            <div className="rounded-lg border border-white/10 bg-black/20 p-3 text-slate-300">
+            <div className="admin-pack-model-note rounded-lg border p-3 text-slate-300">
               <p>Cost equip/hora usat al càlcul = inventari/h + personal/h + cost fix.</p>
               <p className="mt-1">PVP recomanat = cost / (1 - objectiu marge).</p>
             </div>

@@ -3970,3 +3970,105 @@ html.admin-mode .admin-main-shell table tbody tr {
 html.admin-mode .admin-main-shell table tbody tr:hover {
   background: color-mix(in oklab, var(--admin-panel) 72%, var(--admin-primary) 28%) !important;
 }
+
+/* Reviews page: remove golden hover and use theme tones */
+html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-tab {
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-tab--active {
+  background: color-mix(in oklab, var(--admin-primary) 22%, var(--admin-panel) 78%) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-tab--idle {
+  background: color-mix(in oklab, var(--admin-panel) 84%, var(--admin-surface) 16%) !important;
+  color: var(--admin-muted) !important;
+}
+html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-tab--idle:hover {
+  background: color-mix(in oklab, var(--admin-panel) 65%, var(--admin-primary) 35%) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-action {
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-action--ok {
+  background: color-mix(in oklab, var(--admin-success) 18%, var(--admin-panel) 82%) !important;
+}
+html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-action--ok:hover {
+  background: color-mix(in oklab, var(--admin-success) 30%, var(--admin-panel) 70%) !important;
+}
+html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-action--neutral {
+  background: color-mix(in oklab, var(--admin-primary) 15%, var(--admin-panel) 85%) !important;
+}
+html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-action--neutral:hover {
+  background: color-mix(in oklab, var(--admin-primary) 28%, var(--admin-panel) 72%) !important;
+}
+html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-action--danger {
+  background: color-mix(in oklab, var(--admin-danger) 16%, var(--admin-panel) 84%) !important;
+}
+html.admin-mode .admin-main-shell .admin-reviews-page .admin-reviews-action--danger:hover {
+  background: color-mix(in oklab, var(--admin-danger) 28%, var(--admin-panel) 72%) !important;
+}
+
+/* Pack pricing model editor - force corporate solids */
+html.admin-mode .admin-main-shell .admin-pack-model {
+  background: color-mix(in oklab, var(--admin-panel) 92%, var(--admin-surface) 8%) !important;
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell .admin-pack-model .admin-pack-model-input {
+  background: color-mix(in oklab, var(--admin-surface) 84%, #000 16%) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-pack-model .admin-pack-model-input:focus {
+  border-color: color-mix(in oklab, var(--admin-primary) 72%, white 28%) !important;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--admin-primary) 72%, white 28%) !important;
+}
+html.admin-mode .admin-main-shell .admin-pack-model .admin-pack-model-save {
+  background: color-mix(in oklab, var(--admin-primary) 24%, var(--admin-panel) 76%) !important;
+  color: var(--admin-text) !important;
+  border: 1px solid var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell .admin-pack-model .admin-pack-model-save:hover {
+  background: color-mix(in oklab, var(--admin-primary) 38%, var(--admin-panel) 62%) !important;
+}
+html.admin-mode .admin-main-shell .admin-pack-model .admin-pack-model-aside,
+html.admin-mode .admin-main-shell .admin-pack-model .admin-pack-model-note {
+  background: color-mix(in oklab, var(--admin-panel) 88%, var(--admin-surface) 12%) !important;
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell .admin-pack-model .admin-pack-model-chip {
+  border-width: 1px;
+}
+html.admin-mode .admin-main-shell .admin-pack-model .admin-pack-model-chip--ok {
+  border-color: color-mix(in oklab, var(--admin-success) 72%, white 28%) !important;
+  background: color-mix(in oklab, var(--admin-success) 16%, var(--admin-panel) 84%) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-pack-model .admin-pack-model-chip--warn {
+  border-color: color-mix(in oklab, var(--admin-warning) 72%, white 28%) !important;
+  background: color-mix(in oklab, var(--admin-warning) 16%, var(--admin-panel) 84%) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-pack-model .admin-pack-model-chip--danger {
+  border-color: color-mix(in oklab, var(--admin-danger) 72%, white 28%) !important;
+  background: color-mix(in oklab, var(--admin-danger) 16%, var(--admin-panel) 84%) !important;
+  color: var(--admin-text) !important;
+}
+
+/* Catalog tabs - no green hardcode */
+html.admin-mode .admin-main-shell .admin-catalog-page .admin-catalog-tab {
+  border-color: var(--admin-border) !important;
+}
+html.admin-mode .admin-main-shell .admin-catalog-page .admin-catalog-tab--active {
+  background: color-mix(in oklab, var(--admin-primary) 24%, var(--admin-panel) 76%) !important;
+  color: var(--admin-text) !important;
+}
+html.admin-mode .admin-main-shell .admin-catalog-page .admin-catalog-tab--idle {
+  background: color-mix(in oklab, var(--admin-panel) 88%, var(--admin-surface) 12%) !important;
+  color: var(--admin-muted) !important;
+}
+html.admin-mode .admin-main-shell .admin-catalog-page .admin-catalog-tab--idle:hover {
+  background: color-mix(in oklab, var(--admin-panel) 68%, var(--admin-primary) 32%) !important;
+  color: var(--admin-text) !important;
+}
