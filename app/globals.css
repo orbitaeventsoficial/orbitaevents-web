@@ -4559,3 +4559,105 @@ html.admin-mode .admin-main-shell .admin-page-header-link:hover {
   background: var(--admin-cat-action-bg-hover) !important;
   color: var(--admin-cat-action-text) !important;
 }
+
+/* Universal header normalizer: first block that contains H1 looks the same across pages */
+html.admin-mode .admin-main-shell > * > :is(header, section, div):has(> h1):first-child {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: clamp(0.75rem, 1.2vw, 1rem);
+  border: 1px solid var(--admin-border) !important;
+  border-radius: 0.9rem;
+  background: color-mix(in oklab, var(--admin-panel) 90%, var(--admin-surface) 10%) !important;
+}
+
+html.admin-mode .admin-main-shell > * > :is(header, section, div):has(> h1):first-child > h1 {
+  margin: 0 !important;
+  color: var(--admin-text) !important;
+  font-size: clamp(1.55rem, 1.35rem + 0.8vw, 2rem) !important;
+  line-height: 1.16 !important;
+  font-weight: 700 !important;
+}
+
+html.admin-mode .admin-main-shell > * > :is(header, section, div):has(> h1):first-child p {
+  color: var(--admin-muted) !important;
+}
+
+@media (max-width: 1024px) {
+  html.admin-mode .admin-main-shell > * > :is(header, section, div):has(> h1):first-child {
+    gap: 0.625rem;
+    padding: 0.75rem;
+  }
+}
+
+/* Absolute uniform pass: containers + typography */
+html.admin-mode .admin-main-shell {
+  --admin-uniform-radius: 0.9rem;
+  --admin-uniform-padding: clamp(0.75rem, 1.1vw, 1rem);
+}
+
+html.admin-mode .admin-main-shell > * > :is(section, article, aside, .rounded-xl, .rounded-2xl, .rounded-3xl) {
+  border-radius: var(--admin-uniform-radius) !important;
+  border: 1px solid var(--admin-border) !important;
+  background: color-mix(in oklab, var(--admin-panel) 90%, var(--admin-surface) 10%) !important;
+  color: var(--admin-text) !important;
+}
+
+html.admin-mode .admin-main-shell :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--admin-font-family) !important;
+  color: var(--admin-text) !important;
+  letter-spacing: -0.01em !important;
+}
+
+html.admin-mode .admin-main-shell h1 {
+  font-size: clamp(1.55rem, 1.35rem + 0.8vw, 2rem) !important;
+  line-height: 1.16 !important;
+  font-weight: 700 !important;
+}
+
+html.admin-mode .admin-main-shell h2 {
+  font-size: clamp(1.28rem, 1.12rem + 0.4vw, 1.58rem) !important;
+  line-height: 1.22 !important;
+  font-weight: 650 !important;
+}
+
+html.admin-mode .admin-main-shell h3 {
+  font-size: clamp(1.08rem, 1rem + 0.2vw, 1.24rem) !important;
+  line-height: 1.26 !important;
+  font-weight: 620 !important;
+}
+
+html.admin-mode .admin-main-shell :is(
+  p,
+  span,
+  label,
+  li,
+  dd,
+  dt,
+  td,
+  th,
+  a,
+  button,
+  input,
+  select,
+  textarea
+) {
+  font-family: var(--admin-font-family) !important;
+  font-size: clamp(0.95rem, 0.91rem + 0.1vw, 1.02rem) !important;
+  line-height: 1.45 !important;
+  color: var(--admin-text) !important;
+}
+
+html.admin-mode .admin-main-shell :is(.text-xs) {
+  font-size: clamp(0.84rem, 0.81rem + 0.05vw, 0.9rem) !important;
+}
+
+html.admin-mode .admin-main-shell :is(.text-sm) {
+  font-size: clamp(0.95rem, 0.91rem + 0.08vw, 1.02rem) !important;
+}
+
+html.admin-mode .admin-main-shell :is(.text-slate-300, .text-slate-400, .text-slate-500, .text-slate-600) {
+  color: var(--admin-muted) !important;
+}
