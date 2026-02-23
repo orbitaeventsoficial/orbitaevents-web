@@ -6,6 +6,9 @@ import Image from 'next/image';
 import dynamicImport from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminHelpModeProvider, useAdminHelpMode } from './components/AdminHelpMode';
+import { getPriorityItems, NAV_SECTIONS } from './components/nav-items';
+import { useAdminAlerts } from '@/hooks/useAdminAlerts';
+import { useCsrfFetch } from '@/hooks/useCsrfFetch';
 import './admin-theme.css';
 
 const AdminSearchModal = dynamicImport(() => import('./components/AdminSearchModal'), {
@@ -160,18 +163,6 @@ function BottomNavItem({
   );
 }
 
-function getCookieValue(name: string): string | null {
-  if (typeof document === 'undefined') return null;
-  const cookies = document.cookie.split(';');
-  for (const cookie of cookies) {
-    const [cookieName, ...rest] = cookie.trim().split('=');
-    if (cookieName === name) {
-      return decodeURIComponent(rest.join('='));
-    }
-  }
-  return null;
-}
-
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <AdminHelpModeProvider>
@@ -184,50 +175,12 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [newLeadsCount, setNewLeadsCount] = useState(0);
-  const [packPriceAlertsCount, setPackPriceAlertsCount] = useState(0);
-  const [financeAlertsCount, setFinanceAlertsCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [customAdminCss, setCustomAdminCss] = useState('');
   const pathname = usePathname();
   const { enabled: helpModeEnabled, toggle: toggleHelpMode } = useAdminHelpMode();
-
-  // Cargar conteo de leads nuevos
-  const fetchNewLeadsCount = useCallback(async () => {
-    try {
-      const res = await fetch('/api/admin/leads?countOnly=true', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setNewLeadsCount(data.count || 0);
-      }
-    } catch {
-      // Silently fail
-    }
-  }, []);
-
-  const fetchPackPriceAlertsCount = useCallback(async () => {
-    try {
-      const res = await fetch('/api/admin/packs/price-alerts', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setPackPriceAlertsCount(data.count || 0);
-      }
-    } catch {
-      // Silently fail
-    }
-  }, []);
-
-  const fetchFinanceAlertsCount = useCallback(async () => {
-    try {
-      const res = await fetch('/api/admin/finance/alerts', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setFinanceAlertsCount(data.count || 0);
-      }
-    } catch {
-      // Silently fail
-    }
-  }, []);
+  const { newLeadsCount, totalCount: notificationsCount } = useAdminAlerts();
+  useCsrfFetch();
 
   const loadAdminCss = useCallback(async () => {
     try {
@@ -258,36 +211,11 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    // Carrega en idle per no bloquejar render inicial.
-    const run = () => {
-      fetchNewLeadsCount();
-      fetchPackPriceAlertsCount();
-      fetchFinanceAlertsCount();
-    };
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      const idleId = (window as Window & { requestIdleCallback: (cb: IdleRequestCallback) => number })
-        .requestIdleCallback(() => run());
-      return () => {
-        if ('cancelIdleCallback' in window) {
-          (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(idleId);
-        }
-      };
-    }
-    const timeoutId = globalThis.setTimeout(run, 250);
-    return () => globalThis.clearTimeout(timeoutId);
-  }, [fetchNewLeadsCount, fetchPackPriceAlertsCount, fetchFinanceAlertsCount]);
+  }, []);
 
   useEffect(() => {
-    const criticalRoutes = [
-      '/admin/leads',
-      '/admin/bookings',
-      '/admin/tasks',
-      '/admin/economia',
-      '/admin/catalog',
-    ];
-    const run = () => {
-      criticalRoutes.forEach((href) => router.prefetch(href));
-    };
+    const criticalRoutes = ['/admin/leads', '/admin/bookings', '/admin/tasks', '/admin/economia', '/admin/catalog'];
+    const run = () => criticalRoutes.forEach((href) => router.prefetch(href));
     if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
       const idleId = (window as Window & { requestIdleCallback: (cb: IdleRequestCallback) => number })
         .requestIdleCallback(() => run());
@@ -302,24 +230,8 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   useEffect(() => {
-    // Tancar sidebar al canviar de pàgina.
     setSidebarOpen(false);
   }, [pathname]);
-
-  useEffect(() => {
-    // Sense polling periòdic: només refresc quan la pestanya torna visible.
-    const onVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        fetchNewLeadsCount();
-        fetchPackPriceAlertsCount();
-        fetchFinanceAlertsCount();
-      }
-    };
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-    };
-  }, [fetchNewLeadsCount, fetchPackPriceAlertsCount, fetchFinanceAlertsCount]);
 
   useEffect(() => {
     document.documentElement.classList.add('admin-mode');
@@ -346,107 +258,8 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('keydown', handleShortcut);
   }, []);
 
-  useEffect(() => {
-    const windowRef = window as typeof window & { __csrfFetchWrapped?: boolean };
-    if (windowRef.__csrfFetchWrapped) return;
-    windowRef.__csrfFetchWrapped = true;
-
-    const originalFetch = window.fetch.bind(window);
-
-    window.fetch = async (input, init) => {
-      const request = input instanceof Request ? input : new Request(input, init);
-      const method = request.method.toUpperCase();
-      const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method);
-      const url = new URL(request.url, window.location.origin);
-      const isSameOrigin = url.origin === window.location.origin;
-
-      if (isMutation && isSameOrigin) {
-        let token = getCookieValue('csrf-token');
-        if (!token) {
-          try {
-            await originalFetch('/api/csrf', {
-              method: 'GET',
-              credentials: 'same-origin',
-            });
-          } catch {
-            // Ignore token fetch failures and let the request continue.
-          }
-          token = getCookieValue('csrf-token');
-        }
-
-        if (token) {
-          const headers = new Headers(request.headers);
-          headers.set('x-csrf-token', token);
-          const nextRequest = new Request(request, { headers });
-          return originalFetch(nextRequest);
-        }
-      }
-
-      return originalFetch(request);
-    };
-
-    return () => {
-      window.fetch = originalFetch;
-      windowRef.__csrfFetchWrapped = false;
-    };
-  }, []);
-
-  const priorityItems = useMemo(() => ([
-    { icon: '📥', label: 'Entrades', href: '/admin/leads', badge: newLeadsCount > 0 ? String(newLeadsCount) : undefined, badgeColor: 'orange' as const },
-    { icon: '⚡', label: 'Entrada ràpida', href: '/admin/intake' },
-    { icon: '👤', label: 'Clients', href: '/admin/clientes' },
-    { icon: '📋', label: 'Reserves', href: '/admin/bookings' },
-    { icon: '📝', label: 'Tasques', href: '/admin/tasks' },
-    { icon: '🧾', label: 'Pressupost (PDF)', href: '/admin/presupuestos' },
-    { icon: '🧭', label: 'Mapa admin', href: '/admin/mapa' },
-  ]), [newLeadsCount]);
-
-  const navSections = useMemo(() => ([
-    {
-      title: 'Operativa',
-      defaultOpen: true,
-      items: [
-        { icon: '💬', label: 'Missatges', href: '/admin/mensajes' },
-        { icon: '📅', label: 'Calendari', href: '/admin/calendario' },
-        { icon: '📦', label: 'Inventari', href: '/admin/inventory' },
-        { icon: '🎟️', label: 'Descomptes', href: '/admin/discount-codes' },
-        { icon: '📥', label: 'Safata (IMAP)', href: '/admin/inbox', badge: 'IMAP', badgeColor: 'blue' as const },
-      ]
-    },
-    {
-      title: 'Eines',
-      defaultOpen: false,
-      items: [
-        { icon: '💶', label: 'Economia', href: '/admin/economia' },
-        { icon: '🎯', label: 'Operativa de vendes', href: '/admin/sales-ops' },
-        { icon: '⭐', label: 'Ressenyes clients', href: '/admin/ressenyes' },
-        { icon: '📝', label: 'Post-esdeveniment', href: '/admin/post-event' },
-        { icon: '📈', label: 'Analítica', href: '/admin/analytics' },
-        { icon: '🗂️', label: 'Catàleg', href: '/admin/catalog' },
-        { icon: '❓', label: 'FAQ', href: '/admin/faq' },
-        { icon: '✍️', label: 'Textos PRO', href: '/admin/text-manager', badge: 'PRO', badgeColor: 'green' as const },
-        { icon: '🤖', label: 'Correus automàtics', href: '/admin/emails', badge: 'AUTO', badgeColor: 'green' as const },
-        { icon: '🎨', label: 'Canvas', href: '/admin/canvas' },
-        { icon: '🌟', label: 'Google Reviews', href: '/admin/google-reviews', badge: '5★', badgeColor: 'green' as const },
-        { icon: '📰', label: 'Blog', href: '/admin/blog' },
-      ]
-    },
-    {
-      title: 'Configuració',
-      defaultOpen: false,
-      items: [
-        { icon: '⚙️', label: 'Configuració', href: '/admin/settings' },
-        { icon: '📄', label: 'Plantilla pressupostos', href: '/admin/settings/quotes' },
-        { icon: '🔗', label: 'Integracions', href: '/admin/settings/integrations' },
-        { icon: '🎛️', label: 'Features', href: '/admin/features' },
-        { icon: '🗺️', label: 'Cobertura', href: '/admin/coverage' },
-        { icon: '🌐', label: 'Traduccions', href: '/admin/translations' },
-        { icon: '🧩', label: 'CSS PRO', href: '/admin/css-manager', badge: 'PRO', badgeColor: 'green' as const },
-      ]
-    },
-  ]), []);
-
-  const notificationsCount = newLeadsCount + packPriceAlertsCount + financeAlertsCount;
+  const priorityItems = useMemo(() => getPriorityItems(newLeadsCount), [newLeadsCount]);
+  const navSections = NAV_SECTIONS;
 
   const isActive = useCallback((href: string) => {
     return href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href);

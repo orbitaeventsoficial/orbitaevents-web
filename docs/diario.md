@@ -44,4 +44,8 @@
   - ClientPortalAccessPanel.tsx, PresupuestoPdfStudio.tsx, text-manager unificats
   - ServiceJsonLD.tsx manté "Spanish" (schema.org requereix anglès)
   - contactes/[id]/_components/ eliminat (codi mort)
-- [ ] Revisar `admin/layout.tsx` y `admin/page.tsx`
+- [x] Refactoritzar `admin/layout.tsx` (904 → 717 línies)
+  - Nav items extrets a `app/admin/components/nav-items.ts`
+  - Lògica d'alertes extreta a `hooks/useAdminAlerts.ts`
+  - CSRF fetch wrapper extret a `hooks/useCsrfFetch.ts`
+- [ ] Revisar `admin/page.tsx` (1,186 línies)
