@@ -2,7 +2,14 @@ import { defineConfig, devices } from '@playwright/test';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
+ *
+ * BASE_URL env var:
+ *   - Not set → spins up local dev server (pnpm dev) at localhost:3000
+ *   - Set     → runs against that URL (staging/prod), no local server needed
  */
+
+const baseURL = process.env.BASE_URL || 'http://localhost:3000';
+
 export default defineConfig({
   testDir: './e2e',
 
@@ -34,7 +41,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.BASE_URL || 'https://orbitaevents.com',
+    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -82,10 +89,11 @@ export default defineConfig({
     // },
       ],
 
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'pnpm dev',
-  //   url: 'http://127.0.0.1:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  /* Run local dev server when no BASE_URL is set */
+  webServer: process.env.BASE_URL ? undefined : {
+    command: 'pnpm dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: true,
+    timeout: 120_000,
+  },
 });

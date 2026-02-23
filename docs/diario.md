@@ -23,7 +23,7 @@
 - `admin/layout.tsx`: 904 líneas (monolítico)
 - `admin/page.tsx`: 1,186 líneas (monolítico)
 - 326 usos de `any` en TypeScript
-- Playwright corriendo contra producción (webServer comentado)
+- ~~Playwright corriendo contra producción~~ → resolt (vegeu treball en curs)
 - Middleware de 321 líneas con demasiadas responsabilidades
 
 #### 🟡 Menores
@@ -58,3 +58,8 @@
   - tasks/page.tsx: prismaAny eliminat, prisma.task directe
   - ESLint: @typescript-eslint/no-explicit-any: warn afegit
   - PENDENT: 94 usos restants a api/admin/emails/ — requereix tipat Prisma profund
+- [x] Playwright: webServer configurat correctament
+  - Sense BASE_URL → arrenca pnpm dev a localhost:3000
+  - Amb BASE_URL → usa aquella URL (staging/prod), sense servidor local
+  - baseURL ja no apunta a producció per defecte
+- [ ] Middleware (321 línies, massa responsabilitats)
