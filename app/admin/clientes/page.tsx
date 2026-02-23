@@ -596,7 +596,7 @@ export default function AdminContactesPage() {
                           </svg>
                         </button>
                       <Link
-                        href={`/admin/contactes/${customer.id}`}
+                        href={`/admin/clientes/${customer.id}`}
                         className="p-2 rounded-lg transition-all"
                         title="Fitxa 360"
                       >
@@ -670,7 +670,7 @@ export default function AdminContactesPage() {
                   {duplicateWarnings.map((dup) => (
                     <Link
                       key={dup.id}
-                      href={`/admin/contactes/${dup.id}`}
+                      href={`/admin/clientes/${dup.id}`}
                       className="flex items-center justify-between rounded-lg border px-3 py-2 mb-1.5 last:mb-0 transition-colors"
                     >
                       <div>

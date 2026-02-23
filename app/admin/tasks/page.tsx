@@ -36,7 +36,7 @@ function resolveDestination(task: {
   customer?: { id: string; name: string };
   lead?: { id: string; name: string };
 }) {
-  if (task.customer) return `/admin/contactes/${task.customer.id}`;
+  if (task.customer) return `/admin/clientes/${task.customer.id}`;
   if (task.lead) return `/admin/leads/${task.lead.id}`;
 
   const title = task.title.toLowerCase();
@@ -171,7 +171,7 @@ export default async function TasksPage({
     <AdminPage
       title="Tasques"
       subtitle={`${total} tasques${customerId ? ' del client' : ''}`}
-      back={customerId ? { href: `/admin/contactes/${customerId}?tab=tasks`, label: 'Client' } : undefined}
+      back={customerId ? { href: `/admin/clientes/${customerId}?tab=tasks`, label: 'Client' } : undefined}
       actions={
         <>
           <GenerateDailyChecklistButton />

@@ -617,7 +617,7 @@ export default function CalendarMonthClient() {
                         )}
                         {r.customerId && (
                           <Link
-                            href={`/admin/contactes/${r.customerId}`}
+                            href={`/admin/clientes/${r.customerId}`}
                             onClick={(e) => e.stopPropagation()}
                             className="text-[10px] font-medium hover:underline"
                           >

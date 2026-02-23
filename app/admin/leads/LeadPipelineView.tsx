@@ -356,7 +356,7 @@ function PipelineCard({
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         {lead.customerId && (
           <Link
-            href={`/admin/contactes/${lead.customerId}`}
+            href={`/admin/clientes/${lead.customerId}`}
             className="text-[10px]"
           >
             👤

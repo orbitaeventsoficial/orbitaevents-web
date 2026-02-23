@@ -59,12 +59,12 @@ export default async function PresupuestosPage({
       subtitle={<>Personalitza client, pack, extres, descomptes i text per generar el PDF al moment.
         {customer && (
           <span className="block mt-2 text-xs">
-            Guardant a fitxa: <Link href={`/admin/contactes/${customer.id}`} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
+            Guardant a fitxa: <Link href={`/admin/clientes/${customer.id}`} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
           </span>
         )}
       </>}
       back={{ href: '/admin/settings', label: 'Configuració' }}
-      actions={customer ? <Link href={`/admin/contactes/${customer.id}`} className="ap-btn ap-btn--secondary">👤 Fitxa Client</Link> : undefined}
+      actions={customer ? <Link href={`/admin/clientes/${customer.id}`} className="ap-btn ap-btn--secondary">👤 Fitxa Client</Link> : undefined}
     >
 
       <PresupuestoPdfStudio

@@ -100,7 +100,7 @@ export default function LeadActionsEnhanced({
       setSuccess('Estat actualitzat!');
       startTransition(() => {
         if (newStatus === 'WON' && customerId) {
-          router.push(`/admin/contactes/${customerId}`);
+          router.push(`/admin/clientes/${customerId}`);
           return;
         }
         router.refresh();

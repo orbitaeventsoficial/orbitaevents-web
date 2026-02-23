@@ -268,7 +268,7 @@ export default function IntakePage() {
             {duplicates.map((dup) => (
               <Link
                 key={dup.id}
-                href={`/admin/contactes/${dup.id}`}
+                href={`/admin/clientes/${dup.id}`}
                 className="flex items-center justify-between rounded-xl border p-3 transition-colors"
               >
                 <div>

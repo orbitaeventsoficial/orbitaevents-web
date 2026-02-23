@@ -257,7 +257,7 @@ export default async function LeadDetailPage({ params }: Props) {
         <div className="flex gap-2 flex-wrap">
           {lead.customerId && (
             <Link
-              href={`/admin/contactes/${lead.customerId}`}
+              href={`/admin/clientes/${lead.customerId}`}
               className="ap-btn ap-btn--secondary"
             >
               👤 Fitxa Client
@@ -605,7 +605,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 <div>
                   <dt className="text-xs">ID client</dt>
                   <dd className="font-mono text-xs break-all">
-                    <Link href={`/admin/contactes/${lead.customerId}`} className="hover:underline">
+                    <Link href={`/admin/clientes/${lead.customerId}`} className="hover:underline">
                       {lead.customerId}
                     </Link>
                   </dd>
@@ -742,7 +742,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 </div>
               </dl>
               <Link
-                href={`/admin/contactes/${lead.customer.id}`}
+                href={`/admin/clientes/${lead.customer.id}`}
                 className="mt-4 inline-flex rounded-lg px-3 py-1.5 text-xs font-semibold text-white"
               >
                 Obrir fitxa client

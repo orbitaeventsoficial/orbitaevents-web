@@ -169,7 +169,7 @@ export default async function BookingsPage({
                     </div>
                     {booking.customerId ? (
                       <Link
-                        href={`/admin/contactes/${booking.customerId}`}
+                        href={`/admin/clientes/${booking.customerId}`}
                         className="font-medium mt-2 truncate block"
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -258,7 +258,7 @@ export default async function BookingsPage({
                       </td>
                       <td className="px-4 py-3 text-center">
                         {booking.customerId ? (
-                          <Link href={`/admin/contactes/${booking.customerId}`} className="font-medium">
+                          <Link href={`/admin/clientes/${booking.customerId}`} className="font-medium">
                             {booking.clientName}
                           </Link>
                         ) : (

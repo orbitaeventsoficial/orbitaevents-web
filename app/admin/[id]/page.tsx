@@ -30,7 +30,7 @@ export default async function AdminIdFallbackPage({ params }: Props) {
   }
 
   if (customer) {
-    redirect(`/admin/contactes/${id}`);
+    redirect(`/admin/clientes/${id}`);
   }
 
   redirect('/admin/leads');

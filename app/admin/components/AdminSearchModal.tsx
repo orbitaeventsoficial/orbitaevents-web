@@ -199,7 +199,7 @@ export default function AdminSearchModal({
                 {results.customers.map((customer) => (
                   <Link
                     key={customer.id}
-                    href={`/admin/contactes/${customer.id}`}
+                    href={`/admin/clientes/${customer.id}`}
                     onClick={onClose}
                     className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
                   >

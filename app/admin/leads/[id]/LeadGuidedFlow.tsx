@@ -119,7 +119,7 @@ export default function LeadGuidedFlow({
       const customerId = payload?.lead?.customerId as string | undefined;
       startTransition(() => {
         if (nextStatus === 'WON' && customerId) {
-          router.push(`/admin/contactes/${customerId}`);
+          router.push(`/admin/clientes/${customerId}`);
           return;
         }
         router.refresh();

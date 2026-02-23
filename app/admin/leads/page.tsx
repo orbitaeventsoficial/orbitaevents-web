@@ -357,7 +357,7 @@ export default async function LeadsPage({
                     </Link>
                     {lead.customerId && (
                       <Link
-                        href={`/admin/contactes/${lead.customerId}`}
+                        href={`/admin/clientes/${lead.customerId}`}
                         className="rounded-lg border px-2 py-1 text-[11px] font-medium"
                       >
                         Client
@@ -427,7 +427,7 @@ export default async function LeadsPage({
                             {lead.name}
                           </Link>
                           {lead.customerId && (
-                            <Link href={`/admin/contactes/${lead.customerId}`} className="" title="Fitxa client">
+                            <Link href={`/admin/clientes/${lead.customerId}`} className="" title="Fitxa client">
                               👤
                             </Link>
                           )}

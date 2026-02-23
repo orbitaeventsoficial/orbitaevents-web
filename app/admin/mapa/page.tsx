@@ -27,7 +27,6 @@ const SECTIONS: MapSection[] = [
       { href: '/admin/leads', label: 'Entrades' },
       { href: '/admin/intake', label: 'Entrada ràpida' },
       { href: '/admin/clientes', label: 'Clients' },
-      { href: '/admin/contactes', label: 'Contactes' },
       { href: '/admin/sales-ops', label: 'Operativa de vendes' },
       { href: '/admin/mensajes', label: 'Missatges' },
     ],

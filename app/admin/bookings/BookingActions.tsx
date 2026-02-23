@@ -89,7 +89,7 @@ export default function BookingActions({
       </Link>
       {customerId && (
         <Link
-          href={`/admin/contactes/${customerId}`}
+          href={`/admin/clientes/${customerId}`}
           className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors"
         >
           Client

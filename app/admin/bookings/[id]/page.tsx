@@ -256,7 +256,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <span className="text-sm">{eventType} · {formatDate(booking.eventDate)}</span>
           {customer && (
             <Link
-              href={`/admin/contactes/${customer.id}`}
+              href={`/admin/clientes/${customer.id}`}
               className="ap-btn ap-btn--secondary"
             >
               👤 Fitxa Client
@@ -323,7 +323,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <div>
             <p className="text-xs font-medium uppercase">Nom</p>
             {customer ? (
-              <Link href={`/admin/contactes/${customer.id}`} className="mt-1 font-medium transition-colors block">
+              <Link href={`/admin/clientes/${customer.id}`} className="mt-1 font-medium transition-colors block">
                 {booking.clientName}
               </Link>
             ) : (
@@ -363,7 +363,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </Link>
           {customer && (
             <Link
-              href={`/admin/contactes/${customer.id}`}
+              href={`/admin/clientes/${customer.id}`}
               className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/5"
             >
               Obrir fitxa client 360

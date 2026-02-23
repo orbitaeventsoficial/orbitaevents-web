@@ -40,7 +40,7 @@ export default function NewTaskPage() {
       if (!res.ok || !data?.ok) throw new Error(data?.error || 'No s’ha pogut crear la tasca');
 
       if (customerId) {
-        router.push(`/admin/contactes/${customerId}?tab=tasks`);
+        router.push(`/admin/clientes/${customerId}?tab=tasks`);
       } else {
         router.push('/admin/tasks');
       }
@@ -122,7 +122,7 @@ export default function NewTaskPage() {
             {saving ? 'Guardant...' : 'Crear tasca'}
           </button>
           <Link
-            href={customerId ? `/admin/contactes/${customerId}?tab=tasks` : '/admin/tasks'}
+            href={customerId ? `/admin/clientes/${customerId}?tab=tasks` : '/admin/tasks'}
             className="rounded-lg border px-4 py-2 text-sm font-medium"
           >
             Cancel·lar
