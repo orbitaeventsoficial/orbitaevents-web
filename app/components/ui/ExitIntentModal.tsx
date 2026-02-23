@@ -15,8 +15,8 @@ const MIN_TIME_ON_PAGE_MS = 3000;
 
 function trackExitIntent(action: string) {
   if (typeof window === 'undefined') return;
-  if (Array.isArray((window as any).dataLayer)) {
-    (window as any).dataLayer.push({
+  if (Array.isArray(window.dataLayer)) {
+    window.dataLayer.push({
       event: 'cta_click',
       cta_type: action,
       cta_location: 'exit_intent_modal',

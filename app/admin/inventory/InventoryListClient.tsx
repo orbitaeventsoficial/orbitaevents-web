@@ -4,6 +4,12 @@
  * Client component per la llista d'inventari amb filtres, cerca i vistes.
  */
 
+interface BundleApiItem {
+  id: string | number;
+  name: string;
+  itemIds: (string | number)[];
+}
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -101,10 +107,10 @@ export default function InventoryListClient() {
       if (!res.ok) return;
       const data = await res.json();
       const next = Array.isArray(data?.bundles)
-        ? data.bundles.map((b: any) => ({
+        ? data.bundles.map((b: BundleApiItem) => ({
             id: String(b.id),
             name: String(b.name),
-            itemIds: Array.isArray(b.itemIds) ? b.itemIds.map((id: any) => String(id)) : [],
+            itemIds: Array.isArray(b.itemIds) ? b.itemIds.map((id) => String(id)) : [],
           }))
         : [];
       setBundles(next);

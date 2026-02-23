@@ -51,3 +51,10 @@
 - [x] Refactoritzar `admin/page.tsx` (1,186 → 480 línies)
   - Fetching + processat extrets a `app/admin/lib/dashboard-data.ts`
   - Helpers timeAgo/formatEventDate també al lib
+- [x] Reduir usos de `any` (110 → 94)
+  - types/window.d.ts: window.dataLayer tipat globalment
+  - ExitIntentModal.tsx + WebVitalsReporter.tsx: (window as any) eliminat
+  - InventoryListClient.tsx: BundleApiItem interface local
+  - tasks/page.tsx: prismaAny eliminat, prisma.task directe
+  - ESLint: @typescript-eslint/no-explicit-any: warn afegit
+  - PENDENT: 94 usos restants a api/admin/emails/ — requereix tipat Prisma profund

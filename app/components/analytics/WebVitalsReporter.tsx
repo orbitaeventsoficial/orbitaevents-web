@@ -10,8 +10,8 @@ import type { Metric } from 'web-vitals';
 
 function sendToAnalytics(metric: Metric) {
   // 1. Google Tag Manager / dataLayer
-  if (typeof window !== 'undefined' && Array.isArray((window as any).dataLayer)) {
-    (window as any).dataLayer.push({
+  if (typeof window !== 'undefined' && Array.isArray(window.dataLayer)) {
+    window.dataLayer.push({
       event: 'web_vitals',
       metric_name: metric.name,
       metric_value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),

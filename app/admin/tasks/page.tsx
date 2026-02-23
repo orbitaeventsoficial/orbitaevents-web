@@ -89,9 +89,8 @@ export default async function TasksPage({
         },
       ],
     };
-    const prismaAny = prisma as any;
     const [rows, count] = await Promise.all([
-      prismaAny.task.findMany({
+      prisma.task.findMany({
         where,
         orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
         take: limit,
@@ -101,9 +100,9 @@ export default async function TasksPage({
           customer: { select: { id: true, name: true } },
         },
       }),
-      prismaAny.task.count({ where }),
+      prisma.task.count({ where }),
     ]);
-    tasks = rows.map((row: any) => ({
+    tasks = rows.map((row) => ({
       id: row.id,
       title: row.title,
       status: row.status,
