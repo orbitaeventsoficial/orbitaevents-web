@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
+import { AdminPage } from '../components/AdminPage';
 import InboxClient from './InboxClient';
 
 export const dynamic = 'force-dynamic';
@@ -128,31 +129,14 @@ export default async function InboxPage() {
   const imapConfigured = isImapConfigured();
 
   return (
-    <div className="h-[calc(100vh-80px)] flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <div>
-          <h1 className="text-xl font-semibold">📬 Inbox</h1>
-          <p className="text-sm">
-            {stats.unreadLeads} leads nous · {stats.todayLeads} avui
-            {imapConfigured && ' · 📧 Correu connectat'}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Link
-            href="/admin/inbox/compose"
-            className="px-4 py-2 text-white rounded-lg transition-colors font-medium text-sm"
-          >
-            ✏️ Nou email
-          </Link>
-          <Link
-            href="/admin/inbox/settings"
-            className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition-colors text-sm"
-          >
-            ⚙️ Configuració
-          </Link>
-        </div>
-      </header>
+    <AdminPage
+      title="Inbox"
+      subtitle={<>{stats.unreadLeads} leads nous · {stats.todayLeads} avui{imapConfigured && ' · 📧 Correu connectat'}</>}
+      actions={<>
+        <Link href="/admin/inbox/compose" className="ap-btn ap-btn--primary">✏️ Nou email</Link>
+        <Link href="/admin/inbox/settings" className="ap-btn ap-btn--secondary">⚙️ Configuració</Link>
+      </>}
+    >
 
       {/* Avís si IMAP no està configurat */}
       {!imapConfigured && (
@@ -182,7 +166,7 @@ export default async function InboxPage() {
         imapConfigured={imapConfigured}
         quotePacks={quotePacks}
       />
-    </div>
+    </AdminPage>
   );
 }
 

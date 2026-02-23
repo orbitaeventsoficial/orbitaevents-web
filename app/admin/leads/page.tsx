@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
+import { AdminPage } from '../components/AdminPage';
 import LeadActions from './LeadActions';
 import LeadQuickPriority from './LeadQuickPriority';
 import LeadQuickStatus from './LeadQuickStatus';
@@ -252,22 +253,16 @@ export default async function LeadsPage({
   const currentQuery = buildQuery(data.filters);
 
   return (
+    <AdminPage
+      title="Entrades"
+      subtitle="Tauler comercial, seguiment i pipeline operatiu."
+      actions={<Link href="/admin/intake" className="ap-btn ap-btn--primary">Entrada ràpida</Link>}
+    >
     <div
       id="leads-theme-root"
-      className="admin-page-container admin-leads-page space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8"
+      className="space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8"
       style={LEAD_COLOR_DEFAULT_VARS as CSSProperties}
     >
-      <header className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">Entrades</h1>
-          <p className="admin-page-subtitle">Tauler comercial, seguiment i pipeline operatiu.</p>
-        </div>
-        <div className="admin-page-header-actions">
-          <Link href="/admin/intake" className="admin-page-header-link">
-            Entrada ràpida
-          </Link>
-        </div>
-      </header>
 
       <section className="rounded-2xl border p-2">
         <div className="grid grid-cols-2 gap-2">
@@ -537,5 +532,6 @@ export default async function LeadsPage({
 
       </LeadViewToggle>
     </div>
+    </AdminPage>
   );
 }

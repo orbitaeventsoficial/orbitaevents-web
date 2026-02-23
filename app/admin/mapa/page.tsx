@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,14 +97,10 @@ const SECTIONS: MapSection[] = [
 
 export default function AdminMapaPage() {
   return (
-    <div className="space-y-6">
-      <header className="rounded-2xl border p-5">
-        <h1 className="text-2xl font-bold">🧭 Mapa Admin</h1>
-        <p className="mt-2 text-sm">
-          Accés directe a totes les pantalles útils del panell. Cap secció queda orfe.
-        </p>
-      </header>
-
+    <AdminPage
+      title="Mapa"
+      subtitle="Accés directe a totes les pantalles útils del panell. Cap secció queda orfe."
+    >
       <div className="grid gap-4 lg:grid-cols-2">
         {SECTIONS.map((section) => (
           <section key={section.title} className="rounded-2xl border p-4">
@@ -124,6 +121,6 @@ export default function AdminMapaPage() {
           </section>
         ))}
       </div>
-    </div>
+    </AdminPage>
   );
 }

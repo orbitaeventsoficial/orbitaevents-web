@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { AdminPage } from '../components/AdminPage';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -219,19 +220,10 @@ export default function PricingAdminPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-3">
-            <span className="text-3xl">💰</span>
-            Gestió de Preus i Equipament
-          </h1>
-          <p className="mt-1">
-            Edita preus dels extras · Consulta packs i inventari
-          </p>
-        </div>
-      </header>
+    <AdminPage
+      title="Preus"
+      subtitle="Edita preus dels extras · Consulta packs i inventari"
+    >
 
       {/* Tabs */}
       <div className="flex gap-2 flex-wrap">
@@ -695,7 +687,7 @@ export default function PricingAdminPage() {
           </div>
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }
 

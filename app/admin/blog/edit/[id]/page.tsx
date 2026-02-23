@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
+import { AdminPage } from '../../../components/AdminPage';
 
 type Locale = 'es' | 'ca';
 
@@ -196,21 +197,11 @@ export default function EditBlogPostPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Editar post</h1>
-          <p className="mt-1 text-sm">Actualitza contingut, SEO i estat de publicació</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => router.push('/admin/blog')}
-          className="rounded-xl border px-4 py-2 text-sm transition-colors"
-        >
-          Tornar
-        </button>
-      </header>
-
+    <AdminPage
+      title="Editar post"
+      subtitle="Actualitza contingut, SEO i estat de publicació"
+      back={{ href: '/admin/blog', label: 'Blog' }}
+    >
       {flashMessage && (
         <div
           className={`rounded-xl border px-4 py-3 text-sm ${
@@ -389,9 +380,6 @@ export default function EditBlogPostPage() {
           </button>
         </div>
       </form>
-    </div>
+    </AdminPage>
   );
 }
-
-
-

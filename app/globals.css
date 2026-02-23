@@ -2884,97 +2884,6 @@ html.admin-mode .admin-shell [class*='to-'] {
   background-image: none !important;
 }
 
-/* ── 12. PÀGINA GENÈRICA — títols i containers ───────────────────────────── */
-html.admin-mode .admin-shell .admin-page-container {
-  width: 100%;
-  max-width: none;
-}
-
-html.admin-mode .admin-shell .admin-page-title {
-  margin: 0;
-  font-size: clamp(1.4rem, 1.2rem + 0.75vw, 1.9rem);
-  line-height: 1.15;
-  font-weight: 750;
-  letter-spacing: -0.02em;
-  color: var(--at-text);
-}
-
-html.admin-mode .admin-shell .admin-page-subtitle {
-  font-size: clamp(0.9rem, 0.875rem + 0.1vw, 1rem);
-  font-weight: 400;
-  color: var(--at-muted);
-  margin-top: 0.25rem;
-}
-
-/* ── 13. LEADS — tabs i pipeline ─────────────────────────────────────────── */
-html.admin-mode .admin-shell .admin-leads-tab {
-  border-color: var(--at-border);
-  transition: var(--at-transition);
-}
-
-html.admin-mode .admin-shell .admin-leads-tab--active {
-  background: color-mix(in oklab, var(--at-gold) 20%, var(--at-panel) 80%);
-  border-color: var(--at-gold);
-  color: var(--at-gold-text);
-}
-
-html.admin-mode .admin-shell .admin-leads-tab--idle {
-  background: var(--at-panel);
-  border-color: var(--at-border);
-  color: var(--at-muted);
-}
-
-html.admin-mode .admin-shell .admin-leads-tab--idle:hover {
-  background: var(--at-raised);
-  border-color: var(--at-border-s);
-  color: var(--at-text);
-}
-
-/* Tones de columna pipeline */
-html.admin-mode .admin-shell .admin-leads-tone--new      { background: color-mix(in oklab, var(--at-blue) 20%, var(--at-panel) 80%); border-color: var(--at-blue); }
-html.admin-mode .admin-shell .admin-leads-tone--contacted{ background: color-mix(in oklab, var(--at-orange) 18%, var(--at-panel) 82%); border-color: var(--at-orange); }
-html.admin-mode .admin-shell .admin-leads-tone--quote    { background: color-mix(in oklab, var(--at-violet) 16%, var(--at-panel) 84%); border-color: var(--at-violet); }
-html.admin-mode .admin-shell .admin-leads-tone--negotiating{ background: color-mix(in oklab, var(--at-gold) 18%, var(--at-panel) 82%); border-color: var(--at-gold); }
-html.admin-mode .admin-shell .admin-leads-tone--won      { background: color-mix(in oklab, var(--at-green) 18%, var(--at-panel) 82%); border-color: var(--at-green); }
-html.admin-mode .admin-shell .admin-leads-tone--lost     { background: color-mix(in oklab, var(--at-red) 16%, var(--at-panel) 84%); border-color: var(--at-red); }
-
-/* Cards de lead */
-html.admin-mode .admin-shell .admin-leads-card-tone--new      { background: color-mix(in oklab, var(--at-blue) 10%, var(--at-panel) 90%); border-color: color-mix(in oklab, var(--at-blue) 50%, var(--at-border) 50%); }
-html.admin-mode .admin-shell .admin-leads-card-tone--contacted{ background: color-mix(in oklab, var(--at-orange) 10%, var(--at-panel) 90%); border-color: color-mix(in oklab, var(--at-orange) 50%, var(--at-border) 50%); }
-html.admin-mode .admin-shell .admin-leads-card-tone--quote    { background: color-mix(in oklab, var(--at-violet) 10%, var(--at-panel) 90%); border-color: color-mix(in oklab, var(--at-violet) 50%, var(--at-border) 50%); }
-html.admin-mode .admin-shell .admin-leads-card-tone--negotiating{ background: color-mix(in oklab, var(--at-gold) 10%, var(--at-panel) 90%); border-color: color-mix(in oklab, var(--at-gold) 50%, var(--at-border) 50%); }
-html.admin-mode .admin-shell .admin-leads-card-tone--won      { background: color-mix(in oklab, var(--at-green) 10%, var(--at-panel) 90%); border-color: color-mix(in oklab, var(--at-green) 50%, var(--at-border) 50%); }
-html.admin-mode .admin-shell .admin-leads-card-tone--lost     { background: color-mix(in oklab, var(--at-red) 10%, var(--at-panel) 90%); border-color: color-mix(in oklab, var(--at-red) 50%, var(--at-border) 50%); }
-
-/* Elements de columna */
-html.admin-mode .admin-shell .admin-leads-column-title,
-html.admin-mode .admin-shell .admin-leads-column-count,
-html.admin-mode .admin-shell .admin-leads-dropzone,
-html.admin-mode .admin-shell .admin-leads-column-chip {
-  color: var(--at-text);
-}
-
-html.admin-mode .admin-shell .admin-leads-column-count {
-  border-color: var(--at-border-s);
-  background: var(--at-panel);
-}
-
-html.admin-mode .admin-shell .admin-leads-dropzone {
-  border-color: var(--at-border);
-  background: transparent;
-}
-
-html.admin-mode .admin-shell .admin-leads-column-chip {
-  background: var(--at-panel);
-}
-
-/* Mètriques leads */
-html.admin-mode .admin-shell .admin-leads-metric--open      { background: var(--at-panel); border-color: var(--at-border-s); color: var(--at-text); }
-html.admin-mode .admin-shell .admin-leads-metric--won       { background: color-mix(in oklab, var(--at-green) 16%, var(--at-panel) 84%); border-color: var(--at-green); color: var(--at-text); }
-html.admin-mode .admin-shell .admin-leads-metric--lost      { background: color-mix(in oklab, var(--at-red) 14%, var(--at-panel) 86%); border-color: var(--at-red); color: var(--at-text); }
-html.admin-mode .admin-shell .admin-leads-metric--winrate   { background: color-mix(in oklab, var(--at-gold) 16%, var(--at-panel) 84%); border-color: var(--at-gold); color: var(--at-text); }
-html.admin-mode .admin-shell .admin-leads-metric-label      { color: var(--at-muted); }
-
 /* ── 14. CSS MANAGER ─────────────────────────────────────────────────────── */
 html.admin-mode .admin-shell .admin-css-panel {
   background: var(--at-panel);
@@ -3107,7 +3016,6 @@ html.admin-mode .admin-shell :is(.text-slate-300, .text-slate-400, .text-slate-5
 }
 
 /* CTAs d'acció principals */
-html.admin-mode .admin-shell .admin-page-header-link,
 html.admin-mode .admin-shell .admin-quote-action,
 html.admin-mode .admin-shell .admin-tasks-action {
   background: color-mix(in oklab, var(--at-gold) 20%, var(--at-panel) 80%);
@@ -3166,7 +3074,7 @@ html.admin-mode .admin-shell :is(
   button,
   [role='button'],
   a.inline-flex
-):not(.admin-keep-colors, .admin-css-btn--save, .admin-quote-template-save, .admin-page-header-link) {
+):not(.admin-keep-colors, .admin-css-btn--save, .admin-quote-template-save) {
   background-image: none !important;
 }
 

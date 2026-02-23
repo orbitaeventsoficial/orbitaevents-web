@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { AdminPage } from '../components/AdminPage';
 import {
   CATEGORY_CONFIG,
   STATUS_CONFIG,
@@ -254,17 +255,11 @@ export default function InventoryListClient() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Inventari</h1>
-          <p className="mt-1 text-sm">
-            {items.length} elements · {totalValue.toLocaleString('ca-ES')}€ valor total
-          </p>
-        </div>
+    <AdminPage
+      title="Inventari"
+      subtitle={`${items.length} elements · ${totalValue.toLocaleString('ca-ES')}€ valor total`}
+      actions={
         <div className="flex gap-2">
-          {/* Vista */}
           <div className="flex rounded-xl border overflow-hidden">
             <button
               type="button"
@@ -291,12 +286,13 @@ export default function InventoryListClient() {
           </div>
           <Link
             href="/admin/inventory/new"
-            className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium transition-colors"
+            className="ap-btn ap-btn--primary"
           >
             + Nou Element
           </Link>
         </div>
-      </header>
+      }
+    >
 
       {/* KPIs */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -648,6 +644,6 @@ export default function InventoryListClient() {
           )}
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }

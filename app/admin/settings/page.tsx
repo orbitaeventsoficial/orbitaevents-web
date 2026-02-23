@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import SettingsClient from './SettingsClient';
 import DbReconnectButton from './DbReconnectButton';
+import { AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,17 +81,11 @@ export default async function SettingsPage() {
   const settings = await getSettings();
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Configuració</h1>
-          <p className="mt-1 text-sm">
-            Gestiona les configuracions del sistema i estadístiques públiques
-          </p>
-        </div>
-        <DbReconnectButton />
-      </header>
+    <AdminPage
+      title="Configuració"
+      subtitle="Gestiona les configuracions del sistema i estadístiques públiques"
+      actions={<DbReconnectButton />}
+    >
 
       {/* Info Alert */}
       <div className="rounded-2xl border backdrop-blur-sm p-4">
@@ -157,6 +152,6 @@ export default async function SettingsPage() {
           <p className="text-sm">Edita les preguntes freqüents</p>
         </Link>
       </section>
-    </div>
+    </AdminPage>
   );
 }

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AdminPage } from '../components/AdminPage';
 import { prisma } from '@/lib/prisma';
 import { estimateLeadAmount, scoreLead } from '@/lib/services/commercialScoring';
 import SlaAutomationButton from './SlaAutomationButton';
@@ -260,13 +261,10 @@ export default async function SalesOpsPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <header className="rounded-2xl border p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold">Operativa comercial</h1>
-        <p className="mt-1 text-sm">
-          La teva màquina de vendes: priorització diària, control d&apos;embut i execució sense fricció.
-        </p>
-      </header>
+    <AdminPage
+      title="Sales Ops"
+      subtitle="La teva màquina de vendes: priorització diària, control d'embut i execució sense fricció."
+    >
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <div className="rounded-xl border p-4 shadow-sm">
@@ -521,6 +519,6 @@ export default async function SalesOpsPage() {
           )}
         </div>
       </section>
-    </div>
+    </AdminPage>
   );
 }

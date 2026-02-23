@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Pencil, Trash2, Plus } from 'lucide-react';
 import { log } from '@/lib/logger';
+import { AdminPage } from '../components/AdminPage';
 
 interface BlogPost {
   id: string;
@@ -106,13 +107,10 @@ export default function BlogAdminPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Gestió de Blog</h1>
-          <p className="mt-1 text-sm">{total} posts en total</p>
-        </div>
-
+    <AdminPage
+      title="Blog"
+      subtitle={`${total} posts en total`}
+      actions={
         <div className="flex gap-3">
           <select
             value={locale}
@@ -127,13 +125,14 @@ export default function BlogAdminPage() {
           <button
             onClick={() => (window.location.href = '/admin/blog/new')}
             type="button"
-            className="flex items-center gap-2 rounded-xl px-4 py-2 text-white font-medium shadow-lg transition-colors"
+            className="ap-btn ap-btn--primary flex items-center gap-2"
           >
             <Plus className="h-5 w-5" />
             Nou post
           </button>
         </div>
-      </div>
+      }
+    >
 
       {flashMessage && (
         <div
@@ -290,7 +289,6 @@ export default function BlogAdminPage() {
           )}
         </>
       )}
-    </div>
+    </AdminPage>
   );
 }
-

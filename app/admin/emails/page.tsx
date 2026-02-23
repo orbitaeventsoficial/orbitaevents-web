@@ -2,6 +2,7 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import Link from 'next/link';
+import { AdminPage } from '../components/AdminPage';
 import EmailStatsCards from './EmailStatsCards';
 import EmailConfigPanel from './EmailConfigPanel';
 import RecentEmailsTable from './RecentEmailsTable';
@@ -172,24 +173,11 @@ export default async function EmailsAdminPage() {
   const pendingBookings = await getPendingPostEventBookings();
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            📧 Emails Automàtics
-          </h1>
-          <p className="mt-1 text-sm">
-            Control i configuració del sistema d&apos;emails automàtics
-          </p>
-        </div>
-        <Link
-          href="/admin"
-          className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium transition-colors"
-        >
-          ← Tornar al panell
-        </Link>
-      </header>
+    <AdminPage
+      title="Emails Automàtics"
+      subtitle="Control i configuració del sistema d'emails automàtics"
+      back={{ href: '/admin', label: 'Panell' }}
+    >
 
       {/* Stats Cards */}
       <EmailStatsCards stats={stats} />
@@ -322,6 +310,6 @@ export default async function EmailsAdminPage() {
           </section>
         </div>
       </div>
-    </div>
+    </AdminPage>
   );
 }

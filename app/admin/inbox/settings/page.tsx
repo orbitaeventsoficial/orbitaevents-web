@@ -1,4 +1,5 @@
 // app/admin/inbox/settings/page.tsx
+import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,13 +24,11 @@ export default async function InboxSettingsPage() {
   const imapSecure = process.env.IMAP_SECURE || (imapPort === '993' ? 'true' : 'false');
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Configurar safata d'entrada</h1>
-        <p className="mt-1 text-sm">
-          Safata simplificada: només correus de <strong>orbitaevents.com</strong>.
-        </p>
-      </header>
+    <AdminPage
+      title="Configurar safata d'entrada"
+      subtitle={<>Safata simplificada: només correus de <strong>orbitaevents.com</strong>.</>}
+      back={{ href: '/admin/inbox', label: 'Inbox' }}
+    >
 
       <section className={`rounded-xl border p-6 shadow-sm ${
         configured ? 'border-emerald-400/30 bg-emerald-950/30' : 'border-amber-400/30 bg-amber-950/30'
@@ -87,6 +86,6 @@ export default async function InboxSettingsPage() {
           <li>• El panell s&apos;actualitza via IMAP de DonDominio.</li>
         </ul>
       </section>
-    </div>
+    </AdminPage>
   );
 }

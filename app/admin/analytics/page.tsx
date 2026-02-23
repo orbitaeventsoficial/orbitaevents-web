@@ -6,6 +6,7 @@ import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { getGoogleAdsConfigStatus, getGoogleAdsReport } from '@/lib/analytics/google-ads';
 import Link from 'next/link';
 import { EVENT_TYPE_PLAIN, EVENT_TYPE_ICONS, SOURCE_LABELS } from '@/lib/constants';
+import { AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -261,27 +262,20 @@ export default async function AnalyticsPage() {
       : 1;
 
   return (
-    <div className="space-y-6">
-      {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl border bg-black p-6 text-white">
-        <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em]">Òrbita Analítica</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight">Panell de rendiment</h1>
-            <p className="mt-2 max-w-xl text-sm">
-              Totes les mètriques essencials en un sol lloc: vendes, entrades, qualitat i creixement.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="rounded-full border px-3 py-1 text-xs">
-              Any {new Date().getFullYear()}
-            </span>
-            <span className="rounded-full border px-3 py-1 text-xs">
-              {Number(yearGrowth) >= 0 ? '📈' : '📉'} {yearGrowth}% YoY
-            </span>
-          </div>
+    <AdminPage
+      title="Panell de rendiment"
+      subtitle="Totes les mètriques essencials en un sol lloc: vendes, entrades, qualitat i creixement."
+      actions={
+        <div className="flex items-center gap-3">
+          <span className="rounded-full border px-3 py-1 text-xs">
+            Any {new Date().getFullYear()}
+          </span>
+          <span className="rounded-full border px-3 py-1 text-xs">
+            {Number(yearGrowth) >= 0 ? '📈' : '📉'} {yearGrowth}% YoY
+          </span>
         </div>
-      </section>
+      }
+    >
 
       <section className="rounded-2xl border bg-black p-6 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -806,7 +800,6 @@ export default async function AnalyticsPage() {
         </div>
       </section>
 
-    </div>
+    </AdminPage>
   );
 }
-

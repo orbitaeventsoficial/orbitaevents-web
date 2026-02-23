@@ -4,6 +4,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
+import { AdminPage } from '../components/AdminPage';
 import BookingActions from './BookingActions';
 import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS } from '@/lib/constants';
 
@@ -109,24 +110,11 @@ export default async function BookingsPage({
   const totalRevenue = stats.reduce((sum, s) => sum + (s._sum.total || 0), 0);
 
   return (
-    <div className="admin-page-container admin-bookings-page space-y-4 px-1 sm:space-y-6 sm:px-0">
-      {/* Header - Mobile optimized */}
-      <header className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">Reserves</h1>
-          <p className="admin-page-subtitle">
-            {pagination.total} esdeveniments · {formatCurrency(totalRevenue)}
-          </p>
-        </div>
-        <div className="admin-page-header-actions">
-        <Link
-          href="/admin/bookings/new"
-          className="admin-page-header-link inline-flex items-center px-3 py-2 text-xs sm:text-sm font-medium"
-        >
-          + Nova
-        </Link>
-        </div>
-      </header>
+    <AdminPage
+      title="Reserves"
+      subtitle={<>{pagination.total} esdeveniments · {formatCurrency(totalRevenue)}</>}
+      actions={<Link href="/admin/bookings/new" className="ap-btn ap-btn--primary">+ Nova</Link>}
+    >
 
       {/* Stats Cards - Scrollable horizontal en móvil */}
       <section className="admin-bookings-stats flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:overflow-visible">
@@ -371,6 +359,6 @@ export default async function BookingsPage({
           </div>
         </section>
       )}
-    </div>
+    </AdminPage>
   );
 }

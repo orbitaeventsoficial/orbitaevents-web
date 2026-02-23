@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
+import { AdminPage } from '../components/AdminPage';
 
 interface CoverageArea {
   city: string;
@@ -121,15 +122,10 @@ export default function CoveragePage() {
   const provinces = Array.from(new Set(areas.map(a => a.province)));
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          🗺️ Àrees de Cobertura
-        </h1>
-        <p className="mt-1 text-sm">
-          Ciutats i províncies on opera Òrbita Events
-        </p>
-      </header>
+    <AdminPage
+      title="Cobertura"
+      subtitle="Ciutats i províncies on opera Òrbita Events"
+    >
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -223,6 +219,6 @@ export default function CoveragePage() {
           </div>
         ))}
       </div>
-    </div>
+    </AdminPage>
   );
 }

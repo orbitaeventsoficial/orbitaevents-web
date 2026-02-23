@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 // Pàgina de gestió post-event
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -89,16 +90,7 @@ export default async function PostEventPage() {
   const data = await getPostEventData();
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Post-Event</h1>
-          <p className="mt-1 text-sm">
-            Gestiona informes, enquestes i feedback dels esdeveniments
-          </p>
-        </div>
-      </header>
+    <AdminPage title="Post-Event" subtitle="Gestiona informes, enquestes i feedback dels esdeveniments">
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -283,7 +275,7 @@ export default async function PostEventPage() {
           )}
         </div>
       </section>
-    </div>
+    </AdminPage>
   );
 }
 

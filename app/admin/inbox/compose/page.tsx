@@ -1,6 +1,6 @@
 // app/admin/inbox/compose/page.tsx
 import { prisma } from '@/lib/prisma';
-import Link from 'next/link';
+import { AdminPage } from '../../components/AdminPage';
 import ComposeForm from './ComposeForm';
 
 export const dynamic = 'force-dynamic';
@@ -68,22 +68,12 @@ export default async function ComposePage({
   const { leads, packs, customer } = await getLeadsAndPacks(customerId || undefined);
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <header className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold">✏️ Nou correu</h1>
-          <p className="text-sm mt-1">
-            Envia pressupostos professionals i respon sol·licituds
-          </p>
-        </div>
-        <Link
-          href="/admin/inbox"
-          className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 text-sm"
-        >
-          ← Tornar a l&apos;inbox
-        </Link>
-      </header>
+    <AdminPage
+      title="Nou correu"
+      subtitle="Envia pressupostos professionals i respon sol·licituds"
+      back={{ href: '/admin/inbox', label: 'Inbox' }}
+      className="max-w-4xl"
+    >
 
       <ComposeForm
         leads={leads}
@@ -100,7 +90,7 @@ export default async function ComposePage({
         }
         initialTemplate={template}
       />
-    </div>
+    </AdminPage>
   );
 }
 

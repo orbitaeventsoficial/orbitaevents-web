@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,23 +61,11 @@ export default async function ReportsPage() {
   const completedReports = reports.filter(r => r.status === 'COMPLETED');
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            📋 Informes Post-Event
-          </h1>
-          <p className="mt-1 text-sm">
-            Informes interns completats després dels esdeveniments
-          </p>
-        </div>
-        <Link
-          href="/admin/post-event"
-          className="rounded-lg border px-4 py-2 font-medium"
-        >
-          ← Tornar
-        </Link>
-      </header>
+    <AdminPage
+      title="Informes Post-Event"
+      subtitle="Informes interns completats després dels esdeveniments"
+      back={{ href: '/admin/post-event', label: 'Post-Event' }}
+    >
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -183,7 +172,7 @@ export default async function ReportsPage() {
           })}
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }
 

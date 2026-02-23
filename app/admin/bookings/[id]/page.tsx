@@ -17,6 +17,7 @@ import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-ut
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 
 import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS } from '@/lib/constants';
+import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -260,44 +261,33 @@ export default async function BookingDetailPage({ params }: PageProps) {
     : null;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
+    <AdminPage
+      title={`Reserva ${booking.reference}`}
+      back={{ href: '/admin/bookings', label: 'Reserves' }}
+      subtitle={
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${statusConf.bg} ${statusConf.text}`}>
+            {statusConf.label}
+          </span>
+          <span className="text-sm">{eventType} · {formatDate(booking.eventDate)}</span>
+          {customer && (
             <Link
-              href="/admin/bookings"
-              className="transition-colors"
+              href={`/admin/contactes/${customer.id}`}
+              className="ap-btn ap-btn--secondary"
             >
-              ← Tornar
+              👤 Fitxa Client
             </Link>
-            {customer && (
-              <Link
-                href={`/admin/contactes/${customer.id}`}
-                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-colors"
-              >
-                👤 Fitxa Client
-              </Link>
-            )}
-            <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${statusConf.bg} ${statusConf.text}`}>
-              {statusConf.label}
-            </span>
-          </div>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight">
-            Reserva {booking.reference}
-          </h1>
-          <p className="mt-1 text-sm">
-            {eventType} · {formatDate(booking.eventDate)}
-          </p>
+          )}
         </div>
-
-        {/* Status Changer */}
+      }
+      actions={
         <BookingStatusChanger
           bookingId={booking.id}
           currentStatus={booking.status}
           guestCount={booking.guestCount}
         />
-      </header>
+      }
+    >
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <div className="rounded-xl border border-white/10 px-4 py-3 shadow-sm">
@@ -679,6 +669,6 @@ export default async function BookingDetailPage({ params }: PageProps) {
           },
         }}
       />
-    </div>
+    </AdminPage>
   );
 }

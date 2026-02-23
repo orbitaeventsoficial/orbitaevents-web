@@ -4,6 +4,7 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { AdminPage } from '../../components/AdminPage';
 import {
   calculateCurrentValue,
   calculateCostPerHour,
@@ -103,33 +104,11 @@ export default async function InventoryItemPage({ params }: PageProps) {
   const remainingHours = Math.max(0, expectedLifeHours - item.totalHoursUsed);
 
   return (
-    <div className="space-y-6">
-      {/* Capçalera */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/admin/inventory"
-              className="transition-colors"
-            >
-              ← Inventari
-            </Link>
-            <code className="rounded-lg border px-3 py-1 text-sm font-mono font-semibold">
-              {item.code}
-            </code>
-            <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${statusConf.bg} ${statusConf.text}`}>
-              {statusConf.label}
-            </span>
-          </div>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight">
-            {item.name}
-          </h1>
-          <p className="mt-1 text-sm">
-            {catConfig.icon} {catConfig.label} · {conditionLabel}
-            {item.watts ? ` · ${item.watts}W` : ''}
-          </p>
-        </div>
-      </header>
+    <AdminPage
+      title={item.name}
+      subtitle={<>{catConfig.icon} {catConfig.label} · {conditionLabel}{item.watts ? ` · ${item.watts}W` : ''} · <code className="text-xs font-mono">{item.code}</code> · <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text}`}>{statusConf.label}</span></>}
+      back={{ href: '/admin/inventory', label: 'Inventari' }}
+    >
 
       {/* KPIs */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -346,6 +325,6 @@ export default async function InventoryItemPage({ params }: PageProps) {
           </div>
         )}
       </section>
-    </div>
+    </AdminPage>
   );
 }

@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 // Pàgina de gestió de missatges i comunicacions
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -97,16 +98,7 @@ export default async function MensajesPage() {
   const data = await getMessagesData();
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Missatges</h1>
-          <p className="mt-1 text-sm">
-            Gestiona les comunicacions amb la clientela
-          </p>
-        </div>
-      </header>
+    <AdminPage title="Missatges" subtitle="Gestiona les comunicacions amb la clientela">
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-3">
@@ -251,7 +243,7 @@ export default async function MensajesPage() {
           )}
         </div>
       </section>
-    </div>
+    </AdminPage>
   );
 }
 

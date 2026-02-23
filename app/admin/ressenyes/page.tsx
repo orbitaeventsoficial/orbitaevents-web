@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { AdminPage } from '../components/AdminPage';
 
 type Testimonial = {
   id: string;
@@ -86,11 +87,10 @@ export default function AdminRessenyesPage() {
   }
 
   return (
-    <div className="admin-reviews-page space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Ressenyes</h1>
-        <p className="text-sm">Aprova o amaga opinions rebudes del web.</p>
-      </div>
+    <AdminPage
+      title="Ressenyes"
+      subtitle="Aprova o amaga opinions rebudes del web."
+    >
 
       <div className="flex gap-2">
         <button
@@ -169,6 +169,6 @@ export default function AdminRessenyesPage() {
           </div>
         ))}
       </div>
-    </div>
+    </AdminPage>
   );
 }

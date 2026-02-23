@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AdminPage } from '../components/AdminPage';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
 import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import { prisma } from '@/lib/prisma';
@@ -194,18 +195,15 @@ export default async function CatalogPage({
     : 0;
 
   return (
-    <div className="admin-catalog-page space-y-6">
-      <header className="rounded-2xl border border-white/10 p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold">Catàleg</h1>
-        <p className="mt-1 text-sm">
-          Punt únic per operar packs, extres, inventari i regles de preu.
+    <AdminPage
+      title="Catàleg"
+      subtitle="Punt únic per operar packs, extres, inventari i regles de preu."
+      alert={pricingAlerts > 0 ? (
+        <p className="inline-flex rounded-full border px-3 py-1 text-xs font-semibold">
+          ⚠ {pricingAlerts} alertes de divergència de preu en packs
         </p>
-        {pricingAlerts > 0 && (
-          <p className="mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-semibold">
-            ⚠ {pricingAlerts} alertes de divergència de preu en packs
-          </p>
-        )}
-      </header>
+      ) : undefined}
+    >
 
       <nav className="flex flex-wrap gap-2">
         {(Object.keys(TAB_META) as CatalogTab[]).map((tab) => {
@@ -419,6 +417,6 @@ export default async function CatalogPage({
           )}
         </div>
       </section>
-    </div>
+    </AdminPage>
   );
 }

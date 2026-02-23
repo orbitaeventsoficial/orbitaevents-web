@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { AdminPage } from '../components/AdminPage';
 
 const SOURCE_OPTIONS = [
   { value: 'PHONE', label: 'Telèfon', icon: '📞' },
@@ -201,24 +202,11 @@ export default function IntakePage() {
   }, [form, duplicates]);
 
   return (
-    <div className="admin-page-container space-y-4 px-1 pb-24 sm:space-y-6 sm:px-0 sm:pb-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="admin-page-title">
-            Entrada ràpida
-          </h1>
-          <p className="admin-page-subtitle mt-1">
-            Crea una entrada des de qualsevol canal amb detecció de duplicats
-          </p>
-        </div>
-        <Link
-          href="/admin/leads"
-          className="rounded-xl border px-3 py-2 text-sm transition-colors"
-        >
-          ← Entrades
-        </Link>
-      </div>
+    <AdminPage
+      title="Entrada ràpida"
+      subtitle="Crea una entrada des de qualsevol canal amb detecció de duplicats"
+      back={{ href: '/admin/leads', label: 'Entrades' }}
+    >
 
       <section className="rounded-2xl border p-2">
         <div className="grid grid-cols-2 gap-2">
@@ -498,6 +486,6 @@ export default function IntakePage() {
           Netejar
         </button>
       </div>
-    </div>
+    </AdminPage>
   );
 }

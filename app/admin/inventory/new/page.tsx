@@ -8,6 +8,7 @@
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { AdminPage } from '../../components/AdminPage';
 
 const CATEGORIES = [
   { value: 'SOUND', label: 'So', icon: '🔊', prefix: 'SON' },
@@ -129,20 +130,12 @@ export default function NewInventoryItemPage() {
   }, [form, router]);
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Nou element</h1>
-          <p className="text-sm mt-1">Afegeix equipament a l&apos;inventari</p>
-        </div>
-        <Link
-          href="/admin/inventory"
-          className="rounded-xl border px-3 py-2 text-sm transition-colors"
-        >
-          ← Inventari
-        </Link>
-      </div>
-
+    <AdminPage
+      title="Nou element"
+      subtitle="Afegeix equipament a l'inventari"
+      back={{ href: '/admin/inventory', label: 'Inventari' }}
+      className="max-w-3xl"
+    >
       {error && (
         <div className="rounded-xl border p-4">
           <p className="text-sm">{error}</p>
@@ -356,6 +349,6 @@ export default function NewInventoryItemPage() {
           Cancel·lar
         </Link>
       </div>
-    </div>
+    </AdminPage>
   );
 }

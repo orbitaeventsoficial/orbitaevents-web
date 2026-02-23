@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { EVENT_TYPE_PLAIN } from '@/lib/constants';
+import { AdminPage } from '../components/AdminPage';
 
 type CalendarApiDay = {
   reservas: {
@@ -277,7 +278,7 @@ export default function CalendarMonthClient() {
   }, [cells, data]);
 
   return (
-    <div className="space-y-4 sm:space-y-5">
+    <AdminPage title="Calendari">
       {/* Barra superior: selector de mes + meta info */}
       <div className="flex flex-col gap-3 rounded-2xl border backdrop-blur-sm p-3 sm:p-4 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-wrap items-center gap-2">
@@ -678,6 +679,6 @@ export default function CalendarMonthClient() {
           )}
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }

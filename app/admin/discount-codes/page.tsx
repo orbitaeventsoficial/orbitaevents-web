@@ -7,6 +7,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { AdminPage } from '../components/AdminPage';
 
 type DiscountCode = {
   id: string;
@@ -154,25 +155,20 @@ export default function DiscountCodesPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Codis de descompte
-          </h1>
-          <p className="text-sm mt-1">
-            Gestiona codis promocionals per a reserves
-          </p>
-        </div>
+    <AdminPage
+      title="Codis de descompte"
+      subtitle="Gestiona codis promocionals per a reserves"
+      actions={
         <button
           type="button"
           onClick={() => setShowForm(!showForm)}
-          className="rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all"
+          className="ap-btn ap-btn--primary"
         >
           {showForm ? 'Tancar' : '+ Nou codi'}
         </button>
-      </div>
+      }
+      className="max-w-5xl"
+    >
 
       {/* Stats */}
       {stats && (
@@ -421,6 +417,6 @@ export default function DiscountCodesPage() {
           </div>
         )}
       </div>
-    </div>
+    </AdminPage>
   );
 }

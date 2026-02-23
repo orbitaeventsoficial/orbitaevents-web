@@ -7,6 +7,7 @@ import SyncButton from './SyncButton';
 import PackPriceQuickEditor from './PackPriceQuickEditor';
 import { getAllPacks } from '@/config/packs-config';
 import { computePackPricingHealth, getPackPricingModelConfig, type PackPricingHealth } from '@/lib/services/packPricingHealth';
+import { AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,30 +73,30 @@ export default async function PacksPage() {
   const pricingAlertsCount = Array.from(pricingHealthByPack.values()).filter((row) => row.hasAlert).length;
 
   return (
-    <div className="admin-packs-page space-y-6">
-      {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Packs</h1>
-          <p className="mt-1 text-sm">
-            Gestiona els packs de serveis i els seus preus
-          </p>
+    <AdminPage
+      title="Packs"
+      subtitle={
+        <>
+          Gestiona els packs de serveis i els seus preus
           {!packsInSync && (
-            <div className="mt-2 inline-flex items-center gap-2 rounded-md px-3 py-1 text-sm border">
+            <span className="mt-2 inline-flex items-center gap-2 rounded-md px-3 py-1 text-sm border">
               ℹ️ Packs en BD: {packs.length} · Packs al config (seed): {configPacks.length}
-            </div>
+            </span>
           )}
-        </div>
+        </>
+      }
+      actions={
         <div className="flex gap-2">
           <SyncButton />
           <Link
             href="/admin/packs/new"
-            className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium transition-colors"
+            className="ap-btn ap-btn--primary"
           >
             + Nou Pack
           </Link>
         </div>
-      </header>
+      }
+    >
 
       <nav className="flex flex-wrap gap-2">
         <Link
@@ -458,9 +459,6 @@ export default async function PacksPage() {
           <p className="text-sm">Executa el seed per carregar dades inicials</p>
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }
-
-
-

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
+import { AdminPage } from '../components/AdminPage';
 
 interface Feature {
   key: string;
@@ -67,15 +68,7 @@ export default function FeaturesPage() {
   const activeCount = features.filter(f => f.enabled).length;
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          🎛️ Activació de funcionalitats
-        </h1>
-        <p className="mt-1 text-sm">
-          Activa o desactiva funcionalitats del web
-        </p>
-      </header>
+    <AdminPage title="Funcionalitats" subtitle="Activa o desactiva funcionalitats del web">
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -133,6 +126,6 @@ export default function FeaturesPage() {
           ))}
         </div>
       </div>
-    </div>
+    </AdminPage>
   );
 }

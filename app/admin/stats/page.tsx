@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/logger';
+import { AdminPage } from '../components/AdminPage';
 
 interface Stat {
   key: string;
@@ -98,15 +99,10 @@ export default function StatsPage() {
   const manualStats = stats.filter(s => s.isManual).length;
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          📊 Estadístiques Públiques
-        </h1>
-        <p className="mt-1 text-sm">
-          Gestiona les estadístiques que es mostren al lloc web
-        </p>
-      </header>
+    <AdminPage
+      title="Estadístiques"
+      subtitle="Gestiona les estadístiques que es mostren al lloc web"
+    >
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -227,9 +223,7 @@ export default function StatsPage() {
           <li>• Pots restablir a automàtic en qualsevol moment</li>
         </ul>
       </div>
-    </div>
+    </AdminPage>
   );
 }
-
-
 

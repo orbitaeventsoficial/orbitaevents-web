@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import FaqEditorForm from '../FaqEditorForm';
+import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,20 +23,11 @@ export default async function EditFaqPage({
   if (!faq) notFound();
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Editar FAQ</h1>
-          <p className="mt-1 text-sm">Modifica contingut, idioma i estat</p>
-        </div>
-        <Link
-          href="/admin/faq"
-          className="rounded-xl border px-4 py-2 text-sm font-medium"
-        >
-          ← FAQ
-        </Link>
-      </header>
-
+    <AdminPage
+      title="Editar FAQ"
+      subtitle="Modifica contingut, idioma i estat"
+      back={{ href: '/admin/faq', label: 'FAQ' }}
+    >
       <FaqEditorForm
         mode="edit"
         initial={{
@@ -52,7 +43,7 @@ export default async function EditFaqPage({
           })),
         }}
       />
-    </div>
+    </AdminPage>
   );
 }
 

@@ -848,7 +848,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="admin-main">
-        <div className="admin-shell admin-readable admin-unified admin-compact admin-main-shell">
+        <div className="admin-shell admin-main-shell">
           {children}
         </div>
       </main>

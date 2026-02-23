@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import dynamicImport from 'next/dynamic';
 import { prisma } from '@/lib/prisma';
+import { AdminPage } from '../components/AdminPage';
 
 const PresupuestoPdfStudio = dynamicImport(() => import('./PresupuestoPdfStudio'), {
   ssr: false,
@@ -53,33 +54,18 @@ export default async function PresupuestosPage({
   const brandSettings = Object.fromEntries(brandSettingsRows.map((row) => [row.key, row.value]));
 
   return (
-    <div className="admin-page-container admin-presupuestos-page space-y-6">
-      <header className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">Editor avançat de pressupost PDF</h1>
-          <p className="admin-page-subtitle">
-            Personalitza client, pack, extres, descomptes i text per generar el PDF al moment.
-          </p>
-          {customer && (
-            <p className="mt-2 text-xs">
-              Guardant a fitxa: <Link href={`/admin/contactes/${customer.id}`} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
-            </p>
-          )}
-        </div>
-        <div className="admin-page-header-actions">
-          <Link href="/admin/settings" className="admin-page-header-link text-sm">
-            ← Configuració
-          </Link>
-          {customer && (
-            <Link
-              href={`/admin/contactes/${customer.id}`}
-              className="admin-page-header-link rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
-            >
-              👤 Fitxa Client
-            </Link>
-          )}
-        </div>
-      </header>
+    <AdminPage
+      title="Pressupostos"
+      subtitle={<>Personalitza client, pack, extres, descomptes i text per generar el PDF al moment.
+        {customer && (
+          <span className="block mt-2 text-xs">
+            Guardant a fitxa: <Link href={`/admin/contactes/${customer.id}`} className="hover:underline"><strong>{customer.name}</strong></Link> ({customer.email})
+          </span>
+        )}
+      </>}
+      back={{ href: '/admin/settings', label: 'Configuració' }}
+      actions={customer ? <Link href={`/admin/contactes/${customer.id}`} className="ap-btn ap-btn--secondary">👤 Fitxa Client</Link> : undefined}
+    >
 
       <PresupuestoPdfStudio
         initialCustomerId={customer?.id || ''}
@@ -95,6 +81,6 @@ export default async function PresupuestosPage({
         initialBrandTagline={String(brandSettings['quotes.brandTagline'] || 'El teu esdeveniment. El teu estil. La teva nit perfecta.')}
         initialBrandLogoDataUrl={String(brandSettings['quotes.logoDataUrl'] || '')}
       />
-    </div>
+    </AdminPage>
   );
 }

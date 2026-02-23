@@ -13,6 +13,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { AdminPage } from '../components/AdminPage';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -392,18 +393,11 @@ export default function AdminContactesPage() {
   // ═══════════════════════════════════════════════════════════════════════════
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Gestió de Clients
-          </h1>
-          <p className="text-sm mt-1">CRM - Afegeix clients i inicia processos</p>
-        </div>
-
-        {/* Stats */}
-        {stats && (
+    <AdminPage
+      title="Clients"
+      subtitle="CRM - Afegeix clients i inicia processos"
+      actions={
+        stats ? (
           <div className="flex gap-3 flex-wrap">
             <div className="rounded-2xl border backdrop-blur-sm px-4 py-3 text-center">
               <p className="text-2xl font-bold">{stats.total}</p>
@@ -418,9 +412,9 @@ export default function AdminContactesPage() {
               <p className="text-xs">Amb esdeveniments</p>
             </div>
           </div>
-        )}
-      </div>
-
+        ) : undefined
+      }
+    >
       {/* Search & Add */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
@@ -916,6 +910,6 @@ export default function AdminContactesPage() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </AdminPage>
   );
 }

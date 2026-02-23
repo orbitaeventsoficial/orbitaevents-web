@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import CalendarTokenManager from './CalendarTokenManager';
 import IntegrationSetupWizard from './IntegrationSetupWizard';
+import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,14 +56,11 @@ export default async function IntegrationsPage() {
   const cronActive = String(map['emails.cron.lastStatus'] || '').toUpperCase() === 'OK';
 
   return (
-    <div className="space-y-6">
-      <header className="rounded-2xl border p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold">Centre d&apos;integracions</h1>
-        <p className="mt-1 text-sm">
-          Sincronitza CRM, emails i calendari amb Google i mòbil.
-        </p>
-      </header>
-
+    <AdminPage
+      title="Centre d'integracions"
+      subtitle="Sincronitza CRM, emails i calendari amb Google i mòbil."
+      back={{ href: '/admin/settings', label: 'Configuració' }}
+    >
       <IntegrationSetupWizard
         gmailConnected={Boolean(map['integrations.gmail.refreshToken'])}
         imapConfigured={imapConfigured}
@@ -197,6 +195,6 @@ export default async function IntegrationsPage() {
           <p>• Cron estat: {map['emails.cron.lastStatus'] || 'Pendent'}</p>
         </div>
       </section>
-    </div>
+    </AdminPage>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
+import { AdminPage } from '../../components/AdminPage';
 
 export default function NewBlogPostPage() {
   const router = useRouter();
@@ -109,12 +110,11 @@ export default function NewBlogPostPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Nou post</h1>
-        <p className="mt-2 text-white/60">Crea un nou article per al blog</p>
-      </div>
-
+    <AdminPage
+      title="Nou post"
+      subtitle="Crea un nou article per al blog"
+      back={{ href: '/admin/blog', label: 'Blog' }}
+    >
       {flashMessage && (
         <div
           className={`mb-6 rounded-xl border px-4 py-3 text-sm ${
@@ -398,8 +398,6 @@ export default function NewBlogPostPage() {
           </button>
         </div>
       </form>
-    </div>
+    </AdminPage>
   );
 }
-
-

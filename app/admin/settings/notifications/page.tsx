@@ -2,7 +2,7 @@
 import { log } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { AdminPage } from '../../components/AdminPage';
 
 interface NotificationConfig {
   smtp: {
@@ -133,25 +133,11 @@ export default function SettingsNotificationsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <Link
-            href="/admin/settings"
-            className="text-sm mb-2 inline-block"
-          >
-            ← Tornar a configuració
-          </Link>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            📧 Configuració de notificacions
-          </h1>
-          <p className="mt-1 text-sm">
-            Gestiona com reps alertes quan entra una nova entrada
-          </p>
-        </div>
-      </header>
-
+    <AdminPage
+      title="Configuració de notificacions"
+      subtitle="Gestiona com reps alertes quan entra una nova entrada"
+      back={{ href: '/admin/settings', label: 'Configuració' }}
+    >
       {/* Status Cards */}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className={`rounded-xl border p-6 shadow-sm ${config?.status.emailReady ? 'border-emerald-400/30 bg-emerald-950/30' : 'border-rose-400/30 bg-rose-950/30'}`}>
@@ -366,12 +352,8 @@ export default function SettingsNotificationsPage() {
           </ol>
         </div>
       </section>
-    </div>
+    </AdminPage>
   );
 }
-
-
-
-
 
 

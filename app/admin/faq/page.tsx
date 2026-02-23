@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 // Pàgina de gestió de FAQs
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,24 +46,18 @@ export default async function FAQPage() {
   }, {} as Record<string, typeof faqs>);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">FAQ</h1>
-          <p className="mt-1 text-sm">
-            Gestiona les preguntes freqüents del web
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Link
-            href="/admin/faq/new"
-            className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium transition-colors"
-          >
-            + Nova Pregunta
-          </Link>
-        </div>
-      </header>
+    <AdminPage
+      title="FAQ"
+      subtitle="Gestiona les preguntes freqüents del web"
+      actions={
+        <Link
+          href="/admin/faq/new"
+          className="ap-btn ap-btn--primary"
+        >
+          + Nova Pregunta
+        </Link>
+      }
+    >
 
       {/* Stats Cards */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -193,6 +188,6 @@ export default async function FAQPage() {
           <p className="text-sm">Crea la primera pregunta per començar</p>
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }

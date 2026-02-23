@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,23 +42,11 @@ export default async function FeedbackPage() {
   const bookings = await getCompletedBookings();
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            💌 Feedback al Client
-          </h1>
-          <p className="mt-1 text-sm">
-            Envia agraïments i incentius als clients després de l&apos;event
-          </p>
-        </div>
-        <Link
-          href="/admin/post-event"
-          className="px-4 py-2 bg-white/5 rounded-lg font-medium hover:bg-white/10"
-        >
-          ← Tornar
-        </Link>
-      </header>
+    <AdminPage
+      title="Feedback al Client"
+      subtitle="Envia agraïments i incentius als clients després de l'event"
+      back={{ href: '/admin/post-event', label: 'Post-Event' }}
+    >
 
       {/* Info Card */}
       <div className="border rounded-xl p-6">
@@ -127,7 +116,7 @@ export default async function FeedbackPage() {
           })}
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }
 

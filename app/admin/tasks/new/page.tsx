@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { AdminPage } from '../../components/AdminPage';
 
 export default function NewTaskPage() {
   const router = useRouter();
@@ -52,11 +53,12 @@ export default function NewTaskPage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4">
-      <header className="rounded-2xl border p-6">
-        <h1 className="text-xl font-semibold">Nova tasca</h1>
-        <p className="mt-1 text-sm">Crea una tasca operativa vinculada al client.</p>
-      </header>
+    <AdminPage
+      title="Nova tasca"
+      subtitle="Crea una tasca operativa vinculada al client."
+      back={{ href: '/admin/tasks', label: 'Tasques' }}
+      className="max-w-3xl"
+    >
 
       <form onSubmit={onSubmit} className="rounded-2xl border p-6 space-y-4">
         <label className="flex flex-col gap-1 text-sm">
@@ -127,7 +129,7 @@ export default function NewTaskPage() {
           </Link>
         </div>
       </form>
-    </div>
+    </AdminPage>
   );
 }
 

@@ -65,7 +65,9 @@
       "Bash(du:*)",
       "Bash(ls /c/Users/Lore/Desktop/orbitaevents/scripts/*.{mjs,ts,js} 2>/dev/null | while read f; do basename \"$f\"; done)",
       "Bash(done)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(python:*)",
+      "Bash(xxd:*)"
     ]
   }
 }

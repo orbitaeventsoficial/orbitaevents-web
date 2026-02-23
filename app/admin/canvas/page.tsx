@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { AdminPage } from '../components/AdminPage';
 
 const PRESETS = [
   { id: 'email', name: 'Email', width: 600, height: 400 },
@@ -68,14 +69,11 @@ export default function CanvasGeneratorPage() {
   const selectedPreset = PRESETS.find(p => p.id === formData.preset);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">🎨 Generador de Canvas</h1>
-        <p className="mt-1">
-          Crea imatges promocionals amb foto de l&apos;event i codi de descompte
-        </p>
-      </div>
+    <AdminPage
+      title="Generador de Canvas"
+      subtitle="Crea imatges promocionals amb foto de l'event i codi de descompte"
+      className="max-w-6xl"
+    >
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form */}
@@ -276,12 +274,9 @@ export default function CanvasGeneratorPage() {
           <li>4. Descarrega la imatge o copia la URL per enviar per email</li>
         </ul>
       </div>
-    </div>
+    </AdminPage>
   );
 }
-
-
-
 
 
 

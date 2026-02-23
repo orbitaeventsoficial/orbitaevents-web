@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { AdminPage } from '../../components/AdminPage';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 
 type Pack = {
@@ -464,27 +465,12 @@ export default function NewBookingPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Nova reserva
-          </h1>
-          <p className="text-sm mt-1">
-            {leadData
-              ? `Des de l'entrada de ${leadData.name}`
-              : 'Crear una reserva manualment'}
-          </p>
-        </div>
-        <Link
-          href="/admin/bookings"
-          className="rounded-xl border px-3 py-2 text-sm transition-colors"
-        >
-          ← Reserves
-        </Link>
-      </div>
-
+    <AdminPage
+      title="Nova reserva"
+      subtitle={leadData ? `Des de l'entrada de ${leadData.name}` : 'Crear una reserva manualment'}
+      back={{ href: '/admin/bookings', label: 'Reserves' }}
+      className="max-w-5xl"
+    >
       {/* Lead context banner */}
       {leadData && (
         <div className="rounded-xl border p-4 flex items-center justify-between">
@@ -934,6 +920,6 @@ export default function NewBookingPage() {
           Cancel·lar
         </Link>
       </div>
-    </div>
+    </AdminPage>
   );
 }

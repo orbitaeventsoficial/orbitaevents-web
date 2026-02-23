@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AdminPage } from '../components/AdminPage';
 
 const EXAMPLE_CSS = `/* Exemple: admin pastel i semàfors */
 html.admin-mode .admin-layout-shell {
@@ -420,13 +421,7 @@ export default function AdminCssManagerPage() {
   }
 
   return (
-    <div className="admin-page-container admin-css-manager-page space-y-4">
-      <header className="admin-css-panel rounded-2xl border p-5">
-        <h1 className="admin-page-title">CSS PRO</h1>
-        <p className="admin-page-subtitle mt-1">
-          Editor de CSS del panell admin. S&apos;aplica en viu a tot `/admin`.
-        </p>
-      </header>
+    <AdminPage title="CSS Manager" subtitle="Editor de CSS del panell admin. S'aplica en viu a tot /admin." className="admin-css-manager-page">
 
       <section className="admin-css-panel rounded-2xl border p-5">
         <div className="mb-3 flex items-center justify-between">
@@ -484,6 +479,6 @@ export default function AdminCssManagerPage() {
           {msg && <p className="text-sm">{msg}</p>}
         </div>
       </section>
-    </div>
+    </AdminPage>
   );
 }

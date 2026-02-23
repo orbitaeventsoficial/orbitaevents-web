@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import QuoteTemplateEditor from './QuoteTemplateEditor';
 import { DEFAULT_QUOTE_TEMPLATE, getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
+import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,24 +14,17 @@ export default async function QuoteTemplateSettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <header className="rounded-2xl border p-6 shadow-sm">
-        <Link href="/admin/settings" className="text-sm">
-          ← Tornar a configuració
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold">Plantilla de pressupostos</h1>
-        <p className="mt-1 text-sm">
-          Defineix el text del pressupost, condicions i còpia interna. Aquesta plantilla s&apos;usa a
-          la previsualització i als emails enviats al client.
+    <AdminPage
+      title="Plantilla de pressupostos"
+      subtitle="Defineix el text del pressupost, condicions i còpia interna. Aquesta plantilla s'usa a la previsualització i als emails enviats al client."
+      back={{ href: '/admin/settings', label: 'Configuració' }}
+      alert={usingFallback ? (
+        <p className="rounded-xl border px-3 py-2 text-sm">
+          No s&apos;ha pogut carregar la configuració guardada. Es mostren valors per defecte.
         </p>
-        {usingFallback ? (
-          <p className="mt-3 rounded-xl border px-3 py-2 text-sm">
-            No s&apos;ha pogut carregar la configuració guardada. Es mostren valors per defecte.
-          </p>
-        ) : null}
-      </header>
-
+      ) : undefined}
+    >
       <QuoteTemplateEditor initial={template} />
-    </div>
+    </AdminPage>
   );
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { log } from '@/lib/logger';
+import { AdminPage } from '../../../components/AdminPage';
 
 export default function NewReportPage() {
   const router = useRouter();
@@ -95,15 +96,11 @@ export default function NewReportPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          📝 Nou Informe Post-event
-        </h1>
-        <p className="mt-1 text-sm">
-          Completa aquest informe després de l&apos;event
-        </p>
-      </header>
+    <AdminPage
+      title="Nou Informe Post-event"
+      subtitle="Completa aquest informe després de l'event"
+      back={{ href: '/admin/post-event/reports', label: 'Informes' }}
+    >
 
       {booking && (
         <div className="border rounded-xl p-4">
@@ -287,7 +284,7 @@ export default function NewReportPage() {
           </Link>
         </div>
       </form>
-    </div>
+    </AdminPage>
   );
 }
 

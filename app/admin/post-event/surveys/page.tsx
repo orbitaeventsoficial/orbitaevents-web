@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,23 +40,11 @@ export default async function SurveysPage() {
   const surveys = await getSurveys();
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            📊 Enquestes Post-Event
-          </h1>
-          <p className="mt-1 text-sm">
-            Feedback i valoracions dels clients
-          </p>
-        </div>
-        <Link
-          href="/admin/post-event"
-          className="rounded-lg border px-4 py-2 font-medium"
-        >
-          ← Tornar
-        </Link>
-      </header>
+    <AdminPage
+      title="Enquestes Post-Event"
+      subtitle="Feedback i valoracions dels clients"
+      back={{ href: '/admin/post-event', label: 'Post-Event' }}
+    >
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -146,7 +135,7 @@ export default async function SurveysPage() {
           })}
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }
 

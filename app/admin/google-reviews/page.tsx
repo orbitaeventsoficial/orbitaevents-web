@@ -9,6 +9,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { log } from '@/lib/logger';
+import { AdminPage } from '../components/AdminPage';
 
 interface GoogleReview {
   author_name: string;
@@ -73,16 +74,10 @@ export default function GoogleReviewsAdminPage() {
   }
 
   return (
-    <div className="p-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">
-          Ressenyes de Google
-        </h1>
-        <p className="text-white/60">
-          Només es mostren ressenyes de 5 estrelles sincronitzades des de Google Business
-        </p>
-      </div>
+    <AdminPage
+      title="Ressenyes Google"
+      subtitle="Només es mostren ressenyes de 5 estrelles sincronitzades des de Google Business"
+    >
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -216,7 +211,6 @@ export default function GoogleReviewsAdminPage() {
           Veure pàgina de Google Business
         </a>
       </div>
-    </div>
+    </AdminPage>
   );
 }
-

@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AdminPage } from '../components/AdminPage';
 import PaymentToggleButton from '../finanzas/PaymentToggleButton';
 import PaymentReminderActions from '../finanzas/PaymentReminderActions';
 import ProfitabilityConfigEditor from '../rentabilidad/ProfitabilityConfigEditor';
@@ -295,39 +296,28 @@ export default function EconomiaClient(props: EconomiaClientProps) {
   );
 
   return (
-    <div className="admin-economia-page space-y-4">
-      {/* ═══════════ HEADER ═══════════ */}
-      <header className="admin-economia-header relative overflow-hidden rounded-xl border border-white/10 p-5 shadow-lg">
-        <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
-        <div className="relative">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="admin-page-title text-2xl font-black tracking-tight">
-                Economia
-              </h1>
-              <p className="mt-1 text-xs">
-                Control de caixa, cobraments i marge en una sola pantalla.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <a
-                href="/api/admin/reports/profitability"
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold hover:bg-white/10 transition-colors"
-              >
-                Exportar JSON
-              </a>
-              <Link
-                href="/admin/sales-ops"
-                className="rounded-xl border px-4 py-2 text-xs font-semibold transition-colors"
-              >
-                Operativa de vendes
-              </Link>
-            </div>
-          </div>
+    <AdminPage
+      title="Economia"
+      subtitle="Control de caixa, cobraments i marge en una sola pantalla."
+      actions={
+        <div className="flex flex-wrap gap-2">
+          <a
+            href="/api/admin/reports/profitability"
+            target="_blank"
+            rel="noreferrer"
+            className="ap-btn ap-btn--secondary"
+          >
+            Exportar JSON
+          </a>
+          <Link
+            href="/admin/sales-ops"
+            className="ap-btn ap-btn--primary"
+          >
+            Operativa de vendes
+          </Link>
         </div>
-      </header>
+      }
+    >
 
       {/* ═══════════ TAB NAVIGATION ═══════════ */}
       <nav className="admin-economia-tabs flex gap-1 rounded-xl border border-white/10 p-1 shadow-md backdrop-blur-sm">
@@ -1030,7 +1020,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
 
         </motion.div>
       </AnimatePresence>
-    </div>
+    </AdminPage>
   );
 }
 

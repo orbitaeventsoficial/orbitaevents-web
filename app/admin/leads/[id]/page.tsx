@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { AdminPage } from '../../components/AdminPage';
 import LeadActionsEnhanced from './LeadActionsEnhanced';
 import LeadProfileEditor from './LeadProfileEditor';
 import LeadWorkspace from './LeadWorkspace';
@@ -238,73 +239,60 @@ export default async function LeadDetailPage({ params }: Props) {
   const openTasksCount = lead.tasks.filter((task) => task.status !== 'DONE' && task.status !== 'CANCELLED').length;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <header className="rounded-2xl border p-6 shadow-sm">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-          <div className="flex items-center gap-3 mb-2">
-            <Link
-              href="/admin/leads"
-              className="text-sm"
-            >
-              ← Tornar a entrades
-            </Link>
-            {lead.customerId && (
-              <Link
-                href={`/admin/contactes/${lead.customerId}`}
-                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-colors"
-              >
-                👤 Fitxa Client
-              </Link>
-            )}
-          </div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {lead.name}
-          </h1>
-          <div className="mt-2 flex items-center gap-3 flex-wrap">
-            <span
-              className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${statusConf.bg} ${statusConf.text}`}
-            >
-              {statusConf.label}
-            </span>
-            <span className="text-sm">{eventType}</span>
-            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${priorityConf.color}`}>
-              {priorityConf.label}
-            </span>
-          </div>
-          </div>
-
-          <div className="flex gap-2 flex-wrap">
-            {lead.phone && (
-              <>
-                <a
-                  href={`https://wa.me/${lead.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(
-                    `Hola ${lead.name}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`
-                  )}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white"
-                >
-                  💬 WhatsApp
-                </a>
-                <a
-                  href={`tel:${lead.phone}`}
-                  className="inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white"
-                >
-                  📞 Trucar
-                </a>
-              </>
-            )}
-            <a
-              href={`mailto:${lead.email}`}
-              className="inline-flex items-center rounded-md px-4 py-2 text-sm font-medium"
-            >
-              ✉️ Email
-            </a>
-          </div>
+    <AdminPage
+      title={lead.name}
+      back={{ href: '/admin/leads', label: 'Entrades' }}
+      subtitle={
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${statusConf.bg} ${statusConf.text}`}>
+            {statusConf.label}
+          </span>
+          <span className="text-sm">{eventType}</span>
+          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${priorityConf.color}`}>
+            {priorityConf.label}
+          </span>
         </div>
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      }
+      actions={
+        <div className="flex gap-2 flex-wrap">
+          {lead.customerId && (
+            <Link
+              href={`/admin/contactes/${lead.customerId}`}
+              className="ap-btn ap-btn--secondary"
+            >
+              👤 Fitxa Client
+            </Link>
+          )}
+          {lead.phone && (
+            <>
+              <a
+                href={`https://wa.me/${lead.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(
+                  `Hola ${lead.name}! Sóc de Òrbita Events, hem rebut la teva sol·licitud i volem ajudar-te a organitzar el teu event.`
+                )}`}
+                target="_blank" rel="noopener noreferrer"
+                className="ap-btn ap-btn--primary"
+              >
+                💬 WhatsApp
+              </a>
+              <a
+                href={`tel:${lead.phone}`}
+                className="ap-btn ap-btn--secondary"
+              >
+                📞 Trucar
+              </a>
+            </>
+          )}
+          <a
+            href={`mailto:${lead.email}`}
+            className="ap-btn ap-btn--secondary"
+          >
+            ✉️ Email
+          </a>
+        </div>
+      }
+    >
+      <section className="rounded-2xl border p-6 shadow-sm">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           <div className="rounded-xl border px-4 py-3">
             <p className="text-xs uppercase tracking-wide">Valor estimat</p>
             <p className="text-xl font-semibold">
@@ -350,7 +338,7 @@ export default async function LeadDetailPage({ params }: Props) {
             <ScoreSnapshotButton leadId={lead.id} />
           </div>
         </div>
-      </header>
+      </section>
 
       <LeadGuidedFlow
         leadId={lead.id}
@@ -810,9 +798,6 @@ export default async function LeadDetailPage({ params }: Props) {
           />
         </div>
       </div>
-    </div>
+    </AdminPage>
   );
 }
-
-
-
