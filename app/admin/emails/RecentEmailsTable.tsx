@@ -40,7 +40,7 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
     },
   };
 
-  const formatDate = (date: Date) => {
+  const formatRelativeDate = (date: Date) => {
     const d = new Date(date);
     const now = new Date();
     const diff = now.getTime() - d.getTime();
@@ -92,7 +92,7 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
                   <p className={`text-xs ${actionInfo.text}`}>{actionInfo.label}</p>
                 </div>
                 <div className="text-xs">
-                  {formatDate(activity.createdAt)}
+                  {formatRelativeDate(activity.createdAt)}
                 </div>
               </div>
             );

@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, getIncludedTravelOneWayKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import { formatCurrency } from '@/lib/constants';
 
 interface BookingMarginProps {
   bookingId: string;
@@ -29,9 +30,6 @@ interface BookingMarginProps {
   targetMarginPct: number;
 }
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('ca-ES', { style: 'currency', currency: 'EUR' }).format(value);
-}
 
 export default function BookingMarginCard({
   bookingId,

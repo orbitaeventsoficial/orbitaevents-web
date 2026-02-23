@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { AdminPage } from '../components/AdminPage';
+import { formatDateTime } from '@/lib/constants';
 
 type Testimonial = {
   id: string;
@@ -17,13 +18,6 @@ type Testimonial = {
 
 type StatusTab = 'pending' | 'approved';
 
-function formatDate(value: string) {
-  try {
-    return new Date(value).toLocaleString('ca-ES');
-  } catch {
-    return value;
-  }
-}
 
 export default function AdminRessenyesPage() {
   const [pending, setPending] = useState<Testimonial[]>([]);
@@ -130,7 +124,7 @@ export default function AdminRessenyesPage() {
               <div>
                 <div className="text-base font-semibold">{t.customer.name}</div>
                 <div className="text-sm">{t.customer.email}</div>
-                <div className="text-xs mt-1">{formatDate(t.createdAt)}</div>
+                <div className="text-xs mt-1">{formatDateTime(t.createdAt)}</div>
               </div>
               <div className="font-bold text-sm">★ {t.rating.toFixed(1)}</div>
             </div>

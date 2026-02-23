@@ -61,8 +61,8 @@ function getSaturdaysOfMonth(year: number, month: number): Date[] {
   return saturdays;
 }
 
-// Helper: Formatear fecha para comparación
-function formatDate(date: Date): string {
+// Helper: Formatear fecha para comparación (extrae YYYY-MM-DD)
+function toIsoDateString(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
@@ -229,10 +229,10 @@ export async function GET(req: NextRequest) {
 
     // Crear sets para búsqueda rápida
     const bookedDatesSet = new Set(
-      bookings.map(b => formatDate(b.eventDate))
+      bookings.map(b => toIsoDateString(b.eventDate))
     );
     const blockedDatesSet = new Set(
-      blockedDates.map(b => formatDate(b.date))
+      blockedDates.map(b => toIsoDateString(b.date))
     );
 
     // Procesar cada mes
@@ -251,7 +251,7 @@ export async function GET(req: NextRequest) {
       const futureSaturdays = saturdays.filter(sat => sat > now);
 
       const saturdayDates = futureSaturdays.map(sat => {
-        const dateStr = formatDate(sat);
+        const dateStr = toIsoDateString(sat);
         let status: 'available' | 'booked' | 'blocked' = 'available';
 
         if (bookedDatesSet.has(dateStr)) {
@@ -313,7 +313,7 @@ export async function GET(req: NextRequest) {
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     for (let d = new Date(tomorrow); d <= endDate; d.setDate(d.getDate() + 1)) {
-      const dateStr = formatDate(d);
+      const dateStr = toIsoDateString(d);
       if (!bookedDatesSet.has(dateStr) && !blockedDatesSet.has(dateStr)) {
         nextAvailableDate = dateStr;
         break;

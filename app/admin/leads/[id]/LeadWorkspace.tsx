@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { formatDateTime } from '@/lib/constants';
 
 type LeadTask = {
   id: string;
@@ -30,15 +31,6 @@ type LeadActivity = {
   createdAt: string;
 };
 
-function formatDateTime(value: string) {
-  return new Date(value).toLocaleDateString('ca-ES', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
 
 export default function LeadWorkspace({
   leadId,

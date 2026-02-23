@@ -284,7 +284,7 @@ export default function InboxClient({
     }
   }
 
-  function formatDate(date: Date) {
+  function formatEmailDate(date: Date) {
     const d = new Date(date);
     const now = new Date();
     const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
@@ -476,7 +476,7 @@ export default function InboxClient({
                     <p className="text-xs truncate mt-1">{email.preview || email.subject}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                    <span className="text-xs">{formatDate(email.date)}</span>
+                    <span className="text-xs">{formatEmailDate(email.date)}</span>
                   </div>
                 </div>
               </button>

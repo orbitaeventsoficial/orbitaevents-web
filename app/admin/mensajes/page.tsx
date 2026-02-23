@@ -61,7 +61,10 @@ async function getMessagesData() {
   }
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+// Local config kept because it uses a `color` key (not `text`) and has
+// different label/color values from the centralized LEAD_STATUS_CONFIG
+// (e.g. shorter labels, LOST uses red instead of slate).
+const LEAD_STATUS_CONFIG_LOCAL: Record<string, { label: string; color: string; bg: string }> = {
   NEW: { label: 'Nou', color: 'text-blue-300', bg: 'bg-blue-500/20' },
   CONTACTED: { label: 'Contactat', color: 'text-yellow-300', bg: 'bg-yellow-500/20' },
   QUOTE_SENT: { label: 'Pressupost', color: 'text-purple-300', bg: 'bg-purple-500/20' },
@@ -180,7 +183,7 @@ export default async function MensajesPage() {
         </div>
         <div className="divide-y divide-slate-100">
           {data.recentLeads.map((lead) => {
-            const statusConfig = STATUS_CONFIG[lead.status] || STATUS_CONFIG.NEW;
+            const statusConfig = LEAD_STATUS_CONFIG_LOCAL[lead.status] || LEAD_STATUS_CONFIG_LOCAL.NEW;
             const sourceIcon = SOURCE_ICONS[lead.source] || '📩';
             return (
               <div

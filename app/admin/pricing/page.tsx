@@ -4,6 +4,7 @@ import { log } from '@/lib/logger';
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
+import { formatCurrency, formatDate } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -116,22 +117,6 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   BROKEN: { label: 'Avariat', color: 'bg-rose-500/20 text-rose-300' },
   RETIRED: { label: 'Retirat', color: 'bg-slate-500/20 text-slate-400' },
 };
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('ca-ES', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-  }).format(amount);
-}
-
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('ca-ES', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
-}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT PRINCIPAL

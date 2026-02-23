@@ -149,7 +149,7 @@ export default function InboxPanel() {
     }
   };
 
-  const formatDate = (dateStr: string) => {
+  const formatEmailDate = (dateStr: string) => {
     const date = new Date(dateStr);
     const now = new Date();
     const isToday = date.toDateString() === now.toDateString();
@@ -247,7 +247,7 @@ export default function InboxPanel() {
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
                       <span className="text-xs">
-                        {formatDate(email.date)}
+                        {formatEmailDate(email.date)}
                       </span>
                       {email.hasAttachments && (
                         <span className="">📎</span>

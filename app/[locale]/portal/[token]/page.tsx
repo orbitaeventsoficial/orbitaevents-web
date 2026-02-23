@@ -8,6 +8,7 @@ import {
   normalizePortalLocale,
 } from '@/lib/services/clientPortalAccess';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import { formatCurrency } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -117,13 +118,6 @@ const STATUS_LABELS: Record<string, string> = {
   CANCELLED: 'Cancel·lada',
 };
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('ca-ES', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-  }).format(amount);
-}
 
 function formatDistanceKm(km: number): string {
   return new Intl.NumberFormat('ca-ES', {

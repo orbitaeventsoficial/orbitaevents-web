@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminPage } from '../../components/AdminPage';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import { EVENT_TYPE_PLAIN, EVENT_TYPE_ICONS } from '@/lib/constants';
 
 type Pack = {
   id: string;
@@ -48,17 +49,12 @@ type LeadData = {
   customerId: string | null;
 };
 
-const EVENT_TYPES = [
-  { value: 'WEDDING', label: 'Casament', icon: '💍' },
-  { value: 'BIRTHDAY', label: 'Aniversari', icon: '🎂' },
-  { value: 'CORPORATE', label: 'Corporatiu', icon: '🎯' },
-  { value: 'COMMUNION', label: 'Comunió', icon: '⛪' },
-  { value: 'BAPTISM', label: 'Bateig', icon: '👶' },
-  { value: 'GRADUATION', label: 'Graduació', icon: '🎓' },
-  { value: 'ANNIVERSARY', label: 'Celebració', icon: '🎉' },
-  { value: 'PRIVATE_PARTY', label: 'Festa privada', icon: '🎵' },
-  { value: 'OTHER', label: 'Altre', icon: '📋' },
-];
+// Derived from centralized EVENT_TYPE_PLAIN and EVENT_TYPE_ICONS constants.
+const EVENT_TYPES = Object.keys(EVENT_TYPE_PLAIN).map((value) => ({
+  value,
+  label: EVENT_TYPE_PLAIN[value],
+  icon: EVENT_TYPE_ICONS[value] ?? '',
+}));
 const OPERATOR_EXTRA_ID = '__operator_extra__';
 
 type FormData = {

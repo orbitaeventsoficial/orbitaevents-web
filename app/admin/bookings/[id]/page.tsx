@@ -16,7 +16,7 @@ import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAcce
 import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 
-import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS } from '@/lib/constants';
+import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatCurrency } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
@@ -47,22 +47,6 @@ async function getBooking(id: string) {
   }
 }
 
-function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString('ca-ES', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('ca-ES', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-  }).format(amount);
-}
 
 function toGoogleCalendarUtc(date: Date): string {
   const yyyy = date.getUTCFullYear();

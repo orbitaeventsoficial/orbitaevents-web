@@ -3,6 +3,7 @@ import { AdminPage } from '../components/AdminPage';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
 import { computePackPricingHealth, getPackPricingModelConfig } from '@/lib/services/packPricingHealth';
 import { prisma } from '@/lib/prisma';
+import { formatCurrency } from '@/lib/constants';
 
 type CatalogTab = 'packs' | 'extras' | 'inventory' | 'pricing';
 
@@ -38,9 +39,6 @@ function resolveTab(input?: string): CatalogTab {
 
 export const dynamic = 'force-dynamic';
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('ca-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
-}
 
 function formatPct(value: number): string {
   return `${value.toFixed(1)}%`;

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { formatDateTime } from '@/lib/constants';
 
 type FlowKey = 'PAYMENT' | 'POST_EVENT' | 'GENERAL';
 
@@ -30,11 +31,6 @@ export default function CommunicationPanel({
     if (state === 'RESPONDIDO') return 'Respost';
     if (state === 'ENVIADO') return 'Enviat';
     return 'Falta enviar';
-  }
-
-  function formatDateTime(value: string | null): string {
-    if (!value) return '-';
-    return new Date(value).toLocaleString('ca-ES');
   }
 
   async function run(action: 'send_email' | 'send_whatsapp' | 'log_sent' | 'mark_responded', flow: FlowKey, channel?: 'email' | 'whatsapp') {

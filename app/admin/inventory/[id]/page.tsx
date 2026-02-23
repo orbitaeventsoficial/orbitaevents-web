@@ -13,6 +13,7 @@ import {
   STATUS_CONFIG,
   CONDITION_LABELS,
 } from '@/lib/inventory-utils';
+import { formatDate } from '@/lib/constants';
 import InventoryItemEditor from './InventoryItemEditor';
 import InventoryPhotoUpload from './InventoryPhotoUpload';
 
@@ -67,14 +68,6 @@ async function getItem(id: string) {
     log.error('Error obtenint element inventari:', error);
     return null;
   }
-}
-
-function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString('ca-ES', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
 }
 
 const BOOKING_STATUS_LABELS: Record<string, string> = {

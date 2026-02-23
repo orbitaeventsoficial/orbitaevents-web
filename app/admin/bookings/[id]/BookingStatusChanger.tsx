@@ -11,7 +11,9 @@ interface Props {
   guestCount: number;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; border: string }> = {
+// Local config kept because it includes a `border` class not present in the
+// centralized BOOKING_STATUS_CONFIG (which only has bg + text + label).
+const BOOKING_STATUS_CONFIG_LOCAL: Record<string, { label: string; bg: string; text: string; border: string }> = {
   PENDING: { label: 'Pendent', bg: 'bg-yellow-500/20', text: 'text-yellow-300', border: 'border-yellow-500/30' },
   CONFIRMED: { label: 'Confirmada', bg: 'bg-emerald-500/20', text: 'text-emerald-300', border: 'border-emerald-500/30' },
   PREPARING: { label: 'Preparant', bg: 'bg-blue-500/20', text: 'text-blue-300', border: 'border-blue-500/30' },
@@ -79,7 +81,7 @@ export function BookingStatusChanger({ bookingId, currentStatus, guestCount }: P
       {/* Status Buttons */}
       <div className="flex flex-wrap gap-2">
         {STATUS_ORDER.map((status) => {
-          const conf = STATUS_CONFIG[status];
+          const conf = BOOKING_STATUS_CONFIG_LOCAL[status];
           const isActive = status === currentStatus;
 
           return (

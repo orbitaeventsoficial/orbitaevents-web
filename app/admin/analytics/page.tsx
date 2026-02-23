@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { getGoogleAdsConfigStatus, getGoogleAdsReport } from '@/lib/analytics/google-ads';
 import Link from 'next/link';
-import { EVENT_TYPE_PLAIN, EVENT_TYPE_ICONS, SOURCE_LABELS } from '@/lib/constants';
+import { EVENT_TYPE_PLAIN, EVENT_TYPE_ICONS, SOURCE_LABELS, formatCurrency } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
@@ -191,7 +191,7 @@ function pctDelta(current: number, previous: number): number | null {
   return ((current - previous) / previous) * 100;
 }
 
-function formatCurrency(value: number, currency: string) {
+function formatAdsCurrency(value: number, currency: string) {
   return new Intl.NumberFormat('ca-ES', {
     style: 'currency',
     currency: currency || 'EUR',
@@ -554,7 +554,7 @@ export default async function AnalyticsPage() {
               </div>
               <div className="rounded-xl border p-4">
                 <p className="text-xs uppercase">Cost (30d)</p>
-                <p className="mt-2 text-3xl font-semibold">{formatCurrency(adsCost, adsCurrency)}</p>
+                <p className="mt-2 text-3xl font-semibold">{formatAdsCurrency(adsCost, adsCurrency)}</p>
                 <p className={`mt-1 text-xs ${adsDeltas && adsDeltas.cost <= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
                   {adsDeltas && adsDeltas.cost <= 0 ? '↓' : '↑'} {Math.abs(adsDeltas?.cost || 0).toFixed(1)}%
                 </p>

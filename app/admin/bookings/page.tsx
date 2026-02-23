@@ -6,7 +6,7 @@ import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
 import BookingActions from './BookingActions';
-import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS } from '@/lib/constants';
+import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatCurrency } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,22 +77,6 @@ function getPackName(
   );
 }
 
-function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString('ca-ES', {
-    weekday: 'short',
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('ca-ES', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-  }).format(amount);
-}
 
 export default async function BookingsPage({
   searchParams,

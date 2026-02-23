@@ -3,7 +3,10 @@ import { labelEstatReserva } from '@/lib/customer-hub/labels';
 import Link from 'next/link';
 import { EVENT_TYPE_LABELS, BOOKING_STATUS_CONFIG } from '@/lib/constants';
 
-const STATUS_COLORS: Record<string, string> = Object.fromEntries(
+// BOOKING_STATUS_COLORS is derived from the centralized BOOKING_STATUS_CONFIG but
+// produces a single combined class string (border + bg + text) for badge styling.
+// It has a different structure from BOOKING_STATUS_CONFIG, so it is kept local.
+const BOOKING_STATUS_COLORS: Record<string, string> = Object.fromEntries(
   Object.entries(BOOKING_STATUS_CONFIG).map(([k, v]) => [k, `border-current ${v.bg} ${v.text}`])
 );
 
@@ -51,7 +54,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
           </p>
         ) : (
           data.bookings.map((booking) => {
-            const statusColor = STATUS_COLORS[booking.status] || 'border-slate-600 bg-slate-700/20 text-slate-300';
+            const statusColor = BOOKING_STATUS_COLORS[booking.status] || 'border-slate-600 bg-slate-700/20 text-slate-300';
 
             return (
               <div key={booking.id} className="rounded-xl border p-4">
