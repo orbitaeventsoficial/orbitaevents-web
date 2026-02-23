@@ -48,4 +48,6 @@
   - Nav items extrets a `app/admin/components/nav-items.ts`
   - Lògica d'alertes extreta a `hooks/useAdminAlerts.ts`
   - CSRF fetch wrapper extret a `hooks/useCsrfFetch.ts`
-- [ ] Revisar `admin/page.tsx` (1,186 línies)
+- [x] Refactoritzar `admin/page.tsx` (1,186 → 480 línies)
+  - Fetching + processat extrets a `app/admin/lib/dashboard-data.ts`
+  - Helpers timeAgo/formatEventDate també al lib
