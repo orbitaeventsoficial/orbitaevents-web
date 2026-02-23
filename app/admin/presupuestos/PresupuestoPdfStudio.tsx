@@ -1068,7 +1068,7 @@ export default function PresupuestoPdfStudio({
             Idioma preferit del client
             <select className={inputClass} value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
               <option value="ca">Català</option>
-              <option value="es">Español</option>
+              <option value="es">Castellà</option>
               <option value="en">English</option>
             </select>
             <span className="mt-1 block text-xs">

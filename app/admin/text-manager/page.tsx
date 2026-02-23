@@ -37,7 +37,7 @@ interface TranslationComparison {
 
 const LANGUAGE_META: Record<'ca' | 'es' | 'en', { label: string; icon: string }> = {
   ca: { label: 'Català', icon: '🏴' },
-  es: { label: 'Español', icon: '🇪🇸' },
+  es: { label: 'Castellà', icon: '🇪🇸' },
   en: { label: 'English', icon: '🇬🇧' },
 };
 

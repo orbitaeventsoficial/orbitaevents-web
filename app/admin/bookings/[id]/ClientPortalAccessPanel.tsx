@@ -146,7 +146,7 @@ export default function ClientPortalAccessPanel({
             className="mt-1 w-full rounded-lg border border-white/10 px-3 py-2 text-sm"
           >
             <option value="ca">Català</option>
-            <option value="es">Español</option>
+            <option value="es">Castellà</option>
             <option value="en">English</option>
           </select>
         </label>

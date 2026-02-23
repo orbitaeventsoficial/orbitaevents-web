@@ -40,5 +40,8 @@
   - 28 links actualizados a `clientes/[id]`
   - Label "Contactes" eliminado de `mapa/page.tsx` (duplicado)
   - `CustomerTabSelector.tsx` eliminado (dead code)
-- [ ] Unificar labels de idioma (`es`)
+- [x] Unificar labels de idioma (`es`) → tot "Castellà" a l'admin
+  - ClientPortalAccessPanel.tsx, PresupuestoPdfStudio.tsx, text-manager unificats
+  - ServiceJsonLD.tsx manté "Spanish" (schema.org requereix anglès)
+  - contactes/[id]/_components/ eliminat (codi mort)
 - [ ] Revisar `admin/layout.tsx` y `admin/page.tsx`
