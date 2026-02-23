@@ -66,7 +66,11 @@
 ---
 
 ### Pendiente para próximas sesiones
-- [ ] Middleware (`middleware.ts`, 321 líneas) — mezcla bot blocking, auth, CSRF, i18n y redirects legacy en un solo archivo. Difícil de testear y de depurar en producción.
+- [x] Middleware refactoritzat (321 → 90 línies)
+  **Per qué**: Mesclava 5 responsabilitats (bots, www redirect, legacy redirects, admin auth+CSRF, i18n). Impossible de testear individualment i difícil de depurar en producció quan falla l'auth.
+  - `lib/middleware/admin-rate-limit.ts`: Upstash Redis + fallback in-memory
+  - `lib/middleware/admin-auth.ts`: Basic auth + Bearer + CSRF — retorna null si passa, NextResponse si bloqueja
+  - `middleware.ts`: orquestrador de 90 línies, flow clar i llegible
 - [ ] 94 usos de `any` en rutas email — `(pack as any).field` requiere definir tipos para los resultados Prisma con `include`
 - [ ] `formatDate` hardcodeado a `ca-ES` sin soporte i18n
 - [ ] TODO sin resolver en `FiestasClient.tsx`
