@@ -6,6 +6,8 @@ import Image from 'next/image';
 import dynamicImport from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminHelpModeProvider, useAdminHelpMode } from './components/AdminHelpMode';
+import { ToastProvider } from './components/ToastProvider';
+import FloatingAddButton from './components/FloatingAddButton';
 import { getPriorityItems, NAV_SECTIONS } from './components/nav-items';
 import { useAdminAlerts } from '@/hooks/useAdminAlerts';
 import { useCsrfFetch } from '@/hooks/useCsrfFetch';
@@ -248,15 +250,40 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
+      // Ctrl/Cmd+K → Cercador
       const isK = event.key.toLowerCase() === 'k';
       if ((event.metaKey || event.ctrlKey) && isK) {
         event.preventDefault();
         setSearchOpen(true);
+        return;
+      }
+
+      // Alt+número → navegació ràpida
+      if (event.altKey && !event.ctrlKey && !event.metaKey) {
+        const shortcuts: Record<string, string> = {
+          '1': '/admin/leads',
+          '2': '/admin/tasks',
+          '3': '/admin/emails',
+          '4': '/admin/bookings',
+          'c': '/admin/calendario',
+        };
+        const target = shortcuts[event.key.toLowerCase()];
+        if (target) {
+          event.preventDefault();
+          router.push(target);
+          return;
+        }
+        // Alt+N → obrir FAB (simula click)
+        if (event.key.toLowerCase() === 'n') {
+          event.preventDefault();
+          const fab = document.querySelector('[aria-label="Accions ràpides"]') as HTMLButtonElement | null;
+          fab?.click();
+        }
       }
     };
     window.addEventListener('keydown', handleShortcut);
     return () => window.removeEventListener('keydown', handleShortcut);
-  }, []);
+  }, [router]);
 
   const priorityItems = useMemo(() => getPriorityItems(newLeadsCount), [newLeadsCount]);
   const navSections = NAV_SECTIONS;
@@ -662,7 +689,9 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <main className="admin-main">
         <div className="admin-shell admin-main-shell">
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </div>
       </main>
 
@@ -707,6 +736,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           />
         </div>
       </nav>
+      <FloatingAddButton />
       <AdminSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
         </div>
       </body>

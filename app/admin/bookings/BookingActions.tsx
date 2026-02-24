@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/app/admin/components/ToastProvider';
 
 const DELETABLE_STATUSES = new Set(['PENDING', 'CANCELLED']);
 
@@ -18,6 +19,7 @@ export default function BookingActions({
   customerId?: string | null;
 }) {
   const router = useRouter();
+  const toast = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
@@ -37,9 +39,10 @@ export default function BookingActions({
         const payload = await res.json().catch(() => null);
         throw new Error(payload?.error || 'Error eliminant reserva');
       }
+      toast.success('Reserva eliminada');
       router.refresh();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Error eliminant reserva');
+      toast.error(error instanceof Error ? error.message : 'Error eliminant reserva');
     } finally {
       setIsDeleting(false);
     }
@@ -58,9 +61,10 @@ export default function BookingActions({
         const payload = await res.json().catch(() => null);
         throw new Error(payload?.error || "Error actualitzant l'estat");
       }
+      toast.success(`Estat canviat a ${nextStatus}`);
       router.refresh();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Error actualitzant l'estat");
+      toast.error(error instanceof Error ? error.message : "Error actualitzant l'estat");
     } finally {
       setIsUpdatingStatus(false);
     }

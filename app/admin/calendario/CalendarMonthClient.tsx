@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { EVENT_TYPE_PLAIN } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
+import { useToast } from '../components/ToastProvider';
 
 type CalendarApiDay = {
   reservas: {
@@ -117,6 +118,7 @@ function isToday(date: Date): boolean {
 }
 
 export default function CalendarMonthClient() {
+  const toast = useToast();
   const today = useMemo(() => new Date(), []);
   const [monthYear, setMonthYear] = useState<MonthYear>({
     year: today.getFullYear(),
@@ -127,6 +129,27 @@ export default function CalendarMonthClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
+  const [draggingBookingId, setDraggingBookingId] = useState<string | null>(null);
+  const [dragOverDateKey, setDragOverDateKey] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const moveBookingToDate = useCallback(async (bookingId: string, newDateKey: string) => {
+    try {
+      const res = await fetch(`/api/admin/bookings/${bookingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventDate: `${newDateKey}T12:00:00.000Z` }),
+      });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload?.error || 'Error movent reserva');
+      }
+      toast.success(`Reserva moguda al ${new Date(newDateKey).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}`);
+      setRefreshKey((k) => k + 1);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error movent reserva');
+    }
+  }, [toast]);
 
   const cells = useMemo(
     () => getMonthDays(monthYear),
@@ -206,7 +229,7 @@ export default function CalendarMonthClient() {
     return () => {
       cancelled = true;
     };
-  }, [fromStr, toStr]);
+  }, [fromStr, toStr, refreshKey]);
 
   const selectedDayData: {
     date?: Date;
@@ -458,6 +481,23 @@ export default function CalendarMonthClient() {
               key={cell.key}
               type="button"
               onClick={() => setSelectedDateKey(cell.key)}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                setDragOverDateKey(cell.key);
+              }}
+              onDragLeave={() => {
+                if (dragOverDateKey === cell.key) setDragOverDateKey(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const bookingId = e.dataTransfer.getData('text/plain');
+                setDragOverDateKey(null);
+                if (bookingId) {
+                  void moveBookingToDate(bookingId, cell.key);
+                }
+                setDraggingBookingId(null);
+              }}
               className={[
                 'admin-calendar-cell flex h-[132px] sm:h-[152px] md:h-[168px] flex-col overflow-hidden p-1.5 sm:p-2 text-left text-sm transition-all',
                 bgClass,
@@ -465,6 +505,9 @@ export default function CalendarMonthClient() {
                 !cell.inCurrentMonth ? 'opacity-30' : '',
                 isSelected
                   ? 'ring-2 ring-inset ring-cyan-400'
+                  : '',
+                dragOverDateKey === cell.key
+                  ? 'ring-2 ring-inset ring-amber-400/70'
                   : '',
               ].join(' ')}
             >
@@ -484,7 +527,20 @@ export default function CalendarMonthClient() {
                 {hasReservas && (
                   <div className="space-y-0.5 text-[9px] sm:text-[10px] overflow-hidden">
                     {dayData.reservas.slice(0, 2).map((r) => (
-                      <div key={r.id} className="rounded-md px-1 py-0.5">
+                      <div
+                        key={r.id}
+                        draggable
+                        onDragStart={(e) => {
+                          e.stopPropagation();
+                          e.dataTransfer.setData('text/plain', r.id);
+                          e.dataTransfer.effectAllowed = 'move';
+                          setDraggingBookingId(r.id);
+                        }}
+                        onDragEnd={() => {
+                          setDraggingBookingId(null);
+                          setDragOverDateKey(null);
+                        }}
+                        className="rounded-md px-1 py-0.5 cursor-grab active:cursor-grabbing">
                         <div className="truncate font-semibold">
                           {r.leadId ? (
                             <Link

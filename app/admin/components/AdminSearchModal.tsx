@@ -37,6 +37,56 @@ type SearchResults = {
 
 const EMPTY_RESULTS: SearchResults = { leads: [], bookings: [], customers: [] };
 
+const RECENT_KEY = 'admin.recent';
+const MAX_RECENT = 8;
+
+type RecentItem = { href: string; label: string; type: string };
+
+function getRecentItems(): RecentItem[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function addRecentItem(item: RecentItem) {
+  if (typeof window === 'undefined') return;
+  try {
+    const items = getRecentItems().filter((i) => i.href !== item.href);
+    items.unshift(item);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(items.slice(0, MAX_RECENT)));
+  } catch {
+    // silent
+  }
+}
+
+function RecentItems({ onClose }: { onClose: () => void }) {
+  const items = getRecentItems();
+  if (items.length === 0) return null;
+
+  return (
+    <div className="border-t px-4 py-3">
+      <p className="text-[11px] uppercase tracking-wider">Visitats recentment</p>
+      <div className="mt-2 space-y-1">
+        {items.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onClose}
+            className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
+          >
+            <span className="truncate">{item.label}</span>
+            <span className="text-[10px] shrink-0">{item.type}</span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminSearchModal({
   open,
   onClose,
@@ -162,7 +212,7 @@ export default function AdminSearchModal({
                   <Link
                     key={lead.id}
                     href={`/admin/leads/${lead.id}`}
-                    onClick={onClose}
+                    onClick={() => { addRecentItem({ href: `/admin/leads/${lead.id}`, label: lead.name, type: 'Entrada' }); onClose(); }}
                     className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
                   >
                     <span className="truncate">{lead.name}</span>
@@ -181,7 +231,7 @@ export default function AdminSearchModal({
                   <Link
                     key={booking.id}
                     href={`/admin/bookings/${booking.id}`}
-                    onClick={onClose}
+                    onClick={() => { addRecentItem({ href: `/admin/bookings/${booking.id}`, label: `${booking.reference} · ${booking.clientName}`, type: 'Reserva' }); onClose(); }}
                     className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
                   >
                     <span className="truncate">{booking.reference} · {booking.clientName}</span>
@@ -200,7 +250,7 @@ export default function AdminSearchModal({
                   <Link
                     key={customer.id}
                     href={`/admin/clientes/${customer.id}`}
-                    onClick={onClose}
+                    onClick={() => { addRecentItem({ href: `/admin/clientes/${customer.id}`, label: customer.name, type: 'Client' }); onClose(); }}
                     className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm"
                   >
                     <span className="truncate">{customer.name}</span>
@@ -212,28 +262,54 @@ export default function AdminSearchModal({
           )}
 
           {!hasResults && query.trim().length < 2 && (
-            <div className="border-t px-4 py-4">
-              <p className="text-[11px] uppercase tracking-wider">Accessos ràpids</p>
-              <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                {[
-                  { href: '/admin/leads', label: '👥 Entrades' },
-                  { href: '/admin/bookings', label: '📋 Reserves' },
-                  { href: '/admin/sales-ops', label: '🎯 Sales Ops' },
-                  { href: '/admin/economia', label: '💶 Economia' },
-                  { href: '/admin/analytics', label: '📈 Analítica' },
-                  { href: '/admin/clientes', label: '👤 Clients' },
-                ].map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={onClose}
-                    className="rounded-lg border px-3 py-2 text-sm"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+            <>
+              {/* Ítems recents */}
+              <RecentItems onClose={onClose} />
+
+              <div className="border-t px-4 py-4">
+                <p className="text-[11px] uppercase tracking-wider">Accessos ràpids</p>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  {[
+                    { href: '/admin/leads', label: '👥 Entrades' },
+                    { href: '/admin/bookings', label: '📋 Reserves' },
+                    { href: '/admin/sales-ops', label: '🎯 Sales Ops' },
+                    { href: '/admin/economia', label: '💶 Economia' },
+                    { href: '/admin/analytics', label: '📈 Analítica' },
+                    { href: '/admin/clientes', label: '👤 Clients' },
+                  ].map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={onClose}
+                      className="rounded-lg border px-3 py-2 text-sm"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+
+              {/* Dreceres de teclat */}
+              <div className="border-t px-4 py-4">
+                <p className="text-[11px] uppercase tracking-wider mb-2">Dreceres de teclat</p>
+                <div className="grid gap-1.5 sm:grid-cols-2 text-xs">
+                  {[
+                    { keys: 'Ctrl+K', desc: 'Obrir cercador' },
+                    { keys: 'Alt+1', desc: 'Entrades' },
+                    { keys: 'Alt+2', desc: 'Tasques' },
+                    { keys: 'Alt+3', desc: 'Correus' },
+                    { keys: 'Alt+4', desc: 'Reserves' },
+                    { keys: 'Alt+C', desc: 'Calendari' },
+                    { keys: 'Alt+N', desc: 'Acció ràpida (+)' },
+                  ].map((s) => (
+                    <div key={s.keys} className="flex items-center gap-2">
+                      <kbd className="rounded border px-1.5 py-0.5 font-mono text-[10px]">{s.keys}</kbd>
+                      <span>{s.desc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>

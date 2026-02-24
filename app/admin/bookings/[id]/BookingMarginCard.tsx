@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, getIncludedTravelOneWayKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { formatCurrency } from '@/lib/constants';
+import { useToast } from '@/app/admin/components/ToastProvider';
+import { getMarginTone } from '@/lib/margin-utils';
 
 interface BookingMarginProps {
   bookingId: string;
@@ -55,6 +57,7 @@ export default function BookingMarginCard({
   targetMarginPct,
 }: BookingMarginProps) {
   const router = useRouter();
+  const toast = useToast();
 
   // Editable travel fields
   const [distanceKm, setDistanceKm] = useState(initialDistanceKm ?? 0);
@@ -138,12 +141,11 @@ export default function BookingMarginCard({
         throw new Error(data.error || 'Error desant');
       }
 
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      toast.success('Costos de viatge desats');
       router.refresh();
     } catch (error) {
       log.error('Error saving travel cost', error);
-      alert(error instanceof Error ? error.message : 'Error desant costos');
+      toast.error(error instanceof Error ? error.message : 'Error desant costos');
     } finally {
       setSaving(false);
     }
@@ -230,6 +232,12 @@ export default function BookingMarginCard({
         <div>
           <p className="text-xs font-medium uppercase">% Marge</p>
           <p className={`text-2xl font-black ${marginColor}`}>{marginPct.toFixed(1)}%</p>
+          <p className={`text-[11px] mt-0.5 ${marginColor}`}>
+            {marginPct >= 50 ? 'Excel·lent. Marge sa.' :
+             marginPct >= 30 ? 'Acceptable. Considera reduir costos o augmentar preu.' :
+             marginPct >= 15 ? 'Vigilar. Revisa descomptes i transport.' :
+             'Crític! Revisa preu o costos.'}
+          </p>
         </div>
       </div>
 
@@ -376,7 +384,7 @@ export default function BookingMarginCard({
             disabled={saving}
             className="mt-3 px-4 py-2 text-black rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
           >
-            {saved ? '✅ Desat!' : saving ? '⏳ Desant...' : '💾 Desar canvis'}
+            {saving ? '⏳ Desant...' : '💾 Desar canvis'}
           </button>
         )}
       </div>

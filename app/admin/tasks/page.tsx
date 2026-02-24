@@ -5,6 +5,7 @@ import type { LeadTaskStatus, Prisma } from '@prisma/client';
 import { AdminEmptyState, AdminPage, AdminSection } from '@/app/admin/components/AdminPage';
 import TaskRowActions from './TaskRowActions';
 import GenerateDailyChecklistButton from './GenerateDailyChecklistButton';
+import TaskKanbanView from './TaskKanbanView';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,6 +54,8 @@ export default async function TasksPage({
 }: {
   searchParams?: Record<string, string | string[] | undefined>;
 }) {
+  const viewParam = Array.isArray(searchParams?.view) ? searchParams?.view[0] : searchParams?.view;
+  const isKanban = viewParam === 'list' ? false : true; // default kanban
   const statusParam = Array.isArray(searchParams?.status) ? searchParams?.status[0] : searchParams?.status;
   const status: LeadTaskStatus | undefined = isTaskStatus(statusParam) ? statusParam : undefined;
   const customerIdParam = Array.isArray(searchParams?.customerId) ? searchParams?.customerId[0] : searchParams?.customerId;
@@ -173,6 +176,20 @@ export default async function TasksPage({
       back={customerId ? { href: `/admin/clientes/${customerId}?tab=tasks`, label: 'Client' } : undefined}
       actions={
         <>
+          <div className="flex items-center gap-1 rounded-lg border p-0.5">
+            <Link
+              href={`/admin/tasks?view=kanban${status ? `&status=${status}` : ''}${customerId ? `&customerId=${customerId}` : ''}`}
+              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${isKanban ? 'bg-slate-600 text-white' : ''}`}
+            >
+              Kanban
+            </Link>
+            <Link
+              href={`/admin/tasks?view=list${status ? `&status=${status}` : ''}${customerId ? `&customerId=${customerId}` : ''}`}
+              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${!isKanban ? 'bg-slate-600 text-white' : ''}`}
+            >
+              Llista
+            </Link>
+          </div>
           <GenerateDailyChecklistButton />
           <Link href={customerId ? `/admin/tasks/new?customerId=${customerId}` : '/admin/tasks/new'} className="ap-btn ap-btn--primary">
             + Nova tasca
@@ -180,71 +197,82 @@ export default async function TasksPage({
         </>
       }
     >
-      {/* Filtre d'estat */}
-      <AdminSection compact>
-        <form method="GET" action="/admin/tasks" className="flex flex-wrap items-center gap-2">
-          {customerId && <input type="hidden" name="customerId" value={customerId} />}
-          <label htmlFor="task-status-filter" className="ap-subtitle">Estat</label>
-          <select
-            id="task-status-filter"
-            name="status"
-            defaultValue={status || ''}
-          >
-            <option value="">Totes</option>
-            {VALID_STATUS.map((value) => (
-              <option key={value} value={value}>
-                {STATUS_LABELS[value] || value}
-              </option>
-            ))}
-          </select>
-          <button type="submit" className="ap-btn ap-btn--secondary">Aplicar</button>
-        </form>
-      </AdminSection>
+      {/* Vista Kanban */}
+      {isKanban && (
+        <AdminSection>
+          <TaskKanbanView />
+        </AdminSection>
+      )}
 
-      {/* Llista de tasques */}
-      <AdminSection flush>
-        {tasks.length === 0 ? (
-          <AdminEmptyState
-            icon="📝"
-            title="No hi ha tasques"
-            description="Crea una nova tasca per començar"
-            action={
-              <Link href="/admin/tasks/new" className="ap-btn ap-btn--primary">
-                + Nova tasca
-              </Link>
-            }
-          />
-        ) : (
-          <div className="ap-table-body" style={{ borderColor: 'var(--at-border-sub)' }}>
-            {tasks.map((task) => {
-              const destinationHref = resolveDestination(task);
-              return (
-                <article key={task.id} className="flex items-center justify-between gap-3 px-4 py-3" style={{ transition: 'background var(--at-transition)' }}>
-                  <Link href={destinationHref} className="min-w-0 flex-1">
-                    <p className="text-sm truncate">{task.title}</p>
-                    <p className="ap-subtitle">
-                      {(task.customer?.name || task.lead?.name || 'Sense relació')} · {STATUS_LABELS[task.status] || task.status}
-                    </p>
+      {/* Vista Llista */}
+      {!isKanban && (
+        <>
+          <AdminSection compact>
+            <form method="GET" action="/admin/tasks" className="flex flex-wrap items-center gap-2">
+              {customerId && <input type="hidden" name="customerId" value={customerId} />}
+              <input type="hidden" name="view" value="list" />
+              <label htmlFor="task-status-filter" className="ap-subtitle">Estat</label>
+              <select
+                id="task-status-filter"
+                name="status"
+                defaultValue={status || ''}
+              >
+                <option value="">Totes</option>
+                {VALID_STATUS.map((value) => (
+                  <option key={value} value={value}>
+                    {STATUS_LABELS[value] || value}
+                  </option>
+                ))}
+              </select>
+              <button type="submit" className="ap-btn ap-btn--secondary">Aplicar</button>
+            </form>
+          </AdminSection>
+
+          <AdminSection flush>
+            {tasks.length === 0 ? (
+              <AdminEmptyState
+                icon="📝"
+                title="No hi ha tasques"
+                description="Crea una nova tasca per començar"
+                action={
+                  <Link href="/admin/tasks/new" className="ap-btn ap-btn--primary">
+                    + Nova tasca
                   </Link>
-                  <div className="flex shrink-0 items-center gap-3">
-                    <span className="ap-subtitle">
-                      {task.dueDate ? new Date(task.dueDate).toLocaleDateString('ca-ES') : 'Sense data'}
-                    </span>
-                    <TaskRowActions
-                      taskId={task.id}
-                      status={task.status}
-                      destinationHref={destinationHref}
-                    />
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
-      </AdminSection>
+                }
+              />
+            ) : (
+              <div className="ap-table-body" style={{ borderColor: 'var(--at-border-sub)' }}>
+                {tasks.map((task) => {
+                  const destinationHref = resolveDestination(task);
+                  return (
+                    <article key={task.id} className="flex items-center justify-between gap-3 px-4 py-3" style={{ transition: 'background var(--at-transition)' }}>
+                      <Link href={destinationHref} className="min-w-0 flex-1">
+                        <p className="text-sm truncate">{task.title}</p>
+                        <p className="ap-subtitle">
+                          {(task.customer?.name || task.lead?.name || 'Sense relació')} · {STATUS_LABELS[task.status] || task.status}
+                        </p>
+                      </Link>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <span className="ap-subtitle">
+                          {task.dueDate ? new Date(task.dueDate).toLocaleDateString('ca-ES') : 'Sense data'}
+                        </span>
+                        <TaskRowActions
+                          taskId={task.id}
+                          status={task.status}
+                          destinationHref={destinationHref}
+                        />
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </AdminSection>
+        </>
+      )}
 
-      {/* Paginació */}
-      {totalPages > 1 && (
+      {/* Paginació (només vista llista) */}
+      {!isKanban && totalPages > 1 && (
         <div className="flex items-center justify-between ap-subtitle">
           <span>Pàgina {page} de {totalPages}</span>
           <div className="ap-header-actions">

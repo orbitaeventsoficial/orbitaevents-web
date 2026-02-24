@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { EVENT_TYPE_ICONS, SOURCE_LABELS } from '@/lib/constants';
+import { useToast } from '@/app/admin/components/ToastProvider';
 
 type PipelineFilters = {
   status: string[];
@@ -57,6 +58,7 @@ const PRIORITY_DOT: Record<string, string> = {
 
 
 export default function LeadPipelineView({ filters }: { filters: PipelineFilters }) {
+  const toast = useToast();
   const [allLeads, setAllLeads] = useState<PipelineLead[]>([]);
   const [columns, setColumns] = useState<PipelineColumn[]>([]);
   const [loading, setLoading] = useState(true);
@@ -129,9 +131,14 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
       });
       if (!res.ok) {
         setLeadStatusInState(leadId, previousStatus);
+        toast.error('Error movent l\'entrada');
+      } else {
+        const targetLabel = COLUMNS.find((c) => c.status === newStatus)?.label || newStatus;
+        toast.success(`Entrada moguda a ${targetLabel}`);
       }
     } catch {
       setLeadStatusInState(leadId, previousStatus);
+      toast.error('Error de connexió movent l\'entrada');
     } finally {
       setUpdatingId(null);
     }
@@ -210,9 +217,14 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
                   Deixa anar aquí
                 </div>
               )}
-              {col.leads.length === 0 && (
+              {col.leads.length === 0 && !dragOverStatus && (
                 <div className="rounded-xl border border-dashed p-4 text-center text-xs">
-                  Cap entrada
+                  <p className="mb-1">Cap entrada</p>
+                  {col.status === 'NEW' && (
+                    <Link href="/admin/leads" className="text-[10px] font-medium hover:underline">
+                      + Afegir entrada
+                    </Link>
+                  )}
                 </div>
               )}
               {col.leads.map((lead) => (
@@ -306,7 +318,7 @@ function PipelineCard({
         >
           {lead.name}
         </Link>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           {prevStatus && (
             <button
               type="button"
@@ -329,27 +341,41 @@ function PipelineCard({
               →
             </button>
           )}
-          <span className={`w-2 h-2 rounded-full ${PRIORITY_DOT[lead.priority] || PRIORITY_DOT.MEDIUM}`} title={lead.priority} />
+          <span className={`w-3 h-3 rounded-full ${PRIORITY_DOT[lead.priority] || PRIORITY_DOT.MEDIUM}`} title={lead.priority} />
         </div>
       </div>
 
-      <div className="mt-1">
-        <span className="admin-leads-column-chip inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold">
-          {columnLabel}
-        </span>
+      {/* Indicadors visuals ràpids */}
+      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+        {/* Dies sense resposta */}
+        {(() => {
+          const daysSince = Math.floor((Date.now() - new Date(lead.createdAt).getTime()) / 86400000);
+          const daysColor = daysSince <= 2 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' :
+            daysSince <= 5 ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
+            'bg-rose-500/20 text-rose-300 border-rose-500/30';
+          return (
+            <span className={`inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${daysColor}`}>
+              {daysSince}d
+            </span>
+          );
+        })()}
+        {/* Budget prominent */}
+        {lead.budget && (
+          <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">
+            {lead.budget}
+          </span>
+        )}
+        {/* Data event amb icona */}
+        {lead.eventDate && (
+          <span className="inline-flex items-center gap-0.5 text-[10px]">
+            📅 {new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
+          </span>
+        )}
       </div>
 
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px]">
         <span>{EVENT_TYPE_ICONS[lead.eventType] || lead.eventType}</span>
-        <span className="">{SOURCE_LABELS[lead.source] || lead.source}</span>
-        {lead.eventDate && (
-          <span className="">
-            {new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
-          </span>
-        )}
-        {lead.budget && (
-          <span className="font-medium">{lead.budget}</span>
-        )}
+        <span>{SOURCE_LABELS[lead.source] || lead.source}</span>
       </div>
 
       {/* Links */}
@@ -357,17 +383,17 @@ function PipelineCard({
         {lead.customerId && (
           <Link
             href={`/admin/clientes/${lead.customerId}`}
-            className="text-[10px]"
+            className="text-[10px] hover:underline"
           >
-            👤
+            👤 Client
           </Link>
         )}
         {lead.booking && (
           <Link
             href={`/admin/bookings/${lead.booking.id}`}
-            className="text-[10px] font-medium"
+            className="inline-flex items-center gap-0.5 rounded-full border border-sky-500/30 bg-sky-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-sky-300 hover:bg-sky-500/25"
           >
-            {lead.booking.reference}
+            📋 {lead.booking.reference}
           </Link>
         )}
       </div>

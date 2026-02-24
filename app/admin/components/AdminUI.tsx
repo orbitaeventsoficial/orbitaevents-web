@@ -264,7 +264,7 @@ export function Toast({ type, message, onClose }: ToastProps) {
   const style = TOAST_STYLES[type];
 
   return (
-    <div className={`fixed bottom-4 right-4 z-[101] flex items-center gap-3 rounded-xl border ${style.bg} px-4 py-3 shadow-2xl backdrop-blur-sm`}>
+    <div className={`flex items-center gap-3 rounded-xl border ${style.bg} px-4 py-3 shadow-2xl backdrop-blur-sm`}>
       <span className="text-lg">{style.icon}</span>
       <p className="text-sm">{message}</p>
       {onClose && (

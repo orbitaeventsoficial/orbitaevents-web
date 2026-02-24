@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import { generateDailyChecklistTasks } from '@/lib/services/dailyChecklist';
+import { calculateSimpleMarginPct } from '@/lib/margin-utils';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -103,6 +104,8 @@ export interface DashboardData {
   commandLeads: { id: string; name: string; status: string; priority: string; createdAt: Date }[];
   commandBookings: { id: string; reference: string | null; clientName: string; status: string; eventDate: Date }[];
   recentAdminLogs: { id: string; action: string; entity: string; createdAt: Date }[];
+  // Margin
+  avgMarginPct: number;
   // Computed
   timeline: { id: string; icon: string; text: string; time: string; ts: number; href: string }[];
   alerts: DashboardAlert[];
@@ -147,6 +150,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     recentLeadsTimeline, recentBookingsTimeline, recentCustomerActivity, recentAdminLogs,
     upcomingTasks, staleLeadsCount, hotLeadsCount, quotesInFlightCount,
     checklistTodayDoneCount, checklistTodayPendingCount, commandLeads, commandBookings,
+    marginBookings,
   ] = await Promise.all([
     cachedQuery('admin:dashboard:leads:count', () => prisma.lead.count(), CacheTTL.SHORT).catch(() => 0),
     cachedQuery(`admin:dashboard:leads:month:${startOfMonth.toISOString().slice(0, 10)}`, () => prisma.lead.count({ where: { createdAt: { gte: startOfMonth } } }), CacheTTL.SHORT).catch(() => 0),
@@ -177,6 +181,10 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     cachedQuery(`admin:dashboard:checklist:pending:${dayKey}`, () => prisma.task.count({ where: { createdBy: 'system:daily-checklist', createdAt: { gte: todayStart, lte: todayEnd }, status: { in: ['OPEN', 'IN_PROGRESS'] } } }), CacheTTL.SHORT).catch(() => 0),
     cachedQuery('admin:dashboard:command:leads', () => prisma.lead.findMany({ where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } }, orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }], take: 6, select: { id: true, name: true, status: true, priority: true, createdAt: true } }), CacheTTL.VERY_SHORT).catch(() => []),
     cachedQuery('admin:dashboard:command:bookings', () => prisma.booking.findMany({ where: { status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } }, orderBy: [{ eventDate: 'asc' }, { createdAt: 'desc' }], take: 6, select: { id: true, reference: true, clientName: true, status: true, eventDate: true } }), CacheTTL.VERY_SHORT).catch(() => []),
+    cachedQuery('admin:dashboard:margin:avg', () => prisma.booking.findMany({
+      where: { status: { in: ['CONFIRMED', 'COMPLETED'] } },
+      select: { total: true, travelCost: true, pack: { select: { price: true } }, extras: { select: { price: true, quantity: true } } },
+    }), CacheTTL.SHORT).catch(() => []),
   ]);
 
   // ─── Processat ───────────────────────────────────────────────────────────
@@ -189,6 +197,25 @@ export async function fetchDashboardData(): Promise<DashboardData> {
 
   const rating = avgRating._avg.rating ? avgRating._avg.rating.toFixed(1) : '5.0';
   const conversionRate = leadsCount > 0 ? Math.round((wonLeads / leadsCount) * 100) : 0;
+
+  // Marge mitjà de reserves confirmades/completades
+  const marginPcts = (marginBookings as Array<{ total: number; travelCost: number | null; pack: { price: number }; extras: Array<{ price: number; quantity: number }> }>)
+    .filter((b) => b.total > 0)
+    .map((b) => {
+      const extrasTotal = b.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
+      return calculateSimpleMarginPct({
+        total: b.total,
+        packPrice: b.pack.price,
+        extrasTotal,
+        packCostRatio: 0.36,
+        extraCostRatio: 0.28,
+        fixedOperationalCost: 45,
+        travelCost: b.travelCost ?? 0,
+      });
+    });
+  const avgMarginPct = marginPcts.length > 0
+    ? Math.round(marginPcts.reduce((a, b) => a + b, 0) / marginPcts.length)
+    : 0;
 
   const ga4Sessions = ga4?.totals.sessions || 0;
   const ga4Users = ga4?.totals.activeUsers || 0;
@@ -282,6 +309,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     ga4SessionsSeries, ga4UsersSeries,
     ga4Available: Boolean(ga4),
     ga4RealtimeFallback: Boolean(ga4?.realtimeFallback),
+    avgMarginPct,
     leadsSeries, leadsWonSeries, bookingsSeries, revenueSeries, revenueTotal30,
     recentLeads, upcomingBookings, upcomingTasks,
     commandLeads, commandBookings, recentAdminLogs,

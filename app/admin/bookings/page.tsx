@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
 import BookingActions from './BookingActions';
 import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatCurrency } from '@/lib/constants';
+import { getMarginTone, calculateSimpleMarginPct } from '@/lib/margin-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +31,7 @@ async function getBookings(pageParam?: string) {
           include: {
             pack: { include: { translations: true } },
             lead: { select: { id: true, name: true, source: true, preferredLocale: true } },
+            extras: { select: { price: true, quantity: true } },
             _count: { select: { extras: true } },
           },
         }),
@@ -185,6 +187,24 @@ export default async function BookingsPage({
                     {!booking.depositPaid && (
                       <p className="text-[10px] font-medium">Paga pendent</p>
                     )}
+                    {(() => {
+                      const extrasTotal = booking.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
+                      const marginPct = calculateSimpleMarginPct({
+                        total: booking.total,
+                        packPrice: booking.pack.price,
+                        extrasTotal,
+                        packCostRatio: 0.36,
+                        extraCostRatio: 0.28,
+                        fixedOperationalCost: 45,
+                        travelCost: booking.travelCost ?? 0,
+                      });
+                      const tone = getMarginTone(marginPct);
+                      return (
+                        <span className={`inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold mt-1 ${tone.bg} ${tone.color}`}>
+                          {marginPct.toFixed(0)}% marge
+                        </span>
+                      );
+                    })()}
                   </div>
                 </div>
                 <div className="mt-3 pt-3 border-t flex items-center justify-between text-xs">
@@ -224,6 +244,7 @@ export default async function BookingsPage({
                 <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Data</th>
                 <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Pack</th>
                 <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Total</th>
+                <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Marge</th>
                 <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Estat</th>
                 <th scope="col" className="px-4 py-3 text-center font-medium whitespace-nowrap">Accions</th>
               </tr>
@@ -231,7 +252,7 @@ export default async function BookingsPage({
             <tbody className="divide-y divide-slate-700/30">
               {bookings.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center">
+                  <td colSpan={9} className="px-4 py-12 text-center">
                     <span className="text-4xl">📅</span>
                     <p className="mt-2">Encara no hi ha reserves</p>
                   </td>
@@ -291,6 +312,26 @@ export default async function BookingsPage({
                         {!booking.depositPaid && (
                           <span className="block text-xs">Paga pendent</span>
                         )}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {(() => {
+                          const extrasTotal = booking.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
+                          const marginPct = calculateSimpleMarginPct({
+                            total: booking.total,
+                            packPrice: booking.pack.price,
+                            extrasTotal,
+                            packCostRatio: 0.36,
+                            extraCostRatio: 0.28,
+                            fixedOperationalCost: 45,
+                            travelCost: booking.travelCost ?? 0,
+                          });
+                          const tone = getMarginTone(marginPct);
+                          return (
+                            <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${tone.bg} ${tone.color}`}>
+                              {marginPct.toFixed(0)}%
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusConf.bg} ${statusConf.text}`}>
