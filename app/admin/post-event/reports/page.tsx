@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { formatDateSimple } from '@/lib/constants';
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 
@@ -97,7 +98,7 @@ export default async function ReportsPage() {
                   <div>
                     <p className="font-medium">{booking.clientName}</p>
                     <p className="text-sm">
-                      {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · {packName}
+                      {formatDateSimple(booking.eventDate)} · {packName}
                     </p>
                   </div>
                   <Link
@@ -152,7 +153,7 @@ export default async function ReportsPage() {
                       </span>
                     </div>
                     <p className="text-sm">
-                      {new Date(report.booking.eventDate).toLocaleDateString('ca-ES')} · {packName} · {report.booking.eventLocation}
+                      {formatDateSimple(report.booking.eventDate)} · {packName} · {report.booking.eventLocation}
                     </p>
                     {report.lessonsLearned && (
                       <p className="text-sm mt-2 line-clamp-2">

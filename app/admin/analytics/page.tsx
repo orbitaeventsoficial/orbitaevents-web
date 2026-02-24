@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { getGoogleAdsConfigStatus, getGoogleAdsReport } from '@/lib/analytics/google-ads';
 import Link from 'next/link';
-import { EVENT_TYPE_PLAIN, EVENT_TYPE_ICONS, SOURCE_LABELS, formatCurrency } from '@/lib/constants';
+import { EVENT_TYPE_PLAIN, EVENT_TYPE_ICONS, SOURCE_LABELS, formatCurrency, formatNumber, DEFAULT_LOCALE } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
@@ -192,7 +192,7 @@ function pctDelta(current: number, previous: number): number | null {
 }
 
 function formatAdsCurrency(value: number, currency: string) {
-  return new Intl.NumberFormat('ca-ES', {
+  return new Intl.NumberFormat(DEFAULT_LOCALE, {
     style: 'currency',
     currency: currency || 'EUR',
     maximumFractionDigits: 0,
@@ -591,7 +591,7 @@ export default async function AnalyticsPage() {
             <span className="">Ingressos</span>
           </div>
           <p className="mt-3 text-3xl font-semibold">
-            {data.revenue.thisYear.toLocaleString('ca-ES')}€
+            {formatNumber(data.revenue.thisYear)}€
           </p>
           <p className={`mt-2 text-xs ${Number(yearGrowth) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
             {Number(yearGrowth) >= 0 ? '↑' : '↓'} {yearGrowth}% vs any anterior
@@ -611,7 +611,7 @@ export default async function AnalyticsPage() {
             <span className="">AVG</span>
           </div>
           <p className="mt-3 text-3xl font-semibold">
-            {data.revenue.avgBooking.toLocaleString('ca-ES', { maximumFractionDigits: 0 })}€
+            {formatNumber(data.revenue.avgBooking, { maximumFractionDigits: 0 })}€
           </p>
         </div>
         <div className="rounded-2xl border p-5">

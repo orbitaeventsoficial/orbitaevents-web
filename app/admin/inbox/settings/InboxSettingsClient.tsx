@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { formatDateTime } from '@/lib/constants';
 
 export default function InboxSettingsClient({
   isConnected,
@@ -96,13 +97,7 @@ export default function InboxSettingsClient({
             </div>
             {connectedAt && (
               <p className="text-xs">
-                Connectat el {new Date(connectedAt).toLocaleDateString('ca-ES', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                Connectat el {formatDateTime(connectedAt)}
               </p>
             )}
           </div>

@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     const reviewUrl = `${baseUrl}/${locale}/valoracio?token=${reviewToken}&ref=${booking.reference}`;
 
     // Nom del pack
-    const packName = resolvePackName(booking.pack?.translations as any, locale);
+    const packName = resolvePackName(booking.pack?.translations, locale);
 
     // Enviar email
     const emailHtml = generatePostEventEmail({

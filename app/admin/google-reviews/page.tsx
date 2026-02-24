@@ -10,6 +10,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { log } from '@/lib/logger';
 import { AdminPage } from '../components/AdminPage';
+import { formatDateTimeFull } from '@/lib/constants';
 
 interface GoogleReview {
   author_name: string;
@@ -63,7 +64,7 @@ export default function GoogleReviewsAdminPage() {
     [data]
   );
   const totalReviews = data?.user_ratings_total || data?.reviews.length || 0;
-  const lastUpdate = data?.lastUpdated ? new Date(data.lastUpdated).toLocaleString('ca-ES') : 'Mai';
+  const lastUpdate = data?.lastUpdated ? formatDateTimeFull(data.lastUpdated) : 'Mai';
 
   if (loading) {
     return (

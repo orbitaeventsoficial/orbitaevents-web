@@ -5,6 +5,7 @@ import { estimateLeadAmount, scoreLead } from '@/lib/services/commercialScoring'
 import SlaAutomationButton from './SlaAutomationButton';
 import SendExecutiveReportButton from './SendExecutiveReportButton';
 import RunCommercialSequencesButton from './RunCommercialSequencesButton';
+import { formatNumber } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -189,7 +190,7 @@ export default async function SalesOpsPage() {
     {
       area: 'Volum de l\'embut',
       status: pipelineStatus,
-      avui: `${scored.length} entrades obertes i ${pipelineTotal.toLocaleString('ca-ES')}€ en joc`,
+      avui: `${scored.length} entrades obertes i ${formatNumber(pipelineTotal)}€ en joc`,
       en30: 'Neteja d\'embut i focus en oportunitats calentes.',
       en90: 'Escalat de captació per canals amb millor win-rate.',
       href: '/admin/leads',
@@ -270,13 +271,13 @@ export default async function SalesOpsPage() {
         <div className="rounded-xl border p-4 shadow-sm">
           <p className="text-sm">💼</p>
           <p className="text-xs">Embut brut</p>
-          <p className="text-2xl font-semibold">{pipelineTotal.toLocaleString('ca-ES')}€</p>
+          <p className="text-2xl font-semibold">{formatNumber(pipelineTotal)}€</p>
           <p className="mt-1 text-[11px]">Valor total de negoci obert</p>
         </div>
         <div className="rounded-xl border p-4 shadow-sm">
           <p className="text-sm">🔮</p>
           <p className="text-xs">Previsió ponderada</p>
-          <p className="text-2xl font-semibold">{forecastTotal.toLocaleString('ca-ES')}€</p>
+          <p className="text-2xl font-semibold">{formatNumber(forecastTotal)}€</p>
           <p className="mt-1 text-[11px]">Ingressos probables segons scoring</p>
         </div>
         <div className="rounded-xl border p-4 shadow-sm">
@@ -488,7 +489,7 @@ export default async function SalesOpsPage() {
                     {lead.name} · {lead.status} · puntuació {lead.scoring.score}
                   </p>
                   <p className="text-xs">
-                    Prob. {toPct(lead.scoring.probability)} · {lead.weighted.toLocaleString('ca-ES')}€
+                    Prob. {toPct(lead.scoring.probability)} · {formatNumber(lead.weighted)}€
                   </p>
                 </div>
                 {lead.scoring.riskFlags.length > 0 && (

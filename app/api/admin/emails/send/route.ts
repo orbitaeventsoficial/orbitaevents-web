@@ -15,6 +15,14 @@ import type { PackDefinition } from '@/config/packs-config';
 import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
 import { translateTextForLocale } from '@/lib/services/translationService';
 
+interface QuoteAttachmentInput {
+  packId?: string;
+  price?: number;
+  clientName?: string;
+  eventType?: string;
+  eventLocation?: string;
+}
+
 const APP_BASE_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '');
 const EMAIL_LOGO_URL = `${APP_BASE_URL}/img/logosoloplaneta.png`;
 
@@ -139,14 +147,12 @@ function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
     };
   }
 
-  const djHours =
-    typeof (pack as any).durationHours === 'number' ? (pack as any).durationHours : 4;
   return {
     name: pack.name,
     price: pack.priceValue ?? 500,
-    djHours,
+    djHours: pack.durationHours ?? 4,
     extraHourPrice: 80,
-    description: (pack as any).emotion || pack.tagline || pack.name,
+    description: pack.emotion || pack.tagline || pack.name,
   };
 }
 
@@ -207,8 +213,9 @@ export async function POST(req: NextRequest) {
     let attachments: { filename: string; content: string; contentType: string }[] | undefined;
 
     if (quoteAttachment) {
-      const packId = String((quoteAttachment as any).packId || '').trim().toLowerCase();
-      const price = Number((quoteAttachment as any).price || 0);
+      const qa = quoteAttachment as QuoteAttachmentInput;
+      const packId = String(qa.packId || '').trim().toLowerCase();
+      const price = Number(qa.price || 0);
       if (!packId || !Number.isFinite(price) || price <= 0) {
         return NextResponse.json(
           { error: 'Per adjuntar pressupost: pack i preu són obligatoris' },
@@ -222,11 +229,11 @@ export async function POST(req: NextRequest) {
       const quoteData: QuoteData = leadForQuote
         ? createQuoteFromLead(leadForQuote, { ...pack, price })
         : {
-            clientName: String((quoteAttachment as any).clientName || to).slice(0, 120),
+            clientName: String(qa.clientName || to).slice(0, 120),
             clientEmail: String(to),
-            eventType: String((quoteAttachment as any).eventType || 'OTHER'),
+            eventType: String(qa.eventType || 'OTHER'),
             eventDate: new Date(),
-            eventLocation: String((quoteAttachment as any).eventLocation || ''),
+            eventLocation: String(qa.eventLocation || ''),
             guestCount: 0,
             packName: pack.name,
             packDescription: pack.description,

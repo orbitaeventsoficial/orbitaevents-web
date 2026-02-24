@@ -6,7 +6,7 @@ import type { CustomerHubDTO, HubStatus } from '@/lib/customer-hub/dto';
 import { labelEstatClient } from '@/lib/customer-hub/labels';
 import { fetchWithCsrf } from '@/lib/csrf';
 import { useHubContext } from './CustomerHubClient';
-import { formatDate } from '@/lib/constants';
+import { formatDate, formatNumber } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES I CONSTANTS
@@ -497,7 +497,7 @@ function KpiChip({
 
 function money(value?: number): string {
   if (typeof value !== 'number') return '—';
-  return `${value.toLocaleString('ca-ES', { maximumFractionDigits: 0 })}€`;
+  return `${formatNumber(value, { maximumFractionDigits: 0 })}€`;
 }
 
 function formatRelativeTime(dateStr: string): string {

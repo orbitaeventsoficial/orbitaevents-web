@@ -1,6 +1,7 @@
 'use client';
 
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
+import { formatDateTime } from '@/lib/constants';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -110,13 +111,7 @@ export default function CommsPanel({ data }: { data: CustomerHubDTO }) {
               <p className="text-xs font-semibold">{message.subject || message.channel}</p>
               {message.bodyPreview && <p className="mt-1 text-xs">{message.bodyPreview}</p>}
               <p className="mt-1 text-[11px]">
-                {new Date(message.createdAt).toLocaleDateString('ca-ES', {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {formatDateTime(message.createdAt)}
               </p>
             </article>
           ))

@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com';
         const reviewUrl = `${baseUrl}/${locale}/valoracio?token=${reviewToken}&ref=${booking.reference}`;
 
-        const packName = resolvePackName(booking.pack?.translations as any, locale);
+        const packName = resolvePackName(booking.pack?.translations, locale);
 
         const emailHtml = generatePostEventEmail({
           name,

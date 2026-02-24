@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { formatDateSimple } from '@/lib/constants';
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 
@@ -90,7 +91,7 @@ export default async function FeedbackPage() {
                       )}
                     </div>
                     <p className="text-sm">
-                      {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · {packName} · {booking.eventLocation}
+                      {formatDateSimple(booking.eventDate)} · {packName} · {booking.eventLocation}
                     </p>
                     <p className="text-sm mt-1">
                       📧 {booking.clientEmail} · 📞 {booking.clientPhone || 'N/A'}
@@ -98,7 +99,7 @@ export default async function FeedbackPage() {
                   </div>
                   <div className="flex gap-2">
                     <Link
-                      href={`mailto:${booking.clientEmail}?subject=Gràcies per confiar en Òrbita Events!&body=Hola ${booking.clientName},%0D%0A%0D%0AGràcies per confiar en nosaltres per al vostre event del ${new Date(booking.eventDate).toLocaleDateString('ca-ES')}!`}
+                      href={`mailto:${booking.clientEmail}?subject=Gràcies per confiar en Òrbita Events!&body=Hola ${booking.clientName},%0D%0A%0D%0AGràcies per confiar en nosaltres per al vostre event del ${formatDateSimple(booking.eventDate)}!`}
                       className="px-4 py-2 text-white rounded-lg text-sm font-medium"
                     >
                       ✉️ Envia correu

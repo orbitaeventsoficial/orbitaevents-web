@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
+import { formatDate, formatDateFull, formatDateShort, formatDateSimple } from '@/lib/constants';
 import { useRouter } from 'next/navigation';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -203,7 +204,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
       <div className="rounded-2xl border p-5">
         <h2 className="text-lg font-semibold">Resum operatiu</h2>
         <p className="mt-1 text-sm">
-          Client des de {new Date(data.customer.createdAt).toLocaleDateString('ca-ES', { month: 'long', year: 'numeric' })}
+          Client des de {formatDate(data.customer.createdAt)}
         </p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -246,7 +247,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                 <p className="text-sm font-medium">{nextTask.title}</p>
                 {nextTask.dueDate && (
                   <p className="mt-1 text-xs">
-                    Venciment: {new Date(nextTask.dueDate).toLocaleDateString('ca-ES')}
+                    Venciment: {formatDateSimple(nextTask.dueDate)}
                   </p>
                 )}
                 {nextTask.priority === 'HIGH' && (
@@ -288,11 +289,7 @@ export default function SummaryPanel({ data }: { data: CustomerHubDTO }) {
                       </a>
                     </div>
                     <p className="mt-0.5 text-xs">
-                      {ev.date && new Date(ev.date).toLocaleDateString('ca-ES', {
-                        weekday: 'long',
-                        day: 'numeric',
-                        month: 'long',
-                      })}
+                      {ev.date && formatDateFull(ev.date)}
                       {ev.startTime && ` · ${ev.startTime}`}
                     </p>
                     {ev.location && (
@@ -512,5 +509,5 @@ function formatRelativeDate(dateStr: string): string {
   if (diffDays === 1) return 'ahir';
   if (diffDays < 7) return `fa ${diffDays} dies`;
   if (diffDays < 30) return `fa ${Math.floor(diffDays / 7)} setmanes`;
-  return date.toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' });
+  return formatDateShort(date);
 }

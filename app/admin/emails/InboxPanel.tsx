@@ -1,5 +1,6 @@
 'use client';
 import { log } from '@/lib/logger';
+import { formatDateShort, formatDateTimeFull, DEFAULT_LOCALE } from '@/lib/constants';
 
 import { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
@@ -155,9 +156,9 @@ export default function InboxPanel() {
     const isToday = date.toDateString() === now.toDateString();
 
     if (isToday) {
-      return date.toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleTimeString(DEFAULT_LOCALE, { hour: '2-digit', minute: '2-digit' });
     }
-    return date.toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' });
+    return formatDateShort(date);
   };
 
   const unreadCount = emails.filter(e => !e.isRead).length;
@@ -277,7 +278,7 @@ export default function InboxPanel() {
                       )}
                     </p>
                     <p className="text-xs mt-1">
-                      {new Date(selectedEmail.date).toLocaleString('ca-ES')}
+                      {formatDateTimeFull(selectedEmail.date)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

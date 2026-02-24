@@ -2,6 +2,7 @@
 import { log } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
+import { formatDateTimeFull } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 
 interface NotificationConfig {
@@ -212,7 +213,7 @@ export default function SettingsNotificationsPage() {
             <span className="">Última execució</span>
             <span className="">
               {config?.automation.lastRun
-                ? new Date(config.automation.lastRun).toLocaleString('ca-ES')
+                ? formatDateTimeFull(config.automation.lastRun)
                 : 'Mai'}
             </span>
           </div>

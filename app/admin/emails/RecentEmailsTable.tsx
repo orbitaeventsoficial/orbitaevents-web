@@ -1,6 +1,8 @@
 // app/admin/emails/RecentEmailsTable.tsx
 'use client';
 
+import { formatDateSimple } from '@/lib/constants';
+
 interface Activity {
   id: string;
   action: string;
@@ -50,7 +52,7 @@ export default function RecentEmailsTable({ activities }: { activities: Activity
     if (hours < 1) return 'Ara mateix';
     if (hours < 24) return `Fa ${hours}h`;
     if (days < 7) return `Fa ${days}d`;
-    return d.toLocaleDateString('ca-ES');
+    return formatDateSimple(d);
   };
 
   return (

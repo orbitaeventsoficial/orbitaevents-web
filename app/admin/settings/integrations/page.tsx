@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import CalendarTokenManager from './CalendarTokenManager';
 import IntegrationSetupWizard from './IntegrationSetupWizard';
+import { formatDateTimeFull } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
@@ -98,7 +99,7 @@ export default async function IntegrationsPage() {
             Connexió OAuth per carregar dades de campanyes i conversions a Analítica.
           </p>
           <p className="mt-1 text-xs">
-            Connectat: {map['integrations.googleAds.connectedAt'] ? new Date(map['integrations.googleAds.connectedAt']).toLocaleString('ca-ES') : '-'}
+            Connectat: {map['integrations.googleAds.connectedAt'] ? formatDateTimeFull(map['integrations.googleAds.connectedAt']) : '-'}
           </p>
           <a
             href="/api/google-ads/oauth/start"

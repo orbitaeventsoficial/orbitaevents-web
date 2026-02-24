@@ -1,6 +1,7 @@
 // app/admin/emails/page.tsx
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { formatDateTime, formatDateSimple } from '@/lib/constants';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
 import EmailStatsCards from './EmailStatsCards';
@@ -211,7 +212,7 @@ export default async function EmailsAdminPage() {
           <p className="text-xs uppercase">Últim cron</p>
           <p className="mt-2 text-sm">
             {stats.cronLastRun
-              ? new Date(stats.cronLastRun).toLocaleString('ca-ES', { dateStyle: 'medium', timeStyle: 'short' })
+              ? formatDateTime(stats.cronLastRun)
               : 'Mai executat'}
           </p>
           <p className="text-xs mt-1">
@@ -261,7 +262,7 @@ export default async function EmailsAdminPage() {
                       <p className="font-medium">{booking.clientName}</p>
                       <p className="text-sm">{booking.clientEmail}</p>
                       <p className="text-xs mt-1">
-                        Event: {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · Ref: {booking.reference}
+                        Event: {formatDateSimple(booking.eventDate)} · Ref: {booking.reference}
                       </p>
                     </div>
                     <SendPostEventButton bookingId={booking.id} />

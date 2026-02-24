@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { CustomerHubDTO, ProposalDTO, ProposalStatus } from '@/lib/customer-hub/dto';
 import { labelEstatPressupost } from '@/lib/customer-hub/labels';
+import { formatDateSimple } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // STYLES
@@ -282,17 +283,17 @@ function ProposalCard({
             </span>
           </div>
           <p className="mt-1 text-xs">
-            Creat {new Date(proposal.createdAt).toLocaleDateString('ca-ES')} · 
+            Creat {formatDateSimple(proposal.createdAt)} ·
             <span className="font-medium"> {proposal.total.toFixed(2)}€</span>
           </p>
           {proposal.sentAt && (
             <p className="text-[11px]">
-              Enviat {new Date(proposal.sentAt).toLocaleDateString('ca-ES')}
+              Enviat {formatDateSimple(proposal.sentAt)}
             </p>
           )}
           {proposal.acceptedAt && (
             <p className="text-[11px]">
-              ✓ Acceptat {new Date(proposal.acceptedAt).toLocaleDateString('ca-ES')}
+              ✓ Acceptat {formatDateSimple(proposal.acceptedAt)}
             </p>
           )}
         </div>

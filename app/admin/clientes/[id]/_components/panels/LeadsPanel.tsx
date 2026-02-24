@@ -1,6 +1,6 @@
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
 import Link from 'next/link';
-import { EVENT_TYPE_LABELS, LEAD_STATUS_CONFIG as STATUS_CONFIG } from '@/lib/constants';
+import { EVENT_TYPE_LABELS, LEAD_STATUS_CONFIG as STATUS_CONFIG, formatDate, formatDateSimple, formatNumber } from '@/lib/constants';
 
 export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
   return (
@@ -42,21 +42,17 @@ export default function LeadsPanel({ data }: { data: CustomerHubDTO }) {
                   </span>
                   <span className="">
                     {lead.eventDate
-                      ? new Date(lead.eventDate).toLocaleDateString('ca-ES', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })
+                      ? formatDate(lead.eventDate)
                       : 'Sense data'}
                   </span>
                 </div>
                 {lead.booking && (
                   <p className="mt-2 text-xs">
-                    Reserva {lead.booking.reference} · {lead.booking.total.toLocaleString('ca-ES')}€
+                    Reserva {lead.booking.reference} · {formatNumber(lead.booking.total)}€
                   </p>
                 )}
                 <p className="mt-1 text-[11px]">
-                  Creada {new Date(lead.createdAt).toLocaleDateString('ca-ES')}
+                  Creada {formatDateSimple(lead.createdAt)}
                 </p>
               </Link>
             );

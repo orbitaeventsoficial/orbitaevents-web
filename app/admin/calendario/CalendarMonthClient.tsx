@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { EVENT_TYPE_PLAIN } from '@/lib/constants';
+import { EVENT_TYPE_PLAIN, formatDateShort, formatDateFull, DEFAULT_LOCALE } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 import { useToast } from '../components/ToastProvider';
 
@@ -64,7 +64,7 @@ function resolveTimeLabel(booking: CalendarApiDay['reservas'][number]): string {
   const end = booking.eventEndTime?.trim();
   if (start && end) return `${start} - ${end}`;
   if (start) return start;
-  return new Date(booking.fechaEvento).toLocaleTimeString('ca-ES', {
+  return new Date(booking.fechaEvento).toLocaleTimeString(DEFAULT_LOCALE, {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -102,7 +102,7 @@ function addMonths(base: MonthYear, delta: number): MonthYear {
 }
 
 function monthLabel({ year, month }: MonthYear): string {
-  return new Intl.DateTimeFormat('ca-ES', {
+  return new Intl.DateTimeFormat(DEFAULT_LOCALE, {
     month: 'long',
     year: 'numeric',
   }).format(new Date(year, month, 1));
@@ -144,7 +144,7 @@ export default function CalendarMonthClient() {
         const payload = await res.json().catch(() => ({}));
         throw new Error(payload?.error || 'Error movent reserva');
       }
-      toast.success(`Reserva moguda al ${new Date(newDateKey).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}`);
+      toast.success(`Reserva moguda al ${formatDateShort(newDateKey)}`);
       setRefreshKey((k) => k + 1);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error movent reserva');
@@ -178,13 +178,7 @@ export default function CalendarMonthClient() {
 
     const toIso = (d: Date) => d.toISOString().slice(0, 10);
 
-    const visibleRangeLabel = `${firstVisible.toLocaleDateString('ca-ES', {
-      day: '2-digit',
-      month: '2-digit',
-    })} – ${lastVisible.toLocaleDateString('ca-ES', {
-      day: '2-digit',
-      month: '2-digit',
-    })}`;
+    const visibleRangeLabel = `${formatDateShort(firstVisible)} – ${formatDateShort(lastVisible)}`;
 
     return {
       fromStr: toIso(from),
@@ -585,12 +579,7 @@ export default function CalendarMonthClient() {
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-base sm:text-lg font-semibold">
-                {selectedDayData.date.toLocaleDateString('ca-ES', {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
+                {formatDateFull(selectedDayData.date)}
               </h2>
               <p className="mt-0.5 text-xs sm:text-sm">
                 Detalls del dia i accions ràpides

@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AdminPage } from '../components/AdminPage';
 import PaymentToggleButton from '../finanzas/PaymentToggleButton';
 import PaymentReminderActions from '../finanzas/PaymentReminderActions';
+import { formatDateSimple, formatDateFull, DEFAULT_LOCALE } from '@/lib/constants';
+import ExportCsvButton from '../components/ExportCsvButton';
 import ProfitabilityConfigEditor from '../rentabilidad/ProfitabilityConfigEditor';
 import ProfitabilityConfigHistory from '../rentabilidad/ProfitabilityConfigHistory';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
@@ -124,7 +126,7 @@ interface EconomiaClientProps {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function money(value: number) {
-  return new Intl.NumberFormat('ca-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+  return new Intl.NumberFormat(DEFAULT_LOCALE, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
 }
 
 function pct(value: number) {
@@ -301,14 +303,18 @@ export default function EconomiaClient(props: EconomiaClientProps) {
       subtitle="Control de caixa, cobraments i marge en una sola pantalla."
       actions={
         <div className="flex flex-wrap gap-2">
-          <a
-            href="/api/admin/reports/profitability"
-            target="_blank"
-            rel="noreferrer"
-            className="ap-btn ap-btn--secondary"
-          >
-            Exportar JSON
-          </a>
+          <ExportCsvButton
+            filename="rendibilitat"
+            data={[...props.topProfitability, ...props.riskProfitability] as unknown as Record<string, unknown>[]}
+            columns={[
+              { header: 'Referència', accessor: (r) => String(r.reference || '') },
+              { header: 'Client', accessor: (r) => String(r.clientName || '') },
+              { header: 'Data', accessor: (r) => formatDateSimple(r.eventDate as string) },
+              { header: 'Origen', accessor: (r) => String(r.source || '') },
+              { header: 'Marge net (€)', accessor: (r) => Number(r.netMargin || 0) },
+              { header: 'Marge (%)', accessor: (r) => Number(r.marginPct || 0) },
+            ]}
+          />
           <Link
             href="/admin/sales-ops"
             className="ap-btn ap-btn--primary"
@@ -591,7 +597,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             {row.reference} &middot; {row.clientName}
                           </p>
                           <p className="text-xs">
-                            {new Date(row.eventDate).toLocaleDateString('ca-ES')} &middot; {row.source}
+                            {formatDateSimple(row.eventDate)} &middot; {row.source}
                           </p>
                         </div>
                         <div className="text-right shrink-0">
@@ -680,7 +686,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                             <div className="min-w-0">
                               <p className="truncate text-sm font-bold">{row.reference} · {row.clientName}</p>
                               <p className="mt-0.5 text-xs">
-                                {new Date(row.eventDate).toLocaleDateString('ca-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                                {formatDateFull(row.eventDate)}
                                 &nbsp;·&nbsp;
                                 <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase">{row.status}</span>
                               </p>
@@ -713,7 +719,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                                 <p className={`text-sm font-bold ${row.depositPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.depositAmount)}</p>
                               </div>
                               <p className="text-[11px] mb-2">
-                                Venciment: {new Date(row.depositDueAt).toLocaleDateString('ca-ES')}
+                                Venciment: {formatDateSimple(row.depositDueAt)}
                               </p>
                               <PaymentToggleButton bookingId={row.id} field="depositPaid" currentValue={row.depositPaid} />
                             </div>
@@ -723,7 +729,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                                 <p className={`text-sm font-bold ${row.remainingPaid ? 'text-emerald-200' : 'text-rose-200'}`}>{money(row.remainingAmount)}</p>
                               </div>
                               <p className="text-[11px] mb-2">
-                                Venciment: {new Date(row.remainingDueAt).toLocaleDateString('ca-ES')}
+                                Venciment: {formatDateSimple(row.remainingDueAt)}
                               </p>
                               <PaymentToggleButton bookingId={row.id} field="remainingPaid" currentValue={row.remainingPaid} />
                             </div>
@@ -767,7 +773,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                       <div key={row.id} className="flex items-center gap-3 rounded-xl border border-white/5 p-3 hover:bg-white/5 transition-colors">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold truncate">{row.reference} &middot; {row.clientName}</p>
-                          <p className="text-xs">{new Date(row.eventDate).toLocaleDateString('ca-ES')}</p>
+                          <p className="text-xs">{formatDateSimple(row.eventDate)}</p>
                         </div>
                         <div className="text-right shrink-0">
                           {row.dueSoonDeposit && <p className="text-xs">Bestreta: {money(row.depositAmount)}</p>}
@@ -831,7 +837,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                                 <p className="text-sm font-semibold truncate transition-colors">
                                   {row.reference} &middot; {row.clientName}
                                 </p>
-                                <p className="text-xs">{new Date(row.eventDate).toLocaleDateString('ca-ES')} &middot; {row.source}</p>
+                                <p className="text-xs">{formatDateSimple(row.eventDate)} &middot; {row.source}</p>
                               </div>
                               <div className="text-right shrink-0">
                                 <p className={`text-sm font-bold ${marginColor(row.marginPct)}`}>{money(row.netMargin)}</p>
@@ -876,7 +882,7 @@ export default function EconomiaClient(props: EconomiaClientProps) {
                                 <p className="text-sm font-semibold truncate transition-colors">
                                   {row.reference} &middot; {row.clientName}
                                 </p>
-                                <p className="text-xs">{new Date(row.eventDate).toLocaleDateString('ca-ES')} &middot; {row.source}</p>
+                                <p className="text-xs">{formatDateSimple(row.eventDate)} &middot; {row.source}</p>
                               </div>
                               <div className="text-right shrink-0">
                                 <p className="text-sm font-bold">{money(row.netMargin)}</p>

@@ -1,6 +1,7 @@
 'use client';
 
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
+import { formatDate } from '@/lib/constants';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -126,7 +127,7 @@ function TaskColumn({
               <p className="text-sm">{task.title}</p>
               <p className="mt-1 text-[11px]">
                 {task.dueDate
-                  ? new Date(task.dueDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+                  ? formatDate(task.dueDate)
                   : 'Sense venciment'}
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-2">

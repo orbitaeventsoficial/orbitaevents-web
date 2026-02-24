@@ -13,7 +13,7 @@ import {
   STATUS_CONFIG,
   CONDITION_LABELS,
 } from '@/lib/inventory-utils';
-import { formatDate } from '@/lib/constants';
+import { formatDate, formatNumber } from '@/lib/constants';
 import InventoryItemEditor from './InventoryItemEditor';
 import InventoryPhotoUpload from './InventoryPhotoUpload';
 
@@ -108,31 +108,31 @@ export default async function InventoryItemPage({ params }: PageProps) {
         <div className="rounded-2xl border backdrop-blur-sm p-4">
           <p className="text-xs font-medium uppercase">Valor Actual</p>
           <p className="mt-2 text-3xl font-bold">
-            {item.purchasePrice ? `${currentValue.toLocaleString('ca-ES')}€` : `${item.value.toLocaleString('ca-ES')}€`}
+            {item.purchasePrice ? `${formatNumber(currentValue)}€` : `${formatNumber(item.value)}€`}
           </p>
           {item.purchasePrice && (
             <p className="text-xs mt-1">
-              Compra: {item.purchasePrice.toLocaleString('ca-ES')}€
+              Compra: {formatNumber(item.purchasePrice)}€
             </p>
           )}
         </div>
         <div className="rounded-2xl border backdrop-blur-sm p-4">
           <p className="text-xs font-medium uppercase">Hores Acumulades</p>
           <p className="mt-2 text-3xl font-bold">
-            {item.totalHoursUsed.toLocaleString('ca-ES')}h
+            {formatNumber(item.totalHoursUsed)}h
           </p>
           <p className="text-xs mt-1">
-            de {(item.expectedLifeHours || 2000).toLocaleString('ca-ES')}h vida útil
+            de {formatNumber(item.expectedLifeHours || 2000)}h vida útil
           </p>
         </div>
         <div className="rounded-2xl border backdrop-blur-sm p-4">
           <p className="text-xs font-medium uppercase">Cost / Hora</p>
           <p className="mt-2 text-3xl font-bold">
-            {item.purchasePrice ? `${costPerHour.toLocaleString('ca-ES')}€` : '—'}
+            {item.purchasePrice ? `${formatNumber(costPerHour)}€` : '—'}
           </p>
           {item.purchasePrice && (
             <p className="text-xs mt-1">
-              {item.purchasePrice.toLocaleString('ca-ES')}€ / {expectedLifeHours.toLocaleString('ca-ES')}h
+              {formatNumber(item.purchasePrice)}€ / {formatNumber(expectedLifeHours)}h
             </p>
           )}
         </div>
@@ -142,7 +142,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
             {lifeRemaining}%
           </p>
           <p className="text-xs mt-1">
-            {remainingHours.toLocaleString('ca-ES')}h útils aproximades
+            {formatNumber(remainingHours)}h útils aproximades
           </p>
           {/* Barra de progrés */}
           <div className="mt-2 h-2 w-full rounded-full">
@@ -285,7 +285,7 @@ export default async function InventoryItemPage({ params }: PageProps) {
           <h2 className="font-semibold">
             Historial d&apos;ús
             <span className="text-sm font-normal ml-2">
-              ({item.usageHistory.length} registres · {item.totalHoursUsed.toLocaleString('ca-ES')}h total)
+              ({item.usageHistory.length} registres · {formatNumber(item.totalHoursUsed)}h total)
             </span>
           </h2>
         </div>

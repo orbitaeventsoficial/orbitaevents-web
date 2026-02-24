@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ProfitabilityConfig } from '@/lib/services/profitabilityService';
+import { formatDateTimeFull } from '@/lib/constants';
 
 type HistoryEntry = {
   id: string;
@@ -132,7 +133,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
     const a = document.createElement('a');
     const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
     a.href = url;
-    a.download = `rentabilidad-history-${stamp}.csv`;
+    a.download = `rendibilitat-history-${stamp}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -202,7 +203,7 @@ export default function ProfitabilityConfigHistory({ entries }: { entries: Histo
             <div key={entry.id} className="rounded-lg border border-white/10 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">
-                  {new Date(entry.createdAt).toLocaleString('ca-ES')}
+                  {formatDateTimeFull(entry.createdAt)}
                 </p>
                 <button
                   type="button"

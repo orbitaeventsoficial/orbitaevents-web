@@ -35,14 +35,12 @@ function packToQuotePack(pack: PackDefinition | undefined): QuotePack {
     };
   }
 
-  const djHours =
-    typeof (pack as any).durationHours === 'number' ? (pack as any).durationHours : 4;
   return {
     name: pack.name,
     price: pack.priceValue ?? 500,
-    djHours,
+    djHours: pack.durationHours ?? 4,
     extraHourPrice: 80,
-    description: (pack as any).emotion || pack.tagline || pack.name,
+    description: pack.emotion || pack.tagline || pack.name,
   };
 }
 
@@ -74,6 +72,13 @@ function resolveLocalizedExtra(
   );
 }
 
+interface ExtraInput {
+  name?: string;
+  description?: string;
+  price?: number;
+  quantity?: number;
+}
+
 async function normalizeExtras(extras: unknown, locale: string): Promise<QuoteExtra[] | undefined> {
   if (!Array.isArray(extras) || extras.length === 0) return undefined;
 
@@ -83,11 +88,11 @@ async function normalizeExtras(extras: unknown, locale: string): Promise<QuoteEx
 
   if (hasObjectExtras) {
     return extras
-      .map((extra) => ({
-        name: String((extra as any).name || ''),
-        description: (extra as any).description ? String((extra as any).description) : undefined,
-        price: Number((extra as any).price || 0),
-        quantity: Number((extra as any).quantity || 1),
+      .map((extra: ExtraInput) => ({
+        name: String(extra.name || ''),
+        description: extra.description ? String(extra.description) : undefined,
+        price: Number(extra.price || 0),
+        quantity: Number(extra.quantity || 1),
       }))
       .filter((extra) => extra.name.trim().length > 0);
   }
@@ -105,7 +110,7 @@ async function normalizeExtras(extras: unknown, locale: string): Promise<QuoteEx
   }
 
   return dbExtras.map((extra) => {
-    const localized = resolveLocalizedExtra(extra.translations as any, locale);
+    const localized = resolveLocalizedExtra(extra.translations, locale);
     return {
       name: localized?.name || extra.slug,
       description: localized?.description || undefined,
@@ -276,8 +281,7 @@ export async function POST(req: NextRequest) {
       const followUpDueDate = new Date(Date.now() + 48 * 60 * 60 * 1000);
       if (lead.customerId) {
         try {
-          const prismaAny = prisma as any;
-          const existingTask = await prismaAny.task.findFirst({
+          const existingTask = await prisma.task.findFirst({
             where: {
               customerId: lead.customerId,
               leadId,
@@ -287,7 +291,7 @@ export async function POST(req: NextRequest) {
             select: { id: true },
           });
           if (!existingTask) {
-            await prismaAny.task.create({
+            await prisma.task.create({
               data: {
                 customerId: lead.customerId,
                 leadId,

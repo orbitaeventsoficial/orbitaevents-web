@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Pencil, Trash2, Plus } from 'lucide-react';
 import { log } from '@/lib/logger';
+import { formatDateSimple } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 
 interface BlogPost {
@@ -233,7 +234,7 @@ export default function BlogAdminPage() {
                       </td>
                       <td className="px-6 py-4">{post.viewCount}</td>
                       <td className="px-6 py-4 text-sm">
-                        {new Date(post.createdAt).toLocaleDateString('ca-ES')}
+                        {formatDateSimple(post.createdAt)}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex justify-end gap-2">

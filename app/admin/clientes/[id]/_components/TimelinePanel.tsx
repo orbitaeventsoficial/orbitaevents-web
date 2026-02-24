@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import type { TimelineEventDTO, TimelineEventType } from '@/lib/customer-hub/dto';
+import { DEFAULT_LOCALE } from '@/lib/constants';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES I CONSTANTS
@@ -68,9 +69,9 @@ function formatDayHeader(dateStr: string): string {
 
   if (diffDays === 0) return 'Avui';
   if (diffDays === 1) return 'Ahir';
-  if (diffDays < 7) return date.toLocaleDateString('ca-ES', { weekday: 'long' });
-  
-  return date.toLocaleDateString('ca-ES', {
+  if (diffDays < 7) return date.toLocaleDateString(DEFAULT_LOCALE, { weekday: 'long' });
+
+  return date.toLocaleDateString(DEFAULT_LOCALE, {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -79,7 +80,7 @@ function formatDayHeader(dateStr: string): string {
 }
 
 function formatTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleTimeString('ca-ES', {
+  return new Date(dateStr).toLocaleTimeString(DEFAULT_LOCALE, {
     hour: '2-digit',
     minute: '2-digit',
   });

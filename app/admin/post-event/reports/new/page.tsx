@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { log } from '@/lib/logger';
+import { formatDateSimple } from '@/lib/constants';
 import { AdminPage } from '../../../components/AdminPage';
 
 export default function NewReportPage() {
@@ -106,7 +107,7 @@ export default function NewReportPage() {
         <div className="border rounded-xl p-4">
           <h3 className="font-semibold">Event: {booking.clientName}</h3>
           <p className="text-sm mt-1">
-            {new Date(booking.eventDate).toLocaleDateString('ca-ES')} · {booking.eventLocation}
+            {formatDateSimple(booking.eventDate)} · {booking.eventLocation}
           </p>
         </div>
       )}

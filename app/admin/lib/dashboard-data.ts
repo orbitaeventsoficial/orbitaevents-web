@@ -3,6 +3,7 @@ import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import { generateDailyChecklistTasks } from '@/lib/services/dailyChecklist';
 import { calculateSimpleMarginPct } from '@/lib/margin-utils';
+import { formatDateSimple } from '@/lib/constants';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -15,7 +16,7 @@ export function timeAgo(date: Date): string {
   if (diffMins < 60) return `Fa ${diffMins}min`;
   if (diffHours < 24) return `Fa ${diffHours}h`;
   if (diffDays < 7) return `Fa ${diffDays}d`;
-  return date.toLocaleDateString('ca-ES');
+  return formatDateSimple(date);
 }
 
 export function formatEventDate(date: Date): string {
@@ -284,7 +285,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   ].sort((a, b) => b.ts - a.ts).slice(0, 10);
 
   const alerts: DashboardAlert[] = [
-    ...(!ga4Status.ready ? [{ type: 'error', title: 'GA4 pendent', description: ga4Status.reason || 'Configura GA4 al panell d'analítica', href: '/admin/analytics', action: 'Configurar' }] : []),
+    ...(!ga4Status.ready ? [{ type: 'error', title: 'GA4 pendent', description: ga4Status.reason || 'Configura GA4 al panell d\'analítica', href: '/admin/analytics', action: 'Configurar' }] : []),
     ...(ga4Status.ready && !ga4 ? [{ type: 'warning', title: 'GA4 sense dades', description: 'No podem carregar mètriques. Revisa permisos o quota.', href: '/admin/analytics', action: 'Revisar' }] : []),
     ...(ga4?.realtimeFallback ? [{ type: 'warning', title: 'Realtime parcial', description: 'Algunes mètriques realtime no estan disponibles.', href: '/admin/analytics', action: 'Veure' }] : []),
     ...(!imapConfigured ? [{ type: 'info', title: 'IMAP no configurat', description: 'L\'inbox encara no està connectat.', href: '/admin/inbox/settings', action: 'Configurar' }] : []),

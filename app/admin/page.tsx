@@ -5,6 +5,7 @@ import QuickActions from './components/QuickActions';
 import LeadStatusQuickActions from './components/LeadStatusQuickActions';
 import BookingStatusQuickActions from './components/BookingStatusQuickActions';
 import { fetchDashboardData, timeAgo, formatEventDate } from './lib/dashboard-data';
+import { formatDateTimeFull } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -276,7 +277,7 @@ export default async function AdminDashboard() {
             ))}
           </div>
           <p className="admin-cr-footnote">
-            Últim cron: {d.cronMap['emails.cron.lastRun'] ? new Date(d.cronMap['emails.cron.lastRun']).toLocaleString('ca-ES') : 'Mai'}
+            Últim cron: {d.cronMap['emails.cron.lastRun'] ? formatDateTimeFull(d.cronMap['emails.cron.lastRun']) : 'Mai'}
           </p>
         </div>
         <div className="admin-cr-info-card">

@@ -1,5 +1,6 @@
 // app/admin/post-event/page.tsx
 import { log } from '@/lib/logger';
+import { formatDateSimple } from '@/lib/constants';
 // Pàgina de gestió post-event
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -256,7 +257,7 @@ export default async function PostEventPage() {
                 <div>
                   <p className="font-medium">{booking.clientName}</p>
                   <p className="text-sm">
-                    {booking.eventDate.toLocaleDateString('ca-ES')} · {packName} · {booking.eventLocation}
+                    {formatDateSimple(booking.eventDate)} · {packName} · {booking.eventLocation}
                   </p>
                 </div>
                 <Link

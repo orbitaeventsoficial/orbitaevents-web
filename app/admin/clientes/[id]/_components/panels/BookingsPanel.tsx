@@ -1,7 +1,7 @@
 import type { CustomerHubDTO, BookingDTO } from '@/lib/customer-hub/dto';
 import { labelEstatReserva } from '@/lib/customer-hub/labels';
 import Link from 'next/link';
-import { EVENT_TYPE_LABELS, BOOKING_STATUS_CONFIG } from '@/lib/constants';
+import { EVENT_TYPE_LABELS, BOOKING_STATUS_CONFIG, formatDateFull, formatNumber } from '@/lib/constants';
 
 // BOOKING_STATUS_COLORS is derived from the centralized BOOKING_STATUS_CONFIG but
 // produces a single combined class string (border + bg + text) for badge styling.
@@ -19,12 +19,12 @@ function PaymentIndicator({ booking }: { booking: BookingDTO }) {
     <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
       {deposit > 0 && (
         <span className={`rounded-full px-2 py-0.5 ${booking.depositPaid ? 'bg-emerald-500/15 text-emerald-300' : 'bg-rose-500/15 text-rose-300'}`}>
-          Dipòsit {deposit.toLocaleString('ca-ES')} € {booking.depositPaid ? '✓' : '✗'}
+          Dipòsit {formatNumber(deposit)} € {booking.depositPaid ? '✓' : '✗'}
         </span>
       )}
       {remaining > 0 && (
         <span className={`rounded-full px-2 py-0.5 ${booking.remainingPaid ? 'bg-emerald-500/15 text-emerald-300' : 'bg-slate-600/40 text-slate-400'}`}>
-          Resta {remaining.toLocaleString('ca-ES')} € {booking.remainingPaid ? '✓' : ''}
+          Resta {formatNumber(remaining)} € {booking.remainingPaid ? '✓' : ''}
         </span>
       )}
     </div>
@@ -73,7 +73,7 @@ export default function BookingsPanel({ data }: { data: CustomerHubDTO }) {
                   )}
                   <span className="">
                     {booking.date
-                      ? new Date(booking.date).toLocaleDateString('ca-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+                      ? formatDateFull(booking.date)
                       : 'Sense data'}
                   </span>
                   {(booking.startTime || booking.endTime) && (

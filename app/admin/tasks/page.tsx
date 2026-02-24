@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
+import { formatDateSimple } from '@/lib/constants';
 import Link from 'next/link';
 import type { LeadTaskStatus, Prisma } from '@prisma/client';
 import { AdminEmptyState, AdminPage, AdminSection } from '@/app/admin/components/AdminPage';
@@ -254,7 +255,7 @@ export default async function TasksPage({
                       </Link>
                       <div className="flex shrink-0 items-center gap-3">
                         <span className="ap-subtitle">
-                          {task.dueDate ? new Date(task.dueDate).toLocaleDateString('ca-ES') : 'Sense data'}
+                          {task.dueDate ? formatDateSimple(task.dueDate) : 'Sense data'}
                         </span>
                         <TaskRowActions
                           taskId={task.id}

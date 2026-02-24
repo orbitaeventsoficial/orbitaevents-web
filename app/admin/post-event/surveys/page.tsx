@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { formatDateSimple } from '@/lib/constants';
 import Link from 'next/link';
 import { AdminPage } from '../../components/AdminPage';
 
@@ -115,7 +116,7 @@ export default async function SurveysPage() {
                       </span>
                     </div>
                     <p className="text-sm mb-2">
-                      {new Date(survey.booking.eventDate).toLocaleDateString('ca-ES')} · {packName}
+                      {formatDateSimple(survey.booking.eventDate)} · {packName}
                     </p>
                     {survey.bestMoment && (
                       <p className="text-sm mt-2 line-clamp-2 italic">

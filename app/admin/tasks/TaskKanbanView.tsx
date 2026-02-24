@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { formatDateShort } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 
 type KanbanTask = {
@@ -180,7 +181,7 @@ export default function TaskKanbanView() {
                 {/* Data límit */}
                 {task.dueDate && (
                   <p className={`mt-1 text-[10px] ${getDueDateColor(task.dueDate)}`}>
-                    📅 {new Date(task.dueDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
+                    📅 {formatDateShort(task.dueDate)}
                     {(() => {
                       const due = new Date(task.dueDate!);
                       const now = new Date();

@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-import { LEAD_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, PRIORITY_CONFIG } from '@/lib/constants';
+import { LEAD_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, PRIORITY_CONFIG, formatDate, formatDateFull, formatDateSimple, formatDateTimeFull, formatDateTime, formatNumber } from '@/lib/constants';
 
 const PRIORITY_LABELS = Object.fromEntries(
   Object.entries(PRIORITY_CONFIG).map(([k, v]) => [k, { label: v.label, color: `${v.bg} ${v.text}` }])
@@ -296,7 +296,7 @@ export default async function LeadDetailPage({ params }: Props) {
           <div className="rounded-xl border px-4 py-3">
             <p className="text-xs uppercase tracking-wide">Valor estimat</p>
             <p className="text-xl font-semibold">
-              {estimatedRevenue !== null ? `${estimatedRevenue.toLocaleString('ca-ES')}€` : '—'}
+              {estimatedRevenue !== null ? `${formatNumber(estimatedRevenue)}€` : '—'}
             </p>
           </div>
           <div className="rounded-xl border px-4 py-3">
@@ -409,12 +409,7 @@ export default async function LeadDetailPage({ params }: Props) {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="rounded-lg border border-white/10 p-4">
                   <p className="font-medium">
-                    📅 {new Date(lead.booking.eventDate).toLocaleDateString('ca-ES', {
-                      weekday: 'short',
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
+                    📅 {formatDateFull(lead.booking.eventDate)}
                   </p>
                   <p className="text-sm">Ref: {lead.booking.reference}</p>
                   <p className="text-sm">Tipus: {lead.booking.eventType}</p>
@@ -423,16 +418,16 @@ export default async function LeadDetailPage({ params }: Props) {
                 </div>
                 <div className="rounded-lg border border-white/10 p-4">
                   <p className="text-lg font-bold">
-                    {lead.booking.total.toLocaleString('ca-ES')}€
+                    {formatNumber(lead.booking.total)}€
                   </p>
                   <p className="text-sm">Estat: {lead.booking.status}</p>
-                  <p className="text-sm">Subtotal: {lead.booking.subtotal.toLocaleString('ca-ES')}€</p>
-                  <p className="text-sm">IVA: {lead.booking.vatAmount.toLocaleString('ca-ES')}€</p>
+                  <p className="text-sm">Subtotal: {formatNumber(lead.booking.subtotal)}€</p>
+                  <p className="text-sm">IVA: {formatNumber(lead.booking.vatAmount)}€</p>
                   <p className="text-sm">
-                    Dipòsit: {lead.booking.depositPaid ? 'Pagat' : 'Pendent'} ({lead.booking.depositAmount.toLocaleString('ca-ES')}€)
+                    Dipòsit: {lead.booking.depositPaid ? 'Pagat' : 'Pendent'} ({formatNumber(lead.booking.depositAmount)}€)
                   </p>
                   <p className="text-sm">
-                    Resta: {lead.booking.remainingPaid ? 'Pagada' : 'Pendent'} ({lead.booking.remainingAmount.toLocaleString('ca-ES')}€)
+                    Resta: {lead.booking.remainingPaid ? 'Pagada' : 'Pendent'} ({formatNumber(lead.booking.remainingAmount)}€)
                   </p>
                 </div>
                 <div className="rounded-lg border border-white/10 p-4 md:col-span-2">
@@ -463,7 +458,7 @@ export default async function LeadDetailPage({ params }: Props) {
                       </p>
                       <p className="">
                         Data d&apos;enviament: {lead.booking.postEventEmailSentAt
-                          ? new Date(lead.booking.postEventEmailSentAt).toLocaleString('ca-ES')
+                          ? formatDateTimeFull(lead.booking.postEventEmailSentAt)
                           : '-'}
                       </p>
                       <p className="break-all">
@@ -476,9 +471,9 @@ export default async function LeadDetailPage({ params }: Props) {
                       </p>
                       <p className="">
                         Data de resposta: {lead.booking.reviewSubmittedAt
-                          ? new Date(lead.booking.reviewSubmittedAt).toLocaleString('ca-ES')
+                          ? formatDateTimeFull(lead.booking.reviewSubmittedAt)
                           : lead.booking.clientSurvey?.submittedAt
-                            ? new Date(lead.booking.clientSurvey.submittedAt).toLocaleString('ca-ES')
+                            ? formatDateTimeFull(lead.booking.clientSurvey.submittedAt)
                             : '-'}
                       </p>
                     </div>
@@ -614,36 +609,20 @@ export default async function LeadDetailPage({ params }: Props) {
               <div>
                 <dt className="text-xs">Creat</dt>
                 <dd className="">
-                  {new Date(lead.createdAt).toLocaleDateString('ca-ES', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {formatDateTime(lead.createdAt)}
                 </dd>
               </div>
               <div>
                 <dt className="text-xs">Actualitzat</dt>
                 <dd className="">
-                  {new Date(lead.updatedAt).toLocaleDateString('ca-ES', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {formatDateTime(lead.updatedAt)}
                 </dd>
               </div>
               {lead.contactedAt && (
                 <div>
                   <dt className="text-xs">Contactat</dt>
                   <dd className="">
-                    {new Date(lead.contactedAt).toLocaleDateString('ca-ES', {
-                      day: '2-digit',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
+                    {formatDate(lead.contactedAt)}
                   </dd>
                 </div>
               )}
@@ -730,13 +709,13 @@ export default async function LeadDetailPage({ params }: Props) {
                 </div>
                 <div>
                   <dt className="text-xs">Despesa total</dt>
-                  <dd className="">{lead.customer.totalSpent.toLocaleString('ca-ES')}€</dd>
+                  <dd className="">{formatNumber(lead.customer.totalSpent)}€</dd>
                 </div>
                 <div>
                   <dt className="text-xs">Últim event</dt>
                   <dd className="">
                     {lead.customer.lastEventDate
-                      ? new Date(lead.customer.lastEventDate).toLocaleDateString('ca-ES')
+                      ? formatDateSimple(lead.customer.lastEventDate)
                       : '-'}
                   </dd>
                 </div>
@@ -768,8 +747,8 @@ export default async function LeadDetailPage({ params }: Props) {
                       {EVENT_TYPE_LABELS[item.eventType] || item.eventType} · {item.status}
                     </p>
                     <p className="text-xs">
-                      {item.eventDate ? new Date(item.eventDate).toLocaleDateString('ca-ES') : 'Sense data'} ·
-                      {' '}Entrada creada {new Date(item.createdAt).toLocaleDateString('ca-ES')}
+                      {item.eventDate ? formatDateSimple(item.eventDate) : 'Sense data'} ·
+                      {' '}Entrada creada {formatDateSimple(item.createdAt)}
                     </p>
                     {item.booking ? (
                       <p className="text-xs">
@@ -780,7 +759,7 @@ export default async function LeadDetailPage({ params }: Props) {
                         >
                           Reserva {item.booking.reference}
                         </Link>
-                        {' '}· {item.booking.status} · {item.booking.total.toLocaleString('ca-ES')}€
+                        {' '}· {item.booking.status} · {formatNumber(item.booking.total)}€
                       </p>
                     ) : (
                       <p className="text-xs">Sense reserva associada</p>

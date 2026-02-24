@@ -20,6 +20,7 @@ import {
   CONDITION_LABELS,
   calculateLifeRemainingPercent,
 } from '@/lib/inventory-utils';
+import { formatNumber } from '@/lib/constants';
 
 interface InventoryItem {
   id: string;
@@ -263,7 +264,7 @@ export default function InventoryListClient() {
   return (
     <AdminPage
       title="Inventari"
-      subtitle={`${items.length} elements · ${totalValue.toLocaleString('ca-ES')}€ valor total`}
+      subtitle={`${items.length} elements · ${formatNumber(totalValue)}€ valor total`}
       actions={
         <div className="flex gap-2">
           <div className="flex rounded-xl border overflow-hidden">
@@ -321,7 +322,7 @@ export default function InventoryListClient() {
         <div className="rounded-2xl border backdrop-blur-sm p-4">
           <p className="text-xs font-medium uppercase">Valor Total</p>
           <p className="mt-2 text-3xl font-bold">
-            {totalValue.toLocaleString('ca-ES')}€
+            {formatNumber(totalValue)}€
           </p>
         </div>
       </section>
@@ -523,7 +524,7 @@ export default function InventoryListClient() {
                   </div>
                   <p className="font-medium text-sm truncate">{item.name}</p>
                   <div className="flex items-center justify-between text-xs">
-                    <span>{item.value.toLocaleString('ca-ES')}€</span>
+                    <span>{formatNumber(item.value)}€</span>
                     <span>{item.totalHoursUsed}h</span>
                   </div>
                   {item.purchasePrice && (
@@ -595,7 +596,7 @@ export default function InventoryListClient() {
                         {item.watts ? `${item.watts}W` : '—'}
                       </td>
                       <td className="px-4 py-3">
-                        {item.value.toLocaleString('ca-ES')}€
+                        {formatNumber(item.value)}€
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs">

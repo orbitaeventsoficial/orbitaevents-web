@@ -129,26 +129,58 @@ export const LEAD_STATUS_LABELS: Record<string, string> = {
 // FORMATTING HELPERS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export function formatDate(date: Date | string | null | undefined): string {
+export const DEFAULT_LOCALE = 'ca-ES';
+
+export function formatDate(date: Date | string | null | undefined, locale = 'ca-ES'): string {
   if (!date) return '-';
   const d = new Date(date);
-  return d.toLocaleDateString('ca-ES', {
+  return d.toLocaleDateString(locale, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   });
 }
 
-export function formatDateTime(date: Date | string | null | undefined): string {
+export function formatDateTime(date: Date | string | null | undefined, locale = 'ca-ES'): string {
   if (!date) return '-';
   const d = new Date(date);
-  return d.toLocaleDateString('ca-ES', {
+  return d.toLocaleDateString(locale, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+/** Short date without year: "24 feb" */
+export function formatDateShort(date: Date | string | null | undefined, locale = 'ca-ES'): string {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString(locale, { day: '2-digit', month: 'short' });
+}
+
+/** Full date with weekday: "dl. 24 feb 2026" */
+export function formatDateFull(date: Date | string | null | undefined, locale = 'ca-ES'): string {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+/** Locale-default date (no specific options): "24/2/2026" */
+export function formatDateSimple(date: Date | string | null | undefined, locale = 'ca-ES'): string {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString(locale);
+}
+
+/** Full datetime with seconds: "24/2/2026, 14:30:00" */
+export function formatDateTimeFull(date: Date | string | null | undefined, locale = 'ca-ES'): string {
+  if (!date) return '-';
+  return new Date(date).toLocaleString(locale);
+}
+
+/** Number with locale formatting */
+export function formatNumber(value: number | null | undefined, opts?: Intl.NumberFormatOptions, locale = 'ca-ES'): string {
+  if (value === null || value === undefined) return '-';
+  return value.toLocaleString(locale, opts);
 }
 
 export function formatCurrency(amount: number | null | undefined): string {

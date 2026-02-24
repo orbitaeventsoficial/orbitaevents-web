@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { formatDateTimeFull } from '@/lib/constants';
 
 type ActivePortal = {
   id: string;
@@ -45,12 +46,12 @@ export default function ClientPortalAccessPanel({
 
   const expiresAtText = useMemo(() => {
     if (!active?.expiresAt) return 'Sense caducitat';
-    return new Date(active.expiresAt).toLocaleString('ca-ES');
+    return formatDateTimeFull(active.expiresAt);
   }, [active]);
 
   const lastAccessText = useMemo(() => {
     if (!active?.lastAccessedAt) return 'Encara no s\'ha obert';
-    return new Date(active.lastAccessedAt).toLocaleString('ca-ES');
+    return formatDateTimeFull(active.lastAccessedAt);
   }, [active]);
 
   const handleCreateLink = async () => {

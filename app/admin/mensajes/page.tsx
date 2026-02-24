@@ -1,5 +1,6 @@
 // app/admin/mensajes/page.tsx
 import { log } from '@/lib/logger';
+import { formatDateSimple } from '@/lib/constants';
 // Pàgina de gestió de missatges i comunicacions
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -94,7 +95,7 @@ function timeAgo(date: Date): string {
   if (hours < 24) return `Fa ${hours}h`;
   const days = Math.floor(hours / 24);
   if (days < 7) return `Fa ${days}d`;
-  return date.toLocaleDateString('ca-ES');
+  return formatDateSimple(date);
 }
 
 export default async function MensajesPage() {

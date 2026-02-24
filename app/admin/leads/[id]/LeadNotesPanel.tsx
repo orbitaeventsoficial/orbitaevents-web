@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatDateTime } from '@/lib/constants';
 
 type LeadNoteItem = {
   id: string;
@@ -10,13 +11,7 @@ type LeadNoteItem = {
 };
 
 function formatNoteDate(value: string) {
-  return new Date(value).toLocaleDateString('ca-ES', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return formatDateTime(value);
 }
 
 export default function LeadNotesPanel({

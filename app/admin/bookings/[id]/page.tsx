@@ -16,7 +16,7 @@ import { getActivePortalAccessForBooking } from '@/lib/services/clientPortalAcce
 import { calculateCostPerHour, calculateEventDuration } from '@/lib/inventory-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 
-import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatCurrency } from '@/lib/constants';
+import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatCurrency, formatDateSimple, formatDateTimeFull } from '@/lib/constants';
 import { AdminPage } from '../../components/AdminPage';
 
 export const dynamic = 'force-dynamic';
@@ -388,7 +388,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
         {customer && (
           <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3 text-xs">
             Historial client: {customer.totalEvents} esdeveniments · {formatCurrency(customer.totalSpent)} ·
-            {' '}últim esdeveniment {customer.lastEventDate ? new Date(customer.lastEventDate).toLocaleDateString('ca-ES') : '-'}
+            {' '}últim esdeveniment {formatDateSimple(customer.lastEventDate)}
           </div>
         )}
       </section>
@@ -592,7 +592,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
               <tbody>
                 {recentCommRows.map((row) => (
                   <tr key={row.id} className="border-b border-white/10">
-                    <td className="px-2 py-2 whitespace-nowrap">{new Date(row.createdAt).toLocaleString('ca-ES')}</td>
+                    <td className="px-2 py-2 whitespace-nowrap">{formatDateTimeFull(row.createdAt)}</td>
                     <td className="px-2 py-2">{row.action === 'COMM_RESPONDED' ? 'Respost' : 'Enviat'}</td>
                     <td className="px-2 py-2">{row.flow}</td>
                     <td className="px-2 py-2">{row.channel}</td>

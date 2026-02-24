@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
+import { formatNumber } from '@/lib/constants';
 
 export default function MarginExtrasPanel({
   data,
@@ -55,6 +56,6 @@ function Metric({ label, value }: { label: string; value: string }) {
 
 function money(value?: number) {
   if (typeof value !== 'number') return '—';
-  return `${value.toLocaleString('ca-ES', { maximumFractionDigits: 2 })}€`;
+  return `${formatNumber(value, { maximumFractionDigits: 2 })}€`;
 }
 

@@ -7,6 +7,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { formatDateSimple } from '@/lib/constants';
 import { AdminPage } from '../components/AdminPage';
 
 type DiscountCode = {
@@ -372,7 +373,7 @@ export default function DiscountCodesPage() {
                       {c.type === 'PERCENTAGE' ? `${c.value}%` : `${c.value}€`}
                     </td>
                     <td className={`px-4 py-3 ${expired ? 'text-rose-400' : 'text-slate-300'}`}>
-                      {new Date(c.validUntil).toLocaleDateString('ca-ES')}
+                      {formatDateSimple(c.validUntil)}
                       {expired && <span className="block text-[10px]">Caducat</span>}
                     </td>
                     <td className="px-4 py-3">

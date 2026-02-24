@@ -1,4 +1,5 @@
 import type { CustomerHubDTO, DiscountCodeDTO } from '@/lib/customer-hub/dto';
+import { formatDateSimple } from '@/lib/constants';
 
 const SOURCE_LABELS: Record<string, string> = {
   POST_EVENT: 'Post-event',
@@ -48,7 +49,7 @@ export default function DiscountsPanel({ data }: { data: CustomerHubDTO }) {
 
                 <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
                   <span>
-                    Vàlid: {new Date(dc.validFrom).toLocaleDateString('ca-ES')} – {new Date(dc.validUntil).toLocaleDateString('ca-ES')}
+                    Vàlid: {formatDateSimple(dc.validFrom)} – {formatDateSimple(dc.validUntil)}
                   </span>
                   <span>
                     Usos: {dc.currentUses}/{dc.maxUses}
@@ -60,7 +61,7 @@ export default function DiscountsPanel({ data }: { data: CustomerHubDTO }) {
 
                 {dc.usedAt && (
                   <p className="mt-1 text-[11px]">
-                    Últim ús: {new Date(dc.usedAt).toLocaleDateString('ca-ES')}
+                    Últim ús: {formatDateSimple(dc.usedAt)}
                   </p>
                 )}
               </div>

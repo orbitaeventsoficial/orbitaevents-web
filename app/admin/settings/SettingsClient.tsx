@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { formatDateSimple, formatNumber } from '@/lib/constants';
 
 type Setting = {
   id: string;
@@ -44,7 +45,7 @@ function formatDisplay(setting: Setting): string {
     if (num >= 1900 && num <= 2100) {
       return String(num);
     }
-    return num.toLocaleString('ca-ES');
+    return formatNumber(num);
   }
   if (setting.type === 'BOOLEAN') {
     return setting.value === 'true' ? 'Si' : 'No';
@@ -268,7 +269,7 @@ export default function SettingsClient({
                             </p>
                             <p className="text-xs">
                               Actualitzat:{' '}
-                              {new Date(current.updatedAt).toLocaleDateString('ca-ES')}
+                              {formatDateSimple(current.updatedAt)}
                             </p>
                             <button
                               className="mt-2 text-xs px-3 py-1.5 rounded-lg border transition-colors"

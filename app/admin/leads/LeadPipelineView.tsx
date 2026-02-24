@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { EVENT_TYPE_ICONS, SOURCE_LABELS } from '@/lib/constants';
+import { EVENT_TYPE_ICONS, SOURCE_LABELS, formatDateShort } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 
 type PipelineFilters = {
@@ -368,7 +368,7 @@ function PipelineCard({
         {/* Data event amb icona */}
         {lead.eventDate && (
           <span className="inline-flex items-center gap-0.5 text-[10px]">
-            📅 {new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
+            📅 {formatDateShort(lead.eventDate)}
           </span>
         )}
       </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { PackPricingModelConfig } from '@/lib/services/packPricingHealth';
+import { formatDateTimeFull } from '@/lib/constants';
 
 type PackHistoryEntry = {
   id: string;
@@ -113,7 +114,7 @@ export default function PackPricingModelHistory({ entries }: { entries: PackHist
           filteredEntries.map((entry) => (
             <div key={entry.id} className="rounded-lg border border-white/10 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold">{new Date(entry.createdAt).toLocaleString('ca-ES')}</p>
+                <p className="text-sm font-semibold">{formatDateTimeFull(entry.createdAt)}</p>
                 <button
                   type="button"
                   onClick={() => restore(entry)}

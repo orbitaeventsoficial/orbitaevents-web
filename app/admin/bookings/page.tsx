@@ -6,8 +6,9 @@ import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
 import BookingActions from './BookingActions';
-import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatCurrency } from '@/lib/constants';
+import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatDateShort, formatCurrency } from '@/lib/constants';
 import { getMarginTone, calculateSimpleMarginPct } from '@/lib/margin-utils';
+import ExportCsvButton from '../components/ExportCsvButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -99,7 +100,21 @@ export default async function BookingsPage({
     <AdminPage
       title="Reserves"
       subtitle={<>{pagination.total} esdeveniments · {formatCurrency(totalRevenue)}</>}
-      actions={<Link href="/admin/bookings/new" className="ap-btn ap-btn--primary">+ Nova</Link>}
+      actions={<div className="flex gap-2">
+        <ExportCsvButton
+          filename="reserves"
+          headers={['Referència', 'Client', 'Data', 'Tipus', 'Estat', 'Total (€)']}
+          rows={bookings.map((b) => [
+            b.reference,
+            b.clientName,
+            formatDate(b.eventDate),
+            EVENT_TYPE_LABELS[b.eventType] || b.eventType,
+            b.status,
+            String(b.total),
+          ])}
+        />
+        <Link href="/admin/bookings/new" className="ap-btn ap-btn--primary">+ Nova</Link>
+      </div>}
     >
 
       {/* Stats Cards - Scrollable horizontal en móvil */}
@@ -215,7 +230,7 @@ export default async function BookingsPage({
                     </span>
                   </div>
                   <span className="font-medium">
-                    {new Date(booking.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })}
+                    {formatDateShort(booking.eventDate)}
                   </span>
                 </div>
                 <div className="mt-3">

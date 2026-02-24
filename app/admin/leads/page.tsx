@@ -10,6 +10,7 @@ import LeadQuickStatus from './LeadQuickStatus';
 import LeadViewToggle from './LeadViewToggle';
 import type { EventType, LeadSource, LeadStatus, Priority, Prisma } from '@prisma/client';
 import { LEAD_COLOR_DEFAULT_VARS, PRIORITY_COLOR_OPTIONS, STATUS_COLOR_OPTIONS } from './colorTheme';
+import ExportCsvButton from '../components/ExportCsvButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,7 @@ const STATUS_CONFIG = Object.fromEntries(
   ])
 ) as Record<string, { label: string; badgeClass: string; chipClass: string }>;
 
-import { EVENT_TYPE_LABELS, SOURCE_LABELS } from '@/lib/constants';
+import { EVENT_TYPE_LABELS, SOURCE_LABELS, formatDateShort, formatDate } from '@/lib/constants';
 
 const PRIORITY_CONFIG = Object.fromEntries(
   PRIORITY_COLOR_OPTIONS.map((option) => [
@@ -256,7 +257,22 @@ export default async function LeadsPage({
     <AdminPage
       title="Entrades"
       subtitle="Tauler comercial, seguiment i pipeline operatiu."
-      actions={<Link href="/admin/intake" className="ap-btn ap-btn--primary">Entrada ràpida</Link>}
+      actions={<div className="flex gap-2">
+        <ExportCsvButton
+          filename="entrades"
+          headers={['Nom', 'Email', 'Telèfon', 'Tipus', 'Origen', 'Estat', 'Data event']}
+          rows={leads.map((l) => [
+            l.name,
+            l.email,
+            l.phone || '',
+            EVENT_TYPE_LABELS[l.eventType] || l.eventType,
+            SOURCE_LABELS[l.source] || l.source,
+            l.status,
+            l.eventDate ? formatDate(l.eventDate) : '',
+          ])}
+        />
+        <Link href="/admin/intake" className="ap-btn ap-btn--primary">Entrada ràpida</Link>
+      </div>}
     >
     <div
       id="leads-theme-root"
@@ -333,7 +349,7 @@ export default async function LeadsPage({
                   <span>{eventType}</span>
                   <span>
                     {lead.eventDate
-                      ? new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short' })
+                      ? formatDateShort(lead.eventDate)
                       : 'Sense data'}
                   </span>
                 </div>
@@ -450,7 +466,7 @@ export default async function LeadsPage({
                       <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap text-center">{SOURCE_LABELS[lead.source] || lead.source}</td>
                       <td className="px-3 xl:px-4 py-3 text-xs whitespace-nowrap text-center">
                         {lead.eventDate
-                          ? new Date(lead.eventDate).toLocaleDateString('ca-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+                          ? formatDate(lead.eventDate)
                           : '—'}
                       </td>
                       <td className="px-3 xl:px-4 py-3 text-center">

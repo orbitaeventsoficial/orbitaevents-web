@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { EVENT_TYPE_LABELS } from '@/lib/constants';
+import { EVENT_TYPE_LABELS, formatDateSimple } from '@/lib/constants';
 
 interface Lead {
   id: string;
@@ -260,7 +260,7 @@ export default function ComposeForm({ leads, packs, initialCustomer, initialTemp
                   <span className="">Data:</span>
                   <p className="font-medium">
                     {selectedLead.eventDate
-                      ? new Date(selectedLead.eventDate).toLocaleDateString('ca-ES')
+                      ? formatDateSimple(selectedLead.eventDate)
                       : 'No especificat'}
                   </p>
                 </div>

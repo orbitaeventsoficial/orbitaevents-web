@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useDeferredValue, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import DOMPurify from 'dompurify';
-import { getEventLabel } from '@/lib/constants';
+import { getEventLabel, formatDateShort, formatDateTimeFull, formatDateSimple, DEFAULT_LOCALE } from '@/lib/constants';
 import { log } from '@/lib/logger';
 
 interface LeadData {
@@ -290,13 +290,13 @@ export default function InboxClient({
     const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
-      return d.toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' });
+      return d.toLocaleTimeString(DEFAULT_LOCALE, { hour: '2-digit', minute: '2-digit' });
     } else if (diffDays === 1) {
       return 'Ahir';
     } else if (diffDays < 7) {
-      return d.toLocaleDateString('ca-ES', { weekday: 'short' });
+      return d.toLocaleDateString(DEFAULT_LOCALE, { weekday: 'short' });
     } else {
-      return d.toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' });
+      return formatDateShort(d);
     }
   }
 
@@ -516,7 +516,7 @@ export default function InboxClient({
                   </div>
                 </div>
                 <span className="text-sm">
-                  {new Date(selectedEmail.date).toLocaleString('ca-ES')}
+                  {formatDateTimeFull(selectedEmail.date)}
                 </span>
               </div>
             </div>
@@ -533,7 +533,7 @@ export default function InboxClient({
                     {selectedEmail.leadData.eventDate && (
                       <div>
                         <span className="">Data:</span>
-                        <p className="font-medium">{new Date(selectedEmail.leadData.eventDate).toLocaleDateString('ca-ES')}</p>
+                        <p className="font-medium">{formatDateSimple(selectedEmail.leadData.eventDate)}</p>
                       </div>
                     )}
                     {selectedEmail.leadData.guestCount && (
