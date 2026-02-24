@@ -8,17 +8,7 @@
 
 import { log } from '@/lib/logger';
 
-// Tipos TypeScript para ventana global
-type GtagArgs = [string, ...unknown[]];
-
-declare global {
-  // eslint-disable-next-line no-unused-vars
-  interface Window {
-    gtag?: (..._args: GtagArgs) => void;
-    dataLayer?: unknown[];
-    gtagConsentUpdate?: () => void;
-  }
-}
+// Window globals (gtag, dataLayer, gtagConsentUpdate) are declared in types/window.d.ts
 
 /**
  * Tipos de eventos principales
@@ -51,7 +41,7 @@ interface TrackEventParams {
   eventCategory: EventCategory;
   eventLabel?: string;
   value?: number;
-  additionalParams?: Record<string, any>;
+  additionalParams?: Record<string, unknown>;
 }
 
 /**

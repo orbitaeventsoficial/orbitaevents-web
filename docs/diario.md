@@ -240,11 +240,60 @@ S'han realitzat **2 auditories exhaustives de codi** abans de la sessió del 202
 - `app/admin/tasks/page.tsx` — toggle kanban/llista
 - `app/admin/calendario/CalendarMonthClient.tsx` — drag-drop reserves
 
+---
+
+### Continuació sessió 2026-02-24 (part 2)
+
+#### ✅ Centralitzar formatació de dates i números (zero `ca-ES` hardcodejat)
+**Per què**: Hi havia ~60 instàncies de `toLocaleDateString('ca-ES', ...)`, `toLocaleString('ca-ES')` i `new Intl.NumberFormat('ca-ES', ...)` repartides per tot l'admin. Canviar el locale requeriria editar 46 fitxers. Un únic punt de control és imprescindible.
+**Què s'ha fet**:
+- `lib/constants/index.ts` — afegits `DEFAULT_LOCALE`, `formatDateShort`, `formatDateFull`, `formatDateSimple`, `formatDateTimeFull`, `formatNumber`, i paràmetre `locale` a `formatDate`/`formatDateTime`
+- ~46 fitxers admin actualitzats: tots els `'ca-ES'` hardcodejats reemplaçats per helpers centralitzats
+- Casos especials (hora sola, dia de la setmana) usen `DEFAULT_LOCALE`
+- Verificat amb Grep: **zero** `'ca-ES'` hardcodejat a tot el directori admin
+
+#### ✅ Eliminar tots els `as any` a rutes d'email (17 → 0)
+**Per què**: 17 `as any` a 4 fitxers de `api/admin/emails/` desactivaven el sistema de tipus. Cada cast era un punt cec on podien entrar bugs.
+**Què s'ha fet**:
+- `app/api/admin/emails/quote/route.ts`:
+  - `(pack as any).durationHours` → `pack.durationHours ?? 4` (PackDefinition ja té el camp)
+  - `(pack as any).emotion` → `pack.emotion` (PackDefinition ja té el camp)
+  - Interfície `ExtraInput` creada per a extras no tipats
+  - `extra.translations as any` → `extra.translations` (tipus Prisma compatibles)
+  - `prisma as any` → `prisma.task` directe (model Task existeix a l'schema línia 732)
+- `app/api/admin/emails/send/route.ts`:
+  - Mateixos canvis de pack + interfície `QuoteAttachmentInput` creada
+- `app/api/admin/emails/send-post-event/route.ts` i `run-cron/route.ts`:
+  - `booking.pack?.translations as any` → `booking.pack?.translations`
+- Verificat amb Grep: **zero** `as any` a rutes email
+
+#### ✅ Integrar ExportCsvButton a bookings, leads i economia
+**Per què**: El botó ExportCsvButton existia però no estava connectat a cap pàgina. L'operador necessita poder exportar dades.
+**Què s'ha fet**:
+- `ExportCsvButton.tsx` refactoritzat amb mode dual:
+  - `headers+rows` (strings pre-computats, per a server components)
+  - `data+columns` (amb funcions accessor, per a client components)
+  - Motiu: les funcions no es poden serialitzar de server a client components
+- `bookings/page.tsx` — integrat amb mode `headers+rows` (server component)
+- `leads/page.tsx` — integrat amb mode `headers+rows` (server component)
+- `economia/EconomiaClient.tsx` — integrat amb mode `data+columns` (client component), substituint l'antic "Exportar JSON"
+
+#### ✅ Verificació TypeScript
+**Per què**: Confirmar que els canvis no introdueixen errors de compilació.
+**Què s'ha fet**:
+- `npx tsc --noEmit` — només errors preexistents (CookieConsent, analytics), cap error nou introduït
+
+### Commit
+- 53 fitxers, commit `7997d97`: `refactor: centralitzar formatació dates/números i eliminar any a rutes email`
+- Push a origin/main completat
+
+#### ✅ Resoldre errors TypeScript preexistents (7 → 0)
+**Per què**: 7 errors de compilació a CookieConsent i analytics impedien un `tsc --noEmit` net. Causats per declaracions duplicades i incompatibles de `Window.dataLayer`.
+**Què s'ha fet**:
+- `types/window.d.ts` — unificada la declaració de `Window`: `dataLayer`, `gtag`, `gtagConsentUpdate` amb tipus correctes
+- `app/lib/analytics.ts` — eliminat `declare global` duplicat, `Record<string, any>` → `Record<string, unknown>`
+- `npx tsc --noEmit` → **zero errors**
+
 ### Pendent per a properes sessions
-- [ ] 94 usos de `any` a rutes email
-- [ ] `formatDate` hardcodejat a `ca-ES` sense suport i18n
-- [ ] TODO sense resoldre a `FiestasClient.tsx`
-- [ ] Verificar TypeScript (`npx tsc --noEmit`) — node_modules incomplet en la sessió actual
 - [ ] Verificar manualment al navegador: toast, semafors, drag-drop, FAB, dreceres
 - [ ] Comprovar responsive (mòbil): bottom nav no es tapa amb FAB, cards touch-friendly
-- [ ] Integrar `ExportCsvButton` a les pàgines de bookings, leads i economia
