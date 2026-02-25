@@ -126,6 +126,22 @@ export const LEAD_STATUS_LABELS: Record<string, string> = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// LOCALE MAPPING
+// ═══════════════════════════════════════════════════════════════════════════
+
+const LOCALE_MAP: Record<string, string> = {
+  ca: 'ca-ES',
+  es: 'es-ES',
+  en: 'en-GB',
+};
+
+/** Convert a short locale ('ca', 'es', 'en') to its Intl equivalent ('ca-ES', etc.).
+ *  If already a full locale (e.g. 'ca-ES'), returns as-is. */
+export function toIntlLocale(locale: string): string {
+  return LOCALE_MAP[locale] ?? locale;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // FORMATTING HELPERS
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -134,7 +150,7 @@ export const DEFAULT_LOCALE = 'ca-ES';
 export function formatDate(date: Date | string | null | undefined, locale = 'ca-ES'): string {
   if (!date) return '-';
   const d = new Date(date);
-  return d.toLocaleDateString(locale, {
+  return d.toLocaleDateString(toIntlLocale(locale), {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -144,7 +160,7 @@ export function formatDate(date: Date | string | null | undefined, locale = 'ca-
 export function formatDateTime(date: Date | string | null | undefined, locale = 'ca-ES'): string {
   if (!date) return '-';
   const d = new Date(date);
-  return d.toLocaleDateString(locale, {
+  return d.toLocaleDateString(toIntlLocale(locale), {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -156,36 +172,36 @@ export function formatDateTime(date: Date | string | null | undefined, locale = 
 /** Short date without year: "24 feb" */
 export function formatDateShort(date: Date | string | null | undefined, locale = 'ca-ES'): string {
   if (!date) return '-';
-  return new Date(date).toLocaleDateString(locale, { day: '2-digit', month: 'short' });
+  return new Date(date).toLocaleDateString(toIntlLocale(locale), { day: '2-digit', month: 'short' });
 }
 
 /** Full date with weekday: "dl. 24 feb 2026" */
 export function formatDateFull(date: Date | string | null | undefined, locale = 'ca-ES'): string {
   if (!date) return '-';
-  return new Date(date).toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  return new Date(date).toLocaleDateString(toIntlLocale(locale), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 /** Locale-default date (no specific options): "24/2/2026" */
 export function formatDateSimple(date: Date | string | null | undefined, locale = 'ca-ES'): string {
   if (!date) return '-';
-  return new Date(date).toLocaleDateString(locale);
+  return new Date(date).toLocaleDateString(toIntlLocale(locale));
 }
 
 /** Full datetime with seconds: "24/2/2026, 14:30:00" */
 export function formatDateTimeFull(date: Date | string | null | undefined, locale = 'ca-ES'): string {
   if (!date) return '-';
-  return new Date(date).toLocaleString(locale);
+  return new Date(date).toLocaleString(toIntlLocale(locale));
 }
 
 /** Number with locale formatting */
 export function formatNumber(value: number | null | undefined, opts?: Intl.NumberFormatOptions, locale = 'ca-ES'): string {
   if (value === null || value === undefined) return '-';
-  return value.toLocaleString(locale, opts);
+  return value.toLocaleString(toIntlLocale(locale), opts);
 }
 
-export function formatCurrency(amount: number | null | undefined): string {
+export function formatCurrency(amount: number | null | undefined, locale = 'ca-ES'): string {
   if (amount === null || amount === undefined) return '-';
-  return new Intl.NumberFormat('ca-ES', {
+  return new Intl.NumberFormat(toIntlLocale(locale), {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 0,

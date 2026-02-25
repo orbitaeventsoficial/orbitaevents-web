@@ -102,10 +102,10 @@ S'han realitzat **2 auditories exhaustives de codi** abans de la sessió del 202
 
 ---
 
-### Pendent per a properes sessions
-- [ ] 94 usos de `any` a rutes email — `(pack as any).field` requereix definir tipus per als resultats Prisma amb `include`
-- [ ] `formatDate` hardcodejat a `ca-ES` sense suport i18n
-- [ ] TODO sense resoldre a `FiestasClient.tsx`
+### Pendent per a properes sessions (estat actualitzat 2026-02-25)
+- [x] ~~94 usos de `any` a rutes email~~ — Resolt a la sessió 2026-02-24 (17 `as any` eliminats, fitxers ben tipats)
+- [x] ~~`formatDate` hardcodejat a `ca-ES` sense suport i18n~~ — Resolt a la sessió 2026-02-25 amb `toIntlLocale()`
+- [x] ~~TODO sense resoldre a `FiestasClient.tsx`~~ — No era un TODO pendent; és una nota arquitectònica ("TODO sale de packs-config.ts" = "tot ve de packs-config.ts"). Ja implementat correctament.
 
 ---
 
@@ -297,3 +297,54 @@ S'han realitzat **2 auditories exhaustives de codi** abans de la sessió del 202
 ### Pendent per a properes sessions
 - [ ] Verificar manualment al navegador: toast, semafors, drag-drop, FAB, dreceres
 - [ ] Comprovar responsive (mòbil): bottom nav no es tapa amb FAB, cards touch-friendly
+
+---
+
+## 2026-02-25
+
+### Context de la sessió
+- 3 tasques pendents de la sessió 2026-02-23 per resoldre.
+- Investigació prèvia va revelar que 2 de 3 ja estaven resoltes; la tercera (`formatDate` i18n) era real.
+
+### Treball realitzat
+
+#### ✅ Centralitzar locale mapping amb `toIntlLocale()`
+**Per què**: 14 aparicions del patró `locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB'` escampades per 11 fitxers. Codi duplicat, propens a errors (un fitxer tenia `en-US` en lloc de `en-GB`), i impossible de mantenir si s'afegeix un nou locale.
+**Què s'ha fet**:
+- `lib/constants/index.ts` — afegit `LOCALE_MAP` i `toIntlLocale()` que mapeja `ca→ca-ES`, `es→es-ES`, `en→en-GB`
+- 8 funcions de format (`formatDate`, `formatDateTime`, `formatDateShort`, `formatDateFull`, `formatDateSimple`, `formatDateTimeFull`, `formatNumber`, `formatCurrency`) actualitzades per usar `toIntlLocale(locale)` internament
+- `formatCurrency` — afegit paràmetre `locale` (abans hardcodejat a `ca-ES`)
+- Blog `page.tsx` i `[slug]/page.tsx` — eliminades funcions `formatDate` locals, substituïdes per `toIntlLocale()` inline
+- 9 fitxers més actualitzats: `pdf-utils.ts`, `portal/[token]/page.tsx`, `configurador/client.tsx` (corregit bug `en-US`→`en-GB`), `CalendarioUrgencia.tsx`, `contact/route.ts` (3 llocs), `cron/post-event/route.ts`, `emails/run-cron/route.ts`, `emails/send-post-event/route.ts`, `privacy/verify/route.ts`
+- Verificat amb Grep: **zero** aparicions del patró antic
+
+#### ✅ Tancar tasques pendents sessió 2026-02-23
+**Per què**: El diari i la memòria tenien 3 tasques pendents que ja no ho eren.
+**Què s'ha fet**:
+- `any` a emails: ja resolt sessió 2026-02-24 (17 `as any` → 0)
+- `formatDate` i18n: resolt en aquesta sessió amb `toIntlLocale()`
+- TODO a `FiestasClient.tsx`: no era un TODO pendent, era nota arquitectònica ("TODO sale de packs-config.ts")
+- Diari i memòria actualitzats
+
+### Fitxers modificats
+- `lib/constants/index.ts` — `toIntlLocale()`, `LOCALE_MAP`, 8 funcions actualitzades
+- `app/[locale]/blog/page.tsx` — eliminat `formatDate` local, import `toIntlLocale`
+- `app/[locale]/blog/[slug]/page.tsx` — eliminat `formatDate` local, import `toIntlLocale`
+- `lib/pdf-utils.ts` — 3 substitucions, import `toIntlLocale`
+- `app/[locale]/portal/[token]/page.tsx` — 1 substitució, import `toIntlLocale`
+- `app/[locale]/configurador/client.tsx` — 1 substitució (fix `en-US`→`en-GB`), import `toIntlLocale`
+- `app/components/ui/CalendarioUrgencia.tsx` — 1 substitució, import `toIntlLocale`
+- `app/api/contact/route.ts` — 3 substitucions, import `toIntlLocale`
+- `app/api/cron/post-event/route.ts` — 1 substitució, import `toIntlLocale`
+- `app/api/admin/emails/run-cron/route.ts` — 1 substitució, import `toIntlLocale`
+- `app/api/admin/emails/send-post-event/route.ts` — 1 substitució, import `toIntlLocale`
+- `app/api/privacy/verify/route.ts` — 1 substitució, import `toIntlLocale`
+- `docs/diario.md` — tasques 2026-02-23 marcades resoltes, entrada 2026-02-25
+- `.eslintrc.json` — corregit error preexistent: afegit `plugin:@typescript-eslint/recommended` per registrar el plugin, desactivades regles noves que no apliquen al codi existent
+
+#### ✅ Corregir ESLint config (build bloquejat)
+**Per què**: La regla `@typescript-eslint/no-explicit-any: warn` va ser afegida a la sessió 2026-02-23, però sense registrar el plugin `@typescript-eslint` explícitament. `next/core-web-vitals` no el registra de forma que les regles siguin accessibles directament. Resultat: `npm run build` fallava amb "Definition for rule not found".
+**Què s'ha fet**:
+- Afegit `plugin:@typescript-eslint/recommended` als extends (registra el plugin)
+- Desactivades regles noves que `recommended` activa per defecte i que trencarien el codebase: `no-unused-vars`, `no-require-imports`, `prefer-as-const`, `no-unsafe-function-type`, `prefer-const`
+- `npm run build` → **èxit** (compilació + lint + 235 pàgines generades)

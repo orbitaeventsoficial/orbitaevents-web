@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { requireAuth } from '@/lib/auth';
+import { toIntlLocale } from '@/lib/constants';
 
 // Google Reviews URL
 const GOOGLE_REVIEW_URL = 'https://g.page/r/CXcgbvANsXSzEBI/review';
@@ -164,7 +165,7 @@ function generatePostEventEmail(params: {
   
   const firstName = name.split(' ')[0];
   const formattedDate = eventDate.toLocaleDateString(
-    locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB',
+    toIntlLocale(locale),
     {
     weekday: 'long',
     day: 'numeric',

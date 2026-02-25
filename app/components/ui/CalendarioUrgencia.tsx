@@ -22,7 +22,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { WHATSAPP_NUMBER } from '@/lib/constants';
+import { WHATSAPP_NUMBER, toIntlLocale } from '@/lib/constants';
 import { useAvailability } from '@/hooks/usePublicData';
 import { trackCTAClick, trackWhatsAppClick } from '@/app/lib/analytics';
 
@@ -414,7 +414,7 @@ interface DayModalProps {
 function DayModal({ day, monthName, onClose, t, locale }: DayModalProps) {
   if (!day) return null;
 
-  const dateLocale = locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES';
+  const dateLocale = toIntlLocale(locale);
   const formattedDate = new Date(day.date).toLocaleDateString(dateLocale, {
     weekday: 'long',
     day: 'numeric',

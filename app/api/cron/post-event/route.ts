@@ -8,6 +8,7 @@ import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { getRequestId } from '@/lib/request-context';
+import { toIntlLocale } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -228,7 +229,7 @@ function generatePostEventEmail(params: {
   const { name, packName, eventDate, reviewUrl, googleReviewUrl, locale } = params;
 
   const firstName = name.split(' ')[0];
-  const formattedDate = eventDate.toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES', {
+  const formattedDate = eventDate.toLocaleDateString(toIntlLocale(locale), {
     weekday: 'long',
     day: 'numeric',
     month: 'long',

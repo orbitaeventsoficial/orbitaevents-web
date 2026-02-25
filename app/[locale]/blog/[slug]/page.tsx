@@ -9,6 +9,7 @@ import { Link } from '@/lib/navigation';
 import Image from 'next/image';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import BlogTracking from '@/app/components/blog/BlogTracking';
+import { toIntlLocale } from '@/lib/constants';
 
 export const revalidate = 3600;
 
@@ -72,13 +73,6 @@ export async function generateMetadata({
         : [{ url: '/og-default.jpg', width: 1200, height: 630, alt: 'Òrbita Events' }],
     },
   };
-}
-
-function formatDate(dateStr: string, locale: string) {
-  return new Date(dateStr).toLocaleDateString(
-    locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB',
-    { year: 'numeric', month: 'long', day: 'numeric' }
-  );
 }
 
 // Render HTML content from DB (content stored as HTML in the seed)
@@ -201,7 +195,7 @@ export default async function BlogPostPage({
               )}
               {post.publishedAt && (
                 <span className="text-white/50 text-sm">
-                  📅 {formatDate(post.publishedAt, locale)}
+                  📅 {new Date(post.publishedAt).toLocaleDateString(toIntlLocale(locale), { year: 'numeric', month: 'long', day: 'numeric' })}
                 </span>
               )}
               <span className="text-white/50 text-sm">✍️ {tBlog('post.byAuthor', { author: post.author })}</span>

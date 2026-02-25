@@ -11,6 +11,7 @@
 import { getPacksByService, EXTRAS, type ExtraDefinition, type ServiceSlug, type PackDefinition } from '@/app/config/packs-config';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { log } from '@/lib/logger';
+import { toIntlLocale } from '@/lib/constants';
 import { ORBITA_LOGO_BASE64 } from './logo-base64';
 import { ORBITA_LOGO_TEXT_DRETA_BASE64 } from './logo-wordmark-base64';
 
@@ -99,7 +100,7 @@ function formatClientDate(input: string, locale: 'ca' | 'es' | 'en'): string {
   if (!raw) return '-';
   const direct = new Date(raw);
   if (!Number.isNaN(direct.getTime())) {
-    return direct.toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB');
+    return direct.toLocaleDateString(toIntlLocale(locale));
   }
   const parts = raw.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
   if (!parts) return raw;
@@ -109,7 +110,7 @@ function formatClientDate(input: string, locale: 'ca' | 'es' | 'en'): string {
   if (year < 100) year += 2000;
   const parsed = new Date(year, month, day);
   if (Number.isNaN(parsed.getTime())) return raw;
-  return parsed.toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB');
+  return parsed.toLocaleDateString(toIntlLocale(locale));
 }
 
 function checkPageBreak(
@@ -466,7 +467,7 @@ export async function generateQuotePDF(
   let y = 16;
 
   const quoteRef = `OE-${Date.now().toString(36).toUpperCase()}`;
-  const issueDate = new Date().toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB');
+  const issueDate = new Date().toLocaleDateString(toIntlLocale(locale));
   const eventTypeName = SERVICE_NAMES[data.eventType as ServiceSlug]?.[locale] || data.eventType;
   const eventDate = formatClientDate(data.date || '-', locale);
   const eventSchedule = data.eventSchedule?.trim() || '-';

@@ -8,6 +8,7 @@ import { Link } from '@/lib/navigation';
 import Image from 'next/image';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import BlogTracking from '@/app/components/blog/BlogTracking';
+import { toIntlLocale } from '@/lib/constants';
 
 export const revalidate = 3600;
 
@@ -60,13 +61,6 @@ const CATEGORY_COLORS: Record<string, string> = {
   general: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
 };
 
-function formatDate(dateStr: string, locale: string) {
-  return new Date(dateStr).toLocaleDateString(
-    locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB',
-    { year: 'numeric', month: 'long', day: 'numeric' }
-  );
-}
-
 function PostCard({
   post,
   locale,
@@ -117,7 +111,7 @@ function PostCard({
           )}
           {post.publishedAt && (
             <span className="text-white/40 text-xs ml-auto">
-              {formatDate(post.publishedAt, locale)}
+              {new Date(post.publishedAt).toLocaleDateString(toIntlLocale(locale), { year: 'numeric', month: 'long', day: 'numeric' })}
             </span>
           )}
         </div>

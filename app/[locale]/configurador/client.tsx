@@ -26,6 +26,7 @@ import { usePacks } from '@/lib/hooks/usePacks';
 import { generateQuotePDF } from '@/lib/pdf-utils';
 import { fetchWithCsrf } from '@/lib/csrf';
 import TurnstileWidget from '@/components/security/TurnstileWidget';
+import { toIntlLocale } from '@/lib/constants';
 
 type EventType = 'bodas' | 'discomovil' | 'fiestas' | 'alquiler' | 'empresas';
 
@@ -110,7 +111,7 @@ export default function ConfiguradorClient() {
   const tMobile = useTranslations('pages.mobile'); // Per traduccions d'extres
   const tServicesMobile = useTranslations('services.mobile');
   const locale = useLocale() as 'ca' | 'es' | 'en';
-  const dateLocale = locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-US' : 'es-ES';
+  const dateLocale = toIntlLocale(locale);
   const { track } = useAnalytics();
   const fallbackPacks = useMemo(() => getAllPacks(), []);
   const { packs: allPacks } = usePacks({

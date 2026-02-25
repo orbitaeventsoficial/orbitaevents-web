@@ -11,6 +11,7 @@ import { escapeHtml } from '@/lib/utils/sanitize';
 import { verifyTurnstileToken } from '@/lib/turnstile';
 import type { EventType, LeadSource } from '@prisma/client';
 import { normalizeEmail, normalizeName, normalizePhone } from '@/lib/utils/normalize';
+import { toIntlLocale } from '@/lib/constants';
 
 type Locale = 'ca' | 'es' | 'en';
 
@@ -343,7 +344,7 @@ export async function POST(req: NextRequest) {
     const parsedGuests = parseGuestCount(guests ?? guestCount);
 
     const leadId = `OE-${Date.now().toString(36).toUpperCase()}`;
-    const timestamp = new Date().toLocaleString(locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES', {
+    const timestamp = new Date().toLocaleString(toIntlLocale(locale), {
       timeZone: 'Europe/Madrid',
       dateStyle: 'full',
       timeStyle: 'short',
@@ -577,7 +578,7 @@ export async function POST(req: NextRequest) {
       <div class="highlight-box">
         <div class="field-label">${t.adminSelectedPack}</div>
         <div class="field-value">${escapeHtml(packName)}</div>
-        ${estimatedPrice ? `<div class="price">${estimatedPrice.toLocaleString(locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES')} EUR</div>` : ''}
+        ${estimatedPrice ? `<div class="price">${estimatedPrice.toLocaleString(toIntlLocale(locale))} EUR</div>` : ''}
         ${packId ? `<div style="font-size: 12px; color: #666; margin-top: 8px;">ID: ${escapeHtml(packId)}</div>` : ''}
       </div>
       ` : ''}
@@ -677,7 +678,7 @@ export async function POST(req: NextRequest) {
 
       ${estimatedPrice ? `
       <div class="info-box" style="border-left-color: #25D366; background: #f0fff4;">
-        <strong>${t.clientEstimatedBudget}: ${estimatedPrice.toLocaleString(locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES')} EUR</strong><br>
+        <strong>${t.clientEstimatedBudget}: ${estimatedPrice.toLocaleString(toIntlLocale(locale))} EUR</strong><br>
         <span style="font-size: 14px; color: #666;">${t.clientEstimatedNote}</span>
       </div>
       ` : ''}

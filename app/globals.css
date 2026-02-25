@@ -968,7 +968,7 @@ input[type="range"].slider-custom::-moz-range-track {
    ----------------------------------------------------------------------------- */
 .btn-cta,
 .cta-button,
-[class*="cta"],
+[class*="cta"]:not(.admin-cr-step-cta),
 button[class*="pressupost" i],
 a[class*="pressupost" i] {
   background: linear-gradient(135deg, #d7b86e 0%, #f59e0b 100%) !important;

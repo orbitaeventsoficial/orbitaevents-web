@@ -139,7 +139,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const eventType = EVENT_TYPE_LABELS[booking.eventType] || booking.eventType;
   const packTranslation = getPackTranslation(
     booking.pack.translations,
-    booking.lead?.preferredLocale || (booking as any).preferredLocale || 'ca'
+    booking.lead?.preferredLocale || booking.preferredLocale || 'ca'
   );
   const commLogs = await prisma.adminLog.findMany({
     where: {
@@ -460,7 +460,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
             {booking.extras.map((extra) => {
               const extraTranslation = getPackTranslation(
                 extra.extra.translations as Array<{ locale: string; name: string; tagline?: string | null }>,
-                booking.lead?.preferredLocale || (booking as any).preferredLocale || 'ca'
+                booking.lead?.preferredLocale || booking.preferredLocale || 'ca'
               );
               return (
                 <div key={extra.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">

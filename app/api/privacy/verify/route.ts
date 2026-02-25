@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyDataRequest } from '@/lib/services/privacyService';
 import { escapeHtml } from '@/lib/utils/sanitize';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { toIntlLocale } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -277,7 +278,7 @@ function generateSuccessPage(
 
         <div class="deadline">
           <div class="deadline-label">${t.deadlineLabel}</div>
-          <div class="deadline-date">${new Date(deadline).toLocaleDateString(t.htmlLang === 'ca' ? 'ca-ES' : t.htmlLang === 'en' ? 'en-GB' : 'es-ES', {
+          <div class="deadline-date">${new Date(deadline).toLocaleDateString(toIntlLocale(t.htmlLang), {
             day: 'numeric',
             month: 'long',
             year: 'numeric',

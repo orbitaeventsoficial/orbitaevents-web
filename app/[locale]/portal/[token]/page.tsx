@@ -8,7 +8,7 @@ import {
   normalizePortalLocale,
 } from '@/lib/services/clientPortalAccess';
 import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
-import { formatCurrency } from '@/lib/constants';
+import { formatCurrency, toIntlLocale } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -224,7 +224,7 @@ export default async function ClientPortalPage({
           <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm">
             <div>
               <p className="text-slate-400">{t.eventDate}</p>
-              <p>{new Date(booking.eventDate).toLocaleDateString(locale === 'ca' ? 'ca-ES' : locale === 'en' ? 'en-GB' : 'es-ES')}</p>
+              <p>{new Date(booking.eventDate).toLocaleDateString(toIntlLocale(locale))}</p>
             </div>
             <div>
               <p className="text-slate-400">{t.eventLocation}</p>

@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { requireAuth } from '@/lib/auth';
+import { toIntlLocale } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -246,7 +247,7 @@ function generatePostEventEmail(params: {
 
   const firstName = name.split(' ')[0];
   const formattedDate = eventDate.toLocaleDateString(
-    locale === 'ca' ? 'ca-ES' : locale === 'es' ? 'es-ES' : 'en-GB',
+    toIntlLocale(locale),
     {
     weekday: 'long',
     day: 'numeric',

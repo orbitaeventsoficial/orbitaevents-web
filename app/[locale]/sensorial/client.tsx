@@ -342,7 +342,7 @@ export default function SensorialClient() {
     // Create particles
     const createParticles = () => {
       const count = Math.floor(density * (window.innerWidth / 1920));
-      const particles: any[] = [];
+      const particles: Array<{ x: number; y: number; vx: number; vy: number; size: number; emoji: string; rotation: number; rotationSpeed: number; opacity: number }> = [];
 
       for (let i = 0; i < count; i++) {
         particles.push({
@@ -436,7 +436,7 @@ export default function SensorialClient() {
     if (!canvas) return;
 
     const count = Math.floor(density * (window.innerWidth / 1920));
-    const particles: any[] = [];
+    const particles: Array<{ x: number; y: number; vx: number; vy: number; size: number; emoji: string; rotation: number; rotationSpeed: number; opacity: number }> = [];
 
     for (let i = 0; i < count; i++) {
       particles.push({

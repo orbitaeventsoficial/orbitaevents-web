@@ -113,10 +113,18 @@ html.admin-mode .admin-layout-shell .admin-recent-chip--idle:hover {
   color: var(--admin-text) !important;
 }
 
-/* Unified cards/containers */
-html.admin-mode .admin-main-shell :is(section, article, aside, .panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl) {
+/* Unified cards/containers — only elements with explicit visual box classes.
+   Bare semantic tags (section/article/aside) removed: they're often used as
+   layout wrappers and shouldn't get a panel bg unless they also carry a visual class. */
+html.admin-mode .admin-main-shell :is(.panel, .card, .rounded-xl, .rounded-2xl, .rounded-3xl) {
   background: var(--at-panel) !important;
   border-color: var(--at-border) !important;
+}
+
+/* Grid wrappers (no visual box) — transparent so children's rounded corners don't show square parent bg */
+html.admin-mode .admin-main-shell .admin-quote-studio {
+  background: transparent !important;
+  border-color: transparent !important;
 }
 
 /* Inputs */
