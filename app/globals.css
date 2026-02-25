@@ -834,11 +834,11 @@ a {
 }
 
 /* -----------------------------------------------------------------------------
-   FIX 2: HEADER MÉS VISIBLE
+   FIX 2: HEADER MÉS VISIBLE (només web pública, NO admin)
    ----------------------------------------------------------------------------- */
-header,
-.header,
-[class*="Header"] {
+html:not(.admin-mode) header,
+html:not(.admin-mode) .header,
+html:not(.admin-mode) [class*="Header"] {
   background: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.95) 0%,
@@ -853,8 +853,8 @@ header,
 }
 
 /* Header quan es fa scroll */
-header.scrolled,
-.header-scrolled {
+html:not(.admin-mode) header.scrolled,
+html:not(.admin-mode) .header-scrolled {
   background: rgba(0, 0, 0, 0.98) !important;
   border-bottom: 1px solid rgba(215, 184, 110, 0.2);
 }
@@ -964,41 +964,41 @@ input[type="range"].slider-custom::-moz-range-track {
 }
 
 /* -----------------------------------------------------------------------------
-   FIX 5: BOTONS CTA MÉS VISIBLES
+   FIX 5: BOTONS CTA MÉS VISIBLES (només web pública, NO admin)
    ----------------------------------------------------------------------------- */
-.btn-cta,
-.cta-button,
-[class*="cta"]:not(.admin-cr-step-cta),
-button[class*="pressupost" i],
-a[class*="pressupost" i] {
+html:not(.admin-mode) .btn-cta,
+html:not(.admin-mode) .cta-button,
+html:not(.admin-mode) [class*="cta"],
+html:not(.admin-mode) button[class*="pressupost" i],
+html:not(.admin-mode) a[class*="pressupost" i] {
   background: linear-gradient(135deg, #d7b86e 0%, #f59e0b 100%) !important;
   color: #000 !important;
   font-weight: 700 !important;
   border: none !important;
-  box-shadow: 
+  box-shadow:
     0 4px 15px rgba(215, 184, 110, 0.4),
     0 0 30px rgba(215, 184, 110, 0.2) !important;
   transition: all 0.3s ease !important;
 }
 
-.btn-cta:hover,
-.cta-button:hover,
-[class*="cta"]:hover {
+html:not(.admin-mode) .btn-cta:hover,
+html:not(.admin-mode) .cta-button:hover,
+html:not(.admin-mode) [class*="cta"]:hover {
   transform: scale(1.05) !important;
-  box-shadow: 
+  box-shadow:
     0 6px 25px rgba(215, 184, 110, 0.5),
     0 0 40px rgba(215, 184, 110, 0.3) !important;
 }
 
-/* Botons secundaris */
-.btn-secondary,
-[class*="secondary"] button {
+/* Botons secundaris (només web pública) */
+html:not(.admin-mode) .btn-secondary,
+html:not(.admin-mode) [class*="secondary"] button {
   background: transparent !important;
   border: 2px solid rgba(215, 184, 110, 0.6) !important;
   color: #d7b86e !important;
 }
 
-.btn-secondary:hover {
+html:not(.admin-mode) .btn-secondary:hover {
   background: rgba(215, 184, 110, 0.1) !important;
   border-color: #d7b86e !important;
 }
