@@ -7,7 +7,9 @@ import Link from 'next/link';
 import { AdminPage } from '../components/AdminPage';
 import BookingActions from './BookingActions';
 import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatDateShort, formatCurrency } from '@/lib/constants';
-import { getMarginTone, calculateSimpleMarginPct } from '@/lib/margin-utils';
+import { getMarginTone } from '@/lib/margin-utils';
+import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
+import { computeSimpleMarginPct } from '@/lib/services/costEngine';
 import ExportCsvButton from '../components/ExportCsvButton';
 
 export const dynamic = 'force-dynamic';
@@ -86,7 +88,10 @@ export default async function BookingsPage({
 }: {
   searchParams?: { page?: string };
 }) {
-  const { bookings, stats, pagination } = await getBookings(searchParams?.page);
+  const [{ bookings, stats, pagination }, profitConfig] = await Promise.all([
+    getBookings(searchParams?.page),
+    getProfitabilityConfig(),
+  ]);
 
   // Transformar stats
   const statsMap = stats.reduce((acc, s) => {
@@ -204,15 +209,18 @@ export default async function BookingsPage({
                     )}
                     {(() => {
                       const extrasTotal = booking.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
-                      const marginPct = calculateSimpleMarginPct({
-                        total: booking.total,
-                        packPrice: booking.pack.price,
-                        extrasTotal,
-                        packCostRatio: 0.36,
-                        extraCostRatio: 0.28,
-                        fixedOperationalCost: 45,
-                        travelCost: booking.travelCost ?? 0,
-                      });
+                      const marginPct = computeSimpleMarginPct(
+                        {
+                          total: booking.total,
+                          packPrice: booking.pack.price,
+                          extrasTotal,
+                          extraHours: 0,
+                          extraHourPrice: 0,
+                          distanceKm: 0,
+                          travelCost: booking.travelCost ?? 0,
+                        },
+                        profitConfig,
+                      );
                       const tone = getMarginTone(marginPct);
                       return (
                         <span className={`inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold mt-1 ${tone.bg} ${tone.color}`}>
@@ -331,15 +339,18 @@ export default async function BookingsPage({
                       <td className="px-4 py-3 text-center">
                         {(() => {
                           const extrasTotal = booking.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
-                          const marginPct = calculateSimpleMarginPct({
-                            total: booking.total,
-                            packPrice: booking.pack.price,
-                            extrasTotal,
-                            packCostRatio: 0.36,
-                            extraCostRatio: 0.28,
-                            fixedOperationalCost: 45,
-                            travelCost: booking.travelCost ?? 0,
-                          });
+                          const marginPct = computeSimpleMarginPct(
+                            {
+                              total: booking.total,
+                              packPrice: booking.pack.price,
+                              extrasTotal,
+                              extraHours: 0,
+                              extraHourPrice: 0,
+                              distanceKm: 0,
+                              travelCost: booking.travelCost ?? 0,
+                            },
+                            profitConfig,
+                          );
                           const tone = getMarginTone(marginPct);
                           return (
                             <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${tone.bg} ${tone.color}`}>

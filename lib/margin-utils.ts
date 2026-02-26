@@ -17,6 +17,23 @@ export function getMarginTone(pct: number): MarginTone {
   return { color: 'text-rose-300', bg: 'bg-rose-500/20 border-rose-500/30', label: 'Crític', tone: 'rose' };
 }
 
+export type TravelMarginTone = {
+  color: string;
+  border: string;
+  bg: string;
+  tone: 'emerald' | 'orange' | 'rose';
+};
+
+/**
+ * Semàfor de marge de transport.
+ * ≥45% → sa (emerald), ≥20% → vigilar (orange), <20% → crític (rose)
+ */
+export function getTravelMarginTone(pct: number): TravelMarginTone {
+  if (pct >= 45) return { color: 'text-emerald-300', border: 'border-emerald-400/30', bg: 'bg-emerald-950/20', tone: 'emerald' };
+  if (pct >= 20) return { color: 'text-orange-300', border: 'border-orange-400/30', bg: 'bg-orange-950/20', tone: 'orange' };
+  return { color: 'text-rose-300', border: 'border-rose-400/30', bg: 'bg-rose-950/20', tone: 'rose' };
+}
+
 /**
  * Calcula el percentatge de marge simplificat per a una reserva
  * Fórmula: directCost = packPrice×ratio + extrasTotal×ratio + fixedCost + travelCost

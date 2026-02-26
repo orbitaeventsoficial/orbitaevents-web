@@ -6,6 +6,7 @@ import { requireAuth } from '@/lib/auth';
 import { sendEmail } from '@/lib/email';
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { buildLeadTechnicalSnapshot } from '@/lib/services/leadSnapshotService';
+import { escapeHtml } from '@/lib/utils/sanitize';
 
 interface Params {
   params: { id: string };
@@ -15,15 +16,6 @@ const schema = z.object({
   action: z.enum(['save_document', 'send_email']),
   recipient: z.string().email().optional(),
 });
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
 
 export async function POST(req: NextRequest, { params }: Params) {
   const authError = requireAuth(req);

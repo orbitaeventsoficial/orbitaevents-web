@@ -3,10 +3,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { log } from '@/lib/logger';
-import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, getIncludedTravelOneWayKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
+import { calculateBillableTravelKm, calculateTravelBlocks, calculateTravelCharge, calculateTravelCost, DEFAULT_VEHICLE_COST_PER_KM, getIncludedTravelOneWayKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_EUR, TRAVEL_BLOCK_KM } from '@/lib/services/travelCost';
 import { formatCurrency } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
-import { getMarginTone } from '@/lib/margin-utils';
+import { getMarginTone, getTravelMarginTone } from '@/lib/margin-utils';
 
 interface BookingMarginProps {
   bookingId: string;
@@ -16,7 +16,9 @@ interface BookingMarginProps {
   extraHours: number;
   extraHourPrice: number;
   distanceKm: number | null;
-  fuelCostPerKm: number | null;
+  /** @deprecated renamed to vehicleCostPerKm */
+  fuelCostPerKm?: number | null;
+  vehicleCostPerKm?: number | null;
   travelCost: number | null;
   source: string;
   eventLocation?: string | null;
@@ -41,7 +43,8 @@ export default function BookingMarginCard({
   extraHours,
   extraHourPrice,
   distanceKm: initialDistanceKm,
-  fuelCostPerKm: initialFuelCostPerKm,
+  fuelCostPerKm: legacyFuelCostPerKm,
+  vehicleCostPerKm: initialVehicleCostPerKm,
   travelCost: initialTravelCost,
   source,
   eventLocation,
@@ -61,7 +64,8 @@ export default function BookingMarginCard({
 
   // Editable travel fields
   const [distanceKm, setDistanceKm] = useState(initialDistanceKm ?? 0);
-  const [fuelCostPerKm] = useState(initialFuelCostPerKm ?? DEFAULT_FUEL_COST_PER_KM);
+  const resolvedCostPerKm = initialVehicleCostPerKm ?? legacyFuelCostPerKm ?? DEFAULT_VEHICLE_COST_PER_KM;
+  const [vehicleCostPerKm] = useState(resolvedCostPerKm);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [calculatingDistance, setCalculatingDistance] = useState(false);
@@ -70,7 +74,7 @@ export default function BookingMarginCard({
 
   const billableKm = calculateBillableTravelKm(distanceKm, INCLUDED_TRAVEL_KM);
   const travelBlocks = calculateTravelBlocks(distanceKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM);
-  const calculatedTravelCost = calculateTravelCost(distanceKm, fuelCostPerKm, INCLUDED_TRAVEL_KM);
+  const calculatedTravelCost = calculateTravelCost(distanceKm, vehicleCostPerKm, INCLUDED_TRAVEL_KM);
   const calculatedTravelCharge = calculateTravelCharge(distanceKm, INCLUDED_TRAVEL_KM, TRAVEL_BLOCK_KM, TRAVEL_BLOCK_EUR);
   const includedOneWayKm = getIncludedTravelOneWayKm(INCLUDED_TRAVEL_KM);
   const travelNetMargin = calculatedTravelCharge - calculatedTravelCost;
@@ -96,32 +100,14 @@ export default function BookingMarginCard({
   const targetMarginAmount = total * (targetMarginPct / 100);
   const marginDeltaVsTarget = netMargin - targetMarginAmount;
 
-  const marginColor =
-    marginPct >= 50 ? 'text-emerald-300' :
-    marginPct >= 30 ? 'text-amber-300' :
-    marginPct >= 15 ? 'text-orange-300' :
-    'text-rose-300';
+  const marginTone = getMarginTone(marginPct);
+  const marginColor = marginTone.color;
+  const marginBg = `border-${marginTone.tone}-400/30 bg-${marginTone.tone}-950/30`;
 
-  const marginBg =
-    marginPct >= 50 ? 'border-emerald-400/30 bg-emerald-950/30' :
-    marginPct >= 30 ? 'border-amber-400/30 bg-amber-950/30' :
-    marginPct >= 15 ? 'border-orange-400/30 bg-orange-950/30' :
-    'border-rose-400/30 bg-rose-950/30';
-
-  const travelMarginColor =
-    travelMarginPct >= 45 ? 'text-emerald-300' :
-    travelMarginPct >= 20 ? 'text-orange-300' :
-    'text-rose-300';
-
-  const travelMarginCardBorder =
-    travelMarginPct >= 45 ? 'border-emerald-400/30' :
-    travelMarginPct >= 20 ? 'border-orange-400/30' :
-    'border-rose-400/30';
-
-  const travelMarginCardBg =
-    travelMarginPct >= 45 ? 'bg-emerald-950/20' :
-    travelMarginPct >= 20 ? 'bg-orange-950/20' :
-    'bg-rose-950/20';
+  const travelTone = getTravelMarginTone(travelMarginPct);
+  const travelMarginColor = travelTone.color;
+  const travelMarginCardBorder = travelTone.border;
+  const travelMarginCardBg = travelTone.bg;
 
   const handleSave = useCallback(async () => {
     setSaving(true);
@@ -131,7 +117,7 @@ export default function BookingMarginCard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           distanceKm,
-          fuelCostPerKm,
+          fuelCostPerKm: vehicleCostPerKm,
           travelCost: calculatedTravelCost,
         }),
       });
@@ -149,7 +135,7 @@ export default function BookingMarginCard({
     } finally {
       setSaving(false);
     }
-  }, [bookingId, distanceKm, fuelCostPerKm, calculatedTravelCost, router]);
+  }, [bookingId, distanceKm, vehicleCostPerKm, calculatedTravelCost, router, toast]);
 
   const persistDistance = useCallback(async (nextDistanceKm: number) => {
     try {
@@ -158,14 +144,14 @@ export default function BookingMarginCard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           distanceKm: nextDistanceKm,
-          fuelCostPerKm,
-          travelCost: calculateTravelCost(nextDistanceKm, fuelCostPerKm, INCLUDED_TRAVEL_KM),
+          fuelCostPerKm: vehicleCostPerKm,
+          travelCost: calculateTravelCost(nextDistanceKm, vehicleCostPerKm, INCLUDED_TRAVEL_KM),
         }),
       });
     } catch {
       // Silent: mantenim el valor local encara que falli la persistència
     }
-  }, [bookingId, fuelCostPerKm]);
+  }, [bookingId, vehicleCostPerKm]);
 
   const calculateDistanceForDestination = useCallback(async (destination: string) => {
     setCalculatingDistance(true);
@@ -249,7 +235,7 @@ export default function BookingMarginCard({
           <div className="flex justify-between"><span>Cost extres</span><span>{formatCurrency(extrasCost)}</span></div>
           <div className="flex justify-between"><span>Cost hores extra</span><span>{formatCurrency(extraHoursCost)}</span></div>
           <div className="flex justify-between"><span>Cost operacional fix</span><span>{formatCurrency(fixedOperationalCost)}</span></div>
-          <div className="flex justify-between"><span>Cost benzina intern</span><span>{formatCurrency(calculatedTravelCost)}</span></div>
+          <div className="flex justify-between"><span title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</span><span>{formatCurrency(calculatedTravelCost)}</span></div>
           <div className="flex justify-between border-t border-white/10 pt-1.5"><span>Cost directe total</span><span className="font-semibold">{formatCurrency(directCost)}</span></div>
           <div className="flex justify-between"><span>Ingressos reserva</span><span>{formatCurrency(total)}</span></div>
           <div className="flex justify-between"><span>Diferencial de marge (ingrés - cost)</span><span className={marginColor}>{formatCurrency(netMargin)}</span></div>
@@ -276,6 +262,90 @@ export default function BookingMarginCard({
           )}
         </div>
       </div>
+
+      {/* On va cada euro — desglossament del benefici */}
+      {total > 0 && (
+        <div className="mb-6 rounded-xl border border-indigo-500/20 bg-indigo-950/20 p-4">
+          <h3 className="text-sm font-semibold mb-1">On va cada euro d'aquest bolo</h3>
+          <p className="text-[11px] mb-3">Desglossament pràctic: què es queda l'empresa, què s'ha de reservar, i què és benefici net.</p>
+          <div className="space-y-2 text-xs">
+            {/* Benzina / combustible */}
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <span className="font-medium">Combustible (benzina)</span>
+                <p className="text-[10px]">Pot «Gasolina» — usar per repostar la furgoneta</p>
+              </div>
+              <span className="shrink-0 font-semibold text-orange-300">
+                {formatCurrency(distanceKm > 0 ? distanceKm * vehicleCostPerKm * 0.55 : 0)}
+              </span>
+            </div>
+            {/* Manteniment vehicle */}
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <span className="font-medium">Manteniment vehicle</span>
+                <p className="text-[10px]">Pot «Vehicle» — rodes, oli, revisió, assegurança, ITV</p>
+              </div>
+              <span className="shrink-0 font-semibold text-orange-300">
+                {formatCurrency(distanceKm > 0 ? distanceKm * vehicleCostPerKm * 0.45 : 0)}
+              </span>
+            </div>
+            {/* Amortització equip */}
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <span className="font-medium">Amortització equip (so, llum, etc.)</span>
+                <p className="text-[10px]">Pot «Equip» — per quan calgui comprar recanvis o equip nou</p>
+              </div>
+              <span className="shrink-0 font-semibold text-amber-300">{formatCurrency(packCostUsed)}</span>
+            </div>
+            {/* Cost operacional */}
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <span className="font-medium">Costos operatius fixes</span>
+                <p className="text-[10px]">Pot «Operacions» — assegurança RC, llicències, material fungible</p>
+              </div>
+              <span className="shrink-0 font-semibold text-amber-300">{formatCurrency(fixedOperationalCost)}</span>
+            </div>
+            {/* Extres */}
+            {extrasCost > 0 && (
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <span className="font-medium">Cost extres</span>
+                  <p className="text-[10px]">Pot «Extres» — productes i material addicional</p>
+                </div>
+                <span className="shrink-0 font-semibold text-amber-300">{formatCurrency(extrasCost)}</span>
+              </div>
+            )}
+            {/* Hores extra */}
+            {extraHoursCost > 0 && (
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <span className="font-medium">Cost hores extra</span>
+                  <p className="text-[10px]">Pot «Personal» — compensació per hores extra treballades</p>
+                </div>
+                <span className="shrink-0 font-semibold text-amber-300">{formatCurrency(extraHoursCost)}</span>
+              </div>
+            )}
+            {/* Separador */}
+            <div className="border-t border-white/10 pt-2 mt-2">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <span className="font-bold text-emerald-300">Benefici net (el que queda per a tu)</span>
+                  <p className="text-[10px]">Compte corrent de l'empresa — sou, inversions, estalvi</p>
+                </div>
+                <span className={`shrink-0 text-sm font-black ${netMargin >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                  {formatCurrency(netMargin)}
+                </span>
+              </div>
+            </div>
+            {/* Consell */}
+            <div className="border-t border-white/10 pt-2 mt-1">
+              <p className="text-[10px] leading-relaxed">
+                <strong>Consell pràctic:</strong> Obre 4 comptes/pots al banc: <strong>Gasolina</strong> (repostar), <strong>Equip</strong> (recanvis i equip nou), <strong>Operacions</strong> (assegurança, llicències), i <strong>Benefici</strong> (sou i estalvi). Després de cada bolo, transfereix automàticament els imports d'amunt a cada pot. Així mai et quedaràs sense per a manteniment o reposició d'equip.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cost breakdown */}
       <div className="text-sm space-y-1 mb-6 border-t border-white/10 pt-4">
@@ -355,9 +425,9 @@ export default function BookingMarginCard({
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-            <p className="text-[11px] uppercase tracking-wide">Cost benzina intern</p>
+            <p className="text-[11px] uppercase tracking-wide" title="Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km">Cost vehicle per km</p>
             <p className="text-sm font-semibold">{formatCurrency(calculatedTravelCost)}</p>
-            <p className="text-[11px]">{distanceKm.toFixed(1)} km × {fuelCostPerKm.toFixed(2)} €/km</p>
+            <p className="text-[11px]">{distanceKm.toFixed(1)} km × {vehicleCostPerKm.toFixed(2)} €/km</p>
           </div>
           <div className="rounded-lg border border-white/10 bg-white/5 p-3">
             <p className="text-[11px] uppercase tracking-wide">Ingressos transport</p>

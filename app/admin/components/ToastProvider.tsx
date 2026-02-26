@@ -46,7 +46,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={api}>
       {children}
       {/* Toast stack — bottom-right, stacked */}
-      <div className="fixed bottom-20 sm:bottom-4 right-4 z-[101] flex flex-col gap-2 pointer-events-none">
+      <div role="status" aria-live="polite" className="fixed bottom-20 sm:bottom-4 right-4 z-[101] flex flex-col gap-2 pointer-events-none">
         {toasts.map((t) => (
           <div key={t.id} className="pointer-events-auto animate-in slide-in-from-right">
             <Toast type={t.type} message={t.message} onClose={() => remove(t.id)} />

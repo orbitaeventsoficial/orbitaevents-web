@@ -14,6 +14,7 @@ import { getDbPackByCode, getDbPacks } from '@/lib/packs-db';
 import type { PackDefinition } from '@/config/packs-config';
 import { getQuoteTemplateSettings } from '@/lib/services/quoteTemplateService';
 import { translateTextForLocale } from '@/lib/services/translationService';
+import { escapeHtml } from '@/lib/utils/sanitize';
 
 interface QuoteAttachmentInput {
   packId?: string;
@@ -25,15 +26,6 @@ interface QuoteAttachmentInput {
 
 const APP_BASE_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://orbitaevents.com').replace(/\/+$/, '');
 const EMAIL_LOGO_URL = `${APP_BASE_URL}/img/logosoloplaneta.png`;
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
 
 function bodyToHtml(body: string): string {
   const escaped = escapeHtml(body.trim());

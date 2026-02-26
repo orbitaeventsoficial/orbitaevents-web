@@ -174,7 +174,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
           lastEventDate: true,
         },
       });
-  const activePortalAccess = await getActivePortalAccessForBooking(booking.id);
+  const activePortalAccess = await getActivePortalAccessForBooking(booking.id) as Parameters<typeof ClientPortalAccessPanel>[0]['initialActive'];
   const reviewFlowStatus = booking.reviewSubmittedAt || booking.clientSurvey
     ? 'RESPONDIDO'
     : booking.postEventEmailSent

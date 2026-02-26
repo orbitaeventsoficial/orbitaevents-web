@@ -26,6 +26,14 @@ describe('Sanitization Utilities', () => {
       expect(escapeHtml('')).toBe('');
     });
 
+    it('should handle null input', () => {
+      expect(escapeHtml(null)).toBe('');
+    });
+
+    it('should handle undefined input', () => {
+      expect(escapeHtml(undefined)).toBe('');
+    });
+
     it('should handle text without special chars', () => {
       expect(escapeHtml('Hello World')).toBe('Hello World');
     });

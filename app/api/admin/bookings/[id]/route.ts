@@ -11,6 +11,8 @@ import { calculateEventDuration } from '@/lib/inventory-utils';
 import { calculateTravelCharge, calculateTravelCost, DEFAULT_FUEL_COST_PER_KM, sanitizeNonNegative } from '@/lib/services/travelCost';
 import { getFuelCostPerKmReference } from '@/lib/services/fuelReferenceService';
 import { calculateGoogleMapsDistance } from '@/lib/services/googleMapsDistance';
+import { issueClientPortalAccess, getActivePortalAccessForBooking } from '@/lib/services/clientPortalAccess';
+import { sendEmail } from '@/lib/email';
 
 interface Params {
   params: { id: string };
@@ -332,6 +334,50 @@ export async function PATCH(req: NextRequest, { params }: Params) {
             data: { status: 'AVAILABLE' },
           });
         }
+      }
+    }
+
+    // COMPLETED: Auto-crear portal client si no existeix
+    if (newStatus === 'COMPLETED' && oldStatus !== 'COMPLETED') {
+      try {
+        const existingAccess = await getActivePortalAccessForBooking(id);
+        if (!existingAccess) {
+          const portalResult = await issueClientPortalAccess({
+            bookingId: id,
+            locale: existing.preferredLocale || 'ca',
+            createdBy: 'system:auto-completed',
+          });
+
+          // Enviar email al client amb l'enllaç del portal
+          if (existing.clientEmail && !existing.clientEmail.includes('@leads.orbitaevents.local')) {
+            const portalUrl = portalResult.url;
+            await sendEmail({
+              to: existing.clientEmail,
+              subject: 'El teu portal d\'accés — Òrbita Events',
+              html: `
+                <div style="font-family:Segoe UI,Arial,sans-serif;background:#0b1120;color:#e2e8f0;padding:24px;border-radius:12px">
+                  <h2 style="margin:0 0 12px 0;color:#f8fafc">El teu event s'ha completat!</h2>
+                  <p>Hola ${existing.clientName},</p>
+                  <p>Gràcies per confiar en Òrbita Events. Ja tens accés al teu portal personalitzat on podràs veure els detalls del teu event.</p>
+                  <p style="margin:20px 0"><a href="${portalUrl}" style="background:#6366f1;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">Accedir al meu portal</a></p>
+                  <p style="font-size:12px;color:#94a3b8">Aquest enllaç és personal i caducarà en 30 dies.</p>
+                </div>
+              `,
+            });
+          }
+
+          await prisma.adminLog.create({
+            data: {
+              action: 'PORTAL_AUTO_CREATED',
+              entity: 'booking',
+              entityId: id,
+              details: { trigger: 'status_completed', clientEmail: existing.clientEmail },
+            },
+          });
+        }
+      } catch (portalError) {
+        log.error('Auto portal creation failed', portalError);
+        // No bloquejar el canvi d'estat per un error de portal
       }
     }
 

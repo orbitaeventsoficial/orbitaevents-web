@@ -2,7 +2,10 @@ import { prisma } from '@/lib/prisma';
 import { getGa4Report, getGa4ConfigStatus } from '@/lib/analytics/ga4';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import { generateDailyChecklistTasks } from '@/lib/services/dailyChecklist';
-import { calculateSimpleMarginPct } from '@/lib/margin-utils';
+import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
+import { computeSimpleMarginPct } from '@/lib/services/costEngine';
+import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
+import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
 import { formatDateSimple } from '@/lib/constants';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -107,6 +110,10 @@ export interface DashboardData {
   recentAdminLogs: { id: string; action: string; entity: string; createdAt: Date }[];
   // Margin
   avgMarginPct: number;
+  // Financial forecasts
+  cashFlowNet30: number;
+  pipelineWeighted30: number;
+  pendingPayments: number;
   // Computed
   timeline: { id: string; icon: string; text: string; time: string; ts: number; href: string }[];
   alerts: DashboardAlert[];
@@ -141,7 +148,10 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.SMTP_FROM
   );
 
-  const ga4 = await Promise.race([getGa4Report().catch(() => null), timeoutPromise(1200)]);
+  const [ga4, profitConfig] = await Promise.all([
+    Promise.race([getGa4Report().catch(() => null), timeoutPromise(1200)]),
+    getProfitabilityConfig(),
+  ]);
 
   const [
     leadsCount, leadsThisMonth, bookingsConfirmed, bookingsThisMonth,
@@ -204,15 +214,18 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     .filter((b) => b.total > 0)
     .map((b) => {
       const extrasTotal = b.extras.reduce((sum, e) => sum + e.price * e.quantity, 0);
-      return calculateSimpleMarginPct({
-        total: b.total,
-        packPrice: b.pack.price,
-        extrasTotal,
-        packCostRatio: 0.36,
-        extraCostRatio: 0.28,
-        fixedOperationalCost: 45,
-        travelCost: b.travelCost ?? 0,
-      });
+      return computeSimpleMarginPct(
+        {
+          total: b.total,
+          packPrice: b.pack.price,
+          extrasTotal,
+          extraHours: 0,
+          extraHourPrice: 0,
+          distanceKm: 0,
+          travelCost: b.travelCost ?? 0,
+        },
+        profitConfig,
+      );
     });
   const avgMarginPct = marginPcts.length > 0
     ? Math.round(marginPcts.reduce((a, b) => a + b, 0) / marginPcts.length)
@@ -299,6 +312,37 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   ];
   const activities = activitiesRaw.length > 0 ? activitiesRaw : [{ icon: '✅', text: 'Tot al dia, sense activitat pendent', time: 'Ara' }];
 
+  // Financial forecasts (resilient — no bloquejar si falla)
+  let cashFlowNet30 = 0;
+  let pipelineWeighted30 = 0;
+  try {
+    const cashFlow = await buildCashFlowForecast(2);
+    cashFlowNet30 = cashFlow.length > 0 ? cashFlow[0].netFlow : 0;
+  } catch { /* ignorar */ }
+
+  try {
+    const pipeline = await buildPipelineForecast(2);
+    pipelineWeighted30 = pipeline.length > 0 ? pipeline[0].combined : 0;
+  } catch { /* ignorar */ }
+
+  // Pagaments pendents (reserves confirmades/preparing amb pagament pendent)
+  let pendingPayments = 0;
+  try {
+    const pendingBookings = await prisma.booking.findMany({
+      where: {
+        status: { in: ['CONFIRMED', 'PREPARING'] },
+        OR: [{ depositPaid: false }, { remainingPaid: false }],
+      },
+      select: { total: true, depositAmount: true, depositPaid: true, remainingPaid: true },
+    });
+    for (const b of pendingBookings) {
+      const deposit = Number(b.depositAmount) || 0;
+      const total = Number(b.total) || 0;
+      if (!b.depositPaid && deposit > 0) pendingPayments += deposit;
+      if (!b.remainingPaid) pendingPayments += Math.max(0, total - deposit);
+    }
+  } catch { /* ignorar */ }
+
   return {
     leadsCount, leadsThisMonth, bookingsConfirmed, bookingsThisMonth,
     customersCount, testimonialsPending, testimonialsApproved,
@@ -311,6 +355,9 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     ga4Available: Boolean(ga4),
     ga4RealtimeFallback: Boolean(ga4?.realtimeFallback),
     avgMarginPct,
+    cashFlowNet30,
+    pipelineWeighted30,
+    pendingPayments,
     leadsSeries, leadsWonSeries, bookingsSeries, revenueSeries, revenueTotal30,
     recentLeads, upcomingBookings, upcomingTasks,
     commandLeads, commandBookings, recentAdminLogs,

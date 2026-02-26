@@ -17,7 +17,7 @@ import PackPricingModelHistory from './PackPricingModelHistory';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Tab = 'resum' | 'cobraments' | 'rendibilitat' | 'config';
+type Tab = 'resum' | 'cobraments' | 'rendibilitat' | 'tresoreria' | 'previsions' | 'config';
 
 interface PaymentRow {
   id: string;
@@ -89,6 +89,38 @@ interface PackPricingRow {
   hasAlert: boolean;
 }
 
+interface CashFlowMonth {
+  month: string;
+  income: number;
+  costs: number;
+  netFlow: number;
+  cumulative: number;
+}
+
+interface ForecastMonth {
+  month: string;
+  historicalAvg: number;
+  pipeline: number;
+  combined: number;
+}
+
+interface CacChannelRow {
+  channel: string;
+  totalLeads: number;
+  wonLeads: number;
+  conversionRate: number;
+  estimatedCac: number;
+  realCac: number | null;
+}
+
+interface VehicleConfig {
+  fuelPricePerLiter: number;
+  consumptionL100: number;
+  maintenanceCostPerKm: number;
+  effectiveCostPerKm: number;
+  updatedAt: string | null;
+}
+
 interface EconomiaClientProps {
   outstandingTotal: number;
   overdueTotal: number;
@@ -121,6 +153,14 @@ interface EconomiaClientProps {
   historyEntries: HistoryEntry[];
   inventoryValue: number;
   inventoryCount: number;
+  // Tresoreria (Bloc 2)
+  cashFlow?: CashFlowMonth[];
+  // Previsions (Bloc 3)
+  forecast_pipeline?: ForecastMonth[];
+  // Vehicle (Bloc 1)
+  vehicleConfig?: VehicleConfig;
+  // CAC (Bloc 10)
+  cacByChannel?: CacChannelRow[];
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -183,6 +223,8 @@ const TABS: { id: Tab; label: string; icon: string; mobileLabel: string }[] = [
   { id: 'resum', label: 'Resum general', icon: '📊', mobileLabel: 'Resum' },
   { id: 'cobraments', label: 'Cobraments', icon: '💶', mobileLabel: 'Cobrar' },
   { id: 'rendibilitat', label: 'Rendibilitat', icon: '📈', mobileLabel: 'Marge' },
+  { id: 'tresoreria', label: 'Tresoreria', icon: '💰', mobileLabel: 'Caixa' },
+  { id: 'previsions', label: 'Previsions', icon: '🔮', mobileLabel: 'Previsió' },
   { id: 'config', label: 'Configuració', icon: '⚙️', mobileLabel: 'Config' },
 ];
 
@@ -938,6 +980,123 @@ export default function EconomiaClient(props: EconomiaClientProps) {
             </>
           )}
 
+          {/* ═══════════ TRESORERIA ═══════════ */}
+          {activeTab === 'tresoreria' && (
+            <>
+              <section className="rounded-2xl border border-white/10 p-5 shadow-sm">
+                <h2 className="text-lg font-semibold mb-1">Previsió de tresoreria</h2>
+                <p className="text-xs mb-4">Projecció mensual d'ingressos i costos basada en reserves confirmades.</p>
+
+                {props.cashFlow && props.cashFlow.length > 0 ? (
+                  <div className="overflow-x-auto rounded-xl border border-white/10">
+                    <table className="min-w-[700px] w-full text-sm">
+                      <thead>
+                        <tr className="text-left text-[11px] uppercase tracking-wider">
+                          <th className="px-3 py-2">Mes</th>
+                          <th className="px-3 py-2 text-right">Ingressos previstos</th>
+                          <th className="px-3 py-2 text-right">Costos estimats</th>
+                          <th className="px-3 py-2 text-right">Flux net</th>
+                          <th className="px-3 py-2 text-right">Acumulat</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/10">
+                        {props.cashFlow.map((row) => (
+                          <tr key={row.month} className="hover:bg-white/[0.03]">
+                            <td className="px-3 py-2 font-medium">{row.month}</td>
+                            <td className="px-3 py-2 text-right text-emerald-300">{money(row.income)}</td>
+                            <td className="px-3 py-2 text-right text-rose-300">{money(row.costs)}</td>
+                            <td className={`px-3 py-2 text-right font-semibold ${row.netFlow >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                              {money(row.netFlow)}
+                            </td>
+                            <td className={`px-3 py-2 text-right font-bold ${row.cumulative >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                              {money(row.cumulative)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-sm">Sense dades de tresoreria. Les reserves confirmades amb dates futures apareixeran aquí.</p>
+                )}
+              </section>
+            </>
+          )}
+
+          {/* ═══════════ PREVISIONS ═══════════ */}
+          {activeTab === 'previsions' && (
+            <>
+              <section className="rounded-2xl border border-white/10 p-5 shadow-sm">
+                <h2 className="text-lg font-semibold mb-1">Previsió de vendes</h2>
+                <p className="text-xs mb-4">Combinació de pipeline ponderat i tendència històrica amb estacionalitat.</p>
+
+                {props.forecast_pipeline && props.forecast_pipeline.length > 0 ? (
+                  <div className="overflow-x-auto rounded-xl border border-white/10">
+                    <table className="min-w-[700px] w-full text-sm">
+                      <thead>
+                        <tr className="text-left text-[11px] uppercase tracking-wider">
+                          <th className="px-3 py-2">Mes</th>
+                          <th className="px-3 py-2 text-right">Mitjana històrica</th>
+                          <th className="px-3 py-2 text-right">Pipeline ponderat</th>
+                          <th className="px-3 py-2 text-right">Previsió combinada</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/10">
+                        {props.forecast_pipeline.map((row) => (
+                          <tr key={row.month} className="hover:bg-white/[0.03]">
+                            <td className="px-3 py-2 font-medium">{row.month}</td>
+                            <td className="px-3 py-2 text-right">{money(row.historicalAvg)}</td>
+                            <td className="px-3 py-2 text-right text-amber-300">{money(row.pipeline)}</td>
+                            <td className="px-3 py-2 text-right font-bold text-emerald-300">{money(row.combined)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-sm">Sense dades de previsió. Necessitem leads actius i/o reserves passades per generar previsions.</p>
+                )}
+              </section>
+
+              {/* CAC per canal */}
+              {props.cacByChannel && props.cacByChannel.length > 0 && (
+                <section className="rounded-2xl border border-white/10 p-5 shadow-sm">
+                  <h2 className="text-lg font-semibold mb-1">CAC per canal</h2>
+                  <p className="text-xs mb-4">Cost d'adquisició de client real vs estimat, derivat de dades.</p>
+
+                  <div className="overflow-x-auto rounded-xl border border-white/10">
+                    <table className="min-w-[600px] w-full text-sm">
+                      <thead>
+                        <tr className="text-left text-[11px] uppercase tracking-wider">
+                          <th className="px-3 py-2">Canal</th>
+                          <th className="px-3 py-2 text-right">Leads</th>
+                          <th className="px-3 py-2 text-right">Guanyats</th>
+                          <th className="px-3 py-2 text-right">Conversió</th>
+                          <th className="px-3 py-2 text-right">CAC estimat</th>
+                          <th className="px-3 py-2 text-right">CAC real</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/10">
+                        {props.cacByChannel.map((row) => (
+                          <tr key={row.channel} className="hover:bg-white/[0.03]">
+                            <td className="px-3 py-2 font-medium">{row.channel}</td>
+                            <td className="px-3 py-2 text-right">{row.totalLeads}</td>
+                            <td className="px-3 py-2 text-right">{row.wonLeads}</td>
+                            <td className="px-3 py-2 text-right">{(row.conversionRate * 100).toFixed(1)}%</td>
+                            <td className="px-3 py-2 text-right">{money(row.estimatedCac)}</td>
+                            <td className="px-3 py-2 text-right font-semibold">
+                              {row.realCac !== null ? money(row.realCac) : '—'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              )}
+            </>
+          )}
+
           {/* ═══════════ CONFIG ═══════════ */}
           {activeTab === 'config' && (
             <>
@@ -1019,6 +1178,41 @@ export default function EconomiaClient(props: EconomiaClientProps) {
               </section>
               <PackPricingModelEditor initial={props.packPricingConfig} />
               <PackPricingModelHistory entries={props.packPricingHistoryEntries} />
+              {/* Vehicle config */}
+              {props.vehicleConfig && (
+                <section className="rounded-2xl border border-white/10 p-5 shadow-sm">
+                  <h2 className="text-lg font-semibold mb-1">Vehicle i desplaçament</h2>
+                  <p className="text-xs mb-4">
+                    Cost per km derivat del preu MITECO + manteniment. Actualitzat automàticament.
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-4">
+                    <div className="rounded-xl border border-white/10 p-3">
+                      <p className="text-[11px] uppercase tracking-wide">Preu combustible</p>
+                      <p className="text-lg font-bold">
+                        {props.vehicleConfig.fuelPricePerLiter > 0
+                          ? `${props.vehicleConfig.fuelPricePerLiter.toFixed(3)} €/L`
+                          : 'Sense dada MITECO'}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 p-3">
+                      <p className="text-[11px] uppercase tracking-wide">Consum vehicle</p>
+                      <p className="text-lg font-bold">{props.vehicleConfig.consumptionL100.toFixed(1)} L/100km</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 p-3">
+                      <p className="text-[11px] uppercase tracking-wide">Manteniment</p>
+                      <p className="text-lg font-bold">{props.vehicleConfig.maintenanceCostPerKm.toFixed(2)} €/km</p>
+                    </div>
+                    <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
+                      <p className="text-[11px] uppercase tracking-wide">Cost efectiu per km</p>
+                      <p className="text-lg font-bold text-emerald-300">{props.vehicleConfig.effectiveCostPerKm.toFixed(3)} €/km</p>
+                      {props.vehicleConfig.updatedAt && (
+                        <p className="text-[11px]">Act: {formatDateSimple(props.vehicleConfig.updatedAt)}</p>
+                      )}
+                    </div>
+                  </div>
+                </section>
+              )}
+
               <ProfitabilityConfigEditor initial={props.config} />
               <ProfitabilityConfigHistory entries={props.historyEntries} />
             </>

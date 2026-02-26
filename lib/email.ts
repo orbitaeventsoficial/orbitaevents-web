@@ -5,6 +5,7 @@
 
 import nodemailer from 'nodemailer';
 import { SITE_CONFIG } from '@/app/config/site-config';
+import { escapeHtml } from '@/lib/utils/sanitize';
 
 interface SendEmailOptions {
   to: string;
@@ -41,14 +42,6 @@ function htmlToText(html: string): string {
     .trim();
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
 
 function sanitizeHeader(value: string): string {
   return value.replace(/[\r\n]+/g, ' ').trim();

@@ -415,6 +415,10 @@ model Lead {
   contactedAt      DateTime?
   convertedAt      DateTime?
 
+  // Cache de scoring (actualitzat pel cron commercial-daily)
+  cachedScore      Int?
+  cachedScoreAt    DateTime?
+
   @@index([status])
   @@index([eventType])
   @@index([createdAt])

@@ -17,7 +17,8 @@
  * escapeHtml('<script>alert("xss")</script>')
  * // Returns: '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;'
  */
-export function escapeHtml(text: string): string {
+export function escapeHtml(text: string | null | undefined): string {
+  if (!text) return '';
   const map: Record<string, string> = {
     '&': '&amp;',
     '<': '&lt;',
@@ -25,7 +26,7 @@ export function escapeHtml(text: string): string {
     '"': '&quot;',
     "'": '&#039;',
   };
-  return text.replace(/[&<>"']/g, (m) => map[m] || m);
+  return String(text).replace(/[&<>"']/g, (m) => map[m] || m);
 }
 
 /**

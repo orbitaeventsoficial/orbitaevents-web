@@ -6,20 +6,7 @@
 
 import { SITE_CONFIG } from '@/app/config/site-config';
 import { INCLUDED_TRAVEL_KM } from '@/lib/services/travelCost';
-
-// ============================================
-// UTILS - ESCAPE HTML
-// ============================================
-
-function escapeHtml(text: string | null | undefined): string {
-  if (!text) return '';
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+import { escapeHtml } from '@/lib/utils/sanitize';
 
 // ============================================
 // TIPUS

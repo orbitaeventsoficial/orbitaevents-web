@@ -4,6 +4,10 @@ import { buildProfitabilityReport, normalizeProfitabilityConfig } from '@/lib/se
 import { deriveFlowStatus } from '@/lib/services/communicationStatusService';
 import { calculateCostPerHour } from '@/lib/inventory-utils';
 import { computePackPricingHealth, getPackPricingModelConfigEditable, type PackPricingModelConfig } from '@/lib/services/packPricingHealth';
+import { buildCashFlowForecast } from '@/lib/services/cashFlowForecast';
+import { buildPipelineForecast } from '@/lib/services/pipelineForecast';
+import { getEffectiveVehicleCostPerKm } from '@/lib/services/fuelReferenceService';
+import { buildCacAnalysis } from '@/lib/services/cacAnalysis';
 import EconomiaClient from './EconomiaClient';
 
 export const dynamic = 'force-dynamic';
@@ -357,6 +361,17 @@ export default async function EconomiaPage() {
     };
   });
 
+  // Dades addicionals: tresoreria, previsions, vehicle, CAC
+  const [cashFlow, forecastPipeline, vehicleConfig, cacByChannel] = await Promise.all([
+    buildCashFlowForecast(6).catch((err) => { log.error('cashFlow failed', err); return []; }),
+    buildPipelineForecast(6).catch((err) => { log.error('forecast failed', err); return []; }),
+    getEffectiveVehicleCostPerKm().catch((err) => {
+      log.error('vehicleConfig failed', err);
+      return { costPerKm: 0.19, fuelPricePerLiter: 0, consumptionL100: 8.5, maintenanceCostPerKm: 0.12, updatedAt: null };
+    }),
+    buildCacAnalysis().catch((err) => { log.error('cacAnalysis failed', err); return []; }),
+  ]);
+
   return (
     <EconomiaClient
       outstandingTotal={outstandingTotal}
@@ -380,6 +395,16 @@ export default async function EconomiaPage() {
       historyEntries={historyEntries}
       inventoryValue={inventoryValue}
       inventoryCount={inventoryCount}
+      cashFlow={cashFlow}
+      forecast_pipeline={forecastPipeline}
+      vehicleConfig={{
+        fuelPricePerLiter: vehicleConfig.fuelPricePerLiter,
+        consumptionL100: vehicleConfig.consumptionL100,
+        maintenanceCostPerKm: vehicleConfig.maintenanceCostPerKm,
+        effectiveCostPerKm: vehicleConfig.costPerKm,
+        updatedAt: vehicleConfig.updatedAt,
+      }}
+      cacByChannel={cacByChannel}
     />
   );
 }

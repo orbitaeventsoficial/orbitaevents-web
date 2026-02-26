@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import type { LeadSource } from '@prisma/client';
+import { computeBookingFinancialSummary } from './costEngine';
 
 export type ProfitabilityConfig = {
   packCostRatio: number;
@@ -152,23 +153,26 @@ export async function upsertProfitabilityConfig(input: ProfitabilityConfigInput)
 }
 
 function toProfitabilityRow(row: BookingRow, config: ProfitabilityConfig): ProfitabilityRow {
-  const directCost =
-    row.packPrice * config.packCostRatio
-    + row.extrasTotal * config.extraCostRatio
-    + row.extraHours * row.extraHourPrice * config.extraHourCostRatio
-    + config.fixedOperationalCost
-    + row.travelCost;
-
-  const acquisitionCost = config.channelCac[row.source] ?? config.channelCac.UNKNOWN;
-  const netMargin = row.total - directCost - acquisitionCost;
-  const marginPct = row.total > 0 ? netMargin / row.total : 0;
+  const summary = computeBookingFinancialSummary(
+    {
+      total: row.total,
+      packPrice: row.packPrice,
+      extrasTotal: row.extrasTotal,
+      extraHours: row.extraHours,
+      extraHourPrice: row.extraHourPrice,
+      distanceKm: 0,
+      travelCost: row.travelCost,
+      source: row.source,
+    },
+    config,
+  );
 
   return {
     ...row,
-    directCost,
-    acquisitionCost,
-    netMargin,
-    marginPct,
+    directCost: summary.directCost,
+    acquisitionCost: summary.acquisitionCost,
+    netMargin: summary.netMargin,
+    marginPct: summary.marginPct / 100, // ProfitabilityRow espera ratio 0-1
   };
 }
 

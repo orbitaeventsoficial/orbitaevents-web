@@ -194,6 +194,19 @@ export default function TaskKanbanView() {
                     })()}
                   </p>
                 )}
+
+                {/* Botons de moviment per a mòbil (alternativa a drag-drop) */}
+                <div className="mt-2 flex gap-1 md:hidden">
+                  {COLUMNS_DEF.filter((c) => c.status !== col.status).map((target) => (
+                    <button
+                      key={target.status}
+                      onClick={() => moveTask(task.id, target.status)}
+                      className="flex-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-white/10 active:bg-white/20"
+                    >
+                      {target.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             ))}
           </div>

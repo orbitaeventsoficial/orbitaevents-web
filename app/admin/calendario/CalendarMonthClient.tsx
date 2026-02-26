@@ -132,6 +132,7 @@ export default function CalendarMonthClient() {
   const [draggingBookingId, setDraggingBookingId] = useState<string | null>(null);
   const [dragOverDateKey, setDragOverDateKey] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [changingDateForBooking, setChangingDateForBooking] = useState<string | null>(null);
 
   const moveBookingToDate = useCallback(async (bookingId: string, newDateKey: string) => {
     try {
@@ -643,7 +644,7 @@ export default function CalendarMonthClient() {
                         )}
                         {resolveTimeLabel(r)} · {resolveServiceLabel(r)}
                       </div>
-                      <div className="mt-2 flex flex-wrap gap-2">
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
                         <Link
                           href={`/admin/bookings/${r.id}`}
                           onClick={(e) => e.stopPropagation()}
@@ -668,6 +669,29 @@ export default function CalendarMonthClient() {
                           >
                             👤 Client →
                           </Link>
+                        )}
+                        {changingDateForBooking === r.id ? (
+                          <input
+                            type="date"
+                            autoFocus
+                            className="rounded-lg border border-white/20 bg-white/5 px-2 py-0.5 text-[10px]"
+                            defaultValue={r.fechaEvento.slice(0, 10)}
+                            onBlur={() => setChangingDateForBooking(null)}
+                            onChange={(e) => {
+                              const newDate = e.target.value;
+                              if (newDate && newDate !== r.fechaEvento.slice(0, 10)) {
+                                void moveBookingToDate(r.id, newDate);
+                                setChangingDateForBooking(null);
+                              }
+                            }}
+                          />
+                        ) : (
+                          <button
+                            onClick={() => setChangingDateForBooking(r.id)}
+                            className="rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium transition-colors hover:bg-white/10"
+                          >
+                            Canviar data
+                          </button>
                         )}
                       </div>
                     </div>

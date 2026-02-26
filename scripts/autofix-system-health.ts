@@ -327,7 +327,7 @@ async function runChecks(): Promise<CheckResult[]> {
           createdAt: { lte: staleLeadSince },
         },
       }),
-      (prisma as any).task.count({
+      prisma.task.count({
         where: {
           status: { in: ['OPEN', 'IN_PROGRESS'] },
           dueDate: { lt: startOfToday },

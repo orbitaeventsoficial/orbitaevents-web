@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 const DEFAULT_BASE_URL = 'https://orbitaevents.com';
 const DEFAULT_EXPIRY_DAYS = 30;
 const SUPPORTED_LOCALES = new Set(['ca', 'es', 'en']);
-const portalAccessRepo = (prisma as any).clientPortalAccess;
+const portalAccessRepo = prisma.clientPortalAccess;
 
 export type PortalPersonalization = {
   headline?: string;

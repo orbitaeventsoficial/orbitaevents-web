@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { log } from '@/lib/logger';
 import { runCommercialSequences } from '@/lib/services/commercialSequenceService';
 import { enforceLeadSla } from '@/lib/services/slaAutomationService';
+import { sendPaymentReminders } from '@/lib/services/paymentReminderService';
+import { scoreLead } from '@/lib/services/commercialScoring';
 import { sendEmail } from '@/lib/email';
 import { sendWhatsAppText } from '@/lib/services/whatsappService';
 import { SITE_CONFIG } from '@/app/config/site-config';
@@ -69,10 +71,39 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const [sequences, sla] = await Promise.all([
+    const [sequences, sla, paymentReminders] = await Promise.all([
       runCommercialSequences(),
       enforceLeadSla(),
+      sendPaymentReminders().catch((err) => {
+        log.error('Payment reminders failed in commercial-daily', err);
+        return { checked: 0, sent: 0, skipped: 0, errors: 1 };
+      }),
     ]);
+
+    // Actualitzar cache de scoring per a tots els leads actius
+    let scoringUpdated = 0;
+    try {
+      const activeLeads = await prisma.lead.findMany({
+        where: { status: { in: ['NEW', 'CONTACTED', 'QUOTE_SENT', 'NEGOTIATING'] } },
+        select: {
+          id: true, status: true, createdAt: true, updatedAt: true,
+          eventDate: true, budget: true, phone: true, eventLocation: true,
+          guestCount: true, interestedPackId: true, source: true,
+        },
+      });
+
+      for (const lead of activeLeads) {
+        const result = scoreLead(lead);
+        // cachedScore/cachedScoreAt afegits a schema — cal prisma generate post-migració
+        await (prisma.lead.update as Function)({
+          where: { id: lead.id },
+          data: { cachedScore: result.score, cachedScoreAt: new Date() },
+        });
+        scoringUpdated++;
+      }
+    } catch (err) {
+      log.error('Scoring cache update failed', err);
+    }
 
     const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const [commSent24h, commResponded24h, openLeads, openTasks] = await Promise.all([
@@ -93,6 +124,8 @@ export async function GET(request: NextRequest) {
       generatedAt: new Date().toISOString(),
       sequences,
       sla,
+      paymentReminders,
+      scoringUpdated,
       kpi24h: {
         commSent: commSent24h,
         commResponded: commResponded24h,
@@ -111,6 +144,7 @@ export async function GET(request: NextRequest) {
           <li>Envíos email: <strong>${sequences.sentEmail}</strong></li>
           <li>Envíos WhatsApp: <strong>${sequences.sentWhatsapp}</strong></li>
           <li>Tareas SLA creadas: <strong>${sla.createdTasks}</strong></li>
+          <li>Recordatoris pagament: <strong>${paymentReminders.sent}</strong> enviats de ${paymentReminders.checked} revisats</li>
           <li>Comunicaciones 24h: <strong>${commSent24h}</strong></li>
           <li>Respondidas 24h: <strong>${commResponded24h}</strong> (${(responseRate * 100).toFixed(1)}%)</li>
           <li>Leads abiertos: <strong>${openLeads}</strong></li>
@@ -133,6 +167,7 @@ export async function GET(request: NextRequest) {
         `Secuencias: ${sequences.executed}`,
         `Email: ${sequences.sentEmail} · WA: ${sequences.sentWhatsapp}`,
         `SLA tasks: ${sla.createdTasks}`,
+        `Pagaments: ${paymentReminders.sent}/${paymentReminders.checked} recordatoris`,
         `Comms 24h: ${commSent24h} · Resp: ${commResponded24h} (${(responseRate * 100).toFixed(1)}%)`,
         `Open leads: ${openLeads} · Open tasks: ${openTasks}`,
       ].join('\n');

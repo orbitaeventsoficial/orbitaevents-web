@@ -350,7 +350,7 @@ export default async function ClientPortalPage({
           <section className="mt-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6">
             <h2 className="text-lg font-semibold">{t.postEvent}</h2>
             <p className="mt-2 text-sm text-slate-300">
-              Estat de seguiment: {booking.clientFeedback?.sentAt ? 'feedback enviat' : 'pendent de tancament'}.
+              Estat de seguiment: {(booking as Record<string, unknown>).clientFeedback ? 'feedback enviat' : 'pendent de tancament'}.
             </p>
           </section>
         )}

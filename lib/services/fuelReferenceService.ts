@@ -1,5 +1,10 @@
 import { prisma } from '@/lib/prisma';
-import { DEFAULT_FUEL_COST_PER_KM } from '@/lib/services/travelCost';
+import {
+  DEFAULT_FUEL_COST_PER_KM,
+  DEFAULT_VEHICLE_CONSUMPTION_L100,
+  DEFAULT_MAINTENANCE_COST_PER_KM,
+  calculateEffectiveVehicleCostPerKm,
+} from '@/lib/services/travelCost';
 
 const SETTING_COST_KEY = 'finance.fuel.costPerKm';
 const SETTING_UPDATED_AT_KEY = 'finance.fuel.updatedAt';
@@ -157,5 +162,66 @@ export async function getFuelCostPerKmReference(): Promise<{
   return {
     costPerKm: costValue,
     updatedAt,
+  };
+}
+
+/**
+ * Retorna el cost efectiu per km del vehicle, derivat de:
+ * - Preu combustible MITECO (BD) o fallback
+ * - Consum configurat del vehicle (L/100km)
+ * - Cost manteniment/amortització per km (configurable a economia)
+ */
+export async function getEffectiveVehicleCostPerKm(): Promise<{
+  costPerKm: number;
+  fuelPricePerLiter: number;
+  consumptionL100: number;
+  maintenanceCostPerKm: number;
+  updatedAt: string | null;
+}> {
+  const [priceSetting, consumptionSetting, maintenanceSetting, updatedAtSetting] =
+    await Promise.all([
+      prisma.setting.findUnique({ where: { key: SETTING_PRICE_KEY } }),
+      prisma.setting.findUnique({ where: { key: SETTING_CONSUMPTION_KEY } }),
+      prisma.setting.findUnique({ where: { key: 'finance.vehicle.maintenanceCostPerKm' } }),
+      prisma.setting.findUnique({ where: { key: SETTING_UPDATED_AT_KEY } }),
+    ]);
+
+  const fuelPricePerLiter = Number(priceSetting?.value || NaN);
+  const consumptionL100 = Number(consumptionSetting?.value || NaN);
+  const maintenanceCostPerKm = Number(maintenanceSetting?.value || NaN);
+
+  const safeFuelPrice = Number.isFinite(fuelPricePerLiter) && fuelPricePerLiter > 0
+    ? fuelPricePerLiter
+    : 0;
+  const safeConsumption = Number.isFinite(consumptionL100) && consumptionL100 > 0
+    ? consumptionL100
+    : DEFAULT_VEHICLE_CONSUMPTION_L100;
+  const safeMaintenance = Number.isFinite(maintenanceCostPerKm) && maintenanceCostPerKm >= 0
+    ? maintenanceCostPerKm
+    : DEFAULT_MAINTENANCE_COST_PER_KM;
+
+  // Si no tenim preu MITECO, retornem el fallback clàssic
+  if (safeFuelPrice === 0) {
+    return {
+      costPerKm: DEFAULT_FUEL_COST_PER_KM,
+      fuelPricePerLiter: 0,
+      consumptionL100: safeConsumption,
+      maintenanceCostPerKm: safeMaintenance,
+      updatedAt: null,
+    };
+  }
+
+  const costPerKm = calculateEffectiveVehicleCostPerKm(
+    safeFuelPrice,
+    safeConsumption,
+    safeMaintenance,
+  );
+
+  return {
+    costPerKm,
+    fuelPricePerLiter: safeFuelPrice,
+    consumptionL100: safeConsumption,
+    maintenanceCostPerKm: safeMaintenance,
+    updatedAt: updatedAtSetting?.value || null,
   };
 }

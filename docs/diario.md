@@ -342,6 +342,235 @@ S'han realitzat **2 auditories exhaustives de codi** abans de la sessió del 202
 - `docs/diario.md` — tasques 2026-02-23 marcades resoltes, entrada 2026-02-25
 - `.eslintrc.json` — corregit error preexistent: afegit `plugin:@typescript-eslint/recommended` per registrar el plugin, desactivades regles noves que no apliquen al codi existent
 
+---
+
+## 2026-02-25 (sessió 2 — Revisió sistema econòmic-financer + UX)
+
+### Context de la sessió
+L'operador vol un sistema de gestió de nivell professional: coherència financera absoluta, tests exhaustius, i una UX que permeti prendre decisions econòmiques correctes tant en desktop com en mòbil. Criteri de doctor en ADE: cada número ha de reflectir la realitat operativa, cada semàfor ha de tenir significat econòmic real, i la interfície ha de ser comprensible per qualsevol persona.
+
+### Treball realitzat
+
+#### ✅ Bloc 5: Centralitzar `escapeHtml()` (5 còpies → 1)
+**Per què**: 5 fitxers tenien la seva pròpia implementació d'`escapeHtml()`. 2 d'ells acceptaven `null|undefined`, 3 no. Això és risc de seguretat (XSS) i deute tècnic: si es troba un vector d'atac nou, s'ha de corregir a 5 llocs.
+**Què s'ha fet**:
+- `lib/utils/sanitize.ts` — ampliat per acceptar `string | null | undefined` (retorna `''` per null/undefined)
+- 5 fitxers: eliminada còpia local, afegit `import { escapeHtml } from '@/lib/utils/sanitize'`
+- Tests actualitzats amb casos `null` i `undefined`
+- Verificat amb Grep: **zero** `function escapeHtml` fora de `sanitize.ts`
+
+#### ✅ Bloc 7: Correccions de qualitat
+**Per què**: `(prisma as any)` desactiva la comprovació de tipus — si el model canvia, no detectem l'error fins a producció. Toast sense `role="status"` és invisible per a lectors de pantalla (accessibilitat). `exhaustive-deps` evita bugs subtils de closures.
+**Què s'ha fet**:
+- `scripts/autofix-system-health.ts` — `(prisma as any).task` → `prisma.task` (model Task existeix a schema línia 732)
+- `lib/services/clientPortalAccess.ts` — `(prisma as any).clientPortalAccess` → `prisma.clientPortalAccess` (model existeix línia 657)
+- `app/admin/components/ToastProvider.tsx` — afegit `role="status"` i `aria-live="polite"` al contenidor de toasts
+- `BookingMarginCard.tsx` — afegit `toast` al dependency array del `handleSave` useCallback
+- Verificat: **zero** `(prisma as any)` al projecte
+
+#### ✅ Bloc 3: Renominar fuel→vehicle al model de cost
+**Per què**: `DEFAULT_FUEL_COST_PER_KM = 0.19` cobreix NOMÉS benzina. El cost real d'un vehicle inclou manteniment (~0.05 €/km), assegurança (~0.03 €/km), pneumàtics (~0.02 €/km) i amortització (~0.08 €/km). El nom "Cost benzina intern" a la UI enganyava l'operador, que creia que 0.19 €/km cobria tot. Cost real recomanat: 0.35-0.50 €/km.
+**Què s'ha fet**:
+- `lib/services/travelCost.ts` — nova constant `DEFAULT_VEHICLE_COST_PER_KM`, alias deprecated `DEFAULT_FUEL_COST_PER_KM` per compatibilitat
+- Paràmetre `fuelCostPerKm` → `vehicleCostPerKm` a `calculateTravelCost()`
+- `BookingMarginCard.tsx` — interfície actualitzada amb `vehicleCostPerKm` (compat amb prop legacy `fuelCostPerKm`)
+- UI: "Cost benzina intern" → "Cost vehicle per km" + tooltip "Inclou benzina, manteniment, assegurança i amortització. Valor recomanat: 0.35-0.50 €/km"
+
+#### ✅ Bloc 2: Centralitzar semàfors de marge
+**Per què**: `BookingMarginCard.tsx` tenia ~25 línies de lògica inline duplicant `getMarginTone()` amb colors lleugerament diferents (inconsistència visual). A més, el transport tenia llindars propis (45%/20%) sense funció reutilitzable.
+**Què s'ha fet**:
+- `lib/margin-utils.ts` — afegit `getTravelMarginTone()` amb 3 bandes: ≥45% emerald (sa), ≥20% orange (vigilar), <20% rose (crític)
+- `BookingMarginCard.tsx` — substituïts ~25 línies de lògica inline per `getMarginTone()` i `getTravelMarginTone()`
+
+#### ✅ Bloc 1: Unificar ratis de cost (config BD)
+**Per què**: PROBLEMA CRÍTIC. `bookings/page.tsx` i `dashboard-data.ts` usaven `0.36/0.28/45` hardcodejats. El detall de booking sí usava `getProfitabilityConfig()`. Resultat: l'operador canviava la config a Economia, veia marges correctes al detall, però la llista i el dashboard seguien mostrant els antics. Decisió de preus errònies.
+**Què s'ha fet**:
+- `bookings/page.tsx` — afegit `getProfitabilityConfig()` al `Promise.all`, els 2 blocs de marge (mòbil + desktop) ara usen `profitConfig.packCostRatio/extraCostRatio/fixedOperationalCost`
+- `dashboard-data.ts` — afegit `getProfitabilityConfig()` al bloc d'inicialització, marge mitjà usa config de BD
+- Verificat amb Grep: **zero** `0.36` hardcodejat fora de `profitabilityService.ts` i tests
+
+#### ✅ Bloc 4: Tests exhaustius del sistema financer (4 fitxers, ~88 casos nous)
+**Per què**: Zero cobertura de test per a la lògica financera. El sistema decideix si una reserva és rendible, calcula costos de viatge, puntua leads comercialment, i normalitza configuració. Tot això sense cap test unitari. Un error de càlcul = decisions financeres incorrectes.
+**Què s'ha fet**:
+- `__tests__/lib/margin-utils.test.ts` (21 tests) — semàfors de marge (fronteres exactes 15/30/50), semàfors de transport (20/45), càlcul de marge (cas típic, total=0, negatiu, sense extras/viatge)
+- `__tests__/lib/services/travelCost.test.ts` (35 tests) — sanitizeNonNegative (NaN, Infinity, negatiu), km facturables, trams, cost vehicle, suplement client, km inclosos
+- `__tests__/lib/services/commercialScoring.test.ts` (17 tests) — scoring per estat, bonificacions (budget, telèfon, referit), penalitzacions (event passat, stale), clamping (0-100, probabilitat 2%-98%), estimació d'import
+- `__tests__/lib/services/profitabilityService.test.ts` (15 tests) — valors per defecte, normalització (null, parcial, ràtios fora rang, CAC parcial)
+- Tots els tests documentats amb comentaris pedagògics en català explicant conceptes econòmics (marge, ràtio de cost, CAC, amortització, trams de transport)
+- **151 tests totals, 12 fitxers, TOTS passen**
+
+#### ✅ Bloc 6: Fallbacks mòbil per drag-drop
+**Per què**: HTML5 Drag & Drop no funciona en dispositius tàctils (mòbil/tablet). El kanban de tasques i el calendari eren inutilitzables en mòbil — 50%+ del tràfic admin.
+**Què s'ha fet**:
+- `TaskKanbanView.tsx` — afegits botons "Obertes" / "En curs" / "Fetes" sota cada card, visibles només en mòbil (`md:hidden`). Usen la mateixa funció `moveTask()` que el drag-drop.
+- `CalendarMonthClient.tsx` — afegit botó "Canviar data" al panell de detalls de cada reserva. Obre un input `type="date"` natiu (óptim per mòbil). En seleccionar, mou la reserva i refresca el calendari.
+
+### Verificació final
+- `npx tsc --noEmit` → 2 errors pre-existents (portal/booking), cap error nou
+- `npx vitest run` → **151 tests, 12 fitxers, tots passen**
+- Grep `function escapeHtml` → 1 sola definició (sanitize.ts)
+- Grep `0.36` hardcodejat → només a profitabilityService.ts (font canònica) i tests
+- Grep `(prisma as any)` → zero
+
+### Fitxers nous creats
+- `__tests__/lib/margin-utils.test.ts`
+- `__tests__/lib/services/travelCost.test.ts`
+- `__tests__/lib/services/commercialScoring.test.ts`
+- `__tests__/lib/services/profitabilityService.test.ts`
+
+### Fitxers modificats
+- `lib/utils/sanitize.ts` — escapeHtml ampliat a null|undefined
+- `lib/margin-utils.ts` — getTravelMarginTone() afegit
+- `lib/services/travelCost.ts` — DEFAULT_VEHICLE_COST_PER_KM, alias deprecated
+- `lib/services/clientPortalAccess.ts` — eliminat (prisma as any)
+- `lib/email.ts` — import escapeHtml centralitzat
+- `lib/services/documentService.ts` — import escapeHtml centralitzat
+- `lib/services/canvasService.ts` — import escapeHtml centralitzat
+- `app/admin/bookings/page.tsx` — getProfitabilityConfig, zero hardcodes
+- `app/admin/lib/dashboard-data.ts` — getProfitabilityConfig, zero hardcodes
+- `app/admin/bookings/[id]/BookingMarginCard.tsx` — semàfors centralitzats, fuel→vehicle, tooltip, exhaustive-deps
+- `app/admin/components/ToastProvider.tsx` — accessibilitat (role/aria-live)
+- `app/admin/tasks/TaskKanbanView.tsx` — botons mòbil per moure tasques
+- `app/admin/calendario/CalendarMonthClient.tsx` — botó canviar data per mòbil
+- `app/api/admin/emails/send/route.ts` — import escapeHtml centralitzat
+- `app/api/admin/leads/[id]/snapshot/route.ts` — import escapeHtml centralitzat
+- `scripts/autofix-system-health.ts` — eliminat (prisma as any)
+- `__tests__/lib/sanitize.test.ts` — tests null/undefined
+
+## 2026-02-26 — Auditoria econòmica-financera Fase 2
+
+### Context de la sessió
+L'operador vol el sistema econòmic completament automatitzat i interconnectat. Criteri de doctor en ADE: tots els costos derivats de dades reals, previsions de vendes, recordatoris automàtics, i que "la feina es faci sola". Objectiu: enriquir i automatitzar, no reconstruir.
+
+### Treball realitzat
+
+#### Bloc 0: Motor de cost unificat (`costEngine.ts`)
+**Per què**: Hi havia 3 sistemes de cost desconnectats (profitabilityService, packPricingHealth, BookingMarginCard). L'operador veia marges diferents segons on mirés.
+**Què s'ha fet**:
+- Creat `lib/services/costEngine.ts` — `computeBookingFinancialSummary()` com a font única de veritat
+- Si hi ha inventari real → cost REAL, si no → estimat via ratis
+- `profitabilityService.ts` ara delega internament a costEngine
+- `bookings/page.tsx` i `dashboard-data.ts` ara usen `computeSimpleMarginPct()` del costEngine
+- 10 tests nous per al costEngine
+
+#### Bloc 1: MITECO → cost vehicle automàtic
+**Per què**: `travelCost.ts` usava 0.19€/km hardcodejat. `fuelReferenceService.ts` ja descarregava el preu MITECO però no s'usava en cap càlcul.
+**Què s'ha fet**:
+- `travelCost.ts` — nova `calculateEffectiveVehicleCostPerKm()` amb fórmula: `(fuelPrice × consumL100 / 100) + maintenance`
+- `fuelReferenceService.ts` — nova `getEffectiveVehicleCostPerKm()` que llegeix MITECO de BD
+- Defaults: consum 8.5 L/100km (furgoneta), manteniment 0.12 €/km
+- 6 tests nous per al càlcul de cost vehicle
+- UI a economia/config mostrant preu combustible, consum, manteniment i cost efectiu
+
+#### Bloc 7: Eliminar redundàncies de càlcul
+**Per què**: Marge es calculava de manera diferent a bookings/page, dashboard-data, BookingMarginCard, profitabilityService.
+**Què s'ha fet**:
+- `profitabilityService.ts` → `toProfitabilityRow()` ara usa costEngine
+- `dashboard-data.ts` → marge mitjà ara via `computeSimpleMarginPct()` del costEngine
+- `bookings/page.tsx` → ambdós càlculs de marge (mòbil + desktop) via costEngine
+- Eliminat import de `calculateSimpleMarginPct` dels consumidors (queda a margin-utils per retrocompatibilitat)
+
+#### Bloc 2: Previsió de tresoreria
+**Per què**: L'operador no sabia quan entraria diners. Sense previsió de tresoreria, qualsevol empresa petita va a cegues.
+**Què s'ha fet**:
+- Creat `lib/services/cashFlowForecast.ts` — `buildCashFlowForecast()`
+- Ingressos = total × % pendent de cobrar per mes d'event
+- Costos = estimats via costEngine per reserva
+- Taula mensual: ingressos, costos, flux net, acumulat
+- API route: `app/api/admin/economia/cash-flow/route.ts`
+- Nova pestanya "Tresoreria" a Economia
+
+#### Bloc 3: Previsió de vendes + estacionalitat
+**Per què**: L'operador no sabia quantes reserves necessitava per arribar als objectius ni quins mesos eren forts.
+**Què s'ha fet**:
+- Creat `lib/services/pipelineForecast.ts` — `buildPipelineForecast()`
+- Pipeline ponderat: leads actius × probabilitat (scoreLead) × import estimat
+- Històric: reserves passades per mes → mitjana estacional (últims 24 mesos)
+- Combinació: 60% pipeline + 40% històric
+- API route: `app/api/admin/economia/forecast/route.ts`
+- Nova pestanya "Previsions" a Economia
+
+#### Bloc 4: Recordatoris de pagament automàtics
+**Per què**: L'operador mirava manualment quines reserves tenien pagaments pendents. Amb 30+ reserves al mes, molt temps perdut.
+**Què s'ha fet**:
+- Creat `lib/services/paymentReminderService.ts`
+- Cerca reserves amb pagament pendent i event < 14 dies
+- No repeteix si ja enviat en últims 7 dies (via AdminLog)
+- Integrat al cron `commercial-daily`
+- Email en HTML amb import pendent, dies fins l'event
+
+#### Bloc 5: Portal client automàtic en COMPLETED
+**Per què**: Quan una reserva es marcava COMPLETED, l'operador havia de crear manualment el portal. Pas mecànic que s'oblidava.
+**Què s'ha fet**:
+- `app/api/admin/bookings/[id]/route.ts` — al canvi a COMPLETED:
+  - Auto-crea `ClientPortalAccess` via `issueClientPortalAccess()`
+  - Envia email al client amb enllaç del portal
+  - Registra a AdminLog
+  - No bloqueja el canvi d'estat si falla
+
+#### Bloc 6: Cron setmanal sync preus pack
+**Per què**: `packPricingHealth.ts` calcula preu recomanat, però l'operador havia d'anar manualment a revisar. Si els costos canviaven, els preus quedaven desactualitzats.
+**Què s'ha fet**:
+- Creat `app/api/cron/pack-pricing-check/route.ts`
+- Analitza divergència per cada pack actiu
+- Si >15% → crea Task amb prioritat proporcional
+- No canvia preus automàticament (decisió comercial)
+
+#### Bloc 8: Cache intel·ligent de scoring
+**Per què**: `scoreLead()` es cridava per cada lead a cada renderització. Amb 200+ leads, feina repetida.
+**Què s'ha fet**:
+- Afegit `cachedScore` i `cachedScoreAt` al model Lead (schema Prisma)
+- Migració: `20260501090000_add_lead_cached_score`
+- Cron `commercial-daily` actualitza scores de tots els leads actius
+
+#### Bloc 10: CAC real des de dades
+**Per què**: CAC era estimacions fixes (Instagram=35€, etc). No reflectien la realitat.
+**Què s'ha fet**:
+- Creat `lib/services/cacAnalysis.ts` — `buildCacAnalysis()`
+- Per canal: leads totals, guanyats, taxa conversió, CAC ponderat
+- Comparativa CAC estimat vs real a Economia → pestanya Previsions
+
+#### Bloc 9: Dashboard financer enriquit
+**Per què**: Dashboard mostrava marge i facturació, però faltaven KPIs financers clau.
+**Què s'ha fet**:
+- `dashboard-data.ts` — afegit `cashFlowNet30`, `pipelineWeighted30`, `pendingPayments`
+- `app/admin/page.tsx` — 3 cards noves: Flux net previst, Pipeline ponderat, Pendent de cobrar
+- Tot resilient amb catch (no bloqueja dashboard si un servei falla)
+
+### Verificació
+- `npx tsc --noEmit` → 0 errors nous (2 pre-existents en portal/booking page)
+- `npx vitest run` → **167 tests, 14 fitxers, tots passen** (151→167, +16 nous)
+- 6 nous serveis creats, 4 API routes noves, 2 crons nous
+- Tots els càlculs de marge ara via costEngine (font única)
+
+### Fitxers nous creats
+- `lib/services/costEngine.ts`
+- `lib/services/cashFlowForecast.ts`
+- `lib/services/pipelineForecast.ts`
+- `lib/services/paymentReminderService.ts`
+- `lib/services/cacAnalysis.ts`
+- `app/api/admin/economia/cash-flow/route.ts`
+- `app/api/admin/economia/forecast/route.ts`
+- `app/api/cron/pack-pricing-check/route.ts`
+- `prisma/migrations/20260501090000_add_lead_cached_score/migration.sql`
+- `__tests__/lib/services/costEngine.test.ts`
+- `__tests__/lib/services/vehicleCost.test.ts`
+
+### Fitxers modificats
+- `lib/services/travelCost.ts` — calculateEffectiveVehicleCostPerKm, constants noves
+- `lib/services/fuelReferenceService.ts` — getEffectiveVehicleCostPerKm
+- `lib/services/profitabilityService.ts` — delega a costEngine
+- `app/admin/bookings/page.tsx` — computeSimpleMarginPct del costEngine
+- `app/admin/lib/dashboard-data.ts` — costEngine + KPIs financers
+- `app/admin/page.tsx` — 3 cards dashboard noves
+- `app/admin/economia/EconomiaClient.tsx` — 2 pestanyes noves + vehicle config + CAC
+- `app/admin/economia/page.tsx` — integració dades noves
+- `app/api/admin/bookings/[id]/route.ts` — portal auto-created en COMPLETED
+- `app/api/cron/commercial-daily/route.ts` — recordatoris + scoring cache
+- `prisma/schema.prisma` — cachedScore, cachedScoreAt al Lead
+
+---
+
 #### ✅ Corregir ESLint config (build bloquejat)
 **Per què**: La regla `@typescript-eslint/no-explicit-any: warn` va ser afegida a la sessió 2026-02-23, però sense registrar el plugin `@typescript-eslint` explícitament. `next/core-web-vitals` no el registra de forma que les regles siguin accessibles directament. Resultat: `npm run build` fallava amb "Definition for rule not found".
 **Què s'ha fet**:
