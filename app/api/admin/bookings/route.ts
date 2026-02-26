@@ -130,7 +130,8 @@ export async function GET(req: NextRequest) {
     const toDate = searchParams.get('toDate');
     const search = searchParams.get('search');
     const page = safeParseInt(searchParams.get('page'), 1, 1);
-    const limit = safeParseInt(searchParams.get('limit'), 25, 1, 200);
+    const isPipeline = searchParams.get('pipeline') === 'true';
+    const limit = safeParseInt(searchParams.get('limit'), 25, 1, isPipeline ? 1000 : 200);
 
     // Validar enums
     const validStatus = status && Object.values(BookingStatus).includes(status as BookingStatus)

@@ -41,8 +41,8 @@ function ContactContent() {
   const searchParams = useSearchParams();
   const t = useTranslations('contact');
 
-  const preselectedService = searchParams.get('servicio') || undefined;
-  const preselectedDate = searchParams.get('fecha') || undefined;
+  const preselectedService = searchParams?.get('servicio') || undefined;
+  const preselectedDate = searchParams?.get('fecha') || undefined;
 
   const trustItems = [
     {
