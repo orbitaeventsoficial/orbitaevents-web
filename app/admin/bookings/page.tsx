@@ -4,13 +4,22 @@ import { log } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { cachedQuery, CacheTTL } from '@/lib/query-cache';
 import Link from 'next/link';
+import { Prisma } from '@prisma/client';
 import { AdminPage } from '../components/AdminPage';
 import BookingActions from './BookingActions';
+import BookingFilters from './BookingFilters';
+import BookingViewToggle from './BookingViewToggle';
 import { BOOKING_STATUS_CONFIG as STATUS_CONFIG, EVENT_TYPE_LABELS, formatDate, formatDateShort, formatCurrency } from '@/lib/constants';
 import { getMarginTone } from '@/lib/margin-utils';
 import { getProfitabilityConfig } from '@/lib/services/profitabilityService';
 import { computeSimpleMarginPct } from '@/lib/services/costEngine';
 import ExportCsvButton from '../components/ExportCsvButton';
+import dynamicImport from 'next/dynamic';
+
+const BookingPipelineViewWrapper = dynamicImport(
+  () => import('./BookingPipelineView'),
+  { ssr: false, loading: () => <div className="flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" /></div> },
+);
 
 export const dynamic = 'force-dynamic';
 
@@ -18,16 +27,56 @@ export const metadata = {
   title: 'Reserves | Òrbita Admin',
 };
 
-async function getBookings(pageParam?: string) {
+interface BookingSearchParams {
+  page?: string;
+  status?: string;
+  eventType?: string;
+  fromDate?: string;
+  toDate?: string;
+  search?: string;
+  view?: string;
+}
+
+async function getBookings(params: BookingSearchParams) {
   try {
-    const pageRaw = Number.parseInt(pageParam || '1', 10);
+    const pageRaw = Number.parseInt(params.page || '1', 10);
     const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
     const pageSize = 25;
 
+    // Build where clause from filters
+    const where: Prisma.BookingWhereInput = {};
+    if (params.status) {
+      where.status = params.status as Prisma.BookingWhereInput['status'];
+    }
+    if (params.eventType) {
+      where.eventType = params.eventType as Prisma.BookingWhereInput['eventType'];
+    }
+    if (params.fromDate || params.toDate) {
+      where.eventDate = {};
+      if (params.fromDate) {
+        (where.eventDate as Prisma.DateTimeFilter).gte = new Date(params.fromDate);
+      }
+      if (params.toDate) {
+        (where.eventDate as Prisma.DateTimeFilter).lte = new Date(params.toDate + 'T23:59:59');
+      }
+    }
+    if (params.search) {
+      const q = params.search;
+      where.OR = [
+        { clientName: { contains: q, mode: 'insensitive' } },
+        { reference: { contains: q, mode: 'insensitive' } },
+        { eventLocation: { contains: q, mode: 'insensitive' } },
+        { clientEmail: { contains: q, mode: 'insensitive' } },
+      ];
+    }
+
+    const cacheKey = `admin:bookings:${JSON.stringify({ page, pageSize, ...params })}`;
+
     const [bookings, stats, totalCount] = await cachedQuery(
-      `admin:bookings:page:${page}:size:${pageSize}`,
+      cacheKey,
       () => Promise.all([
         prisma.booking.findMany({
+          where,
           orderBy: { eventDate: 'desc' },
           skip: (page - 1) * pageSize,
           take: pageSize,
@@ -43,7 +92,7 @@ async function getBookings(pageParam?: string) {
           _count: true,
           _sum: { total: true },
         }),
-        prisma.booking.count(),
+        prisma.booking.count({ where }),
       ]),
       CacheTTL.VERY_SHORT
     );
@@ -86,10 +135,12 @@ function getPackName(
 export default async function BookingsPage({
   searchParams,
 }: {
-  searchParams?: { page?: string };
+  searchParams?: BookingSearchParams;
 }) {
+  const sp = searchParams || {};
+  const isKanban = sp.view === 'kanban';
   const [{ bookings, stats, pagination }, profitConfig] = await Promise.all([
-    getBookings(searchParams?.page),
+    getBookings(sp),
     getProfitabilityConfig(),
   ]);
 
@@ -147,14 +198,28 @@ export default async function BookingsPage({
         </div>
       </section>
 
-      {/* Info Alert - Compacto en móvil */}
+      {/* Filtres + Toggle vista */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex-1">
+          <BookingFilters />
+        </div>
+        <BookingViewToggle />
+      </div>
+
+      {/* Info Alert */}
       <div className="rounded-2xl border backdrop-blur-sm p-3 text-center sm:p-4">
         <p className="text-xs sm:text-sm">
           <strong>Auto:</strong> Quan passa a <span className="font-semibold">COMPLETED</span>, les stats públiques s&apos;actualitzen.
         </p>
       </div>
 
-      {/* Mobile Card View */}
+      {/* Kanban View */}
+      {isKanban && (
+        <BookingPipelineViewWrapper />
+      )}
+
+      {/* List View (mobile cards + desktop table) */}
+      {!isKanban && <>
       <section className="lg:hidden space-y-3">
         {bookings.length === 0 ? (
           <div className="rounded-2xl border backdrop-blur-sm p-8 text-center">
@@ -380,8 +445,9 @@ export default async function BookingsPage({
           </table>
         </div>
       </section>
+      </>}
 
-      {pagination.totalPages > 1 && (
+      {!isKanban && pagination.totalPages > 1 && (
         <section className="flex flex-col items-center justify-center gap-2 rounded-2xl border p-3 text-xs sm:flex-row sm:justify-between">
           <span>
             Pàgina {pagination.page} de {pagination.totalPages}

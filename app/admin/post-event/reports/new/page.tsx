@@ -10,7 +10,7 @@ import { AdminPage } from '../../../components/AdminPage';
 export default function NewReportPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const bookingId = searchParams.get('bookingId');
+  const bookingId = searchParams?.get('bookingId') ?? null;
 
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState<any>(null);

@@ -14,6 +14,8 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AdminPage } from '../components/AdminPage';
+import { useToast } from '../components/ToastProvider';
+import ExportCsvButton from '../components/ExportCsvButton';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TIPUS
@@ -104,6 +106,7 @@ function getExecutionPriority(customer: Customer): { level: ExecutionPriority; s
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function AdminContactesPage() {
+  const toast = useToast();
   const searchParams = useSearchParams();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [stats, setStats] = useState<CustomerStats | null>(null);
@@ -232,10 +235,10 @@ export default function AdminContactesPage() {
   }, [customers, priorityFilter]);
 
   useEffect(() => {
-    const shouldOpen = searchParams.get('add') === '1';
+    const shouldOpen = searchParams?.get('add') === '1';
     if (!shouldOpen) return;
 
-    const date = searchParams.get('date');
+    const date = searchParams?.get('date');
     setShowAddModal(true);
     if (date) {
       setNewCustomer((prev) => ({
@@ -375,7 +378,7 @@ export default function AdminContactesPage() {
         throw new Error(result.error || 'Error iniciant procés');
       }
 
-      alert(`✅ Procés "${processType}" iniciat per ${selectedCustomer.name}`);
+      toast.success(`Procés "${processType}" iniciat per ${selectedCustomer.name}`);
       setShowActionModal(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error');
@@ -431,16 +434,32 @@ export default function AdminContactesPage() {
           />
         </div>
 
-        <button
-          onClick={() => setShowAddModal(true)}
-          type="button"
-          className="flex items-center gap-2 px-6 py-3 rounded-xl text-white font-medium shadow-lg transition-all"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Afegir Client
-        </button>
+        <div className="flex gap-2">
+          <ExportCsvButton
+            filename="clients"
+            headers={['Nom', 'Email', 'Telèfon', 'Ciutat', 'Font', 'Esdeveniments', 'Despesa total', 'VIP']}
+            rows={customers.map((c) => [
+              c.name,
+              c.email,
+              c.phone || '',
+              c.city || '',
+              SOURCE_LABELS[c.source || ''] || c.source || '',
+              String(c.total_events),
+              String(c.total_spent),
+              c.is_vip ? 'Sí' : 'No',
+            ])}
+          />
+          <button
+            onClick={() => setShowAddModal(true)}
+            type="button"
+            className="flex items-center gap-2 px-6 py-3 rounded-xl text-white font-medium shadow-lg transition-all"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Afegir Client
+          </button>
+        </div>
       </div>
 
       {/* Filtres d'execució */}

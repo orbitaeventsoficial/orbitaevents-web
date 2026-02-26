@@ -577,3 +577,93 @@ L'operador vol el sistema econòmic completament automatitzat i interconnectat. 
 - Afegit `plugin:@typescript-eslint/recommended` als extends (registra el plugin)
 - Desactivades regles noves que `recommended` activa per defecte i que trencarien el codebase: `no-unused-vars`, `no-require-imports`, `prefer-as-const`, `no-unsafe-function-type`, `prefer-const`
 - `npm run build` → **èxit** (compilació + lint + 235 pàgines generades)
+
+---
+
+## 2026-02-26 — Auditoria UX completa admin
+
+### Context de la sessió
+L'operador (no expert tècnic) utilitza l'admin sol per gestionar un negoci d'events. Algunes pàgines clau (reserves, clients) estaven per sota del nivell de les altres (leads, tasques). Cal unificar l'experiència.
+
+### Treball realitzat
+
+#### ✅ Reserves: Filtres + cerca
+**Per què**: La pàgina de reserves no tenia filtres ni cerca. L'API ja suportava `status`, `eventType`, `fromDate`, `toDate`, `search` però la pàgina no els passava. Amb 30+ reserves, trobar-ne una requeria fer scroll.
+**Què s'ha fet**:
+- `BookingFilters.tsx` creat — barra de filtres client-side amb cerca (debounce 300ms), selects d'estat i tipus, dates des de/fins a, botó "Netejar filtres"
+- `bookings/page.tsx` — `searchParams` ampliat a `status`, `eventType`, `fromDate`, `toDate`, `search`, `view`
+- Query Prisma amb `where` dinàmic basat en filtres (ja existent a l'API)
+- Paginació conserva filtres a la URL
+
+#### ✅ Reserves: Vista kanban amb drag & drop
+**Per què**: Leads i tasques tenen kanban, reserves no. L'operador vol veure el flux d'un cop d'ull i moure reserves d'estat amb drag.
+**Què s'ha fet**:
+- `BookingPipelineView.tsx` creat — 4 columnes (PENDING → CONFIRMED → PREPARING → COMPLETED), CANCELLED ocultes
+- Drag & drop HTML5 amb optimistic updates via `PATCH /api/admin/bookings/{id}/status`
+- Cards compactes: referència, nom client, data, total, marge, paga pendent
+- Botons ← → per a mòbil (com a TaskKanbanView)
+- Mètriques per columna: total reserves, facturació
+- `BookingViewToggle.tsx` creat — toggle Llista/Kanban via searchParam `view=kanban`
+
+#### ✅ Clients: alert() → toast + Export CSV
+**Per què**: `window.alert()` a la pàgina de clients — UX amateur. I clients no tenia export CSV (leads i reserves sí).
+**Què s'ha fet**:
+- `alert()` substituït per `toast.success()` (hook `useToast()` que ja existia)
+- `ExportCsvButton` afegit amb headers: Nom, Email, Telèfon, Ciutat, Font, Esdeveniments, Despesa total, VIP
+
+#### ✅ Pipeline Leads: Filtres interactius + score
+**Per què**: La vista pipeline rebia filtres del servidor però no es podien canviar localment (cada canvi recarregava). I el score es calculava però no es veia a les targetes.
+**Què s'ha fet**:
+- Filtres locals (no recarrega pàgina): FilterChips clicables per prioritat, tipus event, font + cerca inline amb debounce
+- Botó "Netejar" per reiniciar filtres locals
+- Score badge a cada card: si hi ha `cachedScore` l'usa, si no, estima (budget+phone+eventDate+email)
+- Colors: verd >70, ambre >40, vermell ≤40
+
+#### ✅ Navegació: Simplificar
+**Per què**: 31 ítems al menú, sobrecàrrega cognitiva per a un operador sol.
+**Què s'ha fet**:
+- **Prioritat** (7→5): Eliminats Entrada ràpida (accessible des de Leads), Pressupost PDF, Mapa admin
+- **Operativa** (5→4): Eliminat Calendari (mogut a Prioritat)
+- **Eines** (12→7): Eliminats FAQ, Textos PRO, Canvas, Google Reviews, Operativa vendes (poc usats, accessibles via Ctrl+K)
+- **Config** (7→4): Eliminats Plantilla pressupostos (dins config), Traduccions, CSS PRO
+
+#### ✅ Bottom nav: Millorat
+**Per què**: Analítica apareixia al bottom nav mòbil i a "Eines". I l'operador necessita accés ràpid al calendari.
+**Què s'ha fet**:
+- Bottom nav: Tauler, Entrades, Reserves, Calendari, Més (obre sidebar)
+- "Més" és un botó que obre el sidebar, no un link
+
+#### ✅ Bidireccionalitat: Botó entrada original
+**Per què**: Des de la fitxa de reserva, el link a l'entrada original estava amagat al peu d'una secció.
+**Què s'ha fet**:
+- Botó "📥 Entrada original" afegit al header d'`AdminPage` (al costat de "👤 Fitxa Client")
+- Només visible si hi ha lead associat
+
+#### ✅ Fix errors TypeScript preexistents (21→0)
+**Per què**: `useSearchParams()` pot retornar `null` en Next.js 14 strict mode. 15 fitxers tenien `searchParams.get()` sense null check. El build fallava.
+**Què s'ha fet**:
+- 11 fitxers arreglats amb optional chaining (`searchParams?.get()`)
+- `layout.tsx` — `isActive()` ara retorna `boolean` explícit (no `boolean | undefined`)
+- `LanguageSelector.tsx`, `MobileBottomNav.tsx` — `pathname` nullable arreglat
+- Build complet: **233 pàgines generades, 0 errors**
+
+### Fitxers nous creats
+- `app/admin/bookings/BookingFilters.tsx`
+- `app/admin/bookings/BookingPipelineView.tsx`
+- `app/admin/bookings/BookingViewToggle.tsx`
+
+### Fitxers modificats
+- `app/admin/bookings/page.tsx` — filtres, toggle kanban, searchParams ampliat
+- `app/admin/bookings/[id]/page.tsx` — botó "Entrada original" al header
+- `app/admin/clientes/page.tsx` — toast, CSV export
+- `app/admin/leads/LeadPipelineView.tsx` — filtres locals, score badge, estimateScore()
+- `app/admin/components/nav-items.ts` — simplificat (31→20 ítems)
+- `app/admin/layout.tsx` — bottom nav millorat, isActive fix
+- `app/[locale]/valoracio/client.tsx` — fix searchParams nullable
+- `app/admin/blog/page.tsx` — fix searchParams nullable
+- `app/admin/bookings/new/page.tsx` — fix searchParams nullable
+- `app/admin/inbox/settings/InboxSettingsClient.tsx` — fix searchParams nullable
+- `app/admin/post-event/reports/new/page.tsx` — fix searchParams nullable
+- `app/admin/tasks/new/page.tsx` — fix searchParams nullable
+- `app/components/mobile-ultimate/MobileBottomNav.tsx` — fix pathname nullable
+- `app/components/ui/LanguageSelector.tsx` — fix pathname nullable

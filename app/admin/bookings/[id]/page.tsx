@@ -262,6 +262,14 @@ export default async function BookingDetailPage({ params }: PageProps) {
               👤 Fitxa Client
             </Link>
           )}
+          {booking.lead && (
+            <Link
+              href={`/admin/leads/${booking.lead.id}`}
+              className="ap-btn ap-btn--secondary"
+            >
+              📥 Entrada original
+            </Link>
+          )}
         </div>
       }
       actions={

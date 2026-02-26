@@ -59,7 +59,7 @@ export default function BlogAdminPage() {
   }, [fetchPosts]);
 
   useEffect(() => {
-    const created = searchParams.get('created');
+    const created = searchParams?.get('created');
     if (created === '1') {
       setFlashMessage({ type: 'success', text: 'Post creat correctament' });
     }

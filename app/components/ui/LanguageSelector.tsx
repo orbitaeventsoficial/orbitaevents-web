@@ -78,7 +78,7 @@ export default function LanguageSelector({
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
 
     // Obtenir path sense locale actual
-    const segments = pathname.split('/');
+    const segments = (pathname || '').split('/');
     const hasLocalePrefix = languageCodes.some(code => code === segments[1]);
     const pathWithoutLocale = hasLocalePrefix
       ? '/' + segments.slice(2).join('/')
@@ -243,7 +243,7 @@ export function LanguageSelectorMobile({ className = '' }: { className?: string 
   const switchLocale = (newLocale: string) => {
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
 
-    const segments = pathname.split('/');
+    const segments = (pathname || '').split('/');
     const hasLocalePrefix = languageCodes.some(code => code === segments[1]);
     const pathWithoutLocale = hasLocalePrefix
       ? '/' + segments.slice(2).join('/')
@@ -323,7 +323,7 @@ export function LanguageBar({ className = '' }: { className?: string }) {
   const switchLocale = (newLocale: string) => {
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
 
-    const segments = pathname.split('/');
+    const segments = (pathname || '').split('/');
     const hasLocalePrefix = languageCodes.some(code => code === segments[1]);
     const pathWithoutLocale = hasLocalePrefix
       ? '/' + segments.slice(2).join('/')

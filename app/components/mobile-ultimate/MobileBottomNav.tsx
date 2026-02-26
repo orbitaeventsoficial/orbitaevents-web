@@ -283,7 +283,7 @@ export default function MobileBottomNav() {
 
   // Determine active tab from current pathname
   const activeId = useMemo(() => {
-    const path = pathname.replace(`/${locale}`, '') || '/';
+    const path = (pathname || '').replace(`/${locale}`, '') || '/';
     if (path === '/' || path === '') return 'home';
     if (path.startsWith('/servicios') || path.startsWith('/tematica') || path.startsWith('/boda-halloween') || path.startsWith('/experiencias')) return 'services';
     if (path.startsWith('/blog')) return 'blog';

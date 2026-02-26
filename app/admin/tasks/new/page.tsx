@@ -8,7 +8,7 @@ import { AdminPage } from '../../components/AdminPage';
 export default function NewTaskPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const customerId = searchParams.get('customerId') || '';
+  const customerId = searchParams?.get('customerId') || '';
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');

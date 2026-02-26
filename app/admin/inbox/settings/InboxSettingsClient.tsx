@@ -21,7 +21,7 @@ export default function InboxSettingsClient({
   } | null>(null);
 
   const searchParams = useSearchParams();
-  const gmailStatus = searchParams.get('gmail');
+  const gmailStatus = searchParams?.get('gmail') ?? null;
 
   async function testConnection() {
     setTesting(true);
@@ -66,9 +66,9 @@ export default function InboxSettingsClient({
       {gmailStatus === 'error' && (
         <div className="border rounded-xl p-4" role="alert">
           <p className="font-medium">❌ Error connectant Gmail. Torna-ho a provar.</p>
-          {searchParams.get('reason') && (
+          {searchParams?.get('reason') && (
             <p className="text-sm mt-2">
-              Detall: {decodeURIComponent(searchParams.get('reason') || '')}
+              Detall: {decodeURIComponent(searchParams?.get('reason') || '')}
             </p>
           )}
         </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { EVENT_TYPE_ICONS, SOURCE_LABELS, formatDateShort } from '@/lib/constants';
+import { EVENT_TYPE_ICONS, EVENT_TYPE_PLAIN, SOURCE_LABELS, PRIORITY_LABELS, formatDateShort } from '@/lib/constants';
 import { useToast } from '@/app/admin/components/ToastProvider';
 
 type PipelineFilters = {
@@ -29,6 +29,7 @@ type PipelineLead = {
   budget: string | null;
   createdAt: string;
   booking: { id: string; reference: string } | null;
+  cachedScore?: number | null;
 };
 
 type PipelineColumn = {
@@ -57,6 +58,23 @@ const PRIORITY_DOT: Record<string, string> = {
 };
 
 
+// Local filter chips for interactive pipeline filtering
+function FilterChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap ${
+        active
+          ? 'border-cyan-400/50 bg-cyan-500/15 text-cyan-200'
+          : 'border-slate-700 text-slate-400 hover:text-slate-200'
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
 export default function LeadPipelineView({ filters }: { filters: PipelineFilters }) {
   const toast = useToast();
   const [allLeads, setAllLeads] = useState<PipelineLead[]>([]);
@@ -65,6 +83,13 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [draggingLeadId, setDraggingLeadId] = useState<string | null>(null);
   const [dragOverStatus, setDragOverStatus] = useState<string | null>(null);
+
+  // Local interactive filters (client-side, no reload)
+  const [localSearch, setLocalSearch] = useState('');
+  const [localPriority, setLocalPriority] = useState<string | null>(null);
+  const [localEventType, setLocalEventType] = useState<string | null>(null);
+  const [localSource, setLocalSource] = useState<string | null>(null);
+
   const filterQuery = useMemo(() => {
     const params = new URLSearchParams();
     filters.status.forEach((value) => params.append('status', value));
@@ -85,13 +110,6 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
       const data = await res.json();
       const leads: PipelineLead[] = data?.data?.leads || data?.leads || [];
       setAllLeads(leads);
-
-      setColumns(
-        COLUMNS.map((col) => ({
-          ...col,
-          leads: leads.filter((l: PipelineLead) => l.status === col.status),
-        }))
-      );
     } catch {
       // Keep existing state on error
     } finally {
@@ -103,17 +121,41 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     fetchPipeline();
   }, [fetchPipeline]);
 
-  const setLeadStatusInState = useCallback((leadId: string, status: string) => {
-    setAllLeads((prev) => {
-      const next = prev.map((lead) => (lead.id === leadId ? { ...lead, status } : lead));
-      setColumns(
-        COLUMNS.map((col) => ({
-          ...col,
-          leads: next.filter((l: PipelineLead) => l.status === col.status),
-        }))
+  // Derive filtered leads from allLeads + local filters
+  const filteredLeads = useMemo(() => {
+    let result = allLeads;
+    if (localSearch) {
+      const q = localSearch.toLowerCase();
+      result = result.filter((l) =>
+        l.name.toLowerCase().includes(q) ||
+        l.email.toLowerCase().includes(q) ||
+        (l.phone && l.phone.includes(q))
       );
-      return next;
-    });
+    }
+    if (localPriority) {
+      result = result.filter((l) => l.priority === localPriority);
+    }
+    if (localEventType) {
+      result = result.filter((l) => l.eventType === localEventType);
+    }
+    if (localSource) {
+      result = result.filter((l) => l.source === localSource);
+    }
+    return result;
+  }, [allLeads, localSearch, localPriority, localEventType, localSource]);
+
+  // Rebuild columns whenever filteredLeads changes
+  useEffect(() => {
+    setColumns(
+      COLUMNS.map((col) => ({
+        ...col,
+        leads: filteredLeads.filter((l) => l.status === col.status),
+      }))
+    );
+  }, [filteredLeads]);
+
+  const setLeadStatusInState = useCallback((leadId: string, status: string) => {
+    setAllLeads((prev) => prev.map((lead) => (lead.id === leadId ? { ...lead, status } : lead)));
   }, []);
 
   const moveLeadStatus = async (leadId: string, newStatus: string) => {
@@ -156,6 +198,12 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
     setDraggingLeadId(null);
   };
 
+  // Collect unique values from all leads for filter chips (must be before early returns)
+  const availableEventTypes = useMemo(() => [...new Set(allLeads.map((l) => l.eventType))].sort(), [allLeads]);
+  const availableSources = useMemo(() => [...new Set(allLeads.map((l) => l.source))].sort(), [allLeads]);
+  const availablePriorities = useMemo(() => [...new Set(allLeads.map((l) => l.priority))].sort(), [allLeads]);
+  const hasLocalFilters = localSearch || localPriority || localEventType || localSource;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -173,8 +221,64 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
 
   return (
     <div className="space-y-3">
+      {/* Local filters */}
+      <div className="space-y-2">
+        <div className="relative">
+          <input
+            type="search"
+            placeholder="Filtrar per nom, email, telèfon..."
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+            className="w-full pl-8 pr-4 py-1.5 rounded-lg border text-xs focus:ring-1 transition-all bg-transparent"
+          />
+          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {availablePriorities.map((p) => (
+            <FilterChip
+              key={p}
+              label={PRIORITY_LABELS[p] || p}
+              active={localPriority === p}
+              onClick={() => setLocalPriority(localPriority === p ? null : p)}
+            />
+          ))}
+          <span className="border-l border-slate-700 mx-0.5" />
+          {availableEventTypes.map((et) => (
+            <FilterChip
+              key={et}
+              label={EVENT_TYPE_PLAIN[et] || et}
+              active={localEventType === et}
+              onClick={() => setLocalEventType(localEventType === et ? null : et)}
+            />
+          ))}
+          <span className="border-l border-slate-700 mx-0.5" />
+          {availableSources.map((s) => (
+            <FilterChip
+              key={s}
+              label={SOURCE_LABELS[s] || s}
+              active={localSource === s}
+              onClick={() => setLocalSource(localSource === s ? null : s)}
+            />
+          ))}
+          {hasLocalFilters && (
+            <>
+              <span className="border-l border-slate-700 mx-0.5" />
+              <button
+                type="button"
+                onClick={() => { setLocalSearch(''); setLocalPriority(null); setLocalEventType(null); setLocalSource(null); }}
+                className="rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 text-[10px] font-medium text-rose-300 hover:bg-rose-500/20 transition-colors"
+              >
+                Netejar
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
       <div className="text-xs">
-        Pipeline filtrat: {totalLeads} de {allLeads.length} entrades
+        Pipeline: {totalLeads} entrades{hasLocalFilters ? ` (de ${allLeads.length} totals)` : ''}
       </div>
 
       <div className="pb-2">
@@ -271,6 +375,17 @@ export default function LeadPipelineView({ filters }: { filters: PipelineFilters
   );
 }
 
+/** Estimate a lead quality score from available fields when cachedScore is not available */
+function estimateScore(lead: PipelineLead): number | null {
+  let score = 30; // base
+  if (lead.budget) score += 20;
+  if (lead.phone) score += 15;
+  if (lead.eventDate) score += 15;
+  if (lead.email) score += 10;
+  // Cap at 100
+  return Math.min(100, score);
+}
+
 function PipelineCard({
   lead,
   columnStatus,
@@ -347,6 +462,21 @@ function PipelineCard({
 
       {/* Indicadors visuals ràpids */}
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+        {/* Score badge */}
+        {(() => {
+          const score = lead.cachedScore ?? estimateScore(lead);
+          if (score === null) return null;
+          const scoreColor = score > 70
+            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+            : score > 40
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+              : 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+          return (
+            <span className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-bold ${scoreColor}`} title="Score de qualitat">
+              {score}
+            </span>
+          );
+        })()}
         {/* Dies sense resposta */}
         {(() => {
           const daysSince = Math.floor((Date.now() - new Date(lead.createdAt).getTime()) / 86400000);

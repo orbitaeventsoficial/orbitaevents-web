@@ -288,8 +288,8 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const priorityItems = useMemo(() => getPriorityItems(newLeadsCount), [newLeadsCount]);
   const navSections = NAV_SECTIONS;
 
-  const isActive = useCallback((href: string) => {
-    return href === '/admin' ? pathname === '/admin' : pathname?.startsWith(href);
+  const isActive = useCallback((href: string): boolean => {
+    return href === '/admin' ? pathname === '/admin' : (pathname?.startsWith(href) ?? false);
   }, [pathname]);
 
   const prefetchRoute = useCallback((href: string) => {
@@ -706,14 +706,7 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             onPrefetch={prefetchRoute}
           />
           <BottomNavItem
-            icon="📈"
-            label="Analítica"
-            href="/admin/analytics"
-            isActive={pathname?.startsWith('/admin/analytics') || false}
-            onPrefetch={prefetchRoute}
-          />
-          <BottomNavItem
-            icon="👥"
+            icon="📥"
             label="Entrades"
             href="/admin/leads"
             isActive={pathname?.startsWith('/admin/leads') || false}
@@ -728,12 +721,20 @@ function AdminLayoutShell({ children }: { children: React.ReactNode }) {
             onPrefetch={prefetchRoute}
           />
           <BottomNavItem
-            icon="⚙️"
-            label="Configuració"
-            href="/admin/settings"
-            isActive={pathname?.startsWith('/admin/settings') || false}
+            icon="📅"
+            label="Calendari"
+            href="/admin/calendario"
+            isActive={pathname?.startsWith('/admin/calendario') || false}
             onPrefetch={prefetchRoute}
           />
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="admin-bottom-nav-item admin-bottom-nav-item--idle"
+          >
+            <span className="admin-bottom-nav-icon-wrap">☰</span>
+            <span className="admin-bottom-nav-label">Més</span>
+          </button>
         </div>
       </nav>
       <FloatingAddButton />

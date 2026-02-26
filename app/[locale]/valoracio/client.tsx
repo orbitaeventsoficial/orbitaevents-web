@@ -28,8 +28,8 @@ const STEPS = [
 
 function ValoracioContent() {
   const searchParams = useSearchParams();
-  const token = searchParams.get('token');
-  const ref = searchParams.get('ref');
+  const token = searchParams?.get('token') ?? null;
+  const ref = searchParams?.get('ref') ?? null;
 
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);

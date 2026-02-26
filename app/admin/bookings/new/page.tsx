@@ -100,9 +100,9 @@ const INITIAL_FORM: FormData = {
 export default function NewBookingPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const leadId = searchParams.get('leadId');
-  const customerId = searchParams.get('customerId');
-  const dateParam = searchParams.get('date');
+  const leadId = searchParams?.get('leadId') ?? null;
+  const customerId = searchParams?.get('customerId') ?? null;
+  const dateParam = searchParams?.get('date') ?? null;
 
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
   const [packs, setPacks] = useState<Pack[]>([]);
