@@ -667,3 +667,91 @@ L'operador (no expert tècnic) utilitza l'admin sol per gestionar un negoci d'ev
 - `app/admin/tasks/new/page.tsx` — fix searchParams nullable
 - `app/components/mobile-ultimate/MobileBottomNav.tsx` — fix pathname nullable
 - `app/components/ui/LanguageSelector.tsx` — fix pathname nullable
+
+#### ✅ Fix mismatches API ↔ components (post-auditoria)
+**Per què**: Auditoria automàtica va detectar que el kanban de reserves demanava `limit=500` però l'API clampava a 200. I `cachedScore` no s'incloïa al select del pipeline leads (migració pendent).
+**Què s'ha fet**:
+- `bookings/route.ts` — suport `pipeline=true` amb limit fins a 1000 (en mode normal es manté 200)
+- `pipeline.ts` — `cachedScore` preparat al type i comentat al select (activar un cop fet `prisma generate`)
+- `contacto/client.tsx` — fix searchParams nullable
+
+### Commits
+- `561e255` — `feat: auditoria UX completa admin — filtres, kanban, pipeline, navegació`
+- `449f5a9` — `fix: corregir mismatches API ↔ components detectats a auditoria UX`
+
+---
+
+## Informe per a Codex — Tasques pendents (2026-02-26)
+
+### PENDENT CRÍTIC: Migració Prisma
+```bash
+cd D:/orbitaevents
+source .env.local && npx prisma db push
+npx prisma generate
+```
+- Això aplica el camp `cachedScore` i `cachedScoreAt` al model Lead (schema.prisma línia 419-420)
+- Un cop fet, descomentar la línia `// cachedScore: true,` a `lib/services/leads/pipeline.ts:43`
+- Descomentar també `cachedScore` del type `PipelineLead` al mateix fitxer (línia 14)
+- Verificar que el pipeline de leads mostra el score real en comptes de l'estimat
+
+### PENDENT: Verificació manual al navegador
+1. **Reserves kanban** (`/admin/bookings?view=kanban`):
+   - [ ] Drag & drop funciona (arrossegar card d'una columna a una altra)
+   - [ ] Botons ← → mòbil funcionen
+   - [ ] Optimistic update: la card es mou immediatament i es torna enrere si l'API falla
+   - [ ] Mètriques per columna (count + facturació) correctes
+   - [ ] CANCELLED no apareix al kanban (recompte a sota)
+   - [ ] Badge "Paga pendent" apareix si `depositPaid=false`
+
+2. **Reserves filtres** (`/admin/bookings`):
+   - [ ] Cerca per nom/referència funciona
+   - [ ] Filtre per estat funciona
+   - [ ] Filtre per tipus event funciona
+   - [ ] Filtres de data (des de/fins a) funcionen
+   - [ ] "Netejar filtres" reseteja tot
+   - [ ] Toggle Llista/Kanban funciona
+
+3. **Pipeline leads** (`/admin/leads?view=pipeline`):
+   - [ ] FilterChips clicables funcionen
+   - [ ] Cerca inline filtra en temps real
+   - [ ] Score badge visible a cada card
+   - [ ] "Netejar" reinicia filtres
+
+4. **Clients** (`/admin/clientes`):
+   - [ ] Al clicar "Enviar recordatori" apareix un toast (no un alert)
+   - [ ] Botó CSV descarrega fitxer amb les columnes correctes
+
+5. **Navegació**:
+   - [ ] Sidebar: 20 ítems (no 31)
+   - [ ] Bottom nav mòbil: Tauler, Entrades, Reserves, Calendari, Més
+   - [ ] Botó "Més" obre el sidebar
+
+6. **Bidireccionalitat**:
+   - [ ] Des de reserva amb lead → botó "📥 Entrada original" visible al header
+
+### PENDENT: `marginPct` al kanban de reserves
+- L'API retorna tots els camps del booking (`include`) però NO calcula marge
+- `BookingPipelineView.tsx` línia 69: `marginPct: typeof b.marginPct === 'number' ? b.marginPct : null`
+- Com que `marginPct` NO és un camp del model Booking, sempre serà `null`
+- Opcions per implementar:
+  1. Calcular al servidor: a la resposta de l'API, cridar `computeSimpleMarginPct()` per cada booking
+  2. Calcular al client: importar la lògica de marge al component (menys ideal)
+  3. Deixar-ho com està: el marge es veu al detall de la reserva (ja funciona)
+
+### PENDENT: Tests pendents d'executar
+```bash
+cd D:/orbitaevents && npx vitest run
+```
+- Última execució: 167 tests, 14 fitxers, tots passen
+- Cap test nou afegit en els últims canvis (fixes menors)
+
+### Arquitectura i patrons a seguir
+- **Cost/marge**: Sempre via `costEngine.ts` — `computeBookingFinancialSummary()` és la font de veritat
+- **Formatació**: `formatDate/Currency/Number()` de `lib/constants` — MAI hardcodejar `'ca-ES'`
+- **Locale**: `toIntlLocale(locale)` per convertir `'ca'→'ca-ES'`
+- **Semàfors marge**: `getMarginTone()` de `lib/margin-utils.ts`
+- **UI admin en català**: Tots els textos visibles en català, variables/URLs en anglès
+- **Drag & drop mòbil**: Sempre afegir botons fallback `md:hidden` (HTML5 D&D no funciona en tàctil)
+- **searchParams/pathname nullable**: Next.js 14 — sempre `?.get()` i `(pathname || '')`
+- **Toast, no alert()**: `useToast()` de `ToastProvider`
+- **CSV export**: `ExportCsvButton` amb mode `headers+rows` (server) o `data+columns` (client)
