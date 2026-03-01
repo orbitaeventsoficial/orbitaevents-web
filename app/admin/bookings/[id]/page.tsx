@@ -445,9 +445,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
           <div className="flex items-start justify-between">
             <div>
               <span className="text-xs font-medium uppercase">Pack</span>
-              <p className="text-lg font-semibold">
+              <Link href={`/admin/packs/${booking.pack.id}`} className="text-lg font-semibold underline decoration-white/20 hover:decoration-white/60 transition-colors">
                 {packTranslation?.name || booking.pack.slug}
-              </p>
+              </Link>
               {packTranslation?.tagline && (
                 <p className="text-sm">{packTranslation.tagline}</p>
               )}

@@ -148,7 +148,7 @@ export default function ClientPortalAccessPanel({
           >
             <option value="ca">Català</option>
             <option value="es">Castellà</option>
-            <option value="en">English</option>
+            <option value="en">Anglès</option>
           </select>
         </label>
 

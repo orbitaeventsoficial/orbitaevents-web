@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import InfoTooltip from '../../components/InfoTooltip';
 import { ADMIN_HELP } from '../../help-content';
@@ -61,7 +61,14 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
   });
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!confirmingDelete) return;
+    const t = setTimeout(() => setConfirmingDelete(false), 3000);
+    return () => clearTimeout(t);
+  }, [confirmingDelete]);
 
   const updateField = (key: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -69,11 +76,8 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
 
   const handleDeleteLead = async () => {
     if (deleting) return;
-    const confirmed = window.confirm(
-      'Segur que vols eliminar aquest registre? Aquesta acció no es pot desfer.'
-    );
-    if (!confirmed) return;
-
+    if (!confirmingDelete) { setConfirmingDelete(true); return; }
+    setConfirmingDelete(false);
     setDeleting(true);
     setStatus(null);
     try {
@@ -153,9 +157,9 @@ export default function LeadProfileEditor({ lead }: { lead: LeadProfile }) {
             type="button"
             onClick={handleDeleteLead}
             disabled={deleting || saving}
-            className="rounded-lg border px-4 py-2 text-sm font-semibold disabled:opacity-60"
+            className={`rounded-lg border px-4 py-2 text-sm font-semibold disabled:opacity-60 ${confirmingDelete ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
           >
-            {deleting ? 'Eliminant...' : 'Eliminar registre'}
+            {deleting ? 'Eliminant...' : confirmingDelete ? 'Segur? Fes clic per confirmar' : 'Eliminar registre'}
           </button>
           <button
             type="button"

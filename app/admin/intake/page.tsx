@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useToast } from '@/app/admin/components/ToastProvider';
 import { AdminPage } from '../components/AdminPage';
 
 const SOURCE_OPTIONS = [
@@ -91,9 +92,11 @@ const INITIAL_FORM: FormData = {
 const INTAKE_SOURCE_STORAGE_KEY = 'admin.intake.source';
 
 export default function IntakePage() {
+  const toast = useToast();
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
   const [duplicates, setDuplicates] = useState<DuplicateWarning[]>([]);
   const [checkingDuplicates, setCheckingDuplicates] = useState(false);
+  const [duplicateOverride, setDuplicateOverride] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<{ id: string; name: string } | null>(null);
@@ -154,12 +157,12 @@ export default function IntakePage() {
 
     // Warn about high-score duplicates
     const highDup = duplicates.find((d) => d.matchScore >= 80);
-    if (highDup) {
-      const proceed = window.confirm(
-        `Atenció: S'ha trobat un client molt similar: "${highDup.name}" (${highDup.matchScore}% coincidència).\n\nVols crear l'entrada igualment?`
-      );
-      if (!proceed) return;
+    if (highDup && !duplicateOverride) {
+      toast.warning(`Possible duplicat: "${highDup.name}" (${highDup.matchScore}%). Fes clic de nou per crear igualment.`);
+      setDuplicateOverride(true);
+      return;
     }
+    setDuplicateOverride(false);
 
     setSubmitting(true);
     setError(null);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { formatDateTime } from '@/lib/constants';
 
 type LeadTask = {
@@ -56,6 +56,20 @@ export default function LeadWorkspace({
   const [loadingDoc, setLoadingDoc] = useState(false);
   const [cleaningActivities, setCleaningActivities] = useState(false);
   const [deletingDocumentId, setDeletingDocumentId] = useState<string | null>(null);
+  const [confirmingActivityId, setConfirmingActivityId] = useState<string | null>(null);
+  const [confirmingDocumentId, setConfirmingDocumentId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!confirmingActivityId) return;
+    const t = setTimeout(() => setConfirmingActivityId(null), 3000);
+    return () => clearTimeout(t);
+  }, [confirmingActivityId]);
+
+  useEffect(() => {
+    if (!confirmingDocumentId) return;
+    const t = setTimeout(() => setConfirmingDocumentId(null), 3000);
+    return () => clearTimeout(t);
+  }, [confirmingDocumentId]);
 
   const openTasks = useMemo(
     () => tasks.filter((task) => task.status !== 'DONE' && task.status !== 'CANCELLED'),
@@ -140,8 +154,8 @@ export default function LeadWorkspace({
   };
 
   const deleteActivity = async (activityId: string) => {
-    const confirmed = window.confirm('Vols eliminar aquesta activitat del timeline?');
-    if (!confirmed) return;
+    if (confirmingActivityId !== activityId) { setConfirmingActivityId(activityId); return; }
+    setConfirmingActivityId(null);
 
     const res = await fetch(`/api/admin/leads/${leadId}/activities/${activityId}`, {
       method: 'DELETE',
@@ -163,9 +177,8 @@ export default function LeadWorkspace({
 
   const deleteDocument = async (documentId: string) => {
     if (deletingDocumentId) return;
-    const confirmed = window.confirm('Vols eliminar aquest document?');
-    if (!confirmed) return;
-
+    if (confirmingDocumentId !== documentId) { setConfirmingDocumentId(documentId); return; }
+    setConfirmingDocumentId(null);
     setDeletingDocumentId(documentId);
     const res = await fetch(`/api/admin/leads/${leadId}/documents/${documentId}`, {
       method: 'DELETE',
@@ -351,9 +364,9 @@ export default function LeadWorkspace({
                       type="button"
                       onClick={() => deleteDocument(doc.id)}
                       disabled={deletingDocumentId === doc.id}
-                      className="rounded-lg border px-2.5 py-1 text-xs font-medium disabled:opacity-60"
+                      className={`rounded-lg border px-2.5 py-1 text-xs font-medium disabled:opacity-60 ${confirmingDocumentId === doc.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
                     >
-                      {deletingDocumentId === doc.id ? 'Eliminant...' : 'Eliminar'}
+                      {deletingDocumentId === doc.id ? 'Eliminant...' : confirmingDocumentId === doc.id ? 'Segur?' : 'Eliminar'}
                     </button>
                   </div>
                 </div>
@@ -398,9 +411,9 @@ export default function LeadWorkspace({
                     <button
                       type="button"
                       onClick={() => deleteActivity(activity.id)}
-                      className="rounded-lg border px-2 py-1 text-xs font-medium"
+                      className={`rounded-lg border px-2 py-1 text-xs font-medium ${confirmingActivityId === activity.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
                     >
-                      Eliminar
+                      {confirmingActivityId === activity.id ? 'Segur?' : 'Eliminar'}
                     </button>
                   </div>
                 </div>

@@ -148,6 +148,7 @@ export default function AdminContactesPage() {
     matchReasons: Array<{ field: string; type: string; score: number }>;
   }>>([]);
   const [checkingDuplicates, setCheckingDuplicates] = useState(false);
+  const [duplicateOverride, setDuplicateOverride] = useState(false);
 
   // Fetch customers
   const fetchCustomers = useCallback(async () => {
@@ -284,14 +285,12 @@ export default function AdminContactesPage() {
 
     // Warn about high-score duplicates
     const highScoreDup = duplicateWarnings.find((d) => d.matchScore >= 80);
-    if (highScoreDup && !window.confirm(
-      `ATENCIÓ: S'ha detectat un possible duplicat:\n\n` +
-      `"${highScoreDup.name}" (${highScoreDup.email})\n` +
-      `Coincidència: ${highScoreDup.matchScore}%\n\n` +
-      `Vols crear-lo igualment?`
-    )) {
+    if (highScoreDup && !duplicateOverride) {
+      toast.warning(`Possible duplicat: "${highScoreDup.name}" (${highScoreDup.matchScore}%). Fes clic a "Crear igualment" per continuar.`);
+      setDuplicateOverride(true);
       return;
     }
+    setDuplicateOverride(false);
 
     setActionLoading(true);
 

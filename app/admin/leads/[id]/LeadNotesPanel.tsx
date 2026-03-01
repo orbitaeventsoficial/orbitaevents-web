@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatDateTime } from '@/lib/constants';
 
 type LeadNoteItem = {
@@ -23,13 +23,20 @@ export default function LeadNotesPanel({
 }) {
   const [notes, setNotes] = useState(initialNotes);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const [cleaning, setCleaning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!confirmingDeleteId) return;
+    const t = setTimeout(() => setConfirmingDeleteId(null), 3000);
+    return () => clearTimeout(t);
+  }, [confirmingDeleteId]);
+
   const deleteNote = async (noteId: string) => {
-    const confirmed = window.confirm('Vols eliminar aquesta nota?');
-    if (!confirmed) return;
+    if (confirmingDeleteId !== noteId) { setConfirmingDeleteId(noteId); return; }
+    setConfirmingDeleteId(null);
     setDeletingId(noteId);
     setError(null);
     try {
@@ -107,9 +114,9 @@ export default function LeadNotesPanel({
                   type="button"
                   onClick={() => deleteNote(note.id)}
                   disabled={deletingId === note.id}
-                  className="rounded-md border px-2.5 py-1 text-xs font-medium disabled:opacity-60"
+                  className={`rounded-md border px-2.5 py-1 text-xs font-medium disabled:opacity-60 ${confirmingDeleteId === note.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
                 >
-                  {deletingId === note.id ? 'Eliminant...' : 'Eliminar'}
+                  {deletingId === note.id ? 'Eliminant...' : confirmingDeleteId === note.id ? 'Segur?' : 'Eliminar'}
                 </button>
               </div>
               <p className="whitespace-pre-wrap text-sm">{note.content}</p>

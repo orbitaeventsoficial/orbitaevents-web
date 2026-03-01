@@ -4,12 +4,19 @@ import type { CustomerHubDTO } from '@/lib/customer-hub/dto';
 import { formatDate } from '@/lib/constants';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function TasksNotesPanel({ data }: { data: CustomerHubDTO }) {
   const router = useRouter();
   const [busyTaskId, setBusyTaskId] = useState<string | null>(null);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!confirmingDeleteId) return;
+    const t = setTimeout(() => setConfirmingDeleteId(null), 3000);
+    return () => clearTimeout(t);
+  }, [confirmingDeleteId]);
 
   const openTasks = data.tasks.filter((task) => !task.done);
   const doneTasks = data.tasks.filter((task) => task.done);
@@ -36,8 +43,8 @@ export default function TasksNotesPanel({ data }: { data: CustomerHubDTO }) {
   };
 
   const deleteTask = async (taskId: string) => {
-    const confirmed = window.confirm('Vols eliminar aquesta tasca?');
-    if (!confirmed) return;
+    if (confirmingDeleteId !== taskId) { setConfirmingDeleteId(taskId); return; }
+    setConfirmingDeleteId(null);
     setBusyTaskId(taskId);
     setError(null);
     try {
@@ -82,6 +89,7 @@ export default function TasksNotesPanel({ data }: { data: CustomerHubDTO }) {
           title="Pendents"
           items={openTasks}
           busyTaskId={busyTaskId}
+          confirmingDeleteId={confirmingDeleteId}
           onToggleDone={(taskId) => updateTaskStatus(taskId, true)}
           onDelete={deleteTask}
         />
@@ -89,6 +97,7 @@ export default function TasksNotesPanel({ data }: { data: CustomerHubDTO }) {
           title="Completades"
           items={doneTasks}
           busyTaskId={busyTaskId}
+          confirmingDeleteId={confirmingDeleteId}
           onToggleDone={(taskId) => updateTaskStatus(taskId, false)}
           onDelete={deleteTask}
           doneColumn
@@ -102,6 +111,7 @@ function TaskColumn({
   title,
   items,
   busyTaskId,
+  confirmingDeleteId,
   onToggleDone,
   onDelete,
   doneColumn = false,
@@ -109,6 +119,7 @@ function TaskColumn({
   title: string;
   items: Array<{ id: string; title: string; dueDate?: string; leadId?: string }>;
   busyTaskId: string | null;
+  confirmingDeleteId: string | null;
   onToggleDone: (taskId: string) => void;
   onDelete: (taskId: string) => void;
   doneColumn?: boolean;
@@ -143,9 +154,9 @@ function TaskColumn({
                   type="button"
                   onClick={() => onDelete(task.id)}
                   disabled={busyTaskId === task.id}
-                  className="rounded border px-2 py-1 text-xs disabled:opacity-60"
+                  className={`rounded border px-2 py-1 text-xs disabled:opacity-60 ${confirmingDeleteId === task.id ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
                 >
-                  Eliminar
+                  {confirmingDeleteId === task.id ? 'Segur?' : 'Eliminar'}
                 </button>
                 {task.leadId && (
                   <Link href={`/admin/leads/${task.leadId}`} className="text-xs">

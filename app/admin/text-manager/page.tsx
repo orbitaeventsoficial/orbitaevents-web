@@ -38,7 +38,7 @@ interface TranslationComparison {
 const LANGUAGE_META: Record<'ca' | 'es' | 'en', { label: string; icon: string }> = {
   ca: { label: 'Català', icon: '🏴' },
   es: { label: 'Castellà', icon: '🇪🇸' },
-  en: { label: 'English', icon: '🇬🇧' },
+  en: { label: 'Anglès', icon: '🇬🇧' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -539,7 +539,7 @@ export default function TextManagerPage() {
               {activeLanguage !== 'en' && otherLangValues.en && (
                 <div className="p-3 rounded-lg border">
                   <div className="flex items-center gap-2 text-xs mb-1">
-                    <span className="font-semibold">🇬🇧 English:</span>
+                    <span className="font-semibold">🇬🇧 Anglès:</span>
                   </div>
                   <p className="text-sm">{otherLangValues.en}</p>
                 </div>

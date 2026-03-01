@@ -221,8 +221,12 @@ export default function PresupuestoPdfStudio({
   const [clientName, setClientName] = useState(initialCustomerName || STUDIO_COPY.ca.defaultClientName);
   const [clientEmail, setClientEmail] = useState(initialCustomerEmail || '');
   const [clientPhone, setClientPhone] = useState('');
-  const [customerId] = useState(initialCustomerId);
+  const [customerId, setCustomerId] = useState(initialCustomerId);
   const [leadId] = useState(initialLeadId);
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [customerResults, setCustomerResults] = useState<Array<{ id: string; name: string; email: string; phone?: string }>>([]);
+  const [showCustomerPicker, setShowCustomerPicker] = useState(false);
+  const [searchingCustomers, setSearchingCustomers] = useState(false);
   const [proposalId, setProposalId] = useState(initialProposalId);
   const [eventDate, setEventDate] = useState('');
   const [eventSchedule, setEventSchedule] = useState('');
@@ -595,6 +599,75 @@ export default function PresupuestoPdfStudio({
     brandPhone,
     brandTagline,
   ]);
+
+  // ─── Customer search autocomplete ───────────────────────────────
+  useEffect(() => {
+    if (!showCustomerPicker) return;
+    const q = customerSearch.trim();
+    if (q.length < 2) { setCustomerResults([]); return; }
+
+    const timer = window.setTimeout(async () => {
+      setSearchingCustomers(true);
+      try {
+        const res = await fetch(`/api/admin/customers?q=${encodeURIComponent(q)}&limit=8`);
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && Array.isArray(data?.customers)) {
+          setCustomerResults(
+            data.customers.map((c: any) => ({
+              id: c.id,
+              name: c.name || '',
+              email: c.email || '',
+              phone: c.phone || '',
+            }))
+          );
+        }
+      } catch { /* ignore */ }
+      finally { setSearchingCustomers(false); }
+    }, 350);
+
+    return () => window.clearTimeout(timer);
+  }, [customerSearch, showCustomerPicker]);
+
+  function selectCustomer(c: { id: string; name: string; email: string; phone?: string }) {
+    setCustomerId(c.id);
+    setClientName(c.name);
+    setClientEmail(c.email);
+    setClientPhone(c.phone || '');
+    setShowCustomerPicker(false);
+    setCustomerSearch('');
+    setCustomerResults([]);
+  }
+
+  function clearSelectedCustomer() {
+    setCustomerId('');
+    setClientName(STUDIO_COPY.ca.defaultClientName);
+    setClientEmail('');
+    setClientPhone('');
+    setClientContact('');
+  }
+
+  // ─── Step validation helpers ──────────────────────────────────
+  const sectionStatus = useMemo(() => {
+    const clientOk = Boolean(customerId) && clientName.trim().length >= 2;
+    const clientWarn = !customerId ? 'Selecciona un client de la base de dades' :
+      clientName.trim().length < 2 ? 'Nom del client massa curt' : null;
+
+    const eventOk = Boolean(eventDate) && guests > 0;
+    const eventWarn = !eventDate ? 'Indica la data de l\'esdeveniment' :
+      guests <= 0 ? 'Indica el nombre de convidats' : null;
+
+    const packOk = basePrice > 0 && packName.trim().length > 0;
+    const packWarn = basePrice <= 0 ? 'Indica el preu base' :
+      !packName.trim() ? 'Indica el nom del pack' : null;
+
+    const brandOk = brandName.trim().length > 0 && brandEmail.trim().includes('@');
+    const brandWarn = !brandName.trim() ? 'Indica la marca' :
+      !brandEmail.trim().includes('@') ? 'Indica el correu de la marca' : null;
+
+    const allOk = clientOk && eventOk && packOk;
+
+    return { clientOk, clientWarn, eventOk, eventWarn, packOk, packWarn, brandOk, brandWarn, allOk };
+  }, [customerId, clientName, eventDate, guests, basePrice, packName, brandName, brandEmail]);
 
   function reloadPackValues(nextPackId: string, nextService?: ServiceSlug) {
     const service = nextService || eventType;
@@ -1069,7 +1142,7 @@ export default function PresupuestoPdfStudio({
             <select className={inputClass} value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
               <option value="ca">Català</option>
               <option value="es">Castellà</option>
-              <option value="en">English</option>
+              <option value="en">Anglès</option>
             </select>
             <span className="mt-1 block text-xs">
               Aquest idioma s&apos;aplica directament al PDF i a l&apos;enviament.
@@ -1125,8 +1198,85 @@ export default function PresupuestoPdfStudio({
           </div>
         </div>
 
-        <div className="rounded-2xl border p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide">Client i esdeveniment</p>
+        <div className={`rounded-2xl border p-4 ${sectionStatus.clientOk ? 'border-emerald-500/30' : sectionStatus.clientWarn ? 'border-amber-500/30' : ''}`}>
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <p className="text-xs font-semibold uppercase tracking-wide">Client i esdeveniment</p>
+              {sectionStatus.clientOk ? (
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>
+              ) : sectionStatus.clientWarn ? (
+                <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.clientWarn}</span>
+              ) : null}
+            </div>
+            {!isCustomerScoped && (
+              <button
+                type="button"
+                onClick={() => setShowCustomerPicker(!showCustomerPicker)}
+                className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-white/5"
+              >
+                + Cercar client
+              </button>
+            )}
+            {isCustomerScoped && !initialCustomerId && (
+              <button
+                type="button"
+                onClick={clearSelectedCustomer}
+                className="rounded-lg border px-3 py-1.5 text-xs transition-colors hover:bg-white/5"
+              >
+                Canviar client
+              </button>
+            )}
+          </div>
+
+          {/* Customer search dropdown */}
+          {showCustomerPicker && (
+            <div className="mb-4 rounded-xl border p-3">
+              <input
+                className={inputClass}
+                placeholder="Cerca per nom, email o telèfon..."
+                value={customerSearch}
+                onChange={(e) => setCustomerSearch(e.target.value)}
+                autoFocus
+              />
+              {searchingCustomers && <p className="mt-2 text-xs">Cercant...</p>}
+              {customerResults.length > 0 && (
+                <div className="mt-2 max-h-48 space-y-1 overflow-y-auto">
+                  {customerResults
+                    .filter((c) => c.id !== customerId)
+                    .map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => selectCustomer(c)}
+                        className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-colors hover:bg-white/5"
+                      >
+                        <div>
+                          <span className="font-medium">{c.name}</span>
+                          <span className="ml-2 text-xs opacity-60">{c.email}</span>
+                        </div>
+                        {c.phone && <span className="text-xs opacity-50">{c.phone}</span>}
+                      </button>
+                    ))}
+                  {customerResults.length > 0 && customerResults.every((c) => c.id === customerId) && (
+                    <p className="py-2 text-center text-xs opacity-60">Client ja seleccionat</p>
+                  )}
+                </div>
+              )}
+              {customerSearch.trim().length >= 2 && !searchingCustomers && customerResults.length === 0 && (
+                <p className="mt-2 text-xs opacity-60">Cap resultat trobat</p>
+              )}
+            </div>
+          )}
+
+          {/* Selected customer badge */}
+          {isCustomerScoped && (
+            <div className="mb-3 flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-sm">
+              <span className="text-emerald-400">&#10003;</span>
+              <span className="font-medium">{clientName}</span>
+              <span className="text-xs opacity-60">{clientEmail}</span>
+            </div>
+          )}
+
           <div className="grid gap-4 md:grid-cols-2">
           <label className="text-sm md:col-span-2">
             Logotip (PNG/JPG)
@@ -1175,6 +1325,14 @@ export default function PresupuestoPdfStudio({
               readOnly={isCustomerScoped}
             />
           </label>
+          <div className="md:col-span-2 mt-2 flex items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wide">Esdeveniment</span>
+            {sectionStatus.eventOk ? (
+              <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>
+            ) : sectionStatus.eventWarn ? (
+              <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.eventWarn}</span>
+            ) : null}
+          </div>
           <label className="text-sm">
             Data de l'esdeveniment
             <input className={inputClass} type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
@@ -1207,8 +1365,15 @@ export default function PresupuestoPdfStudio({
           </div>
         </div>
 
-        <div className="rounded-2xl border p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide">Marca i identitat</p>
+        <div className={`rounded-2xl border p-4 ${sectionStatus.brandOk ? 'border-emerald-500/30' : sectionStatus.brandWarn ? 'border-amber-500/30' : ''}`}>
+          <div className="mb-3 flex items-center gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide">Marca i identitat</p>
+            {sectionStatus.brandOk ? (
+              <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>
+            ) : sectionStatus.brandWarn ? (
+              <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.brandWarn}</span>
+            ) : null}
+          </div>
           <div className="grid gap-4 md:grid-cols-2">
           <label className="text-sm">
             Marca / Empresa
@@ -1258,8 +1423,15 @@ export default function PresupuestoPdfStudio({
           </div>
         </div>
 
-        <div className="rounded-2xl border p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide">Pack i condicions</p>
+        <div className={`rounded-2xl border p-4 ${sectionStatus.packOk ? 'border-emerald-500/30' : sectionStatus.packWarn ? 'border-amber-500/30' : ''}`}>
+          <div className="mb-3 flex items-center gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide">Pack i condicions</p>
+            {sectionStatus.packOk ? (
+              <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">OK</span>
+            ) : sectionStatus.packWarn ? (
+              <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400">{sectionStatus.packWarn}</span>
+            ) : null}
+          </div>
           <div className="grid gap-4 md:grid-cols-3">
           <label className="text-sm md:col-span-2">
             Nom visible del pack
@@ -1393,7 +1565,22 @@ export default function PresupuestoPdfStudio({
           )}
         </div>
 
-        <div className="admin-quote-actions flex flex-wrap items-center gap-3 rounded-xl border p-3">
+        <div className={`admin-quote-actions rounded-xl border p-3 ${sectionStatus.allOk ? 'border-emerald-500/30' : 'border-amber-500/30'}`}>
+          {sectionStatus.allOk ? (
+            <div className="mb-3 flex items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-400">
+              <span>&#10003;</span> Tot correcte — el pressupost està llest per generar o enviar.
+            </div>
+          ) : (
+            <div className="mb-3 rounded-lg bg-amber-500/10 px-3 py-2 text-sm text-amber-400">
+              Revisa els camps marcats abans de continuar:
+              <ul className="mt-1 list-inside list-disc text-xs">
+                {sectionStatus.clientWarn && <li>{sectionStatus.clientWarn}</li>}
+                {sectionStatus.eventWarn && <li>{sectionStatus.eventWarn}</li>}
+                {sectionStatus.packWarn && <li>{sectionStatus.packWarn}</li>}
+              </ul>
+            </div>
+          )}
+          <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={downloadPdf}
@@ -1425,8 +1612,13 @@ export default function PresupuestoPdfStudio({
           >
             Netejar esborrany
           </button>
-          {validationError && <p className="text-sm">{validationError}</p>}
-          {message && <p className="text-sm">{message}</p>}
+          </div>
+          {validationError && <p className="mt-2 text-sm text-amber-400">{validationError}</p>}
+          {message && (
+            <p className={`mt-2 text-sm ${message.includes('correctament') || message.includes('generat') || message.includes('preparat') ? 'text-emerald-400' : 'text-amber-400'}`}>
+              {message}
+            </p>
+          )}
         </div>
       </div>
 

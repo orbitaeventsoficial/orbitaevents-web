@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/app/admin/components/ToastProvider';
@@ -22,6 +22,13 @@ export default function BookingActions({
   const toast = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  useEffect(() => {
+    if (!confirmingDelete) return;
+    const t = setTimeout(() => setConfirmingDelete(false), 3000);
+    return () => clearTimeout(t);
+  }, [confirmingDelete]);
 
   const canDelete = DELETABLE_STATUSES.has(status);
   const calendarHref = eventDate
@@ -30,8 +37,8 @@ export default function BookingActions({
 
   const handleDelete = async () => {
     if (!canDelete || isDeleting) return;
-    if (!confirm('Segur que vols eliminar aquesta reserva?')) return;
-
+    if (!confirmingDelete) { setConfirmingDelete(true); return; }
+    setConfirmingDelete(false);
     setIsDeleting(true);
     try {
       const res = await fetch(`/api/admin/bookings/${id}`, { method: 'DELETE' });
@@ -111,9 +118,9 @@ export default function BookingActions({
           disabled={isDeleting}
           type="button"
           aria-busy={isDeleting}
-          className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors disabled:opacity-50"
+          className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors disabled:opacity-50 ${confirmingDelete ? 'border-rose-500 bg-rose-500/20 text-rose-300' : ''}`}
         >
-          {isDeleting ? 'Eliminant...' : 'Eliminar'}
+          {isDeleting ? 'Eliminant...' : confirmingDelete ? 'Segur?' : 'Eliminar'}
         </button>
       )}
     </div>
